@@ -9,10 +9,9 @@
 
 package net.sourceforge.waters.model.compiler.instance;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 public class IndexOutOfRangeException extends EvalException {

@@ -50,25 +50,33 @@
  */
 package org.supremica.automata;
 
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.util.Args;
-import org.supremica.automata.IO.ProjectBuildFromXML;
-import javax.swing.JOptionPane;
+import java.awt.Component;
 import java.io.File;
 import java.net.URL;
-import java.awt.Component;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyVisitor;
+import javax.swing.JOptionPane;
+
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.plain.base.DocumentElement;
-import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
+import net.sourceforge.waters.plain.base.DocumentElement;
+
+import org.supremica.automata.IO.ProjectBuildFromXML;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+
+
 /**
  * An ordered set of Automaton-objects.
  * @see Automaton
@@ -77,7 +85,9 @@ public class Automata
     extends DocumentElement
     implements AutomatonListener, Iterable<Automaton>, ProductDESProxy
 {
-    private static final String DEFAULT_NAME = "Untitled";
+	private static final long serialVersionUID = 1L;
+
+	private static final String DEFAULT_NAME = "Untitled";
     private static Logger logger = LoggerFactory.createLogger(Automata.class);
     private ArrayList<Automaton> theAutomata;
     private HashMap<String,Automaton> nameMap;
@@ -138,7 +148,8 @@ public class Automata
         shallowAutomataCopy(theProject);
     }
     
-    public Automata(File file)
+    @SuppressWarnings("deprecation")
+	public Automata(File file)
     throws Exception
     {
         this(file.toURL());
@@ -1409,7 +1420,7 @@ public class Automata
                         String message = "The automaton " + currAutomaton +
                             " does not have an initial state.\n" + "Please specify an initial state.";
                         Object[] options = { "Cancel" };
-                        int cont = JOptionPane.showOptionDialog(gui, message, "Alert",
+                        JOptionPane.showOptionDialog(gui, message, "Alert",
                             JOptionPane.OK_OPTION,
                             JOptionPane.WARNING_MESSAGE, null,
                             options, options[0]);
@@ -1439,7 +1450,7 @@ public class Automata
                         String message = "The automaton " + currAutomaton + " is of type 'Undefined'.\n" +
                             "Please specify a type.";
                         Object[] options = { "Cancel" };
-                        int cont = JOptionPane.showOptionDialog(gui, message, "Alert",
+                        JOptionPane.showOptionDialog(gui, message, "Alert",
                             JOptionPane.OK_OPTION,
                             JOptionPane.WARNING_MESSAGE, null,
                             options, options[0]);

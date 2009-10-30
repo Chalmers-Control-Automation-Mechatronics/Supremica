@@ -169,4 +169,9 @@ public final class GroupNodeElement
   private final Set<NodeProxy> mImmediateChildNodes;
   private final BoxGeometryProxy mGeometry;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -275928508278398477L;
+
 }

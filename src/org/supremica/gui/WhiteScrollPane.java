@@ -64,6 +64,8 @@ import javax.swing.*;
 public class WhiteScrollPane
     extends JScrollPane
 {
+    private static final long serialVersionUID = 1L;
+
     private void setWhite()
     {
         Utility.setupPane(this);

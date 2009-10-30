@@ -418,7 +418,8 @@ public class AutomataMinimizer
         {
             return eventsToHide;
         }
-        public boolean equals(MinimizationTask other)
+        @SuppressWarnings("unused")
+		public boolean equals(MinimizationTask other)
         {
             if (automata.equalAutomata(other.automata))
             {

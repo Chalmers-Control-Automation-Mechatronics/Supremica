@@ -29,4 +29,9 @@ public class ToolEdgeAction
 	  ControlledToolbar.Tool.EDGE);
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

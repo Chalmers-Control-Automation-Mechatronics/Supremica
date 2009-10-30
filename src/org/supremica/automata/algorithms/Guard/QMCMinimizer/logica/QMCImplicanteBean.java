@@ -106,7 +106,7 @@ public class QMCImplicanteBean implements Cloneable
      * @param terminos
      * @param cubierto
      */
-    public void marcaTerminosCubiertos(ArrayList terminos, boolean cubierto)
+    public void marcaTerminosCubiertos(ArrayList<QMCBinarioBean> terminos, boolean cubierto)
     {
         QMCBinarioBean terminoCubierto;
         int x = 0;
@@ -114,7 +114,7 @@ public class QMCImplicanteBean implements Cloneable
         {
             if(i==posicionesTerminos[x])
             {
-                terminoCubierto = (QMCBinarioBean)terminos.get(i);
+                terminoCubierto = terminos.get(i);
                 terminoCubierto.setCubierta(cubierto);
                 terminos.set(i,terminoCubierto);
                 x++;

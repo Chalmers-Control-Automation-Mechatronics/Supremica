@@ -223,4 +223,9 @@ public class IDEPropertiesAction
   private final Proxy mActionArgument;
   private final PropertiesVisitor mVisitor;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

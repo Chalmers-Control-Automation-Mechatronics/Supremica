@@ -1,15 +1,18 @@
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
-import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
+
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.gui.AutomatonViewer;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.*;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+
 
 /**
  * A new action
@@ -61,7 +64,7 @@ public class AnalyzerViewAutomatonAction
         {
             try
             {
-                AutomatonViewer viewer = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().getAutomatonViewer(currAutomaton.getName());
+                ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().getAutomatonViewer(currAutomaton.getName());
             }
             catch (Exception ex)
             {

@@ -82,8 +82,8 @@ public class WebServer
 	protected XmlRpcServer xmlrpc;
 	protected ServerSocket serverSocket;
 	protected Thread listener;
-	protected Vector accept, deny;
-	protected Stack threadpool;
+	protected Vector<AddressMatcher> accept, deny;
+	protected Stack<Runner> threadpool;
 	protected ThreadGroup runners;
 
 	// Inputs to setupServerSocket()
@@ -191,9 +191,9 @@ public class WebServer
 		this.address = addr;
 		this.port = port;
 		this.xmlrpc = xmlrpc;
-		accept = new Vector();
-		deny = new Vector();
-		threadpool = new Stack();
+		accept = new Vector<AddressMatcher>();
+		deny = new Vector<AddressMatcher>();
+		threadpool = new Stack<Runner>();
 		runners = new ThreadGroup("XML-RPC Runner");
 	}
 
@@ -326,6 +326,7 @@ public class WebServer
 	 * Adds the bundled handlers to the server.  Called by {@link
 	 * #main(String[])}.
 	 */
+	@SuppressWarnings("deprecation")
 	protected void addDefaultHandlers()
 		throws Exception
 	{
@@ -382,7 +383,6 @@ public class WebServer
 		try
 		{
 			AddressMatcher m = new AddressMatcher(address);
-
 			accept.addElement(m);
 		}
 		catch (Exception x)
@@ -433,7 +433,7 @@ public class WebServer
 
 		for (int i = 0; i < l; i++)
 		{
-			AddressMatcher match = (AddressMatcher) deny.elementAt(i);
+			AddressMatcher match = deny.elementAt(i);
 
 			if (match.matches(address))
 			{
@@ -445,7 +445,7 @@ public class WebServer
 
 		for (int i = 0; i < l; i++)
 		{
-			AddressMatcher match = (AddressMatcher) accept.elementAt(i);
+			AddressMatcher match = accept.elementAt(i);
 
 			if (match.matches(address))
 			{
@@ -624,7 +624,7 @@ public class WebServer
 	{
 		try
 		{
-			return (Runner) threadpool.pop();
+			return threadpool.pop();
 		}
 		catch (EmptyStackException empty)
 		{
@@ -777,7 +777,7 @@ public class WebServer
 					// tokenize first line of HTTP request
 					StringTokenizer tokens = new StringTokenizer(line);
 					String method = tokens.nextToken();
-					String uri = tokens.nextToken();
+					tokens.nextToken();
 					String httpVersion = tokens.nextToken();
 
 					keepAlive = XmlRpc.getKeepAlive() && HTTP_11.equals(httpVersion);

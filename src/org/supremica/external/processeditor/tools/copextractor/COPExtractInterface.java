@@ -25,7 +25,7 @@ public class COPExtractInterface extends
                                  implements 
 							         ActionListener
 {
-	
+    private static final long serialVersionUID = 1L;
 	private static final String EXIT_BUTTON_LABEL = "Done";
 	private static final String EXIT_COMMAND = "EXIT";
 	

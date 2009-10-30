@@ -10,7 +10,6 @@
 package net.sourceforge.waters.model.compiler.constraint;
 
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
-import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;

@@ -180,7 +180,7 @@ public class ErrorWindow
 		setLocationRelativeTo(owner);
 
 		final JPanel contentPane = new JPanel();
-		final Box b = new Box(BoxLayout.PAGE_AXIS);
+		new Box(BoxLayout.PAGE_AXIS);
 
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
@@ -272,9 +272,13 @@ public class ErrorWindow
 	}
 
 
-
 	//#######################################################################
 	//# Data Members
 	private boolean mIsCancelled;
+
+
+	//#######################################################################
+	//# Class Constants
+	private static final long serialVersionUID = 1L;
 
 }

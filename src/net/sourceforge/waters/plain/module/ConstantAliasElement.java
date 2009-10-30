@@ -142,4 +142,9 @@ public final class ConstantAliasElement
   //# Data Members
   private final ScopeKind mScope;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -5076731291632772769L;
+
 }

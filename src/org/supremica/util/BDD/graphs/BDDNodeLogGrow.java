@@ -6,7 +6,9 @@ import org.supremica.util.BDD.*;
 public class BDDNodeLogGrow
 	extends GrowFrame
 {
-	private BDDAutomata manager;
+    private static final long serialVersionUID = 1L;
+
+    private BDDAutomata manager;
 	private double log10 = Math.log(10);
 
 	public BDDNodeLogGrow(BDDAutomata manager, String title)

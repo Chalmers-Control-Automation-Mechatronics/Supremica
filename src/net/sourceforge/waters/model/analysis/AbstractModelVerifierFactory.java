@@ -413,6 +413,10 @@ public abstract class AbstractModelVerifierFactory
     //#######################################################################
     //# Data Members
     private final Collection<String> mUsedPropertyNames;
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
   }
 
 

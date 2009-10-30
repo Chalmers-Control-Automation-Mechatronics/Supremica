@@ -187,4 +187,9 @@ public final class GuardActionBlockElement
   private final List<BinaryExpressionProxy> mActions;
   private final LabelGeometryProxy mGeometry;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -7569059563337147911L;
+
 }

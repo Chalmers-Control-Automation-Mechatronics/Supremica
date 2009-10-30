@@ -18,7 +18,6 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -59,7 +58,6 @@ public class Projection
     int numAutomata = mModel.getAutomata().size();
     AutomatonProxy[] aut = mModel.getAutomata().toArray(new AutomatonProxy[numAutomata]);
     eventAutomaton = new int[events.length][numAutomata];
-    int stateLength = numAutomata;
     int l = 0;
     // transitions indexed first by automaton then by event then by source state
     transitions = new int[numAutomata][events.length][];
@@ -341,7 +339,8 @@ public class Projection
       return Integer.toString(mName);
     }
     
-    public boolean refequals(Object o)
+    @SuppressWarnings("unused")
+	public boolean refequals(Object o)
     {
       if (o instanceof NamedProxy) {
         return refequals((NamedProxy) o);
@@ -507,12 +506,14 @@ public class Projection
       return mMap.get(new IntArray(a));
     }
     
-    public StateProxy get(int[] a)
+    @SuppressWarnings("unused")
+	public StateProxy get(int[] a)
     {
       return mMap.get(new IntArray(a));
     }
     
-    public StateProxy put(Object o, StateProxy s)
+    @SuppressWarnings("unused")
+	public StateProxy put(Object o, StateProxy s)
     {
       return mMap.put(new IntArray((int[])o), s);
     }

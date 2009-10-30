@@ -57,9 +57,8 @@
  */
 package org.supremica.properties;
 
-import javax.swing.UIManager;
-import javax.swing.text.html.Option;
-
+import org.supremica.automata.BDD.BDDLibraryType;
+import org.supremica.automata.BDD.BDDPartitioningType;
 import org.supremica.automata.algorithms.EquivalenceRelation;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.SynthesisType;
@@ -67,9 +66,8 @@ import org.supremica.automata.algorithms.VerificationAlgorithm;
 import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
-import org.supremica.automata.BDD.BDDPartitioningType;
-import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.util.BDD.Options;
+
 
 /**
  * Configurable options. All of these are automatically added to a GUI for editing.

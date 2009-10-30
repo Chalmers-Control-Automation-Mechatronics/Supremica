@@ -12,12 +12,9 @@ public class ASH_MostCommonUncontrollableEvents
 {
 	public void choose(int queue_size)
 	{
-		int max = 0;
-
 		for (int i = 0; i < queue_size; i++)
 		{
 			BDDAutomaton automaton = list[queue[i]];
-
 			queue_costs[i] = automaton.eventOverlapCount(relevant_events);
 		}
 

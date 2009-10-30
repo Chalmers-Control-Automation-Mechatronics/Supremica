@@ -10,41 +10,31 @@
 
 package net.sourceforge.waters.analysis.composing;
 
-import java.lang.Comparable;
-import java.lang.String;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Queue;
-import java.util.PriorityQueue;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;
 
+import net.sourceforge.waters.analysis.bdd.BDDSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.analysis.bdd.BDDSafetyVerifier;
-import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
-import net.sourceforge.waters.analysis.modular.ModularLanguageInclusionChecker;
-import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
@@ -52,10 +42,10 @@ import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
+
 
 public class ComposingSafetyVerifier 
   extends AbstractModelVerifier
@@ -599,6 +589,7 @@ public class ComposingSafetyVerifier
 
   //#########################################################################
   //# Class Constants
+  @SuppressWarnings("unused")
   private static final Logger LOGGER =
     LoggerFactory.createLogger(ComposingSafetyVerifier.class);
 }

@@ -57,7 +57,9 @@ public class MultiArc
 	extends ArcSet
 	implements Comparable<MultiArc>
 {
-	private State fromState;
+    private static final long serialVersionUID = 1L;
+
+    private State fromState;
 	private State toState;
 
 	/**

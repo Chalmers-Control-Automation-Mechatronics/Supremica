@@ -53,9 +53,9 @@ import java.util.*;
 
 public class Place
 {
-	private List prevTransitions = new LinkedList();
-	private List nextTransitions = new LinkedList();
-	private List nextInhibitorTransitions = new LinkedList();
+	private List<Transition> prevTransitions = new LinkedList<Transition>();
+	private List<Transition> nextTransitions = new LinkedList<Transition>();
+	private List<Transition> nextInhibitorTransitions = new LinkedList<Transition>();
 	private String identity;
 	private int time = Integer.MIN_VALUE;
 	private int marking = 0;
@@ -116,17 +116,17 @@ public class Place
 		nextInhibitorTransitions.add(transition);
 	}
 
-	public Iterator nextTransitionIterator()
+	public Iterator<Transition> nextTransitionIterator()
 	{
 		return nextTransitions.iterator();
 	}
 
-	public Iterator nextInhibitorTransitionIterator()
+	public Iterator<Transition> nextInhibitorTransitionIterator()
 	{
 		return nextInhibitorTransitions.iterator();
 	}
 
-	public Iterator prevTransitionIterator()
+	public Iterator<Transition> prevTransitionIterator()
 	{
 		return prevTransitions.iterator();
 	}
@@ -138,11 +138,11 @@ public class Place
 		sb.append("Place: " + identity + "\n");
 		sb.append("\tPrevious transitions:\n");
 
-		Iterator transitionsIt = prevTransitions.iterator();
+		Iterator<Transition> transitionsIt = prevTransitions.iterator();
 
 		while (transitionsIt.hasNext())
 		{
-			Transition currTransition = (Transition) transitionsIt.next();
+			Transition currTransition = transitionsIt.next();
 
 			sb.append("\t\t" + currTransition.getIdentity() + "\n");
 		}
@@ -153,7 +153,7 @@ public class Place
 
 		while (transitionsIt.hasNext())
 		{
-			Transition currTransition = (Transition) transitionsIt.next();
+			Transition currTransition = transitionsIt.next();
 
 			sb.append("\t\t" + currTransition.getIdentity() + "\n");
 		}

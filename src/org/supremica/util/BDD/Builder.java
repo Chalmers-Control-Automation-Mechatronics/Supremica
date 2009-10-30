@@ -5,6 +5,7 @@ import org.supremica.automata.*;
 
 public class Builder
 {
+	@SuppressWarnings("unused")
 	private org.supremica.automata.Automata s_automata;
 	private Automata automata;
 	private BDDAutomata bddautomata = null;

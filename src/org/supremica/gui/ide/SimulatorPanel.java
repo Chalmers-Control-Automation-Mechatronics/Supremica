@@ -7,12 +7,10 @@ class SimulatorPanel
 {
     private static final long serialVersionUID = 1L;
     
-    private DocumentContainer documentContainer;
     private String name;
     
     SimulatorPanel(DocumentContainer moduleContainer, String name)
     {
-        this.documentContainer = moduleContainer;
         this.name = name;
     }
     

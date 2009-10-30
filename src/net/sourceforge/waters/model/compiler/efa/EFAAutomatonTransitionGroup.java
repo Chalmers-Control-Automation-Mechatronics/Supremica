@@ -17,9 +17,7 @@ import java.util.Map;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 /**

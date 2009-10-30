@@ -26,12 +26,16 @@ import com.objectspace.jgl.Tree;
 public class MultiSet
     extends OrderedSet
 {
+    private static final long serialVersionUID = 1L;
+
     static class ComparatorWrapper
         implements BinaryPredicate
     {
-        Comparator comparator;
+        private static final long serialVersionUID = 1L;
+
+        Comparator<Object> comparator;
         
-        ComparatorWrapper(Comparator comparator)
+        ComparatorWrapper(Comparator<Object> comparator)
         {
             this.comparator = comparator;
         }
@@ -47,7 +51,7 @@ public class MultiSet
         super(true);
     }
     
-    public MultiSet(Comparator comp)
+    public MultiSet(Comparator<Object> comp)
     {
         super(new ComparatorWrapper(comp), true);
     }

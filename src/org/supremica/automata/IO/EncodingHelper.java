@@ -53,6 +53,7 @@ import org.supremica.log.*;
 
 public class EncodingHelper
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(EncodingHelper.class);
 
 	private EncodingHelper() {}

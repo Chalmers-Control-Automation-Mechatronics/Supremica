@@ -50,4 +50,9 @@ public class NewAction
         manager.newModuleContainer();
     }
 
+
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
 }

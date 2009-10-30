@@ -53,15 +53,15 @@ import java.util.*;
 
 public class Signals
 {
-	private Map labelToSignalMap = new TreeMap();
+	private Map<String, Signal> labelToSignalMap = new TreeMap<String, Signal>();
 
 	public Signals() {}
 
 	public Signals(Signals other)
 	{
-		for (Iterator signalIt = other.iterator(); signalIt.hasNext(); )
+		for (Iterator<Signal> signalIt = other.iterator(); signalIt.hasNext(); )
 		{
-			Signal currSignal = (Signal) signalIt.next();
+			Signal currSignal = signalIt.next();
 
 			addSignal(new Signal(currSignal));
 		}
@@ -69,9 +69,9 @@ public class Signals
 
 	public void addSignals(Signals other)
 	{
-		for (Iterator signalIt = other.iterator(); signalIt.hasNext(); )
+		for (Iterator<Signal> signalIt = other.iterator(); signalIt.hasNext(); )
 		{
-			Signal currSignal = (Signal) signalIt.next();
+			Signal currSignal = signalIt.next();
 
 			addSignal(new Signal(currSignal));
 		}
@@ -100,10 +100,10 @@ public class Signals
 
 	public Signal getSignal(String label)
 	{
-		return (Signal) labelToSignalMap.get(label);
+		return labelToSignalMap.get(label);
 	}
 
-	public Iterator iterator()
+	public Iterator<Signal> iterator()
 	{
 		return labelToSignalMap.values().iterator();
 	}

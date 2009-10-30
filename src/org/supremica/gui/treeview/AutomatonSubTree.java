@@ -12,6 +12,8 @@ import org.supremica.gui.Supremica;
 public class AutomatonSubTree
     extends SupremicaTreeNode
 {
+    private static final long serialVersionUID = 1L;
+
     private static ImageIcon plantIcon = new ImageIcon(Supremica.class.getResource("/icons/waters/plant.gif"));
     private static ImageIcon specificationIcon = new ImageIcon(Supremica.class.getResource("/icons/waters/spec.gif"));
     private static ImageIcon supervisorIcon = new ImageIcon(Supremica.class.getResource("/icons/waters/supervisor.gif"));

@@ -48,29 +48,46 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.util.SupremicaException;
-import org.supremica.util.*;
-import org.supremica.gui.*;
-import org.supremica.log.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import net.sourceforge.waters.model.base.ItemNotFoundException;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+
 import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexForm;
 import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.AutomataIndexMap;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
-
-import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.base.ListSubject;
-import net.sourceforge.waters.subject.module.*;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.des.*;
-import net.sourceforge.waters.model.base.ItemNotFoundException;
-import org.supremica.automata.Arc;
+import org.supremica.automata.State;
+import org.supremica.gui.ExecutionDialog;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.util.IntArrayHashTable;
+import org.supremica.util.IntArrayList;
+import org.supremica.util.SupremicaException;
 
 //import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
 
@@ -142,7 +159,8 @@ public class AutomataSynchronizerHelper
         this(theAutomata,syncOptions,null,null);
     }
 
-    public AutomataSynchronizerHelper(Automata theAutomata, SynchronizationOptions syncOptions, HashMap<Arc,EdgeSubject>[] arc2EdgeTable, HashMap<String,Integer> autName2indexTable)
+    @SuppressWarnings("deprecation")
+	public AutomataSynchronizerHelper(Automata theAutomata, SynchronizationOptions syncOptions, HashMap<Arc,EdgeSubject>[] arc2EdgeTable, HashMap<String,Integer> autName2indexTable)
     {
         if(syncOptions.getEFAMode())
         {
@@ -693,8 +711,6 @@ public class AutomataSynchronizerHelper
     public void displayTrace()
     throws Exception
     {
-        Alphabet unionAlphabet = theAutomaton.getAlphabet();
-        
         // We have to have an executer for finding the transitions
         clear();
         
@@ -767,8 +783,6 @@ public class AutomataSynchronizerHelper
      */
     public String displayTrace(int[] currState)
     {
-        Alphabet unionAlphabet = theAutomaton.getAlphabet();
-        
         // AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
         AutomataSynchronizerExecuter executer = new AutomataSynchronizerExecuter(this);
         
@@ -1009,16 +1023,15 @@ public class AutomataSynchronizerHelper
     {
         final String name = state.getName();
         final boolean initial = state.isInitial();
-        final Collection<EventProxy> props = state.getPropositions();
-
         final Collection<SimpleIdentifierProxy> idents = new TreeSet<SimpleIdentifierProxy>();
-/*        for (final EventProxy prop : props)
-        {
+        /*
+        final Collection<EventProxy> props = state.getPropositions();
+        for (final EventProxy prop : props) {
           checkEvent(prop);
           final SimpleIdentifierProxy ident = importEvent(prop);
           idents.add(ident);
         }
- */
+        */
         final PlainEventListProxy list = mFactory.createPlainEventListProxy(idents);
         return mFactory.createSimpleNodeProxy(name, list, initial, null, null, null);
     }
@@ -1047,7 +1060,8 @@ public class AutomataSynchronizerHelper
         return (EdgeSubject)edge;
     }
 
-    private void checkEvent(final EventProxy event)
+    @SuppressWarnings("unused")
+	private void checkEvent(final EventProxy event)
     {
         if (mCurrentEvents.contains(event))
         {

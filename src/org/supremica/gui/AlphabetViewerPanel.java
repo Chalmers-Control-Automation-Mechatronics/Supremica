@@ -69,10 +69,14 @@ public class AlphabetViewerPanel
 // implements AutomatonListener // to what are we to listen?
 {
 	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(AlphabetViewerPanel.class);
 	private Automata theAutomata;
+	@SuppressWarnings("unused")
 	private Alphabet theAlphabet;
+	@SuppressWarnings("unused")
 	private boolean showId = false;
+	@SuppressWarnings("unused")
 	private boolean updateNeeded = false;
 	private JTree theTree = new JTree();
 	private JScrollPane scrollPanel = new JScrollPane(theTree);

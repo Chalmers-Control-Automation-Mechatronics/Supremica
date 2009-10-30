@@ -11,7 +11,9 @@ import org.supremica.gui.ActionMan;
 public class SynthesizeAction
 	extends AbstractAction
 {
-	public SynthesizeAction()
+    private static final long serialVersionUID = 1L;
+
+    public SynthesizeAction()
 	{
 		super("Synthesize...", null);
 

@@ -9,15 +9,12 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +31,6 @@ import net.sourceforge.waters.gui.command.UpdateCommand;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
-
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -50,8 +46,6 @@ import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
-
-import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.IndexedHashSetSubject;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
@@ -70,10 +64,8 @@ import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
-import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
-
 import net.sourceforge.waters.xsd.module.SplineKind;
 
 
@@ -892,7 +884,6 @@ class EditorGraph
     //# Editing
     public void update()
     {
-      mIsUpdating = true;
       final Point2D newpos = getNodeSubject().getPointGeometry().getPoint();
       if (!mPoint.equals(newpos)) {
         for (final EdgeSubject edge : getEdges()) {
@@ -900,7 +891,6 @@ class EditorGraph
         }
         mPoint = newpos;
       }
-      mIsUpdating = false;
     }           
 
     //#######################################################################
@@ -1008,13 +998,6 @@ class EditorGraph
     ProxySubject getFake()
     {
       return mFake;
-    }
-
-    void setFake(final ProxySubject fake)
-    {
-      mFakeMap.remove(mFake);
-      mFake = fake;
-      mFakeMap.put(mFake, this);
     }
 
     int getChangeKind()
@@ -1845,9 +1828,7 @@ class EditorGraph
   private final OriginalGetterVisitor mOriginalGetter;
   private final ChangeRecordCreatorVisitor mChangeRecordCreator;
 
-  private boolean mIsUpdating = false;
-
-
+  
   //#########################################################################
   //# Class Constants
   private static final int PASS0_UNLINK = 0;
@@ -1855,7 +1836,9 @@ class EditorGraph
   private static final int PASS2_ADD = 2;
   private static final int PASS3_RELINK = 3;
 
+  @SuppressWarnings("unused")
   private static final int FIRST_PASS = PASS0_UNLINK;
+  @SuppressWarnings("unused")
   private static final int LAST_PASS = PASS3_RELINK;
 
   private static final LabelGeometrySubject DEFAULT_LABELBLOCK_GEO =

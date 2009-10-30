@@ -1,13 +1,12 @@
 package org.supremica.external.avocades.specificationsynthesis;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.DOMException;
-import javax.swing.JTree;
+import java.util.Vector;
 
-// For creating a TreeModel
-import javax.swing.tree.*;
-import javax.swing.event.*;
-import java.util.*;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreePath;
+
+import org.w3c.dom.Document;
+
 
     // This adapter converts the current Document (a DOM) into a JTree model.
     public class Dom implements javax.swing.tree.TreeModel {
@@ -51,7 +50,7 @@ import java.util.*;
 
 		public void valueForPathChanged(TreePath path, Object newValue) {}
 
-      private Vector listenerList = new Vector();
+      private Vector<TreeModelListener> listenerList = new Vector<TreeModelListener>();
 
       public void addTreeModelListener(TreeModelListener listener) {
         if ( listener != null

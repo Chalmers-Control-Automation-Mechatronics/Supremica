@@ -11,7 +11,9 @@ import javax.swing.*;
 public class SupremicaMenuItem
 	extends JMenuItem
 {
-	public SupremicaMenuItem(Action action)
+    private static final long serialVersionUID = 1L;
+
+    public SupremicaMenuItem(Action action)
 	{
 		super(action);
 	}

@@ -14,6 +14,8 @@ import org.supremica.gui.Utility;
 public class DigitalIODisplayView
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
+
 	private static JCheckBox[] cbSignalsIn;
 	private static JCheckBox[] cbSignalsOut;
 	private static DigitalIODriver driver;
@@ -25,7 +27,6 @@ public class DigitalIODisplayView
 		throws Exception
 	{
 		int i;
-		JPanel buttonPanel;
 		JPanel signalPanelIn;
 		JPanel signalPanelOut;
 		JPanel signalPanel;
@@ -33,13 +34,10 @@ public class DigitalIODisplayView
 		JPanel south;
 		JScrollPane signalPanelScroller;
 		Container contentPane;
-		GridLayout gridLayout = new GridLayout();
 		JLabel descUt = new JLabel(" Out               ");
 		JLabel descIn = new JLabel("       In ");
 		String[] inputDescriptions;
 		String[] outputDescriptions;
-		GridBagLayout gridbag = new GridBagLayout();
-		GridBagConstraints c = new GridBagConstraints();
 		JButton updateButton = new JButton("Update");
 		Class IOClass;
 
@@ -50,7 +48,6 @@ public class DigitalIODisplayView
 		JMenu jMenuHelp = new JMenu();
 		JMenuItem jMenuHelpAbout = new JMenuItem();
 
-		buttonPanel = new JPanel();
 		signalPanelIn = new JPanel();
 		signalPanelOut = new JPanel();
 		signalPanel = new JPanel();

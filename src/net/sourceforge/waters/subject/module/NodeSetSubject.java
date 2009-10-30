@@ -402,6 +402,7 @@ class NodeSetSubject
     }
   }
 
+  @SuppressWarnings("unused")
   private void insertPreOrderedNode(final NodeSubject node)
   {
     final String name = node.getName();

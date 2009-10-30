@@ -109,4 +109,9 @@ public abstract class WatersGraphAction
     return gui == null ? null : gui.getEventPanel();
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

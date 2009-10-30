@@ -106,4 +106,9 @@ public abstract class EventListExpressionElement
   //# Data Members
   private final List<Proxy> mEventList;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -9006351211108790339L;
+
 }

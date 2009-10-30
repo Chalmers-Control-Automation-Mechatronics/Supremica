@@ -313,4 +313,9 @@ public class IndexedTreeSet<P extends NamedProxy>
    */
   private Map<String,P> mProxyMap;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

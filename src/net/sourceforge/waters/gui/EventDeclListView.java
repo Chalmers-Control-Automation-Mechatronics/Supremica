@@ -19,8 +19,6 @@ import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.InvalidDnDOperationException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
@@ -33,11 +31,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import javax.swing.Action;
 import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -312,6 +308,7 @@ public class EventDeclListView
     return transferable.isDataFlavorSupported(WatersDataFlavor.EVENTDECL_LIST);
   }
 
+  @SuppressWarnings("unchecked")
   public List<InsertInfo> getInsertInfo(Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
@@ -478,6 +475,7 @@ public class EventDeclListView
 
   //#########################################################################
   //# Commands
+  @SuppressWarnings("unused")
   private void doSetEventsKind(final Iterable<EventDeclSubject> decls,
                                final EventKind kind)
   {
@@ -496,6 +494,7 @@ public class EventDeclListView
     }
   }
 
+  @SuppressWarnings("unused")
   private void doSetEventsObservable(final Iterable<EventDeclSubject> decls,
                                      final boolean observable)
   {
@@ -518,6 +517,7 @@ public class EventDeclListView
 
   //#########################################################################
   //# Auxiliary Methods
+  @SuppressWarnings("unused")
   private EventDeclSubject getClickedItem(final MouseEvent event)
   {
     final Point point = event.getPoint();
@@ -538,6 +538,7 @@ public class EventDeclListView
 
   //#########################################################################
   //# Inner Class EventDeclPopup
+  /*
   private class EventDeclPopup extends JPopupMenu
   {
     //#######################################################################
@@ -640,7 +641,7 @@ public class EventDeclListView
       return buffer.toString();
     }
   }
-
+  */
 
   //#########################################################################
   //# Inner Class EventDeclMouseListener
@@ -702,5 +703,10 @@ public class EventDeclListView
   private final EventDeclDeleteVisitor mDeleteVisitor;
 
   private List<Observer> mObservers;
+
+  
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

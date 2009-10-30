@@ -1,6 +1,5 @@
 package org.supremica.util;
 
-import java.io.IOException;
 import org.supremica.log.*;
 import java.lang.reflect.Method;
 import javax.swing.JOptionPane;
@@ -26,6 +25,7 @@ import javax.swing.JOptionPane;
 */
 public class BrowserControl
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(BrowserControl.class);
   	private static final String errMsg = "Error attempting to launch web browser";
 	/**
@@ -42,7 +42,7 @@ public class BrowserControl
 		{
 			if (osName.startsWith("Mac OS")) 
 			{
-				Class fileMgr = Class.forName("com.apple.eio.FileManager");
+				Class<?> fileMgr = Class.forName("com.apple.eio.FileManager");
 				Method openURL = fileMgr.getDeclaredMethod("openURL", new Class[] {String.class});
 				openURL.invoke(null, new Object[] {url});
 			}

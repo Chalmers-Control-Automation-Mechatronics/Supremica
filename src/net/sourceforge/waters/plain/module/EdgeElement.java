@@ -232,4 +232,9 @@ public final class EdgeElement
   private final PointGeometryProxy mStartPoint;
   private final PointGeometryProxy mEndPoint;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -1027597141812990415L;
+
 }

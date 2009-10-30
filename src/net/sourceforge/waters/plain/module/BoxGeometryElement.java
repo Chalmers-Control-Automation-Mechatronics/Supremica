@@ -102,4 +102,9 @@ public final class BoxGeometryElement
   //# Data Members
   private final Rectangle2D mRectangle;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -1185257531858117071L;
+
 }

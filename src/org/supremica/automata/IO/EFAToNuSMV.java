@@ -349,7 +349,8 @@ public class EFAToNuSMV {
     private static String nextEquals(String variable, String expression){
         return exprEquals("next(" + variable +")", expression); 
     }
-    private static String stmtNextAssign(String v, String e){
+    @SuppressWarnings("unused")
+	private static String stmtNextAssign(String v, String e){
         return declVar("next(" + v + ")", e);
     }  
     
@@ -405,7 +406,8 @@ public class EFAToNuSMV {
         );
     }
     
-    private Collection<String> edgeElements(EdgeProxy edge, SimpleComponentProxy sc){
+    @SuppressWarnings("unused")
+	private Collection<String> edgeElements(EdgeProxy edge, SimpleComponentProxy sc){
         Collection<String> elems = new ArrayList<String>();
         elems.add(exprEquals(varName(sc), valueName(edge.getSource())));
         elems.add(disjunctionOfEnabledEvents(edge));
@@ -422,7 +424,8 @@ public class EFAToNuSMV {
         return elems;
     }
     
-    private String getPropositionAsSelfLoop(SimpleComponentProxy sc, NodeProxy n, SimpleIdentifierProxy idf){
+    @SuppressWarnings("unused")
+	private String getPropositionAsSelfLoop(SimpleComponentProxy sc, NodeProxy n, SimpleIdentifierProxy idf){
         return conjunction(Arrays.asList(
                 exprEquals(varName(sc), valueName(n))
                 , nextEquals(varName(sc), valueName(n))
@@ -430,7 +433,8 @@ public class EFAToNuSMV {
                 ));
     }
     
-    private Collection<EventDeclProxy> filterPropositions(Collection<EventDeclProxy> evs){
+    @SuppressWarnings("unused")
+	private Collection<EventDeclProxy> filterPropositions(Collection<EventDeclProxy> evs){
         return filter(new Filter<EventDeclProxy>() {
             public Boolean f(EventDeclProxy value) {
                 return value.getKind()==EventKind.PROPOSITION;

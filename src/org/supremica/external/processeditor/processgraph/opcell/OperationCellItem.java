@@ -1,17 +1,21 @@
 package org.supremica.external.processeditor.processgraph.opcell;
 
-import java.lang.*;
-import java.awt.*;
-import java.awt.geom.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-import org.supremica.external.processeditor.xml.*;
-import org.supremica.manufacturingTables.xsd.processeditor.*;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
+
+import org.supremica.external.processeditor.xml.Converter;
 import org.supremica.manufacturingTables.xsd.processeditor.Activity;
 import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
 import org.supremica.manufacturingTables.xsd.processeditor.Relation;
+
 
 /**
  * Represents the operation cell.
@@ -20,7 +24,9 @@ public class OperationCellItem extends JPanel implements MouseListener,
 							 							 AttributeListener
 							
 {
-    public static int mainTextMargin = 20;
+	private static final long serialVersionUID = 1L;
+	
+	public static int mainTextMargin = 20;
     public static int exPanelSizeX = 10;    
 
     AttributeListener myListener = null;
@@ -29,7 +35,8 @@ public class OperationCellItem extends JPanel implements MouseListener,
     private boolean extended;
        
     public JPanel mainPanel, exPanel;       
-    private JLabel opName,namePlace,expand = new JLabel(">>"),attName;  
+    @SuppressWarnings("unused")
+	private JLabel opName,namePlace,expand = new JLabel(">>"),attName;  
     private Object complexFunction = null;
 
     private ObjectFactory objectFactory = new ObjectFactory();
@@ -376,7 +383,9 @@ public class OperationCellItem extends JPanel implements MouseListener,
      */
     class ExtensionCell extends JPanel 
     {
-	RowPainter[] rows = new RowPainter[0];
+        private static final long serialVersionUID = 1L;
+
+        RowPainter[] rows = new RowPainter[0];
 	/**
 	 * Creates a new instance of this class that will be associated with 
 	 * the specified object.

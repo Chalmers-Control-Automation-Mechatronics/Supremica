@@ -18,6 +18,8 @@ import net.sourceforge.waters.subject.base.DocumentSubject;
 class CommentPanel
     extends JPanel
 {
+    private static final long serialVersionUID = 1L;
+
     public CommentPanel(final DocumentSubject document)
     {
         super();

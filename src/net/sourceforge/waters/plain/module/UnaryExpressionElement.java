@@ -153,4 +153,9 @@ public final class UnaryExpressionElement
   private final UnaryOperator mOperator;
   private final SimpleExpressionProxy mSubTerm;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -2070705990300031057L;
+
 }

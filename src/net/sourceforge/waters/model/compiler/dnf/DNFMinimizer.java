@@ -350,7 +350,8 @@ public class DNFMinimizer {
       originalTermList = null;
     }
                 
-    Formula read(Reader reader) throws IOException
+    @SuppressWarnings("unused")
+	Formula read(Reader reader) throws IOException
     {
       ArrayList<Term> terms = new ArrayList<Term>();
       Term term = new Term(null);

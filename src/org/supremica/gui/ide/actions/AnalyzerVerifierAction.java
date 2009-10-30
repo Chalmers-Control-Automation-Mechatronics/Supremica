@@ -19,7 +19,8 @@ public class AnalyzerVerifierAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    @SuppressWarnings("unused")
+	private Logger logger = LoggerFactory.createLogger(IDE.class);
     
     public AnalyzerVerifierAction(List<IDEAction> actionList)
     {
@@ -64,8 +65,8 @@ public class AnalyzerVerifierAction
         SynchronizationOptions sOptions = SynchronizationOptions.getDefaultVerificationOptions();
         
         // Work!
-        AutomataVerificationWorker worker = new AutomataVerificationWorker(ide.getIDE(), selectedAutomata,
-            vOptions, sOptions, mOptions);
+        new AutomataVerificationWorker(ide.getIDE(), selectedAutomata,
+        							   vOptions, sOptions, mOptions);
     }
     
 }

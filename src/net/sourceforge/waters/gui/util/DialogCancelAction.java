@@ -87,4 +87,9 @@ public class DialogCancelAction
   //# Data Members
   private static final Action INSTANCE = new DialogCancelAction();
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

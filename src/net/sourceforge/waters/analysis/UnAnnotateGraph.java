@@ -1,26 +1,27 @@
 package net.sourceforge.waters.analysis;
 
+import gnu.trove.THashMap;
+import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
-import gnu.trove.TIntStack;
+import gnu.trove.TIntObjectHashMap;
+import gnu.trove.TIntObjectIterator;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import gnu.trove.TIntArrayList;
-import java.util.Set;
-import gnu.trove.THashSet;
-import net.sourceforge.waters.model.des.AutomatonProxy;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import gnu.trove.THashMap;
-import net.sourceforge.waters.model.des.TransitionProxy;
+import java.util.Set;
+
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
-import java.util.List;
-import gnu.trove.TIntObjectHashMap;
-import net.sourceforge.waters.model.des.EventProxy;
-import java.util.Collections;
-import gnu.trove.TIntObjectIterator;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
 
 public class UnAnnotateGraph
 {
@@ -228,7 +229,6 @@ public class UnAnnotateGraph
       int ot = t[2];
       StateProxy source = nextStates.get(s);
       EventProxy event = mTransitionRelation.getEvent(e);
-      TIntArrayList targets = newStates.get(ot);
       /*for (int ti = 0; ti < targets.size(); ti++) {
         int ta = targets.get(ti);
         StateProxy target = nextStates.get(ta);

@@ -18,7 +18,7 @@ public class JumpController
 	/**
 	 * Hashtable containing jumpinformation
 	 */
-	Hashtable table = new Hashtable();
+	Hashtable<String, JumpsAndTargetHolder> table = new Hashtable<String, JumpsAndTargetHolder>();
 
 	/**
 	 * adds a new target instruction corresponding to a specific label
@@ -29,7 +29,7 @@ public class JumpController
 	{
 		if (table.containsKey(label))
 		{
-			((JumpsAndTargetHolder) table.get(label)).addTarget(target);
+			table.get(label).addTarget(target);
 		}
 		else
 		{
@@ -49,7 +49,7 @@ public class JumpController
 	{
 		if (table.containsKey(label))
 		{
-			((JumpsAndTargetHolder) table.get(label)).addJump(jump);
+			table.get(label).addJump(jump);
 		}
 		else
 		{
@@ -68,7 +68,7 @@ public class JumpController
 class JumpsAndTargetHolder
 {
 	private InstructionHandle trget = null;
-	private List jumps = new LinkedList();
+	private List<BranchHandle> jumps = new LinkedList<BranchHandle>();
 
 	/**
 	 * adds a target
@@ -85,9 +85,9 @@ class JumpsAndTargetHolder
 			trget = target;
 
 			// System.err.println(trget);
-			for (Iterator i = jumps.iterator(); i.hasNext(); )
+			for (Iterator<BranchHandle> i = jumps.iterator(); i.hasNext(); )
 			{
-				((BranchHandle) i.next()).setTarget(trget);
+				i.next().setTarget(trget);
 			}
 		}
 	}

@@ -68,6 +68,7 @@ public class RemovePassEvent
 	 *@param  theAutomaton Description of the Parameter
 	 *@exception  Exception Description of the Exception
 	 */
+	@SuppressWarnings("deprecation")
 	public static void execute(Automaton theAutomaton)
 		throws Exception
 	{
@@ -109,6 +110,7 @@ public class RemovePassEvent
 
 							// Arc newArc = new Arc(currState, nextToState, nextEventId);
 							// WARNING, Red Flag, may be broken...
+							@SuppressWarnings("unused")
 							Arc newArc = new Arc(currState, nextToState, nextEvent);
 						}
 					}

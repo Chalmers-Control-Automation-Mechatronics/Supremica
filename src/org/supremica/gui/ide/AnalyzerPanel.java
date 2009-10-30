@@ -11,18 +11,20 @@ package org.supremica.gui.ide;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.automata.Project;
+import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.ide.actions.Actions;
 
@@ -66,7 +68,9 @@ public class AnalyzerPanel
         this.getActionMap().put("SelectAll",
             new AbstractAction()
         {
-            public void actionPerformed(ActionEvent e)
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent e)
             {
                 automataPanel.selectAllAutomata();
             }

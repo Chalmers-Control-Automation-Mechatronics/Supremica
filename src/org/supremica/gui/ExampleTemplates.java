@@ -74,7 +74,7 @@ public class ExampleTemplates
     
     //private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
     private static final String basePrefix = "/includeInJarFile";
-    private List allGroups = new LinkedList();
+    private List<TemplateGroup> allGroups = new LinkedList<TemplateGroup>();
     
     private ExampleTemplates()
     {
@@ -160,7 +160,8 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Communication Channel", prefix + "CommunicationChannel.xml"));
     }
     
-    private void initializeDESCourseAssignmentSolutions()
+    @SuppressWarnings("unused")
+	private void initializeDESCourseAssignmentSolutions()
     {
         TemplateGroup thisGroup = DESCourseAssignmentSolutions;
         
@@ -385,7 +386,7 @@ public class ExampleTemplates
         return templates;
     }
     
-    public Iterator iterator()
+    public Iterator<TemplateGroup> iterator()
     {
         return allGroups.iterator();
     }

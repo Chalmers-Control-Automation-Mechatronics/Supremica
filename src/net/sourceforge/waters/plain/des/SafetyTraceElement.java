@@ -138,4 +138,9 @@ public final class SafetyTraceElement
     return SafetyTraceProxy.class;
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

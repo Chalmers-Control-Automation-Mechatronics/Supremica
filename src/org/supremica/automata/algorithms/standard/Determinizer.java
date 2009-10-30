@@ -25,14 +25,17 @@ public class Determinizer
     private EpsilonTester epsilonTester = null;
     private StateSets openStateSets = new StateSets();
     private StateSets closedStateSets = new StateSets();
-    private StateSet openStates = new StateSet();
-    private StateSet closedStates = new StateSet();
+    @SuppressWarnings("unused")
+	private StateSet openStates = new StateSet();
+    @SuppressWarnings("unused")
+	private StateSet closedStates = new StateSet();
     private boolean checkControlInconsistencies = false;
     private boolean resolveControlInconsistencies = false;
     private boolean isControlInconsistent = false;
     
     // Debug stuff
-    private int tabs = 0;    // keeps track on num tabs to insert, for formatting output
+    @SuppressWarnings("unused")
+	private int tabs = 0;    // keeps track on num tabs to insert, for formatting output
     
     /**
      * For this automaton, determinize with respect to the events marked as isEpsilon()
@@ -214,7 +217,8 @@ public class Determinizer
         return newAutomaton;
     }
     
-    private Automaton createNewAutomaton()
+    @SuppressWarnings("deprecation")
+	private Automaton createNewAutomaton()
     {
         Automaton aut = new Automaton();
         aut.setType(automaton.getType());
@@ -286,7 +290,8 @@ public class Determinizer
     
     // For this state, calc the states reached in one step on the given events
     // Note that the original state is _not_necessarily_ included (no implicit selfloops, that is)
-    private StateSet eventTransition(State state, Alphabet alpha)
+    @SuppressWarnings("unused")
+	private StateSet eventTransition(State state, Alphabet alpha)
     {
         debugPrint("(evTSA) eventTransition(" + state.getName() + ", " + alpha.toString() + ")", true);
         
@@ -571,13 +576,6 @@ public class Determinizer
             logger.error(excp);
             logger.debug(excp.getStackTrace());
         }
-    }
-    
-    private void printTabs()
-    {
-        
-        //      for(int i = 0; i < tabs; ++i)
-        //              System.out.print("\t");
     }
     
     private void debugPrint(String str, boolean enter)

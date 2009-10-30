@@ -65,6 +65,7 @@ public class SelectEventDialog
 	private org.supremica.automata.LabeledEvent selectedEvent = null;
 	private JPanel contentPane = null;
 	private Alphabet theAlphabet = null;
+	@SuppressWarnings("unused")
 	private Automaton theAutomaton = null;
 
 	public SelectEventDialog(Frame owner, Automaton theAutomaton)
@@ -150,6 +151,7 @@ class AlphabetPanel
 {
 	private static final long serialVersionUID = 1L;
 
+	@SuppressWarnings("unused")
 	private Alphabet theAlphabet;
 
 	// private JList theEventList = new JList();

@@ -29,7 +29,7 @@ public class ExecutionOfOperationCell
 										ActionListener,
 										FocusListener
 {
-	
+    private static final long serialVersionUID = 1L;
 	private static final Color bgColor = new Color(0,0,100,50);
 	private static final Color fgColor = Color.BLACK;
 	

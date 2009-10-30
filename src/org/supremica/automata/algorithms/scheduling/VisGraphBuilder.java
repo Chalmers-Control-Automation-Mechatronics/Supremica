@@ -161,6 +161,7 @@ public class VisGraphBuilder
 		}
     }
 
+    @SuppressWarnings("unchecked")
     private void generateTotalZoneIndices() 
 	{
 		totalZoneIndices = new Hashtable[plantAutomata.size()];

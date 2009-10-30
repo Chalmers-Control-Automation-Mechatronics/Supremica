@@ -4,53 +4,38 @@
 
 package org.supremica.gui.examplegenerator;
 
-import java.math.BigDecimal;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import javax.swing.border.Border;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.LabeledEvent;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 import org.supremica.automata.Project;
-import org.supremica.gui.ide.IDE;
-import org.supremica.gui.ide.DocumentContainerManager;
-import org.supremica.gui.AutomataSynthesisWorker;
 import org.supremica.gui.Gui;
-import org.supremica.gui.SynthesizerDialog;
 import org.supremica.gui.Utility;
-import org.supremica.automata.algorithms.*;
-import org.supremica.automata.Automata;
-import org.supremica.automata.BDD.BDDSynthesizer;
-import org.supremica.util.BDD.OnlineBDDSupervisor;
-import org.supremica.log.*;
-import org.supremica.testcases.Users;
-import org.supremica.testcases.BricksGame;
-import org.supremica.testcases.DiningPhilosophers;
-import org.supremica.testcases.ExtDiningPhilosophers;
-import org.supremica.testcases.CatMouse;
-import org.supremica.testcases.ExtCatMouse;
-import org.supremica.testcases.StickPickingGame;
-import org.supremica.testcases.AllocationBatch;
-import org.supremica.testcases.Counters;
-import org.supremica.testcases.RandomAutomata;
-import org.supremica.testcases.TransferLine;
-import org.supremica.testcases.PigeonHole;
-import org.supremica.testcases.SanchezTestCase;
-import org.supremica.testcases.RoundRobin;
-import org.supremica.testcases.Arbiter;
-import org.supremica.testcases.warehouse.Warehouse;
-import org.supremica.testcases.warehouse.SelectEventsWindow;
-import org.supremica.util.SupremicaException;
+import org.supremica.gui.ide.DocumentContainerManager;
+import org.supremica.gui.ide.IDE;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 
 class TextArea extends JFrame {
-     JTextArea _resultArea = new JTextArea(20, 70);
+
+	private static final long serialVersionUID = 1L;
+
+	JTextArea _resultArea = new JTextArea(20, 70);
      public TextArea(String text) {
         //... Set textarea's initial text, scrolling, and border.
         _resultArea.setText(text);

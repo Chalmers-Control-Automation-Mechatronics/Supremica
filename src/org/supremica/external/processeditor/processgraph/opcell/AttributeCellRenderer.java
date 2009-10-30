@@ -1,16 +1,21 @@
 package org.supremica.external.processeditor.processgraph.opcell;
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import java.awt.Color;
+import java.awt.Component;
+
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+
 
 /**
  * Attribute renderer.
  */
 class AttributeCellRenderer extends AttributePanel implements ListCellRenderer
 {    
-    protected RowPainter myContainer = null;    
-    public AttributeCellRenderer(RowPainter rp)
+	private static final long serialVersionUID = 1L;
+	protected RowPainter myContainer = null;    
+
+	public AttributeCellRenderer(RowPainter rp)
     {	
 	myContainer = rp;
 	setOpaque(true);

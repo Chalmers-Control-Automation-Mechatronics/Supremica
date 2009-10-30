@@ -131,4 +131,9 @@ public final class SplineGeometryElement
   private final List<Point2D> mPoints;
   private final SplineKind mKind;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -6849218770094019805L;
+
 }

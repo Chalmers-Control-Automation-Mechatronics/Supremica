@@ -21,8 +21,12 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCBinarioBea
  * usando las propiedades de las cabeceras de columnas.
  * @author Pedro Sanz
  **/
-    public class QMCRendererListaTablaVerdad extends JCheckBox implements ListCellRenderer {
-        
+    public class QMCRendererListaTablaVerdad
+        extends JCheckBox
+        implements ListCellRenderer
+    {
+        private static final long serialVersionUID = 1L;
+
         JTableHeader header;            
         /**
          * Método constructor del renderer que establece las características de la tabla

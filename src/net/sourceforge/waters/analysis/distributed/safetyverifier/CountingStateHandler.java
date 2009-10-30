@@ -34,4 +34,6 @@ class CountingStateHandler implements StateHandler
 
   private final AtomicInteger mStateCount = new AtomicInteger();
   private final StateHandler mHandler;
+
+  private static final long serialVersionUID = 1L;
 }

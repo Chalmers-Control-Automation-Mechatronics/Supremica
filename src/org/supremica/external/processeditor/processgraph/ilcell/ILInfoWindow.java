@@ -1,39 +1,36 @@
 package org.supremica.external.processeditor.processgraph.ilcell;
 
 
+import static org.supremica.external.avocades.xml.SpecificationSynthesXML.EVENT_IL;
+import static org.supremica.external.avocades.xml.SpecificationSynthesXML.OPERATION_IL;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JMenuItem;
-import javax.swing.JMenu;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.BorderFactory;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
-import java.awt.BorderLayout;
-import java.awt.Toolkit;
-import java.awt.FlowLayout;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.io.File;
-
+import org.supremica.external.processeditor.processgraph.table.TextInputPane;
+import org.supremica.external.processeditor.xml.Loader;
 import org.supremica.manufacturingTables.xsd.il.IL;
 import org.supremica.manufacturingTables.xsd.il.ILStructure;
 import org.supremica.manufacturingTables.xsd.il.ObjectFactory;
 
-import org.supremica.external.processeditor.SOCFrame;
-import org.supremica.external.processeditor.processgraph.table.TextInputPane;
-import org.supremica.external.processeditor.xml.Loader;
-
-//static import
-import static org.supremica.external.avocades.xml.SpecificationSynthesXML.EVENT_IL;
-import static org.supremica.external.avocades.xml.SpecificationSynthesXML.OPERATION_IL;
 
 /**
  * Displays the operation info window, which allow the user to edit 
@@ -45,6 +42,8 @@ public class ILInfoWindow
 						implements 
 							ActionListener 
 { 
+	private static final long serialVersionUID = 1L;
+
 	private static final String TITLE = "InterLock";
 	
     private JButton jbOk = null;

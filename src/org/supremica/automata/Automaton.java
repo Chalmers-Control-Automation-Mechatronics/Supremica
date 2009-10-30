@@ -304,7 +304,8 @@ public class Automaton
     /**
      * Logs a sorted list of the state indices.
      */
-    private void checkStateIndices()
+    @SuppressWarnings("unused")
+	private void checkStateIndices()
     {
         TreeSet<Integer> sort = new TreeSet<Integer>();
         
@@ -447,7 +448,7 @@ public class Automaton
     public Alphabet resolveControlInconsistencies(StateSet stateset)
     {
         Alphabet explicitlyForbiddenEvents = new Alphabet();
-        Map eventToStateMap = new HashMap();
+        Map<LabeledEvent, State> eventToStateMap = new HashMap<LabeledEvent, State>();
         
         // We start by computing the set of explicitly
         // forbidden events
@@ -501,7 +502,7 @@ public class Automaton
                     {
                         try
                         {
-                            State forbiddenState = (State) eventToStateMap.get(currEvent);
+                            State forbiddenState = eventToStateMap.get(currEvent);
                             
                             currArc.setToState(forbiddenState);
                             controlInconsistentEvents.addEvent(currEvent);
@@ -755,7 +756,7 @@ public class Automaton
      */
     public boolean isDeterministic()
     {
-        HashSet foundEvents = new HashSet();
+        HashSet<String> foundEvents = new HashSet<String>();
         
         for (Iterator<State> stIt = stateIterator();	stIt.hasNext(); )
         {
@@ -974,7 +975,7 @@ public class Automaton
      */
     public State getStateWithIndex(int index)
     {
-        return (State) indexStateMap.get(index);
+        return indexStateMap.get(index);
     }
     
     // end index stuff
@@ -1044,7 +1045,7 @@ public class Automaton
         int amount = 0;
         for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
         {
-            Arc currArc = arcIt.next();
+            arcIt.next();
             amount++;
         }
         
@@ -1269,7 +1270,7 @@ public class Automaton
         return alphabet.iterator();
     }
     
-    public Collection eventCollection()
+    public Collection<?> eventCollection()
     {
         return alphabet.values();
     }
@@ -1483,7 +1484,7 @@ public class Automaton
         clearVisitedStates();
         
         // This implements a breath first search
-        LinkedList openStates = new LinkedList();
+        LinkedList<State> openStates = new LinkedList<State>();
         
         fromState.setAssociatedState(null);
         openStates.addLast(fromState);
@@ -1491,9 +1492,9 @@ public class Automaton
         
         while (openStates.size() > 0)
         {
-            State currState = (State) openStates.removeFirst();
+            State currState = openStates.removeFirst();
             
-            for (Iterator arcIt = currState.outgoingArcsIterator();
+            for (Iterator<?> arcIt = currState.outgoingArcsIterator();
             arcIt.hasNext(); )
             {
                 Arc currArc = (Arc) arcIt.next();
@@ -2101,7 +2102,7 @@ public class Automaton
         Iterator<State> state_it = safeStateIterator();
         while(state_it.hasNext())
         {
-            State state = (State)state_it.next(); // Why doesn't a Iterator<State> return a State?
+            State state = state_it.next(); // Why doesn't a Iterator<State> return a State?
             done_something |= saturate(state, alpha, state);	// saturate with self-loops
         }
         
@@ -2241,9 +2242,9 @@ public class Automaton
     static class InternalEventIterator
         implements Iterator<LabeledEvent>
     {
-        private final Iterator arcIt;
+        private final Iterator<?> arcIt;
         
-        public InternalEventIterator(Iterator arcIt)
+        public InternalEventIterator(Iterator<?> arcIt)
         {
             this.arcIt = arcIt;
         }
@@ -2352,7 +2353,7 @@ public class Automaton
         sbuf.append(getName());
         sbuf.append("::");
         
-        for (Iterator it = arcIterator(); it.hasNext(); )
+        for (Iterator<?> it = arcIterator(); it.hasNext(); )
         {
             Arc arc = (Arc) it.next();
             

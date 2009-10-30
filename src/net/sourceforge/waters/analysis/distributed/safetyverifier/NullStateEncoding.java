@@ -42,4 +42,10 @@ public class NullStateEncoding extends StateEncoding
   }
 
   private final ProductDESSchema mModel;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

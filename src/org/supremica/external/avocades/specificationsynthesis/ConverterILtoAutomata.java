@@ -1,9 +1,12 @@
 package org.supremica.external.avocades.specificationsynthesis;
 
-import java.io.*;
-import java.util.*;
-import org.jdom.*;
-import org.jdom.output.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+
+import org.jdom.Document;
+import org.jdom.Element;
+
 
 public class ConverterILtoAutomata {
 
@@ -29,10 +32,10 @@ public class ConverterILtoAutomata {
 
 		// Place all operations not involved in any group.
 
-		List opList = PAroot.getChildren("Operation");
+		List<?> opList = PAroot.getChildren("Operation");
 
 
-		for(Iterator listOP = opList.iterator(); listOP.hasNext(); )
+		for(Iterator<?> listOP = opList.iterator(); listOP.hasNext(); )
 		{
 
 			Element single_OP_element = (Element) listOP.next();
@@ -67,8 +70,8 @@ public class ConverterILtoAutomata {
 
 
 		// Alternative groups
-		List alternativeList = sim_processes.getChildren("substitution");
-		for(Iterator listAlternative = alternativeList.iterator(); listAlternative.hasNext(); )
+		List<?> alternativeList = sim_processes.getChildren("substitution");
+		for(Iterator<?> listAlternative = alternativeList.iterator(); listAlternative.hasNext(); )
 		{
 			int current_automata_state = 0;
 			Element alternative_Element = (Element) listAlternative.next();
@@ -96,7 +99,6 @@ public class ConverterILtoAutomata {
 
 			Element state = new Element("State");
 			state.setAttribute("id", "q" + current_automata_state);
-			String toState = "q" + current_automata_state;
 			state.setAttribute("initial", "true");
 			states.addContent(state);
 
@@ -107,8 +109,8 @@ public class ConverterILtoAutomata {
 
 
 		// Sequence groups
-		List sequenceList = sim_processes.getChildren("sequence");
-		for(Iterator listSequence = sequenceList.iterator(); listSequence.hasNext(); )
+		List<?> sequenceList = sim_processes.getChildren("sequence");
+		for(Iterator<?> listSequence = sequenceList.iterator(); listSequence.hasNext(); )
 		{
 			int current_automata_state = 0;
 			Element sequence_Element = (Element) listSequence.next();
@@ -136,7 +138,6 @@ public class ConverterILtoAutomata {
 
 			Element state = new Element("State");
 			state.setAttribute("id", "q" + current_automata_state);
-			String toState = "q" + current_automata_state;
 			state.setAttribute("initial", "true");
 			states.addContent(state);
 
@@ -146,8 +147,8 @@ public class ConverterILtoAutomata {
 		}
 
 		// Arbitrary groups
-		List arbitraryList = sim_processes.getChildren("exclusiveness");
-		for(Iterator listArbitrary = arbitraryList.iterator(); listArbitrary.hasNext(); )
+		List<?> arbitraryList = sim_processes.getChildren("exclusiveness");
+		for(Iterator<?> listArbitrary = arbitraryList.iterator(); listArbitrary.hasNext(); )
 		{
 			int current_automata_state = 0;
 			Element arbitrary_Element = (Element) listArbitrary.next();
@@ -175,7 +176,6 @@ public class ConverterILtoAutomata {
 
 			Element state = new Element("State");
 			state.setAttribute("id", "q" + current_automata_state);
-			String toState = "q" + current_automata_state;
 			state.setAttribute("initial", "true");
 			states.addContent(state);
 
@@ -185,8 +185,8 @@ public class ConverterILtoAutomata {
 		}
 
 		// Parallel groups
-		List parallelList = sim_processes.getChildren("simultaneity");
-		for(Iterator listParallel = parallelList.iterator(); listParallel.hasNext(); )
+		List<?> parallelList = sim_processes.getChildren("simultaneity");
+		for(Iterator<?> listParallel = parallelList.iterator(); listParallel.hasNext(); )
 		{
 			int current_automata_state = 0;
 			Element parallel_Element = (Element) listParallel.next();
@@ -214,7 +214,6 @@ public class ConverterILtoAutomata {
 
 			Element state = new Element("State");
 			state.setAttribute("id", "q" + current_automata_state);
-			String toState = "q" + current_automata_state;
 			state.setAttribute("initial", "true");
 			states.addContent(state);
 
@@ -231,8 +230,8 @@ public class ConverterILtoAutomata {
 	public void placeGroups(Element group_element, Element automaton, int current_automata_state) {
 
 		// Alternative groups
-		List alternativeList = group_element.getChildren("substitution");
-		for(Iterator listAlternative = alternativeList.iterator(); listAlternative.hasNext(); )
+		List<?> alternativeList = group_element.getChildren("substitution");
+		for(Iterator<?> listAlternative = alternativeList.iterator(); listAlternative.hasNext(); )
 		{
 			Element alternative_Element = (Element) listAlternative.next();
 
@@ -251,8 +250,8 @@ public class ConverterILtoAutomata {
 		/////////////////////////////////////////////////////////////////////////////////////////////		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// Sequence groups
-		List sequenceList = group_element.getChildren("sequence");
-		for(Iterator listSequence = sequenceList.iterator(); listSequence.hasNext(); )
+		List<?> sequenceList = group_element.getChildren("sequence");
+		for(Iterator<?> listSequence = sequenceList.iterator(); listSequence.hasNext(); )
 		{
 			Element sequence_Element = (Element) listSequence.next();
 
@@ -271,8 +270,8 @@ public class ConverterILtoAutomata {
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// Arbitrary groups
-		List arbitraryList = group_element.getChildren("exclusiveness");
-		for(Iterator listArbitrary = arbitraryList.iterator(); listArbitrary.hasNext(); )
+		List<?> arbitraryList = group_element.getChildren("exclusiveness");
+		for(Iterator<?> listArbitrary = arbitraryList.iterator(); listArbitrary.hasNext(); )
 		{
 			Element arbitrary_Element = (Element) listArbitrary.next();
 
@@ -291,8 +290,8 @@ public class ConverterILtoAutomata {
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// Parallel groups
-		List parallelList = group_element.getChildren("simultaneity");
-		for(Iterator listParallel = parallelList.iterator(); listParallel.hasNext(); )
+		List<?> parallelList = group_element.getChildren("simultaneity");
+		for(Iterator<?> listParallel = parallelList.iterator(); listParallel.hasNext(); )
 		{
 			Element parallel_Element = (Element) listParallel.next();
 
@@ -326,8 +325,8 @@ public class ConverterILtoAutomata {
 		state.setAttribute("initial", "false");
 		states.addContent(state);
 
-		List alternativeList = group_element.getChildren("Process");
-		for(Iterator listAlternative = alternativeList.iterator(); listAlternative.hasNext(); )
+		List<?> alternativeList = group_element.getChildren("Process");
+		for(Iterator<?> listAlternative = alternativeList.iterator(); listAlternative.hasNext(); )
 		{
 			Element alternative_Element = (Element) listAlternative.next();
 			String alternative = alternative_Element.getAttributeValue("Id");
@@ -365,8 +364,8 @@ public class ConverterILtoAutomata {
 		Element states = automaton.getChild("States");
 		Element transitions = automaton.getChild("Transitions");
 
-		List sequenceList = group_element.getChildren("Process");
-		for(Iterator listSequence = sequenceList.iterator(); listSequence.hasNext(); )
+		List<?> sequenceList = group_element.getChildren("Process");
+		for(Iterator<?> listSequence = sequenceList.iterator(); listSequence.hasNext(); )
 		{
 			Element sequence_Element = (Element) listSequence.next();
 			String sequence = sequence_Element.getAttributeValue("Id");
@@ -414,9 +413,9 @@ public class ConverterILtoAutomata {
 		Element transitions = automaton.getChild("Transitions");
 
 		int antal_operationer = 0;
-		List arbitraryList = group_element.getChildren("Process");
+		List<?> arbitraryList = group_element.getChildren("Process");
 		String[] elements = new String[arbitraryList.size()];
-		for(Iterator listArbitrary = arbitraryList.iterator(); listArbitrary.hasNext(); )
+		for(Iterator<?> listArbitrary = arbitraryList.iterator(); listArbitrary.hasNext(); )
 		{
 			Element arbitrary_Element = (Element) listArbitrary.next();
 			String arbitrary = arbitrary_Element.getAttributeValue("Id");
@@ -476,8 +475,6 @@ public class ConverterILtoAutomata {
 
 					Element transition = new Element("Transition");
 					transition.setAttribute("event", elements[indices[i]]);
-					int state_nr = current_automata_state - 1;
-					String fromState = "q" + state_nr;
 					transition.setAttribute("source", "q" + start_state);
 					transition.setAttribute("dest", "q" + current_automata_state);
 					transitions.addContent(transition);
@@ -512,9 +509,9 @@ public class ConverterILtoAutomata {
 		Element transitions = automaton.getChild("Transitions");
 
 		int antal_operationer = 0;
-		List parallelList = group_element.getChildren("Process");
+		List<?> parallelList = group_element.getChildren("Process");
 		String[] elements = new String[parallelList.size()];
-		for(Iterator listParallel = parallelList.iterator(); listParallel.hasNext(); )
+		for(Iterator<?> listParallel = parallelList.iterator(); listParallel.hasNext(); )
 		{
 			Element parallel_Element = (Element) listParallel.next();
 			String parallel = parallel_Element.getAttributeValue("Id");
@@ -574,8 +571,6 @@ public class ConverterILtoAutomata {
 
 					Element transition = new Element("Transition");
 					transition.setAttribute("event", elements[indices[i]]);
-					int state_nr = current_automata_state - 1;
-					String fromState = "q" + state_nr;
 					transition.setAttribute("source", "q" + start_state);
 					transition.setAttribute("dest", "q" + current_automata_state);
 					transitions.addContent(transition);
@@ -605,22 +600,18 @@ public class ConverterILtoAutomata {
 
 	public Element makeDeterministic(Element automaton) {
 
-		Vector taBortState = new Vector();
+		Vector<String> taBortState = new Vector<String>();
 
 		Element transitions = automaton.getChild("Transitions");
-		List transitionList = transitions.getChildren("Transition");
-		for(Iterator listTransition = transitionList.iterator(); listTransition.hasNext(); )
+		List<?> transitionList = transitions.getChildren("Transition");
+		for(Iterator<?> listTransition = transitionList.iterator(); listTransition.hasNext(); )
 		{
 			Element transitionElement = (Element) listTransition.next();
 			String eventAttribute = transitionElement.getAttributeValue("event");
 			String sourceAttribute = transitionElement.getAttributeValue("source");
 			String destAttribute = transitionElement.getAttributeValue("dest");
-
-			boolean firstTime = true;
-			String commonDestination = null;
-
-			List nextTransitionList = transitions.getChildren("Transition");
-			for(Iterator nextListTransition = nextTransitionList.iterator(); nextListTransition.hasNext(); )
+			List<?> nextTransitionList = transitions.getChildren("Transition");
+			for(Iterator<?> nextListTransition = nextTransitionList.iterator(); nextListTransition.hasNext(); )
 			{
 				Element nextTransitionElement = (Element) nextListTransition.next();
 				String nextEventAttribute = nextTransitionElement.getAttributeValue("event");
@@ -650,14 +641,13 @@ public class ConverterILtoAutomata {
 	public void changeSourceState(Element automaton, String commonState, String oldState) {
 
 		Element transitions = automaton.getChild("Transitions");
-		List transitionList = transitions.getChildren("Transition");
-		for(Iterator listTransition = transitionList.iterator(); listTransition.hasNext(); )
+		List<?> transitionList = transitions.getChildren("Transition");
+		for(Iterator<?> listTransition = transitionList.iterator(); listTransition.hasNext(); )
 		{
 			Element transitionElement = (Element) listTransition.next();
-			String eventAttribute = transitionElement.getAttributeValue("event");
+			transitionElement.getAttributeValue("event");
 			String sourceAttribute = transitionElement.getAttributeValue("source");
-			String destAttribute = transitionElement.getAttributeValue("dest");
-
+			transitionElement.getAttributeValue("dest");
 			if (sourceAttribute.equals(oldState)) {
 				transitionElement.setAttribute("source", commonState);
 			}
@@ -666,11 +656,11 @@ public class ConverterILtoAutomata {
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void removeStates(Element automaton, Vector taBortState) {
+	public void removeStates(Element automaton, Vector<String> taBortState) {
 
 		Element states = automaton.getChild("States");
-		List stateList = states.getChildren("State");
-		for(Iterator listState = stateList.iterator(); listState.hasNext(); )
+		List<?> stateList = states.getChildren("State");
+		for(Iterator<?> listState = stateList.iterator(); listState.hasNext(); )
 		{
 			Element stateElement = (Element) listState.next();
 			String stateId = (String) stateElement.getAttributeValue("id");
@@ -701,16 +691,16 @@ public class ConverterILtoAutomata {
 	public void placeAutomatas(String single_OP_id, Element restriction, Element automata) {
 
 		boolean onlyOne = true;
-		List singleRestrictionList = restriction.getChildren("And");
-		for(Iterator listSingleRestriction = singleRestrictionList.iterator(); listSingleRestriction.hasNext(); )
+		List<?> singleRestrictionList = restriction.getChildren("And");
+		for(Iterator<?> listSingleRestriction = singleRestrictionList.iterator(); listSingleRestriction.hasNext(); )
 		{
 			Element operation_restriction = (Element) listSingleRestriction.next();
 			placeAutomatonWithRestriction(automata, operation_restriction, single_OP_id);
 			placeAutomatas(single_OP_id, operation_restriction, automata);
 			onlyOne = false;
 		}
-		List alternativeRestrictionList = restriction.getChildren("Or");
-		for(Iterator listAlternativeRestriction = alternativeRestrictionList.iterator(); listAlternativeRestriction.hasNext(); )
+		List<?> alternativeRestrictionList = restriction.getChildren("Or");
+		for(Iterator<?> listAlternativeRestriction = alternativeRestrictionList.iterator(); listAlternativeRestriction.hasNext(); )
 		{
 			Element alternative_restriction = (Element) listAlternativeRestriction.next();
 			placeAutomatonWithAltRestriction(automata, alternative_restriction, single_OP_id);
@@ -787,8 +777,8 @@ public class ConverterILtoAutomata {
 
 	public void placeAutomatonWithRestriction(Element automata, Element operation_restriction, String single_OP_id) {
 
-		List restrictingOPList = operation_restriction.getChildren("Process");
-		for(Iterator listRestrictingOP = restrictingOPList.iterator(); listRestrictingOP.hasNext(); )
+		List<?> restrictingOPList = operation_restriction.getChildren("Process");
+		for(Iterator<?> listRestrictingOP = restrictingOPList.iterator(); listRestrictingOP.hasNext(); )
 		{
 			Element automaton = new Element("Automaton");
 			automaton.setAttribute("name", "Single Process");
@@ -896,8 +886,8 @@ public class ConverterILtoAutomata {
 		automaton.addContent(transitions);
 
 		// List alternative restriction
-		List alternativeOperationList = alternative_restriction.getChildren("Process");
-		for(Iterator listAlternativeOperation = alternativeOperationList.iterator(); listAlternativeOperation.hasNext(); )
+		List<?> alternativeOperationList = alternative_restriction.getChildren("Process");
+		for(Iterator<?> listAlternativeOperation = alternativeOperationList.iterator(); listAlternativeOperation.hasNext(); )
 		{
 			Element alternative_operation = (Element)listAlternativeOperation.next();
 			String alternative_OP_id = alternative_operation.getAttributeValue("id");
@@ -931,16 +921,16 @@ public class ConverterILtoAutomata {
 	public void placeGroupAutomatas(Element group, Element restriction, Element automata) {
 
 		boolean onlyOne = true;
-		List singleRestrictionList = restriction.getChildren("And");
-		for(Iterator listSingleRestriction = singleRestrictionList.iterator(); listSingleRestriction.hasNext(); )
+		List<?> singleRestrictionList = restriction.getChildren("And");
+		for(Iterator<?> listSingleRestriction = singleRestrictionList.iterator(); listSingleRestriction.hasNext(); )
 		{
 			Element operation_restriction = (Element) listSingleRestriction.next();
 			placeGroupWithRestriction(automata, operation_restriction, group);
 			placeGroupAutomatas(group, operation_restriction, automata);
 			onlyOne = false;
 		}
-		List alternativeRestrictionList = restriction.getChildren("Or");
-		for(Iterator listAlternativeRestriction = alternativeRestrictionList.iterator(); listAlternativeRestriction.hasNext(); )
+		List<?> alternativeRestrictionList = restriction.getChildren("Or");
+		for(Iterator<?> listAlternativeRestriction = alternativeRestrictionList.iterator(); listAlternativeRestriction.hasNext(); )
 		{
 			Element alternative_restriction = (Element) listAlternativeRestriction.next();
 			placeGroupWithAltRestriction(automata, alternative_restriction, group);
@@ -956,8 +946,8 @@ public class ConverterILtoAutomata {
 
 	public void placeGroupWithRestriction(Element automata, Element operation_restriction, Element group) {
 
-		List restrictingOPList = operation_restriction.getChildren("Process");
-		for(Iterator listRestrictingOP = restrictingOPList.iterator(); listRestrictingOP.hasNext(); )
+		List<?> restrictingOPList = operation_restriction.getChildren("Process");
+		for(Iterator<?> listRestrictingOP = restrictingOPList.iterator(); listRestrictingOP.hasNext(); )
 		{
 			Element automaton = new Element("Automaton");
 			automaton.setAttribute("name", "Single Process");
@@ -1049,8 +1039,8 @@ public class ConverterILtoAutomata {
 		Element transitions = new Element("Transitions");
 		automaton.addContent(transitions);
 
-		List alternativeOperationList = alternative_restriction.getChildren("Process");
-		for(Iterator listAlternativeOperation = alternativeOperationList.iterator(); listAlternativeOperation.hasNext(); )
+		List<?> alternativeOperationList = alternative_restriction.getChildren("Process");
+		for(Iterator<?> listAlternativeOperation = alternativeOperationList.iterator(); listAlternativeOperation.hasNext(); )
 		{
 			// Get alternative restriction
 			Element alternative_operation = (Element)listAlternativeOperation.next();

@@ -10,7 +10,8 @@ import org.supremica.automata.algorithms.SynchronizationOptions;
 
 public class NodeExpander 
 {
-    private static Logger logger = LoggerFactory.createLogger(NodeExpander.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(NodeExpander.class);
 
     /** Decides if the expansion of the nodes should be done using the methods of this class or using Supremicas methods */
     protected boolean manualExpansion;
@@ -48,7 +49,8 @@ public class NodeExpander
     private boolean uncontrollableEventFound = false;
 
     //Tillf (test)
-    private Alphabet unbookingAlphabet = null;
+    @SuppressWarnings("unused")
+	private Alphabet unbookingAlphabet = null;
 
     //     /** Needed for manual expansion */
     //     protected int[][][] outgoingEventsTable;
@@ -89,7 +91,7 @@ public class NodeExpander
             this(manualExpansion, true, theAutomata, sched);
     }
 
-    public Collection expandNode(Node node, int[] activeAutomataIndex) 
+    public Collection<Node> expandNode(Node node, int[] activeAutomataIndex) 
     {
         if (!manualExpansion) 
         {
@@ -127,10 +129,10 @@ public class NodeExpander
 		}
     }
 
-    public Collection expandNodeManually(Node node, int[] activeAutomataIndex) 
+    public Collection<Node> expandNodeManually(Node node, int[] activeAutomataIndex) 
     {
         uncontrollableEventFound = false;
-        ArrayList children = new ArrayList();
+        ArrayList<Node> children = new ArrayList<Node>();
 
         for (int i=0; i<activeAutomataIndex.length; i++)
         {
@@ -404,10 +406,10 @@ public class NodeExpander
 		}
     }
 
-    public Collection expandNodeWithSupremica(Node node, int[] activeAutomataIndex) 
+    public Collection<Node> expandNodeWithSupremica(Node node, int[] activeAutomataIndex) 
     {       
         uncontrollableEventFound = false;
-        Hashtable childNodes = new Hashtable();
+        Hashtable<Integer, Node> childNodes = new Hashtable<Integer, Node>();
 
         int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
         for (int i=0; i<currStateIndex.length; i++)

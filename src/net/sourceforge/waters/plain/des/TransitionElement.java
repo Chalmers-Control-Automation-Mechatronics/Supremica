@@ -146,4 +146,9 @@ public final class TransitionElement
   private final StateProxy mTarget;
   private final EventProxy mEvent;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

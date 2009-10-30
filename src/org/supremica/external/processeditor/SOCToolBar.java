@@ -1,14 +1,19 @@
 package org.supremica.external.processeditor;
 
-import javax.swing.*;
-import javax.swing.border.*;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JToolBar;
 
 import org.supremica.gui.Supremica;
 
-import java.awt.*;
-import java.awt.Font.*;
-import java.awt.event.*;
-import java.io.*;
 
 /**
  * A Simple class that handles the SOC program menu icons. 
@@ -27,7 +32,9 @@ import java.io.*;
 public class SOCToolBar extends JToolBar implements ActionListener
 						
 {                      
-    private Image fileNew;    
+	private static final long serialVersionUID = 1L;
+
+	private Image fileNew;    
     private Image fileOpen;
     private Image fileSave;
     private Image editCut;
@@ -180,7 +187,6 @@ public class SOCToolBar extends JToolBar implements ActionListener
      */
     public void actionPerformed(ActionEvent e)
     {
-	String itemName = e.getActionCommand();
 	//----- BUTTONS ------	
 	if (e.getSource()instanceof JButton)
 	    {

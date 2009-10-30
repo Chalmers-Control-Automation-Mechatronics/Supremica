@@ -9,6 +9,7 @@ import org.supremica.util.SupremicaException;
  * @author Henrik Staberg
  * @author Andreas Herner
  */
+@SuppressWarnings("unchecked")
 public class RouteController
 	implements Runnable
 {
@@ -81,6 +82,7 @@ public class RouteController
 	//parts is the vertical or horisontal differences
 	// range 0 - movement[2].parts
 	private int matlyftLevel = 0;
+	@SuppressWarnings("unused")
 	private int matlyftLength = -getVert(2);
 
 	// range 0 - (movement[4].parts + movement[5].parts)
@@ -150,7 +152,7 @@ public class RouteController
 		}
 	}
 
-	public List getAllBalls()
+    public List getAllBalls()
 	{
 		LinkedList list = new LinkedList();
 

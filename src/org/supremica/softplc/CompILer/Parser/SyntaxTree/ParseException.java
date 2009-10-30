@@ -7,7 +7,7 @@ package org.supremica.softplc.CompILer.Parser.SyntaxTree;
  * calling the method generateParseException in the generated
  * parser.
  *
- * You can modify this class to customize your error reporting
+ * You can modify this class to customise your error reporting
  * mechanisms so long as you retain the public fields.
  */
 public class ParseException
@@ -237,4 +237,10 @@ public class ParseException
 
 		return retval.toString();
 	}
+
+
+	//#######################################################################
+	//# Class Constants
+	private static final long serialVersionUID = 1L;
+
 }

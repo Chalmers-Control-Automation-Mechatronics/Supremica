@@ -331,9 +331,9 @@ public class ProjectBuildFromWaters
                     tokenizer.parseNumbers();
 
                     int type = tokenizer.nextToken();
-                    while (type != tokenizer.TT_EOF)
+                    while (type != StreamTokenizer.TT_EOF)
                     {
-                        if (type == tokenizer.TT_NUMBER)
+                        if (type == StreamTokenizer.TT_NUMBER)
                         {
                             costValue = tokenizer.nval;
                         }

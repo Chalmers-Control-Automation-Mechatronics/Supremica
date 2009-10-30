@@ -17,18 +17,14 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.distributed.application.DistributedNode;
+import net.sourceforge.waters.analysis.distributed.application.DistributedServer;
+import net.sourceforge.waters.analysis.distributed.application.Server;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
-import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
-import net.sourceforge.waters.analysis.distributed.application.
-  DistributedNode;
-import net.sourceforge.waters.analysis.distributed.application.
-  DistributedServer;
-import net.sourceforge.waters.analysis.distributed.application.Node;
-import net.sourceforge.waters.analysis.distributed.application.Server;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -259,6 +255,7 @@ public class DistributedModelVerifierFactory
   }
 
 
+  @SuppressWarnings("unused")
   private static class ProcessingThreadCount extends CommandLineArgumentInteger
   {
     private ProcessingThreadCount()

@@ -121,7 +121,7 @@ class EventsViewerPanel    // compare AlphabetViewerPanel
         // EventTreeCache eventTreeCache = new EventTreeCache();
         // AutomatonTreeCache automatonTreeCache = new AutomatonTreeCache();
         // This cache is only for storing whether we have already seen the event or not
-        HashSet eventTreeCache = new HashSet();
+        HashSet<LabeledEvent> eventTreeCache = new HashSet<LabeledEvent>();
         
         // Loop over automata and add events to dialog
         for (Automaton aut: automata)
@@ -138,7 +138,7 @@ class EventsViewerPanel    // compare AlphabetViewerPanel
                     root.add(eventsubtree);
                     
                     // Now, look for automata containing this event
-                    Iterator autoit = automata.iterator();
+                    Iterator<?> autoit = automata.iterator();
                     
                     while (autoit.hasNext())
                     {
@@ -188,7 +188,7 @@ class EventsViewerPanel    // compare AlphabetViewerPanel
     public void showUnion()
     {        
         // for all the (immediate) children of the root, make them visible
-        for (Enumeration e = root.children(); e.hasMoreElements(); )
+        for (Enumeration<?> e = root.children(); e.hasMoreElements(); )
         {
             EventSubTree node = (EventSubTree) e.nextElement();
             
@@ -202,7 +202,7 @@ class EventsViewerPanel    // compare AlphabetViewerPanel
     public void showIntersection()
     {        
         // for all the (immediate) children of the root, make them visible
-        for (Enumeration e = root.children(); e.hasMoreElements(); )
+        for (Enumeration<?> e = root.children(); e.hasMoreElements(); )
         {
             EventSubTree node = (EventSubTree) e.nextElement();
             
@@ -375,7 +375,8 @@ class LanguageRestrictorDialog
     private static final long serialVersionUID = 1L;
     private static Logger logger = LoggerFactory.createLogger(LanguageRestrictorDialog.class);
     protected Automata automata;
-    private boolean doit = false;
+    @SuppressWarnings("unused")
+	private boolean doit = false;
     protected EventsViewerPanel sourceEvents;
     protected RestrictEventsViewerPanel restrictEvents;
     protected JButton okButton;
@@ -731,7 +732,7 @@ class LanguageRestrictorDialog
         // Get the restriction alphabet
         Alphabet alpha = restrictEvents.getAlphabet();
         Automata newautomata = new Automata();
-        Iterator autit = automata.iterator();
+        Iterator<?> autit = automata.iterator();
         
         while (autit.hasNext())
         {
@@ -775,7 +776,8 @@ public class LanguageRestrictor
     extends AbstractAction
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(LanguageRestrictor.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(LanguageRestrictor.class);
     
     public LanguageRestrictor()
     {
@@ -787,8 +789,7 @@ public class LanguageRestrictor
     {        
         // Get the selected automata
         Automata automata = ActionMan.getGui().getSelectedAutomata();
-        
         // Throw up the dialog, let the user select the alphabet
-        LanguageRestrictorDialog dlg = new LanguageRestrictorDialog(automata, ActionMan.getGui().getUnselectedAutomata().getUnionAlphabet());
+        new LanguageRestrictorDialog(automata, ActionMan.getGui().getUnselectedAutomata().getUnionAlphabet());
     }
 }

@@ -241,7 +241,10 @@ public class ProductDESElement
         ("ProductDES '" + getName() +
          "' already contains an event named '" + name + "'!");
     }
-  
+
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
   }
 
 
@@ -279,6 +282,9 @@ public class ProductDESElement
          "' already contains an automaton named '" + name + "'!");
     }
   
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
   }
 
 
@@ -286,5 +292,10 @@ public class ProductDESElement
   //# Data Members
   private final Set<EventProxy> mEvents;
   private final Set<AutomatonProxy> mAutomata;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

@@ -49,11 +49,12 @@
  */
 package org.supremica.automata.BDD;
 
-import org.supremica.util.SupremicaException;
-import java.util.*;
-import java.io.*;
-import org.supremica.automata.*;
-import org.supremica.automata.IO.*;
+import java.io.File;
+
+import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
+import org.supremica.automata.IO.ProjectBuildFromXML;
+
 
 public class BDDVerifier
 {

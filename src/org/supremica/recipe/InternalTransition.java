@@ -53,8 +53,8 @@ import java.util.*;
 
 public class InternalTransition
 {
-	private List prevOperations = new LinkedList();
-	private List nextOperations = new LinkedList();
+	private List<InternalOperation> prevOperations = new LinkedList<InternalOperation>();
+	private List<InternalOperation> nextOperations = new LinkedList<InternalOperation>();
 	private String identity;
 	private boolean controllable;
 
@@ -95,12 +95,12 @@ public class InternalTransition
 		nextOperations.add(operation);
 	}
 
-	public Iterator nextOperationIterator()
+	public Iterator<InternalOperation> nextOperationIterator()
 	{
 		return nextOperations.iterator();
 	}
 
-	public Iterator prevOperationIterator()
+	public Iterator<InternalOperation> prevOperationIterator()
 	{
 		return prevOperations.iterator();
 	}
@@ -117,11 +117,11 @@ public class InternalTransition
 
 	public boolean isEnabled(InternalOperationState theState)
 	{
-		Iterator prevOperationIt = prevOperations.iterator();
+		Iterator<InternalOperation> prevOperationIt = prevOperations.iterator();
 
 		while (prevOperationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation) prevOperationIt.next();
+			InternalOperation currOperation = prevOperationIt.next();
 
 			if (!theState.isActive(currOperation))
 			{
@@ -135,11 +135,11 @@ public class InternalTransition
 	public InternalOperationState fire(InternalOperationState oldState)
 	{
 		InternalOperationState newState = new InternalOperationState(oldState);
-		Iterator operationIt = prevOperations.iterator();
+		Iterator<InternalOperation> operationIt = prevOperations.iterator();
 
 		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation) operationIt.next();
+			InternalOperation currOperation = operationIt.next();
 
 			newState.deactiveOperation(currOperation);
 		}
@@ -148,7 +148,7 @@ public class InternalTransition
 
 		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation) operationIt.next();
+			InternalOperation currOperation = operationIt.next();
 
 			newState.setActive(currOperation);
 		}
@@ -163,11 +163,11 @@ public class InternalTransition
 		sb.append("InternalTransition: " + identity + "\n");
 		sb.append("\tPrevious operations:\n");
 
-		Iterator operationIt = prevOperations.iterator();
+		Iterator<InternalOperation> operationIt = prevOperations.iterator();
 
 		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation) operationIt.next();
+			InternalOperation currOperation = operationIt.next();
 
 			sb.append("\t\t" + currOperation.getIdentity() + "\n");
 		}
@@ -178,7 +178,7 @@ public class InternalTransition
 
 		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation) operationIt.next();
+			InternalOperation currOperation = operationIt.next();
 
 			sb.append("\t\t" + currOperation.getIdentity() + "\n");
 		}

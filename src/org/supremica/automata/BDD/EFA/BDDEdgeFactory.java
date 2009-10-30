@@ -4,15 +4,14 @@ package org.supremica.automata.BDD.EFA;
  *
  * @author sajed
  */
-import net.sf.javabdd.*;
+
 import org.supremica.log.*;
-import org.supremica.util.SupremicaException;
-import java.util.*;
-import org.supremica.properties.Config;
+
 
 public class BDDEdgeFactory
 {
-    private static Logger logger = LoggerFactory.createLogger(BDDEdgeFactory.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(BDDEdgeFactory.class);
 
     BDDExtendedAutomata bddExAutomata;
 

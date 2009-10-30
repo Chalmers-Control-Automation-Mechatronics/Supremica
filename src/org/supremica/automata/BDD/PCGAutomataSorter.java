@@ -49,15 +49,15 @@
  */
 package org.supremica.automata.BDD;
 
-import org.supremica.util.SupremicaException;
-import java.util.*;
-import org.supremica.automata.*;
+import java.util.ArrayList;
 
-import org.supremica.util.BDD.PCGNode;
-import org.supremica.util.BDD.PCG;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
 import org.supremica.util.BDD.Options;
-
+import org.supremica.util.BDD.PCGNode;
 import org.supremica.util.BDD.solvers.OrderingSolver;
+
 
 public class PCGAutomataSorter
     implements AutomataSorter
@@ -80,7 +80,7 @@ public class PCGAutomataSorter
         OrderingSolver orderingSolver = new OrderingSolver(orgAutomata.size());
         
         int i = 0;
-        for (Automaton currAutomaton : orgAutomata)
+        for (@SuppressWarnings("unused") Automaton currAutomaton : orgAutomata)
         {
             orderingSolver.addNode(pcgNodeList.get(i), weightMatrix[i], i - 1);
             i++;

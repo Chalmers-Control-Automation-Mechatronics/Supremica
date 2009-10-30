@@ -49,11 +49,22 @@
  */
 package org.supremica.automata.IO;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
-import org.supremica.automata.*;
-import org.supremica.log.*;
+import java.util.StringTokenizer;
+
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.DefaultProjectFactory;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.ProjectFactory;
+import org.supremica.automata.State;
+
 
 /**
  * Import files from Leduc/Song HISC-format
@@ -192,7 +203,8 @@ public class ProjectBuildFromHISC
         return project;
     }
     
-    private void loadSubSystem(String directoryName)
+    @SuppressWarnings("deprecation")
+	private void loadSubSystem(String directoryName)
     throws Exception
     {
         File file = new File(pathName+"/"+directoryName+"/"+directoryName+".sub");
@@ -285,7 +297,8 @@ public class ProjectBuildFromHISC
         }
     }
     
-    private Automaton loadAutomaton(String fileName)
+    @SuppressWarnings("deprecation")
+	private Automaton loadAutomaton(String fileName)
     throws Exception
     {
         File file = new File(fileName);

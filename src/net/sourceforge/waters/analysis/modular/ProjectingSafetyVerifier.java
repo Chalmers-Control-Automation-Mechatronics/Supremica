@@ -376,11 +376,6 @@ public class ProjectingSafetyVerifier
     return new Object[] {plant, spec, uncont};
   }
 
-  private Object[] convertSpec(AutomatonProxy a, Map<EventProxy, EventProxy> forbtouncont)
-  {
-    return convertSpec(a, 0, forbtouncont);
-  }
-
   private AutomatonProxy convertPlant(AutomatonProxy a,
                                       Map<EventProxy, EventProxy> uncont)
   {
@@ -443,9 +438,7 @@ public class ProjectingSafetyVerifier
         }
         double size = 0;
         Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
-        Iterator<EventProxy> i = common.iterator();
         Set<EventProxy> total = new HashSet<EventProxy>();
-        boolean contproj = false;
         for (AutomatonProxy a : s) {
           size += Math.log(a.getStates().size());
           total.addAll(a.getEvents());
@@ -459,7 +452,6 @@ public class ProjectingSafetyVerifier
       int overflows = 0;
       ProjectionList minlist = null;
       minSize = Integer.MAX_VALUE / 4;
-      int setSize = -1;
       for (Tuple tup : possible) {
         try {
           ProjectionList t =
@@ -495,6 +487,7 @@ public class ProjectingSafetyVerifier
     return p;
   }
 
+  @SuppressWarnings("unused")
   private boolean setFailedResult(final TraceProxy counterexample,
                                   final Map<EventProxy,EventProxy> uncont)
   {
@@ -521,18 +514,6 @@ public class ProjectingSafetyVerifier
     final SafetyTraceProxy wrapper =
       factory.createSafetyTraceProxy(tracename, des, modevents);
     return super.setFailedResult(wrapper);
-  }
-
-
-  //#########################################################################
-  //# Inner Class AutomatonComparator
-  private final static class AutomatonComparator
-    implements Comparator<AutomatonProxy>
-  {
-    public int compare(AutomatonProxy a1, AutomatonProxy a2)
-    {
-      return a1.getName().compareTo(a2.getName());
-    }
   }
 
 
@@ -618,16 +599,6 @@ public class ProjectingSafetyVerifier
     public ProductDESProxy getModel()
     {
       return mModel;
-    }
-
-    public Set<EventProxy> getHidden()
-    {
-      return mHidden;
-    }
-
-    public Set<AutomatonProxy> getComposed()
-    {
-      return mCompautomata;
     }
 
     public AutomatonProxy getNew()
@@ -903,6 +874,7 @@ public class ProjectingSafetyVerifier
 
   //#########################################################################
   //# Class Constants
+  @SuppressWarnings("unused")
   private static final Logger LOGGER =
     LoggerFactory.createLogger(ProjectingSafetyVerifier.class);
 

@@ -357,13 +357,11 @@ public class AutomataToIEC61499
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
-			int currAutomatonIndex = currAutomaton.getSynchIndex();
-
+			currAutomaton.getSynchIndex();
 			for (Iterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
 			{
 				State currState = (State) stateIt.next();
 				int currStateIndex = currState.getSynchIndex();
-
 				if (comments)
 				{
 					pw.println("      <!-- " + currState.getName() + " -->");
@@ -457,8 +455,7 @@ public class AutomataToIEC61499
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
-			int currAutomatonIndex = currAutomaton.getSynchIndex();
-
+			currAutomaton.getSynchIndex();
 			for (Iterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
 			{
 				State currState = (State) stateIt.next();
@@ -516,9 +513,6 @@ public class AutomataToIEC61499
 				pw.println();
 				pw.println("        &#47;* Transitions for event " + currEvent.getLabel() + " *&#47;");
 			}
-
-			boolean previousCondition = false;
-
 			pw.println("        if (EI_" + currEvent.getLabel() + (useXmlns ?  "" : ".value") + " &#38;&#38; EO_" + currEvent.getLabel() + (useXmlns ?  "" : ".value") + ")");
 			pw.println("        {");
 
@@ -526,8 +520,7 @@ public class AutomataToIEC61499
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
 				Alphabet theAlphabet = currAutomaton.getAlphabet();
-				int currAutomatonIndex = currAutomaton.getSynchIndex();
-
+				currAutomaton.getSynchIndex();
 				if (theAlphabet.contains(currEvent.getLabel()))
 				{
 					LabeledEvent currAutomatonEvent = currAutomaton.getAlphabet().getEvent(currEvent.getLabel());
@@ -604,23 +597,17 @@ public class AutomataToIEC61499
 			while (alphIt.hasNext())
 			{
 				LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-				int currEventIndex = currEvent.getIndex();
-
 				if (comments)
 				{
 					pw.println("        &#47;* Enabled condition for event " + currEvent.getLabel() + " *&#47; &#13;&#10;");
 				}
-
-				boolean previousCondition = false;
-
 				pw.print("        EO_" + currEvent.getLabel() + (useXmlns ?  "" : ".value") + " = ");
 
 				for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 				{
 					Automaton currAutomaton = (Automaton) autIt.next();
 					Alphabet currAlphabet = currAutomaton.getAlphabet();
-					int currAutomatonIndex = currAutomaton.getSynchIndex();
-
+					currAutomaton.getSynchIndex();
 					if (currAlphabet.containsEqualEvent(currEvent) && currAlphabet.isPrioritized(currEvent))
 					{    // Find all states that enable this event
 

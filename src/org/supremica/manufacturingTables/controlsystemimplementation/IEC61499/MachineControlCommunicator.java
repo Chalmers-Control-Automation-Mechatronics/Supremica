@@ -66,7 +66,8 @@ import java.io.*;
 
 public class MachineControlCommunicator extends MachineController 
 {
-    private boolean EOPPerformedOK; // to tell the machine whether the EOP was performed successfully or not
+    @SuppressWarnings("unused")
+	private boolean EOPPerformedOK; // to tell the machine whether the EOP was performed successfully or not
 
     public MachineControlCommunicator()
     {

@@ -215,9 +215,10 @@ public class AutomataSynthesizer
             AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(newAutomata,
                		doNonblockingSynth, doControllabilitySynth);
             try {
-            	BDDAutomata bdda = bddSynthesizer.getBDDAutomata();
-
-            	int safeStates = bddSynthesizer.computeSafeStates();
+            	@SuppressWarnings("unused")
+				BDDAutomata bdda = bddSynthesizer.getBDDAutomata();
+            	@SuppressWarnings("unused")
+				int safeStates = bddSynthesizer.computeSafeStates();
             
 /*            
             int coreach_int = bddSynthesizer.coReachStates();

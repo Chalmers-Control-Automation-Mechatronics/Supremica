@@ -3,7 +3,12 @@ package net.sourceforge.waters.analysis.distributed.application;
 import java.io.Serializable;
 import java.util.Map;
 
-public abstract class AbstractJobDataDecorator implements JobData, Serializable{
+
+public abstract class AbstractJobDataDecorator implements JobData, Serializable
+{
+
+  private static final long serialVersionUID = 1L;
+
   protected AbstractJobDataDecorator(JobData jobdata)
   {
     mJobData = jobdata;
@@ -39,7 +44,7 @@ public abstract class AbstractJobDataDecorator implements JobData, Serializable{
     mJobData.setImmutable();
   }
 
-  public Map<String,Object> getAttributeMap()
+  public Map<String, Object> getAttributeMap()
   {
     return mJobData.getAttributeMap();
   }

@@ -102,4 +102,9 @@ public abstract class NodeElement
   //# Data Members
   private final PlainEventListProxy mPropositions;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 8722673673545066528L;
+
 }

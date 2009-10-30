@@ -58,10 +58,13 @@ import org.supremica.automata.algorithms.*;
 abstract class SynthesizerPanel
     extends JPanel
 {
+    private static final long serialVersionUID = 1L;
+
     public abstract void update(SynthesizerOptions s);
-    
+
     public abstract void regain(SynthesizerOptions s);
 }
+
 
 class SynthesizerDialogStandardPanel
     extends SynthesizerPanel

@@ -8,7 +8,9 @@ import org.supremica.gui.ActionMan;
 public class CopyAction
 	extends AbstractAction
 {
-	public CopyAction()
+    private static final long serialVersionUID = 1L;
+
+    public CopyAction()
 	{
 		super("Copy...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Copy16.gif")));
 

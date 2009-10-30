@@ -125,6 +125,11 @@ public class GraphSaveEPSAction
   private JFileChooser mFileChooser = null;
   private boolean mChooserPathFollowsModule = true;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
   private static final String EPS = ".eps";
 
 }

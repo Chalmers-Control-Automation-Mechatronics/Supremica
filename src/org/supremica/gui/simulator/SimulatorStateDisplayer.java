@@ -57,6 +57,7 @@ import org.supremica.automata.AutomataIndexFormHelper;
 public class SimulatorStateDisplayer
 	extends JPanel
 {
+    private static final long serialVersionUID = 1L;
 
 //      private SimulatorStateViewer stateViewer;
 //      private Automata theAutomata;

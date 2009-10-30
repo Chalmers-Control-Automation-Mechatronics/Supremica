@@ -1,6 +1,5 @@
 package org.supremica.external.avocades.xml;
 
-import java.lang.Object;
 import java.io.*;
 import javax.xml.bind.*;
 import javax.xml.transform.stream.StreamSource;
@@ -16,8 +15,10 @@ public class Loader {
 	private final String PKGS_EOP = "org.supremica.manufacturingTables.xsd.eop";
 	
 	private JAXBContext jaxbContext;
-    private Unmarshaller u;
-    private Marshaller m;
+    @SuppressWarnings("unused")
+	private Unmarshaller u;
+    @SuppressWarnings("unused")
+	private Marshaller m;
     
     private boolean printDebugInfo = true;
     

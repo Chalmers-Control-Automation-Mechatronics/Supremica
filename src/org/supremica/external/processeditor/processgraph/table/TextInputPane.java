@@ -1,16 +1,26 @@
 package org.supremica.external.processeditor.processgraph.table;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class TextInputPane 
-						extends 
-							JPanel
+	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private EditableText[] txtPanes = null;
 	
 	public TextInputPane(String title, String[] names){

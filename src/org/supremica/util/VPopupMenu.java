@@ -15,9 +15,11 @@ import org.supremica.gui.InterfaceManager;
 public class VPopupMenu
     extends JPopupMenu
 {
-    public VPopupMenu()
+	private static final long serialVersionUID = 1L;
+
+	public VPopupMenu()
     {
-        InterfaceManager interfaceManager = InterfaceManager.getInstance();
+        InterfaceManager.getInstance();
     }
     
     /**Displays the popUpMenu at a specified position*/

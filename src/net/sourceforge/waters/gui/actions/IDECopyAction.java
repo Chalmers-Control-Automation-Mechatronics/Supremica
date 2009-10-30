@@ -138,4 +138,9 @@ public class IDECopyAction
   //# Data Members
   private final Action mDefaultAction;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

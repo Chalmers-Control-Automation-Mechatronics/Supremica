@@ -1,6 +1,7 @@
 package org.supremica.testcases.warehouse;
 
 import java.util.*;
+
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
@@ -9,12 +10,15 @@ import org.supremica.automata.execution.*;
 class Resource
 {
     private static Logger logger = LoggerFactory.createLogger(Resource.class);
-    private boolean exclusive;
+    @SuppressWarnings("unused")
+	private boolean exclusive;
     private String identity;
-    private LinkedList u1NextResources = new LinkedList();
-    private LinkedList u2NextResources = new LinkedList();
-    private User u1;
-    private User u2;
+    private LinkedList<Resource> u1NextResources = new LinkedList<Resource>();
+    private LinkedList<Resource> u2NextResources = new LinkedList<Resource>();
+    @SuppressWarnings("unused")
+	private User u1;
+    @SuppressWarnings("unused")
+	private User u2;
     private int x;
     private int y;
     private Automaton theAutomaton = null;
@@ -136,10 +140,10 @@ class Resource
         {
             
             // Add agv deallocation events
-            for (Iterator nextResIt = u1NextResources.iterator();
+            for (Iterator<Resource> nextResIt = u1NextResources.iterator();
             nextResIt.hasNext(); )
             {
-                Resource nextResource = (Resource) nextResIt.next();
+                Resource nextResource = nextResIt.next();
                 String nextIdentity = nextResource.getIdentity();
                 LabeledEvent agvDeallocationEvent = agvAlphabet.getEvent("agv" + nextIdentity);
                 LabeledEvent thisAGVDeallocationEvent = new LabeledEvent(agvDeallocationEvent);
@@ -195,10 +199,10 @@ class Resource
         {
             
             // Add truck deallocation events
-            for (Iterator nextResIt = u2NextResources.iterator();
+            for (Iterator<Resource> nextResIt = u2NextResources.iterator();
             nextResIt.hasNext(); )
             {
-                Resource nextResource = (Resource) nextResIt.next();
+                Resource nextResource = nextResIt.next();
                 String nextIdentity = nextResource.getIdentity();
                 LabeledEvent truckDeallocationEvent = truckAlphabet.getEvent("truck" + nextIdentity);
                 LabeledEvent thisTruckDeallocationEvent = new LabeledEvent(truckDeallocationEvent);
@@ -226,8 +230,9 @@ class User
 {
     private boolean controllable;
     private String identity;
-    private LinkedList transitions = new LinkedList();
-    private Resource initial;
+    private LinkedList<ArrayList<Object>> transitions = new LinkedList<ArrayList<Object>>();
+    @SuppressWarnings("unused")
+	private Resource initial;
     private Project theProject;
     
     public User(String identity, boolean controllable, Project theProject)
@@ -239,7 +244,7 @@ class User
     
     public void addTransition(Resource fromResource, Resource[] toResources)
     {
-        ArrayList currTransition = new ArrayList(2);
+        ArrayList<Object> currTransition = new ArrayList<Object>(2);
         
         currTransition.add(fromResource);
         currTransition.add(toResources);
@@ -274,13 +279,13 @@ class User
     {
         Automaton theAutomaton = new Automaton(identity);
         
-        HashMap resourceMap = new HashMap();
+        HashMap<Resource, State> resourceMap = new HashMap<Resource, State>();
         
         // For each used resource add a state
-        for (Iterator transitionIt = transitions.iterator();
+        for (Iterator<ArrayList<Object>> transitionIt = transitions.iterator();
         transitionIt.hasNext(); )
         {
-            ArrayList currTransition = (ArrayList) transitionIt.next();
+            ArrayList<?> currTransition = transitionIt.next();
             Resource resource = (Resource) currTransition.get(0);
             State resourceState = new State(resource.getIdentity());
             
@@ -308,12 +313,13 @@ class User
         Alphabet theAlphabet = theAutomaton.getAlphabet();
         
         // For each resource add an arc
-        for (Iterator transitionIt = transitions.iterator();
+        for (Iterator<ArrayList<Object>> transitionIt = transitions.iterator();
         transitionIt.hasNext(); )
         {
-            ArrayList currTransition = (ArrayList) transitionIt.next();
+            ArrayList<?> currTransition = transitionIt.next();
             Resource sourceResource = (Resource) currTransition.get(0);
-            State sourceState = (State) resourceMap.get(sourceResource);
+            @SuppressWarnings("unused")
+			State sourceState = resourceMap.get(sourceResource);
             
             // System.err.println(identity + sourceResource.getIdentity());
             String label = identity + sourceResource.getIdentity();
@@ -354,18 +360,18 @@ class User
         }
         
         // For each transition add an arc
-        for (Iterator transitionIt = transitions.iterator();
+        for (Iterator<ArrayList<Object>> transitionIt = transitions.iterator();
         transitionIt.hasNext(); )
         {
-            ArrayList currTransition = (ArrayList) transitionIt.next();
+            ArrayList<?> currTransition = transitionIt.next();
             Resource sourceResource = (Resource) currTransition.get(0);
             Resource[] destResources = (Resource[]) currTransition.get(1);
-            State sourceState = (State) resourceMap.get(sourceResource);
+            State sourceState = resourceMap.get(sourceResource);
             
             for (int i = 0; i < destResources.length; i++)
             {
                 Resource destResource = destResources[i];
-                State destState = (State) resourceMap.get(destResource);
+                State destState = resourceMap.get(destResource);
                 LabeledEvent currEvent = theAlphabet.getEvent(identity + destResource.getIdentity());
                 
                 if (currEvent == null)

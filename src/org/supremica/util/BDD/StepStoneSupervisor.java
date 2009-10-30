@@ -191,7 +191,7 @@ public class StepStoneSupervisor
 		SizeWatch.setOwner("StepStoneSupervisor.uncontrollableBackward");
 
 		Workset workset = getWorkset(false);
-		int r_all_p, r_all = manager.replace(states, perm_s2sp);
+		int r_all = manager.replace(states, perm_s2sp);
 
 
 

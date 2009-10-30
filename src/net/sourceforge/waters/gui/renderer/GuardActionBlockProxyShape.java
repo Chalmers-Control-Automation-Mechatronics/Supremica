@@ -2,11 +2,10 @@ package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-
 import java.awt.geom.RoundRectangle2D;
 
-import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+
 
 public class GuardActionBlockProxyShape
     extends AbstractProxyShape

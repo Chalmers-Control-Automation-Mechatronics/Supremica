@@ -71,6 +71,7 @@ public abstract class MpsUI
      * Creates the *.mps-file that contains the MILP-formulation used as an input 
      * to the MILP-solver.
      */
+    @SuppressWarnings("unchecked")
     public void createModelFile()
         throws MilpException, IOException
     {

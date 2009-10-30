@@ -28,6 +28,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -330,9 +331,9 @@ class ComponentsTreeModel
     private List<? extends Proxy> getChildren(final Proxy proxy)
     {
       try {
-	return (List<? extends Proxy>) proxy.acceptVisitor(this);
+        return Casting.toList(proxy.acceptVisitor(this));
       } catch (final VisitorException exception) {
-	throw exception.getRuntimeException();
+        throw exception.getRuntimeException();
       }
     }
 

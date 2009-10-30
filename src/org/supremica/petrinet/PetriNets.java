@@ -58,7 +58,7 @@ import java.util.*;
  */
 public class PetriNets
 {
-	private HashMap thePetriNets = new HashMap();
+	private HashMap<String, PetriNet> thePetriNets = new HashMap<String, PetriNet>();
 
 	public PetriNets() {}
 
@@ -87,7 +87,7 @@ public class PetriNets
 
 	public PetriNet getPetriNet(String petriNetName)
 	{
-		return (PetriNet) thePetriNets.get(petriNetName);
+		return thePetriNets.get(petriNetName);
 	}
 
 	public boolean contains(PetriNet thePetriNet)
@@ -100,7 +100,7 @@ public class PetriNets
 		return thePetriNets.containsKey(petriNetName);
 	}
 
-	public Iterator iterator()
+	public Iterator<PetriNet> iterator()
 	{
 		return thePetriNets.values().iterator();
 	}
@@ -166,11 +166,11 @@ public class PetriNets
 
 		thePetriNets.addPetriNet(secondPetriNet);
 
-		Iterator petriNetIt = thePetriNets.iterator();
+		Iterator<PetriNet> petriNetIt = thePetriNets.iterator();
 
 		while (petriNetIt.hasNext())
 		{
-			PetriNet currPetriNet = (PetriNet) petriNetIt.next();
+			PetriNet currPetriNet = petriNetIt.next();
 
 			System.out.println(currPetriNet);
 		}

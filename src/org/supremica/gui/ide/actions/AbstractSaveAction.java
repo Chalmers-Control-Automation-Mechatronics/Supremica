@@ -14,7 +14,6 @@ import javax.swing.Action;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 
 import org.supremica.gui.ide.DocumentContainer;
-import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 
 
@@ -73,5 +72,10 @@ public abstract class AbstractSaveAction
   }
 
   abstract String getShortDescription(final String type);
+
+  
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

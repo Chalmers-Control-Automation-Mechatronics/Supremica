@@ -174,6 +174,10 @@ public class GreedyPackedStateEncoding extends StateEncoding
   }
 
 
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
   private final int[] mWordIndex;
   private final int[] mNumBits;
   private final int[] mBitMask;

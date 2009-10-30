@@ -55,14 +55,15 @@ import org.supremica.log.*;
 
 public class VisualProjectContainer
 {
-    private static Logger logger = LoggerFactory.createLogger(VisualProjectContainer.class);
-    private List theProjects;
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(VisualProjectContainer.class);
+    private List<VisualProject> theProjects;
     private VisualProject currentProject;
     private VisualProjectContainerListeners projectListeners = null;
     
     public VisualProjectContainer()
     {
-        theProjects = new LinkedList();
+        theProjects = new LinkedList<VisualProject>();
     }
     
     public void addProject(VisualProject theProject)
@@ -97,9 +98,9 @@ public class VisualProjectContainer
             return null;
         }
         
-        for (Iterator projIt = iterator(); projIt.hasNext(); )
+        for (Iterator<VisualProject> projIt = iterator(); projIt.hasNext(); )
         {
-            VisualProject currProject = (VisualProject) projIt.next();
+            VisualProject currProject = projIt.next();
             
             if (name.equals(currProject.getName()))
             {
@@ -120,7 +121,7 @@ public class VisualProjectContainer
         this.currentProject = theProject;
     }
     
-    public Iterator iterator()
+    public Iterator<VisualProject> iterator()
     {
         return theProjects.iterator();
     }
@@ -147,7 +148,8 @@ public class VisualProjectContainer
         currListeners.addListener(listener);
     }
     
-    private void notifyListeners()
+    @SuppressWarnings("unused")
+	private void notifyListeners()
     {
         if (projectListeners != null)
         {
@@ -155,7 +157,8 @@ public class VisualProjectContainer
         }
     }
     
-    private void notifyListeners(int mode, Project p)
+    @SuppressWarnings("unused")
+	private void notifyListeners(int mode, Project p)
     {
         if (projectListeners != null)
         {

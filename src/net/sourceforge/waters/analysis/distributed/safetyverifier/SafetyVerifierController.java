@@ -2,30 +2,24 @@ package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import net.sourceforge.waters.analysis.distributed.application.AbstractController;
-import net.sourceforge.waters.analysis.distributed.application.Controller;
-import net.sourceforge.waters.analysis.distributed.application.ControllerID;
 import net.sourceforge.waters.analysis.distributed.application.ErrorCallback;
-import net.sourceforge.waters.analysis.distributed.application.Job;
-import net.sourceforge.waters.analysis.distributed.application.JobResult;
 import net.sourceforge.waters.analysis.distributed.application.Node;
 import net.sourceforge.waters.analysis.distributed.application.Worker;
-import net.sourceforge.waters.analysis.distributed.VerificationJob;
-import net.sourceforge.waters.analysis.distributed.VerificationJobResult;
-
-import net.sourceforge.waters.analysis.distributed.schemata.*;
-
+import net.sourceforge.waters.analysis.distributed.schemata.AutomatonSchema;
+import net.sourceforge.waters.analysis.distributed.schemata.ProductDESSchema;
+import net.sourceforge.waters.analysis.distributed.schemata.SchemaBuilder;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+
 
 public class SafetyVerifierController extends AbstractController
 {
@@ -275,6 +269,8 @@ public class SafetyVerifierController extends AbstractController
   //Some specific exceptions for dealing with various failure modes.
   private static class StateExplorationException extends Exception
   {
+    private static final long serialVersionUID = 1L;
+
     public StateExplorationException(String message, Exception e)
     {
       super(message, e);
@@ -287,14 +283,17 @@ public class SafetyVerifierController extends AbstractController
    */
   private static class AsyncWorkerException extends Exception
   {
-    public AsyncWorkerException(String message, String workerid, Throwable e)
+	private static final long serialVersionUID = 1L;
+
+	public AsyncWorkerException(String message, String workerid, Throwable e)
     {
       super(message, e);
       
       mWorkerID = workerid;
     }
 
-    public String getWorkerID()
+    @SuppressWarnings("unused")
+	public String getWorkerID()
     {
       return mWorkerID;
     }
@@ -304,6 +303,8 @@ public class SafetyVerifierController extends AbstractController
 
   private static class TimeupException extends StateExplorationException
   {
+    private static final long serialVersionUID = 1L;
+
     public TimeupException(String message)
     {
       super(message, null);
@@ -342,10 +343,7 @@ public class SafetyVerifierController extends AbstractController
 	
 	//Reasons for termination. Used after the main
 	//while loop to figure out the current state.
-	boolean timeUp = false;
-	boolean hasBadState = false;
-	
-      exploration: while (true)
+    exploration: while (true)
 	  {
 	    //For termination detection, the total number of incoming and
 	    //outgoing messages are counted twice.  If all the counts are
@@ -376,7 +374,6 @@ public class SafetyVerifierController extends AbstractController
 	    for (SafetyVerifierWorker w : mWorkers)
 	      if (w.getBadState() != null)
 		{
-		  hasBadState = true;
 		  break exploration;
 		}
 
@@ -632,7 +629,8 @@ public class SafetyVerifierController extends AbstractController
 	}
     }
 
-    public synchronized Throwable getErrorForWorker(String workerid)
+    @SuppressWarnings("unused")
+	public synchronized Throwable getErrorForWorker(String workerid)
     {
       return mErrorMap.get(workerid);
     }

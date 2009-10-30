@@ -72,6 +72,7 @@ public class PredecessorSearch
   private final PredecessorProducer mProducer;
   private final PredecessorConsumer mConsumer;
   private final BlockingQueue<Predecessor> mQueue;
+  @SuppressWarnings("unused")
   private final SafetyVerifierWorkerImpl mWorker;
 }
 

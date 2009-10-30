@@ -42,7 +42,7 @@ package org.supremica.automata.algorithms.Guard.QMCMinimizer.util;
 import java.io.File;
 import java.util.Hashtable;
 import java.util.Enumeration;
-import javax.swing.*;
+
 import javax.swing.filechooser.*;
 
 /**
@@ -66,10 +66,12 @@ import javax.swing.filechooser.*;
  */
 public class QMCFiltradorExtensionesArchivos extends FileFilter {
 
-    private static String TYPE_UNKNOWN = "Type Unknown";
-    private static String HIDDEN_FILE = "Hidden File";
+    @SuppressWarnings("unused")
+	private static String TYPE_UNKNOWN = "Type Unknown";
+    @SuppressWarnings("unused")
+	private static String HIDDEN_FILE = "Hidden File";
 
-    private Hashtable filters = null;
+    private Hashtable<String, QMCFiltradorExtensionesArchivos> filters = null;
     private String description = null;
     private String fullDescription = null;
     private boolean useExtensionsInDescription = true;
@@ -81,7 +83,7 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      * @see #addExtension
      */
     public QMCFiltradorExtensionesArchivos() {
-	this.filters = new Hashtable();
+	this.filters = new Hashtable<String, QMCFiltradorExtensionesArchivos>();
     }
 
     /**
@@ -192,7 +194,7 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      */
     public void addExtension(String extension) {
 	if(filters == null) {
-	    filters = new Hashtable(5);
+	    filters = new Hashtable<String, QMCFiltradorExtensionesArchivos>(5);
 	}
 	filters.put(extension.toLowerCase(), this);
 	fullDescription = null;
@@ -213,11 +215,11 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
 	    if(description == null || isExtensionListInDescription()) {
  		fullDescription = description==null ? "(" : description + " (";
 		// build the description from the extension list
-		Enumeration extensions = filters.keys();
+		Enumeration<String> extensions = filters.keys();
 		if(extensions != null) {
-		    fullDescription += "." + (String) extensions.nextElement();
+		    fullDescription += "." + extensions.nextElement();
 		    while (extensions.hasMoreElements()) {
-			fullDescription += ", ." + (String) extensions.nextElement();
+			fullDescription += ", ." + extensions.nextElement();
 		    }
 		}
 		fullDescription += ")";

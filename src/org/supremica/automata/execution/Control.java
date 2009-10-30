@@ -49,13 +49,15 @@
  */
 package org.supremica.automata.execution;
 
-import java.util.*;
-import org.supremica.automata.execution.expressions.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 
 public class Control
 {
 	private String label = null;
-	private List conditions = null;
+	private List<Condition> conditions = null;
 //	private Expression expr = null;
 	private boolean invert = false;
 
@@ -68,7 +70,7 @@ public class Control
 	{
 		this.label = label;
 		this.invert = invert;
-		conditions = new LinkedList();
+		conditions = new LinkedList<Condition>();
 //		expr = new ConstVariable(false);
 	}
 
@@ -83,7 +85,7 @@ public class Control
 	{
 		this(otherControl.label, otherControl.invert);
 
-		conditions = new LinkedList(otherControl.conditions);
+		conditions = new LinkedList<Condition>(otherControl.conditions);
 //		expr = new ConstVariable(true);
 	}
 
@@ -102,7 +104,7 @@ public class Control
 		conditions.remove(condition);
 	}
 
-	public Iterator conditionIterator()
+	public Iterator<Condition> conditionIterator()
 	{
 		return conditions.iterator();
 	}

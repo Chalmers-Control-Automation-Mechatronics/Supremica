@@ -1,20 +1,26 @@
 package org.supremica.external.processeditor.processgraph.resrccell;
 
-import java.lang.*;
-import java.awt.*;
-import java.awt.geom.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 
-import org.supremica.external.processeditor.processgraph.*;
-import org.supremica.external.processeditor.xgraph.*;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.LineBorder;
+
+import org.supremica.external.processeditor.processgraph.NestedCellListener;
+import org.supremica.external.processeditor.xgraph.GraphCell;
+
 
 /**
- * Represents the initiator (and ending) cell of a compelete sequence.
+ * Represents the initiator (and ending) cell of a complete sequence.
  */
 public class Initiator extends GraphCell {
-    public int sizeX = 80 ;
+
+	private static final long serialVersionUID = 1L;
+
+	public int sizeX = 80 ;
     public int sizeY = 50;
     
     private int borderThickness = 2;

@@ -25,7 +25,9 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.util.QMCUtilLogica;
  * Creado 01/12/2005
  *
  */
-public class QMCDialogoNuevaExpresion extends JDialog {
+public class QMCDialogoNuevaExpresion extends JDialog
+{
+    private static final long serialVersionUID = 1L;
 
 	private JPanel jContentPane = null;
 	private JLabel etiquetaVariables1 = null;

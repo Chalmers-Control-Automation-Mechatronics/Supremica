@@ -34,7 +34,7 @@ import net.sourceforge.waters.model.base.Proxy;
  * @author Robi Malik
  */
 
-public class ComponentTransferable extends ProxyTransferable
+public class ComponentTransferable extends ProxyTransferable<Proxy>
 {
 
   //#########################################################################

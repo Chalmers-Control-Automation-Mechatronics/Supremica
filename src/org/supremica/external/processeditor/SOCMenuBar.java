@@ -1,23 +1,44 @@
 package org.supremica.external.processeditor;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-import org.supremica.external.processeditor.processgraph.*;
-import org.supremica.external.processeditor.processgraph.opcell.*;
-import org.supremica.external.processeditor.processgraph.resrccell.*;
-import org.supremica.external.processeditor.xgraph.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JColorChooser;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
+
+import org.supremica.external.processeditor.processgraph.NestedCell;
 import org.supremica.external.processeditor.processgraph.opcell.AttributePanel;
 import org.supremica.external.processeditor.processgraph.opcell.OperationCell;
 import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
-import org.supremica.external.processeditor.xml.*;
-import org.supremica.manufacturingTables.xsd.processeditor.*;
-import org.supremica.external.processeditor.xml.Converter;
 import org.supremica.external.processeditor.xgraph.GraphCell;
+import org.supremica.external.processeditor.xml.Converter;
 import org.supremica.manufacturingTables.xsd.processeditor.Relation;
+import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
+
 
 /**
  * A class that handles the SOC program menubar.
@@ -26,8 +47,9 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
 						    MouseListener,
 						    InternalFrameListener{
 
-
-    protected Border unselectedBorder = new CompoundBorder(new MatteBorder(1, 1, 1, 1, getBackground()), new BevelBorder(BevelBorder.LOWERED, Color.white, Color.gray));   
+	private static final long serialVersionUID = 1L;
+	
+	protected Border unselectedBorder = new CompoundBorder(new MatteBorder(1, 1, 1, 1, getBackground()), new BevelBorder(BevelBorder.LOWERED, Color.white, Color.gray));   
     protected Border selectedBorder = new CompoundBorder(new MatteBorder(1, 1, 1, 1, Color.red), new MatteBorder(1, 1, 1, 1, getBackground()));   
     protected Border activeBorder = new CompoundBorder(new MatteBorder(1, 1, 1, 1, Color.blue), new MatteBorder(1, 1, 1, 1, getBackground()));                
     
@@ -686,7 +708,7 @@ public class SOCMenuBar extends JMenuBar implements ActionListener,
     		}else if("Open DB interface".equals(e.getActionCommand())) {
     			graphContainer.openDBConnection();
     		}else if("Printer Settings...".equals(e.getActionCommand())) {
-    			JMenuItem tmp = getMenuItem("Custom Save.Save As...");
+    			getMenuItem("Custom Save.Save As...");
     		}else if("Print".equals(e.getActionCommand())) {
     			graphContainer.print();
     		}else if("Exit".equals(e.getActionCommand())) {

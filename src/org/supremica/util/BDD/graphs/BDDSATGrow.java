@@ -6,7 +6,9 @@ import org.supremica.util.BDD.*;
 public class BDDSATGrow
 	extends GrowFrame
 {
-	private BDDAutomata manager;
+    private static final long serialVersionUID = 1L;
+
+    private BDDAutomata manager;
 
 	public BDDSATGrow(BDDAutomata manager, String title)
 	{

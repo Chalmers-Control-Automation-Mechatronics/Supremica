@@ -3,9 +3,7 @@ package net.sourceforge.waters.analysis.distributed;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
-
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sourceforge.waters.analysis.distributed.application.JobResult;
 import net.sourceforge.waters.analysis.distributed.safetyverifier.JobStats;

@@ -159,6 +159,7 @@ public class ModularLanguageInclusionChecker
 
   //#########################################################################
   //# Static Class Variables
+  @SuppressWarnings("unused")
   private static final Logger LOGGER =
     Logger.getLogger(ModularLanguageInclusionChecker.class);
 

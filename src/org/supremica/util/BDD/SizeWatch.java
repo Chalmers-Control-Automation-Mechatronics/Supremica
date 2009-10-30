@@ -7,6 +7,7 @@ public class SizeWatch
 	extends Frame
 	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
 
 	// ---------------------- singleton stuffs
 	private static SizeWatch instance_ = null;
@@ -66,6 +67,7 @@ public class SizeWatch
 	}
 
 	// -----------------------------------
+	@SuppressWarnings("unused")
 	private String owner = "";
 
 	public static void setManager(JBDD manager_)

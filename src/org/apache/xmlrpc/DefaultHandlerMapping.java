@@ -70,14 +70,14 @@ import java.util.Hashtable;
 public class DefaultHandlerMapping
 	implements XmlRpcHandlerMapping
 {
-	private Hashtable handlers;
+	private Hashtable<String, Object> handlers;
 
 	/**
 	 * Create a new mapping.
 	 */
 	public DefaultHandlerMapping()
 	{
-		handlers = new Hashtable();
+		handlers = new Hashtable<String, Object>();
 	}
 
 	/**

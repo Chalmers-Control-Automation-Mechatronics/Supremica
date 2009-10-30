@@ -9,14 +9,29 @@
 
 package org.supremica.automata.algorithms.Guard;
 
-import bsh.This;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import net.sourceforge.waters.model.des.StateProxy;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.automata.algorithms.Guard.QMCMinimizer.interfaz.*;
-import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.*;
-import org.supremica.automata.algorithms.Guard.QMCMinimizer.util.*;
+
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
+import org.supremica.automata.algorithms.AutomataSynthesizer;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.algorithms.SynthesisAlgorithm;
+import org.supremica.automata.algorithms.SynthesisType;
+import org.supremica.automata.algorithms.SynthesizerOptions;
+import org.supremica.automata.algorithms.Guard.QMCMinimizer.interfaz.QMCModeloTablaVerdad;
+import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCAlgoritmo;
+import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCFuncion;
+import org.supremica.automata.algorithms.Guard.QMCMinimizer.util.QMCUtilFormateo;
+
 
 /**
  *
@@ -45,6 +60,7 @@ public class RelationGenerator {
     
     String [][] boolVars;
     /** Creates a new instance of RelationGenerator */
+    @SuppressWarnings("unchecked")
     public RelationGenerator(Automata input) {
         this.input = input;
         try{ this.supervisor = getSupervisor();}catch(Exception e){}
@@ -370,6 +386,7 @@ public class RelationGenerator {
         return supervisor;
     }
     
+    @SuppressWarnings("unchecked")
     public Set<StateProxy>[] getMustAFStates(LabeledEvent event)
     {
         TreeSet<StateProxy>[] output = new TreeSet[2];

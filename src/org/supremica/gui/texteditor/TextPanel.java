@@ -13,6 +13,8 @@ import javax.swing.*;
 public class TextPanel
 	extends JScrollPane
 {
+    private static final long serialVersionUID = 1L;
+
 	JTextArea textarea = null;
 
 	public TextPanel()

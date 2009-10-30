@@ -80,6 +80,7 @@ public class EOPActionRow extends EOPRow implements Cloneable
  	return null;
     }
     
+    @SuppressWarnings("unchecked")
     public Object clone() 
     {
 	EOPActionRow clone = null;

@@ -664,7 +664,8 @@ public class SpringEmbedder
       return Math.abs(oldDelta - newDelta);
     }
 
-    Point2D getMove()
+    @SuppressWarnings("unused")
+	Point2D getMove()
     {
       final double dx = mNewPoint.getX() - mOldPoint.getX();
       final double dy = mNewPoint.getY() - mOldPoint.getY();
@@ -704,11 +705,6 @@ public class SpringEmbedder
 
     //#######################################################################
     //# Simple Access
-    boolean isInitial()
-    {
-      return mIsInitial;
-    }
-
     int getFanout()
     {
       return mNeighbours.size();

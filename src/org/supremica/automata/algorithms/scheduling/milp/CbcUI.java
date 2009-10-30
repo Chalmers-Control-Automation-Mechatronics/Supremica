@@ -56,9 +56,6 @@ public class CbcUI
         
         // ...and prints it to stdout
         String milpEchoStr = "";
-        String totalMilpEchoStr = "";
-        String totalIterationCount = "";
-        String lpIterationCount = "";
         while ((milpEchoStr = milpEcho.readLine()) != null)
         {
             if (milpEchoStr.contains("infeasible"))

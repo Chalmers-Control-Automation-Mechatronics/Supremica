@@ -70,4 +70,9 @@ public final class EventAliasElement
     return downcast.visitEventAliasProxy(this);
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 3515813668650056013L;
+
 }

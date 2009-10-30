@@ -99,4 +99,5 @@ public interface Supervisor
 class EventDisabledException
     extends SupremicaException
 {
+    private static final long serialVersionUID = 1L;
 }

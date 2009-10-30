@@ -1,43 +1,27 @@
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import gnu.trove.THashSet;
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
+import gnu.trove.TObjectIntHashMap;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
-import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.base.ProxyVisitor;
-import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntArrayList;
-import net.sourceforge.waters.analysis.LightWeightGraph;
-import java.util.PriorityQueue;
-import gnu.trove.TObjectIntHashMap;
-import java.util.Stack;
-import gnu.trove.THashSet;
-import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class NonDeterministicComposer
@@ -81,7 +65,6 @@ public class NonDeterministicComposer
       //System.out.println(a);
     }
     eventAutomaton = new int[events.length][numAutomata];
-    int stateLength = numAutomata;
     // transitions indexed first by automaton then by event then by source state
     transitions = new int[numAutomata][events.length][][];
     for (int i = 0; i < events.length; i++) {
@@ -328,13 +311,14 @@ public class NonDeterministicComposer
     public int[] take();
   }
   
-  private static class IntBag
+  @SuppressWarnings("unused")
+private static class IntBag
   {
     private int mLength;
     private final int mInitialSize;
     private int[] mValues;
     
-    public IntBag(int initialSize)
+	public IntBag(int initialSize)
     {
       mLength = 0;
       mInitialSize = initialSize;
@@ -429,11 +413,13 @@ public class NonDeterministicComposer
    *  I'll make this encode it properly later on
    *
    */
+  @SuppressWarnings("unused")
   private int[] encode(final int[] sState)
   {
     return sState;
   }
   
+  @SuppressWarnings("unused")
   private int[] decode(final int[] sState)
   {
     return sState;
@@ -460,12 +446,14 @@ public class NonDeterministicComposer
       return mMap.get(new IntArray(a));
     }
     
-    public Integer get(int[] a)
+    @SuppressWarnings("unused")
+	public Integer get(int[] a)
     {
       return mMap.get(new IntArray(a));
     }
     
-    public Integer put(Object o, Integer s)
+    @SuppressWarnings("unused")
+	public Integer put(Object o, Integer s)
     {
       return mMap.put(new IntArray((int[])o), s);
     }
@@ -543,6 +531,7 @@ public class NonDeterministicComposer
     return mDumpState;
   }
   
+  /*
   private static class Pointer
     implements Comparable<Pointer>
   {
@@ -571,15 +560,19 @@ public class NonDeterministicComposer
       return mArray[mIndex].compareTo(p.mArray[p.mIndex]);
     }
   }
+  */
   
+  @SuppressWarnings("unused")
   private int mCompositionSize = 0;
   private int mNodeLimit;
   private List<AutomatonProxy> mModel;
   private ProductDESProxyFactory mFactory;
   private Map<int[], Integer> states;
+  @SuppressWarnings("unused")
   private Collection<TransitionProxy> trans;
   private EventProxy[] events;
   private int[][][][] transitions;
+  @SuppressWarnings("unused")
   private TIntArrayList[][] mBackTransitions;
   private boolean[][] mMarkedStates;
   private TIntArrayList mNewMarked;
@@ -588,6 +581,7 @@ public class NonDeterministicComposer
   private Bag unvisited;
   private int[][] eventAutomaton;
   private final EventProxy mMarked;
+  @SuppressWarnings("unused")
   private int mNewDumpState;
   private int mDumpState = -1;
   private TIntHashSet[][] mIntDisabled;

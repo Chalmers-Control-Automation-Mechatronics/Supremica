@@ -117,7 +117,7 @@ public class SmoothSupervisor
 				manager.deref(i_first);
 		} // End of computing saturated I
 		*/
-		int r_all_p, r_all = i_all;
+		int r_all = i_all;
 
 		manager.ref(i_all);    //gets derefed by orTo and finally a deref
 
@@ -191,7 +191,7 @@ public class SmoothSupervisor
 		int m_all = GroupHelper.getM(manager, spec, plant);
 
 		// gets derefed in first orTo ??
-		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);
+		int r_all = manager.replace(m_all, perm_s2sp);
 
 		manager.deref(m_all);
 

@@ -11,12 +11,11 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
+import net.sourceforge.waters.analysis.ProjectingNonBlockingChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.analysis.ProjectingNonBlockingChecker;
 
 
 /**

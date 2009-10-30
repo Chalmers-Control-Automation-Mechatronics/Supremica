@@ -5,10 +5,10 @@ import org.jdom.*;
 
 public class CheckAlt{
 
-	Vector restriction_vector;
+	Vector<String> restriction_vector;
 
 	public CheckAlt() {
-		restriction_vector = new Vector();
+		restriction_vector = new Vector<String>();
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,8 +22,8 @@ public class CheckAlt{
 
 		if (operation_definition.equals("pod_sub")) {
 
-			List POORs = poo_element.getChildren("Process_operation_occurrence_relationship");
-			for(Iterator listIt = POORs.iterator(); listIt.hasNext(); )
+			List<?> POORs = poo_element.getChildren("Process_operation_occurrence_relationship");
+			for(Iterator<?> listIt = POORs.iterator(); listIt.hasNext(); )
 			{
 				Element poor_element = (Element) listIt.next();
 				Element relation_type_element = poor_element.getChild("Relation_type");
@@ -64,11 +64,8 @@ public class CheckAlt{
 		boolean notfound = true;
 		String pod_id = e;
 		Element pod_element = new Element("ejhittad");
-
-		java.util.List PODs = root.getChildren("Process_operation_definition");
+		java.util.List<?> PODs = root.getChildren("Process_operation_definition");
 		Object[] PODs_array = PODs.toArray();
-		int nr_PODs = PODs_array.length;
-
 		int i = 0;
 		while (notfound) {
 
@@ -93,10 +90,8 @@ public class CheckAlt{
 		String poo_id = e;
 		Element poo_element = new Element("ejhittad");
 
-		java.util.List POOs = root.getChildren("Process_operation_occurrence");
+		java.util.List<?> POOs = root.getChildren("Process_operation_occurrence");
 		Object[] POOs_array = POOs.toArray();
-		int nr_POOs = POOs_array.length;
-
 		int i = 0;
 		while (notfound) {
 
@@ -115,7 +110,7 @@ public class CheckAlt{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Vector getAltPOOs() {
+	public Vector<String> getAltPOOs() {
 		return restriction_vector;
 	}
 }

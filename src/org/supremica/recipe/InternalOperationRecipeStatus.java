@@ -53,7 +53,7 @@ import java.util.*;
 
 public class InternalOperationRecipeStatus
 {
-	private static List collection = new LinkedList();
+	private static List<InternalOperationRecipeStatus> collection = new LinkedList<InternalOperationRecipeStatus>();
 	public static final InternalOperationRecipeStatus Undetermined = new InternalOperationRecipeStatus();
 	public static final InternalOperationRecipeStatus NotStarted = new InternalOperationRecipeStatus();
 	public static final InternalOperationRecipeStatus Running = new InternalOperationRecipeStatus();
@@ -64,7 +64,7 @@ public class InternalOperationRecipeStatus
 		collection.add(this);
 	}
 
-	public static Iterator iterator()
+	public static Iterator<InternalOperationRecipeStatus> iterator()
 	{
 		return collection.iterator();
 	}

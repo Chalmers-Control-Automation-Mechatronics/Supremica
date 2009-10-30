@@ -29,7 +29,7 @@ public class ConvertPanel
 							implements 
 							    ActionListener
 {
-	
+    private static final long serialVersionUID = 1L;
 	private static final String XML_EXTENSION = ".xml";
 	private static final String WATER_MODULE_EXTENSION = ".wmod";
 	

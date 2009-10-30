@@ -14,14 +14,13 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+
 import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.xml.bind.JAXBException;
@@ -37,11 +36,9 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 
 import org.supremica.Version;
-import org.supremica.apps.SupremicaWithGui;
 import org.supremica.automata.Project;
 import org.supremica.comm.xmlrpc.Server;
 import org.supremica.gui.InterfaceManager;
-import org.supremica.gui.LogDisplay;
 import org.supremica.gui.SupremicaLoggerFactory;
 import org.supremica.gui.Utility;
 import org.supremica.gui.ide.actions.Actions;

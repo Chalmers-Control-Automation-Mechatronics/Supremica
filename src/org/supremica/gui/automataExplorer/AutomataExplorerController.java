@@ -58,8 +58,11 @@ import org.supremica.automata.Automata;
 public class AutomataExplorerController
         extends JPanel
 {
-    private AutomataStateViewer stateViewer;
-    private Automata theAutomata;
+	private static final long serialVersionUID = 1L;
+
+	private AutomataStateViewer stateViewer;
+    @SuppressWarnings("unused")
+	private Automata theAutomata;
     private JButton undoButton;
     private JButton redoButton;
     

@@ -8,6 +8,8 @@ import org.supremica.gui.ActionMan;
 public class DeleteAction
     extends AbstractAction
 {
+    private static final long serialVersionUID = 1L;
+
     public DeleteAction()
     {
         super("Delete...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Delete16.gif")));

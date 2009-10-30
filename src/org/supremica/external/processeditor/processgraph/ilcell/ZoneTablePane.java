@@ -10,7 +10,9 @@ public class ZoneTablePane
 						extends 
 							BasicTablePane
 {
-	ZoneTablePane(){
+    private static final long serialVersionUID = 1L;
+
+    ZoneTablePane(){
 		super();
 		setHeader("Booked Zones");
 		

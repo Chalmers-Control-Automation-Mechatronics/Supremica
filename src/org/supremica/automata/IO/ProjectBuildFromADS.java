@@ -49,11 +49,22 @@
  */
 package org.supremica.automata.IO;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
-import org.supremica.automata.*;
-import org.supremica.log.*;
+import java.util.StringTokenizer;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.DefaultProjectFactory;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.ProjectFactory;
+import org.supremica.automata.State;
+
 
 /**
  * Import TCT ADS files
@@ -203,8 +214,6 @@ public class ProjectBuildFromADS
         
         int currParserState = READ_AUTOMATON_NAME;
         int numberOfStates = 0;
-        State currState = null;
-        boolean initialState = true;
         String currLine = reader.readLine();
         
         while (currLine != null)

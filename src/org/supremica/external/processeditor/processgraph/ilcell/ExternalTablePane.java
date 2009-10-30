@@ -16,12 +16,12 @@ import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
-import org.supremica.external.processeditor.processgraph.table.BasicCellRenderer;
 import org.supremica.external.processeditor.processgraph.table.BasicTablePane;
 import org.supremica.external.processeditor.processgraph.table.ValueChangedCellRenderer;
-import org.supremica.manufacturingTables.xsd.il.ExternalComponents;
 import org.supremica.manufacturingTables.xsd.il.ExternalComponent;
+import org.supremica.manufacturingTables.xsd.il.ExternalComponents;
 import org.supremica.manufacturingTables.xsd.il.Term;
+
 
 public class ExternalTablePane 
 						extends 
@@ -30,6 +30,7 @@ public class ExternalTablePane
 							ActionListener,
 							MouseListener
 {
+	private static final long serialVersionUID = 1L;
 	private ExternalDataEditor editor = null;
 	private List<JComboBox> comboBoxList = null;
 	
@@ -152,13 +153,12 @@ public class ExternalTablePane
 
 
 class ExternalCellEditor
-					extends
-						DefaultCellEditor
+	extends DefaultCellEditor
 {
-	private int editor = -1;
+    private static final long serialVersionUID = 1L;
 
+    private int editor = -1;
 	JComboBox validDataComboBox = null;
-
 	JTextField txtField = null;
 
 	public ExternalCellEditor( JComboBox dataComboBox ){

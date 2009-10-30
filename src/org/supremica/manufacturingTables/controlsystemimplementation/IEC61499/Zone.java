@@ -69,7 +69,8 @@ public class Zone implements Listener
     public static final String OCCUPIED_ZONE_TOKEN = "o";
     // This means that the zone is booked by another machine then the requesting
 
-    private Mailbox mailbox; // No longer used in the Fuber implementation
+    @SuppressWarnings("unused")
+	private Mailbox mailbox; // No longer used in the Fuber implementation
     private ZoneThread zoneThread; // All communication with the mailbox is now done via the zoneThread
     private String zoneName;
     private boolean booked;

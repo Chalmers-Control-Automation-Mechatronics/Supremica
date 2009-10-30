@@ -111,5 +111,7 @@ class BaseJobData implements Serializable, JobData
 
   private boolean mImmutable = false;
   private final Map<String,Object> mAttributes;
+
+  private static final long serialVersionUID = 1L;
   private static final String IMMUTABLE_MESSAGE = "Cannot modify immutable job data";
 }

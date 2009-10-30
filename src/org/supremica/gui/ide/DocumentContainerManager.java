@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -29,9 +30,7 @@ import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.gui.observer.ContainerSwitchEvent;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.observer.MainPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Observer;
-import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -54,10 +53,11 @@ import net.sourceforge.waters.valid.ValidUnmarshaller;
 import org.supremica.automata.Project;
 import org.supremica.automata.IO.ADSUnmarshaller;
 import org.supremica.automata.IO.HISCUnmarshaller;
-import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.SupremicaMarshaller;
+import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.xml.sax.SAXException;
+
 
 public class DocumentContainerManager
 {

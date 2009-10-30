@@ -66,11 +66,11 @@ import java.util.Vector;
 public class VerticalFlowLayout
 	implements LayoutManager2, java.io.Serializable
 {
+	private static final long serialVersionUID = 1L;
 
 	//----------------------------------
 	// Alignment Values
 	//----------------------------------
-
 	/**
 	 * The center layout contraint.
 	 */
@@ -89,7 +89,7 @@ public class VerticalFlowLayout
 	//************************************************************************
 	// Data
 	//************************************************************************
-	private Vector /* Array */ m_components;
+	private Vector /* Array */<AlignedComponent> m_components;
 	private boolean m_bUniformWidths;
 	private int m_vGap;
 	private int m_externalPadLeft;
@@ -155,7 +155,7 @@ public class VerticalFlowLayout
 		m_externalPadBottom = 0;
 		m_internalPadX = 0;
 		m_internalPadY = 0;
-		m_components = new Vector /* Array */();
+		m_components = new Vector /* Array */<AlignedComponent>();
 	}
 
 	/**
@@ -170,7 +170,7 @@ public class VerticalFlowLayout
 	{
 		m_bUniformWidths = uniformWidths;
 		m_vGap = vGap;
-		m_components = new Vector /* Array */();
+		m_components = new Vector /* Array */<AlignedComponent>();
 	}
 
 	//************************************************************************
@@ -234,7 +234,7 @@ public class VerticalFlowLayout
 	{
 		if (comp != null)
 		{
-			Enumeration e = m_components.elements();
+			Enumeration<AlignedComponent> e = m_components.elements();
 
 			if (e != null)
 			{
@@ -242,7 +242,7 @@ public class VerticalFlowLayout
 				{
 
 					// Get the component/alignment pair
-					AlignedComponent alcomp = (AlignedComponent) e.nextElement();
+					AlignedComponent alcomp = e.nextElement();
 
 					// Pull just the component out and see if there's a match
 					Component currComp = alcomp.getComponent();
@@ -328,7 +328,7 @@ public class VerticalFlowLayout
 
 			//D.out("Parent container insets: "+insets.toString());
 			// Go through all of the components and add things up
-			Enumeration e = m_components.elements();
+			Enumeration<AlignedComponent> e = m_components.elements();
 
 			if (e != null)
 			{
@@ -336,7 +336,7 @@ public class VerticalFlowLayout
 				{
 
 					// Get component/alignment pair
-					AlignedComponent alcomp = (AlignedComponent) e.nextElement();
+					AlignedComponent alcomp = e.nextElement();
 
 					// Pull just the component out
 					Dimension compSize = alcomp.getComponent().getPreferredSize();
@@ -391,8 +391,6 @@ public class VerticalFlowLayout
 		int xRight = m_externalPadRight;
 		int compWidth = 0;
 		int parentWidth = 0;
-		int parentHeight = 0;
-
 		// see if insets/border has changed.  If so, recompute
 		if ((m_insets == null) || (m_insets != parent.getInsets()))
 		{
@@ -411,7 +409,6 @@ public class VerticalFlowLayout
 		if (d != null)
 		{
 			parentWidth = d.width;
-			parentHeight = d.height;
 		}
 
 		// adjust starting pos for insets
@@ -424,13 +421,13 @@ public class VerticalFlowLayout
 		}
 
 		// Go through all of the components and place them vertically.
-		Enumeration e = m_components.elements();
+		Enumeration<AlignedComponent> e = m_components.elements();
 
 		if (e != null)
 		{
 			while (e.hasMoreElements())
 			{
-				AlignedComponent alcomp = (AlignedComponent) e.nextElement();
+				AlignedComponent alcomp = e.nextElement();
 				Component comp = alcomp.getComponent();
 				String alignment = alcomp.getAlignment();
 

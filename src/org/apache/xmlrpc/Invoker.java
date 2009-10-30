@@ -70,7 +70,7 @@ public class Invoker
 	implements XmlRpcHandler
 {
 	private Object invokeTarget;
-	private Class targetClass;
+	private Class<?> targetClass;
 
 	public Invoker(Object target)
 	{
@@ -88,7 +88,7 @@ public class Invoker
 	/**
 	 * main method, sucht methode in object, wenn gefunden dann aufrufen.
 	 */
-	public Object execute(String methodName, Vector params)
+	public Object execute(String methodName, Vector<Comparable> params)
 		throws Exception
 	{
 

@@ -13,11 +13,10 @@ package net.sourceforge.waters.gui;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -40,9 +39,8 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
@@ -379,6 +377,7 @@ public class SimpleComponentEditorDialog
 
   //#########################################################################
   //# Class Constants
+  private static final long serialVersionUID = 1L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
   private static final GraphSubject GRAPH_TEMPLATE = new GraphSubject();
   private static final SimpleComponentSubject COMPONENT_TEMPLATE =

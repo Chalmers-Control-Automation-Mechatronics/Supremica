@@ -57,23 +57,32 @@
  */
 package org.supremica.gui;
 
-import org.supremica.log.*;
-import org.supremica.automata.algorithms.Stoppable;
-import java.util.*;
-import java.awt.event.*;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.GridLayout;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Frame;
-import javax.swing.*;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+
+import org.supremica.automata.algorithms.Stoppable;
+
 
 public final class ExecutionDialog
     extends JDialog
     implements ActionListener, Runnable
 {
     private static final long serialVersionUID = 1L;
-    private List threadsToStop;
+    private List<Stoppable> threadsToStop;
     private JPanel contentPanel = null;
     
     /** The header of the operation. */
@@ -93,7 +102,8 @@ public final class ExecutionDialog
     
     private ExecutionDialogMode currentMode = null;
     private ExecutionDialogMode newMode = null;
-    private int nbrOfFoundStates = -1;
+    @SuppressWarnings("unused")
+	private int nbrOfFoundStates = -1;
     
     private void Init(String title)
     {
@@ -155,7 +165,7 @@ public final class ExecutionDialog
      * Creates dialog box for canceling the Stoppable classes in the supplied List.
      * @see Stoppable
      */
-    public ExecutionDialog(Frame frame, String title, List threadsToStop)
+    public ExecutionDialog(Frame frame, String title, List<Stoppable> threadsToStop)
     {
         super(frame);
         
@@ -169,7 +179,7 @@ public final class ExecutionDialog
     // -- MF -- Special case when you've got only one thread to watch
     public ExecutionDialog(Frame frame, String title, Stoppable threadToStop)
     {
-        this(frame, title, new ArrayList());
+        this(frame, title, new ArrayList<Stoppable>());
         
         addThreadToStop(threadToStop);
     }
@@ -306,9 +316,9 @@ public final class ExecutionDialog
     
     public void stopAllThreads()
     {
-        for (Iterator exIt = threadsToStop.iterator(); exIt.hasNext(); )
+        for (Iterator<Stoppable> exIt = threadsToStop.iterator(); exIt.hasNext(); )
         {
-            Stoppable threadToStop = (Stoppable) exIt.next();
+            Stoppable threadToStop = exIt.next();
             if (!threadToStop.isStopped())
                 threadToStop.requestStop();
         }

@@ -10,7 +10,7 @@ import java.util.*;
 
 public final class TypeConstant
 {
-	private static List theTypes = new ArrayList();
+	private static List<TypeConstant> theTypes = new ArrayList<TypeConstant>();
 	private String type;
 
 	private TypeConstant(String t)
@@ -20,7 +20,7 @@ public final class TypeConstant
 		theTypes.add(this);
 	}
 
-	public static Iterator iterator()
+	public static Iterator<TypeConstant> iterator()
 	{
 		return theTypes.iterator();
 	}

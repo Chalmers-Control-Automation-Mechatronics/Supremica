@@ -260,8 +260,6 @@ public class DistributedServer
   //# Main code
   public static void main(String[] args)
   { 
-    String name = DEFAULT_SERVICE_NAME;
-
     try
       {
 	Server server = new DistributedServer();

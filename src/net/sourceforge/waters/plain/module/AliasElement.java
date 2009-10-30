@@ -105,4 +105,9 @@ public abstract class AliasElement
   //# Data Members
   private final ExpressionProxy mExpression;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -91966653805921270L;
+
 }

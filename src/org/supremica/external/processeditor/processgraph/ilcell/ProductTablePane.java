@@ -4,12 +4,13 @@ import java.util.List;
 
 import org.supremica.external.processeditor.processgraph.table.BasicTablePane;
 import org.supremica.manufacturingTables.xsd.il.Term;
-import org.supremica.manufacturingTables.xsd.il.Zones;
 
 public class ProductTablePane 
 						extends 
 							BasicTablePane
 {
+	private static final long serialVersionUID = 1L;
+
 	public ProductTablePane(){
 		super();
 		setHeader("Product");

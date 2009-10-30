@@ -11,7 +11,8 @@ public class OneProductRelaxer
     private ModifiedAstar scheduler;
     private Automata plantAutomata;
     
-    private org.supremica.log.Logger logger = org.supremica.log.LoggerFactory.createLogger(this.getClass());
+    @SuppressWarnings("unused")
+	private org.supremica.log.Logger logger = org.supremica.log.LoggerFactory.createLogger(this.getClass());
 
     /**
      * The remaining cost for each state of each robot (if run independently of other robots).
@@ -66,7 +67,7 @@ public class OneProductRelaxer
                 throw new Exception("No accepting state for " + theAuto.getName() + " was found during preprocessing...");
             }
             
-            ArrayList estList = new ArrayList();
+            ArrayList<State> estList = new ArrayList<State>();
             
             remainingCosts[i] = new double[theAuto.nbrOfStates()];
             for (int j=0; j<remainingCosts[i].length; j++)
@@ -86,7 +87,7 @@ public class OneProductRelaxer
                 
                 while (!estList.isEmpty())
                 {
-                    Iterator<Arc> incomingArcIterator = ((State)estList.remove(0)).incomingArcsIterator();
+                    Iterator<Arc> incomingArcIterator = estList.remove(0).incomingArcsIterator();
                     
                     while (incomingArcIterator.hasNext())
                     {
@@ -132,7 +133,8 @@ public class OneProductRelaxer
     {
         double estimate = 0;
         double[] currCosts = expander.getCosts(node);
-        int[] activeAutomataIndex = scheduler.getActiveAutomataIndex();
+        @SuppressWarnings("unused")
+		int[] activeAutomataIndex = scheduler.getActiveAutomataIndex();
 
         for (int i=0; i<scheduler.getActiveLength(); i++) 
         {

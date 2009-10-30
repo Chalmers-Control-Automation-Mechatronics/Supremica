@@ -33,7 +33,8 @@ public class TableGroupPane
 							MouseListener,
 							KeyListener
 {
-	
+    private static final long serialVersionUID = 1L;
+
 	protected JPopupMenu popupMenu;
 	
 	protected int[] selectedRows = null;

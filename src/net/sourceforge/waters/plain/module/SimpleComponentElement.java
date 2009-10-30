@@ -140,4 +140,9 @@ public final class SimpleComponentElement
   private final ComponentKind mKind;
   private final GraphProxy mGraph;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -3162288088134374148L;
+
 }

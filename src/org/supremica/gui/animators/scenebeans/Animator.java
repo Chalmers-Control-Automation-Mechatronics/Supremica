@@ -17,7 +17,9 @@ public class Animator
     extends JFrame
     implements ActionListener
 {
+    private static final long serialVersionUID = 1L;
     private static Logger logger = LoggerFactory.createLogger(Animator.class);
+
     AnimationCanvas _canvas;
     private MouseDispatcher _dispatcher;
     private List _commands, _events, _announced;
@@ -167,6 +169,7 @@ public class Animator
         });
     }
     
+    @SuppressWarnings("unchecked")
     public void setAnimation(Animation anim)
     {
         _canvas.setAnimation(anim);

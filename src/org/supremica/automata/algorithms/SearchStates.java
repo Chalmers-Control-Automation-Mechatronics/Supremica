@@ -245,8 +245,9 @@ public class SearchStates
         return new String(str);
     }
     
-    private Automaton buildAutomaton()    // once the states have been created, we could build an entire automaton
-    throws Exception
+    @SuppressWarnings("unused")
+	private Automaton buildAutomaton()    // once the states have been created, we could build an entire automaton
+    	throws Exception
     {
         return syncher.getAutomaton();
     }

@@ -83,7 +83,7 @@ abstract class ExecModelBuilder
 	Map basicFunctionBlocksID = new HashMap();
 	// list to order the blocks with algorithms first
 	// used to assign lowest block ids to blocks with algorithms
-	List basicFunctionBlocksList = new ArrayList();
+	List<String> basicFunctionBlocksList = new ArrayList<String>();
 	int fbMaxID = 1;
 
 	// String fb name, Map event input name -> event ID

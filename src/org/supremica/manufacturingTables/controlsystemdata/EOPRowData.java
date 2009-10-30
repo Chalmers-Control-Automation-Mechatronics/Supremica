@@ -63,17 +63,17 @@ import java.util.Map;
 
 abstract public class EOPRowData
 {
-    protected Map sensorToStateMap; // HashMap will be used for quick access to the states
-    protected Map actuatorToStateMap;
-    protected Map variableToValueMap;
-    protected Map zoneToStateMap;
+    protected Map<String, String> sensorToStateMap; // HashMap will be used for quick access to the states
+    protected Map<String, String> actuatorToStateMap;
+    protected Map<String, String> variableToValueMap;
+    protected Map<String, String> zoneToStateMap;
     
     public EOPRowData()
     {
-	sensorToStateMap = new HashMap(10); //initital capacity 10 and default load factor (0,75) suits me fine
-	actuatorToStateMap = new HashMap(10);
-	variableToValueMap = new HashMap(5);
-	zoneToStateMap = new HashMap(10);
+	sensorToStateMap = new HashMap<String, String>(10); //initital capacity 10 and default load factor (0,75) suits me fine
+	actuatorToStateMap = new HashMap<String, String>(10);
+	variableToValueMap = new HashMap<String, String>(5);
+	zoneToStateMap = new HashMap<String, String>(10);
     }
 
     final public void addSensorToState(String sensor, String state)
@@ -81,7 +81,7 @@ abstract public class EOPRowData
 	sensorToStateMap.put(sensor, state);
     }
 
-    final public Map getSensorToStateMap() 
+    final public Map<String, String> getSensorToStateMap() 
     {
 	return sensorToStateMap;
     }
@@ -91,7 +91,7 @@ abstract public class EOPRowData
 	actuatorToStateMap.put(actuator, state);
     }
 
-    final public Map getActuatorToStateMap() 
+    final public Map<String, String> getActuatorToStateMap() 
     {
 	return actuatorToStateMap;
     }
@@ -111,7 +111,7 @@ abstract public class EOPRowData
 	}
     }
 
-    final public Map getZoneToStateMap() 
+    final public Map<String, String> getZoneToStateMap() 
     {
 	return zoneToStateMap;
     }
@@ -121,7 +121,7 @@ abstract public class EOPRowData
 	variableToValueMap.put(variable, value);
     }
 
-    final public Map getVariableToValueMap() 
+    final public Map<String, String> getVariableToValueMap() 
     {
 	return variableToValueMap;
     }

@@ -95,7 +95,8 @@ public class XmlRpcWorker
 	 * @throws NullPointerException if the handler is null.
 	 * @throws Exception if the handler throws an exception.
 	 */
-	protected static Object invokeHandler(Object handler, XmlRpcRequest request, XmlRpcContext context)
+	@SuppressWarnings("unchecked")
+    protected static Object invokeHandler(Object handler, XmlRpcRequest request, XmlRpcContext context)
 		throws Exception
 	{
 		long now = 0;

@@ -9,26 +9,17 @@
 
 package org.supremica.testcases;
 
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import org.omg.CORBA.portable.IDLEntity;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.Project;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.State;
 import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.StateSet;
-import org.supremica.automata.execution.*;
-import uk.ac.ic.doc.scenebeans.Null;
+import org.supremica.automata.State;
+
 
 /**
  *
  * @author Sajed
  */
-
-
 public class MouseBuffer {
     
     final int NBR_ROOMS = 5;

@@ -13,11 +13,10 @@ package net.sourceforge.waters.gui;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -362,6 +361,7 @@ public class ForeachComponentEditorDialog
 
   //#########################################################################
   //# Class Constants
+  private static final long serialVersionUID = 1L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
   private static final ForeachComponentSubject TEMPLATE =
     new ForeachComponentSubject("", new SimpleIdentifierSubject(""));

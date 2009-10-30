@@ -22,7 +22,7 @@ public class AOH_Solver
 		throws BDDException
 	{
 		Vector automata = a.getAutomata();
-		PCG pcg = new PCG(automata);
+		new PCG(automata);
 		int[][] weightMatrix = a.getCommunicationMatrix();
 		OrderingSolver os = new OrderingSolver(automata.size());
 		int i = 0;

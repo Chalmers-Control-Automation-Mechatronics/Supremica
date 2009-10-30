@@ -18,7 +18,6 @@ class AnalyzerAutomatonViewerPanel
     private static final long serialVersionUID = 1L;
     
     private String name;
-    private DotBuilder builder;
     private Automaton theAutomaton;
     private GrappaPanel viewerPanel = null;
     
@@ -56,9 +55,7 @@ class AnalyzerAutomatonViewerPanel
     
     private void build()
     {
-        builder = DotBuilder.getDotBuilder(null, this, new AutomatonToDot(theAutomaton), "");
-        
-        //builder.start();
+        DotBuilder.getDotBuilder(null, this, new AutomatonToDot(theAutomaton), "");
     }
     
     public void setGraph(Graph theGraph)

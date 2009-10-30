@@ -169,7 +169,8 @@ public class EventHider
 {
     private static final long serialVersionUID = 1L;
     
-    private static Logger logger = LoggerFactory.createLogger(EventHider.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(EventHider.class);
     private IDEActionInterface ide;
     
     public EventHider(IDEActionInterface ide)
@@ -185,11 +186,11 @@ public class EventHider
         Automata automata = ActionMan.getGui().getSelectedAutomata();
         
         // Throw up the dialog, let the user select the alphabet
-        EventHiderDialog dlg = new EventHiderDialog(ide, automata, ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getUnselectedAutomata().getUnionAlphabet());
+        new EventHiderDialog(ide, automata, ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getUnselectedAutomata().getUnionAlphabet());
     }
     
     public void doAction(Automata theAutomata, Alphabet othersAlphabet)
     {
-        EventHiderDialog dlg = new EventHiderDialog(ide, theAutomata, othersAlphabet);        
+        new EventHiderDialog(ide, theAutomata, othersAlphabet);
     }
 }

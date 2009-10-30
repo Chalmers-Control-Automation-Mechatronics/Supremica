@@ -9,7 +9,7 @@ import java.util.*;
 
 public class IlReturnOperator
 {
-	private static List theInstructions = new ArrayList();
+	private static List<IlReturnOperator> theInstructions = new ArrayList<IlReturnOperator>();
 	private String instruction;
 
 	private IlReturnOperator(String s)
@@ -20,7 +20,7 @@ public class IlReturnOperator
 	}
 
 	/**iterator gives an iterator over the instruction constants*/
-	public static Iterator iterator()
+	public static Iterator<IlReturnOperator> iterator()
 	{
 		return theInstructions.iterator();
 	}

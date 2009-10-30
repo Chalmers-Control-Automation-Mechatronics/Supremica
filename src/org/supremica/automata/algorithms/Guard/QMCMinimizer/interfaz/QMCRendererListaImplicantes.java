@@ -18,9 +18,12 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCImplicante
  * usando las propiedades de las cabeceras de columnas.
  * @author Pedro Sanz
  **/
-public class QMCRendererListaImplicantes extends JCheckBox implements ListCellRenderer {
-    
-		
+public class QMCRendererListaImplicantes
+    extends JCheckBox
+    implements ListCellRenderer
+{
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructor que define el formato de las celdas
      **/

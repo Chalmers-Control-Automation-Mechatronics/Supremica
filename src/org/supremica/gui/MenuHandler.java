@@ -51,6 +51,7 @@ package org.supremica.gui;
 
 import java.util.*;
 import javax.swing.*;
+
 import org.supremica.util.VPopupMenu;
 
 // MF -- Small changes here to make the main popup menu usefable from other tables
@@ -63,10 +64,10 @@ public class MenuHandler
 	private final JPopupMenu twoAutomataMenu = new VPopupMenu();
 	boolean oneAutomataMenuLastSep = false;
 	boolean twoAutomataMenuLastSep = false;
-	private final LinkedList zeroAutomataItems = new LinkedList();
-	private final LinkedList oneAutomataItems = new LinkedList();
-	private final LinkedList twoAutomataItems = new LinkedList();
-	private final LinkedList disabledItems = new LinkedList();
+	private final LinkedList<JMenuItem> zeroAutomataItems = new LinkedList<JMenuItem>();
+	private final LinkedList<JMenuItem> oneAutomataItems = new LinkedList<JMenuItem>();
+	private final LinkedList<JMenuItem> twoAutomataItems = new LinkedList<JMenuItem>();
+	private final LinkedList<JMenuItem> disabledItems = new LinkedList<JMenuItem>();
 
 	public static final int DISABLED = -1;
 
@@ -169,13 +170,13 @@ public class MenuHandler
 		return oneAutomataMenu;
 	}
 
-	private void setEnabled(LinkedList theList, boolean enable)
+	private void setEnabled(LinkedList<JMenuItem> theList, boolean enable)
 	{
-		Iterator menuItemIt = theList.iterator();
+		Iterator<JMenuItem> menuItemIt = theList.iterator();
 
 		while (menuItemIt.hasNext())
 		{
-			JMenuItem currItem = (JMenuItem) menuItemIt.next();
+			JMenuItem currItem = menuItemIt.next();
 
 			currItem.setEnabled(enable);
 		}

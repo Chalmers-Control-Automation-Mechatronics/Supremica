@@ -180,7 +180,7 @@ public class GraphEventPanel
     dragsource.createDefaultDragGestureRecognizer
       (this, DnDConstants.ACTION_COPY, this);
     final DropTargetListener dropper = new DropListener();
-    final DropTarget droptarget = new DropTarget(this, dropper);
+    new DropTarget(this, dropper);
 
     final Action add = manager.getInsertEventLabelAction();
     addKeyboardAction(add);
@@ -368,8 +368,9 @@ public class GraphEventPanel
     try {
       if (transferable.isDataFlavorSupported
           (WatersDataFlavor.IDENTIFIER_LIST)) {
-        final List<Proxy> data = (List<Proxy>)
-          transferable.getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
+        final List<Proxy> data =
+          Casting.toList(transferable.getTransferData
+              (WatersDataFlavor.IDENTIFIER_LIST));
         for (final Proxy proxy : data) {
           if (!containsEqualIdentifier(proxy)) {
             return true;
@@ -404,8 +405,9 @@ public class GraphEventPanel
     if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER_LIST)) {
       final ModuleProxyCloner cloner =
         ModuleSubjectFactory.getCloningInstance();
-      final List<Proxy> data = (List<Proxy>)
-        transferable.getTransferData(WatersDataFlavor.IDENTIFIER_LIST);
+      final List<Proxy> data =
+        Casting.toList(transferable.getTransferData
+            (WatersDataFlavor.IDENTIFIER_LIST));
       for (final Proxy proxy : data) {
         if (!containsEqualIdentifier(proxy)) {
           final Proxy cloned = cloner.getClone(proxy);
@@ -889,6 +891,9 @@ public class GraphEventPanel
     //# Data Members
     private final boolean mFocusable;
 
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
   }
 
 
@@ -899,7 +904,7 @@ public class GraphEventPanel
   {
 
     //#######################################################################
-    //# Interfaca java.awt.event.MouseListener
+    //# Interface java.awt.event.MouseListener
     public void mouseClicked(final MouseEvent event)
     {
       final Point point = event.getPoint();
@@ -1368,5 +1373,7 @@ public class GraphEventPanel
   private static final int MINCOLUMNWIDTH0 = 20;
   private static final int COLUMNWIDTH1 = 96;
   private static final int MINCOLUMNWIDTH1 = 24;
+
+  private static final long serialVersionUID = 1L;
 
 }

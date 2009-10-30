@@ -6,10 +6,10 @@ import java.awt.Component;
 import javax.swing.JTable;
 
 public class ValueChangedCellRenderer 
-								extends
-									BasicCellRenderer
+	extends BasicCellRenderer
 {
-	private final Color CHANGED_VALUE_CELL_COLOR = new Color(153,186,250,200);
+    private static final long serialVersionUID = 1L;
+	private static final Color CHANGED_VALUE_CELL_COLOR = new Color(153,186,250,200);
 	
 	public ValueChangedCellRenderer() {
 		super();

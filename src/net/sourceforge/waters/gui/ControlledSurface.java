@@ -10,9 +10,11 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.*;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -27,7 +29,14 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.dnd.InvalidDnDOperationException;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -45,21 +54,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 
-import net.sourceforge.waters.gui.EditorSurface.DRAGOVERSTATUS;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CompoundCommand;
-import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.DeleteCommand;
+import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.ReorganizeListCommand;
-import net.sourceforge.waters.gui.command.UndoableCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -91,7 +98,21 @@ import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.plain.module.GraphElement;
 import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
@@ -102,7 +123,22 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
-import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.EventListExpressionSubject;
+import net.sourceforge.waters.subject.module.ForeachEventSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
@@ -130,7 +166,7 @@ public class ControlledSurface
     mPopupFactory = manager == null ? null : new GraphPopupFactory(manager);
     setFocusable(true);
     final DropTargetListener dtListener = new DTListener();
-    final DropTarget dropTarget = new DropTarget(this, dtListener);
+    new DropTarget(this, dtListener);
     addKeyListener(new KeySpy());
     updateTool();
 
@@ -416,6 +452,7 @@ public class ControlledSurface
     }
   }
 
+  @SuppressWarnings("unchecked")
   public List<InsertInfo> getInsertInfo(Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
@@ -522,6 +559,7 @@ public class ControlledSurface
     return false;
   }
 
+  @SuppressWarnings("unchecked")
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
     final GraphSubject graph = getGraph();
@@ -590,6 +628,7 @@ public class ControlledSurface
     return inserts;
   }
 
+  @SuppressWarnings("unchecked")
   public void insertItems(List<InsertInfo> inserts)
   {
     final GraphSubject graph = getGraph();
@@ -981,7 +1020,7 @@ public class ControlledSurface
   {
     final String name = node.getName();
     final SimpleIdentifierSubject ident = new SimpleIdentifierSubject(name);
-    final JTextField text = new StateNameInputCell(node, ident);
+    new StateNameInputCell(node, ident);
   }
 
 
@@ -1906,7 +1945,6 @@ public class ControlledSurface
     {
       super.mousePressed(event);
       if (event.getButton() == MouseEvent.BUTTON1) {
-        final Point point = event.getPoint();
         final ProxySubject item = getItemToBeSelected(event);
          if (item == null || event.isControlDown()) {
           // Clicking on whitespace --- drag select.
@@ -2038,7 +2076,6 @@ public class ControlledSurface
     {
       super.mousePressed(event);
       if (event.getButton() == MouseEvent.BUTTON1) {
-        final Point point = event.getPoint();
         if (event.isControlDown() || mFocusedObject == null) {
           // Clicking on whitespace --- drag select.
           mInternalDragAction = new InternalDragActionSelect(event);
@@ -2082,7 +2119,6 @@ public class ControlledSurface
       mPopupFactory.maybeShowPopup
         (ControlledSurface.this, event, mFocusedObject);
       if (event.getButton() == MouseEvent.BUTTON1) {
-        final Point point = event.getPoint();
         if (event.isControlDown()) {
           mInternalDragAction = new InternalDragActionSelect(event);
         } else if (mFocusedObject == null) {
@@ -2166,7 +2202,6 @@ public class ControlledSurface
       mPopupFactory.maybeShowPopup
         (ControlledSurface.this, event, mFocusedObject);
       if (event.getButton() == MouseEvent.BUTTON1) {
-        final Point point = event.getPoint();
         final ProxySubject item = getItemToBeSelected(event);
         if (item == null || event.isControlDown()) {
           mInternalDragAction = new InternalDragActionSelect(event);
@@ -2257,7 +2292,8 @@ public class ControlledSurface
       return mDragStart;
     }
 
-    Point getDragStartOnGrid()
+    @SuppressWarnings("unused")
+	Point getDragStartOnGrid()
     {
       return mDragStartOnGrid;
     }
@@ -2789,7 +2825,6 @@ public class ControlledSurface
                                   final ProxySubject label)
     {
       super(event);
-      mLabelBlock = (LabelBlockSubject) mFocusedObject;
       mClickedLabel = label;
       addToSelection(mClickedLabel);
       mExternalDragStatus = DRAGOVERSTATUS.NOTDRAG;
@@ -2798,7 +2833,6 @@ public class ControlledSurface
     private InternalDragActionDND(final Point point)
     {
       super(point, point, false);
-      mLabelBlock = null;
       mClickedLabel = null;
       mExternalDragStatus = DRAGOVERSTATUS.NOTDRAG;
     }
@@ -2957,9 +2991,6 @@ public class ControlledSurface
       }
     }
 
-    //#######################################################################
-    //# Data Members
-    private final LabelBlockSubject mLabelBlock;
     private final ProxySubject mClickedLabel;
     private Line2D mLine;
     private int mDropIndex;
@@ -3373,7 +3404,6 @@ public class ControlledSurface
     void commitSecondaryGraph()
     {
       final NodeSubject node = (NodeSubject) mFocusedObject;
-      final Point2D anchor;
       if (node == null) {
         if (mSource != null) {
           replaceSelection(mSource);
@@ -3522,7 +3552,8 @@ public class ControlledSurface
       }
     }
 
-    private void move(final ProxySubject item, final int dx, final int dy)
+    @SuppressWarnings("unused")
+	private void move(final ProxySubject item, final int dx, final int dy)
     {
       try {
         assert(mSecondaryGraph != null);
@@ -3753,7 +3784,7 @@ public class ControlledSurface
                   if (hasSelected(l))
                     {
                       List<AbstractSubject> labels =
-                        new ArrayList(l.getEventListModifiable());
+                        new ArrayList<AbstractSubject>(l.getEventListModifiable());
                       labels.retainAll(mSelectedList);
                       //System.err.println(labels);
                       int index = l.getEventList().size();
@@ -3796,7 +3827,7 @@ public class ControlledSurface
                   if (hasSelected(l))
                     {
                       List<AbstractSubject> labels =
-                        new ArrayList(l.getEventListModifiable());
+                        new ArrayList<AbstractSubject>(l.getEventListModifiable());
                       labels.retainAll(mSelectedList);
                       //System.err.println(labels);
                       int index = 0;
@@ -3838,7 +3869,7 @@ public class ControlledSurface
     implements FocusListener
   {
 
-    //#######################################################################
+	//#######################################################################
     //# Constructor
     private StateNameInputCell(final SimpleNodeSubject node,
                                final SimpleIdentifierSubject ident)
@@ -3873,7 +3904,9 @@ public class ControlledSurface
       setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
       addFocusListener(this);
       final Action enter = new AbstractAction("<enter>") {
-          public void actionPerformed(final ActionEvent event)
+        private static final long serialVersionUID = 1L;
+
+        public void actionPerformed(final ActionEvent event)
           {
             try {
               commitEdit();
@@ -3885,6 +3918,7 @@ public class ControlledSurface
         };
       addEnterAction(enter);
       final Action escape = new AbstractAction("<escape>") {
+          private static final long serialVersionUID = 1L;
           public void actionPerformed(final ActionEvent event)
           {
             cancel();
@@ -3947,6 +3981,10 @@ public class ControlledSurface
     //#######################################################################
     //# Data Members
     private SimpleNodeSubject mNode;
+
+    //#######################################################################
+    //# Class Constants
+	private static final long serialVersionUID = 1L;
   }
 
 
@@ -4464,7 +4502,8 @@ public class ControlledSurface
 
     //#######################################################################
     //# Auxiliary Methods
-    private List<? extends Proxy> getTransferData
+    @SuppressWarnings("unchecked")
+	private List<? extends Proxy> getTransferData
       (final Transferable transferable)
       throws IOException, UnsupportedFlavorException
     {
@@ -4472,7 +4511,8 @@ public class ControlledSurface
         (WatersDataFlavor.IDENTIFIER_LIST);
     }
 
-    private boolean isContainingAll(final EventListExpressionProxy elist)
+    @SuppressWarnings("unchecked")
+	private boolean isContainingAll(final EventListExpressionProxy elist)
     {
       final List<? extends Proxy> list = elist.getEventList();
       final ProxyAccessorMap<Proxy> map =
@@ -4626,6 +4666,7 @@ public class ControlledSurface
 
   //#########################################################################
   //# Class Constants
+  private static final long serialVersionUID = 1L;
   private static final int STATE_INPUT_WIDTH = 128;
 
 }

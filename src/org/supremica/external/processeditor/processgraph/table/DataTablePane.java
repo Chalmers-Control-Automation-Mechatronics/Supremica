@@ -23,6 +23,7 @@ public class DataTablePane
 						implements 
 							ActionListener
 {
+    private static final long serialVersionUID = 1L;
 	
 	private JButton jbAdd;
 	private JButton jbRemove;
@@ -104,6 +105,7 @@ public class DataTablePane
 	}
 	
 	//TODO: Implement this function
+	@SuppressWarnings("unused")
 	private void fromFile(){
 		
 		if(fc == null){

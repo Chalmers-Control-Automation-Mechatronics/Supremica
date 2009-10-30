@@ -9,9 +9,9 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import org.jdom.Document;
-import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.supremica.external.avocades.COPBuilder;
+
 
 class RelationExtractionWorker
                            extends

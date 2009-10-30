@@ -68,13 +68,13 @@ public class MachineData implements EquipmentContainer
     private String name;
     private String type;
     private String description;
-    private List actuators; 
+    private List<Actuator> actuators; 
     // The order for the actuators (and sensors, variables and EOPs below) are not important but I allways iterate 
     // through all elements in the list.
-    private List sensors; 
+    private List<Sensor> sensors; 
     private Mailbox mailbox;
-    private List variables;
-    private List EOPs;
+    private List<VariableData> variables;
+    private List<EOPData> EOPs;
     private MachineController machineController;
     private boolean ownControlSystem;
 
@@ -99,11 +99,11 @@ public class MachineData implements EquipmentContainer
 	this.ownControlSystem = ownControlSystem;
 	this.type = type;
 	this.machineController = machineController;
-	variables = new LinkedList();
+	variables = new LinkedList<VariableData>();
 	description = null;
-	sensors = new LinkedList();
-	actuators = new LinkedList();
-	EOPs = new LinkedList();
+	sensors = new LinkedList<Sensor>();
+	actuators = new LinkedList<Actuator>();
+	EOPs = new LinkedList<EOPData>();
 	this.mailbox = mailbox;
     }
 
@@ -137,7 +137,7 @@ public class MachineData implements EquipmentContainer
 	EOPs.add(EOPData);
     }
 
-    public List getEOPs()
+    public List<EOPData> getEOPs()
     {
 	return EOPs;
     }
@@ -152,7 +152,7 @@ public class MachineData implements EquipmentContainer
 	return machineController;
     }
 
-    public List getVariables()
+    public List<VariableData> getVariables()
     {
 	return variables;
     }
@@ -161,7 +161,7 @@ public class MachineData implements EquipmentContainer
     {
 	variables.add(variableToAdd);
     }
-    public List getSensors()
+    public List<Sensor> getSensors()
     {
 	return sensors;
     }
@@ -170,7 +170,7 @@ public class MachineData implements EquipmentContainer
     {
 	sensors.add(sensorToAdd);
     }
-    public List getActuators()
+    public List<Actuator> getActuators()
     {
 	return actuators;
     }

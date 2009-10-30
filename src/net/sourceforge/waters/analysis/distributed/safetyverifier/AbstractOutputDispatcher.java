@@ -2,6 +2,8 @@ package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
 public abstract class AbstractOutputDispatcher implements OutputDispatcher
 {
+  private static final long serialVersionUID = 1L;
+
   public AbstractOutputDispatcher(StateDistribution dist)
   {
     mStateDistribution = dist;

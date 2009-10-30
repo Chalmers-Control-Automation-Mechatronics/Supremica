@@ -53,9 +53,9 @@ import java.util.*;
 
 public class InternalOperation
 {
-	private LinkedList prevTransitions = new LinkedList();
-	private LinkedList nextTransitions = new LinkedList();
-	private ArrayList resourceCandidates = new ArrayList();
+	private LinkedList<InternalTransition> prevTransitions = new LinkedList<InternalTransition>();
+	private LinkedList<InternalTransition> nextTransitions = new LinkedList<InternalTransition>();
+	private ArrayList<String> resourceCandidates = new ArrayList<String>();
 	private String identity;
 	private String activeResource = null;
 	private int time = Integer.MIN_VALUE;
@@ -74,7 +74,7 @@ public class InternalOperation
 		index = orgOperation.index;
 
 		// Copy the resource candidates
-		Iterator resourceIt = orgOperation.resourceCandidates();
+		Iterator<String> resourceIt = orgOperation.resourceCandidates();
 
 		addResourceCandidates(resourceIt);
 	}
@@ -124,11 +124,11 @@ public class InternalOperation
 		return activeResource != null;
 	}
 
-	public void addResourceCandidates(Iterator resourceIt)
+	public void addResourceCandidates(Iterator<String> resourceIt)
 	{
 		while (resourceIt.hasNext())
 		{
-			String resource = (String) resourceIt.next();
+			String resource = resourceIt.next();
 
 			addResourceCandidate(resource);
 		}
@@ -140,12 +140,12 @@ public class InternalOperation
 	}
 
 	// Remove !?
-	public Iterator resourceCandidates()
+	public Iterator<String> resourceCandidates()
 	{
 		return resourceCandidates.iterator();
 	}
 
-	public Iterator resourceCandidateIterator()
+	public Iterator<String> resourceCandidateIterator()
 	{
 		return resourceCandidates.iterator();
 	}
@@ -170,12 +170,12 @@ public class InternalOperation
 		nextTransitions.add(transition);
 	}
 
-	public Iterator nextTransitionIterator()
+	public Iterator<InternalTransition> nextTransitionIterator()
 	{
 		return nextTransitions.iterator();
 	}
 
-	public Iterator prevTransitionIterator()
+	public Iterator<InternalTransition> prevTransitionIterator()
 	{
 		return prevTransitions.iterator();
 	}
@@ -187,11 +187,11 @@ public class InternalOperation
 		sb.append("InternalOperation: " + identity + " initial: " + isInitial() + " final: " + isFinal() + "\n");
 		sb.append("\tPrevious transitions:\n");
 
-		Iterator transitionsIt = prevTransitions.iterator();
+		Iterator<InternalTransition> transitionsIt = prevTransitions.iterator();
 
 		while (transitionsIt.hasNext())
 		{
-			InternalTransition currTransition = (InternalTransition) transitionsIt.next();
+			InternalTransition currTransition = transitionsIt.next();
 
 			sb.append("\t\t" + currTransition.getIdentity() + "\n");
 		}
@@ -202,18 +202,18 @@ public class InternalOperation
 
 		while (transitionsIt.hasNext())
 		{
-			InternalTransition currTransition = (InternalTransition) transitionsIt.next();
+			InternalTransition currTransition = transitionsIt.next();
 
 			sb.append("\t\t" + currTransition.getIdentity() + "\n");
 		}
 
 		sb.append("\tResources:\n");
 
-		Iterator resourceIt = resourceCandidates.iterator();
+		Iterator<String> resourceIt = resourceCandidates.iterator();
 
 		while (resourceIt.hasNext())
 		{
-			String currResource = (String) resourceIt.next();
+			String currResource = resourceIt.next();
 
 			sb.append("\t\t" + currResource + "\n");
 		}

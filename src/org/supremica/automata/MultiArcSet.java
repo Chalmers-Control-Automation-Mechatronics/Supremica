@@ -57,4 +57,5 @@ import java.util.*;
 public class MultiArcSet
 	extends TreeSet<MultiArc>
 {
+    private static final long serialVersionUID = 1L;
 }

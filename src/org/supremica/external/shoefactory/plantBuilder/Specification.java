@@ -54,10 +54,12 @@ import org.supremica.automata.*;
 public class Specification
 {
     protected Project theSpec = null;
-    private Automaton station = null;
+    @SuppressWarnings("unused")
+	private Automaton station = null;
     private Alphabet currAlphabet;
     private int shoeNr;
-    private boolean[] createdEvents = new boolean[13];
+    @SuppressWarnings("unused")
+	private boolean[] createdEvents = new boolean[13];
     private boolean[] viatable = new boolean[5];
     
         /*The above array is there to keep track of the tables without stations. The array is true for
@@ -121,6 +123,7 @@ public class Specification
         currAlphabet.addEvent(put0REvent);
         currAlphabet.addEvent(get0REvent);
         
+        @SuppressWarnings("unused")
         Arc putArc = new Arc(sInitial, s0, put0LEvent);
         
         s0ret1 = currShoe.createUniqueState("q");
@@ -129,12 +132,15 @@ public class Specification
         s0ret2 = currShoe.createUniqueState("q");
         currShoe.addState(s0ret2);
         
+        @SuppressWarnings("unused")
         Arc getArc = new Arc(s0ret1, sInitial, get0LEvent);
         
         g1 = currShoe.createUniqueState("q");
         currShoe.addState(g1);
         
+        @SuppressWarnings("unused")
         Arc tmp6g = new Arc(s0, g1, get0REvent);
+        @SuppressWarnings("unused")
         Arc tmp6p = new Arc(s0ret2, s0ret1, put0REvent);
         
         Error = new LabeledEvent("Error" + nr);
@@ -168,15 +174,19 @@ public class Specification
                 
                 State stat0 = currShoe.createUniqueState("q");
                 currShoe.addState(stat0);
+                @SuppressWarnings("unused")
                 Arc putstat0 = new Arc(tab6, stat0, gt6s0);
+                @SuppressWarnings("unused")
                 Arc getstat0 = new Arc(stat0, tab6, pt6s0);
                 
                 if (allowerror)
                 {
                     State Er1 = currShoe.createUniqueState("q");
                     currShoe.addState(Er1);
-                    Arc AEr1 = new Arc(stat0, Er1, Error);
-                    Arc AEr2 = new Arc(Er1, Er2, pt6s0);
+                    @SuppressWarnings("unused")
+					Arc AEr1 = new Arc(stat0, Er1, Error);
+                    @SuppressWarnings("unused")
+					Arc AEr2 = new Arc(Er1, Er2, pt6s0);
                 }
             }
             
@@ -190,15 +200,19 @@ public class Specification
                 
                 State stat1 = currShoe.createUniqueState("q");
                 currShoe.addState(stat1);
-                Arc putstat1 = new Arc(tab6, stat1, gt6s1);
-                Arc getstat1 = new Arc(stat1, tab6, pt6s1);
+                @SuppressWarnings("unused")
+				Arc putstat1 = new Arc(tab6, stat1, gt6s1);
+                @SuppressWarnings("unused")
+				Arc getstat1 = new Arc(stat1, tab6, pt6s1);
                 
                 if (allowerror)
                 {
                     State Er1 = currShoe.createUniqueState("q");
                     currShoe.addState(Er1);
-                    Arc AEr1 = new Arc(stat1, Er1, Error);
-                    Arc AEr2 = new Arc(Er1, Er2, pt6s1);
+                    @SuppressWarnings("unused")
+					Arc AEr1 = new Arc(stat1, Er1, Error);
+                    @SuppressWarnings("unused")
+					Arc AEr2 = new Arc(Er1, Er2, pt6s1);
                 }
             }
             
@@ -213,14 +227,18 @@ public class Specification
                 State stat2 = currShoe.createUniqueState("q");
                 currShoe.addState(stat2);
                 
+                @SuppressWarnings("unused")
                 Arc putstat2 = new Arc(tab6, stat2, gt6s2);
+                @SuppressWarnings("unused")
                 Arc getstat2 = new Arc(stat2, tab6, pt6s2);
                 
                 if (allowerror)
                 {
                     State Er1 = currShoe.createUniqueState("q");
                     currShoe.addState(Er1);
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat2, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er2, pt6s2);
                 }
             }
@@ -235,14 +253,18 @@ public class Specification
                 
                 State stat3 = currShoe.createUniqueState("q");
                 currShoe.addState(stat3);
+                @SuppressWarnings("unused")
                 Arc putstat3 = new Arc(tab6, stat3, gt6s3);
+                @SuppressWarnings("unused")
                 Arc getstat3 = new Arc(stat3, tab6, pt6s3);
                 
                 if (allowerror)
                 {
                     State Er1 = currShoe.createUniqueState("q");
                     currShoe.addState(Er1);
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat3, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er2, pt6s3);
                 }
             }
@@ -257,19 +279,25 @@ public class Specification
                 
                 State stat4 = currShoe.createUniqueState("q");
                 currShoe.addState(stat4);
+                @SuppressWarnings("unused")
                 Arc putstat4 = new Arc(tab6, stat4, gt6s4);
+                @SuppressWarnings("unused")
                 Arc getstat4 = new Arc(stat4, tab6, pt6s4);
                 
                 if (allowerror)
                 {
                     State Er1 = currShoe.createUniqueState("q");
                     currShoe.addState(Er1);
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat4, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er2, pt6s4);
                 }
             }
             
+            @SuppressWarnings("unused")
             Arc putArc6 = new Arc(g1, tab6, put6Event);
+            @SuppressWarnings("unused")
             Arc getArc6 = new Arc(tab6, h1, get6Event);
         }
         
@@ -377,11 +405,13 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret3 = currShoe.createUniqueState("q");
                 currShoe.addState(s0ret3);
                 
+                @SuppressWarnings("unused")
                 Arc ag2p = new Arc(s0ret3, s0ret2, getL1Event);
                 
                 s0ret4 = currShoe.createUniqueState("q");
                 currShoe.addState(s0ret4);
                 
+                @SuppressWarnings("unused")
                 Arc ag3p = new Arc(s0ret4, s0ret3, putR1Event);
                 
                 if (sv[5] || sv[6] || sv[6] || sv[8] || sv[9] || sv[10] || sv[11])
@@ -391,7 +421,9 @@ the if(true) is there so you can discard the error events completly if needed.
                     g2 = currShoe.createUniqueState("q");
                     currShoe.addState(g2);
                     
+                    @SuppressWarnings("unused")
                     Arc ag2 = new Arc(tab1, g2, get1Event);
+                    @SuppressWarnings("unused")
                     Arc putArc1 = new Arc(g1, tab1, put1Event);
                 }
                 
@@ -421,7 +453,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret6 = currShoe.createUniqueState("q");
                 currShoe.addState(s0ret6);
                 
+                @SuppressWarnings("unused")
                 Arc ag3p = new Arc(s0ret6, s0ret5, putR2Event);
+                @SuppressWarnings("unused")
                 Arc ag2p = new Arc(s0ret5, s0ret4, getL2Event);
                 
                 if (sv[9] || sv[10] || sv[11])
@@ -431,7 +465,9 @@ the if(true) is there so you can discard the error events completly if needed.
                     g3 = currShoe.createUniqueState("q");
                     currShoe.addState(g3);
                     
+                    @SuppressWarnings("unused")
                     Arc ag3 = new Arc(tab2, g3, get2Event);
+                    @SuppressWarnings("unused")
                     Arc putArc2 = new Arc(g2, tab2, put2Event);
                 }
                 
@@ -465,9 +501,13 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret8 = currShoe.createUniqueState("q");
                 currShoe.addState(s0ret8);
                 
+                @SuppressWarnings("unused")
                 Arc ag5p = new Arc(s0ret8, s0ret7, putR3Event);
+                @SuppressWarnings("unused")
                 Arc ag4p = new Arc(s0ret7, s0ret6, getL3Event);
+                @SuppressWarnings("unused")
                 Arc ag4 = new Arc(tab3, g4, get3Event);
+                @SuppressWarnings("unused")
                 Arc putArc3;
                 
                 if (sv[9] || sv[10] || sv[11])
@@ -507,9 +547,13 @@ the if(true) is there so you can discard the error events completly if needed.
                     s0ret10 = currShoe.createUniqueState("q");
                     currShoe.addState(s0ret10);
                     
+                    @SuppressWarnings("unused")
                     Arc ag7p = new Arc(s0ret10, s0ret9, putR4Event);
+                    @SuppressWarnings("unused")
                     Arc ag6p = new Arc(s0ret9, s0ret8, getL4Event);
+                    @SuppressWarnings("unused")
                     Arc ag5 = new Arc(tab4, g5, get4Event);
+                    @SuppressWarnings("unused")
                     Arc putArc4 = new Arc(g4, tab4, put4Event);
                 }
                 
@@ -721,7 +765,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret4 = currShoe.createUniqueState("q");
                 currShoe.addState(s0ret4);
                 
+                @SuppressWarnings("unused")
                 Arc ag3p = new Arc(s0ret4, s0ret3, putR1Event);
+                @SuppressWarnings("unused")
                 Arc ag2p = new Arc(s0ret3, s0ret2, getL1Event);
                 
                 if (sv[5] || sv[6] || sv[6] || sv[8] || sv[9] || sv[10] || sv[11])
@@ -731,7 +777,9 @@ the if(true) is there so you can discard the error events completly if needed.
                     g2 = currShoe.createUniqueState("q");
                     currShoe.addState(g2);
                     
+                    @SuppressWarnings("unused")
                     Arc ag2 = new Arc(tab1, g2, get1Event);
+                    @SuppressWarnings("unused")
                     Arc putArc1 = new Arc(g1, tab1, put1Event);
                 }
                 
@@ -761,7 +809,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret6 = currShoe.createUniqueState("q");
                 currShoe.addState(s0ret6);
                 
+                @SuppressWarnings("unused")
                 Arc ag3p = new Arc(s0ret6, s0ret5, putR2Event);
+                @SuppressWarnings("unused")
                 Arc ag2p = new Arc(s0ret5, s0ret4, getL2Event);
                 
                 if (sv[9] || sv[10] || sv[11])
@@ -771,7 +821,9 @@ the if(true) is there so you can discard the error events completly if needed.
                     g3 = currShoe.createUniqueState("q");
                     currShoe.addState(g3);
                     
+                    @SuppressWarnings("unused")
                     Arc ag3 = new Arc(tab2, g3, get2Event);
+                    @SuppressWarnings("unused")
                     Arc putArc2 = new Arc(g2, tab2, put2Event);
                 }
                 
@@ -805,9 +857,13 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret8 = currShoe.createUniqueState("q");
                 currShoe.addState(s0ret8);
                 
+                @SuppressWarnings("unused")
                 Arc ag5p = new Arc(s0ret8, s0ret7, putR3Event);
+                @SuppressWarnings("unused")
                 Arc ag4p = new Arc(s0ret7, s0ret6, getL3Event);
+                @SuppressWarnings("unused")
                 Arc ag4 = new Arc(tab3, g4, get3Event);
+                @SuppressWarnings("unused")
                 Arc putArc3;
                 
                 if (sv[9] || sv[10] || sv[11])
@@ -845,9 +901,13 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret10 = currShoe.createUniqueState("q");
                 currShoe.addState(s0ret10);
                 
+                @SuppressWarnings("unused")
                 Arc ag7p = new Arc(s0ret10, s0ret9, putR4Event);
+                @SuppressWarnings("unused")
                 Arc ag6p = new Arc(s0ret9, s0ret8, getL4Event);
+                @SuppressWarnings("unused")
                 Arc ag5 = new Arc(tab4, g5, get4Event);
+                @SuppressWarnings("unused")
                 Arc putArc4 = new Arc(g4, tab4, put4Event);
                 
                 viatable[3] = false;
@@ -874,7 +934,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret11 = createNewState(currShoe,"q");
                 s0ret12 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag9p = new Arc(s0ret12, s0ret11, putR5Event);
+                @SuppressWarnings("unused")
                 Arc ag8p = new Arc(s0ret11, s0ret10, getL5Event);
                 
                 tab5 = createNewState(currShoe,"q");
@@ -892,7 +954,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt11s21);
                 
                 State stat21 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat21 = new Arc(tab11, stat21, gt11s21);
+                @SuppressWarnings("unused")
                 Arc getstat21 = new Arc(stat21, tab11, pt11s21);
                 
                 if (allowerror)
@@ -902,11 +966,17 @@ the if(true) is there so you can discard the error events completly if needed.
                     State Er4 = createNewState(currShoe,"q");
                     State Er5 = createNewState(currShoe,"q");
                     State Er6 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat21, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt11s21);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, Er4, get11Event);
+                    @SuppressWarnings("unused")
                     Arc AEr4 = new Arc(Er4, Er5, putR5Event);
+                    @SuppressWarnings("unused")
                     Arc AEr5 = new Arc(Er5, Er6, getL5Event);
+                    @SuppressWarnings("unused")
                     Arc AEr6 = new Arc(Er6, E10, put10Event);
                 }
             }
@@ -920,7 +990,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt11s22);
                 
                 State stat22 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat22 = new Arc(tab11, stat22, gt11s22);
+                @SuppressWarnings("unused")
                 Arc getstat22 = new Arc(stat22, tab11, pt11s22);
                 
                 if (allowerror)
@@ -930,11 +1002,17 @@ the if(true) is there so you can discard the error events completly if needed.
                     State Er4 = createNewState(currShoe,"q");
                     State Er5 = createNewState(currShoe,"q");
                     State Er6 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat22, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt11s22);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, Er4, get11Event);
+                    @SuppressWarnings("unused")
                     Arc AEr4 = new Arc(Er4, Er5, putR5Event);
+                    @SuppressWarnings("unused")
                     Arc AEr5 = new Arc(Er5, Er6, getL5Event);
+                    @SuppressWarnings("unused")
                     Arc AEr6 = new Arc(Er6, E10, put10Event);
                 }
             }
@@ -948,7 +1026,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt11s23);
                 
                 State stat23 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat23 = new Arc(tab11, stat23, gt11s23);
+                @SuppressWarnings("unused")
                 Arc getstat23 = new Arc(stat23, tab11, pt11s23);
                 
                 if (allowerror)
@@ -958,18 +1038,26 @@ the if(true) is there so you can discard the error events completly if needed.
                     State Er4 = createNewState(currShoe,"q");
                     State Er5 = createNewState(currShoe,"q");
                     State Er6 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat23, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt11s23);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, Er4, get11Event);
+                    @SuppressWarnings("unused")
                     Arc AEr4 = new Arc(Er4, Er5, putR5Event);
+                    @SuppressWarnings("unused")
                     Arc AEr5 = new Arc(Er5, Er6, getL5Event);
+                    @SuppressWarnings("unused")
                     Arc AEr6 = new Arc(Er6, E10, put10Event);
                 }
             }
             
             g7 = createNewState(currShoe,"q");
             
+            @SuppressWarnings("unused")
             Arc ag7 = new Arc(tab5, g7, get5Event);
+            @SuppressWarnings("unused")
             Arc ag7p;
             
             if (!(sv[16] || sv[17] || sv[18] || sv[19] || sv[20]))
@@ -981,7 +1069,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 ag7p = new Arc(s0ret14, tab5, put5Event);
             }
             
+            @SuppressWarnings("unused")
             Arc putArc11 = new Arc(g7, tab11, put11Event);
+            @SuppressWarnings("unused")
             Arc getArc11 = new Arc(tab11, s0ret12, get11Event);
         }
         
@@ -1197,10 +1287,12 @@ the if(true) is there so you can discard the error events completly if needed.
                 
                 s0ret3 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag2p = new Arc(s0ret3, s0ret2, getL1Event);
                 
                 s0ret4 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag3p = new Arc(s0ret4, s0ret3, putR1Event);
                 
                 if (sv[5] || sv[6] || sv[6] || sv[8] || sv[9] || sv[10] || sv[11])
@@ -1208,7 +1300,9 @@ the if(true) is there so you can discard the error events completly if needed.
                     tab1 = createNewState(currShoe,"q");
                     g2 = createNewState(currShoe,"q");
                     
+                    @SuppressWarnings("unused")
                     Arc ag2 = new Arc(tab1, g2, get1Event);
+                    @SuppressWarnings("unused")
                     Arc putArc1 = new Arc(g1, tab1, put1Event);
                 }
                 
@@ -1236,7 +1330,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret5 = createNewState(currShoe,"q");
                 s0ret6 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag3p = new Arc(s0ret6, s0ret5, putR2Event);
+                @SuppressWarnings("unused")
                 Arc ag2p = new Arc(s0ret5, s0ret4, getL2Event);
                 
                 if (sv[9] || sv[10] || sv[11])
@@ -1244,7 +1340,9 @@ the if(true) is there so you can discard the error events completly if needed.
                     tab2 = createNewState(currShoe,"q");
                     g3 = createNewState(currShoe,"q");
                     
+                    @SuppressWarnings("unused")
                     Arc ag3 = new Arc(tab2, g3, get2Event);
+                    @SuppressWarnings("unused")
                     Arc putArc2 = new Arc(g2, tab2, put2Event);
                 }
                 
@@ -1274,9 +1372,13 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret7 = createNewState(currShoe,"q");
                 s0ret8 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag5p = new Arc(s0ret8, s0ret7, putR3Event);
+                @SuppressWarnings("unused")
                 Arc ag4p = new Arc(s0ret7, s0ret6, getL3Event);
+                @SuppressWarnings("unused")
                 Arc ag4 = new Arc(tab3, g4, get3Event);
+                @SuppressWarnings("unused")
                 Arc putArc3;
                 
                 if (sv[9] || sv[10] || sv[11])
@@ -1310,9 +1412,13 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret9 = createNewState(currShoe,"q");
                 s0ret10 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag7p = new Arc(s0ret10, s0ret9, putR4Event);
+                @SuppressWarnings("unused")
                 Arc ag6p = new Arc(s0ret9, s0ret8, getL4Event);
+                @SuppressWarnings("unused")
                 Arc ag5 = new Arc(tab4, g5, get4Event);
+                @SuppressWarnings("unused")
                 Arc putArc4 = new Arc(g4, tab4, put4Event);
                 
                 viatable[3] = false;
@@ -1331,7 +1437,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 tab10 = createNewState(currShoe,"q");
                 
                 State not10 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putArc10 = new Arc(g5, not10, put10Event);
+                @SuppressWarnings("unused")
                 Arc getArc10 = new Arc(not10, tab10, get10Event);
             }
             
@@ -1346,7 +1454,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt12s16);
                 
                 State stat16 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat16 = new Arc(tab12, stat16, gt12s16);
+                @SuppressWarnings("unused")
                 Arc getstat16 = new Arc(stat16, tab12, pt12s16);
                 
                 if (allowerror)
@@ -1354,9 +1464,13 @@ the if(true) is there so you can discard the error events completly if needed.
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
                     State Er4 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat16, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt12s16);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, Er4, get12Event);
+                    @SuppressWarnings("unused")
                     Arc AEr4 = new Arc(Er4, E10, putR10Event);
                 }
             }
@@ -1370,7 +1484,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt12s17);
                 
                 State stat17 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat17 = new Arc(tab12, stat17, gt12s17);
+                @SuppressWarnings("unused")
                 Arc getstat17 = new Arc(stat17, tab12, pt12s17);
                 
                 if (allowerror)
@@ -1378,9 +1494,13 @@ the if(true) is there so you can discard the error events completly if needed.
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
                     State Er4 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat17, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt12s17);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, Er4, get12Event);
+                    @SuppressWarnings("unused")
                     Arc AEr4 = new Arc(Er4, E10, putR10Event);
                 }
             }
@@ -1394,7 +1514,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt12s18);
                 
                 State stat18 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat18 = new Arc(tab12, stat18, gt12s18);
+                @SuppressWarnings("unused")
                 Arc getstat18 = new Arc(stat18, tab12, pt12s18);
                 
                 if (allowerror)
@@ -1402,9 +1524,13 @@ the if(true) is there so you can discard the error events completly if needed.
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
                     State Er4 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat18, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt12s18);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, Er4, get12Event);
+                    @SuppressWarnings("unused")
                     Arc AEr4 = new Arc(Er4, E10, putR10Event);
                 }
             }
@@ -1418,7 +1544,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt12s19);
                 
                 State stat19 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat19 = new Arc(tab12, stat19, gt12s19);
+                @SuppressWarnings("unused")
                 Arc getstat19 = new Arc(stat19, tab12, pt12s19);
                 
                 if (allowerror)
@@ -1426,9 +1554,13 @@ the if(true) is there so you can discard the error events completly if needed.
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
                     State Er4 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat19, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt12s19);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, Er4, get12Event);
+                    @SuppressWarnings("unused")
                     Arc AEr4 = new Arc(Er4, E10, putR10Event);
                 }
             }
@@ -1436,6 +1568,7 @@ the if(true) is there so you can discard the error events completly if needed.
             g6 = createNewState(currShoe,"q");
             s0ret13 = createNewState(currShoe,"q");
             
+            @SuppressWarnings("unused")
             Arc ag6p = new Arc(g6, s0ret13, putR10Event);
             
                         /*if(sv[20])
@@ -1465,6 +1598,7 @@ the if(true) is there so you can discard the error events completly if needed.
             //      else
             //      {
             //if table 11 shall be visited after 12 or else return to table0
+            @SuppressWarnings("unused")
             Arc ag6;
             
             if (!(sv[21] || sv[22] || sv[22]))
@@ -1477,7 +1611,9 @@ the if(true) is there so you can discard the error events completly if needed.
             }
             
             //      }
+            @SuppressWarnings("unused")
             Arc putArc12 = new Arc(tab10, tab12, put12Event);
+            @SuppressWarnings("unused")
             Arc getArc12 = new Arc(tab12, g6, get12Event);
         }
         
@@ -1504,10 +1640,12 @@ the if(true) is there so you can discard the error events completly if needed.
                 
                 s0ret3 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag2p = new Arc(s0ret3, s0ret2, getL1Event);
                 
                 s0ret4 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag3p = new Arc(s0ret4, s0ret3, putR1Event);
                 
                 if (sv[5] || sv[6] || sv[6] || sv[8] || sv[9] || sv[10] || sv[11])
@@ -1515,7 +1653,9 @@ the if(true) is there so you can discard the error events completly if needed.
                     tab1 = createNewState(currShoe,"q");
                     g2 = createNewState(currShoe,"q");
                     
+                    @SuppressWarnings("unused")
                     Arc ag2 = new Arc(tab1, g2, get1Event);
+                    @SuppressWarnings("unused")
                     Arc putArc1 = new Arc(g1, tab1, put1Event);
                 }
                 
@@ -1543,7 +1683,9 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret5 = createNewState(currShoe,"q");
                 s0ret6 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag3p = new Arc(s0ret6, s0ret5, putR2Event);
+                @SuppressWarnings("unused")
                 Arc ag2p = new Arc(s0ret5, s0ret4, getL2Event);
                 
                 if (sv[9] || sv[10] || sv[11])
@@ -1551,7 +1693,9 @@ the if(true) is there so you can discard the error events completly if needed.
                     tab2 = createNewState(currShoe,"q");
                     g3 = createNewState(currShoe,"q");
                     
+                    @SuppressWarnings("unused")
                     Arc ag3 = new Arc(tab2, g3, get2Event);
+                    @SuppressWarnings("unused")
                     Arc putArc2 = new Arc(g2, tab2, put2Event);
                 }
                 
@@ -1581,9 +1725,13 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret7 = createNewState(currShoe,"q");
                 s0ret8 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag5p = new Arc(s0ret8, s0ret7, putR3Event);
+                @SuppressWarnings("unused")
                 Arc ag4p = new Arc(s0ret7, s0ret6, getL3Event);
+                @SuppressWarnings("unused")
                 Arc ag4 = new Arc(tab3, g4, get3Event);
+                @SuppressWarnings("unused")
                 Arc putArc3;
                 
                 if (sv[9] || sv[10] || sv[11])
@@ -1605,15 +1753,20 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt9s12);
                 
                 State stat12 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat12 = new Arc(tab9, stat12, gt9s12);
+                @SuppressWarnings("unused")
                 Arc getstat12 = new Arc(stat12, tab9, pt9s12);
                 
                 if (allowerror)
                 {
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat12, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt9s12);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, E7, get9Event);
                 }
             }
@@ -1627,15 +1780,20 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt9s13);
                 
                 State stat13 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat13 = new Arc(tab9, stat13, gt9s13);
+                @SuppressWarnings("unused")
                 Arc getstat13 = new Arc(stat13, tab9, pt9s13);
                 
                 if (allowerror)
                 {
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat13, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt9s13);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, E7, get9Event);
                 }
             }
@@ -1649,15 +1807,20 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt9s14);
                 
                 State stat14 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat14 = new Arc(tab9, stat14, gt9s14);
+                @SuppressWarnings("unused")
                 Arc getstat14 = new Arc(stat14, tab9, pt9s14);
                 
                 if (allowerror)
                 {
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat14, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt9s14);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, E7, get9Event);
                 }
             }
@@ -1671,22 +1834,29 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt9s15);
                 
                 State stat15 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat15 = new Arc(tab9, stat15, gt9s15);
+                @SuppressWarnings("unused")
                 Arc getstat15 = new Arc(stat15, tab9, pt9s15);
                 
                 if (allowerror)
                 {
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat15, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt9s15);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, E7, get9Event);
                 }
             }
             
+            @SuppressWarnings("unused")
             Arc putArc9 = new Arc(g4, tab9, put9Event);
             
             //if table 9 is the last table to be visted
+            @SuppressWarnings("unused")
             Arc getArc9;
             
             if (!(sv[16] || sv[17] || sv[18] || sv[19] || sv[20] || sv[21] || sv[22] || sv[23]))
@@ -1724,15 +1894,19 @@ the if(true) is there so you can discard the error events completly if needed.
                 
                 s0ret3 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag2p = new Arc(s0ret3, s0ret2, getL1Event);
                 
                 s0ret4 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag3p = new Arc(s0ret4, s0ret3, putR1Event);
                 
                 if (sv[5] || sv[6] || sv[6] || sv[8] || sv[9] || sv[10] || sv[11])
                 {
+                    @SuppressWarnings("unused")
                     Arc ag2 = new Arc(tab1, g2, get1Event);
+                    @SuppressWarnings("unused")
                     Arc putArc1 = new Arc(g1, tab1, put1Event);
                 }
                 
@@ -1762,9 +1936,13 @@ the if(true) is there so you can discard the error events completly if needed.
                 s0ret5 = createNewState(currShoe,"q");
                 s0ret6 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag3p = new Arc(s0ret6, s0ret5, putR2Event);
+                @SuppressWarnings("unused")
                 Arc ag2p = new Arc(s0ret5, s0ret4, getL2Event);
+                @SuppressWarnings("unused")
                 Arc ag3 = new Arc(tab2, g3, get2Event);
+                @SuppressWarnings("unused")
                 Arc putArc2 = new Arc(g2, tab2, put2Event);
                 
                 viatable[1] = false;
@@ -1781,15 +1959,20 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt8s9);
                 
                 State stat9 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat9 = new Arc(tab8, stat9, gt8s9);
+                @SuppressWarnings("unused")
                 Arc getstat9 = new Arc(stat9, tab8, pt8s9);
                 
                 if (allowerror)
                 {
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat9, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt8s9);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, E5, get8Event);
                 }
             }
@@ -1803,15 +1986,20 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt8s10);
                 
                 State stat10 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat10 = new Arc(tab8, stat10, gt8s10);
+                @SuppressWarnings("unused")
                 Arc getstat10 = new Arc(stat10, tab8, pt8s10);
                 
                 if (allowerror)
                 {
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat10, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt8s10);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, E5, get8Event);
                 }
             }
@@ -1825,20 +2013,27 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt8s11);
                 
                 State stat11 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat11 = new Arc(tab8, stat11, gt8s11);
+                @SuppressWarnings("unused")
                 Arc getstat11 = new Arc(stat11, tab8, pt8s11);
                 
                 if (allowerror)
                 {
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat11, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt8s11);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, E5, get8Event);
                 }
             }
             
+            @SuppressWarnings("unused")
             Arc putArc8 = new Arc(g3, tab8, put8Event);
+            @SuppressWarnings("unused")
             Arc getArc8 = new Arc(tab8, g3, get8Event);
         }
         
@@ -1864,15 +2059,19 @@ the if(true) is there so you can discard the error events completly if needed.
                 
                 s0ret3 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag2p = new Arc(s0ret3, s0ret2, getL1Event);
                 
                 s0ret4 = createNewState(currShoe,"q");
                 
+                @SuppressWarnings("unused")
                 Arc ag3p = new Arc(s0ret4, s0ret3, putR1Event);
                 
                 if (sv[5] || sv[6] || sv[6] || sv[8] || sv[9] || sv[10] || sv[11])
                 {
+                    @SuppressWarnings("unused")
                     Arc ag2 = new Arc(tab1, g2, get1Event);
+                    @SuppressWarnings("unused")
                     Arc putArc1 = new Arc(g1, tab1, put1Event);
                 }
                 
@@ -1890,15 +2089,20 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt7s5);
                 
                 State stat5 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat5 = new Arc(tab7, stat5, gt7s5);
+                @SuppressWarnings("unused")
                 Arc getstat5 = new Arc(stat5, tab7, pt7s5);
                 
                 if (allowerror)
                 {
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat5, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt7s5);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, E3, get7Event);
                 }
             }
@@ -1912,15 +2116,20 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt7s6);
                 
                 State stat6 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat6 = new Arc(tab7, stat6, gt7s6);
+                @SuppressWarnings("unused")
                 Arc getstat6 = new Arc(stat6, tab7, pt7s6);
                 
                 if (allowerror)
                 {
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat6, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt7s6);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, E3, get7Event);
                 }
             }
@@ -1934,15 +2143,20 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt7s7);
                 
                 State stat7 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat7 = new Arc(tab7, stat7, gt7s7);
+                @SuppressWarnings("unused")
                 Arc getstat7 = new Arc(stat7, tab7, pt7s7);
                 
                 if (allowerror)
                 {
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat7, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt7s7);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, E3, get7Event);
                 }
             }
@@ -1956,22 +2170,29 @@ the if(true) is there so you can discard the error events completly if needed.
                 currAlphabet.addEvent(gt7s8);
                 
                 State stat8 = createNewState(currShoe,"q");
+                @SuppressWarnings("unused")
                 Arc putstat8 = new Arc(tab7, stat8, gt7s8);
+                @SuppressWarnings("unused")
                 Arc getstat8 = new Arc(stat8, tab7, pt7s8);
                 
                 if (allowerror)
                 {
                     State Er1 = createNewState(currShoe,"q");
                     State Er3 = createNewState(currShoe,"q");
+                    @SuppressWarnings("unused")
                     Arc AEr1 = new Arc(stat8, Er1, Error);
+                    @SuppressWarnings("unused")
                     Arc AEr2 = new Arc(Er1, Er3, pt7s8);
+                    @SuppressWarnings("unused")
                     Arc AEr3 = new Arc(Er3, E3, get7Event);
                 }
             }
             
             i1 = createNewState(currShoe,"q");
             
+            @SuppressWarnings("unused")
             Arc putArc7 = new Arc(g2, tab7, put7Event);
+            @SuppressWarnings("unused")
             Arc getArc7 = new Arc(tab7, i1, get7Event);
         }
         
@@ -1982,10 +2203,15 @@ the if(true) is there so you can discard the error events completly if needed.
             h4 = createNewState(currShoe,"q");
             h5 = createNewState(currShoe,"q");    //this part handles the paralell structure
             
+            @SuppressWarnings("unused")
             Arc aft6_1 = new Arc(h1, h2, put1Event);
+            @SuppressWarnings("unused")
             Arc aft6_2 = new Arc(h2, h3, get1Event);
+            @SuppressWarnings("unused")
             Arc aft6_3 = new Arc(h3, h4, put2Event);
+            @SuppressWarnings("unused")
             Arc aft6_4 = new Arc(h4, h5, get2Event);
+            @SuppressWarnings("unused")
             Arc aft6_5 = new Arc(h5, tab3, put3Event);
         }
         
@@ -1994,8 +2220,11 @@ the if(true) is there so you can discard the error events completly if needed.
             i2 = createNewState(currShoe,"q");
             i3 = createNewState(currShoe,"q");
             
+            @SuppressWarnings("unused")
             Arc aft7_1 = new Arc(i1, i2, put2Event);
+            @SuppressWarnings("unused")
             Arc aft7_2 = new Arc(i2, i3, get2Event);
+            @SuppressWarnings("unused")
             Arc aft7_3 = new Arc(i3, tab3, put3Event);
         }
         

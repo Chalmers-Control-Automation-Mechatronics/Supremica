@@ -77,6 +77,7 @@ import org.xml.sax.SAXException;
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
  * @version $Id$
  */
+@SuppressWarnings("deprecation")
 public class XmlRpcClient
 	implements XmlRpcHandler
 {
@@ -84,7 +85,7 @@ public class XmlRpcClient
 	private String auth;
 
 	// pool of worker instances
-	protected Stack pool = new Stack();
+	protected Stack<Worker> pool = new Stack<Worker>();
 	protected int workers = 0;
 	protected int asyncWorkers = 0;
 
@@ -156,7 +157,7 @@ public class XmlRpcClient
 	 * @exception IOException: If the call could not be made because of lower
 	 *          level problems.
 	 */
-	public Object execute(String method, Vector params)
+	public Object execute(String method, Vector<Comparable> params)
 		throws XmlRpcException, IOException
 	{
 		Worker worker = getWorker(false);
@@ -179,7 +180,7 @@ public class XmlRpcClient
 	 * If the callback parameter is not null, it will be called later to handle
 	 * the result or error when the call is finished.
 	 */
-	public void executeAsync(String method, Vector params, AsyncCallback callback)
+	public void executeAsync(String method, Vector<Comparable> params, AsyncCallback callback)
 	{
 
 		// if at least 4 threads are running, don't create any new ones,
@@ -218,7 +219,7 @@ public class XmlRpcClient
 	{
 		try
 		{
-			Worker w = (Worker) pool.pop();
+			Worker w = pool.pop();
 
 			if (async)
 			{
@@ -281,7 +282,7 @@ public class XmlRpcClient
 	 * @param params
 	 * @param callback
 	 */
-	synchronized void enqueue(String method, Vector params, AsyncCallback callback)
+	synchronized void enqueue(String method, Vector<Comparable> params, AsyncCallback callback)
 	{
 		CallData call = new CallData(method, params, callback);
 
@@ -351,7 +352,7 @@ public class XmlRpcClient
 		 * @param params
 		 * @param callback
 		 */
-		public void start(String method, Vector params, AsyncCallback callback)
+		public void start(String method, Vector<Comparable> params, AsyncCallback callback)
 		{
 			this.call = new CallData(method, params, callback);
 
@@ -378,7 +379,7 @@ public class XmlRpcClient
 		/**
 		 * Execute an XML-RPC call and handle asyncronous callback.
 		 */
-		void executeAsync(String method, Vector params, AsyncCallback callback)
+		void executeAsync(String method, Vector<Comparable> params, AsyncCallback callback)
 		{
 			Object res = null;
 
@@ -408,7 +409,7 @@ public class XmlRpcClient
 		/**
 		 * Execute an XML-RPC call.
 		 */
-		Object execute(String method, Vector params)
+		Object execute(String method, Vector<Comparable> params)
 			throws XmlRpcException, IOException
 		{
 			fault = false;
@@ -424,8 +425,6 @@ public class XmlRpcClient
 
 			try
 			{
-				ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
 				if (buffer == null)
 				{
 					buffer = new ByteArrayOutputStream();
@@ -483,7 +482,7 @@ public class XmlRpcClient
 
 				try
 				{
-					Hashtable f = (Hashtable) result;
+					Hashtable<?, ?> f = (Hashtable<?, ?>) result;
 					String faultString = (String) f.get("faultString");
 					int faultCode = Integer.parseInt(f.get("faultCode").toString());
 
@@ -516,7 +515,7 @@ public class XmlRpcClient
 		/**
 		 * Generate an XML-RPC request from a method name and a parameter vector.
 		 */
-		void writeRequest(XmlWriter writer, String method, Vector params)
+		void writeRequest(XmlWriter writer, String method, Vector<Comparable> params)
 			throws IOException, XmlRpcException
 		{
 			writer.startElement("methodCall");
@@ -558,7 +557,7 @@ public class XmlRpcClient
 	class CallData
 	{
 		String method;
-		Vector params;
+		Vector<Comparable> params;
 		AsyncCallback callback;
 		CallData next;
 
@@ -566,7 +565,7 @@ public class XmlRpcClient
 		 * Make a call to be queued and then executed by the next free async
 		 * thread
 		 */
-		public CallData(String method, Vector params, AsyncCallback callback)
+		public CallData(String method, Vector<Comparable> params, AsyncCallback callback)
 		{
 			this.method = method;
 			this.params = params;
@@ -588,7 +587,7 @@ public class XmlRpcClient
 		{
 			String url = args[0];
 			String method = args[1];
-			Vector v = new Vector();
+			Vector<Comparable> v = new Vector<Comparable>();
 
 			for (int i = 2; i < args.length; i++)
 			{

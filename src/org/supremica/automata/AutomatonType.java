@@ -54,7 +54,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 public class AutomatonType
 {
-    private static List collection = new LinkedList();
+    private static List<AutomatonType> collection = new LinkedList<AutomatonType>();
     public static final AutomatonType UNDEFINED = new AutomatonType("Undefined", false);
     public static final AutomatonType PLANT = new AutomatonType("Plant", true);
     public static final AutomatonType SPECIFICATION = new AutomatonType("Specification", true);
@@ -73,7 +73,7 @@ public class AutomatonType
         this.identifier = identifier;
     }
     
-    public static Iterator iterator()
+    public static Iterator<AutomatonType> iterator()
     {
         return collection.iterator();
     }
@@ -85,9 +85,9 @@ public class AutomatonType
     
     public static AutomatonType toType(String type)
     {
-        for (Iterator it = collection.iterator(); it.hasNext(); )
+        for (Iterator<AutomatonType> it = collection.iterator(); it.hasNext(); )
         {
-            AutomatonType thisOne = (AutomatonType) it.next();
+            AutomatonType thisOne = it.next();
             if (equals(thisOne, type))
             {
                 return thisOne;

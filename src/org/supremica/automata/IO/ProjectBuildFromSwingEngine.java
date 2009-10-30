@@ -56,6 +56,7 @@ import java.util.*;
 
 public class ProjectBuildFromSwingEngine
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromSwingEngine.class);
 	ProjectFactory theProjectFactory;
 

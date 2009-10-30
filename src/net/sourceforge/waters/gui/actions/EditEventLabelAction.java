@@ -111,4 +111,9 @@ public class EditEventLabelAction
   //# Data Members
   private final Proxy mActionArgument;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

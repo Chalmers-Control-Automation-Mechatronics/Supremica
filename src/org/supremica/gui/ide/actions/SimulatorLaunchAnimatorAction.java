@@ -1,10 +1,12 @@
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
+import java.util.List;
+
+import javax.swing.Action;
+
 import org.supremica.gui.VisualProject;
-import org.supremica.gui.animators.scenebeans.Animator;
+
 
 /**
  * Launch animator action.
@@ -52,7 +54,7 @@ public class SimulatorLaunchAnimatorAction
                 return;
             }
 
-            Animator animator = currProject.getAnimator();
+            currProject.getAnimator();
         }
         catch (Exception ex)
         {

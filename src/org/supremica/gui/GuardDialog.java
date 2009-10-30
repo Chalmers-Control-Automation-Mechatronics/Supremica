@@ -18,7 +18,9 @@ import org.supremica.automata.algorithms.Guard.*;
 abstract class GuardPanel
 	extends JPanel
 {
-	public abstract void update(GuardOptions s);
+    private static final long serialVersionUID = 1L;
+
+    public abstract void update(GuardOptions s);
 
 	public abstract void regain(GuardOptions s);
 }

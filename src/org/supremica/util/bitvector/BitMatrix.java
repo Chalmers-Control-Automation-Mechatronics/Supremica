@@ -34,8 +34,11 @@ import java.awt.Rectangle;
  * @see     QuickBitVector
  * @see     java.util.BitSet
  */
-public class BitMatrix extends PersistentObject {
-	protected int columns;
+public class BitMatrix extends PersistentObject
+{
+    private static final long serialVersionUID = 1L;
+
+    protected int columns;
 	protected int rows;
 
 	/*

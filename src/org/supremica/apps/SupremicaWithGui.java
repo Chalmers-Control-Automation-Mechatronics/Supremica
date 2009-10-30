@@ -122,9 +122,7 @@ public class SupremicaWithGui
         workbench.initialize();
         splash.setVisible(false);
         workbench.setVisible(true);
-        
-        PreLoader preLoader = PreLoader.getPreLoader();
-        
+        PreLoader.getPreLoader();
         return workbench;
     }
 }

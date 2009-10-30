@@ -50,10 +50,10 @@
 
 package org.supremica.automata.BDD;
 
-import net.sf.javabdd.*;
-import org.supremica.log.*;
-import org.supremica.util.SupremicaException;
-import java.util.*;
+import java.util.Iterator;
+
+import net.sf.javabdd.BDD;
+
 
 public class BDDDisjunctiveTransitions
     implements BDDTransitions

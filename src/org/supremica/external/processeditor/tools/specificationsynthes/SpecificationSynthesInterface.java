@@ -18,12 +18,11 @@ import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
  *
  */
 public class SpecificationSynthesInterface
-						              extends
-						                  JFrame 
-									          implements 
-									              ActionListener
+	extends JFrame 
+	implements ActionListener
 {
-	
+    private static final long serialVersionUID = 1L;
+
 	ConvertPanel cPanel = null;
 	SOCGraphContainer graphContainer = null;
 	

@@ -13,8 +13,7 @@ public class parser /*@bgen(jjtree)*/
 	{
 		try
 		{
-			parser t = new parser(new BufferedReader(new FileReader(new File(args[0]))));
-
+			new parser(new BufferedReader(new FileReader(new File(args[0]))));
 			try
 			{
 				SimpleNode n = parser.Start();
@@ -12885,7 +12884,6 @@ public class parser /*@bgen(jjtree)*/
 	static final public Operand il_operand()
 		throws ParseException
 	{
-		String s;
 		Operand o = new Operand();
 
 		switch ((jj_ntk == -1)
@@ -13919,11 +13917,9 @@ Token t;
 
 		jjtree.openNodeScope(jjtn000);
 
-		Token t;
-
 		try
 		{
-			t = jj_consume_token(il_return_op);
+			jj_consume_token(il_return_op);
 		}
 		finally
 		{
@@ -21297,6 +21293,7 @@ Token t;
 	static private Token jj_scanpos, jj_lastpos;
 	static private int jj_la;
 	static public boolean lookingAhead = false;
+	@SuppressWarnings("unused")
 	static private boolean jj_semLA;
 	static private int jj_gen;
 	static final private int[] jj_la1 = new int[156];
@@ -21722,7 +21719,7 @@ Token t;
 		}
 	}
 
-	static private java.util.Vector jj_expentries = new java.util.Vector();
+	static private java.util.Vector<int[]> jj_expentries = new java.util.Vector<int[]>();
 	static private int[] jj_expentry;
 	static private int jj_kind = -1;
 	static private int[] jj_lasttokens = new int[100];
@@ -21750,10 +21747,10 @@ Token t;
 
 			boolean exists = false;
 
-			for (java.util.Enumeration e = jj_expentries.elements();
+			for (java.util.Enumeration<int[]> e = jj_expentries.elements();
 					e.hasMoreElements(); )
 			{
-				int[] oldentry = (int[]) (e.nextElement());
+				int[] oldentry = (e.nextElement());
 
 				if (oldentry.length == jj_expentry.length)
 				{
@@ -21854,7 +21851,7 @@ Token t;
 
 		for (int i = 0; i < jj_expentries.size(); i++)
 		{
-			exptokseq[i] = (int[]) jj_expentries.elementAt(i);
+			exptokseq[i] = jj_expentries.elementAt(i);
 		}
 
 		return new ParseException(token, exptokseq, tokenImage);

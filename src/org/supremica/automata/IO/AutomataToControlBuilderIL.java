@@ -55,6 +55,7 @@ import java.io.*;
 
 public class AutomataToControlBuilderIL
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(AutomataToControlBuilderST.class);
 	private AutomataToIEC1131 theExporter = null;
 	private ControlBuilderHelper theHelper = null;

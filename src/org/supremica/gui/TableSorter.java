@@ -82,8 +82,10 @@ import javax.swing.table.TableColumnModel;
 public class TableSorter
     extends TableMap
 {
+    private static final long serialVersionUID = 1L;
+
     int indexes[];
-    Vector sortingColumns = new Vector();
+    Vector<Integer> sortingColumns = new Vector<Integer>();
     boolean ascending = true;
     int compares;
     
@@ -105,7 +107,7 @@ public class TableSorter
     
     public int compareRowsByColumn(int row1, int row2, int column)
     {
-        Class type = model.getColumnClass(column);
+        Class<?> type = model.getColumnClass(column);
         TableModel data = model;
         
         // Check for nulls.
@@ -242,7 +244,7 @@ public class TableSorter
         
         for (int level = 0; level < sortingColumns.size(); level++)
         {
-            Integer column = (Integer) sortingColumns.elementAt(level);
+            Integer column = sortingColumns.elementAt(level);
             int result = compareRowsByColumn(row1, row2, column.intValue());
             
             if (result != 0)

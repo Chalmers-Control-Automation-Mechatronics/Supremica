@@ -136,6 +136,7 @@ public class KeepSmoothSupervisor
 	private class KeepSmoothPartition
 	{
 		private int size, current;
+		@SuppressWarnings("unused")
 		private Cluster[] clusters;
 		private BDDAutomata manager;
 		private KeepCluster[] keepclusters;
@@ -175,6 +176,7 @@ public class KeepSmoothSupervisor
 			}
 		}
 
+		@SuppressWarnings("unused")
 		public boolean empty()
 		{
 			return empty_;

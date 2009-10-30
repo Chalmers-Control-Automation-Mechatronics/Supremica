@@ -54,10 +54,15 @@ import org.supremica.petrinet.*;
 public class TimedMarking
 	extends Marking
 {
+	@SuppressWarnings("unused")
 	private int[] marking;
+	@SuppressWarnings("unused")
 	private int[] remainingTime;    // In current operation
+	@SuppressWarnings("unused")
 	private int elapsedTime;
+	@SuppressWarnings("unused")
 	private static int nbrOfProductPlaces;
+	@SuppressWarnings("unused")
 	private static PetriNet pn;
 	/* Use one-product relaxation for this estimate */
 

@@ -29,4 +29,9 @@ public class ToolNodeAction
 	  ControlledToolbar.Tool.NODE);
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

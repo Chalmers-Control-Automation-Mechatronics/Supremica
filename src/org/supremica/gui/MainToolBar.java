@@ -15,6 +15,7 @@ public class MainToolBar
 	extends JToolBar
 {
 	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
 	private static Supremica supremica;
 	private static final OpenAction openAction = new OpenAction();
 	private static final SaveAction saveAction = new SaveAction();
@@ -22,6 +23,7 @@ public class MainToolBar
 	private static final DeleteAction deleteAction = new DeleteAction();
 	private static final CopyAction copyAction = new CopyAction();
 	private static final ViewAction viewAction = new ViewAction();
+	@SuppressWarnings("unused")
 	private static final StatusAction statusAction = new StatusAction();
 
 	private static final MoveAutomataAction moveAutomataToTopAction = new MoveAutomataAction(true, true);

@@ -87,15 +87,14 @@ public class XMLCreator
 	    }
     }
 
-    public void createXMLFile(Object o, String path, String fileName)
+    @SuppressWarnings("deprecation")
+	public void createXMLFile(Object o, String path, String fileName)
     {
 	try
 	    {
 		File file = new File(path, fileName);
 		marshaller.marshal(o,new FileOutputStream(file));
-
 		//Validation is not performed as part of the marshalling operation. In other words, unlike the case for unmarshalling, there is no setValidating method for marshalling. Instead, when marshalling data, you use the Validator class that is a part of the binding framework to validate a content tree against a schema. For example:
-
 		Validator validator = jaxbContext.createValidator();
 		validator.validate(o);
 	    }

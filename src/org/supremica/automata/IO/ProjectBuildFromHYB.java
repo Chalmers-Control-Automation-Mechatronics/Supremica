@@ -137,10 +137,6 @@ public class ProjectBuildFromHYB
 		Automaton currAutomaton = new Automaton(automatonName);
 		currProject.addAutomaton(currAutomaton);
 		currAlphabet = currAutomaton.getAlphabet();
-
-		// Init
-		boolean initialState = true;
-
 		// Loop over lines
 		for (String currLine = reader.readLine(); currLine != null; currLine = reader.readLine())
 		{

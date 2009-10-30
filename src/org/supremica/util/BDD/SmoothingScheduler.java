@@ -2,8 +2,11 @@ package org.supremica.util.BDD;
 
 public class SmoothingScheduler
 {
+	@SuppressWarnings("unused")
 	private int size;
+	@SuppressWarnings("unused")
 	private BDDAutomata manager;
+	@SuppressWarnings("unused")
 	private DisjPartition dp;
 
 	public SmoothingScheduler(BDDAutomata manager, DisjPartition dp)

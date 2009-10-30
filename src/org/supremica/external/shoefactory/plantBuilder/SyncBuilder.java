@@ -108,8 +108,7 @@ public class SyncBuilder
         try
         {
             synthes = new AutomatonSynthesizer(theAutomaton, synthesizerOptions);
-            
-            boolean s = synthes.synthesize();
+            synthes.synthesize();
         }
         catch (Exception ex)
         {}

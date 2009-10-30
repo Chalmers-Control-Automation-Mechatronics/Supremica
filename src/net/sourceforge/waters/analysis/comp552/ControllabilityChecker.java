@@ -44,7 +44,7 @@ public class ControllabilityChecker extends ModelChecker
    * @param  desFactory Factory used for trace construction.
    */
   public ControllabilityChecker(final ProductDESProxy model,
-				final ProductDESProxyFactory desFactory)
+                                final ProductDESProxyFactory desFactory)
   {
     super(model, desFactory);
   }
@@ -79,14 +79,15 @@ public class ControllabilityChecker extends ModelChecker
       // The following code demonstrates how to create some BDDs.
       // It has nothing to do with controllability checking.
 
-      // Allocate five Boolean variables ...
+      // Allocate five Boolean variables.
       bddFactory.setVarNum(5);
 
-      // Get the first and second variable ...
+      // Get the first and second variable.
       final BDD x0 = bddFactory.ithVar(0);
       final BDD x1 = bddFactory.ithVar(1);
 
       // Calculate their logical AND ...
+      @SuppressWarnings("unused")
       final BDD and01 = x0.and(x1);
 
       // The BDD factory has its own memory management and garbage
@@ -95,7 +96,7 @@ public class ControllabilityChecker extends ModelChecker
       x0.free();
       x1.free();
       // It causes an exception if we use x0 or x1 again from now on.
-   
+
       // Since this is going to be done very often, there is a shorter
       // alternative. The andWith() (and similar methods) automatically
       // consume the two input BDDs.

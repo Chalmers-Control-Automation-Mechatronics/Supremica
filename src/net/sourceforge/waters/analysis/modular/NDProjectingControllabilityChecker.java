@@ -9,7 +9,8 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import java.lang.Comparable;
+import gnu.trove.THashSet;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,11 +27,13 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.analysis.CertainDeath;
+import net.sourceforge.waters.analysis.RemoveAllTau;
+import net.sourceforge.waters.analysis.TauLoopRemoval;
+import net.sourceforge.waters.analysis.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
@@ -51,15 +54,10 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
-import net.sourceforge.waters.analysis.TauLoopRemoval;
-import net.sourceforge.waters.analysis.RemoveAllTau;
-import net.sourceforge.waters.analysis.TransitionRelation;
-import net.sourceforge.waters.analysis.CertainDeath;
-import gnu.trove.THashSet;
 
 
 /**
- * The projectiong controllability check algorithm.
+ * The projecting controllability check algorithm.
  *
  * @author Simon Ware
  */
@@ -91,7 +89,6 @@ public class NDProjectingControllabilityChecker
       (ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
     mChecker = checker;
     mStates = 0;
-    mLeast = least;
     setNodeLimit(10000000);
     mMaxProjStates = maxsize;
   }
@@ -391,11 +388,6 @@ public class NDProjectingControllabilityChecker
     return new Object[] {plant, spec, uncont};
   }
 
-  private Object[] convertSpec(AutomatonProxy a)
-  {
-    return convertSpec(a, 0);
-  }
-
   private AutomatonProxy addSelfLoops(AutomatonProxy a,
                                       Set<EventProxy> selfloop)
   {
@@ -482,15 +474,12 @@ public class NDProjectingControllabilityChecker
         }*/
         double size = 0;
         Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
-        Iterator<EventProxy> i = common.iterator();
         Set<EventProxy> total = new HashSet<EventProxy>();
-        boolean contproj = false;
         for (AutomatonProxy a : s) {
           size += Math.log(a.getStates().size());
           total.addAll(a.getEvents());
           common.retainAll(a.getEvents());
         }
-        Iterator<AutomatonProxy> it = s.iterator();
         double tot = total.size();
         double uncom = tot - common.size();
         size *= uncom;
@@ -499,7 +488,6 @@ public class NDProjectingControllabilityChecker
       int overflows = 0;
       ProjectionList minlist = null;
       minSize = Integer.MAX_VALUE / 4;
-      int setSize = -1;
       for (Tuple tup : possible) {
         try {
           long maxsize = 1;
@@ -540,6 +528,7 @@ public class NDProjectingControllabilityChecker
     return p;
   }
 
+  @SuppressWarnings("unused")
   private boolean setFailedResult(final TraceProxy counterexample,
                                   final Map<EventProxy,EventProxy> uncont)
   {
@@ -566,18 +555,6 @@ public class NDProjectingControllabilityChecker
     final SafetyTraceProxy wrapper =
       factory.createSafetyTraceProxy(tracename, des, modevents);
     return super.setFailedResult(wrapper);
-  }
-
-
-  //#########################################################################
-  //# Inner Class AutomatonComparator
-  private final static class AutomatonComparator
-    implements Comparator<AutomatonProxy>
-  {
-    public int compare(AutomatonProxy a1, AutomatonProxy a2)
-    {
-      return a1.getName().compareTo(a2.getName());
-    }
   }
 
 
@@ -729,22 +706,13 @@ public class NDProjectingControllabilityChecker
       return mModel;
     }
 
-    public Set<EventProxy> getHidden()
-    {
-      return mHidden;
-    }
-
-    public Set<AutomatonProxy> getComposed()
-    {
-      return mCompautomata;
-    }
-
     public AutomatonProxy getNew()
     {
       return mNew;
     }
 
-    public TraceProxy getTrace(TraceProxy trace, ProductDESProxy model)
+    @SuppressWarnings("unused")
+	public TraceProxy getTrace(TraceProxy trace, ProductDESProxy model)
     {
       List<Map<StateProxy, Set<EventProxy>>> events =
         new ArrayList<Map<StateProxy, Set<EventProxy>>>(mCompautomata.size());
@@ -1005,7 +973,6 @@ public class NDProjectingControllabilityChecker
   private AutomatonProxy mSpec = null;
   private int mStates;
   private int mMaxProjStates;
-  private final boolean mLeast;
   private Map<AutomataHidden, AutomatonProxy> mMinAutMap =
     new HashMap<AutomataHidden, AutomatonProxy>();
   private Set<AutomataHidden> mChecked = new HashSet<AutomataHidden>();
@@ -1014,6 +981,7 @@ public class NDProjectingControllabilityChecker
 
   //#########################################################################
   //# Class Constants
+  @SuppressWarnings("unused")
   private static final Logger LOGGER =
     LoggerFactory.createLogger(ProjectingControllabilityChecker.class);
 

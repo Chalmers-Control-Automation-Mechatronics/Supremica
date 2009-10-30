@@ -161,11 +161,10 @@ public class AutomatonToDot
                 en.execute();
                  */
         
-        Vector initialStates = new Vector();
+        Vector<State> initialStates = new Vector<State>();
         final String initPrefix = "__init_";
         String standardShape = null;
         String acceptingShape = null;
-        String mutuallyAcceptingShape = null;
         String forbiddenShape = null;
         
         pw.println("digraph state_automaton {");
@@ -183,23 +182,14 @@ public class AutomatonToDot
         {
             standardShape = "circle";
             acceptingShape = "doublecircle";
-            mutuallyAcceptingShape = "doublecircle";
             forbiddenShape = "box";
         }
         else
         {
             standardShape = "plaintext";
             acceptingShape = "ellipse";
-            mutuallyAcceptingShape = "ellipse";
             forbiddenShape = "box";
         }
-        
-        // The mutually accepting states are not shown if we aren't using colors...
-        if (!useStateColors)
-        {
-            mutuallyAcceptingShape = "plaintext";
-        }
-        
         if (!aut.hasInitialState())
         {
             pw.println("\t noState [shape = plaintext, label = \"No initial state\" ]");
@@ -210,7 +200,7 @@ public class AutomatonToDot
             return;
         }
         
-        for (Iterator states = aut.stateIterator(); states.hasNext(); )
+        for (Iterator<?> states = aut.stateIterator(); states.hasNext(); )
         {
             State state = (State) states.next();
             
@@ -237,7 +227,7 @@ public class AutomatonToDot
         
         for (int i = 0; i < initialStates.size(); i++)
         {
-            String stateId = ((State) initialStates.elementAt(i)).getName();
+            String stateId = initialStates.elementAt(i).getName();
             
             // pw.println("\t\"" + initPrefix + stateId + "\" [label = \"\"]; ");
             // pw.println("\t\"" + initPrefix + stateId + "\" [height = \"0\"]; ");
@@ -246,7 +236,7 @@ public class AutomatonToDot
         }
         
         //Alphabet theAlphabet = aut.getAlphabet();
-        for (Iterator states = aut.stateIterator(); states.hasNext(); )
+        for (Iterator<?> states = aut.stateIterator(); states.hasNext(); )
         {
             State sourceState = (State) states.next();
             
@@ -260,7 +250,7 @@ public class AutomatonToDot
             pw.println("\"" + getStateColor(sourceState) + "]; ");
             
             
-            for (Iterator arcSets = sourceState.outgoingMultiArcIterator();
+            for (Iterator<?> arcSets = sourceState.outgoingMultiArcIterator();
             arcSets.hasNext(); )
             {
                 boolean is_ctrl = true;
@@ -279,7 +269,7 @@ public class AutomatonToDot
                 
                 if (writeEventLabels)
                 {
-                    for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
+                    for (Iterator<?> arcIt = currArcSet.iterator(); arcIt.hasNext(); )
                     {
                         Arc currArc = (Arc) arcIt.next();
                         LabeledEvent thisEvent = currArc.getEvent();
@@ -337,9 +327,9 @@ public class AutomatonToDot
         // An attemp to always start at the initial state.
         // The problem is that a rectangle is drawn around the initial state.
         // Ok, new versions of dot seems to be able to deal with this.
-        for (Iterator stateIt = initialStates.iterator(); stateIt.hasNext(); )
+        for (Iterator<State> stateIt = initialStates.iterator(); stateIt.hasNext(); )
         {
-            State currState = (State) stateIt.next();
+            State currState = stateIt.next();
             
             pw.println("\t{ rank = min ;");
             pw.println("\t\t\"" + initPrefix + currState.getName() + "\";");

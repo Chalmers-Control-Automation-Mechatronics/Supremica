@@ -10,7 +10,9 @@ import org.supremica.gui.ActionMan;
 public class PreferencesAction
 	extends AbstractAction
 {
-	public PreferencesAction()
+    private static final long serialVersionUID = 1L;
+
+    public PreferencesAction()
 	{
 		super("Preferences...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Preferences16.gif")));
 

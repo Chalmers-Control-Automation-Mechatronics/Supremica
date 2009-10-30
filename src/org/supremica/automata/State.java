@@ -602,7 +602,7 @@ public class State
         Iterator<Arc> arcIt = incomingArcsIterator();
         while (arcIt.hasNext())
         {
-            Arc arc = (Arc) arcIt.next();
+            Arc arc = arcIt.next();
             if (arc.getEvent().equals(eventLabel))
             {
                 previousStates.add(arc.getFromState());
@@ -855,11 +855,11 @@ public class State
         }
 
         // Examine states
-        LinkedList statesToExamine = new LinkedList();
+        LinkedList<State> statesToExamine = new LinkedList<State>();
         statesToExamine.add(this);
         while (statesToExamine.size() != 0)
         {
-            State currState = (State) statesToExamine.removeFirst();
+            State currState = statesToExamine.removeFirst();
 
             for (Iterator<Arc> arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
             {
@@ -891,13 +891,13 @@ public class State
 
         result.add(this);
 
-        LinkedList statesToExamine = new LinkedList();
+        LinkedList<State> statesToExamine = new LinkedList<State>();
 
         statesToExamine.add(this);
 
         while (statesToExamine.size() != 0)
         {
-            State currState = (State) statesToExamine.removeFirst();
+            State currState = statesToExamine.removeFirst();
 
             for (Iterator<Arc> arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
             {

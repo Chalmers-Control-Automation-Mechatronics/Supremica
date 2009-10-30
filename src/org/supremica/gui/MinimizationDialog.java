@@ -163,8 +163,10 @@ public class MinimizationDialog
     abstract class MinimizationPanel
         extends JPanel
     {
+        private static final long serialVersionUID = 1L;
+
         public abstract void update(MinimizationOptions options);
-        
+
         public abstract void regain(MinimizationOptions options);
     }
     

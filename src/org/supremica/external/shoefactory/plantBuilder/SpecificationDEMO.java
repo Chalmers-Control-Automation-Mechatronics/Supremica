@@ -55,7 +55,8 @@ public class SpecificationDEMO
 {
     protected Project theSpec = null;
     private Alphabet currAlphabet;
-    private int shoeNr, typ;
+    @SuppressWarnings("unused")
+	private int shoeNr, typ;
     
     public SpecificationDEMO(int nr, boolean type)
     {
@@ -111,7 +112,8 @@ public class SpecificationDEMO
         currAlphabet.addEvent(putT2S1);
         currAlphabet.addEvent(getT2S1);
         
-        Arc putArc = new Arc(sInitial, s0, putT0L);
+        @SuppressWarnings("unused")
+		Arc putArc = new Arc(sInitial, s0, putT0L);
         State s1 = createNewState(currShoe,"q");
         State s2 = createNewState(currShoe,"q");
         State s3 = createNewState(currShoe,"q");
@@ -122,32 +124,53 @@ public class SpecificationDEMO
         State s8 = createNewState(currShoe,"q");
         State s9 = createNewState(currShoe,"q");
         State s10 = createNewState(currShoe,"q");
+        @SuppressWarnings("unused")
         Arc putArc0 = new Arc(s0, s1, getT0R);
         
         if (type)
         {
+            @SuppressWarnings("unused")
             Arc putArc1 = new Arc(s1, s2, putT1);
+            @SuppressWarnings("unused")
             Arc putArc2 = new Arc(s2, s3, getT1S0);
+            @SuppressWarnings("unused")
             Arc putArc3 = new Arc(s3, s4, putT1S0);
+            @SuppressWarnings("unused")
             Arc putArc4 = new Arc(s4, s5, getT1);
+            @SuppressWarnings("unused")
             Arc putArc5 = new Arc(s5, s6, putT2);
+            @SuppressWarnings("unused")
             Arc putArc6 = new Arc(s6, s7, getT2S1);
+            @SuppressWarnings("unused")
             Arc putArc7 = new Arc(s7, s8, putT2S1);
+            @SuppressWarnings("unused")
             Arc putArc8 = new Arc(s8, s9, getT2);
+            @SuppressWarnings("unused")
             Arc putArc9 = new Arc(s9, s10, putT0R);
+            @SuppressWarnings("unused")
             Arc putArc10 = new Arc(s10, sInitial, getT0L);
         }
         else
         {
+            @SuppressWarnings("unused")
             Arc putArc1 = new Arc(s1, s2, putT2);
+            @SuppressWarnings("unused")
             Arc putArc2 = new Arc(s2, s3, getT2S1);
+            @SuppressWarnings("unused")
             Arc putArc3 = new Arc(s3, s4, putT2S1);
+            @SuppressWarnings("unused")
             Arc putArc4 = new Arc(s4, s5, getT2);
+            @SuppressWarnings("unused")
             Arc putArc5 = new Arc(s5, s6, putT1);
+            @SuppressWarnings("unused")
             Arc putArc6 = new Arc(s6, s7, getT1S0);
+            @SuppressWarnings("unused")
             Arc putArc7 = new Arc(s7, s8, putT1S0);
+            @SuppressWarnings("unused")
             Arc putArc8 = new Arc(s8, s9, getT1);
+            @SuppressWarnings("unused")
             Arc putArc9 = new Arc(s9, s10, putT0R);
+            @SuppressWarnings("unused")
             Arc putArc10 = new Arc(s10, sInitial, getT0L);
         }
         

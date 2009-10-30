@@ -10,28 +10,31 @@
 package org.supremica.gui.ide;
 
 import java.awt.Frame;
-import javax.swing.*;
-import java.util.*;
-import org.supremica.gui.WhiteScrollPane;
-import org.supremica.gui.TableSorter;
-import org.supremica.gui.AutomatonViewer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.JTableHeader;
-
-import org.supremica.gui.VisualProject;
-import org.supremica.log.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Iterator;
+
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import org.supremica.automata.Automaton;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+
 import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.gui.TableSorter;
+import org.supremica.gui.VisualProject;
+import org.supremica.gui.WhiteScrollPane;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
+
 
 public class AnalyzerAutomataPanel
     extends WhiteScrollPane
@@ -78,7 +81,9 @@ public class AnalyzerAutomataPanel
         theAutomatonTable = new JTable(theTableSorter);
         theAutomatonTable.setTableHeader(new JTableHeader(theAutomatonTable.getColumnModel())
         {
-            public String getToolTipText(MouseEvent e)
+			private static final long serialVersionUID = 1L;
+
+			public String getToolTipText(MouseEvent e)
             {
                 int i = columnAtPoint(e.getPoint());
                 if (i == TABLE_NAME_COLUMN)
@@ -186,7 +191,7 @@ public class AnalyzerAutomataPanel
                                 
                                 try
                                 {
-                                    AutomatonViewer viewer = analyzerPanel.getVisualProject().getAutomatonViewer(currAutomaton.getName());
+                                    analyzerPanel.getVisualProject().getAutomatonViewer(currAutomaton.getName());
                                 }
                                 catch (Exception ex)
                                 {

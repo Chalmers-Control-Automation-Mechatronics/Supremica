@@ -66,7 +66,7 @@ public final class IntArrayList
 	private int maxSize = -1;
 	private int[][] firstBlock = null;
 	private int[][] lastBlock = null;
-	private final LinkedList blocks = new LinkedList();
+	private final LinkedList<int[][]> blocks = new LinkedList<int[][]>();
 
 	public IntArrayList()
 	{
@@ -214,7 +214,7 @@ public final class IntArrayList
 
 			blocks.removeFirst();
 
-			firstBlock = (int[][]) blocks.getFirst();
+			firstBlock = blocks.getFirst();
 		}
 
 		size--;
@@ -240,7 +240,7 @@ public final class IntArrayList
 
 			blocks.removeLast();
 
-			lastBlock = (int[][]) blocks.getLast();
+			lastBlock = blocks.getLast();
 		}
 
 		int[] currArray = lastBlock[--currMaxBlockIndex];
@@ -265,7 +265,7 @@ public final class IntArrayList
 		return maxSize;
 	}
 
-	public Iterator iterator()
+	public Iterator<?> iterator()
 	{
 		return new IntArrayListIterator();
 	}
@@ -274,7 +274,7 @@ public final class IntArrayList
 	{
 		StringBuffer sb = new StringBuffer();
 
-		for (Iterator it = iterator(); it.hasNext(); )
+		for (Iterator<?> it = iterator(); it.hasNext(); )
 		{
 			int[] currEntry = (int[]) it.next();
 
@@ -289,9 +289,9 @@ public final class IntArrayList
 	{
 		StringBuffer sb = new StringBuffer("blocks: \n");
 
-		for (Iterator it = blocks.iterator(); it.hasNext(); )
+		for (Iterator<int[][]> it = blocks.iterator(); it.hasNext(); )
 		{
-			int[][] currBlock = (int[][]) it.next();
+			int[][] currBlock = it.next();
 
 			sb.append(toString(currBlock));
 		}
@@ -355,7 +355,7 @@ public final class IntArrayList
 	{
 		private int[][] currBlock = null;
 		private int currIndex = 0;
-		private Iterator blockIterator = null;
+		private Iterator<int[][]> blockIterator = null;
 		private int currSize;
 		private int currElement;
 
@@ -363,7 +363,7 @@ public final class IntArrayList
 		{
 			currIndex = currMinBlockIndex;
 			blockIterator = blocks.iterator();
-			currBlock = (int[][]) blockIterator.next();
+			currBlock = blockIterator.next();
 			currSize = size();
 			currElement = 0;
 		}
@@ -391,7 +391,7 @@ public final class IntArrayList
 
 				if (blockIterator.hasNext())
 				{
-					currBlock = (int[][]) blockIterator.next();
+					currBlock = blockIterator.next();
 				}
 				else
 				{

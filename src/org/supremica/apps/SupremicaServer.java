@@ -65,6 +65,7 @@ public class SupremicaServer
 
 	private static Logger logger = LoggerFactory.createLogger(SupremicaServer.class);
 	private VisualProjectContainer theVisualProjectContainer = null;
+	@SuppressWarnings("unused")
 	private Server xmlRpcServer = null;
 
 	// Construct the frame
@@ -96,6 +97,6 @@ public class SupremicaServer
 
 	public static void main(String args[])
 	{
-		SupremicaServer server = new SupremicaServer();
+		new SupremicaServer();
 	}
 }

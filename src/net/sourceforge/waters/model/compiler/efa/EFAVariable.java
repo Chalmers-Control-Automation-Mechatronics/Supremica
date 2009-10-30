@@ -21,7 +21,6 @@ import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**

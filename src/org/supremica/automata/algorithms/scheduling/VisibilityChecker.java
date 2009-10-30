@@ -20,7 +20,7 @@ public class VisibilityChecker {
 	this.start = start;
 	this.goal = goal;
 
-	this.intersectionEdges = new ArrayList(intersectionEdges);
+	this.intersectionEdges = new ArrayList<double[]>(intersectionEdges);
     }
 
     /**

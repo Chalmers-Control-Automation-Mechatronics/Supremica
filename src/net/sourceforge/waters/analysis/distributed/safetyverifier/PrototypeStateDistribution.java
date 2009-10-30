@@ -213,6 +213,7 @@ public class PrototypeStateDistribution extends HashStateDistribution
     public double probability;
   }
 
+  @SuppressWarnings("unused")
   private static class LowestProbabilityFirst 
     implements Comparator<MachineProbability>
   {
@@ -273,4 +274,10 @@ public class PrototypeStateDistribution extends HashStateDistribution
   private final int[] mHashAutomata;
   private final int[] mAutomataShift;
   private final StateEncoding mEncoding;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

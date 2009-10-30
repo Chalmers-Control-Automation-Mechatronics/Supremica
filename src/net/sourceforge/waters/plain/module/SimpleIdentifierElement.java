@@ -133,4 +133,9 @@ public final class SimpleIdentifierElement
   //# Data Members
   private final String mName;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -59614276860081368L;
+
 }

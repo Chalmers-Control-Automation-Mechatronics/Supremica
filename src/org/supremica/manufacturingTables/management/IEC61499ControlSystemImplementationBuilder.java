@@ -86,7 +86,8 @@ public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImp
 	super();
     }
 
-    public void createNewPLCProgram(ManufacturingCell cell)
+    @SuppressWarnings("unchecked")
+	public void createNewPLCProgram(ManufacturingCell cell)
     {
 	// For the Fuber application:
 	cellMachines = new HashSet<org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Machine>();
@@ -190,7 +191,6 @@ public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImp
 	    
 	    Machine machine; 
 	    org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.MachineController machineController;
-	    org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Mailbox machineMailbox = null;
 	    // Check if the machine has own control system
 	    
 	    // Machines with own control system

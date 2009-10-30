@@ -26,7 +26,7 @@ public interface Gui
     
     void selectAutomata(int[] a);
     
-    void selectAutomata(Collection a);
+    void selectAutomata(Collection<?> a);
     
     void unselectAutomaton(int s);
     

@@ -14,6 +14,8 @@ import org.supremica.automata.*;
 public class TransferLine
     extends Automata
 {
+    private static final long serialVersionUID = 1L;
+
     private Project project;
     private LabeledEvent[] events_vector;
     private boolean sanchez_models;

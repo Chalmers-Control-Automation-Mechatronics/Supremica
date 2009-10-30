@@ -494,7 +494,7 @@ public class BDDAutomata
     {
         if (reachableStatesBDD == null)
         {
-            reachableStatesBDD = manager.reachableStates(initialStatesBDD, bddTransitions, sourceStateVariables, eventDomain.set(), destToSourceStatePairing);
+            reachableStatesBDD = BDDManager.reachableStates(initialStatesBDD, bddTransitions, sourceStateVariables, eventDomain.set(), destToSourceStatePairing);
             nbrOfReachableStates = reachableStatesBDD.satCount(sourceStateVariables);              
         }
         return reachableStatesBDD;
@@ -504,7 +504,7 @@ public class BDDAutomata
     {
         if (coreachableStatesBDD == null)
         {
-            coreachableStatesBDD = manager.coreachableStates(markedStatesBDD, bddTransitions, sourceStateVariables, eventDomain.set(), destToSourceStatePairing);
+            coreachableStatesBDD = BDDManager.coreachableStates(markedStatesBDD, bddTransitions, sourceStateVariables, eventDomain.set(), destToSourceStatePairing);
             nbrOfCoreachableStates = coreachableStatesBDD.satCount(sourceStateVariables);
         }
         return coreachableStatesBDD;

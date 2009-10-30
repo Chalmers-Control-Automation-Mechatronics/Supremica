@@ -1,19 +1,19 @@
 package org.supremica.external.processeditor.xml;
 
-import java.awt.Point;
-import java.math.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
-import org.supremica.manufacturingTables.xsd.processeditor.Properties;
 import org.supremica.manufacturingTables.xsd.processeditor.Activity;
+import org.supremica.manufacturingTables.xsd.processeditor.Algebraic;
 import org.supremica.manufacturingTables.xsd.processeditor.Attribute;
 import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
 import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceType;
+import org.supremica.manufacturingTables.xsd.processeditor.Properties;
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 import org.supremica.manufacturingTables.xsd.processeditor.ROPType;
 import org.supremica.manufacturingTables.xsd.processeditor.Relation;
-import org.supremica.manufacturingTables.xsd.processeditor.Algebraic;
 import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
+
 
 /**
  * The <code>Converter</code> class includes <code>static</code> methods,
@@ -862,7 +862,6 @@ public class Converter {
 		try{		    
 		    String name = ((Activity)objectToSet).getOperation();
 		    String tryThisName = name;
-		    boolean nameUnique = false;
 		    int numOfLoops = 0;
 		    while(!isNameUnique(objectToCheck, tryThisName)) {
 			tryThisName = name+(++numOfLoops);		
@@ -974,7 +973,6 @@ public class Converter {
 			returnStatement = subPred;
 		    }else if(((Relation)o).getType().equals("Alternative")) {
 			Iterator iterator = ((Relation)o).getActivityRelationGroup().iterator();
-			int firstPred = 0;
 			while(iterator.hasNext()) {
 			    Object next = iterator.next();		       
 			    try {		
@@ -984,7 +982,6 @@ public class Converter {
 			}
 		    }else if(((Relation)o).getType().equals("Parallel")) {    	
 			Iterator iterator = ((Relation)o).getActivityRelationGroup().iterator();
-			int firstPred = 0;
 			while(iterator.hasNext()) {
 			    Object next = iterator.next();
 			    try {
@@ -994,7 +991,6 @@ public class Converter {
 			}					    	    
 		    }else if(((Relation)o).getType().equals("Arbitrary")) {
 			Iterator iterator = ((Relation)o).getActivityRelationGroup().iterator();
-			int firstPred = 0;
 			while(iterator.hasNext()) {
 			    Object next = iterator.next();		  
 			    try {		

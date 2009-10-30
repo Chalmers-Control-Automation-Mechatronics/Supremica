@@ -65,16 +65,20 @@ public class SimulatorEventListModel
     extends AbstractListModel
     implements SignalObserver
 {
-    private static Logger logger = LoggerFactory.createLogger(SimulatorEventListModel.class);
+	private static final long serialVersionUID = 1L;
+
+	private static Logger logger = LoggerFactory.createLogger(SimulatorEventListModel.class);
     
     // private int[] currState;
     private int[] events;
     private int eventAmount = 0;
     private Automata theAutomata;
-    private Project theProject;
+    @SuppressWarnings("unused")
+	private Project theProject;
     private Controls theControls;
     private Alphabet theAlphabet;
-    private boolean showState = false;
+    @SuppressWarnings("unused")
+	private boolean showState = false;
     private boolean showDisabledEvents = false;
     private AutomataSynchronizerHelper helper;
     

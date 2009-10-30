@@ -50,8 +50,6 @@
 
 package org.supremica.automata.BDD;
 
-import net.sf.javabdd.*;
-import org.supremica.log.*;
 
 public interface  BDDTransitions
 {    

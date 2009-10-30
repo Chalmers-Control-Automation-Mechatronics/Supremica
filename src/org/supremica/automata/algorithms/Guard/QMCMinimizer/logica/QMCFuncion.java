@@ -25,9 +25,9 @@ public class QMCFuncion {
     private String [] terminos;
     private String [] indiferencias;
         
-    private ArrayList listaTerminos;
-    private ArrayList listaBinarios;
-    private ArrayList listaBinariosInteractivos;
+    private ArrayList<QMCBinarioBean> listaTerminos;
+    private ArrayList<QMCBinarioBean> listaBinarios;
+    private ArrayList<QMCBinarioBean> listaBinariosInteractivos;
     private boolean tieneTerminos;
     
       
@@ -182,7 +182,7 @@ public class QMCFuncion {
      * Devuelve  la lista de binarios terminos
      * @return listaTerminos
      */
-    public ArrayList getListaTerminos() {
+    public ArrayList<QMCBinarioBean> getListaTerminos() {
         return listaTerminos;
     }
     
@@ -190,9 +190,9 @@ public class QMCFuncion {
      * Genera la lista de los datos binarios de la funcion
      * @param listaBinarios  arrayList de binarios
      */
-    public void setListaBinarios(Vector datosTabla) 
+    public void setListaBinarios(Vector<?> datosTabla) 
     {
-        Vector fila;
+        Vector<?> fila;
         String valorTermino, valorDec, valorBin;
         QMCBinarioBean binarioBean, termino; 
         int indice, posicion, contadorIndiferencias;
@@ -213,12 +213,12 @@ public class QMCFuncion {
         contadorIndiferencias = 0;
         
         // Inicializa las listas
-        listaBinarios = new ArrayList();
-        listaTerminos = new ArrayList();
+        listaBinarios = new ArrayList<QMCBinarioBean>();
+        listaTerminos = new ArrayList<QMCBinarioBean>();
         
         for (int i=0; i<datosTabla.size(); i++)
         {
-            fila = (Vector)datosTabla.elementAt(i);
+            fila = (Vector<?>)datosTabla.elementAt(i);
             // Genera los objetos binario a partir de la tabla de verdad 
             binarioBean = new QMCBinarioBean();      
             // Valor decimal 
@@ -265,7 +265,7 @@ public class QMCFuncion {
         z = 0;
         while(i<listaTerminos.size())
         {
-            termino = (QMCBinarioBean)listaTerminos.get(i);
+            termino = listaTerminos.get(i);
             if(termino.isIndiferencia() == false)
             {
                 terminos[j] = termino.getValorDec();
@@ -296,7 +296,7 @@ public class QMCFuncion {
         numBinarios = (int)Math.pow(2,numVariables);       
         
         // Inicializa la lista de terminos
-        listaBinariosInteractivos = new ArrayList();      
+        listaBinariosInteractivos = new ArrayList<QMCBinarioBean>();      
         for (int i=0; i<numBinarios; i++)
         {
             binarioInteractivo = new QMCBinarioBean();
@@ -317,20 +317,20 @@ public class QMCFuncion {
      * Devuelve un ArrayList de binarios
      * @return listaBinarios.
      */
-    public ArrayList getListaBinarios() {
+    public ArrayList<QMCBinarioBean> getListaBinarios() {
         return listaBinarios;
     }
     /**
      * Devuelve un ArrayList de binarios vacios (modo interactivo)
      * @return listaBinariosInteractivos.
      */
-    public ArrayList getListaBinariosInteractivos() {
+    public ArrayList<QMCBinarioBean> getListaBinariosInteractivos() {
         if(listaBinariosInteractivos != null)
         {
             QMCBinarioBean binario;
             for(int i=0;i<listaBinariosInteractivos.size();i++)
             {
-                binario = (QMCBinarioBean)listaBinariosInteractivos.get(i);
+                binario = listaBinariosInteractivos.get(i);
                 binario.setTermino(false);
             }
         }

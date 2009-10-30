@@ -37,4 +37,9 @@ public class MainPanelSwitchEvent
     return EditorChangedEvent.Kind.MAINPANEL_SWITCH;
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

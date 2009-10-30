@@ -216,6 +216,9 @@ public class NonTypingTable
       clearSelection();
     }
 
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
   }
 
 
@@ -240,11 +243,11 @@ public class NonTypingTable
     public void actionPerformed(final ActionEvent event)
     {
       if (!isEditing()) {
-	final ListSelectionModel selmodel = getSelectionModel();
-	final int numrows = getRowCount();
-	final int selrow = selmodel.getLeadSelectionIndex();
-	final int newrow = (selrow + numrows + mOffset) % numrows;
-	setRowSelectionInterval(newrow, newrow);
+        final ListSelectionModel selmodel = getSelectionModel();
+        final int numrows = getRowCount();
+        final int selrow = selmodel.getLeadSelectionIndex();
+        final int newrow = (selrow + numrows + mOffset) % numrows;
+        setRowSelectionInterval(newrow, newrow);
       }
     }
 
@@ -252,6 +255,9 @@ public class NonTypingTable
     //# Data Members
     private final int mOffset;
 
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
   }
 
 
@@ -264,5 +270,10 @@ public class NonTypingTable
 
   private static final String CYCLE_DOWN = "Cycle Down";
   private static final String CYCLE_UP = "Cycle Up";
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

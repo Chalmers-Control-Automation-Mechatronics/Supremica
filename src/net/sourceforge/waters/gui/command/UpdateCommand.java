@@ -88,7 +88,7 @@ public class UpdateCommand
     mHasBeenExecuted = false;
     if (name == null) {
       final int size = modified.size() + added.size() + removed.size();
-      final List all = new ArrayList<Proxy>(size);
+      final List<Proxy> all = new ArrayList<Proxy>(size);
       all.addAll(modified);
       all.addAll(added);
       all.addAll(removed);

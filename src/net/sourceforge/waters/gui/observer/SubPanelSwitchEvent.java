@@ -37,4 +37,9 @@ public class SubPanelSwitchEvent
     return EditorChangedEvent.Kind.SUBPANEL_SWITCH;
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

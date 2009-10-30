@@ -11,6 +11,8 @@ import javax.swing.tree.*;
 public class SupremicaTreeCellRenderer
     extends DefaultTreeCellRenderer
 {
+    private static final long serialVersionUID = 1L;
+
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,    //
         boolean expanded,    // true => openIcon, else closedIcon
         boolean leaf,    // true => leafIcon, cannot be open

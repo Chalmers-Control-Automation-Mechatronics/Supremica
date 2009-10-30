@@ -33,12 +33,17 @@ public class SelectionChangedEvent
     super(source);
   }
 
-	
+
   //#########################################################################
   //# Simple Access
   public EditorChangedEvent.Kind getKind()
   {
     return EditorChangedEvent.Kind.SELECTION_CHANGED;
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

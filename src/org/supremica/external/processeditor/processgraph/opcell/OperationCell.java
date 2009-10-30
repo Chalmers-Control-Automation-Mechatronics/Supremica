@@ -25,6 +25,8 @@ public class OperationCell
 							NestedCellListener,
                             AttributeListener
 {
+    private static final long serialVersionUID = 1L;
+
     public JPanel predecessorBar = new JPanel();
     public int predecessorSpaceY = 1;
     public int predecessorSpaceX = 0;

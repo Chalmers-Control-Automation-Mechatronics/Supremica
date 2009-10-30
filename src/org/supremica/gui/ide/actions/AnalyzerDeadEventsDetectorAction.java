@@ -1,13 +1,15 @@
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
-import javax.swing.ImageIcon;
+import java.util.List;
+
+import javax.swing.Action;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.algorithms.DeadEventsDetector;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.*;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 
 /**
@@ -16,7 +18,8 @@ import org.supremica.log.*;
 public class AnalyzerDeadEventsDetectorAction
     extends IDEAction
 {
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    @SuppressWarnings("unused")
+	private Logger logger = LoggerFactory.createLogger(IDE.class);
 
     private static final long serialVersionUID = 1L;
 

@@ -1,35 +1,35 @@
 package net.sourceforge.waters.analysis;
 
-import net.sourceforge.waters.plain.base.NamedElement;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.des.StateProxy;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Arrays;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import java.util.ArrayList;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TIntArrayList;
+import gnu.trove.TObjectIntHashMap;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import net.sourceforge.waters.model.base.ProxyVisitor;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
+import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-import java.util.Collections;
-import java.util.List;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TObjectHashingStrategy;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntProcedure;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.plain.base.NamedElement;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+
 
 public class LightWeightGraph
   extends NamedElement
   implements AutomatonProxy
 {
+  private static final long serialVersionUID = 1L;
+
   private final int[][][] mTransitions;
   private final EventProxy[] mEvents;
   private final boolean[] mMarked;
@@ -169,9 +169,8 @@ public class LightWeightGraph
     int j = 0;
     boolean[] marked = mMarked;
     for (int i = 0; i < states.length; i++) {
-      EventProxy event = null;
       if (marked[i]) {
-        event = mMark; j++;
+        j++;
       }
       states[i] = new MemStateProxy(i, mMark);
     }
@@ -260,11 +259,6 @@ public class LightWeightGraph
       mEvent = event;
     }
     
-    public MemStateProxy(int name)
-    {
-      this(name, null);
-    }
-    
     public Collection<EventProxy> getPropositions()
     {
       if (mEvent == null) {
@@ -279,11 +273,6 @@ public class LightWeightGraph
       return mName == 0;
     }
     
-    public int getNum()
-    {
-      return mName;
-    }
-    
     public MemStateProxy clone()
     {
       return new MemStateProxy(mName, mEvent);
@@ -294,7 +283,8 @@ public class LightWeightGraph
       return Integer.toString(mName);
     }
     
-    public boolean refequals(Object o)
+    @SuppressWarnings("unused")
+	public boolean refequals(Object o)
     {
       if (o instanceof NamedProxy) {
         return refequals((NamedProxy) o);
@@ -379,29 +369,5 @@ public class LightWeightGraph
   {
     return AutomatonProxy.class;
   }
-  
-  private static class ArrayHash
-    implements TObjectHashingStrategy<int[]>
-  {
-    static ArrayHash ARRAYHASH = new ArrayHash();
-    
-    public int computeHashCode(int[] arr)
-    {
-      int hashcode = 7;
-      for (int i = 0 ; i < 2; i++) {
-        hashcode = hashcode * 31 + arr[i];
-      }
-      return hashcode;
-    }
-    
-    public boolean equals(int[] arr1, int[] arr2)
-    {
-      for (int i = 0; i < 2; i++) {
-        if (arr1[i] != arr2[i]) {
-          return false;
-        }
-      }
-      return true;
-    }
-  }
+
 }

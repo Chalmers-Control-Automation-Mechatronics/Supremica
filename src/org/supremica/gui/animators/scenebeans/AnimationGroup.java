@@ -53,7 +53,7 @@ import java.util.*;
 
 public class AnimationGroup
 {
-	private List items = new LinkedList();
+	private List<AnimationItem> items = new LinkedList<AnimationItem>();
 	private AnimationTypes type;
 	private String description;
 
@@ -61,6 +61,10 @@ public class AnimationGroup
 	{
 		this.type = type;
 		this.description = type.getDescription();
+	}
+
+	public AnimationTypes getType() {
+		return type;
 	}
 
 	public String getDescription()
@@ -77,4 +81,5 @@ public class AnimationGroup
 	{
 		return items.iterator();
 	}
+
 }

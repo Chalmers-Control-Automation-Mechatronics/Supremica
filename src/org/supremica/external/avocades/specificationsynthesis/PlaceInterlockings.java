@@ -1,6 +1,7 @@
 package org.supremica.external.avocades.specificationsynthesis;
 
 import java.util.*;
+
 import org.jdom.*;
 
 public class PlaceInterlockings {
@@ -15,8 +16,8 @@ public class PlaceInterlockings {
 
 	public void placeInterlocking(Element STEProot, Element PAroot, ConverterSTEPtoPA steppa) {
 
-		List POOs = STEProot.getChildren("Process_operation_occurrence");
-		for(Iterator listIt = POOs.iterator(); listIt.hasNext(); )
+		List<?> POOs = STEProot.getChildren("Process_operation_occurrence");
+		for(Iterator<?> listIt = POOs.iterator(); listIt.hasNext(); )
 		{
 			Element poo_element = (Element) listIt.next();
 			String poo_id = poo_element.getAttributeValue("id");
@@ -29,9 +30,9 @@ public class PlaceInterlockings {
 			String pod = pod_name.getText();
 
 			// Get a list of operation restrictions on this operation.
-			List operation_interlocking = getOperationVector(STEProot, poo_element);
+			List<Vector<String>> operation_interlocking = getOperationVector(STEProot, poo_element);
 			// Get a list of resourcestate restrictions on this operation.
-			List resource_Vector = getResourceVector(STEProot, poo_element);
+			List<Vector<String>> resource_Vector = getResourceVector(STEProot, poo_element);
 
 			Element or = new Element("Or");
 
@@ -66,17 +67,17 @@ public class PlaceInterlockings {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public List getOperationVector(Element STEProot, Element poo_element) {
+	public List<Vector<String>> getOperationVector(Element STEProot, Element poo_element) {
 
-		String poo_id = poo_element.getAttributeValue("id");
+		poo_element.getAttributeValue("id");
 
-		List merged_operation_conditions = null;
-		List operation_conditions = null;
+		List<Vector<String>> merged_operation_conditions = null;
+		List<Vector<String>> operation_conditions = null;
 		boolean first = true;
 
 		// Get a list of all poor elements of poo.
-		List POORs = poo_element.getChildren("Process_operation_occurrence_relationship");
-		for(Iterator listIt = POORs.iterator(); listIt.hasNext(); )
+		List<?> POORs = poo_element.getChildren("Process_operation_occurrence_relationship");
+		for(Iterator<?> listIt = POORs.iterator(); listIt.hasNext(); )
 		{
 			Element poor_element = (Element) listIt.next();
 			String poor_elemt_id = poor_element.getAttributeValue("id");
@@ -98,14 +99,14 @@ public class PlaceInterlockings {
 					// The described conditions may include several requirements seperated by " ".
 					String described_condition = described_condition_element.getText();
 
-					Vector operation_interlockings = new Vector();
+					Vector<String> operation_interlockings = new Vector<String>();
 					// Convert the string to a vector with single conditions and adds this to a vector.
 					operation_interlockings = convertToVector(described_condition);
 					// Add the operation that was releted to.
 					operation_interlockings.addElement(related);
 
 					if (first) {
-						operation_conditions = new ArrayList();
+						operation_conditions = new ArrayList<Vector<String>>();
 						first = false;
 					}
 					operation_conditions.add(operation_interlockings);
@@ -123,16 +124,16 @@ public class PlaceInterlockings {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public List getResourceVector(Element STEProot, Element poo_element) {
+	public List<Vector<String>> getResourceVector(Element STEProot, Element poo_element) {
 
 		String poo_id = poo_element.getAttributeValue("id");
 
-		List resource_condition = null;
+		List<Vector<String>> resource_condition = null;
 		boolean first = true;
 
 		// Get all condition assigments.
-		List CAs = STEProot.getChildren("Condition_assignment");
-		for(Iterator listIt = CAs.iterator(); listIt.hasNext(); )
+		List<?> CAs = STEProot.getChildren("Condition_assignment");
+		for(Iterator<?> listIt = CAs.iterator(); listIt.hasNext(); )
 		{
 			Element condition_assiment = (Element) listIt.next();
 
@@ -150,7 +151,7 @@ public class PlaceInterlockings {
 				String described_condition = described_condition_element.getText();
 
 				if (first) {
-					resource_condition = new ArrayList();
+					resource_condition = new ArrayList<Vector<String>>();
 					first = false;
 				}
 
@@ -166,9 +167,9 @@ public class PlaceInterlockings {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Vector convertToVector(String described_condition_text) {
+	public Vector<String> convertToVector(String described_condition_text) {
 
-		Vector operation_interlockings = new Vector();
+		Vector<String> operation_interlockings = new Vector<String>();
 
 		int nr = described_condition_text.indexOf(" ");
 		int start_nr = 0;
@@ -202,8 +203,8 @@ public class PlaceInterlockings {
 
 		Element condition_assigment_element = null;
 
-		List condition_assigments = STEProot.getChildren("Condition_assignment");
-		for(Iterator listIt = condition_assigments.iterator(); listIt.hasNext(); )
+		List<?> condition_assigments = STEProot.getChildren("Condition_assignment");
+		for(Iterator<?> listIt = condition_assigments.iterator(); listIt.hasNext(); )
 		{
 			Element condition_assigment = (Element) listIt.next();
 
@@ -222,15 +223,15 @@ public class PlaceInterlockings {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	public List mergeVectors(List operation_interlocking) {
+	public List<Vector<String>> mergeVectors(List<Vector<String>> operation_interlocking) {
 
-		Vector merged_vector = new Vector();
+		Vector<String> merged_vector = new Vector<String>();
 
 		int vector_nr;
 		for (vector_nr=0; vector_nr < operation_interlocking.size(); vector_nr=vector_nr+1) {
 
-			Vector condition = (Vector) operation_interlocking.get(vector_nr);
-			String product = (String) condition.get(0); // Product type.
+			Vector<String> condition = operation_interlocking.get(vector_nr);
+			String product = condition.get(0); // Product type.
 			String product_part_of_name = product.substring(0, 4);
 
 			// Checks if the condition include a product type assigned to it. The condition vectors that have the same product type are to be merged into a signle condition vector.
@@ -239,7 +240,7 @@ public class PlaceInterlockings {
 				int nr;
 				for (nr=vector_nr+1; nr < operation_interlocking.size(); nr=nr+1) {
 
-					Vector condition_next = (Vector) operation_interlocking.get(nr);
+					Vector<?> condition_next = operation_interlocking.get(nr);
 					String product_next = (String) condition_next.get(0);
 
 					// Checks if this condition have the same product.
@@ -260,7 +261,7 @@ public class PlaceInterlockings {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Vector merge(Vector vectorOne, Vector vectorTwo) {
+	public Vector<String> merge(Vector<String> vectorOne, Vector<?> vectorTwo) {
 
 		int nr;
 		for (nr=0; nr < vectorTwo.size(); nr=nr+1) {
@@ -276,12 +277,12 @@ public class PlaceInterlockings {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void insertInterlocking(Element or, List condition_list, Element STEProot) {
+	public void insertInterlocking(Element or, List<Vector<String>> condition_list, Element STEProot) {
 
 		int nr;
 		for (nr=0; nr < condition_list.size(); nr=nr+1) {
 
-			Vector condition_vector = (Vector) condition_list.get(nr);
+			Vector<?> condition_vector = condition_list.get(nr);
 
 			if (condition_vector.size() > 1) {
 
@@ -351,8 +352,8 @@ public class PlaceInterlockings {
 		String id_resource = null;
 		String assigned_to = null;
 
-		List stateAssignmentList = STEProot.getChildren("State_assignment");
-		for(Iterator listSA = stateAssignmentList.iterator(); listSA.hasNext(); )
+		List<?> stateAssignmentList = STEProot.getChildren("State_assignment");
+		for(Iterator<?> listSA = stateAssignmentList.iterator(); listSA.hasNext(); )
 		{
 			Element sa_element = (Element) listSA.next();
 			String sa_id = sa_element.getAttributeValue("id");
@@ -363,8 +364,8 @@ public class PlaceInterlockings {
 			}
 		}
 
-		List itemList = STEProot.getChildren("Item");
-		for(Iterator listItem = itemList.iterator(); listItem.hasNext(); )
+		List<?> itemList = STEProot.getChildren("Item");
+		for(Iterator<?> listItem = itemList.iterator(); listItem.hasNext(); )
 		{
 			Element item_element = (Element) listItem.next();
 			Element id = item_element.getChild("Id");
@@ -391,8 +392,8 @@ public class PlaceInterlockings {
 		String state_namn = null;
 		String describedState = null;
 
-		List stateAssignmentList = STEProot.getChildren("State_assignment");
-		for(Iterator listSA = stateAssignmentList.iterator(); listSA.hasNext(); )
+		List<?> stateAssignmentList = STEProot.getChildren("State_assignment");
+		for(Iterator<?> listSA = stateAssignmentList.iterator(); listSA.hasNext(); )
 		{
 			Element sa_element = (Element) listSA.next();
 			String sa_id = sa_element.getAttributeValue("id");
@@ -403,8 +404,8 @@ public class PlaceInterlockings {
 			}
 		}
 
-		List stateList = STEProot.getChildren("State");
-		for(Iterator listState = stateList.iterator(); listState.hasNext(); )
+		List<?> stateList = STEProot.getChildren("State");
+		for(Iterator<?> listState = stateList.iterator(); listState.hasNext(); )
 		{
 			Element state_element = (Element) listState.next();
 

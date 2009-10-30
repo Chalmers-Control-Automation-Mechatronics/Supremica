@@ -25,11 +25,12 @@ import javax.swing.table.JTableHeader;
 
 
 public class BasicTablePane 
-						extends
-							JPanel
+	extends JPanel
 
 {
-	protected JButton jbTableHeader = null; 
+    private static final long serialVersionUID = 1L;
+
+    protected JButton jbTableHeader = null; 
 	protected BasicTable table = null;
 	protected JScrollPane scrollPane = null;
 	
@@ -196,12 +197,13 @@ public class BasicTablePane
 	}	
 }
 
-class RowHeaderRenderer extends 
-							JLabel 
-						implements 
-							ListCellRenderer
+class RowHeaderRenderer
+    extends JLabel 
+	implements ListCellRenderer
 {
-	  //constructor
+    private static final long serialVersionUID = 1L;
+
+    //constructor
 	  public RowHeaderRenderer(JTable table) {
 	    JTableHeader header = table.getTableHeader();
 	    setOpaque(true);

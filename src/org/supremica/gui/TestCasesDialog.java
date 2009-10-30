@@ -4,33 +4,71 @@
 
 package org.supremica.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.StringTokenizer;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.LabeledEvent;
-
 import org.supremica.automata.Project;
-import org.supremica.gui.ide.IDE;
+import org.supremica.automata.algorithms.AutomataSynthesizer;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.algorithms.SynthesisAlgorithm;
+import org.supremica.automata.algorithms.SynthesisType;
+import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.gui.ide.DocumentContainerManager;
-import org.supremica.gui.AutomataSynthesisWorker;
-import org.supremica.gui.SynthesizerDialog;
-import org.supremica.automata.algorithms.*;
-import org.supremica.automata.Automata;
-import org.supremica.automata.BDD.BDDSynthesizer;
-import org.supremica.util.BDD.OnlineBDDSupervisor;
-import org.supremica.log.*;
-import org.supremica.testcases.*;
-import org.supremica.testcases.warehouse.Warehouse;
+import org.supremica.gui.ide.IDE;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.testcases.AllocationBatch;
+import org.supremica.testcases.Arbiter;
+import org.supremica.testcases.BricksGame;
+import org.supremica.testcases.CatMouse;
+import org.supremica.testcases.Counters;
+import org.supremica.testcases.DiningPhilosophers;
+import org.supremica.testcases.ExtCatMouse;
+import org.supremica.testcases.ExtDiningPhilosophers;
+import org.supremica.testcases.OperationBasedSystems;
+import org.supremica.testcases.PigeonHole;
+import org.supremica.testcases.RandomAutomata;
+import org.supremica.testcases.RoundRobin;
+import org.supremica.testcases.SanchezTestCase;
+import org.supremica.testcases.StickPickingGame;
+import org.supremica.testcases.TransferLine;
+import org.supremica.testcases.Users;
 import org.supremica.testcases.warehouse.SelectEventsWindow;
+import org.supremica.testcases.warehouse.Warehouse;
 import org.supremica.util.SupremicaException;
+
 
 class Util
 {
@@ -172,8 +210,10 @@ class Util
 }
 
 class TextArea extends JFrame {
-     JTextArea _resultArea = new JTextArea(20, 70);
-     public TextArea(String text) {
+	private static final long serialVersionUID = 1L;
+	JTextArea _resultArea = new JTextArea(20, 70);
+
+	public TextArea(String text) {
         //... Set textarea's initial text, scrolling, and border.
         _resultArea.setText(text);
          _resultArea.setEditable(false);
@@ -355,9 +395,9 @@ class PhilosPanel
     {
         DiningPhilosophers dp = new DiningPhilosophers(int_num.get(), l_take.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put.isSelected(), animation.isSelected(), memory.isSelected());
         
-        Iterator<LabeledEvent>  uit;
-        
-/*        for(int i=0;i<dp.getProject().nbrOfAutomata();i++)
+        /*
+        Iterator<LabeledEvent> uit;
+        for(int i=0;i<dp.getProject().nbrOfAutomata();i++)
         {
             System.out.println("i: "+i);
             uit = dp.getProject().getAutomatonAt(i).getAlphabet().getUncontrollableAlphabet().iterator();

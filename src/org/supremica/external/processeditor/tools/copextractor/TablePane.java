@@ -13,7 +13,8 @@ public class TablePane
 							implements
 							    ActionListener
 {
-	
+    private static final long serialVersionUID = 1L;
+
 	private JButton jbAddFile = null;
 	private JButton jbRemove = null;
 	

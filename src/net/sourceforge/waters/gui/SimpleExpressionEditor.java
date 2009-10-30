@@ -123,4 +123,9 @@ public class SimpleExpressionEditor
     }
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

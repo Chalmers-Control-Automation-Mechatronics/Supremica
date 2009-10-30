@@ -60,11 +60,11 @@ import java.util.*;
  **/
 public class LabelTrace
 {
-	private LinkedList theTrace;
+	private LinkedList<String> theTrace;
 
 	public LabelTrace()
 	{
-		theTrace = new LinkedList();
+		theTrace = new LinkedList<String>();
 	}
 
 	public void addFirst(String label)
@@ -80,25 +80,25 @@ public class LabelTrace
 	public String getFirst()
 		throws NoSuchElementException
 	{
-		return (String) theTrace.getFirst();
+		return theTrace.getFirst();
 	}
 
 	public String getLast()
 		throws NoSuchElementException
 	{
-		return (String) theTrace.getLast();
+		return theTrace.getLast();
 	}
 
 	public String removeFirst()
 		throws NoSuchElementException
 	{
-		return (String) theTrace.removeFirst();
+		return theTrace.removeFirst();
 	}
 
 	public String removeLast()
 		throws NoSuchElementException
 	{
-		return (String) theTrace.removeLast();
+		return theTrace.removeLast();
 	}
 
 	public int size()
@@ -111,7 +111,7 @@ public class LabelTrace
 		theTrace.clear();
 	}
 
-	public Iterator iterator()
+	public Iterator<String> iterator()
 	{
 		return theTrace.iterator();
 	}
@@ -120,9 +120,9 @@ public class LabelTrace
 	{
 		StringBuffer traceDesc = new StringBuffer();
 
-		for (Iterator eIt = iterator(); eIt.hasNext(); )
+		for (Iterator<String> eIt = iterator(); eIt.hasNext(); )
 		{
-			String currLabel = (String) eIt.next();
+			String currLabel = eIt.next();
 
 			traceDesc.append("'" + currLabel + "'");
 

@@ -11,10 +11,9 @@ package net.sourceforge.waters.model.compiler.constraint;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.OccursChecker;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 

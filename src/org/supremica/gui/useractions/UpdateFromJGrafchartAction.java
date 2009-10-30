@@ -1,22 +1,48 @@
 package org.supremica.gui.useractions;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import grafchart.sfc.EditorAPI;
+import grafchart.sfc.GCDocument;
+import grafchart.sfc.GCStep;
+import grafchart.sfc.GCStepInitial;
+import grafchart.sfc.GCTransition;
+import grafchart.sfc.GCTransitionInPort;
+import grafchart.sfc.GCTransitionOutPort;
+import grafchart.sfc.GrafchartStorage;
+import grafchart.sfc.WorkspaceObject;
+
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
+import org.supremica.gui.ActionMan;
 import org.supremica.gui.Supremica;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.VisualProjectContainer;
-import org.supremica.gui.ActionMan;
-import grafchart.sfc.JGrafchartSupremicaEditor;
-import org.supremica.log.*;
-import grafchart.sfc.*;
-import java.util.*;
-import org.supremica.automata.*;
-import com.nwoods.jgo.*;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+
+import com.nwoods.jgo.JGoLink;
+import com.nwoods.jgo.JGoListPosition;
+import com.nwoods.jgo.JGoPort;
+
 
 public class UpdateFromJGrafchartAction
 	extends AbstractAction
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(AbstractAction.class);
 
 	public class JGrafchartStepReader
@@ -30,8 +56,6 @@ public class UpdateFromJGrafchartAction
 
 		private void reset()
 		{
-			String theName = "";
-
 			isAccepting = false;
 			isForbidden = false;
 		}
@@ -123,11 +147,13 @@ public class UpdateFromJGrafchartAction
 
 	public class JGrafchartTransitionReader
 	{
+		@SuppressWarnings("unused")
 		private GCTransition theTransition;
 		private Alphabet theEvents = null;
 		private boolean isControllable = true;
 		private boolean isPrioritized = true;
 		private boolean isObservable = true;
+		@SuppressWarnings("unused")
 		private boolean isOperator = false;
 		private boolean isImmediate = false;
 		private boolean isEpsilon = false;
@@ -323,7 +349,7 @@ public class UpdateFromJGrafchartAction
 
 	public Automaton buildAutomaton(WorkspaceObject theWorkspace)
 	{
-		HashMap stepToStateMap = new HashMap();
+		HashMap<GCStep, State> stepToStateMap = new HashMap<GCStep, State>();
 		JGrafchartTransitionReader transitionReader = new JGrafchartTransitionReader();
 		JGrafchartStepReader stepReader = new JGrafchartStepReader();
 		JGrafchartWorkbenchReader workspaceReader = new JGrafchartWorkbenchReader();
@@ -470,7 +496,7 @@ public class UpdateFromJGrafchartAction
 					}
 				}
 
-				State precedingState = (State) stepToStateMap.get(precedingStep);
+				State precedingState = stepToStateMap.get(precedingStep);
 
 				if (precedingState == null)
 				{
@@ -479,7 +505,7 @@ public class UpdateFromJGrafchartAction
 					return null;
 				}
 
-				State succeedingState = (State) stepToStateMap.get(succeedingStep);
+				State succeedingState = stepToStateMap.get(succeedingStep);
 
 				if (succeedingState == null)
 				{
@@ -490,7 +516,7 @@ public class UpdateFromJGrafchartAction
 
 				Alphabet theEvents = transitionReader.getEvents();
 
-				for (Iterator alphIt = theEvents.iterator(); alphIt.hasNext(); )
+				for (Iterator<?> alphIt = theEvents.iterator(); alphIt.hasNext(); )
 				{
 					LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
@@ -590,14 +616,12 @@ public class UpdateFromJGrafchartAction
 
 		//ActionMan.updateFromJGrafchart(ActionMan.getGui());
 		VisualProject theProject = null;
-		JGrafchartSupremicaEditor theEditor = null;
-
 		try
 		{
 			VisualProjectContainer projectContainer = ActionMan.getGui().getVisualProjectContainer();
 
 			theProject = (VisualProject) projectContainer.getActiveProject();
-			theEditor = theProject.getJGrafchartEditor();
+			theProject.getJGrafchartEditor();
 		}
 		catch (Exception ex)
 		{
@@ -611,9 +635,9 @@ public class UpdateFromJGrafchartAction
 		//fillDocument(workspace1);
 		// Print top level workspaces
 		GrafchartStorage theStorage = EditorAPI.topGrafcharts;
-		ArrayList topLevelWorkspaceList = theStorage.getStorage();
+		ArrayList<?> topLevelWorkspaceList = theStorage.getStorage();
 
-		for (Iterator it = topLevelWorkspaceList.iterator(); it.hasNext(); )
+		for (Iterator<?> it = topLevelWorkspaceList.iterator(); it.hasNext(); )
 		{
 			GCDocument currDoc = (GCDocument) it.next();
 			Project currProject = buildProject(currDoc);
@@ -628,7 +652,6 @@ public class UpdateFromJGrafchartAction
 
 	public void fillDocument(GCDocument doc)
 	{
-		int yPos = 30;
 		GCDocument jgSupervisor = doc;
 
 		jgSupervisor.setWorkspaceName("Automata");    // Top level
@@ -639,7 +662,6 @@ public class UpdateFromJGrafchartAction
 
 		// Create Grafcet
 		int xpos = 100;
-		int ypos = 100;
 		GCStepInitial s1 = supervisor.createInitialStep(xpos, 100, "s1(accepting)", "");
 		GCTransition t1 = supervisor.createTransition(xpos, 200, "{e1,e2}");
 		GCStep s2 = supervisor.createStep(xpos, 300, "s2", "");

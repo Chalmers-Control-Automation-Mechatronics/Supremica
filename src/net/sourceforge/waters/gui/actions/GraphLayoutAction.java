@@ -134,4 +134,9 @@ public class GraphLayoutAction
   //# Data Members
   private GraphSubject mObservedGraph;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

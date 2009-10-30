@@ -53,7 +53,7 @@ import java.util.*;
 
 public class InputProtocol
 {
-	private static Collection types = new LinkedList();
+	private static Collection<InputProtocol> types = new LinkedList<InputProtocol>();
 	public static final InputProtocol JarProtocol = new InputProtocol("jar");
 	public static final InputProtocol FileProtocol = new InputProtocol("file");
 	public static final InputProtocol UnknownProtocol = new InputProtocol("Unknown", false);
@@ -74,7 +74,7 @@ public class InputProtocol
 		this.description = description;
 	}
 
-	public static Iterator iterator()
+	public static Iterator<InputProtocol> iterator()
 	{
 		return types.iterator();
 	}

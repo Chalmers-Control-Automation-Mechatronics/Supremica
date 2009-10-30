@@ -4,15 +4,17 @@ import java.util.*;
 import java.io.*;
 
 public class EventSet
-	extends Vector
+	extends Vector<Event>
 {
-	private int count = 0, total = 0;
+    private static final long serialVersionUID = 1L;
+
+    private int count = 0, total = 0;
 	private boolean closed = false;
 
 	// ------------------------------------------------ stuffs used BEFORE closing!
 	private boolean in(String name)
 	{
-		for (Enumeration e = elements(); e.hasMoreElements(); )
+		for (Enumeration<?> e = elements(); e.hasMoreElements(); )
 		{
 			Event ev = (Event) e.nextElement();
 
@@ -29,7 +31,7 @@ public class EventSet
 	{
 		BDDAssert.internalCheck(!closed, "[EventSet.getEventByName]BAD FUNCTION CALL!");
 
-		for (Enumeration e = elements(); e.hasMoreElements(); )
+		for (Enumeration<?> e = elements(); e.hasMoreElements(); )
 		{
 			Event ev = (Event) e.nextElement();
 
@@ -46,7 +48,7 @@ public class EventSet
 	{
 		BDDAssert.internalCheck(!closed, "[EventSet.getIdByName]BAD FUNCTION CALL!");
 
-		for (Enumeration e = elements(); e.hasMoreElements(); )
+		for (Enumeration<?> e = elements(); e.hasMoreElements(); )
 		{
 			Event ev = (Event) e.nextElement();
 
@@ -175,7 +177,7 @@ public class EventSet
 			events[t] = null;
 		}
 
-		for (Enumeration e = elements(); e.hasMoreElements(); )
+		for (Enumeration<?> e = elements(); e.hasMoreElements(); )
 		{
 			Event ev = (Event) e.nextElement();
 

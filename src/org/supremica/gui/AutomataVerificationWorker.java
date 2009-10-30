@@ -82,7 +82,8 @@ public class AutomataVerificationWorker
     private MinimizationOptions minimizationOptions;
     private ExecutionDialog executionDialog;
     private boolean stopRequested = false;
-    private EventQueue eventQueue = new EventQueue();
+    @SuppressWarnings("unused")
+	private EventQueue eventQueue = new EventQueue();
     
     public AutomataVerificationWorker(IDEReportInterface workbench, Automata theAutomata,
         VerificationOptions verificationOptions,
@@ -195,7 +196,7 @@ public class AutomataVerificationWorker
         }
         
         // Initialize the ExecutionDialog
-        final ArrayList threadsToStop = new ArrayList();
+        final ArrayList<Stoppable> threadsToStop = new ArrayList<Stoppable>();
         threadsToStop.add(this);
         threadsToStop.add(automataVerifier);
         executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);

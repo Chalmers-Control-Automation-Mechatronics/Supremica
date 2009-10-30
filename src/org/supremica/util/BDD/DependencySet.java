@@ -8,6 +8,7 @@ import java.io.*;
 public class DependencySet
 {
 	private BDDAutomata manager;
+	@SuppressWarnings("unused")
 	private BDDAutomaton[] all, dependent;
 	private BDDAutomaton me;
 	private boolean[] map_dependency;

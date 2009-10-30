@@ -1,15 +1,15 @@
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import net.sourceforge.waters.analysis.distributed.schemata.AutomatonSchema;
+import net.sourceforge.waters.analysis.distributed.schemata.ProductDESSchema;
 
-import net.sourceforge.waters.analysis.distributed.schemata.*;
 
 public class SelectorDistribution extends HashStateDistribution
 {
-  public SelectorDistribution(String[] handlers, ProductDESSchema model, StateEncoding encoding, AutomataSelector selector)
+  private static final long serialVersionUID = -6465883083272581701L;
+
+  public SelectorDistribution(String[] handlers, ProductDESSchema model,
+		  					  StateEncoding encoding, AutomataSelector selector)
   {
     super(handlers);
 

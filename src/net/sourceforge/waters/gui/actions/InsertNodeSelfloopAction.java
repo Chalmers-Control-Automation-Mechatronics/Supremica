@@ -69,4 +69,9 @@ public class InsertNodeSelfloopAction
   //# Data Members
   private final Proxy mActionArgument;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

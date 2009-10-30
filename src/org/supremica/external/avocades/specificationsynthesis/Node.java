@@ -1,7 +1,5 @@
 package org.supremica.external.avocades.specificationsynthesis;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.DOMException;
 
 public class Node {
 

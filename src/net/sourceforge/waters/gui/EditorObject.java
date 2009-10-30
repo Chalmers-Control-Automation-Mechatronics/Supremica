@@ -26,7 +26,6 @@ import net.sourceforge.waters.subject.base.Subject;
 public abstract class EditorObject
 {
     protected boolean visible;
-    private int hash = 0;
     
     public EditorObject()
     {

@@ -55,9 +55,13 @@ import java.util.*;
 public class CompactStateSet
 	implements StateStorage
 {
+	@SuppressWarnings("unused")
 	private StateCompressor compressor;
+	@SuppressWarnings("unused")
 	private int nbrOfStatesInEachBlock;
+	@SuppressWarnings("unused")
 	private StateBlocks stateBlocks;
+	@SuppressWarnings("unused")
 	private HashMap stateToPositionMap;
 
 	public CompactStateSet(StateCompressor compressor)

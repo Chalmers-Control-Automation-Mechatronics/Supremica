@@ -8,7 +8,9 @@ import org.supremica.gui.ActionMan;
 public class OpenJGrafchartAction
 	extends AbstractAction
 {
-	public OpenJGrafchartAction()
+    private static final long serialVersionUID = 1L;
+
+    public OpenJGrafchartAction()
 	{
 		super("Open JGrafchart", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Edit16.gif")));
 

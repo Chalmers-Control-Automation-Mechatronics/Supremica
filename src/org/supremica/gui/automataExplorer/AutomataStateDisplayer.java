@@ -59,8 +59,12 @@ import org.supremica.properties.Config;
 public class AutomataStateDisplayer
         extends JPanel
 {
-    private AutomataStateViewer stateViewer;
-    private Automata theAutomata;
+	private static final long serialVersionUID = 1L;
+	
+	@SuppressWarnings("unused")
+	private AutomataStateViewer stateViewer;
+    @SuppressWarnings("unused")
+	private Automata theAutomata;
     private JCheckBox isInitialBox = new JCheckBox("initial");
     private JCheckBox isAcceptingBox = new JCheckBox("accepting");
     private JCheckBox isForbiddenBox = new JCheckBox("forbidden");

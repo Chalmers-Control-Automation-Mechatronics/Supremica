@@ -35,6 +35,13 @@ public class SafetyVerificationJob extends VerificationJob
     set(STATE_DISTRIBUTION_ATTR, dist);
   }
 
+
+
+  //#########################################################################
+  //# Class Constants
   public static final String PROCESSING_THREADS_ATTR = "processing-threads";
   public static final String STATE_DISTRIBUTION_ATTR = "state-distribution";
+
+  private static final long serialVersionUID = 1L;
+
 }

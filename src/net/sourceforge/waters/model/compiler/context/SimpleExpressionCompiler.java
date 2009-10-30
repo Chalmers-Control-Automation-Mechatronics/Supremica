@@ -377,7 +377,6 @@ public class SimpleExpressionCompiler
       throws VisitorException
     {
       final List<SimpleIdentifierProxy> items = expr.getItems();
-      final int numitems = items.size();
       for (final SimpleIdentifierProxy item : items) {
         final SimpleExpressionProxy found = getBoundExpression(item);
         if (found == null) {
@@ -1260,7 +1259,6 @@ public class SimpleExpressionCompiler
         mNumPrimes++;
         final SimpleExpressionProxy origsub = expr.getSubTerm();
         final SimpleExpressionProxy simpsub = simplify(origsub);
-        final IdentifierProxy ident = getIdentifierValue(simpsub);
         final UnaryExpressionProxy newexpr = createExpression(expr, simpsub);
         mNumPrimes--;
         return processIdentifier(newexpr, true);

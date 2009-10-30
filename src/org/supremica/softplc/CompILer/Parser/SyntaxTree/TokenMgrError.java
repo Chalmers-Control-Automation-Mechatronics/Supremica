@@ -4,6 +4,7 @@ package org.supremica.softplc.CompILer.Parser.SyntaxTree;
 public class TokenMgrError
 	extends Error
 {
+    private static final long serialVersionUID = 1L;
 
 	/*
 	 * Ordinals for various reasons why an Error of this type can be thrown.

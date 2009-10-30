@@ -1,9 +1,8 @@
 package net.sourceforge.waters.analysis.distributed;
 
-import java.io.Serializable;
-
 import net.sourceforge.waters.analysis.distributed.application.JobResult;
 import net.sourceforge.waters.model.des.EventProxy;
+
 
 public class VerificationJobResult extends JobResult
 {
@@ -39,4 +38,6 @@ public class VerificationJobResult extends JobResult
 
   public static final String TRACE_ATTR = "trace";
   public static final String RESULT_ATTR = "result";
+  private static final long serialVersionUID = 1L;
+
 }

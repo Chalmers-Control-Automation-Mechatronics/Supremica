@@ -14,6 +14,8 @@ import org.supremica.gui.Supremica;
 public class StateSetSubTree
 	extends SupremicaTreeNode
 {
+    private static final long serialVersionUID = 1L;
+
 	private static ImageIcon statesIcon = new ImageIcon(Supremica.class.getResource("/icons/States16.gif"));
 
 	public StateSetSubTree(StateSet states)

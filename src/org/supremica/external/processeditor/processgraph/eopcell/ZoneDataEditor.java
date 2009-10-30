@@ -5,19 +5,21 @@ import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.table.TableColumn;
-import javax.swing.*;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import org.supremica.external.processeditor.SOCFrame;
 import org.supremica.external.processeditor.processgraph.table.BasicTable;
 import org.supremica.external.processeditor.processgraph.table.DataTablePane;
 
 public class ZoneDataEditor 
-							extends
-								JFrame
-							implements
-								ActionListener
+	extends	JFrame
+	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
+
 	private JButton jbOk = null;
 	private JButton jbCancel = null;
 	private JButton jbApply = null;

@@ -175,7 +175,7 @@ public class XmlRpcClientLite
 		 * @throws XmlRpcException
 		 * @throws IOException
 		 */
-		Object execute(String method, Vector params)
+		Object execute(String method, Vector<Comparable> params)
 			throws XmlRpcException, IOException
 		{
 			long now = System.currentTimeMillis();
@@ -291,7 +291,7 @@ public class XmlRpcClientLite
 
 				try
 				{
-					Hashtable f = (Hashtable) result;
+					Hashtable<?, ?> f = (Hashtable<?, ?>) result;
 					String faultString = (String) f.get("faultString");
 					int faultCode = Integer.parseInt(f.get("faultCode").toString());
 
@@ -542,7 +542,7 @@ public class XmlRpcClientLite
 			String url = args[0];
 			String method = args[1];
 			XmlRpcClientLite client = new XmlRpcClientLite(url);
-			Vector v = new Vector();
+			Vector<Comparable> v = new Vector<Comparable>();
 
 			for (int i = 2; i < args.length; i++)
 			{

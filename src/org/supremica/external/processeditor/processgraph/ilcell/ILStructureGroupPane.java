@@ -16,12 +16,11 @@ import org.supremica.external.processeditor.processgraph.table.TableGroupPane;
 import org.supremica.manufacturingTables.xsd.il.*;
 
 public class ILStructureGroupPane 
-							extends 
-								TableGroupPane
+	extends TableGroupPane
 {
+    private static final long serialVersionUID = 1L;
 	private static final String ROWNAME = "or"; 
-	
-	
+
 	ModeTablePane tableMode = null;
 	InternalTablePane tableInternal = null;
 	ExternalTablePane tableExternal = null;

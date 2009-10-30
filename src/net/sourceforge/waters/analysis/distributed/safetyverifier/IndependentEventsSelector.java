@@ -74,5 +74,6 @@ class IndependentEventsSelector implements AutomataSelector
   }
   
   private final ProbabilityEstimator mEstimator;
+  @SuppressWarnings("unused")
   private final ProductDESSchema mModel;
 }

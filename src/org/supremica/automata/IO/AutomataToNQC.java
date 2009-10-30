@@ -56,10 +56,10 @@ import java.text.DateFormat;
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.SynchronizationType;
-import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
 
 public class AutomataToNQC
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(AutomataToNQC.class);
 	private Automata theAutomata;
     private AutomataIndexMap indexMap;
@@ -311,8 +311,6 @@ public class AutomataToNQC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = indexMap.getEventIndex(currEvent);
-
 			pw.println("\n// External enable condition for event \"" + currEvent.getLabel() + "\"");
 			pw.println("void enabled_" + currEvent.getLabel() + "(int& e)");
 			pw.println("{");
@@ -332,8 +330,6 @@ public class AutomataToNQC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = indexMap.getEventIndex(currEvent);
-
 			pw.println("\n// Action for event \"" + currEvent.getLabel() + "\"");
 			pw.println("void do_" + currEvent.getLabel() + "()");
 			pw.println("{");
@@ -459,11 +455,7 @@ public class AutomataToNQC
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			int currEventIndex = indexMap.getEventIndex(currEvent);
-
 			pw.println("\n\t\t// Transition for event \"" + currEvent.getLabel() + "\"");
-
-			boolean previousCondition = false;
-
 			pw.println("\t\tif (e_" + currEventIndex + ")");
 			pw.println("\t\t{");
 			pw.println("\t\t\tdo_" + currEvent.getLabel() + "();");

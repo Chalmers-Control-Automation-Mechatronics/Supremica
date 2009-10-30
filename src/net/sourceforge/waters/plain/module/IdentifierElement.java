@@ -63,4 +63,9 @@ public abstract class IdentifierElement
     return toString().compareTo(partner.toString());
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 5615251604646305917L;
+
 }

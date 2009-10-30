@@ -49,13 +49,18 @@
  */
 package org.supremica.automata.BDD;
 
-import java.math.BigInteger;
-import net.sf.javabdd.*;
-import org.supremica.automata.*;
-import org.supremica.log.*;
-import java.util.*;
+import java.util.Iterator;
+
+import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDDomain;
+import net.sf.javabdd.BDDFactory;
+import net.sf.javabdd.BDDPairing;
+import net.sf.javabdd.BDDVarSet;
+
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
-import org.supremica.util.ArrayHelper;
+
 
 public class BDDManager
 {

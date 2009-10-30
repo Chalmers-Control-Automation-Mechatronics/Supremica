@@ -79,4 +79,9 @@ public final class PlainEventListElement
     return downcast.visitPlainEventListProxy(this);
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1899391218638821721L;
+
 }

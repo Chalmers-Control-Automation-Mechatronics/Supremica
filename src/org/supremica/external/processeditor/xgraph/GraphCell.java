@@ -9,6 +9,8 @@ import java.awt.event.*;
  */
 public class GraphCell extends JPanel implements MouseListener,
 						 MouseMotionListener {
+    private static final long serialVersionUID = 1L;
+
     protected int sizeX = 50;
     protected int sizeY = 20; 
     protected int locX = 0;

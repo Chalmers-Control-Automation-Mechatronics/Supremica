@@ -5,12 +5,7 @@ package org.supremica.automata.BDD.EFA;
  *
  * @author sajed
  */
-import org.supremica.automata.BDD.EFA.BDDExtendedAutomaton;
-import org.supremica.automata.BDD.EFA.BDDExtendedAutomata;
-import net.sf.javabdd.*;
-import org.supremica.log.*;
-import org.supremica.util.SupremicaException;
-import java.util.*;
+import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
@@ -18,6 +13,7 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+
 
 public class BDDMonolithicEdges
     implements BDDEdges
@@ -115,7 +111,7 @@ public class BDDMonolithicEdges
         {
            BinaryExpressionProxy bep = null;
            bep = (BinaryExpressionProxy)parser.parse(var+"="+var,Operator.TYPE_ARITHMETIC);
-           return bddExAutomata.manager.action2BDD(bep);
+           return BDDExtendedManager.action2BDD(bep);
         }
         catch(ParseException pe)
         {

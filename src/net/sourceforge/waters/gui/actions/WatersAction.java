@@ -121,4 +121,9 @@ public abstract class WatersAction
     return (UndoInterface) container;
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

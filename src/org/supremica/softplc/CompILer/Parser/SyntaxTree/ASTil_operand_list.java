@@ -18,14 +18,14 @@ public class ASTil_operand_list
 	}
 
 	// Appended
-	private LinkedList operands = new LinkedList();
+	private LinkedList<Operand> operands = new LinkedList<Operand>();
 
 	public void addOperand(Operand o)
 	{
 		operands.add(o);
 	}
 
-	public LinkedList getOperands()
+	public LinkedList<Operand> getOperands()
 	{
 		return operands;
 	}

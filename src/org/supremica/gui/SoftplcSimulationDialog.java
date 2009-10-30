@@ -12,7 +12,7 @@ public class SoftplcSimulationDialog
 	private static final long serialVersionUID = 1L;
 	private boolean ok = false;
 	private JComboBox interfaces;
-	private Vector interfacesVector = new Vector();
+	private Vector<Object> interfacesVector = new Vector<Object>();
 
 	public SoftplcSimulationDialog(Frame frame, String title, boolean modal)
 	{

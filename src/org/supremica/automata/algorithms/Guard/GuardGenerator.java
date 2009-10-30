@@ -32,13 +32,13 @@ public class GuardGenerator {
     public String extractGuard(LabeledEvent event)
     {
         String output = "";
-        TreeSet states = getAllowedStates(event);
+        TreeSet<String> states = getAllowedStates(event);
         Iterator<String> stateItr = states.iterator();
-        TreeSet tsAND = new TreeSet();
-        TreeSet tsOR = new TreeSet();
+        TreeSet<String> tsAND = new TreeSet<String>();
+        TreeSet<String> tsOR = new TreeSet<String>();
         while(stateItr.hasNext())
         {
-            tsAND = new TreeSet();
+            tsAND = new TreeSet<String>();
             String currState = ""+stateItr.next();
             StringTokenizer st = new StringTokenizer(currState, nameSep);
             while(st.hasMoreTokens())
@@ -54,9 +54,9 @@ public class GuardGenerator {
         
     }
     
-    public TreeSet getAllowedStates(LabeledEvent event)
+    public TreeSet<String> getAllowedStates(LabeledEvent event)
     {
-        TreeSet output = new TreeSet();
+        TreeSet<String> output = new TreeSet<String>();
         Iterator<Arc> arcItr = automaton.arcIterator();
         while(arcItr.hasNext())
         {
@@ -67,6 +67,7 @@ public class GuardGenerator {
         return output;
     }
     
+    @SuppressWarnings("unchecked")
     public String operand(String opr, TreeSet terms)
     {
         Iterator<TreeSet> itr = terms.iterator();

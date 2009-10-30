@@ -36,4 +36,9 @@ public class ClipboardChangedEvent
     return EditorChangedEvent.Kind.CLIPBOARD_CHANGED;
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

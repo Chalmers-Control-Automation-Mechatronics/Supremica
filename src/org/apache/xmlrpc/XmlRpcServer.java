@@ -70,7 +70,7 @@ import java.util.Stack;
  */
 public class XmlRpcServer
 {
-	private Stack pool;
+	private Stack<XmlRpcWorker> pool;
 	private int nbrWorkers;
 
 	/**
@@ -85,7 +85,7 @@ public class XmlRpcServer
 	 */
 	public XmlRpcServer()
 	{
-		pool = new Stack();
+		pool = new Stack<XmlRpcWorker>();
 		nbrWorkers = 0;
 		handlerMapping = new DefaultHandlerMapping();
 	}
@@ -162,7 +162,7 @@ public class XmlRpcServer
 	{
 		try
 		{
-			return (XmlRpcWorker) pool.pop();
+			return pool.pop();
 		}
 		catch (EmptyStackException x)
 		{

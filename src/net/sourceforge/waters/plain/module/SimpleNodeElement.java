@@ -199,4 +199,9 @@ public final class SimpleNodeElement
   private final PointGeometryProxy mInitialArrowGeometry;
   private final LabelGeometryProxy mLabelGeometry;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -4557804336585122065L;
+
 }

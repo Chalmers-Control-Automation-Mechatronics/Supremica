@@ -47,7 +47,10 @@ import java.awt.TextArea;
  *  before you do this, the BDD package is _locked_ and may [can ?] not be used!
  *
  */
-public class OnlineBDDSupervisorGui extends Frame {
+public class OnlineBDDSupervisorGui extends Frame
+{
+    private static final long serialVersionUID = 1L;
+
 	private OnlineBDDSupervisor supervisor;
 	private Label state;
 	private String helpmsg = "You can not close this window.\n"

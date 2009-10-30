@@ -53,9 +53,9 @@ import java.util.*;
 
 public class Transition
 {
-	private List prevPlaces = new LinkedList();
-	private List nextPlaces = new LinkedList();
-	private List prevInhibitorPlaces = new LinkedList();
+	private List<Place> prevPlaces = new LinkedList<Place>();
+	private List<Place> nextPlaces = new LinkedList<Place>();
+	private List<Place> prevInhibitorPlaces = new LinkedList<Place>();
 	private String identity;
 	private String label;
 	boolean controllable = true;
@@ -123,17 +123,17 @@ public class Transition
 		nextPlaces.add(place);
 	}
 
-	public Iterator nextPlaceIterator()
+	public Iterator<Place> nextPlaceIterator()
 	{
 		return nextPlaces.iterator();
 	}
 
-	public Iterator prevPlaceIterator()
+	public Iterator<Place> prevPlaceIterator()
 	{
 		return prevPlaces.iterator();
 	}
 
-	public Iterator prevInhibitorPlaceIterator()
+	public Iterator<Place> prevInhibitorPlaceIterator()
 	{
 		return prevInhibitorPlaces.iterator();
 	}
@@ -150,11 +150,11 @@ public class Transition
 		sb.append("Transition: " + identity + "\n");
 		sb.append("\tPrevious places:\n");
 
-		Iterator placeIt = prevPlaces.iterator();
+		Iterator<Place> placeIt = prevPlaces.iterator();
 
 		while (placeIt.hasNext())
 		{
-			Place currPlace = (Place) placeIt.next();
+			Place currPlace = placeIt.next();
 
 			sb.append("\t\t" + currPlace.getIdentity() + "\n");
 		}
@@ -165,7 +165,7 @@ public class Transition
 
 		while (placeIt.hasNext())
 		{
-			Place currPlace = (Place) placeIt.next();
+			Place currPlace = placeIt.next();
 
 			sb.append("\t\t" + currPlace.getIdentity() + "\n");
 		}
@@ -176,7 +176,7 @@ public class Transition
 
 		while (placeIt.hasNext())
 		{
-			Place currPlace = (Place) placeIt.next();
+			Place currPlace = placeIt.next();
 
 			sb.append("\t\t" + currPlace.getIdentity() + "\n");
 		}

@@ -46,4 +46,9 @@ public abstract class ComponentElement
     return (ComponentElement) super.clone();
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -7341748549643097748L;
+
 }

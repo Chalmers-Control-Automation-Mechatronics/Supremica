@@ -64,9 +64,9 @@ public class AutomatonPurge
 
 	public void execute()
 	{
-		LinkedList stateList = new LinkedList();
+		LinkedList<State> stateList = new LinkedList<State>();
 		
-		for (Iterator stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
+		for (Iterator<?> stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = (State) stateIt.next();
 
@@ -78,9 +78,9 @@ public class AutomatonPurge
 
 		theAutomaton.beginTransaction();
 
-		for (Iterator stateIt = stateList.iterator(); stateIt.hasNext(); ) 
+		for (Iterator<State> stateIt = stateList.iterator(); stateIt.hasNext(); ) 
 		{
-			State currState = (State) stateIt.next();
+			State currState = stateIt.next();
 
 			theAutomaton.removeState(currState);
 		}

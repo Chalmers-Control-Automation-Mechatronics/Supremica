@@ -116,7 +116,7 @@ public class TableMap
 		return model.getColumnName(aColumn);
 	}
 
-	public Class getColumnClass(int aColumn)
+	public Class<?> getColumnClass(int aColumn)
 	{
 		return model.getColumnClass(aColumn);
 	}

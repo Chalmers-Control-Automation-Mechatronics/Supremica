@@ -10,8 +10,10 @@ package org.supremica.util.BDD;
 
 public class DisjOptimizer
 {
+	@SuppressWarnings("unused")
 	private GroupHelper gh;
 	private BDDAutomata manager;
+	@SuppressWarnings("unused")
 	private int max_size, size, algo;
 	private int[] twave, twave_u;
 	private Cluster[] clusters;
@@ -158,7 +160,6 @@ public class DisjOptimizer
 		IndexedSet.empty(events_have);
 
 		// and do the insertation
-		int current = 0;
 		for(int i = 0; i < size; i++)
 		{
 			boolean [] new_events = copy[i].getCareSet();

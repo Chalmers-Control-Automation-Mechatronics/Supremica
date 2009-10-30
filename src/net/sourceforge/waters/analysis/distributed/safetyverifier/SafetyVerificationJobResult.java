@@ -25,5 +25,12 @@ public class SafetyVerificationJobResult extends VerificationJobResult
     set(STATS_ATTR, stats);
   }
 
+
+
+  //#########################################################################
+  //# Class Constants
   public static final String STATS_ATTR = "job-stats";
+
+  private static final long serialVersionUID = 1L;
+
 }

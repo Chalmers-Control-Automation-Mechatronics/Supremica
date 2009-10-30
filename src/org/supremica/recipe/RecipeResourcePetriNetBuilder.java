@@ -61,9 +61,9 @@ public class RecipeResourcePetriNetBuilder
 	// private PlantConnections plantConnections;
 	private PetriNet thePetriNet;
 	private InternalOperationRecipes theRecipes;
-	private List firstPlaces = new LinkedList();
-	private List lastPlaces = new LinkedList();
-	private HashMap resourcePlaces = new HashMap();
+	private List<List> firstPlaces = new LinkedList<List>();
+	private List<Place> lastPlaces = new LinkedList<Place>();
+	private HashMap<String, Place> resourcePlaces = new HashMap<String, Place>();
 	private int transitionCounter = 1;
 	private int nbr_of_resource_places = 0;
 	private int[] product_start_index;
@@ -86,7 +86,7 @@ public class RecipeResourcePetriNetBuilder
 		recipeCounter = 0;
 		thePetriNet = new PetriNet("unknown");
 
-		Iterator recipeIt = theRecipes.iterator();
+		Iterator<?> recipeIt = theRecipes.iterator();
 
 		while (recipeIt.hasNext())
 		{
@@ -101,21 +101,21 @@ public class RecipeResourcePetriNetBuilder
 		thePetriNet.addTransition(goalTransit);
 
 		// Create all arcs to the goalTransit
-		Iterator lastPlacesIt = lastPlaces.iterator();
+		Iterator<Place> lastPlacesIt = lastPlaces.iterator();
 
 		while (lastPlacesIt.hasNext())
 		{
-			Place currPlace = (Place) lastPlacesIt.next();
+			Place currPlace = lastPlacesIt.next();
 
 			thePetriNet.addArc(currPlace, goalTransit);
 		}
 
 		// Add all resource places
-		Iterator resourceIt = resourcePlaces.values().iterator();
+		Iterator<Place> resourceIt = resourcePlaces.values().iterator();
 
 		while (resourceIt.hasNext())
 		{
-			Place currPlace = (Place) resourceIt.next();
+			Place currPlace = resourceIt.next();
 
 			thePetriNet.addPlace(currPlace);
 		}
@@ -146,7 +146,7 @@ public class RecipeResourcePetriNetBuilder
 	{
 		if (resourcePlaces.containsKey(name))
 		{
-			return (Place) resourcePlaces.get(name);
+			return resourcePlaces.get(name);
 		}
 		else
 		{
@@ -193,13 +193,13 @@ public class RecipeResourcePetriNetBuilder
 		product_start_index[recipeCounter++] = firstPlace.getIndex();
 
 		// Create a place for each <operation,resource>
-		Iterator operationIt = theRecipe.operationIterator();
+		Iterator<?> operationIt = theRecipe.operationIterator();
 
 		while (operationIt.hasNext())
 		{
 			InternalOperation currOperation = (InternalOperation) operationIt.next();
 			String currOperationName = currOperation.getIdentity();
-			Iterator resourceIt = currOperation.resourceCandidateIterator();
+			Iterator<?> resourceIt = currOperation.resourceCandidateIterator();
 
 			while (resourceIt.hasNext())
 			{
@@ -226,7 +226,7 @@ public class RecipeResourcePetriNetBuilder
 		{
 			InternalOperation currOperation = (InternalOperation) operationIt.next();
 			String currOperationName = currOperation.getIdentity();
-			Iterator resourceIt = currOperation.resourceCandidateIterator();
+			Iterator<?> resourceIt = currOperation.resourceCandidateIterator();
 
 			while (resourceIt.hasNext())
 			{
@@ -246,7 +246,7 @@ public class RecipeResourcePetriNetBuilder
 				}
 
 				// Iterate over all the next transitions in the InternalOperationRecipe
-				Iterator intTransitionIt = currOperation.nextTransitionIterator();
+				Iterator<?> intTransitionIt = currOperation.nextTransitionIterator();
 
 				while (intTransitionIt.hasNext())
 				{
@@ -282,7 +282,7 @@ public class RecipeResourcePetriNetBuilder
 					}
 
 					// For all cases.
-					Iterator nextOperationIt = intTransition.nextOperationIterator();
+					Iterator<?> nextOperationIt = intTransition.nextOperationIterator();
 
 					while (nextOperationIt.hasNext())
 					{
@@ -290,7 +290,7 @@ public class RecipeResourcePetriNetBuilder
 						String nextOperationName = nextOperation.getIdentity();
 
 						// Find all possible resource candidates for the next resource
-						Iterator nextResourceIt = nextOperation.resourceCandidateIterator();
+						Iterator<?> nextResourceIt = nextOperation.resourceCandidateIterator();
 
 						while (nextResourceIt.hasNext())
 						{

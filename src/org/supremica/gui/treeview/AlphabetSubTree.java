@@ -11,6 +11,8 @@ import org.supremica.gui.Supremica;
 public class AlphabetSubTree
     extends SupremicaTreeNode
 {
+    private static final long serialVersionUID = 1L;
+
     private static ImageIcon alphabetIcon = new ImageIcon(Supremica.class.getResource("/icons/Alphabet16.gif"));
     
     public AlphabetSubTree(Alphabet alpha)

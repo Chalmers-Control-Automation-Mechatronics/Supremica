@@ -60,6 +60,7 @@ public class ProjectToHtml
 	private static Logger logger = LoggerFactory.createLogger(ProjectToHtml.class);
 	private Project project;
 	private File directory;
+	@SuppressWarnings("unused")
 	private boolean overwrite;
 	private int maxNbrOfStatesInPng;
 	private Process dotProcess;

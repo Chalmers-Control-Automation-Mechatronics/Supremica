@@ -6,7 +6,7 @@ public class AutomataCoverManager
 {
 	private BDDAutomata manager;
 	private PerEventTransitionSystem pets;
-	private Vector covers;
+	private Vector<AutomataCover> covers;
 	private boolean[] vector_cover;
 
 	public AutomataCoverManager(BDDAutomata manager, BDDAutomaton[] automata)
@@ -23,7 +23,7 @@ public class AutomataCoverManager
 			vector_cover[i] = false;
 		}
 
-		covers = new Vector();
+		covers = new Vector<AutomataCover>();
 
 		int len = automata.length;
 
@@ -62,9 +62,9 @@ public class AutomataCoverManager
 
 	public void cleanup()
 	{
-		for (Enumeration e = covers.elements(); e.hasMoreElements(); )
+		for (Enumeration<AutomataCover> e = covers.elements(); e.hasMoreElements(); )
 		{
-			AutomataCover ac = (AutomataCover) e.nextElement();
+			AutomataCover ac = e.nextElement();
 
 			ac.cleanup();
 		}
@@ -74,9 +74,9 @@ public class AutomataCoverManager
 
 	public void dump()
 	{
-		for (Enumeration e = covers.elements(); e.hasMoreElements(); )
+		for (Enumeration<AutomataCover> e = covers.elements(); e.hasMoreElements(); )
 		{
-			AutomataCover ac = (AutomataCover) e.nextElement();
+			AutomataCover ac = e.nextElement();
 
 			ac.dump();
 		}
@@ -103,9 +103,9 @@ public class AutomataCoverManager
 
 			manager.ref(new_);
 
-			for (Enumeration e = covers.elements(); e.hasMoreElements(); )
+			for (Enumeration<AutomataCover> e = covers.elements(); e.hasMoreElements(); )
 			{
-				AutomataCover ac = (AutomataCover) e.nextElement();
+				AutomataCover ac = e.nextElement();
 				int tmp = ac.forward_reachability(front);
 
 				new_ = manager.orTo(new_, tmp);

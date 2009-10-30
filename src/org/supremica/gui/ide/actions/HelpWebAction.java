@@ -13,6 +13,7 @@ public class HelpWebAction
 {
 	private static final long serialVersionUID = 1L;
 
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(HelpWebAction.class);
 
 	public HelpWebAction(List<IDEAction> actionList)

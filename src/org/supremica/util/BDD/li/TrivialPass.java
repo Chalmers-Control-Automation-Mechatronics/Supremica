@@ -8,7 +8,9 @@ package org.supremica.util.BDD.li;
 public class TrivialPass
 	extends Exception
 {
-	public TrivialPass(String pass_what)
+    private static final long serialVersionUID = 1L;
+
+    public TrivialPass(String pass_what)
 	{
 		super(pass_what);
 	}

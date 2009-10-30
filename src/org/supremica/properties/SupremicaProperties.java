@@ -58,11 +58,19 @@
 
 package org.supremica.properties;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Properties;
-import javax.swing.text.html.Option;
 
 import org.supremica.util.BDD.Options;
 
@@ -139,7 +147,7 @@ public final class SupremicaProperties
     public static void saveProperties()
     throws FileNotFoundException, IOException
     {
-        supremicaProperties.saveProperties(false);
+        SupremicaProperties.saveProperties(false);
     }
 
 
@@ -292,7 +300,8 @@ public final class SupremicaProperties
     }
 
     private static SupremicaProperties supremicaProperties;
-    private static Config config = Config.getInstance();
+    @SuppressWarnings("unused")
+	private static Config config = Config.getInstance();
     private static File propertyFile = null;
 
     static

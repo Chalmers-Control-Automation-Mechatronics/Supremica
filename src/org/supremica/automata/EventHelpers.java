@@ -61,6 +61,7 @@ import org.supremica.log.*;
  */
 public class EventHelpers
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(EventHelpers.class);
 
 //	/**

@@ -26,6 +26,7 @@ import java.util.Set;
  * @author Robi Malik
  */
 
+@SuppressWarnings("unchecked")
 public class Casting {
 
   /**

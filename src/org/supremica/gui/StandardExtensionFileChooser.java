@@ -60,6 +60,7 @@ public class StandardExtensionFileChooser
 	extends JFileChooser
 {
 	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(StandardExtensionFileChooser.class);
 
 	public StandardExtensionFileChooser() {}

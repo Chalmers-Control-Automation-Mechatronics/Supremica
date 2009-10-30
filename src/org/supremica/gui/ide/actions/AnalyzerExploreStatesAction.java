@@ -1,16 +1,18 @@
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
-import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
+import java.util.List;
+
+import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
-import org.supremica.gui.AutomatonExplorer;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.*;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 
 /**
@@ -71,7 +73,7 @@ public class AnalyzerExploreStatesAction
             // Get AutomatonExplorer
             try
             {
-                AutomatonExplorer explorer = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().getAutomatonExplorer(currAutomatonName);
+                ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().getAutomatonExplorer(currAutomatonName);
             }
             catch (Exception ex)
             {

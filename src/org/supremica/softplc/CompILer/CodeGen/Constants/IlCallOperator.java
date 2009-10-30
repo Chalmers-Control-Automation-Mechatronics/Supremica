@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class IlCallOperator
 {
-	private static List theInstructions = new ArrayList();
+	private static List<IlCallOperator> theInstructions = new ArrayList<IlCallOperator>();
 	private String instruction;
 
 	private IlCallOperator(String s)
@@ -24,7 +24,7 @@ public class IlCallOperator
 	}
 
 	/**iterator gives an iterator over the instruction constants*/
-	public static Iterator iterator()
+	public static Iterator<IlCallOperator> iterator()
 	{
 		return theInstructions.iterator();
 	}

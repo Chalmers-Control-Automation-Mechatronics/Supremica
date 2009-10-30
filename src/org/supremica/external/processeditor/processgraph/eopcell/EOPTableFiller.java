@@ -7,7 +7,9 @@ import java.util.List;
 public class EOPTableFiller {
 	
 	/* final */
+	@SuppressWarnings("unused")
 	private static final String SEPARATOR = ",";
+	@SuppressWarnings("unused")
 	private static final String SPACE = " ";
 	
 	/* variables */

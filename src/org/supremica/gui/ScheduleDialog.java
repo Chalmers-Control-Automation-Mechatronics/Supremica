@@ -9,19 +9,40 @@
 
 package org.supremica.gui;
 
-import javax.swing.*;
 import java.awt.GridLayout;
-import java.awt.event.*;
-import java.io.*;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import org.supremica.automata.algorithms.scheduling.milp.RandomPathUsingMilp;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.algorithms.scheduling.*;
+import org.supremica.automata.algorithms.scheduling.ModifiedAstar;
+import org.supremica.automata.algorithms.scheduling.MultithreadedAstar;
+import org.supremica.automata.algorithms.scheduling.Scheduler;
+import org.supremica.automata.algorithms.scheduling.SchedulingConstants;
+import org.supremica.automata.algorithms.scheduling.VelocityBalancer;
+import org.supremica.automata.algorithms.scheduling.VisGraphScheduler;
 import org.supremica.automata.algorithms.scheduling.milp.Milp;
+import org.supremica.automata.algorithms.scheduling.milp.RandomPathUsingMilp;
 import org.supremica.gui.ide.actions.IDEActionInterface;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+
 
 public class ScheduleDialog
     extends JDialog
@@ -46,11 +67,12 @@ public class ScheduleDialog
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
     private JCheckBox nodeExpander, buildAutomaton, vgDrawer, balanceVelocities;
-    private int memoryCapacity;
+    @SuppressWarnings("unused")
+	private int memoryCapacity;
     private JTextField memoryCapacityField;
     private JButton okButton, cancelButton;
     JButton autoTestButton; //Tillf
-    private java.util.ArrayList filesToSchedule = new java.util.ArrayList();
+    private java.util.ArrayList<File> filesToSchedule = new java.util.ArrayList<File>();
     
     private Automata selectedAutomata = null;
     // TODO: do something with this ugly implementation (search for "ugly" in this file)
@@ -456,7 +478,7 @@ public class ScheduleDialog
                 {
                     // 				getParent().repaint();
                     
-                    File currFile = (File)filesToSchedule.remove(0);
+                    File currFile = filesToSchedule.remove(0);
                     
                     logger.info("Scheduling " + currFile.getPath());
                     
@@ -651,7 +673,10 @@ public class ScheduleDialog
 class ApproxWeightsDialog
         extends JDialog implements Runnable, ActionListener, KeyListener
 {
-    private Scheduler sched = null;
+	private static final long serialVersionUID = 1L;
+	
+	@SuppressWarnings("unused")
+	private Scheduler sched = null;
     private ScheduleDialog parentDlg = null;
     private JPanel ioPanel = new JPanel();
     private JPanel btnPanel = new JPanel();
@@ -801,7 +826,7 @@ class ApproxWeightsDialog
      */
     public void keyPressed(KeyEvent ev)
     {
-        if (ev.getKeyCode() == ev.VK_ENTER)
+        if (ev.getKeyCode() == KeyEvent.VK_ENTER)
         {
             okBtn.doClick();
         }

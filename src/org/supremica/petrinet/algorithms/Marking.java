@@ -54,8 +54,6 @@ import org.supremica.automata.State;
 public class Marking
 	extends State
 {
-	private int[] marking;
-
 	public Marking(String name) 
 	{
 		super(name);

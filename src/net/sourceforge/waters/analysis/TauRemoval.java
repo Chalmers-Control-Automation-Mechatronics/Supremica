@@ -15,36 +15,28 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIterator;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TIntObjectIterator;
 import gnu.trove.TIntStack;
 import gnu.trove.TObjectHashingStrategy;
 import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
 import net.sourceforge.waters.analysis.modular.BiSimulator;
-import net.sourceforge.waters.model.base.ProxyVisitor;
-import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.plain.base.NamedElement;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
 
 public class TauRemoval
 {  
@@ -439,6 +431,7 @@ public class TauRemoval
     totrans.addAll(fromtrans);
   }
   
+  @SuppressWarnings("unused")
   private static void removeSubsets(THashSet<int[]>[] statetransitions,
                                     TIntHashSet[] tautransitions,
                                     boolean[] marked)
@@ -516,6 +509,7 @@ public class TauRemoval
     }
   }
   
+  @SuppressWarnings("unused")
   private static void generatepreds(TIntHashSet[] tautransitions,
                                     TIntHashSet[] predtaus)
   {
@@ -627,7 +621,7 @@ public class TauRemoval
     return an2;
   }
   
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "unused" })
   private static void equivalentIncoming(THashSet<int[]>[] statetransitions,
                                          Set<TIntHashSet>[] annotations,
                                          boolean[] marked, boolean[] initial)
@@ -732,7 +726,7 @@ public class TauRemoval
         THashSet<int[]> trans = statetransitions[source];
         if (trans == null) {continue;}
         for (int[] tran : trans) {
-          int target = tran[1]; int event = tran[0];
+          int target = tran[1];
           TIntHashSet preds = predtrans[target];
           if (preds == null) {
             preds = new TIntHashSet();
@@ -1121,7 +1115,8 @@ public class TauRemoval
   private static class ArrayHash
     implements TObjectHashingStrategy<int[]>
   {
-    static ArrayHash ARRAYHASH = new ArrayHash();
+	private static final long serialVersionUID = 1L;
+	private static final ArrayHash ARRAYHASH = new ArrayHash();
 
     public int computeHashCode(int[] arr)
     {

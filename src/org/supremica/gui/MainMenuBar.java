@@ -96,7 +96,9 @@ public class MainMenuBar
     private static final long serialVersionUID = 1L;
     private Supremica supremica;
     private ContentHelp help = null;
-    private CSH.DisplayHelpFromSource helpDisplayer = null;
+
+    @SuppressWarnings("unused")
+	private CSH.DisplayHelpFromSource helpDisplayer = null;
     
     public MainMenuBar(Supremica supremica)    // should get rid of supremica here
     {

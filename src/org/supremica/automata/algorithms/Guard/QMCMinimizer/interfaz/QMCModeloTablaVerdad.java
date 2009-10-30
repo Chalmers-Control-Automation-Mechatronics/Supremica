@@ -11,10 +11,10 @@ import javax.swing.table.DefaultTableModel;
  * Fecha 15/11/2005
  *
  */
-public class QMCModeloTablaVerdad extends DefaultTableModel {
-    
-   
-    
+public class QMCModeloTablaVerdad extends DefaultTableModel
+{
+    private static final long serialVersionUID = 1L;
+
     public QMCModeloTablaVerdad ()
     {
         
@@ -25,7 +25,7 @@ public class QMCModeloTablaVerdad extends DefaultTableModel {
         super(datos,cabecera);
             
     }
-    public Class getColumnClass (int indColumn)
+    public Class<?> getColumnClass (int indColumn)
     {        
         return Integer.class;
     }

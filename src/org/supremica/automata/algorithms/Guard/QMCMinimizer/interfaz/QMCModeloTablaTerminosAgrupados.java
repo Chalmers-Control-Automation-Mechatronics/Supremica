@@ -9,9 +9,8 @@ import javax.swing.table.DefaultTableModel;
  */
 public class QMCModeloTablaTerminosAgrupados extends DefaultTableModel
 {
- 
+    private static final long serialVersionUID = 1L;
 
-  
     public QMCModeloTablaTerminosAgrupados(String [] cabecera, Object[][] datos)
     {
         super(datos,cabecera);
@@ -22,7 +21,7 @@ public class QMCModeloTablaTerminosAgrupados extends DefaultTableModel
     
     boolean [] columnaEditable = {false,false,true};
     
-    public Class getColumnClass (int indColumn)
+    public Class<?> getColumnClass (int indColumn)
     {
         return tipoColumna[indColumn];
     }

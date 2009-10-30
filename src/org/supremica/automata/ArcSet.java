@@ -54,7 +54,9 @@ import java.util.*;
 public class ArcSet
 	extends LinkedList<Arc>
 {
-	public ArcSet()
+    private static final long serialVersionUID = 1L;
+
+    public ArcSet()
 	{
 		super();
 	}

@@ -25,7 +25,9 @@ import org.supremica.manufacturingTables.xsd.il.IL;
 
 public class SpecificationTable extends JTable {
     
-    TableModel model = null;
+	private static final long serialVersionUID = 1L;
+
+	TableModel model = null;
     
     protected String[] columnToolTips = {"Machine name",
     									 "Type",
@@ -97,14 +99,8 @@ public class SpecificationTable extends JTable {
     }
     
     public void refresh(){
-    	
-    	String name = "";
-    	String type = "";
-    	String comment = "";
-    	
     	File file = null;
     	Object o = null;
-    	
     	int row = 0;
     	while(row < getModel().getRowCount()){
     		
@@ -118,16 +114,9 @@ public class SpecificationTable extends JTable {
     		if(o == null){
     			getModel().deleteRow(row);
     		}else{
-    			//test if property have changed
-    			name = (String)getModel().
-    							getValueAt(row, getModel().NAME_COL);
-    			type = (String)getModel().
-    							getValueAt(row, getModel().TYPE_COL);
-    			comment = (String)getModel().
-    							getValueAt(row, getModel().COMMENT_COL);
-    			
-    			
-    			
+    			getModel().getValueAt(row, getModel().NAME_COL);
+    			getModel().getValueAt(row, getModel().TYPE_COL);
+    			getModel().getValueAt(row, getModel().COMMENT_COL);
     			//next row
     			row = row + 1;
     		}
@@ -233,10 +222,10 @@ public class SpecificationTable extends JTable {
     protected JTableHeader createDefaultTableHeader() {
     	return new JTableHeader(columnModel) {
     		
-    		public String getToolTipText(MouseEvent e) {
-    					String tip = null;
+			private static final long serialVersionUID = 1L;
+
+			public String getToolTipText(MouseEvent e) {
     					java.awt.Point p = e.getPoint();
-    				
     					int index = columnModel.getColumnIndexAtX(p.x);
     					int realIndex = columnModel.getColumn(index).getModelIndex();
     					return columnToolTips[realIndex];

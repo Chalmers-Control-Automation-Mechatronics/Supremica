@@ -2,21 +2,21 @@ package net.sourceforge.waters.analysis.composing;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
-import java.lang.String;
+import java.util.Map;
+import java.util.Set;
 
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-public class Candidate{
+
+public class Candidate {
 	
-	public Candidate(){
+	public Candidate()
+	{
 	}
 	
 	public Candidate(Set<AutomatonProxy> automata,Set<EventProxy> events){

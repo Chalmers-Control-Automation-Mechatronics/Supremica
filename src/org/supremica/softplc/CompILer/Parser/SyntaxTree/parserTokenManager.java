@@ -2345,6 +2345,7 @@ public class parserTokenManager
 		while (start++ != end);
 	}
 
+	@SuppressWarnings("unused")
 	static private final void jjCheckNAddStates(int start)
 	{
 		jjCheckNAdd(jjnextStates[start]);
@@ -2355,17 +2356,11 @@ public class parserTokenManager
 
 	static private final int jjMoveNfa_0(int startState, int curPos)
 	{
-		int[] nextStates;
 		int startsAt = 0;
-
 		jjnewStateCnt = 472;
-
 		int i = 1;
-
 		jjstateSet[0] = startState;
-
-		int j, kind = 0x7fffffff;
-
+		int kind = 0x7fffffff;
 		for (;;)
 		{
 			if (++jjround == 0x7fffffff)
@@ -2377,7 +2372,6 @@ public class parserTokenManager
 			{
 				long l = 1L << curChar;
 
-				MatchLoop:
 				do
 				{
 					switch (jjstateSet[--i])
@@ -4097,7 +4091,6 @@ public class parserTokenManager
 			{
 				long l = 1L << (curChar & 077);
 
-				MatchLoop:
 				do
 				{
 					switch (jjstateSet[--i])
@@ -8091,7 +8084,6 @@ public class parserTokenManager
 				int i2 = (curChar & 0xff) >> 6;
 				long l2 = 1L << (curChar & 077);
 
-				MatchLoop:
 				do
 				{
 					switch (jjstateSet[--i])
@@ -8423,11 +8415,8 @@ public class parserTokenManager
 
 	public static final Token getNextToken()
 	{
-		int kind;
-		Token specialToken = null;
 		Token matchedToken;
 		int curPos = 0;
-
 		EOFLoop:
 		for (;;)
 		{

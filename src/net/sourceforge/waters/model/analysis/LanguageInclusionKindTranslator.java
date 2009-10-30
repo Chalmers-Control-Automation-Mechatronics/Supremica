@@ -89,9 +89,9 @@ public class LanguageInclusionKindTranslator
     }
   }
 
-
+  
   //#########################################################################
-  //# Static Class Variables
-  private static LanguageInclusionKindTranslator theInstance;
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

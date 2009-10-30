@@ -53,9 +53,9 @@ import java.util.*;
 
 public class FileFormats
 {
-	private static List collection = new LinkedList();
-	private static List inputs = new LinkedList();
-	private static List outputs = new LinkedList();
+	private static List<FileFormats> collection = new LinkedList<FileFormats>();
+	private static List<FileFormats> inputs = new LinkedList<FileFormats>();
+	private static List<FileFormats> outputs = new LinkedList<FileFormats>();
 
 	// Both input and output
 	public static final FileFormats XML = new FileFormats(true, true, "XML", ".xml", "XML files (*.xml)");
@@ -120,17 +120,17 @@ public class FileFormats
 		this.description = description;
 	}
 
-	public static Iterator iterator()
+	public static Iterator<FileFormats> iterator()
 	{
 		return collection.iterator();
 	}
 
-	public static Iterator inputsIterator()
+	public static Iterator<FileFormats> inputsIterator()
 	{
 		return inputs.iterator();
 	}
 
-	public static Iterator outputsIterator()
+	public static Iterator<FileFormats> outputsIterator()
 	{
 		return outputs.iterator();
 	}

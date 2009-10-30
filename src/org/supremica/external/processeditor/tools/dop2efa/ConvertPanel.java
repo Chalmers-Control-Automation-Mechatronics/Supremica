@@ -15,6 +15,7 @@ public class ConvertPanel
 					extends JPanel 
 							implements ActionListener {
 	
+    private static final long serialVersionUID = 1L;
 	private static final String WATER_MODULE_EXTENSION = ".wmod";
 	
 	private ROPtablePane leftPane;

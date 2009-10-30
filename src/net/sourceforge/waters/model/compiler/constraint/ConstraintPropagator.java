@@ -22,17 +22,16 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorByContents;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
+import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -198,7 +197,6 @@ public class ConstraintPropagator
   public void propagate()
     throws EvalException
   {
-    int i = 0;
     outer:
     while (!mIsUnsatisfiable) {
       if (!mUnprocessedConstraints.isEmpty()) {
@@ -940,11 +938,6 @@ public class ConstraintPropagator
     CompiledEnumRange getEnumRange()
     {
       return (CompiledEnumRange) getContrainedRange();
-    }
-
-    CompiledEnumRange getOriginalEnumRange()
-    {
-      return (CompiledEnumRange) getOriginalRange();
     }
 
     //#######################################################################

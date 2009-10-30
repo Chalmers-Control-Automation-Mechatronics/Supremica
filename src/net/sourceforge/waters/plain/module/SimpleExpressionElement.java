@@ -92,4 +92,9 @@ public abstract class SimpleExpressionElement
   //# Data Members
   private final String mPlainText;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -6051054495525586491L;
+
 }

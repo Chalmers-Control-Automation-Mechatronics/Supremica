@@ -29,4 +29,9 @@ public class ToolSelectAction
 	  ControlledToolbar.Tool.SELECT);
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

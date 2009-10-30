@@ -12,14 +12,14 @@ import java.util.*;
 // TODO: include dependency heuristc too!
 public class Cluster
 {
-	private Collection members;    /* list of BDDAutomaton */
+	private Collection<BDDAutomaton> members;    /* list of BDDAutomaton */
 	private int twave, twaveu, cube, cubep, keep; /** BDDs */
 	private boolean [] event_care; /** what events are included in this cluster ? */
 	private int included_events; /** number of events that are used in this cluster, equals the cardinality of the care-set */
 	private int state_vector_bits; /** size of the state vector, good for estimating T~ size ?*/
 	private boolean active;	/** an inactive cluster can be ignored during reachability (decided by the optimizer) */
 	private int dep_size; /** size of the dependency set */
-	private HashSet dep_set; /** the dependency set itself */
+	private HashSet<BDDAutomaton> dep_set; /** the dependency set itself */
 	private BDDAutomata manager;
 
 	/**
@@ -38,8 +38,8 @@ public class Cluster
 	{
 
 		this.manager = manager;
-		this.members = new LinkedList();
-		this.dep_set = new HashSet();
+		this.members = new LinkedList<BDDAutomaton>();
+		this.dep_set = new HashSet<BDDAutomaton>();
 
 		this.state_vector_bits = 0;
 		this.active = true;
@@ -150,9 +150,9 @@ public class Cluster
 	 */
 	public void join(Cluster with)
 	{
-		for (Iterator it = with.members.iterator(); it.hasNext(); )
+		for (Iterator<BDDAutomaton> it = with.members.iterator(); it.hasNext(); )
 		{
-			BDDAutomaton a = (BDDAutomaton) it.next();
+			BDDAutomaton a = it.next();
 			addAutomaton(a);
 		}
 	}
@@ -160,13 +160,13 @@ public class Cluster
 
 	public boolean interact(Cluster c)
 	{
-		for (Iterator e1 = members.iterator(); e1.hasNext(); )
+		for (Iterator<BDDAutomaton> e1 = members.iterator(); e1.hasNext(); )
 		{
-			BDDAutomaton a1 = (BDDAutomaton) e1.next();
+			BDDAutomaton a1 = e1.next();
 
-			for (Iterator e2 = c.members.iterator(); e2.hasNext(); )
+			for (Iterator<BDDAutomaton> e2 = c.members.iterator(); e2.hasNext(); )
 			{
-				BDDAutomaton a2 = (BDDAutomaton) e2.next();
+				BDDAutomaton a2 = e2.next();
 
 				if ((a1 != a2) && a1.interact(a2))
 				{
@@ -211,7 +211,7 @@ public class Cluster
 		return dep_size;
 	}
 
-	public Iterator iterator()
+	public Iterator<BDDAutomaton> iterator()
 	{
 		return members.iterator();
 	}
@@ -302,12 +302,12 @@ public class Cluster
 
 	public String toString()
 	{
-		Iterator e = members.iterator();
+		Iterator<BDDAutomaton> e = members.iterator();
 
 		// if we have only one automaton, return its name
 		if (members.size() == 1)
 		{
-			BDDAutomaton a = (BDDAutomaton) e.next();
+			BDDAutomaton a = e.next();
 
 			return a.getName();
 		}
@@ -317,7 +317,7 @@ public class Cluster
 
 		for (; e.hasNext(); )
 		{
-			BDDAutomaton a1 = (BDDAutomaton) e.next();
+			BDDAutomaton a1 = e.next();
 
 			buf.append(a1.getName());
 			buf.append(" ");

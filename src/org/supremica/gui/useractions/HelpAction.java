@@ -12,7 +12,9 @@ import org.supremica.gui.help.ContentHelp;
 public class HelpAction
 	extends AbstractAction
 {
-	private ContentHelp help = null;
+    private static final long serialVersionUID = 1L;
+
+    private ContentHelp help = null;
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
 
 	public HelpAction()

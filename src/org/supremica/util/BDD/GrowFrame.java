@@ -8,6 +8,7 @@ public class GrowFrame
 	extends Frame
 	implements ActionListener
 {
+    private static final long serialVersionUID = 1L;
 	private final static long SHOW_THRESHOLD = 1000;
 
 	/** how long to wait before next graph is drawn */
@@ -378,6 +379,8 @@ public class GrowFrame
 	private class GrowCanvas
 		extends Canvas
 	{
+	    private static final long serialVersionUID = 1L;
+
 		public GrowCanvas()
 		{
 			this.setSize(400, 300);
@@ -496,7 +499,6 @@ public class GrowFrame
 				Marker current = marker_root;
 				int mark_y = 20;
 				int mark_delta = Math.max(dims.height / 6, 40);
-				int halve = dims.width / 2;
 				FontMetrics fm = g.getFontMetrics();
 
 				while (current != null)

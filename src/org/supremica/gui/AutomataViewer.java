@@ -17,7 +17,8 @@ class AutomataViewerPanel
 // implements AutomatonListener
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(AutomataViewerPanel.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(AutomataViewerPanel.class);
     private Automata automata;
     private JTree theTree = new JTree();
     private JScrollPane scrollPanel = new JScrollPane(theTree);
@@ -30,11 +31,6 @@ class AutomataViewerPanel
         add(scrollPanel, BorderLayout.CENTER);
         build(showalpha, showstates);
         theTree.setCellRenderer(new SupremicaTreeCellRenderer());    // EventNodeRenderer());
-    }
-    
-    private AutomataViewerPanel(Automata automata)
-    {
-        this(automata, true, true);
     }
     
     public void build(boolean showalpha, boolean showstates)

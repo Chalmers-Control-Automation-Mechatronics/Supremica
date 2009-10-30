@@ -65,10 +65,14 @@ public class SimulatorEventList
     implements ListDataListener
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(SimulatorEventList.class);
-    private boolean showStateId = false;
-    private Automata theAutomata;
-    private int[] currState;
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(SimulatorEventList.class);
+    @SuppressWarnings("unused")
+	private boolean showStateId = false;
+    @SuppressWarnings("unused")
+	private Automata theAutomata;
+    @SuppressWarnings("unused")
+	private int[] currState;
     
 //      private SimulatorStateViewer stateViewer;
     private SimulatorExecuter theExecuter;

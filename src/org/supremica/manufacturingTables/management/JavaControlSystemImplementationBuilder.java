@@ -75,6 +75,7 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 	super();
     }
 
+    @SuppressWarnings("unchecked")
     public void createNewPLCProgram(ManufacturingCell cell)
     {
 	// PLCProgram with mailbox and coordinator are created.

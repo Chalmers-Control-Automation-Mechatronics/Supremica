@@ -103,6 +103,8 @@ public class AutomatonSchema implements Serializable
   private final TransitionSchema[] mTransitions;
   private final int mAutomatonId;
 
+  private static final long serialVersionUID = 1L;
+
   public static final int PLANT = 0;
   public static final int SPECIFICATION = 1;
   public static final int PROPERTY = 2;

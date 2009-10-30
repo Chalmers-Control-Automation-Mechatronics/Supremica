@@ -53,6 +53,7 @@ class LowestProbabilitySelector implements AutomataSelector
   }
 
   private final ProbabilityEstimator mEstimator;
+  @SuppressWarnings("unused")
   private final ProductDESSchema mModel;
   private final int mDesiredBits;
 }

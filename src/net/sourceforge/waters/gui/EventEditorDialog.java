@@ -17,10 +17,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
-import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -34,6 +32,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -62,8 +61,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.gui.command.Command;
-import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
+import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.IconRadioButton;
@@ -75,7 +74,6 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.module.ColorGeometrySubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -1126,6 +1124,10 @@ public class EventEditorDialog
       addIndexRange();
     }
 
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
   }
 
 
@@ -1152,6 +1154,10 @@ public class EventEditorDialog
     {
       removeIndexRanges();
     }
+
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
 
   }
 
@@ -1181,6 +1187,10 @@ public class EventEditorDialog
       moveIndexRangesUp();
     }
 
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
   }
 
 
@@ -1208,6 +1218,10 @@ public class EventEditorDialog
     {
       moveIndexRangesDown();
     }
+
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
 
   }
 
@@ -1274,6 +1288,8 @@ public class EventEditorDialog
 
   //#########################################################################
   //# Class Constants
+  private static final long serialVersionUID = 1L;
+  
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
   private static final SimpleIdentifierSubject TEMPLATE_IDENT =
     new SimpleIdentifierSubject("");

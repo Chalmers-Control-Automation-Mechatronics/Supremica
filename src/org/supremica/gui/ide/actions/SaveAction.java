@@ -54,4 +54,9 @@ public class SaveAction extends AbstractSaveAction
     return "Save the " + type;
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

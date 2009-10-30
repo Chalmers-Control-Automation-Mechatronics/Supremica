@@ -74,7 +74,6 @@ public class AutomatonSplit
         Automata split = new Automata();
         Automaton splitA = null;
         Automaton splitB = null;
-        int bestValue = Integer.MAX_VALUE;
         
         try
         {

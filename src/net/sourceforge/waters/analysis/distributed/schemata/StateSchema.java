@@ -44,4 +44,9 @@ public class StateSchema implements Serializable
   private final String mName;
   private final boolean mInitial;
   private final int[] mPropositionIds;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 }

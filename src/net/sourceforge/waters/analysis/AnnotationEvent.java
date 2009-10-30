@@ -12,6 +12,8 @@ public class AnnotationEvent
   extends NamedElement
   implements EventProxy
 {
+  private static final long serialVersionUID = 1L;
+
   private final Set<Set<EventProxy>> mAnnotations;
   
   public AnnotationEvent(Set<Set<EventProxy>> annotations, String name)

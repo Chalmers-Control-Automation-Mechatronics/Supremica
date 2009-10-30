@@ -23,7 +23,8 @@ import org.supremica.log.LoggerFactory;
 public class AnalyzerScheduleAction
         extends IDEAction
 {
-    private static Logger logger = LoggerFactory.createLogger(AnalyzerScheduleAction.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(AnalyzerScheduleAction.class);
     private static final long serialVersionUID = 1L;
     
     /** Creates a new instance of AnalyzerScheduleAction */

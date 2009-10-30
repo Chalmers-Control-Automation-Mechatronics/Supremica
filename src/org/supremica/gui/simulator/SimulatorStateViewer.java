@@ -61,15 +61,18 @@ public class SimulatorStateViewer
 //      implements SignalObserver
 {
     private static final long serialVersionUID = 1L;
-    private Automata theAutomata;
+    @SuppressWarnings("unused")
+	private Automata theAutomata;
     private Project theProject;
-    private AutomataSynchronizerHelper helper;
+    @SuppressWarnings("unused")
+	private AutomataSynchronizerHelper helper;
     
 //      private int[] currState;
     private SimulatorEventList forwardEvents;
     
 //      private SimulatorEventList backwardEvents;
-    private SimulatorExecuterController controller;
+    @SuppressWarnings("unused")
+	private SimulatorExecuterController controller;
     private SimulatorStateDisplayer stateDisplayer;
     
 //      private JSplitPane eventSplitter;
@@ -77,7 +80,8 @@ public class SimulatorStateViewer
     
 //      private LinkedList prevStates = new LinkedList();
 //      private LinkedList nextStates = new LinkedList();
-    private SimulatorExecuter simulator;
+    @SuppressWarnings("unused")
+	private SimulatorExecuter simulator;
     private EventExecuter theExecuter;
     private boolean executerIsExternal;
     

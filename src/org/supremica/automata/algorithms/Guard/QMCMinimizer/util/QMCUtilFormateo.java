@@ -7,10 +7,9 @@ package org.supremica.automata.algorithms.Guard.QMCMinimizer.util;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-import javax.swing.table.TableColumn;
-
 import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCBinarioBean;
 import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCImplicanteBean;
+
 
 /**
  * Clase que contiene utilidades para el tabulado de listas en forma de matrices y formateo de expresiones.
@@ -496,6 +495,7 @@ public class QMCUtilFormateo
      * @param listaImplicantes
      * @param listaTerminos
      */
+    @SuppressWarnings("unchecked")
     public static void renuevaMarcas(ArrayList listaImplicantes, ArrayList listaTerminos)
     {
         QMCImplicanteBean implicante;
@@ -528,8 +528,6 @@ public class QMCUtilFormateo
     public static String copiaTabla(Enumeration columnas)
     {
         String tablaSerializada = "";
-        TableColumn columna;
-        
         return tablaSerializada;
         
     }

@@ -74,6 +74,6 @@ public interface ContextXmlRpcHandler
 	 * exception of this type must be thrown.
 	 * @see org.apache.xmlrpc.AuthenticationFailed
 	 */
-	public Object execute(String method, Vector params, XmlRpcContext context)
+	public Object execute(String method, Vector<?> params, XmlRpcContext context)
 		throws Exception;
 }

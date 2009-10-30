@@ -263,6 +263,7 @@ class EFATransitionRelationBuilder
     return record;
   }
 
+  @SuppressWarnings("unused")
   private ConstraintList buildDifferenceFormula
     (final EFAVariableTransitionRelation rel1,
      final EFAVariableTransitionRelation rel2)

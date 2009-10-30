@@ -11,13 +11,14 @@ package org.supremica.automata.IO;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+
 import javax.swing.filechooser.FileFilter;
 
-import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
+
 import org.supremica.automata.Project;
+
 
 public class SupremicaMarshaller
     implements ProxyMarshaller<Project>

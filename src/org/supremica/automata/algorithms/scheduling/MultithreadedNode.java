@@ -21,7 +21,8 @@ public class MultithreadedNode
 		this(basis, null);
 	}
 
-	public MultithreadedNode(double[] basis, ArrayList subthreads)
+	public MultithreadedNode(double[] basis,
+	                         ArrayList<MultithreadedAstar> subthreads)
 	{
 		super(basis);
 

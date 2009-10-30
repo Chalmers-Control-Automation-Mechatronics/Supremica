@@ -211,4 +211,9 @@ public final class GraphElement
   private final Set<NodeProxy> mNodes;
   private final Collection<EdgeProxy> mEdges;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 2791138918150034103L;
+
 }

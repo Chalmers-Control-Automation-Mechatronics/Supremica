@@ -53,7 +53,7 @@ import java.util.*;
 
 public class AnimationTypes
 {
-	private static List collection = new LinkedList();
+	private static List<AnimationTypes> collection = new LinkedList<AnimationTypes>();
 	public static final AnimationTypes Undefined = new AnimationTypes("Undefined");
 	public static final AnimationTypes MageeKramerExample = new AnimationTypes("Magee & Kramer Examples");
 	private String description;
@@ -65,7 +65,7 @@ public class AnimationTypes
 		collection.add(this);
 	}
 
-	public static Iterator iterator()
+	public static Iterator<AnimationTypes> iterator()
 	{
 		return collection.iterator();
 	}

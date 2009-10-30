@@ -69,7 +69,6 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
-import org.apache.log4j.spi.Filter;
 import org.apache.log4j.varia.NullAppender;
 
 

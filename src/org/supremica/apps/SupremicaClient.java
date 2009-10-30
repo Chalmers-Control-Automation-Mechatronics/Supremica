@@ -60,7 +60,8 @@ public class SupremicaClient
 
 	private SupremicaClient() {}
 
-	public static void main(String[] args)
+	@SuppressWarnings("unchecked")
+    public static void main(String[] args)
 		throws Exception
 	{
 		XmlRpcClient xmlrpc = new XmlRpcClient("http://localhost:" + Config.XML_RPC_PORT.get());

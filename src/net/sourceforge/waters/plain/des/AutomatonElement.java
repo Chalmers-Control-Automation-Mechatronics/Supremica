@@ -267,6 +267,9 @@ public final class AutomatonElement
          "' already contains an event named '" + name + "'!");
     }
 
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
   }
 
 
@@ -309,6 +312,9 @@ public final class AutomatonElement
          "' already contains a state named '" + name + "'!");
     }
 
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
   }
 
 
@@ -318,5 +324,10 @@ public final class AutomatonElement
   private final Set<EventProxy> mEvents;
   private final Set<StateProxy> mStates;
   private final Collection<TransitionProxy> mTransitions;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

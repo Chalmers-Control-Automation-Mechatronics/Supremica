@@ -288,4 +288,9 @@ public class IndexedListModel<E extends IdentifiedSubject>
   private ListSubject<E> mSubject;
   private final List<E> mSortedMirror;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

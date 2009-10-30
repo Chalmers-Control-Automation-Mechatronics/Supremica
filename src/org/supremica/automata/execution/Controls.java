@@ -54,17 +54,17 @@ import org.supremica.automata.LabeledEvent;
 
 public class Controls
 {
-	private Map labelToControlMap = new TreeMap();
+	private Map<String, Control> labelToControlMap = new TreeMap<String, Control>();
 
 	public Controls() {}
 
 	public Controls(Controls otherControls)
 	{
-		labelToControlMap = new HashMap((int) (otherControls.size() * 1.5));
+		labelToControlMap = new HashMap<String, Control>((int) (otherControls.size() * 1.5));
 
-		for (Iterator conIt = otherControls.iterator(); conIt.hasNext(); )
+		for (Iterator<Control> conIt = otherControls.iterator(); conIt.hasNext(); )
 		{
-			Control currControl = (Control) conIt.next();
+			Control currControl = conIt.next();
 			Control newControl = new Control(currControl);
 
 			addControl(newControl);
@@ -73,9 +73,9 @@ public class Controls
 
 	public void addControls(Controls otherControls)
 	{
-		for (Iterator conIt = otherControls.iterator(); conIt.hasNext(); )
+		for (Iterator<Control> conIt = otherControls.iterator(); conIt.hasNext(); )
 		{
-			Control currControl = (Control) conIt.next();
+			Control currControl = conIt.next();
 			Control newControl = new Control(currControl);
 
 			addControl(newControl);
@@ -111,7 +111,7 @@ public class Controls
 
 	public Control getControl(String label)
 	{
-		return (Control) labelToControlMap.get(label);
+		return labelToControlMap.get(label);
 	}
 
 	public Control getControl(LabeledEvent theEvent)
@@ -119,7 +119,7 @@ public class Controls
 		return getControl(theEvent.getLabel());
 	}
 
-	public Iterator iterator()
+	public Iterator<Control> iterator()
 	{
 		return labelToControlMap.values().iterator();
 	}

@@ -58,7 +58,7 @@ import java.util.*;
  */
 public class InternalOperationRecipes
 {
-	private HashMap theRecipes = new HashMap();
+	private HashMap<String, InternalOperationRecipe> theRecipes = new HashMap<String, InternalOperationRecipe>();
 
 	public InternalOperationRecipes() {}
 
@@ -87,7 +87,7 @@ public class InternalOperationRecipes
 
 	public InternalOperationRecipe getRecipe(String recipeName)
 	{
-		return (InternalOperationRecipe) theRecipes.get(recipeName);
+		return theRecipes.get(recipeName);
 	}
 
 	public boolean contains(InternalOperationRecipe theRecipe)
@@ -105,7 +105,7 @@ public class InternalOperationRecipes
 		return theRecipes.size();
 	}
 
-	public Iterator iterator()
+	public Iterator<InternalOperationRecipe> iterator()
 	{
 		return theRecipes.values().iterator();
 	}
@@ -171,11 +171,11 @@ public class InternalOperationRecipes
 
 		theRecipes.addRecipe(secondRecipe);
 
-		Iterator recipeIt = theRecipes.iterator();
+		Iterator<InternalOperationRecipe> recipeIt = theRecipes.iterator();
 
 		while (recipeIt.hasNext())
 		{
-			InternalOperationRecipe currRecipe = (InternalOperationRecipe) recipeIt.next();
+			InternalOperationRecipe currRecipe = recipeIt.next();
 
 			System.out.println(currRecipe);
 		}

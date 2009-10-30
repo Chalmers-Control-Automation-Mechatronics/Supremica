@@ -65,7 +65,8 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 public class AutomataSynchronizer
     implements Stoppable
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizer.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizer.class);
     private Automata theAutomata;
     private AutomataSynchronizerHelper synchHelper;
     private SynchronizationOptions syncOptions;
@@ -400,6 +401,7 @@ public class AutomataSynchronizer
         return automaton;
     }
 
+    @SuppressWarnings("unchecked")
     public Automata removeGuardsActionsFromEFAs(ListSubject<AbstractSubject> components)
     {
         Automata automata = new Automata();

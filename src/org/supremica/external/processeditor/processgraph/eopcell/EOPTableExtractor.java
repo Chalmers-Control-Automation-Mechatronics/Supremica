@@ -351,17 +351,10 @@ public class EOPTableExtractor {
 	 * @param table
 	 */
 	private static void addIdActionState(Action[] actions, BasicTable table){
-		
-		
 		int numberOfColumns = -1;
-		
-		ZoneState zoneState = null;
-		ObjectFactory factory = new ObjectFactory();
-		
 		if(null == table || null == actions || 0 == actions.length){
 			return;
 		}
-		
 		numberOfColumns = table.getColumnCount();
 		for(int col = 0; col < numberOfColumns; col++){
 			for(int i = 0; i < actions.length; i++){

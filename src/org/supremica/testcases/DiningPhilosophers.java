@@ -2,19 +2,20 @@
 /** DiningPhilosophers.java ***************** */
 package org.supremica.testcases;
 
-import java.util.Iterator;
-import org.omg.CORBA.portable.IDLEntity;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.IO.AutomataToXML;
-import org.supremica.automata.Project;
 import org.supremica.automata.Alphabet;
-import org.supremica.automata.State;
 import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.execution.*;
-import org.supremica.log.*;
-import uk.ac.ic.doc.scenebeans.Null;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
+import org.supremica.automata.execution.Action;
+import org.supremica.automata.execution.Actions;
+import org.supremica.automata.execution.Command;
+import org.supremica.automata.execution.Condition;
+import org.supremica.automata.execution.Control;
+import org.supremica.automata.execution.Controls;
+
 
 // Builds a Philo automaton
 class EatingPhilosopher

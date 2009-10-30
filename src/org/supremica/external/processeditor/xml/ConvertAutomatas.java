@@ -1,20 +1,28 @@
 package org.supremica.external.processeditor.xml;
 
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 
-import org.supremica.automata.*;
+import javax.swing.JOptionPane;
 
-import org.supremica.automata.IO.AutomataToXML;
-import org.supremica.automata.IO.ProjectBuildFromXML;
-
-import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
 import org.supremica.automata.algorithms.AutomataSynthesizer;
-import org.supremica.automata.algorithms.SynthesizerOptions;
-import org.supremica.automata.algorithms.SynthesisType;
+import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
-
+import org.supremica.automata.algorithms.SynthesisType;
+import org.supremica.automata.algorithms.SynthesizerOptions;
+import org.supremica.gui.AutomatonViewer;
 import org.supremica.manufacturingTables.xsd.processeditor.Activity;
 import org.supremica.manufacturingTables.xsd.processeditor.Attribute;
 import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
@@ -22,9 +30,8 @@ import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceTyp
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 import org.supremica.manufacturingTables.xsd.processeditor.ROPType;
 import org.supremica.manufacturingTables.xsd.processeditor.Relation;
-import org.supremica.gui.*;
+import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
 
-import org.supremica.manufacturingTables.xsd.processeditor.*;
 
 public class ConvertAutomatas {          
 
@@ -1003,7 +1010,7 @@ public class ConvertAutomatas {
 	    Project theProject = builder.build(file);	
 	    for(Automaton currAutomaton : theProject) {
 		MyAutomatonViewer viewer = new MyAutomatonViewer(currAutomaton);
-		viewer.show();
+		viewer.setVisible(true);
 		viewer.update();	
 	    }
 	}catch(Exception ex) {
@@ -1012,8 +1019,10 @@ public class ConvertAutomatas {
     }
 
     class MyAutomatonViewer extends AutomatonViewer {
-	public MyAutomatonViewer(Automaton automaton) throws Exception {
-	    super(automaton);
-	}
+        private static final long serialVersionUID = 1L;
+
+        public MyAutomatonViewer(Automaton automaton) throws Exception {
+	        super(automaton);
+	    }
     }
 }

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +17,6 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -39,7 +37,8 @@ public class ObserverProjection
   public ObserverProjection(ProductDESProxy model, ProductDESProxyFactory factory,
                             Set<EventProxy> hide, Set<EventProxy> forbidden, EventProxy marked)
   {
-    Set<EventProxy[]> set = new HashSet<EventProxy[]>();
+    @SuppressWarnings("unused")
+	Set<EventProxy[]> set = new HashSet<EventProxy[]>();
     
     mMarked = marked;
     mModel = model;
@@ -73,7 +72,6 @@ public class ObserverProjection
       System.out.println("Automata" + i + " " + aut[i].getName());
     }
     eventAutomaton = new int[events.length][numAutomata];
-    int stateLength = numAutomata;
     int l = 0;
     // transitions indexed first by automaton then by event then by source state
     transitions = new int[numAutomata][events.length][];
@@ -271,9 +269,6 @@ public class ObserverProjection
       for (int j = 0; j < transitions[0][i].length; j++) {
         int target = transitions[0][i][j];
         if (target != -1) {
-          StateProxy source = ns[j];
-          EventProxy eveo = events[i];
-          StateProxy targ = ns[target];
           trans.add(mFactory.createTransitionProxy(ns[j], events[i], ns[target]));
         }
       }
@@ -365,6 +360,7 @@ public class ObserverProjection
     }
   }
   
+  /*
   private boolean isBlocked(int state, int event)
   {
     IntBag suc = new IntBag(10);
@@ -386,6 +382,7 @@ public class ObserverProjection
     }
     return true;
   }
+  */
   
   public boolean explore(int[] state, boolean forbidden)
     throws AnalysisException
@@ -464,7 +461,6 @@ public class ObserverProjection
     int min, max;
     min = 0;
     max = events.length;
-    boolean result = false;
     TIntHashSet blocked = new TIntHashSet();
     //System.out.println("state:" + Arrays.toString(state));
     MemStateProxy source = newStates.get(state);
@@ -506,7 +502,6 @@ public class ObserverProjection
           return false;
         }
       }
-      result = true;
       int[] succ = new int[successor.size()];
       for (int j = 0; j < succ.length; j++) {
         succ[j] = successor.get(j);
@@ -576,8 +571,6 @@ public class ObserverProjection
   
   public int[] actualState(int[] state, int hideEvent)
   {
-    int numAutomata = transitions.length;
-    int numHidden = mHide.size();
     SortedSet<Integer> setofstates = new TreeSet<Integer>();
     IntBag nextstate = new IntBag(100);
     for (int i = 0; i < state.length; i++) {
@@ -653,7 +646,8 @@ public class ObserverProjection
       return Integer.toString(mName);
     }
     
-    public boolean refequals(Object o)
+    @SuppressWarnings("unused")
+	public boolean refequals(Object o)
     {
       if (o instanceof NamedProxy) {
         return refequals((NamedProxy) o);
@@ -871,12 +865,14 @@ public class ObserverProjection
       return mMap.get(new IntArray(a));
     }
     
-    public MemStateProxy get(int[] a)
+    @SuppressWarnings("unused")
+	public MemStateProxy get(int[] a)
     {
       return mMap.get(new IntArray(a));
     }
     
-    public MemStateProxy put(Object o, MemStateProxy s)
+    @SuppressWarnings("unused")
+	public MemStateProxy put(Object o, MemStateProxy s)
     {
       return mMap.put(new IntArray((int[])o), s);
     }
@@ -918,12 +914,14 @@ public class ObserverProjection
       return mMap.get(new IntArray(a));
     }
     
-    public Integer get(int[] a)
+    @SuppressWarnings("unused")
+	public Integer get(int[] a)
     {
       return mMap.get(new IntArray(a));
     }
     
-    public Integer put(Object o, Integer s)
+    @SuppressWarnings("unused")
+	public Integer put(Object o, Integer s)
     {
       return mMap.put(new IntArray((int[])o), s);
     }
@@ -1023,6 +1021,7 @@ public class ObserverProjection
   private int[][] eventAutomaton;
   private final EventProxy mMarked;
   private int mNewDumpState;
+  @SuppressWarnings("unused")
   private TIntArrayList[][] mBackTrans;
   private int mDumpState = -1;
 }

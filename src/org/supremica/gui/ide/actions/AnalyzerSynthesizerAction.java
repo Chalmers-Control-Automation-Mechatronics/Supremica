@@ -29,7 +29,8 @@ public class AnalyzerSynthesizerAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    @SuppressWarnings("unused")
+	private Logger logger = LoggerFactory.createLogger(IDE.class);
     
     public AnalyzerSynthesizerAction(List<IDEAction> actionList)
     {
@@ -64,7 +65,7 @@ public class AnalyzerSynthesizerAction
 
         EditorPanel editorPanel = ide.getActiveDocumentContainer().getEditorPanel();
 
-        Vector controllableEvents = new Vector();
+        Vector<String> controllableEvents = new Vector<String>();
         controllableEvents.add("Generate guards for ALL controllable events");
         for(EventDeclSubject sigmaS:  editorPanel.getModuleSubject().getEventDeclListModifiable())
         {
@@ -85,7 +86,6 @@ public class AnalyzerSynthesizerAction
         {
             return;
         }
-        
-        AutomataSynthesisWorker worker = new AutomataSynthesisWorker(ide.getIDE(), selectedAutomata, options);
+        new AutomataSynthesisWorker(ide.getIDE(), selectedAutomata, options);
     }
 }

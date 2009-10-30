@@ -83,10 +83,10 @@ import java.util.*;
  **/
 public class PetriNet
 {
-	private HashMap places = new HashMap();
-	private List orderedPlaces = new LinkedList();
-	private HashMap transitions = new HashMap();
-	private List orderedTransitions = new LinkedList();
+	private HashMap<String, Place> places = new HashMap<String, Place>();
+	private List<Place> orderedPlaces = new LinkedList<Place>();
+	private HashMap<String, Transition> transitions = new HashMap<String, Transition>();
+	private List<Transition> orderedTransitions = new LinkedList<Transition>();
 	private String identity;
 
 	public PetriNet(String identity)
@@ -166,20 +166,20 @@ public class PetriNet
 
 	public Place getPlace(String identity)
 	{
-		return (Place) places.get(identity);
+		return places.get(identity);
 	}
 
 	public Transition getTransition(String identity)
 	{
-		return (Transition) transitions.get(identity);
+		return transitions.get(identity);
 	}
 
-	public Iterator placeIterator()
+	public Iterator<Place> placeIterator()
 	{
 		return orderedPlaces.iterator();
 	}
 
-	public Iterator transitionIterator()
+	public Iterator<Transition> transitionIterator()
 	{
 		return orderedTransitions.iterator();
 	}
@@ -204,22 +204,22 @@ public class PetriNet
 		PetriNet newPetriNet = new PetriNet(newIdentity);
 
 		// Create copies of all places
-		Iterator placeIt = placeIterator();
+		Iterator<Place> placeIt = placeIterator();
 
 		while (placeIt.hasNext())
 		{
-			Place currPlace = (Place) placeIt.next();
+			Place currPlace = placeIt.next();
 			Place newPlace = new Place(currPlace);
 
 			newPetriNet.addPlace(newPlace);
 		}
 
 		// Create copies of all transitions
-		Iterator transitionIt = transitionIterator();
+		Iterator<Transition> transitionIt = transitionIterator();
 
 		while (transitionIt.hasNext())
 		{
-			Transition currTransition = (Transition) transitionIt.next();
+			Transition currTransition = transitionIt.next();
 			Transition newTransition = new Transition(currTransition);
 
 			newPetriNet.addTransition(newTransition);
@@ -232,14 +232,14 @@ public class PetriNet
 
 		while (placeIt.hasNext())
 		{
-			Place orgPlace = (Place) placeIt.next();
+			Place orgPlace = placeIt.next();
 			Place newPlace = newPetriNet.getPlace(orgPlace.getIdentity());
 
 			transitionIt = orgPlace.nextTransitionIterator();
 
 			while (transitionIt.hasNext())
 			{
-				Transition orgTransition = (Transition) transitionIt.next();
+				Transition orgTransition = transitionIt.next();
 				Transition newTransition = newPetriNet.getTransition(orgTransition.getIdentity());
 
 				newPetriNet.addArc(newPlace, newTransition);
@@ -251,14 +251,14 @@ public class PetriNet
 
 		while (transitionIt.hasNext())
 		{
-			Transition orgTransition = (Transition) transitionIt.next();
+			Transition orgTransition = transitionIt.next();
 			Transition newTransition = newPetriNet.getTransition(orgTransition.getIdentity());
 
 			placeIt = orgTransition.nextPlaceIterator();
 
 			while (placeIt.hasNext())
 			{
-				Place orgPlace = (Place) placeIt.next();
+				Place orgPlace = placeIt.next();
 				Place newPlace = newPetriNet.getPlace(orgPlace.getIdentity());
 
 				newPetriNet.addArc(newTransition, newPlace);
@@ -270,11 +270,11 @@ public class PetriNet
 
 	public boolean hasInhibitorArcs()
 	{
-		Iterator transitionIt = transitionIterator();
+		Iterator<Transition> transitionIt = transitionIterator();
 
 		while (transitionIt.hasNext())
 		{
-			Transition currTransition = (Transition) transitionIt.next();
+			Transition currTransition = transitionIt.next();
 
 			if (currTransition.hasInhibitorArc())
 			{
@@ -291,20 +291,20 @@ public class PetriNet
 
 		sb.append("PetriNet: " + identity + "\n");
 
-		Iterator placeIt = placeIterator();
+		Iterator<Place> placeIt = placeIterator();
 
 		while (placeIt.hasNext())
 		{
-			Place currPlace = (Place) placeIt.next();
+			Place currPlace = placeIt.next();
 
 			sb.append(currPlace);
 		}
 
-		Iterator transitionIt = transitionIterator();
+		Iterator<Transition> transitionIt = transitionIterator();
 
 		while (transitionIt.hasNext())
 		{
-			Transition currTransition = (Transition) transitionIt.next();
+			Transition currTransition = transitionIt.next();
 
 			sb.append(currTransition);
 		}

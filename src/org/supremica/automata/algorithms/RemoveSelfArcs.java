@@ -58,6 +58,7 @@ public class RemoveSelfArcs
 {
 	private RemoveSelfArcs() {}
 
+	@SuppressWarnings("deprecation")
 	public static void execute(Automaton theAutomaton)
 		throws Exception
 	{

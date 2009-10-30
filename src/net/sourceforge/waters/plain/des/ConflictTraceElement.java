@@ -160,4 +160,9 @@ public class ConflictTraceElement
   //# Data Members
   private final ConflictKind mKind;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

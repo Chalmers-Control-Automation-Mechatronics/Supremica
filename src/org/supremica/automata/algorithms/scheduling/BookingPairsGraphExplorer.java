@@ -10,7 +10,7 @@
 package org.supremica.automata.algorithms.scheduling;
 
 import java.util.ArrayList;
-import org.supremica.automata.LabeledEvent;
+
 
 /**
  *
@@ -24,9 +24,12 @@ public class BookingPairsGraphExplorer
 //    private ArrayList<int[]>[] neighbors;
 //    private int[][] vertices;
     
-    private ArrayList<int[]>[] edges = null;
-    private boolean[] inComponent;
-    private int[] rootIndex;
+    @SuppressWarnings("unused")
+	private ArrayList<int[]>[] edges = null;
+    @SuppressWarnings("unused")
+	private boolean[] inComponent;
+    @SuppressWarnings("unused")
+	private int[] rootIndex;
     
     public BookingPairsGraphExplorer(ArrayList<int[]>[] edges)
     {

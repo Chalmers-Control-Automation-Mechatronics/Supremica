@@ -49,18 +49,45 @@
  */
 package org.supremica.automata.IO;
 
-import org.supremica.util.SupremicaException;
-import java.util.*;
-import java.io.*;
-import java.net.URL;
+import java.io.File;
+import java.io.InputStream;
+import java.io.Reader;
 import java.net.MalformedURLException;
-import javax.xml.parsers.SAXParserFactory;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.parsers.SAXParser;
-import org.xml.sax.*;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.DefaultProjectFactory;
+import org.supremica.automata.InputProtocol;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.ProjectFactory;
+import org.supremica.automata.State;
+import org.supremica.automata.execution.Action;
+import org.supremica.automata.execution.Actions;
+import org.supremica.automata.execution.BinarySignal;
+import org.supremica.automata.execution.Command;
+import org.supremica.automata.execution.Condition;
+import org.supremica.automata.execution.Control;
+import org.supremica.automata.execution.Controls;
+import org.supremica.automata.execution.EventTimer;
+import org.supremica.automata.execution.Signal;
+import org.supremica.automata.execution.Signals;
+import org.supremica.automata.execution.Timers;
+import org.supremica.util.SupremicaException;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-import org.supremica.automata.*;
-import org.supremica.automata.execution.*;
-import org.supremica.log.*;
+
 
 public class ProjectBuildFromXML
     extends DefaultHandler
@@ -88,10 +115,13 @@ public class ProjectBuildFromXML
     private final static String immediateStr = "immediate";
     private final static String epsilonStr = "epsilon";
     private final static String projectStr = "SupremicaProject";
-    private final static String layoutStr = "Layout";
+    @SuppressWarnings("unused")
+	private final static String layoutStr = "Layout";
     private final static String statesLayoutStr = "StatesLayout";
-    private final static String stateLayoutStr = "StateLayout";
-    private final static String supremicaLayoutStr = "SupremicaLayout";
+    @SuppressWarnings("unused")
+	private final static String stateLayoutStr = "StateLayout";
+    @SuppressWarnings("unused")
+	private final static String supremicaLayoutStr = "SupremicaLayout";
     private final static String executionStr = "Execution";
     private final static String inputSignalsStr = "InputSignals";
     private final static String outputSignalsStr = "OutputSignals";
@@ -104,18 +134,28 @@ public class ProjectBuildFromXML
     private final static String timerStr = "Timer";
     private final static String commandStr = "Command";
     private final static String conditionStr = "Condition";
-    private final static String interfacesStr = "Interfaces";
-    private final static String interfaceStr = "Interface";
-    private final static String mastersStr = "Masters";
-    private final static String masterStr = "Master";
-    private final static String slavesStr = "Slaves";
-    private final static String slaveStr = "Slave";
+    @SuppressWarnings("unused")
+	private final static String interfacesStr = "Interfaces";
+    @SuppressWarnings("unused")
+	private final static String interfaceStr = "Interface";
+    @SuppressWarnings("unused")
+	private final static String mastersStr = "Masters";
+    @SuppressWarnings("unused")
+	private final static String masterStr = "Master";
+    @SuppressWarnings("unused")
+	private final static String slavesStr = "Slaves";
+    @SuppressWarnings("unused")
+	private final static String slaveStr = "Slave";
     private final static String animationStr = "Animation";
     private final static String userInterfaceStr = "UserInterface";
-    private final static String expressionStr = "Expression";
-    private final static String orStr = "Or";
-    private final static String andStr = "And";
-    private final static String notStr = "Not";
+    @SuppressWarnings("unused")
+	private final static String expressionStr = "Expression";
+    @SuppressWarnings("unused")
+	private final static String orStr = "Or";
+    @SuppressWarnings("unused")
+	private final static String andStr = "And";
+    @SuppressWarnings("unused")
+	private final static String notStr = "Not";
     private ProjectFactory theProjectFactory = null;
     private Project currProject = null;
     private Automaton currAutomaton = null;
@@ -131,8 +171,8 @@ public class ProjectBuildFromXML
     private File thisFile = null;
     
     // mappings between id and state/event
-    private Map idStateMap = new HashMap();
-    private Map idEventMap = new HashMap();
+    private Map<String, State> idStateMap = new HashMap<String, State>();
+    private Map<String, LabeledEvent> idEventMap = new HashMap<String, LabeledEvent>();
     
     public ProjectBuildFromXML()
     {
@@ -175,7 +215,8 @@ public class ProjectBuildFromXML
         return build(stream);
     }
     
-    public Project build(File file)
+    @SuppressWarnings("deprecation")
+	public Project build(File file)
     throws Exception
     {
         return build(file.toURL());
@@ -222,8 +263,9 @@ public class ProjectBuildFromXML
         return build(source, validate);
     }
     
-    private Project build(String fileName, boolean validate)
-    throws Exception
+    @SuppressWarnings("unused")
+	private Project build(String fileName, boolean validate)
+    	throws Exception
     {
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
         
@@ -292,8 +334,8 @@ public class ProjectBuildFromXML
         else if (automatonStr.equals(name))
         {
             // Reset the id maps when parsing a new automaton
-            idEventMap = new HashMap();
-            idStateMap = new HashMap();
+            idEventMap = new HashMap<String, LabeledEvent>();
+            idStateMap = new HashMap<String, State>();
             
             doAutomaton(attributes);
         }
@@ -634,7 +676,7 @@ public class ProjectBuildFromXML
         }
         
         // Get the state corresponding to this id
-        State sourceState = (State) idStateMap.get(sourceId);
+        State sourceState = idStateMap.get(sourceId);
         
         // State sourceState = currAutomaton.getStateWithId(sourceId);
         if (sourceState == null)
@@ -651,7 +693,7 @@ public class ProjectBuildFromXML
         }
         
         // Get the state corresponding to this id
-        State destState = (State) idStateMap.get(destId);
+        State destState = idStateMap.get(destId);
         
         // State destState = currAutomaton.getStateWithId(destId);
         if (destState == null)
@@ -673,7 +715,7 @@ public class ProjectBuildFromXML
             throwException("event id '" + eventId + "' is not a valid event id");
         }
         
-        LabeledEvent event = (LabeledEvent) idEventMap.get(eventId);
+        LabeledEvent event = idEventMap.get(eventId);
                
         // TEMP-solution (use EFA instead)
         double probability = Arc.DEFAULT_PROBABILITY;
@@ -712,9 +754,9 @@ public class ProjectBuildFromXML
     throws SAXException
     {
         int line = locator.getLineNumber();
-        int column = locator.getColumnNumber();
+        @SuppressWarnings("unused")
+		int column = locator.getColumnNumber();
         String exMsg = "Error while parsing at line: " + line + ". Reason: \"" + msg + "\".";
-        
         throw new SAXException(exMsg);
     }
     
@@ -1072,7 +1114,8 @@ public class ProjectBuildFromXML
         currControl.addCondition(new Condition(condition, invert));
     }
     
-    public final void doAnimation(Attributes attributes)
+    @SuppressWarnings("deprecation")
+	public final void doAnimation(Attributes attributes)
     throws SAXException
     {
         if (currProject == null)
@@ -1138,7 +1181,8 @@ public class ProjectBuildFromXML
     
     
     
-    public final void doUserInterface(Attributes attributes)
+    @SuppressWarnings("deprecation")
+	public final void doUserInterface(Attributes attributes)
     throws SAXException
     {
         if (currProject == null)

@@ -784,11 +784,9 @@ public class ActionMan
         }
         else
         {
-            JFileChooser fileExporter = null;
-
             if (exportMode == ExportFormat.XML)
             {
-                fileExporter = FileDialogs.getXMLFileExporter();
+                FileDialogs.getXMLFileExporter();
 
                 return;
             }
@@ -1255,8 +1253,8 @@ public class ActionMan
         SynchronizationOptions sOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
         // Work!
-        AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, selectedAutomata,
-            vOptions, sOptions, mOptions);
+        new AutomataVerificationWorker(gui, selectedAutomata,
+                                       vOptions, sOptions, mOptions);
     }
 
     // Automaton.ActionAndControlViewer action performed
@@ -1264,7 +1262,7 @@ public class ActionMan
     {
         try
         {
-            ActionAndControlViewer viewer = gui.getVisualProjectContainer().getActiveProject().getActionAndControlViewer();
+            gui.getVisualProjectContainer().getActiveProject().getActionAndControlViewer();
         }
         catch (Exception ex)
         {
@@ -1289,7 +1287,7 @@ public class ActionMan
                 return;
             }
 
-            Animator animator = currProject.getAnimator();
+            currProject.getAnimator();
         }
         catch (Exception ex)
         {
@@ -1386,7 +1384,7 @@ public class ActionMan
             // Get AutomatonExplorer
             try
             {
-                AutomatonExplorer explorer = gui.getVisualProjectContainer().getActiveProject().getAutomatonExplorer(currAutomatonName);
+                gui.getVisualProjectContainer().getActiveProject().getAutomatonExplorer(currAutomatonName);
             }
             catch (Exception ex)
             {
@@ -1494,7 +1492,7 @@ public class ActionMan
         }
 
 		Project currProject = gui.getVisualProjectContainer().getActiveProject();
-        AutomataMinimizationWorker worker = new AutomataMinimizationWorker(gui.getFrame(), selectedAutomata, currProject, options);
+        new AutomataMinimizationWorker(gui.getFrame(), selectedAutomata, currProject, options);
     }
 
     /*
@@ -1727,13 +1725,12 @@ public class ActionMan
             return;
         }
 
-        // Why not simpy instantiate an AlphabetViewer with the given
+        // Why not simply instantiate an AlphabetViewer with the given
         // automata object?? Use AutomataViewer instead!
         try
         {
             // AlphabetViewer alphabetviewer = new AlphabetViewer(selectedAutomata);
             AutomataViewer alphabetViewer = new AutomataViewer(selectedAutomata, true, false);
-
             alphabetViewer.setVisible(true);
         }
         catch (Exception ex)
@@ -1765,7 +1762,7 @@ public class ActionMan
 
             try
             {
-                AutomatonViewer viewer = gui.getVisualProjectContainer().getActiveProject().getAutomatonViewer(currAutomaton.getName());
+                gui.getVisualProjectContainer().getActiveProject().getAutomatonViewer(currAutomaton.getName());
             }
             catch (Exception ex)
             {
@@ -2179,7 +2176,8 @@ public class ActionMan
         }
     }
 
-    public static void importHYBFile(Gui gui, File file)
+    @SuppressWarnings("deprecation")
+	public static void importHYBFile(Gui gui, File file)
     {
         gui.info("Importing " + file.getAbsolutePath() + " ...");
 
@@ -2200,7 +2198,8 @@ public class ActionMan
         }
     }
 
-    public static void importHISCFile(Gui gui, File file)
+    @SuppressWarnings("deprecation")
+	public static void importHISCFile(Gui gui, File file)
     {
         gui.info("Importing " + file.getAbsolutePath() + " ...");
 
@@ -2221,7 +2220,8 @@ public class ActionMan
         }
     }
 
-    public static void importUMDESFile(Gui gui, File file)
+    @SuppressWarnings("deprecation")
+	public static void importUMDESFile(Gui gui, File file)
     {
         gui.info("Importing " + file.getAbsolutePath() + " ...");
 
@@ -3352,8 +3352,6 @@ public class ActionMan
             {
                 if (!currFile.isDirectory())
                 {
-                    String prefixName = null;
-
                     try
                     {
                         AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
@@ -3451,7 +3449,7 @@ public class ActionMan
 
             // Test defaultsynthesismethod
             Automata selectedAutomata = gui.getSelectedAutomata();
-            Supervisor sup = AutomataSynthesizer.synthesizeControllableNonblocking(selectedAutomata);
+            AutomataSynthesizer.synthesizeControllableNonblocking(selectedAutomata);
         }
         catch (Exception ex)
         {

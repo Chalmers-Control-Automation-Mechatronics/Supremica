@@ -44,4 +44,9 @@ public abstract class ExpressionElement
     return (ExpressionElement) super.clone();
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1125060374274763L;
+
 }

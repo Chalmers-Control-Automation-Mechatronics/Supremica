@@ -239,4 +239,9 @@ public final class ModuleElement
   private final List<Proxy> mEventAliasList;
   private final List<Proxy> mComponentList;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 3652252443427994660L;
+
 }

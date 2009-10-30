@@ -1,21 +1,20 @@
 package org.supremica.external.processeditor.processgraph.table;
 
-import javax.swing.JTable;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableCellRenderer;
 import java.awt.Component;
-import java.awt.Color;
+import java.util.List;
 
+import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableCellEditor;
-import javax.swing.event.*;
-import java.util.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+
 
 public class BasicTable 
-					extends 
-						JTable
+	extends	JTable
 {
+	private static final long serialVersionUID = 1L;
+
 	private BasicTableModel tableModel = null;
 	private TableListener tableListener = null;
 	

@@ -1,9 +1,7 @@
 package org.supremica.gui.ide;
 
 import javax.swing.JFrame;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Project;
+
 
 public interface IDEReportInterface
 {

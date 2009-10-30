@@ -57,10 +57,11 @@ import java.awt.event.WindowEvent;
 public class JGrafchartSupremicaEditor
 	extends grafchart.sfc.EditorAPI
 {
-	public JGrafchartSupremicaEditor(String[] args)
+    private static final long serialVersionUID = 1L;
+
+    public JGrafchartSupremicaEditor(String[] args)
 	{
 		super(args);
-
 		init();
 	}
 

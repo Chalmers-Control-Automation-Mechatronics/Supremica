@@ -1,15 +1,15 @@
 package org.supremica.external.processeditor.tools.copextractor;
 
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.table.AbstractTableModel;
 
 public class BasicTableModel
-					extends AbstractTableModel {
-	
+	extends AbstractTableModel
+{
+	private static final long serialVersionUID = 1L;
+
 	public final int NAME_COL = 0;
 	public final int TYPE_COL = 1;
 	public final int COMMENT_COL = 2;
@@ -67,7 +67,8 @@ public class BasicTableModel
      * then the last column would contain text ("true"/"false"),
      * rather than a check box.
      */
-    public Class getColumnClass(int c) {
+    public Class<?> getColumnClass(int c)
+    {
     	if(c == 3){
     		return Boolean.class;
     	}else{

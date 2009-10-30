@@ -13,20 +13,18 @@ package org.supremica.gui.ide.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 
@@ -88,5 +86,10 @@ public class OpenAction
             cmanager.openContainers(filelist);
         }
     }
+
+    
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
 
 }

@@ -10,49 +10,33 @@
 package net.sourceforge.waters.analysis.modular;
 
 import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
 import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
-import net.sourceforge.waters.analysis.LightWeightGraph;
-import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.base.ProxyVisitor;
-import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class BlockedEvents
 {
   public BlockedEvents(List<AutomatonProxy> model,
-		       ProductDESProxyFactory factory,
+		       		   ProductDESProxyFactory factory,
                        EventProxy marked)
   {
     mMarked = marked;
@@ -168,7 +152,6 @@ public class BlockedEvents
     events = unionEvents();
     int numAutomata = mModel.size();
     eventAutomaton = new int[events.length][numAutomata];
-    int stateLength = numAutomata;
     // transitions indexed first by automaton then by event
     // then by source state
     transitions = new int[numAutomata][events.length][][];
@@ -394,13 +377,14 @@ public class BlockedEvents
     public int[] take();
   }
   
+  @SuppressWarnings("unused")
   private static class IntBag
   {
     private int mLength;
     private final int mInitialSize;
     private int[] mValues;
     
-    public IntBag(int initialSize)
+	public IntBag(int initialSize)
     {
       mLength = 0;
       mInitialSize = initialSize;
@@ -495,11 +479,13 @@ public class BlockedEvents
    *  I'll make this encode it properly later on
    *
    */
+  @SuppressWarnings("unused")
   private int[] encode(final int[] sState)
   {
     return sState;
   }
   
+  @SuppressWarnings("unused")
   private int[] decode(final int[] sState)
   {
     return sState;
@@ -526,12 +512,14 @@ public class BlockedEvents
       return mMap.get(new IntArray(a));
     }
     
-    public Integer get(int[] a)
+    @SuppressWarnings("unused")
+	public Integer get(int[] a)
     {
       return mMap.get(new IntArray(a));
     }
     
-    public Integer put(Object o, Integer s)
+    @SuppressWarnings("unused")
+	public Integer put(Object o, Integer s)
     {
       return mMap.put(new IntArray((int[])o), s);
     }
@@ -609,13 +597,14 @@ public class BlockedEvents
     return mDumpState;
   }
   
+  @SuppressWarnings("unused")
   private static class Pointer
     implements Comparable<Pointer>
   {
     EventProxy[] mArray;
     int mIndex;
     
-    public Pointer(EventProxy[] array)
+	public Pointer(EventProxy[] array)
     {
       mArray = array;
       mIndex = 0;
@@ -641,25 +630,32 @@ public class BlockedEvents
   private TIntHashSet[][] mIntDisabled;
   private Set<EventProxy>[][] mDisabled;
   private boolean[][][] mEventActivated;
+  @SuppressWarnings("unused")
   private int mCompositionSize = 0;
   private int mNodeLimit;
   private List<AutomatonProxy> mModel;
   private ProductDESProxyFactory mFactory;
   private Map<int[], Integer> states;
+  @SuppressWarnings("unused")
   private Collection<TransitionProxy> trans;
   private EventProxy[] events;
   private int[][][][] transitions;
+  @SuppressWarnings("unused")
   private TIntArrayList[][] mBackTransitions;
   private boolean[][] mInitialStates;
   private boolean[][] mMarkedStates;
+  @SuppressWarnings("unused")
   private TIntArrayList mNewMarked;
+  @SuppressWarnings("unused")
   private List<int[]> newtrans = new ArrayList<int[]>();
   private int numStates;
   private Bag unvisited;
   private int[][] eventAutomaton;
   private final EventProxy mMarked;
+  @SuppressWarnings("unused")
   private int mNewDumpState;
   private int mDumpState = -1;
+  @SuppressWarnings("unused")
   private TIntHashSet mNewInitial = new TIntHashSet();
   private boolean containsmarked;
   private TObjectIntHashMap<EventProxy> mEventToIndex;

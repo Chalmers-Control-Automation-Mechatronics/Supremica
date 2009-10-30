@@ -5,7 +5,6 @@ package org.supremica.softplc.CompILer.Checker;
 import org.supremica.softplc.CompILer.Parser.*;
 import org.supremica.softplc.CompILer.Parser.SyntaxTree.*;
 import java.util.*;
-import java.util.LinkedList;
 
 /**
  * Checks a IEC 6-1131 Instruction List syntax tree
@@ -39,20 +38,20 @@ public class VariableChecker
 	 * Keys  : variable names
 	 * Values: variable types
 	 */
-	Hashtable symbolicVariables;
+	Hashtable<String, String> symbolicVariables;
 
 	/* Hashtable with located variables placed
 	 * in the PROGRAM block
 	 * Keys  : locations
 	 * Values: variable names
 	 */
-	Hashtable locatedVariables;
+	Hashtable<String, String> locatedVariables;
 
 	/* Hashtable with all function blocks
 	 * Keys  : function block names
 	 * Values: hashtables with symbolic variables
 	 */
-	Hashtable functionBlocks;
+	Hashtable<String, Hashtable<String, String>> functionBlocks;
 
 	/* Object that is passed down the tree by the
  * visitor
@@ -77,9 +76,9 @@ public class VariableChecker
 		 */
 	public boolean check()
 	{
-		symbolicVariables = new Hashtable();
-		locatedVariables = new Hashtable();
-		functionBlocks = new Hashtable();
+		symbolicVariables = new Hashtable<String, String>();
+		locatedVariables = new Hashtable<String, String>();
+		functionBlocks = new Hashtable<String, Hashtable<String, String>>();
 		VC = new VCinfo();
 
 		Node[] children;
@@ -244,7 +243,7 @@ public class VariableChecker
 	 */
 	private Variable getVariable(String variableName, String blockName)
 	{
-		Hashtable fbVariables;
+		Hashtable<?, ?> fbVariables;
 		Variable v = new Variable();
 		StringTokenizer tokens = new StringTokenizer(variableName, ".", false);
 		int TokenCount = tokens.countTokens();
@@ -282,12 +281,12 @@ public class VariableChecker
 				return null;
 			}
 
-			v.typeName = (String) symbolicVariables.get(v.name);
+			v.typeName = symbolicVariables.get(v.name);
 		}
 		else
 		/* Look for the variable in the function block's declarations */
 		{
-			fbVariables = (Hashtable) functionBlocks.get(blockName);
+			fbVariables = functionBlocks.get(blockName);
 
 			if (!fbVariables.containsKey(v.name))
 			{
@@ -307,7 +306,7 @@ public class VariableChecker
 		if (locatedVariables.containsKey(v.name))
 		{
 			v.directVariable = true;
-			v.name = ((String) locatedVariables.get(v.name));
+			v.name = locatedVariables.get(v.name);
 		}
 
 		/*
@@ -318,7 +317,7 @@ public class VariableChecker
 		else if (functionBlocks.containsKey(v.typeName))
 		{
 			v.isFunctionBlock = true;
-			fbVariables = (Hashtable) functionBlocks.get(v.typeName);
+			fbVariables = functionBlocks.get(v.typeName);
 			v.fieldSelectorTypeName = (String) fbVariables.get(v.fieldSelector);
 		}
 
@@ -327,7 +326,7 @@ public class VariableChecker
 
 	public String getFunctionBlockTypeName(String fbVariableName, String blockName)
 	{
-		Hashtable fbVariables;
+		Hashtable<?, ?> fbVariables;
 
 		/*
  * Kolla att det anropade funktionsblocket är deklarerat och hämta typeName
@@ -342,12 +341,12 @@ public class VariableChecker
 				System.err.println("Error: Undeclared function block: " + fbVariableName);
 			}
 
-			return (String) symbolicVariables.get(fbVariableName);
+			return symbolicVariables.get(fbVariableName);
 		}
 		else
 		/* funktionsblocket finns i ett function block */
 		{
-			fbVariables = (Hashtable) functionBlocks.get(blockName);
+			fbVariables = functionBlocks.get(blockName);
 
 			if (!fbVariables.containsKey(fbVariableName))
 			{
@@ -362,8 +361,8 @@ public class VariableChecker
 
 	public Object visitIL_PARAM_LIST(ASTil_param_list n, Object o)
 	{
-		LinkedList inParameters;
-		LinkedList outParameters;
+		LinkedList<?> inParameters;
+		LinkedList<?> outParameters;
 		int i;
 		int pos;
 		Node parent;
@@ -466,20 +465,16 @@ public class VariableChecker
 	public Object visitPROGRAM_DECLARATION(ASTprogram_declaration n, Object o)
 	{
 		Node[] children = n.getChildren();
-		String programname = (String) ((SimpleNode) children[0]).visit(this, o);
-
+		((SimpleNode) children[0]).visit(this, o);
 		for (int i = 1; i < children.length; i++)
 		{
 			SimpleNode c = (SimpleNode) children[i];
-
 			if (c != null)
 			{
 				((VCinfo) o).blockType = "program";
-
 				c.visit(this, o);
 			}
 		}
-
 		return null;
 	}
 
@@ -495,7 +490,7 @@ public class VariableChecker
 
 			// Lägg in en ny hashtabell i den stora hashtabellen med
 			// alla funktionsblock
-			functionBlocks.put(fbName, new Hashtable());
+			functionBlocks.put(fbName, new Hashtable<String, String>());
 		}
 
 		if (children != null)
@@ -531,7 +526,7 @@ public class VariableChecker
 
 			// Lägg in en ny hashtabell i den stora hashtabellen med
 			// alla funktionsblock
-			functionBlocks.put(fbName, new Hashtable());
+			functionBlocks.put(fbName, new Hashtable<String, String>());
 		}
 
 		if (children != null)
@@ -626,7 +621,7 @@ public class VariableChecker
 	{
 		String[] names;
 		int i;
-		Hashtable tmpHash;
+		Hashtable<String, String> tmpHash;
 		int numElements;
 
 		//varför ha denna och inte
@@ -649,7 +644,7 @@ public class VariableChecker
 		{
 			String fbName = ((VCinfo) o).functionBlockName;
 
-			tmpHash = (Hashtable) functionBlocks.get(fbName);
+			tmpHash = functionBlocks.get(fbName);
 
 			// Lägg in variablerna i hashtabellen
 			for (i = 0; i < names.length; i++)
@@ -699,7 +694,7 @@ public class VariableChecker
  */
 			if (((VCinfo) o).blockType == "program")
 			{
-				typeName = (String) symbolicVariables.get(n.getName());
+				typeName = symbolicVariables.get(n.getName());
 
 				if (!(symbolicVariables.containsKey(n.getName()) || locatedVariables.containsKey(n.getName())))
 				{
@@ -710,7 +705,7 @@ public class VariableChecker
 			}
 			else if (((VCinfo) o).blockType == "functionBlock")
 			{
-				Hashtable fbVariables = (Hashtable) functionBlocks.get(((VCinfo) o).functionBlockName);
+				Hashtable<?, ?> fbVariables = functionBlocks.get(((VCinfo) o).functionBlockName);
 
 				if (!fbVariables.containsKey(n.getName()))
 				{
@@ -737,7 +732,7 @@ public class VariableChecker
 			if (locatedVariables.containsKey(n.getName()))
 			{
 				n.setIsDirectVariable(true);
-				n.setName((String) locatedVariables.get(n.getName()));
+				n.setName(locatedVariables.get(n.getName()));
 			}
 
 			/*
@@ -749,7 +744,7 @@ public class VariableChecker
 			{
 				n.setIsFunctionBlock(true);
 
-				Hashtable fbVariables = (Hashtable) functionBlocks.get(typeName);
+				Hashtable<?, ?> fbVariables = functionBlocks.get(typeName);
 
 				/* kolla att det finns en field_selector */
 				if (n.getFieldSelector() != null)
@@ -783,7 +778,7 @@ public class VariableChecker
 
 		if (((VCinfo) o).blockType == "functionBlock")
 		{
-			Hashtable fbVariables = (Hashtable) functionBlocks.get(((VCinfo) o).functionBlockName);
+			Hashtable<?, ?> fbVariables = functionBlocks.get(((VCinfo) o).functionBlockName);
 
 			if (!fbVariables.containsKey(n.getName()))
 			{
@@ -802,7 +797,7 @@ public class VariableChecker
 		{
 			if (symbolicVariables.containsKey(n.getName()))
 			{
-				n.setTypeName((String) symbolicVariables.get(n.getName()));
+				n.setTypeName(symbolicVariables.get(n.getName()));
 			}
 		}
 
@@ -1274,25 +1269,17 @@ public class VariableChecker
 	public Object visitIL_FB_CALL(ASTil_fb_call n, Object o)
 	{
 		Node[] children = n.getChildren();
-		Node[] params = null;
-		Node[] p2 = null;
-
 		if (children != null)
 		{
-			int childNum = children.length;
-			int i;
-
-			for (i = 0; i < children.length; i++)
+			for (int i = 0; i < children.length; i++)
 			{
 				SimpleNode c = (SimpleNode) children[i];
-
 				if (c != null)
 				{
 					c.visit(this, o);
 				}
 			}
 		}
-
 		return null;
 	}
 
@@ -1334,7 +1321,7 @@ public class VariableChecker
 	*/
 	public Object visitIL_OPERAND_LIST(ASTil_operand_list n, Object o)
 	{
-		LinkedList operands;
+		LinkedList<?> operands;
 		int i;
 		int pos;
 		Node parent;
@@ -1343,11 +1330,8 @@ public class VariableChecker
 		Operand operand;
 		String fb_name;
 		String fb_type;
-		Hashtable fbVariables;
-		Enumeration e;
+		Hashtable<?, ?> fbVariables;
 		String functionBlockName;
-		Variable v;
-
 		if (((VCinfo) o).blockType == "program")
 		{
 			functionBlockName = null;
@@ -1370,7 +1354,7 @@ public class VariableChecker
 
 		if (fb_type != null)
 		{
-			fbVariables = (Hashtable) functionBlocks.get(fb_type);
+			fbVariables = functionBlocks.get(fb_type);
 
 			for (i = 0; i < operands.size(); i++)
 			{

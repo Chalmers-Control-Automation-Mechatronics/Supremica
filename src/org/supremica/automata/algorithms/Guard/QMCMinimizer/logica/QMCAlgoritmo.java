@@ -18,6 +18,7 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.util.QMCUtilFormateo
  *  Fecha 13/02/2006
  *
  */
+@SuppressWarnings("unchecked")
 public class QMCAlgoritmo {
 
 

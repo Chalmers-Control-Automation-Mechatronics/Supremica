@@ -1,7 +1,6 @@
 package org.supremica.automata.algorithms.scheduling.milp;
 
 import java.util.*;
-import java.io.*;
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
@@ -75,7 +74,8 @@ public class Milp
     protected boolean buildSchedule;
     
     /** The output string */
-    private String outputStr = "";
+    @SuppressWarnings("unused")
+	private String outputStr = "";
     
     /**
      * Contains the info about the nearest path splits above a given state. The
@@ -345,9 +345,7 @@ public class Milp
         if (isRunning)
         {
             timer.restart();
-            
             milpSolver.processSolutionFile();
-            String t = "";
         }
         
         // Builds the optimal schedule (if solicited)
@@ -858,7 +856,8 @@ public class Milp
     /**
      * Rescales the times in plants if their total sum is close to the bigM-value.
      */
-    private void rescalePlantTimes()
+    @SuppressWarnings("unused")
+	private void rescalePlantTimes()
     {
         double maxCost = 0;
         int totNrStates = 0;
@@ -1091,7 +1090,6 @@ public class Milp
         String specName = currSpec.getName().trim();
         specName = specName.replace(".", "_");
         specName = specName.replace(" ", "_");
-        String specStr = "xor_" + specName + " : ";
         
         ArrayList<int[]> currXorConstraints = new ArrayList<int[]>();
         
@@ -1142,7 +1140,8 @@ public class Milp
     }
     
     //TO BE INAUGURATED
-    private void createExternalPrecedenceConstraintsNew(Automaton currSpec)
+    @SuppressWarnings("unchecked")
+	private void createExternalPrecedenceConstraintsNew(Automaton currSpec)
     {
         ArrayList<int[]>[] involvedEventInfoList = new ArrayList[2];
         for (int i = 0; i < involvedEventInfoList.length; i++)
@@ -1205,9 +1204,6 @@ public class Milp
             {
                 for (int k=j+1; k<involvedEventInfoList[i].size(); k++)
                 {
-                    int jEventIndex = involvedEventInfoList[i].get(j)[2];
-                    int kEventIndex = involvedEventInfoList[i].get(k)[2];
-                    
                     if (j < k)
                     {
                         externalPrecVariables.add(new int[]{j, k});
@@ -1293,15 +1289,14 @@ public class Milp
     }
     
     //TO BE DEPRECATED
-    private void createExternalPrecedenceConstraints(Automaton currSpec)
+    @SuppressWarnings("unchecked")
+	private void createExternalPrecedenceConstraints(Automaton currSpec)
     throws Exception
     {
         // Get the name of the specification and replace some characters that the GLPK-solver would not accept
         String specName = currSpec.getName().trim();
         specName = specName.replace(".", "_");
         specName = specName.replace(" ", "_");
-        
-        State initialStateInSpec = currSpec.getInitialState();
         ArrayList<int[]> precedingEventsInfo = new ArrayList<int[]>();
         ArrayList<int[]> followingEventsInfo = new ArrayList<int[]>();
         ArrayList<int[]> currEventsInfo = null;
@@ -1999,12 +1994,10 @@ public class Milp
      * Of course, the situation is identical if the robots book the zones in the same order,
      * the important thing here is that there is no unbooking between the zones.
      */
-    private void createCircularWaitConstraints()
+    @SuppressWarnings("unchecked")
+	private void createCircularWaitConstraints()
     throws Exception
     {
-        // Connectivity-test
-        ArrayList<LabeledEvent[]> bEventPairs = new ArrayList<LabeledEvent[]>();
-        
         //test-flag to choose between looking far or near into the future in search of connected components
         boolean fullCC = false;
         
@@ -2534,9 +2527,7 @@ public class Milp
         
         while (!stateQueue.isEmpty())
         {
-            State state = stateQueue.remove(0);
-            
-            
+            stateQueue.remove(0);
         }
     }
     
@@ -2668,7 +2659,6 @@ public class Milp
     throws Exception
     {
         int nrOfPlants = plants.size();
-        int nrOfZones = zones.size();
         
         // This alphabet is needed to check which events are shared by the plants.
         // The firing times of corresponding transitions should be equal for each shared event.
@@ -2693,8 +2683,6 @@ public class Milp
         for (int i=0; i<nrOfPlants; i++)
         {
             Automaton currPlant = plants.getAutomatonAt(i);
-            int currPlantIndex = indexMap.getAutomatonIndex(currPlant);
-            
             deltaTimes[i] = new double[currPlant.nbrOfStates()];
             for (Iterator<State> stateIter = currPlant.stateIterator(); stateIter.hasNext(); )
             {
@@ -2872,8 +2860,6 @@ public class Milp
             ArrayList<ArrayList<ArrayList<int[]>>> currSharedEventInfoList = new ArrayList<ArrayList<ArrayList<int[]>>>();
             
             IntArrayTreeSet sharedTimeVars = sharedEventTimeVarsMap.get(sharedEvent);
-            int currCounter = 0;
-            
             int prevRobotIndex = -1;
             ArrayList<ArrayList<int[]>> currSharedEventInRobotList = null;
             for (Iterator<int[]> sharedTimeVarIt = sharedTimeVars.iterator(); sharedTimeVarIt.hasNext();)
@@ -3766,7 +3752,8 @@ public class Milp
      * (since we don't want any limitation here, any cycle should be found). The fromTic-, toTic-
      * and bufferExists-parameters of the Edge class are not used in this case. 
      */
-    private void checkForLoops(Automata autos)
+    @SuppressWarnings("unchecked")
+	private void checkForLoops(Automata autos)
         throws MilpException
     {
         String exceptionStr = "";

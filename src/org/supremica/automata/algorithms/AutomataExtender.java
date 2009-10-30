@@ -50,6 +50,7 @@
 package org.supremica.automata.algorithms;
 
 import java.util.*;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
@@ -114,18 +115,18 @@ public class AutomataExtender
         
         newAut.getAlphabet().union(newAlphabet);
         
-        HashMap stateMap = new HashMap(orgAut.nbrOfStates());
+        HashMap<State, ArrayList<State>> stateMap = new HashMap<State, ArrayList<State>>(orgAut.nbrOfStates());
         int nbrOfStateCopies = Math.max(2, k + 1);
         
         // Add a controllable version of each uncontrollable event
         if (mode == MODE_CHANGE_UNCON_TOP_EVENTS)
         {
-            LinkedList newEvents = new LinkedList();
-            Iterator eventIt = newAlphabet.iterator();
+            LinkedList<LabeledEvent> newEvents = new LinkedList<LabeledEvent>();
+            Iterator<LabeledEvent> eventIt = newAlphabet.iterator();
             
             while (eventIt.hasNext())
             {
-                LabeledEvent currEvent = (LabeledEvent) eventIt.next();
+                LabeledEvent currEvent = eventIt.next();
                 
                 if (!currEvent.isControllable())
                 {
@@ -142,18 +143,18 @@ public class AutomataExtender
             
             while (eventIt.hasNext())
             {
-                LabeledEvent currEvent = (LabeledEvent) eventIt.next();
+                LabeledEvent currEvent = eventIt.next();
                 
                 newAlphabet.addEvent(currEvent);
             }
         }
         
         // Create all states
-        Iterator states = orgAut.stateIterator();
+        Iterator<?> states = orgAut.stateIterator();
         while (states.hasNext())
         {
             State orgState = (State) states.next();
-            ArrayList newStates = new ArrayList(nbrOfStateCopies);
+            ArrayList<State> newStates = new ArrayList<State>(nbrOfStateCopies);
             
             for (int i = 0; i < nbrOfStateCopies; i++)
             {
@@ -189,12 +190,12 @@ public class AutomataExtender
         while (states.hasNext())
         {
             State orgSourceState = (State) states.next();
-            ArrayList newStates = (ArrayList) stateMap.get(orgSourceState);
+            ArrayList<?> newStates = stateMap.get(orgSourceState);
             
             for (int i = 0; i < nbrOfStateCopies; i++)
             {
                 State newSourceState = (State) newStates.get(i);
-                Iterator outgoingArcs = orgSourceState.outgoingArcsIterator();
+                Iterator<?> outgoingArcs = orgSourceState.outgoingArcsIterator();
                 
                 while (outgoingArcs.hasNext())
                 {
@@ -213,7 +214,7 @@ public class AutomataExtender
                         {
                             
                             // Add an arc to the "first" copy of orgDestState
-                            State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(0);
+                            State newDestState = (State) stateMap.get(orgDestState).get(0);
                             
                             // Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
                             Arc newArc = new Arc(newSourceState, newDestState, currEvent);
@@ -224,7 +225,7 @@ public class AutomataExtender
                         {
                             
                             // Add an arc to the i + 1 copy of orgDestState
-                            State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(i + 1);
+                            State newDestState = (State) stateMap.get(orgDestState).get(i + 1);
                             
                             // Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
                             Arc newArc = new Arc(newSourceState, newDestState, currEvent);
@@ -240,7 +241,7 @@ public class AutomataExtender
                         {
                             
                             // Add an arc to the "first" copy of orgDestState
-                            State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(0);
+                            State newDestState = (State) stateMap.get(orgDestState).get(0);
                             
                             // Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
                             Arc newArc = new Arc(newSourceState, newDestState, currEvent);
@@ -252,7 +253,7 @@ public class AutomataExtender
                         {
                             if (!currEvent.isControllable())
                             {
-                                State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(k);
+                                State newDestState = (State) stateMap.get(orgDestState).get(k);
                                 
                                 // Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId() + "_c");
                                 // WARNING Red Flag, may be broken...

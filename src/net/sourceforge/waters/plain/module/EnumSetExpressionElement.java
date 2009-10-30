@@ -151,4 +151,9 @@ public final class EnumSetExpressionElement
   //# Data Members
   private final List<SimpleIdentifierProxy> mItems;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -2797485423617093299L;
+
 }

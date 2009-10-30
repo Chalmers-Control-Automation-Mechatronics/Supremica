@@ -62,7 +62,9 @@ import org.xml.sax.SAXException;
 public class ConvertPanel extends JPanel implements ActionListener,
                                                     MouseListener
 {
-	private static final String XML_EXTENSION = ".xml";
+    private static final long serialVersionUID = 1L;
+
+    private static final String XML_EXTENSION = ".xml";
 	private static final String WATER_MODULE_EXTENSION = ".wmod";
 	
 	private final String[] jbuttons = new String[]{"Specification synthesis",
@@ -506,7 +508,8 @@ public class ConvertPanel extends JPanel implements ActionListener,
      * Enables the user to save document to a file
      * @param document
      */
-    private void saveDocument( Document document ){
+    @SuppressWarnings("unused")
+	private void saveDocument(Document document ){
    
     	File file = showFileChooser(JFileChooser.FILES_ONLY);
         
@@ -587,7 +590,8 @@ public class ConvertPanel extends JPanel implements ActionListener,
      * Opens the document in IDE if possible.
      * @param document the document to be opened
      */
-    private void openDocument( Document document ){
+    @SuppressWarnings("unused")
+	private void openDocument(Document document ){
     	
     	IDE ide = null;
     	File file = null;

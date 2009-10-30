@@ -8,7 +8,7 @@ import java.util.*;
  */
 public class IlSimpleOperator
 {
-	private static List theInstructions = new ArrayList();
+	private static List<IlSimpleOperator> theInstructions = new ArrayList<IlSimpleOperator>();
 	private String instruction;
 
 	private IlSimpleOperator(String s)
@@ -19,7 +19,7 @@ public class IlSimpleOperator
 	}
 
 	/**iterator gives an iterator over the instruction constants*/
-	public static Iterator iterator()
+	public static Iterator<IlSimpleOperator> iterator()
 	{
 		return theInstructions.iterator();
 	}

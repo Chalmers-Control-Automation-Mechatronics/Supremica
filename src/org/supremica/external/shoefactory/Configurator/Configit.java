@@ -70,7 +70,9 @@ public class Configit
 	Container c;
 	Gui gui;
 	private boolean resetok = true;
+	@SuppressWarnings("unused")
 	private String[] Gender = { "Male", "Female" };
+	@SuppressWarnings("unused")
 	private String[] GeneralType = { "Children", "Adult" };
 	private String[] Size;
 	private String[] Color;

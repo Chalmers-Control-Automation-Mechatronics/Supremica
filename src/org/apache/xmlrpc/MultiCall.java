@@ -54,6 +54,7 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
+import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -70,7 +71,7 @@ import java.util.Vector;
 public class MultiCall
 	implements ContextXmlRpcHandler
 {
-	public Object execute(String method, Vector params, XmlRpcContext context)
+	public Object execute(String method, Vector<?> params, XmlRpcContext context)
 		throws Exception
 	{
 		if ("multicall".equals(method))
@@ -81,21 +82,21 @@ public class MultiCall
 		throw new NoSuchMethodException("No method '" + method + "' in " + this.getClass().getName());
 	}
 
-	public Vector multicall(Vector requests, XmlRpcContext context)
+	public Vector<Serializable> multicall(Vector<?> requests, XmlRpcContext context)
 	{
-		Vector response = new Vector();
+		Vector<Serializable> response = new Vector<Serializable>();
 		XmlRpcRequest request;
 
 		for (int i = 0; i < requests.size(); i++)
 		{
 			try
 			{
-				Hashtable call = (Hashtable) requests.elementAt(i);
+				Hashtable<?, ?> call = (Hashtable<?, ?>) requests.elementAt(i);
 
-				request = new XmlRpcRequest((String) call.get("methodName"), (Vector) call.get("params"));
+				request = new XmlRpcRequest((String) call.get("methodName"), (Vector<?>) call.get("params"));
 
 				Object handler = context.getHandlerMapping().getHandler(request.getMethodName());
-				Vector v = new Vector();
+				Vector<Object> v = new Vector<Object>();
 
 				v.addElement(XmlRpcWorker.invokeHandler(handler, request, context));
 				response.addElement(v);
@@ -106,7 +107,7 @@ public class MultiCall
 				int code = ((x instanceof XmlRpcException)
 							? ((XmlRpcException) x).code
 							: 0);
-				Hashtable h = new Hashtable();
+				Hashtable<String, Comparable> h = new Hashtable<String, Comparable>();
 
 				h.put("faultString", message);
 				h.put("faultCode", new Integer(code));

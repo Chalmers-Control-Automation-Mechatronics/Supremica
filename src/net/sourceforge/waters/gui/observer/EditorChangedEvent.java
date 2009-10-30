@@ -74,5 +74,9 @@ public abstract class EditorChangedEvent extends EventObject
     UNDOREDO;
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }
-	

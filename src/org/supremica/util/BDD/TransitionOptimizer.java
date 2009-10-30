@@ -181,7 +181,7 @@ public class TransitionOptimizer {
 		for(int i = 0; i < n; i++) used[i] = false;
 
 
-		LinkedList new_list = new LinkedList();
+		LinkedList<PerEventTransition> new_list = new LinkedList<PerEventTransition>();
 
 		for(int i = 0; i < all.length; i++) {
 			int[] usage = all[i].getEventUsageCount();
@@ -213,8 +213,8 @@ public class TransitionOptimizer {
 		// create an array of it
 		optimized = new PerEventTransition[new_list.size()];
 		int idx = 0;
-		for(Iterator it = new_list.iterator(); it.hasNext() ; ) {
-			optimized[idx++] = (PerEventTransition) it.next();
+		for(Iterator<PerEventTransition> it = new_list.iterator(); it.hasNext() ; ) {
+			optimized[idx++] = it.next();
 		}
 	}
 

@@ -19,10 +19,10 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCFuncion;
  * @author Pedro Sanz
  * Creado 05/11/2005
  */
-public class QMCDialogoNuevaTabla extends JDialog {
+public class QMCDialogoNuevaTabla extends JDialog
+{
+    private static final long serialVersionUID = 1L;
 
-	
-	
 	private JPanel jContentPane = null;
 	private JButton botonAceptar = null;
 	private JButton botonCancelar = null;

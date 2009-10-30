@@ -11,17 +11,25 @@ package org.supremica.automata.algorithms.Guard;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.util.*;
-import net.sourceforge.waters.model.des.StateProxy;
-import org.supremica.automata.*;
-import org.supremica.automata.BDD.*;
-import net.sf.javabdd.*;
-import org.supremica.log.*;
-import org.supremica.util.ArrayHelper;
-import java.math.BigInteger;
-import java.nio.MappedByteBuffer;
 import java.util.HashMap;
-import net.sf.javabdd.BDD.BDDIterator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDVarSet;
+
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
+import org.supremica.automata.BDD.BDDAutomata;
+import org.supremica.automata.BDD.BDDAutomaton;
+import org.supremica.automata.BDD.BDDManager;
+import org.supremica.automata.BDD.BDDMonolithicTransitions;
+import org.supremica.automata.BDD.BDDTransitions;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 
 /**
@@ -66,7 +74,8 @@ public class BDDGuardGenerator {
 
     boolean logEnabled = false;
        
-    private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
 //    String pathRoot = "C:/Users/sajed/Desktop/";
     String pathRoot = "G:/Sajed/";
 
@@ -429,7 +438,8 @@ public class BDDGuardGenerator {
         return mdd;
     }
 
-    public boolean traverseBDD(BDD lastBDDAut, BDD bdd, LinkedList<String> assignment, MDD mdd, MDDNode root)
+    @SuppressWarnings("unchecked")
+	public boolean traverseBDD(BDD lastBDDAut, BDD bdd, LinkedList<String> assignment, MDD mdd, MDDNode root)
     {
         int lastVar = Integer.parseInt(assignment.getLast().substring(0, assignment.getLast().length()-2));
 

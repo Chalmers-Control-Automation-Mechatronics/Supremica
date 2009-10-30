@@ -49,17 +49,24 @@
  */
 package org.supremica.gui;
 
-import java.awt.*;
+import java.awt.EventQueue;
 import java.math.BigDecimal;
-import javax.swing.*;
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.automata.algorithms.*;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.util.ActionTimer;
-import org.supremica.gui.ide.IDEReportInterface;
+import org.supremica.automata.algorithms.AutomataSynthesizer;
+import org.supremica.automata.algorithms.AutomatonSynthesizer;
+import org.supremica.automata.algorithms.Stoppable;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.gui.ide.actions.IDEActionInterface;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.util.ActionTimer;
+
 
 /**
  * Thread dealing with synthesis.
@@ -79,7 +86,8 @@ public class AutomataSynthesisWorker
 
     private ExecutionDialog executionDialog;
     private boolean stopRequested = false;
-    private EventQueue eventQueue = new EventQueue();
+    @SuppressWarnings("unused")
+	private EventQueue eventQueue = new EventQueue();
     private ActionTimer timer;
     private Automata result;
 

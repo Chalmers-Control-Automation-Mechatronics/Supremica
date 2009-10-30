@@ -1,7 +1,7 @@
 package org.supremica.external.processeditor;
 
-import java.awt.*;
-import javax.swing.*;
+import javax.swing.UIManager;
+
 
 /**
  * A Simple class that contain the <code>main</code> method for the 
@@ -29,6 +29,6 @@ public class SOC {
     	try {
     		UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
     	}catch(Exception ex) {}
-    	SOCFrame soc = new SOCFrame();
+    	new SOCFrame();
     }
 }

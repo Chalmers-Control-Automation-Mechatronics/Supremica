@@ -76,9 +76,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 	private static Connect dbConnect = null;		// Connection setup object
 	private SOCGraphContainer graphContainer = null;
 
-	@SuppressWarnings("unused")
 	private String encodingName = "UTF-8";
-	@SuppressWarnings("unused")
 	private String transferTypeName = "SOC object";
 
 	public int projectID = 0;
@@ -985,7 +983,6 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 					ArrayList<String> standardNames = getStandardNames();
 					if (transferTypeName.equals("SOC object")) {
 						for (int i=0; i<standardNames.size(); i++){
-							@SuppressWarnings("unused")
 							Object o = dbConnect.getStandardXMLAsObject(projectID, index, standardNames.get(i));
 							if(graphContainer != null){
 								graphContainer.insertResource(o, null);
@@ -1006,7 +1003,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 									w.write(xmlStr);
 									w.close();
 									printArea.append("\nFile created: " + outputFile.toString());
-								}catch (IOException ioe) {
+								} catch (IOException ioe) {
 									printArea.append("\nIOException: " + ioe.getMessage());
 								}
 							}

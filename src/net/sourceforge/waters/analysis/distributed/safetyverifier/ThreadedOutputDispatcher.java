@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.distributed.application.WorkerLocal;
 
-import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.analysis.distributed.application.WorkerLocal;
 
 public class ThreadedOutputDispatcher extends AbstractOutputDispatcher
 {
+  private static final long serialVersionUID = 1L;
+
   public ThreadedOutputDispatcher(WorkerLocal worker, StateDistribution dist, int threadcount, int waitinglimit)
   {
     super(dist);

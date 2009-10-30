@@ -23,8 +23,6 @@ import java.util.Set;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorByContents;
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -33,23 +31,15 @@ import net.sourceforge.waters.model.compiler.constraint.SplitCandidate;
 import net.sourceforge.waters.model.compiler.constraint.SplitComputer;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.compiler.context.
-  DuplicateIdentifierException;
-import net.sourceforge.waters.model.compiler.context.
-  UndefinedIdentifierException;
-import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
+import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
-import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -58,16 +48,13 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
@@ -195,7 +182,6 @@ public class EFACompiler
   private void computeEventPartitions()
     throws EvalException
   {
-    final BinaryOperator andop = mOperatorTable.getAndOperator();
     final ConstraintPropagator propagator =
       new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
     final EFAEventNameBuilder namer =
@@ -481,8 +467,6 @@ public class EFACompiler
       mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
       mVariableCollector =
         new EFAVariableCollector(mOperatorTable,mRootContext);
-      mPropagator =
-        new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
     }
 
     //#######################################################################
@@ -708,7 +692,6 @@ public class EFACompiler
     //# Data Members
     private final EFAGuardCompiler mGuardCompiler;
     private final EFAVariableCollector mVariableCollector;
-    private final ConstraintPropagator mPropagator;
 
     private SimpleComponentProxy mCurrentComponent;
     private Set<EFAVariable> mCollectedVariables;

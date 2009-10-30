@@ -2,14 +2,15 @@ package org.supremica.gui.ide;
 
 import org.supremica.gui.LogDisplay;
 import org.supremica.gui.WhiteScrollPane;
-import org.supremica.log.*;
+
 
 class LogPanel
     extends WhiteScrollPane
 {
     private static final long serialVersionUID = 1L;
     
-    private IDE ide;
+    @SuppressWarnings("unused")
+	private IDE ide;
     private String title;
     
     LogPanel(IDE ide, String title)

@@ -51,7 +51,8 @@ public class MultithreadedAstar
     /** Stores the accepting node of the resulting schedule (with a reference to the ancestor node. */
 //     protected MultithreadedNode acceptingNode = null;
     
-    private MultithreadedAstar parentThread = null;
+    @SuppressWarnings("unused")
+	private MultithreadedAstar parentThread = null;
     private MultithreadedNode rootNode = null;
     private double branchingProbality;
     private static final double DEFAULT_PROBABILITY = 1;
@@ -154,11 +155,7 @@ public class MultithreadedAstar
             {
                 if (isRunning)
                 {
-                    // If the node is not accepting, it goes to the CLOSED tree if there is not a node there already
-                    // that represents the same logical state and is better than the current node in all
-                    // "aspects" (lower cost in all directions). If the current node is promising (if it ends up on CLOSED),
-                    // its successors are found and put on the OPEN tree.
-                    double currEstimatedCost = step();
+                    step();
                     if (acceptingNode != null)
                     {
                         break;

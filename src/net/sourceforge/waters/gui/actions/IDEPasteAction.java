@@ -19,20 +19,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.List;
+
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
 
-import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 import org.supremica.gui.ide.IDE;
@@ -150,5 +149,10 @@ public class IDEPasteAction
   //#########################################################################
   //# Data Members
   private final Action mDefaultAction;
+
+  
+  //#######################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

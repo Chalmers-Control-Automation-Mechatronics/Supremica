@@ -1,6 +1,5 @@
 package org.supremica.external.processeditor;
 
-import org.supremica.external.processeditor.xgraph.*;
 import org.supremica.external.processeditor.xgraph.Selection;
 
 /**

@@ -110,11 +110,11 @@ class MEC
 			return;
 		}
 
-		Vector classes = new Vector();
+		Vector<Vector<Node>> classes = new Vector<Vector<Node>>();
 
 		for (int i = 0; i < max; i++)
 		{    // for each possibly empty class
-			Vector class_ = null;
+			Vector<Node> class_ = null;
 
 			for (int j = 0; j < curr; j++)
 			{    // for each member
@@ -122,7 +122,7 @@ class MEC
 				{    // member of this class
 					if (class_ == null)
 					{
-						class_ = new Vector();
+						class_ = new Vector<Node>();
 					}
 
 					class_.add(nodes[j]);
@@ -140,11 +140,11 @@ class MEC
 
 		localnodes = new Node[num_of_classes][];
 
-		Enumeration e = classes.elements();
+		Enumeration<Vector<Node>> e = classes.elements();
 
 		for (int i = 0; e.hasMoreElements(); i++)
 		{
-			Vector this_class = (Vector) e.nextElement();
+			Vector<?> this_class = e.nextElement();
 
 			// allocate the corresponding array
 			int num_of_members = this_class.size();
@@ -153,7 +153,7 @@ class MEC
 			localnodes[i] = current;
 
 			// copy this class to the vector
-			Enumeration e2 = this_class.elements();
+			Enumeration<?> e2 = this_class.elements();
 
 			for (int j = 0; e2.hasMoreElements(); j++)
 			{
@@ -184,11 +184,8 @@ class MEC
 
 			for (int j = 0; j <= i; j++)
 			{
-				int col = group[j].index;
 				int w = group[j].weight[row];
-
 				group[i].wlocal[j] = group[j].wlocal[i] = w;
-
 				/*
 				// sanity check
 				int w2 = group[i].weight[col];

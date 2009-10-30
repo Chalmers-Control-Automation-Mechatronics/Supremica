@@ -94,6 +94,7 @@ public abstract class DotViewer
 	private double scaleFactor = SCALE_RESET;
 	DotBuilder builder;
 	private String objectName = "";
+	@SuppressWarnings("unused")
 	private InputStream dotReturnStream;
 	private GraphicsToClipboard toClipboard = null;
 
@@ -459,9 +460,9 @@ public abstract class DotViewer
 	public void build()
 		throws Exception
 	{
+		@SuppressWarnings("unused")
 		DotBuilder builder = DotBuilder.getDotBuilder(null, this, getSerializer(), "");
 		//builder = new DotBuilder(this);
-
 		//builder.start();
 	}
 

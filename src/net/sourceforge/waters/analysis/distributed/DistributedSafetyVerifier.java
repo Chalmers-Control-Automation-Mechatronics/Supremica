@@ -4,32 +4,26 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
-
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.SerializableKindTranslator;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
-import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
-
-import net.sourceforge.waters.analysis.distributed.application.Job;
 import net.sourceforge.waters.analysis.distributed.application.JobResult;
 import net.sourceforge.waters.analysis.distributed.application.Server;
 import net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerificationJob;
+import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.SerializableKindTranslator;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
+
 
 /**
  * XXX

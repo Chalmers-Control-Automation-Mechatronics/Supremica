@@ -126,4 +126,9 @@ public abstract class Element
     return ProxyPrinter.getPrintString(this);
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

@@ -50,11 +50,10 @@
 
 package org.supremica.automata.BDD;
 
-import net.sf.javabdd.*;
-import org.supremica.log.*;
-import org.supremica.util.SupremicaException;
-import java.util.*;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
+
 
 public class BDDTransitionFactory
 {

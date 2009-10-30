@@ -209,11 +209,6 @@ public class GeneticAlgorithms
         return data;
     }
     
-    private static int getGADataSize()
-    {
-        return GA_DATA_SIZE;
-    }
-    
     /**
      * Calculates the exact synchronisation size. (Without building the full 
      * automata model of the composed system.)

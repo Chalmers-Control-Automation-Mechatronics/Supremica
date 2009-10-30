@@ -9,9 +9,11 @@ package org.supremica.util;
 import java.util.*;
 
 public class IntArrayVector
-	extends Vector
+	extends Vector<int[]>
 {
-	public IntArrayVector()
+    private static final long serialVersionUID = 1L;
+
+    public IntArrayVector()
 	{
 		super();
 	}

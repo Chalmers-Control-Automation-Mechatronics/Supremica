@@ -1,52 +1,52 @@
 package org.supremica.external.processeditor;
 
-import java.awt.image.*;
-import javax.imageio.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
+import java.io.File;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.filechooser.*;
+import javax.imageio.ImageIO;
+import javax.swing.JCheckBox;
+import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JToolBar;
 import javax.xml.bind.JAXBException;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.print.*;
-import java.io.*;
-
-import org.supremica.gui.ide.IDE;
-
-import org.supremica.external.processeditor.processgraph.*;
-import org.supremica.external.processeditor.processgraph.ilcell.*;
-import org.supremica.external.processeditor.processgraph.opcell.*;
-import org.supremica.external.processeditor.processgraph.resrccell.*;
-import org.supremica.external.processeditor.xml.ConvertAutomatas;
-import org.supremica.external.processeditor.xml.Loader;
-import org.supremica.external.processeditor.xml.XlsConverter;
-import org.supremica.external.processeditor.xml.XmlConverter;
-import org.supremica.external.processeditor.xml.SDPConverter;
-
-import org.supremica.external.processeditor.xgraph.Graph;
-import org.supremica.external.processeditor.xgraph.GraphCell;
-import org.supremica.external.processeditor.xgraph.Selection;
-
+import org.supremica.external.processeditor.processgraph.NestedCell;
+import org.supremica.external.processeditor.processgraph.NestedCellListener;
 import org.supremica.external.processeditor.processgraph.opcell.OperationCell;
 import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
-
-
-import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
-import org.supremica.manufacturingTables.xsd.processeditor.ROP;
-import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
-import org.supremica.manufacturingTables.xsd.il.IL;
-import org.supremica.manufacturingTables.xsd.eop.Operation;
-
-import org.supremica.external.processeditor.xml.Converter;
-
+import org.supremica.external.processeditor.tools.copextractor.COPExtractInterface;
 import org.supremica.external.processeditor.tools.db.DBInterface;
 import org.supremica.external.processeditor.tools.dop2efa.DOPtoEFAInterface;
 import org.supremica.external.processeditor.tools.specificationsynthes.SpecificationSynthesInterface;
-import org.supremica.external.processeditor.tools.copextractor.COPExtractInterface;
+import org.supremica.external.processeditor.xgraph.Graph;
+import org.supremica.external.processeditor.xgraph.GraphCell;
+import org.supremica.external.processeditor.xgraph.Selection;
+import org.supremica.external.processeditor.xml.ConvertAutomatas;
+import org.supremica.external.processeditor.xml.Converter;
+import org.supremica.external.processeditor.xml.Loader;
+import org.supremica.external.processeditor.xml.SDPConverter;
+import org.supremica.external.processeditor.xml.XlsConverter;
+import org.supremica.external.processeditor.xml.XmlConverter;
+import org.supremica.gui.ide.IDE;
+import org.supremica.manufacturingTables.xsd.eop.Operation;
+import org.supremica.manufacturingTables.xsd.il.IL;
+import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
+import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
 import org.xml.sax.SAXException;
+
 
 /**
  * The most central GUI class of the <code>org.soc</code> package. 
@@ -58,12 +58,12 @@ import org.xml.sax.SAXException;
  * the user instruction to the internal frames and their underlaying graphs.
  */
 public class SOCGraphContainer
-							extends 
-								JDesktopPane 
-									implements 
-										SOCGraphFrameListener,
-										SOCToolBarListener {
-    private PageFormat mPageFormat = null;   
+	extends	JDesktopPane 
+	implements SOCGraphFrameListener, SOCToolBarListener
+{
+	private static final long serialVersionUID = 1L;
+
+	private PageFormat mPageFormat = null;   
     
     private int numOfNewSheetToDay = 0;    
 
@@ -77,7 +77,8 @@ public class SOCGraphContainer
     private IDE ide = null;
     
     private Object memory;
-    private Object numOfCopies = 0;
+    @SuppressWarnings("unused")
+	private Object numOfCopies = 0;
 
     private File cDir = null;
     private SOCFileFilter xmlFilter = new SOCFileFilter(".xml");
@@ -991,13 +992,13 @@ public class SOCGraphContainer
     public void print() {
 	if(getSelectedFrame() != null) {
 	    if(getSelectedFrame().getGraph().getSelection().hasSelected()) {
-		SOCGraphPrinter p = new SOCGraphPrinter(getSelectedFrame().
+			new SOCGraphPrinter(getSelectedFrame().
 							getGraph().
 							getSelection().
 							getSelectedAt(0),
 							mPageFormat);	     
 	    }else {
-		SOCGraphPrinter p = new SOCGraphPrinter(getSelectedFrame().
+			new SOCGraphPrinter(getSelectedFrame().
 							getGraph(),
 							mPageFormat);	  
 	    }

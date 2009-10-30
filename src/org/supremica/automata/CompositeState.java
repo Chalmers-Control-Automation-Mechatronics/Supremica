@@ -56,7 +56,8 @@ import org.supremica.log.*;
 public class CompositeState
     extends State
 {
-    private static Logger logger = LoggerFactory.createLogger(CompositeState.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(CompositeState.class);
     
     /** The indices of the underlying states */
     
@@ -71,7 +72,7 @@ public class CompositeState
      * See for ex. T.Liljenvalls Lic. (currentCosts = T_v).
      */
     private double[] currentCosts = null;
-    private ArrayList composingStates;
+    private ArrayList<State> composingStates;
     
     public CompositeState(State state)
     {
@@ -98,7 +99,7 @@ public class CompositeState
     
     public void initialize(int[] indices, AutomataSynchronizerHelper helper)
     {
-        composingStates = new ArrayList();
+        composingStates = new ArrayList<State>();
         
         // -2 since the last two indices correspond to something funny, not the nbrs of the underlying states.
         for (int i = 0; i < indices.length - 2; i++)
@@ -135,7 +136,7 @@ public class CompositeState
         
         for (int i = 0; i < currentCosts.length; i++)
         {
-            compositeCosts[i] = ((State) composingStates.get(i)).getCost();
+            compositeCosts[i] = composingStates.get(i).getCost();
             
             if (isInitial())
             {
@@ -267,7 +268,7 @@ public class CompositeState
     public boolean[] getFiringAutomata(CompositeState prevState)
     {
         boolean[] firingAutomata = new boolean[composingStates.size()];
-        ArrayList prevComposingStates = prevState.getComposingStates();
+        ArrayList<State> prevComposingStates = prevState.getComposingStates();
         
         for (int i = 0; i < firingAutomata.length; i++)
         {
@@ -312,7 +313,7 @@ public class CompositeState
         return (accumulatedCost > -1);
     }
     
-    public ArrayList getComposingStates()
+    public ArrayList<State> getComposingStates()
     {
         return composingStates;
     }

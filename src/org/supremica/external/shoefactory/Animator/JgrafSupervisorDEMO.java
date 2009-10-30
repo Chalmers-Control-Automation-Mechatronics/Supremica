@@ -7,6 +7,7 @@ import org.supremica.gui.*;
 
 public class JgrafSupervisorDEMO
 {
+	@SuppressWarnings("unused")
 	private int yPos = 0, stepID = 0, shoeNr;
 	private static String[] putEventsA = { "put_T0L", "put_T0R" };
 	private static String[] putEventsB = { "put_T1", "put_T2" };
@@ -27,17 +28,29 @@ public class JgrafSupervisorDEMO
 		WorkspaceObject wo = jgSupervisor.createWorkspaceObject(100, 50, "Supervisor");
 		GCDocument supervisor = wo.getSubWorkspace();
 		BooleanVariable[] bv1 = new BooleanVariable[putEventsA.length + putEventsB.length + putEventsC.length + getEventsA.length + getEventsB.length + getEventsC.length];
+		@SuppressWarnings("unused")
 		BooleanVariable suc = jgSupervisor.createBooleanVariable(300, 50, "success", "0");
+		@SuppressWarnings("unused")
 		StringVariable sup = jgSupervisor.createStringVariable(400, 50, "supervisor", "theSupervisor");
+		@SuppressWarnings("unused")
 		StringVariable curS = jgSupervisor.createStringVariable(500, 50, "currStation", "");
+		@SuppressWarnings("unused")
 		StringVariable gotS = jgSupervisor.createStringVariable(600, 50, "gotoString", "");
+		@SuppressWarnings("unused")
 		IntegerVariable nrO = jgSupervisor.createIntegerVariable(700, 50, "nrOfShoes", "0");
+		@SuppressWarnings("unused")
 		IntegerVariable sho = jgSupervisor.createIntegerVariable(800, 50, "index", "0");
+		@SuppressWarnings("unused")
 		StringVariable curE = jgSupervisor.createStringVariable(900, 50, "currEvent", "");
+		@SuppressWarnings("unused")
 		StringVariable getR = jgSupervisor.createStringVariable(300, 150, "getRot", "");
+		@SuppressWarnings("unused")
 		StringVariable stepS = jgSupervisor.createStringVariable(400, 150, "stepString", "");
+		@SuppressWarnings("unused")
 		StringVariable curT = jgSupervisor.createStringVariable(500, 150, "currTable", "");
+		@SuppressWarnings("unused")
 		StringVariable agvS = jgSupervisor.createStringVariable(600, 150, "agvString", "");
+		@SuppressWarnings("unused")
 		BooleanVariable turn = jgSupervisor.createBooleanVariable(700, 150, "turn", "0");
 
 		// Create Grafcet

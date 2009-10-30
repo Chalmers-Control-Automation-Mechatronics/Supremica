@@ -12,6 +12,8 @@ import org.supremica.gui.Supremica;
 public class EventSubTree
     extends SupremicaTreeNode
 {
+    private static final long serialVersionUID = 1L;
+
     //private static ImageIcon controllableIcon = new ImageIcon(Supremica.class.getResource("/icons/ControllableEvent16.gif"));
     private static ImageIcon controllableIcon = new ImageIcon(Supremica.class.getResource("/icons/waters/controllable.gif"));
     //private static ImageIcon uncontrollableIcon = new ImageIcon(Supremica.class.getResource("/icons/UncontrollableEvent16.gif"));

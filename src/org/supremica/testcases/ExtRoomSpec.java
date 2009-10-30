@@ -9,19 +9,12 @@
 
 package org.supremica.testcases;
 
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import org.omg.CORBA.portable.IDLEntity;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.Project;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.State;
 import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.StateSet;
-import org.supremica.automata.execution.*;
-import uk.ac.ic.doc.scenebeans.Null;
+import org.supremica.automata.State;
+
 
 /**
  *
@@ -76,7 +69,6 @@ public class ExtRoomSpec {
         }
 
         
-        int init_acc;
         if(LEVEL_ID == 1 && ROOM_ID == 1)
         {
             states[0][num_cats-1].setInitial(true);
@@ -117,8 +109,6 @@ public class ExtRoomSpec {
                 for(int j=0; j<states[1].length;j++)
                 {
                     State temp_state = states[1][j];
-                    String state_name = temp_state.getName();
-                    
                     if(!CFEvents[i].isControllable())
                         spec.addArc(new Arc(temp_state,FORBIDDEN_STATE,CFEvents[i]));
                 }

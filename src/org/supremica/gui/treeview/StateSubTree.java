@@ -12,6 +12,8 @@ import org.supremica.gui.Supremica;
 public class StateSubTree
     extends SupremicaTreeNode
 {
+    private static final long serialVersionUID = 1L;
+
     private static ImageIcon ordinaryStateIcon = new ImageIcon(Supremica.class.getResource("/icons/State16.gif"));
     private static ImageIcon markedStateIcon = new ImageIcon(Supremica.class.getResource("/icons/MarkedState16.gif"));
     private static ImageIcon markedInitialStateIcon = new ImageIcon(Supremica.class.getResource("/icons/MarkedInitialState16.gif"));

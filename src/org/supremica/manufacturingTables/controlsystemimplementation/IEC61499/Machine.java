@@ -69,7 +69,8 @@ public class Machine implements Listener
     private String coordinator; // to know who to send the EOPDone messages to
     private String description;
     private MachineController machineController;
-    private Mailbox cellMailbox; // No longer used in the Fuber implementation
+    @SuppressWarnings("unused")
+	private Mailbox cellMailbox; // No longer used in the Fuber implementation
     private MachineThread machineThread; // All communication with the mailbox is now done via the machineThread
     public Machine(String name, String type, MachineController machineController, Mailbox cellMailbox)
     {

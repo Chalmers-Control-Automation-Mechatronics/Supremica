@@ -93,4 +93,9 @@ public final class ForeachEventAliasElement
     return downcast.visitForeachEventAliasProxy(this);
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -4338378615845358317L;
+
 }

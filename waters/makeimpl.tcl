@@ -476,6 +476,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
   set supername [Java_ClassGetName $superinfo]
   set superclassname [Java_ClassGetShortName $superinfo]
   set superinfo $classMap($supername)
+  set hash [Aux_Hash "$superclassname:" 0xabababab]
   regsub {Proxy$} $interfacename $implobjname classname
 
   ############################################################################
@@ -1307,19 +1308,30 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	if {[string compare $impl "plain"] == 0 ||
 	    [Java_IsCollectionType $type]} {
 	  Java_WriteLn $stream $umap "  private final $type $membername;"
+          set hash [Aux_Hash "$type:$membername:" $hash]
 	} else {
 	  Java_WriteLn $stream $umap "  private $type $membername;"
 	}
       }
       Java_WriteLn $stream $umap ""
     }
-    Java_WriteLn $stream $umap "}"
 
+  ############################################################################
+  # Serial Version UID
+    if {[string compare $impl "plain"] == 0} {
+      Java_GenerateSeparatorComment $stream $umap "Class Constants"
+      Java_WriteLn $stream $umap \
+          "  private static final long serialVersionUID = ${hash}L;"
+      Java_WriteLn $stream $umap ""
+    }
+
+    Java_WriteLn $stream $umap "}"
     if {$write} {
       close $stream
       Java_ReplaceFile $tmpname $destname
     }
   }
+
 }
 
 
@@ -2655,3 +2667,17 @@ proc Java_ReplaceFile {tmpname destname} {
 }
 
 
+##############################################################################
+# Auxiliary Methods
+##############################################################################
+
+proc Aux_Hash {text hash0} {
+  set result $hash0
+  set len [string length $text]
+  for {set i 0} {$i < $len} {incr i} {
+    set ch [string index $text $i]
+    scan $ch "%c" value
+    set result [expr 5 * $result + $value]
+  }
+  return $result
+}

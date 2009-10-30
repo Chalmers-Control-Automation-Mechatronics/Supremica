@@ -3,8 +3,8 @@ package net.sourceforge.waters.analysis.composing;
 import java.util.Set;
 import java.util.HashSet;
 
-import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+
 
 public class TransitionRecord {
 	

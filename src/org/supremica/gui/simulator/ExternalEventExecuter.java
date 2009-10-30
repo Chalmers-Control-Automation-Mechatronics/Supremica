@@ -1,6 +1,7 @@
 package org.supremica.gui.simulator;
 
 import org.supremica.automata.*;
+
 import java.util.*;
 
 /**
@@ -33,12 +34,13 @@ class ExternalEventExecuter
     }
     ;
     
-    private Stack pending_events;    // what I really need is a queue :)
-    private Automata theAutomata;
+    private Stack<EventWrapper> pending_events;    // what I really need is a queue :)
+    @SuppressWarnings("unused")
+	private Automata theAutomata;
     private Alphabet theAlphabet;
     private int events_size;
     private EventWrapper[] events;    // int --> EventWrapper
-    private TreeMap events_map;    // Event --> EventWrapper
+    private TreeMap<LabeledEvent, EventWrapper> events_map;    // Event --> EventWrapper
     
     public ExternalEventExecuter(SimulatorExecuter theExecuter, SimulatorEventListModel eventModel)
     {
@@ -48,16 +50,16 @@ class ExternalEventExecuter
         
         theAutomata = eventModel.getAutomata();
         theAlphabet = eventModel.getAlphabet();
-        pending_events = new Stack();
+        pending_events = new Stack<EventWrapper>();
         events_size = theAlphabet.size();
         events = new EventWrapper[events_size];
-        events_map = new TreeMap();
+        events_map = new TreeMap<LabeledEvent, EventWrapper>();
         
         native_initialize(events_size);
         
         int i = 0;
         
-        for (Iterator alphIt = theAlphabet.iterator(); alphIt.hasNext(); )
+        for (Iterator<?> alphIt = theAlphabet.iterator(); alphIt.hasNext(); )
         {
             LabeledEvent currEvent = theAlphabet.getEvent(((LabeledEvent) alphIt.next()).getLabel());
             
@@ -116,7 +118,8 @@ class ExternalEventExecuter
         native_fire(ew.index);
     }
     
-    private void from_native_fire(int index)
+    @SuppressWarnings("unused")
+	private void from_native_fire(int index)
     {
         if ((index >= 0) && (index < events_size))
         {
@@ -144,7 +147,7 @@ class ExternalEventExecuter
         {
             if (!pending_events.empty())
             {
-                EventWrapper ew = (EventWrapper) pending_events.pop();
+                EventWrapper ew = pending_events.pop();
                 
                 if (!theExecuter.executeEvent(ew.event))
                 {
@@ -165,7 +168,7 @@ class ExternalEventExecuter
         for (int i = 0; i < nbrOfEvents; i++)
         {
             LabeledEvent currEvent = eventModel.getEventAt(i);
-            EventWrapper ew = (EventWrapper) events_map.get(currEvent);
+            EventWrapper ew = events_map.get(currEvent);
             
             if (ew != null)
             {

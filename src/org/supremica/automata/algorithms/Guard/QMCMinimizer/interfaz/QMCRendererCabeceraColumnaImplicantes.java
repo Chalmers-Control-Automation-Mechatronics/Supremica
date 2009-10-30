@@ -1,13 +1,13 @@
 package org.supremica.automata.algorithms.Guard.QMCMinimizer.interfaz;
 
 import java.awt.Component;
-import java.awt.event.ItemListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+
 
 import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCBinarioBean;
 
@@ -21,8 +21,9 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCBinarioBea
 public class QMCRendererCabeceraColumnaImplicantes extends JCheckBox
     implements TableCellRenderer {
 
- 
-  
+  private static final long serialVersionUID = 1L;
+
+
   public QMCRendererCabeceraColumnaImplicantes() 
   {
       

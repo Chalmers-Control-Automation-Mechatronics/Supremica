@@ -18,8 +18,8 @@ public class ASTil_param_list
 	}
 
 	// Appended
-	private LinkedList in = new LinkedList();
-	private LinkedList out = new LinkedList();
+	private LinkedList<Param> in = new LinkedList<Param>();
+	private LinkedList<Param> out = new LinkedList<Param>();
 
 	public void addParameter(Param p)
 	{
@@ -33,12 +33,12 @@ public class ASTil_param_list
 		}
 	}
 
-	public LinkedList getInParameters()
+	public LinkedList<Param> getInParameters()
 	{
 		return in;
 	}
 
-	public LinkedList getOutParameters()
+	public LinkedList<Param> getOutParameters()
 	{
 		return out;
 	}

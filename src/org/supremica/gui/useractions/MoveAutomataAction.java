@@ -10,7 +10,9 @@ import org.supremica.gui.ActionMan;
 public class MoveAutomataAction
 	extends AbstractAction
 {
-	boolean directionIsUp;
+    private static final long serialVersionUID = 1L;
+
+    boolean directionIsUp;
 	boolean allTheWay;
 
 	public MoveAutomataAction(boolean directionIsUp, boolean allTheWay)

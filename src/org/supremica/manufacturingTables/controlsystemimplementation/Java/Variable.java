@@ -65,14 +65,14 @@ import java.util.Map;
 public class Variable implements Listener
 {
     private String name;
-    private Map values; // HashMap will be used for quick access to the values.
+    private Map<String, String> values; // HashMap will be used for quick access to the values.
     private String currentValue;
     private Mailbox mailbox;
 
     public Variable(String name, Mailbox mailbox)
     {
 	this.name = name;
-	values = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine;
+	values = new HashMap<String, String>(5); //initital capacity 5 and default load factor (0,75) suits me fine;
 	currentValue = null;
 	this.mailbox = mailbox;
 	mailbox.register(this);

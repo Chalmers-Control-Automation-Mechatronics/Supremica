@@ -41,11 +41,10 @@ import org.supremica.external.processeditor.xml.Loader;
  * the user to edit the execution of operation
  */
 public class EOPInfoWindow
-						extends 
-							JFrame 
-						implements 
-							ActionListener 
-{ 
+	extends JFrame 
+	implements ActionListener 
+{
+    private static final long serialVersionUID = 1L;
 	private static final String TITLE = "Execution Of Operation";
 	
     private JButton jbOk = null;

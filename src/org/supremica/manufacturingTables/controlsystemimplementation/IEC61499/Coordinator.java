@@ -69,7 +69,8 @@ public class Coordinator
     // All communication with the MachineCoordinators is now done via the CoordinatorThread
     private CoordinatorThread coordinatorThread; 
     private boolean performsTask; // In this version of the concept, only one product at a time is allowed
-    private String ID;
+    @SuppressWarnings("unused")
+	private String ID;
     private Map<String, MachineCoordinator> machineCoordinators; // The String corresponds to the machine name
     // The Coordinator creates all the MachineCoordinators and can reach them by references.
     private Map<String, Boolean> machineCoordinatorsStarted; // used to keep track of which machines/machineControllers that are started.
@@ -168,7 +169,8 @@ public class Coordinator
 	else
 	{
 	    System.out.println("The COP could not be performed!");
-	    Boolean temp = machineCoordinatorsStarted.get(machineName);
+	    @SuppressWarnings("unused")
+		Boolean temp = machineCoordinatorsStarted.get(machineName);
 	    temp = Boolean.FALSE; // do not know why I have to separate this two lines
 	}
 	if (machineCoordinatorsStarted.isEmpty())

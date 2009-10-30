@@ -169,7 +169,7 @@ public class PetriNetSupervisor
 	 */
 	private int pick_one_event(boolean forward)
 	{
-		int index = -1, best, queue_size = 0;
+		int best, queue_size = 0;
 
 		if(levelGraph != null) {
 			int c = 0;

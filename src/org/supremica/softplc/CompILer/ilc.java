@@ -63,7 +63,7 @@ public class ilc
 				//XXX new VaribleChecker(n,logger);
 				if (v.check())
 				{
-					JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir, logger, debug);
+					new JavaBytecodeGenerator(n, outDir, logger, debug);
 				}
 				else
 				{

@@ -15,7 +15,8 @@ import org.supremica.util.SupremicaException;
 public class MilpException 
     extends SupremicaException
 {
-    
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates a new instance of <code>MilpException</code> without detail message.
      */

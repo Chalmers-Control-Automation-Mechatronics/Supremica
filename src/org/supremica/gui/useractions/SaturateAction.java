@@ -14,6 +14,8 @@ import org.supremica.gui.ActionMan;
 public class SaturateAction
 	extends AbstractAction
 {
+    private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(SaturateAction.class);
 	private Automata new_automata = new Automata();
 

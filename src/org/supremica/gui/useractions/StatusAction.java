@@ -8,6 +8,8 @@ import org.supremica.gui.ActionMan;
 public class StatusAction
 	extends AbstractAction
 {
+    private static final long serialVersionUID = 1L;
+
 	public StatusAction()
 	{
 		super("Status...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Information16.gif")));

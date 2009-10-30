@@ -224,4 +224,9 @@ public final class EventDeclElement
   private final List<SimpleExpressionProxy> mRanges;
   private final ColorGeometryProxy mColorGeometry;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 5145756044012763020L;
+
 }

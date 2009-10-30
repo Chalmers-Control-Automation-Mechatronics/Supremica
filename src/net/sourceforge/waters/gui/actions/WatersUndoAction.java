@@ -81,4 +81,9 @@ public class WatersUndoAction
     putValue(Action.SHORT_DESCRIPTION, text);
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

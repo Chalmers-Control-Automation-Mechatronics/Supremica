@@ -20,7 +20,9 @@ import org.supremica.gui.ActionMan;
 public class DiminishAction
 	extends AbstractAction
 {
+    private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(DiminishAction.class);
+
 	private Automata newautomata = new Automata();
 	private int statenbr = 0;
 
@@ -39,7 +41,7 @@ public class DiminishAction
 		Automata automata = gui.getSelectedAutomata();
 
 		// Iterate over all automata
-		for (Iterator autit = automata.iterator(); autit.hasNext(); )
+		for (Iterator<?> autit = automata.iterator(); autit.hasNext(); )
 		{
 			Automaton automaton = new Automaton((Automaton) autit.next());    // make a copy
 
@@ -159,8 +161,8 @@ public class DiminishAction
 		automaton.beginTransaction();
 
 		// Remove all arcs between two forbidden states (is it safe to do this?)
-		LinkedList toBeRemoved = new LinkedList();
-		for (Iterator arcit = automaton.arcIterator(); arcit.hasNext(); )
+		LinkedList<Arc> toBeRemoved = new LinkedList<Arc>();
+		for (Iterator<?> arcit = automaton.arcIterator(); arcit.hasNext(); )
 		{
 			Arc arc = (Arc) arcit.next();
 
@@ -171,13 +173,13 @@ public class DiminishAction
 		}
 		while (toBeRemoved.size() != 0)
 		{
-			automaton.removeArc((Arc) toBeRemoved.remove(0));
+			automaton.removeArc(toBeRemoved.remove(0));
 		}				
 
 		// Now, lets adjust the remaining arcs. 
 		// If we reach a forbidden state, we need to take that arc further down the chain
 		// Do we know that it is a chain? What about nondeterminism??
-		for (Iterator arcit = automaton.arcIterator(); arcit.hasNext(); )
+		for (Iterator<?> arcit = automaton.arcIterator(); arcit.hasNext(); )
 		{
 			Arc arc = (Arc) arcit.next();
 			State nextstate = arc.getToState();
@@ -187,7 +189,7 @@ public class DiminishAction
 				// We know that from the forbidden state, we reach a non-forbidden one
 				// (otherwise this transition would have been removed above)
 				// We don't know if there are multiple non-forbidden states reached, however!
-				for (Iterator narcit = nextstate.outgoingArcsIterator();
+				for (Iterator<?> narcit = nextstate.outgoingArcsIterator();
 						narcit.hasNext(); )
 				{
 					Arc newarc = (Arc) narcit.next();
@@ -201,7 +203,7 @@ public class DiminishAction
 		}
 		while (toBeRemoved.size() != 0)
 		{
-			automaton.removeArc((Arc) toBeRemoved.remove(0));
+			automaton.removeArc(toBeRemoved.remove(0));
 		}				
 
 		// Remove the forbidden states

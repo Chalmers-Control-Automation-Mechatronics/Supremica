@@ -232,7 +232,7 @@ public class BDDAutomaton
 //        System.out.println("state name: "+sourceState.getName());
 //        System.out.println("sourceStateIndex: "+sourceStateIndex);
 
-        BDD sourceBDD = manager.factory.buildCube(sourceStateIndex, getSourceStateDomain().vars());
+        BDD sourceBDD = BDDManager.factory.buildCube(sourceStateIndex, getSourceStateDomain().vars());
         Integer myIndex = generateIndex(sourceBDD);
 
         if(!isTransSelfLoop)

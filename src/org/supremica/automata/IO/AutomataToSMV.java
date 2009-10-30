@@ -54,11 +54,10 @@ import java.util.*;
 import java.text.DateFormat;
 import org.supremica.log.*;
 import org.supremica.automata.*;
-import org.supremica.automata.algorithms.SynchronizationType;
-import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
 
 public class AutomataToSMV
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(AutomataToSMV.class);
 	private Automata theAutomata;
 //	private AutomataSynchronizerHelper syncHelper;
@@ -249,7 +248,6 @@ public class AutomataToSMV
 	String getEnableCondition(LabeledEvent currEvent, boolean filter, boolean selectPlant)
 	{
 		StringBuffer buff = new StringBuffer("(");
-		int currEventIndex = currEvent.getIndex();
 		boolean previousCondition = false;
 
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )

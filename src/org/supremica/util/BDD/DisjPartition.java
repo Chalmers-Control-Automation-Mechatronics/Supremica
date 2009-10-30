@@ -7,6 +7,7 @@ public class DisjPartition
 {
 	private int max_size, curr;
 	private JBDD manager;
+	@SuppressWarnings("unused")
 	private DisjOptimizer dop;
 	private int cube, cubep, s2sp, sp2s;
 	private Cluster[] clusters;
@@ -23,7 +24,7 @@ public class DisjPartition
 		this.sp2s = manager.getPermuteSp2S();
 
 		/* compute the clusters */
-		Vector cv = new Vector();
+		Vector<Cluster> cv = new Vector<Cluster>();
 		Cluster[] old = dop.getClusters();
 
 		// this new cold will ignore those that are inactive (marked by optimizer)
@@ -61,11 +62,11 @@ public class DisjPartition
 		curr = cv.size();
 		clusters = new Cluster[curr];
 
-		Enumeration e = cv.elements();
+		Enumeration<Cluster> e = cv.elements();
 
 		for (int i = 0; i < curr; i++)
 		{
-			clusters[i] = (Cluster) e.nextElement();
+			clusters[i] = e.nextElement();
 		}
 	}
 
@@ -114,11 +115,11 @@ public void check(String place){
 	// --------------------------------------------------
 
 	/** stupid greedy insertation algorithm */
-	public void add(Vector v, Cluster c)
+	public void add(Vector<Cluster> v, Cluster c)
 	{
-		for (Enumeration e = v.elements(); e.hasMoreElements(); )
+		for (Enumeration<Cluster> e = v.elements(); e.hasMoreElements(); )
 		{
-			Cluster c2 = (Cluster) e.nextElement();
+			Cluster c2 = e.nextElement();
 			int tmp = manager.or(c2.getTwave(), c.getTwave());
 
 			if (manager.nodeCount(tmp) < Options.max_partition_size)

@@ -108,6 +108,7 @@ public class EOPInitialRow extends EOPRow implements Cloneable
 	return ExternalComponentToStateMap;
     }
 
+    @SuppressWarnings("unchecked")
     public Object clone() 
     {
 	EOPInitialRow clone = null;

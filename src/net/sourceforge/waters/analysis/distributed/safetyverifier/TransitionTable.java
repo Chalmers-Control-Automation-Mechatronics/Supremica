@@ -3,12 +3,11 @@ package net.sourceforge.waters.analysis.distributed.safetyverifier;
 import gnu.trove.TIntArrayList;
 
 import java.util.Arrays;
-import java.util.Set;
-import java.util.HashSet;
 
-import net.sourceforge.waters.analysis.distributed.schemata.ProductDESSchema;
 import net.sourceforge.waters.analysis.distributed.schemata.AutomatonSchema;
+import net.sourceforge.waters.analysis.distributed.schemata.ProductDESSchema;
 import net.sourceforge.waters.analysis.distributed.schemata.TransitionSchema;
+
 
 /**
  * Represents transition information for an automaton. This uses a

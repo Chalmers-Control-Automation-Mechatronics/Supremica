@@ -10,56 +10,62 @@
 
 package org.supremica.gui.ide;
 
-import com.lowagie.text.*;
-import com.lowagie.text.pdf.*;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.print.*;
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.LayoutManager;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.Locale;
 import java.util.logging.Level;
-import javax.print.attribute.*;
-import javax.print.attribute.standard.*;
-import javax.swing.*;
-import javax.print.*;
 
-import java.awt.Rectangle;
-import java.awt.Graphics2D;
-import java.awt.Color;
-import java.io.Writer;
-import java.io.OutputStreamWriter;
-import java.io.IOException;
-
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.batik.dom.GenericDOMImplementation;
-
-//import org.w3c.dom.Document;
-import org.apache.batik.svggen.SVGGraphics2DIOException;
-import org.w3c.dom.DOMImplementation;
-
+import javax.print.StreamPrintService;
+import javax.print.StreamPrintServiceFactory;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttribute;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.JobName;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
-import net.sourceforge.waters.gui.EventEditorDialog;
-import net.sourceforge.waters.gui.EventTableModel;
 import net.sourceforge.waters.gui.GraphEventPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
-import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.svggen.SVGGraphics2DIOException;
+import org.supremica.gui.GraphicsToClipboard;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
-import org.supremica.gui.GraphicsToClipboard;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
+import org.w3c.dom.DOMImplementation;
+
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.DefaultFontMapper;
+import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfTemplate;
+import com.lowagie.text.pdf.PdfWriter;
 
 
 /**
@@ -109,7 +115,6 @@ public class ComponentEditorPanel
         
         final JScrollPane scrollsurface = new JScrollPane(mSurface);
         final JScrollPane scrollevents = new JScrollPane(mEventsPane);
-        final JViewport viewevents = scrollevents.getViewport();
         final JSplitPane split = new JSplitPane
             (JSplitPane.HORIZONTAL_SPLIT, scrollevents, scrollsurface);
         final int halfwidth = size.width >> 1;

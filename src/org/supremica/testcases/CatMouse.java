@@ -11,17 +11,15 @@ package org.supremica.testcases;
 
 import java.util.Iterator;
 import java.util.StringTokenizer;
-import org.omg.CORBA.portable.IDLEntity;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.Project;
+
 import org.supremica.automata.Alphabet;
-import org.supremica.automata.State;
 import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.StateSet;
-import org.supremica.automata.execution.*;
-import uk.ac.ic.doc.scenebeans.Null;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
+
 
 /**
  *
@@ -233,7 +231,7 @@ class Cat
     
     public void renameState(Automaton sm, int st_index, final String new_label)
     {
-        StateSet ss = sm.getStateSet();
+        sm.getStateSet();
         State st_old = sm.getStateWithIndex(st_index);
         State st_new = new State(st_old,new_label);
         sm.replaceState(st_old, st_new);
@@ -303,8 +301,6 @@ class Mouse
         //indices into events
         for(i=0; i<number_of_events;i++)
             event_indices[i] = i;
-        
-        this.length = length;
 
 /*        if (inited)
         {
@@ -520,7 +516,8 @@ class Room
     // Need not be the same everywhere
     static Automaton room = null;
     static boolean inited = false;
-    private int length;
+    @SuppressWarnings("unused")
+	private int length;
     
     int id;
     
@@ -530,8 +527,7 @@ class Room
     throws Exception
     {
         this.id = id;
-        this.length = length;
-        this.num_cats = num_cats;
+        Room.num_cats = num_cats;
         
         number_of_states = 1 + 2*(num_cats);
         states = new State[number_of_states];
@@ -815,7 +811,7 @@ class Room
     
     public void renameState(Automaton sm, int st_index, final String new_label)
     {
-        StateSet ss = sm.getStateSet();
+        sm.getStateSet();
         State st_old = sm.getStateWithIndex(st_index);
         State st_new = new State(st_old,new_label);
         sm.replaceState(st_old, st_new);   
@@ -863,9 +859,6 @@ class Room
                         sm.getAlphabet().addEvent(lem[h]);
                     }
                     
-                    int RC_cnt = 1;
-                    int RM_cnt = 1;
-                    String ECM;
                     State init_state;
 
                     //compute which states specify cat and mouse
@@ -955,9 +948,6 @@ public class CatMouse
     {
         // Add comment
         project.setComment("The cat and mouse problem. The cat and mouse must never be in the same room. This is specified 'locally', by the five specifications for the different rooms. Since this is a static specification, this can also be expressed 'globally' as a set of forbidden states in the composed plant model, 'cat||mouse'.");
-        
-        int idLength = ("" + num).length();
-        
         Cat cat = new Cat();
         Mouse mouse = new Mouse();
         for (int i = 0; i < num; ++i){

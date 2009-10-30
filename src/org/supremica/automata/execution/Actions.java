@@ -54,15 +54,15 @@ import org.supremica.automata.LabeledEvent;
 
 public class Actions
 {
-	private Map labelToActionMap = new TreeMap();
+	private Map<String, Action> labelToActionMap = new TreeMap<String, Action>();
 
 	public Actions() {}
 
 	public Actions(Actions otherActions)
 	{
-		for (Iterator actIt = otherActions.iterator(); actIt.hasNext(); )
+		for (Iterator<Action> actIt = otherActions.iterator(); actIt.hasNext(); )
 		{
-			Action currAction = (Action) actIt.next();
+			Action currAction = actIt.next();
 			Action newAction = new Action(currAction);
 
 			addAction(newAction);
@@ -71,9 +71,9 @@ public class Actions
 
 	public void addActions(Actions otherActions)
 	{
-		for (Iterator actIt = otherActions.iterator(); actIt.hasNext(); )
+		for (Iterator<Action> actIt = otherActions.iterator(); actIt.hasNext(); )
 		{
-			Action currAction = (Action) actIt.next();
+			Action currAction = actIt.next();
 			Action newAction = new Action(currAction);
 
 			addAction(newAction);
@@ -109,15 +109,15 @@ public class Actions
 
 	public Action getAction(String label)
 	{
-		return (Action) labelToActionMap.get(label);
+		return labelToActionMap.get(label);
 	}
 
 	public Action getAction(LabeledEvent event)
 	{
-		return (Action) labelToActionMap.get(event.getLabel());
+		return labelToActionMap.get(event.getLabel());
 	}
 
-	public Iterator iterator()
+	public Iterator<Action> iterator()
 	{
 		return labelToActionMap.values().iterator();
 	}

@@ -66,7 +66,7 @@ public class EOPData
     private String id;
     private String type;
     private String comment;
-    private List EOPRows; // contains initial row and action rows 
+    private List<EOPRowData> EOPRows; // contains initial row and action rows 
     public static final String ALTERNATIVE_TYPE = "alternative";
     public static final String BASIC_TYPE = "basic";
     public static final String [] TYPES = {BASIC_TYPE, ALTERNATIVE_TYPE};
@@ -91,7 +91,7 @@ public class EOPData
 	    
 	this.type = type;
 	comment = null;
-	EOPRows = new LinkedList();
+	EOPRows = new LinkedList<EOPRowData>();
     }
 
     public String getType()
@@ -130,7 +130,7 @@ public class EOPData
     
     public EOPInitialRowData getEOPInitialRow()
     {
-	return (EOPInitialRowData) ( (LinkedList) EOPRows ).getFirst();
+	return (EOPInitialRowData) ( (LinkedList<EOPRowData>) EOPRows ).getFirst();
     }
 
     // Append a new EOPActionRow to the end of the EOPRows list
@@ -140,13 +140,13 @@ public class EOPData
     }
 
     // Return the whole list with EOPRows including actionrow
-    public List getEOPRows()
+    public List<EOPRowData> getEOPRows()
     {
 	return EOPRows;
     }
     
     // Return the list of actionrows
-    public List getEOPActionRows()
+    public List<EOPRowData> getEOPActionRows()
     {
 	return EOPRows.subList( 1, EOPRows.size() );
     }

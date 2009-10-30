@@ -9,7 +9,7 @@ package org.supremica.automata.algorithms.scheduling.milp;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.TreeSet;
+
 
 /**
  * This class extends a TreeSet to order int[]-objects that represent boolean
@@ -26,6 +26,8 @@ import java.util.TreeSet;
 public class BooleanCombinationTreeSet
         extends IntArrayTreeSet
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates a IntArrayTreeSet using {@link IntArrayComparator} to order 
      * int[]-objects that represent boolean permutations. 

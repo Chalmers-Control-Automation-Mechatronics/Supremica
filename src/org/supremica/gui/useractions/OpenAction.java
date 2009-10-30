@@ -8,6 +8,8 @@ import org.supremica.gui.ActionMan;
 public class OpenAction
     extends AbstractAction
 {
+    private static final long serialVersionUID = 1L;
+
     public OpenAction()
     {
         super();

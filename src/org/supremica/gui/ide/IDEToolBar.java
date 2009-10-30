@@ -13,21 +13,19 @@ package org.supremica.gui.ide;
 import java.awt.Insets;
 import java.util.LinkedList;
 import java.util.List;
-import javax.swing.AbstractButton;
+
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
-import javax.swing.JToolBar;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 
 import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.actions.IDECopyAction;
 import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
 import net.sourceforge.waters.gui.actions.IDEPasteAction;
-import net.sourceforge.waters.gui.actions.InsertEventDeclAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
-import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.ToolEdgeAction;
 import net.sourceforge.waters.gui.actions.ToolGroupNodeAction;
 import net.sourceforge.waters.gui.actions.ToolNodeAction;
@@ -185,6 +183,7 @@ public class IDEToolBar
 
     //#######################################################################
     //# Class Constants
+    private static final long serialVersionUID = 1L;
     private static final Insets INSETS = new Insets(0, 0, 0, 0);
 
 }

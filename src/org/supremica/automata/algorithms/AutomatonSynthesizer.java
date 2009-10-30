@@ -134,7 +134,7 @@ public class AutomatonSynthesizer
     
     public void initializeAcceptingStates()
     {
-        Iterator stateIt = theAutomaton.stateIterator();
+        Iterator<?> stateIt = theAutomaton.stateIterator();
         logger.debug("AutomatonSynthesizer.initializeAcceptingStates...");
         while (stateIt.hasNext())
         {
@@ -211,7 +211,6 @@ public class AutomatonSynthesizer
         // Do fixed point iteration
         doControllable(stateList);
         boolean newUnsafeStates = false;
-        int iteration = 0;
         do
         {
             stateList = doCoreachable();
@@ -245,8 +244,8 @@ public class AutomatonSynthesizer
     {
         logger.debug("AutomatonSynthesizer.synthesizeControllable...");
         // boolean newUnsafeStates;
-        LinkedList stateList = new LinkedList();
-        Iterator stateIt = theAutomaton.stateIterator();
+        LinkedList<State> stateList = new LinkedList<State>();
+        Iterator<?> stateIt = theAutomaton.stateIterator();
         while (stateIt.hasNext())
         {
             State currState = (State) stateIt.next();
@@ -294,7 +293,7 @@ public class AutomatonSynthesizer
         doReachable();
         // Forbid the states with MAX_COST set
         boolean didSomething = false;
-        Iterator stateIt = theAutomaton.stateIterator();
+        Iterator<?> stateIt = theAutomaton.stateIterator();
         while (stateIt.hasNext())
         {
             State currState = (State) stateIt.next();
@@ -336,11 +335,10 @@ public class AutomatonSynthesizer
             // Get and remove a state
             State currState = stateStack.remove();
             currState.setVisited(true);
-            Iterator arcIt = currState.incomingArcsIterator();
+            Iterator<?> arcIt = currState.incomingArcsIterator();
             while (arcIt.hasNext())
             {
                 Arc currArc = (Arc) arcIt.next();
-                LabeledEvent currEvent = currArc.getEvent();
                 State fromState = currArc.getFromState();
                 if ((fromState.getCost() != State.MAX_COST) && !fromState.isVisited())
                 {
@@ -353,7 +351,7 @@ public class AutomatonSynthesizer
         // Find all states that are not coreachable and
         // mark them as unsafe.
         int nbrOfNewUnsafeStates = 0;
-        Iterator stateIt = theAutomaton.stateIterator();
+        Iterator<?> stateIt = theAutomaton.stateIterator();
         while (stateIt.hasNext())
         {
             State currState = (State) stateIt.next();
@@ -404,7 +402,7 @@ public class AutomatonSynthesizer
     public StateSet doControllable(State currState)
     {
         StateSet stateStack = new StateSet();
-        Iterator arcIt = currState.incomingArcsIterator();
+        Iterator<?> arcIt = currState.incomingArcsIterator();
         while (arcIt.hasNext())
         {
             Arc currArc = (Arc) arcIt.next();
@@ -449,7 +447,7 @@ public class AutomatonSynthesizer
         // Push the initial state on the stack
         // Mark the state as visited
         State initialState = theAutomaton.getInitialState();
-        LinkedList stateStack = new LinkedList();
+        LinkedList<State> stateStack = new LinkedList<State>();
         //if ((initialState.getCost() != State.MAX_COST)  || expandForbidden)
         if (expandForbidden || !initialState.isForbidden())
         {
@@ -462,10 +460,10 @@ public class AutomatonSynthesizer
             {
                 return;
             }
-            State currState = (State) stateStack.removeLast();
+            State currState = stateStack.removeLast();
             currState.setVisited(true);
             // Look at states reachable from here
-            Iterator arcIt = currState.outgoingArcsIterator();
+            Iterator<?> arcIt = currState.outgoingArcsIterator();
             while (arcIt.hasNext())
             {
                 Arc currArc = (Arc) arcIt.next();
@@ -481,7 +479,7 @@ public class AutomatonSynthesizer
         }
         
         // Set max cost on the states that can't be reached
-        Iterator stateIt = theAutomaton.stateIterator();
+        Iterator<?> stateIt = theAutomaton.stateIterator();
         while (stateIt.hasNext())
         {
             State currState = (State) stateIt.next();

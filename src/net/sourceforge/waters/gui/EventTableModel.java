@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 
@@ -27,7 +28,6 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -106,7 +106,7 @@ public class EventTableModel
     return 2;
   }
 
-  public Class getColumnClass(final int column)
+  public Class<?> getColumnClass(final int column)
   {
     switch (column) {
     case 0:
@@ -347,6 +347,7 @@ public class EventTableModel
     }
   }
 
+  @SuppressWarnings("unused")
   private boolean containsEvent(final IdentifierSubject ident)
   {
     final EventEntry entry = new EventEntry(ident);
@@ -794,5 +795,10 @@ public class EventTableModel
   private final GraphModelObserver mGraphModelObserver;
   private final IdentifierCollectVisitor mIdentifierCollectVisitor;
   private final GraphSearchVisitor mGraphSearchVisitor;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

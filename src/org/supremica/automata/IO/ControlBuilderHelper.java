@@ -49,8 +49,8 @@
  */
 package org.supremica.automata.IO;
 
-import java.io.*;
-import java.util.*;
+import java.io.PrintWriter;
+
 
 public class ControlBuilderHelper
 	extends IEC61131Helper

@@ -6,7 +6,9 @@ import org.supremica.util.BDD.*;
 public class BDDNodeANDSATDiffGrow
 	extends BDDNodeGrow
 {
-	private BDDSATDiffGrow satdiff = null;
+    private static final long serialVersionUID = 1L;
+
+    private BDDSATDiffGrow satdiff = null;
 
 	public BDDNodeANDSATDiffGrow(BDDAutomata manager, String title)
 	{

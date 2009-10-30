@@ -89,7 +89,7 @@ public class ConflictKindTranslator
 
 
   //#########################################################################
-  //# Static Class Variables
-  private static ConflictKindTranslator theInstance;
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

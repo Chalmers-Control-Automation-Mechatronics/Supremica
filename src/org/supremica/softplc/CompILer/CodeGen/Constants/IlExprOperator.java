@@ -9,7 +9,7 @@ import java.util.*;
 
 public class IlExprOperator
 {
-	private static List theInstructions = new ArrayList();
+	private static List<IlExprOperator> theInstructions = new ArrayList<IlExprOperator>();
 	private String instruction;
 
 	private IlExprOperator(String s)
@@ -20,7 +20,7 @@ public class IlExprOperator
 	}
 
 	/**iterator gives an iterator over the instruction constants*/
-	public static Iterator iterator()
+	public static Iterator<IlExprOperator> iterator()
 	{
 		return theInstructions.iterator();
 	}

@@ -18,7 +18,7 @@ public class ASTvar1_list
 	}
 
 	// Appended
-	private LinkedList names = new LinkedList();
+	private LinkedList<String> names = new LinkedList<String>();
 	private String typeName;
 
 	public void addName(String name)
@@ -33,7 +33,7 @@ public class ASTvar1_list
 
 		for (i = 0; i < names.size(); i++)
 		{
-			strNames[i] = (String) names.get(i);
+			strNames[i] = names.get(i);
 		}
 
 		return strNames;

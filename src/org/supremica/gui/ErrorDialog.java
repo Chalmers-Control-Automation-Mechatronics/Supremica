@@ -63,10 +63,6 @@ public class ErrorDialog
 	private static final long serialVersionUID = 1L;
 	JEditorPane text;
 
-	private ErrorDialog()
-	{
-	}
-
 	public ErrorDialog(JFrame frame, String message, Exception ex)
 	{
 		super(frame, "Unexpected error", true);

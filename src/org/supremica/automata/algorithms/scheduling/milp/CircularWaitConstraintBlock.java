@@ -22,6 +22,8 @@ import java.util.ArrayList;
 public class CircularWaitConstraintBlock 
     extends ArrayList<int[]>
 {
+    private static final long serialVersionUID = 1L;
+
     private boolean hasBuffer;
     
     public CircularWaitConstraintBlock()

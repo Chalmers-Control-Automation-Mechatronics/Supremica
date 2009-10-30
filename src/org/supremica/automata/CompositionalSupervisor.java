@@ -101,12 +101,10 @@ public class CompositionalSupervisor
         // Save the current global state
         State[] currentStateSave = (State[]) currentGlobalState.clone();
         // We would end up (hypotetically) in some other state...
-        State[] hypotheticalState;
         try
         {
             // Try executing the event
             executeEvent(event);
-            hypotheticalState = currentGlobalState;
             // Restore order
             currentGlobalState = currentStateSave;
         }

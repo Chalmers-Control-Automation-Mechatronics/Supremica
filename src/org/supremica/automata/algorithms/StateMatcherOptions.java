@@ -56,7 +56,7 @@ public class StateMatcherOptions
 {
 	public static class Accepting
 	{
-		private static Collection types = new LinkedList();
+		private static Collection<Accepting> types = new LinkedList<Accepting>();
 		public static final Accepting DontCare = new Accepting("Don't care");
 		public static final Accepting Yes = new Accepting("Yes");
 		public static final Accepting No = new Accepting("No");
@@ -69,7 +69,7 @@ public class StateMatcherOptions
 			types.add(this);
 		}
 
-		public static Iterator iterator()
+		public static Iterator<Accepting> iterator()
 		{
 			return types.iterator();
 		}
@@ -107,7 +107,7 @@ public class StateMatcherOptions
 
 	public static class Forbidden
 	{
-		private static Collection types = new LinkedList();
+		private static Collection<Forbidden> types = new LinkedList<Forbidden>();
 		public static final Forbidden DontCare = new Forbidden("Don't care");
 		public static final Forbidden Yes = new Forbidden("Yes");
 		public static final Forbidden No = new Forbidden("No");
@@ -120,7 +120,7 @@ public class StateMatcherOptions
 			types.add(this);
 		}
 
-		public static Iterator iterator()
+		public static Iterator<Forbidden> iterator()
 		{
 			return types.iterator();
 		}
@@ -158,7 +158,7 @@ public class StateMatcherOptions
 
 	public static class Deadlock
 	{
-		private static Collection types = new LinkedList();
+		private static Collection<Deadlock> types = new LinkedList<Deadlock>();
 		public static final Deadlock DontCare = new Deadlock("Don't care");
 		public static final Deadlock Yes = new Deadlock("Yes");
 		public static final Deadlock No = new Deadlock("No");
@@ -171,7 +171,7 @@ public class StateMatcherOptions
 			types.add(this);
 		}
 
-		public static Iterator iterator()
+		public static Iterator<Deadlock> iterator()
 		{
 			return types.iterator();
 		}

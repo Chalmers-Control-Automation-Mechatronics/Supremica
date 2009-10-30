@@ -6,18 +6,23 @@ import java.util.ArrayList;
 import org.supremica.log.*;
 
 public class ClosedNodes extends Hashtable {
-    public static final int CLOSED_NODE_INFO_SIZE = 2;
+ 
+	private static final long serialVersionUID = 1L;
+	public static final int CLOSED_NODE_INFO_SIZE = 2;
 
-    private static Logger logger = LoggerFactory.createLogger(ClosedNodes.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(ClosedNodes.class);
 
-    private int compositeStateSize;
+    @SuppressWarnings("unused")
+	private int compositeStateSize;
 
     public ClosedNodes(int compositeStateSize) {
 		super();
 		this.compositeStateSize = compositeStateSize;
     }
 
-    public int putNode(int key, int[] value) {	
+    @SuppressWarnings("unchecked")
+	public int putNode(int key, int[] value) {	
 		// 	if (!containsKey(key))
 		// 	    put(key, value);
 		// 	else {
@@ -31,8 +36,6 @@ public class ClosedNodes extends Hashtable {
 
 		// 	    put(key, newNode);
 		// 	}
-		Integer internalKey = new Integer(key);
-
 		if (!containsKey(key)) {
 			ArrayList<int[]> values = new ArrayList<int[]>(1);
 			values.add(value);
@@ -50,7 +53,8 @@ public class ClosedNodes extends Hashtable {
 		}
     }
 
-    public ArrayList<int[]> getNodeArray(int key) {
+    @SuppressWarnings("unchecked")
+	public ArrayList<int[]> getNodeArray(int key) {
 		return (ArrayList<int[]>) get(new Integer(key));
     }
 
@@ -97,16 +101,15 @@ public class ClosedNodes extends Hashtable {
 		return -1;
     }
 
-    public void removeNode(int key, int arrayIndex) {
+    @SuppressWarnings("unchecked")
+	public void removeNode(int key, int arrayIndex) {
 		ArrayList<int[]> values = getNodeArray(key);
-	
-		int[] banan = values.get(arrayIndex);
-
 		values.remove(arrayIndex);
 		put(key, values);
     }
     
-    public void replaceNode(int key, int arrayIndex, int[] newNode) {
+    @SuppressWarnings("unchecked")
+	public void replaceNode(int key, int arrayIndex, int[] newNode) {
 		ArrayList<int[]> values = getNodeArray(key);
 
 		values.remove(arrayIndex);

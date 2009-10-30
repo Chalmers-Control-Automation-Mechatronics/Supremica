@@ -37,8 +37,8 @@ public class ConverterSTEPtoPA {
 		PAdoc = new Document(PA);
 
 		// Create a List of the involved POOs
-		List pooList = root.getChildren("Process_operation_occurrence");
-		for(Iterator listPOO = pooList.iterator(); listPOO.hasNext(); )
+		List<?> pooList = root.getChildren("Process_operation_occurrence");
+		for(Iterator<?> listPOO = pooList.iterator(); listPOO.hasNext(); )
 		{
 			Element poo_element = (Element) listPOO.next();
 			if (! checkDecomp(poo_element)) {
@@ -74,10 +74,8 @@ public class ConverterSTEPtoPA {
 		String poo_id = e;
 		Element poo_element = new Element("ejhittad");
 
-		java.util.List POOs = root.getChildren("Process_operation_occurrence");
+		java.util.List<?> POOs = root.getChildren("Process_operation_occurrence");
 		Object[] POOs_array = POOs.toArray();
-		int nr_POOs = POOs_array.length;
-
 		int i = 0;
 		while (notfound) {
 
@@ -101,11 +99,8 @@ public class ConverterSTEPtoPA {
 		boolean notfound = true;
 		String pod_id = e;
 		Element pod_element = new Element("ejhittad");
-
-		java.util.List PODs = root.getChildren("Process_operation_definition");
+		java.util.List<?> PODs = root.getChildren("Process_operation_definition");
 		Object[] PODs_array = PODs.toArray();
-		int nr_PODs = PODs_array.length;
-
 		int i = 0;
 		while (notfound) {
 
@@ -126,7 +121,7 @@ public class ConverterSTEPtoPA {
 
     public void CreateGroups(Element poo, Element PA) {
 
-		Vector group = new Vector();
+		Vector<Element> group = new Vector<Element>();
 
 		// Check if it a decomp_group. If it is create and place an element in the xml with the relationtype as element id.
 		if (checkGrouping(poo)) {
@@ -138,7 +133,7 @@ public class ConverterSTEPtoPA {
 			// Checks and places restrictions (precedence POOs) on the found group.
 			CheckSeq sequence = new CheckSeq();
 			sequence.createPrecedenceGroups(root, group_poo_id, this);
-			Vector restrictions_on_group = sequence.getSeqPOOs();
+			Vector<?> restrictions_on_group = sequence.getSeqPOOs();
 
 			// If there are restrictions these are are placed.
 			if (! restrictions_on_group.isEmpty()) {
@@ -157,8 +152,8 @@ public class ConverterSTEPtoPA {
 			}
 
 			// Hämta alla process relationer element för en viss POO (Dessa kan vara decomp, alt, par, seq, arb)
-			List pooList = poo.getChildren("Process_operation_occurrence_relationship");
-			for(Iterator listPOO = pooList.iterator(); listPOO.hasNext(); )
+			List<?> pooList = poo.getChildren("Process_operation_occurrence_relationship");
+			for(Iterator<?> listPOO = pooList.iterator(); listPOO.hasNext(); )
 			{
 				Element relation_member_element = (Element) listPOO.next();
 				Element relType = relation_member_element.getChild("Relation_type");
@@ -176,7 +171,7 @@ public class ConverterSTEPtoPA {
 			int number_in_group;
 			for (number_in_group=0; number_in_group < group.size(); number_in_group=number_in_group+1) {
 
-				Element group_member_element = (Element) group.elementAt(number_in_group);
+				Element group_member_element = group.elementAt(number_in_group);
 				String group_member_id = group_member_element.getAttributeValue("id");
 
 				// If it is an decomposed (Grouping) POO that is found do CreateGroups again else add the single poo.
@@ -190,10 +185,7 @@ public class ConverterSTEPtoPA {
 					// Check for predecessors..
 					CheckSeq seq = new CheckSeq();
 					seq.createPrecedenceGroups(root, group_member_id, this);
-					Vector restrictions = seq.getSeqPOOs();
-
-					boolean inlagd_and_element = false;
-
+					Vector<?> restrictions = seq.getSeqPOOs();
 					// Check if there are any restrictions.
 					if (! restrictions.isEmpty()) {
 
@@ -246,8 +238,7 @@ public class ConverterSTEPtoPA {
 
 		Element pod_element = getPODelement(pod);
 		Element pod_element_process_type = pod_element.getChild("Process_type");
-		String type = pod_element_process_type.getText();
-
+		pod_element_process_type.getText();
 		Element pod_element_id = pod_element.getChild("Id");
 		String id = pod_element_id.getText();
 
@@ -262,12 +253,12 @@ public class ConverterSTEPtoPA {
 
 		boolean decomp = false;
 
-		List pooList = root.getChildren("Process_operation_occurrence");
-		for(Iterator listPOO = pooList.iterator(); listPOO.hasNext(); )
+		List<?> pooList = root.getChildren("Process_operation_occurrence");
+		for(Iterator<?> listPOO = pooList.iterator(); listPOO.hasNext(); )
 		{
 			Element poo_element = (Element) listPOO.next();;
-			List poorList = poo_element.getChildren("Process_operation_occurrence_relationship");
-			for(Iterator listPOOR = poorList.iterator(); listPOOR.hasNext(); )
+			List<?> poorList = poo_element.getChildren("Process_operation_occurrence_relationship");
+			for(Iterator<?> listPOOR = poorList.iterator(); listPOOR.hasNext(); )
 			{
 				Element poor_element = (Element) listPOOR.next();
 				Element relType = poor_element.getChild("Relation_type");
@@ -277,8 +268,7 @@ public class ConverterSTEPtoPA {
 
 					Element related = poor_element.getChild("Related");
 					String related_id = related.getText();
-					Element related_element = getPOOelement(related_id);
-
+					getPOOelement(related_id);
 					if (related_id.equals(poo.getAttributeValue("id"))) {
 						decomp = true;
 					}
@@ -292,7 +282,7 @@ public class ConverterSTEPtoPA {
 ///////////////////////////// place_restrictions ///////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void place_restrictions(Element root, Vector restrictions, Element platsen) {
+	public void place_restrictions(Element root, Vector<?> restrictions, Element platsen) {
 
 		// Check if there are alternative restrictions.
 		int k;
@@ -303,7 +293,7 @@ public class ConverterSTEPtoPA {
 			// Check if the found poo is alternative with other poos
 			CheckAlt checkalt = new CheckAlt();
 			checkalt.addRestrictions(element_POO, root);
-			Vector alt_poos = checkalt.getAltPOOs();
+			Vector<?> alt_poos = checkalt.getAltPOOs();
 
 			// If there were alternative restrictions
 			if (! alt_poos.isEmpty()) {

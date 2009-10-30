@@ -17,9 +17,11 @@ import javax.swing.JPanel;
  * Creado 01/11/2005
  *
  */
-public class QMCDialogoAcerca extends JDialog {
+public class QMCDialogoAcerca extends JDialog
+{
+    private static final long serialVersionUID = 1L;
 
-	private JPanel jContentPane = null;
+    private JPanel jContentPane = null;
 	private JButton botonAceptar = null;
 	private JLabel titulo = null;
 	private JLabel Proyecto = null;

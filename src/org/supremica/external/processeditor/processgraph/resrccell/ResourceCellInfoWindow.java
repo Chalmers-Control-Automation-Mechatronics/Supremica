@@ -1,13 +1,25 @@
 package org.supremica.external.processeditor.processgraph.resrccell;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.text.*;
-import javax.swing.border.*;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-import org.supremica.manufacturingTables.xsd.processeditor.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.border.TitledBorder;
+
+import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+import org.supremica.manufacturingTables.xsd.processeditor.ROPType;
+
 
 /**
  * Displays the resource info window, which allow the user to edit the
@@ -16,7 +28,9 @@ import org.supremica.manufacturingTables.xsd.processeditor.*;
 public class ResourceCellInfoWindow extends JDialog implements ActionListener,
 							       MouseListener
 {    
-    private int sizeX = 300;
+	private static final long serialVersionUID = 1L;
+
+	private int sizeX = 300;
     private int sizeY = 350;
 
     private String[] types = {"DOP", "COP"};
@@ -103,8 +117,8 @@ public class ResourceCellInfoWindow extends JDialog implements ActionListener,
      * </ul>
      */
     public int showDialog() {
-	show();
-	return option;
+    	setVisible(true);
+    	return option;
     }
     /**
      * Is invoked when an action has occured. 

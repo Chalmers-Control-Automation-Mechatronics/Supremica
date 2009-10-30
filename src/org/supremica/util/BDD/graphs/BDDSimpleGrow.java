@@ -12,6 +12,7 @@ import org.supremica.util.BDD.*;
 public class BDDSimpleGrow
 	extends GrowFrame
 {
+    private static final long serialVersionUID = 1L;
 
 	private BDDAutomata manager;
 	private SimpleStatCanvas canvas;
@@ -61,6 +62,9 @@ public class BDDSimpleGrow
 
 	// ---- [ inner class : SimpleStatCanvas ] ---------------------------------------------------------
 	private class SimpleStatCanvas extends Canvas {
+
+	    private static final long serialVersionUID = 1L;
+
 		public SimpleStatCanvas() {
 			setSize(300, 130);
 			setBackground(Color.lightGray);

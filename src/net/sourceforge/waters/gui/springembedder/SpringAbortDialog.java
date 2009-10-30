@@ -113,4 +113,9 @@ public class SpringAbortDialog
   private final JProgressBar mProgress;
   private final SpringEmbedder mEmbedder;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

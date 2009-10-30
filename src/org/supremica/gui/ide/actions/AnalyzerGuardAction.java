@@ -9,28 +9,41 @@
 
 package org.supremica.gui.ide.actions;
 
-import javax.swing.Action;
-import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.*;
-import org.supremica.automata.algorithms.Guard.*;
-import org.supremica.gui.ide.IDE;
-import org.supremica.gui.GuardDialog;
-import org.supremica.automata.*;
-import org.supremica.log.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+
+import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.supremica.automata.Automata;
+import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.BDD.BDDAutomata;
 import org.supremica.automata.BDD.BDDManager;
+import org.supremica.automata.algorithms.Guard.BDDGuardGenerator;
+import org.supremica.automata.algorithms.Guard.GuardOptions;
+import org.supremica.gui.GuardDialog;
 import org.supremica.gui.ide.EditorPanel;
-import net.sf.javabdd.*;
-import net.sourceforge.waters.model.module.NodeProxy;
+import org.supremica.gui.ide.IDE;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 
 /**
@@ -44,7 +57,8 @@ public class AnalyzerGuardAction
     /** Creates a new instance of AnalyzerGuardAction */
 
     private static final long serialVersionUID = 1L;
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    @SuppressWarnings("unused")
+	private Logger logger = LoggerFactory.createLogger(IDE.class);
 
     HashMap<String,String> aut2type;
     HashMap<String,String> aut2initState;
@@ -88,7 +102,7 @@ public class AnalyzerGuardAction
  //       GuardGenerator gg = new GuardGenerator(selectedAutomata.getAutomatonAt(0),guardOptions.getExpressionType());
         editorPanel = ide.getActiveDocumentContainer().getEditorPanel();
 
-        Vector events = new Vector();
+        Vector<String> events = new Vector<String>();
         events.add("Generate guards for ALL events");
 
 /*       for(AbstractSubject as: editorPanel.getModuleSubject().getComponentListModifiable())
@@ -128,7 +142,7 @@ public class AnalyzerGuardAction
 
         long time1 = System.currentTimeMillis();
 
-        BDD prelUnconStates = manager.prelimUncontrollableStates(automataBDD);
+        BDD prelUnconStates = BDDManager.prelimUncontrollableStates(automataBDD);
         BDD forbiddenStates = prelUnconStates.or(automataBDD.getForbiddenStates());
 //        forbiddenStates.printDot();
 //        System.out.println("number of coreachable states: "+automataBDD.numberOfCoreachableStates());
@@ -151,9 +165,6 @@ public class AnalyzerGuardAction
         catch (IOException e) {}
 */
         HashMap<String,BDDGuardGenerator> event2guard = new HashMap<String,BDDGuardGenerator>();
-        boolean singleEventSelected = false;
-
-        long time2 = System.currentTimeMillis();
         if(sigma.getName().equals(""))
         {
             for(EventDeclSubject sigmaS:  editorPanel.getModuleSubject().getEventDeclListModifiable())
@@ -161,7 +172,6 @@ public class AnalyzerGuardAction
                 if(sigmaS.getKind() == EventKind.CONTROLLABLE)
                 {
     //                System.out.println("Generating guard for event "+ sigmaS.getName()+"...");
-                    long runTime = System.currentTimeMillis();
                     bddgg = new BDDGuardGenerator(automataBDD, sigmaS.getName(), safeStatesBDD, guardOptions.getExpressionType());
 
 //                    System.out.println("The guard was generated in "+(System.currentTimeMillis()-runTime)+" millisecs");
@@ -180,13 +190,10 @@ public class AnalyzerGuardAction
         }
         else
         {
-            singleEventSelected = true;
             bddgg = new BDDGuardGenerator(automataBDD, sigma.getName(), safeStatesBDD, guardOptions.getExpressionType());
         }
-
-        long totalGuardGenTime = System.currentTimeMillis()-time2;
-
-/*        try
+        /*
+        try
         {
             out.newLine();
             out.write("Total time of generating guards for all events: "+totalGuardGenTime+" ms");

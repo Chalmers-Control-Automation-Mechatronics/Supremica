@@ -15,12 +15,12 @@ public class AutomataCommunicationHelper
 	 * returns the dependency group
 	 *
 	 */
-	public static Collection getDependencyGroup(Automata selected, Automata all)
+	public static Collection<Automaton> getDependencyGroup(Automata selected, Automata all)
 		throws Exception
 	{
 		all = new Automata(all, true);
 
-		Collection toSelect = new HashSet();
+		Collection<Automaton> toSelect = new HashSet<Automaton>();
 
 		for (Iterator<Automaton> it = selected.iterator(); it.hasNext(); )
 		{
@@ -54,14 +54,14 @@ public class AutomataCommunicationHelper
 	 *
 	 * @return Vector of Automaton which is v, such that selected SUBSET-EQUAL v SUBSET-EQUAL all.
 	 */
-	public static Collection getMaximalComponent(Automata selected, Automata all)
+	public static Collection<Automaton> getMaximalComponent(Automata selected, Automata all)
 		throws Exception
 	{
 		boolean done;
 
 		all = new Automata(all, true);
 
-		Collection toSelect = new HashSet();
+		Collection<Automaton> toSelect = new HashSet<Automaton>();
 
 		for (Iterator<Automaton> it = selected.iterator(); it.hasNext(); )
 		{
@@ -91,9 +91,9 @@ public class AutomataCommunicationHelper
 				}
 			}
 
-			for (Iterator it = toSelect.iterator(); it.hasNext(); )
+			for (Iterator<Automaton> it = toSelect.iterator(); it.hasNext(); )
 			{
-				Automaton a = (Automaton) it.next();
+				Automaton a = it.next();
 
 				all.removeAutomaton(a);
 			}
@@ -108,10 +108,10 @@ public class AutomataCommunicationHelper
 	 *
 	 * @return Collection of Automata whose alphabet share no common events
 	 */
-	public static Collection split(Automata all)
+	public static Collection<Automata> split(Automata all)
 		throws Exception
 	{
-		Collection v = new LinkedList();
+		Collection<Automata> v = new LinkedList<Automata>();
 
 		all = new Automata(all, true);
 
@@ -122,11 +122,11 @@ public class AutomataCommunicationHelper
 			Automaton first = all.iterator().next();
 			Automata firstAut = new Automata(first);
 			Automata componentAut = new Automata();
-			Collection component = getMaximalComponent(firstAut, all);
+			Collection<Automaton> component = getMaximalComponent(firstAut, all);
 
-			for (Iterator it = component.iterator(); it.hasNext(); )
+			for (Iterator<Automaton> it = component.iterator(); it.hasNext(); )
 			{
-				Automaton a = (Automaton) it.next();
+				Automaton a = it.next();
 
 				all.removeAutomaton(a);
 				componentAut.addAutomaton(a);

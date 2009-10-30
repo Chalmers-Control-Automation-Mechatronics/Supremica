@@ -1,24 +1,21 @@
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -28,10 +25,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntArrayList;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class Composer
@@ -66,7 +60,6 @@ public class Composer
       System.out.println("Automata" + i + " " + aut[i].getName());
     }
     eventAutomaton = new int[events.length][numAutomata];
-    int stateLength = numAutomata;
     // transitions indexed first by automaton then by event then by source state
     transitions = new int[numAutomata][events.length][];
     // go through and put all the events to be hidden to the front
@@ -204,6 +197,7 @@ public class Composer
     return result;
   }
   
+  @SuppressWarnings("unused")
   private void markStates()
   {
     boolean[] reachable = new boolean[mBackTransitions[0].length];
@@ -346,11 +340,6 @@ public class Composer
       return mName == 0;
     }
     
-    public int getNum()
-    {
-      return mName;
-    }
-    
     public MemStateProxy clone()
     {
       return new MemStateProxy(mName, mEvent);
@@ -361,7 +350,8 @@ public class Composer
       return Integer.toString(mName);
     }
     
-    public boolean refequals(Object o)
+    @SuppressWarnings("unused")
+	public boolean refequals(Object o)
     {
       if (o instanceof NamedProxy) {
         return refequals((NamedProxy) o);
@@ -558,12 +548,13 @@ public class Composer
     return sState;
   }
   
+  @SuppressWarnings("unused")
   private static class StateMap
     extends AbstractMap<int[], MemStateProxy>
   {
     final Map<IntArray, MemStateProxy> mMap;
     
-    public StateMap(int num)
+	public StateMap(int num)
     {
       mMap = new HashMap<IntArray, MemStateProxy>(num);
     }
@@ -626,12 +617,14 @@ public class Composer
       return mMap.get(new IntArray(a));
     }
     
-    public Integer get(int[] a)
+    @SuppressWarnings("unused")
+	public Integer get(int[] a)
     {
       return mMap.get(new IntArray(a));
     }
     
-    public Integer put(Object o, Integer s)
+    @SuppressWarnings("unused")
+	public Integer put(Object o, Integer s)
     {
       return mMap.put(new IntArray((int[])o), s);
     }
@@ -725,6 +718,7 @@ public class Composer
   private Bag unvisited;
   private int[][] eventAutomaton;
   private final EventProxy mMarked;
+  @SuppressWarnings("unused")
   private int mNewDumpState;
   private int mDumpState = -1;
 }

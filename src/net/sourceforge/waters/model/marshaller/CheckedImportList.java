@@ -71,4 +71,9 @@ class CheckedImportList<P extends NamedProxy>
   private final String mContainerName;
   private final String mItemKindName;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

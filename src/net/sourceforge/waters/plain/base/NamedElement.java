@@ -70,4 +70,9 @@ public abstract class NamedElement
   //# Data Members
   private final String mName;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

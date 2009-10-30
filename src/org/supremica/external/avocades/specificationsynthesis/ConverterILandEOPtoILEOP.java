@@ -1,9 +1,11 @@
 package org.supremica.external.avocades.specificationsynthesis;
 
-import java.io.*;
-import java.util.*;
-import org.jdom.*;
-import org.jdom.output.*;
+import java.util.Iterator;
+import java.util.List;
+
+import org.jdom.Document;
+import org.jdom.Element;
+
 
 public class ConverterILandEOPtoILEOP {
 

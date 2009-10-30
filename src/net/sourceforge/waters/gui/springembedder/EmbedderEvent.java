@@ -89,4 +89,9 @@ public class EmbedderEvent extends EventObject
   //# Data Members
   private final EmbedderEventType mType;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

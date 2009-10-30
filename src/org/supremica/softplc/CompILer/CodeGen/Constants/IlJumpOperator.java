@@ -9,7 +9,7 @@ import java.util.*;
 
 public class IlJumpOperator
 {
-	private static List theInstructions = new ArrayList();
+	private static List<IlJumpOperator> theInstructions = new ArrayList<IlJumpOperator>();
 	private String instruction;
 
 	private IlJumpOperator(String s)
@@ -20,7 +20,7 @@ public class IlJumpOperator
 	}
 
 	/**iterator gives an iterator over the instruction constants*/
-	public static Iterator iterator()
+	public static Iterator<IlJumpOperator> iterator()
 	{
 		return theInstructions.iterator();
 	}

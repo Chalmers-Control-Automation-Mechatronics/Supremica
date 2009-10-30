@@ -11,7 +11,9 @@ import org.supremica.automata.LabeledEvent;
 public class AlphabetViewerSubTree
 	extends SupremicaTreeNode
 {
-	/**
+    private static final long serialVersionUID = 1L;
+
+    /**
 	 * DEPRECATED! Use AlphabetSubTree instead!!
 	 */
 	private AlphabetViewerSubTree(Automaton automaton)

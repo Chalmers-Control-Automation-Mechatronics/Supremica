@@ -6,8 +6,8 @@ import org.jdom.*;
 
 public class PlaceOperationDescriptions {
 
-Vector inlagda_operationer = new Vector();
-Vector senast_condition = new Vector();
+Vector<String> inlagda_operationer = new Vector<String>();
+Vector<?> senast_condition = new Vector<Object>();
 
 ConverterSTEPtoPA steptopa;
 
@@ -26,8 +26,8 @@ ConverterSTEPtoPA steptopa;
 		steptopa = steppa;
 
 		// Create a List of the involved POOs
-		List POOs = STEProot.getChildren("Process_operation_occurrence");
-		for(Iterator listPOO = POOs.iterator(); listPOO.hasNext(); )
+		List<?> POOs = STEProot.getChildren("Process_operation_occurrence");
+		for(Iterator<?> listPOO = POOs.iterator(); listPOO.hasNext(); )
 		{
 			Element poo_element = (Element) listPOO.next();
 			// Check is this POO belongs to a decompgroup and not an grouping.
@@ -86,7 +86,7 @@ ConverterSTEPtoPA steptopa;
 
 		Element pod_element = steptopa.getPODelement(pod);
 		Element pod_element_process_type = pod_element.getChild("Process_type");
-		String type = pod_element_process_type.getText();
+		pod_element_process_type.getText();
 
 		Element pod_element_id = pod_element.getChild("Id");
 		String id = pod_element_id.getText();
@@ -101,19 +101,19 @@ ConverterSTEPtoPA steptopa;
 
     public void CreateOperation(Element decomp_poo, Element PAroot, Element senastefliken, Element STEProot, String type) {
 
-		Vector total_resource_states = new Vector();
+		Vector<String> total_resource_states = new Vector<String>();
 
 		// 1. Get the relation and add it to the xml.
 		//Element relation = new Element(steptopa.getPodID(decomp_poo));
 		//senastefliken.addContent(relation);
 
 		// 2. Get all POOs within this decomposed POO POO17 = POO17_1 seq POO17_2 seq POO17_3 ...
-		Vector group = getDecompPOOs(decomp_poo);
+		Vector<Element> group = getDecompPOOs(decomp_poo);
 
 		int groupNr;
 		for (groupNr=0; groupNr < group.size(); groupNr=groupNr+1) {
 
-			Element group_member_element = (Element) group.elementAt(groupNr);
+			Element group_member_element = group.elementAt(groupNr);
 			String group_member_id = group_member_element.getAttributeValue("id");
 
 			Element poo_process = new Element("Process");
@@ -154,7 +154,7 @@ ConverterSTEPtoPA steptopa;
 			} else {
 
 				// 2. if it is not a decomposed process then the restrictions are added for each poo.
-				Vector conditions = getConditions(group_member_id, STEProot);
+				Vector<String> conditions = getConditions(group_member_id, STEProot);
 
 				boolean relation_type;
 				if (type != null) {
@@ -176,7 +176,7 @@ ConverterSTEPtoPA steptopa;
 					for (condition_nr=0; condition_nr < conditions.size(); condition_nr=condition_nr+1) {
 
 						// Each condition is a string expressions with possible several state conditions seperated by " ".
-						String condition = (String) conditions.elementAt(condition_nr);
+						String condition = conditions.elementAt(condition_nr);
 
 						int nr = condition.indexOf(" ");
 						int start_nr = 0;
@@ -219,7 +219,7 @@ ConverterSTEPtoPA steptopa;
 
 						} else { // Only one condition in string
 
-							Vector resource_state_vector = new Vector();
+							Vector<String> resource_state_vector = new Vector<String>();
 
 							String resource = get_resource(condition, STEProot);
 							resource_state_vector.add(resource);
@@ -232,8 +232,8 @@ ConverterSTEPtoPA steptopa;
 							int i;
 							for (i=0; i < total_resource_states.size(); i=i+2) {
 
-								String namn = (String) total_resource_states.elementAt(i);
-								String state = (String) total_resource_states.elementAt(i+1);
+								String namn = total_resource_states.elementAt(i);
+								String state = total_resource_states.elementAt(i+1);
 
 								Element condition_element = new Element("State");
 								condition_element.setAttribute("name", namn);
@@ -251,15 +251,15 @@ ConverterSTEPtoPA steptopa;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Vector getNewStates(Vector resource_state_vector, Vector total) {
+	public Vector<String> getNewStates(Vector<String> resource_state_vector, Vector<String> total) {
 
 		// Changes state for a specific resource in the condition vector.
-		String namn = (String) resource_state_vector.elementAt(0);
-		String state = (String) resource_state_vector.elementAt(1);
+		String namn = resource_state_vector.elementAt(0);
+		String state = resource_state_vector.elementAt(1);
 
 		int nr;
 		for (nr=0; nr < total.size(); nr=nr+2) {
-			String namn_total = (String) total.elementAt(nr);
+			String namn_total = total.elementAt(nr);
 			if (namn_total.equals(namn)) {
 				total.set(nr+1, state);
 			}
@@ -276,8 +276,8 @@ ConverterSTEPtoPA steptopa;
 		String id_resource = null;
 		String assigned_to = null;
 
-		List stateAssignmentList = STEProot.getChildren("State_assignment");
-		for(Iterator listSA = stateAssignmentList.iterator(); listSA.hasNext(); )
+		List<?> stateAssignmentList = STEProot.getChildren("State_assignment");
+		for(Iterator<?> listSA = stateAssignmentList.iterator(); listSA.hasNext(); )
 		{
 			Element sa_element = (Element) listSA.next();
 			String sa_id = sa_element.getAttributeValue("id");
@@ -288,8 +288,8 @@ ConverterSTEPtoPA steptopa;
 			}
 		}
 
-		List itemList = STEProot.getChildren("Item");
-		for(Iterator listItem = itemList.iterator(); listItem.hasNext(); )
+		List<?> itemList = STEProot.getChildren("Item");
+		for(Iterator<?> listItem = itemList.iterator(); listItem.hasNext(); )
 		{
 			Element item_element = (Element) listItem.next();
 			Element id = item_element.getChild("Id");
@@ -316,8 +316,8 @@ ConverterSTEPtoPA steptopa;
 		String state_namn = null;
 		String describedState = null;
 
-		List stateAssignmentList = STEProot.getChildren("State_assignment");
-		for(Iterator listSA = stateAssignmentList.iterator(); listSA.hasNext(); )
+		List<?> stateAssignmentList = STEProot.getChildren("State_assignment");
+		for(Iterator<?> listSA = stateAssignmentList.iterator(); listSA.hasNext(); )
 		{
 			Element sa_element = (Element) listSA.next();
 			String sa_id = sa_element.getAttributeValue("id");
@@ -328,8 +328,8 @@ ConverterSTEPtoPA steptopa;
 			}
 		}
 
-		List stateList = STEProot.getChildren("State");
-		for(Iterator listState = stateList.iterator(); listState.hasNext(); )
+		List<?> stateList = STEProot.getChildren("State");
+		for(Iterator<?> listState = stateList.iterator(); listState.hasNext(); )
 		{
 			Element state_element = (Element) listState.next();
 			String state_id = state_element.getAttributeValue("id");
@@ -349,23 +349,23 @@ ConverterSTEPtoPA steptopa;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void place_restriction(Element and, Element group_member_element, Element STEProot, Vector total_resource_states) {
+	public void place_restriction(Element and, Element group_member_element, Element STEProot, Vector<String> total_resource_states) {
 
-		Vector group = getDecompPOOs(group_member_element);
+		Vector<Element> group = getDecompPOOs(group_member_element);
 
 		int number_of_groupmembers = group.size();
 		int number_in_group;
 		for (number_in_group=0; number_in_group < number_of_groupmembers; number_in_group=number_in_group+1) {
 
-			Element group_element = (Element) group.elementAt(number_in_group);
+			Element group_element = group.elementAt(number_in_group);
 			String group_member_id = group_element.getAttributeValue("id");
 
-			Vector conditions = getConditions(group_member_id, STEProot);
+			Vector<String> conditions = getConditions(group_member_id, STEProot);
 
 			int condition_nr;
 			for (condition_nr=0; condition_nr < conditions.size(); condition_nr=condition_nr+1) {
 
-				String condition = (String) conditions.elementAt(condition_nr);
+				String condition = conditions.elementAt(condition_nr);
 
 				int nr = condition.indexOf(" ");
 				int start_nr = 0;
@@ -400,7 +400,7 @@ ConverterSTEPtoPA steptopa;
 
 				} else { // There is only one state in the string
 
-					Vector resource_state_vector = new Vector();
+					Vector<String> resource_state_vector = new Vector<String>();
 
 					// Find the resource_state
 					String resource = get_resource(condition, STEProot);
@@ -418,8 +418,8 @@ ConverterSTEPtoPA steptopa;
 		int i;
 		for (i=0; i < total_resource_states.size(); i=i+2) {
 
-			String namn = (String) total_resource_states.elementAt(i);
-			String state = (String) total_resource_states.elementAt(i+1);
+			String namn = total_resource_states.elementAt(i);
+			String state = total_resource_states.elementAt(i+1);
 
 			Element condition_element = new Element("State");
 			condition_element.setAttribute("name", namn);
@@ -432,13 +432,13 @@ ConverterSTEPtoPA steptopa;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Vector getDecompPOOs(Element poo) {
+	public Vector<Element> getDecompPOOs(Element poo) {
 
-		Vector group = new Vector();
+		Vector<Element> group = new Vector<Element>();
 
 		// Get all POOR for a specific POO
-		List poorList = poo.getChildren("Process_operation_occurrence_relationship");
-		for(Iterator listPOOR = poorList.iterator(); listPOOR.hasNext(); )
+		List<?> poorList = poo.getChildren("Process_operation_occurrence_relationship");
+		for(Iterator<?> listPOOR = poorList.iterator(); listPOOR.hasNext(); )
 		{
 			Element relation_member_element = (Element) listPOOR.next();
 			Element relType = relation_member_element.getChild("Relation_type");
@@ -458,12 +458,12 @@ ConverterSTEPtoPA steptopa;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Vector getConditions(String poo, Element STEProot) {
+	public Vector<String> getConditions(String poo, Element STEProot) {
 
-		Vector group = new Vector();
+		Vector<String> group = new Vector<String>();
 
-		List caList = STEProot.getChildren("Condition_assignment");
-		for(Iterator listCA = caList.iterator(); listCA.hasNext(); )
+		List<?> caList = STEProot.getChildren("Condition_assignment");
+		for(Iterator<?> listCA = caList.iterator(); listCA.hasNext(); )
 		{
 			Element ca_element = (Element) listCA.next();
 

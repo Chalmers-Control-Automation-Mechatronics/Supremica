@@ -56,14 +56,14 @@ public final class StateBlocks
 	private final StateCompressor compressor;
 	private final int nbrOfStatesInEachBlock; // number of states in this block
 	private int size = 0; // current number of states
-	private ArrayList stateBlocks;
+	private ArrayList<StateBlock> stateBlocks;
 	private StateBlock currBlock;
 
 	public StateBlocks(StateCompressor compressor, int nbrOfStatesInEachBlock)
 	{
 		this.compressor = compressor;
 		this.nbrOfStatesInEachBlock = nbrOfStatesInEachBlock;
-		stateBlocks = new ArrayList();
+		stateBlocks = new ArrayList<StateBlock>();
 		currBlock = new StateBlock(compressor, nbrOfStatesInEachBlock);
 		stateBlocks.add(currBlock);
 	}
@@ -85,7 +85,7 @@ public final class StateBlocks
 		// First get the block
 		int theBlockIndex = position / nbrOfStatesInEachBlock;
 		int theBlockPosition = position % nbrOfStatesInEachBlock;
-		StateBlock theBlock = (StateBlock)stateBlocks.get(theBlockIndex);
+		StateBlock theBlock = stateBlocks.get(theBlockIndex);
 		theBlock.get(theBlockPosition, theState);
 	}
 

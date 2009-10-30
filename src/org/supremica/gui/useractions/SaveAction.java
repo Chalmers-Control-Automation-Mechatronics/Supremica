@@ -8,7 +8,9 @@ import org.supremica.gui.ActionMan;
 public class SaveAction
 	extends AbstractAction
 {
-	public SaveAction()
+    private static final long serialVersionUID = 1L;
+
+    public SaveAction()
 	{
 		super();
 

@@ -1,16 +1,22 @@
 package org.supremica.external.processeditor.processgraph.opcell;
 
-import java.lang.*;
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import java.awt.Color;
+import java.awt.Font;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
+
 
 /**
  * Represents the attribute panel.
  */
 public class AttributePanel extends JPanel
 {
-    public String value = "";   
+
+	private static final long serialVersionUID = 1L;
+
+	public String value = "";   
     public String type = "";
     public Color attributeColor = Color.white;    
     public JLabel nameLabel = new JLabel();

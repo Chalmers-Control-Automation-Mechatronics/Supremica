@@ -5,7 +5,10 @@ import org.supremica.automata.*;
 public class SanchezTestCase
 	extends Automata
 {
+	private static final long serialVersionUID = 1L;
+	
 	private Project project;
+	@SuppressWarnings("unused")
 	private int blocks;
 
 	public SanchezTestCase(int blocks, int type)

@@ -6,7 +6,7 @@ public class IncompleteStateList
 {
 	private int count;
 	private String[] automata_names;
-	private Vector list;
+	private Vector<String[]> list;
 
 	public IncompleteStateList(BDDAutomaton[] as, int size)
 	{
@@ -18,7 +18,7 @@ public class IncompleteStateList
 			automata_names[i] = as[i].getName();
 		}
 
-		list = new Vector();
+		list = new Vector<String[]>();
 	}
 
 	public void insert(String[] list_)
@@ -45,7 +45,7 @@ public class IncompleteStateList
 		return automata_names;
 	}
 
-	public Vector getList()
+	public Vector<String[]> getList()
 	{
 		return list;
 	}

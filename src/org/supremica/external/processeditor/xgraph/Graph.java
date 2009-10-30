@@ -15,6 +15,8 @@ public class Graph
 					KeyListener,
 					CellListener
 {
+    private static final long serialVersionUID = 1L;
+
     public GraphEdge[] edges = new GraphEdge[0];
     public GraphCell[] cells = new GraphCell[0];    
     protected Selection selection = new Selection(this);

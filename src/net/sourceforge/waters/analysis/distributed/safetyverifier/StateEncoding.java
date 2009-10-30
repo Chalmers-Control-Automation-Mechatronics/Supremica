@@ -38,4 +38,10 @@ public abstract class StateEncoding implements Serializable
    */
   public abstract String interpret(StateTuple state);
   public abstract String interpret(int[] unpacked);
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

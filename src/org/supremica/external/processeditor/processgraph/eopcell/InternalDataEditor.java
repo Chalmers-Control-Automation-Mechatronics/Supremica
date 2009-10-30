@@ -18,7 +18,9 @@ public class InternalDataEditor
 							implements
 								ActionListener
 {
-	private JButton jbOk = null;
+    private static final long serialVersionUID = 1L;
+
+    private JButton jbOk = null;
 	private JButton jbCancel = null;
 	private JButton jbApply = null;
 	

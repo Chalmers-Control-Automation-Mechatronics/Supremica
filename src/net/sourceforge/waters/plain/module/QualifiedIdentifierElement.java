@@ -154,4 +154,9 @@ public final class QualifiedIdentifierElement
   private final IdentifierProxy mBaseIdentifier;
   private final IdentifierProxy mComponentIdentifier;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -1801684018144270566L;
+
 }

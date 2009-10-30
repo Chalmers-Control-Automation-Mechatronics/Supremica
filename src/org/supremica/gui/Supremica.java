@@ -48,22 +48,52 @@
  */
 package org.supremica.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import java.util.*;
-import java.io.*;
-import javax.help.*;
-import org.supremica.log.*;
-import org.supremica.*;
-import org.supremica.comm.xmlrpc.*;
-import org.supremica.gui.help.*;
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import javax.help.CSH;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JViewport;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+
+import org.supremica.Version;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.Project;
+import org.supremica.automata.IO.EncodingHelper;
+import org.supremica.automata.IO.ProjectBuildFromXML;
+import org.supremica.comm.xmlrpc.Server;
+import org.supremica.gui.help.ContentHelp;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
-import org.supremica.automata.*;
-import org.supremica.automata.IO.*;
-import org.supremica.gui.ide.actions.IDEActionInterface;
+
 
 public class Supremica
     extends JFrame
@@ -77,17 +107,21 @@ public class Supremica
     private MainToolBar toolBar = new MainToolBar(this);
     private MainPopupMenu mainPopupMenu = new MainPopupMenu(this);
     private VisualProjectContainer theVisualProjectContainer;
-    private TypeCellEditor typeEditor;
+    @SuppressWarnings("unused")
+	private TypeCellEditor typeEditor;
     private BorderLayout layout;
     private JTable theAutomatonTable;
     private TableSorter theTableSorter;
     private TableModel fullTableModel;
     private JScrollPane theAutomatonTableScrollPane;
-    private MenuHandler menuHandler;
+    @SuppressWarnings("unused")
+	private MenuHandler menuHandler;
     private JSplitPane splitPaneVertical;
-    private Server xmlRpcServer = null;
+    @SuppressWarnings("unused")
+	private Server xmlRpcServer = null;
     private ContentHelp help = null;
-    private CSH.DisplayHelpFromSource helpDisplayer = null;
+    @SuppressWarnings("unused")
+	private CSH.DisplayHelpFromSource helpDisplayer = null;
     
     // MF -- made publically available
     public static int TABLE_IDENTITY_COLUMN = 0;
@@ -278,11 +312,6 @@ public class Supremica
         }
     }
     
-    private JFrame getCurrentFrame()
-    {
-        return this;
-    }
-    
     // Component initialization
     private void jbInit()
     throws Exception
@@ -391,12 +420,12 @@ public class Supremica
         // XXX: where is my implementation dude???
     }
     
-    public void selectAutomata(Collection whichAutomata)
+    public void selectAutomata(Collection<?> whichAutomata)
     {
         // make it a name set. reason: automata object may be _equal_ but not _same_ :(
-        Collection which = new HashSet();
+        Collection<String> which = new HashSet<String>();
         
-        for (Iterator it = whichAutomata.iterator(); it.hasNext(); )
+        for (Iterator<?> it = whichAutomata.iterator(); it.hasNext(); )
         {
             Automaton a = (Automaton) it.next();
             
@@ -404,9 +433,7 @@ public class Supremica
         }
         
         theAutomatonTable.clearSelection();
-        
-        int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
-        
+        theAutomatonTable.getSelectedRows();
         for (int i = 0; i < theAutomatonTable.getRowCount(); i++)
         {
             try
@@ -502,10 +529,10 @@ public class Supremica
      *
      *@return  The selectedAutomataAsCollection value
      */
-    public Collection getSelectedAutomataAsCollection()
+    public Collection<Automaton> getSelectedAutomataAsCollection()
     {
         int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
-        LinkedList selectedAutomata = new LinkedList();
+        LinkedList<Automaton> selectedAutomata = new LinkedList<Automaton>();
         
         for (int i = 0; i < selectedRowIndices.length; i++)
         {
@@ -765,7 +792,8 @@ public class Supremica
         return newName;
     }
     
-    private int getIntegerInDialogWindow(String text)
+    @SuppressWarnings("unused")
+	private int getIntegerInDialogWindow(String text)
     {
         boolean finished = false;
         String theInteger = "";

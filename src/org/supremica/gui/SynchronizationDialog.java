@@ -57,7 +57,9 @@ import org.supremica.automata.algorithms.*;
 abstract class SynchronizationPanel
 	extends JPanel
 {
-	public abstract void update(SynchronizationOptions s);
+    private static final long serialVersionUID = 1L;
+
+    public abstract void update(SynchronizationOptions s);
 
 	public abstract void regain(SynchronizationOptions s);
 }

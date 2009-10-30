@@ -27,6 +27,11 @@ public class ToolGroupNodeAction
 	  "Create group nodes",
 	  "/icons/waters/nodegroup16.gif",
 	  ControlledToolbar.Tool.GROUPNODE);
-    }
+  }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

@@ -558,19 +558,9 @@ public class DocumentManager {
 
     //#######################################################################
     //# Simple Access
-    private URI getURI()
-    {
-      return mURI;
-    }
-
     private DocumentProxy getDocument()
     {
       return mDocument;
-    }
-
-    private long getOpeningTime()
-    {
-      return mOpeningTime;
     }
 
     //#######################################################################

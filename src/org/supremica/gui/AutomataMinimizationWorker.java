@@ -80,7 +80,7 @@ public class AutomataMinimizationWorker
     // For the stopping
     private ExecutionDialog executionDialog;
     private boolean stopRequested = false;
-    private ArrayList threadsToStop = new ArrayList();
+    private ArrayList<Stoppable> threadsToStop = new ArrayList<Stoppable>();
     
     public AutomataMinimizationWorker(Frame frame, Automata theAutomata, Project theProject, MinimizationOptions options)
     {
@@ -134,7 +134,7 @@ public class AutomataMinimizationWorker
             
             // Iterate over automata and minimize each individually
             int i = 0;
-            Iterator autIt = theAutomata.iterator();
+            Iterator<?> autIt = theAutomata.iterator();
             while (autIt.hasNext())
             {
                 Automaton currAutomaton = (Automaton) autIt.next();
@@ -277,9 +277,9 @@ public class AutomataMinimizationWorker
     {
         stopRequested = true;
         
-        for (Iterator exIt = threadsToStop.iterator(); exIt.hasNext(); )
+        for (Iterator<Stoppable> exIt = threadsToStop.iterator(); exIt.hasNext(); )
         {
-            ((Stoppable) exIt.next()).requestStop();
+            exIt.next().requestStop();
         }
         threadsToStop.clear();
         

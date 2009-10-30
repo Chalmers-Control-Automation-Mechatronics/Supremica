@@ -49,8 +49,8 @@
  */
 package org.supremica.automata.IO;
 
-import java.io.*;
-import java.util.*;
+import java.io.PrintWriter;
+
 
 public class SattLineHelper
 	extends ControlBuilderHelper
@@ -87,24 +87,15 @@ public class SattLineHelper
 
 	public void printFileHeader(PrintWriter pw, String fileName)
 	{
-
-		// Start of file header
-		Date theDate = new Date();
-
-		//logger.info(theDate.toString());
 		pw.println("\" Syntax version 2.19, date: 2004-01-27-20:33:34.140 N \" ");
 		pw.println("\"Original file date: ---\"");
 		pw.println("\"Program date: 2004-01-27-20:33:34.140, name: " + fileName + "\"");    // Should perhaps get current date and time
 		pw.println("(* This program unit was created by Supremica. *)");
 		pw.println("");
-
-		// End of file header
 	}
 
 	public void printBasePictureInvocation(PrintWriter pw)
 	{
-
-		// Start of BasePicture Invocation
 		pw.println("BasePicture Invocation");
 		pw.println("   ( 0.0 , 0.0 , 0.0 , 1.0 , 1.0 ");
 		pw.println("    ) : MODULEDEFINITION DateCode_ 492916896 ( GroupConn = ProgStationData.");    // Don't know importance of DateCode
@@ -113,7 +104,6 @@ public class SattLineHelper
 
 	public void printTypeDefinitions(PrintWriter pw)
 	{
-
 		// Empty
 	}
 

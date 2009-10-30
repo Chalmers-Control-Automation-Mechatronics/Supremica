@@ -9,16 +9,8 @@
 
 package org.supremica.automata.algorithms.scheduling.milp;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
 import org.supremica.automata.Automata;
-import org.supremica.util.ActionTimer;
+
 
 /**
  *

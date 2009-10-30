@@ -12,11 +12,10 @@ package net.sourceforge.waters.analysis.comp552;
 import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
-import java.net.InetAddress;
+import java.security.Permission;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.PropertyPermission;
-import java.security.Permission;
 
 
 class TeachingSecurityManager extends SecurityManager

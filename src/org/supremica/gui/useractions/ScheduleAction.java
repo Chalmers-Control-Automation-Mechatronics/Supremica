@@ -13,7 +13,10 @@ import org.supremica.gui.*;
 public class ScheduleAction
     extends AbstractAction
 {
-    private static Logger logger = LoggerFactory.createLogger(ScheduleAction.class);
+	private static final long serialVersionUID = 1L;
+	
+	@SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(ScheduleAction.class);
     
     public ScheduleAction()
     {
@@ -38,7 +41,7 @@ public class ScheduleAction
         try
         {
             // dlg = new ScheduleDialog(ActionMan.getGui());
-            dlg.setVisible(true);
+            // dlg.setVisible(true);
         }
         catch (Exception ex)
         {

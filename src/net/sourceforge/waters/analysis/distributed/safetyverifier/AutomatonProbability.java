@@ -3,7 +3,7 @@ package net.sourceforge.waters.analysis.distributed.safetyverifier;
 import java.util.Comparator;
 
 import net.sourceforge.waters.analysis.distributed.schemata.AutomatonSchema;
-import net.sourceforge.waters.analysis.distributed.schemata.ProductDESSchema;
+
 
 /**
  * A tuple containing an automaton and its estimated probability of

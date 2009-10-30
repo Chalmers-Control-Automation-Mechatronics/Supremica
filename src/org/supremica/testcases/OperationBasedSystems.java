@@ -2,14 +2,19 @@
 /** OperationBasedSystems.java ***************** */
 package org.supremica.testcases;
 
-import java.util.*;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import org.omg.CORBA.portable.IDLEntity;
-import org.supremica.automata.*;
-import org.supremica.automata.execution.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.log.*;
-import uk.ac.ic.doc.scenebeans.Null;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
+
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
+import org.supremica.automata.algorithms.AutomataSynchronizer;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+
 
 public class OperationBasedSystems
 {
@@ -45,10 +50,6 @@ public class OperationBasedSystems
     public TreeSet generateAllStates()
     {
         TreeSet output = new TreeSet();
-        Set<AutomatonProxy> allAutomata = project.getAutomata();
-        
-        
-        
         return output;
         
     }

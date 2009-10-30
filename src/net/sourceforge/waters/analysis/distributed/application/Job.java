@@ -78,4 +78,10 @@ public class Job extends AbstractJobDataDecorator
   {
     set(NODECOUNT_ATTR, count);
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

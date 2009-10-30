@@ -22,24 +22,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.*;
-
-import org.supremica.gui.Utility;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
-import net.sourceforge.waters.subject.base.ListSubject;
-import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+
+
+import org.supremica.gui.Utility;
 
 
 public class EditorEditEdgeDialog
@@ -91,7 +94,7 @@ public class EditorEditEdgeDialog
     con.gridy = 3;
     con.weightx = 0;
     con.weighty = 0;
-    con.anchor = con.EAST;
+    con.anchor = GridBagConstraints.EAST;
     layout.setConstraints(buttonPanel, con);
     buttonPanel.setAlignmentX(JPanel.RIGHT_ALIGNMENT);
     add(buttonPanel);
@@ -296,6 +299,7 @@ public class EditorEditEdgeDialog
 
   //#########################################################################
   //# Class Constants
+  private static final long serialVersionUID = 1L;
   private static final int fieldHeight = 100;
   private static final int fieldWidth = 200;
 

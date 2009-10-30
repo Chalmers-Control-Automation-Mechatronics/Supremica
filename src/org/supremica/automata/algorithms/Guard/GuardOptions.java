@@ -15,10 +15,9 @@
 
 package org.supremica.automata.algorithms.Guard;
 
-import org.supremica.automata.*;
-import org.supremica.log.*;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
-import org.supremica.util.SupremicaException;
 
 /**
  *
@@ -27,6 +26,7 @@ import org.supremica.util.SupremicaException;
 
 public final class GuardOptions
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(GuardOptions.class);
 	private String event;    
 	private int expressionType;    // 0: the guard expression will be generated from the forbidden states; 1: from forbidden states; 2: Optimal case

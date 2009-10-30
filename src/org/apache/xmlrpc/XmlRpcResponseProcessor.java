@@ -198,7 +198,7 @@ public class XmlRpcResponseProcessor
 	{
 
 		// System.err.println("error: "+message);
-		Hashtable h = new Hashtable();
+		Hashtable<String, Comparable> h = new Hashtable<String, Comparable>();
 
 		h.put("faultCode", new Integer(code));
 		h.put("faultString", message);

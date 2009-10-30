@@ -49,16 +49,15 @@
  */
 package org.supremica.automata.BDD;
 
-import org.supremica.log.*;
-import org.supremica.util.SupremicaException;
-import java.util.*;
-import java.io.*;
-import org.supremica.automata.*;
-import org.supremica.automata.IO.*;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 public class BDDSynthesizer
 {
-    private static Logger logger = LoggerFactory.createLogger(BDDSynthesizer.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(BDDSynthesizer.class);
     
     BDDAutomata bddAutomata;
     

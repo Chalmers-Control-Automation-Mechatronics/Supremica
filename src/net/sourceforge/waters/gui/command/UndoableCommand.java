@@ -7,6 +7,8 @@ import javax.swing.undo.CannotUndoException;
 public class UndoableCommand
     extends AbstractUndoableEdit
 {
+    private static final long serialVersionUID = 1L;
+
     private final Command mCommand;
     
     public UndoableCommand(Command command)

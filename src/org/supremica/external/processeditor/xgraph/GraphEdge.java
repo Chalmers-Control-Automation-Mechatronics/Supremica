@@ -1,9 +1,8 @@
 package org.supremica.external.processeditor.xgraph;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
 import java.awt.Graphics;
+import java.awt.Point;
+
 
 /**
  * Represents the edges that can be added and manipulated to the graph.

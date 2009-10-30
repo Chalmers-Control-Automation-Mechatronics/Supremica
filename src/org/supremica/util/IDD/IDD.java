@@ -55,12 +55,13 @@ import org.supremica.log.*;
 
 public final class IDD
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(IDD.class);
 	private final int nbrOfLevels;
 	private final int[] nbrOfBranches;
 	private final List[] theNodes;
-	private final HashMap theCopyCache;
-	private final HashMap theComputeCache;
+	private final HashMap<Integer, Node> theCopyCache;
+	private final HashMap<ComputeCacheNode, Node> theComputeCache;
 	int nbrOfNodes = 0;
 	private final Node rootNode;
 	private final Node terminal1Node;
@@ -74,12 +75,12 @@ public final class IDD
 		nbrOfLevels = nbrOfBranches.length;
 		this.nbrOfBranches = nbrOfBranches;
 		theNodes = new List[nbrOfLevels];
-		theCopyCache = new HashMap();
-		theComputeCache = new HashMap();
+		theCopyCache = new HashMap<Integer, Node>();
+		theComputeCache = new HashMap<ComputeCacheNode, Node>();
 
 		for (int i = 0; i < nbrOfLevels; i++)
 		{
-			List newArray = new ArrayList();
+			List<?> newArray = new ArrayList<Object>();
 
 			theNodes[i] = newArray;
 		}
@@ -282,7 +283,7 @@ public final class IDD
 	 * The level must be: 1 <= level <= nbrOfLevels - 1
 	 * where nbrOfLevels is equals to nbrOfBranches.length
 	 */
-	public List getNodesAtLevel(int level)
+	public List<?> getNodesAtLevel(int level)
 	{
 		if (level < 1)
 		{
@@ -304,7 +305,7 @@ public final class IDD
 	public Node getNode(Node theNode)
 	{
 		int level = theNode.getLevel();
-		Iterator nodeIt = theNodes[level].iterator();
+		Iterator<?> nodeIt = theNodes[level].iterator();
 
 		while (nodeIt.hasNext())
 		{
@@ -323,13 +324,14 @@ public final class IDD
 	 * The level of theNode must be: 1 <= level <= nbrOfLevels - 1
 	 * where nbrOfLevels is equals to nbrOfBranches.length
 	 */
-	public void addNode(Node theNode)
+	@SuppressWarnings("unchecked")
+    public void addNode(Node theNode)
 	{
 		int level = theNode.getLevel();
 
 		if (level > 0)
 		{
-			List levelList = theNodes[level];
+			List<Node> levelList = theNodes[level];
 
 			levelList.add(theNode);
 		}
@@ -819,7 +821,7 @@ public final class IDD
 	 */
 	public Node getFromCopyCache(Node key)
 	{
-		return (Node) theCopyCache.get(new Integer(key.getId()));
+		return theCopyCache.get(new Integer(key.getId()));
 	}
 
 	public void addToComputeCache(Node key1, Node key2, Node value)
@@ -833,7 +835,7 @@ public final class IDD
 	 */
 	public Node getFromComputeCache(Node key1, Node key2)
 	{
-		return (Node) theComputeCache.get(new ComputeCacheNode(key1, key2));
+		return theComputeCache.get(new ComputeCacheNode(key1, key2));
 	}
 
 	public int nbrOfNodes()

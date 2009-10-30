@@ -9,7 +9,9 @@ public class ModeTablePane
 						extends 
 							BasicTablePane
 {
-	public ModeTablePane(){
+    private static final long serialVersionUID = 1L;
+
+    public ModeTablePane(){
 		super();
 		setHeader(" ");
 		

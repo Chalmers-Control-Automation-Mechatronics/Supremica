@@ -25,7 +25,8 @@ public class ExtendedAutomataIndexMap {
     public final Map<String, Integer> variableStringToIndexMap;
     private final Map<Integer, VariableComponentProxy> indexToVariableMap;
 
-    private static Logger logger = LoggerFactory.createLogger(AutomataIndexMap.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(AutomataIndexMap.class);
 
     public ExtendedAutomataIndexMap(ExtendedAutomata theExAutomata)
     {

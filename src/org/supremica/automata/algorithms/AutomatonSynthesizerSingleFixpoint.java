@@ -19,12 +19,14 @@ public class AutomatonSynthesizerSingleFixpoint
     }
     
     // bit fields in the State::sethelper variable
-    private static final int SET_EMPTY = 0, SET_QX = 1, SET_B1 = 2,
+    @SuppressWarnings("unused")
+	private static final int SET_EMPTY = 0, SET_QX = 1, SET_B1 = 2,
         SET_A1 = 4, SET_A2 = 8, SET_B2 = 16, SET_MARK = 32
         ;
     
     // ---------------------------------------------------
-    private void remove(int mask)
+    @SuppressWarnings("unused")
+	private void remove(int mask)
     {
         int inv_bit = ~mask;
         Iterator stateIt = theAutomaton.stateIterator();
@@ -37,7 +39,8 @@ public class AutomatonSynthesizerSingleFixpoint
         }
     }
     
-    private void add(int mask)
+    @SuppressWarnings("unused")
+	private void add(int mask)
     {
         Iterator stateIt = theAutomaton.stateIterator();
         
@@ -49,7 +52,8 @@ public class AutomatonSynthesizerSingleFixpoint
         }
     }
     
-    private void set(int value)
+    @SuppressWarnings("unused")
+	private void set(int value)
     {
         Iterator stateIt = theAutomaton.stateIterator();
         
@@ -63,7 +67,8 @@ public class AutomatonSynthesizerSingleFixpoint
     
     // ---------------------------------------------------
     // if any elements are in mask, set to 'set' else remove 'remove'
-    private long union(int mask, int set, int remove)
+    @SuppressWarnings("unused")
+	private long union(int mask, int set, int remove)
     {
         int inv_remove = ~remove;
         long count = 0;
@@ -200,7 +205,8 @@ public class AutomatonSynthesizerSingleFixpoint
     // -----------------------------------------------------------------------------
     // B(X) = { q | E s \in S_uncontrollable  . \delta(q, s) \in X }
     // B1 : doB(1, 2)
-    private void doB(int mask, int set)
+    @SuppressWarnings("unused")
+	private void doB(int mask, int set)
     {
         Iterator stateIt = theAutomaton.stateIterator();
         

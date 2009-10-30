@@ -51,7 +51,6 @@ package org.supremica.util;
 
 public final class PriorityQueue
 {
-	private Element root = null;
 	private int size = 0;
 
 	public PriorityQueue() {}
@@ -82,7 +81,9 @@ public final class PriorityQueue
 class Element
 {
 	private PriorityQueueObject obj;
+	@SuppressWarnings("unused")
 	private Element left = null;
+	@SuppressWarnings("unused")
 	private Element right = null;
 
 	public Element(PriorityQueueObject obj)

@@ -231,7 +231,7 @@ public final class AutomataIndexForm
         typeIsSupSpecTable = new boolean[theAutomata.size()];
         automataSize = new int[theAutomata.size()];
         
-        for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+        for (Iterator<?> autIt = theAutomata.iterator(); autIt.hasNext(); )
         {
             Automaton currAutomaton = (Automaton) autIt.next();
             int i = indexMap.getAutomatonIndex(currAutomaton);
@@ -285,7 +285,7 @@ public final class AutomataIndexForm
         alphabetEventsTable = new boolean[nbrOfAutomata][theAlphabet.size()];
         prioritizedEventsTable = new boolean[nbrOfAutomata][theAlphabet.size()];
         
-        for (Iterator theAlphabetIt = theAlphabet.iterator();
+        for (Iterator<?> theAlphabetIt = theAlphabet.iterator();
         theAlphabetIt.hasNext(); )
         {
             LabeledEvent currEvent = (LabeledEvent) theAlphabetIt.next();
@@ -329,7 +329,7 @@ public final class AutomataIndexForm
         stateStatusTable = new int[theAutomata.size()][];
         automatonStateMaxIndex = new int[theAutomata.size()];
         
-        for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+        for (Iterator<?> autIt = theAutomata.iterator(); autIt.hasNext(); )
         {
             Automaton currAutomaton = (Automaton) autIt.next();
             int currAutomatonIndex = indexMap.getAutomatonIndex(currAutomaton);
@@ -374,6 +374,7 @@ public final class AutomataIndexForm
      * @param  theAutomaton Description of the Parameter
      * @exception  Exception Description of the Exception
      */
+    @SuppressWarnings("unchecked")
     void generateNextStateTransitionIndices(Automata theAutomata, Automaton theAutomaton)
     throws Exception
     {
@@ -388,9 +389,9 @@ public final class AutomataIndexForm
         outgoingEventsTable = new int[nbrOfAutomata][][];
         enableEventsTable = new int[nbrOfAutomata][][];
         
-        TreeSet sortedEventIndices = new TreeSet();
+        TreeSet<Integer> sortedEventIndices = new TreeSet<Integer>();
         int alphabetSize = theAlphabet.size();
-        Iterator autIt = theAutomata.iterator();
+        Iterator<?> autIt = theAutomata.iterator();
         
         while (autIt.hasNext())
         {
@@ -410,8 +411,9 @@ public final class AutomataIndexForm
                 enableEventsTable[currAutomatonIndex][i][0] = Integer.MAX_VALUE;
             }
             
-            Alphabet currAlphabet = currAutomaton.getAlphabet();
-            Iterator stateIt = currAutomaton.stateIterator();
+            @SuppressWarnings("unused")
+			Alphabet currAlphabet = currAutomaton.getAlphabet();
+            Iterator<?> stateIt = currAutomaton.stateIterator();
             
             while (stateIt.hasNext())
             {
@@ -431,11 +433,11 @@ public final class AutomataIndexForm
                 for (int i = 0; i < nbrOfEvents; i++)
                 {
                     nextStateTable[currAutomatonIndex][currStateIndex][i] = Integer.MAX_VALUE;
-                    sortedArcs[i] = new LinkedList();
+                    sortedArcs[i] = new LinkedList<Object>();
                 }
                 
                 // Iterate over outgoing arcs
-                Iterator outgoingArcsIt = currState.outgoingArcsIterator();
+                Iterator<?> outgoingArcsIt = currState.outgoingArcsIterator();
                 while (outgoingArcsIt.hasNext())
                 {
                     Arc currArc = (Arc) outgoingArcsIt.next();
@@ -481,12 +483,12 @@ public final class AutomataIndexForm
                 outgoingEventsTable[currAutomatonIndex][currStateIndex] = new int[sortedEventIndices.size()+1];
                 
                 // Now copy all indices to an int array
-                Iterator sortedEventIndicesIt = sortedEventIndices.iterator();
+                Iterator<Integer> sortedEventIndicesIt = sortedEventIndices.iterator();
                 int i = 0;
                 while (sortedEventIndicesIt.hasNext())
                 {
                     // Generate outgoingEventsTable
-                    int thisIndex = ((Integer) sortedEventIndicesIt.next()).intValue();
+                    int thisIndex = sortedEventIndicesIt.next().intValue();
                     outgoingEventsTable[currAutomatonIndex][currStateIndex][i++] = thisIndex;
                     
                     // Generate enableEventsTable
@@ -512,14 +514,14 @@ public final class AutomataIndexForm
                 // Generate nextStatesTable based on sortedArcs
                 for (i=0; i<nbrOfEvents; i++)
                 {
-                    LinkedList arcList = sortedArcs[i];
+                    LinkedList<?> arcList = sortedArcs[i];
                     
                     // Make new array
                     nextStatesTable[currAutomatonIndex][currStateIndex][i] = new int[arcList.size()+1];
                     
                     // Add the target states' indices
                     int j=0;
-                    for (Iterator arcIt = arcList.iterator(); arcIt.hasNext(); )
+                    for (Iterator<?> arcIt = arcList.iterator(); arcIt.hasNext(); )
                     {
                         Arc arc = (Arc) arcIt.next();
                         State currNextState = arc.getToState();
@@ -557,8 +559,8 @@ public final class AutomataIndexForm
         prevStatesTable = new int[nbrOfAutomata][][][];
         incomingEventsTable = new int[nbrOfAutomata][][];
         
-        TreeSet sortedEventIndices = new TreeSet();
-        Iterator autIt = theAutomata.iterator();
+        TreeSet<Integer> sortedEventIndices = new TreeSet<Integer>();
+        Iterator<?> autIt = theAutomata.iterator();
         
         while (autIt.hasNext())
         {
@@ -569,8 +571,9 @@ public final class AutomataIndexForm
             prevStatesTable[currAutomatonIndex] = new int[currAutomatonNbrOfStates][][];
             incomingEventsTable[currAutomatonIndex] = new int[currAutomatonNbrOfStates][];
             
-            Alphabet currAlphabet = currAutomaton.getAlphabet();
-            Iterator stateIt = currAutomaton.stateIterator();
+            @SuppressWarnings("unused")
+			Alphabet currAlphabet = currAutomaton.getAlphabet();
+            Iterator<?> stateIt = currAutomaton.stateIterator();
             
             while (stateIt.hasNext())
             {
@@ -589,7 +592,7 @@ public final class AutomataIndexForm
                 sortedEventIndices.clear();
                 
                 // Interate over incoming arcs
-                Iterator incomingArcsIt = currState.incomingArcsIterator();
+                Iterator<?> incomingArcsIt = currState.incomingArcsIterator();
                 while (incomingArcsIt.hasNext())
                 {
                     Arc currArc = (Arc) incomingArcsIt.next();
@@ -621,12 +624,12 @@ public final class AutomataIndexForm
                 incomingEventsTable[currAutomatonIndex][currStateIndex] = new int[sortedEventIndices.size() + 1];
                 
                 // Now copy all indices to an int array
-                Iterator sortedEventIndicesIt = sortedEventIndices.iterator();
+                Iterator<Integer> sortedEventIndicesIt = sortedEventIndices.iterator();
                 int i = 0;
                 
                 while (sortedEventIndicesIt.hasNext())
                 {
-                    int thisIndex = ((Integer) sortedEventIndicesIt.next()).intValue();
+                    int thisIndex = sortedEventIndicesIt.next().intValue();
                     
                     incomingEventsTable[currAutomatonIndex][currStateIndex][i++] = thisIndex;
                 }
@@ -664,7 +667,7 @@ public final class AutomataIndexForm
         
         int nbrOfAutomata = theAutomata.size();
         
-        for (Iterator theAlphabetIt = theAlphabet.iterator();
+        for (Iterator<?> theAlphabetIt = theAlphabet.iterator();
         theAlphabetIt.hasNext(); )
         {
             LabeledEvent currEvent = (LabeledEvent) theAlphabetIt.next();

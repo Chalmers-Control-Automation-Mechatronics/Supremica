@@ -223,7 +223,9 @@ public class Arc
     public static class EventComparator
         implements Comparator<Arc>, Serializable
     {
-        public int compare(Arc one, Arc two)
+		private static final long serialVersionUID = 1L;
+
+		public int compare(Arc one, Arc two)
         {
             return one.getEvent().compareTo(two.getEvent());
         }
@@ -288,8 +290,9 @@ public class Arc
 
     public void setProbability(double probability)
     {
-        String label = getEvent().getName();
-	this.probability = probability;
+        @SuppressWarnings("unused")
+		String label = getEvent().getName();
+        this.probability = probability;
     }
 
     public double getProbability()

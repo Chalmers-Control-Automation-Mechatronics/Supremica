@@ -64,17 +64,17 @@ import java.util.LinkedList;
 
 public class Actuator extends Equipment
 {
-    private List actuators; 
+    private List<Actuator> actuators; 
     // The order for the actuators are not important but I allways iterate through all elements.
     // Normally very few elements are used.
     
     public Actuator(String name)
     {
 	super(name);
-	actuators = new LinkedList();
+	actuators = new LinkedList<Actuator>();
     }
     
-    public List getActuators()
+    public List<Actuator> getActuators()
     {
 	return actuators;
     }

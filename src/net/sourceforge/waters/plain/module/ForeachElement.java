@@ -167,4 +167,9 @@ public abstract class ForeachElement
   private final SimpleExpressionProxy mGuard;
   private final List<Proxy> mBody;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 9066051134988041742L;
+
 }

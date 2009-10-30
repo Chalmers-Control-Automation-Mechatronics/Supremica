@@ -24,6 +24,7 @@ public class VisibilityGraphRelaxer
 
 	private volatile boolean relaxFromNodes;
 	private Automata plantAutomata;
+	@SuppressWarnings("unused")
 	private NodeExpander expander;
 	private ModifiedAstar scheduler;
 	private OneProductRelaxer oneProdRelaxer;

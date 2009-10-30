@@ -133,4 +133,9 @@ public final class IntConstantElement
   //# Data Members
   private final int mValue;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 6146767186819894411L;
+
 }

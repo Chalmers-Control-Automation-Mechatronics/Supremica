@@ -245,7 +245,6 @@ public class AdlinkPCI7432
 		throws Exception
 	{
 		AdlinkPCI7432 driver = new AdlinkPCI7432(0, false, true);
-		boolean[] inputs = new boolean[32];
 		boolean[] outputs = new boolean[32];
 
 		System.out.println("s 1: for setting output 1");

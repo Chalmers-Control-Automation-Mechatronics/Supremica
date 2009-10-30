@@ -61,7 +61,8 @@ public final class AutomataIndexMap
     private final Map<LabeledEvent, Integer> eventToIndexMap;
     private final LabeledEvent[] indexToEventArray;
     
-    private static Logger logger = LoggerFactory.createLogger(AutomataIndexMap.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(AutomataIndexMap.class);
     
     public AutomataIndexMap(final Automata theAutomata)
     {

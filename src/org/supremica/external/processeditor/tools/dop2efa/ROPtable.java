@@ -21,8 +21,10 @@ import org.supremica.external.processeditor.xml.Loader;
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 
 public class ROPtable extends JTable {
-    
-    ROPtableModel model;
+
+	private static final long serialVersionUID = 1L;
+
+	ROPtableModel model;
     
     protected String[] columnToolTips = {"Machine name",
     									 "Type",
@@ -208,9 +210,8 @@ public class ROPtable extends JTable {
 	//Implement table header tool tips. 
     protected JTableHeader createDefaultTableHeader() {
     	return new JTableHeader(columnModel) {
-    		
-    		public String getToolTipText(MouseEvent e) {
-    					String tip = null;
+			private static final long serialVersionUID = 1L;
+			public String getToolTipText(MouseEvent e) {
     					java.awt.Point p = e.getPoint();
     				
     					int index = columnModel.getColumnIndexAtX(p.x);

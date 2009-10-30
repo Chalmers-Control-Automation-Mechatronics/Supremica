@@ -772,7 +772,8 @@ public class Alphabet
         return listeners;
     }
     
-    private void notifyListeners()
+    @SuppressWarnings("unused")
+	private void notifyListeners()
     {
         if (listeners != null)
         {

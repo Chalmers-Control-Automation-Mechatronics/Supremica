@@ -58,7 +58,10 @@ import org.supremica.automata.Automata;
 public class AutomataStateViewer
         extends JPanel
 {
-    private Automata theAutomata;
+	private static final long serialVersionUID = 1L;
+	
+	@SuppressWarnings("unused")
+	private Automata theAutomata;
     private AutomataSynchronizerHelper helper;
     private int[] currState;
     private AutomataEventList forwardEvents;
@@ -67,8 +70,8 @@ public class AutomataStateViewer
     private AutomataStateDisplayer stateDisplayer;
     private JSplitPane eventSplitter;
     private JSplitPane stateEventSplitter;
-    private LinkedList prevStates = new LinkedList();
-    private LinkedList nextStates = new LinkedList();
+    private LinkedList<int[]> prevStates = new LinkedList<int[]>();
+    private LinkedList<int[]> nextStates = new LinkedList<int[]>();
     
     public AutomataStateViewer(AutomataSynchronizerHelper helper)
     {
@@ -127,7 +130,7 @@ public class AutomataStateViewer
     {
         if (prevStates.size() > 0)
         {
-            int[] newState = (int[]) prevStates.removeLast();
+            int[] newState = prevStates.removeLast();
             
             nextStates.addFirst(currState);
             setCurrState(newState, true);
@@ -143,7 +146,7 @@ public class AutomataStateViewer
     {
         if (nextStates.size() > 0)
         {
-            int[] newState = (int[]) nextStates.removeFirst();
+            int[] newState = nextStates.removeFirst();
             
             prevStates.addLast(currState);
             setCurrState(newState, true);

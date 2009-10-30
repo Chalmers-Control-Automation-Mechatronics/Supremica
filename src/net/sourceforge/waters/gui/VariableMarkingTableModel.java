@@ -122,4 +122,9 @@ public class VariableMarkingTableModel
     }
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

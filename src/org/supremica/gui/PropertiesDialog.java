@@ -58,27 +58,49 @@
 
 package org.supremica.gui;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.*;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
-import javax.swing.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
 import org.supremica.properties.BooleanProperty;
-import org.supremica.properties.Config;
 import org.supremica.properties.DoubleProperty;
 import org.supremica.properties.IntegerProperty;
+import org.supremica.properties.ObjectProperty;
 import org.supremica.properties.Property;
 import org.supremica.properties.PropertyType;
-import org.supremica.properties.ObjectProperty;
 import org.supremica.properties.SupremicaProperties;
 
 
@@ -290,6 +312,8 @@ public class PropertiesDialog
         extends JCheckBox
         implements Chooser
     {
+        private static final long serialVersionUID = 1L;
+
         private final BooleanProperty property;
 
         BooleanChooser(BooleanProperty property)
@@ -318,6 +342,8 @@ public class PropertiesDialog
         extends JPanel
         implements Chooser
     {
+        private static final long serialVersionUID = 1L;
+
         private final IntegerProperty property;
 
         JFormattedTextField text;
@@ -437,6 +463,8 @@ public class PropertiesDialog
         extends JPanel
         implements Chooser
     {
+        private static final long serialVersionUID = 1L;
+
         private final DoubleProperty property;
 
         JFormattedTextField text;
@@ -498,6 +526,8 @@ public class PropertiesDialog
         extends JPanel
         implements Chooser
     {
+        private static final long serialVersionUID = 1L;
+
         private final ObjectProperty property;
 
         private JTextField text = null;
@@ -559,13 +589,15 @@ class PropertiesControllerPanel
     extends JPanel
 {
     private static final long serialVersionUID = 1L;
-    private PropertiesDialog theDialog = null;
+    @SuppressWarnings("unused")
+	private PropertiesDialog theDialog = null;
 
     public PropertiesControllerPanel(PropertiesDialog theDialog)
     {
         this.theDialog = theDialog;
 
-        Box buttonBox = new Box(BoxLayout.X_AXIS);
+        @SuppressWarnings("unused")
+		Box buttonBox = new Box(BoxLayout.X_AXIS);
 
         Action applyAction = new ApplyChangesAction(theDialog);
         JButton applyButton = new JButton(applyAction);
@@ -583,7 +615,9 @@ class PropertiesControllerPanel
     private class CancelDialogAction
         extends AbstractAction
     {
-        private final JDialog dialog;
+        private static final long serialVersionUID = 1L;
+		
+		private final JDialog dialog;
 
         public CancelDialogAction(JDialog dialog)
         {
@@ -604,6 +638,8 @@ class PropertiesControllerPanel
     private class ApplyChangesAction
         extends AbstractAction
     {
+        private static final long serialVersionUID = 1L;
+
         private final PropertiesDialog dialog;
 
         public ApplyChangesAction(PropertiesDialog dialog)

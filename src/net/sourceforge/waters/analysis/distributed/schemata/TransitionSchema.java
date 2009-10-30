@@ -36,4 +36,9 @@ public class TransitionSchema implements Serializable
   private final int mSource;
   private final int mTarget;
   private final int mEventId;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 }

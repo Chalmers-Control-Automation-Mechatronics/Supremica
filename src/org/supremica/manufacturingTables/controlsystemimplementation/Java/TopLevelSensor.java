@@ -110,7 +110,7 @@ public class TopLevelSensor extends Sensor implements Listener
 	if (monitorOn)
 	{
 	    System.err.println("State monitoring!:");
-	    String monitoredState = requestState();
+	    requestState();
 	    //while (monitorOn) if (!((String) requestState()).equals(monitoredState()) alarm!...;
 	}
 	else 

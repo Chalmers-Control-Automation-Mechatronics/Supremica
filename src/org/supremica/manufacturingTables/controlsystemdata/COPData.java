@@ -67,7 +67,7 @@ public class COPData
     private String id;
     private String comment;
     private String machine;
-    private List activities; 
+    private List<COPActivity> activities; 
     // List of activities. Each activity contains (optional) preconditions for operations in other machines, and 
     // then always an operation for this COPs machine that has to be performed.
  
@@ -76,7 +76,7 @@ public class COPData
 	this.id = id;
 	this.machine = machine;
 	comment = null;
-	activities = new LinkedList();
+	activities = new LinkedList<COPActivity>();
     }
 
     public String getMachine()
@@ -105,7 +105,7 @@ public class COPData
 	activities.add(COPActivity);
     }
     
-    public List getCOPActivities()
+    public List<COPActivity> getCOPActivities()
     {
 	return activities;
     }

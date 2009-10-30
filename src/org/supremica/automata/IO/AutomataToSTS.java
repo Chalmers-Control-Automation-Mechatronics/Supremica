@@ -52,28 +52,24 @@ package org.supremica.automata.IO;
 import java.io.*;
 import java.util.*;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import org.supremica.log.*;
-import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.algorithms.AutomataSynthesizer;
-import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.SynthesizerOptions;
-import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 
 public class AutomataToSTS
     implements AutomataSerializer
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataToSTS.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(AutomataToSTS.class);
     private Automata automata;
-    private boolean includeCost = true;
+    @SuppressWarnings("unused")
+	private boolean includeCost = true;
     
     public AutomataToSTS(Automata automata)
     {
@@ -96,7 +92,7 @@ public class AutomataToSTS
         String initState = "";
         String memories = "";
         ArrayList<Object> markedStates = new ArrayList<Object>();
-        HashSet<String> tempMarkedStates = new HashSet();
+        HashSet<String> tempMarkedStates = new HashSet<String>();
         for(int i = 0; i<automata.size(); i++)
         {
             Automaton aut = automata.getAutomatonAt(i);
@@ -110,7 +106,7 @@ public class AutomataToSTS
             else
                 root[0][0] += "}";
 
-            tempMarkedStates = new HashSet();
+            tempMarkedStates = new HashSet<String>();
             root[0][i+1] = aut_name+" = OR { ";
             for(int j = 0; j<aut.nbrOfStates();j++)
             {

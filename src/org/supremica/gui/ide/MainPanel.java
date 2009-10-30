@@ -10,34 +10,22 @@
 package org.supremica.gui.ide;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
+
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import net.sourceforge.waters.gui.EditorWindowInterface;
-import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.xsd.base.EventKind;
-import org.supremica.gui.ide.actions.IDEAction;
-
-import org.supremica.log.*;
-
 import org.supremica.gui.WhiteScrollPane;
-import org.supremica.gui.ide.actions.Actions;
+
 
 abstract class MainPanel
     extends JPanel
 {
 
-    //######################################################################
+	//######################################################################
     //# Constructor
     public MainPanel(String name)
     {
@@ -139,5 +127,10 @@ abstract class MainPanel
 
     private EmptyRightPanel emptyRightPanel = new EmptyRightPanel();
     private String name;
+
+    
+    //######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
 
 }

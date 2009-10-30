@@ -113,8 +113,8 @@ class MainPopupMenu
         {
             verifyItem.setToolTipText("Verification is disabled--use the Workbench!");
             synthesizeItem.setToolTipText("Synthesis is disabled--use the Workbench!");
-            menuHandler.add(verifyItem, menuHandler.DISABLED);
-            menuHandler.add(synthesizeItem, menuHandler.DISABLED);
+            menuHandler.add(verifyItem, MenuHandler.DISABLED);
+            menuHandler.add(synthesizeItem, MenuHandler.DISABLED);
         }
         else
         {
@@ -423,7 +423,7 @@ class MainPopupMenu
             });
             
             // BDD crap, sorry for the compressed lines... /Arash
-            JMenuItem miR, miCR, miXXX;
+            JMenuItem miR, miCR;
             
             expMenu.addSeparator();
             expMenu.add(miR = new JMenuItem("BDD/Reachability"));

@@ -187,10 +187,7 @@ public class ActionTimer
     public String toStringShort()
     {
         final String hours = " h";
-        final String minutes = " m";
         final String seconds = " s";
-        final String milliseconds = " mi";
-
         // Calculate time
         long time = elapsedTime();    // time is in millisecs
 

@@ -104,4 +104,9 @@ public final class ParameterBindingElement
   //# Data Members
   private final ExpressionProxy mExpression;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 4082468244818880722L;
+
 }

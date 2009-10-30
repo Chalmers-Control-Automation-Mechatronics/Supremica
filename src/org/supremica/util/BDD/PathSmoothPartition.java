@@ -9,6 +9,7 @@ import java.util.*;
 public class PathSmoothPartition
 {
 	private int size, current;
+	@SuppressWarnings("unused")
 	private Cluster[] clusters;
 	private BDDAutomata manager;
 	private PathCluster[] pathclusters;

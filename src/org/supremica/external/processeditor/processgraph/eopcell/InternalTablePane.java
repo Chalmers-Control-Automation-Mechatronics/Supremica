@@ -26,7 +26,9 @@ public class InternalTablePane
 							ActionListener,
 							MouseListener
 {
-	public static final String ACTUATOR = "Actuator";
+    private static final long serialVersionUID = 1L;
+
+    public static final String ACTUATOR = "Actuator";
 	public static final String VARIABLE = "Variable";
 	public static final String SENSOR = "Sensor";
 	
@@ -193,6 +195,7 @@ public class InternalTablePane
 class InternalCellEditor extends
 							DefaultCellEditor
 {
+    private static final long serialVersionUID = 1L;
 	private static final String ACTUATOR = "Actuator";
 	private static final String VARIABLE = "Variable";
 	private static final String SENSOR = "Sensor";

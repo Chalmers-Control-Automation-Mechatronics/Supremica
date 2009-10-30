@@ -11,10 +11,8 @@
 package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
-import javax.swing.ImageIcon;
-import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 
@@ -27,7 +25,7 @@ public class CloseAction
     extends net.sourceforge.waters.gui.actions.IDEAction
 {
 
-    //#######################################################################
+	//#######################################################################
     //# Constructor
     CloseAction(final IDE ide)
     {
@@ -66,5 +64,10 @@ public class CloseAction
             break;
         }
     }
+
+    
+	//#######################################################################
+    //# Class Constants
+	private static final long serialVersionUID = 1L;
 
 }

@@ -150,4 +150,9 @@ public class EditNodeMarkingAction
   private final NodeSubject mNode;
   private final IdentifierSubject mIdentifier;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

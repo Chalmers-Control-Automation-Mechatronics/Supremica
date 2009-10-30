@@ -41,4 +41,9 @@ public class UnsupportedOperatorException extends EvalException {
           explanation + "!", location);
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

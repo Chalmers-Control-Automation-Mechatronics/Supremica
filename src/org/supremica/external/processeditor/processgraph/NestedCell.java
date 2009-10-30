@@ -1,16 +1,26 @@
 package org.supremica.external.processeditor.processgraph;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.math.*;
-import java.util.*;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.util.Iterator;
+
+import javax.swing.JList;
+import javax.swing.JPanel;
 
 import org.supremica.external.processeditor.processgraph.opcell.OperationCell;
-import org.supremica.external.processeditor.processgraph.opcell.*;
-import org.supremica.external.processeditor.xgraph.*;
-import org.supremica.external.processeditor.xml.*;
-import org.supremica.manufacturingTables.xsd.processeditor.*;
+import org.supremica.external.processeditor.xgraph.CellEvent;
+import org.supremica.external.processeditor.xgraph.CellListener;
+import org.supremica.external.processeditor.xgraph.GraphCell;
+import org.supremica.external.processeditor.xml.Converter;
+import org.supremica.manufacturingTables.xsd.processeditor.Activity;
+import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
+import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+import org.supremica.manufacturingTables.xsd.processeditor.Relation;
+import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
+
 
 /**
  * Allows a nested behaviour for cell components.
@@ -35,6 +45,8 @@ public class NestedCell
 						CellListener,
                         NestedCellListener
 {     
+    private static final long serialVersionUID = 1L;
+
     public int cellStepX = 0;    
     public int cellStepY = 0;
     public int conditionWidth = 30;
@@ -47,7 +59,7 @@ public class NestedCell
     public NestedCellListener nestedCellListener = null;       
     
     protected Object complexFunction = null;
-    public java.util.List list = null;    
+    public java.util.List<?> list = null;    
 
     public static boolean multiStructure;
     public boolean multiMode = true;
@@ -640,7 +652,7 @@ public class NestedCell
 	}	      
 	((OperationCell)operationCell).addNestedCellListener(this);
 	cell.insert(operationCell);		
-	operationCell.setPos(new Point(cell.marginX, cell.marginY));	
+	operationCell.setPos(new Point(NestedGraph.marginX, NestedGraph.marginY));	
 	OperationEdge upperEdge = new OperationEdge(this, 
 						    operationCell);	    
 	upperEdge.setAnchor(UPPER_CENTER, UPPER_CENTER);
@@ -664,7 +676,7 @@ public class NestedCell
      *
      * @param func iterates over the graph contents 
      */ 
-    protected void buildSequence(Iterator func) {
+    protected void buildSequence(Iterator<Object> func) {
 	try {
 	    Object o = func.next();
 	    GraphCell newCell = null;
@@ -710,15 +722,15 @@ public class NestedCell
 	if(cells.getCellCount() != 0) {	       		
 	    GraphCell cellBefore = cells.getCellAt(cells.getCellCount());
 	    cells.insert(newCell);			    
-	    newCell.setPos(new Point(cells.marginX,
+	    newCell.setPos(new Point(NestedGraph.marginX,
 				     cellBefore.getPos().y+
 				     cellBefore.getSize().height+
-				     cells.marginY+
+				     NestedGraph.marginY+
 				     cellStepY));			       
 	    cells.insert(new OperationEdge(cellBefore, newCell));     	    
 	}else {
 	    cells.insert(newCell);	    
-	    newCell.setPos(new Point(cells.marginX, cells.marginY));	    
+	    newCell.setPos(new Point(NestedGraph.marginX, NestedGraph.marginY));	    
 	    OperationEdge startEdge = new OperationEdge(this, newCell);
 	    startEdge.setAnchor(UPPER_CENTER, UPPER_CENTER);
 	    startEdge.setSourceAnchorRelativePos(false);
@@ -743,7 +755,7 @@ public class NestedCell
      *
      * @param func iterates over the graph contents 
      */ 
-    protected void buildAlternative(Iterator func) {
+    protected void buildAlternative(Iterator<Object> func) {
 	try {
 	    Object o = func.next();
 	    GraphCell newCell = null;
@@ -787,12 +799,12 @@ public class NestedCell
 	    cells.insert(newCell);
 	    newCell.setPos(new Point (cellBefore.getPos().x+
 				      cellBefore.getSize().width+
-				      cells.marginX+
+				      NestedGraph.marginX+
 				      cellStepX,
-				      cells.marginY));	 
+				      NestedGraph.marginY));	 
 	}else {
 	    cells.insert(newCell);
-	    newCell.setPos(new Point(cells.marginX, cells.marginY));
+	    newCell.setPos(new Point(NestedGraph.marginX, NestedGraph.marginY));
 	}	    	 
 	OperationEdge upperEdge = new OperationEdge(this, 
 						    newCell);	
@@ -817,7 +829,7 @@ public class NestedCell
      *
      * @param func iterates over the graph contents 
      */
-    protected void buildParallel(Iterator func) {
+    protected void buildParallel(Iterator<Object> func) {
 	try {
 	    Object o = func.next();
 	    GraphCell newCell = null;
@@ -861,12 +873,12 @@ public class NestedCell
 	    cells.insert(newCell);
 	    newCell.setPos(new Point (cellBefore.getPos().x+
 				      cellBefore.getSize().width+
-				      cells.marginX+
+				      NestedGraph.marginX+
 				      cellStepX,
-				      cells.marginY));	    	  
+				      NestedGraph.marginY));	    	  
 	}else {
 	    cells.insert(newCell);
-	    newCell.setPos(new Point(cells.marginX, cells.marginY));       
+	    newCell.setPos(new Point(NestedGraph.marginX, NestedGraph.marginY));       
 	}
 	OperationEdge upperEdge = new OperationEdge(this, 
 						    newCell);	
@@ -891,7 +903,7 @@ public class NestedCell
      *
      * @param func iterates over the graph contents 
      */ 
-    protected void buildArbitrary(Iterator func) {
+    protected void buildArbitrary(Iterator<Object> func) {
 	//DEBUG
 	//System.out.println("NestedCell.buildArbitrary()");
 	//END DEBUG
@@ -938,12 +950,12 @@ public class NestedCell
 	    cells.insert(newCell);
 	    newCell.setPos(new Point (cellBefore.getPos().x+
 				      cellBefore.getSize().width+
-				      cells.marginX+
+				      NestedGraph.marginX+
 				      cellStepX,
-				      cells.marginY));	  	   	    
+				      NestedGraph.marginY));	  	   	    
 	}else {
 	    cells.insert(newCell);
-	    newCell.setPos(new Point(cells.marginX, cells.marginY));
+	    newCell.setPos(new Point(NestedGraph.marginX, NestedGraph.marginY));
 	}
        
 	OperationEdge upperEdge = new OperationEdge(this, this);
@@ -1214,7 +1226,7 @@ public class NestedCell
      *
      * @return the activity/relation group
      */
-    public java.util.List getActivityRelationGroup() {
+    public java.util.List<Object> getActivityRelationGroup() {
 	if(getRelation() != null) {
 	    return getRelation().getActivityRelationGroup();
 	}else if(getROP() != null) {

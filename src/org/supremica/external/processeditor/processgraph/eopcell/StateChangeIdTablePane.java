@@ -9,6 +9,8 @@ public class StateChangeIdTablePane
                                 extends
                                     BasicTablePane
 {
+    private static final long serialVersionUID = 1L;
+
 	public StateChangeIdTablePane(){
 		super();
 		setHeader(" ");

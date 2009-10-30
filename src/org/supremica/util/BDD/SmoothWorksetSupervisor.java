@@ -35,7 +35,7 @@ public class SmoothWorksetSupervisor
 
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
 		int i_all = manager.and(plant.getI(), spec.getI());
-		int r_all_p, r_all = i_all;
+		int r_all = i_all;
 
 		manager.ref(i_all);    //gets derefed by orTo and finally a deref
 
@@ -55,9 +55,7 @@ public class SmoothWorksetSupervisor
 			{
 				gf.mark(clusters[p].toString());
 			}
-
-			int r_all_pp, front_s, front_sp;
-
+			int r_all_pp;
 			do
 			{
 				r_all_pp = r_all;
@@ -107,7 +105,7 @@ public class SmoothWorksetSupervisor
 
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
 		int m_all = GroupHelper.getM(manager, spec, plant);
-		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);    // gets derefed in first orTo ??
+		int r_all = manager.replace(m_all, perm_s2sp);    // gets derefed in first orTo ??
 
 		manager.deref(m_all);
 
@@ -135,11 +133,7 @@ public class SmoothWorksetSupervisor
 			{
 				gf.mark(clusters[p].toString());
 			}
-
-			int r_all_org, r_all_pp, front_s, front_sp;
-
-			r_all_org = r_all;
-
+			int r_all_pp;
 			do
 			{
 				r_all_pp = r_all;

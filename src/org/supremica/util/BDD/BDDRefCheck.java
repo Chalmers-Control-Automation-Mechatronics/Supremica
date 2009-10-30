@@ -41,6 +41,7 @@ class BDDRefCheck
 	}
 
 	/** Check all the refcounts */
+	@SuppressWarnings("unused")
 	private void check()
 	{
 		check(null);

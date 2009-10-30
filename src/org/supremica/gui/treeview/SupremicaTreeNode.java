@@ -12,6 +12,8 @@ import javax.swing.tree.*;
 public class SupremicaTreeNode
     extends DefaultMutableTreeNode
 {
+    private static final long serialVersionUID = 1L;
+
     boolean enabled = true;
     
     public SupremicaTreeNode()

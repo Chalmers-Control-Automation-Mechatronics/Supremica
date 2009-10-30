@@ -21,7 +21,9 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCImplicante
  * Fecha creación 12-jun-2006
  *
  */
-public class QMCDialogoImplicante extends JDialog {
+public class QMCDialogoImplicante extends JDialog
+{
+    private static final long serialVersionUID = 1L;
 
     private JPanel jContentPane = null;
 	private JButton botonAceptar = null;	

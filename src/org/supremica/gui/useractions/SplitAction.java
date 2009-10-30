@@ -17,7 +17,10 @@ import org.supremica.gui.ActionMan;
 public class SplitAction
 	extends AbstractAction
 {
-	private static Logger logger = LoggerFactory.createLogger(SplitAction.class);
+    private static final long serialVersionUID = 1L;
+	private static final Logger logger =
+	    LoggerFactory.createLogger(SplitAction.class);
+
 	private Automata newautomata;
 
 	public SplitAction()

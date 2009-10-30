@@ -43,7 +43,8 @@ public class VisGraphScheduler
     private ActionTimer timer = new ActionTimer();
     
     /** The index mapping handler */
-    private AutomataIndexMap indexMap;
+    @SuppressWarnings("unused")
+	private AutomataIndexMap indexMap;
     
     /** This boolean is true if the scheduler-thread should be (is) running */
     private volatile boolean isRunning = false;
@@ -372,6 +373,7 @@ public class VisGraphScheduler
      * the corresponding unbooking times. Also the total (independent) running
      * time of each robot is stored.
      */
+    @SuppressWarnings("unchecked")
     private synchronized void extractGraphTimes()
     throws Exception
     {
@@ -504,6 +506,7 @@ public class VisGraphScheduler
     }
     
     /** Now works only for two robots */
+    @SuppressWarnings("unchecked")
     private synchronized void init()
     throws Exception
     {

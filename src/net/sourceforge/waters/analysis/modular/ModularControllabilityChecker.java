@@ -213,6 +213,7 @@ public class ModularControllabilityChecker
 
   //#########################################################################
   //# Static Class Variables
+  @SuppressWarnings("unused")
   private static final Logger LOGGER =
     Logger.getLogger(ModularControllabilityChecker.class);
 }

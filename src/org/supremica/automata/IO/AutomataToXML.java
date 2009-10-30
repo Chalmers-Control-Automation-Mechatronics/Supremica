@@ -61,7 +61,8 @@ import org.supremica.automata.LabeledEvent;
 public class AutomataToXML
     implements AutomataSerializer
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataToXML.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(AutomataToXML.class);
     private Automata automata;
     private boolean includeCost = true;
     private boolean debugMode = false;

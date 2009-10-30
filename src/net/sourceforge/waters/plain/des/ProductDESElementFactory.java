@@ -211,4 +211,9 @@ public class ProductDESElementFactory
   private static final ProductDESElementFactory INSTANCE =
     new ProductDESElementFactory();
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

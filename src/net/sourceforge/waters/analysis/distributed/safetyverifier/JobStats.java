@@ -48,4 +48,10 @@ public class JobStats implements Serializable
 
 
   private final Map<String,Object> mStatsMap = new HashMap<String,Object>();
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

@@ -10,7 +10,6 @@
 package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 
 import net.sourceforge.waters.model.base.Proxy;

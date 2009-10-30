@@ -759,16 +759,6 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
 
     //#######################################################################
     //# Simple Access
-    CompiledSimpleNode getSource()
-    {
-      return mSource;
-    }
-
-    EventProxy getEvent()
-    {
-      return mEvent;
-    }
-
     CompiledSimpleNode getTarget()
     {
       return mTarget;
@@ -777,11 +767,6 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     CompiledNode getCause()
     {
       return mCause;
-    }
-
-    Proxy getLocation() 
-    {
-      return mLocation;
     }
 
     //#######################################################################

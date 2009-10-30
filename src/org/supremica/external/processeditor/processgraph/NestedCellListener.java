@@ -1,7 +1,8 @@
 package org.supremica.external.processeditor.processgraph;
 
-import java.awt.*;
-import javax.swing.*;
+import javax.swing.JList;
+
+
 /**
  * Handles the communication from a nested cell and to its listener.
  */

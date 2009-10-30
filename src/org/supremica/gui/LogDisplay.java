@@ -59,7 +59,12 @@
 package org.supremica.gui;
 
 import java.awt.Color;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,17 +78,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import javax.swing.*;
-import javax.swing.text.*;
+
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.helpers.OptionConverter;
-
-import org.supremica.gui.*;
+import org.apache.log4j.spi.LoggingEvent;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.log.LoggerFilter;
@@ -101,9 +115,7 @@ public class LogDisplay
     
     public static LogDisplay getInstance()
     {
-        final InterfaceManager interfaceManager =
-            InterfaceManager.getInstance();
-        final LoggerFactory factory = LoggerFactory.getInstance();
+        InterfaceManager.getInstance();
         if (theLogDisplay == null)
         {
             theLogDisplay = new LogDisplay();

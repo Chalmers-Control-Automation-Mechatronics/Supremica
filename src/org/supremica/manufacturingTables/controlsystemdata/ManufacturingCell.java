@@ -68,8 +68,8 @@ public class ManufacturingCell
 {
     private String name;
     private String description;
-    private Map machines; // HashMap will be used for quick access to the machines when registering EOPs
-    private List COPs; // The order for the COPs are not important but I allways iterate through all elements in the list.
+    private Map<String, MachineData> machines; // HashMap will be used for quick access to the machines when registering EOPs
+    private List<COPData> COPs; // The order for the COPs are not important but I allways iterate through all elements in the list.
     private List<ZoneData> zones; // -||-
 
     private Mailbox mailbox;
@@ -81,9 +81,9 @@ public class ManufacturingCell
 	this.name = name;
 	this.coordinator = coordinator;
 	description = null;
-	machines = new HashMap();  //default capacity (16) and load factor (0,75) suits me fine
+	machines = new HashMap<String, MachineData>();  //default capacity (16) and load factor (0,75) suits me fine
 	this.mailbox = mailbox;
-	COPs = new LinkedList();
+	COPs = new LinkedList<COPData>();
 	zones = new LinkedList<ZoneData>();
     }
 
@@ -122,14 +122,14 @@ public class ManufacturingCell
 	zones.add(zoneToAdd);
     }
 
-    public Map getMachines()
+    public Map<String, MachineData> getMachines()
     {
 	return machines;
     }
     
     public MachineData getMachine(String machineName)
     {
-	return (MachineData) machines.get(machineName);
+	return machines.get(machineName);
     }
     
     public void addMachine(MachineData machineToAdd)
@@ -142,7 +142,7 @@ public class ManufacturingCell
 	COPs.add(COPData);
     }
 
-    public List getCOPs()
+    public List<COPData> getCOPs()
     {
 	return COPs;
     }

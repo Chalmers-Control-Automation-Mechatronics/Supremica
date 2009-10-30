@@ -163,10 +163,10 @@ public class Server
     }
     
     // ---------------------------------------------------
-    public Vector getAutomataIdentities()
+    public Vector<String> getAutomataIdentities()
     {
-        Vector theIdentities = new Vector();
-        Iterator autIt = getActiveProject().iterator();
+        Vector<String> theIdentities = new Vector<String>();
+        Iterator<?> autIt = getActiveProject().iterator();
         
         while (autIt.hasNext())
         {
@@ -245,7 +245,7 @@ public class Server
         return escaped_xml;
     }
     
-    public String getAutomata(Vector automataIdentities)
+    public String getAutomata(Vector<?> automataIdentities)
     throws XmlRpcException
     {
         
@@ -298,7 +298,7 @@ public class Server
             throw new XmlRpcException(0, "Error while parsing automatonXmlEncoding: " + e.getMessage());
         }
         
-        Iterator autIt = project.iterator();
+        Iterator<?> autIt = project.iterator();
         
         if (!autIt.hasNext())
         {
@@ -330,7 +330,7 @@ public class Server
             throw new XmlRpcException(0, "Error while parsing automataXmlEncoding.");
         }
         
-        Iterator autIt = project.iterator();
+        Iterator<?> autIt = project.iterator();
         
         while (autIt.hasNext())
         {
@@ -349,7 +349,7 @@ public class Server
         return 0;    // ignore this
     }
     
-    public int removeAutomata(Vector automataIdentities)
+    public int removeAutomata(Vector<?> automataIdentities)
     throws XmlRpcException
     {
         for (int i = 0; i < automataIdentities.size(); i++)

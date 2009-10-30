@@ -9,10 +9,6 @@
 
 package net.sourceforge.waters.model.expr;
 
-import java.util.Comparator;
-
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-
 
 /**
  * <P>An operator table.</P>

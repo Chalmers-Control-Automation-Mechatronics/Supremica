@@ -434,6 +434,8 @@ public class Selection {
 	 * The selection frame it self.
 	 */
 	class SelectItem extends JPanel {
+	    private static final long serialVersionUID = 1L;
+
 	    public static final int SIZE_X = 6;
 	    public static final int SIZE_Y = 6;
 	    /**

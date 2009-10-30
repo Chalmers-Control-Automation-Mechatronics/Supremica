@@ -1,26 +1,34 @@
 package org.supremica.external.processeditor.processgraph.eopcell;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.Component;
 import java.math.BigInteger;
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.swing.JMenuItem;
 
-
-
 import org.supremica.external.processeditor.processgraph.table.BasicTable;
-import org.supremica.external.processeditor.processgraph.table.BasicTablePane;
 import org.supremica.external.processeditor.processgraph.table.TableEvent;
 import org.supremica.external.processeditor.processgraph.table.TableGroupPane;
+import org.supremica.manufacturingTables.xsd.eop.Action;
+import org.supremica.manufacturingTables.xsd.eop.ActuatorValue;
+import org.supremica.manufacturingTables.xsd.eop.EOP;
+import org.supremica.manufacturingTables.xsd.eop.ExternalComponentValue;
+import org.supremica.manufacturingTables.xsd.eop.ExternalComponents;
+import org.supremica.manufacturingTables.xsd.eop.InitialState;
+import org.supremica.manufacturingTables.xsd.eop.InternalComponents;
+import org.supremica.manufacturingTables.xsd.eop.ObjectFactory;
+import org.supremica.manufacturingTables.xsd.eop.SensorValue;
+import org.supremica.manufacturingTables.xsd.eop.VariableValue;
+import org.supremica.manufacturingTables.xsd.eop.ZoneState;
+import org.supremica.manufacturingTables.xsd.eop.Zones;
 
-import org.supremica.manufacturingTables.xsd.eop.*;
 
 public class EOPTableGroupPane 
-							extends 
-								TableGroupPane
+	extends TableGroupPane
 {
+    private static final long serialVersionUID = 1L;
 	private static final String ROWNAME = "Action "; 
 	
 	InternalTablePane tableInternal = null;

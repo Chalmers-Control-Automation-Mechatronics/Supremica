@@ -1,9 +1,17 @@
 package org.supremica.external.processeditor;
 
-import java.awt.*;
-import java.awt.print.*;
-import javax.swing.*;
-import java.lang.Math.*;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.print.PageFormat;
+import java.awt.print.Pageable;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+
+import javax.swing.JPanel;
+import javax.swing.RepaintManager;
+
 
 /**
  * Prints out graphs and selected objects.
@@ -11,17 +19,22 @@ import java.lang.Math.*;
 public class SOCGraphPrinter implements Printable, Pageable
 {
 
-    private final double INCH = 72;   
+    @SuppressWarnings("unused")
+	private final double INCH = 72;   
     private JPanel panel;
     private PageFormat mPageFormat;
-    private double xPrintSize , yPrintSize;    
+    @SuppressWarnings("unused")
+	private double xPrintSize , yPrintSize;    
 
     // Number between 0 and 1 the scales the pic between full pagesize and zero
-    private double scaleFactor = 0.25;           
+    @SuppressWarnings("unused")
+	private double scaleFactor = 0.25;           
     
-    private int numPages; // How many pages in the document
+    @SuppressWarnings("unused")
+	private int numPages; // How many pages in the document
     
-    private double printX, printY; // coordinates of upper-left of print area
+    @SuppressWarnings("unused")
+	private double printX, printY; // coordinates of upper-left of print area
     
     private double printWidth; // Width of the printable area
     

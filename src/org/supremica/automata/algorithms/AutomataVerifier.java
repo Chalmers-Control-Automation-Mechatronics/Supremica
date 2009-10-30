@@ -49,28 +49,36 @@
  */
 package org.supremica.automata.algorithms;
 
-import javax.swing.text.html.Option;
-import org.supremica.util.SupremicaException;
-import java.util.*;
-import org.supremica.gui.*;
-import org.supremica.log.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.State;
 import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomataIndexMap;
+import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.AutomataIndexMap;
-import org.supremica.automata.algorithms.minimization.MinimizationOptions;
-import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
-import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
+import org.supremica.automata.State;
+import org.supremica.automata.BDD.BDDVerifier;
 import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
 import org.supremica.automata.algorithms.minimization.MinimizationHelper;
-import org.supremica.automata.BDD.BDDVerifier;
-import org.supremica.util.BDD.*;
+import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
+import org.supremica.gui.ActionMan;
+import org.supremica.gui.AutomataVerificationWorker;
+import org.supremica.gui.ExecutionDialog;
+import org.supremica.gui.ExecutionDialogMode;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
+import org.supremica.util.SupremicaException;
+import org.supremica.util.BDD.Options;
+
 
 /**
  * For performing verification. Uses AutomataSynchronizerExecuter for much of the actual verification work.
@@ -100,7 +108,8 @@ public class AutomataVerifier
 
     // Used by findUncontrollableStates
     private AutomataSynchronizerHelper uncontrollabilityCheckHelper;
-    private ArrayList uncontrollabilityCheckExecuters = new ArrayList();
+    @SuppressWarnings("unused")
+	private ArrayList<?> uncontrollabilityCheckExecuters = new ArrayList<Object>();
 
     // Used in excludeUncontrollableStates
     private int stateAmountLimit;
@@ -127,8 +136,6 @@ public class AutomataVerifier
     public AutomataVerifier(Automata theAutomata, VerificationOptions verificationOptions, SynchronizationOptions synchronizationOptions, MinimizationOptions minimizationOptions)
     throws IllegalArgumentException, Exception
     {
-        Automaton currAutomaton;
-
         this.theAutomata = new Automata(theAutomata);
         this.verificationOptions = verificationOptions;
         this.synchronizationOptions = synchronizationOptions;
@@ -566,7 +573,7 @@ public class AutomataVerifier
         for (int i = 0; i < synchronizationExecuters.size(); i++)
         {
             AutomataSynchronizerExecuter currExec =
-                (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+                synchronizationExecuters.get(i);
 
             currExec.selectAutomata(selectedAutomata);
             currExec.start();
@@ -603,7 +610,7 @@ public class AutomataVerifier
         if (Config.VERBOSE_MODE.isTrue())
         {
             // For printing the names of the automata in selectedAutomata
-            for (Iterator autIt = selectedAutomata.iterator();
+            for (Iterator<?> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
                 automataNames = automataNames.append(((Automaton) autIt.next()).getName());
@@ -906,7 +913,7 @@ public class AutomataVerifier
         //
         int amountOfCommon = 0;
         int amountOfUnique = 0;
-        Iterator eventIterator = rightAlphabet.iterator();
+        Iterator<?> eventIterator = rightAlphabet.iterator();
         LabeledEvent currEvent;
 
         while (eventIterator.hasNext())
@@ -1015,13 +1022,13 @@ public class AutomataVerifier
                 // For the moment we assume that we only have one thread
                 for (int j = 0; j < synchronizationExecuters.size(); j++)
                 {
-                    AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(j);
+                    AutomataSynchronizerExecuter currExec = synchronizationExecuters.get(j);
 
                     currExec.selectAutomata(selectedAutomata);
                     currExec.start();
                 }
 
-                ((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
+                synchronizationExecuters.get(0).join();
 
                 if (stopRequested)
                 {
@@ -1031,7 +1038,7 @@ public class AutomataVerifier
                 // Examine if there are states in potentiallyUncontrollableStates
                 // that are not represented in the new synchronization
                 int stateCount = 0;
-                Iterator stateIt = synchHelper.getStateIterator();
+                Iterator<?> stateIt = synchHelper.getStateIterator();
                 while (stateIt.hasNext())
                 {
                     int[] currState = (int[]) stateIt.next();
@@ -1166,13 +1173,13 @@ public class AutomataVerifier
         // Start all the synchronization executers and wait for completion
         for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
         {
-            AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+            AutomataSynchronizerExecuter currExec = synchronizationExecuters.get(i);
 
             currExec.selectAllAutomata();
             currExec.start();
         }
 
-        ((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
+        synchronizationExecuters.get(0).join();
 
         return !uncontrollabilityCheckHelper.getAutomataIsControllable();
 
@@ -1222,8 +1229,9 @@ public class AutomataVerifier
      * @see org.supremica.util.BDD.BDDAutomata
      * @see AutomataBDDVerifier
      */
-    private boolean BDDLanguageInclusionVerification()
-    throws Exception
+    @SuppressWarnings("unused")
+	private boolean BDDLanguageInclusionVerification()
+    	throws Exception
     {
         Automata unselected = ActionMan.getGui().getUnselectedAutomata();
 
@@ -1406,13 +1414,13 @@ public class AutomataVerifier
         // Start all the synchronization executers and wait for completion
         for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
         {
-            AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+            AutomataSynchronizerExecuter currExec = synchronizationExecuters.get(i);
 
             currExec.selectAllAutomata();
             currExec.start();
         }
 
-        ((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
+        synchronizationExecuters.get(0).join();
 
         return synchHelper.getAutomataIsControllable();
     }
@@ -1501,11 +1509,12 @@ public class AutomataVerifier
      *
      * Does not use the synchHelper!
      */
-    private boolean isIndividuallyNonblocking()
-    throws Exception
+    @SuppressWarnings("unused")
+	private boolean isIndividuallyNonblocking()
+    	throws Exception
     {
         boolean allIndividuallyNonblocking = true;
-        Iterator autIt = theAutomata.iterator();
+        Iterator<?> autIt = theAutomata.iterator();
         Automaton currAutomaton;
 
         while (autIt.hasNext())
@@ -1660,19 +1669,19 @@ public class AutomataVerifier
             return monolithicNonblockingVerification();
     }
 
-    private boolean modularLanguageinclusionVerification(Automata inclusionAutomata)
-    throws Exception
+    @SuppressWarnings("unused")
+	private boolean modularLanguageinclusionVerification(Automata inclusionAutomata)
+    	throws Exception
     {
         prepareForLanguageInclusion(inclusionAutomata);
-
         return modularControllabilityVerification();
     }
 
-    private boolean monolithicLanguageinclusionVerification(Automata inclusionAutomata)
-    throws Exception
+    @SuppressWarnings("unused")
+	private boolean monolithicLanguageinclusionVerification(Automata inclusionAutomata)
+    	throws Exception
     {
         prepareForLanguageInclusion(inclusionAutomata);
-
         return monolithicControllabilityVerification();
     }
 
@@ -1713,8 +1722,8 @@ public class AutomataVerifier
         }
 
         // Examine all states, starting from the marked ones and moving backwards...
-        LinkedList statesToExamine = new LinkedList();
-        Iterator stateIterator = aut.stateIterator();
+        LinkedList<State> statesToExamine = new LinkedList<State>();
+        Iterator<?> stateIterator = aut.stateIterator();
         State currState;
 
         // Add all marked states
@@ -1733,7 +1742,7 @@ public class AutomataVerifier
         Iterator<Arc> incomingArcIterator;
         while (statesToExamine.size() > 0)
         {
-            examinedState = (State) statesToExamine.removeFirst();    // OBS. removeFirst!
+            examinedState = statesToExamine.removeFirst();    // OBS. removeFirst!
             incomingArcIterator = examinedState.incomingArcsIterator();
 
             while (incomingArcIterator.hasNext())
@@ -1821,7 +1830,7 @@ public class AutomataVerifier
         // Stop everything!
         for (int i = 0; i < synchronizationExecuters.size(); i++)
         {
-            ((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
+            synchronizationExecuters.get(i).requestStop();
         }
 
         if (threadToStop != null)

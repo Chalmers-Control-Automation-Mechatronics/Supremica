@@ -21,11 +21,17 @@ public class ShoeDEMO
 		shoeNr = nr;
 		stationVisit = sV;
 
+		@SuppressWarnings("unused")
 		IntegerVariable iv1 = shoe.createIntegerVariable(300, 50, "nrOfRot", "0");
+		@SuppressWarnings("unused")
 		IntegerVariable iv2 = shoe.createIntegerVariable(400, 50, "currentTable", "0");
+		@SuppressWarnings("unused")
 		BooleanVariable bv2 = shoe.createBooleanVariable(500, 50, "done", "0");
+		@SuppressWarnings("unused")
 		BooleanVariable sbv1 = shoe.createBooleanVariable(300, 150, "station0", "1");
+		@SuppressWarnings("unused")
 		BooleanVariable sbv2 = shoe.createBooleanVariable(400, 150, "station1", "1");
+		@SuppressWarnings("unused")
 		StringVariable sv = shoe.createStringVariable(500, 150, "pointerString", "");
 		String[] events = { "put_T0L", "put_T0R", "put_T1", "put_T2",
 							"put_T1_S0", "put_T2_S1", "get_T0L", "get_T0R",
@@ -304,7 +310,9 @@ public class ShoeDEMO
 	public void createonTable(GCDocument doc, int currentTable)
 	{
 		int y = 0;
+		@SuppressWarnings("unused")
 		BooleanVariable start = doc.createBooleanVariable(400, 150, "start", "0");
+		@SuppressWarnings("unused")
 		BooleanVariable leave = doc.createBooleanVariable(500, 150, "leavetable", "0");
 
 		if (currentTable == 1)
@@ -401,8 +409,11 @@ public class ShoeDEMO
 		int y = 0;
 
 		//create subdoc
+		@SuppressWarnings("unused")
 		BooleanVariable bv1 = doc.createBooleanVariable(500, 50, "start", "0");
+		@SuppressWarnings("unused")
 		BooleanVariable bv2 = doc.createBooleanVariable(600, 50, "moveReady", "0");
+		@SuppressWarnings("unused")
 		IntegerVariable iv1 = doc.createIntegerVariable(700, 50, "goto", "1");
 		GCStepInitial initialStep = doc.createInitialStep(100, y, "S_toTable" + currentTable + "_end", "S moveReady=0;");
 

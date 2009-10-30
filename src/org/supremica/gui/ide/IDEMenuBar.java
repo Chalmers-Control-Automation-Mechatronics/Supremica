@@ -59,11 +59,15 @@ public class IDEMenuBar
     extends JMenuBar
     implements Observer
 {
+    private static final long serialVersionUID = 1L;
+
     //#######################################################################
     //# Inner Class NewFromTemplateHandler
     class NewFromTemplateHandler
         implements ActionListener
     {
+        private static final long serialVersionUID = 1L;
+
         private TemplateItem item = null;
 
         public NewFromTemplateHandler(TemplateItem item)

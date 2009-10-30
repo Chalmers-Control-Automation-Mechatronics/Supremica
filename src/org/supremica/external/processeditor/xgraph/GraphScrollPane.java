@@ -1,16 +1,21 @@
 package org.supremica.external.processeditor.xgraph;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.Point;
+
+import javax.swing.JScrollPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 
 /**
  * Provides a scrollable view. 
  */
 public class GraphScrollPane extends JScrollPane implements ChangeListener {
 
-    public static final int MARGIN_RIGHT = 25;
+	private static final long serialVersionUID = 1L;
+
+	public static final int MARGIN_RIGHT = 25;
     public static final int MARGIN_LEFT = 25;
     public static final int MARGIN_DOWN = 25;
     public static final int MARGIN_UP = 25;

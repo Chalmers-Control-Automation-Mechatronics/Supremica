@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +26,6 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -37,7 +35,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
@@ -71,7 +68,6 @@ public class Projection2
     int numAutomata = mModel.getAutomata().size();
     AutomatonProxy[] aut = mModel.getAutomata().toArray(new AutomatonProxy[numAutomata]);
     eventAutomaton = new int[events.length][numAutomata];
-    int stateLength = numAutomata;
     int l = 0;
     // transitions indexed first by automaton then by event then by source state
     transitions = new int[numAutomata][events.length][];
@@ -318,7 +314,6 @@ public class Projection2
   
   public int[] actualState(int[] state)
   {
-    int numAutomata = transitions.length;
     int numHidden = mHide.size();
     SortedSet<Integer> setofstates = new TreeSet<Integer>();
     IntBag nextstate = new IntBag(100);
@@ -330,7 +325,6 @@ public class Projection2
     // find out what states can be reached from state with hidden events
     while (!nextstate.isEmpty()) {
       int s = nextstate.take();
-      events:
       for (int i = 0; i < numHidden; i++) {
         int newstate = transitions[0][i][s];
         if (newstate == -1) {
@@ -381,7 +375,8 @@ public class Projection2
       return Integer.toString(mName);
     }
     
-    public boolean refequals(Object o)
+    @SuppressWarnings("unused")
+	public boolean refequals(Object o)
     {
       if (o instanceof NamedProxy) {
         return refequals((NamedProxy) o);
@@ -600,7 +595,8 @@ public class Projection2
       return mMap.get(new IntArray(a));
     }
     
-    public StateProxy get(int[] a)
+    @SuppressWarnings("unused")
+	public StateProxy get(int[] a)
     {
       return mMap.get(new IntArray(a));
     }
@@ -637,12 +633,14 @@ public class Projection2
       return mMap.get(new IntArray(a));
     }
     
-    public Integer get(int[] a)
+    @SuppressWarnings("unused")
+	public Integer get(int[] a)
     {
       return mMap.get(new IntArray(a));
     }
     
-    public Integer put(Object o, Integer s)
+    @SuppressWarnings("unused")
+	public Integer put(Object o, Integer s)
     {
       return mMap.put(new IntArray((int[])o), s);
     }
@@ -715,6 +713,7 @@ public class Projection2
     }
   }
   
+  @SuppressWarnings("unused")
   private int mCompositionSize = 0;
   private int mNodeLimit;
   private ProductDESProxy mModel;

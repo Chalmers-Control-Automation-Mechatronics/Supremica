@@ -484,6 +484,7 @@ public class HornerPolynomial
     checkDegree(2, "Quadratic");
   }
 
+  @SuppressWarnings("unused")
   private void checkCubic()
   {
     checkDegree(3, "Cubic");

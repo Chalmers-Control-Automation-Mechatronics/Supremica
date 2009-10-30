@@ -78,7 +78,7 @@ public class InstanceEditorDialog
 		r3.add(cancelButton);
 		setContentPane(contentPanel);
 		pack();
-		show();
+		setVisible(true);
 	}
 
 
@@ -119,5 +119,10 @@ public class InstanceEditorDialog
 	private final JTextField mModuleInput = new JTextField(16);
 	private final JButton okButton = new JButton("OK");
 	private final ModuleWindowInterface mRoot;
+
+
+	//#########################################################################
+	//# Class Constants
+	private static final long serialVersionUID = 1L;
 
 }

@@ -39,4 +39,9 @@ public class RaisedDialogPanel extends JPanel
     setBorder(compound);
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

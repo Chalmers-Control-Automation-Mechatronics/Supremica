@@ -63,4 +63,9 @@ class EventListCell
   //# Data Members
   private final ModuleContext mContext;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

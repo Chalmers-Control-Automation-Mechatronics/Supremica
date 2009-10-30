@@ -11,8 +11,6 @@ public class ASH_MostCommonArcs
 {
 	public void choose(int queue_size)
 	{
-		int max = 0;
-
 		for (int i = 0; i < queue_size; i++)
 		{
 			BDDAutomaton automaton = list[queue[i]];

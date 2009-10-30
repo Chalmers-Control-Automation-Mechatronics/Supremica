@@ -152,4 +152,9 @@ public final class LoopTraceElement
   //# Data Members
   private final int mLoopIndex;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

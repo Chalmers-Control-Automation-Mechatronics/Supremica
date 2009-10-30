@@ -1,11 +1,17 @@
 package org.supremica.external.processeditor.processgraph;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Point;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
-import org.supremica.external.processeditor.processgraph.opcell.*;
-import org.supremica.external.processeditor.xgraph.*;
+import org.supremica.external.processeditor.xgraph.CellEvent;
+import org.supremica.external.processeditor.xgraph.CellListener;
+import org.supremica.external.processeditor.xgraph.Graph;
+import org.supremica.external.processeditor.xgraph.GraphCell;
+
 
 /**
  * Allows a nested behaviour for graph components.
@@ -20,10 +26,11 @@ import org.supremica.external.processeditor.xgraph.*;
  * The graph component can consecutively enclose other cells
  * that can be considered as graphs, i.e. nested cells.
  */
-public class NestedGraph extends Graph implements MouseListener,
-						  MouseMotionListener,
-						  KeyListener,
-                                                  CellListener {
+public class NestedGraph
+    extends Graph
+    implements MouseListener, MouseMotionListener, KeyListener, CellListener
+{
+    private static final long serialVersionUID = 1L;
     
     public CellListener graphListener; 
     public static int marginX = 10;

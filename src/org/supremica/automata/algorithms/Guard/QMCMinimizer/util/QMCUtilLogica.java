@@ -16,6 +16,7 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCImplicante
  *  Fecha 5/04/2006
  *
  */
+@SuppressWarnings("unchecked")
 public class QMCUtilLogica {
     
    

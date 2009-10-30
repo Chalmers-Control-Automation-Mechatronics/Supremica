@@ -58,24 +58,15 @@
 
 package org.supremica.gui;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
-import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.Filter;
-import org.apache.log4j.varia.NullAppender;
-
+import org.apache.log4j.spi.LoggingEvent;
 import org.supremica.log.LoggerFactory;
-import org.supremica.log.LoggerFilter;
 import org.supremica.log.SupremicaLevel;
 import org.supremica.properties.BooleanProperty;
 import org.supremica.properties.Config;

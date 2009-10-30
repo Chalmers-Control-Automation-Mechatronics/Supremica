@@ -55,4 +55,10 @@ public class JobResult extends AbstractJobDataDecorator
   {
     set(EXCEPTION_ATTR, exception);
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

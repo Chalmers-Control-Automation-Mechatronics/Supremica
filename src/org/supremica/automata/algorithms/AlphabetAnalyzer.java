@@ -61,7 +61,7 @@ public class AlphabetAnalyzer
      * Map from an Event-object to the Set of Automaton-objects that contains this event.
      */
     private Map<LabeledEvent,Automata> eventToAutomataMap;
-    private Collection eventCollection;
+    private Collection<Automata> eventCollection;
     
     public AlphabetAnalyzer(Automata theAutomata)
     {
@@ -107,7 +107,7 @@ public class AlphabetAnalyzer
      */
     public boolean isUnsynchronizedEvent(LabeledEvent ev)
     {
-        Set automatonSet = (Set) eventToAutomataMap.get(ev);
+        Set<?> automatonSet = (Set<?>) eventToAutomataMap.get(ev);
         
         if (automatonSet == null)
         {
@@ -145,11 +145,11 @@ public class AlphabetAnalyzer
         int newUnique = 0;
         boolean inLeft;
         boolean inRight;
-        Iterator eventMapIt = eventCollection.iterator();
+        Iterator<Automata> eventMapIt = eventCollection.iterator();
         
         while (eventMapIt.hasNext())
         {
-            Automata currSet = (Automata) eventMapIt.next();
+            Automata currSet = eventMapIt.next();
             
             inLeft = currSet.containsAutomaton(leftAut);
             inRight = currSet.containsAutomaton(rightAut);
@@ -226,9 +226,9 @@ public class AlphabetAnalyzer
      *
      * FIXME: this algorithm is currently not working :(
      */
-    public static HashSet getBlockedEvents(Automaton a)
+    public static HashSet<String> getBlockedEvents(Automaton a)
     {
-        HashSet ret = new HashSet();
+        HashSet<String> ret = new HashSet<String>();
         Alphabet alfa = a.getAlphabet();
         
         for (Iterator<LabeledEvent> evIt = alfa.iterator(); evIt.hasNext(); )

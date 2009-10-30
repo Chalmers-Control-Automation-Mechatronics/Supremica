@@ -362,7 +362,8 @@ public class XlsConverter implements FileConverter {
     public FileConverter newInstance() {
 	return new XlsConverter();
     }
-    private int getIndex(String attributeType) {
+    @SuppressWarnings("unused")
+	private int getIndex(String attributeType) {
 	int index = -1;
 	for(int i = 0; i < headers.length; i++) {
 	    if(attributeType.equals(headers[i])) {

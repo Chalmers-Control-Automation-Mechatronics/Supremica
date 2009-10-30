@@ -12,7 +12,10 @@ import javax.swing.*;
  */
 public class SOCFrame extends JFrame  {       
     
-    private JMenuBar jmb;   
+ 	private static final long serialVersionUID = 1L;
+ 	
+	@SuppressWarnings("unused")
+	private JMenuBar jmb;   
     private SOCGraphContainer table;   
     
     /**

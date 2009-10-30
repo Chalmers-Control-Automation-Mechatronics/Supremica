@@ -120,4 +120,9 @@ public abstract class AbstractNamedElement
     return name.compareTo(partnername);
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

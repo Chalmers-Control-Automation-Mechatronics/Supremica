@@ -57,6 +57,8 @@ import java.util.*;
 public class EventToAutomataMap
     extends HashMap<LabeledEvent,Automata>
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Inserts Automaton aut in the Automata that is found using the
      * LabeledEvent ev as a key in the map. Creates new Automata if there is none.

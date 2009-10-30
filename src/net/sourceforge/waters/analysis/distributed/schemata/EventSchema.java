@@ -37,7 +37,13 @@ public class EventSchema implements Serializable
   private final int mKind;
   private final boolean mObservable;
 
+
+  //#########################################################################
+  //# Class Constants
   public static final int CONTROLLABLE = 0;
   public static final int UNCONTROLLABLE = 1;
   public static final int PROPOSITION = 2;
+
+  private static final long serialVersionUID = 1L;
+
 }

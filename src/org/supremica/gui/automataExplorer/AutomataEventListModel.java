@@ -58,7 +58,9 @@ import org.supremica.log.*;
 public class AutomataEventListModel
         extends AbstractListModel
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataEventListModel.class);
+ 	private static final long serialVersionUID = 1L;
+
+	private static Logger logger = LoggerFactory.createLogger(AutomataEventListModel.class);
     
     private int[] currState;
     
@@ -67,8 +69,10 @@ public class AutomataEventListModel
     private int eventAmount = 0;
     private boolean forward;
     private Automata theAutomata;
-    private Alphabet theAlphabet;
-    private boolean showState = false;
+    @SuppressWarnings("unused")
+	private Alphabet theAlphabet;
+    @SuppressWarnings("unused")
+	private boolean showState = false;
     private AutomataSynchronizerHelper helper;
     
     public AutomataEventListModel(AutomataSynchronizerHelper helper, boolean forward)

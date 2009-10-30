@@ -1100,7 +1100,8 @@ public class COPBuilder {
     	return s.substring(0, s.indexOf(EVENT_MACHINE_SEPARATOR));
     }
     
-    private void removeMachineNameFromActivitiesInROP(final ROP rop){
+    @SuppressWarnings("unused")
+	private void removeMachineNameFromActivitiesInROP(final ROP rop){
     	
     	final String strMachineName;
     	
@@ -1171,7 +1172,8 @@ public class COPBuilder {
     	}
     }
     
-    private void removeDuplicatesOfPreconditionsInOperations(final Relation relation){
+    @SuppressWarnings("unused")
+	private void removeDuplicatesOfPreconditionsInOperations(final Relation relation){
     	
     	//Sanity check
     	if( null == relation){

@@ -11,7 +11,6 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -240,15 +239,6 @@ public class MonolithicConflictChecker
 
   //#########################################################################
   //# Auxiliary Static Methods
-  private static String longbits(long x)
-  {
-    final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < 64; i++) {
-      sb.append((((x >> i) & 1) == 0) ? "0" : "1");
-    }
-    return sb.toString();
-  }
-
   private static int clog2(int x)
   {
     x--;
@@ -346,8 +336,7 @@ public class MonolithicConflictChecker
         assert state[i] != null : "Every automaton must have an initial state";
       }
       long init = mStateSchema.encodeState(state);
-      // Register the initial state.
-      int initid = registerState(init);
+      registerState(init);
 
       // Expand all the states in the fringe, until no more
       // are added. This implies we have explored the entire
@@ -512,7 +501,6 @@ public class MonolithicConflictChecker
                             final EventProxy marking)
       throws OverflowException
     {
-      mEventMap = eventmap;
       // Build the schema for each automata. This gives
       // a fixed ordering for automata
       final Set<AutomatonProxy> automata = model.getAutomata();
@@ -620,10 +608,6 @@ public class MonolithicConflictChecker
      * State encoding data for the synchronous product.
      */
     private final StateEncodingData[] mEncondings;
-    /**
-     * Mapping of events to integer IDs.
-     */
-    private final EventMap mEventMap;
 
   }
 
@@ -644,7 +628,6 @@ public class MonolithicConflictChecker
                     final EventMap eventmap,
                     final EventProxy marking)
     {
-      mAutomaton = automaton;
       // Enumerate the state set for this automata.
       // This gives an ordering to the states.
       final Set<StateProxy> states = automaton.getStates();
@@ -690,18 +673,6 @@ public class MonolithicConflictChecker
       }
     }
 
-    //#######################################################################
-    //# Simple Access
-    /**
-     * Get a state, given its number in the state
-     * enumeration.
-     */
-    StateProxy getNumberedState(int state)
-    {
-      assert state >= 0 && state < mStates.length: "State out of range";
-      return mStates[state];
-    }
-
     /**
      * Gets the state number, given a state.
      */
@@ -716,14 +687,6 @@ public class MonolithicConflictChecker
     int stateSize()
     {
       return mStates.length;
-    }
-
-    /**
-     * Return the event set for the automaton.
-     */
-    Set<EventProxy> getEvents()
-    {
-      return mAutomaton.getEvents();
     }
 
     StateProxy getInitialState()
@@ -745,26 +708,6 @@ public class MonolithicConflictChecker
       }
     }
 
-    /**
-     * A predicate to check whether an event is enabled
-     * from a given state.
-     */
-    boolean isEventEnabled(final int src, final int event)
-    {
-      return getSuccessorState(src, event) >= 0;
-    }
-
-    /*
-    TIntHashSet getOutgoingTransitions(int state)
-    {
-      TransitionData td = transitions.getTransitions(state);
-      if (td == null) {
-        return null;
-      }
-      return td.out;
-    }
-    */
-
     boolean isMarked(int state)
     {
       if (mMarkedStates == null) {
@@ -777,11 +720,7 @@ public class MonolithicConflictChecker
 
     //#######################################################################
     //# Data Members
-    /**
-     * The automaton object for this schema.
-     */
-    private final AutomatonProxy mAutomaton;
-    /**
+   /**
      * An array of states in the automata, with a
      * fixed ordering.
      */
@@ -903,80 +842,6 @@ public class MonolithicConflictChecker
 
 
   //#########################################################################
-  //# Inner Class Transition
-  /**
-   * A transition in the synchronous product.
-   * the source and destination are stored as encoded
-   * states in the automaton, and the event is stored
-   * as an integer, the index of the event in the
-   * events array.
-   */
-  private static class Transition implements Comparable<Transition>
-  {
-    //#######################################################################
-    //# Data Members
-    Transition (long src, long dest, int e)
-    {
-      source = src;
-      destination = dest;
-      event = e;
-    }
-
-    //#######################################################################
-    //# Overrides for java.lang.Object
-    public boolean equals (Object o)
-    {
-      if (o == null) return false;
-      if (!(o instanceof Transition)) return false;
-
-      Transition t = (Transition)o;
-      return t.source == source &&
-        t.destination == destination &&
-        t.event == event;
-    }
-
-    public int hashCode()
-    {
-      //This is a crap hashcode, only implemented to
-      //satisfy the equality contract.
-      return (int) (source + destination + event);
-    }
-
-    public int compareTo(Transition t)
-    {
-      //What a horrible control flow hack, to avoid
-      //repeating code to make sure the result is not
-      //borked with a cast to integer. This could
-      //arise if two states had a difference that could
-      //not fit into a 32 bit integer.
-      long x = t.source - source;
-      do {
-        if (x != 0)
-          break;
-
-        x = t.destination - destination;
-        if (x != 0)
-          break;
-
-        x = t.event - event;
-      } while (false);
-
-      if (x > 0)
-        return 1;
-      if (x < 0)
-        return -1;
-      return 0;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final long source;
-    private final long destination;
-    private final int event;
-
-  }
-
-  //#########################################################################
   //# Inner Class TransitionStore
   /**
    * An attempt to efficiently allocate memory for
@@ -1047,7 +912,8 @@ public class MonolithicConflictChecker
       return (t << 8) | (chunkptr & 255);
     }
 
-    int transitionCount()
+    @SuppressWarnings("unused")
+	int transitionCount()
     {
       return transition_count;
     }
@@ -1165,9 +1031,6 @@ public class MonolithicConflictChecker
   }
 
 
-  //#########################################################################
-  //# Data Members
-  private boolean result = false;
   private EventMap mEventMap;
   private SyncProduct mSyncProduct;
 

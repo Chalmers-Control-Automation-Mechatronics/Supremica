@@ -271,18 +271,18 @@ abstract public class MachineController
 
     // Add/register an eop to the machine controller. For alternative EOPs many EOPs can have the same operation
     // number and those are stored in a list
-     final public void registerEOP(EOP EOP)  
+     final public void registerEOP(EOP eop)  
      {
- 	List EOPList = EOPs.get(EOP.getId());
-	if (EOPList != null && EOP.getType().equals(EOP.ALTERNATIVE_TYPE))
+ 	List<EOP> EOPList = EOPs.get(eop.getId());
+	if (EOPList != null && eop.getType().equals(EOP.ALTERNATIVE_TYPE))
  	{
- 	    EOPList.add(EOP);
+ 	    EOPList.add(eop);
  	}
  	else if (EOPList == null)
  	{
- 	    EOPList = new LinkedList();
- 	    EOPList.add(EOP);
- 	    EOPs.put(EOP.getId(), EOPList);
+ 	    EOPList = new LinkedList<EOP>();
+ 	    EOPList.add(eop);
+ 	    EOPs.put(eop.getId(), EOPList);
  	}
  	else
  	{

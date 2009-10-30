@@ -9,17 +9,20 @@
 
 package org.supremica.gui.ide.actions;
 
-import javax.swing.AbstractButton;
+import java.util.List;
+
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
-import java.util.List;
+
 
 public abstract class IDEAction
     extends AbstractAction
 {
+	private static final long serialVersionUID = 1L;
 
-    protected IDEActionInterface ide;
-    private int minimumNumberOfSelectedComponents = 0;
+	protected IDEActionInterface ide;
+    @SuppressWarnings("unused")
+	private int minimumNumberOfSelectedComponents = 0;
     private boolean editorActiveRequired = false;
     private boolean analyzerActiveRequired = false;
 

@@ -12,6 +12,8 @@ public class DisabledEvents
   extends NamedElement
   implements EventProxy
 {
+  private static final long serialVersionUID = 1L;
+
   private final Set<EventProxy> mDisabled;
   
   public DisabledEvents(Set<EventProxy> disabled)

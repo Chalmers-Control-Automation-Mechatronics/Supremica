@@ -68,14 +68,14 @@ public class VariableData
 {
     private String name;
     private String initialValue;
-    private List values; 
+    private List<String> values; 
     // The order for the values are not important but I allways iterate through all values.
     // Normally very few elements are used.
 
     public VariableData(String name)
     {
 	this.name = name;
-	values = new LinkedList();
+	values = new LinkedList<String>();
 	initialValue = null;
     }
 
@@ -84,7 +84,7 @@ public class VariableData
 	return name;
     }
    
-    public List getValues()
+    public List<String> getValues()
     {
 	return values;
     }

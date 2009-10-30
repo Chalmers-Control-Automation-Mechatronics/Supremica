@@ -18,10 +18,12 @@ import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
  *
  */
 public class DOPtoEFAInterface
-						extends JFrame 
-									implements ActionListener{
-	
-	ConvertPanel cPanel;
+	extends JFrame 
+	implements ActionListener
+{
+    private static final long serialVersionUID = 1L;
+
+    ConvertPanel cPanel;
 	SOCGraphContainer graphContainer;
 	
 	public DOPtoEFAInterface(){

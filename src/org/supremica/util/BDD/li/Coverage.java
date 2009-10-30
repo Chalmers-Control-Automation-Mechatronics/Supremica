@@ -16,6 +16,7 @@ public class Coverage
 {
 	private BaseLI li;
 	private BDDAutomaton target;
+	@SuppressWarnings("unused")
 	private boolean ctrl, last_was_spec;
 	private int size;
 	private int num_locals;

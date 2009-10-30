@@ -102,4 +102,9 @@ public final class PointGeometryElement
   //# Data Members
   private final Point2D mPoint;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 5704991697433114501L;
+
 }

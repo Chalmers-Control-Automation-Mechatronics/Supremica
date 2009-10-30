@@ -3,8 +3,7 @@ package net.sourceforge.waters.analysis;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
 import gnu.trove.TIntStack;
-import gnu.trove.TIntArrayList;
-import java.util.Arrays;
+
 
 public class CertainConflict
 {

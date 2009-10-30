@@ -13,7 +13,6 @@ package org.supremica.gui.ide;
 import java.awt.Component;
 import java.io.File;
 import java.net.MalformedURLException;
-import javax.swing.JTabbedPane;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 

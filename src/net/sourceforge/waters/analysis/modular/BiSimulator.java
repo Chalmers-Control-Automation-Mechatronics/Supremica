@@ -27,7 +27,6 @@ import gnu.trove.TObjectProcedure;
 
 import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -48,6 +47,7 @@ public class BiSimulator
   private final Collection<EventProxy>[] mProps;
   private final EventProxy[] mEvents;
   private final boolean[] mIsInitial;
+  @SuppressWarnings("unused")
   private EventProxy mMark;
   private SimpleEquivalenceClass[] mStateToClass;
   private THashSet<SimpleEquivalenceClass> mWS;
@@ -138,7 +138,6 @@ public class BiSimulator
   public AutomatonProxy run()
   {
     setupInitialPartitions();
-    int size = -1;
     while (true) {
       System.out.println("partitioning");
       while (true) {
@@ -182,7 +181,6 @@ public class BiSimulator
     }
     final THashMap<SimpleEquivalenceClass,StateProxy> classToState =
       new THashMap<SimpleEquivalenceClass,StateProxy>(mP.size());
-    final TIntArrayList marked = new TIntArrayList();
     final Collection<StateProxy> states = new ArrayList<StateProxy>(mP.size());
     mP.forEach(new TObjectProcedure<SimpleEquivalenceClass>() {
       int state = 0;

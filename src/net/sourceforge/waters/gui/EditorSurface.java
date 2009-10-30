@@ -9,16 +9,15 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
 import java.util.Collections;
 import java.util.List;
+
 import javax.swing.JComponent;
 
 import net.sourceforge.waters.gui.renderer.AbstractRendererShape;
@@ -316,5 +315,10 @@ public class EditorSurface
         /** Is being draggedOver but can't drop held object. */
         CANTDROP;
     }
-    
+
+
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
 }

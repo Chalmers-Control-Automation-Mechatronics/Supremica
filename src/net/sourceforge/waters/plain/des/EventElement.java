@@ -130,4 +130,9 @@ public final class EventElement
   private final EventKind mKind;
   private final boolean mIsObservable;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

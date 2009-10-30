@@ -21,13 +21,13 @@ public class Shell
 
 	/** execute once every [interval] ms */
 	static short interval = 40;
-	Constructor classConstructor;
+	Constructor<?> classConstructor;
 
 	public Shell(String io, String path, String name)
 	{
 		if ((io.length() > 0) && (name.length() > 0))
 		{
-			Class IOClass;
+			Class<?> IOClass;
 
 			try
 			{
@@ -67,7 +67,7 @@ public class Shell
 
 	public void ILShell(String path, String name)
 	{
-		Class ILClass;
+		Class<?> ILClass;
 		Class[] constructorArgumentTypes = { boolean[].class,
 											 boolean[].class };
 

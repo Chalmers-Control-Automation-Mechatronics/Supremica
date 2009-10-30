@@ -118,4 +118,9 @@ public final class LabelBlockElement
   //# Data Members
   private final LabelGeometryProxy mGeometry;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -8557468829788179813L;
+
 }

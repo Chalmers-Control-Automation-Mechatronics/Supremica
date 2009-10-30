@@ -55,6 +55,8 @@ import java.awt.Insets;
 public class ToolBarButton
 	extends JButton
 {
+    private static final long serialVersionUID = 1L;
+
 	private static Insets tmpInsets = new Insets(0, 0, 0, 0);
 
 	public ToolBarButton()

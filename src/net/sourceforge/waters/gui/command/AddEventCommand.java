@@ -17,7 +17,6 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.gui.NamedComparator;
 import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 

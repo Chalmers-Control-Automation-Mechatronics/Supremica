@@ -63,7 +63,9 @@ import org.supremica.util.SupremicaException;
 
 public class SynchronizationOptions
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(SynchronizationOptions.class);
+	
 	private SynchronizationType syncType;    // PRIORITIZED, FULL, Broadcast, Unknown
 	private boolean forbidUnconStates;    // mark uc-states as uncontrollable
 	private boolean expandForbiddenStates;    // expand beyond an uc-state
@@ -80,7 +82,8 @@ public class SynchronizationOptions
 	private boolean dialogOK = false;
 	private String automatonNameSeparator;
 	private String stateNameSeparator;
-    private boolean EFAMode;
+    @SuppressWarnings("unused")
+	private boolean EFAMode;
 
 	/**
 	 * Default constructor

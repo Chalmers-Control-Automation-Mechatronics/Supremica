@@ -110,4 +110,9 @@ public abstract class IdentifiedElement
   //# Data Members
   private final IdentifierProxy mIdentifier;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 3658649095394102398L;
+
 }

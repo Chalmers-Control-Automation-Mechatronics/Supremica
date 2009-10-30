@@ -123,4 +123,9 @@ public final class ColorGeometryElement
   //# Data Members
   private final Set<Color> mColorSet;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -5667739637678377383L;
+
 }

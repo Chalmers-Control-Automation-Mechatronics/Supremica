@@ -16,7 +16,8 @@ import org.supremica.log.*;
 public class AnalyzerEventHiderAction
     extends IDEAction
 {
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    @SuppressWarnings("unused")
+	private Logger logger = LoggerFactory.createLogger(IDE.class);
     
     private static final long serialVersionUID = 1L;
     

@@ -65,7 +65,8 @@ public class TopLevelActuator extends Actuator implements Listener
 {
     private Mailbox mailbox;
     private String currentState;
-    private double actuationTime; 
+    @SuppressWarnings("unused")
+	private double actuationTime; 
     
     public TopLevelActuator(String name, Mailbox mailbox)
     {

@@ -155,4 +155,9 @@ public class SerializableKindTranslator
   private final Map<String,ComponentKind> mAutomatonKindMap;
   private final Map<String,EventKind> mEventKindMap;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

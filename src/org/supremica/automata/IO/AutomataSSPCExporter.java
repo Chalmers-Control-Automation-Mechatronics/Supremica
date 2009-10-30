@@ -1,6 +1,7 @@
 package org.supremica.automata.IO;
 
 import org.supremica.automata.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -22,7 +23,7 @@ public class AutomataSSPCExporter
 {
 	private File file;
 	private String path;
-	private HashMap fileMap, eventMap;
+	private HashMap<Comparable, Comparable> fileMap, eventMap;
 	private int event_count = 0, state_count;
 
 	/** save the automata to disk, use 'file' for the system (project) file name */
@@ -31,14 +32,14 @@ public class AutomataSSPCExporter
 	{
 		this.file = new File(file);
 		this.path = this.file.getParent();
-		this.fileMap = new HashMap();
-		this.eventMap = new HashMap();
+		this.fileMap = new HashMap<Comparable, Comparable>();
+		this.eventMap = new HashMap<Comparable, Comparable>();
 
 		PrintWriter system = new PrintWriter(new FileOutputStream(file));
 		PrintWriter plant = new PrintWriter(new FileOutputStream(file + ".plant"));
 		PrintWriter spec = new PrintWriter(new FileOutputStream(file + ".spec"));
 
-		for (Iterator autIt = automata.iterator(); autIt.hasNext(); )
+		for (Iterator<?> autIt = automata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 			String name = getName(currAutomaton);
@@ -137,14 +138,14 @@ public class AutomataSSPCExporter
 	{
 		File file2 = new File(path, name + ".fsm");
 		PrintWriter me = new PrintWriter(new FileOutputStream(file2));
-		HashMap stateMap = new HashMap(); // String -> Integer map
+		HashMap<State, Integer> stateMap = new HashMap<State, Integer>(); // String -> Integer map
 
 
 		me.println("FSM " + name);
 		me.println();
 
 		// 1. build the state map
-		for (Iterator states = a.stateIterator(); states.hasNext(); )
+		for (Iterator<?> states = a.stateIterator(); states.hasNext(); )
 		{
 			State state = (State) states.next();
 			Integer num = state_count++;
@@ -152,11 +153,11 @@ public class AutomataSSPCExporter
 		}
 
 		// dump the state/transition list
-		for (Iterator states = a.stateIterator(); states.hasNext(); )
+		for (Iterator<?> states = a.stateIterator(); states.hasNext(); )
 		{
 			State state = (State) states.next();
 
-			Integer num = (Integer) stateMap.get(state);
+			Integer num = stateMap.get(state);
 			me.print("\tSTATE " + num.intValue() );
 
 
@@ -180,7 +181,7 @@ public class AutomataSSPCExporter
 				// String tname = arc.getLabel();
 				int tname = getEvent(arc.getLabel());
 				State toState = arc.getToState();
-				Integer toInt = (Integer) stateMap.get(toState);
+				Integer toInt = stateMap.get(toState);
 				me.println("\t\tTRANSITION " + tname + " TO " + toInt.intValue() );
 			}
 

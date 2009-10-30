@@ -10,7 +10,9 @@ public class BasicCellRenderer
 							implements
 								TableCellRenderer 
 {
-	private final Color NOT_EDITABLE_CELL_COLOR = Color.LIGHT_GRAY;
+    private static final long serialVersionUID = 1L;
+
+    private final Color NOT_EDITABLE_CELL_COLOR = Color.LIGHT_GRAY;
 	private final Color VALUE_CELL_COLOR = new Color(153,186,243,80);
 	private final Color SELECTED_CELL_BODER_COLOR = new Color(0,0,0,100);
 	

@@ -11,17 +11,15 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.Color;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 
 /**
- * A collection of all the colors used in the editor.
+ * A collection of all the colours used in the editor.
  *
  * @author Simon Ware
  */

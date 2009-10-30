@@ -179,7 +179,6 @@ public class GlpkUI
             w.write("alt_paths_");
 
             int[] constrId = constr.getId();
-            String body = constr.getBody(); //temp
             if (constrId.length > 2)
             {
                 w.write(milpConstructor.makeAltPathsVariable(constrId[0], constrId[1], constrId[2]) +
@@ -351,7 +350,6 @@ public class GlpkUI
         counter = 0;
         for (CircularWaitConstraintBlock currConstraint : milpConstructor.getCircularWaitConstraints())
         {
-            boolean bufferInCycle = false;
             String circWaitConstrStr = "circ_wait_" + counter + " : ";
             String unfeasConstrStr = "unfeas_" + counter++ + " : ";
 
@@ -665,9 +663,7 @@ public class GlpkUI
             else if (str.indexOf(" prec_") > -1)
             {
                 str = str.substring(str.indexOf("_r") + 2);
-                String strplantIndex = str.substring(0, str.indexOf("_"));
                 str = str.substring(str.indexOf("_") + 1);
-                String strStartStateIndex = str.substring(0, str.indexOf("_"));
                 str = str.substring(str.indexOf("_") + 1);
                 String strEndStateIndex = str;
                 int counterIndex = str.indexOf("_");
@@ -680,12 +676,7 @@ public class GlpkUI
                 {
                     strEndStateIndex = strEndStateIndex.substring(0, strEndStateIndex.indexOf(" "));
                 }
-
-                int plantIndex = (new Integer(strplantIndex)).intValue();
-                int startStateIndex = (new Integer(strStartStateIndex)).intValue();
-                int endStateIndex = (new Integer(strEndStateIndex)).intValue();
-
-//                optimalAltPathVariables[plantIndex][startStateIndex][endStateIndex] = true;
+                // optimalAltPathVariables[plantIndex][startStateIndex][endStateIndex] = true;
             }
             else if (str.indexOf("_from") > -1 && str.indexOf("alt_paths") < 0)
             {

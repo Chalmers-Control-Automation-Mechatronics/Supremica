@@ -8,11 +8,11 @@ import java.awt.event.*;
 import java.io.*;
 
 public class TablePane
-					extends
-					    JPanel 
-							implements
-							    ActionListener{
-	
+	extends JPanel 
+	implements ActionListener
+{
+    private static final long serialVersionUID = 1L;
+
 	private JButton jbAddFile;
 	private JButton jbRemove;
 	

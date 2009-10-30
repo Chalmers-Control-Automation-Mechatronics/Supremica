@@ -9,18 +9,14 @@
 
 package org.supremica.testcases;
 
-import java.util.Iterator;
-import org.omg.CORBA.portable.IDLEntity;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Project;
 import org.supremica.automata.Alphabet;
-import org.supremica.automata.State;
 import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.execution.*;
-import uk.ac.ic.doc.scenebeans.Null;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
 
 /**
  *
@@ -30,7 +26,8 @@ import uk.ac.ic.doc.scenebeans.Null;
 class ExtEatingPhilosopher
 {
     int j;
-    private int numInterm;
+    @SuppressWarnings("unused")
+	private int numInterm;
     static State[] intermStates;
     Automaton EXTphilo;
     
@@ -246,7 +243,6 @@ public class ExtDiningPhilosophers{
         project.setComment("Extended Dining Philosophers (parameters: n = # philosophers, k = #  intermediate states of each philosopher). \nConsider the dining philosophers problem where the number of intermediates states (after taking the fork on the left and before taking the fork on the right) may vary. This means that each philosopher, from the idles state takes the fork on his left reaching intermediate state 1, executes k-1 intermediate events reaching intermediate state k, takes his right fork entering a state where he eats, and when he is done goes back to the idle state. The uncontrollable events are \"philosopher i takes the left fork\" for i even. There are n philosophers around the table. Design a maximally permissive nonblocking supervisor.");
         
         int idLength = ("" + num).length();
-        int intermLength = ("" + numInterm).length();
         
         // First the philosphers
         // Philosopher philo = new Philosopher(l_take, r_take, l_put, r_put);

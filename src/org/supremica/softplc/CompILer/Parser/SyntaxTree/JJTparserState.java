@@ -3,16 +3,16 @@ package org.supremica.softplc.CompILer.Parser.SyntaxTree;
 
 class JJTparserState
 {
-	private java.util.Stack nodes;
-	private java.util.Stack marks;
+	private java.util.Stack<Node> nodes;
+	private java.util.Stack<Integer> marks;
 	private int sp;    // number of nodes on stack
 	private int mk;    // current mark
 	private boolean node_created;
 
 	JJTparserState()
 	{
-		nodes = new java.util.Stack();
-		marks = new java.util.Stack();
+		nodes = new java.util.Stack<Node>();
+		marks = new java.util.Stack<Integer>();
 		sp = 0;
 		mk = 0;
 	}
@@ -46,7 +46,7 @@ class JJTparserState
 	 */
 	Node rootNode()
 	{
-		return (Node) nodes.elementAt(0);
+		return nodes.elementAt(0);
 	}
 
 	/* Pushes a node on to the stack. */
@@ -65,16 +65,16 @@ class JJTparserState
 	{
 		if (--sp < mk)
 		{
-			mk = ((Integer) marks.pop()).intValue();
+			mk = marks.pop().intValue();
 		}
 
-		return (Node) nodes.pop();
+		return nodes.pop();
 	}
 
 	/* Returns the node currently on the top of the stack. */
 	Node peekNode()
 	{
-		return (Node) nodes.peek();
+		return nodes.peek();
 	}
 
 	/*
@@ -93,7 +93,7 @@ class JJTparserState
 			popNode();
 		}
 
-		mk = ((Integer) marks.pop()).intValue();
+		mk = marks.pop().intValue();
 	}
 
 	void openNodeScope(Node n)
@@ -113,7 +113,7 @@ class JJTparserState
 	 */
 	void closeNodeScope(Node n, int num)
 	{
-		mk = ((Integer) marks.pop()).intValue();
+		mk = marks.pop().intValue();
 
 		while (num-- > 0)
 		{
@@ -142,7 +142,7 @@ class JJTparserState
 		{
 			int a = nodeArity();
 
-			mk = ((Integer) marks.pop()).intValue();
+			mk = marks.pop().intValue();
 
 			while (a-- > 0)
 			{
@@ -159,7 +159,7 @@ class JJTparserState
 		}
 		else
 		{
-			mk = ((Integer) marks.pop()).intValue();
+			mk = marks.pop().intValue();
 			node_created = false;
 		}
 	}

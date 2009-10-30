@@ -55,7 +55,9 @@ public class TemplateProperties
 	private String stateNameSuffix = null;
 	private String labelPrefix = null;
 	private String labelSuffix = null;
+	@SuppressWarnings("unused")
 	private String stateNameRegExp = null;
+	@SuppressWarnings("unused")
 	private String labelRegExp = null;
 
 	public TemplateProperties() {}

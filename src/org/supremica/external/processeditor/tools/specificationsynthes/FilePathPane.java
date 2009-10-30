@@ -10,9 +10,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class FilePathPane 
-					extends JPanel 
-								implements ActionListener{
-	
+	extends JPanel 
+	implements ActionListener
+{
+    private static final long serialVersionUID = 1L;
 	private final static String TOOL_TIP_TEXT = "File path";
 	
 	private JTextField tfFilePath = null;

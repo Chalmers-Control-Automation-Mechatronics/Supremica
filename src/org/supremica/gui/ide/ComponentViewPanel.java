@@ -9,16 +9,15 @@
 
 package org.supremica.gui.ide;
 
-import com.lowagie.text.*;
-import com.lowagie.text.pdf.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.LayoutManager;
 
-import java.awt.*;
-import java.io.*;
-import java.awt.print.*;
-import java.util.Locale;
-import javax.print.attribute.*;
-import javax.print.attribute.standard.*;
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;
@@ -89,7 +88,6 @@ public class ComponentViewPanel
         
         final JScrollPane scrollsurface = new JScrollPane(surface);
         final JScrollPane scrollevents = new JScrollPane(events);
-        final JViewport viewevents = scrollevents.getViewport();
         final JSplitPane split = new JSplitPane
             (JSplitPane.HORIZONTAL_SPLIT, scrollevents, scrollsurface);
         final int halfwidth = size.width >> 1;

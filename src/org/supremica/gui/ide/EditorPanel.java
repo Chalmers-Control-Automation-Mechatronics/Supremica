@@ -12,11 +12,11 @@ package org.supremica.gui.ide;
 
 import java.awt.Component;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -37,7 +37,6 @@ import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
@@ -313,5 +312,10 @@ public class EditorPanel
     private final CommentPanel mCommentPanel;
 
     private final Collection<Observer> mObservers = new LinkedList<Observer>();
+
+
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
 
 }

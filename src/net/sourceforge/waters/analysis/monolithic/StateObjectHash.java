@@ -41,6 +41,8 @@ abstract class StateObjectHash
   extends StateHash
   implements Serializable, StateObjectHashingStrategy
 {
+    private static final long serialVersionUID = 1L;
+
     /** the set of Objects */
     protected transient EncodedStateTuple[] _set;
     

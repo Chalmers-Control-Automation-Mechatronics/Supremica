@@ -14,8 +14,11 @@ import org.supremica.gui.ActionMan;
 public class MakeDeterministicAction
     extends AbstractAction
 {
-    private static Logger logger = LoggerFactory.createLogger(MakeDeterministicAction.class);
+    private static final long serialVersionUID = 1L;
+    private static final Logger logger =
+        LoggerFactory.createLogger(MakeDeterministicAction.class);
     private static LabeledEvent epsilon = new LabeledEvent("");
+
     private Automata newautomata;
     
     public MakeDeterministicAction()
@@ -36,7 +39,7 @@ public class MakeDeterministicAction
         Automata automata = gui.getSelectedAutomata();
         
         // Iterate over all automata
-        for (Iterator autit = automata.iterator(); autit.hasNext(); )
+        for (Iterator<?> autit = automata.iterator(); autit.hasNext(); )
         {
             // Determinize this automaton!
             Automaton automaton = (Automaton) autit.next();
@@ -113,10 +116,11 @@ public class MakeDeterministicAction
      * arcs with the same label, they are "epsilonized", so the nondeterminism is represented
      * by epsilon transitions instead.
      */
-    private boolean epsilonize(State state, Automaton automaton)
+    @SuppressWarnings("deprecation")
+	private boolean epsilonize(State state, Automaton automaton)
     {
         boolean found = false;
-        HashMap arcset = new HashMap();
+        HashMap<String, Arc> arcset = new HashMap<String, Arc>();
         
         // Initialize arc iterator
         Iterator<Arc> arcit = state.safeOutgoingArcsIterator();

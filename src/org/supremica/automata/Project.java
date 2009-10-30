@@ -62,8 +62,10 @@ import org.supremica.automata.execution.*;
 public class Project
     extends Automata
 {
-    private static Logger logger = LoggerFactory.createLogger(Project.class);
-    private Actions theActions = null;
+	private static final long serialVersionUID = 1L;
+	private static Logger logger = LoggerFactory.createLogger(Project.class);
+
+	private Actions theActions = null;
     private Controls theControls = null;
     private Signals theInputSignals = null;
     private Signals theOutputSignals = null;
@@ -279,7 +281,8 @@ public class Project
         notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
     }
     
-    private void clearActions()
+    @SuppressWarnings("unused")
+	private void clearActions()
     {
         if (theActions != null)
         {
@@ -288,7 +291,8 @@ public class Project
         }
     }
     
-    private void clearControls()
+    @SuppressWarnings("unused")
+	private void clearControls()
     {
         if (theControls != null)
         {
@@ -297,7 +301,8 @@ public class Project
         }
     }
     
-    private void clearTimers()
+    @SuppressWarnings("unused")
+	private void clearTimers()
     {
         if (theTimers != null)
         {

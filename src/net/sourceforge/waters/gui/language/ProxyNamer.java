@@ -216,6 +216,7 @@ public class ProxyNamer {
 
   //#########################################################################
   //# Simple Access
+  @SuppressWarnings("unused")
   private String getName(final Proxy proxy, final boolean plural)
   {
     final Class<? extends Proxy> iface = proxy.getProxyInterface();

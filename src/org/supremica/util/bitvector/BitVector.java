@@ -48,8 +48,11 @@ package org.supremica.util.bitvector;
  * @see     BitMatrix
  * @see     java.util.BitSet
  */
-public class BitVector extends PersistentObject {
-	/*
+public class BitVector extends PersistentObject
+{
+    private static final long serialVersionUID = 1L;
+
+    /*
 	 * Bits are packed into arrays of "units."  Currently a unit is a long,
 	 * which consists of 64 bits, requiring 6 address bits.  The choice of unit
 	 * is determined purely by performance concerns.

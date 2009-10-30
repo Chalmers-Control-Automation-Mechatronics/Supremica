@@ -1,14 +1,9 @@
 package net.sourceforge.waters.analysis;
 
+import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
-import gnu.trove.TIntStack;
-import java.util.ArrayList;
-import java.util.Collection;
-import gnu.trove.TIntArrayList;
-import java.util.Set;
-import gnu.trove.THashSet;
-import java.util.Arrays;
+
 
 public class RemoveSubsetTau
 {

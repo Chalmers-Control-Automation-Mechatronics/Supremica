@@ -57,21 +57,23 @@ import java.util.Hashtable;
 
 public final class StateMemorizer
 {    // Skr�p
-    private static Logger logger = LoggerFactory.createLogger(StateMemorizer.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(StateMemorizer.class);
     
     private class HashtableHolder
     {
-        private Hashtable stateHash;
+        private Hashtable<StateHolder, StateHolder> stateHash;
         private int[] automataIndices;
         
         // Jikes 1.15 workaround
-        public HashtableHolder(Hashtable stateHash, int[] automataIndices)
+        public HashtableHolder(Hashtable<StateHolder, StateHolder> stateHash, int[] automataIndices)
         {
             this.stateHash = stateHash;
             this.automataIndices = automataIndices;
         }
         
-        private Hashtable getHashtable()
+        @SuppressWarnings("unused")
+		private Hashtable<StateHolder, StateHolder> getHashtable()
         {
             return stateHash;
         }
@@ -82,9 +84,10 @@ public final class StateMemorizer
         }
     }
     
-    private LinkedList tableList = new LinkedList();
-    private Hashtable tableHash = new Hashtable(1023);
-    private int[] automataIndices;
+    private LinkedList<HashtableHolder> tableList = new LinkedList<HashtableHolder>();
+    private Hashtable<StateHolder, Hashtable<StateHolder, StateHolder>> tableHash = new Hashtable<StateHolder, Hashtable<StateHolder, StateHolder>>(1023);
+    @SuppressWarnings("unused")
+	private int[] automataIndices;
     
     public StateMemorizer()
     {}
@@ -97,11 +100,11 @@ public final class StateMemorizer
     public void add(int[] automataIndices, int[] fullState, int problemPlant, int problemEvent)
     {
         int[] stateIndices = stateCompression(automataIndices, fullState);
-        Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+        Hashtable<StateHolder, StateHolder> stateHash = tableHash.get(new StateHolder(automataIndices));
         
         if (stateHash == null)
         {
-            stateHash = new Hashtable(47);
+            stateHash = new Hashtable<StateHolder, StateHolder>(47);
             
             tableHash.put(new StateHolder(automataIndices), stateHash);
             tableList.add(new HashtableHolder(stateHash, automataIndices));
@@ -113,7 +116,7 @@ public final class StateMemorizer
     public void remove(int[] automataIndices, int[] fullState)
     {
         int[] stateIndices = stateCompression(automataIndices, fullState);
-        Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+        Hashtable<?, ?> stateHash = tableHash.get(new StateHolder(automataIndices));
         
         stateHash.remove(new StateHolder(stateIndices));
     }
@@ -122,11 +125,11 @@ public final class StateMemorizer
     public boolean contains(int[] fullState)
     {
         HashtableHolder hashtableHolder;
-        Iterator tableIterator = tableList.iterator();
+        Iterator<HashtableHolder> tableIterator = tableList.iterator();
         
         while (tableIterator.hasNext())
         {
-            hashtableHolder = (HashtableHolder) tableIterator.next();
+            hashtableHolder = tableIterator.next();
             
             if (contains(hashtableHolder.getAutomataIndices(), fullState))
             {
@@ -140,7 +143,7 @@ public final class StateMemorizer
     public boolean contains(int[] automataIndices, int[] fullState)
     {
         int[] stateIndices = stateCompression(automataIndices, fullState);
-        Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+        Hashtable<?, ?> stateHash = tableHash.get(new StateHolder(automataIndices));
         
         return stateHash.containsKey(new StateHolder(stateIndices));
     }
@@ -148,7 +151,7 @@ public final class StateMemorizer
     private StateHolder getStateHolder(int[] automataIndices, int[] fullState)
     {
         int[] stateIndices = stateCompression(automataIndices, fullState);
-        Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+        Hashtable<?, ?> stateHash = tableHash.get(new StateHolder(automataIndices));
         
         return (StateHolder) stateHash.get(new StateHolder(stateIndices));
     }
@@ -186,11 +189,11 @@ public final class StateMemorizer
     {
         int count = 0;
         HashtableHolder hashtableHolder;
-        Iterator tableIterator = tableList.iterator();
+        Iterator<HashtableHolder> tableIterator = tableList.iterator();
         
         while (tableIterator.hasNext())
         {
-            hashtableHolder = (HashtableHolder) tableIterator.next();
+            hashtableHolder = tableIterator.next();
             count = count + size(hashtableHolder.getAutomataIndices());
         }
         
@@ -202,7 +205,7 @@ public final class StateMemorizer
     {
         
         // return ((Hashtable) tableHash.get(new StateHolder(automataIndices))).size();
-        Hashtable hashtable = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+        Hashtable<?, ?> hashtable = tableHash.get(new StateHolder(automataIndices));
         
         if (hashtable != null)
         {
@@ -218,7 +221,7 @@ public final class StateMemorizer
     {
         
         // ((Hashtable) tableHash.get(new StateHolder(automataIndices))).clear();
-        Hashtable hashtable = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+        Hashtable<StateHolder, StateHolder> hashtable = tableHash.get(new StateHolder(automataIndices));
         
         tableList.remove(new HashtableHolder(hashtable, automataIndices));
         
@@ -229,7 +232,7 @@ public final class StateMemorizer
     // the hashtable associated with automataIndices
     public void clean(int[] automataIndices)
     {
-        Iterator stateIterator = iterator(automataIndices);
+        Iterator<?> stateIterator = iterator(automataIndices);
         StateHolder stateHolder;
         
         while (stateIterator.hasNext())
@@ -247,9 +250,9 @@ public final class StateMemorizer
         }
     }
     
-    public Iterator iterator(int[] automataIndices)
+    public Iterator<?> iterator(int[] automataIndices)
     {
-        Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+        Hashtable<?, ?> stateHash = tableHash.get(new StateHolder(automataIndices));
         
         return stateHash.values().iterator();
     }

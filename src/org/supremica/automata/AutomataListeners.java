@@ -55,7 +55,9 @@ import org.supremica.log.*;
 public class AutomataListeners
 	extends Listeners
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(AutomataListeners.class);
+
 	public static final int MODE_AUTOMATON_ADDED = 1;
 	public static final int MODE_AUTOMATON_REMOVED = 2;
 	public static final int MODE_AUTOMATON_RENAMED = 3;

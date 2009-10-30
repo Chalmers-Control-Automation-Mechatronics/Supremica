@@ -211,4 +211,9 @@ public final class VariableComponentElement
   private final SimpleExpressionProxy mInitialStatePredicate;
   private final List<VariableMarkingProxy> mVariableMarkings;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 3062243688693388120L;
+
 }

@@ -68,4 +68,9 @@ public class ContainerSwitchEvent
   //# Data Members
   private final DocumentContainer mNewContainer;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

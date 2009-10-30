@@ -16,17 +16,17 @@ public class PCG
 	}
 
 	private int size;
-	private HashMap map = new HashMap();
+	private HashMap<PCGNode, Node> map = new HashMap<PCGNode, Node>();
 	private Node[] nodes;
 	private PCGNode[] org_nodes;
 
-	public PCG(Vector nodes_)
+	public PCG(Vector<?> nodes_)
 	{
 		size = nodes_.size();
 		nodes = new Node[size];
 		org_nodes = new PCGNode[size];
 
-		Enumeration e = nodes_.elements();
+		Enumeration<?> e = nodes_.elements();
 		int i = 0;
 
 		while (e.hasMoreElements())
@@ -66,8 +66,8 @@ public class PCG
 	public void connect(Object obj1, Object obj2, int weight)
 		throws BDDException
 	{
-		Node node1 = (Node) map.get(obj1);
-		Node node2 = (Node) map.get(obj2);
+		Node node1 = map.get(obj1);
+		Node node2 = map.get(obj2);
 
 		BDDAssert.bddAssert(node1 != null, "first object not found");
 		BDDAssert.bddAssert(node2 != null, "second object not found");
@@ -157,6 +157,7 @@ public class PCG
 	}
 
 	// ----------------------------------- complete search
+	@SuppressWarnings("unused")
 	private int[] getShortestPath_complete()
 	{
 		int[] perm = new int[size + 1];
@@ -329,6 +330,7 @@ public class PCG
 	}
 
 	// ------------------------------------------------------------------------------
+	@SuppressWarnings("unused")
 	private int[] getShortestPath_greedy()
 		throws BDDException
 	{
@@ -370,8 +372,6 @@ public class PCG
 	{
 		boolean first = true;
 		int index = -1, max = -1;
-		Node me = nodes[me_];
-
 		for (int i = 0; i < size; i++)
 		{
 			if (free[i])

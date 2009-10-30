@@ -70,8 +70,11 @@ public class ConfigitDEMO
 	Container c;
 	Gui gui;
 	private boolean resetok = true;
+	@SuppressWarnings("unused")
 	private int total = 0;
+	@SuppressWarnings("unused")
 	private String[] Gender = { "Male", "Female" };
+	@SuppressWarnings("unused")
 	private String[] GeneralType = { "Children", "Adult" };
 	private String[] Size;
 	private String[] Color;

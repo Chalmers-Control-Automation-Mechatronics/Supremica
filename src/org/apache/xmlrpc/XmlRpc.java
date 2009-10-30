@@ -90,6 +90,7 @@ import javax.xml.parsers.*;
  */
 
 // ajabaja tord, inte ändra kod du inte är insatt i bara för att få tyst på jikes:
+@SuppressWarnings("deprecation")
 public abstract class XmlRpc
 	extends HandlerBase
 {
@@ -141,7 +142,7 @@ static
 */
 
 	// the stack we're parsing our values into.
-	Stack values;
+	Stack<Value> values;
 	Value currentValue;
 
 	/**
@@ -211,7 +212,7 @@ static
 	 */
 	protected XmlRpc(String typeFactory)
 	{
-		Class c = null;
+		Class<?> c = null;
 
 		if ((typeFactory != null) && (typeFactory.length() > 0))
 		{
@@ -235,7 +236,7 @@ static
 	 * @param typeFactory The implementation to use.
 	 * @return The new type mapping.
 	 */
-	private TypeFactory createTypeFactory(Class typeFactory)
+	private TypeFactory createTypeFactory(Class<?> typeFactory)
 	{
 
 		// If we're using the default, serve it up immediately.
@@ -298,7 +299,7 @@ catch (ClassNotFoundException x)
 	/**
 	 * Set the SAX Parser to be used by directly passing the Class object.
 	 */
-	public static void setDriver(Class driver)
+	public static void setDriver(Class<?> driver)
 	{
 
 		// ARASH
@@ -377,7 +378,7 @@ catch (ClassNotFoundException x)
 		// reset values (XmlRpc objects are reusable)
 		errorLevel = NONE;
 		errorMsg = null;
-		values = new Stack();
+		values = new Stack<Value>();
 
 		if (cdata == null)
 		{
@@ -531,7 +532,7 @@ parser.setErrorHandler(this);
 
 					// Add object to sub-array; if current container
 					// is a struct, add later (at </member>).
-					currentValue = (Value) values.peek();
+					currentValue = values.peek();
 
 					currentValue.endElement(v);
 				}
@@ -545,7 +546,7 @@ parser.setErrorHandler(this);
 
 			values.pop();
 
-			currentValue = (Value) values.peek();
+			currentValue = values.peek();
 
 			currentValue.endElement(v);
 		}
@@ -686,8 +687,8 @@ parser.setErrorHandler(this);
 
 		// the name to use for the next member of struct values
 		String nextMemberName;
-		Hashtable struct;
-		Vector array;
+		Hashtable<String, Object> struct;
+		Vector<Object> array;
 
 		/**
 		 * Constructor.
@@ -728,11 +729,11 @@ parser.setErrorHandler(this);
 			{
 
 			case ARRAY :
-				value = array = new Vector();
+				value = array = new Vector<Object>();
 				break;
 
 			case STRUCT :
-				value = struct = new Hashtable();
+				value = struct = new Hashtable<String, Object>();
 				break;
 			}
 		}

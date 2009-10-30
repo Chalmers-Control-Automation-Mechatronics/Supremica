@@ -2426,18 +2426,16 @@ F xn F   T*/
 	 * next to TOS value
 	 * @param arg type constant
 	 */
+	@SuppressWarnings("unused")
 	private void emitExprORN(TypeConstant t, Object arg)
 	{
 		if (t == TypeConstant.T_BOOL)
 		{
-			InstructionHandle end_orn;
 			BranchInstruction ifne = new IFNE(null);
-
 			ilRun.append(ifne);    // stack = false
 			ilRun.append(InstructionConstants.POP);
 			ilRun.append(new PUSH(constPoolGen, true));
-
-			end_orn = ilRun.append(InstructionConstants.NOP);
+			ilRun.append(InstructionConstants.NOP);
 		}
 		else
 		{

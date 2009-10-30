@@ -65,7 +65,9 @@ package org.apache.xmlrpc;
 public class AuthenticationFailed
 	extends RuntimeException
 {
-	public AuthenticationFailed() {}
+    private static final long serialVersionUID = 1L;
+
+    public AuthenticationFailed() {}
 
 	public AuthenticationFailed(String msg)
 	{

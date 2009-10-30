@@ -52,6 +52,8 @@ package org.supremica.util;
 public class SupremicaException
 	extends Exception
 {
+    private static final long serialVersionUID = 1L;
+
 	public SupremicaException()
 	{
 		super();

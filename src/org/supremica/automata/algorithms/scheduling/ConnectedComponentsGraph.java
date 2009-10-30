@@ -10,7 +10,6 @@
 package org.supremica.automata.algorithms.scheduling;
 
 import java.util.ArrayList;
-import org.supremica.automata.LabeledEvent;
 
 
 /**
@@ -19,12 +18,15 @@ import org.supremica.automata.LabeledEvent;
  */
 public class ConnectedComponentsGraph
 {
-    //temp
-    private org.supremica.log.Logger logger = org.supremica.log.LoggerFactory.createLogger(ConnectedComponentsGraph.class);
+    @SuppressWarnings("unused")
+	private org.supremica.log.Logger logger = org.supremica.log.LoggerFactory.createLogger(ConnectedComponentsGraph.class);
     
-    private ArrayList<int[]>[] edges = null;
-    private boolean[] inComponent;
-    private int[] rootIndex;
+    @SuppressWarnings("unused")
+	private ArrayList<int[]>[] edges = null;
+    @SuppressWarnings("unused")
+	private boolean[] inComponent;
+    @SuppressWarnings("unused")
+	private int[] rootIndex;
     private ConnectedComponentVertice[] vertices;
     
     ArrayList<ConnectedComponentVertice> tarjanStack = new ArrayList<ConnectedComponentVertice>();
@@ -71,6 +73,7 @@ public class ConnectedComponentsGraph
      * B. D. Johnson, "Finding all the elementary cicruits of a directed graph",
      * is extended with a color check to find such cycles. 
      */
+    @SuppressWarnings("unchecked")
     public ArrayList<ArrayList<ConnectedComponentEdge>> enumerateAllCycles()
     {
         cycleSequences = new ArrayList<ArrayList<ConnectedComponentEdge>>();
@@ -146,7 +149,7 @@ public class ConnectedComponentsGraph
                 { // Look only in forward direction to avoid cycle repetition                
                     if (toVertice.equals(startVertice))
                     { // If the start Vertice if found again, we have a cycle
-                        ArrayList newCycleSequence = new ArrayList<ConnectedComponentEdge>();
+                        ArrayList<ConnectedComponentEdge> newCycleSequence = new ArrayList<ConnectedComponentEdge>();
                         
                         //temp (output circuit)
 //                        String str = "Johnson-circuit: ";
@@ -262,7 +265,8 @@ public class ConnectedComponentsGraph
      *
      * @param - v is the root vertice of the path being currently explored by the Tarjan's alg. 
      */
-    private void tarjan(ConnectedComponentVertice v)
+    @SuppressWarnings("unused")
+	private void tarjan(ConnectedComponentVertice v)
     {
         v.setDepthIndex(tarjanIndex);
         v.setLowlinkIndex(tarjanIndex);
@@ -304,7 +308,8 @@ public class ConnectedComponentsGraph
     /**
      * Checks whether the vertices v1 and v2 could belong to the same minimal SCC. 
      */
-    private boolean haveSameRoot(ConnectedComponentVertice v1, ConnectedComponentVertice v2, ArrayList<ConnectedComponentVertice> currSCC)
+    @SuppressWarnings("unused")
+	private boolean haveSameRoot(ConnectedComponentVertice v1, ConnectedComponentVertice v2, ArrayList<ConnectedComponentVertice> currSCC)
     {
         if (v1.getLowlinkIndex() != v2.getDepthIndex() && v1.getLowlinkIndex() != v2.getLowlinkIndex())
         {

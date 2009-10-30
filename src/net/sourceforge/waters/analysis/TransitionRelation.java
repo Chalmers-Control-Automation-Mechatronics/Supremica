@@ -401,7 +401,6 @@ public class TransitionRelation
   {
     markState(s, false);
     for (int e = 0;  e < mPredecessors[s].length; e++) {
-      final int event = e;
       TIntHashSet preds = mPredecessors[s][e];
       if (preds == null) {continue;}
       int[] arpreds = preds.toArray();
@@ -617,7 +616,6 @@ public class TransitionRelation
     markState(to, mMarked[to] || mMarked[from]);
     markState(from, false);
     for (int e = 0; e < mEvents.length; e++) {
-      final int event = e;
       TIntHashSet succs = mSuccessors[from][e];
       if (succs == null) {continue;}
       int[] arsuccs = succs.toArray();
@@ -634,7 +632,6 @@ public class TransitionRelation
     if (from == to) {return;}
     markState(to, mMarked[to] || mMarked[from]);
     for (int e = 0; e < mEvents.length; e++) {
-      final int event = e;
       TIntHashSet succs = mSuccessors[from][e];
       if (succs == null) {continue;}
       int[] arsuccs = succs.toArray();
@@ -651,7 +648,6 @@ public class TransitionRelation
     makeInitialState(to, mIsInitial[to] || mIsInitial[from]);
     makeInitialState(from, false);
     for (int e = 0; e < mEvents.length; e++) {
-      final int event = e;
       TIntHashSet preds = mPredecessors[from][e];
       if (preds != null) {
         int[] arpreds = preds.toArray();
@@ -669,7 +665,6 @@ public class TransitionRelation
     if (from == to) {return;}
     makeInitialState(to, mIsInitial[to] || mIsInitial[from]);
     for (int e = 0; e < mEvents.length; e++) {
-      final int event = e;
       TIntHashSet preds = mPredecessors[from][e];
       if (preds != null) {
         int[] arpreds = preds.toArray();
@@ -710,7 +705,6 @@ public class TransitionRelation
   {
     markState(s, false);
     for (int e = 0;  e < mSuccessors[s].length; e++) {
-      final int event = e;
       TIntHashSet succs = mSuccessors[s][e];
       if (succs == null) {continue;}
       int[] arsuccs = succs.toArray();

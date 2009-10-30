@@ -9,29 +9,30 @@
 
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
-import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
+
+import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.xsd.module.ScopeKind;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.LabeledEvent;
 import org.supremica.gui.ide.IDE;
+
 
 /**
  * The action used to send an automaton from the analyser to the editor.

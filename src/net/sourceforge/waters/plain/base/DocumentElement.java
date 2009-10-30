@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.base.Proxy;
  * <P>An immutable implementation of the {@link DocumentProxy} interface.</P>
  *
  * <P>This abstract extends the behaviour of a {@link NamedElement} by
- * adding a settable member reprenting the document's file name. Although
+ * adding a settable member representing the document's file name. Although
  * the element is considered immutable its target file name is changeable,
  * so as to make it possible to write the same document into different
  * files.</P>
@@ -147,5 +147,10 @@ public abstract class DocumentElement
   //# Data Members
   private String mComment;
   private URI mLocation;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

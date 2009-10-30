@@ -50,6 +50,7 @@
 package org.supremica.automata.algorithms.minimization;
 
 import java.util.*;
+
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
@@ -217,6 +218,7 @@ public class AutomatonMinimizer
             countHWS += halfWaySynthesis(theAutomaton);
             
             // Check if the library with the native methods is ok
+            /*
             if (false && BisimulationEquivalenceMinimizer.libraryLoaded())
             {
                 // tau_u-saturate!
@@ -225,6 +227,7 @@ public class AutomatonMinimizer
                 // Partition using native methods, long state names and STRONG bisimulation equivalence
                 countBSE += BisimulationEquivalenceMinimizer.minimize(theAutomaton, false, true);
             }
+            */
             
             // Message
             if (Config.VERBOSE_MODE.isTrue())
@@ -557,8 +560,7 @@ public class AutomatonMinimizer
         newAutomaton.getAlphabet().union(theAutomaton.getAlphabet()); // Odd... but it works.
         
         // Associate one state with each equivalence class
-        int stateNumber = 1; // Number 0 is dedicated to the initial state
-        Iterator equivClassIt = equivClasses.iterator();
+        Iterator<?> equivClassIt = equivClasses.iterator();
         while (equivClassIt.hasNext())
         {
             EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
@@ -672,7 +674,7 @@ public class AutomatonMinimizer
     {
         boolean refined = false;
         
-        for (Iterator eventIt = theAutomaton.getAlphabet().iterator(); eventIt.hasNext(); )
+        for (Iterator<?> eventIt = theAutomaton.getAlphabet().iterator(); eventIt.hasNext(); )
         {
             if (stopRequested)
             {
@@ -1374,17 +1376,17 @@ public class AutomatonMinimizer
         
         // If two states have the same incoming arcs (from the same state(s) and with the same
         // event(s)) AND if both states have the same events active, then they can be merged!
-        Hashtable infoHash = new Hashtable((aut.nbrOfStates()*4)/3+1);
+        Hashtable<Integer, List<StateInfo>> infoHash = new Hashtable<Integer, List<StateInfo>>((aut.nbrOfStates()*4)/3+1);
         for (State state : aut)
         {
             // Find relevant info about the state
             StateInfo info = new StateInfoActiveEventsRule(state);
             
             // Get list of states with same hashcode
-            LinkedList list = (LinkedList) infoHash.get(new Integer(info.hashCode()));
+            LinkedList<StateInfo> list = (LinkedList<StateInfo>) infoHash.get(new Integer(info.hashCode()));
             if (list == null)
             {
-                list = new LinkedList();
+                list = new LinkedList<StateInfo>();
                 infoHash.put(new Integer(info.hashCode()), list);
             }
             list.add(info);
@@ -1480,7 +1482,7 @@ public class AutomatonMinimizer
         synth.doCoreachable();
         
         // Remove all outgoing arcs from these states
-        for (Iterator it = aut.stateIterator(); it.hasNext(); )
+        for (Iterator<?> it = aut.stateIterator(); it.hasNext(); )
         {
             if (stopRequested)
             {
@@ -2098,7 +2100,8 @@ public class AutomatonMinimizer
     /**
      * True if there are epsilon selfloops in aut.
      */
-    private static boolean hasEpsilonSelfloops(Automaton aut)
+    @SuppressWarnings("unused")
+	private static boolean hasEpsilonSelfloops(Automaton aut)
     {
         for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
         {
@@ -2560,7 +2563,9 @@ class StateInfoIncoming
     class Arclets
         extends TreeSet<Arclet>
     {
-        public Arclets(Iterator<Arc> arcIterator)
+		private static final long serialVersionUID = 1L;
+
+		public Arclets(Iterator<Arc> arcIterator)
         {
             while (arcIterator.hasNext())
             {
@@ -2652,9 +2657,11 @@ class StateInfoActiveEventsRule
 class EquivalenceClasses
     extends StateSets
 {
-    public void addAll(EquivalenceClassHolder equivClassHolder)
+	private static final long serialVersionUID = 1L;
+
+	public void addAll(EquivalenceClassHolder equivClassHolder)
     {
-        Iterator equivIt = equivClassHolder.iterator();
+        Iterator<?> equivIt = equivClassHolder.iterator();
         while (equivIt.hasNext())
         {
             EquivalenceClass currEquivClass = (EquivalenceClass) equivIt.next();
@@ -2668,6 +2675,7 @@ class EquivalenceClasses
 class EquivalenceClass
     extends StateSet
 {
+	private static final long serialVersionUID = 1L;
 }
 
 /**
@@ -2720,7 +2728,7 @@ class EqClass
  * @since  November 28, 2001
  */
 class EquivalenceClassHolder
-    extends HashMap
+    extends HashMap<EquivalenceClass,EquivalenceClass>
 {
     private static final long serialVersionUID = 1L;
     
@@ -2730,7 +2738,6 @@ class EquivalenceClassHolder
         if (!containsKey(nextClass))
         {
             EquivalenceClass newEquivClass = new EquivalenceClass(); //EqClassFactory.getEqClass(nextClass);
-            
             put(nextClass, newEquivClass);
         }
         
@@ -2741,19 +2748,18 @@ class EquivalenceClassHolder
         theEquivalenceClass.add(state);
     }
     
-    public Iterator iterator()
+    public Iterator<EquivalenceClass> iterator()
     {
         return values().iterator();
     }
     
     public void update()
     {
-        Iterator equivClassIt = iterator();
+        Iterator<EquivalenceClass> equivClassIt = iterator();
         
         while (equivClassIt.hasNext())
         {
-            EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
-            
+            EquivalenceClass currEquivClass = equivClassIt.next();
             currEquivClass.update();
         }
     }
@@ -2761,7 +2767,7 @@ class EquivalenceClassHolder
     public String toString()
     {
         StringBuffer sb = new StringBuffer();
-        Iterator equivClassIt = iterator();
+        Iterator<?> equivClassIt = iterator();
         
         sb.append("(");
         

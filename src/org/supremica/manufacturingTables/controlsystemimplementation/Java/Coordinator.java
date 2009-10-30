@@ -152,6 +152,7 @@ public class Coordinator implements Listener
 	    else
 	    {
 		System.out.println("The COP could not be performed!");
+		@SuppressWarnings("unused")
 		Boolean temp = machineCoordinatorsStarted.get(msg.getSender());
 		temp = Boolean.FALSE; // do not know why I have to separate this two lines
 		// Now I do know, and the lines above are incorrect, the value in the Map is not changed!!!!!!!!!!!!!!!!!!!

@@ -358,11 +358,6 @@ class EFAEventNameBuilder {
 
     //#######################################################################
     //# Result Retrieval
-    private OccurrenceKind getOccurrenceKind()
-    {
-      return mOccurrenceKind;
-    }
-
     private boolean isLiteral()
     {
       return mIsLiteral;

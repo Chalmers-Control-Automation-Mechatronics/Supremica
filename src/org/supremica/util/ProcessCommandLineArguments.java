@@ -57,12 +57,15 @@
  */
 package org.supremica.util;
 
-import java.awt.Dimension;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
+
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.xml.bind.JAXBException;
@@ -99,18 +102,17 @@ import net.sourceforge.waters.valid.ValidUnmarshaller;
 
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.supremica.Version;
+import org.supremica.automata.Project;
 import org.supremica.automata.IO.ADSUnmarshaller;
 import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
-import org.supremica.automata.Project;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
-
 import org.w3c.dom.DOMImplementation;
 import org.xml.sax.SAXException;
+
 
 /**
  * Class responsible for interpreting command line arguments given to Supremica.

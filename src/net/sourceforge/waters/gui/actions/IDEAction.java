@@ -144,4 +144,9 @@ public abstract class IDEAction
   //# Data Members
   private final IDE mIDE;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

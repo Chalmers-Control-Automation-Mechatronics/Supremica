@@ -140,4 +140,9 @@ public final class TraceStepElement
   private final EventProxy mEvent;
   private final Map<AutomatonProxy,StateProxy> mStateMap;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

@@ -168,4 +168,9 @@ public final class InstanceElement
   private final String mModuleName;
   private final List<ParameterBindingProxy> mBindingList;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1495666764808319468L;
+
 }

@@ -75,7 +75,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 {
 
 	private ModuleSubjectFactory factory;
+	@SuppressWarnings("unused")
 	private IdentifierSubject identifier;
+	@SuppressWarnings("unused")
 	private ExpressionParser parser;
 	private ModuleSubject module;
 	private boolean expand;

@@ -50,12 +50,13 @@
 package org.supremica.automata.algorithms;
 
 import java.util.*;
+
 import org.supremica.automata.*;
 
 public class AlphabetNormalize
 {
 	private Automaton theAutomaton;
-	private HashMap labelMap;
+	private HashMap<String, LinkedList<LabeledEvent>> labelMap;
 
 	public AlphabetNormalize(Automaton theAutomaton)
 	{
@@ -65,7 +66,7 @@ public class AlphabetNormalize
 	public void execute()
 		throws Exception
 	{
-		labelMap = new HashMap();
+		labelMap = new HashMap<String, LinkedList<LabeledEvent>>();
 
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 
@@ -73,11 +74,11 @@ public class AlphabetNormalize
 				eventIt.hasNext(); )
 		{
 			LabeledEvent currEvent = eventIt.next();
-			LinkedList currList = (LinkedList) labelMap.get(currEvent.getLabel());
+			LinkedList<LabeledEvent> currList = labelMap.get(currEvent.getLabel());
 
 			if (currList == null)
 			{
-				LinkedList newList = new LinkedList();
+				LinkedList<LabeledEvent> newList = new LinkedList<LabeledEvent>();
 
 				newList.add(currEvent);
 				labelMap.put(currEvent.getLabel(), newList);
@@ -92,7 +93,7 @@ public class AlphabetNormalize
 		removeControllable(labelMap);
 
 		// printLabelMap(labelMap);
-		Iterator arcIt = theAutomaton.arcIterator();
+		Iterator<?> arcIt = theAutomaton.arcIterator();
 
 		while (arcIt.hasNext())
 		{
@@ -103,7 +104,7 @@ public class AlphabetNormalize
 			// LabeledEvent currEvent = theAlphabet.getEventWithId(eventId);
 			LabeledEvent currEvent = currArc.getEvent();
 			String currLabel = currEvent.getLabel();
-			LinkedList currList = (LinkedList) labelMap.get(currLabel);
+			LinkedList<?> currList = labelMap.get(currLabel);
 			LabeledEvent firstEvent = (LabeledEvent) currList.getFirst();
 
 			// currArc.setEvent(firstEvent.getId());
@@ -111,23 +112,23 @@ public class AlphabetNormalize
 		}
 	}
 
-	public void removeControllable(Map labelMap)
+	public void removeControllable(Map<String, LinkedList<LabeledEvent>> labelMap)
 	{
-		Set entrySet = labelMap.entrySet();
-		Iterator entryIt = entrySet.iterator();
+		Set<?> entrySet = labelMap.entrySet();
+		Iterator<?> entryIt = entrySet.iterator();
 
 		while (entryIt.hasNext())
 		{
-			Map.Entry currEntry = (Map.Entry) entryIt.next();
+			Map.Entry<?, ?> currEntry = (Map.Entry<?, ?>) entryIt.next();
 
 			// String label = (String)currEntry.getKey();
-			LinkedList list = (LinkedList) currEntry.getValue();
+			LinkedList<?> list = (LinkedList<?>) currEntry.getValue();
 
 			if (list.size() > 1)
 			{
 
 				// System.err.println(label);
-				ListIterator eventIt = list.listIterator();
+				ListIterator<?> eventIt = list.listIterator();
 
 				while (eventIt.hasNext())
 				{
@@ -144,22 +145,22 @@ public class AlphabetNormalize
 		}
 	}
 
-	public void printLabelMap(Map labelMap)
+	public void printLabelMap(Map<?, ?> labelMap)
 	{
 		System.err.println("***********");
 
-		Set entrySet = labelMap.entrySet();
-		Iterator entryIt = entrySet.iterator();
+		Set<?> entrySet = labelMap.entrySet();
+		Iterator<?> entryIt = entrySet.iterator();
 
 		while (entryIt.hasNext())
 		{
-			Map.Entry currEntry = (Map.Entry) entryIt.next();
+			Map.Entry<?, ?> currEntry = (Map.Entry<?, ?>) entryIt.next();
 			String label = (String) currEntry.getKey();
-			List list = (List) currEntry.getValue();
+			List<?> list = (List<?>) currEntry.getValue();
 
 			System.err.println(label);
 
-			Iterator eventIt = list.iterator();
+			Iterator<?> eventIt = list.iterator();
 
 			while (eventIt.hasNext())
 			{

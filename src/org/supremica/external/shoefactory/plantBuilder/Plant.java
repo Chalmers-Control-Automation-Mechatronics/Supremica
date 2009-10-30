@@ -69,7 +69,7 @@ public class Plant
     private Alphabet[] IOAlphabet = new Alphabet[25];
     private int nrOfSlots = 12;
     private int sAindex = 0, sind = 0;
-    private ArrayList shoesInSystem = new ArrayList(1);
+    private ArrayList<Integer> shoesInSystem = new ArrayList<Integer>(1);
     
     public Plant()
     {
@@ -133,9 +133,13 @@ public class Plant
             currAlphabet[table_id].addEvent(putEventR);
             currAlphabet[table_id].addEvent(getEventR);
             
-            Arc putArcL;
+            @SuppressWarnings("unused")
+			Arc putArcL;
+            @SuppressWarnings("unused")
             Arc getArcL;
+            @SuppressWarnings("unused")
             Arc getArcR;
+            @SuppressWarnings("unused")
             Arc putArcR;
             
             for (int i = 0; i < X; i++)
@@ -153,14 +157,10 @@ public class Plant
             
             currAlphabet[table_id].addEvent(putEvent);
             currAlphabet[table_id].addEvent(getEvent);
-            
-            Arc putArc;
-            Arc getArc;
-            
             for (int i = 0; i < X; i++)
             {
-                putArc = new Arc(filledOneState[i], filledOneState[i + 1], putEvent);
-                getArc = new Arc(filledOneState[i + 1], filledOneState[i], getEvent);
+                new Arc(filledOneState[i], filledOneState[i + 1], putEvent);
+                new Arc(filledOneState[i + 1], filledOneState[i], getEvent);
             }
         }
         
@@ -176,8 +176,8 @@ public class Plant
                 
                 for (int i = 0; i < X; i++)
                 {
-                    Arc putArc = new Arc(filledOneState[i], filledOneState[i + 1], CreatedEvents[0]);
-                    Arc getArc = new Arc(filledOneState[i + 1], filledOneState[i], CreatedEvents[1]);
+                    new Arc(filledOneState[i], filledOneState[i + 1], CreatedEvents[0]);
+                    new Arc(filledOneState[i + 1], filledOneState[i], CreatedEvents[1]);
                 }
                 
                 sind++;
@@ -223,8 +223,8 @@ public class Plant
         
         s_SMindex++;
         
-        Arc getArc = new Arc(initialState, workState, getEvent);
-        Arc putArc = new Arc(workState, initialState, putEvent);
+        new Arc(initialState, workState, getEvent);
+        new Arc(workState, initialState, putEvent);
         
         thePlant.addAutomaton(station);
         
@@ -239,9 +239,6 @@ public class Plant
         index = 0;
         sind = 0;
         IOAlfindex = 0;
-        
-        int X = nrOfSlots;
-        
         if (newShoe)
         {
             shoesInSystem.add(new Integer(snmbr));
@@ -264,9 +261,13 @@ public class Plant
             
             for (int j = 0; j < 12; j++)
             {
+                @SuppressWarnings("unused")
                 Arc putArcL = new Arc(table_SMatr[i][j], table_SMatr[i][j + 1], putEventL);
+                @SuppressWarnings("unused")
                 Arc getArcL = new Arc(table_SMatr[i][j + 1], table_SMatr[i][j], getEventL);
+                @SuppressWarnings("unused")
                 Arc putArcR = new Arc(table_SMatr[i][j], table_SMatr[i][j + 1], putEventR);
+                @SuppressWarnings("unused")
                 Arc getArcR = new Arc(table_SMatr[i][j + 1], table_SMatr[i][j], getEventR);
             }
         }
@@ -288,9 +289,13 @@ public class Plant
                 
                 for (int j = 0; j < 24; j++)
                 {
+                    @SuppressWarnings("unused")
                     Arc putArc1 = new Arc(table_SMatr[i][j], table_SMatr[i][j + 1], putEvent1);
+                    @SuppressWarnings("unused")
                     Arc getArc1 = new Arc(table_SMatr[i][j + 1], table_SMatr[i][j], getEvent1);
+                    @SuppressWarnings("unused")
                     Arc putArc2 = new Arc(table_SMatr[i][j], table_SMatr[i][j + 1], putEvent2);
+                    @SuppressWarnings("unused")
                     Arc getArc2 = new Arc(table_SMatr[i][j + 1], table_SMatr[i][j], getEvent2);
                 }
             }
@@ -304,7 +309,9 @@ public class Plant
                 
                 for (int j = 0; j < 24; j++)
                 {
+                    @SuppressWarnings("unused")
                     Arc putArc = new Arc(table_SMatr[i][j], table_SMatr[i][j + 1], putEvent);
+                    @SuppressWarnings("unused")
                     Arc getArc = new Arc(table_SMatr[i][j + 1], table_SMatr[i][j], getEvent);
                 }
             }
@@ -335,11 +342,15 @@ public class Plant
                 
                 for (int j = 0; j < 24; j++)
                 {
+                    @SuppressWarnings("unused")
                     Arc putArc = new Arc(table_SMatr[i][j], table_SMatr[i][j + 1], putEvent);
+                    @SuppressWarnings("unused")
                     Arc getArc = new Arc(table_SMatr[i][j + 1], table_SMatr[i][j], getEvent);
                 }
                 
+                @SuppressWarnings("unused")
                 Arc putArc = new Arc(station_SMatr[index][0], station_SMatr[index][1], getEvent);
+                @SuppressWarnings("unused")
                 Arc getArc = new Arc(station_SMatr[index][1], station_SMatr[index][0], putEvent);
                 
                 index++;
@@ -355,6 +366,7 @@ public class Plant
         
         IOAlfindex++;
         
+        @SuppressWarnings("unused")
         Arc putArc0 = new Arc(IOSTate[index], IOSTate[index], putEvent0);
         
         index++;
@@ -378,23 +390,41 @@ public class Plant
             
             IOAlfindex++;
             
+            @SuppressWarnings("unused")
             Arc putArc1 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent1);
+            @SuppressWarnings("unused")
             Arc putArc2 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent2);
+            @SuppressWarnings("unused")
             Arc putArc3 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent3);
+            @SuppressWarnings("unused")
             Arc getArc1 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent1);
+            @SuppressWarnings("unused")
             Arc getArc2 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent2);
+            @SuppressWarnings("unused")
             Arc getArc3 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent3);
+            @SuppressWarnings("unused")
             Arc putArc4 = new Arc(IOSTate[index + 2], IOSTate[index + 1], putEvent1);
+            @SuppressWarnings("unused")
             Arc putArc5 = new Arc(IOSTate[index + 2], IOSTate[index + 1], putEvent2);
+            @SuppressWarnings("unused")
             Arc putArc6 = new Arc(IOSTate[index + 2], IOSTate[index + 1], putEvent3);
+            @SuppressWarnings("unused")
             Arc getArc4 = new Arc(IOSTate[index + 1], IOSTate[index + 2], getEvent1);
+            @SuppressWarnings("unused")
             Arc getArc5 = new Arc(IOSTate[index + 1], IOSTate[index + 2], getEvent2);
+            @SuppressWarnings("unused")
             Arc getArc6 = new Arc(IOSTate[index + 1], IOSTate[index + 2], getEvent3);
+            @SuppressWarnings("unused")
             Arc putArc7 = new Arc(IOSTate[index + 3], IOSTate[index + 2], putEvent1);
+            @SuppressWarnings("unused")
             Arc putArc8 = new Arc(IOSTate[index + 3], IOSTate[index + 2], putEvent2);
+            @SuppressWarnings("unused")
             Arc putArc9 = new Arc(IOSTate[index + 3], IOSTate[index + 2], putEvent3);
+            @SuppressWarnings("unused")
             Arc getArc7 = new Arc(IOSTate[index + 2], IOSTate[index + 3], getEvent1);
+            @SuppressWarnings("unused")
             Arc getArc8 = new Arc(IOSTate[index + 2], IOSTate[index + 3], getEvent2);
+            @SuppressWarnings("unused")
             Arc getArc9 = new Arc(IOSTate[index + 2], IOSTate[index + 3], getEvent3);
             
             index += 4;
@@ -416,23 +446,41 @@ public class Plant
         
         IOAlfindex++;
         
+        @SuppressWarnings("unused")
         Arc putArc7 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent7);
+        @SuppressWarnings("unused")
         Arc putArc8 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent8);
+        @SuppressWarnings("unused")
         Arc putArc9 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent9);
+        @SuppressWarnings("unused")
         Arc getArc7 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent7);
+        @SuppressWarnings("unused")
         Arc getArc8 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent8);
+        @SuppressWarnings("unused")
         Arc getArc9 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent9);
+        @SuppressWarnings("unused")
         Arc putArc10 = new Arc(IOSTate[index + 2], IOSTate[index + 1], putEvent7);
+        @SuppressWarnings("unused")
         Arc putArc11 = new Arc(IOSTate[index + 2], IOSTate[index + 1], putEvent8);
+        @SuppressWarnings("unused")
         Arc putArc12 = new Arc(IOSTate[index + 2], IOSTate[index + 1], putEvent9);
+        @SuppressWarnings("unused")
         Arc getArc10 = new Arc(IOSTate[index + 1], IOSTate[index + 2], getEvent7);
+        @SuppressWarnings("unused")
         Arc getArc11 = new Arc(IOSTate[index + 1], IOSTate[index + 2], getEvent8);
+        @SuppressWarnings("unused")
         Arc getArc12 = new Arc(IOSTate[index + 1], IOSTate[index + 2], getEvent9);
+        @SuppressWarnings("unused")
         Arc putArc13 = new Arc(IOSTate[index + 3], IOSTate[index + 2], putEvent7);
+        @SuppressWarnings("unused")
         Arc putArc14 = new Arc(IOSTate[index + 3], IOSTate[index + 2], putEvent8);
+        @SuppressWarnings("unused")
         Arc putArc15 = new Arc(IOSTate[index + 3], IOSTate[index + 2], putEvent9);
+        @SuppressWarnings("unused")
         Arc getArc13 = new Arc(IOSTate[index + 2], IOSTate[index + 3], getEvent7);
+        @SuppressWarnings("unused")
         Arc getArc14 = new Arc(IOSTate[index + 2], IOSTate[index + 3], getEvent8);
+        @SuppressWarnings("unused")
         Arc getArc15 = new Arc(IOSTate[index + 2], IOSTate[index + 3], getEvent9);
         
         index += 4;
@@ -449,9 +497,13 @@ public class Plant
         
         IOAlfindex++;
         
+        @SuppressWarnings("unused")
         Arc putArc1 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent10);
+        @SuppressWarnings("unused")
         Arc getArc1 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent10);
+        @SuppressWarnings("unused")
         Arc putArc2 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent11);
+        @SuppressWarnings("unused")
         Arc getArc2 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent11);
         
         index += 2;
@@ -466,9 +518,13 @@ public class Plant
         IOAlphabet[IOAlfindex].addEvent(getEvent12);
         IOAlphabet[IOAlfindex].addEvent(getEvent13);
         
+        @SuppressWarnings("unused")
         Arc putArc3 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent12);
+        @SuppressWarnings("unused")
         Arc getArc3 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent12);
+        @SuppressWarnings("unused")
         Arc putArc4 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent13);
+        @SuppressWarnings("unused")
         Arc getArc4 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent13);
     }
     
@@ -526,7 +582,7 @@ public class Plant
         
         for (int i = 0; i < shoesInSystem.size(); i++)
         {
-            add_shoe(((Integer) (shoesInSystem.get(i))).intValue(), false);
+            add_shoe((shoesInSystem.get(i)).intValue(), false);
             shoesInSystem.trimToSize();
         }
     }
@@ -562,6 +618,7 @@ public class Plant
             initialState.setAccepting(true);
             IO.setInitialState(initialState);
             
+            @SuppressWarnings("unused")
             Arc putArc = new Arc(initialState, initialState, putEvent);
             
             thePlant.addAutomaton(IO);
@@ -610,23 +667,41 @@ public class Plant
             
             IOindex++;
             
+            @SuppressWarnings("unused")
             Arc putArc1 = new Arc(workState1, initialState, putEvent1);
+            @SuppressWarnings("unused")
             Arc putArc2 = new Arc(workState1, initialState, putEvent2);
+            @SuppressWarnings("unused")
             Arc putArc3 = new Arc(workState1, initialState, putEvent3);
+            @SuppressWarnings("unused")
             Arc getArc1 = new Arc(initialState, workState1, getEvent1);
+            @SuppressWarnings("unused")
             Arc getArc2 = new Arc(initialState, workState1, getEvent2);
+            @SuppressWarnings("unused")
             Arc getArc3 = new Arc(initialState, workState1, getEvent3);
+            @SuppressWarnings("unused")
             Arc putArc4 = new Arc(workState2, workState1, putEvent1);
+            @SuppressWarnings("unused")
             Arc putArc5 = new Arc(workState2, workState1, putEvent2);
+            @SuppressWarnings("unused")
             Arc putArc6 = new Arc(workState2, workState1, putEvent3);
+            @SuppressWarnings("unused")
             Arc getArc4 = new Arc(workState1, workState2, getEvent1);
+            @SuppressWarnings("unused")
             Arc getArc5 = new Arc(workState1, workState2, getEvent2);
+            @SuppressWarnings("unused")
             Arc getArc6 = new Arc(workState1, workState2, getEvent3);
+            @SuppressWarnings("unused")
             Arc putArc7 = new Arc(workState3, workState2, putEvent1);
+            @SuppressWarnings("unused")
             Arc putArc8 = new Arc(workState3, workState2, putEvent2);
+            @SuppressWarnings("unused")
             Arc putArc9 = new Arc(workState3, workState2, putEvent3);
+            @SuppressWarnings("unused")
             Arc getArc7 = new Arc(workState2, workState3, getEvent1);
+            @SuppressWarnings("unused")
             Arc getArc8 = new Arc(workState2, workState3, getEvent2);
+            @SuppressWarnings("unused")
             Arc getArc9 = new Arc(workState2, workState3, getEvent3);
             
             thePlant.addAutomaton(IO);
@@ -675,23 +750,41 @@ public class Plant
             
             IOindex++;
             
+            @SuppressWarnings("unused")
             Arc putArc1 = new Arc(workState1, initialState, putEvent1);
+            @SuppressWarnings("unused")
             Arc putArc2 = new Arc(workState1, initialState, putEvent2);
+            @SuppressWarnings("unused")
             Arc putArc3 = new Arc(workState1, initialState, putEvent3);
+            @SuppressWarnings("unused")
             Arc getArc1 = new Arc(initialState, workState1, getEvent1);
+            @SuppressWarnings("unused")
             Arc getArc2 = new Arc(initialState, workState1, getEvent2);
+            @SuppressWarnings("unused")
             Arc getArc3 = new Arc(initialState, workState1, getEvent3);
+            @SuppressWarnings("unused")
             Arc putArc4 = new Arc(workState2, workState1, putEvent1);
+            @SuppressWarnings("unused")
             Arc putArc5 = new Arc(workState2, workState1, putEvent2);
+            @SuppressWarnings("unused")
             Arc putArc6 = new Arc(workState2, workState1, putEvent3);
+            @SuppressWarnings("unused")
             Arc getArc4 = new Arc(workState1, workState2, getEvent1);
+            @SuppressWarnings("unused")
             Arc getArc5 = new Arc(workState1, workState2, getEvent2);
+            @SuppressWarnings("unused")
             Arc getArc6 = new Arc(workState1, workState2, getEvent3);
+            @SuppressWarnings("unused")
             Arc putArc7 = new Arc(workState3, workState2, putEvent1);
+            @SuppressWarnings("unused")
             Arc putArc8 = new Arc(workState3, workState2, putEvent2);
+            @SuppressWarnings("unused")
             Arc putArc9 = new Arc(workState3, workState2, putEvent3);
+            @SuppressWarnings("unused")
             Arc getArc7 = new Arc(workState2, workState3, getEvent1);
+            @SuppressWarnings("unused")
             Arc getArc8 = new Arc(workState2, workState3, getEvent2);
+            @SuppressWarnings("unused")
             Arc getArc9 = new Arc(workState2, workState3, getEvent3);
             
             thePlant.addAutomaton(IO);
@@ -726,9 +819,13 @@ public class Plant
             
             IOindex++;
             
+            @SuppressWarnings("unused")
             Arc putArc1 = new Arc(workState, initialState, putEvent1);
+            @SuppressWarnings("unused")
             Arc getArc1 = new Arc(initialState, workState, getEvent1);
+            @SuppressWarnings("unused")
             Arc putArc2 = new Arc(workState, initialState, putEvent2);
+            @SuppressWarnings("unused")
             Arc getArc2 = new Arc(initialState, workState, getEvent2);
             
             thePlant.addAutomaton(IO);
@@ -763,9 +860,13 @@ public class Plant
             
             IOindex++;
             
+            @SuppressWarnings("unused")
             Arc putArc1 = new Arc(workState, initialState, putEvent1);
+            @SuppressWarnings("unused")
             Arc getArc1 = new Arc(initialState, workState, getEvent1);
+            @SuppressWarnings("unused")
             Arc putArc2 = new Arc(workState, initialState, putEvent2);
+            @SuppressWarnings("unused")
             Arc getArc2 = new Arc(initialState, workState, getEvent2);
             
             thePlant.addAutomaton(IO);

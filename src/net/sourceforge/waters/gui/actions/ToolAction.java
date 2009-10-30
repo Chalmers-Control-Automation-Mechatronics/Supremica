@@ -63,4 +63,9 @@ public abstract class ToolAction
   //# Data Members
   private final ControlledToolbar.Tool mTool;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

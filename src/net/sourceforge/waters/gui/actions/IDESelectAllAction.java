@@ -13,22 +13,21 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
+
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 
-import net.sf.javabdd.*;
+import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDBitVector;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import org.supremica.automata.BDD.EFA.*;
 import org.supremica.automata.ExtendedAutomata;
-import org.supremica.automata.ExtendedAutomaton;
-import org.supremica.automata.algorithms.AutomataSynchronizer;
-import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.BDD.EFA.BDDExtendedAutomata;
+import org.supremica.automata.BDD.EFA.BDDExtendedManager;
 import org.supremica.gui.ide.EditorPanel;
 import org.supremica.gui.ide.IDE;
 
@@ -171,5 +170,10 @@ public class IDESelectAllAction
       setEnabled(enabled);
     }
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

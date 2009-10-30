@@ -66,4 +66,9 @@ public class ErrorLabel
   private static final Color WARNING_COLOR = Color.RED;
   private static final Color MESSAGE_COLOR = null;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

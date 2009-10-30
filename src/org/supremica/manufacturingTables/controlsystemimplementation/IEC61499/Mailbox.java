@@ -66,11 +66,11 @@ import java.util.Collections;
 
 public class Mailbox
 {
-    private Map listeners; // HashMap will be used for quick access to listeners of the mailbox
+    private Map<String,Listener> listeners; // HashMap will be used for quick access to listeners of the mailbox
 
     public Mailbox()
     {
-	listeners = Collections.synchronizedMap(new HashMap(10)); //initital capacity 10 and default load factor (0,75) suits me fine
+	listeners = Collections.synchronizedMap(new HashMap<String,Listener>(10)); //initital capacity 10 and default load factor (0,75) suits me fine
     }
 
     public void send(Message msg)

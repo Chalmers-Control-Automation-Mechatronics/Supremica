@@ -5,7 +5,9 @@ import java.util.*;
 public class StateSets
 	extends HashSet<StateSet>
 {
-	public StateSets()
+    private static final long serialVersionUID = 1L;
+
+    public StateSets()
 	{
 		super(); 
 	}

@@ -83,6 +83,7 @@ public final class Base64
 	static private final int TWENTYFOURBITGROUP = 24;
 	static private final int EIGHTBIT = 8;
 	static private final int SIXTEENBIT = 16;
+	@SuppressWarnings("unused")
 	static private final int SIXBIT = 6;
 	static private final int FOURBYTE = 4;
 	static private final int SIGN = -128;

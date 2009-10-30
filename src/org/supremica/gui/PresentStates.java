@@ -25,14 +25,17 @@ class PresentStatesTableModel
 	extends DefaultTableModel    // AbstractTableModel
 {
 	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
 	private IntArrayVector states;
 	private SearchStates ss;
+	@SuppressWarnings("unused")
 	private final int rows;
+	@SuppressWarnings("unused")
 	private final int cols;
 
 	private static Vector formColumnNameVector(Automata a)
 	{
-		Vector v = new Vector();
+		Vector<String> v = new Vector<String>();
 
 		for (int i = 0; i < a.size(); ++i)
 		{
@@ -195,6 +198,7 @@ class PresentStatesFrame
 	private ForbidButton forbid_button;
 //      private RouteButton route_button;
 
+	@SuppressWarnings("unused")
 	private static void debug(String s)
 	{
 		logger.debug(s);
@@ -230,7 +234,7 @@ class PresentStatesFrame
 	private class ForbidButton
 		extends JButton
 	{
-		private static final long serialVersionaUID = 1L; // what's this? necessary for what? //MF
+		private static final long serialVersionUID = 1L;
 
 		public ForbidButton()
 		{
@@ -298,6 +302,7 @@ class PresentStatesFrame
 				}
 			}
 			**/ 
+			@SuppressWarnings("unused")
 			Forbidder forbidder = new Forbidder(automata, table.getSelectedRows(), search_states, theVisualProject);
 		}
 	}
@@ -448,6 +453,7 @@ public class PresentStates
 	}
 
 	// Debugging only
+	@SuppressWarnings("unused")
 	private void conOut()
 	{
 

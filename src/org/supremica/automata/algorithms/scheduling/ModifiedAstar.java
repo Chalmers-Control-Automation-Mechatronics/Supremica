@@ -15,11 +15,21 @@
  */
 package org.supremica.automata.algorithms.scheduling;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
-import org.supremica.automata.*;
-import org.supremica.gui.ActionMan;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.automata.AutomataIndexMap;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
 import org.supremica.util.ActionTimer;
+
 
 public class ModifiedAstar
     implements Scheduler
@@ -427,7 +437,8 @@ public class ModifiedAstar
     /** 
      * Resets or initializes the OPEN and the CLOSED trees.
      */
-    protected void initTrees()
+    @SuppressWarnings("unchecked")
+	protected void initTrees()
     {
         if (openTree == null)
         {
@@ -1430,7 +1441,7 @@ public class ModifiedAstar
 		
         String s = printNodeName(node) + "; Tv = [";
         
-        int addIndex = node.getBasis().length - (plantAutomata.size() + 1);
+        // int addIndex = node.getBasis().length - (plantAutomata.size() + 1);
         for (int i=0; i<getActiveLength()-1; i++)
 		{
             s += node.getValueAt(i + CURRENT_COSTS_INDEX) +  " ";
@@ -1652,7 +1663,7 @@ public class ModifiedAstar
 	public void sleep (long ms)
 		throws InterruptedException
 	{
-		astarThread.sleep(ms);
+		Thread.sleep(ms);
 	}
 
 	public Automaton getSchedule()

@@ -10,9 +10,11 @@ class AnimationSignals
 	implements AnimationListener
 {
 	private static Logger logger = LoggerFactory.createLogger(AnimationSignals.class);
+	@SuppressWarnings("unused")
 	private Animation theAnimation;
-	private HashMap theSignals = new HashMap();
-	private LinkedList observers = new LinkedList();
+	private HashMap<String, Boolean> theSignals = new HashMap<String, Boolean>();
+	@SuppressWarnings("unused")
+	private LinkedList<?> observers = new LinkedList<Object>();
 
 	public AnimationSignals(Animation theAnimation)
 	{
@@ -20,9 +22,9 @@ class AnimationSignals
 
 		theAnimation.addAnimationListener(this);
 
-		Set theEvents = theAnimation.getEventNames();
+		Set<?> theEvents = theAnimation.getEventNames();
 
-		for (Iterator evIt = theEvents.iterator(); evIt.hasNext(); )
+		for (Iterator<?> evIt = theEvents.iterator(); evIt.hasNext(); )
 		{
 			String currEvent = (String) evIt.next();
 
@@ -72,7 +74,7 @@ class AnimationSignals
 */
 	public synchronized boolean isTrue(String theSignal)
 	{
-		Boolean currValue = (Boolean) theSignals.get(theSignal);
+		Boolean currValue = theSignals.get(theSignal);
 
 		if (currValue == null)
 		{

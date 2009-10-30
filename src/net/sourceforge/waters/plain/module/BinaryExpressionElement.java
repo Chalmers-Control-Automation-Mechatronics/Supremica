@@ -171,4 +171,9 @@ public final class BinaryExpressionElement
   private final SimpleExpressionProxy mLeft;
   private final SimpleExpressionProxy mRight;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -892348068208926353L;
+
 }

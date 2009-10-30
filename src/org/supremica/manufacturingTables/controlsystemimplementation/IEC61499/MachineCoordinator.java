@@ -66,8 +66,10 @@ import java.util.Map;
 public class MachineCoordinator implements Listener
 {
     private String machine;
-    private Mailbox mailbox; // No longer used in the Fuber implementation
-    private Coordinator coordinator; // No longer used in the Fuber implementation
+    @SuppressWarnings("unused")
+	private Mailbox mailbox; // No longer used in the Fuber implementation
+    @SuppressWarnings("unused")
+	private Coordinator coordinator; // No longer used in the Fuber implementation
     // All communication with the mailbox and the coordinator is now done via the machineCoordinatorThread
     private MachineCoordinatorThread machineCoordinatorThread; 
     private COPActivity currentActivity;

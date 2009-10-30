@@ -53,12 +53,10 @@ import java.util.*;
 
 public class Listeners
 {
-	protected List listeners = null;
+	protected List<Listener> listeners = null;
 	protected Object owner;
 	protected boolean batchUpdate = false;
 	protected boolean updateNeeded = false;
-
-	private Listeners() {}
 
 	protected Listeners(Object owner)
 	{
@@ -69,7 +67,7 @@ public class Listeners
 	{
 		if (listeners == null)
 		{
-			listeners = new LinkedList();
+			listeners = new LinkedList<Listener>();
 		}
 
 		listeners.add(l);
@@ -113,11 +111,11 @@ public class Listeners
 		{
 			if (listeners != null)
 			{
-				Iterator listenerIt = listeners.iterator();
+				Iterator<Listener> listenerIt = listeners.iterator();
 
 				while (listenerIt.hasNext())
 				{
-					Listener currListener = (Listener) listenerIt.next();
+					Listener currListener = listenerIt.next();
 
 					currListener.updated(owner);
 				}

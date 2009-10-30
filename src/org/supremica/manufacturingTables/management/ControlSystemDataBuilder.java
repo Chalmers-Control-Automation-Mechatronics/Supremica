@@ -295,8 +295,7 @@ public class ControlSystemDataBuilder
 	    nbrOfBlanks++;
 	    for (Iterator variableIter = externalComponents.getExternalComponent().iterator(); variableIter.hasNext();)
 	    {
-		ExternalComponent externalComponent = (ExternalComponent) variableIter.next();
-
+	    	variableIter.next();
 		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<ExternalComponent>");
 		nbrOfBlanks++;
 		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Component>" + externalComponent.getComponent() + "</Component>");

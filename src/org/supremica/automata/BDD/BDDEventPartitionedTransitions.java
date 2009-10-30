@@ -50,11 +50,14 @@
 
 package org.supremica.automata.BDD;
 
-import net.sf.javabdd.*;
-import org.supremica.automata.*;
-import org.supremica.log.*;
-import org.supremica.util.SupremicaException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import net.sf.javabdd.BDD;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.LabeledEvent;
+
 
 public class BDDEventPartitionedTransitions
     implements BDDTransitions

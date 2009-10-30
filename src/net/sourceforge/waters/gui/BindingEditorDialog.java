@@ -67,7 +67,7 @@ public class BindingEditorDialog
 		r3.add(cancelButton);
 		setContentPane(contentPanel);
 		pack();
-		show();
+		setVisible(true);
 	}
 
 
@@ -93,6 +93,7 @@ public class BindingEditorDialog
 				ErrorWindow.askRevert(this, exception, exprText);
 				return;
 			}
+			@SuppressWarnings("unused")
 			final ParameterBindingSubject binding =
 				new ParameterBindingSubject(nameText, expr);
 			// *** TODO *** Add binding to module ...
@@ -113,5 +114,10 @@ public class BindingEditorDialog
 	private final JTextField mExprInput = new JTextField(16);
 	private final JButton okButton = new JButton("OK");
 	private final ModuleWindowInterface mRoot;
+
+
+	//#######################################################################
+	//# Class Constants
+	private static final long serialVersionUID = 1L;
 
 }

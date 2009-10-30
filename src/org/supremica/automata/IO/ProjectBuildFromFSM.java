@@ -49,11 +49,27 @@
  */
 package org.supremica.automata.IO;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
-import org.supremica.automata.*;
-import org.supremica.log.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.DefaultProjectFactory;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.ProjectFactory;
+import org.supremica.automata.State;
+
 
 /**
  * Import UMDES files, http://www.eecs.umich.edu/umdes/
@@ -438,11 +454,11 @@ public class ProjectBuildFromFSM
         }
         
         // Add all transitions and events
-        for (Iterator labelIt = transitionMap.labelIterator();
+        for (Iterator<LabeledEvent> labelIt = transitionMap.labelIterator();
         labelIt.hasNext(); )
         {
-            LabeledEvent currEvent = (LabeledEvent) labelIt.next();
-            List currList = transitionMap.getTransitions(currEvent);
+            LabeledEvent currEvent = labelIt.next();
+            List<?> currList = transitionMap.getTransitions(currEvent);
             
             // Add the event
             if (currAlphabet.contains(currEvent))
@@ -453,7 +469,7 @@ public class ProjectBuildFromFSM
             currAlphabet.addEvent(currEvent);
             
             // Add the transition
-            for (Iterator transIt = currList.iterator(); transIt.hasNext(); )
+            for (Iterator<?> transIt = currList.iterator(); transIt.hasNext(); )
             {
                 TransitionMap.Transition currTransition = (TransitionMap.Transition) transIt.next();
                 String sourceStateName = currTransition.getSourceStateName();
@@ -474,7 +490,8 @@ public class ProjectBuildFromFSM
 
 class TransitionMap
 {
-    private HashMap theMap = new HashMap();
+    private HashMap<LabeledEvent, List<Transition>> theMap =
+        new HashMap<LabeledEvent, List<Transition>>();
     
     public TransitionMap()
     {}
@@ -482,15 +499,15 @@ class TransitionMap
     public void addArc(String sourceState, String destState, LabeledEvent event)
     {
         Transition newTransition = new Transition(sourceState, destState);
-        List transitions;
+        List<Transition> transitions;
         
         if (theMap.containsKey(event))
         {
-            transitions = (List) theMap.get(event);
+            transitions = theMap.get(event);
         }
         else
         {
-            transitions = new LinkedList();
+            transitions = new LinkedList<Transition>();
             
             theMap.put(event, transitions);
         }
@@ -498,18 +515,18 @@ class TransitionMap
         transitions.add(newTransition);
     }
     
-    public Iterator labelIterator()
+    public Iterator<LabeledEvent> labelIterator()
     {
-        Set currSet = theMap.keySet();
+        Set<LabeledEvent> currSet = theMap.keySet();
         
         return currSet.iterator();
     }
     
-    public List getTransitions(LabeledEvent event)
+    public List<?> getTransitions(LabeledEvent event)
     {
         if (theMap.containsKey(event))
         {
-            return (List) theMap.get(event);
+            return theMap.get(event);
         }
         else
         {

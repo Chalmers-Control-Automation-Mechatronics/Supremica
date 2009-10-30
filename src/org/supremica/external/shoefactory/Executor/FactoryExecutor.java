@@ -4,6 +4,7 @@ import org.supremica.external.shoefactory.plantBuilder.*;
 import org.supremica.external.shoefactory.Animator.*;
 import org.supremica.gui.*;
 import grafchart.sfc.*;
+
 import java.net.URL;
 import java.util.*;
 import org.supremica.automata.*;
@@ -16,8 +17,8 @@ public class FactoryExecutor
 	static int shoeNr = 1, sNr = 0;
 	static Gui gui;
 	static EditorAPI e;
-	static ArrayList shoes = new ArrayList();
-	static ArrayList shoeNumbers = new ArrayList();
+	static ArrayList<GCDocument> shoes = new ArrayList<GCDocument>();
+	static ArrayList<Integer> shoeNumbers = new ArrayList<Integer>();
 	static GCDocument top, jgSupervisor;
 
 	public FactoryExecutor() {}
@@ -53,7 +54,7 @@ public class FactoryExecutor
 					top = e.openWorkspace(xmlPath);
 					jgSupervisor = e.newWorkspace();
 
-					JgrafSupervisor js = new JgrafSupervisor(jgSupervisor, shoeNr);
+					new JgrafSupervisor(jgSupervisor, shoeNr);
 
 					shoePlant = new Plant();
 
@@ -68,8 +69,7 @@ public class FactoryExecutor
 					syncPlant.synthesizePlants("theSupervisor");
 
 					GCDocument newShoe = e.newWorkspace();
-					Shoe s = new Shoe(newShoe, stationV, shoeNr);
-
+					new Shoe(newShoe, stationV, shoeNr);
 					shoes.add(newShoe);
 					shoeNumbers.add(new Integer(shoeNr));
 					newShoe.setSpeed(threadSleepInterval);
@@ -112,7 +112,7 @@ public class FactoryExecutor
 				gui.addProject(shoeSpec.getSpec());
 
 				GCDocument newShoe = e.newWorkspace();
-				Shoe s = new Shoe(newShoe, stationV, shoeNr);
+				new Shoe(newShoe, stationV, shoeNr);
 
 				shoes.add(newShoe);
 				shoeNumbers.add(new Integer(shoeNr));
@@ -164,7 +164,7 @@ public class FactoryExecutor
 	public static boolean deleteShoe(int nr)
 	{
 		Integer i = new Integer(nr);
-		GCDocument temp = (GCDocument) shoes.get(shoeNumbers.indexOf(i));
+		GCDocument temp = shoes.get(shoeNumbers.indexOf(i));
 
 		e.stopWorkspace(temp);
 		e.deleteWorkspace(temp);
@@ -186,7 +186,7 @@ public class FactoryExecutor
 		gui.selectAutomata(sel);
 
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		Iterator autIt = selectedAutomata.iterator();
+		Iterator<?> autIt = selectedAutomata.iterator();
 
 		while (autIt.hasNext())
 		{
@@ -206,7 +206,7 @@ public class FactoryExecutor
 	{
 		for (int nr = 1; nr <= shoes.size(); nr++)
 		{
-			GCDocument temp = (GCDocument) shoes.get(nr - 1);
+			GCDocument temp = shoes.get(nr - 1);
 
 			temp.setSpeed(time);
 		}
@@ -217,8 +217,6 @@ public class FactoryExecutor
 
 	public static int getShoeIndex(int currIndex)
 	{
-		Integer i = new Integer(0);
-
 		if (currIndex == 0)
 		{
 			return Integer.parseInt(shoeNumbers.get(0).toString());

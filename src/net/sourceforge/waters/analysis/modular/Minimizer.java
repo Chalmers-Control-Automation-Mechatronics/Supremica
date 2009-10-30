@@ -19,18 +19,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map.Entry;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.TreeSet;
 
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
@@ -170,7 +167,6 @@ public class Minimizer
     for (Set<Integer> p : mPartitions) {
       check(p);
     }
-    AutomatonProxy minAut;
     if (mStates.length > mPartitions.size()) { 
       List<StateProxy> states = new ArrayList<StateProxy>(mPartitions.size());
       Collection<TransitionProxy> transitions = new ArrayList<TransitionProxy>();
@@ -347,7 +343,8 @@ public class Minimizer
       return Integer.toString(mName);
     }
     
-    public boolean refequals(Object o)
+    @SuppressWarnings("unused")
+	public boolean refequals(Object o)
     {
       if (o instanceof NamedProxy) {
         return refequals((NamedProxy) o);

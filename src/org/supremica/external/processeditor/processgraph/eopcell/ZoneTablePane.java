@@ -28,7 +28,9 @@ public class ZoneTablePane
 							ActionListener,
 							MouseListener
 {
-	private List<JComboBox> comboBoxList = null;
+    private static final long serialVersionUID = 1L;
+
+    private List<JComboBox> comboBoxList = null;
 	private ZoneDataEditor editor = null;
 	
 	public ZoneTablePane(Zones zones){
@@ -154,6 +156,7 @@ public class ZoneTablePane
 class ZoneCellEditor extends
 						DefaultCellEditor
 {
+    private static final long serialVersionUID = 1L;
 	private static final String ACTUATOR = "Actuator";
 	private static final String VARIABLE = "Variable";
 	private static final String SENSOR = "Sensor";

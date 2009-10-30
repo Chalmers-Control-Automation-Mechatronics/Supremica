@@ -23,6 +23,7 @@ public class ProgramBuilder
 	/* references to the direct variable fields */
 	String directOutput = "directOutput";
 	String directInput = "directInput";
+	@SuppressWarnings("unused")
 	private File temp;
 
 	/**

@@ -67,8 +67,8 @@ public class EOP
     private String id;
     private String type;
     private String comment;
-    private List EOPRows; // contains initial row and action rows 
-    private ListIterator actionIterator;
+    private List<EOPRow> EOPRows; // contains initial row and action rows 
+    private ListIterator<EOPRow> actionIterator;
 
     public static final String ALTERNATIVE_TYPE = 
 	org.supremica.manufacturingTables.controlsystemdata.EOPData.ALTERNATIVE_TYPE;
@@ -96,7 +96,7 @@ public class EOP
 	    
 	this.type = type;
 	comment = null;
-	EOPRows = new LinkedList();
+	EOPRows = new LinkedList<EOPRow>();
 	actionIterator = EOPRows.listIterator();
     }
 
@@ -142,7 +142,7 @@ public class EOP
     // that must be checked (those that does not have a EOP.IGNORE_TOKEN as the state).
     public EOPInitialRow getEOPInitialRowActions()
     {
-	EOPInitialRow initialRowActions =  (EOPInitialRow) ( (EOPInitialRow) ( (LinkedList) EOPRows).getFirst() ).clone();
+	EOPInitialRow initialRowActions =  (EOPInitialRow) ( (EOPInitialRow) ( (LinkedList<EOPRow>) EOPRows).getFirst() ).clone();
         initialRowActions.removeUnimportantStates();
 	startActions();
 	return initialRowActions;
@@ -151,7 +151,7 @@ public class EOP
     // Returns a clone of EOPInitialRow 
     public EOPInitialRow getEOPInitialRowClone()
     {
-	EOPInitialRow initialRow =  (EOPInitialRow) ( (EOPInitialRow) ( (LinkedList) EOPRows).getFirst() ).clone();
+	EOPInitialRow initialRow =  (EOPInitialRow) ( (EOPInitialRow) ( (LinkedList<EOPRow>) EOPRows).getFirst() ).clone();
 	startActions();
 	return initialRow;
     }
@@ -186,7 +186,7 @@ public class EOP
 	    }
 	else
 	    {
-		EOPRow previousRow = (EOPRow) EOPRows.get( actionIterator.previousIndex() ); 
+		EOPRow previousRow = EOPRows.get( actionIterator.previousIndex() ); 
 		// previousIndex does not change the value of the iterator 
 		EOPActionRow nextActions = (EOPActionRow) ( (EOPActionRow) actionIterator.next() ).clone();
 		nextActions.removeUnchangedComponents(previousRow);
@@ -197,7 +197,7 @@ public class EOP
     // Returns the last row. Is often used to get the last row of the whole list.
     public EOPRow getLastRow()
     {
-	return (EOPRow) EOPRows.get( actionIterator.previousIndex() ); 
+	return EOPRows.get( actionIterator.previousIndex() ); 
 
     }
     

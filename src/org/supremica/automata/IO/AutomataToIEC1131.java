@@ -735,9 +735,6 @@ public class AutomataToIEC1131
 		int currEventIndex = currEvent.getIndex();
 
 		pw.println("\n\t(* Transition for event \"" + currEvent.getLabel() + "\" *)");
-
-		boolean previousCondition = false;
-
 		pw.println("\tIF (e_" + currEventIndex + ")");
 		pw.println("\tTHEN");
 
@@ -843,9 +840,6 @@ public class AutomataToIEC1131
 		int currEventIndex = currEvent.getIndex();
 
 		theHelper.printILComment(pw, "Transition for event \"" + currEvent.getLabel() + "\"");
-
-		boolean previousCondition = false;
-
 		theHelper.printILCommand(pw, "LD", "e_" + currEventIndex);
 		theHelper.printILCommand(pw, "JMPCN", "trans_after_e_" + currEventIndex);
 
@@ -869,9 +863,6 @@ public class AutomataToIEC1131
 			}
 
 			theHelper.printILComment(pw, "Transitions in " + currAutomaton.getName());
-
-			boolean previousState = false;
-
 			for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
 			     stateIt.hasNext(); )
 			{

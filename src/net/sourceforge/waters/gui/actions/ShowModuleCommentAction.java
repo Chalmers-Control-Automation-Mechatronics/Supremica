@@ -49,4 +49,9 @@ public class ShowModuleCommentAction
     root.showComment();
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

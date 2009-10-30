@@ -18,7 +18,8 @@ import java.util.TreeSet;
 public class IntArrayTreeSet
         extends TreeSet<int[]>
 {
-    
+    private static final long serialVersionUID = 1L;
+
     /** 
      * Creates a new instance of IntArrayTreeSet, using IntArrayComparator to
      * order tree nodes. 

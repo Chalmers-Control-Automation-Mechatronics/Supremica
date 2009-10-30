@@ -275,6 +275,9 @@ public class SimpleExpressionCell
       return mParser.getDocumentFilter();
     }
 
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
   }
 
 
@@ -399,5 +402,10 @@ public class SimpleExpressionCell
 
   private boolean mAllowNull;
   private ErrorDisplay mErrorDisplay;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

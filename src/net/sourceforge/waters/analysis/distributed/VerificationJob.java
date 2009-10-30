@@ -50,7 +50,13 @@ public class VerificationJob extends Job
     set(WALLTIME_LIMIT_ATTR, limit);
   }
 
+
+  //#########################################################################
+  //# Class Constants
   public static final String MODEL_ATTR = "waters-model";
   public static final String KIND_XLATOR_ATTR = "waters-kindtranslator";
   public static final String WALLTIME_LIMIT_ATTR = "job-walltime-limit";
+
+  private static final long serialVersionUID = 1L;
+
 }

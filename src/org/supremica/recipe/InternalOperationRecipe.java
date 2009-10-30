@@ -58,10 +58,10 @@ import java.util.*;
  */
 public class InternalOperationRecipe
 {
-	private HashMap operations = new HashMap();
-	private List sortedOperations = new LinkedList();
-	private HashMap transitions = new HashMap();
-	private List sortedTransitions = new LinkedList();
+	private HashMap<String, InternalOperation> operations = new HashMap<String, InternalOperation>();
+	private List<InternalOperation> sortedOperations = new LinkedList<InternalOperation>();
+	private HashMap<String, InternalTransition> transitions = new HashMap<String, InternalTransition>();
+	private List<InternalTransition> sortedTransitions = new LinkedList<InternalTransition>();
 	private String identity;
 	private InternalOperationRecipeStatus status = InternalOperationRecipeStatus.NotStarted;
 
@@ -161,7 +161,7 @@ public class InternalOperationRecipe
 			throw new SupremicaException(identity + " does not exist");
 		}
 
-		return (InternalOperation) operations.get(identity);
+		return operations.get(identity);
 	}
 
 	public InternalTransition getInternalTransition(String identity)
@@ -172,15 +172,15 @@ public class InternalOperationRecipe
 			throw new SupremicaException(identity + " does not exist");
 		}
 
-		return (InternalTransition) transitions.get(identity);
+		return transitions.get(identity);
 	}
 
-	public Iterator operationIterator()
+	public Iterator<InternalOperation> operationIterator()
 	{
 		return sortedOperations.iterator();
 	}
 
-	public Iterator transitionIterator()
+	public Iterator<InternalTransition> transitionIterator()
 	{
 		return sortedTransitions.iterator();
 	}
@@ -215,22 +215,22 @@ public class InternalOperationRecipe
 		InternalOperationRecipe newRecipe = new InternalOperationRecipe(newIdentity);
 
 		// Create copies of all operations
-		Iterator operationIt = operationIterator();
+		Iterator<InternalOperation> operationIt = operationIterator();
 
 		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation) operationIt.next();
+			InternalOperation currOperation = operationIt.next();
 			InternalOperation newOperation = new InternalOperation(currOperation);
 
 			newRecipe.addOperation(newOperation);
 		}
 
 		// Create copies of all transitions
-		Iterator transitionIt = transitionIterator();
+		Iterator<InternalTransition> transitionIt = transitionIterator();
 
 		while (transitionIt.hasNext())
 		{
-			InternalTransition currTransition = (InternalTransition) transitionIt.next();
+			InternalTransition currTransition = transitionIt.next();
 			InternalTransition newTransition = new InternalTransition(currTransition);
 
 			newRecipe.addTransition(newTransition);
@@ -243,14 +243,14 @@ public class InternalOperationRecipe
 
 		while (operationIt.hasNext())
 		{
-			InternalOperation orgOperation = (InternalOperation) operationIt.next();
+			InternalOperation orgOperation = operationIt.next();
 			InternalOperation newOperation = newRecipe.getInternalOperation(orgOperation.getIdentity());
 
 			transitionIt = orgOperation.nextTransitionIterator();
 
 			while (transitionIt.hasNext())
 			{
-				InternalTransition orgTransition = (InternalTransition) transitionIt.next();
+				InternalTransition orgTransition = transitionIt.next();
 				InternalTransition newTransition = newRecipe.getInternalTransition(orgTransition.getIdentity());
 
 				newRecipe.addArc(newOperation, newTransition);
@@ -262,14 +262,14 @@ public class InternalOperationRecipe
 
 		while (transitionIt.hasNext())
 		{
-			InternalTransition orgTransition = (InternalTransition) transitionIt.next();
+			InternalTransition orgTransition = transitionIt.next();
 			InternalTransition newTransition = newRecipe.getInternalTransition(orgTransition.getIdentity());
 
 			operationIt = orgTransition.nextOperationIterator();
 
 			while (operationIt.hasNext())
 			{
-				InternalOperation orgOperation = (InternalOperation) operationIt.next();
+				InternalOperation orgOperation = operationIt.next();
 				InternalOperation newOperation = newRecipe.getInternalOperation(orgOperation.getIdentity());
 
 				newRecipe.addArc(newTransition, newOperation);
@@ -285,20 +285,20 @@ public class InternalOperationRecipe
 
 		sb.append("InternalOperationRecipe: " + identity + "\n");
 
-		Iterator operationIt = operationIterator();
+		Iterator<InternalOperation> operationIt = operationIterator();
 
 		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation) operationIt.next();
+			InternalOperation currOperation = operationIt.next();
 
 			sb.append(currOperation);
 		}
 
-		Iterator transitionIt = transitionIterator();
+		Iterator<InternalTransition> transitionIt = transitionIterator();
 
 		while (transitionIt.hasNext())
 		{
-			InternalTransition currTransition = (InternalTransition) (transitionIt.next());
+			InternalTransition currTransition = (transitionIt.next());
 
 			sb.append(currTransition);
 		}
@@ -306,14 +306,14 @@ public class InternalOperationRecipe
 		return sb.toString();
 	}
 
-	public Iterator enabledTransitions(InternalOperationState theState)
+	public Iterator<InternalTransition> enabledTransitions(InternalOperationState theState)
 	{
-		List enabledTransitions = new LinkedList();
-		Iterator transitionIt = transitionIterator();
+		List<InternalTransition> enabledTransitions = new LinkedList<InternalTransition>();
+		Iterator<InternalTransition> transitionIt = transitionIterator();
 
 		while (transitionIt.hasNext())
 		{
-			InternalTransition currTransition = (InternalTransition) transitionIt.next();
+			InternalTransition currTransition = transitionIt.next();
 
 			if (currTransition.isEnabled(theState))
 			{
@@ -348,11 +348,11 @@ public class InternalOperationRecipe
 
 		if (status == InternalOperationRecipeStatus.Running)
 		{    // Find all operations that are active
-			Iterator operationIt = operationIterator();
+			Iterator<InternalOperation> operationIt = operationIterator();
 
 			while (operationIt.hasNext())
 			{
-				InternalOperation currOperation = (InternalOperation) operationIt.next();
+				InternalOperation currOperation = operationIt.next();
 
 				if (currOperation.isActive())
 				{
@@ -374,11 +374,11 @@ public class InternalOperationRecipe
 	{
 		int nbrOfInitialOperations = 0;
 		int nbrOfFinalOperations = 0;
-		Iterator operationIt = operationIterator();
+		Iterator<InternalOperation> operationIt = operationIterator();
 
 		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation) operationIt.next();
+			InternalOperation currOperation = operationIt.next();
 
 			if (currOperation.isInitial())
 			{

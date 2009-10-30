@@ -37,6 +37,7 @@ public class PerEventTransitionSystem
 	// ---------------------------------------------------------
 	public int forward_reachability(int Q_i, GrowFrame gf)
 	{
+		@SuppressWarnings("unused")
 		int cube_sp = manager.getStatepCube();
 		int cube_s = manager.getStateCube();
 		int sp2s = manager.getPermuteSp2S();

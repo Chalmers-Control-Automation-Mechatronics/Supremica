@@ -56,6 +56,7 @@ public class SynchronizerStateCompressor
 	private int decompressedStateLength;
 	private int[] tmpCompressedState;
 	private int[] tmpDecompressedState;
+	@SuppressWarnings("unused")
 	private int[] maxIntegerInEachAutomaton;
 
 

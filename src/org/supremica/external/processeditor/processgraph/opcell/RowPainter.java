@@ -1,12 +1,20 @@
 package org.supremica.external.processeditor.processgraph.opcell;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.border.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-import org.supremica.manufacturingTables.xsd.processeditor.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+
+import org.supremica.manufacturingTables.xsd.processeditor.Activity;
+import org.supremica.manufacturingTables.xsd.processeditor.Attribute;
+
 
 /**
  * Draws a row of attributes.
@@ -15,10 +23,12 @@ public class RowPainter extends JPanel implements MouseListener,
 						  KeyListener
 						 
 {       
-    
-    private DefaultListModel mod = new DefaultListModel();
+    private static final long serialVersionUID = 1L;
+	
+	private DefaultListModel mod = new DefaultListModel();
     private JList list = new JList(mod);
-    private AttributeCellRenderer renderer = null;       
+    @SuppressWarnings("unused")
+	private AttributeCellRenderer renderer = null;       
 
     private AttributeListener myListener = null;
 
@@ -136,7 +146,6 @@ public class RowPainter extends JPanel implements MouseListener,
     public void setAttributeTypeVisible(String type, boolean visible) {	    
 	if(operand.getProperties() != null) {
 	    Object[] attributes = operand.getProperties().getAttribute().toArray();
-	    boolean attributeChanged = false;
 	    for(int j = 0; j < attributes.length; j++) {	       
 		if((attributes[j] instanceof Attribute)&&
 		   (type.equals(((Attribute)attributes[j]).getType()))) { 

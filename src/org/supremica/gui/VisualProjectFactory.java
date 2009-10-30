@@ -55,6 +55,7 @@ import org.supremica.log.*;
 public class VisualProjectFactory
 	implements ProjectFactory
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(VisualProjectFactory.class);
 
 	public VisualProjectFactory() {}

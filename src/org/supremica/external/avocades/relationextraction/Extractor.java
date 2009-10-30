@@ -8,6 +8,7 @@
 package org.supremica.external.avocades.relationextraction;
 
 import java.util.*;
+
 import org.jdom.*;
 
 import java.util.Hashtable;
@@ -32,21 +33,23 @@ import static org.supremica.external.avocades.AutomataNames.DONT_CARE_STATE_POST
 public class Extractor
 {
 	private ArrayList<Document> COPList;
+	@SuppressWarnings("unused")
 	private Document relationsDoc; // Output xml document.
+	@SuppressWarnings("unused")
 	private Element relations = new Element("COP");
 
 	public class Restriction {
 		public String opId;
 		public String opName;
-		public List restrictions;
+		public List<?> restrictions;
 
 		public Restriction() {}
 
-		public Restriction(String id, String name, ArrayList r)
+		public Restriction(String id, String name, ArrayList<?> r)
 		{
 			opId = id;
 			opName = name;
-			restrictions = (List) r.clone();
+			restrictions = (List<?>) r.clone();
 		}
 	}
 
@@ -63,21 +66,22 @@ public class Extractor
 *
 ******************************************************/
 
+@SuppressWarnings("unchecked")
 public ArrayList<Document> extractRestrictions(Document sup, ArrayList<Document> ROPs)
 {
 	COPList = new ArrayList<Document>(ROPs);
 	
 	Element root = sup.getRootElement();
-	List automaton = root.getChildren("Automaton");
-	Iterator autIter = automaton.iterator();
-	Element theSupervisor = (Element) autIter.next();
+	List<Element> automaton = root.getChildren("Automaton");
+	Iterator<Element> autIter = automaton.iterator();
+	Element theSupervisor = autIter.next();
 
-	List eventsList = theSupervisor.getChildren("Events");
-	Iterator eventsIter = eventsList.iterator();
-	Element events = (Element) eventsIter.next();
+	List<Element> eventsList = theSupervisor.getChildren("Events");
+	Iterator<Element> eventsIter = eventsList.iterator();
+	Element events = eventsIter.next();
 
-	List eventList = events.getChildren("Event");
-	List restrList = new ArrayList();
+	List<Element> eventList = events.getChildren("Event");
+	List<Restriction> restrList = new ArrayList<Restriction>();
 
 	/* opMatch contains a matching between operation names and start-event IDs.
 	In each place lies an arrayList containing two strings, the operation name in
@@ -87,9 +91,9 @@ public ArrayList<Document> extractRestrictions(Document sup, ArrayList<Document>
 	Hashtable<String, String> opMatch = new Hashtable<String, String>();
 
 	int i = 0;
-	for(Iterator eventIter = eventList.iterator(); eventIter.hasNext(); )
+	for(Iterator<Element> eventIter = eventList.iterator(); eventIter.hasNext(); )
 	{
-		Element event = (Element) eventIter.next();
+		Element event = eventIter.next();
 		String eventLabel = event.getAttributeValue("label");
 		if(eventLabel.length() > OPERATION_START_PREFIX.length())
 		{
@@ -129,7 +133,7 @@ public ArrayList<Document> extractRestrictions(Document sup, ArrayList<Document>
 		/* Get the supervisor states where eventId is enabled, e.g. q0 and q2 */
 		List<String> enabledInSupStates = getSupervisorStates(theSupervisor, restr.opId);
 
-		List enabledInModelStates = getModelStates(enabledInSupStates,
+		List<?> enabledInModelStates = getModelStates(enabledInSupStates,
 				                                   restr.opId,
 				                                   opMatch);
 
@@ -138,7 +142,7 @@ public ArrayList<Document> extractRestrictions(Document sup, ArrayList<Document>
 		restrList.add(restr);
 	}
 
-	ArrayList simpleRestr = simplify((ArrayList) restrList);
+	ArrayList<Restriction> simpleRestr = simplify((ArrayList<Restriction>) restrList);
 
 	buildCOPDocs(simpleRestr, ROPs);
 	return COPList;
@@ -153,37 +157,38 @@ public ArrayList<Document> extractRestrictions(Document sup, ArrayList<Document>
 *
 ******************************************************/
 
+@SuppressWarnings("unchecked")
 public ArrayList<String> getSupervisorStates(Element sup, String eventId)
 {
 	//ArrayList enabledInStateIds = new ArrayList();
-	ArrayList enabledInStates = new ArrayList();
+	ArrayList<String> enabledInStates = new ArrayList<String>();
 
-	List statesList = sup.getChildren("States");
-	Iterator statesIter = statesList.iterator();
-	Element states = (Element) statesIter.next();
+	List<Element> statesList = sup.getChildren("States");
+	Iterator<Element> statesIter = statesList.iterator();
+	Element states = statesIter.next();
 
-	List transitionsList = sup.getChildren("Transitions");
-	Iterator transitionsIter = transitionsList.iterator();
-	Element transitions = (Element) transitionsIter.next();
+	List<Element> transitionsList = sup.getChildren("Transitions");
+	Iterator<Element> transitionsIter = transitionsList.iterator();
+	Element transitions = transitionsIter.next();
 
-	List stateList = states.getChildren("State");
-	List transList = transitions.getChildren("Transition");
+	List<Element> stateList = states.getChildren("State");
+	List<Element> transList = transitions.getChildren("Transition");
 
 	/* Find state ID where eventID is enabled. */
-	for(Iterator transIter = transList.iterator(); transIter.hasNext(); )
+	for(Iterator<Element> transIter = transList.iterator(); transIter.hasNext(); )
 	{
-		Element trans = (Element) transIter.next();
+		Element trans = transIter.next();
 		String evId = trans.getAttributeValue("event");
 		if(evId.equals(eventId))
 		{
 			String source = trans.getAttributeValue("source"); // Id of supervisor state
 
-			Iterator stateIter = stateList.iterator();
+			Iterator<Element> stateIter = stateList.iterator();
 			boolean found = false;
 			while( !found && stateIter.hasNext() )
 			{
 
-				Element state = (Element) stateIter.next();
+				Element state = stateIter.next();
 				String stId = state.getAttributeValue("id");
 
 				if(stId.equals(source))
@@ -215,20 +220,20 @@ public ArrayList<String> getSupervisorStates(Element sup, String eventId)
 *
 ******************************************************/
 
-public ArrayList getModelStates(List supStates, String eventId, Hashtable<String, String> match)
+public ArrayList<?> getModelStates(List<String> supStates, String eventId, Hashtable<String, String> match)
 {
 	/* For each of the operations in the system, find out what state it has in
 	each of the supervisor states listed in supStates. Create an entry that
 	contains the operation id, and then an ordered list of its states. The first
 	state corresponds to the first */
 
-	ArrayList modelStates = new ArrayList();
+	ArrayList<ArrayList<String>> modelStates = new ArrayList<ArrayList<String>>();
 
 	int i = 0;
 	// For all operations
 	for(Iterator<String> matchIter = match.keySet().iterator(); matchIter.hasNext(); )
 	{
-		ArrayList operationStates = new ArrayList();
+		ArrayList<String> operationStates = new ArrayList<String>();
 		
 		String opName = matchIter.next();
 		String opId = match.get( opName ); // Get id of the operation
@@ -238,9 +243,9 @@ public ArrayList getModelStates(List supStates, String eventId, Hashtable<String
 
 		/* For each of the states where eventId is enabled, extract the states of all operations */
 		int place = 2;
-		for(Iterator stateIter = supStates.iterator(); stateIter.hasNext(); )
+		for(Iterator<String> stateIter = supStates.iterator(); stateIter.hasNext(); )
 		{
-			String supStateName = (String) stateIter.next();
+			String supStateName = stateIter.next();
 
 			String opStateName;
 			int index = supStateName.indexOf(opName + STATE_INDICATOR);
@@ -309,27 +314,27 @@ public ArrayList getModelStates(List supStates, String eventId, Hashtable<String
 * End_loop;
 *
 ******************************************************/
-public ArrayList simplify(ArrayList operationList)
+@SuppressWarnings("unchecked")
+public ArrayList<Restriction> simplify(ArrayList<Restriction> operationList)
 {
 
-	ArrayList simpleRestr = new ArrayList();
-	simpleRestr = (ArrayList) operationList.clone();
+	ArrayList<Restriction> simpleRestr = new ArrayList<Restriction>();
+	simpleRestr = (ArrayList<Restriction>) operationList.clone();
 
 
 	/* Remove the restriction O_init from the entry for O. */
-	for(Iterator restrIter = simpleRestr.iterator(); restrIter.hasNext(); )
+	for(Iterator<Restriction> restrIter = simpleRestr.iterator(); restrIter.hasNext(); )
 	{
-		Restriction restr = (Restriction) restrIter.next();
+		Restriction restr = restrIter.next();
 		String opName = restr.opName;
-		String opId = restr.opId;
-		ArrayList rList = (ArrayList) restr.restrictions;
+		ArrayList<?> rList = (ArrayList<?>) restr.restrictions;
 
-		Iterator rIter = rList.iterator();
+		Iterator<?> rIter = rList.iterator();
 		boolean found = false;
 		int placeRList = 0;
 		while( rIter.hasNext() && !found )
 		{
-			ArrayList oneRestr = (ArrayList) rIter.next();
+			ArrayList<?> oneRestr = (ArrayList<?>) rIter.next();
 			String name = (String) oneRestr.get(1);
 			if( name.equals(opName) )
 			{
@@ -341,20 +346,17 @@ public ArrayList simplify(ArrayList operationList)
 		}
 	}
 
-	ArrayList simpleRestrOld = new ArrayList();
-	ArrayList simpleRestrOld2 = new ArrayList();
-	ArrayList simpleRestrOld3 = new ArrayList();
+	ArrayList<Restriction> simpleRestrOld = new ArrayList<Restriction>();
+	ArrayList<Restriction> simpleRestrOld2 = new ArrayList<Restriction>();
+	ArrayList<Restriction> simpleRestrOld3 = new ArrayList<Restriction>();
 
 
 	/* Step 1: Find predecessors. */
-	ArrayList predSucc = new ArrayList();
-	for(Iterator restrIter = simpleRestr.iterator(); restrIter.hasNext(); )
+	ArrayList<ArrayList<String>> predSucc = new ArrayList<ArrayList<String>>();
+	for(Iterator<Restriction> restrIter = simpleRestr.iterator(); restrIter.hasNext(); )
 	{
-		Restriction restr = (Restriction) restrIter.next();
-		String opName = restr.opName;
-		String opId = restr.opId;
-
-		ArrayList ps = findPredecessors(restr);
+		Restriction restr = restrIter.next();
+		ArrayList<ArrayList<String>> ps = findPredecessors(restr);
 		predSucc.addAll(ps);
 	}
 
@@ -458,14 +460,13 @@ public ArrayList simplify(ArrayList operationList)
 * and/or successors are set to init (when Ox equals init or exec).
 *
 ******************************************************/
-public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
+public ArrayList<Restriction> replaceIECpredSucc(ArrayList<Restriction> restr, ArrayList<ArrayList<String>> ps)
 {
 
-	for(Iterator restrIter = restr.iterator(); restrIter.hasNext(); )
+	for(Iterator<Restriction> restrIter = restr.iterator(); restrIter.hasNext(); )
 	{
-		Restriction operation = (Restriction) restrIter.next();
-		String opName = operation.opName;
-		ArrayList rList = (ArrayList) operation.restrictions;
+		Restriction operation = restrIter.next();
+		ArrayList<?> rList = (ArrayList<?>) operation.restrictions;
 
 		boolean changed = true;
 
@@ -473,14 +474,14 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 		{
 			changed = false;
 			// As long as at least one change is done in the restriction list
-			Iterator rIter = rList.iterator();
+			Iterator<?> rIter = rList.iterator();
 			while( rIter.hasNext() )
 			{
-				ArrayList states = (ArrayList) rIter.next();
+				ArrayList<?> states = (ArrayList<?>) rIter.next();
 				int noOfStates = states.size();
 				String op = new String();
-				HashSet preds = new HashSet();
-				HashSet succs = new HashSet();
+				HashSet<String> preds = new HashSet<String>();
+				HashSet<String> succs = new HashSet<String>();
 				String allOpStatesFirst = new String();
 				String allOpStatesSecond = new String();
 				String allOpStatesThird = new String();
@@ -502,7 +503,6 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 						allOpStatesThird = allOpStatesThird.replaceAll(op.concat(END_STATE_POSTFIX), "");
 
 						int i2=0;
-						boolean found2 = false;
 						while(i2<noOfStates)
 						{
 							String state2 = (String) states.get(i2);
@@ -512,7 +512,6 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 								allOpStatesSecond = allOpStatesSecond.replaceAll(op.concat(EXECUTION_STATE_POSTFIX), "");
 
 								int i3=0;
-								boolean found3 = false;
 								while(i3<noOfStates)
 								{
 									String state3 = (String) states.get(i3);
@@ -523,15 +522,15 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 
 										// All strings found
 
-										HashSet thePreds = new HashSet();
-										HashSet theSuccs = new HashSet();
-										HashSet tempPreds = getPredecessors(op, ps);
-										HashSet tempSuccs = getSuccessors(op, ps);
-										HashSet rOps = getRestrictionOps(rList);
+										HashSet<String> thePreds = new HashSet<String>();
+										HashSet<String> theSuccs = new HashSet<String>();
+										HashSet<?> tempPreds = getPredecessors(op, ps);
+										HashSet<?> tempSuccs = getSuccessors(op, ps);
+										HashSet<String> rOps = getRestrictionOps(rList);
 
-										for( Iterator rOpsIter = rOps.iterator(); rOpsIter.hasNext(); )
+										for( Iterator<String> rOpsIter = rOps.iterator(); rOpsIter.hasNext(); )
 										{
-											Object temp = (Object) rOpsIter.next();
+											Object temp = rOpsIter.next();
 
 											if(tempPreds.contains(temp))
 											{
@@ -543,7 +542,7 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 											}
 										}
 
-										ArrayList predsSuccs = new ArrayList(preds);
+										ArrayList<String> predsSuccs = new ArrayList<String>(preds);
 										predsSuccs.addAll(succs);
 
 										boolean equal = findPredSucc(allOpStatesFirst, allOpStatesSecond, allOpStatesThird, predsSuccs, thePreds, theSuccs, preds.size(), succs.size());
@@ -555,19 +554,19 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 											rList = replaceState(rList, op, op.concat(DONT_CARE_STATE_POSTFIX), i1);
 											if(thePreds.size() > 0)
 											{
-												for(Iterator predIter = thePreds.iterator(); predIter.hasNext(); )
+												for(Iterator<String> predIter = thePreds.iterator(); predIter.hasNext(); )
 												{
 
-													String thePred = (String) predIter.next();
+													String thePred = predIter.next();
 
 													rList = replaceState(rList, thePred, thePred.concat(END_STATE_POSTFIX), i1);
 												}
 											}
 											if(theSuccs.size() > 0)
 											{
-												for(Iterator succIter = theSuccs.iterator(); succIter.hasNext(); )
+												for(Iterator<String> succIter = theSuccs.iterator(); succIter.hasNext(); )
 												{
-													String theSucc = (String) succIter.next();
+													String theSucc = succIter.next();
 
 													rList = replaceState(rList, theSucc, theSucc.concat(INITIAL_STATE_POSTFIX), i1);
 												}
@@ -614,9 +613,9 @@ public ArrayList replaceIECpredSucc(ArrayList restr, ArrayList ps)
 public boolean findPredSucc
 (
 	String si, String se, String sc,
-	ArrayList predsSuccs,
-	HashSet thePreds,
-	HashSet theSuccs,
+	ArrayList<String> predsSuccs,
+	HashSet<String> thePreds,
+	HashSet<String> theSuccs,
 	int noPreds, int noSuccs
 )
 {
@@ -638,9 +637,9 @@ public boolean findPredSucc
 		while( noPredsSuccs > 0 && !ans )
 		{
 			// Study all other preds, i.e. remPreds.remove(pred);
-			String ps = (String) predsSuccs.get(0);
+			String ps = predsSuccs.get(0);
 
-			ArrayList remPS = new ArrayList(predsSuccs);
+			ArrayList<String> remPS = new ArrayList<String>(predsSuccs);
 			remPS.remove(0);
 			int noPredsNew = noPreds, noSuccsNew = noSuccs;
 
@@ -704,13 +703,13 @@ public boolean findPredSucc
 * restrictions specified by rList.
 *
 ******************************************************/
-HashSet getRestrictionOps(ArrayList rList)
+HashSet<String> getRestrictionOps(ArrayList<?> rList)
 {
-	HashSet h = new HashSet();
+	HashSet<String> h = new HashSet<String>();
 
-	for( Iterator rIter = rList.iterator(); rIter.hasNext(); )
+	for( Iterator<?> rIter = rList.iterator(); rIter.hasNext(); )
 	{
-		ArrayList states = (ArrayList) rIter.next();
+		ArrayList<?> states = (ArrayList<?>) rIter.next();
 		String opName = (String) states.get(1);
 		h.add(opName);
 	}
@@ -724,15 +723,14 @@ HashSet getRestrictionOps(ArrayList rList)
 *
 *
 ******************************************************/
-public ArrayList findReplaceIEC(ArrayList r)
+@SuppressWarnings("unchecked")
+public ArrayList<Restriction> findReplaceIEC(ArrayList<Restriction> r)
 {
-	ArrayList temp = (ArrayList) r.clone();
-	ArrayList simpleRestr = new ArrayList();
-	for(Iterator restrIter = temp.iterator(); restrIter.hasNext(); )
+	ArrayList<Restriction> temp = (ArrayList<Restriction>) r.clone();
+	ArrayList<Restriction> simpleRestr = new ArrayList<Restriction>();
+	for(Iterator<Restriction> restrIter = temp.iterator(); restrIter.hasNext(); )
 	{
-		Restriction restr = (Restriction) restrIter.next();
-		ArrayList rList = (ArrayList) restr.restrictions;
-
+		Restriction restr = restrIter.next();
 		Restriction oneSimpleRestr = replaceIEC(restr);
 		simpleRestr.add(oneSimpleRestr);
 
@@ -749,6 +747,7 @@ public ArrayList findReplaceIEC(ArrayList r)
 * try to change predecessors/successors to find removable IEC-structures.
 *
 ******************************************************/
+@SuppressWarnings("unchecked")
 public Restriction replaceIEC(Restriction restr)
 {
 	/* 
@@ -759,12 +758,10 @@ public Restriction replaceIEC(Restriction restr)
 	 * where O2 is in O2_init and O1 is in - (don't care). 
 	 */
 
-	String op = (String) restr.opName;
-
 	// Restrictions for starting one operation (call it Op)
-	Restriction simpleRestr = new Restriction(restr.opId, restr.opName, (ArrayList) restr.restrictions);
+	Restriction simpleRestr = new Restriction(restr.opId, restr.opName, (ArrayList<?>) restr.restrictions);
 
-	ArrayList restrictions = (ArrayList) simpleRestr.restrictions;
+	ArrayList<ArrayList<String>> restrictions = (ArrayList<ArrayList<String>>) simpleRestr.restrictions;
 	int noOfRestr = restrictions.size();
 	int i = 0;
 
@@ -773,13 +770,12 @@ public Restriction replaceIEC(Restriction restr)
 	   i.e each entry contains one restriction. */
 	while(i < noOfRestr)
 	{
-		ArrayList otherStatesList = new ArrayList(); //Each entry contains a set
-		ArrayList allStatesList = new ArrayList();   //Each entry contains a set
-		String allStates = new String();
+		ArrayList<Set> otherStatesList = new ArrayList<Set>(); //Each entry contains a set
+		ArrayList<HashSet<String>> allStatesList = new ArrayList<HashSet<String>>();   //Each entry contains a set
 		String opName = new String();
 
 		//Get the restr (operation) we are currently working with. List containing strings.
-		ArrayList states = (ArrayList) restrictions.get(i);
+		ArrayList<String> states = (ArrayList<String>) restrictions.get(i);
 		int stateNumber = -1;
 
 		/* For all states of the operation, e.g. O1_init, O1_init, O1_comp,
@@ -788,9 +784,9 @@ public Restriction replaceIEC(Restriction restr)
 		 * otherStatesList that in each entry contains a string representing 
 		 * the states of the other operations (e.g. all but O1). 
 		 */
-		for(Iterator stateIter = states.iterator(); stateIter.hasNext(); )
+		for(Iterator<String> stateIter = states.iterator(); stateIter.hasNext(); )
 		{
-			String stateName = (String) stateIter.next();
+			String stateName = stateIter.next();
 
 			if(stateNumber == 2)
 			{
@@ -802,10 +798,7 @@ public Restriction replaceIEC(Restriction restr)
 			// Into the real states (leaving name and id)
 			if(stateNumber > 1)
 			{
-
-				Set allOtherStates = new HashSet();
-				Set temp = new HashSet();
-
+				Set<String> allOtherStates = new HashSet<String>();
 				// e.g. O1_initO2_compO3_exec in each ArrayList-entry
 				allOtherStates = getStates(stateNumber, restrictions);
 				allStatesList.add(getStates(stateNumber, restrictions));
@@ -821,8 +814,8 @@ public Restriction replaceIEC(Restriction restr)
 		int noOfRestrEntrys = states.size();
 		String rem = "rem";
 		String keep = "keep";
-		ArrayList treated = new ArrayList();
-		ArrayList remove = new ArrayList();
+		ArrayList<HashSet<?>> treated = new ArrayList<HashSet<?>>();
+		ArrayList<String> remove = new ArrayList<String>();
 		for(int ii=0; ii<noOfRestrEntrys; ii++)
 		{
 			remove.add(keep);
@@ -831,19 +824,19 @@ public Restriction replaceIEC(Restriction restr)
 
 		int indF, indS, indT;
 		/* For each entry in other-list */
-		for(Iterator otherIter = otherStatesList.iterator(); otherIter.hasNext(); )
+		for(Iterator<Set> otherIter = otherStatesList.iterator(); otherIter.hasNext(); )
 		{
-			HashSet other = (HashSet) otherIter.next();
+			HashSet<?> other = (HashSet<?>) otherIter.next();
 
 			// Only check each restriction string once.
 			if( !treated.contains(other) )
 			{
-				HashSet first = new HashSet();
-				HashSet second = new HashSet();
-				HashSet third = new HashSet();
+				HashSet<String> first = new HashSet<String>();
+				HashSet<String> second = new HashSet<String>();
+				HashSet<String> third = new HashSet<String>();
 
 				/* Build a set containing all other operation´s states */
-				for(Iterator oIter = other.iterator(); oIter.hasNext(); )
+				for(Iterator<?> oIter = other.iterator(); oIter.hasNext(); )
 				{
 					String n = (String) oIter.next();
 					first.add(n);
@@ -893,12 +886,12 @@ public Restriction replaceIEC(Restriction restr)
 		{
 			if( remove.get(k) == rem )
 			{
-				restrictions = removeStates(k, restrictions);
+				restrictions = (ArrayList<ArrayList<String>>) removeStates(k, restrictions);
 			}
 		}
 
 		i++;
-		simpleRestr.restrictions = (ArrayList) restrictions.clone();
+		simpleRestr.restrictions = (ArrayList<?>) restrictions.clone();
 	}
 
 	return simpleRestr;
@@ -913,21 +906,21 @@ public Restriction replaceIEC(Restriction restr)
 * predecessor to Oj.
 *
 ******************************************************/
-public ArrayList findPredecessors(Restriction restr)
+public ArrayList<ArrayList<String>> findPredecessors(Restriction restr)
 {
 	String op = (String) restr.opName;
 
-	ArrayList theRestr = (ArrayList) restr.restrictions;
-	ArrayList predSucc = new ArrayList();
+	ArrayList<?> theRestr = (ArrayList<?>) restr.restrictions;
+	ArrayList<ArrayList<String>> predSucc = new ArrayList<ArrayList<String>>();
 
-	for(Iterator restrIter = theRestr.iterator(); restrIter.hasNext(); )
+	for(Iterator<?> restrIter = theRestr.iterator(); restrIter.hasNext(); )
 	{
-		ArrayList states = (ArrayList) restrIter.next();
+		ArrayList<?> states = (ArrayList<?>) restrIter.next();
 		int i = 0;
 		boolean pred = true;
 		String opName = (String) states.get(1);
 
-		Iterator statesIter = states.iterator();
+		Iterator<?> statesIter = states.iterator();
 		while(statesIter.hasNext() && pred)
 		{
 			String state = (String) statesIter.next();
@@ -942,7 +935,7 @@ public ArrayList findPredecessors(Restriction restr)
 		}
 		if(pred)
 		{
-			ArrayList temp = new ArrayList();
+			ArrayList<String> temp = new ArrayList<String>();
 			temp.add(0, opName);
 			temp.add(1, op);
 			predSucc.add(temp);
@@ -962,20 +955,19 @@ public ArrayList findPredecessors(Restriction restr)
 *
 *
 ******************************************************/
-public ArrayList removeEqualAlternatives(ArrayList restr)
+public ArrayList<Restriction> removeEqualAlternatives(ArrayList<Restriction> restr)
 {
 	// For each operation
-	for(Iterator opIter = restr.iterator(); opIter.hasNext(); )
+	for(Iterator<Restriction> opIter = restr.iterator(); opIter.hasNext(); )
 	{
-		Restriction operation = (Restriction) opIter.next();
-		String op = operation.opName;
+		Restriction operation = opIter.next();
 
 		// All restrictions for the operation
-		ArrayList rList = (ArrayList) operation.restrictions;
+		ArrayList<?> rList = (ArrayList<?>) operation.restrictions;
 
 		if(rList.size() > 0)
 		{
-			ArrayList firstStates = (ArrayList) rList.get(0);
+			ArrayList<?> firstStates = (ArrayList<?>) rList.get(0);
 			int noOfStates = firstStates.size();
 			int j, i=2;
 			while( i < noOfStates-1 )
@@ -1009,12 +1001,12 @@ public ArrayList removeEqualAlternatives(ArrayList restr)
 * Get the restriction corresponding to place i
 *
 ******************************************************/
-public String getRestrString(ArrayList l, int i)
+public String getRestrString(ArrayList<?> l, int i)
 {
 	String r = new String();
-	for(Iterator lIter = l.iterator(); lIter.hasNext(); )
+	for(Iterator<?> lIter = l.iterator(); lIter.hasNext(); )
 	{
-		ArrayList states = (ArrayList) lIter.next();
+		ArrayList<?> states = (ArrayList<?>) lIter.next();
 		String state = (String) states.get(i);
 		r = r.concat(state);
 	}
@@ -1028,11 +1020,11 @@ public String getRestrString(ArrayList l, int i)
 * Remove the restriction corresponding to place i
 *
 ******************************************************/
-public ArrayList removeRestrString(ArrayList l, int i)
+public ArrayList<?> removeRestrString(ArrayList<?> l, int i)
 {
-	for(Iterator lIter = l.iterator(); lIter.hasNext(); )
+	for(Iterator<?> lIter = l.iterator(); lIter.hasNext(); )
 	{
-		ArrayList states = (ArrayList) lIter.next();
+		ArrayList<?> states = (ArrayList<?>) lIter.next();
 		states.remove(i);
 	}
 	return l;
@@ -1045,14 +1037,15 @@ public ArrayList removeRestrString(ArrayList l, int i)
 *
 *
 ******************************************************/
-public ArrayList replaceState(ArrayList l, String op, String s, int i)
+@SuppressWarnings("unchecked")
+public ArrayList<?> replaceState(ArrayList<?> l, String op, String s, int i)
 {
-	Iterator lIter = l.iterator();
+	Iterator<?> lIter = l.iterator();
 	boolean ready = false;
 	while(lIter.hasNext() && !ready )
 	{
-		ArrayList states = (ArrayList) lIter.next();
-		String opName = (String) states.get(1);
+		ArrayList<String> states = (ArrayList<String>) lIter.next();
+		String opName = states.get(1);
 		if(op.equals(opName))
 		{
 			states.set(i,s);
@@ -1075,38 +1068,38 @@ public ArrayList replaceState(ArrayList l, String op, String s, int i)
 *
 ******************************************************/
 
-public ArrayList removeCompSequences(ArrayList restr, ArrayList ps)
+public ArrayList<Restriction> removeCompSequences(ArrayList<Restriction> restr, ArrayList<ArrayList<String>> ps)
 {
 	// For each predecessor-successor pair
-	for(Iterator psIter = ps.iterator(); psIter.hasNext(); )
+	for(Iterator<ArrayList<String>> psIter = ps.iterator(); psIter.hasNext(); )
 	{
-		ArrayList predSucc = (ArrayList) psIter.next();
+		ArrayList<?> predSucc = psIter.next();
 		if(predSucc.size() > 0)
 		{
 			String pred = (String) predSucc.get(0);
 			String succ = (String) predSucc.get(1);
 
-			for(Iterator rIter = restr.iterator(); rIter.hasNext(); )
+			for(Iterator<Restriction> rIter = restr.iterator(); rIter.hasNext(); )
 			{
-				Restriction operation = (Restriction) rIter.next();
-				ArrayList rList = (ArrayList) operation.restrictions;
+				Restriction operation = rIter.next();
+				ArrayList<?> rList = (ArrayList<?>) operation.restrictions;
 
 				if(rList.size()>0)
 				{
 					String op = operation.opName;
 
 
-					ArrayList testPair = new ArrayList();
+					ArrayList<String> testPair = new ArrayList<String>();
 					testPair.add(0,pred);
 					testPair.add(1,op);
 
-					ArrayList testPair2 = new ArrayList();
+					ArrayList<String> testPair2 = new ArrayList<String>();
 					testPair2.add(0,succ);
 					testPair2.add(1,op);
 
-					ArrayList firstStates = (ArrayList) rList.get(0);
+					ArrayList<?> firstStates = (ArrayList<?>) rList.get(0);
 					int noOfStates = firstStates.size();
-					int j, i=2;
+					int i=2;
 
 					while( i < noOfStates )
 					{
@@ -1140,23 +1133,23 @@ public ArrayList removeCompSequences(ArrayList restr, ArrayList ps)
 *
 ******************************************************/
 
-public ArrayList removeCompExecSequences(ArrayList restr, ArrayList ps)
+public ArrayList<Restriction> removeCompExecSequences(ArrayList<Restriction> restr, ArrayList<ArrayList<String>> ps)
 {
 	// For each predecessor-successor pair
-	for(Iterator psIter = ps.iterator(); psIter.hasNext(); )
+	for(Iterator<ArrayList<String>> psIter = ps.iterator(); psIter.hasNext(); )
 	{
-		ArrayList predSucc = (ArrayList) psIter.next();
+		ArrayList<?> predSucc = psIter.next();
 
 		String pred = (String) predSucc.get(0);
 		String succ = (String) predSucc.get(1);
 
-		for(Iterator rIter = restr.iterator(); rIter.hasNext(); )
+		for(Iterator<Restriction> rIter = restr.iterator(); rIter.hasNext(); )
 		{
-			Restriction operation = (Restriction) rIter.next();
-			ArrayList rList = (ArrayList) operation.restrictions;
+			Restriction operation = rIter.next();
+			ArrayList<?> rList = (ArrayList<?>) operation.restrictions;
 			String op = operation.opName;
 
-			ArrayList testPair = new ArrayList();
+			ArrayList<String> testPair = new ArrayList<String>();
 			testPair.add(0,pred);
 			testPair.add(1,op);
 
@@ -1166,9 +1159,9 @@ public ArrayList removeCompExecSequences(ArrayList restr, ArrayList ps)
 
 				if(rList.size() > 0)
 				{
-					ArrayList firstStates = (ArrayList) rList.get(0);
+					ArrayList<?> firstStates = (ArrayList<?>) rList.get(0);
 					int noOfStates = firstStates.size();
-					int j, i=2;
+					int i=2;
 
 					while( i < noOfStates )
 					{
@@ -1200,12 +1193,12 @@ public ArrayList removeCompExecSequences(ArrayList restr, ArrayList ps)
 *
 ******************************************************/
 
-public ArrayList removeInitInitSequences(ArrayList restr, ArrayList ps)
+public ArrayList<Restriction> removeInitInitSequences(ArrayList<Restriction> restr, ArrayList<ArrayList<String>> ps)
 {
 	// For each predecessor-successor pair
-	for(Iterator psIter = ps.iterator(); psIter.hasNext(); )
+	for(Iterator<ArrayList<String>> psIter = ps.iterator(); psIter.hasNext(); )
 	{
-		ArrayList predSucc = (ArrayList) psIter.next();
+		ArrayList<?> predSucc = psIter.next();
 
 		if(predSucc.size() > 0)
 		{
@@ -1213,17 +1206,15 @@ public ArrayList removeInitInitSequences(ArrayList restr, ArrayList ps)
 			String succ = (String) predSucc.get(1);
 
 
-			for(Iterator rIter = restr.iterator(); rIter.hasNext(); )
+			for(Iterator<Restriction> rIter = restr.iterator(); rIter.hasNext(); )
 			{
-				Restriction operation = (Restriction) rIter.next();
-				ArrayList rList = (ArrayList) operation.restrictions;
-				String op = operation.opName;
-
+				Restriction operation = rIter.next();
+				ArrayList<?> rList = (ArrayList<?>) operation.restrictions;
 				if(rList.size() > 0)
 				{
-					ArrayList firstStates = (ArrayList) rList.get(0);
+					ArrayList<?> firstStates = (ArrayList<?>) rList.get(0);
 					int noOfStates = firstStates.size();
-					int j, i=2;
+					int i=2;
 
 					while( i < noOfStates )
 					{
@@ -1257,12 +1248,12 @@ public ArrayList removeInitInitSequences(ArrayList restr, ArrayList ps)
 *
 ******************************************************/
 
-public ArrayList removeExecInitSequences(ArrayList restr, ArrayList ps)
+public ArrayList<Restriction> removeExecInitSequences(ArrayList<Restriction> restr, ArrayList<ArrayList<String>> ps)
 {
 	// For each predecessor-successor pair
-	for(Iterator psIter = ps.iterator(); psIter.hasNext(); )
+	for(Iterator<ArrayList<String>> psIter = ps.iterator(); psIter.hasNext(); )
 	{
-		ArrayList predSucc = (ArrayList) psIter.next();
+		ArrayList<?> predSucc = psIter.next();
 
 		if(predSucc.size() > 0)
 		{
@@ -1270,17 +1261,16 @@ public ArrayList removeExecInitSequences(ArrayList restr, ArrayList ps)
 			String succ = (String) predSucc.get(1);
 
 
-			for(Iterator rIter = restr.iterator(); rIter.hasNext(); )
+			for(Iterator<Restriction> rIter = restr.iterator(); rIter.hasNext(); )
 			{
-				Restriction operation = (Restriction) rIter.next();
-				ArrayList rList = (ArrayList) operation.restrictions;
-				String op = operation.opName;
+				Restriction operation = rIter.next();
+				ArrayList<?> rList = (ArrayList<?>) operation.restrictions;
 
 				if(rList.size() > 0)
 				{
-					ArrayList firstStates = (ArrayList) rList.get(0);
+					ArrayList<?> firstStates = (ArrayList<?>) rList.get(0);
 					int noOfStates = firstStates.size();
-					int j, i=2;
+					int i=2;
 
 					while( i < noOfStates )
 					{
@@ -1312,26 +1302,26 @@ public ArrayList removeExecInitSequences(ArrayList restr, ArrayList ps)
 * Oi with Oj_-.
 *
 ******************************************************/
-public ArrayList removeSuccessors(ArrayList restr , ArrayList ps)
+public ArrayList<Restriction> removeSuccessors(ArrayList<Restriction> restr , ArrayList<ArrayList<String>> ps)
 {
 
 	// For each operation
-	for(Iterator opIter = restr.iterator(); opIter.hasNext(); )
+	for(Iterator<Restriction> opIter = restr.iterator(); opIter.hasNext(); )
 	{
-		Restriction operation = (Restriction) opIter.next();
+		Restriction operation = opIter.next();
 
 		String opName = operation.opName;
-		ArrayList rList = (ArrayList) operation.restrictions;
+		ArrayList<?> rList = (ArrayList<?>) operation.restrictions;
 
-		ArrayList remove = new ArrayList();
+		ArrayList<ArrayList<?>> remove = new ArrayList<ArrayList<?>>();
 
 		// For each restriction of the operation
-		for(Iterator rIter = rList.iterator(); rIter.hasNext(); )
+		for(Iterator<?> rIter = rList.iterator(); rIter.hasNext(); )
 		{
-			ArrayList states = (ArrayList) rIter.next();
+			ArrayList<?> states = (ArrayList<?>) rIter.next();
 
 			String rOpName = (String) states.get(1);
-			ArrayList temp = new ArrayList();
+			ArrayList<String> temp = new ArrayList<String>();
 			temp.add(0, opName);
 			temp.add(1, rOpName);
 
@@ -1343,9 +1333,9 @@ public ArrayList removeSuccessors(ArrayList restr , ArrayList ps)
 			}
 		}
 
-		for(Iterator remIter = remove.iterator(); remIter.hasNext(); )
+		for(Iterator<ArrayList<?>> remIter = remove.iterator(); remIter.hasNext(); )
 		{
-			ArrayList remStates = (ArrayList) remIter.next();
+			ArrayList<?> remStates = remIter.next();
 			rList.remove(remStates);
 		}
 	}
@@ -1362,32 +1352,32 @@ public ArrayList removeSuccessors(ArrayList restr , ArrayList ps)
 *
 ******************************************************/
 
-public ArrayList removeSequences(ArrayList restr, ArrayList ps)
+public ArrayList<?> removeSequences(ArrayList<?> restr, ArrayList<ArrayList<String>> ps)
 {
 	// For each operation
-	for(Iterator restrIter = restr.iterator(); restrIter.hasNext(); )
+	for(Iterator<?> restrIter = restr.iterator(); restrIter.hasNext(); )
 	{
 		Restriction operation = (Restriction) restrIter.next();
 		String opName = operation.opName;
 
 		// Get all predecessors
-		HashSet preds = getPredecessors(opName, ps);
+		HashSet<?> preds = getPredecessors(opName, ps);
 
 		// For all predecessors
-		for(Iterator pIter = preds.iterator(); pIter.hasNext(); )
+		for(Iterator<?> pIter = preds.iterator(); pIter.hasNext(); )
 		{
 			String predName = (String) pIter.next();
 
 			// Get all their predecessors
-			HashSet pPreds = getPredecessors(predName, ps);
-			ArrayList rList = (ArrayList) operation.restrictions;
+			HashSet<?> pPreds = getPredecessors(predName, ps);
+			ArrayList<?> rList = (ArrayList<?>) operation.restrictions;
 
 			// Remove the pPred-entries from the restriction list for opName
 			int i=0;
 			int noOfOps = rList.size();
 			while( i<noOfOps )
 			{
-				ArrayList states = (ArrayList) rList.get(i);
+				ArrayList<?> states = (ArrayList<?>) rList.get(i);
 				if(pPreds.contains(states.get(1)))
 				{
 					rList.remove(i);
@@ -1406,12 +1396,12 @@ public ArrayList removeSequences(ArrayList restr, ArrayList ps)
 * getPredecessors
 *
 ******************************************************/
-public HashSet getPredecessors(String opName, ArrayList ps)
+public HashSet<?> getPredecessors(String opName, ArrayList<ArrayList<String>> ps)
 {
-	HashSet predecessors = new HashSet();
-	for(Iterator psIter = ps.iterator(); psIter.hasNext(); )
+	HashSet<String> predecessors = new HashSet<String>();
+	for(Iterator<ArrayList<String>> psIter = ps.iterator(); psIter.hasNext(); )
 	{
-		ArrayList pair = (ArrayList) psIter.next();
+		ArrayList<String> pair = psIter.next();
 		if(pair.get(1).equals(opName))
 		{
 			predecessors.add(pair.get(0));
@@ -1425,12 +1415,12 @@ public HashSet getPredecessors(String opName, ArrayList ps)
 * getSuccessors
 *
 ******************************************************/
-public HashSet getSuccessors(String opName, ArrayList ps)
+public HashSet<String> getSuccessors(String opName, ArrayList<ArrayList<String>> ps)
 {
-	HashSet successors = new HashSet();
-	for(Iterator psIter = ps.iterator(); psIter.hasNext(); )
+	HashSet<String> successors = new HashSet<String>();
+	for(Iterator<ArrayList<String>> psIter = ps.iterator(); psIter.hasNext(); )
 	{
-		ArrayList pair = (ArrayList) psIter.next();
+		ArrayList<String> pair = psIter.next();
 		if(pair.get(0).equals(opName))
 		{
 			successors.add(pair.get(1));
@@ -1444,24 +1434,23 @@ public HashSet getSuccessors(String opName, ArrayList ps)
 * removeDontCareOperations
 *
 ******************************************************/
-public ArrayList removeDontCareOperations(ArrayList restr)
+public ArrayList<Restriction> removeDontCareOperations(ArrayList<Restriction> restr)
 {
 
-	for(Iterator rIter = restr.iterator(); rIter.hasNext(); )
+	for(Iterator<Restriction> rIter = restr.iterator(); rIter.hasNext(); )
 	{
-		Restriction operation = (Restriction) rIter.next();
-		ArrayList rList = (ArrayList) operation.restrictions;
-		String op = operation.opName;
+		Restriction operation = rIter.next();
+		ArrayList<?> rList = (ArrayList<?>) operation.restrictions;
 
-		ArrayList remove = new ArrayList();
+		ArrayList<ArrayList<?>> remove = new ArrayList<ArrayList<?>>();
 
-		for(Iterator rListIter = rList.iterator(); rListIter.hasNext(); )
+		for(Iterator<?> rListIter = rList.iterator(); rListIter.hasNext(); )
 		{
-			ArrayList states = (ArrayList) rListIter.next();
+			ArrayList<?> states = (ArrayList<?>) rListIter.next();
 			String opName = (String) states.get(1);
 
 			// Check if there are only O_-
-			Iterator sIter = states.iterator();
+			Iterator<?> sIter = states.iterator();
 
 			boolean allDontCare = true;
 			int i = 0;
@@ -1484,9 +1473,9 @@ public ArrayList removeDontCareOperations(ArrayList restr)
 			}
 		}
 
-		for(Iterator remIter = remove.iterator(); remIter.hasNext(); )
+		for(Iterator<ArrayList<?>> remIter = remove.iterator(); remIter.hasNext(); )
 		{
-			ArrayList remStates = (ArrayList) remIter.next();
+			ArrayList<?> remStates = remIter.next();
 			rList.remove(remStates);
 		}
 	}
@@ -1499,27 +1488,22 @@ public ArrayList removeDontCareOperations(ArrayList restr)
 * removeDontCareStates
 *
 ******************************************************/
-public ArrayList removeDontCareStates(ArrayList restr)
+public ArrayList<Restriction> removeDontCareStates(ArrayList<Restriction> restr)
 {
 
-	for(Iterator rIter = restr.iterator(); rIter.hasNext(); )
+	for(Iterator<Restriction> rIter = restr.iterator(); rIter.hasNext(); )
 	{
-		Restriction operation = (Restriction) rIter.next();
-		ArrayList rList = (ArrayList) operation.restrictions;
-		ArrayList remove = new ArrayList();
-
+		Restriction operation = rIter.next();
+		ArrayList<?> rList = (ArrayList<?>) operation.restrictions;
 		String allOpStates = new String();
 		String allOpStates2 = new String();
 		String allButOp = new String();
 		String allButOp2 = new String();
-		String rem = "rem", keep = "keep";
-
-		String op = operation.opName;
 
 		// For each of the restriction entries
-		for(Iterator rListIter = rList.iterator(); rListIter.hasNext(); )
+		for(Iterator<?> rListIter = rList.iterator(); rListIter.hasNext(); )
 		{
-			ArrayList states = (ArrayList) rListIter.next();
+			ArrayList<?> states = (ArrayList<?>) rListIter.next();
 			int noOfStates = states.size();
 			String opName = (String) states.get(1);
 
@@ -1574,7 +1558,7 @@ public ArrayList removeDontCareStates(ArrayList restr)
 * Restriction instance.
 *
 ******************************************************/
-public HashSet getStates(int index, ArrayList restrictions)
+public HashSet<String> getStates(int index, ArrayList<?> restrictions)
 {
 	if(index<2)
 	{
@@ -1582,11 +1566,11 @@ public HashSet getStates(int index, ArrayList restrictions)
 		return null;
 	}
 
-	HashSet c = new HashSet();
+	HashSet<String> c = new HashSet<String>();
 
-	for(Iterator rIter = restrictions.iterator(); rIter.hasNext(); )
+	for(Iterator<?> rIter = restrictions.iterator(); rIter.hasNext(); )
 	{
-		ArrayList oneOperation = (ArrayList) rIter.next();
+		ArrayList<?> oneOperation = (ArrayList<?>) rIter.next();
 		String temp = (String) oneOperation.get(index);
 		c.add(temp);
 	}
@@ -1600,7 +1584,7 @@ public HashSet getStates(int index, ArrayList restrictions)
 *
 *
 ******************************************************/
-public ArrayList removeStates(int index, ArrayList restrictionList)
+public ArrayList<?> removeStates(int index, ArrayList<?> restrictionList)
 {
 	if(index<2)
 	{
@@ -1608,11 +1592,11 @@ public ArrayList removeStates(int index, ArrayList restrictionList)
 		return null;
 	}
 
-	ArrayList newRestrList = new ArrayList();
+	ArrayList<ArrayList<?>> newRestrList = new ArrayList<ArrayList<?>>();
 	int i = 0;
-	for(Iterator rIter = restrictionList.iterator(); rIter.hasNext(); )
+	for(Iterator<?> rIter = restrictionList.iterator(); rIter.hasNext(); )
 	{
-		ArrayList oneOperation = (ArrayList) rIter.next();
+		ArrayList<?> oneOperation = (ArrayList<?>) rIter.next();
 		oneOperation.remove(index);
 		newRestrList.add(i, oneOperation);
 		i++;
@@ -1627,24 +1611,24 @@ public ArrayList removeStates(int index, ArrayList restrictionList)
 *
 *
 ******************************************************/
-public ArrayList copyRestrictions(ArrayList r)
+public ArrayList<Restriction> copyRestrictions(ArrayList<Restriction> r)
 {
-	ArrayList newR = new ArrayList();
-	for(Iterator rIter = r.iterator(); rIter.hasNext(); )
+	ArrayList<Restriction> newR = new ArrayList<Restriction>();
+	for(Iterator<Restriction> rIter = r.iterator(); rIter.hasNext(); )
 	{
-		Restriction op = (Restriction) rIter.next();
+		Restriction op = rIter.next();
 		String opName = op.opName;
 		String opId = op.opId;
 
 
-		ArrayList rList = (ArrayList) op.restrictions;
+		ArrayList<?> rList = (ArrayList<?>) op.restrictions;
 
-		ArrayList newRList = new ArrayList();
-		for(Iterator rListIter = rList.iterator(); rListIter.hasNext(); )
+		ArrayList<ArrayList<String>> newRList = new ArrayList<ArrayList<String>>();
+		for(Iterator<?> rListIter = rList.iterator(); rListIter.hasNext(); )
 		{
-			ArrayList states = (ArrayList) rListIter.next();
-			ArrayList newStates = new ArrayList();
-			for(Iterator sIter = states.iterator(); sIter.hasNext(); )
+			ArrayList<?> states = (ArrayList<?>) rListIter.next();
+			ArrayList<String> newStates = new ArrayList<String>();
+			for(Iterator<?> sIter = states.iterator(); sIter.hasNext(); )
 			{
 				String state = (String) sIter.next();
 				String newState = new String(state);
@@ -1666,7 +1650,7 @@ public ArrayList copyRestrictions(ArrayList r)
 *
 *
 ******************************************************/
-public int compareRestrictions(ArrayList r1, ArrayList r2)
+public int compareRestrictions(ArrayList<Restriction> r1, ArrayList<Restriction> r2)
 {
 	if(!(r1.size() == r2.size()))
 	{
@@ -1677,8 +1661,8 @@ public int compareRestrictions(ArrayList r1, ArrayList r2)
 	{
 		for(int i = 0; i<r1.size(); i++)
 		{
-			Restriction op1 = (Restriction) r1.get(i);
-			Restriction op2 = (Restriction) r2.get(i);
+			Restriction op1 = r1.get(i);
+			Restriction op2 = r2.get(i);
 
 			String opName1 = op1.opName;
 			String opName2 = op2.opName;
@@ -1697,8 +1681,8 @@ public int compareRestrictions(ArrayList r1, ArrayList r2)
 				return -1;
 			}
 
-			ArrayList rList1 = (ArrayList) op1.restrictions;
-			ArrayList rList2 = (ArrayList) op2.restrictions;
+			ArrayList<?> rList1 = (ArrayList<?>) op1.restrictions;
+			ArrayList<?> rList2 = (ArrayList<?>) op2.restrictions;
 			if(!(rList1.size() == rList2.size()))
 			{
 				//System.out.println("Not equal sizes");
@@ -1708,8 +1692,8 @@ public int compareRestrictions(ArrayList r1, ArrayList r2)
 			{
 				for(int j = 0; j<rList1.size(); j++)
 				{
-					ArrayList states1 = (ArrayList) rList1.get(j);
-					ArrayList states2 = (ArrayList) rList2.get(j);
+					ArrayList<?> states1 = (ArrayList<?>) rList1.get(j);
+					ArrayList<?> states2 = (ArrayList<?>) rList2.get(j);
 
 					if(!states1.equals(states2))
 					{
@@ -1732,14 +1716,14 @@ public int compareRestrictions(ArrayList r1, ArrayList r2)
 * contains their operations.
 *
 ******************************************************/
-public ArrayList getOpMachMatching(ArrayList ROPList)
+public ArrayList<ArrayList<String>> getOpMachMatching(ArrayList<Document> ROPList)
 {
 	int i = 0;
-	ArrayList opsMachs = new ArrayList();
-	for( Iterator ROPiter = ROPList.iterator(); ROPiter.hasNext(); )
+	ArrayList<ArrayList<String>> opsMachs = new ArrayList<ArrayList<String>>();
+	for( Iterator<Document> ROPiter = ROPList.iterator(); ROPiter.hasNext(); )
 	{
-		ArrayList temp = new ArrayList();
-		Document rop = (Document) ROPiter.next();
+		ArrayList<String> temp = new ArrayList<String>();
+		Document rop = ROPiter.next();
 		Element root = rop.getRootElement();
 		Element mach = root.getChild("Machine");
 		String machName = mach.getText();
@@ -1759,6 +1743,7 @@ public ArrayList getOpMachMatching(ArrayList ROPList)
  * @param relation
  * @return
  */
+@SuppressWarnings("unchecked")
 public List<Element> getActivitiesFromRelation(Element relation){
 	
 	final ArrayList<Element> actList = new ArrayList<Element>();
@@ -1798,9 +1783,9 @@ public List<String> getOperationsFromActivities(final List<Element> activities){
 	}
 	
 	
-	for( Iterator actIter = activities.iterator(); actIter.hasNext(); )
+	for( Iterator<Element> actIter = activities.iterator(); actIter.hasNext(); )
 	{
-		Element act = (Element) actIter.next();
+		Element act = actIter.next();
 		Element operation = act.getChild("Operation");
 		String opName = operation.getText();
 		actList.add(opName);
@@ -1816,21 +1801,21 @@ public List<String> getOperationsFromActivities(final List<Element> activities){
 *
 *
 ******************************************************/
-public ArrayList getRestriction(String opName, ArrayList restr, String found)
+public ArrayList<?> getRestriction(String opName, ArrayList<Restriction> restr, String found)
 {
-	for( Iterator rIter = restr.iterator(); rIter.hasNext(); )
+	for( Iterator<Restriction> rIter = restr.iterator(); rIter.hasNext(); )
 	{
-		Restriction r = (Restriction) rIter.next();
+		Restriction r = rIter.next();
 		if(opName.equals(r.opName))
 		{
-			ArrayList rr = (ArrayList) r.restrictions;
+			ArrayList<?> rr = (ArrayList<?>) r.restrictions;
 			found = "nf";
 			return rr;
 		}
 	}
 	System.out.println("Cannot find a restriction for " + opName);
 	found = "f";
-	return new ArrayList();
+	return new ArrayList<Object>();
 }
 
 
@@ -1840,12 +1825,12 @@ public ArrayList getRestriction(String opName, ArrayList restr, String found)
 *
 *
 ******************************************************/
-public String getMachine(String opName, ArrayList opsMachs)
+public String getMachine(String opName, ArrayList<ArrayList<String>> opsMachs)
 {
 	int i = 0;
-	for( Iterator opIter = opsMachs.iterator(); opIter.hasNext(); )
+	for( Iterator<ArrayList<String>> opIter = opsMachs.iterator(); opIter.hasNext(); )
 	{
-		ArrayList omList = (ArrayList) opIter.next();
+		ArrayList<?> omList = opIter.next();
 		if(omList.contains(opName))
 		{
 			String mach = (String) omList.get(0);
@@ -1865,18 +1850,19 @@ public String getMachine(String opName, ArrayList opsMachs)
 *
 ******************************************************/
 
-public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
+@SuppressWarnings("unchecked")
+public void buildCOPDocs(ArrayList<Restriction> restr, ArrayList<Document> ROPs)
 {
-	ArrayList opsMachs = getOpMachMatching(ROPs);
-	for( Iterator COPiter = COPList.iterator(); COPiter.hasNext(); )
+	ArrayList<ArrayList<String>> opsMachs = getOpMachMatching(ROPs);
+	for( Iterator<Document> COPiter = COPList.iterator(); COPiter.hasNext(); )
 	{
 
-		Document rop = (Document) COPiter.next();
+		Document rop = COPiter.next();
 		Element root = rop.getRootElement();
 		Element rel = root.getChild("Relation");
-		List activities = getActivitiesFromRelation( rel );
+		List<?> activities = getActivitiesFromRelation( rel );
 
-		for( Iterator actIter = activities.iterator(); actIter.hasNext(); )
+		for( Iterator<?> actIter = activities.iterator(); actIter.hasNext(); )
 		{
 			Element act = (Element) actIter.next();
 			Element operation = act.getChild("Operation");
@@ -1885,7 +1871,7 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 			act.removeChildren("Operation");
 
 			String found = new String();
-			ArrayList rList = getRestriction(opName, restr, found);
+			ArrayList<?> rList = getRestriction(opName, restr, found);
 
 			if(found.equals("nf"))
 			{
@@ -1894,8 +1880,7 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 			// If a restriction exists
 			else if(rList.size() > 0)
 			{
-				int noOfEntries = rList.size();
-				ArrayList preConds = new ArrayList();
+				ArrayList<ArrayList<String>> preConds = new ArrayList<ArrayList<String>>();
 				
 				// Transform restriction into a number of preconditions
 
@@ -1905,21 +1890,20 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 
 				// A restriction contains one row for each operation, i.e. it is actually the columns that consitute a precondition. Build ArrayList "preConds" that contain one entry for each column.
 				int rowNo = 0;
-				for( Iterator rIter = rList.iterator(); rIter.hasNext(); )
+				for( Iterator<?> rIter = rList.iterator(); rIter.hasNext(); )
 				{
 					// All states of the operation
-					ArrayList states = (ArrayList) rIter.next();
+					ArrayList<?> states = (ArrayList<?>) rIter.next();
 
 					int i = 0;
-					String temp = new String();
 					// Iterate within each "entry" (restriction) consisting of 1, O1, O1_-, O1_comp etc.
-					for( Iterator sIter = states.iterator(); sIter.hasNext(); )
+					for( Iterator<?> sIter = states.iterator(); sIter.hasNext(); )
 					{
 						String state = (String) sIter.next();
 
 						if ( i > 1 )
 						{
-							ArrayList theEntry = new ArrayList();
+							ArrayList<String> theEntry = new ArrayList<String>();
 
 							if(rowNo==0) // preConds is empty
 							{
@@ -1928,13 +1912,13 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 							else if(rowNo==1)
 							{
 
-								ArrayList oldState = (ArrayList) preConds.get(i-2);
+								ArrayList<String> oldState = preConds.get(i-2);
 								oldState.add(state);
-								theEntry = (ArrayList) oldState.clone();
+								theEntry = (ArrayList<String>) oldState.clone();
 							}
 							else if(rowNo>1)
 							{
-								theEntry = (ArrayList) preConds.get(i-2);
+								theEntry = preConds.get(i-2);
 								theEntry.add(state);
 							}
 
@@ -1956,14 +1940,14 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 				// Create the COP xml-document:
 
 				// For all alternative preconditions (e.g. (O1_comp AND O2_init) OR (O1_init))
-				for( Iterator pIter = preConds.iterator(); pIter.hasNext(); )
+				for( Iterator<ArrayList<String>> pIter = preConds.iterator(); pIter.hasNext(); )
 				{
-					ArrayList states = (ArrayList) pIter.next();
+					ArrayList<?> states = pIter.next();
 					Element precondAND = new Element("Precondition");
 					precondAND.setAttribute("Operator", "and");
 
 					// For all AND-conditions (e.g. O1_comp AND O2_init)
-					for( Iterator sIter = states.iterator(); sIter.hasNext(); )
+					for( Iterator<?> sIter = states.iterator(); sIter.hasNext(); )
 					{
 						String state = (String) sIter.next();
 						if( state.endsWith(INITIAL_STATE_POSTFIX)   ||
@@ -2009,16 +1993,16 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 
 /*****************************************************/
 
-	public void printSetList(List v)
+	public void printSetList(List<?> v)
 	{
 
 		int i=1;
-		for(Iterator e = v.iterator(); e.hasNext(); )
+		for(Iterator<?> e = v.iterator(); e.hasNext(); )
 		{
-			Set vv = (Set) e.next();
+			Set<?> vv = (Set<?>) e.next();
 			System.out.println("Rad " + i);
 			i++;
-			for(Iterator ee = vv.iterator(); ee.hasNext(); )
+			for(Iterator<?> ee = vv.iterator(); ee.hasNext(); )
 			{
 				System.out.println(ee.next());
 			}
@@ -2027,15 +2011,15 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 	}
 /*****************************************************/
 
-	public void printList(List v)
+	public void printList(List<?> v)
 	{
 		int i=1;
-		for(Iterator e = v.iterator(); e.hasNext(); )
+		for(Iterator<?> e = v.iterator(); e.hasNext(); )
 		{
-			List vv = (List) e.next();
+			List<?> vv = (List<?>) e.next();
 			System.out.println("Rad " + i);
 			i++;
-			for(Iterator ee = vv.iterator(); ee.hasNext(); )
+			for(Iterator<?> ee = vv.iterator(); ee.hasNext(); )
 			{
 				System.out.println(ee.next());
 			}
@@ -2045,11 +2029,11 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 
 /*****************************************************/
 
-	public void printStringList(List v)
+	public void printStringList(List<?> v)
 	{
 		System.out.println();
 		int i=1;
-		for(Iterator e = v.iterator(); e.hasNext(); )
+		for(Iterator<?> e = v.iterator(); e.hasNext(); )
 		{
 			//System.out.println("Rad " + i);
 			System.out.println(e.next());
@@ -2060,9 +2044,9 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 
 /*****************************************************/
 
-	public void printStringSet(Set v)
+	public void printStringSet(Set<?> v)
 	{
-		for(Iterator ee = v.iterator(); ee.hasNext(); )
+		for(Iterator<?> ee = v.iterator(); ee.hasNext(); )
 		{
 			System.out.println(ee.next());
 		}
@@ -2070,10 +2054,10 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 	}
 /*****************************************************/
 
-	public void printRestrictionList(ArrayList r)
+	public void printRestrictionList(ArrayList<?> r)
 	{
 		int k=1;
-		for(Iterator f = r.iterator(); f.hasNext(); )
+		for(Iterator<?> f = r.iterator(); f.hasNext(); )
 		{
 			Restriction ff = (Restriction) f.next();
 			System.out.println("******** Restriction " + k + " ********");
@@ -2087,13 +2071,12 @@ public void buildCOPDocs(ArrayList restr, ArrayList ROPs)
 
 /*****************************************************/
 
-	public void printRestrictionSubList(ArrayList r, int a, int b)
+	public void printRestrictionSubList(ArrayList<?> r, int a, int b)
 	{
 
 		int k=1;
 		int aa=0, bb=0;
-		Iterator f = r.iterator();
-		boolean ready = false;
+		Iterator<?> f = r.iterator();
 		while( f.hasNext() && bb<b)
 		{
 			Restriction ff = (Restriction) f.next();

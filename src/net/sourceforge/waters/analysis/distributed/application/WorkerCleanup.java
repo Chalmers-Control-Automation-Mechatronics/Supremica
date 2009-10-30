@@ -1,14 +1,12 @@
 package net.sourceforge.waters.analysis.distributed.application;
 
-import java.rmi.RemoteException;
 import java.rmi.NoSuchObjectException;
 import java.rmi.server.UnicastRemoteObject;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.HashSet;
 import java.util.Set;
+
 
 /**
  * Keeps track of workers that have been created on this

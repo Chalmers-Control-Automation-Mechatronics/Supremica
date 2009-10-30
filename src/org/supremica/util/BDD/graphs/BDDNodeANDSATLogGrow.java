@@ -6,7 +6,9 @@ import org.supremica.util.BDD.*;
 public class BDDNodeANDSATLogGrow
 	extends BDDNodeGrow
 {
-	private BDDSATLogGrow satlog = null;
+    private static final long serialVersionUID = 1L;
+
+    private BDDSATLogGrow satlog = null;
 
 	public BDDNodeANDSATLogGrow(BDDAutomata manager, String title)
 	{

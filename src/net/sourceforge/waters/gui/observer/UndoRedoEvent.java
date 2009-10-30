@@ -46,4 +46,9 @@ public class UndoRedoEvent
     return EditorChangedEvent.Kind.UNDOREDO;
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

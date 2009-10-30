@@ -449,11 +449,7 @@ public class AutomataToJava
         for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
         {
             event = (LabeledEvent) alphIt.next();
-            
             pw.println("\t\tcase " + event.getIndex() + ": // Event \"" + event.getLabel() + "\"");
-            
-            boolean previousCondition = false;
-            
             for (Iterator autIt = project.iterator(); autIt.hasNext(); )
             {
                 automaton = (Automaton) autIt.next();
@@ -477,16 +473,10 @@ public class AutomataToJava
                     {
                         currState = (State) stateIt.next();
                         toState = currState.nextState(automatonEvent);
-                        
-                        int currStateIndex = currState.getSynchIndex();
-                        
                         if (toState == null)
                         {
                             throw new GenerationException("Could not find the next state from state " + currState.getName() + " with label " + event.getLabel() + " in automaton " + automaton.getName());
                         }
-                        
-                        int toStateIndex = toState.getSynchIndex();
-                        
                         if (currState != toState)
                         {
                             if (!previousState)
@@ -539,11 +529,8 @@ public class AutomataToJava
         pw.println("\t\t *   break;");
         pw.println("\t\t */");
         pw.println("\t\tswitch (eventIndex) {");
-        
         LabeledEvent event;
         EventTimer timer;
-        boolean firstTimer = true;
-        
         for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
         {
             event = (LabeledEvent) alphIt.next();
@@ -669,11 +656,8 @@ public class AutomataToJava
         pw.println("\t\t *   return timers[2].hasTimedOut();  // Timer \"mytimer\"");
         pw.println("\t\t */");
         pw.println("\t\tswitch (eventIndex) {");
-        
         LabeledEvent event;
         EventTimer timer;
-        boolean firstTimer = true;
-        
         for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
         {
             event = (LabeledEvent) alphIt.next();

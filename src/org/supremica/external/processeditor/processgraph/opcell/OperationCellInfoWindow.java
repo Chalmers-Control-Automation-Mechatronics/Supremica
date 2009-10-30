@@ -1,39 +1,78 @@
 package org.supremica.external.processeditor.processgraph.opcell;
 
-import java.util.*;
-import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.event.*;
-import javax.swing.border.*;
-import java.text.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.Font.*;
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Iterator;
 
-import org.supremica.manufacturingTables.xsd.processeditor.Properties;
+import javax.swing.AbstractCellEditor;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+
 import org.supremica.manufacturingTables.xsd.processeditor.Activity;
 import org.supremica.manufacturingTables.xsd.processeditor.Attribute;
 import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
 import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceType;
 import org.supremica.manufacturingTables.xsd.processeditor.Precondition;
+import org.supremica.manufacturingTables.xsd.processeditor.Properties;
+
 
 /**
  * Displays the operation info window, which allow the user to edit 
  * the operation, predecessor and attribute information.
  */
 public class OperationCellInfoWindow extends JDialog implements ActionListener {
-    private int sizeX = 800;
+
+	private static final long serialVersionUID = 1L;
+	
+	private int sizeX = 800;
     private int sizeY = 300;
     private  JTextField label;
     private JToolBar toolBar;
     private JToggleButton nameChange;
     private JButton deleteOp, ok, cancel;
 
-    private JCheckBox checkE,checkR, checkP,checkZ,checkW,
+    @SuppressWarnings("unused")
+	private JCheckBox checkE,checkR, checkP,checkZ,checkW,
 	checkOwn,checkOther,checkExtra;
    
-    private JPanel operationPanel,tablePanel, edgeOptionsChBoxes ;
+    @SuppressWarnings("unused")
+	private JPanel operationPanel,tablePanel, edgeOptionsChBoxes ;
     
     public String opName = "";
 
@@ -242,7 +281,8 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
     private JTextArea description = new JTextArea(3,10);
     private JScrollPane descriptionScrollPane;
     private JToggleButton modifyDescription;
-    private JButton clearDescription;
+    @SuppressWarnings("unused")
+	private JButton clearDescription;
 
     private void descriptionPanel()
     {
@@ -285,12 +325,10 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
      * </ul>
      */
     public int showDialog() {
-	show();
-	return option;
+    	setVisible(true);
+    	return option;
     }
-    private Activity getActivity() {
-    	return operand;
-    }
+
     /**
      * Is invoked when an action has occured.
      */
@@ -354,7 +392,9 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
 	//***************************END NEW CODE *********************************
     public class PredecessorWindow extends JPanel implements ActionListener
     {
-    	private JButton add = new JButton("Add");
+		private static final long serialVersionUID = 1L;
+		
+		private JButton add = new JButton("Add");
     	private JButton modify = new JButton("Modify");
     	private JButton remove = new JButton("Remove");
     	private int xSize = 100;
@@ -510,11 +550,12 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
     
     public class AttributeWindow extends JPanel implements ActionListener
     {
-	private JButton add=new JButton("Add"),
-	    modify=new JButton("Modify"),
-	    remove=new JButton("Remove");
-	private AttributeTableModel model = new AttributeTableModel();
-	private JTable table;
+		private static final long serialVersionUID = 1L;
+		private JButton add=new JButton("Add"),
+	    	modify=new JButton("Modify"),
+	    	remove=new JButton("Remove");
+		private AttributeTableModel model = new AttributeTableModel();
+		private JTable table;
 
 	public AttributeWindow() 
 	{	    
@@ -672,6 +713,8 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
     class JComponentTableCellRenderer extends DefaultTableCellRenderer 
 	implements TableCellRenderer
     {
+		private static final long serialVersionUID = 1L;
+
 	public Component getTableCellRendererComponent(JTable table, Object value,
 						       boolean isSelected,boolean hasFocus,
 						       int row, int column)
@@ -681,6 +724,7 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
     }    
     class AttributeTableModel extends AbstractTableModel
     {
+		private static final long serialVersionUID = 1L;
 	//Overwrights some of the methods in parentclass AbstractTableModel
 	public void addRow(Object[] newRow)
 	{
@@ -715,7 +759,7 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
 	public Object getValueAt(int row, int col) {
 	    return attributeInfo[row][col];
 	}	    		 
-	public Class getColumnClass(int c)
+	public Class<?> getColumnClass(int c)
 	{
 	    /*
 	    try {	
@@ -762,6 +806,7 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
     }        
     class ColorRenderer extends JLabel implements TableCellRenderer
     {
+		private static final long serialVersionUID = 1L;
 	Border unselectedBorder = null;
 	Border selectedBorder = null;
 	boolean hasBorder = true;
@@ -805,9 +850,15 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
     }     
     class CheckBoxRenderer extends JCheckBox implements TableCellRenderer
     {
+	private static final long serialVersionUID = 1L;
+
+	@SuppressWarnings("unused")
 	private Color selectedBackground;
+	@SuppressWarnings("unused")
 	private Color unSelectedBackground;
+	@SuppressWarnings("unused")
 	private boolean isDefined = false;		
+	@SuppressWarnings("unused")
 	private boolean firstTime = true;	
 
 	public CheckBoxRenderer(boolean s)
@@ -845,6 +896,7 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
     class AttributeColorChanger extends AbstractCellEditor implements TableCellEditor,
 							 ActionListener
     {
+		private static final long serialVersionUID = 1L;
 	Color presentColor;
 	JButton button;
 	JColorChooser colorChooser;

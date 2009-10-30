@@ -13,9 +13,9 @@ import org.supremica.manufacturingTables.xsd.il.ObjectFactory;
 
 
 public class InterLockCell 
-						extends 
-							ResourceCell 
+	extends ResourceCell 
 {
+    private static final long serialVersionUID = 1L;
 	private static final Color bgColor = new Color(250,119,19,80);
 	private static final Color fgColor = Color.BLACK;
 	

@@ -118,6 +118,7 @@ public class RegexpDialog
 			return menu;
 		}
 
+		@SuppressWarnings("unused")
 		private JMenu makeHelpMenu()
 		{
 			JMenu help = new JMenu("Help");

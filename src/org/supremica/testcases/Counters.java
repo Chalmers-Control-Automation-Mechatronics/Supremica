@@ -8,6 +8,8 @@ import org.supremica.automata.*;
 public class Counters
     extends Automata
 {
+    private static final long serialVersionUID = 1L;
+
     private Project project;
     private static boolean first = true;
     

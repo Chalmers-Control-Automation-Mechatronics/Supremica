@@ -858,7 +858,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     final CompiledSingleEvent event = output.getEvent();
     IdentifierProxy ident = event.getIdentifier();
     if (ident == null) {
-      final EventDeclProxy decl = createEventDecl(event);
+      createEventDecl(event);
       ident = event.getIdentifier();
     }
     final IdentifierProxy iclone = ident.clone();
@@ -1203,7 +1203,6 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       (final SimpleExpressionProxy expr)
     {
       if (expr.equalsByContents(mSuffix)) {
-        final IdentifierProxy ident = (IdentifierProxy) expr;
         return mNameSpace.getPrefixedIdentifier(mSuffix, mFactory);
       } else {
         return mContext.getBoundExpression(expr);

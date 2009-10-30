@@ -1,31 +1,33 @@
 package org.supremica.external.processeditor;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.io.File;
 
-import org.supremica.external.processeditor.processgraph.*;
-import org.supremica.external.processeditor.processgraph.ilcell.*;
+import javax.swing.ImageIcon;
+import javax.swing.JInternalFrame;
+
+import org.supremica.external.processeditor.processgraph.NestedCell;
+import org.supremica.external.processeditor.processgraph.NestedCellListener;
 import org.supremica.external.processeditor.processgraph.eopcell.ExecutionOfOperationCell;
-import org.supremica.external.processeditor.processgraph.resrccell.*;
-import org.supremica.external.processeditor.xgraph.*;
-import org.supremica.external.processeditor.xml.*;
-import org.supremica.manufacturingTables.xsd.processeditor.*;
-import org.supremica.external.processeditor.xml.Converter;
+import org.supremica.external.processeditor.processgraph.ilcell.InterLockCell;
+import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
 import org.supremica.external.processeditor.xgraph.Graph;
 import org.supremica.external.processeditor.xgraph.GraphCell;
 import org.supremica.external.processeditor.xgraph.GraphScrollPane;
-import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
-import org.supremica.external.processeditor.processgraph.ilcell.InterLockCell;
-import org.supremica.external.processeditor.processgraph.eopcell.ExecutionOfOperationCell;
-import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
-import org.supremica.manufacturingTables.xsd.processeditor.ROP;
-import org.supremica.manufacturingTables.xsd.il.IL;
-import org.supremica.manufacturingTables.xsd.eop.EOP;
-
-import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
 import org.supremica.external.processeditor.xgraph.Selection;
 import org.supremica.external.processeditor.xgraph.SelectionListener;
+import org.supremica.external.processeditor.xml.Converter;
+import org.supremica.manufacturingTables.xsd.eop.EOP;
+import org.supremica.manufacturingTables.xsd.il.IL;
+import org.supremica.manufacturingTables.xsd.processeditor.Activity;
+import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
+import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+import org.supremica.manufacturingTables.xsd.processeditor.ROPType;
+import org.supremica.manufacturingTables.xsd.processeditor.Relation;
+import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
+
 
 /**
  * Represents the SOC worksheets.
@@ -38,7 +40,11 @@ import org.supremica.external.processeditor.xgraph.SelectionListener;
  * which is an instance of this class. 
  */
 public class SOCGraphFrame extends JInternalFrame implements SelectionListener {
-    private Point defaultLocation = new Point(30, 30);
+
+	private static final long serialVersionUID = 1L;
+	
+	@SuppressWarnings("unused")
+	private Point defaultLocation = new Point(30, 30);
     private GraphScrollPane graphScroll;
     private Graph graph = new Graph();    
     private boolean multiMode = false;    

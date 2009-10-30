@@ -513,6 +513,7 @@ public class TestAlgo
         }
 	}
 
+	@SuppressWarnings("unused")
 	private void testSctVerification() throws Exception {
 		// the supervisor synthesis
         System.out.println("\n***** Testing DES and SCT/verification algorithms");
@@ -543,6 +544,7 @@ public class TestAlgo
         Options.ordering_algorithm = save_ordering;
 	}
 
+	@SuppressWarnings("unused")
 	private void testH1H2Heuristics() throws Exception {
 		int oldalgo;
 		int oldh1 = Options.es_heuristics;
@@ -594,6 +596,7 @@ public class TestAlgo
         Options.algo_family = oldalgo;
 	}
 
+	@SuppressWarnings("unused")
 	private void testTransitionOptimization() throws Exception {
 		int oldalgo;
 		int oldopt;
@@ -634,6 +637,7 @@ public class TestAlgo
         Options.transition_optimizer_algo = oldopt;
 	}
 
+	@SuppressWarnings("unused")
 	private void testDisjunctiveOptimization() throws Exception {
 		int oldalgo;
 		int oldopt;
@@ -675,6 +679,7 @@ public class TestAlgo
         Options.disj_optimizer_algo = oldopt;
 	}
 
+	@SuppressWarnings("unused")
 	private void testInterleavedAndSeparatedOrdering(int testCaseIndex)
 			throws Exception {
 		System.out.println("\n***** Testing interleaved & separated ordering, using " + TEST_FILES[testCaseIndex]);
@@ -702,6 +707,7 @@ public class TestAlgo
         Options.interleaved_variables = save_int;
 	}
 
+	@SuppressWarnings("unused")
 	private void testOrderingAlgorithms(int testCaseIndex) throws Exception {
 		System.out.println("\n***** Testing all ordering algorithms (slow!)");
 		int save_ordering = Options.ordering_algorithm;
@@ -727,6 +733,7 @@ public class TestAlgo
 		Options.ordering_algorithm = save_ordering;
 	}
 
+	@SuppressWarnings("unused")
 	private void testEncodings(int testCaseIndex) throws Exception {
 		System.out.println("\n***** Testing all encoding functions");
 		
@@ -754,6 +761,7 @@ public class TestAlgo
 		Options.encoding_algorithm = save_encoding;
 	}
 
+	@SuppressWarnings("unused")
 	private void testSearchAlgorithms(int testCaseIndex) throws Exception {
 		System.out.println("\n***** Testing all search algorithms");
 		

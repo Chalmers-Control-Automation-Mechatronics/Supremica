@@ -1,8 +1,8 @@
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
 import java.io.IOException;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
+
 
 /**
  * Represents a packed state tuple. All state tuples contain a depth
@@ -133,16 +133,11 @@ public class StateTuple implements Serializable
       }
   }
 
-  private void readObjectNoData() 
-    throws ObjectStreamException
-  {
-
-  }
-  
-
   //These fields should be final, but to avoid further reflection when
   //deserialising, they are marked as transient-volatile to keep them 
   //threadsafe
   private transient int[] mState;
   private transient int mDepth;
+
+  private static final long serialVersionUID = 1L;
 }

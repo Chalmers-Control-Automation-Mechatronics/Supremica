@@ -52,5 +52,10 @@ class NodeSetElement extends IndexedArraySet<NodeProxy> {
     return new DuplicateNameException
       ("Graph already contains a node named '" + name + "'!");
   }
-  
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

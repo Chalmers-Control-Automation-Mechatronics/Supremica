@@ -1,22 +1,24 @@
 package org.supremica.external.avocades.relationextraction;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
-import java.awt.event.*;
-import javax.xml.parsers.*;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
-import org.xml.sax.*;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
-import org.jdom.*;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.*;
-
 import org.w3c.dom.Document;
+
 
 public class ReadAndWrite extends JPanel {
 
-    protected String newline = "\n";
+	private static final long serialVersionUID = 1L;
+
+	protected String newline = "\n";
 
     //PPNGui guireferens;
     Document doc;
@@ -50,16 +52,11 @@ public class ReadAndWrite extends JPanel {
 			int returnVal = fc.showOpenDialog(ReadAndWrite.this);
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-
 				File file = fc.getSelectedFile();
 				String filnamn = file.getName();
-				String path = file.getPath();
-
 				String[] filNamnsFalt = {filnamn};
-
 				// Load filename and SAX driver class
 				boolean expandEntities = true;
-				String filename = filNamnsFalt[0];
 				String saxDriverClass = null;
 					if (filNamnsFalt.length > 1) {
 						if (filNamnsFalt[1].equalsIgnoreCase("false")) {

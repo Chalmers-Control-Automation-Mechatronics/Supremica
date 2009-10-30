@@ -5,20 +5,25 @@ package org.supremica.automata.BDD.EFA;
  *
  * @author sajed
  */
-import org.supremica.log.*;
-import org.supremica.automata.BDD.BDDLibraryType;
-import org.supremica.properties.Config;
-import net.sf.javabdd.*;
-import java.util.*;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.model.expr.ParseException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDBitVector;
+import net.sf.javabdd.BDDDomain;
+import net.sf.javabdd.BDDFactory;
+import net.sf.javabdd.BDDPairing;
+import net.sf.javabdd.BDDVarSet;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.VariableComponentProxy;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import org.supremica.automata.ExtendedAutomataIndexMap;
+
+import org.supremica.automata.BDD.BDDLibraryType;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.properties.Config;
+
 
 public class BDDExtendedManager
 {
@@ -179,12 +184,13 @@ public class BDDExtendedManager
 
     static BDD action2BDD(BinaryExpressionProxy expr)
     {
-        BDDBitVector leftSide = bddBitVecTargetMap.get(expr.getLeft().toString());
+        @SuppressWarnings("unused")
+		BDDBitVector leftSide = bddBitVecTargetMap.get(expr.getLeft().toString());
         // return leftSide.equ(arithExpr2BDDBitVec(expr.getRight()));
         // ++ cannot find symbol
-	// ++ symbol  : method equ(net.sf.javabdd.BDDBitVector)
-	// ++ location: class net.sf.javabdd.BDDBitVector
-	return null;
+        // ++ symbol  : method equ(net.sf.javabdd.BDDBitVector)
+        // ++ location: class net.sf.javabdd.BDDBitVector
+        return null;
     }
 
     static BDDBitVector arithExpr2BDDBitVec(SimpleExpressionProxy expr)

@@ -106,9 +106,9 @@ class EventsViewerPanel    // compare AlphabetsViewerPanel
 		// EventTreeCache eventTreeCache = new EventTreeCache();
 		// AutomatonTreeCache automatonTreeCache = new AutomatonTreeCache();
 		// This cache is only for storing whether we have already seen the event or not
-		HashSet eventTreeCache = new HashSet();
+		HashSet<LabeledEvent> eventTreeCache = new HashSet<LabeledEvent>();
 
-		for (Iterator eventit = alphabet.iterator(); eventit.hasNext(); )
+		for (Iterator<?> eventit = alphabet.iterator(); eventit.hasNext(); )
 		{
 			LabeledEvent event = (LabeledEvent) eventit.next();
 
@@ -187,7 +187,7 @@ class EventsViewerPanel    // compare AlphabetsViewerPanel
 	{
 
 		// for all the (immediate) children of the root, make them visible
-		for (Enumeration e = root.children(); e.hasMoreElements(); )
+		for (Enumeration<?> e = root.children(); e.hasMoreElements(); )
 		{
 			EventSubTree node = (EventSubTree) e.nextElement();
 
@@ -373,8 +373,10 @@ class SelectOperatorEventsDialog
 	extends JFrame
 {
 	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(SelectOperatorEventsDialog.class);
 	private Alphabet alphabet;
+	@SuppressWarnings("unused")
 	private boolean doit = false;
 	private EventsViewerPanel sourceEvents;
 	private RestrictEventsViewerPanel restrictEvents;
@@ -741,6 +743,7 @@ public class SelectEventsWindow
 	extends AbstractAction
 {
 	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(SelectEventsWindow.class);
 	private Alphabet theAlphabet = null;
 	private SelectOperatorEventsDialog dlg = null;

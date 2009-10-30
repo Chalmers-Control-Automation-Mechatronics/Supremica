@@ -36,6 +36,7 @@ public class QMCControladorListaImplicantesReducida extends MouseAdapter {
      * Implementación del método mouseClicked que realiza las comprobaciones pertinentes  
      * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
      */    
+    @SuppressWarnings("unchecked")
     public void mouseClicked(MouseEvent e)
     {
         listaImplicantesReducida = (JList)e.getSource();

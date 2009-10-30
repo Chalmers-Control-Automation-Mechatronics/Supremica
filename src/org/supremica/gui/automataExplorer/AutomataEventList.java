@@ -58,9 +58,14 @@ import org.supremica.automata.Automata;
 public class AutomataEventList
         extends JPanel
 {
-    private boolean forward;
-    private boolean showStateId = false;
-    private Automata theAutomata;
+	private static final long serialVersionUID = 1L;
+	
+	@SuppressWarnings("unused")
+	private boolean forward;
+    @SuppressWarnings("unused")
+	private boolean showStateId = false;
+    @SuppressWarnings("unused")
+	private Automata theAutomata;
     private int[] currState;
     private AutomataStateViewer stateViewer;
     private AutomataEventListModel eventsList;

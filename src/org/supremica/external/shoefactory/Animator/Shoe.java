@@ -50,11 +50,17 @@ public class Shoe
 		shoeNr = nr;
 		stationVisit = sV;
 
+		@SuppressWarnings("unused")
 		IntegerVariable iv0 = shoe.createIntegerVariable(300, 250, "choice", "0");
+		@SuppressWarnings("unused")
 		IntegerVariable iv1 = shoe.createIntegerVariable(300, 50, "nrOfRot", "0");
+		@SuppressWarnings("unused")
 		IntegerVariable iv2 = shoe.createIntegerVariable(400, 50, "currentTable", "0");
+		@SuppressWarnings("unused")
 		IntegerVariable iv3 = shoe.createIntegerVariable(400, 150, "currentStation", "0");
+		@SuppressWarnings("unused")
 		BooleanVariable bv0 = shoe.createBooleanVariable(300, 150, "done", "0");
+		@SuppressWarnings("unused")
 		StringVariable sv = shoe.createStringVariable(400, 250, "pointerString", "");
 
 		//Change to boolean list when list stringpointers are supported
@@ -481,7 +487,9 @@ public class Shoe
 		 *------------ Moves the shoe to station 20 and then back to table 0 ---------------------------------*/
 		WorkspaceObject eh = shoe.createWorkspaceObject(200, 150, "Errorhandler");
 		GCDocument errorHandler = eh.getSubWorkspace();
+		@SuppressWarnings("unused")
 		StringVariable esv = errorHandler.createStringVariable(400, 50, "eventConditionString", "");
+		@SuppressWarnings("unused")
 		BooleanVariable ebv = errorHandler.createBooleanVariable(400, 150, "eventCondition", "0");
 
 		yPos = 50;
@@ -871,7 +879,9 @@ public class Shoe
 	public void createonTable(GCDocument doc, int currentTable)
 	{
 		int y = 0;
+		@SuppressWarnings("unused")
 		BooleanVariable start = doc.createBooleanVariable(400, 150, "start", "0");
+		@SuppressWarnings("unused")
 		BooleanVariable leave = doc.createBooleanVariable(500, 150, "leavetable", "0");
 
 		if (currentTable == 6)
@@ -1212,6 +1222,7 @@ public class Shoe
 
 		if (currentTable == 10)
 		{
+			@SuppressWarnings("unused")
 			IntegerVariable iv1 = doc.createIntegerVariable(400, 50, "from12", "0");
 			GCStepInitial initialStep = doc.createInitialStep(100, y, "Start", ";");
 
@@ -1425,8 +1436,11 @@ public class Shoe
 		int y = 0;
 
 		//create subdoc
+		@SuppressWarnings("unused")
 		BooleanVariable bv1 = doc.createBooleanVariable(500, 50, "start", "0");
+		@SuppressWarnings("unused")
 		BooleanVariable bv2 = doc.createBooleanVariable(600, 50, "moveReady", "0");
+		@SuppressWarnings("unused")
 		IntegerVariable iv1 = doc.createIntegerVariable(700, 50, "goto", "0");
 		GCStepInitial initialStep = doc.createInitialStep(100, y, "S_toTable" + currentTable + "_end", "S moveReady=0;");
 

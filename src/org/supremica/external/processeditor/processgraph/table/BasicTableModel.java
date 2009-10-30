@@ -4,13 +4,14 @@ import javax.swing.table.AbstractTableModel;
 import java.util.List;
 import java.util.LinkedList;
 
+
 public class BasicTableModel
-						extends 
-							AbstractTableModel
+	extends AbstractTableModel
 {
-	private List<String> columnNames = null;
+    private static final long serialVersionUID = 1L;
+
+    private List<String> columnNames = null;
 	private List<String> rowNames = null;
-	
 	private List<List<Object>> dataList = null;
 	private List<Integer> noEditableRowList = null;
 	
@@ -51,7 +52,7 @@ public class BasicTableModel
 	 * JTable uses this method to determine the default renderer/
 	 * editor for each cell.
 	 */
-	public Class getColumnClass(int c) {
+	public Class<?> getColumnClass(int c) {
 		return getValueAt(0, c).getClass();
 	}
 

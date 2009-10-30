@@ -67,20 +67,20 @@ abstract public class Equipment implements EquipmentContainer
     protected String name;
     private String description;
     //private List actuators;
-    protected List sensors; 
+    protected List<Sensor> sensors; 
     // The order for the sensors (and states and hardwareConnections below) are not important but I allways 
     // iterate through all elements in the List. Normally very few elements are used.
-    protected List states;
-    protected List hardwareConnections;
+    protected List<String> states;
+    protected List<String> hardwareConnections;
     
     public Equipment(String name)
     {
 	this.name = name;
 	description = null;
-	states = new LinkedList();
+	states = new LinkedList<String>();
 	//actuators = new LinkedList();
-	sensors = new LinkedList();
-	hardwareConnections = new LinkedList();
+	sensors = new LinkedList<Sensor>();
+	hardwareConnections = new LinkedList<String>();
     }
 
     final public String getName()
@@ -99,7 +99,7 @@ abstract public class Equipment implements EquipmentContainer
     }
      
 
-    final public List getStates()
+    final public List<String> getStates()
     {
 	return states;
     }
@@ -111,7 +111,7 @@ abstract public class Equipment implements EquipmentContainer
 
     abstract public void addActuator(Actuator actuatorToAdd);
 
-    public List getSensors()
+    public List<Sensor> getSensors()
     {
 	return sensors;
     }
@@ -121,7 +121,7 @@ abstract public class Equipment implements EquipmentContainer
 	sensors.add(sensorToAdd);
     }
 
-    final public List getHardwareConnections()
+    final public List<String> getHardwareConnections()
     {
 	return hardwareConnections;
     }

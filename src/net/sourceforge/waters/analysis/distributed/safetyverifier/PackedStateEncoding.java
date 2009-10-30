@@ -239,4 +239,10 @@ public class PackedStateEncoding extends StateEncoding
   private final int[] mStartBit;
   private final int[] mLength;
   private final int mStateArrayLength;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

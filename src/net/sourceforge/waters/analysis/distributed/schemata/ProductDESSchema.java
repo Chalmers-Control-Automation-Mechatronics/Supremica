@@ -64,4 +64,10 @@ public class ProductDESSchema implements Serializable
   private final String mName;
   private final AutomatonSchema[] mAutomata;
   private final EventSchema[] mEvents;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

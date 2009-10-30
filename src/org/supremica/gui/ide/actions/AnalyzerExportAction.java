@@ -1,28 +1,33 @@
 package org.supremica.gui.ide.actions;
 
-import java.util.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import javax.swing.JFileChooser;
-import java.awt.event.ActionEvent;
-import org.supremica.automata.IO.*;
+import javax.swing.JOptionPane;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.Project;
-import org.supremica.automata.algorithms.AutomataSynthesizer;
-import org.supremica.automata.algorithms.SynchronizationOptions;
-import org.supremica.automata.algorithms.SynthesisAlgorithm;
-import org.supremica.automata.algorithms.SynthesisType;
-import org.supremica.automata.algorithms.SynthesizerOptions;
+import org.supremica.automata.IO.AutomataSSPCExporter;
+import org.supremica.automata.IO.AutomataToCommunicationGraph;
+import org.supremica.automata.IO.AutomataToSTS;
+import org.supremica.automata.IO.AutomataToXML;
+import org.supremica.automata.IO.AutomatonToDot;
+import org.supremica.automata.IO.AutomatonToDsx;
+import org.supremica.automata.IO.AutomatonToFSM;
+import org.supremica.automata.IO.FileFormats;
 import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.gui.ExportDialog;
 import org.supremica.gui.ExportFormat;
 import org.supremica.gui.FileDialogs;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.texteditor.TextFrame;
-import org.supremica.log.*;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 
 /**

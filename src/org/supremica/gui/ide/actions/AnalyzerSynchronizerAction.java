@@ -73,6 +73,6 @@ public class AnalyzerSynchronizerAction
         }
         
         // Start worker thread - perform the task.
-        AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(ide.getIDE(), selectedAutomata, "", synchronizationOptions);
+        new AutomataSynchronizerWorker(ide.getIDE(), selectedAutomata, "", synchronizationOptions);
     }
 }

@@ -12,11 +12,10 @@ package net.sourceforge.waters.model.compiler.constraint;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
@@ -43,7 +42,6 @@ class BooleanLiteralRule extends SimplificationRule
     (final ModuleProxyFactory factory,
      final CompilerOperatorTable optable)
   {
-    final UnaryOperator op = optable.getNotOperator();
     final BooleanVariablePlaceHolder VARNAME =
       new BooleanVariablePlaceHolder(factory, "VARNAME");
     final SimpleIdentifierProxy ident = VARNAME.getIdentifier();

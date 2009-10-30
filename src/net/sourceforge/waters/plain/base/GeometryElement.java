@@ -29,4 +29,9 @@ public abstract class GeometryElement
   {
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

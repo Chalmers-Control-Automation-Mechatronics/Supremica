@@ -12,8 +12,6 @@ package net.sourceforge.waters.model.expr;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-
 
 /**
  * <P>An empty operator table.</P>

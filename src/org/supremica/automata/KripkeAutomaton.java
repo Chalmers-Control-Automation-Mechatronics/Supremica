@@ -55,7 +55,8 @@ public class KripkeAutomaton
     /**
      * Creates a new KripkeAutomaton.
      */
-    public KripkeAutomaton()
+    @SuppressWarnings("deprecation")
+	public KripkeAutomaton()
     {
         super();
     }

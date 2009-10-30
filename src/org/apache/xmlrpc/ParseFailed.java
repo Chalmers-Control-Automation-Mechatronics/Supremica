@@ -65,7 +65,9 @@ package org.apache.xmlrpc;
 public class ParseFailed
 	extends RuntimeException
 {
-	protected Exception cause;
+    private static final long serialVersionUID = 1L;
+
+    protected Exception cause;
 
 	public ParseFailed(String message)
 	{

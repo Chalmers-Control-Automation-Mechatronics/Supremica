@@ -13,7 +13,8 @@ public class HelpAboutAction
 {
     private static final long serialVersionUID = 1L;
     
-    private static Logger logger = LoggerFactory.createLogger(HelpAboutAction.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(HelpAboutAction.class);
     
     public HelpAboutAction(List<IDEAction> actionList)
     {

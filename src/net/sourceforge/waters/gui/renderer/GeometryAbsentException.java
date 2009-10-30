@@ -12,4 +12,9 @@ public class GeometryAbsentException
   {
     super(message);
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 }

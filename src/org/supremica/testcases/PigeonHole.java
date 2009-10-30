@@ -7,8 +7,10 @@ import org.supremica.automata.*;
 public class PigeonHole
 {
 	private Project project;
+	@SuppressWarnings("unused")
 	private int pigeons, holes;
 	private LabeledEvent[] iEvents, lEvents;
+	@SuppressWarnings("unused")
 	private static boolean first = true;
 
 	private final LabeledEvent invadeEvent(int p, int h)

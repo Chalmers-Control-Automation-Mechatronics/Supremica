@@ -54,12 +54,12 @@ import java.util.*;
 public class Action
 {
 	private String label = null;
-	private List commands = null;
+	private List<Command> commands = null;
 
 	public Action(String label)
 	{
 		this.label = label;
-		commands = new LinkedList();
+		commands = new LinkedList<Command>();
 	}
 
 	public Action(String label, Command command)
@@ -72,7 +72,7 @@ public class Action
 	public Action(Action otherAction)
 	{
 		this.label = otherAction.label;
-		commands = new LinkedList(otherAction.commands);
+		commands = new LinkedList<Command>(otherAction.commands);
 	}
 
 	public String getLabel()
@@ -90,7 +90,7 @@ public class Action
 		commands.remove(command);
 	}
 
-	public Iterator commandIterator()
+	public Iterator<Command> commandIterator()
 	{
 		return commands.iterator();
 	}

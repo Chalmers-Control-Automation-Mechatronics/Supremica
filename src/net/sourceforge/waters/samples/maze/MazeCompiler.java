@@ -44,7 +44,6 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.module.ScopeKind;
 
 import org.xml.sax.SAXException;
 

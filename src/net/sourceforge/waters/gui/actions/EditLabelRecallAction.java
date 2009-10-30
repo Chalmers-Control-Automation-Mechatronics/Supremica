@@ -194,4 +194,9 @@ public class EditLabelRecallAction
   private final RecallEnabledVisitor mRecallEnabledVisitor;
   private final RecallVisitor mRecallVisitor;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

@@ -68,20 +68,20 @@ public abstract class Actuator
 {
     protected String name;
     private String description;
-    protected List actuators;
+    protected List<Actuator> actuators;
     // The order for the actuators (and sensors and hardwareConnections below) are not important but I allways iterate 
     // through all elements in the list. Normally very few elements are used.
-    protected List sensors;
-    protected List hardwareConnections;
-    protected Map states;// HashMap will be used for quick access to the states
+    protected List<Sensor> sensors;
+    protected List<String> hardwareConnections;
+    protected Map<String, String> states;// HashMap will be used for quick access to the states
     
     public Actuator(String name)
     {
 	this.name = name;
-	states = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
-	actuators = new LinkedList();
-	sensors = new LinkedList();
-	hardwareConnections = new LinkedList();
+	states = new HashMap<String, String>(5); //initital capacity 5 and default load factor (0,75) suits me fine
+	actuators = new LinkedList<Actuator>();
+	sensors = new LinkedList<Sensor>();
+	hardwareConnections = new LinkedList<String>();
     }
 
     final public String getName()

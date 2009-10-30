@@ -301,6 +301,7 @@ class EventDeclDeleteVisitor
 
   //#########################################################################
   //# Showing the Dialog
+  @SuppressWarnings("unchecked")
   private void handleNamedIdentifier(final IdentifierProxy ident,
                                      final String name)
     throws VisitorException

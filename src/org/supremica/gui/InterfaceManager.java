@@ -49,9 +49,10 @@
  */
 package org.supremica.gui;
 
-import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
-import org.supremica.properties.*;
+import javax.swing.UIManager;
+
+import org.supremica.properties.Config;
+
 
 public class InterfaceManager
 {

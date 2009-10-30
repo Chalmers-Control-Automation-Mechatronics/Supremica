@@ -7,10 +7,11 @@ import org.supremica.manufacturingTables.xsd.il.Operations;
 import org.supremica.manufacturingTables.xsd.il.Term;
 
 public class OperationTablePane 
-						extends 
-							BasicTablePane
+	extends BasicTablePane
 {
-	OperationTablePane(){
+    private static final long serialVersionUID = 1L;
+
+    OperationTablePane(){
 		super();
 		setHeader("Operations");
 		

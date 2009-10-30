@@ -49,35 +49,38 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.util.AbstractList;
-import org.supremica.log.*;
-import org.supremica.util.SupremicaException;
-import org.supremica.gui.*;
-
-// For the automata selection methods
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import org.supremica.automata.*;
-import org.supremica.properties.Config;
-
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.des.*;
-
-import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
+
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomataIndexForm;
+import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.automata.AutomataIndexMap;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.CompositeState;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.gui.ExecutionDialog;
+import org.supremica.gui.ExecutionDialogMode;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.properties.Config;
+import org.supremica.util.SupremicaException;
 
 /**
  * Performs all kinds of synchronization tasks, for synchronization, verification and synthesis.
@@ -1354,7 +1357,8 @@ public final class AutomataSynchronizerExecuter
     }
     
     
-    private String printTypeIsPlantTable()
+    @SuppressWarnings("unused")
+	private String printTypeIsPlantTable()
     {
         StringBuffer sb = new StringBuffer();
         

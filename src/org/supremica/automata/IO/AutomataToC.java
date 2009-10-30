@@ -56,10 +56,10 @@ import java.text.DateFormat;
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.SynchronizationType;
-import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
 
 public class AutomataToC
 {
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(AutomataToC.class);
 	private Automata theAutomata;
 //	private AutomataSynchronizerHelper syncHelper;
@@ -312,8 +312,6 @@ public class AutomataToC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getIndex();
-
 			pw.println("\n// External enable condition for event \"" + currEvent.getLabel() + "\"");
 			pw.println("void enabled_" + currEvent.getLabel() + "(int& e)");
 			pw.println("{");
@@ -333,8 +331,6 @@ public class AutomataToC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getIndex();
-
 			pw.println("\n// Action for event \"" + currEvent.getLabel() + "\"");
 			pw.println("void do_" + currEvent.getLabel() + "()");
 			pw.println("{");
@@ -462,9 +458,6 @@ public class AutomataToC
 			int currEventIndex = currEvent.getIndex();
 
 			pw.println("\n\t\t// Transition for event \"" + currEvent.getLabel() + "\"");
-
-			boolean previousCondition = false;
-
 			pw.println("\t\tif (e_" + currEventIndex + ")");
 			pw.println("\t\t{");
 			pw.println("\t\t\tdo_" + currEvent.getLabel() + "();");

@@ -147,4 +147,9 @@ public final class StateElement
   private final boolean mIsInitial;
   private final Collection<EventProxy> mPropositions;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

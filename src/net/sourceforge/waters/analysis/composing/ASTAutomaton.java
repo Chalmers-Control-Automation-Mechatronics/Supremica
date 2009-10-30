@@ -1,11 +1,11 @@
 package net.sourceforge.waters.analysis.composing;
 
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
 
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+
 
 public class ASTAutomaton {
 

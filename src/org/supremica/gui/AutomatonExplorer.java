@@ -72,14 +72,16 @@ public class AutomatonExplorer
     implements AutomatonListener
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(AutomatonExplorer.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(AutomatonExplorer.class);
     private Automaton theAutomaton;
     private BorderLayout layout = new BorderLayout();
     private JPanel contentPane;
     private JMenuBar menuBar = new JMenuBar();
     private StateViewer stateViewer;
     private ExplorerController controller;
-    private VisualProject theProject;
+    @SuppressWarnings("unused")
+	private VisualProject theProject;
 
     public AutomatonExplorer(VisualProject theProject, Automaton theAutomaton)
     throws Exception
@@ -250,7 +252,8 @@ class StateViewer
     extends JPanel
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(StateViewer.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(StateViewer.class);
     private Automaton theAutomaton;
     private State currState;
     private EventList forwardEvents;
@@ -259,8 +262,8 @@ class StateViewer
     private StateDisplayer stateDisplayer;
     private JSplitPane eventSplitter;
     private JSplitPane stateEventSplitter;
-    private LinkedList prevStates = new LinkedList();
-    private LinkedList nextStates = new LinkedList();
+    private LinkedList<State> prevStates = new LinkedList<State>();
+    private LinkedList<State> nextStates = new LinkedList<State>();
 
     public StateViewer(Automaton theAutomaton)
     {
@@ -433,8 +436,10 @@ class EventList
 {
     private static final long serialVersionUID = 1L;
     private boolean forward;
-    private boolean showStateId = false;
-    private Automaton theAutomaton;
+    @SuppressWarnings("unused")
+	private boolean showStateId = false;
+    @SuppressWarnings("unused")
+	private Automaton theAutomaton;
     private State currState;
     private StateViewer stateViewer;
     private EventListModel eventsList;
@@ -531,15 +536,18 @@ class EventListModel
     extends AbstractListModel
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(EventListModel.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(EventListModel.class);
     private State currState;
     //private ArrayList currArcs = new ArrayList();
 
     /** Sorts the arcs in a TreeMap with the same key for equivalent arcs (epsilon closure) */
     private TreeMap currArcs = new TreeMap();
     private boolean forward;
-    private Automaton theAutomaton;
-    private Alphabet theAlphabet;
+    @SuppressWarnings("unused")
+	private Automaton theAutomaton;
+    @SuppressWarnings("unused")
+	private Alphabet theAlphabet;
     private boolean showState = false;
     private boolean considerEpsilonClosure = false;
 
@@ -575,6 +583,7 @@ class EventListModel
         this.considerEpsilonClosure = bool;
     }
 
+    @SuppressWarnings("unchecked")
     public void update()
     {
         Iterator arcIt;
@@ -730,7 +739,8 @@ class StateDisplayer
 {
     private static final long serialVersionUID = 1L;
     private StateViewer stateViewer;
-    private Automaton theAutomaton;
+    @SuppressWarnings("unused")
+	private Automaton theAutomaton;
     private JCheckBox isInitialBox = new JCheckBox("initial");
     private JCheckBox isAcceptingBox = new JCheckBox("accepting");
     //private JCheckBox isMutuallyAcceptingBox = new JCheckBox("mutually accepting");

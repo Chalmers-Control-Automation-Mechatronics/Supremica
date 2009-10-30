@@ -19,7 +19,8 @@ import org.supremica.log.*;
 public class AnalyzerMinimizeAction
     extends IDEAction
 {
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    @SuppressWarnings("unused")
+	private Logger logger = LoggerFactory.createLogger(IDE.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -67,6 +68,6 @@ public class AnalyzerMinimizeAction
             return;
         }
         Project currProject = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
-        AutomataMinimizationWorker worker = new AutomataMinimizationWorker(ide.getFrame(), selectedAutomata, currProject, options);
+        new AutomataMinimizationWorker(ide.getFrame(), selectedAutomata, currProject, options);
     }
 }

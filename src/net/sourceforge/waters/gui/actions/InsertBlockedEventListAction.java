@@ -146,4 +146,9 @@ public class InsertBlockedEventListAction
   private GraphSubject mObservedGraph;
   private Point mPoint;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

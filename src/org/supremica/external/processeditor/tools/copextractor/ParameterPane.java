@@ -3,7 +3,9 @@ package org.supremica.external.processeditor.tools.copextractor;
 import javax.swing.*;
 import java.util.Hashtable;
 
-public class ParameterPane extends JPanel{
+public class ParameterPane extends JPanel
+{
+    private static final long serialVersionUID = 1L;
 	
 	Hashtable<String, JCheckBox> options;
 	

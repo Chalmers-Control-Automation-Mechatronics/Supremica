@@ -57,7 +57,7 @@ public class ExampleAnimations
 	private static ExampleAnimations animations = null;
 	private final AnimationGroup MageeKramerExamples = new AnimationGroup(AnimationTypes.MageeKramerExample);
 	private static final String prefix = "/scenebeans/mageekramer/xml/";
-	private List allGroups = new LinkedList();
+	private List<AnimationGroup> allGroups = new LinkedList<AnimationGroup>();
 
 	private ExampleAnimations()
 	{
@@ -96,7 +96,7 @@ public class ExampleAnimations
 		return animations;
 	}
 
-	public Iterator iterator()
+	public Iterator<AnimationGroup> iterator()
 	{
 		return allGroups.iterator();
 	}

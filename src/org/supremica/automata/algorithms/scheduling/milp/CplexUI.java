@@ -64,9 +64,6 @@ public class CplexUI
         
         // ...and prints it to stdout
         String milpEchoStr = "";
-        String totalMilpEchoStr = "";
-        String totalIterationCount = "";
-        String lpIterationCount = "";
         while ((milpEchoStr = milpEcho.readLine()) != null)
         {   
 //            System.out.println("echo: " + milpEchoStr);

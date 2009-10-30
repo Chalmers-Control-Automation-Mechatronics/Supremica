@@ -16,10 +16,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
-import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -31,6 +29,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -839,6 +838,10 @@ public class VariableEditorDialog
       }
     }
 
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
   }
 
 
@@ -936,6 +939,10 @@ public class VariableEditorDialog
       return cell;
     }
 
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
   }
 
 
@@ -969,6 +976,10 @@ public class VariableEditorDialog
       }
     }
 
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
   }
 
 
@@ -996,6 +1007,10 @@ public class VariableEditorDialog
       addMarking();
     }
 
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
   }
 
 
@@ -1022,6 +1037,10 @@ public class VariableEditorDialog
     {
       removeMarkings();
     }
+
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
 
   }
 
@@ -1051,6 +1070,10 @@ public class VariableEditorDialog
       moveMarkingsUp();
     }
 
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
   }
 
 
@@ -1078,6 +1101,10 @@ public class VariableEditorDialog
     {
       moveMarkingsDown();
     }
+
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
 
   }
 
@@ -1131,6 +1158,7 @@ public class VariableEditorDialog
 
   //#########################################################################
   //# Class Constants
+  private static final long serialVersionUID = 1L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
   private static final VariableComponentSubject VARIABLE_TEMPLATE =
     new VariableComponentSubject(new SimpleIdentifierSubject(""),

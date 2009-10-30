@@ -294,8 +294,9 @@ public class ComponentsTree
   public List<InsertInfo> getInsertInfo(Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
-    final List<Proxy> data = (List<Proxy>) transferable.getTransferData
-      (WatersDataFlavor.MODULE_COMPONENT_LIST);
+    final List<Proxy> data =
+      Casting.toList(transferable.getTransferData
+        (WatersDataFlavor.MODULE_COMPONENT_LIST));
     final int size = data.size();
     final ListSubject<? extends ProxySubject> list;
     final ModuleContext context;
@@ -336,6 +337,7 @@ public class ComponentsTree
     return !items.isEmpty();
   }
 
+  @SuppressWarnings("unchecked")
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
     final ComponentsTreeModel model = getComponentsTreeModel();
@@ -621,6 +623,11 @@ public class ComponentsTree
       return this;
     }
 
+
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
   }
 
 
@@ -741,5 +748,10 @@ public class ComponentsTree
 
   private List<Observer> mObservers;
   private boolean mIsPermanentFocusOwner;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

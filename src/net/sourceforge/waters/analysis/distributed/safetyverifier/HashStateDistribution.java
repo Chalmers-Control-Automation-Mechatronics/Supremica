@@ -46,4 +46,10 @@ public class HashStateDistribution extends StateDistribution
 
   private String[] mHandlerIDs;
   private StateHandler[] mHandlerCache;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

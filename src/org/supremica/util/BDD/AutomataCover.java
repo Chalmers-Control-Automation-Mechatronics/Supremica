@@ -6,6 +6,7 @@ public class AutomataCover
 {
 	private BDDAutomata manager;
 	private BDDAutomaton[] all;
+	@SuppressWarnings("unused")
 	private AutomatonSelectionHeuristic euristics = null;
 	private String name;
 	private int local_count, notused_count, shared_count, bdd_t, bdd_cubes_me,
@@ -237,7 +238,7 @@ public class AutomataCover
 		// Options.out.println("local_t"); Options.out.flush(); manager.printSet(local_t);
 		int cube_sp = manager.getStatepCube();
 		int permute1 = manager.getPermuteS2Sp();
-		int permute2 = manager.getPermuteSp2S();
+		manager.getPermuteSp2S();
 		int permute3 = manager.getPermuteSpp2Sp();
 		int permute4 = manager.getPermuteSp2Spp();
 
@@ -287,7 +288,7 @@ public class AutomataCover
 		int local_t = getLocalT();
 
 		// Options.out.println("local_t (forward_reachability)"); Options.out.flush(); manager.printSet(local_t);
-		int permute1 = manager.getPermuteS2Sp();
+		manager.getPermuteS2Sp();
 		int permute2 = manager.getPermuteSp2S();
 		int cube_s = manager.getStateCube();
 		int old_r, r = Q_i;

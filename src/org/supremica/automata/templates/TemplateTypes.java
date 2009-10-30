@@ -53,7 +53,7 @@ import java.util.*;
 
 public class TemplateTypes
 {
-    private static List collection = new LinkedList();
+    private static List<TemplateTypes> collection = new LinkedList<TemplateTypes>();
     public static final TemplateTypes Undefined = new TemplateTypes("Undefined");
     public static final TemplateTypes DESBookExample = new TemplateTypes("DES-Book Examples", "Examples from 'Discrete Event Systems; Lecture Notes' by Martin Fabian");
     public static final TemplateTypes DESBookExercise = new TemplateTypes("DES-Book Exercises", "Examples from 'Discrete Event Systems; Lecture Notes' by Martin Fabian");
@@ -86,7 +86,7 @@ public class TemplateTypes
         collection.add(this);
     }
     
-    public static Iterator iterator()
+    public static Iterator<TemplateTypes> iterator()
     {
         return collection.iterator();
     }

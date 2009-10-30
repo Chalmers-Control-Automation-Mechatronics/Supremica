@@ -225,4 +225,9 @@ public class ListTableModel<E>
   private List<E> mList;
   private final Class<E> mClass;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

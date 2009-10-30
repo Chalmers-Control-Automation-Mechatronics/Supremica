@@ -1,7 +1,7 @@
 package org.supremica.external.processeditor.processgraph.opcell;
 
-import java.awt.*;
-import javax.swing.*;
+import javax.swing.JList;
+
 
 /**
  * Handles the communication between a attribute object and 

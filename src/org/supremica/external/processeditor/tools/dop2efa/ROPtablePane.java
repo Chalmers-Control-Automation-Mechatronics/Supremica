@@ -1,20 +1,27 @@
 package org.supremica.external.processeditor.tools.dop2efa;
 
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import java.text.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.Font.*;
-import java.io.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 
 public class ROPtablePane
-					extends JPanel 
-							implements ActionListener{
+	extends JPanel 
+	implements ActionListener
+{
 	
+	private static final long serialVersionUID = 1L;
+
 	private JButton jbAddFile;
 	private JButton jbRemove;
 	

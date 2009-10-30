@@ -1,6 +1,5 @@
 package net.sourceforge.waters.analysis.composing;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1045,6 +1044,7 @@ public class Composing {
     return Collections.min(composition,comparator);
   }
   
+  /*
   private int getCutNumber1(Set<AutomatonProxy> source,
                             Set<AutomatonProxy> target) {
     int cutnumber = 0;
@@ -1061,6 +1061,7 @@ public class Composing {
     }    
   	return cutnumber;
   }
+  */
   
   private int getCutNumber2(Set<AutomatonProxy> source,
                             Set<AutomatonProxy> target) {

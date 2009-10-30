@@ -102,7 +102,8 @@ public class ModularHeuristicFactory {
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void assign(final ModelVerifier verifier)
+    @SuppressWarnings("unused")
+	protected void assign(final ModelVerifier verifier)
     {
       final AbstractModularSafetyVerifier modular =
         (AbstractModularSafetyVerifier) verifier;
@@ -129,7 +130,8 @@ public class ModularHeuristicFactory {
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void assign(final ModelVerifier verifier)
+    @SuppressWarnings("unused")
+	protected void assign(final ModelVerifier verifier)
     {
       final AbstractModularSafetyVerifier modular =
         (AbstractModularSafetyVerifier) verifier;

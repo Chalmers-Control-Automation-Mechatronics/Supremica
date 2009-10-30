@@ -136,4 +136,9 @@ public final class VariableMarkingElement
   private final IdentifierProxy mProposition;
   private final SimpleExpressionProxy mPredicate;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -1327580557181015281L;
+
 }

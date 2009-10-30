@@ -1,7 +1,6 @@
 package org.supremica.gui.examplegenerator;
 
 import java.awt.BorderLayout;
-import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -9,10 +8,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.testcases.DiningPhilosophers;
+
 
 class PhilosPanel extends JPanel implements TestCase {
 	private static final long serialVersionUID = 1L;
@@ -62,16 +61,13 @@ class PhilosPanel extends JPanel implements TestCase {
 		DiningPhilosophers dp = new DiningPhilosophers(int_num.get(), l_take
 				.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put
 				.isSelected(), animation.isSelected(), memory.isSelected());
-
-		Iterator<LabeledEvent> uit;
-
 		/*
+		 * Iterator<LabeledEvent> uit;
 		 * for(int i=0;i<dp.getProject().nbrOfAutomata();i++) {
 		 * System.out.println("i: "+i); uit =
 		 * dp.getProject().getAutomatonAt(i).getAlphabet().getUncontrollableAlphabet().iterator();
 		 * while(uit.hasNext()) System.out.println(""+uit.next()); }
 		 */
-
 		return dp.getProject();
 	}
 }

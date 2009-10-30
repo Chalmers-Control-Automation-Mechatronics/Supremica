@@ -1,11 +1,16 @@
 package org.supremica.automata.algorithms.scheduling;
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Iterator;
 
-import org.supremica.automata.*;
-import org.supremica.gui.ScheduleDialog;
-import org.supremica.gui.ActionMan;
-import org.supremica.log.*;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+
 
 public class TwoProductsRelaxer
 	implements Relaxer

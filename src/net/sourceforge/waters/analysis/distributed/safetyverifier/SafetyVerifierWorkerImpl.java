@@ -3,24 +3,19 @@ package net.sourceforge.waters.analysis.distributed.safetyverifier;
 import gnu.trove.THashMap;
 
 import java.rmi.RemoteException;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
 import net.sourceforge.waters.analysis.distributed.application.AbstractWorker;
-import net.sourceforge.waters.analysis.distributed.application.Worker;
 import net.sourceforge.waters.analysis.distributed.application.Job;
-import net.sourceforge.waters.analysis.distributed.application.Node;
+import net.sourceforge.waters.analysis.distributed.schemata.AutomatonSchema;
+import net.sourceforge.waters.analysis.distributed.schemata.EventSchema;
+import net.sourceforge.waters.analysis.distributed.schemata.ProductDESSchema;
 
-import net.sourceforge.waters.analysis.distributed.schemata.*;
 
 public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVerifierWorker
 {
+
   public SafetyVerifierWorkerImpl()
   {
     //The constructor is used sparingly; the created method is run
@@ -399,8 +394,10 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
       
 
-    private final StateTuple[] mOutgoingBuffer;
-    private int mOutgoingBufferIndex = 0;
+    @SuppressWarnings("unused")
+	private final StateTuple[] mOutgoingBuffer;
+    @SuppressWarnings("unused")
+	private int mOutgoingBufferIndex = 0;
     private final int mBufferSize;
     private final HashCache mOutputCache; 
   }
@@ -868,4 +865,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   //should provide useful numbers for testing the effectiveness of 
   //state distribution implementations
   private volatile CountingStateHandler mLocalHandler = null;
+
+  private static final long serialVersionUID = 1L;
+
 }

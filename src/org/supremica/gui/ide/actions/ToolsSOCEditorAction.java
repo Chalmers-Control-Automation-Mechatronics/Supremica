@@ -14,7 +14,8 @@ import org.supremica.external.processeditor.SOCFrame;
 public class ToolsSOCEditorAction
     extends IDEAction
 {
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    @SuppressWarnings("unused")
+	private Logger logger = LoggerFactory.createLogger(IDE.class);
 
     private static final long serialVersionUID = 1L;
 

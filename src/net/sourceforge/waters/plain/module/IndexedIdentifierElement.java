@@ -169,4 +169,9 @@ public final class IndexedIdentifierElement
   private final String mName;
   private final List<SimpleExpressionProxy> mIndexes;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 4808329137095609178L;
+
 }

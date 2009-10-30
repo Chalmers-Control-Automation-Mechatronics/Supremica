@@ -79,7 +79,7 @@ public class FileClassLoader
 		root = rootDir;
 	}
 
-	protected Class loadClass(String name, boolean resolve)
+	protected Class<?> loadClass(String name, boolean resolve)
 		throws ClassNotFoundException
 	{
 

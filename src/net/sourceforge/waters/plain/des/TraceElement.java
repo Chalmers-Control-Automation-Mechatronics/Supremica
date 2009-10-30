@@ -226,7 +226,10 @@ public abstract class TraceElement
         ("Trace '" + getName() +
          "' already contains an automaton named '" + name + "'!");
     }
-  
+
+    //#########################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
   }
 
 
@@ -267,5 +270,10 @@ public abstract class TraceElement
   private final Set<AutomatonProxy> mAutomata;
   private final List<TraceStepProxy> mTraceSteps;
   private List<EventProxy> mTraceEvents;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

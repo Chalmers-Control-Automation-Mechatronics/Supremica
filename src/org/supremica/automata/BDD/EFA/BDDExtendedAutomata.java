@@ -25,7 +25,8 @@ import org.supremica.automata.*;
 
 public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
-    private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
 
     BDDExtendedManager manager;
     List<ExtendedAutomaton> theExAutomata;
@@ -443,7 +444,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     {
         if (reachableStatesBDD == null)
         {
-            reachableStatesBDD = manager.reachableStates(getInitialState(),bddEdges, sourceStateVariables, eventDomain.set(), destToSourceLocationPairing, destToSourceVariablePairing);
+            reachableStatesBDD = BDDExtendedManager.reachableStates(getInitialState(),bddEdges, sourceStateVariables, eventDomain.set(), destToSourceLocationPairing, destToSourceVariablePairing);
             nbrOfReachableStates = reachableStatesBDD.satCount(sourceStateVariables);
         }
         return reachableStatesBDD;
@@ -505,7 +506,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     {
         if (coreachableStatesBDD == null)
         {
-            coreachableStatesBDD = manager.coreachableStates(markedLocationsBDD, bddEdges, sourceStateVariables, eventDomain.set(), destToSourceLocationPairing, destToSourceVariablePairing);
+            coreachableStatesBDD = BDDExtendedManager.coreachableStates(markedLocationsBDD, bddEdges, sourceStateVariables, eventDomain.set(), destToSourceLocationPairing, destToSourceVariablePairing);
             nbrOfCoreachableStates = coreachableStatesBDD.satCount(sourceStateVariables);
         }
 

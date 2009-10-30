@@ -111,4 +111,9 @@ public class IconRadioButton
   //# Data Members
   private final JRadioButton mButton;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

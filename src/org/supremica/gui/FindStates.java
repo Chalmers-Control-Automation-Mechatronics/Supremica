@@ -63,6 +63,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.event.*;
 import java.util.regex.*;
+
 import org.supremica.log.*;
 import org.supremica.automata.algorithms.SearchStates;
 import org.supremica.automata.algorithms.StateMatcher;
@@ -108,8 +109,8 @@ class FindStatesTableModel
 
 	// private Object[][] cells = null;
 	private Automata automata;
-	private HashMap patternMap = new HashMap();
-	private HashMap stateMatcherOptionsMap = new HashMap();
+	private HashMap<Automaton, Pattern> patternMap = new HashMap<Automaton, Pattern>();
+	private HashMap<Automaton, StateMatcherOptions> stateMatcherOptionsMap = new HashMap<Automaton, StateMatcherOptions>();
 	public final static int AUTOMATON_COL = 0;
 	public final static int TYPE_COL = AUTOMATON_COL + 1;
 	public final static int REGEXP_COL = TYPE_COL + 1;
@@ -127,7 +128,7 @@ class FindStatesTableModel
 
 		try
 		{    // I know compile _cannot_ throw here, but Java requires me to catch this exception
-			for (Iterator it = a.iterator(); it.hasNext(); )
+			for (Iterator<?> it = a.iterator(); it.hasNext(); )
 			{
 				Automaton currAutomaton = (Automaton) it.next();
 
@@ -180,26 +181,26 @@ class FindStatesTableModel
 
 		if (col == REGEXP_COL)
 		{
-			return ((Pattern) patternMap.get(automaton)).pattern();
+			return patternMap.get(automaton).pattern();
 		}
 
 		if (col == ACCEPTING_COL)
 		{
-			StateMatcherOptions currOptions = (StateMatcherOptions) stateMatcherOptionsMap.get(automaton);
+			StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
 
 			return currOptions.getAcceptingCondition();
 		}
 
 		if (col == FORBIDDEN_COL)
 		{
-			StateMatcherOptions currOptions = (StateMatcherOptions) stateMatcherOptionsMap.get(automaton);
+			StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
 
 			return currOptions.getForbiddenCondition();
 		}
 
 		if (col == DEADLOCK_COL)
 		{
-			StateMatcherOptions currOptions = (StateMatcherOptions) stateMatcherOptionsMap.get(automaton);
+			StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
 
 			return currOptions.getDeadlockCondition();
 		}
@@ -243,7 +244,7 @@ class FindStatesTableModel
 		else if (isAcceptingColumn(col))
 		{
 			Automaton automaton = automata.getAutomatonAt(row);
-			StateMatcherOptions currOptions = (StateMatcherOptions) stateMatcherOptionsMap.get(automaton);
+			StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
 
 			if (currOptions != null)
 			{
@@ -253,7 +254,7 @@ class FindStatesTableModel
 		else if (isForbiddenColumn(col))
 		{
 			Automaton automaton = automata.getAutomatonAt(row);
-			StateMatcherOptions currOptions = (StateMatcherOptions) stateMatcherOptionsMap.get(automaton);
+			StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
 
 			if (currOptions != null)
 			{
@@ -263,7 +264,7 @@ class FindStatesTableModel
 		else if (isDeadlockColumn(col))
 		{
 			Automaton automaton = automata.getAutomatonAt(row);
-			StateMatcherOptions currOptions = (StateMatcherOptions) stateMatcherOptionsMap.get(automaton);
+			StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
 
 			if (currOptions != null)
 			{
@@ -338,7 +339,7 @@ class FindStatesTableModel
 
 		for (int i = 0; i < automata.size(); ++i)
 		{
-			patterns[i] = (Pattern) patternMap.get(automata.getAutomatonAt(i));
+			patterns[i] = patternMap.get(automata.getAutomatonAt(i));
 		}
 
 		return patterns;
@@ -350,7 +351,7 @@ class FindStatesTableModel
 
 		for (int i = 0; i < automata.size(); ++i)
 		{
-			options[i] = (StateMatcherOptions) stateMatcherOptionsMap.get(automata.getAutomatonAt(i));
+			options[i] = stateMatcherOptionsMap.get(automata.getAutomatonAt(i));
 		}
 
 		return options;
@@ -401,8 +402,11 @@ class FindStatesTable
 	private static Logger logger = LoggerFactory.createLogger(FindStatesTable.class);
 	private Automata automata;
 	private JFrame frame;
+	@SuppressWarnings("unused")
 	private StateMatcherAcceptingCellEditor acceptingEditor;
+	@SuppressWarnings("unused")
 	private StateMatcherForbiddenCellEditor forbiddenEditor;
+	@SuppressWarnings("unused")
 	private StateMatcherDeadlockCellEditor deadlockEditor;
 
 	// local utility functions
@@ -423,6 +427,7 @@ class FindStatesTable
 		return automata.getAutomaton(name);
 	}
 
+	@SuppressWarnings("unused")
 	private void deleteAutomaton(int row)
 	{
 		automata.removeAutomaton(getAutomaton(row));
@@ -433,6 +438,7 @@ class FindStatesTable
 		repaint();
 	}
 
+	@SuppressWarnings("unused")
 	private FindStatesTable getThisTable()
 	{
 		return this;
@@ -504,7 +510,7 @@ class FindStatesTable
 		{
 			stateMatcherTypeCombo = new JComboBox();
 
-			Iterator typeIt = StateMatcherOptions.Accepting.iterator();
+			Iterator<?> typeIt = StateMatcherOptions.Accepting.iterator();
 
 			while (typeIt.hasNext())
 			{
@@ -552,7 +558,7 @@ class FindStatesTable
 		{
 			stateMatcherTypeCombo = new JComboBox();
 
-			Iterator typeIt = StateMatcherOptions.Forbidden.iterator();
+			Iterator<?> typeIt = StateMatcherOptions.Forbidden.iterator();
 
 			while (typeIt.hasNext())
 			{
@@ -600,7 +606,7 @@ class FindStatesTable
 		{
 			stateMatcherTypeCombo = new JComboBox();
 
-			Iterator typeIt = StateMatcherOptions.Deadlock.iterator();
+			Iterator<?> typeIt = StateMatcherOptions.Deadlock.iterator();
 
 			while (typeIt.hasNext())
 			{
@@ -707,9 +713,7 @@ class FindStatesTable
 			{
 
 				//logger.info("maybeShowpopup");
-				int col = columnAtPoint(e.getPoint());
 				int row = rowAtPoint(e.getPoint());
-
 				//logger.info("row " + row + " col " + col);
 				if (row < 0)
 				{
@@ -774,8 +778,10 @@ class FreeFormPanel
 	private String tip = "Search with a free form regexp";
 	private JTextField reg_exp;
 	private JTextField sep_str;
+	@SuppressWarnings("unused")
 	private boolean ok = false;
 
+	@SuppressWarnings("unused")
 	private void setOk()
 	{
 		ok = true;
@@ -955,8 +961,11 @@ class FindStatesFrame
 	private FindStatesTable table = null;
 	private Automata automata = null;
 	private JTabbedPane tabbedPane = null;
+	@SuppressWarnings("unused")
 	private CancelButton quit_button = null;
+	@SuppressWarnings("unused")
 	private JButton find_button = null;
+	@SuppressWarnings("unused")
 	private ForbidButton forbid_button = null;
 	private VisualProject theVisualProject = null;
 
@@ -999,16 +1008,6 @@ class FindStatesFrame
 		return automata;
 	}
 
-	private Pattern[] getRegexpPatterns()
-	{
-		return table.getRegexpPatterns();
-	}
-
-	private void doRepaint()
-	{
-		repaint();
-	}
-
 	private FindStatesTab getSelectedComponent()
 	{
 		return (FindStatesTab) tabbedPane.getSelectedComponent();
@@ -1042,7 +1041,7 @@ class FindStatesFrame
 	private class ForbidButton
 		extends JButton
 	{
-		private static final long serialVersionaUID = 1L; // what's this? necessary for what? //MF
+		private static final long serialVersionUID = 1L;
 
 		public ForbidButton()
 		{
@@ -1138,8 +1137,9 @@ class FindStatesFrame
 				else
 				{
 					ss.join(); // wait for ss to stop
-					Forbidder forbidder = new Forbidder(getAutomata(), ss, theVisualProject);
-					// forbidder.start();	// Should Forbidder be a thread of its own, monitorable/interruptable?
+					new Forbidder(getAutomata(), ss, theVisualProject);
+					// forbidder.start();
+					// Should Forbidder be a thread of its own, monitorable/interruptable?
 				}
 			}
 		}

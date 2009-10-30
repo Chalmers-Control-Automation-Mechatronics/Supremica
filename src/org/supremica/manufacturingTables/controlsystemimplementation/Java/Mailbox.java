@@ -64,16 +64,16 @@ import java.util.Map;
 
 public class Mailbox
 {
-    private Map listeners; // HashMap will be used for quick access to listeners of the mailbox
+    private Map<String, Listener> listeners; // HashMap will be used for quick access to listeners of the mailbox
 
     public Mailbox()
     {
-	listeners = new HashMap(10); //initital capacity 10 and default load factor (0,75) suits me fine
+	listeners = new HashMap<String, Listener>(10); //initital capacity 10 and default load factor (0,75) suits me fine
     }
 
     public void send(Message msg)
     {
-	Listener listener = (Listener) listeners.get(msg.getReceiver());
+	Listener listener = listeners.get(msg.getReceiver());
 	if (listener != null)
 	    {
 		listener.receiveMessage(msg);

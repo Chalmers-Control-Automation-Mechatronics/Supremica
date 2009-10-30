@@ -58,4 +58,9 @@ public class InsertVariableAction
     }
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

@@ -1,30 +1,36 @@
 package org.supremica.external.processeditor.processgraph.resrccell;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import java.io.*;
+import java.awt.Color;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.io.File;
 
-import org.supremica.external.processeditor.processgraph.*;
-import org.supremica.external.processeditor.processgraph.opcell.*;
-import org.supremica.external.processeditor.xgraph.*;
-import org.supremica.external.processeditor.processgraph.resrccell.Initiator;
+import javax.swing.JList;
+
+import org.supremica.external.processeditor.processgraph.NestedCell;
+import org.supremica.external.processeditor.processgraph.NestedGraph;
+import org.supremica.external.processeditor.processgraph.OperationEdge;
 import org.supremica.external.processeditor.processgraph.opcell.OperationCell;
-import org.supremica.external.processeditor.processgraph.resrccell.ResourceCell;
-import org.supremica.external.processeditor.processgraph.resrccell.ResourceCellInfoWindow;
-import org.supremica.external.processeditor.xml.*;
-import org.supremica.manufacturingTables.xsd.processeditor.*;
+import org.supremica.external.processeditor.xgraph.CellEvent;
+import org.supremica.external.processeditor.xgraph.GraphCell;
+import org.supremica.external.processeditor.xml.Converter;
+import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
+import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+import org.supremica.manufacturingTables.xsd.processeditor.ROPType;
+import org.supremica.manufacturingTables.xsd.processeditor.Relation;
+import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
+
 
 /**
- * Grahically representation of the objects ot the <code>org.xml.ROP</code> 
+ * Graphical representation of the objects of the <code>org.xml.ROP</code> 
  * class.
  */
 public class ResourceCell
-					extends 
-						NestedCell 
+	extends	NestedCell 
 {    
-    private boolean emptyCell = true;    
+	private static final long serialVersionUID = 1L;
+
+	private boolean emptyCell = true;    
 
     public GraphCell initCell = null;
     public GraphCell functionCell = null;
@@ -122,15 +128,15 @@ public class ResourceCell
 				 	getROP().getId());	
     	((Initiator)initCell).addNestedCellListener(this);	
     	cells.insert(initCell);	
-    	initCell.setPos(new Point(cell.marginX, cell.marginY));
+    	initCell.setPos(new Point(NestedGraph.marginX, NestedGraph.marginY));
 	            
     	endCell = new Initiator("END");
     	((Initiator)endCell).addNestedCellListener(this);
     	cells.insert(endCell);
-    	endCell.setPos(new Point(cells.marginX,
+    	endCell.setPos(new Point(NestedGraph.marginX,
     				initCell.getPos().y+
     				initCell.getSize().height+
-    				cells.marginY+
+    				NestedGraph.marginY+
     				cellStepY));	    			
     	cells.insert(new OperationEdge(initCell, endCell));	
     }	
@@ -148,15 +154,15 @@ public class ResourceCell
     			functionCell = new NestedCell(getROP().getRelation());	    
     			((NestedCell)functionCell).addNestedCellListener(this);
     			cells.insert(functionCell);	    
-    			functionCell.setPos(new Point(cells.marginX,
+    			functionCell.setPos(new Point(NestedGraph.marginX,
     					initCell.getPos().y+
     					initCell.getSize().height+
-    					cells.marginY+
+    					NestedGraph.marginY+
     					cellStepY));	    
-    			endCell.setPos(new Point(cells.marginX,
+    			endCell.setPos(new Point(NestedGraph.marginX,
     					functionCell.getPos().y+
     					functionCell.getSize().height+
-    					cells.marginY+
+    					NestedGraph.marginY+
     					cellStepY));	    	    
     			cells.insert(new OperationEdge(initCell, functionCell));
     			cells.insert(new OperationEdge(functionCell, endCell));

@@ -22,8 +22,9 @@ public class BallTrackView
  * It also manages the balls such that they don't run into each other.
  */
 {
+    private static final long serialVersionUID = 1L;
 
-	/**Background image*/
+    /**Background image*/
 	MediaTracker bildsLaddningKontroll = new MediaTracker(this);
 	private static final String imageFileWithText = "backgroundtext.gif";
 	private static final String imageFileWithoutText = "background.gif";
@@ -442,7 +443,9 @@ public class BallTrackView
 	private int level = 0;    //Level of the lifts, vertical
 	private float partLength = 0;    //The size of the step in the leg, will be converted to int
 	private int partLengthInt = 0;
+	@SuppressWarnings("unused")
 	private int stepInLower;    //Number of step in lift leg
+	@SuppressWarnings("unused")
 	private int stepInUpper;    //Number of step in lift leg
 	private int centerX;    //Center of the cylinders
 	private int radiusX = 3;    //Radius of lift "bar"
@@ -450,8 +453,10 @@ public class BallTrackView
 
 	//Int taken from radius of a big ball
 	private int topHeight = 2;    //Height of carrier
+	@SuppressWarnings("unused")
 	private int yPos;    //position of the lifts vertical
 	private int lowerY;    //position of the lower "station"
+	@SuppressWarnings("unused")
 	private int middleY;    //position of the middle "station"
 	private int upperY;    //position of the upper "station"
 	private int upperX;

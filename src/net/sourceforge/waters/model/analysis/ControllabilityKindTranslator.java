@@ -64,4 +64,9 @@ public class ControllabilityKindTranslator
     return event.getKind();
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

@@ -64,6 +64,7 @@ public class JavaBytecodeGenerator
 	 * all detected errors are corrected
 	 */
 	private boolean errorsPresent = false;
+	@SuppressWarnings("unused")
 	private File temp;
 
 	/**
@@ -1086,8 +1087,6 @@ public class JavaBytecodeGenerator
 		IlCallOperator op = (IlCallOperator) ((SimpleNode) children[0]).visit(this, null);
 		String fbName = (String) ((SimpleNode) children[1]).visit(this, null);
 		String fbTypeName = ((ASTfb_name) children[1]).getTypeName();
-		Object[] args = null;
-
 		if (children.length == 3 /* is there any arguments */)
 		{
 			error("The Checker has not done its job properly. Wrong " + "number of arguments to IL_FB_CALL");

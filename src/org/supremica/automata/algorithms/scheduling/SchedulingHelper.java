@@ -63,14 +63,12 @@ public class SchedulingHelper
         // Remove the self-loops in the initial state. Such self-loops are sometimes created during
         // schedule construction to run a schedule repeatedly.
         ArrayList<Arc> arcsToBeRemoved = new ArrayList<Arc>();
-        boolean selfLoopDetected = false;
         for (Iterator<Arc> arcIt = currInitialState.outgoingArcsIterator(); arcIt.hasNext();)
         {
             Arc arc = arcIt.next();
             if (arc.isSelfLoop())
             {
                 arcsToBeRemoved.add(arc);
-                selfLoopDetected = true;
             }
         }
         for (Arc arc : arcsToBeRemoved)

@@ -6,24 +6,29 @@ package org.supremica.automata.BDD.EFA;
  */
 
 import java.math.BigInteger;
-import net.sf.javabdd.*;
-import java.util.*;
 import java.util.ArrayList;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.model.expr.ParseException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDDomain;
+import net.sf.javabdd.BDDPairing;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
-
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
-import org.supremica.automata.*;
+
+
+import org.supremica.automata.ExtendedAutomaton;
 
 public class BDDExtendedAutomaton {
 
@@ -205,7 +210,7 @@ public class BDDExtendedAutomaton {
 //        System.out.println("state name: "+sourceState.getName());
 //        System.out.println("sourceStateIndex: "+sourceStateIndex);
 
-        BDD sourceBDD = manager.factory.buildCube(sourceLocationIndex, sourceLocationDomain.vars());
+        BDD sourceBDD = BDDExtendedManager.factory.buildCube(sourceLocationIndex, sourceLocationDomain.vars());
 
         Integer bddIndex = -1;
 //        String varsBits = "";
@@ -277,11 +282,11 @@ public class BDDExtendedAutomaton {
         }
 
         // Examine states
-        LinkedList statesToExamine = new LinkedList();
+        LinkedList<NodeProxy> statesToExamine = new LinkedList<NodeProxy>();
         statesToExamine.add(thisLocation);
         while (statesToExamine.size() != 0)
         {
-            NodeProxy currLocation = (NodeProxy) statesToExamine.removeFirst();
+            NodeProxy currLocation = statesToExamine.removeFirst();
 
             HashMap<NodeProxy,ArrayList<EdgeSubject>> outgoingEdgesMap = theExAutomaton.getLocationToOutgoingEdgesMap();
 

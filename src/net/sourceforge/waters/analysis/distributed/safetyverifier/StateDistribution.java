@@ -79,4 +79,10 @@ public abstract class StateDistribution implements StateHandler, Serializable
   }
   
   private final Map<String,StateHandler> mHandlers = new HashMap<String,StateHandler>();
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

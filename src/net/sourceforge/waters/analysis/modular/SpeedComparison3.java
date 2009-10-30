@@ -1,27 +1,28 @@
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
+
 
 public class SpeedComparison3
 {

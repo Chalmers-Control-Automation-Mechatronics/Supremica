@@ -9,6 +9,7 @@ import org.supremica.log.*;
 public class VisGraphDrawer
 	extends JFrame
 {
+    private static final long serialVersionUID = 1L;
 	/** The logger */
 	private static Logger logger = LoggerFactory.createLogger(VisGraphDrawer.class);
 	
@@ -178,6 +179,8 @@ public class VisGraphDrawer
 class GraphicalZone 
 	extends Polygon
 {
+    private static final long serialVersionUID = 1L;
+
 	private double[] xCoords = new double[2];
 	private double[] yCoords = new double[2];
 	private int[] xPixels = new int[2];

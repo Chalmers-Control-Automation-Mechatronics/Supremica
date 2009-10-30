@@ -67,6 +67,7 @@ public class ActionAndControlViewerPanel
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(ActionAndControlViewerPanel.class);
 	private Project theProject;
+	@SuppressWarnings("unused")
 	private boolean updateNeeded = false;
 	private JTree theTree = new JTree();
 	private JScrollPane scrollPanel = new JScrollPane(theTree);

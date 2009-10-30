@@ -9,21 +9,9 @@
 
 package org.supremica.testcases;
 
-import java.util.StringTokenizer;
-import org.omg.CORBA.portable.IDLEntity;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
-import org.supremica.automata.IO.AutomataToXML;
+import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.State;
-import org.supremica.automata.Arc;
-import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.StateSet;
-import org.supremica.automata.execution.*;
-import uk.ac.ic.doc.scenebeans.Null;
-import org.supremica.log.*;
 
 
 /**
@@ -133,7 +121,6 @@ public class ExtCatMouse{
             CatBuffer[][] cb = new CatBuffer[num_levels][5];
             MouseBuffer[][] mb = new MouseBuffer[num_levels][5];
             RoomSpec[][] spec = new RoomSpec[num_levels][5];
-            int init_id;
             for (int i = 0; i < num_levels; ++i)
             {
                 for (int j = 0; j < 5; ++j)
@@ -156,8 +143,6 @@ public class ExtCatMouse{
         {
             ExtCatBuffer[][] ecb = new ExtCatBuffer[num_levels][5];
             ExtMouseBuffer[][] emb = new ExtMouseBuffer[num_levels][5];
-            int init_id;
-            
             for (int i = 0; i < num_levels; ++i)
             {
                 for (int j = 0; j < 5; ++j)
@@ -179,7 +164,6 @@ public class ExtCatMouse{
             CatBuffer[][] cb = new CatBuffer[num_levels][5];
             MouseBuffer[][] mb = new MouseBuffer[num_levels][5];
             ExtRoomSpec[][] spec = new ExtRoomSpec[num_levels][5];
-            int init_id;
             for (int i = 0; i < num_levels; ++i)
             {
                 for (int j = 0; j < 5; ++j)

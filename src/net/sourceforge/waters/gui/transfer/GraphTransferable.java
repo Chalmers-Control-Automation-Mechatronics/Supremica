@@ -10,6 +10,7 @@
 
 package net.sourceforge.waters.gui.transfer;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 
 
@@ -24,7 +25,7 @@ import net.sourceforge.waters.model.module.GraphProxy;
  * @author Robi Malik
  */
 
-public class GraphTransferable extends ProxyTransferable
+public class GraphTransferable extends ProxyTransferable<Proxy>
 {
 
   //#########################################################################

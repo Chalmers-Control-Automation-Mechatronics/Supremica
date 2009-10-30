@@ -64,9 +64,8 @@ public class IdenticalKindTranslator
     return event.getKind();
   }
 
-
   //#########################################################################
-  //# Static Class Variables
-  private static IdenticalKindTranslator theInstance;
+  //# Singleton Implementation
+  private static final long serialVersionUID = 1L;
 
 }

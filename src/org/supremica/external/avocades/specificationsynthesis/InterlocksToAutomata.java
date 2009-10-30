@@ -1,6 +1,7 @@
 package org.supremica.external.avocades.specificationsynthesis;
 
 import java.util.*;
+
 import org.jdom.*;
 
 public class InterlocksToAutomata {
@@ -22,11 +23,11 @@ public class InterlocksToAutomata {
 	public void test(Element root, Element Automata) {
 		System.out.println("Hit");
 
-		List ops = root.getChildren("Operation");
+		List<?> ops = root.getChildren("Operation");
 		System.out.println("Hit2");
-		ArrayList opIds = new ArrayList();
+		ArrayList<String> opIds = new ArrayList<String>();
 				// Place all op IDs in a ArrayList.
-		for(Iterator ILIter = ops.iterator(); ILIter.hasNext(); )
+		for(Iterator<?> ILIter = ops.iterator(); ILIter.hasNext(); )
 		{
 			Element op = (Element) ILIter.next();
 			String opId = op.getAttributeValue("opID");
@@ -54,20 +55,18 @@ printStringList(opIds);
 			ArrayList robotInterlockings = getInterlockingIds(PAroot, "Robot_interlocking");*/
 
 			// List all operations
-			List operationList = EOProot.getChildren("Operation");
+			List<?> operationList = EOProot.getChildren("Operation");
 
-			for(Iterator listOperation = operationList.iterator(); listOperation.hasNext(); )
+			for(Iterator<?> listOperation = operationList.iterator(); listOperation.hasNext(); )
 			{
 				Element operation = (Element) listOperation.next();
-				String operationId = operation.getAttributeValue("id");
-
+				operation.getAttributeValue("id");
 				// List all involved processes.
-				List processList = operation.getChildren("Process");
-				for(Iterator listProcess = processList.iterator(); listProcess.hasNext(); )
+				List<?> processList = operation.getChildren("Process");
+				for(Iterator<?> listProcess = processList.iterator(); listProcess.hasNext(); )
 				{
 					Element process = (Element) listProcess.next();
-					String processId = process.getAttributeValue("id");
-
+					process.getAttributeValue("id");
 					// If there is process interlocking for the process, find
 					// unsafe states and build automaton.
 					/*if (procInterlockings.contains(processId))
@@ -81,12 +80,11 @@ printStringList(opIds);
 					}*/
 
 					// List all involved events.
-					List eventList = process.getChildren("Event");
-					for(Iterator eventIter = eventList.iterator(); eventIter.hasNext(); )
+					List<?> eventList = process.getChildren("Event");
+					for(Iterator<?> eventIter = eventList.iterator(); eventIter.hasNext(); )
 					{
 						Element event = (Element) eventIter.next();
-						String eventId = event.getAttributeValue("id");
-
+						event.getAttributeValue("id");
 						// If there is event interlocking for the event, build
 						// automaton.
 						/*if (eventInterlockings.contains(eventId))
@@ -105,12 +103,12 @@ printStringList(opIds);
 	*
 	*************************************************************************/
 
-	public ArrayList getInterlockingIds(Element PAroot, String type) {
+	public ArrayList<String> getInterlockingIds(Element PAroot, String type) {
 
-		List interlockingList = PAroot.getChildren(type);
-		ArrayList interlockings = new ArrayList();
+		List<?> interlockingList = PAroot.getChildren(type);
+		ArrayList<String> interlockings = new ArrayList<String>();
 		// Place all interlocking IDs in a ArrayList.
-		for(Iterator ILIter = interlockingList.iterator(); ILIter.hasNext(); )
+		for(Iterator<?> ILIter = interlockingList.iterator(); ILIter.hasNext(); )
 		{
 			Element interlocking = (Element) ILIter.next();
 			String interlockingId = interlocking.getAttributeValue("id");
@@ -130,8 +128,8 @@ printStringList(opIds);
 
 		Element interlockingElement = null;
 
-		List interlockingList = PAroot.getChildren(type);
-		for(Iterator listInterlocking = interlockingList.iterator(); listInterlocking.hasNext(); )
+		List<?> interlockingList = PAroot.getChildren(type);
+		for(Iterator<?> listInterlocking = interlockingList.iterator(); listInterlocking.hasNext(); )
 		{
 			Element interlocking = (Element) listInterlocking.next();
 			String interlockingId = interlocking.getAttributeValue("id");
@@ -162,11 +160,11 @@ printStringList(opIds);
 		String safeOrUnsafeProc = specificProcIL.getAttributeValue("type");
 
 		// unsafeStates contains all unsafe states
-		ArrayList procUnsafeStates = getUnsafeState(specificProcIL);
-		ArrayList procComp = getComponentList(specificProcIL, "proc");
-		List triggersRestoresSafes = findTriggersRestoresSafes(procUnsafeStates, procComp, opId, safeOrUnsafeProc, PAroot);
-		ArrayList triggers = (ArrayList) triggersRestoresSafes.get(0);
-		ArrayList restores = (ArrayList) triggersRestoresSafes.get(1);
+		ArrayList<ArrayList<String>> procUnsafeStates = getUnsafeState(specificProcIL);
+		ArrayList<String> procComp = getComponentList(specificProcIL, "proc");
+		List<ArrayList<String>> triggersRestoresSafes = findTriggersRestoresSafes(procUnsafeStates, procComp, opId, safeOrUnsafeProc, PAroot);
+		ArrayList<String> triggers = triggersRestoresSafes.get(0);
+		ArrayList<String> restores = triggersRestoresSafes.get(1);
 
 		if (! triggers.isEmpty() | ! restores.isEmpty())
 		{
@@ -199,14 +197,14 @@ printStringList(opIds);
 		Element ILrestriction = ILevent.getChild("Restriction");
 		Element ILor = ILrestriction.getChild("Or");
 		/* Get all ands. Corresponds to the interlocking rows in the Volvo case. */
-		List ILandList = ILor.getChildren("And");
+		List<?> ILandList = ILor.getChildren("And");
 
 		String safeOrUnsafe = specificEventIL.getAttributeValue("type");
 		// Find state in operation, before the interresting event
-		List execState = getStateBeforeEvent(op, eventId);
+		List<String> execState = getStateBeforeEvent(op, eventId);
 		int alt = 0;
 
-		for(Iterator andIter = ILandList.iterator(); andIter.hasNext(); )
+		for(Iterator<?> andIter = ILandList.iterator(); andIter.hasNext(); )
 		{
 			// For each IL row, compare it with the internal state in the
 			// operation execution spec, to see if the IL row is
@@ -216,16 +214,16 @@ printStringList(opIds);
 			String tag = " " + eventId;
 
 			// Get list of all components involved in the internal interlocking
-			ArrayList intComp = getComponentList(alternativeState, "internal");
+			getComponentList(alternativeState, "internal");
 
 			// Get the component states that build the (un)safe state.
-			ArrayList internalStates = getStates(alternativeState, "internal");
+			ArrayList<ArrayList<String>> internalStates = getStates(alternativeState, "internal");
 
 			boolean relevant = false;
 			//System.out.println("execState:" + execState.toString());
 
-			for(Iterator ee = internalStates.iterator(); ee.hasNext(); ) {
-				ArrayList internalState = (ArrayList) ee.next();
+			for(Iterator<ArrayList<String>> ee = internalStates.iterator(); ee.hasNext(); ) {
+				ArrayList<?> internalState = ee.next();
 				//System.out.println("IL, Internal states: "+internalState.toString());
 				if (execState.containsAll(internalState)) {
 					relevant = true;
@@ -244,8 +242,8 @@ printStringList(opIds);
 
 				tag = " " + eventId;
 				// At the moment, the algorithm can only handle one external machine.
-				ArrayList extComp = getComponentList(alternativeState, "external");
-				ArrayList externalStates = getStates(alternativeState, "external");
+				ArrayList<String> extComp = getComponentList(alternativeState, "external");
+				ArrayList<ArrayList<String>> externalStates = getStates(alternativeState, "external");
 
 				if( !externalStates.isEmpty() )
 				{
@@ -255,8 +253,8 @@ printStringList(opIds);
 				}
 
 
-				List notOngoingOp = alternativeState.getChildren("Op_not_ongoing");
-				for( Iterator ongoingIter = notOngoingOp.iterator(); ongoingIter.hasNext(); )
+				List<?> notOngoingOp = alternativeState.getChildren("Op_not_ongoing");
+				for( Iterator<?> ongoingIter = notOngoingOp.iterator(); ongoingIter.hasNext(); )
 				{
 					tag = " " + eventId;
 					Element ongoing = (Element) ongoingIter.next();
@@ -266,8 +264,8 @@ printStringList(opIds);
 				}
 
 
-				List notStartedOp = alternativeState.getChildren("Op_not_started");
-				for( Iterator startedIter = notStartedOp.iterator(); startedIter.hasNext(); )
+				List<?> notStartedOp = alternativeState.getChildren("Op_not_started");
+				for( Iterator<?> startedIter = notStartedOp.iterator(); startedIter.hasNext(); )
 				{
 					tag = " " + eventId;
 					Element started = (Element) startedIter.next();
@@ -306,10 +304,10 @@ printStringList(opIds);
 		Element ILor = ILrestriction.getChild("Or");
 
 		/* Get all ands. Corresponds to the interlocking rows in the Volvo case. */
-		List ILandList = ILor.getChildren("And");
+		List<?> ILandList = ILor.getChildren("And");
 
 		int alt = 0;
-		for(Iterator andIter = ILandList.iterator(); andIter.hasNext(); )
+		for(Iterator<?> andIter = ILandList.iterator(); andIter.hasNext(); )
 		{
 			alt++;
 			Element alternativeState = (Element) andIter.next();
@@ -322,8 +320,8 @@ printStringList(opIds);
 			//ArrayList internalStates = getStates(alternativeState, "internal");
 
 			// At the moment, the algorithm can only handle one external machine.
-			ArrayList extComp = getComponentList(alternativeState, "external");
-			ArrayList externalStates = getStates(alternativeState, "external");
+			ArrayList<String> extComp = getComponentList(alternativeState, "external");
+			ArrayList<ArrayList<String>> externalStates = getStates(alternativeState, "external");
 
 			if( !externalStates.isEmpty() )
 			{
@@ -332,8 +330,8 @@ printStringList(opIds);
 			}
 
 
-			List notOngoingOp = alternativeState.getChildren("Op_not_ongoing");
-			for( Iterator ongoingIter = notOngoingOp.iterator(); ongoingIter.hasNext(); )
+			List<?> notOngoingOp = alternativeState.getChildren("Op_not_ongoing");
+			for( Iterator<?> ongoingIter = notOngoingOp.iterator(); ongoingIter.hasNext(); )
 			{
 				Element ongoing = (Element) ongoingIter.next();
 				String ongId = ongoing.getAttributeValue("name");
@@ -341,8 +339,8 @@ printStringList(opIds);
 				createOpAutomata(ongoing, opId, tag, Automata, "ong");
 			}
 
-			List notStartedOp = alternativeState.getChildren("Op_not_started");
-			for( Iterator startedIter = notStartedOp.iterator(); startedIter.hasNext(); )
+			List<?> notStartedOp = alternativeState.getChildren("Op_not_started");
+			for( Iterator<?> startedIter = notStartedOp.iterator(); startedIter.hasNext(); )
 			{
 				Element started = (Element) startedIter.next();
 				String nstId = started.getAttributeValue("name");
@@ -358,12 +356,12 @@ printStringList(opIds);
 	*
 	*************************************************************************/
 
-	public void createExtAutomata(ArrayList states, ArrayList comp, String opId, String tag, String safeOrUnsafe, Element Automata, Element PAroot)
+	public void createExtAutomata(ArrayList<ArrayList<String>> states, ArrayList<String> comp, String opId, String tag, String safeOrUnsafe, Element Automata, Element PAroot)
 	{
-		List trigRestSafe = findTriggersRestoresSafes(states, comp, opId, safeOrUnsafe, PAroot);
-		ArrayList triggers = (ArrayList) trigRestSafe.get(0);
-		ArrayList restores = (ArrayList) trigRestSafe.get(1);
-		ArrayList safes = (ArrayList) trigRestSafe.get(2);
+		List<ArrayList<String>> trigRestSafe = findTriggersRestoresSafes(states, comp, opId, safeOrUnsafe, PAroot);
+		ArrayList<String> triggers = trigRestSafe.get(0);
+		ArrayList<String> restores = trigRestSafe.get(1);
+		ArrayList<?> safes = trigRestSafe.get(2);
 		if (! triggers.isEmpty() | ! restores.isEmpty()) {
 			//System.out.println("CreateExt, opId = "+opId);
 			createTrigRestAutomata(triggers, restores, Automata, opId, tag);
@@ -381,8 +379,8 @@ printStringList(opIds);
 
 	public void createOpAutomata(Element op, String operationId, String tag, Element Automata, String type)
 	{
-		ArrayList triggers = new ArrayList();
-		ArrayList restores = new ArrayList();
+		ArrayList<String> triggers = new ArrayList<String>();
+		ArrayList<String> restores = new ArrayList<String>();
 		String opId = op.getAttributeValue("name");
 
 		triggers.add(opId);
@@ -406,24 +404,24 @@ printStringList(opIds);
 	*
 	*************************************************************************/
 
-	public ArrayList getUnsafeState(Element interlocking) {
+	public ArrayList<ArrayList<String>> getUnsafeState(Element interlocking) {
 
-		ArrayList allUnsafeStates = new ArrayList();
+		ArrayList<ArrayList<String>> allUnsafeStates = new ArrayList<ArrayList<String>>();
 		Element event = interlocking.getChild("Event");
 		Element restriction = event.getChild("Restriction");
 		Element or = restriction.getChild("Or");
 
 		/* Get all ands. Corresponds to the rows in the Volvo case. */
-		List andList = or.getChildren("And");
-		for(Iterator andIter = andList.iterator(); andIter.hasNext(); )
+		List<?> andList = or.getChildren("And");
+		for(Iterator<?> andIter = andList.iterator(); andIter.hasNext(); )
 		{
 			Element and = (Element) andIter.next();
 			/* Get the states for the first and, e.g. A and B */
-			List stateList = and.getChildren("State");
-			ArrayList oneUnsafeState = new ArrayList();
+			List<?> stateList = and.getChildren("State");
+			ArrayList<String> oneUnsafeState = new ArrayList<String>();
 			/* For each state (component would be a better word), get its name and id.
 			Id corresponds to the unsafe state of the state */
-			for(Iterator stateIter = stateList.iterator(); stateIter.hasNext(); )
+			for(Iterator<?> stateIter = stateList.iterator(); stateIter.hasNext(); )
 			{
 				Element state = (Element) stateIter.next();
 
@@ -448,12 +446,12 @@ printStringList(opIds);
 	*
 	*************************************************************************/
 
-	public ArrayList getComponentList(Element altState, String intOrExt) {
+	public ArrayList<String> getComponentList(Element altState, String intOrExt) {
 
-		ArrayList theComponents = new ArrayList();
+		ArrayList<String> theComponents = new ArrayList<String>();
 
 		/* Get the states for the first and, e.g. A and B */
-		List compList;
+		List<?> compList;
 
 		if(intOrExt.equals("internal"))
 		{
@@ -475,10 +473,9 @@ printStringList(opIds);
 
 		if(!compList.isEmpty())
 		{
-			ArrayList oneComp = new ArrayList();
 			/* For each state (component would be a better word), get its name and id.
 			Id corresponds to the unsafe state of the state */
-			for(Iterator compIter = compList.iterator(); compIter.hasNext(); )
+			for(Iterator<?> compIter = compList.iterator(); compIter.hasNext(); )
 			{
 				Element comp = (Element) compIter.next();
 
@@ -500,10 +497,10 @@ printStringList(opIds);
 	*
 	*************************************************************************/
 
-	public ArrayList getStates(Element altState, String intOrExt) {
+	public ArrayList<ArrayList<String>> getStates(Element altState, String intOrExt) {
 
-		ArrayList theStates = new ArrayList();
-		List stateList;
+		ArrayList<ArrayList<String>> theStates = new ArrayList<ArrayList<String>>();
+		List<?> stateList;
 
 		if(intOrExt.equals("internal"))
 		{
@@ -521,10 +518,10 @@ printStringList(opIds);
 
 		if(!stateList.isEmpty())
 		{
-			ArrayList oneState = new ArrayList();
+			ArrayList<String> oneState = new ArrayList<String>();
 			/* For each state (component would be a better word), get its name and id.
 			Id corresponds to the unsafe state of the state */
-			for(Iterator stateIter = stateList.iterator(); stateIter.hasNext(); )
+			for(Iterator<?> stateIter = stateList.iterator(); stateIter.hasNext(); )
 			{
 				Element state = (Element) stateIter.next();
 
@@ -552,7 +549,7 @@ printStringList(opIds);
 	*
 	************************************************************************/
 
-	public List findTriggersRestoresSafes(ArrayList states, ArrayList comp, String opId, String safeOrUnsafe, Element PAroot)
+	public List<ArrayList<String>> findTriggersRestoresSafes(ArrayList<ArrayList<String>> states, ArrayList<String> comp, String opId, String safeOrUnsafe, Element PAroot)
 	{
 
 		if(safeOrUnsafe.equals("safe"))
@@ -586,20 +583,20 @@ printStringList(opIds);
 	*
 	************************************************************************/
 
-	public List findTriggersRestoresSafesSafe(ArrayList safeStates, ArrayList comp, String opId, Element PAroot)
+	public List<ArrayList<String>> findTriggersRestoresSafesSafe(ArrayList<ArrayList<String>> safeStates, ArrayList<String> comp, String opId, Element PAroot)
 	{
 
 		//System.out.println("\n****** findTrigRestSafe for operation " + opId + " ******");
-		List trigRestSafe = new ArrayList();
-		ArrayList triggers = new ArrayList();
-		ArrayList restores = new ArrayList();
-		ArrayList allSafe = new ArrayList();
-		ArrayList executionState = null;
-		ArrayList executionComp = null;
+		List<ArrayList<String>> trigRestSafe = new ArrayList<ArrayList<String>>();
+		ArrayList<String> triggers = new ArrayList<String>();
+		ArrayList<String> restores = new ArrayList<String>();
+		ArrayList<String> allSafe = new ArrayList<String>();
+		ArrayList<String> executionState = null;
+		ArrayList<String> executionComp = null;
 
 		// List of all operations
-		List operationList = PAroot.getChildren("Operation");
-		for(Iterator operationIter = operationList.iterator(); operationIter.hasNext(); )
+		List<?> operationList = PAroot.getChildren("Operation");
+		for(Iterator<?> operationIter = operationList.iterator(); operationIter.hasNext(); )
 		{
 			Element operation = (Element) operationIter.next();
 			String operationId = operation.getAttributeValue("id");
@@ -611,29 +608,27 @@ printStringList(opIds);
 			if(operationId != opId )
 			{
 				// List all involved processes
-				List processList = operation.getChildren("Process");
+				List<?> processList = operation.getChildren("Process");
 
 				// For all processes (i.e. steps in the execution spec.)
-				Iterator processIter = processList.iterator();
+				Iterator<?> processIter = processList.iterator();
 
 				/* Compare each state in the EOP with each state in the IL. If at least one state in the EOP is not contained in the list of safe states according to the IL, the operation is a trigger. */
 				while( processIter.hasNext() )
 				{
 					Element process = (Element) processIter.next();
-					String procId = process.getAttributeValue("id");
-
+					process.getAttributeValue("id");
 					//System.out.println("Ny process, procId= " + procId);
-
 					Element event = process.getChild("Event");
 					Element restriction = event.getChild("Restriction");
 					Element and = restriction.getChild("And");
 
-					executionState = new ArrayList();
-					executionComp = new ArrayList();
+					executionState = new ArrayList<String>();
+					executionComp = new ArrayList<String>();
 
 					// Build a state-ArrayList for each event
-					List stateList = and.getChildren("State");
-					for(Iterator listState = stateList.iterator(); listState.hasNext(); )
+					List<?> stateList = and.getChildren("State");
+					for(Iterator<?> listState = stateList.iterator(); listState.hasNext(); )
 					{
 						Element state = (Element) listState.next();
 						String stateName = state.getAttributeValue("name");
@@ -656,13 +651,13 @@ printStringList(opIds);
 						// for execution of operation opId. If not, the operation operationId is a
 						// trigger for opId.
 
-						Iterator e = safeStates.iterator();
-						ArrayList oneSafeState = new ArrayList();
+						Iterator<ArrayList<String>> e = safeStates.iterator();
+						ArrayList<?> oneSafeState = new ArrayList<Object>();
 
 						// For all safe states, as long as the execution state is not found.
 						while(e.hasNext() && !trigger)
 						{
-							oneSafeState = (ArrayList) e.next();
+							oneSafeState = e.next();
 							if (!executionState.containsAll(oneSafeState))
 							{
 								trigger = true;
@@ -685,9 +680,9 @@ printStringList(opIds);
 					// executionState now holds the last state in the execution spec
 					// for the operation operationId.
 					boolean restore = false;
-					Iterator ee = safeStates.iterator();
+					Iterator<ArrayList<String>> ee = safeStates.iterator();
 					while(ee.hasNext() && !restore ) {
-						ArrayList oneSafeState = (ArrayList) ee.next();
+						ArrayList<?> oneSafeState = ee.next();
 						if (executionState.containsAll(oneSafeState)) {
 							restore = true;
 						}
@@ -716,7 +711,7 @@ printStringList(opIds);
 	*
 	************************************************************************/
 
-	public void createTrigRestAutomata(List triggers, List restores, Element automata, String operationId, String type) {
+	public void createTrigRestAutomata(List<String> triggers, List<String> restores, Element automata, String operationId, String type) {
 
 		int initState = 0;
 
@@ -764,9 +759,9 @@ printStringList(opIds);
 
 
 		//ArrayList triggers = (ArrayList) triggersRestoresSafes.get(0);
-		for(Iterator trigIter = triggers.iterator(); trigIter.hasNext(); )
+		for(Iterator<String> trigIter = triggers.iterator(); trigIter.hasNext(); )
 		{
-			String trigger = (String) trigIter.next();
+			String trigger = trigIter.next();
 
 			event = new Element("Event");
 			event.setAttribute("id", "st" + trigger);
@@ -791,9 +786,9 @@ printStringList(opIds);
 		}
 
 		//ArrayList restores = (ArrayList) triggersRestoresSafes.get(1);
-		for(Iterator restIter = restores.iterator(); restIter.hasNext(); )
+		for(Iterator<String> restIter = restores.iterator(); restIter.hasNext(); )
 		{
-			String restore = (String) restIter.next();
+			String restore = restIter.next();
 
 			event = new Element("Event");
 			event.setAttribute("id", "fin" + restore );
@@ -821,7 +816,7 @@ printStringList(opIds);
 	*
 	************************************************************************/
 
-	public void createWaitSafeAutomata(List restores, List safes, Element automata, String operationId, String type) {
+	public void createWaitSafeAutomata(List<String> restores, List<?> safes, Element automata, String operationId, String type) {
 
 		System.out.println("createWaitSafeAutomata for opId " +operationId + " type "+ type);
 
@@ -867,9 +862,9 @@ printStringList(opIds);
 		//ArrayList restores = (ArrayList) triggersRestoresSafes.get(1);
 		//ArrayList safes = (ArrayList) triggersRestoresSafes.get(2);
 
-		for(Iterator restIter = restores.iterator(); restIter.hasNext(); )
+		for(Iterator<String> restIter = restores.iterator(); restIter.hasNext(); )
 		{
-			String restore = (String) restIter.next();
+			String restore = restIter.next();
 
 			event = new Element("Event");
 			event.setAttribute("id", "fin" + restore);
@@ -892,7 +887,7 @@ printStringList(opIds);
 
 		}
 
-		for(Iterator safeIter = safes.iterator(); safeIter.hasNext(); )
+		for(Iterator<?> safeIter = safes.iterator(); safeIter.hasNext(); )
 		{
 			String safe = (String) safeIter.next();
 
@@ -931,22 +926,18 @@ printStringList(opIds);
 
 	public Element makeDeterministic(Element automaton) {
 
-		ArrayList removeState = new ArrayList();
+		ArrayList<String> removeState = new ArrayList<String>();
 
 		Element transitions = automaton.getChild("Transitions");
-		List transitionList = transitions.getChildren("Transition");
-		for(Iterator listTransition = transitionList.iterator(); listTransition.hasNext(); )
+		List<?> transitionList = transitions.getChildren("Transition");
+		for(Iterator<?> listTransition = transitionList.iterator(); listTransition.hasNext(); )
 		{
 			Element transitionElement = (Element) listTransition.next();
 			String eventAttribute = transitionElement.getAttributeValue("event");
 			String sourceAttribute = transitionElement.getAttributeValue("source");
 			String destAttribute = transitionElement.getAttributeValue("dest");
-
-			boolean firstTime = true;
-			String commonDestination = null;
-
-			List nextTransitionList = transitions.getChildren("Transition");
-			for(Iterator nextListTransition = nextTransitionList.iterator(); nextListTransition.hasNext(); )
+			List<?> nextTransitionList = transitions.getChildren("Transition");
+			for(Iterator<?> nextListTransition = nextTransitionList.iterator(); nextListTransition.hasNext(); )
 			{
 				Element nextTransitionElement = (Element) nextListTransition.next();
 				String nextEventAttribute = nextTransitionElement.getAttributeValue("event");
@@ -964,11 +955,11 @@ printStringList(opIds);
 
 						String initState = "q" + 0;
 
-						List nextnextTransitionList = transitions.getChildren("Transition");
-						for(Iterator nextnextListTransition = nextnextTransitionList.iterator(); nextnextListTransition.hasNext(); )
+						List<?> nextnextTransitionList = transitions.getChildren("Transition");
+						for(Iterator<?> nextnextListTransition = nextnextTransitionList.iterator(); nextnextListTransition.hasNext(); )
 						{
 							Element nextnextTransitionElement = (Element) nextnextListTransition.next();
-							String nextnextEventAttribute = nextnextTransitionElement.getAttributeValue("event");
+							nextnextTransitionElement.getAttributeValue("event");
 							String nextnextSourceAttribute = nextnextTransitionElement.getAttributeValue("source");
 							String nextnextDestAttribute = nextnextTransitionElement.getAttributeValue("dest");
 
@@ -992,14 +983,13 @@ printStringList(opIds);
 	public void changeSourceState(Element automaton, String commonState, String oldState) {
 
 		Element transitions = automaton.getChild("Transitions");
-		List transitionList = transitions.getChildren("Transition");
-		for(Iterator listTransition = transitionList.iterator(); listTransition.hasNext(); )
+		List<?> transitionList = transitions.getChildren("Transition");
+		for(Iterator<?> listTransition = transitionList.iterator(); listTransition.hasNext(); )
 		{
 			Element transitionElement = (Element) listTransition.next();
-			String eventAttribute = transitionElement.getAttributeValue("event");
+			transitionElement.getAttributeValue("event");
 			String sourceAttribute = transitionElement.getAttributeValue("source");
-			String destAttribute = transitionElement.getAttributeValue("dest");
-
+			transitionElement.getAttributeValue("dest");
 			if (sourceAttribute.equals(oldState)) {
 				transitionElement.setAttribute("source", commonState);
 			}
@@ -1009,11 +999,11 @@ printStringList(opIds);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public void removeStates(Element automaton, ArrayList removeState) {
+	public void removeStates(Element automaton, ArrayList<String> removeState) {
 
 		Element states = automaton.getChild("States");
-		List stateList = states.getChildren("State");
-		for(Iterator listState = stateList.iterator(); listState.hasNext(); )
+		List<?> stateList = states.getChildren("State");
+		for(Iterator<?> listState = stateList.iterator(); listState.hasNext(); )
 		{
 			Element stateElement = (Element) listState.next();
 			String stateId = (String) stateElement.getAttributeValue("id");
@@ -1033,23 +1023,23 @@ printStringList(opIds);
 	*
 	*
 	************************************************************************/
-	public List getExecutionStates(Element op)
+	public List<List<String>> getExecutionStates(Element op)
 	{
 
-		List execStates = new ArrayList();
-		List processList = op.getChildren("Process");
-		for(Iterator processIter = processList.iterator(); processIter.hasNext(); )
+		List<List<String>> execStates = new ArrayList<List<String>>();
+		List<?> processList = op.getChildren("Process");
+		for(Iterator<?> processIter = processList.iterator(); processIter.hasNext(); )
 		{
 			Element process = (Element) processIter.next();
 			Element event = process.getChild("Event");
 			Element restriction = event.getChild("Restriction");
 			Element and = restriction.getChild("And");
 
-			List oneState = new ArrayList();
+			List<String> oneState = new ArrayList<String>();
 
 			// Build a state-ArrayList for each event
-			List stateList = and.getChildren("State");
-			for(Iterator listState = stateList.iterator(); listState.hasNext(); )
+			List<?> stateList = and.getChildren("State");
+			for(Iterator<?> listState = stateList.iterator(); listState.hasNext(); )
 			{
 				Element state = (Element) listState.next();
 				String stateName = state.getAttributeValue("name");
@@ -1069,15 +1059,15 @@ printStringList(opIds);
 	*
 	*
 	************************************************************************/
-	public List getStateBeforeEvent(Element op, String eventId)
+	public List<String> getStateBeforeEvent(Element op, String eventId)
 	{
-		List execState = new ArrayList();
-		List processList = op.getChildren("Process");
+		List<String> execState = new ArrayList<String>();
+		List<?> processList = op.getChildren("Process");
 		boolean first = true;
 		boolean found = false;
 		String newEventId = "", oldEventId = "";
 
-		Iterator processIter = processList.iterator();
+		Iterator<?> processIter = processList.iterator();
 		while( processIter.hasNext() && !found)
 		{
 			Element process = (Element) processIter.next();
@@ -1102,8 +1092,8 @@ printStringList(opIds);
 		Element oldEvent = getEvent(op, oldEventId);
 		Element restriction = oldEvent.getChild("Restriction");
 		Element and = restriction.getChild("And");
-		List stateList = and.getChildren("State");
-		for(Iterator listState = stateList.iterator(); listState.hasNext(); )
+		List<?> stateList = and.getChildren("State");
+		for(Iterator<?> listState = stateList.iterator(); listState.hasNext(); )
 		{
 			Element state = (Element) listState.next();
 
@@ -1123,8 +1113,8 @@ printStringList(opIds);
 	************************************************************************/
 	public Element getEvent(Element op, String eventId)
 	{
-		List processList = op.getChildren("Process");
-		Iterator processIter = processList.iterator();
+		List<?> processList = op.getChildren("Process");
+		Iterator<?> processIter = processList.iterator();
 		Element theEvent = null;
 		boolean found = false;
 		while( processIter.hasNext() && !found )
@@ -1144,16 +1134,16 @@ printStringList(opIds);
 
 	/*****************************************************/
 
-	public void printSetList(List v)
+	public void printSetList(List<?> v)
 	{
 
 		int i=1;
-		for(Iterator e = v.iterator(); e.hasNext(); )
+		for(Iterator<?> e = v.iterator(); e.hasNext(); )
 		{
-			Set vv = (Set) e.next();
+			Set<?> vv = (Set<?>) e.next();
 			System.out.println("Rad " + i);
 			i++;
-			for(Iterator ee = vv.iterator(); ee.hasNext(); )
+			for(Iterator<?> ee = vv.iterator(); ee.hasNext(); )
 			{
 				System.out.println(ee.next());
 			}
@@ -1162,15 +1152,15 @@ printStringList(opIds);
 	}
 /*****************************************************/
 
-	public void printList(List v)
+	public void printList(List<?> v)
 	{
 		int i=1;
-		for(Iterator e = v.iterator(); e.hasNext(); )
+		for(Iterator<?> e = v.iterator(); e.hasNext(); )
 		{
-			List vv = (List) e.next();
+			List<?> vv = (List<?>) e.next();
 			System.out.println("Rad " + i);
 			i++;
-			for(Iterator ee = vv.iterator(); ee.hasNext(); )
+			for(Iterator<?> ee = vv.iterator(); ee.hasNext(); )
 			{
 				System.out.println(ee.next());
 			}
@@ -1180,11 +1170,11 @@ printStringList(opIds);
 
 /*****************************************************/
 
-	public void printStringList(List v)
+	public void printStringList(List<String> v)
 	{
 		System.out.println();
 		int i=1;
-		for(Iterator e = v.iterator(); e.hasNext(); )
+		for(Iterator<String> e = v.iterator(); e.hasNext(); )
 		{
 			//System.out.println("Rad " + i);
 			System.out.println(e.next());
@@ -1195,9 +1185,9 @@ printStringList(opIds);
 
 /*****************************************************/
 
-	public void printStringSet(Set v)
+	public void printStringSet(Set<?> v)
 	{
-		for(Iterator ee = v.iterator(); ee.hasNext(); )
+		for(Iterator<?> ee = v.iterator(); ee.hasNext(); )
 		{
 			System.out.println(ee.next());
 		}
@@ -1216,12 +1206,12 @@ printStringList(opIds);
 	*
 	************************************************************************/
 
-	public boolean checkSelfRestore(ArrayList safeStates, ArrayList comp, Element op, String evId, Element PAroot)
+	public boolean checkSelfRestore(ArrayList<?> safeStates, ArrayList<?> comp, Element op, String evId, Element PAroot)
 	{
 		boolean selfRestore = false;
-		List procList = op.getChildren("Process");
+		List<?> procList = op.getChildren("Process");
 		String eventId = "";
-		Iterator procIter = procList.iterator();
+		Iterator<?> procIter = procList.iterator();
 		boolean selfTrigger = false;
 		int i = 0;
 
@@ -1234,16 +1224,16 @@ printStringList(opIds);
 			{
 				Element restr = event.getChild("Restriction");
 				Element and = restr.getChild("And");
-				List stateList = and.getChildren("State");
-				ArrayList execState = new ArrayList();
+				List<?> stateList = and.getChildren("State");
+				ArrayList<ArrayList<String>> execState = new ArrayList<ArrayList<String>>();
 
-				for(Iterator stateIter = stateList.iterator(); stateIter.hasNext(); )
+				for(Iterator<?> stateIter = stateList.iterator(); stateIter.hasNext(); )
 				{
 					Element state = (Element) stateIter.next();
 					String stateName = state.getAttributeValue("name");
 					String stateId = state.getAttributeValue("id");
 					String stateExpression = stateName + stateId;
-					ArrayList oneState = new ArrayList();
+					ArrayList<String> oneState = new ArrayList<String>();
 					oneState.add(stateExpression);
 					execState.add(oneState);
 
@@ -1365,17 +1355,17 @@ printStringList(opIds);
 	* It is assumed that the total unsafe state can be found in a single operation.
 	*************************************************************************/
 
-	public List findTriggersRestoresSafesUnsafe(ArrayList unsafeStates, ArrayList comp, String opId, Element PAroot)
+	public List<ArrayList<String>> findTriggersRestoresSafesUnsafe(ArrayList<?> unsafeStates, ArrayList<?> comp, String opId, Element PAroot)
 	{
-		List triggersAndRestores = new ArrayList();
+		List<ArrayList<String>> triggersAndRestores = new ArrayList<ArrayList<String>>();
 
-		ArrayList triggers = new ArrayList();
-		ArrayList restores = new ArrayList();
-		ArrayList stateArrayList = null;
+		ArrayList<String> triggers = new ArrayList<String>();
+		ArrayList<String> restores = new ArrayList<String>();
+		ArrayList<String> stateArrayList = null;
 
 		// List all operations
-		List operationList = PAroot.getChildren("Operation");
-		for(Iterator operationIter = operationList.iterator(); operationIter.hasNext(); )
+		List<?> operationList = PAroot.getChildren("Operation");
+		for(Iterator<?> operationIter = operationList.iterator(); operationIter.hasNext(); )
 		{
 			Element operation = (Element) operationIter.next();
 			String operationId = operation.getAttributeValue("id");
@@ -1386,19 +1376,19 @@ printStringList(opIds);
 			if(operationId != opId)
 			{
 				// List all involved processes
-				List processList = operation.getChildren("Process");
-				for(Iterator processIter = processList.iterator(); processIter.hasNext(); )
+				List<?> processList = operation.getChildren("Process");
+				for(Iterator<?> processIter = processList.iterator(); processIter.hasNext(); )
 				{
 					Element process = (Element) processIter.next();
 					Element event = process.getChild("Event");
 					Element restriction = event.getChild("Restriction");
 					Element and = restriction.getChild("And");
 
-					stateArrayList = new ArrayList();
+					stateArrayList = new ArrayList<String>();
 
 					// Build a state-ArrayList for each event
-					List stateList = and.getChildren("State");
-					for(Iterator listState = stateList.iterator(); listState.hasNext(); )
+					List<?> stateList = and.getChildren("State");
+					for(Iterator<?> listState = stateList.iterator(); listState.hasNext(); )
 					{
 						Element state = (Element) listState.next();
 						String stateName = state.getAttributeValue("name");
@@ -1409,10 +1399,10 @@ printStringList(opIds);
 
 					/* If one of the unsafeStateSubArrayLists in the ArrayList unsafeStates contains
 					the unsafe state, the operation is a trigger */
-					Iterator e = unsafeStates.iterator();
+					Iterator<?> e = unsafeStates.iterator();
 					while(e.hasNext() && !trigger ) {
 
-						ArrayList oneUnsafeState = (ArrayList) e.next();
+						ArrayList<?> oneUnsafeState = (ArrayList<?>) e.next();
 
 						if (stateArrayList.containsAll(oneUnsafeState)) {
 							triggers.add(operationId);
@@ -1426,10 +1416,10 @@ printStringList(opIds);
 				if (trigger)
 				{
 					boolean restore = true;
-					Iterator ee = unsafeStates.iterator();
+					Iterator<?> ee = unsafeStates.iterator();
 					while(ee.hasNext() && restore ) {
 
-						ArrayList oneUnsafeState = (ArrayList) ee.next();
+						ArrayList<?> oneUnsafeState = (ArrayList<?>) ee.next();
 						if (stateArrayList.containsAll(oneUnsafeState)) {
 							restore = false;
 						}
@@ -1465,7 +1455,7 @@ printStringList(opIds);
 	*
 	************************************************************************/
 
-	public void createTrigRestAutomataOld(List triggersRestoresSafes, Element automata, String operationId, String type) {
+	public void createTrigRestAutomataOld(List<?> triggersRestoresSafes, Element automata, String operationId, String type) {
 
 		int initState = 0;
 
@@ -1523,8 +1513,8 @@ printStringList(opIds);
 
 
 
-		ArrayList triggers = (ArrayList) triggersRestoresSafes.get(0);
-		for(Iterator trigIter = triggers.iterator(); trigIter.hasNext(); )
+		ArrayList<?> triggers = (ArrayList<?>) triggersRestoresSafes.get(0);
+		for(Iterator<?> trigIter = triggers.iterator(); trigIter.hasNext(); )
 		{
 			String trigger = (String) trigIter.next();
 
@@ -1550,8 +1540,8 @@ printStringList(opIds);
 			// Should there be a self loop for triggerSto as well?
 		}
 
-		ArrayList restores = (ArrayList) triggersRestoresSafes.get(1);
-		for(Iterator restIter = restores.iterator(); restIter.hasNext(); )
+		ArrayList<?> restores = (ArrayList<?>) triggersRestoresSafes.get(1);
+		for(Iterator<?> restIter = restores.iterator(); restIter.hasNext(); )
 		{
 			String restore = (String) restIter.next();
 
@@ -1593,18 +1583,18 @@ printStringList(opIds);
 	*
 	************************************************************************/
 
-	public List findTriggersAndRestoresSafeOld(ArrayList safeStates, ArrayList comp, String opId, Element PAroot)
+	public List<ArrayList<String>> findTriggersAndRestoresSafeOld(ArrayList<?> safeStates, ArrayList<?> comp, String opId, Element PAroot)
 	{
 		//System.out.println("******findTrigRestSafe for operation " + opId + " ******");
-		List trigAndRest = new ArrayList();
-		ArrayList triggers = new ArrayList();
-		ArrayList restores = new ArrayList();
-		ArrayList executionState = null;
-		ArrayList executionComp = null;
+		List<ArrayList<String>> trigAndRest = new ArrayList<ArrayList<String>>();
+		ArrayList<String> triggers = new ArrayList<String>();
+		ArrayList<String> restores = new ArrayList<String>();
+		ArrayList<String> executionState = null;
+		ArrayList<String> executionComp = null;
 
 		// List of all operations
-		List operationList = PAroot.getChildren("Operation");
-		for(Iterator operationIter = operationList.iterator(); operationIter.hasNext(); )
+		List<?> operationList = PAroot.getChildren("Operation");
+		for(Iterator<?> operationIter = operationList.iterator(); operationIter.hasNext(); )
 		{
 			Element operation = (Element) operationIter.next();
 			String operationId = operation.getAttributeValue("id");
@@ -1617,27 +1607,27 @@ printStringList(opIds);
 			if(operationId != opId )
 			{
 				// List all involved processes
-				List processList = operation.getChildren("Process");
+				List<?> processList = operation.getChildren("Process");
 				boolean containsSafeState = false;
 
 				// For all processes (i.e. steps in the execution spec.)
-				for(Iterator processIter = processList.iterator(); processIter.hasNext(); )
+				for(Iterator<?> processIter = processList.iterator(); processIter.hasNext(); )
 				{
 					boolean triggerProc = true;
 					Element process = (Element) processIter.next();
-					String procId = process.getAttributeValue("id");
+					process.getAttributeValue("id");
 					//System.out.println("Ny process, procId= " + procId);
 
 					Element event = process.getChild("Event");
 					Element restriction = event.getChild("Restriction");
 					Element and = restriction.getChild("And");
 
-					executionState = new ArrayList();
-					executionComp = new ArrayList();
+					executionState = new ArrayList<String>();
+					executionComp = new ArrayList<String>();
 
 					// Build a state-ArrayList for each event
-					List stateList = and.getChildren("State");
-					for(Iterator listState = stateList.iterator(); listState.hasNext(); )
+					List<?> stateList = and.getChildren("State");
+					for(Iterator<?> listState = stateList.iterator(); listState.hasNext(); )
 					{
 						Element state = (Element) listState.next();
 						String stateName = state.getAttributeValue("name");
@@ -1656,11 +1646,11 @@ printStringList(opIds);
 						// for execution of operation opId. If not, the operation operationId is a
 						// trigger for opId.
 
-						Iterator e = safeStates.iterator();
-						ArrayList oneSafeState = new ArrayList();
+						Iterator<?> e = safeStates.iterator();
+						ArrayList<?> oneSafeState = new ArrayList<Object>();
 						while(e.hasNext() && triggerProc)
 						{
-							oneSafeState = (ArrayList) e.next();
+							oneSafeState = (ArrayList<?>) e.next();
 							if (executionState.containsAll(oneSafeState)) {
 								if(!trigger)
 									triggerProc = false;
@@ -1683,10 +1673,10 @@ printStringList(opIds);
 					// executionState now holds the last state in the execution spec
 					// for the operation operationId.
 					boolean restore = false;
-					Iterator ee = safeStates.iterator();
+					Iterator<?> ee = safeStates.iterator();
 					while(ee.hasNext() && !restore ) {
 
-						ArrayList oneSafeState = (ArrayList) ee.next();
+						ArrayList<?> oneSafeState = (ArrayList<?>) ee.next();
 						if (executionState.containsAll(oneSafeState)) {
 							restore = true;
 						}

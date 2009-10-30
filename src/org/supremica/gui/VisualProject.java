@@ -75,7 +75,9 @@ import org.supremica.gui.ide.AnalyzerAutomataPanel;
 public class VisualProject
     extends Project
 {
+    private static final long serialVersionUID = 1L;
     private static Logger logger = LoggerFactory.createLogger(VisualProject.class);
+
     private Automata selectedAutomata = null;
     private ActionAndControlViewer theActionAndControlViewer = null;    // Lazy construction
     private Animator theAnimator = null;    // Lazy construction
@@ -83,10 +85,10 @@ public class VisualProject
     private Container theUserInterface = null;    // Lazy construction
     private SimulatorExecuter theSimulator = null;    // Lazy construction
     private JGrafchartSupremicaEditor theJGrafchartEditor = null;    // Lazy construction
-    private HashMap theAutomatonViewerContainer = new HashMap();
-    private HashMap theAutomatonExplorerContainer = new HashMap();
+    private HashMap<String, AutomatonViewer> theAutomatonViewerContainer = new HashMap<String, AutomatonViewer>();
+    private HashMap<String, AutomatonExplorer> theAutomatonExplorerContainer = new HashMap<String, AutomatonExplorer>();
 //	private HashMap theAutomatonFrameContainer = new HashMap();
-    private HashMap theAlphabetViewerContainer = new HashMap();
+    private HashMap<String, AlphabetViewer> theAlphabetViewerContainer = new HashMap<String, AlphabetViewer>();
     private LightTableModel lightTableModel = new LightTableModel();
     private FullTableModel fullTableModel = new FullTableModel();
     private AnalyzerTableModel analyzerTableModel = new AnalyzerTableModel();
@@ -138,7 +140,7 @@ public class VisualProject
     {
         //System.err.println("Rename " + aut + " from " + oldName);
         
-        AutomatonViewer theViewer = (AutomatonViewer) theAutomatonViewerContainer.get(oldName);
+        AutomatonViewer theViewer = theAutomatonViewerContainer.get(oldName);
 
         if (theViewer != null)
         {
@@ -146,7 +148,7 @@ public class VisualProject
             theAutomatonViewerContainer.put(aut.getName(), theViewer);
         }
 
-        AutomatonExplorer theExplorer = (AutomatonExplorer) theAutomatonExplorerContainer.get(oldName);
+        AutomatonExplorer theExplorer = theAutomatonExplorerContainer.get(oldName);
 
         if (theExplorer != null)
         {
@@ -154,7 +156,7 @@ public class VisualProject
             theAutomatonExplorerContainer.put(aut.getName(), theExplorer);
         }
 
-        AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAlphabetViewerContainer.get(oldName);
+        AlphabetViewer theAlphabetViewer = theAlphabetViewerContainer.get(oldName);
 
         if (theAlphabetViewer != null)
         {
@@ -169,7 +171,7 @@ public class VisualProject
     {
         super.removeAutomaton(aut);
 
-        AutomatonViewer theViewer = (AutomatonViewer) theAutomatonViewerContainer.get(aut.getName());
+        AutomatonViewer theViewer = theAutomatonViewerContainer.get(aut.getName());
 
         if (theViewer != null)
         {
@@ -178,7 +180,7 @@ public class VisualProject
             theAutomatonViewerContainer.remove(aut.getName());
         }
 
-        AutomatonExplorer theExplorer = (AutomatonExplorer) theAutomatonExplorerContainer.get(aut.getName());
+        AutomatonExplorer theExplorer = theAutomatonExplorerContainer.get(aut.getName());
 
         if (theExplorer != null)
         {
@@ -188,7 +190,7 @@ public class VisualProject
         }
 
 
-        AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAlphabetViewerContainer.get(aut.getName());
+        AlphabetViewer theAlphabetViewer = theAlphabetViewerContainer.get(aut.getName());
 
         if (theAlphabetViewer != null)
         {
@@ -221,7 +223,7 @@ public class VisualProject
 
     public void updateFrameTitles()
     {
-        String title = "Supremica - " + getName();
+        // String title = "Supremica - " + getName();
     }
 
     public File getProjectFile()
@@ -335,7 +337,7 @@ public class VisualProject
     public AutomatonViewer returnAutomatonViewer(Automaton automaton)
     throws Exception
     {
-        return (AutomatonViewer) theAutomatonViewerContainer.get(automaton.getName());
+        return theAutomatonViewerContainer.get(automaton.getName());
     }
 
     public AutomatonViewer createAutomatonViewer(Automaton automaton, AutomatonViewerFactory maker)
@@ -351,7 +353,7 @@ public class VisualProject
     {
         if (theAutomatonExplorerContainer.containsKey(automaton))
         {
-            AutomatonExplorer explorer = (AutomatonExplorer) theAutomatonExplorerContainer.get(automaton);
+            AutomatonExplorer explorer = theAutomatonExplorerContainer.get(automaton);
 
             explorer.setVisible(true);
 
@@ -578,6 +580,8 @@ public class VisualProject
         extends AbstractTableModel
         implements AutomataListener
     {
+        private static final long serialVersionUID = 1L;
+
         public LightTableModel()
         {}
 
@@ -596,7 +600,7 @@ public class VisualProject
             return "Unknown";
         }
 
-        public Class getColumnClass(int column)
+        public Class<?> getColumnClass(int column)
         {
             if (column == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
@@ -670,6 +674,8 @@ public class VisualProject
         extends AbstractTableModel
         implements AutomataListener
     {
+        private static final long serialVersionUID = 1L;
+
         public FullTableModel()
         {}
 
@@ -703,7 +709,7 @@ public class VisualProject
             return "Unknown";
         }
 
-        public Class getColumnClass(int column)
+        public Class<?> getColumnClass(int column)
         {
             if (column == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
@@ -811,6 +817,8 @@ public class VisualProject
         extends AbstractTableModel
         implements AutomataListener
     {
+        private static final long serialVersionUID = 1L;
+
         public AnalyzerTableModel()
         {}
 
@@ -849,7 +857,7 @@ public class VisualProject
             return "Unknown";
         }
 
-        public Class getColumnClass(int column)
+        public Class<?> getColumnClass(int column)
         {
             if (column == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {

@@ -128,4 +128,9 @@ public final class LabelGeometryElement
   private final Point2D mOffset;
   private final AnchorPosition mAnchor;
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -1337175543808520293L;
+
 }

@@ -9,13 +9,14 @@
 
 package net.sourceforge.waters.analysis;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.THashMap;
+import gnu.trove.THashSet;
 
-import java.lang.Comparable;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,18 +29,20 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.analysis.modular.BiSimulator;
+import net.sourceforge.waters.analysis.modular.BlockedEvents;
+import net.sourceforge.waters.analysis.modular.NonDeterministicComposer;
+import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
+import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -47,27 +50,10 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.analysis.modular.ObserverProjection;
-import net.sourceforge.waters.analysis.modular.NonDeterministicComposer;
-import net.sourceforge.waters.analysis.modular.BiSimulator;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
-import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
-import net.sourceforge.waters.analysis.LightWeightGraph;
-import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
-import gnu.trove.THashSet;
-import gnu.trove.THashMap;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import gnu.trove.TObjectIntHashMap;
-import net.sourceforge.waters.analysis.modular.BlockedEvents;
 
 
 /**
@@ -385,7 +371,6 @@ public class ProjectingNonBlockingChecker
       }
     }
     Set<Tuple> possible = new TreeSet<Tuple>();
-    boolean stop = true;
     System.out.println("keyset:" + numoccuring.keySet().size());
     for (Set<AutomatonProxy> s : numoccuring.keySet()) {
       if (s.size() > 4 && s.size() != automata.size()) {
@@ -393,15 +378,12 @@ public class ProjectingNonBlockingChecker
       }
       double size = 0;
       Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
-      Iterator<EventProxy> i = common.iterator();
       Set<EventProxy> total = new HashSet<EventProxy>();
-      boolean contproj = false;
       for (AutomatonProxy a : s) {
         size += Math.log(a.getStates().size());
         total.addAll(a.getEvents());
         common.retainAll(a.getEvents());
       }
-      Iterator<AutomatonProxy> it = s.iterator();
       double tot = total.size();
       double uncom = tot - common.size();
       size = uncom;
@@ -506,7 +488,6 @@ public class ProjectingNonBlockingChecker
       int overflows = 0;
       ProjectionList minlist = null;
       minSize = Integer.MAX_VALUE / 4;
-      int setSize = -1;
       System.out.println("possible: " + possible.size());
       int num = 0;
       tuples:
@@ -560,6 +541,7 @@ public class ProjectingNonBlockingChecker
     return p;
   }
 
+  @SuppressWarnings("unused")
   private boolean setFailedResult(final TraceProxy counterexample,
                                   final Map<EventProxy,EventProxy> uncont)
   {
@@ -586,18 +568,6 @@ public class ProjectingNonBlockingChecker
     final SafetyTraceProxy wrapper =
       factory.createSafetyTraceProxy(tracename, des, modevents);
     return super.setFailedResult(wrapper);
-  }
-
-
-  //#########################################################################
-  //# Inner Class AutomatonComparator
-  private final static class AutomatonComparator
-    implements Comparator<AutomatonProxy>
-  {
-    public int compare(AutomatonProxy a1, AutomatonProxy a2)
-    {
-      return a1.getName().compareTo(a2.getName());
-    }
   }
 
 
@@ -698,7 +668,6 @@ public class ProjectingNonBlockingChecker
         }
       } else {
         blockedEvents();
-        Set<EventProxy> forb = Collections.emptySet();
         System.out.println("marking: " + getMarkingProposition());
         try {
           //removeTransitions
@@ -870,25 +839,9 @@ public class ProjectingNonBlockingChecker
       }
     }
     
-    private TIntHashSet getIntSet(Set<EventProxy> set, EventProxy[] array)
-    {
-      TIntHashSet res = new TIntHashSet(set.size());
-      for (int i = 0; i < array.length; i++) {
-        if (set.contains(array[i])) {
-          res.add(i);
-        }
-      }
-      return res;
-    }
-
     public ProductDESProxy getModel()
     {
       return getFactory().createProductDESProxy("model", mTarget, mAutomata);
-    }
-
-    public Set<EventProxy> getHidden()
-    {
-      return mHidden;
     }
 
     public Set<AutomatonProxy> getComposed()
@@ -906,7 +859,8 @@ public class ProjectingNonBlockingChecker
       return mAutomata;
     }
 
-    public TraceProxy getTrace(TraceProxy trace, ProductDESProxy model)
+    @SuppressWarnings("unused")
+	public TraceProxy getTrace(TraceProxy trace, ProductDESProxy model)
     {
       List<Map<StateProxy, Set<EventProxy>>> events =
         new ArrayList<Map<StateProxy, Set<EventProxy>>>(mCompautomata.size());
@@ -1167,11 +1121,14 @@ public class ProjectingNonBlockingChecker
   private int mTime = 0;
   
   
+  @SuppressWarnings("unused")
   private RemoveImpossibleTransitions mRIT = null;
+  @SuppressWarnings("unused")
   private MergeEvents mME = null;
   
   //#########################################################################
   //# Class Constants
+  @SuppressWarnings("unused")
   private static final Logger LOGGER =
     LoggerFactory.createLogger(ProjectingNonBlockingChecker.class);
 

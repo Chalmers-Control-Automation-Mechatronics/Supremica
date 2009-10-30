@@ -56,4 +56,9 @@ public class InsertEventLabelAction
     }
   }
 
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

@@ -1,12 +1,20 @@
 package org.supremica.external.processeditor.xml;
 
-import java.awt.*;
-import java.io.*;
-import javax.swing.*;
-import java.lang.Object.*;
+import java.awt.List;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 
-import com.jniwrapper.win32.jexcel.*;
-import com.jniwrapper.win32.jexcel.format.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
+
+import com.jniwrapper.win32.jexcel.Application;
+import com.jniwrapper.win32.jexcel.Cell;
+import com.jniwrapper.win32.jexcel.Workbook;
+import com.jniwrapper.win32.jexcel.Worksheet;
+
 
 public class SDPConverter {  
     public int resourceCol = 2;
@@ -159,7 +167,8 @@ public class SDPConverter {
 	}  
 	return false;
     }	    
-    public String componentInterpreter(String description, String res)
+    @SuppressWarnings("deprecation")
+	public String componentInterpreter(String description, String res)
     {
 	String item = "";
 	
@@ -193,16 +202,15 @@ public class SDPConverter {
 	return res+"-"+item;   	
     }
     public boolean containingNumber(String str){
-	for(int i=0;i<str.length();i++){
-	    Character c =str.charAt(i);
-	    if(c.isDigit(str.charAt(i)))
-		return true;
+	for (int i=0;i<str.length();i++){
+	    if (Character.isDigit(str.charAt(i)))
+	    	return true;
 	}
 	return false;
     } 
     public void closeAllResources(File file)
     {
-	Loader loader = new Loader();
+	new Loader();
 	for(int index=0;index<componentList.getItemCount();index++)
 	    {		
 		((FileConverter)xmlConverterListModel.get(index)).
@@ -222,23 +230,23 @@ public class SDPConverter {
 		System.out.println(ex);}
     }
     class ListOfComponentTypes extends List {  	
-	
-	BufferedReader document ;
-	public ListOfComponentTypes(){
-	    super();
-	    try{
-		document = new BufferedReader(new FileReader("ListOfComponentTypes.txt"));	 
-		String line = document.readLine();;
-		int i = 1;
-		while(line != null){	
-		    this.addItem(line);
-		    line = document.readLine();	
+
+		private static final long serialVersionUID = 1L;
+
+		BufferedReader document ;
+
+		@SuppressWarnings("deprecation")
+		public ListOfComponentTypes(){
+			try{
+				document = new BufferedReader(new FileReader("ListOfComponentTypes.txt"));	 
+				String line = document.readLine();;
+				while(line != null){	
+					this.addItem(line);
+					line = document.readLine();	
+				}
+			} catch(Exception ex) {
+				System.out.println(ex);
+			}
 		}
-	    }catch(Exception ex) {
-		System.out.println(ex);} 
-	}
-	    
     }
 }
-  
-    

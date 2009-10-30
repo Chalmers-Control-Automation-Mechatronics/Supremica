@@ -39,4 +39,9 @@ public final class ControllerID implements Serializable
   }
 
   private final String mId;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 }
