@@ -19,6 +19,20 @@ import net.sourceforge.waters.xsd.des.ProductDES;
 import org.xml.sax.SAXException;
 
 
+/**
+ * <P>A helper class to read and write Waters Product DES (<CODE>.wdes</CODE>)
+ * files.</P>
+ *
+ * <P>The most convenient way to use a JAXBProductDESMarshaller is to create an
+ * instance and register it with a {@link DocumentManager} as a marshaller
+ * and/or unmarshaller. The {@link DocumentManager} can automatically
+ * recognise files by their extension and use the appropriate marshaller to
+ * load or save their contents.</P>
+ *
+ * @see DocumentManager
+ * @author Robi Malik
+ */
+
 public class JAXBProductDESMarshaller
   extends JAXBMarshaller<ProductDESProxy,ProductDES>
 {

@@ -57,7 +57,7 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     mModuleProxyFactory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     final JAXBModuleMarshaller modmarshaller =
-      new JAXBModuleMarshaller(mModuleProxyFactory, optable);
+      new JAXBModuleMarshaller(mModuleProxyFactory, optable, false);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(modmarshaller);

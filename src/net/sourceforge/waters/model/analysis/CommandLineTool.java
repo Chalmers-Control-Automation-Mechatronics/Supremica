@@ -140,7 +140,7 @@ public class CommandLineTool
       final ValidUnmarshaller importer =
         new ValidUnmarshaller(moduleFactory, optable);
       final JAXBModuleMarshaller moduleMarshaller =
-        new JAXBModuleMarshaller(moduleFactory, optable);
+        new JAXBModuleMarshaller(moduleFactory, optable, false);
       final JAXBProductDESMarshaller desMarshaller =
         new JAXBProductDESMarshaller(desFactory);
       final DocumentManager docManager = new DocumentManager();

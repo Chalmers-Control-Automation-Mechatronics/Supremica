@@ -45,8 +45,9 @@ import org.xml.sax.SAXException;
  * <P>This abstract base class implements the core of the wrapper
  * functionality, but is not intended to be used directly. Instead, use one
  * of the subclasses depending on the type of document you want to
- * handle.</P>
+ * handle and register it with a {@link DocumentManager}.</P>
  *
+ * @see DocumentManager
  * @author Robi Malik
  */
 
@@ -75,6 +76,34 @@ public abstract class JAXBMarshaller
     mJAXBMarshaller = context.createMarshaller();
     mJAXBMarshaller.setProperty
       (Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  /**
+   * Returns whether geometry information is provided when unmarshalling.
+   * @see #setImportingGeometry(boolean)
+   */
+  boolean isImportingGeometry()
+  {
+    return mImporter.isImportingGeometry();
+  }
+
+  /**
+   * Specifies whether geometry information is provided when unmarshalling.
+   * If set to true <CODE>true</CODE> (the default), then all geometry
+   * information is included in the loaded object model, otherwise all
+   * geometry objects are set to <CODE>null</CODE> regardless of the file
+   * contents. This option can be useful to speed up command line tools
+   * that do not require geometry information: it saves some memory, and
+   * the AWT library does not need to be loaded.
+   * @param  importgeo  <CODE>true</CODE> if geometry information is provided,
+   *                    <CODE>false</CODE> otherwise.
+   */
+  void setImportingGeometry(final boolean importgeo)
+  {
+    mImporter.setImportingGeometry(importgeo);
   }
 
 

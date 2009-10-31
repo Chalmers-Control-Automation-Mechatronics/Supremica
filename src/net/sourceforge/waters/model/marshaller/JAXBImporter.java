@@ -24,9 +24,30 @@ abstract class JAXBImporter
 {
 
   //#########################################################################
+  //# Constructors
+  JAXBImporter()
+  {
+    mImportingGeometry = true;
+  }
+
+
+  //#########################################################################
   //# Invocation
   abstract Object importElement(final ElementType element)
     throws WatersUnmarshalException;
+
+
+  //#########################################################################
+  //# Configuration
+  boolean isImportingGeometry()
+  {
+    return mImportingGeometry;
+  }
+
+  void setImportingGeometry(final boolean importing)
+  {
+    mImportingGeometry = importing;
+  }
 
 
   //#########################################################################
@@ -54,5 +75,10 @@ abstract class JAXBImporter
       unsafe.insertUnique(proxy);
     }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private boolean mImportingGeometry;
 
 }

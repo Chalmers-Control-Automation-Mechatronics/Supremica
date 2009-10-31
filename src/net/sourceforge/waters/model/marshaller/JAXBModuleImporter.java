@@ -527,7 +527,7 @@ public class JAXBModuleImporter
 
   private BoxGeometryProxy importBoxGeometry(final BoxGeometry element)
   {
-    if (element == null) {
+    if (element == null || !isImportingGeometry()) {
       return null;
     } else {
       final Box boxElement = element.getBox();
@@ -547,7 +547,7 @@ public class JAXBModuleImporter
   private ColorGeometryProxy importColorGeometry
     (final ColorGeometry element)
   {
-    if (element == null) {
+    if (element == null || !isImportingGeometry()) {
       return null;
     } else {
       final Color colorElement = element.getColor();
@@ -874,7 +874,7 @@ public class JAXBModuleImporter
     (final LabelGeometry element)
     throws WatersUnmarshalException
   {
-    if (element == null) {
+    if (element == null || !isImportingGeometry()) {
       return null;
     } else {
       final Point offsetElement = element.getPoint();
@@ -951,7 +951,7 @@ public class JAXBModuleImporter
   private PointGeometryProxy importPointGeometryType
     (final PointGeometryType element)
   {
-    if (element == null) {
+    if (element == null || !isImportingGeometry()) {
       return null;
     } else {
       final Point pointElement = element.getPoint();
@@ -1031,7 +1031,7 @@ public class JAXBModuleImporter
   private SplineGeometryProxy importSplineGeometry
     (final SplineGeometry element)
   {
-    if (element == null) {
+    if (element == null || !isImportingGeometry()) {
       return null;
     } else {
       final List<java.awt.Point> points = new LinkedList<java.awt.Point>();
