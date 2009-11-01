@@ -72,6 +72,11 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   public void setStateEncoding(StateEncoding encoding)
   {
     mStateEncoding = encoding;
+
+    //Now we can get the encoded state length and create
+    //the state storage. There should be a better place to
+    //do this, like a 'ready' function. Maybe another day.
+    mStateStorage = new SlabStateStorage(mStateEncoding.getEncodedLength());
   }
 
 
@@ -112,17 +117,13 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   {
     //This method will add states to be checked, and will 
     //maintain the hashtable of visited states etc.
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
-	if (!mObservedSet.containsKey(state))
-	  {
-	    mObservedSet.put(state, state);
-	    mStateList.add(state);
-	  }
+	mStateStorage.addState(state);
 	mIncomingStateCounter++;
 
 	//Notify any threads that might be waiting for new states.
-	mStateList.notifyAll();
+	mIncomingLock.notifyAll();
       }
   }
 
@@ -217,7 +218,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     private int fillBuffer(StateTuple[] buffer, boolean alreadyRunning) 
       throws InterruptedException
     {
-      synchronized (mStateList)
+      synchronized (mIncomingLock)
 	{
 	  //If the processing thread is not current running then do
 	  //not decrement the running thread counter. This is used so
@@ -238,7 +239,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 		  if (mKillState)
 		    throw new InterruptedException("Thread should be killed");
 
-		  mStateList.wait();
+		  mIncomingLock.wait();
 		}
 	      
 	      //There should certainly be some states now. We want to
@@ -410,18 +411,18 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
    */
   private int unprocessedStates()
   {
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
-	return mStateList.size() - mCurrentStateIndex;
+	return mStateStorage.getUnprocessedStateCount();
       }
   }
 
 
   private StateTuple getNextState()
   {
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
-	return mStateList.get(mCurrentStateIndex++);
+	return mStateStorage.getNextState();
       }
   }
   
@@ -503,27 +504,33 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
   public int getStateCount()
   {
-    return mCurrentStateIndex;
+    return mStateStorage.getProcessedStateCount();
   }
 
 
   public long getIncomingStateCount()
   {
-    return mIncomingStateCounter;
+    synchronized (mIncomingLock)
+      {
+	return mIncomingStateCounter;
+      }
   }
 
 
   public long getOutgoingStateCount()
   {
-    return mOutgoingStateCounter;
+    synchronized (mOutgoingLock)
+      {
+	return mOutgoingStateCounter;
+      }
   }
 
 
   public int getWaitingStateCount()
   {
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
-	return mStateList.size() - mCurrentStateIndex;
+	return mStateStorage.getUnprocessedStateCount();
       }
   }
 
@@ -542,9 +549,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     //Hack? Also wake up threads waiting on the incoming state list.
     //This is necessary so that any processing threads that are waiting
     //on states can check the pause/kill status too.
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
-	mStateList.notifyAll();
+	mIncomingLock.notifyAll();
       }
   }
 
@@ -560,9 +567,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     //Hack? Also wake up threads waiting on the incoming state list.
     //This is necessary so that any processing threads that are waiting
     //on states can check the pause/kill status too.
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
-	mStateList.notifyAll();
+	mIncomingLock.notifyAll();
       }
   }
 
@@ -584,9 +591,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     //Hack? Also wake up threads waiting on the incoming state list.
     //This is necessary so that any processing threads that are waiting
     //on states can check the pause/kill status too.
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
-	mStateList.notifyAll();
+	mIncomingLock.notifyAll();
       }
   }
 
@@ -594,9 +601,6 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   public void created() throws Exception
   {
     super.created();
-    
-    mStateList = new ArrayList<StateTuple>();
-    mObservedSet = new THashMap<StateTuple,StateTuple>();
   }
 
 
@@ -710,7 +714,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
   public void startIdleTest()
   {
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
 	//We initialise the idle flag to whether the system appears to
 	//be idle now. If it is idle then any changes to the state will
@@ -722,7 +726,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
   public boolean finishIdleTest()
   {
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
 	//Store the current/old value of the idle flag.
 	boolean canary = mIdleCanaryFlag;
@@ -751,11 +755,14 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	stats.set("local-added-states", mLocalHandler.getCount());
       }
     
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
-	stats.set("state-count", mStateList.size());
-	stats.set("processed-states", getStateCount());
-	stats.set("unprocessed-states", mStateList.size() - mCurrentStateIndex);
+	if (mStateStorage != null)
+	  {
+	    stats.set("state-count", mStateStorage.getStateCount());
+	    stats.set("processed-states", mStateStorage.getProcessedStateCount());
+	    stats.set("unprocessed-states", mStateStorage.getUnprocessedStateCount());
+	  }
 	stats.set("incoming-state-count", mIncomingStateCounter);
       }
 
@@ -770,7 +777,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
   private boolean appearsIdle()
   {
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
 	return getWaitingStateCount() == 0 && mRunningProcessingThreads == 0;
       }
@@ -779,24 +786,25 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
   private void killCanary()
   {
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
 	mIdleCanaryFlag = false;
       }
   }
 
-  /**
-   * Gets the state equivalent to the given state, except the 
-   * object that is actually stored in the worker. This state 
-   * should have the correct depth hint, etc.
-   * @param state State to get
-   * @return StateTuple from the worker, or null if it doesn't exist.
-   */
-  public StateTuple getExploredState(StateTuple state)
+  public int getStateDepth(StateTuple state)
   {
-    synchronized (mStateList)
+    synchronized (mIncomingLock)
       {
-	return mObservedSet.get(state);
+	return mStateStorage.getStateDepth(state);
+      }
+  }
+
+  public boolean containsState(StateTuple state)
+  {
+    synchronized (mIncomingLock)
+      {
+	return mStateStorage.containsState(state);
       }
   }
 
@@ -815,25 +823,14 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 
   private ProductDESSchema mModel = null;
   
-  /**
-   * List of states which have been visited, or need to be visited on
-   * this node. This acts both as a list and a queue.
-   *
-   * This object is also used for synchronisation in the addState
-   * method.
-   */
-  private List<StateTuple> mStateList;
+  private final Object mIncomingLock = new Object();
   
-  //This is used like a set but is actually a map because 
-  //we need to be able to retrieve the actual state tuple from
-  //the set, which isn't possible in the standard set interface.
-  private THashMap<StateTuple,StateTuple> mObservedSet;
-  private int mCurrentStateIndex = 0;
+  private StateStorage mStateStorage;
 
   /**
    * A count of incoming states to this node. This is incremented
    * after each addState call, and should be protected by the
-   * mStateList monitor when modified. States that have already been
+   * mIncomingLock monitor when modified. States that have already been
    * observed are counted as well.
    */
   private int mRunningProcessingThreads = 0;

@@ -41,6 +41,11 @@ public class NullStateEncoding extends StateEncoding
     return interpret(state.getStateArray());
   }
 
+  public int getEncodedLength()
+  {
+    return mModel.getAutomataCount();
+  }
+
   private final ProductDESSchema mModel;
 
 

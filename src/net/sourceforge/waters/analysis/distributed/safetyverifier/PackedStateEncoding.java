@@ -228,6 +228,10 @@ public class PackedStateEncoding extends StateEncoding
     return y;
   }
 
+  public int getEncodedLength()
+  {
+    return mStateArrayLength;
+  }
 
   private final ProductDESSchema mModel;
 

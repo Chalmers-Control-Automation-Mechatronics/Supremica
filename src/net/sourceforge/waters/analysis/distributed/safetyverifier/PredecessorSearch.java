@@ -235,16 +235,14 @@ class PredecessorProducer extends Thread
 	//sent back to the controller and continue.
 
 	StateTuple pred_state = mStateEncoding.encodeState(pre, Integer.MAX_VALUE);
-	StateTuple t = mWorker.getExploredState(pred_state);
-
 	    
 	//If the state is not in our local observed set, then
 	//we cannot tell if the state is reachable... if it is, some other
 	//worker will take care of it
-	if (t == null)
+	if (!mWorker.containsState(pred_state))
 	  return;
 	else
-	  pred_state = t;
+	  pred_state.setDepthHint(mWorker.getStateDepth(pred_state));
 
 	Predecessor p = new Predecessor(packedCurrent, pred_state, event);
 	mQueue.put(p);

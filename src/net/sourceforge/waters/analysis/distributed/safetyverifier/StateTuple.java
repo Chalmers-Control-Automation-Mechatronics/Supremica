@@ -85,6 +85,11 @@ public class StateTuple implements Serializable
     return mDepth;
   }
 
+  public void setDepthHint(int depth)
+  {
+    mDepth = depth;
+  }
+
   /*
    * Serialisation protocol for state tuple:
    *   [ depth ][N][state][data0]...[dataN] 
@@ -137,7 +142,7 @@ public class StateTuple implements Serializable
   //deserialising, they are marked as transient-volatile to keep them 
   //threadsafe
   private transient int[] mState;
-  private transient int mDepth;
+  private volatile transient int mDepth;
 
   private static final long serialVersionUID = 1L;
 }

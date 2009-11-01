@@ -82,6 +82,8 @@ public class GreedyPackedStateEncoding extends StateEncoding
       }
 
     mWordCount = wordCount;
+
+    System.err.format("Automaton count: %d, Encoded word count: %d\n", aut.length, mWordCount);
   }
 
   public void outputDebugging()
@@ -173,6 +175,10 @@ public class GreedyPackedStateEncoding extends StateEncoding
     return y;
   }
 
+  public int getEncodedLength()
+  {
+    return mWordCount;
+  }
 
   //#########################################################################
   //# Class Constants

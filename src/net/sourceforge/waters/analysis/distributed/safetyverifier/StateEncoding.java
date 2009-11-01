@@ -39,6 +39,7 @@ public abstract class StateEncoding implements Serializable
   public abstract String interpret(StateTuple state);
   public abstract String interpret(int[] unpacked);
 
+  public abstract int getEncodedLength();
 
   //#########################################################################
   //# Class Constants
