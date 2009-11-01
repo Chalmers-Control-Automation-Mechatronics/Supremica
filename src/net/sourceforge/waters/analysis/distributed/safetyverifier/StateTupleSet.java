@@ -138,18 +138,15 @@ public class StateTupleSet
     public boolean equal(Object obj, int x)
     {
       StateTuple state = (StateTuple)obj;
-      int[] data = new int[mStateLength];
-      mData.retrieve(x, data, mStateLength);
-      return java.util.Arrays.equals(data, state.getStateArray());
+      mData.retrieve(x, mData1, mStateLength);
+      return java.util.Arrays.equals(mData1, state.getStateArray());
     }
 
     public boolean equalIndirect(int x, int y)
     {
-      int[] datax = new int[mStateLength];
-      int[] datay = new int[mStateLength];
-      mData.retrieve(x, datax, mStateLength);
-      mData.retrieve(y, datay, mStateLength);
-      return java.util.Arrays.equals(datax, datay);
+      mData.retrieve(x, mData1, mStateLength);
+      mData.retrieve(y, mData2, mStateLength);
+      return java.util.Arrays.equals(mData1, mData2);
     }
 
     public int computeHash(Object obj)
@@ -160,10 +157,12 @@ public class StateTupleSet
 
     public int computeIndirectHash(int ptr)
     {
-      int[] data = new int[mStateLength];
-      mData.retrieve(ptr, data, mStateLength);
-      return java.util.Arrays.hashCode(data);
+      mData.retrieve(ptr, mData1, mStateLength);
+      return java.util.Arrays.hashCode(mData1);
     }
+
+    private final int[] mData1 = new int[mStateLength];
+    private final int[] mData2 = new int[mStateLength];
   }
 
 
