@@ -140,7 +140,6 @@ public class IntHashData
   public int index(Object value)
   {
     final byte[] state = mState;
-    final int[] data = mData;
     final int length = state.length;
     final int hash = mStrategy.computeHash(value) & 0x7fffffff;
     int index = hash % length;

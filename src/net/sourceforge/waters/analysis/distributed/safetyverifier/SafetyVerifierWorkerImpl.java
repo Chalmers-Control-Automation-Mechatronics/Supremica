@@ -1,7 +1,5 @@
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
-import gnu.trove.THashMap;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
