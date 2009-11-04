@@ -62,6 +62,7 @@ import org.supremica.util.SupremicaException;
  *
  * This class generates a java source file from a bunch of automata.
  */
+@SuppressWarnings("unchecked")
 public class AutomataToJava
 {
     public static class GenerationException

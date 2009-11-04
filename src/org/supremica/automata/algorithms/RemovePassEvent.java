@@ -73,14 +73,14 @@ public class RemovePassEvent
 		throws Exception
 	{
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
-		Iterator stateIt = theAutomaton.stateIterator();
+		Iterator<State> stateIt = theAutomaton.stateIterator();
 
 		while (stateIt.hasNext())
 		{
 
 			// Find a state with an outgoing pass event
 			State currState = (State) stateIt.next();
-			Iterator arcIt = currState.safeOutgoingArcsIterator();
+			Iterator<Arc> arcIt = currState.safeOutgoingArcsIterator();
 
 			while (arcIt.hasNext())
 			{
@@ -95,7 +95,7 @@ public class RemovePassEvent
 					// A state with outgoing pass event is found
 					// Copy all uncontrollable arcs
 					State currToState = currArc.getToState();
-					Iterator nextArcIt = currToState.outgoingArcsIterator();
+					Iterator<Arc> nextArcIt = currToState.outgoingArcsIterator();
 
 					while (nextArcIt.hasNext())
 					{

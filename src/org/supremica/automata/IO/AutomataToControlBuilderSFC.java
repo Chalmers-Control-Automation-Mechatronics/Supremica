@@ -155,7 +155,7 @@ public class AutomataToControlBuilderSFC
         
         // . is not allowed in simple variable names, replaced with _
         // #"@|*: Max identfier length (variable, step name etc) = 32.
-        for (Iterator alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
+        for (Iterator<LabeledEvent> alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
         {
             LabeledEvent currEvent = (LabeledEvent) alphaIt.next();
             
@@ -219,7 +219,7 @@ public class AutomataToControlBuilderSFC
         
         enumer.execute();
         
-        for (Iterator automataIt = theProject.iterator();
+        for (Iterator<Automaton> automataIt = theProject.iterator();
         automataIt.hasNext(); )
         {
             // Each automaton is translated into a ControlBuilder Sequence.
@@ -291,7 +291,7 @@ public class AutomataToControlBuilderSFC
         Alphabet testAlphabet = new Alphabet(unionAlphabet);
         
         // Step 2. Pick an event
-        for (Iterator alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
+        for (Iterator<LabeledEvent> alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
         {
             LabeledEvent theEvent = (LabeledEvent) alphaIt.next();
             
@@ -342,7 +342,7 @@ public class AutomataToControlBuilderSFC
         {
             
             // Step 2. Pick e in C \ D.
-            for (Iterator alphaIt = iteratorAlphabet.iterator();
+            for (Iterator<LabeledEvent> alphaIt = iteratorAlphabet.iterator();
             alphaIt.hasNext(); )
             {
                 LabeledEvent confEvent = (LabeledEvent) alphaIt.next();
@@ -404,7 +404,7 @@ public class AutomataToControlBuilderSFC
         // Iterate over the automata, if the event is present we must find all states
         // that have transitions with this event. For each state, an iterator over the
         // outgoing arcs find such events.
-        for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+        for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
         {
             Automaton aut = (Automaton) autIt.next();
             Alphabet theAlphabet = aut.getAlphabet();
@@ -416,7 +416,7 @@ public class AutomataToControlBuilderSFC
                 logger.debug("The event " + theEvent.getLabel() + " exsits in the automaton " + aut.getName().replace('.', '_'));
                 
                 // The event exists in this automaton. What arcs?
-                for (Iterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+                for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
                 {
                     Arc anArc = (Arc) arcIt.next();
                     
@@ -437,7 +437,7 @@ public class AutomataToControlBuilderSFC
                                 // It is only necessary to get the conflicting transitions for this state once?
                                 sourceState.setVisited(true);
                                 
-                                for (Iterator outgoingIt = sourceState.outgoingArcsIterator();
+                                for (Iterator<Arc> outgoingIt = sourceState.outgoingArcsIterator();
                                 outgoingIt.hasNext(); )
                                 {
                                     Arc currArc = (Arc) outgoingIt.next();
@@ -524,7 +524,7 @@ public class AutomataToControlBuilderSFC
             pw.println("ALTERNATIVESEQ");
         }
         
-        for (Iterator eventIt = theAlphabet.controllableEventIterator();
+        for (Iterator<LabeledEvent> eventIt = theAlphabet.controllableEventIterator();
         eventIt.hasNext(); )
         {
             LabeledEvent currEvent = (LabeledEvent) eventIt.next();
@@ -592,7 +592,7 @@ public class AutomataToControlBuilderSFC
         }
         
         /* And then the actual generation condition. */
-        for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+        for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
         {
             Automaton aut = (Automaton) autIt.next();
             Alphabet theAlphabet = aut.getAlphabet();
@@ -606,7 +606,7 @@ public class AutomataToControlBuilderSFC
                 boolean stateFound = false;
                 boolean firstState = true;
                 
-                for (Iterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+                for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
                 {
                     Arc anArc = (Arc) arcIt.next();
                     
@@ -689,7 +689,7 @@ public class AutomataToControlBuilderSFC
         
         theCondition.append("NOT (");
         
-        for (Iterator ucEventIt = theAlphabet.uncontrollableEventIterator();
+        for (Iterator<LabeledEvent> ucEventIt = theAlphabet.uncontrollableEventIterator();
         ucEventIt.hasNext(); )
         {
             LabeledEvent theUcEvent = (LabeledEvent) ucEventIt.next();
@@ -717,7 +717,7 @@ public class AutomataToControlBuilderSFC
         boolean firstAutomaton = true;
         boolean nextAutomaton = false;
         
-        for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+        for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
         {
             Automaton aut = (Automaton) autIt.next();
             Alphabet theAlphabet = aut.getAlphabet();
@@ -731,7 +731,7 @@ public class AutomataToControlBuilderSFC
                 boolean stateFound = false;
                 boolean firstState = true;
                 
-                for (Iterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+                for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
                 {
                     Arc anArc = (Arc) arcIt.next();
                     
@@ -821,7 +821,7 @@ public class AutomataToControlBuilderSFC
         
         boolean firstArc = true;
         
-        for (Iterator outgoingArcsIt = theState.outgoingArcsIterator();
+        for (Iterator<Arc> outgoingArcsIt = theState.outgoingArcsIterator();
         outgoingArcsIt.hasNext(); )
         {
             if (firstArc)

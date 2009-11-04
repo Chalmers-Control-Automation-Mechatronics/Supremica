@@ -239,7 +239,7 @@ public class IDEMenuBar
 
         // File.NewFromTemplate
         ExampleTemplates exTempl = ExampleTemplates.getInstance();
-        for (Iterator groupIt = exTempl.iterator(); groupIt.hasNext(); )
+        for (Iterator<TemplateGroup> groupIt = exTempl.iterator(); groupIt.hasNext(); )
         {
             TemplateGroup currGroup = (TemplateGroup) groupIt.next();
             JMenu menuFileNewFromTemplateGroup = new JMenu();
@@ -248,7 +248,7 @@ public class IDEMenuBar
             menuFileNewFromTemplateGroup.setToolTipText(currGroup.getShortDescription());
             menu.add(menuFileNewFromTemplateGroup);
 
-            for (Iterator itemIt = currGroup.iterator(); itemIt.hasNext(); )
+            for (Iterator<TemplateItem> itemIt = currGroup.iterator(); itemIt.hasNext(); )
             {
                 TemplateItem currItem = (TemplateItem) itemIt.next();
                 JMenuItem menuItem = new JMenuItem();

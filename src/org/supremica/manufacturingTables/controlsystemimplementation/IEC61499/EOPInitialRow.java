@@ -64,6 +64,7 @@ import java.util.Map;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+@SuppressWarnings("unchecked")
 public class EOPInitialRow extends EOPRow implements Cloneable
 {
     private Map<EOPExternalComponent, String> ExternalComponentToStateMap;
@@ -108,7 +109,6 @@ public class EOPInitialRow extends EOPRow implements Cloneable
 	return ExternalComponentToStateMap;
     }
 
-    @SuppressWarnings("unchecked")
     public Object clone() 
     {
 	EOPInitialRow clone = null;

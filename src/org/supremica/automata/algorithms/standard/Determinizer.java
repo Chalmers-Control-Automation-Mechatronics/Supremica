@@ -96,7 +96,7 @@ public class Determinizer
     public void execute()
     {
         // Clear the caches - is this necessary?
-        for (Iterator state_it = automaton.stateIterator();
+        for (Iterator<State> state_it = automaton.stateIterator();
         state_it.hasNext(); )
         {
             State state = (State) state_it.next();
@@ -224,7 +224,7 @@ public class Determinizer
         aut.setType(automaton.getType());
         
         // Add all events except the epsilons
-        Iterator alphait = automaton.getAlphabet().iterator();
+        Iterator<LabeledEvent> alphait = automaton.getAlphabet().iterator();
         while (alphait.hasNext())
         {
             LabeledEvent event = (LabeledEvent) alphait.next();
@@ -268,7 +268,7 @@ public class Determinizer
         
         // System.out.println("(evCSsE) closure instantiated");
         /* State */
-        Iterator stateit = states.iterator();
+        Iterator<State> stateit = states.iterator();
         
         // System.out.println("(evCSsE) stateit created");
         while (stateit.hasNext())
@@ -297,7 +297,7 @@ public class Determinizer
         
         StateSet stateset = new StateSet();
         /* LabeledEvent */
-        Iterator eventit = alpha.iterator();
+        Iterator<LabeledEvent> eventit = alpha.iterator();
         
         while (eventit.hasNext())
         {
@@ -473,7 +473,7 @@ public class Determinizer
     public void cleanUpDebug()
     {
         /* State */
-        for (Iterator stateit = automaton.stateIterator(); stateit.hasNext(); )
+        for (Iterator<State> stateit = automaton.stateIterator(); stateit.hasNext(); )
         {
             State state = (State) stateit.next();
             

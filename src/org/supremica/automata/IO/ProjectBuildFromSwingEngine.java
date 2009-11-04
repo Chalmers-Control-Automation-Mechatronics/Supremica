@@ -74,10 +74,10 @@ public class ProjectBuildFromSwingEngine
 	{
 		Project newProject = theProjectFactory.getProject();
 
-		Map idMap = theSwingEngine.getIdMap();
-		Set idSet = idMap.keySet();
+		Map<?,?> idMap = theSwingEngine.getIdMap();
+		Set<?> idSet = idMap.keySet();
 
-		for (Iterator idIt = idSet.iterator(); idIt.hasNext(); )
+		for (Iterator<?> idIt = idSet.iterator(); idIt.hasNext(); )
 		{
 			String currId = (String) idIt.next();
 

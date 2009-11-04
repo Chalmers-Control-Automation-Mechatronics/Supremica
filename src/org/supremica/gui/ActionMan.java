@@ -272,7 +272,7 @@ public class ActionMan
             return;
         }
 
-        Iterator autIt = selectedAutomata.iterator();
+        Iterator<?> autIt = selectedAutomata.iterator();
         while (autIt.hasNext())
         {
             Automaton currAutomaton = (Automaton) autIt.next();
@@ -309,7 +309,7 @@ public class ActionMan
                   return;
                   }
          */
-        Iterator autIt = selectedAutomata.iterator();
+        Iterator<?> autIt = selectedAutomata.iterator();
 
         while (autIt.hasNext())
         {
@@ -338,7 +338,7 @@ public class ActionMan
             return;
         }
 
-        Iterator autIt = selectedAutomata.iterator();
+        Iterator<?> autIt = selectedAutomata.iterator();
         while (autIt.hasNext())
         {
             Automaton currAutomaton = (Automaton) autIt.next();
@@ -385,7 +385,7 @@ public class ActionMan
                   return;
                   }
          */
-        Iterator autIt = selectedAutomata.iterator();
+        Iterator<?> autIt = selectedAutomata.iterator();
 
         while (autIt.hasNext())
         {
@@ -418,7 +418,7 @@ public class ActionMan
     {
         Automata selectedAutomata = gui.getSelectedAutomata();
 
-        Iterator autIt = selectedAutomata.iterator();
+        Iterator<?> autIt = selectedAutomata.iterator();
 
         while (autIt.hasNext())
         {
@@ -498,7 +498,7 @@ public class ActionMan
         {
 
             // Avoid automata that can't move any further
-            Iterator autIt;
+            Iterator<?> autIt;
 
             if (directionIsUp)
             {
@@ -635,7 +635,7 @@ public class ActionMan
 */
         if (exportMode == ExportFormat.DOT_DEBUG)
         {
-            for (Iterator autIt = selectedAutomata.iterator();
+            for (Iterator<?> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
                 Automaton currAutomaton = (Automaton) autIt.next();
@@ -657,7 +657,7 @@ public class ActionMan
 
         if (exportMode == ExportFormat.DSX_DEBUG)
         {
-            for (Iterator autIt = selectedAutomata.iterator();
+            for (Iterator<?> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
                 Automaton currAutomaton = (Automaton) autIt.next();
@@ -679,7 +679,7 @@ public class ActionMan
 
         if (exportMode == ExportFormat.FSM_DEBUG)
         {
-            for (Iterator autIt = selectedAutomata.iterator();
+            for (Iterator<?> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
                 Automaton currAutomaton = (Automaton) autIt.next();
@@ -774,7 +774,7 @@ public class ActionMan
                  */
         if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) || (exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG) || (exportMode == ExportFormat.STS))
         {
-            for (Iterator autIt = selectedAutomata.iterator();
+            for (Iterator<?> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
                 Automaton currAutomaton = (Automaton) autIt.next();
@@ -915,7 +915,7 @@ public class ActionMan
             return;
         }
 
-        Iterator autIt = selectedAutomata.iterator();
+        Iterator<?> autIt = selectedAutomata.iterator();
 
         while (autIt.hasNext())
         {
@@ -1003,7 +1003,7 @@ public class ActionMan
             return;
         }
 
-        Iterator autIt = selectedAutomata.iterator();
+        Iterator<?> autIt = selectedAutomata.iterator();
 
         while (autIt.hasNext())
         {
@@ -1032,7 +1032,7 @@ public class ActionMan
             return;
         }
 
-        Iterator autIt = selectedAutomata.iterator();
+        Iterator<?> autIt = selectedAutomata.iterator();
 
         while (autIt.hasNext())
         {
@@ -1060,7 +1060,7 @@ public class ActionMan
             return;
         }
 
-        Iterator autIt = selectedAutomata.iterator();
+        Iterator<?> autIt = selectedAutomata.iterator();
 
         while (autIt.hasNext())
         {
@@ -1088,7 +1088,7 @@ public class ActionMan
             return;
         }
 
-        Iterator autIt = selectedAutomata.iterator();
+        Iterator<?> autIt = selectedAutomata.iterator();
 
         while (autIt.hasNext())
         {
@@ -1585,7 +1585,7 @@ public class ActionMan
         gui.info("Number of selected automata: " + selectedAutomata.size() + " (" + nbrOfAutomata + ")");
         gui.info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
 
-        for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+        for (Iterator<?> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
         {
             Automaton currAutomaton = (Automaton) autIt.next();
             StringBuffer statusStr = new StringBuffer();
@@ -1626,7 +1626,7 @@ public class ActionMan
         {
             double potentialNumberOfStates = 1.0;
 
-            for (Iterator autIt = selectedAutomata.iterator();
+            for (Iterator<?> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
                 Automaton currAutomaton = (Automaton) autIt.next();
@@ -1755,7 +1755,7 @@ public class ActionMan
             return;
         }
 
-        Iterator autIt = selectedAutomata.iterator();
+        Iterator<?> autIt = selectedAutomata.iterator();
         while (autIt.hasNext())
         {
             Automaton currAutomaton = (Automaton) autIt.next();
@@ -2276,7 +2276,7 @@ public class ActionMan
             return;
         }
 
-        Iterator autIt = selectedAutomata.iterator();
+        Iterator<?> autIt = selectedAutomata.iterator();
         while (autIt.hasNext())
         {
             Automaton currAutomaton = (Automaton) autIt.next();
@@ -3538,7 +3538,7 @@ public class ActionMan
         try
         {
             Automata all = gui.getVisualProjectContainer().getActiveProject();
-            Collection v = AutomataCommunicationHelper.getDependencyGroup(gui.getSelectedAutomata(), all);
+            Collection<?> v = AutomataCommunicationHelper.getDependencyGroup(gui.getSelectedAutomata(), all);
 
             gui.selectAutomata(v);
         }
@@ -3557,7 +3557,7 @@ public class ActionMan
         try
         {
             Automata all = gui.getVisualProjectContainer().getActiveProject();
-            Collection v = AutomataCommunicationHelper.getMaximalComponent(gui.getSelectedAutomata(), all);
+            Collection<?> v = AutomataCommunicationHelper.getMaximalComponent(gui.getSelectedAutomata(), all);
 
             gui.selectAutomata(v);
         }

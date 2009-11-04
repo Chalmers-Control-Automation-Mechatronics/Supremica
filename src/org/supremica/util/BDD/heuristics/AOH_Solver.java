@@ -21,13 +21,13 @@ public class AOH_Solver
 	public void init(Automata a)
 		throws BDDException
 	{
-		Vector automata = a.getAutomata();
+		Vector<?> automata = a.getAutomata();
 		new PCG(automata);
 		int[][] weightMatrix = a.getCommunicationMatrix();
 		OrderingSolver os = new OrderingSolver(automata.size());
 		int i = 0;
 
-		for (Enumeration e = automata.elements(); e.hasMoreElements(); i++)
+		for (Enumeration<?> e = automata.elements(); e.hasMoreElements(); i++)
 		{
 			Automaton a1 = (Automaton) e.nextElement();
 

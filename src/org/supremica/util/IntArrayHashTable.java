@@ -326,7 +326,7 @@ public final class IntArrayHashTable
 		return theTable;
 	}
 
-	public Iterator iterator()
+	public Iterator<?> iterator()
 	{
 		return new IntArrayHashTableIterator();
 	}
@@ -394,7 +394,7 @@ public final class IntArrayHashTable
 
 		System.out.println("theHashTable: \n" + theHashTable);
 
-		Iterator hashIt = theHashTable.iterator();
+		Iterator<?> hashIt = theHashTable.iterator();
 
 		while (hashIt.hasNext())
 		{
@@ -405,7 +405,7 @@ public final class IntArrayHashTable
 	}
 
 	private class IntArrayHashTableIterator
-		implements Iterator
+		implements Iterator<Object>
 	{
 		private int currIndex = -1;
 		private int nextIndex = -1;

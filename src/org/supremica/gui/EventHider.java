@@ -119,10 +119,10 @@ class EventHiderDialog
         Alphabet toBeHidden;
         
         // Loop over the selected automata
-        Iterator autit = automata.iterator();
+        Iterator<Automaton> autit = automata.iterator();
         while (autit.hasNext())
         {
-            Automaton automaton = (Automaton) autit.next();
+            Automaton automaton = autit.next();
             Automaton newAutomaton = new Automaton(automaton);
             newAutomaton.setName(null);
             

@@ -14,6 +14,7 @@ import java.util.*;
 import org.supremica.properties.Config;
 import net.sourceforge.waters.model.des.StateProxy;
 
+@SuppressWarnings("unchecked")
 public class StateSet
     extends TreeSet<State>
 {

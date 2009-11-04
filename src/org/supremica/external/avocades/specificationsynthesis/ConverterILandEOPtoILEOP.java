@@ -7,6 +7,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 
 
+@SuppressWarnings("unchecked")
 public class ConverterILandEOPtoILEOP {
 
 	Document ILEOPDoc;

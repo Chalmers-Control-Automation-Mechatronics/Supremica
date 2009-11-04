@@ -54,7 +54,7 @@ public interface Gui
     // this should be the main frame
     VisualProjectContainer getVisualProjectContainer();
     
-    Collection getSelectedAutomataAsCollection();
+    Collection<Automaton> getSelectedAutomataAsCollection();
     
     Project getSelectedProject();
     

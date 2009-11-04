@@ -72,7 +72,8 @@ abstract public class MachineController
     protected Machine machine;
     protected boolean performsEOP; // can only perform one EOP at a time
     protected String ID;
-    protected Map<Comparable, List<EOP>> EOPs;  // HashMap will be used for quick access to the states
+    @SuppressWarnings("unchecked")
+	protected Map<Comparable, List<EOP>> EOPs;  // HashMap will be used for quick access to the states
     protected EOPRow currentEOPRow;
     protected EOP currentEOP;
     protected Map<EOP, EOPInitialRow> currAltEOPToInitRowMap; 
@@ -81,7 +82,8 @@ abstract public class MachineController
     // Hence the initial row in the maps can be checked and the elements removed as I request the states of the machine
     // and compares to the different alternative EOPs.
 
-    public MachineController()
+    @SuppressWarnings("unchecked")
+	public MachineController()
     {
 	performsEOP = false;
 	ID = "MachineController";

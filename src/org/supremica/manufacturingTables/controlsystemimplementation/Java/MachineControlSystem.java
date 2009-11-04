@@ -64,6 +64,9 @@ import java.util.Map;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Iterator;
+
+
+@SuppressWarnings("unchecked")
 public class MachineControlSystem extends MachineController implements Listener 
 {
     private Mailbox mailbox;

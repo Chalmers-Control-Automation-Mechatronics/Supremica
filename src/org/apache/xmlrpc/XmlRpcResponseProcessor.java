@@ -193,6 +193,7 @@ public class XmlRpcResponseProcessor
 	/**
 	 * Writes an XML-RPC error response to the XML writer.
 	 */
+	@SuppressWarnings("unchecked")
 	void writeError(int code, String message, XmlWriter writer)
 		throws XmlRpcException, IOException
 	{

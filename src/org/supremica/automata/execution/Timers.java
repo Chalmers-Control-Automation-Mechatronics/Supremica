@@ -174,7 +174,7 @@ public class Timers
 	}
 
 	class TimerIterator
-		implements Iterator
+		implements Iterator<Object>
 	{
 		private final Iterator<EventTimer> theIterator;
 		@SuppressWarnings("unused")

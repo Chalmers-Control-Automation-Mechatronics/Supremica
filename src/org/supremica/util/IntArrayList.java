@@ -351,7 +351,7 @@ public final class IntArrayList
 	}
 
 	private class IntArrayListIterator
-		implements Iterator
+		implements Iterator<Object>
 	{
 		private int[][] currBlock = null;
 		private int currIndex = 0;

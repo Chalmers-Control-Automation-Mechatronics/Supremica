@@ -155,7 +155,7 @@ public class SimulatorEventListModel
                     Control currControl = theControls.getControl(currEvent.getLabel());
                     boolean conditionsFulfilled = true;
                     
-                    for (Iterator condIt = currControl.conditionIterator();
+                    for (Iterator<Condition> condIt = currControl.conditionIterator();
                     condIt.hasNext(); )
                     {
                         Condition condition = (Condition) condIt.next();

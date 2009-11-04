@@ -418,7 +418,7 @@ class SynthesizerDialogGuardPanel
     private JComboBox eventList;
 //	private JTextField eventField;
 
-    public SynthesizerDialogGuardPanel(Vector events)
+    public SynthesizerDialogGuardPanel(Vector<?> events)
     {
 		Box standardBox = Box.createVerticalBox();
 
@@ -555,7 +555,7 @@ public class SynthesizerDialog
         update();
     }
 
-    public SynthesizerDialog(Frame parentFrame, int numSelected, SynthesizerOptions synthesizerOptions, Vector controllableEvents)
+    public SynthesizerDialog(Frame parentFrame, int numSelected, SynthesizerOptions synthesizerOptions, Vector<?> controllableEvents)
     {
         this(parentFrame, numSelected, synthesizerOptions);
         guardPanel = new SynthesizerDialogGuardPanel(controllableEvents);

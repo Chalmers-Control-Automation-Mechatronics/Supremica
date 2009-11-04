@@ -443,6 +443,7 @@ abstract class ClassGlue implements Comparable<Object>, FileWritableGlue {
   private boolean mNeedsGlue;
   private String mCppClassName;
   private List<MethodGlue> mMethodList;
+  @SuppressWarnings("unused")
   private List<FieldGlue> mFieldList;
   private int mNumSubclasses;
   private int mNumConstructors;

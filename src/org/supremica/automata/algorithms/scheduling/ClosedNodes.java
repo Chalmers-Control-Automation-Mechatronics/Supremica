@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.supremica.log.*;
 
+@SuppressWarnings("unchecked")
 public class ClosedNodes extends Hashtable {
  
 	private static final long serialVersionUID = 1L;
@@ -21,7 +22,6 @@ public class ClosedNodes extends Hashtable {
 		this.compositeStateSize = compositeStateSize;
     }
 
-    @SuppressWarnings("unchecked")
 	public int putNode(int key, int[] value) {	
 		// 	if (!containsKey(key))
 		// 	    put(key, value);
@@ -53,8 +53,7 @@ public class ClosedNodes extends Hashtable {
 		}
     }
 
-    @SuppressWarnings("unchecked")
-	public ArrayList<int[]> getNodeArray(int key) {
+ 	public ArrayList<int[]> getNodeArray(int key) {
 		return (ArrayList<int[]>) get(new Integer(key));
     }
 
@@ -101,14 +100,12 @@ public class ClosedNodes extends Hashtable {
 		return -1;
     }
 
-    @SuppressWarnings("unchecked")
 	public void removeNode(int key, int arrayIndex) {
 		ArrayList<int[]> values = getNodeArray(key);
 		values.remove(arrayIndex);
 		put(key, values);
     }
     
-    @SuppressWarnings("unchecked")
 	public void replaceNode(int key, int arrayIndex, int[] newNode) {
 		ArrayList<int[]> values = getNodeArray(key);
 

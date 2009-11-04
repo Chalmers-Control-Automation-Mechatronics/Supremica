@@ -24,7 +24,7 @@ public class QMCControladorListaTablaVerdad extends MouseAdapter {
    
     int index, fila;
     String valorTerm, tipoTerm;
-    ArrayList listaBinarios;
+    ArrayList<?> listaBinarios;
     QMCBinarioBean binarioInteractivo, binarioLogico;
     JList listaCabecerasTablaVerdad;
     JTable tablaTerminos;

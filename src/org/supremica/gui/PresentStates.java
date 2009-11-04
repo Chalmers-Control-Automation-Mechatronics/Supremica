@@ -33,7 +33,7 @@ class PresentStatesTableModel
 	@SuppressWarnings("unused")
 	private final int cols;
 
-	private static Vector formColumnNameVector(Automata a)
+	private static Vector<String> formColumnNameVector(Automata a)
 	{
 		Vector<String> v = new Vector<String>();
 
@@ -469,7 +469,7 @@ public class PresentStates
 		System.out.println();
 
 		// Next we print the states one by one
-		for (Iterator it1 = searchs.iterator(); it1.hasNext(); )
+		for (Iterator<?> it1 = searchs.iterator(); it1.hasNext(); )
 		{
 			System.out.print("<");
 

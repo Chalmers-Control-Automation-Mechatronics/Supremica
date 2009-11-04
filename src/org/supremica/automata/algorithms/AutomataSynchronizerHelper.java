@@ -251,7 +251,7 @@ public class AutomataSynchronizerHelper
         // Build the initial state  (including 2 status fields)
         int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
         
-        Iterator autIt = theAutomata.iterator();
+        Iterator<Automaton> autIt = theAutomata.iterator();
         while (autIt.hasNext())
         {
             Automaton currAutomaton = (Automaton) autIt.next();
@@ -564,7 +564,7 @@ public class AutomataSynchronizerHelper
         return theStates.size();
     }
     
-    public Iterator getStateIterator()
+    public Iterator<?> getStateIterator()
     {
         return theStates.iterator();
     }
@@ -654,7 +654,7 @@ public class AutomataSynchronizerHelper
         int[] eventPriority = new int[unionAlphabet.size()];
         int index = 0;
         
-        for (Iterator eventIterator = unionAlphabet.iterator();
+        for (Iterator<LabeledEvent> eventIterator = unionAlphabet.iterator();
         eventIterator.hasNext(); )
         {
             LabeledEvent currEvent = (LabeledEvent) eventIterator.next();
@@ -708,7 +708,8 @@ public class AutomataSynchronizerHelper
     /**
      * Displays the event-trace leading to the uncontrollable state.
      */
-    public void displayTrace()
+    @SuppressWarnings("unchecked")
+	public void displayTrace()
     throws Exception
     {
         // We have to have an executer for finding the transitions
@@ -884,7 +885,7 @@ public class AutomataSynchronizerHelper
         State[][] stateTable = getIndexFormStateTable();
         AutomataIndexMap indexMap = theAutomataIndexForm.getIndexMap();
         
-        for (Iterator stateHolderIterator = stateMemorizer.iterator(automataIndices);
+        for (Iterator<?> stateHolderIterator = stateMemorizer.iterator(automataIndices);
         stateHolderIterator.hasNext(); )
         {
             StateHolder stateHolder = (StateHolder) stateHolderIterator.next();

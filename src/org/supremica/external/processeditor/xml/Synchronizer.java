@@ -148,7 +148,7 @@ public class Synchronizer {
     public boolean predecessorFinish(Relation[] relations, Object o) {       
 	if(o instanceof Activity) {	    
 	    if(((Activity)o).getPrecondition() != null) {
-		Iterator predIt = ((Activity)o).getPrecondition().getPredecessor().iterator();
+		Iterator<OperationReferenceType> predIt = ((Activity)o).getPrecondition().getPredecessor().iterator();
 		while(predIt.hasNext()) {
 		    if(!predecessorFinish(relations, predIt.next())) {
 			return false;
@@ -188,7 +188,7 @@ public class Synchronizer {
 	if(op instanceof Activity) {
 	    if(((Activity)op).getPrecondition() != null) {
 		int predsIndex = 0;
-		Iterator itPred = ((Activity)op).getPrecondition().getPredecessor().iterator();
+		Iterator<OperationReferenceType> itPred = ((Activity)op).getPrecondition().getPredecessor().iterator();
 		while(itPred.hasNext()) {
 		    Object next = itPred.next();
 		    if(next instanceof OperationReferenceType) {
@@ -213,7 +213,7 @@ public class Synchronizer {
 	//END DEBUG
 	return prevIndex;
     }
-    public boolean findPredecessor(Iterator it, String[] preds) {
+    public boolean findPredecessor(Iterator<?> it, String[] preds) {
 	//DEBUG
 	System.out.println("Synchronizer.findPredecessor(Iterator, String[]");
 	//END DEBUG

@@ -69,7 +69,7 @@ public class Builder
                 }
  */
 		// build the automata
-		for (Iterator it = s_automata.iterator(); it.hasNext(); )
+		for (Iterator<org.supremica.automata.Automaton> it = s_automata.iterator(); it.hasNext(); )
 		{
 			org.supremica.automata.Automaton s_a = (org.supremica.automata.Automaton) it.next();
 

@@ -33,11 +33,11 @@ public class EnumerateStates
      */
     public void execute()
     {
-        Iterator autit = automata.iterator();
+        Iterator<Automaton> autit = automata.iterator();
         
         while (autit.hasNext())
         {
-            enumerate((Automaton) autit.next());
+            enumerate(autit.next());
         }
     }
     
@@ -59,10 +59,10 @@ public class EnumerateStates
         prefix.setLength(prefixlen);
         
         int num = 1;
-        Iterator stateit = automaton.stateIterator();
+        Iterator<State> stateit = automaton.stateIterator();
         while (stateit.hasNext())
         {
-            State state = (State) stateit.next();
+            State state = stateit.next();
             
             if (!state.isInitial())
             {

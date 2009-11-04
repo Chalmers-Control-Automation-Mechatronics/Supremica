@@ -668,7 +668,7 @@ public class ModifiedAstar
             {
                 // tillf (test)
 				// 				Iterator childIter = expander.expandNodeManually(currNode, activeAutomataIndex, true).iterator();
-                Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
+                Iterator<Node> childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
                    
                 
 				// 				//tillf (test)

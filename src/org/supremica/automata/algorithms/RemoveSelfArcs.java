@@ -62,14 +62,14 @@ public class RemoveSelfArcs
 	public static void execute(Automaton theAutomaton)
 		throws Exception
 	{
-		Iterator stateIt = theAutomaton.stateIterator();
+		Iterator<State> stateIt = theAutomaton.stateIterator();
 
 		while (stateIt.hasNext())
 		{
 			State currState = (State) stateIt.next();
 
 			// Remove all event that begins and ends in the current state
-			Iterator arcIt = currState.safeOutgoingArcsIterator();
+			Iterator<Arc> arcIt = currState.safeOutgoingArcsIterator();
 
 			while (arcIt.hasNext())
 			{

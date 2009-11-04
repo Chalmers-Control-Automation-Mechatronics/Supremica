@@ -140,7 +140,7 @@ public class AnalyzerExportAction
 */
         if (exportMode == ExportFormat.DOT_DEBUG)
         {
-            for (Iterator autIt = selectedAutomata.iterator();
+            for (Iterator<Automaton> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
                 Automaton currAutomaton = (Automaton) autIt.next();
@@ -162,7 +162,7 @@ public class AnalyzerExportAction
 
         if (exportMode == ExportFormat.DSX_DEBUG)
         {
-            for (Iterator autIt = selectedAutomata.iterator();
+            for (Iterator<Automaton> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
                 Automaton currAutomaton = (Automaton) autIt.next();
@@ -184,7 +184,7 @@ public class AnalyzerExportAction
 
         if (exportMode == ExportFormat.FSM_DEBUG)
         {
-            for (Iterator autIt = selectedAutomata.iterator();
+            for (Iterator<Automaton> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
                 Automaton currAutomaton = (Automaton) autIt.next();
@@ -279,7 +279,7 @@ public class AnalyzerExportAction
                  */
         if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) || (exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG))
         {
-            for (Iterator autIt = selectedAutomata.iterator();
+            for (Iterator<Automaton> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
                 Automaton currAutomaton = (Automaton) autIt.next();

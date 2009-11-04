@@ -77,7 +77,7 @@ public class AnimationGroup
 		items.add(item);
 	}
 
-	public Iterator iterator()
+	public Iterator<AnimationItem> iterator()
 	{
 		return items.iterator();
 	}

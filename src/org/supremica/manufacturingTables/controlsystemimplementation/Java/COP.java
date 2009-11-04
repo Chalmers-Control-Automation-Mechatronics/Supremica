@@ -63,13 +63,15 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Iterator;
 
+//import org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.COPActivity;
+
 public class COP
 {
     private String id; // The id shall be used when there are different COPs for the same machine
     private String comment;
     private String machine;
     private List<COPActivity> activities; 
-    private Iterator activityIterator;
+    private Iterator<COPActivity> activityIterator;
     // List of activities. Each activity contains (optional) preconditions for operations in other machines, and 
     // then always an operation for this COPs machine that has to be performed. Last it contains (optional) successors 
     // that has to be performed in other machines.
@@ -104,9 +106,9 @@ public class COP
     }
  
     // Add a new COP activity to the end of the activity list.
-    public void addCOPActivity(COPActivity COPActivity)
+    public void addCOPActivity(COPActivity activity)
     {
-	activities.add(COPActivity);
+	activities.add(activity);
     }
     
     public void start()

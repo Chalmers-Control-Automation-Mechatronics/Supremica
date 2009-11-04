@@ -75,8 +75,8 @@ public class Invoker
 	public Invoker(Object target)
 	{
 		invokeTarget = target;
-		targetClass = (invokeTarget instanceof Class)
-					  ? (Class) invokeTarget
+		targetClass = (invokeTarget instanceof Class<?>)
+					  ? (Class<?>) invokeTarget
 					  : invokeTarget.getClass();
 
 		if (XmlRpc.debug)
@@ -88,12 +88,13 @@ public class Invoker
 	/**
 	 * main method, sucht methode in object, wenn gefunden dann aufrufen.
 	 */
+	@SuppressWarnings("unchecked")
 	public Object execute(String methodName, Vector<Comparable> params)
 		throws Exception
 	{
 
 		// Array mit Classtype bilden, ObjectAry mit Values bilden
-		Class[] argClasses = null;
+		Class<?>[] argClasses = null;
 		Object[] argValues = null;
 
 		if (params != null)

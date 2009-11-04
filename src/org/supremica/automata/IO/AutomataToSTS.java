@@ -83,7 +83,8 @@ public class AutomataToSTS
         this.automata.addAutomaton(automaton);
     }
     
-    public void serialize(PrintWriter pw)
+    @SuppressWarnings("unchecked")
+	public void serialize(PrintWriter pw)
     {
         pw.println("root = plant");
         String[][] root = new String[automata.size()+1][];
@@ -298,6 +299,7 @@ public class AutomataToSTS
 		return _cartesianProduct(0, sets);
 	}
 
+	@SuppressWarnings("unchecked")
 	private static Set<Set<Object>> _cartesianProduct(int index, ArrayList<Object> sets)
 	{
 		Set<Set<Object>> ret = new HashSet<Set<Object>>();

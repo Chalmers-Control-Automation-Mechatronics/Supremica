@@ -34,7 +34,7 @@ public class SaturateAction
 		Automata automata = gui.getSelectedAutomata();
 
 		// Iterate over all automata
-		for (Iterator aut_it = automata.iterator(); aut_it.hasNext(); )
+		for (Iterator<Automaton> aut_it = automata.iterator(); aut_it.hasNext(); )
 		{
 			Automaton aut = (Automaton) aut_it.next();
 

@@ -119,7 +119,7 @@ public class XmlRpcRequestProcessor
 				throw new ParseFailed(errorMsg);
 			}
 
-			return new XmlRpcRequest(methodName, (Vector<Object>) requestParams.clone());
+			return new XmlRpcRequest(methodName, (Vector<Comparable>) requestParams.clone());
 		}
 		finally
 		{

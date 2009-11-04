@@ -445,7 +445,7 @@ class CompareButton
             wb.syncher = new AutomataSynchronizer(plantsAndSupervisors, synch_ops);
             wb.syncher.execute();
             Automaton aut = wb.syncher.getAutomaton();
-            for (Iterator it = aut.stateIterator(); it.hasNext(); )
+            for (Iterator<State> it = aut.stateIterator(); it.hasNext(); )
             {
                 State state = (State) it.next();
                 logger.debug("state " + state.getName() + " is " + (state.isForbidden()
@@ -531,7 +531,7 @@ class ContButton
             StateSet state_set = new StateSet();    // store the newly forbidden states her, want to avoid duplicates
             AutomatonSynthesizer synth = new AutomatonSynthesizer(wb.automaton, SynthesizerOptions.getDefaultSynthesizerOptions());
             // Now, for each state that is forbidden now, calc the new uncontrollable ones
-            for (Iterator it = wb.automaton.stateIterator(); it.hasNext(); )
+            for (Iterator<State> it = wb.automaton.stateIterator(); it.hasNext(); )
             {
                 State state = (State) it.next();
                 if (state.isForbidden())
@@ -541,7 +541,7 @@ class ContButton
                 }
             }
             // Traverse the new set of forbidden states and set the forbidden flag
-            for (Iterator it = state_set.iterator(); it.hasNext(); )
+            for (Iterator<State> it = state_set.iterator(); it.hasNext(); )
             {
                 State state = (State) it.next();
                 state.setForbidden(true);
@@ -653,7 +653,7 @@ class ReachButton
             wb.automaton.clearSelectedStates();
             AutomatonSynthesizer synth = new AutomatonSynthesizer(wb.automaton, SynthesizerOptions.getDefaultSynthesizerOptions());
             synth.doReachable();
-            for (Iterator it = wb.automaton.stateIterator(); it.hasNext(); )
+            for (Iterator<State> it = wb.automaton.stateIterator(); it.hasNext(); )
             {
                 State state = (State) it.next();
                 if (state.getCost() == State.MAX_COST)

@@ -185,7 +185,7 @@ public class AnalyzerAutomataPanel
                         {
                             //moduleContainer.getVisualProject();
                             
-                            for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext();)
+                            for (Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext();)
                             {
                                 Automaton currAutomaton = (Automaton) autIt.next();
                                 

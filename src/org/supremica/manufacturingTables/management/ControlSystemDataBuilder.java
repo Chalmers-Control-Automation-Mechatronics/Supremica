@@ -68,6 +68,7 @@ import org.supremica.manufacturingTables.xsd.rop.*;
 //import net.sourceforge.fuber.xsd.libraryelement.*;
 import org.supremica.manufacturingTables.controlsystemdata.*;
 
+@SuppressWarnings("unchecked")
 public class ControlSystemDataBuilder
 {
 
@@ -148,10 +149,10 @@ public class ControlSystemDataBuilder
 	    else
 	    {
 		// Activities
-		for (Iterator activityIter = relation.getActivity().iterator(); activityIter.hasNext();)
+		for (Iterator<Activity> activityIter = relation.getActivity().iterator(); activityIter.hasNext();)
 		{
 		    // Current Activity
-		    Activity activity = (Activity) activityIter.next();
+		    Activity activity = activityIter.next();
 		    // Create COP Activity and add to COPData
 		    COPActivity COPActivity = new COPActivity(activity.getOperation());
 		    COPData.addCOPActivity(COPActivity);
@@ -167,7 +168,7 @@ public class ControlSystemDataBuilder
 			nbrOfBlanks++;
 			
 			// Predecessors
-			for (Iterator predecessorIter = precondition.getPredecessor().iterator(); predecessorIter.hasNext();)
+			for (Iterator<OperationReferenceType> predecessorIter = precondition.getPredecessor().iterator(); predecessorIter.hasNext();)
 			{
 			    // Current Predecessor (are kinds of OperationReferences)
 			    OperationReferenceType predecessor = (OperationReferenceType) predecessorIter.next();
@@ -272,15 +273,15 @@ public class ControlSystemDataBuilder
 	InternalComponents internalComponents = EOP.getInternalComponents();
 	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<InternalComponents>"); 
 	nbrOfBlanks++;
-	for (Iterator actuatorIter = internalComponents.getActuator().iterator(); actuatorIter.hasNext();)
+	for (Iterator<String> actuatorIter = internalComponents.getActuator().iterator(); actuatorIter.hasNext();)
 	    {
 		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Actuator>" + (String) actuatorIter.next() + "</Actuator>"); 
 	    }
-	for (Iterator sensorIter = internalComponents.getSensor().iterator(); sensorIter.hasNext();)
+	for (Iterator<String> sensorIter = internalComponents.getSensor().iterator(); sensorIter.hasNext();)
 	    {
 		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Sensor>" + (String) sensorIter.next() + "</Sensor>"); 
 	    }
-	for (Iterator variableIter = internalComponents.getVariable().iterator(); variableIter.hasNext();)
+	for (Iterator<String> variableIter = internalComponents.getVariable().iterator(); variableIter.hasNext();)
 	    {
 		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Variable>" + (String) variableIter.next() + "</Variable>"); 
 	    }
@@ -293,7 +294,7 @@ public class ControlSystemDataBuilder
 	{
 	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<ExternalComponents>"); 
 	    nbrOfBlanks++;
-	    for (Iterator variableIter = externalComponents.getExternalComponent().iterator(); variableIter.hasNext();)
+	    for (Iterator<?> variableIter = externalComponents.getExternalComponent().iterator(); variableIter.hasNext();)
 	    {
 	    	variableIter.next();
 		//System.out.println(blanks.substring(0,nbrOfBlanks) + "<ExternalComponent>");
@@ -313,7 +314,7 @@ public class ControlSystemDataBuilder
 	{
 	    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Zones>"); 
 	    nbrOfBlanks++;
-	    for (Iterator zoneIter = zones.getZone().iterator(); zoneIter.hasNext();)
+	    for (Iterator<String> zoneIter = zones.getZone().iterator(); zoneIter.hasNext();)
 	    {
 		System.out.println(blanks.substring(0,nbrOfBlanks) + "<Zone>" + (String) zoneIter.next() + "</Zone>"); 
 	    }
@@ -331,7 +332,7 @@ public class ControlSystemDataBuilder
 	EOPData.setEOPInitialRow(initialRow);
 	
 	//   ActuatorValue
-	for (Iterator actuatorIter = initialState.getActuatorValue().iterator(); actuatorIter.hasNext();)
+	for (Iterator<ActuatorValue> actuatorIter = initialState.getActuatorValue().iterator(); actuatorIter.hasNext();)
 	{
 	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<ActuatorValue>"); 
 	    nbrOfBlanks++;
@@ -349,7 +350,7 @@ public class ControlSystemDataBuilder
 	}
 	
 	//   SensorValue
-	for (Iterator sensorIter = initialState.getSensorValue().iterator(); sensorIter.hasNext();)
+	for (Iterator<SensorValue> sensorIter = initialState.getSensorValue().iterator(); sensorIter.hasNext();)
 	{
 	    //System.out.println(blanks.substring(0,nbrOfBlanks) + "<SensorValue>"); 
 	    nbrOfBlanks++;
@@ -631,7 +632,7 @@ public class ControlSystemDataBuilder
 // 	return true;
 //     }
     
-    public void buildPLCData(Factory factory)
+	public void buildPLCData(Factory factory)
     {
 
 	// Variable to keep track of the indentation, just for now for printing the XML code

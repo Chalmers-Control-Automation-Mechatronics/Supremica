@@ -137,7 +137,7 @@ public class AutomataToSattLineSFC
 		boolean firstEvent = true;
 		int lineLength = 0;
 
-		for (Iterator alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
+		for (Iterator<LabeledEvent> alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphaIt.next();
 

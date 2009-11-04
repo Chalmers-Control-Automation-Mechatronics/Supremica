@@ -161,7 +161,7 @@ public class AlphabetViewerPanel
 	public void build()
 	{
 		SupremicaTreeNode root = new SupremicaTreeNode();    // Really AutomataSubTree(theAutomata, showalpha, nostates)?
-		Iterator autit = theAutomata.iterator();
+		Iterator<Automaton> autit = theAutomata.iterator();
 
 		while (autit.hasNext())
 		{

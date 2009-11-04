@@ -35,7 +35,7 @@ class GuardDialogStandardPanel
     private JComboBox eventList;
 //	private JTextField eventField;
 
-	public GuardDialogStandardPanel(Vector events)
+	public GuardDialogStandardPanel(Vector<?> events)
 	{
 		Box standardBox = Box.createVerticalBox();
 
@@ -130,7 +130,7 @@ public class GuardDialog
 	private Frame parentFrame;
 
 
-	public GuardDialog(Frame parentFrame, GuardOptions guardOptions, Vector events)
+	public GuardDialog(Frame parentFrame, GuardOptions guardOptions, Vector<?> events)
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
 		this.parentFrame = parentFrame;

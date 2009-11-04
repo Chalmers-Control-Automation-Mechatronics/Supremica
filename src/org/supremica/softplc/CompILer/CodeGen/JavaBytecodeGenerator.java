@@ -51,7 +51,7 @@ public class JavaBytecodeGenerator
 	 * This list is used for distinguishing declared data types
 	 * and function_block types
 	 */
-	List declaredDataTypes = new LinkedList();
+	List<?> declaredDataTypes = new LinkedList<Object>();
 
 	/**
 	 * Logger prints nice error, info, warning and debug messages in the Supremica console

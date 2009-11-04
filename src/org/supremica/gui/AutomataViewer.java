@@ -36,7 +36,7 @@ class AutomataViewerPanel
     public void build(boolean showalpha, boolean showstates)
     {
         SupremicaTreeNode root = new SupremicaTreeNode();
-        Iterator autit = automata.iterator();
+        Iterator<Automaton> autit = automata.iterator();
         
         while (autit.hasNext())
         {

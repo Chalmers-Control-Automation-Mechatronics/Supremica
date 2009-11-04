@@ -77,7 +77,7 @@ import org.xml.sax.SAXException;
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
  * @version $Id$
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"unchecked", "deprecation"})
 public class XmlRpcClient
 	implements XmlRpcHandler
 {

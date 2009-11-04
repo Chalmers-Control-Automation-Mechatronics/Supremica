@@ -69,7 +69,7 @@ public class COP
     private String comment;
     private String machine;
     private List<COPActivity> activities; 
-    private Iterator activityIterator;
+    private Iterator<COPActivity> activityIterator;
     // List of activities. Each activity contains (optional) preconditions for operations in other machines, and 
     // then always an operation for this COPs machine that has to be performed. Last it contains (optional) successors 
     // that has to be performed in other machines.

@@ -19,7 +19,7 @@ public class AutomatonMembership
 	public boolean shouldInclude(BDDAutomaton a)
 	{
 		String name = a.getName();
-		Iterator autIt = theAutomata.iterator();
+		Iterator<org.supremica.automata.Automaton> autIt = theAutomata.iterator();
 
 		while (autIt.hasNext())
 		{

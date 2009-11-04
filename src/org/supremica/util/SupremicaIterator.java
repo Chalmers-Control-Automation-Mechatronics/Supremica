@@ -57,11 +57,11 @@ import java.util.NoSuchElementException;
  */
 public class SupremicaIterator
 {
-	private final Iterator theIterator;
+	private final Iterator<?> theIterator;
 	private Object currObject = null;
 	private boolean isValid = false;
 
-	public SupremicaIterator(Iterator theIterator)
+	public SupremicaIterator(Iterator<?> theIterator)
 	{
 		this.theIterator = theIterator;
 

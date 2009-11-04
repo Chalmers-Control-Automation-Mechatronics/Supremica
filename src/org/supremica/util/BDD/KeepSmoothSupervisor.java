@@ -287,8 +287,8 @@ public class KeepSmoothSupervisor
 				v_vars = new int[bits];
 				bits = 0;
 
-				for (Iterator it = cluster.iterator(); it.hasNext(); ) {
-					BDDAutomaton a = (BDDAutomaton) it.next();
+				for (Iterator<BDDAutomaton> it = cluster.iterator(); it.hasNext(); ) {
+					BDDAutomaton a = it.next();
 
 					int size = a.getNumStateBits();
 					int[] vp = a.getVar();

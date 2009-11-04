@@ -68,7 +68,7 @@ public class Shell
 	public void ILShell(String path, String name)
 	{
 		Class<?> ILClass;
-		Class[] constructorArgumentTypes = { boolean[].class,
+		Class<?>[] constructorArgumentTypes = { boolean[].class,
 											 boolean[].class };
 
 		try

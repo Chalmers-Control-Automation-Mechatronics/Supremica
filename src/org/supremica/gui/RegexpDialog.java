@@ -110,7 +110,7 @@ public class RegexpDialog
 		{
 			JMenu menu = new JMenu("States");
 
-			for (Iterator it = a.stateIterator(); it.hasNext(); )
+			for (Iterator<State> it = a.stateIterator(); it.hasNext(); )
 			{
 				menu.add(new StatesMenuItem(((State) it.next()).getName()));
 			}

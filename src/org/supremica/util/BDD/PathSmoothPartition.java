@@ -153,7 +153,7 @@ public class PathSmoothPartition
 
 			manager.ref(bdd_curr_i);
 
-			for (Iterator it = cluster.iterator(); it.hasNext(); ) {
+			for (Iterator<BDDAutomaton> it = cluster.iterator(); it.hasNext(); ) {
 				BDDAutomaton a = (BDDAutomaton) it.next();
 
 
@@ -189,7 +189,7 @@ public class PathSmoothPartition
 			v_cubep = new int[bits];
 			bits = 0;
 
-			for (Iterator it = cluster.iterator(); it.hasNext(); ) {
+			for (Iterator<BDDAutomaton> it = cluster.iterator(); it.hasNext(); ) {
 				BDDAutomaton a = (BDDAutomaton) it.next();
 
 				int size = a.getNumStateBits();

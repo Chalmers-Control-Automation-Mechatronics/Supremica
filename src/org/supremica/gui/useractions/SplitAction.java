@@ -40,7 +40,7 @@ public class SplitAction
 		Automata automata = gui.getSelectedAutomata();
 
 		// Iterate over all automata
-		for (Iterator autit = automata.iterator(); autit.hasNext(); )
+		for (Iterator<Automaton> autit = automata.iterator(); autit.hasNext(); )
 		{
 			Automaton automaton = (Automaton) autit.next();
 

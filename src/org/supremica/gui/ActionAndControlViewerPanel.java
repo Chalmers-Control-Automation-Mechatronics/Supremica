@@ -111,7 +111,7 @@ public class ActionAndControlViewerPanel
 
 		root.add(timersNode);
 
-		for (Iterator theIt = theProject.inputSignalsIterator();
+		for (Iterator<Signal> theIt = theProject.inputSignalsIterator();
 				theIt.hasNext(); )
 		{
 			Signal currSignal = (Signal) theIt.next();
@@ -128,7 +128,7 @@ public class ActionAndControlViewerPanel
 			currPortNode.add(currPortNodeAttribute);
 		}
 
-		for (Iterator theIt = theProject.outputSignalsIterator();
+		for (Iterator<Signal> theIt = theProject.outputSignalsIterator();
 				theIt.hasNext(); )
 		{
 			Signal currSignal = (Signal) theIt.next();
@@ -149,14 +149,14 @@ public class ActionAndControlViewerPanel
 
 		if (currActions != null)
 		{
-			for (Iterator actIt = currActions.iterator(); actIt.hasNext(); )
+			for (Iterator<Action> actIt = currActions.iterator(); actIt.hasNext(); )
 			{
 				Action currAction = (Action) actIt.next();
 				DefaultMutableTreeNode currActionNode = new DefaultMutableTreeNode(currAction.getLabel());
 
 				actionsNode.add(currActionNode);
 
-				for (Iterator cmdIt = currAction.commandIterator();
+				for (Iterator<Command> cmdIt = currAction.commandIterator();
 						cmdIt.hasNext(); )
 				{
 					Command currCommand = (Command) cmdIt.next();
@@ -171,14 +171,14 @@ public class ActionAndControlViewerPanel
 
 		if (currControls != null)
 		{
-			for (Iterator conIt = currControls.iterator(); conIt.hasNext(); )
+			for (Iterator<Control> conIt = currControls.iterator(); conIt.hasNext(); )
 			{
 				Control currControl = (Control) conIt.next();
 				DefaultMutableTreeNode currControlNode = new DefaultMutableTreeNode(currControl.getLabel());
 
 				controlsNode.add(currControlNode);
 
-				for (Iterator condIt = currControl.conditionIterator();
+				for (Iterator<Condition> condIt = currControl.conditionIterator();
 						condIt.hasNext(); )
 				{
 					Condition currCondition = (Condition) condIt.next();
@@ -189,7 +189,7 @@ public class ActionAndControlViewerPanel
 			}
 		}
 
-		for (Iterator theIt = theProject.timerIterator(); theIt.hasNext(); )
+		for (Iterator<EventTimer> theIt = theProject.timerIterator(); theIt.hasNext(); )
 		{
 			EventTimer currTimer = (EventTimer) theIt.next();
 			DefaultMutableTreeNode currTimerNode = new DefaultMutableTreeNode(currTimer.getName());

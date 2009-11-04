@@ -74,7 +74,7 @@ class TypeCellEditor
 		this.theTableSorter = theTableSorter;
 		automatonTypeCombo = new JComboBox();
 
-		Iterator typeIt = AutomatonType.iterator();
+		Iterator<AutomatonType> typeIt = AutomatonType.iterator();
 
 		while (typeIt.hasNext())
 		{

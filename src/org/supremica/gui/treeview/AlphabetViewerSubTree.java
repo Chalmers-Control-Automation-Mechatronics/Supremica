@@ -20,7 +20,7 @@ public class AlphabetViewerSubTree
 	{
 		super(automaton.getName());
 
-		Iterator eventIt = automaton.getAlphabet().iterator();
+		Iterator<LabeledEvent> eventIt = automaton.getAlphabet().iterator();
 
 		while (eventIt.hasNext())
 		{

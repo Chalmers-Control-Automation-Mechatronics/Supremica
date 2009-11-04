@@ -78,6 +78,6 @@ public interface AuthenticatedXmlRpcHandler
 	 * exception of this type must be thrown.
 	 * @see org.apache.xmlrpc.AuthenticationFailed
 	 */
-	public Object execute(String method, Vector params, String user, String password)
+	public Object execute(String method, Vector<?> params, String user, String password)
 		throws Exception;
 }

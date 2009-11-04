@@ -165,7 +165,7 @@ public class AutomataToSattLineSFCForBallProcess
 		}
 
 		/* And then the actual generation condition. */
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+		for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) autIt.next();
 			Alphabet theAlphabet = aut.getAlphabet();
@@ -179,7 +179,7 @@ public class AutomataToSattLineSFCForBallProcess
 				boolean stateFound = false;
 				boolean firstState = true;
 
-				for (Iterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+				for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
 				{
 					Arc anArc = (Arc) arcIt.next();
 
@@ -326,7 +326,7 @@ public class AutomataToSattLineSFCForBallProcess
 		/* This version takes care of line length limits and assumes that the
 		   ordering of the SFCs doesn't change. Then we can allow self loops.
 		   In general, that is not the case for IT/DA PLCs, such as Satt Line. */
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+		for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) autIt.next();
 			Alphabet theAlphabet = aut.getAlphabet();
@@ -340,7 +340,7 @@ public class AutomataToSattLineSFCForBallProcess
 				boolean stateFound = false;
 				boolean firstState = true;
 
-				for (Iterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+				for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
 				{
 					Arc anArc = (Arc) arcIt.next();
 

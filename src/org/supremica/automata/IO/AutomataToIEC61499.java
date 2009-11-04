@@ -66,6 +66,7 @@ import org.supremica.util.SupremicaException;
  *  application implementing the automata in the 
  *  current project.
  */
+@SuppressWarnings("unchecked")
 public class AutomataToIEC61499
 {
 
@@ -119,7 +120,7 @@ public class AutomataToIEC61499
 		{
 
 			// First generate FBs for all models
-			for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+			for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext();)
 			{
 				Project tempProject = new Project();
 

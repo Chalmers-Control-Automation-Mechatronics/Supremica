@@ -124,7 +124,7 @@ public class SimulatorExecuter
         Automaton automaton;
         State state;
         int[] initialState = AutomataIndexFormHelper.createState(this.project.size());
-        Iterator autIt = this.project.iterator();
+        Iterator<Automaton> autIt = this.project.iterator();
         while (autIt.hasNext())
         {
             automaton = (Automaton) autIt.next();
@@ -313,7 +313,7 @@ public class SimulatorExecuter
             {
                 org.supremica.automata.execution.Action currAction = actions.getAction(label);
                 
-                for (Iterator cmdIt = currAction.commandIterator();
+                for (Iterator<Command> cmdIt = currAction.commandIterator();
                 cmdIt.hasNext(); )
                 {
                     Command currCommand = (Command) cmdIt.next();

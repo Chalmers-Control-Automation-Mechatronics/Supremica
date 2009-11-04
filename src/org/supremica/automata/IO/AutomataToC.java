@@ -85,7 +85,7 @@ public class AutomataToC
 		pw.println("// This file was generated at: " + DateFormat.getDateTimeInstance().format(new Date()));
 		pw.println("// The following automata are synchronized:");
 
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 
@@ -106,7 +106,7 @@ public class AutomataToC
 	{
 
 		// Iterate over all events and compute which events that are enabled
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+		for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			int currEventIndex = currEvent.getIndex();
@@ -122,7 +122,7 @@ public class AutomataToC
 	void printStateVariables(PrintWriter pw)
 		throws Exception
 	{
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 			State initialState = currAutomaton.getInitialState();
@@ -203,7 +203,7 @@ public class AutomataToC
 		pw.println("\n\t\t// Compute the enabled events");
 
 		// Iterate over all events and compute which events that are enabled
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+		for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			int currEventIndex = currEvent.getIndex();
@@ -214,7 +214,7 @@ public class AutomataToC
 
 			pw.print("\t\te_" + currEventIndex + " = ");
 
-			for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+			for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
 				Alphabet currAlphabet = currAutomaton.getAlphabet();
@@ -240,7 +240,7 @@ public class AutomataToC
 
 						pw.print("(");
 
-						for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
+						for (Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
 								stateIt.hasNext(); )
 						{
 							State currState = (State) stateIt.next();
@@ -282,7 +282,7 @@ public class AutomataToC
 		pw.println("\n\t\t// Compute the external enabled events");
 
 		// Iterate over all events and compute which events that are externally enabled
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+		for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			int currEventIndex = currEvent.getIndex();
@@ -309,7 +309,7 @@ public class AutomataToC
 		pw.println("// Note that all labels must valid identifiers in C");
 
 		// Iterate over all events and compute which events that are externally enabled
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+		for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			pw.println("\n// External enable condition for event \"" + currEvent.getLabel() + "\"");
@@ -328,7 +328,7 @@ public class AutomataToC
 		pw.println("// Note that all labels must valid identifiers in C");
 
 		// Iterate over all events and compute which events that are externally enabled
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+		for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			pw.println("\n// Action for event \"" + currEvent.getLabel() + "\"");
@@ -347,7 +347,7 @@ public class AutomataToC
 		pw.println("\t\t// Priority is given to uncontrollable events");
 
 		// Iterate over all events and compute which events that are enabled
-		for (Iterator alphIt = allEvents.uncontrollableEventIterator();
+		for (Iterator<LabeledEvent> alphIt = allEvents.uncontrollableEventIterator();
 				alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
@@ -358,7 +358,7 @@ public class AutomataToC
 			pw.println("\t\tenabledEvent = " + "enabledEvent || " + "e_" + currEventIndex + ";");
 		}
 
-		for (Iterator alphIt = allEvents.controllableEventIterator();
+		for (Iterator<LabeledEvent> alphIt = allEvents.controllableEventIterator();
 				alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
@@ -452,7 +452,7 @@ public class AutomataToC
 		pw.println("\t\t// It is in general not safe to have more than one event set to true at this point");
 
 		// Iterate over all events and compute which events that are enabled
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+		for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			int currEventIndex = currEvent.getIndex();
@@ -462,7 +462,7 @@ public class AutomataToC
 			pw.println("\t\t{");
 			pw.println("\t\t\tdo_" + currEvent.getLabel() + "();");
 
-			for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+			for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
 				Alphabet currAlphabet = currAutomaton.getAlphabet();
@@ -481,7 +481,7 @@ public class AutomataToC
 
 					boolean previousState = false;
 
-					for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
+					for (Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
 							stateIt.hasNext(); )
 					{
 						State currState = (State) stateIt.next();

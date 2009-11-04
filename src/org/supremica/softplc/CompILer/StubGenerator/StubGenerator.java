@@ -14,7 +14,7 @@ public class StubGenerator
 	/**
 	 * Create an IEC 61131 Function block declaration.
 	 */
-	public void generate(Class theClass, PrintWriter pw)
+	public void generate(Class<?> theClass, PrintWriter pw)
 	{
 		pw.print("FUNCTION_BLOCK ");
 
@@ -34,7 +34,7 @@ public class StubGenerator
 
 			if (Modifier.isPublic(modifiers))
 			{
-				Class currFieldType = currField.getType();
+				Class<?> currFieldType = currField.getType();
 				String currFieldName = currField.getName();
 
 				if (currFieldType.isPrimitive())

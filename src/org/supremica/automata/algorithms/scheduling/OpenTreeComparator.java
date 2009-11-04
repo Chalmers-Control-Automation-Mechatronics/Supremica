@@ -2,6 +2,7 @@ package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
 
+@SuppressWarnings("unchecked")
 public class OpenTreeComparator
 	implements Comparator //<Object[]>
 {

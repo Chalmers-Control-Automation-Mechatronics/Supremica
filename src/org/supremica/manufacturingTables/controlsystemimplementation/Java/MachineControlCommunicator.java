@@ -64,6 +64,7 @@ import java.util.Map.Entry;
 import java.util.Iterator;
 import java.io.*;
 
+@SuppressWarnings("unchecked")
 public class MachineControlCommunicator extends MachineController 
 {
     private boolean EOPPerformedOK; // to tell the machine whether the EOP was performed successfully or not

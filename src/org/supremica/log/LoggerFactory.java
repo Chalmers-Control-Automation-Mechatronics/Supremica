@@ -106,7 +106,7 @@ public class LoggerFactory
         return mLoggerFilter;
     }
     
-    public Logger createLoggerFor(final Class clazz)
+    public Logger createLoggerFor(final Class<?> clazz)
     {
         return createLoggerFor(clazz.getName());
     }
@@ -182,7 +182,7 @@ public class LoggerFactory
         return theInstance;
     }
     
-    public static Logger createLogger(final Class clazz)
+    public static Logger createLogger(final Class<?> clazz)
     {
         return getInstance().createLoggerFor(clazz);
     }

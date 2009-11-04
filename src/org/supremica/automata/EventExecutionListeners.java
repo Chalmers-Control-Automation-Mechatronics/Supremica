@@ -63,7 +63,7 @@ public class EventExecutionListeners
 	{
 		if (listeners != null)
 		{
-			Iterator listenerIt = listeners.iterator();
+			Iterator<Listener> listenerIt = listeners.iterator();
 
 			while (listenerIt.hasNext())
 			{

@@ -44,7 +44,7 @@ public class XmlConverter implements FileConverter {
 	//END DEBUG
 	if(relation instanceof Relation) {
 	    fc.newRelation(((Relation)relation).getType().name());
-	    Iterator iterator = ((Relation)relation).getActivityRelationGroup().iterator();
+	    Iterator<?> iterator = ((Relation)relation).getActivityRelationGroup().iterator();
 	    while(iterator.hasNext()) {
 		Object next = iterator.next();
 		if(next instanceof Relation) {
@@ -69,7 +69,7 @@ public class XmlConverter implements FileConverter {
 	    }
 	    fc.newOperation(opText);
 	    if(((Activity)activity).getProperties() != null) {
-		Iterator iterator = ((Activity)activity).getProperties().getAttribute().iterator();
+		Iterator<Attribute> iterator = ((Activity)activity).getProperties().getAttribute().iterator();
 		while(iterator.hasNext()) {
 		    Object next = iterator.next();
 		    if(next instanceof Attribute) {

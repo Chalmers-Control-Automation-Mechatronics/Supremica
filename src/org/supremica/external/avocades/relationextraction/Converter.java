@@ -17,6 +17,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 
 
+@SuppressWarnings("unchecked")
 public class Converter
 {
 
@@ -109,7 +110,6 @@ public class Converter
 *
 ******************************************************/
 
-	@SuppressWarnings("unchecked")
   public ArrayList<Set> getPossibleStates(Element root, Set<String> involvedComponents)
 	{
 		List<?> machineList = root.getChildren("Machine");
@@ -204,7 +204,6 @@ public class Converter
 *
 ******************************************************/
 
-	@SuppressWarnings("unchecked")
     public List<Set> safeToUnsafe(List<Set<List<String>>> safeStates, ArrayList<Set> allPossibleStates)
 	{
 		ArrayList<Set> unsafeStates = (ArrayList<Set>) allPossibleStates.clone();

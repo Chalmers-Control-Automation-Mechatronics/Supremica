@@ -33,6 +33,7 @@ import org.supremica.manufacturingTables.xsd.processeditor.Relation;
 import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
 
 
+@SuppressWarnings("unchecked")
 public class ConvertAutomatas {          
 
     String[] zoneNames = new String[0];    

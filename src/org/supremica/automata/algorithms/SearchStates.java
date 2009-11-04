@@ -79,7 +79,7 @@ public class SearchStates
             
             // Note the difference between the two getStateIterator.
             // This is AutomataSynchronizerHelper::getStateIterator, returns Iterator...
-            for (Iterator it = syncher.getHelper().getStateIterator();
+            for (Iterator<?> it = syncher.getHelper().getStateIterator();
             it.hasNext() && (!stopRequested); )
             {
                 int[] composite_state = (int[]) it.next();
@@ -149,7 +149,7 @@ public class SearchStates
     }
     
     // To iterate over the matched states
-    public Iterator iterator()
+    public Iterator<int[]> iterator()
     {
         return container.iterator();
     }

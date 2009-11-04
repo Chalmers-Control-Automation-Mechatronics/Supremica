@@ -143,7 +143,7 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
 	    //----- SET PRECONDITION -----
 	    try {		
 		predecessorInfo = new Object[operand.getPrecondition().getPredecessor().size()][predecessorHeaders.length];
-		Iterator predIterator = operand.getPrecondition().getPredecessor().iterator();
+		Iterator<OperationReferenceType> predIterator = operand.getPrecondition().getPredecessor().iterator();
 		int i = 0;
 		while(predIterator.hasNext()) {
 		    Object tmp = predIterator.next();
@@ -159,7 +159,7 @@ public class OperationCellInfoWindow extends JDialog implements ActionListener {
 	    //----- SET ATTRIBUTE -----
 	    try {	       
 		attributeInfo = new Object[operand.getProperties().getAttribute().size()][attributeHeaders.length];	      				
-		Iterator attIterator = operand.getProperties().getAttribute().iterator();	      
+		Iterator<Attribute> attIterator = operand.getProperties().getAttribute().iterator();	      
 		int i = 0;
 		while(attIterator.hasNext()) {
 		    Object tmp = attIterator.next();

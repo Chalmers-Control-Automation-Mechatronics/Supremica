@@ -13,7 +13,8 @@ public class ArrayHelper
     {
     }
     
-     public static String arrayToString(Object array)
+     @SuppressWarnings("unchecked")
+	public static String arrayToString(Object array)
      {
          if (array == null)
          {

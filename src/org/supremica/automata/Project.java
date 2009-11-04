@@ -119,7 +119,7 @@ public class Project
         return theActions;
     }
     
-    public Iterator actionIterator()
+    public Iterator<Action> actionIterator()
     {
         return theActions.iterator();
     }
@@ -129,7 +129,7 @@ public class Project
         return theControls;
     }
     
-    public Iterator controlIterator()
+    public Iterator<Control> controlIterator()
     {
         return theControls.iterator();
     }
@@ -139,7 +139,7 @@ public class Project
         return theInputSignals;
     }
     
-    public Iterator inputSignalsIterator()
+    public Iterator<Signal> inputSignalsIterator()
     {
         return theInputSignals.iterator();
     }
@@ -149,7 +149,7 @@ public class Project
         return theOutputSignals;
     }
     
-    public Iterator outputSignalsIterator()
+    public Iterator<Signal> outputSignalsIterator()
     {
         return theOutputSignals.iterator();
     }
@@ -159,7 +159,7 @@ public class Project
         return theTimers;
     }
     
-    public Iterator timerIterator()
+    public Iterator<EventTimer> timerIterator()
     {
         return theTimers.iterator();
     }
@@ -333,7 +333,7 @@ public class Project
         
         boolean valid = true;
         
-        for (Iterator theIt = actionIterator(); theIt.hasNext(); )
+        for (Iterator<Action> theIt = actionIterator(); theIt.hasNext(); )
         {
             Action currAction = (Action) theIt.next();
             String currLabel = currAction.getLabel();
@@ -345,7 +345,7 @@ public class Project
                 logger.error("The action " + currLabel + " is not a valid event");
             }
             
-            for (Iterator theCmdIt = currAction.commandIterator();
+            for (Iterator<Command> theCmdIt = currAction.commandIterator();
             theCmdIt.hasNext(); )
             {
                 Command currCommand = (Command) theCmdIt.next();
@@ -360,7 +360,7 @@ public class Project
             }
         }
         
-        for (Iterator theIt = controlIterator(); theIt.hasNext(); )
+        for (Iterator<Control> theIt = controlIterator(); theIt.hasNext(); )
         {
             Control currControl = (Control) theIt.next();
             String currLabel = currControl.getLabel();
@@ -372,7 +372,7 @@ public class Project
                 logger.error("The control " + currLabel + " is not a valid event");
             }
             
-            for (Iterator theCondIt = currControl.conditionIterator();
+            for (Iterator<Condition> theCondIt = currControl.conditionIterator();
             theCondIt.hasNext(); )
             {
                 Condition currCondition = (Condition) theCondIt.next();
@@ -387,7 +387,7 @@ public class Project
             }
         }
         
-        for (Iterator theIt = timerIterator(); theIt.hasNext(); )
+        for (Iterator<EventTimer> theIt = timerIterator(); theIt.hasNext(); )
         {
             EventTimer currTimer = (EventTimer) theIt.next();
             String currStartEvent = currTimer.getStartEvent();

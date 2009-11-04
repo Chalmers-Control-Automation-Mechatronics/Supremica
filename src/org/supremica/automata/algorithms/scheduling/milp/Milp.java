@@ -8,6 +8,8 @@ import org.supremica.automata.algorithms.scheduling.*;
 import org.supremica.util.ActionTimer;
 
 //TODO (always): Structure the code. Comment better.
+
+@SuppressWarnings("unchecked")
 public class Milp
         implements Scheduler
 {
@@ -1140,7 +1142,6 @@ public class Milp
     }
     
     //TO BE INAUGURATED
-    @SuppressWarnings("unchecked")
 	private void createExternalPrecedenceConstraintsNew(Automaton currSpec)
     {
         ArrayList<int[]>[] involvedEventInfoList = new ArrayList[2];
@@ -1289,7 +1290,6 @@ public class Milp
     }
     
     //TO BE DEPRECATED
-    @SuppressWarnings("unchecked")
 	private void createExternalPrecedenceConstraints(Automaton currSpec)
     throws Exception
     {
@@ -1994,7 +1994,6 @@ public class Milp
      * Of course, the situation is identical if the robots book the zones in the same order,
      * the important thing here is that there is no unbooking between the zones.
      */
-    @SuppressWarnings("unchecked")
 	private void createCircularWaitConstraints()
     throws Exception
     {
@@ -3752,7 +3751,6 @@ public class Milp
      * (since we don't want any limitation here, any cycle should be found). The fromTic-, toTic-
      * and bufferExists-parameters of the Edge class are not used in this case. 
      */
-    @SuppressWarnings("unchecked")
 	private void checkForLoops(Automata autos)
         throws MilpException
     {

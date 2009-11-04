@@ -542,7 +542,7 @@ class EventListModel
     //private ArrayList currArcs = new ArrayList();
 
     /** Sorts the arcs in a TreeMap with the same key for equivalent arcs (epsilon closure) */
-    private TreeMap currArcs = new TreeMap();
+    private TreeMap<String,Arc> currArcs = new TreeMap<String,Arc>();
     private boolean forward;
     @SuppressWarnings("unused")
 	private Automaton theAutomaton;

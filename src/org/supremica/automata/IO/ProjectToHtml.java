@@ -88,7 +88,7 @@ public class ProjectToHtml
 		serializeProject();
 
 		// Serialize all automata
-		for (Iterator projectIt = project.iterator(); projectIt.hasNext(); )
+		for (Iterator<Automaton> projectIt = project.iterator(); projectIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
@@ -98,7 +98,7 @@ public class ProjectToHtml
 		// Serialize all events
 		Alphabet projectAlphabet = AlphabetHelpers.getUnionAlphabet(project, true, true);    // project.getUnionAlphabet();
 
-		for (Iterator alphIt = projectAlphabet.iterator(); alphIt.hasNext(); )
+		for (Iterator<LabeledEvent> alphIt = projectAlphabet.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent ev = (LabeledEvent) alphIt.next();
 
@@ -116,7 +116,7 @@ public class ProjectToHtml
 		pw.println("<h2>Plants:</h2>");
 		pw.println("<ul>");
 
-		for (Iterator projectIt = project.plantIterator();
+		for (Iterator<Automaton> projectIt = project.plantIterator();
 				projectIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) projectIt.next();
@@ -128,7 +128,7 @@ public class ProjectToHtml
 		pw.println("<h2>Specifications:</h2>");
 		pw.println("<ul>");
 
-		for (Iterator projectIt = project.specificationIterator();
+		for (Iterator<Automaton> projectIt = project.specificationIterator();
 				projectIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) projectIt.next();
@@ -140,7 +140,7 @@ public class ProjectToHtml
 		pw.println("<h2>Supervisors:</h2>");
 		pw.println("<ul>");
 
-		for (Iterator projectIt = project.supervisorIterator();
+		for (Iterator<Automaton> projectIt = project.supervisorIterator();
 				projectIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) projectIt.next();
@@ -163,7 +163,7 @@ public class ProjectToHtml
 		pw.println("<h2>Alphabet:</h2>");
 		pw.println("<ul>");
 
-		for (Iterator eventIt = theAutomaton.eventIterator();
+		for (Iterator<LabeledEvent> eventIt = theAutomaton.eventIterator();
 				eventIt.hasNext(); )
 		{
 			LabeledEvent event = (LabeledEvent) eventIt.next();

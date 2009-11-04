@@ -113,7 +113,7 @@ public final class SupremicaProperties
     throws FileNotFoundException, IOException
     {
         Properties propertiesFromFile = buildProperties(propertyFile);
-        for (Enumeration e = propertiesFromFile.keys(); e.hasMoreElements(); )
+        for (Enumeration<?> e = propertiesFromFile.keys(); e.hasMoreElements(); )
         {
             String newKey = (String)e.nextElement();
             String newValue = propertiesFromFile.getProperty(newKey);

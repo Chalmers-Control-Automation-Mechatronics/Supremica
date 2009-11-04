@@ -57,6 +57,7 @@ import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.SynchronizationType;
 
+@SuppressWarnings("unchecked")
 public class AutomataToNQC
 {
 	@SuppressWarnings("unused")

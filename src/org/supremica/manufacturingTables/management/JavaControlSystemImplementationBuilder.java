@@ -67,6 +67,7 @@ import java.util.Map.Entry;
 import org.supremica.manufacturingTables.controlsystemdata.*;
 import org.supremica.manufacturingTables.controlsystemimplementation.Java.*;
 
+@SuppressWarnings("unchecked")
 public class JavaControlSystemImplementationBuilder extends ControlSystemImplementationBuilder
 {
 
@@ -75,7 +76,6 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 	super();
     }
 
-    @SuppressWarnings("unchecked")
     public void createNewPLCProgram(ManufacturingCell cell)
     {
 	// PLCProgram with mailbox and coordinator are created.
@@ -108,31 +108,31 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 	    Map<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity> activities = new HashMap<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity>();
 	    
 	    COPData COPData = (COPData) COPIter.next();
-	    COP COP = new COP(COPData.getId(), COPData.getMachine());
-	    COP.setComment(COPData.getComment());
+	    COP cop = new COP(COPData.getId(), COPData.getMachine());
+	    cop.setComment(COPData.getComment());
 	    //COP Activities
 	    for (Iterator activityIter = COPData.getCOPActivities().iterator(); activityIter.hasNext();)
 	    {
 		org.supremica.manufacturingTables.controlsystemdata.COPActivity COPActivityData = (org.supremica.manufacturingTables.controlsystemdata.COPActivity) activityIter.next();
-		org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity COPActivity = new org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity(COPActivityData.getOperation());
+		org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity activity = new org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity(COPActivityData.getOperation());
 		// Add activity to hashmap
-		activities.put(String.valueOf(COPActivity.getOperation()), COPActivity);
+		activities.put(String.valueOf(activity.getOperation()), activity);
 		// Predecessors
 		for (Iterator predecessorIter = COPActivityData.getPredecessors().iterator(); predecessorIter.hasNext();)
 		{
 		    Predecessor predecessorData = (Predecessor) predecessorIter.next();
 		    COPPredecessor predecessor = new COPPredecessor( predecessorData.getOperation(), predecessorData.getMachine() );
 		    // Add predecesor
-		    COPActivity.addPredecessor(predecessor);
+		    activity.addPredecessor(predecessor);
 		    // Create an Hashmap
 		}
 		// Add activity
-		COP.addCOPActivity(COPActivity);
+		cop.addCOPActivity(activity);
 	    }
 	    // Register COP to Coordinator
-	    coordinator.registerCOP(COP);
+	    coordinator.registerCOP(cop);
 	    // Add activity map to hashmap with all activities for all machines
-	    machinesActivities.put(COP.getMachine(), activities);
+	    machinesActivities.put(cop.getMachine(), activities);
 	}
 	// Now when all COPs are added we will iterate through them again and add successors where appropriate
 	for (Iterator machineIter = machinesActivities.entrySet().iterator(); machineIter.hasNext();)
@@ -398,7 +398,7 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
     }
     
     // Low Level Sensor
-    private org.supremica.manufacturingTables.controlsystemimplementation.Java.Sensor createLowLevelSensor(org.supremica.manufacturingTables.controlsystemdata.Sensor sensorData)
+	private org.supremica.manufacturingTables.controlsystemimplementation.Java.Sensor createLowLevelSensor(org.supremica.manufacturingTables.controlsystemdata.Sensor sensorData)
     {
 	org.supremica.manufacturingTables.controlsystemimplementation.Java.Sensor sensor = new org.supremica.manufacturingTables.controlsystemimplementation.Java.LowLevelSensor(sensorData.getName());
 	System.err.println("Adding low level sensor: " + sensorData.getName());

@@ -160,6 +160,7 @@ class XmlWriter
 	 * parameter is passed to this method (not supported by the <a
 	 * href="http://xml-rpc.com/spec">XML-RPC specification</a>).
 	 */
+	@SuppressWarnings("unchecked")
 	public void writeObject(Object obj)
 		throws XmlRpcException, IOException
 	{

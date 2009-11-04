@@ -241,7 +241,7 @@ public class MultithreadedAstar
             throw new Exception("The node " + printNodeName(currNode) + " was not found on the openTree");
         }
         
-        ArrayList subthreads = currNode.getSubthreads();
+        ArrayList<?> subthreads = currNode.getSubthreads();
         
         if (subthreads == null)
         {
@@ -252,7 +252,7 @@ public class MultithreadedAstar
             
             if (currNodeIsAddedToClosed)
             {
-                Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
+                Iterator<?> childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
                 
                 if (!expander.isUncontrollableEventFound())
                 {

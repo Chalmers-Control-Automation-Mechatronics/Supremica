@@ -57,6 +57,7 @@ import java.util.*;
  * reachable states in the AutomataSynchronizerExecuterAlgorithm.
  * The state in this storage must be of the form int[].
  **/
+@SuppressWarnings("unchecked")
 public interface StateStorage
 {
 	/**

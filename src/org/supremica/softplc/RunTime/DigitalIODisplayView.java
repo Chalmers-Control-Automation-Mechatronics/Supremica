@@ -39,7 +39,7 @@ public class DigitalIODisplayView
 		String[] inputDescriptions;
 		String[] outputDescriptions;
 		JButton updateButton = new JButton("Update");
-		Class IOClass;
+		Class<?> IOClass;
 
 		/**Menu initialization*/
 		JMenuBar jMenuBar1 = new JMenuBar();

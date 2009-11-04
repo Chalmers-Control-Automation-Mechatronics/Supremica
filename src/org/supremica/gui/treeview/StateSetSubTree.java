@@ -27,7 +27,7 @@ public class StateSetSubTree
 
 	public static void buildSubTree(StateSet states, SupremicaTreeNode root)
 	{
-		Iterator stateit = states.iterator();
+		Iterator<State> stateit = states.iterator();
 
 		while (stateit.hasNext())
 		{

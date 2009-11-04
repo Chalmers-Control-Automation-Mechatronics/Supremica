@@ -52,6 +52,7 @@ package org.supremica.util.compactStateSet;
 import org.supremica.automata.StateStorage;
 import java.util.*;
 
+@SuppressWarnings("unchecked")
 public class CompactStateSet
 	implements StateStorage
 {

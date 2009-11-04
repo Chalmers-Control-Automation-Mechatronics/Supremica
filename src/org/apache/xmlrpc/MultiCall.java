@@ -82,6 +82,7 @@ public class MultiCall
 		throw new NoSuchMethodException("No method '" + method + "' in " + this.getClass().getName());
 	}
 
+	@SuppressWarnings("unchecked")
 	public Vector<Serializable> multicall(Vector<?> requests, XmlRpcContext context)
 	{
 		Vector<Serializable> response = new Vector<Serializable>();
@@ -93,7 +94,7 @@ public class MultiCall
 			{
 				Hashtable<?, ?> call = (Hashtable<?, ?>) requests.elementAt(i);
 
-				request = new XmlRpcRequest((String) call.get("methodName"), (Vector<?>) call.get("params"));
+				request = new XmlRpcRequest((String) call.get("methodName"), (Vector<Comparable>) call.get("params"));
 
 				Object handler = context.getHandlerMapping().getHandler(request.getMethodName());
 				Vector<Object> v = new Vector<Object>();

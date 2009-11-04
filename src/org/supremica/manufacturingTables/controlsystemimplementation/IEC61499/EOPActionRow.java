@@ -63,6 +63,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Iterator;
 
+@SuppressWarnings("unchecked")
 public class EOPActionRow extends EOPRow implements Cloneable
 {
     
@@ -80,7 +81,6 @@ public class EOPActionRow extends EOPRow implements Cloneable
  	return null;
     }
     
-    @SuppressWarnings("unchecked")
     public Object clone() 
     {
 	EOPActionRow clone = null;

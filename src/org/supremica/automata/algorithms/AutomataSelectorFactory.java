@@ -205,7 +205,7 @@ class AutomataSelectorFactory
         private static Logger logger = LoggerFactory.createLogger(AutomataSelector.class);
         private Automata globalSet;
         private Automata partialSet = new Automata();
-        private Iterator specIterator;
+        private Iterator<Automaton> specIterator;
         private Map<LabeledEvent,Automata> ucEventToPlantMap;
         private int progress = 0;
         private int progressMax;

@@ -77,7 +77,7 @@ public class AOH_Force
 
 		// create an array of nodes
 		int idx = 0;
-		for (Enumeration it = gf.getNodes().elements(); it.hasMoreElements(); idx++)
+		for (Enumeration<?> it = gf.getNodes().elements(); it.hasMoreElements(); idx++)
 		{
 			nodes[idx] = (Node) it.nextElement();
 		}

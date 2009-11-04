@@ -53,7 +53,7 @@ public final class Args
      * not of type theClass.
      *
      */
-    public static void checkForClass(Object aObject, Class theClass)
+    public static void checkForClass(Object aObject, Class<?> theClass)
     {
         if (!theClass.isInstance(aObject))
         {
@@ -124,7 +124,7 @@ public final class Args
      * Throw an <code>IllegalArgumentException</code> only if <code>aCollection.isEmpty</code>
      * returns <code>true</code>.
      */
-    public static void checkForEmpty(Collection aCollection)
+    public static void checkForEmpty(Collection<?> aCollection)
     {
         if ( aCollection.isEmpty() )
         {

@@ -74,7 +74,7 @@ public class AutomatonToDsx
 		pw.println("number of events: " + aut.nbrOfEvents());
 
 		// Print all states
-		Iterator states = aut.stateIterator();
+		Iterator<State> states = aut.stateIterator();
 
 		while (states.hasNext())
 		{
@@ -93,7 +93,7 @@ public class AutomatonToDsx
 		}
 
 		// Print all events
-		Iterator events = aut.eventIterator();
+		Iterator<LabeledEvent> events = aut.eventIterator();
 
 		while (events.hasNext())
 		{
@@ -147,7 +147,7 @@ public class AutomatonToDsx
 
 			pw.print(":");
 
-			Iterator outgoingArcs = sourceState.outgoingArcsIterator();
+			Iterator<Arc> outgoingArcs = sourceState.outgoingArcsIterator();
 
 			while (outgoingArcs.hasNext())
 			{

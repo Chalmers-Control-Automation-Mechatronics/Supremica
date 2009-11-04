@@ -23,10 +23,12 @@ public class AutomataSSPCExporter
 {
 	private File file;
 	private String path;
+	@SuppressWarnings("unchecked")
 	private HashMap<Comparable, Comparable> fileMap, eventMap;
 	private int event_count = 0, state_count;
 
 	/** save the automata to disk, use 'file' for the system (project) file name */
+	@SuppressWarnings("unchecked")
 	public AutomataSSPCExporter(Automata automata, String file)
 		throws IOException
 	{

@@ -82,7 +82,7 @@ public class AutomataListeners
 			{
 
 				// logger.debug("AutomataListeners.notifyListeners notifying");
-				for (Iterator listenerIt = listeners.iterator();
+				for (Iterator<Listener> listenerIt = listeners.iterator();
 						listenerIt.hasNext(); )
 				{
 					AutomataListener currListener = (AutomataListener) listenerIt.next();

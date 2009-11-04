@@ -77,7 +77,7 @@ public class PetriNetToDsx
 		pw.println("number of transitions: " + pn.nbrOfTransitions());
 
 		// Print all places
-		Iterator places = pn.placeIterator();
+		Iterator<Place> places = pn.placeIterator();
 
 		while (places.hasNext())
 		{
@@ -110,7 +110,7 @@ public class PetriNetToDsx
 		}
 
 		// Print all transitions
-		Iterator transitionIt = pn.transitionIterator();
+		Iterator<Transition> transitionIt = pn.transitionIterator();
 
 		while (transitionIt.hasNext())
 		{
@@ -150,7 +150,7 @@ public class PetriNetToDsx
 			pw.print(currTransition.getIdentity() + ": ");
 
 			// Print prev places
-			Iterator placeIt = currTransition.prevPlaceIterator();
+			Iterator<Place> placeIt = currTransition.prevPlaceIterator();
 
 			while (placeIt.hasNext())
 			{

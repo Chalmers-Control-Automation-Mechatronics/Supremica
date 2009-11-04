@@ -100,7 +100,7 @@ public class AutomataExplorer
         int[] initialState = AutomataIndexFormHelper.createState(this.theAutomata.size());
         
         // + 1 status field
-        Iterator autIt = this.theAutomata.iterator();
+        Iterator<Automaton> autIt = this.theAutomata.iterator();
         
         while (autIt.hasNext())
         {

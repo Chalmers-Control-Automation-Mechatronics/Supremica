@@ -20,6 +20,7 @@ import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
  * necessary for manipulation of xml objects defined by the 
  * <code>org.xml.rop</code> package.
  */
+@SuppressWarnings("unchecked")
 public class Converter {    
     
     public static final int IS_VISIBLE_TRUE = 0;

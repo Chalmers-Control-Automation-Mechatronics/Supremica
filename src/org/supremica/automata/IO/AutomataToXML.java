@@ -231,7 +231,7 @@ public class AutomataToXML
             for (State sourceState : aut) 
             {
                 Integer sourceId = stateIdMap.get(sourceState);
-                Iterator outgoingArcsIt = sourceState.outgoingArcsIterator();
+                Iterator<Arc> outgoingArcsIt = sourceState.outgoingArcsIterator();
                 
                 while (outgoingArcsIt.hasNext())
                 {

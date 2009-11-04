@@ -92,7 +92,7 @@ public class OperationCell
 	    if(complexFunction instanceof Activity) {	    	    
 		
 		try {
-		    Iterator predIterator = ((Activity)complexFunction).
+		    Iterator<OperationReferenceType> predIterator = ((Activity)complexFunction).
 			getPrecondition().getPredecessor().iterator();
 		    int sumHeight = 0;
 		    if(predIterator.hasNext()) {
@@ -262,7 +262,7 @@ public class OperationCell
       	
 	if(complexFunction instanceof Activity) {	    	    	   
 	    try {
-		Iterator predIterator = ((Activity)complexFunction).getPrecondition().getPredecessor().iterator();
+		Iterator<OperationReferenceType> predIterator = ((Activity)complexFunction).getPrecondition().getPredecessor().iterator();
 		int sumHeight = 0;
 		while(predIterator.hasNext()) {
 		    Object tmp = predIterator.next();

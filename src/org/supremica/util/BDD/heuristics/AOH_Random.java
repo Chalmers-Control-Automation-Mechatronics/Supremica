@@ -19,7 +19,7 @@ public class AOH_Random
 	public void init(Automata a)
 		throws BDDException
 	{
-		Vector automata = a.getAutomata();
+		Vector<Automaton> automata = a.getAutomata();
 		int size = automata.size();
 
 		order = new int[size];

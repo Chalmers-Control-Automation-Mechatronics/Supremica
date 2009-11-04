@@ -120,8 +120,8 @@ public class IDDToDot
 			pw.println("{ rank = same; ");
 			pw.println("\"level_" + i + "\"; ");
 
-			List currNodeList = theIDD.getNodesAtLevel(i);
-			Iterator nodeIt = currNodeList.iterator();
+			List<?> currNodeList = theIDD.getNodesAtLevel(i);
+			Iterator<?> nodeIt = currNodeList.iterator();
 
 			while (nodeIt.hasNext())
 			{
@@ -144,8 +144,8 @@ public class IDDToDot
 
 		for (int i = 1; i < nbrOfLevels; i++)
 		{
-			List currNodeList = theIDD.getNodesAtLevel(i);
-			Iterator nodeIt = currNodeList.iterator();
+			List<?> currNodeList = theIDD.getNodesAtLevel(i);
+			Iterator<?> nodeIt = currNodeList.iterator();
 
 			while (nodeIt.hasNext())
 			{

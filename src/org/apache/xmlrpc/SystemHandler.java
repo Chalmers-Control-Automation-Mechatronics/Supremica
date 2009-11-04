@@ -146,7 +146,7 @@ public class SystemHandler
 	 * Execute a &lt;ignored&gt;.&lt;name&gt; call by calling the handler for
 	 * &lt;name&gt; in the the system handler mapping.
 	 */
-	public Object execute(String method, Vector params, XmlRpcContext context)
+	public Object execute(String method, Vector<?> params, XmlRpcContext context)
 		throws Exception
 	{
 		Object handler = null;

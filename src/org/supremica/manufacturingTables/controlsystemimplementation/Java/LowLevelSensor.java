@@ -77,7 +77,7 @@ public class LowLevelSensor extends Sensor
 	// For now I assume that when sensors contains sensors, the lower level sensors are equivalent
 	if (!sensors.isEmpty())
 	    {
-		Iterator sensorIter = sensors.iterator();
+		Iterator<Sensor> sensorIter = sensors.iterator();
 		currentState = ((Sensor) sensorIter.next()).requestState();
 		while (sensorIter.hasNext())
 		    {
@@ -93,7 +93,7 @@ public class LowLevelSensor extends Sensor
 	    {
 		// Normally a sensor can not have more than one hardwareConnection but I assume they can have many. 
 		// In that case they should all be the same (have the same value/state).
-		Iterator hardwareIter = hardwareConnections.iterator();
+		Iterator<String> hardwareIter = hardwareConnections.iterator();
 		try
 		    {
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));

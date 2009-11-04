@@ -55,6 +55,7 @@ import java.text.DateFormat;
 import org.supremica.log.*;
 import org.supremica.automata.*;
 
+@SuppressWarnings("unchecked")
 public class AutomataToSMV
 {
 	@SuppressWarnings("unused")

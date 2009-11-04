@@ -47,9 +47,9 @@ public class OperationBasedSystems
         }
     }
     
-    public TreeSet generateAllStates()
+    public TreeSet<?> generateAllStates()
     {
-        TreeSet output = new TreeSet();
+        TreeSet<?> output = new TreeSet<Object>();
         return output;
         
     }

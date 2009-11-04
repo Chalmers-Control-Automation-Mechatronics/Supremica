@@ -175,6 +175,7 @@ public class XmlRpcClientLite
 		 * @throws XmlRpcException
 		 * @throws IOException
 		 */
+		@SuppressWarnings("unchecked")
 		Object execute(String method, Vector<Comparable> params)
 			throws XmlRpcException, IOException
 		{
@@ -532,6 +533,7 @@ public class XmlRpcClientLite
 	/**
 	 * Just for testing.
 	 */
+	@SuppressWarnings("unchecked")
 	public static void main(String args[])
 		throws Exception
 	{

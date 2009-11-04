@@ -85,7 +85,7 @@ public class FileClassLoader
 
 		// Since all support classes of loaded class use same class loader
 		// must check subclass cache of classes for things like Object
-		Class c = findLoadedClass(name);
+		Class<?> c = findLoadedClass(name);
 
 		if (c == null)
 		{

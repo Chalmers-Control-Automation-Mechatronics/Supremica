@@ -341,7 +341,7 @@ public class Automata
     {
         Automata newAutomata = new Automata();
         
-        for (Iterator theIt = plantIterator(); theIt.hasNext(); )
+        for (Iterator<Automaton> theIt = plantIterator(); theIt.hasNext(); )
         {
             Automaton currAutomaton = (Automaton) theIt.next();
             
@@ -365,7 +365,7 @@ public class Automata
     {
         Automata newAutomata = new Automata();
         
-        for (Iterator theIt = specificationIterator(); theIt.hasNext(); )
+        for (Iterator<Automaton> theIt = specificationIterator(); theIt.hasNext(); )
         {
             Automaton currAutomaton = (Automaton) theIt.next();
             
@@ -389,7 +389,7 @@ public class Automata
     {
         Automata newAutomata = new Automata();
         
-        for (Iterator theIt = supervisorIterator(); theIt.hasNext(); )
+        for (Iterator<Automaton> theIt = supervisorIterator(); theIt.hasNext(); )
         {
             Automaton currAutomaton = (Automaton) theIt.next();
             
@@ -1189,7 +1189,7 @@ public class Automata
     class AutomatonTypeIterator
         implements Iterator<Automaton>
     {
-        private Iterator autIt;
+        private Iterator<Automaton> autIt;
         private AutomatonType theType;
         private Automaton theAutomaton = null;
         
@@ -1241,7 +1241,7 @@ public class Automata
     {
         StringBuffer sbuf = new StringBuffer();
         
-        for (Iterator it = iterator(); it.hasNext(); )
+        for (Iterator<Automaton> it = iterator(); it.hasNext(); )
         {
             Automaton automaton = (Automaton) it.next();
             

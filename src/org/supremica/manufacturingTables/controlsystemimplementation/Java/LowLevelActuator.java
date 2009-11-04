@@ -74,7 +74,7 @@ public class LowLevelActuator extends Actuator
     {
 	if (!actuators.isEmpty())
 	    {
-		Iterator actuatorIter = actuators.iterator();
+		Iterator<Actuator> actuatorIter = actuators.iterator();
 		currentState = ((Actuator) actuators.get(0)).requestState();
 		actuatorIter.next();
 		while (actuatorIter.hasNext())
@@ -96,7 +96,7 @@ public class LowLevelActuator extends Actuator
 		// "A" and "B" shall not be given at the same time. Neither "not A" and "not B".
 		
 		boolean sensorExist = false;
-		Iterator sensorIter = sensors.iterator();
+		Iterator<Sensor> sensorIter = sensors.iterator();
 		while (sensorIter.hasNext())
 		    {
 			String currentSensorState = ((Sensor) sensorIter.next()).requestState();
@@ -147,7 +147,7 @@ public class LowLevelActuator extends Actuator
 		
 		// This hardware connections must, of course, contain more than the name of the actuator, 
 		// for instance how many signals and what to signal.
-		Iterator hardwareIter = hardwareConnections.iterator();
+		Iterator<String> hardwareIter = hardwareConnections.iterator();
 		while (hardwareIter.hasNext())
 		    {
 			System.err.println("Actuator " + (String) hardwareIter.next() + " shall go to state " + orderedState + ".");
@@ -161,7 +161,7 @@ public class LowLevelActuator extends Actuator
 	if (!actuators.isEmpty())
 	    {
 		//set boolean started if not started before
-		Iterator actuatorIter = actuators.iterator();
+		Iterator<Actuator> actuatorIter = actuators.iterator();
 		actuatorOK = true;
 		while (actuatorIter.hasNext() && actuatorOK)
 		    {

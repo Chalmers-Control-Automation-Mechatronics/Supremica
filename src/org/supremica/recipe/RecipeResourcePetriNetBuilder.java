@@ -61,7 +61,7 @@ public class RecipeResourcePetriNetBuilder
 	// private PlantConnections plantConnections;
 	private PetriNet thePetriNet;
 	private InternalOperationRecipes theRecipes;
-	private List<List> firstPlaces = new LinkedList<List>();
+	private List<List<?>> firstPlaces = new LinkedList<List<?>>();
 	private List<Place> lastPlaces = new LinkedList<Place>();
 	private HashMap<String, Place> resourcePlaces = new HashMap<String, Place>();
 	private int transitionCounter = 1;

@@ -84,7 +84,7 @@ public class AutomatonToFSM
 		// Print the initial state first
 		serializeState(pw, initialState);
 
-		for (Iterator states = aut.stateIterator(); states.hasNext(); )
+		for (Iterator<State> states = aut.stateIterator(); states.hasNext(); )
 		{
 			State state = (State) states.next();
 

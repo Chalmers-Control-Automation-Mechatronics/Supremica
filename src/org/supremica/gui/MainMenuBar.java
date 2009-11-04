@@ -174,7 +174,7 @@ public class MainMenuBar
         menuFile.add(menuFileNewFromTemplate);
         
         ExampleTemplates exTempl = ExampleTemplates.getInstance();
-        for (Iterator groupIt = exTempl.iterator(); groupIt.hasNext(); )
+        for (Iterator<TemplateGroup> groupIt = exTempl.iterator(); groupIt.hasNext(); )
         {
             TemplateGroup currGroup = (TemplateGroup) groupIt.next();
             JMenu menuFileNewFromTemplateGroup = new JMenu();
@@ -182,7 +182,7 @@ public class MainMenuBar
             menuFileNewFromTemplateGroup.setText(currGroup.getName());
             menuFileNewFromTemplate.add(menuFileNewFromTemplateGroup);
             
-            for (Iterator itemIt = currGroup.iterator(); itemIt.hasNext(); )
+            for (Iterator<TemplateItem> itemIt = currGroup.iterator(); itemIt.hasNext(); )
             {
                 TemplateItem currItem = (TemplateItem) itemIt.next();
                 JMenuItem menuItem = new JMenuItem();
@@ -554,7 +554,7 @@ public class MainMenuBar
             
             ExampleAnimations exAnim = ExampleAnimations.getInstance();
             
-            for (Iterator groupIt = exAnim.iterator(); groupIt.hasNext(); )
+            for (Iterator<AnimationGroup> groupIt = exAnim.iterator(); groupIt.hasNext(); )
             {
                 AnimationGroup currGroup = (AnimationGroup) groupIt.next();
                 JMenu menuToolsAnimationGroup = new JMenu();
@@ -562,7 +562,7 @@ public class MainMenuBar
                 menuToolsAnimationGroup.setText(currGroup.getDescription());
                 menuToolsAnimations.add(menuToolsAnimationGroup);
                 
-                for (Iterator itemIt = currGroup.iterator(); itemIt.hasNext(); )
+                for (Iterator<AnimationItem> itemIt = currGroup.iterator(); itemIt.hasNext(); )
                 {
                     AnimationItem currItem = (AnimationItem) itemIt.next();
                     JMenuItem menuItem = new JMenuItem();

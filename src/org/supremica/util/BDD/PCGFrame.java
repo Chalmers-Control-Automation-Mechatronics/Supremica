@@ -16,7 +16,7 @@ public class PCGFrame
 	private Button bUp, bDown, bDone, bDump;
 	private java.awt.List order;
 
-	public PCGFrame(int[] perm, Vector all)
+	public PCGFrame(int[] perm, Vector<?> all)
 	{
 		super(new Frame(), "[PCGFrame]", true);
 

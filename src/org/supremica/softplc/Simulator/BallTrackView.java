@@ -13,6 +13,7 @@ import org.supremica.gui.Utility;
  * @author Anders Röding
  * @author Henrik Staberg
  */
+@SuppressWarnings("unchecked")
 public class BallTrackView
 	extends JFrame
 

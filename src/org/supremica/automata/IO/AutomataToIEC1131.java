@@ -112,7 +112,7 @@ public class AutomataToIEC1131
     {
 
 	// Input signals
-	for (Iterator theIt = theProject.inputSignalsIterator();
+	for (Iterator<Signal> theIt = theProject.inputSignalsIterator();
 	     theIt.hasNext(); )
 	{
 	    Signal currSignal = (Signal) theIt.next();
@@ -122,7 +122,7 @@ public class AutomataToIEC1131
 	}
 
 	// Output signals
-	for (Iterator theIt = theProject.outputSignalsIterator();
+	for (Iterator<Signal> theIt = theProject.outputSignalsIterator();
 	     theIt.hasNext(); )
 	{
 	    Signal currSignal = (Signal) theIt.next();
@@ -136,7 +136,7 @@ public class AutomataToIEC1131
     {
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 	    int currEventIndex = currEvent.getIndex();
@@ -151,12 +151,12 @@ public class AutomataToIEC1131
 
     void printStateVariables(PrintWriter pw,int tabs)
     {
-	for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+	for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 	{
 	    Automaton currAutomaton = (Automaton) autIt.next();
 	    int currAutomatonIndex = currAutomaton.getSynchIndex();
 
-	    for (Iterator stateIt = currAutomaton.stateIterator();
+	    for (Iterator<State> stateIt = currAutomaton.stateIterator();
 		 stateIt.hasNext(); )
 	    {
 		State currState = (State) stateIt.next();
@@ -171,7 +171,7 @@ public class AutomataToIEC1131
 
     void printTimerVariables(PrintWriter pw)
     {
-	for (Iterator theIt = theProject.timerIterator(); theIt.hasNext(); )
+	for (Iterator<EventTimer> theIt = theProject.timerIterator(); theIt.hasNext(); )
 	{
 	    EventTimer currTimer = (EventTimer) theIt.next();
 
@@ -229,7 +229,7 @@ public class AutomataToIEC1131
 	pw.println("\tIF (NOT initialized)");
 	pw.println("\tTHEN");
 
-	for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+	for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 	{
 	    Automaton currAutomaton = (Automaton) autIt.next();
 	    int currAutomatonIndex = currAutomaton.getSynchIndex();
@@ -284,7 +284,7 @@ public class AutomataToIEC1131
 	theHelper.printILCommand(pw, "JMPC", "after_initialization");
 
 	// Initialize timer delays
-	for (Iterator theIt = theProject.timerIterator(); theIt.hasNext(); )
+	for (Iterator<EventTimer> theIt = theProject.timerIterator(); theIt.hasNext(); )
 	{
 	    EventTimer currTimer = (EventTimer) theIt.next();
 
@@ -294,7 +294,7 @@ public class AutomataToIEC1131
 
 	theHelper.printILCommand(pw, "LD", "TRUE");
 
-	for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+	for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 	{
 	    Automaton currAutomaton = (Automaton) autIt.next();
 	    int currAutomatonIndex = currAutomaton.getSynchIndex();
@@ -349,7 +349,7 @@ public class AutomataToIEC1131
 	pw.println("\n\t(* Compute the enabled events *)");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    while (alphIt.hasNext())
 	    {
@@ -362,7 +362,7 @@ public class AutomataToIEC1131
 
 		pw.print("\te_" + currEventIndex + " := ");
 
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+		for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 		    Automaton currAutomaton = (Automaton) autIt.next();
 		    Alphabet currAlphabet = currAutomaton.getAlphabet();
@@ -388,7 +388,7 @@ public class AutomataToIEC1131
 
 			    pw.print("(");
 
-			    for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
+			    for (Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
 				 stateIt.hasNext(); )
 			    {
 				State currState = (State) stateIt.next();
@@ -462,7 +462,7 @@ public class AutomataToIEC1131
 	theHelper.printILComment(pw, "Compute the enabled events");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 	    int currEventIndex = currEvent.getIndex();
@@ -471,7 +471,7 @@ public class AutomataToIEC1131
 
 	    boolean previousCondition = false;
 
-	    for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+	    for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 	    {
 		Automaton currAutomaton = (Automaton) autIt.next();
 		Alphabet currAlphabet = currAutomaton.getAlphabet();
@@ -547,7 +547,7 @@ public class AutomataToIEC1131
 	theHelper.printILComment(pw, "Check if the events are externally enabled");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 	    int currEventIndex = currEvent.getIndex();
@@ -560,7 +560,7 @@ public class AutomataToIEC1131
 	theHelper.printILComment(pw, "Check if the events are enabled by timers");
 
 	// Iterate over all events and compute which events that are enabled by the timer
-	for (Iterator timerIt = theProject.timerIterator(); timerIt.hasNext(); )
+	for (Iterator<EventTimer> timerIt = theProject.timerIterator(); timerIt.hasNext(); )
 	{
 	    EventTimer currTimer = (EventTimer) timerIt.next();
 	    int currTimerIndex = currTimer.getSynchIndex();
@@ -603,7 +603,7 @@ public class AutomataToIEC1131
     {
 	theHelper.printILComment(pw, "Start timers");
 
-	for (Iterator timerIt = theProject.timerIterator(); timerIt.hasNext(); )
+	for (Iterator<EventTimer> timerIt = theProject.timerIterator(); timerIt.hasNext(); )
 	{
 	    EventTimer currTimer = (EventTimer) timerIt.next();
 	    int currTimerIndex = currTimer.getSynchIndex();
@@ -727,7 +727,7 @@ public class AutomataToIEC1131
 	pw.println("\t(* It is in general not safe to have more than one event set to true at this point *)");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    while (alphIt.hasNext())
 	    {
@@ -738,7 +738,7 @@ public class AutomataToIEC1131
 		pw.println("\tIF (e_" + currEventIndex + ")");
 		pw.println("\tTHEN");
 
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+		for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 		    Automaton currAutomaton = (Automaton) autIt.next();
 		    Alphabet theAlphabet = currAutomaton.getAlphabet();
@@ -757,7 +757,7 @@ public class AutomataToIEC1131
 
 			boolean previousState = false;
 
-			for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
+			for (Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
 			     stateIt.hasNext(); )
 			{
 			    State currState = (State) stateIt.next();
@@ -832,7 +832,7 @@ public class AutomataToIEC1131
 	theHelper.printILComment(pw, "It is in general not safe to have more than one event set to true at this point");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    while (alphIt.hasNext())
 	    {
@@ -847,7 +847,7 @@ public class AutomataToIEC1131
 		theHelper.printILCommand(pw, "JMP", "do_e_" + currEventIndex);
 		theHelper.printILLabel(pw, "after_do_e_" + currEventIndex);
 
-		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+		for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 		    Automaton currAutomaton = (Automaton) autIt.next();
 		    Alphabet currAlphabet = currAutomaton.getAlphabet();
@@ -863,7 +863,7 @@ public class AutomataToIEC1131
 			}
 
 			theHelper.printILComment(pw, "Transitions in " + currAutomaton.getName());
-			for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
+			for (Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
 			     stateIt.hasNext(); )
 			{
 			    State currState = (State) stateIt.next();
@@ -909,7 +909,7 @@ public class AutomataToIEC1131
 	theHelper.printILComment(pw, "Priority is given to uncontrollable events");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator alphIt = allEvents.uncontrollableEventIterator();
+	for (Iterator<LabeledEvent> alphIt = allEvents.uncontrollableEventIterator();
 	     alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
@@ -923,7 +923,7 @@ public class AutomataToIEC1131
 	    theHelper.printILCommand(pw, "ST", "enabledEvent");
 	}
 
-	for (Iterator alphIt = allEvents.controllableEventIterator();
+	for (Iterator<LabeledEvent> alphIt = allEvents.controllableEventIterator();
 	     alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
@@ -945,7 +945,7 @@ public class AutomataToIEC1131
 	pw.println("\t(* Priority is given to uncontrollable events *)");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator alphIt = allEvents.uncontrollableEventIterator();
+	for (Iterator<LabeledEvent> alphIt = allEvents.uncontrollableEventIterator();
 	     alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
@@ -956,7 +956,7 @@ public class AutomataToIEC1131
 	    pw.println("\tenabledEvent = " + "enabledEvent OR " + "e_" + currEventIndex + ";");
 	}
 
-	for (Iterator alphIt = allEvents.controllableEventIterator();
+	for (Iterator<LabeledEvent> alphIt = allEvents.controllableEventIterator();
 	     alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
@@ -977,7 +977,7 @@ public class AutomataToIEC1131
 	theHelper.printILComment(pw, "The actions");
 
 	// Iterate over all events and compute which events that are externally enabled
-	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 	    int currEventIndex = currEvent.getIndex();
@@ -989,7 +989,7 @@ public class AutomataToIEC1131
 	    {
 		Action currAction = theActions.getAction(currEvent.getLabel());
 
-		for (Iterator it = currAction.commandIterator(); it.hasNext(); )
+		for (Iterator<Command> it = currAction.commandIterator(); it.hasNext(); )
 		{
 		    Command currCommand = (Command) it.next();
 
@@ -1025,7 +1025,7 @@ public class AutomataToIEC1131
 	theHelper.printILComment(pw, "The conditions");
 
 	// Iterate over all events and compute which events that are externally enabled
-	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 	    int currEventIndex = currEvent.getIndex();
@@ -1040,7 +1040,7 @@ public class AutomataToIEC1131
 		Control currControl = theControls.getControl(currEvent.getLabel());
 		int i = 0;
 
-		for (Iterator it = currControl.conditionIterator();
+		for (Iterator<Condition> it = currControl.conditionIterator();
 		     it.hasNext(); )
 		{
 		    Condition currCondition = (Condition) it.next();

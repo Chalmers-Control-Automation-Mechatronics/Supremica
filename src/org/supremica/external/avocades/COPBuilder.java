@@ -1058,7 +1058,7 @@ public class COPBuilder {
     		return;
     	}
     	
-    	List children = element.getChildren();
+    	List<?> children = element.getChildren();
     	for(Object o : children){
     		
     		if(o instanceof Element){

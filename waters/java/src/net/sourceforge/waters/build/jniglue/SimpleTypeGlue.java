@@ -20,6 +20,7 @@ class SimpleTypeGlue extends TypeGlue {
   private static final int C_CHAR = 2;
   private static final int C_DOUBLE = 3;
   private static final int C_INT = 4;
+  @SuppressWarnings("unused")
   private static final int C_OBJECT = 5;
   private static final int C_STRING = 6;
 

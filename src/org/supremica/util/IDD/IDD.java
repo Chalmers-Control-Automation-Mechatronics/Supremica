@@ -59,7 +59,7 @@ public final class IDD
 	private static Logger logger = LoggerFactory.createLogger(IDD.class);
 	private final int nbrOfLevels;
 	private final int[] nbrOfBranches;
-	private final List[] theNodes;
+	private final List<?>[] theNodes;
 	private final HashMap<Integer, Node> theCopyCache;
 	private final HashMap<ComputeCacheNode, Node> theComputeCache;
 	int nbrOfNodes = 0;
@@ -331,7 +331,7 @@ public final class IDD
 
 		if (level > 0)
 		{
-			List<Node> levelList = theNodes[level];
+			List<Node> levelList = (List<Node>) theNodes[level];
 
 			levelList.add(theNode);
 		}

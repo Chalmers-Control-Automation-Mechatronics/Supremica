@@ -27,7 +27,7 @@ public class AlphabetSubTree
     // take the node to insert to and insert into it
     static public void buildSubTree(Alphabet alpha, SupremicaTreeNode root)
     {
-        Iterator eventIt = alpha.iterator();
+        Iterator<LabeledEvent> eventIt = alpha.iterator();
         
         while (eventIt.hasNext())
         {

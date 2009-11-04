@@ -64,6 +64,7 @@ import java.util.Map.Entry;
 import java.util.Iterator;
 import java.io.*;
 
+@SuppressWarnings("unchecked")
 public class MachineControlCommunicator extends MachineController 
 {
     @SuppressWarnings("unused")
@@ -128,7 +129,7 @@ public class MachineControlCommunicator extends MachineController
     // The activities are different for different EOP types but for a machine with own control system 
     // it should only be asking the value for external components and zones and communicating with 
     // the machine about internal variables.
-    private void performInitialRow()
+	private void performInitialRow()
     {
 	// I make a clone of the current EOP row to iterate through. 
 	EOPInitialRow initialRow = (EOPInitialRow) ( (EOPInitialRow) currentEOPRow ).clone(); 	
