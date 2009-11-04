@@ -32,7 +32,7 @@ abstract class JAXBCheckedListHandler
   {
     final L listelem = getListElement(container);
     if (listelem != null) {
-      final List untyped = getList(listelem);
+      final List<?> untyped = getList(listelem);
       final List<ElementType> elements = Casting.toList(untyped);
       importer.copyCheckedList(elements, proxies);
     }

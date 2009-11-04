@@ -20,7 +20,7 @@ public class IconLoader
     //# Static Class Methods
     private static final ImageIcon getIcon(final String name)
     {
-        final Class cls = IconLoader.class;
+        final Class<?> cls = IconLoader.class;
         final String resourcename = "/icons/" + name + ".gif";
         final URL resource = cls.getResource(resourcename);
         

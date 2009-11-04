@@ -69,6 +69,6 @@ public interface ProxyMarshaller<D extends DocumentProxy>
 
   public Collection<String> getSupportedExtensions();
 
-  public Collection<Class> getMarshalledClasses();
+  public Collection<Class<?>> getMarshalledClasses();
 
 }

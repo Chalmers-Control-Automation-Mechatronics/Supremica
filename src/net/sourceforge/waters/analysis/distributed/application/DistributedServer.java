@@ -94,7 +94,7 @@ public class DistributedServer
     InstantiationException
     
   {
-    Class c = Class.forName(name);
+    Class<?> c = Class.forName(name);
 
     //The loaded class /must/ implement the Controller 
     //interface.

@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
 
+import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.module.ComponentList;
 import net.sourceforge.waters.xsd.module.Module;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
@@ -50,7 +51,7 @@ class ModuleComponentListHandler
     return container.getComponentList();
   }
 
-  List getList(final ComponentList listelem)
+  List<ElementType> getList(final ComponentList listelem)
   {
     return listelem.getList();
   }

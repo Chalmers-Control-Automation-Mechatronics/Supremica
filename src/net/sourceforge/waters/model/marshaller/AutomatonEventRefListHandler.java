@@ -49,7 +49,7 @@ class AutomatonEventRefListHandler
     return container.getEventRefList();
   }
 
-  List getList(EventRefList listelem)
+  List<?> getList(EventRefList listelem)
   {
     return listelem.getList();
   }

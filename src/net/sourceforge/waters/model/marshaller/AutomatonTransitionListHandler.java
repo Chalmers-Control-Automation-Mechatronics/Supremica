@@ -15,6 +15,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 
 import net.sourceforge.waters.xsd.des.Automaton;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
+import net.sourceforge.waters.xsd.des.Transition;
 import net.sourceforge.waters.xsd.des.TransitionList;
 
 
@@ -49,7 +50,7 @@ class AutomatonTransitionListHandler
     return container.getTransitionList();
   }
 
-  List getList(TransitionList listelem)
+  List<Transition> getList(TransitionList listelem)
   {
     return listelem.getList();
   }

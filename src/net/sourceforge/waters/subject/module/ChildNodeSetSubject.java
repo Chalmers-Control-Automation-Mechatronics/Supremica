@@ -244,7 +244,7 @@ class ChildNodeSetSubject
   //# Printing
   public String getShortClassName()
   {
-    final Class clazz = getClass();
+    final Class<?> clazz = getClass();
     final String fullclazzname = clazz.getName();
     final int dotpos = fullclazzname.lastIndexOf('.');
     return fullclazzname.substring(dotpos + 1);

@@ -14,6 +14,7 @@ import java.util.List;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
 import net.sourceforge.waters.xsd.des.AutomataList;
+import net.sourceforge.waters.xsd.des.Automaton;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
 import net.sourceforge.waters.xsd.des.ProductDES;
 
@@ -50,7 +51,7 @@ class ProductDESAutomataListHandler
     return container.getAutomataList();
   }
 
-  List getList(AutomataList listelem)
+  List<Automaton> getList(AutomataList listelem)
   {
     return listelem.getList();
   }

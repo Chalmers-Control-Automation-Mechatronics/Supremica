@@ -46,7 +46,7 @@ public class ProxyPrinter
   public static void printProxy(final Writer writer, final Proxy proxy)
     throws IOException
   {
-    final Class clazz = proxy.getClass();
+    final Class<?> clazz = proxy.getClass();
     final Package pack = clazz.getPackage();
     final String packname = pack.getName();
     final int dotpos = packname.lastIndexOf('.');

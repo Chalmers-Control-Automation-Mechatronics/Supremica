@@ -435,7 +435,7 @@ public class DocumentManager {
   public <DD extends DocumentProxy>
     ProxyMarshaller<DD> findProxyMarshaller(final Class<DD> clazz)
   {
-    final ProxyMarshaller marshaller = getProxyMarshaller(clazz);
+    final ProxyMarshaller<?> marshaller = getProxyMarshaller(clazz);
     if (marshaller != null) {
       final Class<ProxyMarshaller<DD>> marshallerclazz =
         Casting.toClass(ProxyMarshaller.class);
@@ -493,21 +493,21 @@ public class DocumentManager {
     }
   }
 
-  private ProxyMarshaller getProxyMarshaller(final Class clazz)
+  private ProxyMarshaller<?> getProxyMarshaller(final Class<?> clazz)
   {
     if (DocumentProxy.class.isAssignableFrom(clazz)) {
-      ProxyMarshaller marshaller = mClassMarshallerMap.get(clazz);
+      ProxyMarshaller<?> marshaller = mClassMarshallerMap.get(clazz);
       if (marshaller != null) {
         return marshaller;
       }
-      final Class superclass = clazz.getSuperclass();
+      final Class<?> superclass = clazz.getSuperclass();
       if (superclass != null) {
         marshaller = getProxyMarshaller(superclass);
         if (marshaller != null) {
           return marshaller;
         }
       }
-      final Class[] interfaces = clazz.getInterfaces();
+      final Class<?>[] interfaces = clazz.getInterfaces();
       for (int i = 0; i < interfaces.length; i++) {
         marshaller = getProxyMarshaller(interfaces[i]);
         if (marshaller != null) {

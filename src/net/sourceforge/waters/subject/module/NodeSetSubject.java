@@ -336,7 +336,7 @@ class NodeSetSubject
   public void checkSetParent(final Subject parent)
   {
     if (parent != null && mParent != null) {
-      final Class clazz = getClass();
+      final Class<?> clazz = getClass();
       final StringBuffer buffer = new StringBuffer();
       buffer.append("Trying to redefine parent of ");
       buffer.append(getShortClassName(clazz));
@@ -503,7 +503,7 @@ class NodeSetSubject
   private ClassCastException createBadType(final NodeProxy node)
   {
     final StringBuffer buffer = new StringBuffer("Unsupported node class ");
-    final Class clazz = node.getClass();
+    final Class<?> clazz = node.getClass();
     final String name = getShortClassName(clazz);
     buffer.append(name);
     buffer.append("!");
@@ -514,7 +514,7 @@ class NodeSetSubject
   private ClassCastException createBadType(final Object item)
   {
     final StringBuffer buffer = new StringBuffer("Can't add object of class ");
-    final Class clazz = item.getClass();
+    final Class<?> clazz = item.getClass();
     final String name = getShortClassName(clazz);
     buffer.append(name);
     buffer.append(" to node set!");
@@ -527,7 +527,7 @@ class NodeSetSubject
     final ComponentProxy comp =
       parent == null ? null : (ComponentProxy) parent.getParent();
     if (comp == null) {
-      final Class clazz = getClass();
+      final Class<?> clazz = getClass();
       final String name = getShortClassName(clazz);
       buffer.append(name);
     } else {
@@ -537,7 +537,7 @@ class NodeSetSubject
     }
   }
 
-  private String getShortClassName(final Class clazz)
+  private String getShortClassName(final Class<?> clazz)
   {
     final String fullclazzname = clazz.getName();
     final int dotpos = fullclazzname.lastIndexOf('.');

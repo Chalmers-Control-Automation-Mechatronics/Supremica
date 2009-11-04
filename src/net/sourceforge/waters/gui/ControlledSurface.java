@@ -4242,7 +4242,7 @@ public class ControlledSurface
 
     //#######################################################################
     //# Invocation
-    private ProxyTransferable createTransferable
+    private ProxyTransferable<?> createTransferable
       (final List<? extends Proxy> list)
     {
       mTransferredBlock = null;
@@ -4267,7 +4267,7 @@ public class ControlledSurface
       }
       final GraphProxy graph = new GraphElement
         (false, mTransferredBlock, mTransferredNodes, mTransferredEdges, null);
-      final ProxyTransferable transferable = new GraphTransferable(graph);
+      final ProxyTransferable<?> transferable = new GraphTransferable(graph);
       mTransferredBlock = null;
       mTransferredNodes = null;
       mTransferredEdges = null;
@@ -4320,7 +4320,7 @@ public class ControlledSurface
 
     //#######################################################################
     //# Invocation
-    private ProxyTransferable createTransferable
+    private ProxyTransferable<? extends Proxy> createTransferable
       (final List<? extends Proxy> list)
     {
       final int size = list.size();
@@ -4334,7 +4334,7 @@ public class ControlledSurface
       }
       final List<Proxy> transferlist =
         new ArrayList<Proxy>(mTransferredItems.values());
-      final ProxyTransferable transferable =
+      final ProxyTransferable<? extends Proxy> transferable =
         new IdentifierTransferable(transferlist);
       mTransferredItems = null;
       return transferable;

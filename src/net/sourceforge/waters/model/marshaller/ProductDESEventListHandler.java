@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.des.EventProxy;
 
+import net.sourceforge.waters.xsd.des.Event;
 import net.sourceforge.waters.xsd.des.EventList;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
 import net.sourceforge.waters.xsd.des.ProductDES;
@@ -49,7 +50,7 @@ class ProductDESEventListHandler
     return container.getEventList();
   }
 
-  List getList(EventList listelem)
+  List<Event> getList(EventList listelem)
   {
     return listelem.getList();
   }

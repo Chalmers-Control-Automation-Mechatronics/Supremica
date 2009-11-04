@@ -41,7 +41,7 @@ public class DistributedNode
     if (id == null)
       throw new IllegalArgumentException("Controller ID cannot be null");
 
-    Class c = Class.forName(classname);
+    Class<?> c = Class.forName(classname);
 
     if (!Worker.class.isAssignableFrom(c))
       throw new ClassCastException

@@ -15,6 +15,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 
 import net.sourceforge.waters.xsd.des.Automaton;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
+import net.sourceforge.waters.xsd.des.State;
 import net.sourceforge.waters.xsd.des.StateList;
 
 
@@ -49,7 +50,7 @@ class AutomatonStateListHandler
     return container.getStateList();
   }
 
-  List getList(final StateList listelem)
+  List<State> getList(final StateList listelem)
   {
     return listelem.getList();
   }

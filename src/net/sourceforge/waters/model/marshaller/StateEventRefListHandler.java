@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.des.EventProxy;
 
+import net.sourceforge.waters.xsd.des.EventRef;
 import net.sourceforge.waters.xsd.des.EventRefList;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
 import net.sourceforge.waters.xsd.des.State;
@@ -49,7 +50,7 @@ class StateEventRefListHandler
     return container.getPropositions();
   }
 
-  List getList(EventRefList listelem)
+  List<EventRef> getList(EventRefList listelem)
   {
     return listelem.getList();
   }

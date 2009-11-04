@@ -334,7 +334,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
   public void checkSetParent(final Subject parent)
   {
     if (parent != null && mParent != null) {
-      final Class clazz = getClass();
+      final Class<?> clazz = getClass();
       final StringBuffer buffer = new StringBuffer();
       buffer.append("Trying to redefine parent of ");
       buffer.append(getShortClassName(clazz));
@@ -524,7 +524,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
 
   protected void appendContainerName(final StringBuffer buffer)
   {
-    final Class clazz = getClass();
+    final Class<?> clazz = getClass();
     final String name = getShortClassName(clazz);
     buffer.append(name);
   }
@@ -534,7 +534,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     buffer.append("item");
   }
 
-  protected String getShortClassName(final Class clazz)
+  protected String getShortClassName(final Class<?> clazz)
   {
     final String fullclazzname = clazz.getName();
     final int dotpos = fullclazzname.lastIndexOf('.');

@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
 
+import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.module.EventListExpression;
 import net.sourceforge.waters.xsd.module.EventListType;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
@@ -50,7 +51,7 @@ class EventListExpressionEventListHandler
     return container.getEventList();
   }
 
-  List getList(final EventListType listelem)
+  List<ElementType> getList(final EventListType listelem)
   {
     return listelem.getList();
   }

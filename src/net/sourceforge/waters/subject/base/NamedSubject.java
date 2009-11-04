@@ -105,8 +105,8 @@ public abstract class NamedSubject
   {
     if (!mName.equals(name)) {
       final Subject parent = getParent();
-      if (parent instanceof IndexedCollection) {
-        final IndexedCollection collection = (IndexedCollection) parent;
+      if (parent instanceof IndexedCollection<?>) {
+        final IndexedCollection<?> collection = (IndexedCollection<?>) parent;
         collection.reinsert(this, name);
       }
       final ModelChangeEvent event =

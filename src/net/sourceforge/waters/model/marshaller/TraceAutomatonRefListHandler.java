@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
+import net.sourceforge.waters.xsd.des.AutomatonRef;
 import net.sourceforge.waters.xsd.des.TraceType;
 import net.sourceforge.waters.xsd.des.AutomatonRefList;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
@@ -49,7 +50,7 @@ class TraceAutomatonRefListHandler
     return container.getAutomatonRefList();
   }
 
-  List getList(AutomatonRefList listelem)
+  List<AutomatonRef> getList(AutomatonRefList listelem)
   {
     return listelem.getList();
   }

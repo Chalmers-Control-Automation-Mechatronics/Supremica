@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 
+import net.sourceforge.waters.xsd.module.ConstantAlias;
 import net.sourceforge.waters.xsd.module.ConstantAliasList;
 import net.sourceforge.waters.xsd.module.Module;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
@@ -50,7 +51,7 @@ class ModuleConstantAliasListHandler
     return container.getConstantAliasList();
   }
 
-  List getList(final ConstantAliasList listelem)
+  List<ConstantAlias> getList(final ConstantAliasList listelem)
   {
     return listelem.getList();
   }

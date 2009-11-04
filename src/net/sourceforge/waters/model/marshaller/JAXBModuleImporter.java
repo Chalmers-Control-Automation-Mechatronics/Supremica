@@ -126,7 +126,7 @@ public class JAXBModuleImporter
   {
     mFactory = factory;
     mOperatorTable = optable;
-    mHandlerMap = new HashMap<Class,ImportHandler>(128);
+    mHandlerMap = new HashMap<Class<?>,ImportHandler>(128);
 
     ImportHandler handler;
     handler = new ImportHandler() {
@@ -477,10 +477,10 @@ public class JAXBModuleImporter
   Object importElement(final ElementType element)
     throws WatersUnmarshalException
   {
-    final Class clazz = element.getClass();
+    final Class<?> clazz = element.getClass();
     ImportHandler handler = mHandlerMap.get(clazz);
     if (handler == null) {
-      final Class[] ifaces = clazz.getInterfaces();
+      final Class<?>[] ifaces = clazz.getInterfaces();
       for (int i = 0; i < ifaces.length; i++) {
         handler = mHandlerMap.get(ifaces[i]);
         if (handler != null) {
@@ -1139,7 +1139,7 @@ public class JAXBModuleImporter
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final OperatorTable mOperatorTable;
-  private final Map<Class,ImportHandler> mHandlerMap;
+  private final Map<Class<?>,ImportHandler> mHandlerMap;
   private IndexedList<NodeProxy> mGraphNodeList;
 
   private static final EventListExpressionEventListHandler

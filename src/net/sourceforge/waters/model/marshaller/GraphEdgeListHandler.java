@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.module.EdgeProxy;
 
+import net.sourceforge.waters.xsd.module.Edge;
 import net.sourceforge.waters.xsd.module.EdgeList;
 import net.sourceforge.waters.xsd.module.Graph;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
@@ -50,7 +51,7 @@ class GraphEdgeListHandler
     return container.getEdgeList();
   }
 
-  List getList(final EdgeList listelem)
+  List<Edge> getList(final EdgeList listelem)
   {
     return listelem.getList();
   }

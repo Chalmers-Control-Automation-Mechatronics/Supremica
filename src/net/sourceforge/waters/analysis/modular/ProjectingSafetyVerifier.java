@@ -266,7 +266,7 @@ public class ProjectingSafetyVerifier
       forbiddenEvents.addAll(spec.getEvents());
       AutomatonProxy plant = (AutomatonProxy) array[0];
       automata.add(plant);
-      final Map<EventProxy,EventProxy> uncont = Casting.toMap((Map) array[2]);
+      final Map<EventProxy,EventProxy> uncont = Casting.toMap((Map<?,?>) array[2]);
       Set<AutomatonProxy> newplants = new HashSet<AutomatonProxy>(plants.size());
       for (AutomatonProxy p : plants) {
         newplants.add(convertPlant(p, uncont));

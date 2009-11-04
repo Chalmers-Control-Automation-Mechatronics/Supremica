@@ -15,6 +15,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 
 import net.sourceforge.waters.xsd.module.Graph;
 import net.sourceforge.waters.xsd.module.NodeList;
+import net.sourceforge.waters.xsd.module.NodeType;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
@@ -50,7 +51,7 @@ class GraphNodeListHandler
     return container.getNodeList();
   }
 
-  List getList(final NodeList listelem)
+  List<NodeType> getList(final NodeList listelem)
   {
     return listelem.getList();
   }

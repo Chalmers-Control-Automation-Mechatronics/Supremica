@@ -30,7 +30,7 @@ abstract class JAXBListHandler
 
   abstract L getListElement(C container);
 
-  abstract List getList(L listelem);
+  abstract List<?> getList(L listelem);
 
 
   //#########################################################################
@@ -42,7 +42,7 @@ abstract class JAXBListHandler
   {
     if (!proxies.isEmpty()) {
       final L listelem = createListElement(container);
-      final List untyped = getList(listelem);
+      final List<?> untyped = getList(listelem);
       final List<ElementType> elements = Casting.toList(untyped);
       for (final P proxy : proxies) {
         final ElementType element =
@@ -59,7 +59,7 @@ abstract class JAXBListHandler
   {
     final L listelem = getListElement(container);
     if (listelem != null) {
-      final List untyped = getList(listelem);
+      final List<?> untyped = getList(listelem);
       final List<ElementType> elements = Casting.toList(untyped);
       importer.copyList(elements, proxies);
     }

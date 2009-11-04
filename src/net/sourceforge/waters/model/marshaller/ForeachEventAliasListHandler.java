@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
 
+import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.module.EventAliasList;
 import net.sourceforge.waters.xsd.module.ForeachEventAlias;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
@@ -50,7 +51,7 @@ class ForeachEventAliasListHandler
     return container.getEventAliasList();
   }
 
-  List getList(final EventAliasList listelem)
+  List<ElementType> getList(final EventAliasList listelem)
   {
     return listelem.getList();
   }

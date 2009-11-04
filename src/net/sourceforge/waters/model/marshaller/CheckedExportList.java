@@ -56,7 +56,7 @@ class CheckedExportList<P extends NamedProxy>
   //# Error Messages
   protected void appendContainerName(final StringBuffer buffer)
   {
-    final Class clazz = mContainer.getClass();
+    final Class<?> clazz = mContainer.getClass();
     final String clazzname = getShortClassName(clazz);
     buffer.append(clazzname);
     if (mContainer instanceof NamedProxy) {

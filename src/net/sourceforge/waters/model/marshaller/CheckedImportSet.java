@@ -20,13 +20,13 @@ class CheckedImportSet<P extends NamedProxy>
 
   //#########################################################################
   //# Constructors
-  public CheckedImportSet(final Class containerclazz,
+  public CheckedImportSet(final Class<?> containerclazz,
                           final String itemkindname)
   {
     this(containerclazz, null, itemkindname);
   }
 
-  public CheckedImportSet(final Class containerclazz,
+  public CheckedImportSet(final Class<?> containerclazz,
                           final String containername,
                           final String itemkindname)
   {
@@ -67,7 +67,7 @@ class CheckedImportSet<P extends NamedProxy>
 
   //#########################################################################
   //# Data Members
-  private final Class mContainerClazz;
+  private final Class<?> mContainerClazz;
   private final String mContainerName;
   private final String mItemKindName;
 

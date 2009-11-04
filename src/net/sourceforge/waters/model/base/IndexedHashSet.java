@@ -297,7 +297,7 @@ public class IndexedHashSet<P extends NamedProxy>
 
   protected void appendContainerName(final StringBuffer buffer)
   {
-    final Class clazz = getClass();
+    final Class<?> clazz = getClass();
     final String name = getShortClassName(clazz);
     buffer.append(name);
   }
@@ -307,7 +307,7 @@ public class IndexedHashSet<P extends NamedProxy>
     buffer.append("item");
   }
 
-  protected String getShortClassName(final Class clazz)
+  protected String getShortClassName(final Class<?> clazz)
   {
     final String fullclazzname = clazz.getName();
     final int dotpos = fullclazzname.lastIndexOf('.');

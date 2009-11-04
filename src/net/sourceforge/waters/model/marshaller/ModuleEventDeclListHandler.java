@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.module.EventDeclProxy;
 
+import net.sourceforge.waters.xsd.module.EventDecl;
 import net.sourceforge.waters.xsd.module.EventDeclList;
 import net.sourceforge.waters.xsd.module.Module;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
@@ -50,7 +51,7 @@ class ModuleEventDeclListHandler
     return container.getEventDeclList();
   }
 
-  List getList(final EventDeclList listelem)
+  List<EventDecl> getList(final EventDeclList listelem)
   {
     return listelem.getList();
   }

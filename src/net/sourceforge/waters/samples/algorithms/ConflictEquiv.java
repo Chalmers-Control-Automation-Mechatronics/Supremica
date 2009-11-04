@@ -55,7 +55,7 @@ public class ConflictEquiv {
                         final String resultname,
                         final ProductDESProxyFactory factory)
   {
-    final Collection states = aut.getStates();
+    final Collection<StateProxy> states = aut.getStates();
     final int numstates = states.size();
     mAutomaton = aut;
     mResultName = resultname;
