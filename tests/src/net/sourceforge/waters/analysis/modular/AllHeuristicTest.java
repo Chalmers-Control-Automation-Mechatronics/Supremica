@@ -9,13 +9,10 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.
-  AbstractControllabilityCheckerTest;
+import net.sourceforge.waters.model.analysis.AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 

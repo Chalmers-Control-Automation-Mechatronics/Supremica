@@ -106,9 +106,6 @@ public class TestAutomatonSynthesizer
 			synchronizer.execute();
 			assertTrue(synchronizer.getNumberOfStates() == 8);
 			Automaton theAutomaton = synchronizer.getAutomaton();
-
-			Automaton theAutomaton1 = new Automaton(theAutomaton);
-
 			SynthesizerOptions synthOptions = new SynthesizerOptions();
 			synthOptions.setSynthesisType(SynthesisType.CONTROLLABLE);
 

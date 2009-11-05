@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 

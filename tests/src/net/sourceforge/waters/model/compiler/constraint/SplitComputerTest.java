@@ -222,6 +222,7 @@ public class SplitComputerTest extends TestCase
 
   //#########################################################################
   //# Utilities
+  @SuppressWarnings("unused")
   private void addAtom(final String name)
     throws ParseException
   {
@@ -266,7 +267,6 @@ public class SplitComputerTest extends TestCase
     final ConstraintList constraints = parse(inputs);
     // System.err.println(constraints);
     final ConstraintList expected = parse(outputs);
-    final boolean changed = !constraints.equals(expected);
     final SplitCandidate split =
       mSplitComputer.proposeSplit(constraints, mContext);
     if (split == null) {

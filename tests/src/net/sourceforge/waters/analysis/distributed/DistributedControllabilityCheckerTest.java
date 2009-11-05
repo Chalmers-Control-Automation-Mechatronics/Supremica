@@ -7,7 +7,6 @@
 //# $Id$
 //###########################################################################
 
-
 package net.sourceforge.waters.analysis.distributed;
 
 import java.rmi.AlreadyBoundException;
@@ -18,15 +17,10 @@ import java.rmi.server.UnicastRemoteObject;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
-import net.sourceforge.waters.analysis.distributed.application.
-  DistributedNode;
-import net.sourceforge.waters.analysis.distributed.application.
-  DistributedServer;
-import net.sourceforge.waters.analysis.distributed.application.Node;
+import net.sourceforge.waters.analysis.distributed.application.DistributedNode;
+import net.sourceforge.waters.analysis.distributed.application.DistributedServer;
 import net.sourceforge.waters.analysis.distributed.application.Server;
-import net.sourceforge.waters.model.analysis.
-  AbstractControllabilityCheckerTest;
+import net.sourceforge.waters.model.analysis.AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;

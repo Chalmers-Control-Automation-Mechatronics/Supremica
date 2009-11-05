@@ -92,7 +92,8 @@ public class TestProjectBuildFromFSM
         return suite;
     }
     
-    public void rem_testUMDES_1()
+    @SuppressWarnings("deprecation")
+	public void rem_testUMDES_1()
     {
         try
         {
@@ -107,7 +108,7 @@ public class TestProjectBuildFromFSM
             assertTrue(theProject.isEventControllabilityConsistent());
             assertTrue(!theProject.hasSelfLoop());
             
-            for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+            for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext();)
             {
                 Automaton currAutomaton = (Automaton)autIt.next();
                 Alphabet currAlphabet = currAutomaton.getAlphabet();
@@ -189,7 +190,8 @@ public class TestProjectBuildFromFSM
     }
     
     
-    public void testUMDES_2()
+    @SuppressWarnings("deprecation")
+	public void testUMDES_2()
     {
         try
         {
@@ -203,7 +205,7 @@ public class TestProjectBuildFromFSM
             assertTrue(theProject.isEventControllabilityConsistent());
             assertTrue(theProject.hasSelfLoop());
             
-            for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+            for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext();)
             {
                 Automaton currAutomaton = (Automaton)autIt.next();
                 Alphabet currAlphabet = currAutomaton.getAlphabet();

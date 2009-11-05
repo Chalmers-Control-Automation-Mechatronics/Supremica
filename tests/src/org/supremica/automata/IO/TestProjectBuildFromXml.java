@@ -111,7 +111,7 @@ public class TestProjectBuildFromXml
             Automaton robotAutomaton = null;
             Automaton machineAutomaton = null;
             
-            for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+            for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext();)
             {
                 Automaton currAutomaton = (Automaton)autIt.next();
                 Alphabet currAlphabet = currAutomaton.getAlphabet();

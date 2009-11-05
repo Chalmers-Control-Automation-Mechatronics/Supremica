@@ -122,7 +122,7 @@ public abstract class AbstractWatersTest
   //# Logging
   protected Logger getLogger()
   {
-    final Class clazz = getClass();
+    final Class<?> clazz = getClass();
     return Logger.getLogger(clazz);
   }
 

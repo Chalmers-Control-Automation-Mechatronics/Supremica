@@ -95,7 +95,8 @@ public class TestAutomatonToFSM
         return suite;
     }
     
-    public void testReadWriteRead()
+    @SuppressWarnings("deprecation")
+	public void testReadWriteRead()
     {
         try
         {

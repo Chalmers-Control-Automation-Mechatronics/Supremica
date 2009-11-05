@@ -109,7 +109,7 @@ public class TestAutomataSynthesizer
             // Test Prioritized synchronization, although all events are prioritized in this example
             {
                 AutomataSynthesizer synthesizer = new AutomataSynthesizer(theProject, syncOptions, syntOptions);
-                Automata supAutomata = synthesizer.execute();
+                synthesizer.execute();
                 
 /*
                                 assertTrue(synchronizer.getNumberOfStates() == 8);

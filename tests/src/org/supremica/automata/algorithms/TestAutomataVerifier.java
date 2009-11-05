@@ -49,29 +49,36 @@
 package org.supremica.automata.algorithms;
 
 import java.io.File;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.supremica.testhelpers.*;
-import org.supremica.testcases.Arbiter;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.minimization.*;
-import org.supremica.automata.IO.*;
-
+import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
-import net.sourceforge.waters.model.marshaller.WatersMarshalException;
-import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.OperatorTable;
+
+import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
+import org.supremica.automata.IO.ADSUnmarshaller;
+import org.supremica.automata.IO.HISCUnmarshaller;
+import org.supremica.automata.IO.ProjectBuildFromWaters;
+import org.supremica.automata.IO.ProjectBuildFromXML;
+import org.supremica.automata.IO.SupremicaMarshaller;
+import org.supremica.automata.IO.SupremicaUnmarshaller;
+import org.supremica.automata.IO.UMDESUnmarshaller;
+import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
+import org.supremica.testhelpers.TestFiles;
+
 
 public class TestAutomataVerifier
     extends TestCase

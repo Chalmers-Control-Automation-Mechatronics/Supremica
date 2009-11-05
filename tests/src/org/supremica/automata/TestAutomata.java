@@ -106,7 +106,7 @@ public class TestAutomata
             Alphabet unionAlphabet = AlphabetHelpers.getUnionAlphabet(project);
             assertTrue(unionAlphabet.size() == 5);
             //System.err.println("******");
-            for (Iterator autIt = project.iterator(); autIt.hasNext(); )
+            for (Iterator<Automaton> autIt = project.iterator(); autIt.hasNext(); )
             {
                 Automaton automaton = (Automaton)autIt.next();
                 //System.err.println("******");

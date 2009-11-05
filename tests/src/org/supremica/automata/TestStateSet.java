@@ -91,6 +91,7 @@ public class TestStateSet
 		return suite;
 	}
 
+	@SuppressWarnings("unused")
 	public void testStateSets()
 	{
 		State q0 = new State("q0"); // id and name, set to the same
@@ -120,7 +121,6 @@ public class TestStateSet
 		twoset.add(new State(q0));
 		assertTrue(twoset.size() == 2); // should not add existing
 
-		assertTrue(oneset == oneset);
 		assertTrue(oneset.equals(oneset));
 		assertTrue(!(oneset == twoset));
 		assertTrue(oneset.equals(twoset));

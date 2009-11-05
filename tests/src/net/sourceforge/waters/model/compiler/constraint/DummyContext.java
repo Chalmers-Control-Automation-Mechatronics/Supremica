@@ -10,14 +10,11 @@
 
 package net.sourceforge.waters.model.compiler.constraint;
 
-import junit.framework.TestCase;
-
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorByContents;

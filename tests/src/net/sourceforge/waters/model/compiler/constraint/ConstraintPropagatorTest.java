@@ -10,18 +10,16 @@
 
 package net.sourceforge.waters.model.compiler.constraint;
 
-import junit.framework.TestCase;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
+import junit.framework.TestCase;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
+import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -580,6 +578,7 @@ public class ConstraintPropagatorTest extends TestCase
 
   //#########################################################################
   //# Utilities
+  @SuppressWarnings("unused")
   private void addAtom(final String name)
     throws ParseException
   {
@@ -653,7 +652,7 @@ public class ConstraintPropagatorTest extends TestCase
       new ConstraintPropagator(mPropagator);
     if (recall != null) {
       final SimpleExpressionProxy varname = mParser.parse(recall);
-      final SimpleExpressionProxy eqn = propagator2.recallBinding(varname);
+      propagator2.recallBinding(varname);
     }
     propagator2.addConstraints(constraints2);
     propagator2.propagate();

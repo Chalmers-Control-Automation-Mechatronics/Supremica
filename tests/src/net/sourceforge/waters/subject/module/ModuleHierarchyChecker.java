@@ -437,7 +437,7 @@ class ModuleHierarchyChecker
 
   private String getShortClassName(final Object object)
   {
-    final Class clazz = object.getClass();
+    final Class<?> clazz = object.getClass();
     final String fullclazzname = clazz.getName();
     final int dotpos = fullclazzname.lastIndexOf('.');
     return fullclazzname.substring(dotpos + 1);

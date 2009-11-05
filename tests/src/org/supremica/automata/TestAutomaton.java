@@ -124,6 +124,7 @@ public class TestAutomaton
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void testAddState()
 	{
 		Automaton theAutomaton = new Automaton();

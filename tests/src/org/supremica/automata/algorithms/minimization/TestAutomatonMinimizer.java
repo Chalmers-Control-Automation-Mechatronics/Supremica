@@ -63,23 +63,30 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
-import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.DuplicateNameException;
+import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 
-import org.supremica.testhelpers.*;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.automata.IO.*;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.IO.ProjectBuildFromWaters;
+import org.supremica.automata.IO.ProjectBuildFromXML;
+import org.supremica.automata.algorithms.AutomataSynchronizer;
+import org.supremica.automata.algorithms.EquivalenceRelation;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.testhelpers.TestFiles;
 
 
 public class TestAutomatonMinimizer

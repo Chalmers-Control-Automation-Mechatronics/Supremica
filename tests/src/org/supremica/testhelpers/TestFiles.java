@@ -59,7 +59,7 @@ import java.io.*;
 
 public class TestFiles
 {
-    private static List collection = new LinkedList();
+    private static List<TestFiles> collection = new LinkedList<TestFiles>();
     
     // Sorted alphabetically (for convenience), please comply.  :o)
     public static final TestFiles AGV = new TestFiles("agv.xml");
@@ -101,7 +101,7 @@ public class TestFiles
         this.filename = filename;
     }
     
-    public static Iterator iterator()
+    public static Iterator<TestFiles> iterator()
     {
         return collection.iterator();
     }

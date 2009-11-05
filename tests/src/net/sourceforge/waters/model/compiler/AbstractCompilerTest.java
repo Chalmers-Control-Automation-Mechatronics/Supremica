@@ -15,19 +15,14 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
+import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersException;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.compiler.context.
-  DuplicateIdentifierException;
-import net.sourceforge.waters.model.compiler.context.
-  UndefinedIdentifierException;
-import net.sourceforge.waters.model.compiler.graph.
-  NondeterministicModuleException;
+import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
+import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
+import net.sourceforge.waters.model.compiler.graph.NondeterministicModuleException;
 import net.sourceforge.waters.model.compiler.instance.EmptyLabelBlockException;
 import net.sourceforge.waters.model.compiler.instance.EventKindException;
 import net.sourceforge.waters.model.compiler.instance.InstantiationException;
@@ -47,10 +42,6 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-
-import net.sourceforge.waters.junit.AbstractWatersTest;
-
-import org.xml.sax.SAXException;
 
 
 public abstract class AbstractCompilerTest
@@ -476,6 +467,7 @@ public abstract class AbstractCompilerTest
 
   //#########################################################################
   //# Utilities
+  @SuppressWarnings("unused")
   private void compileError(final String dirname,
                             final String name,
                             final List<ParameterBindingProxy> bindings,
@@ -486,6 +478,7 @@ public abstract class AbstractCompilerTest
     compileError(dirname, name, bindings, exclass, culprits);
   }
 
+  @SuppressWarnings("unused")
   private void compileError(final String dirname,
                             final String subdirname,
                             final String name,
@@ -532,6 +525,7 @@ public abstract class AbstractCompilerTest
     compileError(dirname, name, bindings, exclass, culprits);
   }
 
+  @SuppressWarnings("unused")
   private void compileError(final String dirname,
                             final String subdirname,
                             final String name,

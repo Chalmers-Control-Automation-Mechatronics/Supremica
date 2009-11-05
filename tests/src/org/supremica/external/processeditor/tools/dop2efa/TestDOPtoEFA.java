@@ -3,18 +3,29 @@
  */
 package org.supremica.external.processeditor.tools.dop2efa;
 
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.supremica.testhelpers.*;
-import java.util.List;
-import java.util.LinkedList;
-import java.io.File;
-
 import org.supremica.external.avocades.common.Module;
-import org.supremica.external.avocades.dop2efa.*;
-import org.supremica.manufacturingTables.xsd.processeditor.*;
+import org.supremica.external.avocades.dop2efa.DOPtoEFA;
+import org.supremica.manufacturingTables.xsd.processeditor.Activity;
+import org.supremica.manufacturingTables.xsd.processeditor.Attribute;
+import org.supremica.manufacturingTables.xsd.processeditor.LowerIndicator;
+import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
+import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceType;
+import org.supremica.manufacturingTables.xsd.processeditor.Precondition;
+import org.supremica.manufacturingTables.xsd.processeditor.Properties;
+import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+import org.supremica.manufacturingTables.xsd.processeditor.ROPType;
+import org.supremica.manufacturingTables.xsd.processeditor.Relation;
+import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
+import org.supremica.manufacturingTables.xsd.processeditor.UpperIndicator;
+
 
 public class TestDOPtoEFA extends TestCase{
 	

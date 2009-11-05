@@ -12,9 +12,7 @@ package net.sourceforge.waters.analysis.composing;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.model.analysis.
-       AbstractLanguageInclusionCheckerTest;
+import net.sourceforge.waters.model.analysis.AbstractLanguageInclusionCheckerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 

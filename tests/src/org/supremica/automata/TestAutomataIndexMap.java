@@ -48,14 +48,13 @@
  */
 package org.supremica.automata;
 
-import java.util.*;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.supremica.testhelpers.*;
-import org.supremica.automata.IO.*;
+import org.supremica.automata.IO.ProjectBuildFromXML;
+import org.supremica.testhelpers.TestFiles;
+
 
 public class TestAutomataIndexMap
 	extends TestCase
