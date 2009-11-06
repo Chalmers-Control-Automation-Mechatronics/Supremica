@@ -19,15 +19,17 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import javax.swing.filechooser.FileFilter;
-import javax.xml.bind.JAXBException;
+
 import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.IndexedTreeSet;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
+import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
@@ -41,37 +43,25 @@ import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.xml.sax.SAXException;
 
-
-public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
+public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>
 {
 
   //#########################################################################
   //# Constructors
   public MazeCompiler(final File inputdir,
                       final File outputdir,
-                      final ModuleProxyFactory factory)
-    throws JAXBException, SAXException
-  {
-    this(inputdir, outputdir, factory,
-         new JAXBModuleMarshaller(factory, null));
-  }
-
-  public MazeCompiler(final File inputdir,
-                      final File outputdir,
                       final ModuleProxyFactory factory,
-                      final JAXBModuleMarshaller marshaller)
+                      final DocumentManager docman)
   {
     mInputDir = inputdir;
     mOutputDir = outputdir;
     mFactory = factory;
-    mJAXBMarshaller = marshaller;
     mUseLanguageInclusion = true;
+    mDocumentManager = docman;
     mReader = new MazeReader();
     mCopiedModules = new HashSet<String>(16);
   }
@@ -79,15 +69,9 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
 
   //#########################################################################
   //# Parameters
-  public void setInputDir(final File inputdir)
+  public void setInputDirectory(final File inputdir)
   {
     mInputDir = inputdir;
-    mCopiedModules.clear();
-  }
-
-  public void setOutputDir(final File outputdir)
-  {
-    mOutputDir = outputdir;
     mCopiedModules.clear();
   }
 
@@ -98,9 +82,20 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.base.ProxyUnmarshaller
-  public ModuleProxy unmarshal(final URI uri)
-    throws WatersUnmarshalException, IOException
+  //# Interface net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller
+  public File getOutputDirectory()
+  {
+    return mOutputDir;
+  }
+
+  public void setOutputDirectory(final File outputdir)
+  {
+    mOutputDir = outputdir;
+    mCopiedModules.clear();
+  }
+
+  public ModuleProxy unmarshalCopying(final URI uri)
+  throws IOException, WatersMarshalException, WatersUnmarshalException
   {
     final String pathname = uri.getPath();
     final int start1 = pathname.lastIndexOf(File.separatorChar);
@@ -111,6 +106,19 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     final Maze maze = mReader.load(uri, name);
     maze.createActions();
     return createModule(maze);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
+  public ModuleProxy unmarshal(final URI uri)
+    throws IOException, WatersUnmarshalException
+  {
+    try {
+      return unmarshalCopying(uri);
+    } catch (final WatersMarshalException exception) {
+      throw new WatersUnmarshalException(exception);
+    }
   }
 
   public Class<ModuleProxy> getDocumentClass()
@@ -135,23 +143,26 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
 
   public DocumentManager getDocumentManager()
   {
-    return null;
+    return mDocumentManager;
   }
 
-  public void setDocumentManager(DocumentManager manager)
+  public void setDocumentManager(final DocumentManager manager)
   {
+    mDocumentManager = manager;
   }
 
 
   //#########################################################################
   //# Compiling Maze Files
   private ModuleProxy createModule(final Maze maze)
-    throws WatersUnmarshalException, IOException
+  throws IOException, WatersMarshalException, WatersUnmarshalException
   {
     final String name = maze.getName();
     final String comment =
       "Automatically generated from maze description '" + name + "'.";
-    final String extname = name + mJAXBMarshaller.getDefaultExtension();
+    final ProxyMarshaller<ModuleProxy> marshaller =
+      mDocumentManager.findProxyMarshaller(ModuleProxy.class);
+    final String extname = name + marshaller.getDefaultExtension();
     final File outputfile = new File(mOutputDir, extname);
     final URI uri = outputfile.toURI();
     final Collection<Action> escapes = new LinkedList<Action>();
@@ -174,7 +185,7 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
 
   private InstanceProxy createInstance(final Square square,
                                        final Collection<Action> escapes)
-    throws WatersUnmarshalException, IOException
+    throws IOException, WatersMarshalException, WatersUnmarshalException
   {
     final String templname = square.getTemplateName();
     if (templname == null) {
@@ -256,17 +267,16 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
   }
 
   private void copyModule(final String name)
-    throws WatersUnmarshalException, IOException
+    throws WatersMarshalException, WatersUnmarshalException, IOException
   {
     if (!mCopiedModules.contains(name)) {
-      final String extname = name + mJAXBMarshaller.getDefaultExtension();
+      final ProxyMarshaller<ModuleProxy> marshaller =
+        mDocumentManager.findProxyMarshaller(ModuleProxy.class);
+      final String extname = name + marshaller.getDefaultExtension();
       final File source = new File(mInputDir, extname);
       final File target = new File(mOutputDir, extname);
-      try {
-        mJAXBMarshaller.copyXMLFile(source, target);
-      } catch (final JAXBException exception) {
-        throw new WatersUnmarshalException(exception);
-      }
+      final ModuleProxy module = (ModuleProxy) mDocumentManager.load(source);
+      mDocumentManager.saveAs(module, target);
       mCopiedModules.add(name);
     }
   }
@@ -279,7 +289,7 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
   private boolean mUseLanguageInclusion;
 
   private final ModuleProxyFactory mFactory;
-  private final JAXBModuleMarshaller mJAXBMarshaller;
+  private DocumentManager mDocumentManager;
   private final MazeReader mReader;
   private final Set<String> mCopiedModules;
 

@@ -142,7 +142,7 @@ public class DocumentManager {
    * Loads a document from a URI.
    * This methods loads a document from a given file name, guessing the
    * expected class from the file name extension.
-   * @param  uri          A URI specifiying the location of the document
+   * @param  uri          A URI specifying the location of the document
    *                      to be retrieved.
    * @return The loaded document. This may be just a cached copy,
    *         or it may actually be retrieved by reading an external file.
@@ -226,7 +226,7 @@ public class DocumentManager {
    * Loads a document from a URL.
    * This methods loads a document from a given file name, guessing the
    * expected class from the file name extension.
-   * @param  url          A URL specifiying the location of the document
+   * @param  url          A URL specifying the location of the document
    *                      to be retrieved.
    * @return The loaded document. This may be just a cached copy,
    *         or it may actually be retrieved by reading an external file.

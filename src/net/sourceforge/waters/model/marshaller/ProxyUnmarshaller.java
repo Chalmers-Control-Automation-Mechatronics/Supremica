@@ -16,36 +16,42 @@ import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 
+
 /**
- * <P>A helper class to read Waters documents from files.</P>
- *
- * <P>The ProxyUnmarshaller is a simple wrapper that provides an easy way
- * to load a document from a file.</P> 
- *
+ * <P>
+ * The basic unmarshaller interface.
+ * </P>
+ * 
+ * <P>
+ * The ProxyUnmarshaller provides the basic means for the
+ * {@link DocumentManager} to unmarshal, i.e., load documents from various file
+ * formats.
+ * </P>
+ * 
  * @author Robi Malik
  */
 
 public interface ProxyUnmarshaller<D extends DocumentProxy>
 {
 
-  //#########################################################################
-  //# Access Methods
+  // #########################################################################
+  // # Access Methods
   /**
    * Loads a document from a file.
-   * @param  uri      A URI specifiying the location of the document
-   *                  to be retrieved.
+   * 
+   * @param uri
+   *          A URI specifying the location of the document to be retrieved.
    * @return The loaded document.
-   * @throws WatersUnmarshalException to indicate that parsing the input file
-   *                  has failed for some reason.
-   * @throws IOException to indicate that the input file could not be
-   *                  opened or read.
+   * @throws WatersUnmarshalException
+   *           to indicate that parsing the input file has failed for some
+   *           reason.
+   * @throws IOException
+   *           to indicate that the input file could not be opened or read.
    */
-  public D unmarshal(URI uri)
-    throws WatersUnmarshalException, IOException;
+  public D unmarshal(URI uri) throws WatersUnmarshalException, IOException;
 
-
-  //#########################################################################
-  //# Type Information
+  // #########################################################################
+  // # Type Information
   /**
    * Gets the class of documents handled by this unmarshaller.
    */
@@ -57,29 +63,27 @@ public interface ProxyUnmarshaller<D extends DocumentProxy>
   public String getDefaultExtension();
 
   /**
-   * Gets a list of file name extensions for files that may be handled
-   * by this marshaller.
+   * Gets a list of file name extensions for files that may be handled by this
+   * marshaller.
    */
   public Collection<String> getSupportedExtensions();
-  
+
   /**
-   * Gets a list of file filters that may be handled
-   * by this marshaller.
+   * Gets a list of file filters that may be handled by this marshaller.
    */
   public Collection<FileFilter> getSupportedFileFilters();
 
-
-  //#########################################################################
-  //# Entity Resolving
+  // #########################################################################
+  // # Entity Resolving
   /**
-   * Gets the document manager used by this unmarshaller to resolve
-   * references to other files.
+   * Gets the document manager used by this unmarshaller to resolve references
+   * to other files.
    */
   public DocumentManager getDocumentManager();
 
   /**
-   * Sets a document manager to used by this unmarshaller to resolve
-   * references to other files.
+   * Sets a document manager to used by this unmarshaller to resolve references
+   * to other files.
    */
   public void setDocumentManager(DocumentManager manager);
 

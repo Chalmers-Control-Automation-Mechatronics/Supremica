@@ -499,15 +499,14 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
     mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
     mTraceMarshaller = new JAXBTraceMarshaller(mProductDESFactory);
-    mMazeCompiler = new MazeCompiler
-      (mInputDirectory, mOutputDirectory, moduleFactory, mModuleMarshaller);
     // mMazeCompiler.setUseLanguageInclusion(false);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
-    mDocumentManager.registerUnmarshaller(mMazeCompiler);
+    mMazeCompiler = new MazeCompiler
+      (mInputDirectory, mOutputDirectory, moduleFactory, mDocumentManager);
     ensureDirectoryExists(mOutputDirectory);
   }
 
