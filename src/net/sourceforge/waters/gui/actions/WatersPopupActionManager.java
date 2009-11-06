@@ -13,10 +13,15 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.net.URI;
+
 import javax.swing.Action;
 import javax.swing.JComponent;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 
@@ -94,6 +99,18 @@ public class WatersPopupActionManager
   public IDEAction getEditEventLabelAction(final Proxy arg)
   {
     return new EditEventLabelAction(mIDE, arg);
+  }
+
+  public IDEAction getGotoModuleAction(final ModuleProxy parent,
+                                       final String name)
+  {
+    try {
+      final DocumentManager docman = mIDE.getDocumentManager();
+      final URI uri = docman.resolve(parent, name, ModuleProxy.class);
+      return new GotoModuleAction(mIDE, name, uri);
+    } catch (final WatersUnmarshalException exception) {
+      return null;
+    }
   }
 
   public IDEAction getGraphLayoutAction()
@@ -184,5 +201,6 @@ public class WatersPopupActionManager
   //#######################################################################
   //# Data Members
   private final IDE mIDE;
+
 
 }

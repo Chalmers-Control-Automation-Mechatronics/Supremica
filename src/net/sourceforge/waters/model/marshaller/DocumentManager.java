@@ -366,6 +366,26 @@ public class DocumentManager {
   }
 
 
+  /**
+   * Determines a full URI for a given document name relative to another
+   * document. For example, this method can be used to locate the files for
+   * {@link InstanceProxy} items found within a module.
+   * @param  context The document containing the name to be looked up.
+   * @param  base    The name of the document to be looked up.
+   * @param  clazz   The expected class of the document to be looked up.
+   */
+  public <DD extends DocumentProxy>
+    URI resolve(final DocumentProxy context, final String base,
+                final Class<DD> clazz)
+    throws WatersUnmarshalException
+  {
+    final URI uri = context.getLocation();
+    final ProxyMarshaller<DD> marshaller = findProxyMarshaller(clazz);
+    final String ext = marshaller.getDefaultExtension();
+    return resolve(uri, base + ext);
+  }
+
+
   //#########################################################################
   //# Registering Marshallers
   /**

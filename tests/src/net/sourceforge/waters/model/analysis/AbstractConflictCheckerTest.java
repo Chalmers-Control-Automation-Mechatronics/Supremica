@@ -888,11 +888,11 @@ public abstract class AbstractConflictCheckerTest
         mLanguageInclusionChecker =
           new NativeLanguageInclusionChecker(des, factory);
       } catch (final NoClassDefFoundError exception) {
-          mLanguageInclusionChecker =
-            new MonolithicLanguageInclusionChecker(des, factory);
+        mLanguageInclusionChecker =
+          new MonolithicLanguageInclusionChecker(des, factory);
       } catch (final UnsatisfiedLinkError exception) {
-          mLanguageInclusionChecker =
-            new MonolithicLanguageInclusionChecker(des, factory);
+        mLanguageInclusionChecker =
+          new MonolithicLanguageInclusionChecker(des, factory);
       }
     }
     mLanguageInclusionChecker.setModel(des);

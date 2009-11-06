@@ -23,10 +23,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.LinkedList;
 import java.util.Set;
+
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JTree;
@@ -84,14 +85,14 @@ public class ComponentsTree
   //#########################################################################
   //# Constructor
   public ComponentsTree(final ModuleWindowInterface root,
-			final WatersPopupActionManager manager)
+                        final WatersPopupActionManager manager)
   {
     super(new ComponentsTreeModel(root.getModuleSubject()));
     mRoot = root;
     mModuleContext = root.getModuleContext();
     mPrinter = new HTMLPrinter();
     mDoubleClickVisitor = new DoubleClickVisitor();
-    mPopupFactory = new ComponentsTreePopupFactory(manager);
+    mPopupFactory = new ComponentsTreePopupFactory(manager, mModuleContext);
     mDataFlavorVisitor = new DataFlavorVisitor();
     mObservers = null;
     mIsPermanentFocusOwner = false;
@@ -677,6 +678,14 @@ public class ComponentsTree
       return manager.getShowModuleCommentAction();
     }
 
+    public Object visitInstanceProxy(final InstanceProxy inst)
+    {
+      final WatersPopupActionManager manager = mPopupFactory.getMaster();
+      final String name = inst.getModuleName();
+      final ModuleProxy module = mModuleContext.getModule();
+      return manager.getGotoModuleAction(module, name);
+    }
+
     public IDEAction visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
       final WatersPopupActionManager manager = mPopupFactory.getMaster();
@@ -697,7 +706,7 @@ public class ComponentsTree
     private DataFlavor getDataFlavor(final Proxy proxy)
     {
       try {
-	return (DataFlavor) proxy.acceptVisitor(this);
+        return (DataFlavor) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
         throw exception.getRuntimeException();
       }

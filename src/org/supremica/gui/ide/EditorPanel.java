@@ -72,7 +72,7 @@ public class EditorPanel
         setLeftComponent(mTabbedPane);
 
 		final IDE ide = mModuleContainer.getIDE();
- 		final WatersPopupActionManager manager = ide.getPopupActionManager();
+        final WatersPopupActionManager manager = ide.getPopupActionManager();
         final ComponentsTree comptree = new ComponentsTree(this, manager);
         mComponentsTab = new Tab("Components", comptree);
         final EventDeclListView eventlist =

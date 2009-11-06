@@ -14,6 +14,8 @@ import javax.swing.JPopupMenu;
 
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import net.sourceforge.waters.model.module.InstanceProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
 
@@ -23,9 +25,11 @@ class ComponentsTreePopupFactory
 
   //#########################################################################
   //# Constructor
-  ComponentsTreePopupFactory(final WatersPopupActionManager master)
+  ComponentsTreePopupFactory(final WatersPopupActionManager master,
+                             final ModuleContext context)
   {
     super(master);
+    mContext = context;
   }
 
 
@@ -48,6 +52,18 @@ class ComponentsTreePopupFactory
 
   //#######################################################################
   //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+  public Object visitInstanceProxy(final InstanceProxy inst)
+  {
+    visitProxy(inst);
+    final WatersPopupActionManager master = getMaster();
+    final JPopupMenu popup = getPopup();
+    final String name = inst.getModuleName();
+    final ModuleProxy module = mContext.getModule();
+    final IDEAction gotomod = master.getGotoModuleAction(module, name);
+    popup.add(gotomod);
+    return null;
+  }
+
   public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
   {
     visitProxy(comp);
@@ -57,5 +73,10 @@ class ComponentsTreePopupFactory
     popup.add(editgraph);
     return null;
   }
+
+
+  //#######################################################################
+  //# Data Members
+  private final ModuleContext mContext;
 
 }

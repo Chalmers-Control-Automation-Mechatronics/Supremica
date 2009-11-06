@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.swing.Icon;
 
 import net.sourceforge.waters.gui.language.ProxyNamer;
@@ -26,8 +27,8 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
@@ -70,6 +71,7 @@ public class ModuleContext
   //# Constructor
   public ModuleContext(final ModuleSubject module)
   {
+    mModule = module;
     mCanDropVisitor = new CanDropVisitor();
     mIdentifierNameVisitor = new IdentifierNameVisitor();
     mIconGetterVisitor = new IconGetterVisitor();
@@ -97,6 +99,14 @@ public class ModuleContext
   public String getToolTipText(final Proxy item)
   {
     return mToolTipGetterVisitor.getToolTipText(item);
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public ModuleSubject getModule()
+  {
+    return mModule;
   }
 
 
@@ -812,6 +822,7 @@ public class ModuleContext
 
   //#########################################################################
   //# Data Members
+  private final ModuleSubject mModule;
   private final CanDropVisitor mCanDropVisitor;
   private final IdentifierNameVisitor mIdentifierNameVisitor;
   private final IconGetterVisitor mIconGetterVisitor;
