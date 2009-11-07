@@ -295,11 +295,12 @@ public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>
 
   private IndexedSet<EventDeclProxy> mEvents;
 
-  private static final String MAZEEXT = ".txt";
+  private static final String MAZEEXT = ".maze";
   private static final Collection<String> EXTENSIONS =
     Collections.singletonList(MAZEEXT);
   private static final FileFilter MAZEFILTER =
-    new StandardExtensionFileFilter(MAZEEXT, "Maze description files [*.txt]");
+    new StandardExtensionFileFilter
+      (MAZEEXT, "Maze description files [*" + MAZEEXT + "]");
   private static final Collection<FileFilter> FILTERS =
     Collections.singletonList(MAZEFILTER);
 
