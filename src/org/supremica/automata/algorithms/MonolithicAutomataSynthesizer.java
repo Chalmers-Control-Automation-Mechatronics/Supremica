@@ -204,12 +204,10 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 	private boolean stopRequested = false;
 	private Stoppable threadToStop;
 
-	@Override
 	public boolean isStopped() {
 		return stopRequested;
 	}
 
-	@Override
 	public void requestStop() {
 		stopRequested = true;
 		if (threadToStop != null) {

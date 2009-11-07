@@ -184,7 +184,6 @@ public final class AutomataSynchronizerExecuter
     public AutomataSynchronizerExecuter(AutomataSynchronizerHelper synchronizerHelper)
     {
         setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-			@Override
 			public void uncaughtException(Thread thread, Throwable cause) {
 				cause.printStackTrace();
 				causeOfInterrupt = cause;
