@@ -91,7 +91,7 @@ public class DistributedNode
   public void shutdown()
   {
     //No warning necessary. This should kill all non-daemon mode threads?
-    System.out.println("Shutting down node");
+    System.err.println("Shutting down node");
     System.exit(0);
   }
 
@@ -110,7 +110,7 @@ public class DistributedNode
 	    {
 	      try
 		{
-		  System.out.format("Attempting to get server proxy\n");
+		  System.err.format("Attempting to get server proxy\n");
 		  mServerProxy = getServerProxy();
 		  mServerProxy.registerNode(mNodeProxy);
 		  failcount = 0;
@@ -127,14 +127,14 @@ public class DistributedNode
 	    {
 	      try
 		{
-		  System.out.format("Pinging server\n");
+		  System.err.format("Pinging server\n");
 		  mServerProxy.ping();
 		  failcount = 0;
 		}
 	      catch (RemoteException e)
 		{
 		  //Ping failed.
-		  System.out.format("Ping failed!\n");
+		  System.err.format("Ping failed!\n");
 		  mServerProxy = null;
 		}
 	    }

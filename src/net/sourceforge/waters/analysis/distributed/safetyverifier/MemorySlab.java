@@ -19,7 +19,7 @@ public class MemorySlab
   }
 
   /**
-   * Allocate space and store data into the slab, expanding it if necessary.
+   * Allocates space and stores data into the slab, expanding it if necessary.
    */
   public int allocate(int[] data)
   {
@@ -37,7 +37,7 @@ public class MemorySlab
   }
 
   /**
-   * Copy data out of the memory slab into a temporary buffer.
+   * Copies data out of the memory slab into a temporary buffer.
    */
   public void retrieve(int ptr, int[] buffer, int length)
   {
@@ -46,11 +46,36 @@ public class MemorySlab
     System.arraycopy(mChunks[chunk], pos, buffer, 0, length);
   }
 
+  /**
+   * Reads a single word from the chunk.
+   */
   public int read(int ptr)
   {
     final int chunk = ptr >>> CHUNK_BITS;
     final int pos = ptr & CHUNK_MASK;
     return mChunks[chunk][pos];
+  }
+
+  /**
+   * Gets direct access to a chunk array corresponding to a pointer.
+   * @param ptr pointer to get chunk for
+   * @return the underlying chunk array for direct access.
+   */
+  public int[] getChunk(int ptr)
+  {
+    return mChunks[ptr >>> CHUNK_BITS];
+  }
+
+  /**
+   * Returns the position within the chunk that this pointer
+   * corresponds to.
+   * @param ptr Pointer
+   * @return the position within the chunk that this pointer
+   * corresponds to.
+   */
+  public int getChunkPosition(int ptr)
+  {
+    return ptr & CHUNK_MASK;
   }
 
   //Number of bits to use in the 

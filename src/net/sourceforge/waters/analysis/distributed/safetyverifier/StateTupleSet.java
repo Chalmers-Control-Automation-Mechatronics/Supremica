@@ -23,7 +23,10 @@ public class StateTupleSet
   {
     int initialcap = PrimeFinder.nextPrime(initialcapacity);
     mStateLength = statelength;
-    mHash = new IntHashData(initialcap, new StateTupleHashStrategy());
+    
+    mStrategy = new DirectHashStrategy();
+    
+    mHash = new IntHashData(initialcap, mStrategy);
     mData = new MemorySlab();
   }
 
@@ -59,6 +62,7 @@ public class StateTupleSet
 	final int ptr = mData.allocate(data);
 	mSize++;
 	mHash.store(index, ptr);
+
 	return ptr;
       }
     else
@@ -133,41 +137,100 @@ public class StateTupleSet
     return mSize;
   }
 
-  private class StateTupleHashStrategy implements HashStrategy
+  private class DirectHashStrategy implements HashStrategy
   {
     public boolean equal(Object obj, int x)
     {
-      StateTuple state = (StateTuple)obj;
-      mData.retrieve(x, mData1, mStateLength);
-      return java.util.Arrays.equals(mData1, state.getStateArray());
+      final int[] chunk = mData.getChunk(x);
+      final int pos = mData.getChunkPosition(x);
+      final int[] state = ((StateTuple)obj).getStateArray();
+
+      for (int i = 0; i < mStateLength; i++)
+	{
+	  if (state[i] != chunk[pos + i])
+	    return false;
+	}
+
+      return true;
     }
 
     public boolean equalIndirect(int x, int y)
     {
-      mData.retrieve(x, mData1, mStateLength);
-      mData.retrieve(y, mData2, mStateLength);
-      return java.util.Arrays.equals(mData1, mData2);
+      final int[] chunkx = mData.getChunk(x);
+      final int[] chunky = mData.getChunk(y);
+      int posx = mData.getChunkPosition(x);
+      int posy = mData.getChunkPosition(y);
+      final int posx_end = posx + mStateLength;
+
+      while (posx < posx_end)
+	{
+	  if (chunkx[posx] != chunky[posy])
+	    return false;
+	  posx++;
+	  posy++;
+	}
+      return true;
     }
 
     public int computeHash(Object obj)
     {
       StateTuple state = (StateTuple)obj;
-      return java.util.Arrays.hashCode(state.getStateArray());
+      return computeHash_sdbm(state.getStateArray(), 0, mStateLength);
     }
 
     public int computeIndirectHash(int ptr)
     {
-      mData.retrieve(ptr, mData1, mStateLength);
-      return java.util.Arrays.hashCode(mData1);
+      final int[] chunk = mData.getChunk(ptr);
+      final int pos = mData.getChunkPosition(ptr);
+      return computeHash_sdbm(chunk, pos, mStateLength);
     }
 
-    private final int[] mData1 = new int[mStateLength];
-    private final int[] mData2 = new int[mStateLength];
+    private int computeHash_java(final int[] ar, final int start, final int length)
+    {
+      final int end = start + length;
+      int hash = 1;
+      for (int i = start; i < end; i++)
+	{
+	  hash = 31 * hash + ar[i];
+	}
+      
+      return hash;
+    }
+
+    private int computeHash_bernstein(final int[] ar, int start, final int length)
+    {
+      final int end = start + length;
+      int hash = 5381;
+      
+      while (start < end)
+	{
+	  hash = ((hash << 5) + hash) + ar[start];
+	  start++;
+	}
+      
+      return hash;
+    }
+
+    private int computeHash_sdbm(final int[] ar, int start, final int length)
+    {
+      final int end = start + length;
+      int hash = 0;
+      
+      while (start < end)
+	{
+	  hash = ar[start] + (hash << 6) + (hash << 16) - hash;
+	  start++;
+	}
+      
+      return hash;
+    }
   }
 
 
   private int mSize = 0;
   private final float mLoadFactor = 0.5f;
+
+  private HashStrategy mStrategy;
 
   private final int mStateLength;
   private final IntHashData mHash;

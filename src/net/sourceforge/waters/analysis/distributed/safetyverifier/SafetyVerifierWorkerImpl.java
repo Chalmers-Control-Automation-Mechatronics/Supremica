@@ -18,7 +18,6 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   {
     //The constructor is used sparingly; the created method is run
     //after the object has been successfully exported.
-    System.out.format("Constructed safety verifier worker\n");
   }
 
   public void setJob(Job job)
@@ -606,6 +605,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   {
     super.deleted();
     System.err.format("deleted() called on safety verifier worker\n");
+
 
     //Clean up running threads so the object can be garbage collected.
     kill();
