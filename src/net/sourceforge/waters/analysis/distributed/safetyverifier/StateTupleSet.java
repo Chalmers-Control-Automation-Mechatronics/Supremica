@@ -185,6 +185,7 @@ public class StateTupleSet
       return computeHash_sdbm(chunk, pos, mStateLength);
     }
 
+    @SuppressWarnings("unused")
     private int computeHash_java(final int[] ar, final int start, final int length)
     {
       final int end = start + length;
@@ -197,6 +198,7 @@ public class StateTupleSet
       return hash;
     }
 
+    @SuppressWarnings("unused")
     private int computeHash_bernstein(final int[] ar, int start, final int length)
     {
       final int end = start + length;

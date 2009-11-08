@@ -280,8 +280,7 @@
                verbose="false"
                nowarn="true"
                excludes="${supremica_basedir}/external/robotCoordination/**,
-                  net/sourceforge/waters/mbt/**,
-				  ${supremica_basedir}/external/operationframeworkto61131/**"
+                 ${supremica_basedir}/external/operationframeworkto61131/**"
                source="1.5"
                fork="true"
                memoryMaximumSize="128M">
@@ -630,8 +629,6 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${dist}/vw" perm="755"/>   
         <copy file="${templates}/wcheck" todir="${dist}"/>      
         <chmod file="${dist}/wcheck" perm="755"/>       
-        <copy file="${templates}/MBTTranslate" todir="${dist}"/>        
-        <chmod file="${dist}/MBTTranslate" perm="755"/>         
         <copy file="${templates}/demo" todir="${dist}"/>
         <chmod file="${dist}/demo" perm="755"/>
         <copy file="${templates}/demo.cmd" todir="${dist}"/>
