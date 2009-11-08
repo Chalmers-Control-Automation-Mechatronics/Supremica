@@ -2,39 +2,47 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.marshaller
-//# CLASS:   JAXBModuleImporter
+//# CLASS:   ModuleConstantAliasListHandler
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
-import java.net.URI;
+import java.util.List;
 
-import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.xsd.module.Module;
+import net.sourceforge.waters.xsd.module.ModuleSequence;
 
 
-public class JAXBModuleImporter
-  extends JAXBAbstractModuleImporter<ModuleProxy,Module>
+class ModuleSequenceListHandler
+  extends JAXBListHandler<ModuleSequence,ModuleSequence,ModuleProxy>
 {
+
+
   //#########################################################################
   //# Constructors
-  public JAXBModuleImporter(final ModuleProxyFactory factory,
-                            final OperatorTable optable)
+  ModuleSequenceListHandler()
   {
-    super(factory, optable);
   }
 
 
   //#########################################################################
-  //# Overrides for Abstract Base Class JAXBImporter
-  public ModuleProxy importDocument(final Module element, final URI uri)
-    throws WatersUnmarshalException
+  //# Overrides for Abstract Base Class JAXBListHandler
+  ModuleSequence createListElement(final ModuleSequence container)
   {
-    return importModule(element, uri);
+    return container;
+  }
+
+  ModuleSequence getListElement(final ModuleSequence container)
+  {
+    return container;
+  }
+
+  List<Module> getList(final ModuleSequence listelem)
+  {
+    return listelem.getList();
   }
 
 }

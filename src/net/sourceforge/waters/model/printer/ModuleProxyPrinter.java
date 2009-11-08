@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ModuleSequenceProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -472,6 +473,15 @@ public class ModuleProxyPrinter
     printCollection("ALIASES", proxy.getEventAliasList());
     printCollection("COMPONENTS", proxy.getComponentList());
     println('}');
+    return null;
+  }
+
+  public Object visitModuleSequenceProxy(final ModuleSequenceProxy proxy)
+    throws VisitorException
+  {
+    for (final ModuleProxy module : proxy.getModules()) {
+      visitModuleProxy(module);
+    }
     return null;
   }
 

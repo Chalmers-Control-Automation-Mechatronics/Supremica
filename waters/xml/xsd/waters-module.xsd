@@ -15,6 +15,27 @@
 
 
 <!-- ==================================================================== -->
+<!-- ModuleSequence                                                       -->
+<!-- ==================================================================== -->
+
+<xs:element name="ModuleSequence">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:DocumentType">
+        <xs:sequence>
+          <xs:element ref="M:Module" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+
+<!-- ==================================================================== -->
 <!-- Module                                                               -->
 <!-- ==================================================================== -->
 

@@ -183,6 +183,12 @@ public class AbstractModuleProxyVisitor
     return visitDocumentProxy(proxy);
   }
 
+  public Object visitModuleSequenceProxy(final ModuleSequenceProxy proxy)
+    throws VisitorException
+  {
+    return visitDocumentProxy(proxy);
+  }
+
   public Object visitNodeProxy(final NodeProxy proxy)
     throws VisitorException
   {

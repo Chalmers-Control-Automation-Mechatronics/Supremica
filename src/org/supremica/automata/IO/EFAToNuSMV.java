@@ -54,6 +54,7 @@ import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ModuleSequenceProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -689,6 +690,11 @@ public class EFAToNuSMV {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        public Object visitModuleSequenceProxy(ModuleSequenceProxy proxy)
+        {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
         public Object visitNodeProxy(NodeProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
@@ -757,6 +763,7 @@ public class EFAToNuSMV {
         public Object visitDocumentProxy(DocumentProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
+
     }
     
     public static interface SpecPrinter {

@@ -473,6 +473,31 @@ public interface ModuleProxyFactory
        URI location);
 
   /**
+   * Creates a new module sequence.
+   * @param name The name of the new module sequence.
+   * @param comment The comment of the new module sequence, or <CODE>null</CODE>.
+   * @param location The location of the new module sequence.
+   * @param modules The constant of the new module sequence, or <CODE>null</CODE> if empty.
+   */
+  public ModuleSequenceProxy createModuleSequenceProxy
+      (String name,
+       String comment,
+       URI location,
+       Collection<? extends ModuleProxy> modules);
+
+  /**
+   * Creates a new module sequence using default values.
+   * This method creates a module sequence with
+   * the comment set to <CODE>null</CODE> and
+   * an empty constant.
+   * @param name The name of the new module sequence.
+   * @param location The location of the new module sequence.
+   */
+  public ModuleSequenceProxy createModuleSequenceProxy
+      (String name,
+       URI location);
+
+  /**
    * Creates a new parameter binding.
    * @param name The name of the new parameter binding.
    * @param expression The expression of the new parameter binding.

@@ -491,6 +491,20 @@ public class ModuleProxyCloner
                                       componentList);
   }
 
+  public ModuleSequenceProxy visitModuleSequenceProxy
+    (final ModuleSequenceProxy proxy)
+    throws VisitorException
+  {
+    final String name = proxy.getName();
+    final String comment = proxy.getComment();
+    final Collection<ModuleProxy> modules0 = proxy.getModules();
+    final Collection<ModuleProxy> modules = cloneProxyCollection(modules0);
+    return mFactory.createModuleSequenceProxy(name,
+                                              comment,
+                                              null,
+                                              modules);
+  }
+
   public NodeProxy visitNodeProxy
     (final NodeProxy proxy)
     throws VisitorException

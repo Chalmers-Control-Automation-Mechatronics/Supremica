@@ -33,6 +33,7 @@ import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -424,6 +425,26 @@ public class ModuleSubjectFactory
   {
     return new ModuleSubject(name,
                              location);
+  }
+
+  public ModuleSequenceSubject createModuleSequenceProxy
+      (final String name,
+       final String comment,
+       final URI location,
+       final Collection<? extends ModuleProxy> modules)
+  {
+    return new ModuleSequenceSubject(name,
+                                     comment,
+                                     location,
+                                     modules);
+  }
+
+  public ModuleSequenceSubject createModuleSequenceProxy
+      (final String name,
+       final URI location)
+  {
+    return new ModuleSequenceSubject(name,
+                                     location);
   }
 
   public ParameterBindingSubject createParameterBindingProxy

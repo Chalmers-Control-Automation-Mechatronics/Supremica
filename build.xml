@@ -733,6 +733,7 @@ Class-Path: ${manifest.pathlist}</echo>
                     <exclude name="**/Abstract*.java"/>
                     <exclude name="**/Native*.java"/>
                     <exclude name="net/sourceforge/waters/analysis/composing/**/*.java"/>
+                    <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
                     <exclude name="net/sourceforge/waters/analysis/modular/**/*.java"/>
                 </fileset>
             </batchtest>

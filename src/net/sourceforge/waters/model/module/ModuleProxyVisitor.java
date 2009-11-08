@@ -101,6 +101,9 @@ public interface ModuleProxyVisitor
   public Object visitModuleProxy(ModuleProxy proxy)
     throws VisitorException;
 
+  public Object visitModuleSequenceProxy(ModuleSequenceProxy proxy)
+    throws VisitorException;
+
   public Object visitNodeProxy(NodeProxy proxy)
     throws VisitorException;
 

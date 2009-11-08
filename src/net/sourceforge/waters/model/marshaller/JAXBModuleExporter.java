@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ModuleSequenceProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -98,6 +99,7 @@ import net.sourceforge.waters.xsd.module.IntConstant;
 import net.sourceforge.waters.xsd.module.LabelBlock;
 import net.sourceforge.waters.xsd.module.LabelGeometry;
 import net.sourceforge.waters.xsd.module.Module;
+import net.sourceforge.waters.xsd.module.ModuleSequence;
 import net.sourceforge.waters.xsd.module.NodeRef;
 import net.sourceforge.waters.xsd.module.NodeType;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
@@ -377,6 +379,15 @@ public class JAXBModuleExporter
   {
     final Module element = mFactory.createModule();
     copyModuleProxy(proxy, element);
+    return element;
+  }
+
+  public ModuleSequence visitModuleSequenceProxy
+      (final ModuleSequenceProxy proxy)
+    throws VisitorException
+  {
+    final ModuleSequence element = mFactory.createModuleSequence();
+    copyModuleSequenceProxy(proxy, element);
     return element;
   }
 
@@ -950,6 +961,15 @@ public class JAXBModuleExporter
     mModuleComponentListHandler.toJAXB(this, componentListProxy, element);
   }
 
+  private void copyModuleSequenceProxy(final ModuleSequenceProxy proxy,
+                                       final ModuleSequence element)
+    throws VisitorException
+  {
+    copyDocumentProxy(proxy, element);
+    final List<ModuleProxy> list = proxy.getModules();
+    mModuleSequenceListHandler.toJAXB(this, list, element);
+  }
+
   private void copyNodeProxy
       (final NodeProxy proxy,
        final NodeType element)
@@ -1248,5 +1268,8 @@ public class JAXBModuleExporter
   private static final ModuleEventDeclListHandler
     mModuleEventDeclListHandler =
     new ModuleEventDeclListHandler(mFactory);
+  private static final ModuleSequenceListHandler
+    mModuleSequenceListHandler =
+    new ModuleSequenceListHandler();
 
 }
