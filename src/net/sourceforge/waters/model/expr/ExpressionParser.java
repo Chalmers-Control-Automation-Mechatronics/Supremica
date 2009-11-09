@@ -387,13 +387,11 @@ public class ExpressionParser {
       mScanner.next();
       final ParseResult lhs = parseResult(Token.CLOSEBR, token);
       return parseResult(lhs, token, outerpri, outerassoc);
-    case Token.OPENEN:
+    case Token.OPENSQ:
       mScanner.next();
       final ParseResult enumset = parseEnumSetResult();
       return parseResult(enumset, token, outerpri, outerassoc);
-    case Token.OPENSQ:
     case Token.CLOSEBR:
-    case Token.CLOSEEN:
     case Token.CLOSESQ:
     case Token.COMMA:
       throw createUnexpectedTokenException(token);
@@ -521,7 +519,7 @@ public class ExpressionParser {
     final List<SimpleIdentifierProxy> items =
       new LinkedList<SimpleIdentifierProxy>();
     Token token = mScanner.next();
-    if (token.getType() != Token.CLOSEEN) {
+    if (token.getType() != Token.CLOSESQ) {
       while (true) {
         if (token.getType() != Token.SYMBOL) {
           throw createUnexpectedTokenException(token);
@@ -531,7 +529,7 @@ public class ExpressionParser {
           mFactory.createSimpleIdentifierProxy(name);
         items.add(ident);
         token = mScanner.next();
-        if (token.getType() == Token.CLOSEEN) {
+        if (token.getType() == Token.CLOSESQ) {
           break;
         } else if (token.getType() != Token.COMMA) {
           throw createUnexpectedTokenException(token);

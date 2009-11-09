@@ -20,6 +20,29 @@ import java.util.Map;
  * The expression scanner analyses a stream of characters and converts
  * it to tokens for the parser.</P>
  *
+ * <P>Supported tokens:</P>
+ * <DL>
+ * <DT>Separators</DT>
+ * <DD>The special separator characters produce tokens of their own:
+ * <CODE>'('</CODE> ({@link Token#OPENBR}),
+ * <CODE>'['</CODE> ({@link Token#OPENSQ}),
+ * <CODE>')'</CODE> ({@link Token#CLOSEBR}),
+ * <CODE>']'</CODE> ({@link Token#CLOSESQ}),
+ * <CODE>','</CODE> ({@link Token#COMMA}).</DD>
+ * <DT>Operators (<CODE>{@link Token#OPERATOR}</CODE>)</DT>
+ * <DD>Operator tokens such as <CODE>+</CODE> or <CODE>..</CODE> as
+ * defined by a {@link OperatorTable}.</DD>
+ * <DT>Numbers (<CODE>{@link Token#NUMBER}</CODE>)</DT>
+ * Any sequence of digits, optionally preceded by a minus sign,
+ * forms a number token.
+ * <DT>Symbols (<CODE>{@link Token#SYMBOL}</CODE>)</DT>
+ * <DD>Any character sequence matching the regular expression
+ * <CODE>[a-zA-Z:_][a-zA-Z0-9:_]*</CODE> forms a symbol token. In addition, any
+ * sequence of characters enclosed in curled braces <CODE>{...}</CODE> can
+ * form a part of a symbol. Possible symbols are: <CODE>x25</CODE>,
+ * <CODE>:accepting</CODE>, <CODE>a{1+7}bc{- +}</CODE>.
+ * </DL>
+ *
  * @author Robi Malik
  */
 
@@ -38,7 +61,7 @@ class ExpressionScanner {
     mTokenText = new StringBuffer();
     setInputStream(reader);
   }
-    
+
 
   //#########################################################################
   //# Setting the Input Stream
@@ -65,7 +88,7 @@ class ExpressionScanner {
     throws IOException, ParseException
   {
     return peek(true);
-  }    
+  }
 
   Token peek(final boolean allowNeg)
     throws IOException, ParseException
@@ -74,7 +97,7 @@ class ExpressionScanner {
       storeNextToken(allowNeg);
     }
     return mNextToken;
-  }    
+  }
 
   int getPosition()
   {
@@ -157,6 +180,24 @@ class ExpressionScanner {
   }
 
   /**
+   * Checks whether a character represents the escape-start character
+   * <CODE>'{'</CODE>.
+   */
+  boolean isEscapeStartCharachter(final int ch)
+  {
+    return ch == '{';
+  }
+
+  /**
+   * Checks whether a character represents the escape-end character
+   * <CODE>'}'</CODE>.
+   */
+  boolean isEscapeEndCharachter(final int ch)
+  {
+    return ch == '}';
+  }
+
+  /**
    * Checks whether a character is an expression character.
    * @param  ch          The character to be checked.
    * @return <CODE>true</CODE> if the given character can occur
@@ -169,7 +210,9 @@ class ExpressionScanner {
       isDigit(ch) ||
       isIdentifierCharacter(ch) ||
       isOperatorCharacter(ch) ||
-      isSeparatorCharacter(ch);
+      isSeparatorCharacter(ch) ||
+      isEscapeStartCharachter(ch) ||
+      isEscapeEndCharachter(ch);
   }
 
   /**
@@ -211,8 +254,8 @@ class ExpressionScanner {
       mTokenText.append((char) ch);
       if (isDigit(ch)) {
         storeNumberToken();
-      } else if (isIdentifierStart(ch)) {
-        storeSymbolToken();
+      } else if (isIdentifierStart(ch) || isEscapeStartCharachter(ch)) {
+        storeSymbolToken(ch);
       } else if (allowNeg && ch == '-') {
         ch = getNextCharacter();
         if (isDigit(ch)) {
@@ -250,13 +293,22 @@ class ExpressionScanner {
     mNextToken = createNumberToken();
   }
 
-  private void storeSymbolToken()
+  private void storeSymbolToken(int ch)
     throws IOException
   {
-    int ch = getNextCharacter();
-    while (isIdentifierCharacter(ch)) {
-      mTokenText.append((char) ch);
+    while (true) {
+      if (isEscapeStartCharachter(ch)) {
+        final int tokentype = appendEscapeGroup();
+        if (tokentype == Token.END) {
+          return;
+        }
+      }
       ch = getNextCharacter();
+      if (isIdentifierCharacter(ch) || isEscapeStartCharachter(ch)) {
+        mTokenText.append((char) ch);
+      } else {
+        break;
+      }
     }
     putback(ch);
     mNextToken = createSymbolToken();
@@ -289,6 +341,21 @@ class ExpressionScanner {
       }
     }
     mNextToken = token;
+  }
+
+  private int appendEscapeGroup()
+    throws IOException
+  {
+    int ch;
+    do {
+      ch = getNextCharacter();
+      if (ch < 0) {
+        mNextToken = createToken(Token.END);
+        return Token.END;
+      }
+      mTokenText.append((char) ch);
+    } while (!isEscapeEndCharachter(ch));
+    return Token.SYMBOL;
   }
 
 
@@ -370,8 +437,6 @@ class ExpressionScanner {
     storeSeparatorTokenCreator(map, ')', Token.CLOSEBR);
     storeSeparatorTokenCreator(map, '[', Token.OPENSQ);
     storeSeparatorTokenCreator(map, ']', Token.CLOSESQ);
-    storeSeparatorTokenCreator(map, '{', Token.OPENEN);
-    storeSeparatorTokenCreator(map, '}', Token.CLOSEEN);
     storeSeparatorTokenCreator(map, ',', Token.COMMA);
     storeSeparatorTokenCreator(map, -1, Token.END);
     return map;

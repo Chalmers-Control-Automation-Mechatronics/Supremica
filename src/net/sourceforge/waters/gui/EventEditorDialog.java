@@ -149,7 +149,7 @@ public class EventEditorDialog
    * to the module. Therefore, they can query the value of {@link
    * #getEventDecl()} to determine which subject was created. The
    * {@link ActionEvent} passed to the listener is the event that caused
-   * the dialog to be comitted.
+   * the dialog to be committed.
    */
   public void addActionListener(final ActionListener listener)
   {

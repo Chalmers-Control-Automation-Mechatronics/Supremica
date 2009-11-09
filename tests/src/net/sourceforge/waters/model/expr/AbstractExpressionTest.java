@@ -239,13 +239,13 @@ public abstract class AbstractExpressionTest extends TestCase
   public void testExpression_a_b_c_nospace()
     throws ParseException
   {
-    testExpression("{a,b,c}", mExpr_a_b_c, Operator.TYPE_RANGE);
+    testExpression("[a,b,c]", mExpr_a_b_c, Operator.TYPE_RANGE);
   }
 
   public void testExpression_a_b_c_space()
     throws ParseException
   {
-    testExpression("{a, b, c}", mExpr_a_b_c, Operator.TYPE_RANGE);
+    testExpression("[a, b, c]", mExpr_a_b_c, Operator.TYPE_RANGE);
   }
 
   public void testExpression_event_1()
@@ -284,6 +284,24 @@ public abstract class AbstractExpressionTest extends TestCase
     testExpression("a . event[1]", mExpr_aqe1, Operator.TYPE_NAME);
   }
 
+  public void testExpression_garble1()
+    throws ParseException
+  {
+    testExpression(GARBLE1, mExpr_garble1, Operator.TYPE_NAME);
+  }
+
+  public void testExpression_garble2()
+    throws ParseException
+  {
+    testExpression(GARBLE2, mExpr_garble2, Operator.TYPE_NAME);
+  }
+
+  public void testExpression_garble1plusgarble2() throws ParseException
+  {
+    testExpression(GARBLE1 + "+" + GARBLE2, mExpr_garble1plusgarble2,
+        Operator.TYPE_INT);
+  }
+
   public void testExpression_1_multi()
     throws ParseException
   {
@@ -314,13 +332,13 @@ public abstract class AbstractExpressionTest extends TestCase
 
   public void testError_a_b()
   {
-    final String text = "{a, b";
+    final String text = "[a, b";
     testExpression(text, text.length());
   }
 
   public void testError_a_b_comma()
   {
-    final String text = "{a, b,";
+    final String text = "[a, b,";
     testExpression(text, text.length());
   }
 
@@ -422,6 +440,8 @@ public abstract class AbstractExpressionTest extends TestCase
     mExpr_a = factory.createSimpleIdentifierProxy("a");
     mExpr_b = factory.createSimpleIdentifierProxy("b");
     mExpr_c = factory.createSimpleIdentifierProxy("c");
+    mExpr_garble1 = factory.createSimpleIdentifierProxy(GARBLE1);
+    mExpr_garble2 = factory.createSimpleIdentifierProxy(GARBLE2);
 
     mExpr_1eqm100 = factory.createBinaryExpressionProxy
       (equals, mExpr_1.clone(), mExpr_m100.clone());
@@ -437,6 +457,8 @@ public abstract class AbstractExpressionTest extends TestCase
       (plus, mExpr_1plus1.clone(), mExpr_2.clone());
     mExpr_1plusm2 = factory.createBinaryExpressionProxy
       (plus, mExpr_1.clone(), mExpr_m2.clone());
+    mExpr_garble1plusgarble2 = factory.createBinaryExpressionProxy
+      (plus, mExpr_garble1.clone(), mExpr_garble2.clone());
     mExpr_1times2 = factory.createBinaryExpressionProxy
       (times, mExpr_1.clone(), mExpr_2.clone());
     mExpr_1to2 = factory.createBinaryExpressionProxy
@@ -500,6 +522,8 @@ public abstract class AbstractExpressionTest extends TestCase
     mExpr_a = null;
     mExpr_b = null;
     mExpr_c = null;
+    mExpr_garble1 = null;
+    mExpr_garble2 = null;
     mExpr_1eqm100 = null;
     mExpr_1minusm100 = null;
     mExpr_1minusmm100 = null;
@@ -507,6 +531,7 @@ public abstract class AbstractExpressionTest extends TestCase
     mExpr_1plus1eq2 = null;
     mExpr_1plus1plus2 = null;
     mExpr_1plusm2 = null;
+    mExpr_garble1plusgarble2 = null;
     mExpr_1times2 = null;
     mExpr_1to2 = null;
     mExpr_2eq1plus1 = null;
@@ -562,6 +587,9 @@ public abstract class AbstractExpressionTest extends TestCase
   private SimpleIdentifierProxy mExpr_a;
   private SimpleIdentifierProxy mExpr_b;
   private SimpleIdentifierProxy mExpr_c;
+  private SimpleIdentifierProxy mExpr_garble1;
+  private SimpleExpressionProxy mExpr_garble1plusgarble2;
+  private SimpleIdentifierProxy mExpr_garble2;
   private SimpleExpressionProxy mExpr_m100tom2;
   private SimpleExpressionProxy mExpr_m_a;
   private SimpleExpressionProxy mExpr_aprime;
@@ -576,4 +604,6 @@ public abstract class AbstractExpressionTest extends TestCase
   private QualifiedIdentifierProxy mExpr_aqbqc;
   private QualifiedIdentifierProxy mExpr_aqe1;
 
+  private static final String GARBLE1 = "{1+1}";
+  private static final String GARBLE2 = "a{2+}bc{= (}";
 }

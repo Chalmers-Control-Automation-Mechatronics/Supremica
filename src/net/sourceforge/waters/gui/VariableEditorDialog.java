@@ -155,7 +155,7 @@ public class VariableEditorDialog
     mTypeInput = new SimpleExpressionCell
       (template.getType(), Operator.TYPE_RANGE, parser);
     mTypeInput.addActionListener(commithandler);
-    mTypeInput.setToolTipText("Enter type expression, e.g., 0..8 or {on,off}");
+    mTypeInput.setToolTipText("Enter type expression, e.g., 0..8 or [on,off]");
     mTypeInput.setAllowNull(false);
     mDeterministicLabel = new JLabel("Deterministic:");
     mDeterministicButton =
