@@ -58,6 +58,27 @@ public interface ConflictChecker extends ModelVerifier
    */
   public EventProxy getMarkingProposition();
 
+  /**
+   * <P>Sets the precondition (alpha marking) for a generalised nonblocking
+   * check.</P>
+   * <P>If non-null, the precondition defines the set of states from which
+   * marked states need to be reachable. If null, all states are assumes to
+   * be marked by the precondition, i.e., a standard nonblocking check is
+   * carried out.</P>
+   * @param  marking  The marking proposition to be used,
+   *                  or <CODE>null</CODE> for a standard nonblocking check.
+   */
+  public void setGeneralisedPrecondition(EventProxy marking);
+
+  /**
+   * Gets the precondition (alpha marking) for a generalised nonblocking
+   * check.
+   * @return The current precondition or <CODE>null</CODE> to
+   *         indicate standard conflict check.
+   * @see #setGeneralisedPrecondition(EventProxy)
+   */
+  public EventProxy getGeneralisedPrecondition();
+
 
   //#########################################################################
   //# More Specific Access to the Results

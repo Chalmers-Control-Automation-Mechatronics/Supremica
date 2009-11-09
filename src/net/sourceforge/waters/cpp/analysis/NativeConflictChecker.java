@@ -146,6 +146,12 @@ public class NativeConflictChecker
   {
     return mMarking;
   }
+  public void setGeneralisedPrecondition(EventProxy marking){
+    mPreconditionMarking = marking;
+  }
+  public EventProxy getGeneralisedPrecondition(){
+    return mPreconditionMarking;
+  }
 
   public ConflictTraceProxy getCounterExample()
   {
@@ -188,5 +194,6 @@ public class NativeConflictChecker
   //# Data Members
   private EventProxy mMarking;
   private EventProxy mUsedMarking;
+ private EventProxy mPreconditionMarking;
 
 }

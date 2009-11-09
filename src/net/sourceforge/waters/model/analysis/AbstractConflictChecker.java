@@ -98,7 +98,12 @@ public abstract class AbstractConflictChecker
   {
     return mMarking;
   }
-
+  public void setGeneralisedPrecondition(EventProxy marking){
+    mPreconditionMarking = marking;
+  }
+  public EventProxy getGeneralisedPrecondition(){
+    return mPreconditionMarking;
+  }
   public ConflictTraceProxy getCounterExample()
   {
     return (ConflictTraceProxy) super.getCounterExample();
@@ -167,5 +172,5 @@ public abstract class AbstractConflictChecker
   //# Data Members
   private EventProxy mMarking;
   private EventProxy mUsedMarking;
-
+  private EventProxy mPreconditionMarking;
 }
