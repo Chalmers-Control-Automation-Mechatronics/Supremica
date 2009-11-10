@@ -442,7 +442,7 @@ public class DocumentManager {
   //# Finding Marshallers
   /**
    * Gets the marshaller used to marshal objects of a given class.
-   * If there is no marshaller for excatly the given class, this method
+   * If there is no marshaller for exactly the given class, this method
    * tries all superclasses and superinterfaces and returns a marshaller
    * for the first supported class or interface found.
    * @param  clazz        The class of objects to be looked up.

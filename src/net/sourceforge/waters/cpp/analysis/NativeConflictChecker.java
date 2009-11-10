@@ -146,10 +146,15 @@ public class NativeConflictChecker
   {
     return mMarking;
   }
-  public void setGeneralisedPrecondition(EventProxy marking){
+
+  public void setGeneralisedPrecondition(final EventProxy marking)
+  {
     mPreconditionMarking = marking;
+    clearAnalysisResult();
   }
-  public EventProxy getGeneralisedPrecondition(){
+
+  public EventProxy getGeneralisedPrecondition()
+  {
     return mPreconditionMarking;
   }
 
