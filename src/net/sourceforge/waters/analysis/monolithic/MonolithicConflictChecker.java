@@ -84,6 +84,28 @@ public class MonolithicConflictChecker
     super(model, marking, factory);
   }
 
+    /**
+     * Creates a new conflict checker to check a particular model.
+     * @param  model      The model to be checked by this conflict checker.
+     * @param  marking    The proposition event that defines which states
+     *                    are marked. Every state has a list of propositions
+     *                    attached to it; the conflict checker considers only
+     *                    those states as marked that are labelled by
+     *                    <CODE>marking</CODE>, i.e., their list of
+     *                    propositions must contain this event(exactly the
+     *                    same object).
+     * @param preMarking  The proposition event that defines which states have alpha
+     *						(precondition) markings.
+     * @param  factory    Factory used for trace construction.
+     */
+    public MonolithicConflictChecker(final ProductDESProxy model,
+                                     final EventProxy marking,
+                                     final EventProxy preMarking,
+                                     final ProductDESProxyFactory factory)
+    {
+      super(model, marking, preMarking, factory);
+  }
+
 
   //#########################################################################
   //# Invocation
@@ -117,7 +139,20 @@ public class MonolithicConflictChecker
         }
       }
 
-      if (coreachable.cardinality() == numstates) {
+//if all precondition marked states are coreachable then the model is nonblocking
+final TIntHashSet premarked = mSyncProduct.mPreconditionMarkedStates;
+     final TIntIterator iter = premarked.iterator();
+boolean nonblocking = true;
+while (iter.hasNext()) {
+		final int stateid = iter.next();
+		if(!coreachable.get(stateid)) {
+			nonblocking = false;
+			break;
+		}
+}
+
+
+      if (nonblocking) {
         return setSatisfiedResult();
       } else {
         // Generate a counter example. As each state is numbered in the
@@ -263,8 +298,9 @@ public class MonolithicConflictChecker
     {
       final ProductDESProxy model = getModel();
       final EventProxy marking = getUsedMarkingProposition();
+      final EventProxy preconditionMarking = getGeneralisedPrecondition();
       // Create a new state schema for the product.
-      mStateSchema = new SyncStateSchema(model, mEventMap, marking);
+      mStateSchema = new SyncStateSchema(model, mEventMap, marking, preconditionMarking);
     }
 
 
@@ -377,6 +413,18 @@ public class MonolithicConflictChecker
         mMarkedStates.add(stateid);
       }
 
+            // Does the current state need to have a precondition marking?
+	        boolean need_premarking = true;
+	        for (int i = 0; i < automata.length; i++) {
+	          if (!automata[i].isPreconditionMarked(dstate[i])) {
+	            need_premarking = false;
+	            break;
+	          }
+	        }
+	        if (need_premarking) {
+	          mPreconditionMarkedStates.add(stateid);
+      }
+
       // Explore transitions ...
       nextevent:
       for (int eventid = 0; eventid < mEventMap.size(); eventid++) {
@@ -407,7 +455,7 @@ public class MonolithicConflictChecker
       new TransitionSchema(false, true);
 
     private final TIntHashSet mMarkedStates = new TIntHashSet();
-
+    private final TIntHashSet mPreconditionMarkedStates = new TIntHashSet();
     /**
      * A map of synchronous product states to integer
      * ids, to allow the states to be more efficiently
@@ -498,7 +546,8 @@ public class MonolithicConflictChecker
      */
     private SyncStateSchema(final ProductDESProxy model,
                             final EventMap eventmap,
-                            final EventProxy marking)
+                            final EventProxy marking,
+                            final EventProxy preconditionMarking)
       throws OverflowException
     {
       // Build the schema for each automata. This gives
@@ -512,7 +561,7 @@ public class MonolithicConflictChecker
         case PLANT:
         case SPEC:
           final AutomatonSchema schema =
-            new AutomatonSchema(aut, eventmap, marking);
+            new AutomatonSchema(aut, eventmap, marking, preconditionMarking);
           list.add(schema);
           break;
         default:
@@ -626,7 +675,8 @@ public class MonolithicConflictChecker
     //# Constructor
     AutomatonSchema(final AutomatonProxy automaton,
                     final EventMap eventmap,
-                    final EventProxy marking)
+                    final EventProxy marking,
+                    final EventProxy preMarking)
     {
       // Enumerate the state set for this automata.
       // This gives an ordering to the states.
@@ -637,6 +687,11 @@ public class MonolithicConflictChecker
         mMarkedStates = new TIntHashSet(numstates);
       } else {
         mMarkedStates = null;
+      }
+            if (automaton.getEvents().contains(preMarking)) {
+	          mPreconditionMarkedStates = new TIntHashSet(numstates);
+	        } else {
+	          mPreconditionMarkedStates = null;
       }
       int i = 0;
       StateProxy initial = null;
@@ -649,6 +704,10 @@ public class MonolithicConflictChecker
         if (mMarkedStates != null &&
             state.getPropositions().contains(marking)) {
           mMarkedStates.add(i);
+        }
+                if (mPreconditionMarkedStates != null &&
+		            state.getPropositions().contains(preMarking)) {
+		          mPreconditionMarkedStates.add(i);
         }
         mStates[i] = state;
         mStateMap.put(state, i);
@@ -717,6 +776,15 @@ public class MonolithicConflictChecker
       }
     }
 
+        boolean isPreconditionMarked(int state)
+	    {
+	      if (mPreconditionMarkedStates == null) {
+	        return true;
+	      } else {
+	        return mPreconditionMarkedStates.contains(state);
+	      }
+    }
+
 
     //#######################################################################
     //# Data Members
@@ -732,6 +800,7 @@ public class MonolithicConflictChecker
     private final TObjectIntHashMap<StateProxy> mStateMap =
       new TObjectIntHashMap<StateProxy>();
     private final TIntHashSet mMarkedStates;
+        private final TIntHashSet mPreconditionMarkedStates;
     private final int[][] mTransitionTable;
     /**
      * The initial state of the automaton.
