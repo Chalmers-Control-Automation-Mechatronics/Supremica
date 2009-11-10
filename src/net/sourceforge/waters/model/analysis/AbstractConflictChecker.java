@@ -76,6 +76,31 @@ public abstract class AbstractConflictChecker
     mUsedMarking = null;
   }
 
+    /**
+     * Creates a new conflict checker to check a particular model.
+     * @param  model      The model to be checked by this conflict checker.
+     * @param  marking    The proposition event that defines which states
+     *                    are marked. Every state has a list of propositions
+     *                    attached to it; the conflict checker considers only
+     *                    those states as marked that are labelled by
+     *                    <CODE>marking</CODE>, i.e., their list of
+     *                    propositions must contain this event (exactly the
+     *                    same object).
+     * @param preMarking  The proposition event that defines which states have alpha
+     *						(precondition) markings.
+     * @param  factory    Factory used for trace construction.
+     */
+    public AbstractConflictChecker(final ProductDESProxy model,
+                                   final EventProxy marking,
+                                   final EventProxy preMarking,
+                                   final ProductDESProxyFactory factory)
+    {
+      super(model, factory);
+      mMarking = marking;
+      mPreconditionMarking = preMarking;
+      mUsedMarking = null;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
