@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
-//# CLASS:   MonolithicConflictCheckerTest
+//# CLASS:   AbstractGeneralisedNonblockingCheckerTest
 //###########################################################################
-//# $Id$
+//# $Id: AbstractGeneralisedNonblockingCheckerTest.java 4768 2009-10-09 03:16:33Z robi $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -18,15 +18,15 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class MonolithicConflictCheckerTest
-  extends AbstractGeneralisedNonblockingCheckerTest
+public class AbstractGeneralisedNonblockingCheckerTest
+  extends AbstractConflictCheckerTest
 {
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite() {
     TestSuite testSuite =
-      new TestSuite(MonolithicConflictCheckerTest.class);
+      new TestSuite(AbstractGeneralisedNonblockingCheckerTest.class);
     return testSuite;
   }
 
@@ -47,32 +47,36 @@ public class MonolithicConflictCheckerTest
 
 
   //#########################################################################
-  //# Overridden Test Cases
-  public void testHISCRhoneSubsystem1Patch0() throws Exception
+  //#Test Cases --- paper (multi-coloured automata)
+ /* public void testSyncG() throws Exception
   {
-    try {
-      super.testHISCRhoneSubsystem1Patch0();
-    } catch (final OverflowException exception) {
-      // never mind
-    }
+    final String group = "tests";
+    final String dir = "paper";
+    final String name = "paper.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+*/
+  public void testG1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "paper";
+    final String name = "g1.wmod";
+    runModelVerifier(group, dir, name, true);
+  }/*
+  public void testG2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "paper";
+    final String name = "g2.wmod";
+    runModelVerifier(group, dir, name, true);
+  }*/
+  public void testG3() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "paper";
+    final String name = "g3.wmod";
+    runModelVerifier(group, dir, name, false);
   }
 
-  public void testHISCRhoneSubsystem1Patch1() throws Exception
-  {
-    try {
-      super.testHISCRhoneSubsystem1Patch1();
-    } catch (final OverflowException exception) {
-      // never mind
-    }
-  }
-
-  public void testHISCRhoneSubsystem1Patch2() throws Exception
-  {
-    try {
-      super.testHISCRhoneSubsystem1Patch2();
-    } catch (final OverflowException exception) {
-      // never mind
-    }
-  }
 
 }

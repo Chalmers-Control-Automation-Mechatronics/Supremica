@@ -140,11 +140,20 @@ public class MonolithicConflictChecker
       }
 
 //if all precondition marked states are coreachable then the model is nonblocking
-final TIntHashSet premarked = mSyncProduct.mPreconditionMarkedStates;
-     final TIntIterator iter = premarked.iterator();
+final int[] premarked = mSyncProduct.mPreconditionMarkedStates.toArray();
+ /*    final TIntIterator iter = premarked.iterator();
 boolean nonblocking = true;
 while (iter.hasNext()) {
 		final int stateid = iter.next();
+		if(!coreachable.get(stateid)) {
+			nonblocking = false;
+			break;
+		}
+}*/
+
+boolean nonblocking = true;
+for (int index = 0; index < premarked.length; index++) {
+int stateid = premarked[index];
 		if(!coreachable.get(stateid)) {
 			nonblocking = false;
 			break;
