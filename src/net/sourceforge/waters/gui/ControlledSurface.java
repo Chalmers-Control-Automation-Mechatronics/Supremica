@@ -4468,11 +4468,16 @@ public class ControlledSurface
     public EventListExpressionProxy visitLabelBlockProxy
       (final LabelBlockProxy block)
     {
-      final ModuleContext context =
-        mRoot.getModuleWindowInterface().getModuleContext();
-      return
-        context.canDropOnEdge(mTransferData) && !isContainingAll(block) ?
-        block : null;
+      final LabelBlockSubject subject = (LabelBlockSubject) block;
+      if (subject.getParent() == getGraph()) {
+        return isContainingAll(block) ? null : block;
+      } else {
+        final ModuleContext context =
+          mRoot.getModuleWindowInterface().getModuleContext();
+        return
+          context.canDropOnEdge(mTransferData) && !isContainingAll(block) ?
+            block : null;
+      }
     }
 
     public EventListExpressionProxy visitLabelGeometryProxy

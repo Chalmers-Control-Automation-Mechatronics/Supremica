@@ -193,7 +193,7 @@ public class ModuleContext
   /**
    * Tries to determine whether the given list of identifiers can be
    * dropped on a node. This method checks all the identifiers in the given
-   * list, recursively entering foreach-event blocks
+   * list, recursively entering foreach-event blocks.
    * @return <CODE>false</CODE> if an identifier is found that can be
    *         determined <I>not</I> to be of type proposition ({@link
    *         EventKind#PROPOSITION}); <CODE>true</CODE> otherwise.
@@ -205,8 +205,8 @@ public class ModuleContext
 
   /**
    * Tries to determine whether the given list of identifiers can be
-   * dropped on a node. This method checks all the identifiers in the given
-   * list, recursively entering foreach-event blocks
+   * dropped on an edge. This method checks all the identifiers in the given
+   * list, recursively entering foreach-event blocks.
    * @return <CODE>false</CODE> if an identifier is found that can be
    *         determined <I>not</I> to be controllable ({@link
    *         EventKind#CONTROLLABLE}) or uncontrollable ({@link
