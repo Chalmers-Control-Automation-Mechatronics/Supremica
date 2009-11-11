@@ -14,7 +14,6 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
