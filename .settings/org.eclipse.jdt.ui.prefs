@@ -1,4 +1,4 @@
-#Thu Nov 12 04:11:50 GMT 2009
+#Thu Nov 12 18:02:00 GMT 2009
 eclipse.preferences.version=1
 editor_save_participant_org.eclipse.jdt.ui.postsavelistener.cleanup=true
 formatter_profile=_Waters
@@ -26,7 +26,7 @@ sp_cleanup.always_use_parentheses_in_expressions=false
 sp_cleanup.always_use_this_for_non_static_field_access=false
 sp_cleanup.always_use_this_for_non_static_method_access=false
 sp_cleanup.convert_to_enhanced_for_loop=false
-sp_cleanup.correct_indentation=true
+sp_cleanup.correct_indentation=false
 sp_cleanup.format_source_code=false
 sp_cleanup.format_source_code_changes_only=false
 sp_cleanup.make_local_variable_final=false
