@@ -12,6 +12,7 @@ package net.sourceforge.waters.samples.maze;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -52,12 +53,16 @@ public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>
 
   //#########################################################################
   //# Constructors
-  public MazeCompiler(final File inputdir,
-                      final File outputdir,
+  public MazeCompiler(final ModuleProxyFactory factory,
+                      final DocumentManager docman)
+  {
+    this(null, factory, docman);
+  }
+
+  public MazeCompiler(final File outputdir,
                       final ModuleProxyFactory factory,
                       final DocumentManager docman)
   {
-    mInputDir = inputdir;
     mOutputDir = outputdir;
     mFactory = factory;
     mUseLanguageInclusion = true;
@@ -69,12 +74,6 @@ public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>
 
   //#########################################################################
   //# Parameters
-  public void setInputDirectory(final File inputdir)
-  {
-    mInputDir = inputdir;
-    mCopiedModules.clear();
-  }
-
   public void setUseLanguageInclusion(final boolean inclusion)
   {
     mUseLanguageInclusion = inclusion;
@@ -95,7 +94,7 @@ public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>
   }
 
   public ModuleProxy unmarshalCopying(final URI uri)
-  throws IOException, WatersMarshalException, WatersUnmarshalException
+    throws IOException, WatersMarshalException, WatersUnmarshalException
   {
     final String pathname = uri.getPath();
     final int start1 = pathname.lastIndexOf(File.separatorChar);
@@ -105,7 +104,10 @@ public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>
     final String name = pathname.substring(start2, stop2);
     final Maze maze = mReader.load(uri, name);
     maze.createActions();
-    return createModule(maze);
+    final ModuleProxy module = createModule(maze);
+    final File outfile = module.getFileLocation();
+    mDocumentManager.saveAs(module, outfile);
+    return module;
   }
 
 
@@ -273,7 +275,7 @@ public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>
       final ProxyMarshaller<ModuleProxy> marshaller =
         mDocumentManager.findProxyMarshaller(ModuleProxy.class);
       final String extname = name + marshaller.getDefaultExtension();
-      final File source = new File(mInputDir, extname);
+      final URL source = getClass().getResource(extname);
       final File target = new File(mOutputDir, extname);
       final ModuleProxy module = (ModuleProxy) mDocumentManager.load(source);
       mDocumentManager.saveAs(module, target);
@@ -284,7 +286,6 @@ public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>
 
   //#########################################################################
   //# Data Members
-  private File mInputDir;
   private File mOutputDir;
   private boolean mUseLanguageInclusion;
 

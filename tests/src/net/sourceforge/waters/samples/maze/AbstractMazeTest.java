@@ -404,10 +404,9 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     final String extname = name + mMazeCompiler.getDefaultExtension();
     final File filename = new File(mInputDirectory, extname);
     final URI uri = filename.toURI();
-    final ModuleProxy module = mMazeCompiler.unmarshal(uri);
+    final ModuleProxy module = mMazeCompiler.unmarshalCopying(uri);
     final File outmodulefile = module.getFileLocation();
     final URI outmoduleuri = outmodulefile.toURI();
-    mModuleMarshaller.marshal(module, outmodulefile);
     final ModuleProxy read =
       (ModuleProxy) mModuleMarshaller.unmarshal(outmoduleuri);
     assertTrue("Module changed after reading back in!",
@@ -505,8 +504,8 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
-    mMazeCompiler = new MazeCompiler
-      (mInputDirectory, mOutputDirectory, moduleFactory, mDocumentManager);
+    mMazeCompiler =
+      new MazeCompiler(mOutputDirectory, moduleFactory, mDocumentManager);
     ensureDirectoryExists(mOutputDirectory);
   }
 

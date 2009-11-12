@@ -34,6 +34,7 @@ import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
@@ -46,6 +47,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.samples.maze.MazeCompiler;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
@@ -103,8 +105,13 @@ public class DocumentContainerManager
         mDocumentManager.registerUnmarshaller(umdesUnmarshaller);
         mDocumentManager.registerUnmarshaller(adsUnmarshaller);
 
-        mImporter = new ProductDESImporter(factory);
-        mWasCancelled = false;
+        mProductDESImporter = new ProductDESImporter(factory);
+        mModuleImporters =
+          new LinkedList<CopyingProxyUnmarshaller<ModuleProxy>>();
+        final File mazeinputs = null;
+        final CopyingProxyUnmarshaller<ModuleProxy> mazeImporter =
+          new MazeCompiler(mazeinputs, factory, mDocumentManager);
+        mModuleImporters.add(mazeImporter);
     }
 
 
@@ -137,6 +144,11 @@ public class DocumentContainerManager
     public DocumentManager getDocumentManager()
     {
         return mDocumentManager;
+    }
+
+    public List<CopyingProxyUnmarshaller<ModuleProxy>> getModuleImporters()
+    {
+        return mModuleImporters;
     }
 
     public List<DocumentContainer> getRecent()
@@ -310,7 +322,7 @@ public class DocumentContainerManager
             final Project project = (Project) doc;
             if (SupremicaUnmarshaller.validate(project)) {
                 final ModuleSubject module =
-                    (ModuleSubject) mImporter.importModule(project);
+                    (ModuleSubject) mProductDESImporter.importModule(project);
                 return new ModuleContainer(mIDE, module);
             } else {
                 final String text = getWarningText(doc, WARN_CONVERSION);
@@ -319,7 +331,7 @@ public class DocumentContainerManager
                 switch (choice) {
                 case JOptionPane.YES_OPTION:
                     final ModuleSubject module =
-                        (ModuleSubject) mImporter.importModule(project);
+                        (ModuleSubject) mProductDESImporter.importModule(project);
                     return new ModuleContainer(mIDE, module);
                 case JOptionPane.NO_OPTION:
                     return new AutomataContainer(mIDE, project);
@@ -663,7 +675,8 @@ public class DocumentContainerManager
     private final Map<URI,DocumentContainer> mURIContainerMap;
     private final List<DocumentContainer> mRecentList;
     private final DocumentManager mDocumentManager;
-    private final ProductDESImporter mImporter;
+    private final ProductDESImporter mProductDESImporter;
+    private final List<CopyingProxyUnmarshaller<ModuleProxy>> mModuleImporters;
     private final List<Observer> mObservers;
 
     private boolean mWasCancelled;

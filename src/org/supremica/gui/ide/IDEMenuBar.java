@@ -49,6 +49,7 @@ import org.supremica.gui.ExampleTemplates;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.CloseAction;
 import org.supremica.gui.ide.actions.ExitAction;
+import org.supremica.gui.ide.actions.ImportAction;
 import org.supremica.gui.ide.actions.NewAction;
 import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.gui.ide.actions.SaveAction;
@@ -120,6 +121,8 @@ public class IDEMenuBar
         final Action close = actions.getAction(CloseAction.class);
         menu.add(close);
         menu.addSeparator();
+        final Action importAction = actions.getAction(ImportAction.class);
+        menu.add(importAction);
         menu.add(ide.getActions().editorPrintAction.getMenuItem());
         menu.add(ide.getActions().editorSavePostscriptAction.getMenuItem());
 		final Action epsprint = actions.getAction(GraphSaveEPSAction.class);

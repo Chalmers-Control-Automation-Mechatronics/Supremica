@@ -158,7 +158,7 @@ public class ModuleContext
   }
 
   /**
-   * Tries to determine an icon for a propsition with a given identifier.
+   * Tries to determine an icon for a proposition with a given identifier.
    * This method tries to be a bit smarter that {@link
    * #guessEventIcon(IdentifierProxy) guessEventIcon()} by checking the
    * names of the default propositions.

@@ -4470,6 +4470,7 @@ public class ControlledSurface
     {
       final LabelBlockSubject subject = (LabelBlockSubject) block;
       if (subject.getParent() == getGraph()) {
+        // Any event can be dropped on the blocked events list.
         return isContainingAll(block) ? null : block;
       } else {
         final ModuleContext context =

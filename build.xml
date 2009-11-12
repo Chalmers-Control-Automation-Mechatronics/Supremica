@@ -496,6 +496,9 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy todir="${build}/net/sourceforge/waters/model/marshaller">
             <fileset dir="${waters.xsd}" includes="*.xsd"/>
         </copy>
+        <copy todir="${build}/net/sourceforge/waters/samples/maze">
+            <fileset dir="${waters.examples}/maze" includes="*.wmod"/>
+        </copy>
     </target>
     
     <target name="-jar_supremica" depends="compile_supremica,downloads_supremica,copy_watersxmlfiles_into_build">

@@ -139,8 +139,6 @@
       <compilerarg value="-Xlint:deprecation"/>
       <include name="net/sourceforge/waters/**/*.java"/>
       <exclude name="net/sourceforge/waters/gui/**/*.java"/>
-      <exclude name="net/sourceforge/waters/mbt/**/*.java"/>
-      <exclude name="net/sourceforge/waters/model/compiler/old/**/Old*.java"/>
       <exclude name="net/sourceforge/waters/model/unchecked/**/*.java"/>
       <include name="org/supremica/log/**/*.java"/>
    </javac>
@@ -152,16 +150,19 @@
     <copy todir="${waters.classes}/net/sourceforge/waters/model/marshaller">
       <fileset dir="${xsd}" includes="*.xsd"/>
     </copy>
+    <copy todir="${waters.classes}/net/sourceforge/waters/samples/maze">
+      <fileset dir="${waters.examples}/maze" includes="*.wmod"/>
+    </copy>
     <jar jarfile="${waters.jar}">
       <fileset dir="${waters.classes}">
         <include name="net/sourceforge/waters/**/*.class"/>
+        <include name="net/sourceforge/waters/**/*.wmod"/>
         <include name="net/sourceforge/waters/**/*.xsd"/>
         <include name="net/sourceforge/waters/**/*.xsl"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/model/unchecked/**"/>
         <exclude name="net/sourceforge/waters/xsd/**"/>
-        <include name="org/supremica/automata/**"/>
         <include name="org/supremica/log/**"/>
       </fileset>
     </jar>
@@ -182,9 +183,7 @@
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/cpp/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
-        <exclude name="net/sourceforge/waters/mbt/**"/>
         <exclude name="net/sourceforge/waters/model/analysis/**"/>
-        <exclude name="net/sourceforge/waters/model/compiler/old/**"/>
         <exclude name="net/sourceforge/waters/samples/**"/>
       </fileset>
     </jar>
