@@ -85,44 +85,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="coll_l1r1_m1"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="l2"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="l2"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="m1"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="m1"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="r2"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="r2"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="req">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="req">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="T12">
 <PointGeometry>
@@ -371,38 +333,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="coll_m1_m2"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="l1"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="l1"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="m2"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="m2"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="r1"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="r1"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="T12">
 <PointGeometry>
@@ -644,32 +574,6 @@
 <SimpleIdentifier Name="T"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="l1"/>
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="l2"/>
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="m1"/>
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="m2"/>
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="r1"/>
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="r2"/>
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="out">
 <EventList>
@@ -798,19 +702,6 @@
 <SimpleIdentifier Name="P"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="P"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="P"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="not_at">
-<SimpleIdentifier Name="P"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="OFF">
 <EventList>
@@ -885,31 +776,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="switch1"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="curve"/>
-<SimpleIdentifier Name="straight"/>
-<IndexedIdentifier Name="req">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="req">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="l2"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="r2"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="m1"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="RQR"/>
 <SimpleNode Name="RQL"/>
@@ -1014,31 +880,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="switch2"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="curve"/>
-<SimpleIdentifier Name="straight"/>
-<IndexedIdentifier Name="req">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="req">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="l2"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="r2"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="m1"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="RQR"/>
 <SimpleNode Name="RQL"/>
@@ -1143,16 +984,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="switchsup"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="curve"/>
-<SimpleIdentifier Name="straight"/>
-<IndexedIdentifier Name="req">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="req">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -1189,14 +1020,6 @@
 <SimpleIdentifier Name="T"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stopped">
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="MOVE">
 <PointGeometry>
@@ -1258,38 +1081,6 @@
 <SimpleIdentifier Name="T"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="l1"/>
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="l2"/>
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="m1"/>
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="m2"/>
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="r1"/>
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="r2"/>
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stopped">
-<SimpleIdentifier Name="T"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>

@@ -186,7 +186,8 @@
   </Graph>
 </xsl:template>
 
-<xsl:template match="events[count(./*) = 0]"/>
+<xsl:template
+  match="events[count(event[not(@name=../../edges//label/@name)]) = 0]"/>
 
 <xsl:template match="events">
   <LabelBlock>
@@ -195,9 +196,11 @@
 </xsl:template>
 
 <xsl:template match="events/event">
-  <xsl:call-template name="parse-identifier2">
-    <xsl:with-param name="expr" select="@name"/>
-  </xsl:call-template>
+  <xsl:if test="not(@name=../../edges//label/@name)">
+    <xsl:call-template name="parse-identifier2">
+      <xsl:with-param name="expr" select="@name"/>
+    </xsl:call-template>
+  </xsl:if>
 </xsl:template>
 
 <xsl:template match="nodes[count(./*) = 0]"/>

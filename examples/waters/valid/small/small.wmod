@@ -38,17 +38,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="buffer"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="finish">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="full">
 <PointGeometry>
@@ -121,20 +110,6 @@
 <SimpleIdentifier Name="MACH"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="break">
-<SimpleIdentifier Name="MACH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="finish">
-<SimpleIdentifier Name="MACH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="repair">
-<SimpleIdentifier Name="MACH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start">
-<SimpleIdentifier Name="MACH"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="working">
 <PointGeometry>
@@ -219,17 +194,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="repair"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="break">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="repair">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="repair">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="m1">
 <EventList>

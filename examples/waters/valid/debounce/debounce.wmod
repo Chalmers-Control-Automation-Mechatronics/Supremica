@@ -48,23 +48,6 @@
 <SimpleIdentifier Name="I"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="chg_value">
-<SimpleIdentifier Name="I"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="new_value">
-<SimpleIdentifier Name="I"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="I"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="I"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timer">
-<SimpleIdentifier Name="I"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="FLIP">
 <PointGeometry>
@@ -223,11 +206,6 @@
 <SimpleIdentifier Name="I"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="new_value">
-<SimpleIdentifier Name="I"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -268,17 +246,6 @@
 <SimpleIdentifier Name="I"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="I"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="I"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timer">
-<SimpleIdentifier Name="I"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="on">
 <PointGeometry>

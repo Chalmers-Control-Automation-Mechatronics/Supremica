@@ -63,17 +63,6 @@
 <SimpleIdentifier Name="_0"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="tu_accept">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tu_accept">
-<SimpleIdentifier Name="PREV"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tu_load">
-<SimpleIdentifier Name="PREV"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="false" Name="FILLED3">
 <PointGeometry>
@@ -258,17 +247,6 @@
 <SimpleIdentifier Name="_0"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="machine_load">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tu_accept">
-<SimpleIdentifier Name="PREV"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tu_reject">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="EMPTY">
 <EventList>
@@ -407,14 +385,6 @@
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="machine_unload">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tu_load">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="false" Name="FULL">
 <PointGeometry>
@@ -476,17 +446,6 @@
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="machine_load">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="machine_unload">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tu_load">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="false" Name="FULL">
 <PointGeometry>
@@ -572,14 +531,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="init"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="tu_accept">
-<IntConstant Value="0"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tu_load">
-<IntConstant Value="0"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="false" Name="WORKING">
 <PointGeometry>
@@ -639,14 +590,6 @@
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="machine_load">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="machine_unload">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="false" Name="WORKING">
 <PointGeometry>
@@ -708,17 +651,6 @@
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="tu_accept">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tu_load">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tu_reject">
-<SimpleIdentifier Name="GROUP"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="false" Name="WORKING">
 <PointGeometry>

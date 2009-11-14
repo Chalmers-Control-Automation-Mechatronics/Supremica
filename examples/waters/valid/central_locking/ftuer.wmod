@@ -176,55 +176,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="ftuer"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="async">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="CS_ok"/>
-<SimpleIdentifier Name="done_ER"/>
-<IndexedIdentifier Name="done_SER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="done_VR"/>
-<SimpleIdentifier Name="done_ZS"/>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="soft_VR"/>
-<SimpleIdentifier Name="soft_ZS"/>
-<IndexedIdentifier Name="start_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="sync">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_W">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="cs3">
 <PointGeometry>
@@ -998,14 +949,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="mer"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="MER_an">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="MER_aus">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -1060,32 +1003,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="merguard"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="MER_an">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="MER_aus">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -1168,32 +1085,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="mvrguard"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="MVR_an">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="MVR_aus">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -1276,17 +1167,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="mvrstzv"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="MVR_an">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="MVR_aus">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="STZV">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -1354,29 +1234,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="sync"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="async">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="sync">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tuer_auf">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tuer_zu">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="AUF">
 <PointGeometry>
@@ -1642,14 +1499,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="tklemme"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="tuer_auf">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tuer_zu">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="AUF">
 <PointGeometry>
@@ -1704,57 +1553,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="tmotor1"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="MER_an">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="MER_aus">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="MVR_an">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="MVR_aus">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="soft_CS"/>
-<IndexedIdentifier Name="start_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="STZV">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="er1">
 <PointGeometry>
@@ -2219,26 +2017,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="ttimer"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_W">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -2305,44 +2083,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="ttimguard"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="stop_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_ER">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_VR">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_W">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time_ZS">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -2444,22 +2184,6 @@
 <SimpleIdentifier Name="FT"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="CS_ok"/>
-<SimpleIdentifier Name="done_ER"/>
-<IndexedIdentifier Name="done_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="done_VR"/>
-<SimpleIdentifier Name="done_ZS"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="soft_VR"/>
-<SimpleIdentifier Name="soft_ZS"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="CS">
 <PointGeometry>

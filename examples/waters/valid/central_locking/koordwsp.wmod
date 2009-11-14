@@ -125,40 +125,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="automvr"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="autom_VR"/>
-<SimpleIdentifier Name="ER"/>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="FS"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="SER"/>
-<SimpleIdentifier Name="SERFS"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="soft_VR"/>
-<SimpleIdentifier Name="soft_ZS"/>
-<SimpleIdentifier Name="TAST"/>
-<IndexedIdentifier Name="time">
-<SimpleIdentifier Name="FS"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="FS"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tuer_auf">
-<SimpleIdentifier Name="BT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tuer_auf">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tuer_auf">
-<SimpleIdentifier Name="HT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="wsp"/>
-<SimpleIdentifier Name="ZS"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="ER">
 <EventList>
@@ -473,12 +439,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="check_cod_ser"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="cod_er"/>
-<SimpleIdentifier Name="cod_ser"/>
-<SimpleIdentifier Name="is_cod_er"/>
-<SimpleIdentifier Name="is_cod_ser"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="SER">
 <PointGeometry>
@@ -551,10 +511,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="cod_ser"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="cod_er"/>
-<SimpleIdentifier Name="cod_ser"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="SER">
 <PointGeometry>
@@ -605,19 +561,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="crash"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="CS"/>
-<SimpleIdentifier Name="CS_ok"/>
-<SimpleIdentifier Name="done_ZS"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="soft_VR"/>
-<SimpleIdentifier Name="zuendung_an"/>
-<SimpleIdentifier Name="zuendung_aus"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="CS2a">
 <PointGeometry>
@@ -982,25 +925,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="decoder"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="autom_VR"/>
-<SimpleIdentifier Name="ER"/>
-<SimpleIdentifier Name="is_cod_er"/>
-<SimpleIdentifier Name="is_cod_ser"/>
-<SimpleIdentifier Name="SER"/>
-<SimpleIdentifier Name="SERFS"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="soft_VR"/>
-<SimpleIdentifier Name="soft_ZS"/>
-<SimpleIdentifier Name="TAST"/>
-<SimpleIdentifier Name="ZS"/>
-<SimpleIdentifier Name="ZSA"/>
-<SimpleIdentifier Name="ZSI"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="RQSER">
 <PointGeometry>
@@ -1375,21 +1299,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="eingabe_er"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="CS_ok"/>
-<SimpleIdentifier Name="ER"/>
-<SimpleIdentifier Name="ER_BT"/>
-<SimpleIdentifier Name="ER_FS"/>
-<SimpleIdentifier Name="ER_FT"/>
-<SimpleIdentifier Name="ER_HK"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="TASTVR"/>
-<SimpleIdentifier Name="VR_BT"/>
-<SimpleIdentifier Name="VR_FS"/>
-<SimpleIdentifier Name="VR_FT"/>
-<SimpleIdentifier Name="VR_HK"/>
-<SimpleIdentifier Name="wsp"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="C1">
 <PointGeometry>
@@ -1561,21 +1470,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="eingabe_fs"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="CS_ok"/>
-<SimpleIdentifier Name="ER_BT"/>
-<SimpleIdentifier Name="ER_FS"/>
-<SimpleIdentifier Name="ER_FT"/>
-<SimpleIdentifier Name="ER_HK"/>
-<SimpleIdentifier Name="SERFS"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="TASTVR"/>
-<SimpleIdentifier Name="VR_BT"/>
-<SimpleIdentifier Name="VR_FS"/>
-<SimpleIdentifier Name="VR_FT"/>
-<SimpleIdentifier Name="VR_HK"/>
-<SimpleIdentifier Name="wsp"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="FS">
 <PointGeometry>
@@ -1669,21 +1563,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="eingabe_ser"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="CS_ok"/>
-<SimpleIdentifier Name="ER_BT"/>
-<SimpleIdentifier Name="ER_FS"/>
-<SimpleIdentifier Name="ER_FT"/>
-<SimpleIdentifier Name="ER_HK"/>
-<SimpleIdentifier Name="SER"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="TASTVR"/>
-<SimpleIdentifier Name="VR_BT"/>
-<SimpleIdentifier Name="VR_FS"/>
-<SimpleIdentifier Name="VR_FT"/>
-<SimpleIdentifier Name="VR_HK"/>
-<SimpleIdentifier Name="wsp"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="VR">
 <PointGeometry>
@@ -1777,21 +1656,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="eingabe_vr"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="CS_ok"/>
-<SimpleIdentifier Name="ER_BT"/>
-<SimpleIdentifier Name="ER_FS"/>
-<SimpleIdentifier Name="ER_FT"/>
-<SimpleIdentifier Name="ER_HK"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="TAST"/>
-<SimpleIdentifier Name="TASTVR"/>
-<SimpleIdentifier Name="VR_BT"/>
-<SimpleIdentifier Name="VR_FS"/>
-<SimpleIdentifier Name="VR_FT"/>
-<SimpleIdentifier Name="VR_HK"/>
-<SimpleIdentifier Name="wsp"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="VR">
 <PointGeometry>
@@ -1885,22 +1749,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="eingabe_zs"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="CS_ok"/>
-<SimpleIdentifier Name="ER_BT"/>
-<SimpleIdentifier Name="ER_FS"/>
-<SimpleIdentifier Name="ER_FT"/>
-<SimpleIdentifier Name="ER_HK"/>
-<SimpleIdentifier Name="kein_ZS"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="TASTVR"/>
-<SimpleIdentifier Name="VR_BT"/>
-<SimpleIdentifier Name="VR_FS"/>
-<SimpleIdentifier Name="VR_FT"/>
-<SimpleIdentifier Name="VR_HK"/>
-<SimpleIdentifier Name="wsp"/>
-<SimpleIdentifier Name="ZS"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="VR">
 <PointGeometry>
@@ -2002,20 +1850,6 @@
 <SimpleIdentifier Name="NAME"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="ctr_ge_max">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="ctr_lt_max">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="inc_ctr">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="reset_ctr">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IN">
 <EventList>
@@ -2088,16 +1922,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="kein_zs"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="kein_ZS"/>
-<IndexedIdentifier Name="tuer_auf">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tuer_zu">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="ZS"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="AUF">
 <PointGeometry>
@@ -2174,24 +1998,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="keine_wsp"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="ER"/>
-<SimpleIdentifier Name="ER_BT"/>
-<SimpleIdentifier Name="ER_FS"/>
-<SimpleIdentifier Name="ER_FT"/>
-<SimpleIdentifier Name="ER_HK"/>
-<SimpleIdentifier Name="SER"/>
-<SimpleIdentifier Name="SERFS"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="TAST"/>
-<SimpleIdentifier Name="TASTVR"/>
-<SimpleIdentifier Name="VR_BT"/>
-<SimpleIdentifier Name="VR_FS"/>
-<SimpleIdentifier Name="VR_FT"/>
-<SimpleIdentifier Name="VR_HK"/>
-<SimpleIdentifier Name="wsp"/>
-<SimpleIdentifier Name="ZS"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -2323,17 +2129,6 @@
 <SimpleIdentifier Name="NAME"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="reset">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="time">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="NAME"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -2398,14 +2193,6 @@
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="tuer_auf">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tuer_zu">
-<SimpleIdentifier Name="TUER"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="AUF">
 <PointGeometry>
@@ -2462,22 +2249,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="tuermodell"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="CS_ok"/>
-<SimpleIdentifier Name="done_ER"/>
-<IndexedIdentifier Name="done_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="done_VR"/>
-<SimpleIdentifier Name="done_ZS"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="soft_VR"/>
-<SimpleIdentifier Name="soft_ZS"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="CS">
 <PointGeometry>
@@ -2662,28 +2433,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="warten"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="autom_VR"/>
-<SimpleIdentifier Name="CS_ok"/>
-<SimpleIdentifier Name="done_ER"/>
-<IndexedIdentifier Name="done_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="done_VR"/>
-<SimpleIdentifier Name="done_ZS"/>
-<SimpleIdentifier Name="ER"/>
-<SimpleIdentifier Name="SER"/>
-<SimpleIdentifier Name="SERFS"/>
-<SimpleIdentifier Name="soft_CS"/>
-<SimpleIdentifier Name="soft_ER"/>
-<IndexedIdentifier Name="soft_SER">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="soft_VR"/>
-<SimpleIdentifier Name="soft_ZS"/>
-<SimpleIdentifier Name="TAST"/>
-<SimpleIdentifier Name="ZS"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -2773,27 +2522,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="wspcount"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="autom_VR"/>
-<IndexedIdentifier Name="ctr_ge_max">
-<SimpleIdentifier Name="WSP"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="ctr_lt_max">
-<SimpleIdentifier Name="WSP"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="ER"/>
-<IndexedIdentifier Name="inc_ctr">
-<SimpleIdentifier Name="WSP"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="SER"/>
-<SimpleIdentifier Name="SERFS"/>
-<SimpleIdentifier Name="TAST"/>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="WSP"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="wsp"/>
-<SimpleIdentifier Name="ZS"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="WSP">
 <PointGeometry>
@@ -2959,23 +2687,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="wsptime"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="autom_VR"/>
-<SimpleIdentifier Name="ER"/>
-<IndexedIdentifier Name="reset_ctr">
-<SimpleIdentifier Name="WSP"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="SER"/>
-<SimpleIdentifier Name="SERFS"/>
-<SimpleIdentifier Name="TAST"/>
-<IndexedIdentifier Name="time">
-<SimpleIdentifier Name="WSP"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="timeout">
-<SimpleIdentifier Name="WSP"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="ZS"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="RESET">
 <PointGeometry>
@@ -3082,24 +2793,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="zsi"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="tuer_auf">
-<SimpleIdentifier Name="BT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tuer_auf">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tuer_zu">
-<SimpleIdentifier Name="BT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="tuer_zu">
-<SimpleIdentifier Name="FT"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="ZSA"/>
-<SimpleIdentifier Name="ZSI"/>
-<SimpleIdentifier Name="zuendung_an"/>
-<SimpleIdentifier Name="zuendung_aus"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="ZU">
 <PointGeometry>
@@ -3460,10 +3153,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="zuendung"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="zuendung_an"/>
-<SimpleIdentifier Name="zuendung_aus"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="AN">
 <PointGeometry>

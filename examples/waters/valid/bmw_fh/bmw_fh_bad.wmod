@@ -81,41 +81,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="comfort_condition_doors_bad"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="CLOSE">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CLOSE">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_cond_doors"/>
-<IndexedIdentifier Name="CMFT_FRONT">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_FRONT">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_start"/>
-<IndexedIdentifier Name="OPEN">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="OPEN">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="timer"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="doors_closed">
 <EventList>
@@ -262,31 +227,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="comfort_condition_key"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_cond_key"/>
-<IndexedIdentifier Name="CMFT_FRONT">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_FRONT">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_start"/>
-<SimpleIdentifier Name="KEY_PLUG"/>
-<SimpleIdentifier Name="KEY_UNPLUG"/>
-<SimpleIdentifier Name="timer"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="key">
 <PointGeometry>
@@ -378,29 +318,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="comfort_control"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_cond_doors"/>
-<SimpleIdentifier Name="cmft_cond_key"/>
-<SimpleIdentifier Name="cmft_start"/>
-<SimpleIdentifier Name="CMFT_STOP"/>
-<SimpleIdentifier Name="FH_UNLOCK"/>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="STOP"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="timer"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="esc_req">
 <PointGeometry>
@@ -615,17 +532,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="comfort_function"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="STOP"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="no_request">
 <EventList>
@@ -688,29 +594,6 @@
 <SimpleIdentifier Name="FUNC"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="FUNC"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_cond_doors"/>
-<SimpleIdentifier Name="cmft_cond_key"/>
-<IndexedIdentifier Name="CMFT_FRONT">
-<SimpleIdentifier Name="FUNC"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_ROOF">
-<SimpleIdentifier Name="FUNC"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="cmft_start"/>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="FUNC"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="REQ">
-<SimpleIdentifier Name="STOP"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="reset"/>
-<SimpleIdentifier Name="timeout"/>
-<SimpleIdentifier Name="timer"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="timeout">
 <PointGeometry>
@@ -1124,14 +1007,6 @@
 <SimpleIdentifier Name="DOOR"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="CLOSE">
-<SimpleIdentifier Name="DOOR"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="OPEN">
-<SimpleIdentifier Name="DOOR"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="closed">
 <EventList>
@@ -1188,20 +1063,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="fh"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="cmft_start"/>
-<SimpleIdentifier Name="ecefin"/>
-<SimpleIdentifier Name="fh_cond_door_open"/>
-<SimpleIdentifier Name="fh_cond_doors_closed"/>
-<SimpleIdentifier Name="fh_cond_ecefin"/>
-<SimpleIdentifier Name="fh_cond_kl_r"/>
-<SimpleIdentifier Name="FH_LOCK"/>
-<SimpleIdentifier Name="FH_UNLOCK"/>
-<SimpleIdentifier Name="KL_50_ON"/>
-<SimpleIdentifier Name="nocountry"/>
-<SimpleIdentifier Name="read_country"/>
-<SimpleIdentifier Name="usaus"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s">
 <PointGeometry>
@@ -1513,22 +1374,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="fh_condition_doors_bad"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="CLOSE">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CLOSE">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="fh_cond_door_open"/>
-<SimpleIdentifier Name="fh_cond_doors_closed"/>
-<IndexedIdentifier Name="OPEN">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="OPEN">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="doors_closed">
 <EventList>
@@ -1662,23 +1507,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="fh_condition_ecefin_bad"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="CLOSE">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CLOSE">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="fh_cond_ecefin"/>
-<SimpleIdentifier Name="KL_R_OFF"/>
-<SimpleIdentifier Name="KL_R_ON"/>
-<IndexedIdentifier Name="OPEN">
-<SimpleIdentifier Name="DRD"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="OPEN">
-<SimpleIdentifier Name="PSD"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="radio_door_open">
 <PointGeometry>
@@ -1976,14 +1804,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="fh_condition_kl_r"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="cmft_start"/>
-<SimpleIdentifier Name="fh_cond_ecefin"/>
-<SimpleIdentifier Name="fh_cond_kl_r"/>
-<SimpleIdentifier Name="KL_50_OFF"/>
-<SimpleIdentifier Name="KL_50_ON"/>
-<SimpleIdentifier Name="KL_R_ON"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="radio">
 <PointGeometry>
@@ -2088,16 +1908,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="fh_sync_cmft"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="CLOSE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="CMFT_BACK">
-<SimpleIdentifier Name="OPEN"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="FH_LOCK"/>
-<SimpleIdentifier Name="FH_UNLOCK"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="locked">
 <EventList>
@@ -2164,14 +1974,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="lock"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="KEY_PLUG"/>
-<SimpleIdentifier Name="KEY_UNPLUG"/>
-<SimpleIdentifier Name="KL_50_OFF"/>
-<SimpleIdentifier Name="KL_50_ON"/>
-<SimpleIdentifier Name="KL_R_OFF"/>
-<SimpleIdentifier Name="KL_R_ON"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="radio">
 <PointGeometry>
@@ -2282,12 +2084,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="readcountry"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="ecefin"/>
-<SimpleIdentifier Name="nocountry"/>
-<SimpleIdentifier Name="read_country"/>
-<SimpleIdentifier Name="usaus"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -2340,11 +2136,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="timer"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="reset"/>
-<SimpleIdentifier Name="timeout"/>
-<SimpleIdentifier Name="timer"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="on">
 <PointGeometry>

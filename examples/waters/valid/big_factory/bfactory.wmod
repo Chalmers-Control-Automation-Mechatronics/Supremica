@@ -19,13 +19,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="buffer2"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="finish1"/>
-<SimpleIdentifier Name="finish2"/>
-<SimpleIdentifier Name="start1"/>
-<SimpleIdentifier Name="start2"/>
-<SimpleIdentifier Name="start3"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="s2">
 <PointGeometry>
@@ -132,12 +125,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="machine1"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="break1"/>
-<SimpleIdentifier Name="finish1"/>
-<SimpleIdentifier Name="repair1"/>
-<SimpleIdentifier Name="start1"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -212,12 +199,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="machine2"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="break2"/>
-<SimpleIdentifier Name="finish2"/>
-<SimpleIdentifier Name="repair2"/>
-<SimpleIdentifier Name="start2"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="DOWN">
 <PointGeometry>
@@ -292,12 +273,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="machine3"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<SimpleIdentifier Name="break3"/>
-<SimpleIdentifier Name="finish3"/>
-<SimpleIdentifier Name="repair3"/>
-<SimpleIdentifier Name="start3"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="DOWN">
 <PointGeometry>

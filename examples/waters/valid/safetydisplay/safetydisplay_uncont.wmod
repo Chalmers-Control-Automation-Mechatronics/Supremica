@@ -32,18 +32,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="display"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="displayoff"/>
-<IndexedIdentifier Name="displayon">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="displayon">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="displayon">
-<IntConstant Value="3"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -151,36 +139,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="displaypriorityuncontrollable"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="displayoff"/>
-<IndexedIdentifier Name="displayon">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="displayon">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="displayon">
-<IntConstant Value="3"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="switchoff">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="switchoff">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="switchoff">
-<IntConstant Value="3"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="switchon">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="switchon">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="switchon">
-<IntConstant Value="3"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="on123">
 <EventList>
@@ -670,14 +628,6 @@
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="switchoff">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="switchon">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="init">
 <PointGeometry>

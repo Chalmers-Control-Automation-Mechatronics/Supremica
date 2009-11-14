@@ -422,20 +422,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="belt"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="B1_start"/>
-<SimpleIdentifier Name="B1_stop"/>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="LS_off_B1">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="LS_on_B1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="LS_on_B1">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="belt_stopped">
 <PointGeometry>
@@ -710,17 +696,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="belt_drop"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="L_drop_B2">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="LS1_off_B2">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="LS_on_B2">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -832,17 +807,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="belt_pick"/>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="L_pick_B1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="LS_off_B1">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="LS_on_B1">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -959,30 +923,6 @@
 <SimpleIdentifier Name="ST"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<IndexedIdentifier Name="L_dropS">
-<SimpleIdentifier Name="ST"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_dropS">
-<SimpleIdentifier Name="ST"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_pickS">
-<SimpleIdentifier Name="ST"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_pickS">
-<SimpleIdentifier Name="ST"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="LS_off">
-<SimpleIdentifier Name="ST"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="LS_on">
-<SimpleIdentifier Name="ST"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="part_dropped">
 <PointGeometry>
@@ -1194,53 +1134,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="init"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init"/>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_drop_B2">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_dropS">
-<SimpleIdentifier Name="S"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_dropS">
-<SimpleIdentifier Name="S"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX2">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX3">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX4">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX5">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX6">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX7">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_pick_B1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_pickS">
-<SimpleIdentifier Name="S"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_pickS">
-<SimpleIdentifier Name="S"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s1">
 <PointGeometry>
@@ -1344,16 +1237,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="init_L1X1"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init"/>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_left">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_X1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -1486,16 +1369,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="init_L2X8"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init"/>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_right">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_X8">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -1636,16 +1509,6 @@
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init"/>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_up">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Z1">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -1788,31 +1651,6 @@
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init"/>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_back">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_forward">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mY1">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mY3">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y1">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y2">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y3">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -2104,45 +1942,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="magnet_L1"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_at_X1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X2">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X3">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X4">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X5">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X6">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X7">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mag_off">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mag_on">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y2">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y3">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="X6Y1">
 <EventList>
@@ -3017,45 +2816,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="magnet_L2"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_at_X2">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X3">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X4">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X5">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X6">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X7">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X8">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mag_off">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mag_on">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y1">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y2">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y3">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="L2_UK">
 <PointGeometry>
@@ -3932,15 +3692,6 @@
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_mag_off">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mag_on">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="mag_off">
 <EventList>
@@ -4045,43 +3796,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="observer_L1x"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_at_X1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X2">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X3">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X4">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X5">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X6">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X7">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_left">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_right">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="T_X1"/>
-<SimpleIdentifier Name="T_X2"/>
-<SimpleIdentifier Name="T_X3"/>
-<SimpleIdentifier Name="T_X4"/>
-<SimpleIdentifier Name="T_X5"/>
-<SimpleIdentifier Name="T_X6"/>
-<SimpleIdentifier Name="T_X7"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="L1_X5fromX6">
 <PointGeometry>
@@ -5109,43 +4823,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="observer_L2x"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_at_X2">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X3">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X4">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X5">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X6">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X7">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X8">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_left">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_right">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<SimpleIdentifier Name="T_X2"/>
-<SimpleIdentifier Name="T_X3"/>
-<SimpleIdentifier Name="T_X4"/>
-<SimpleIdentifier Name="T_X5"/>
-<SimpleIdentifier Name="T_X6"/>
-<SimpleIdentifier Name="T_X7"/>
-<SimpleIdentifier Name="T_X8"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -6173,58 +5850,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="plant_move_L1x"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init"/>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_at_X1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X2">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X3">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X4">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X5">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X6">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X7">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_left">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX2">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX3">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX4">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX5">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX6">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX7">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_right">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="L_leave_Xi5f">
 <PointGeometry>
@@ -7344,58 +6969,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="plant_move_L2x"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init"/>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_at_X2">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X3">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X4">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X5">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X6">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X7">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X8">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_left">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX2">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX3">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX4">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX5">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX6">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX7">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX8">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_right">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="L_leave_Xi5f">
 <PointGeometry>
@@ -8523,24 +8096,6 @@
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init"/>
-<IndexedIdentifier Name="L_back">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_forward">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y1">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y2">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y3">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -8931,22 +8486,6 @@
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init"/>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_down">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_up">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Z1">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Z2">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -9163,54 +8702,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="safety2L1"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_at_X1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X2">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X2">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X3">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X3">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X4">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X4">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X5">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X5">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X6">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X6">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X7">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X8">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_left">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_right">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="X6X7">
 <PointGeometry>
@@ -10397,54 +9888,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="safety2L2"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_at_X1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X2">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X3">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X3">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X4">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X4">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X5">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X5">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X6">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X6">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X7">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X7">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_at_X8">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_left">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_right">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="X6X7">
 <PointGeometry>
@@ -11648,34 +11091,6 @@
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init"/>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_back">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_forward">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mY1">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mY2">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mY3">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y1">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y2">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Y3">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="L_leave_Y2h">
 <PointGeometry>
@@ -12233,95 +11648,6 @@
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init"/>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="L_back">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_down">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_drop_B2">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_dropS">
-<SimpleIdentifier Name="S"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_dropS">
-<SimpleIdentifier Name="S"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_forward">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_left">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mag_off">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mag_on">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX2">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX3">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX4">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX5">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX6">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX7">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mX8">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mY1">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mY2">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_mY3">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_pick_B1">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_pickS">
-<SimpleIdentifier Name="S"/>
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_pickS">
-<SimpleIdentifier Name="S"/>
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_right">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="L_up">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Z1">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="TL_Z2">
-<SimpleIdentifier Name="i"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -12706,21 +12032,6 @@
 <SimpleIdentifier Name="ST"/>
 </IndexedIdentifier>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="init_done"/>
-<IndexedIdentifier Name="LED_off">
-<SimpleIdentifier Name="ST"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="LED_on">
-<SimpleIdentifier Name="ST"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="LS_off">
-<SimpleIdentifier Name="ST"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="LS_on">
-<SimpleIdentifier Name="ST"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="S_start">
 <PointGeometry>

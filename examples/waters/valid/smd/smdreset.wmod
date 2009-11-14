@@ -25,13 +25,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="counterobserver"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="counter"/>
-<SimpleIdentifier Name="counter_equals_12"/>
-<SimpleIdentifier Name="counter_less_than_12"/>
-<SimpleIdentifier Name="repeat"/>
-<SimpleIdentifier Name="reset"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -110,11 +103,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="operatorobserver"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="operator_input"/>
-<SimpleIdentifier Name="repeat"/>
-<SimpleIdentifier Name="stop"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -163,24 +151,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="recoverysupervisor"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="counter"/>
-<SimpleIdentifier Name="done_recover"/>
-<SimpleIdentifier Name="done_scan"/>
-<SimpleIdentifier Name="done_turn"/>
-<SimpleIdentifier Name="done_vacuum"/>
-<SimpleIdentifier Name="error_scan"/>
-<SimpleIdentifier Name="error_turn"/>
-<SimpleIdentifier Name="error_vacuum"/>
-<SimpleIdentifier Name="operator_input"/>
-<SimpleIdentifier Name="recover"/>
-<SimpleIdentifier Name="repeat"/>
-<SimpleIdentifier Name="reset"/>
-<SimpleIdentifier Name="scan"/>
-<SimpleIdentifier Name="stop"/>
-<SimpleIdentifier Name="turn"/>
-<SimpleIdentifier Name="vacuum"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -349,13 +319,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="scanobserver"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="done_recover"/>
-<SimpleIdentifier Name="done_scan"/>
-<SimpleIdentifier Name="error_scan"/>
-<SimpleIdentifier Name="recover"/>
-<SimpleIdentifier Name="scan"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -431,22 +394,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="scansupervisor"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="counter"/>
-<SimpleIdentifier Name="counter_equals_12"/>
-<SimpleIdentifier Name="counter_less_than_12"/>
-<SimpleIdentifier Name="done_recover"/>
-<SimpleIdentifier Name="done_scan"/>
-<SimpleIdentifier Name="done_turn"/>
-<SimpleIdentifier Name="error_scan"/>
-<SimpleIdentifier Name="error_turn"/>
-<SimpleIdentifier Name="operator_input"/>
-<SimpleIdentifier Name="recover"/>
-<SimpleIdentifier Name="repeat"/>
-<SimpleIdentifier Name="scan"/>
-<SimpleIdentifier Name="stop"/>
-<SimpleIdentifier Name="turn"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <PointGeometry>
@@ -611,13 +558,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="turnobserver"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="done_recover"/>
-<SimpleIdentifier Name="done_turn"/>
-<SimpleIdentifier Name="error_turn"/>
-<SimpleIdentifier Name="recover"/>
-<SimpleIdentifier Name="turn"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -693,13 +633,6 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="vacuumobserver"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="done_recover"/>
-<SimpleIdentifier Name="done_vacuum"/>
-<SimpleIdentifier Name="error_vacuum"/>
-<SimpleIdentifier Name="recover"/>
-<SimpleIdentifier Name="vacuum"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -775,22 +708,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="vacuumsupervisor"/>
 <Graph>
-<LabelBlock>
-<SimpleIdentifier Name="counter"/>
-<SimpleIdentifier Name="counter_equals_12"/>
-<SimpleIdentifier Name="counter_less_than_12"/>
-<SimpleIdentifier Name="done_recover"/>
-<SimpleIdentifier Name="done_turn"/>
-<SimpleIdentifier Name="done_vacuum"/>
-<SimpleIdentifier Name="error_turn"/>
-<SimpleIdentifier Name="error_vacuum"/>
-<SimpleIdentifier Name="operator_input"/>
-<SimpleIdentifier Name="recover"/>
-<SimpleIdentifier Name="repeat"/>
-<SimpleIdentifier Name="stop"/>
-<SimpleIdentifier Name="turn"/>
-<SimpleIdentifier Name="vacuum"/>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <PointGeometry>

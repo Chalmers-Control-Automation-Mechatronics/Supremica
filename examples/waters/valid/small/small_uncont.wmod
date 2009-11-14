@@ -38,14 +38,6 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="buffer_uncont"/>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="finish">
-<IntConstant Value="1"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start">
-<IntConstant Value="2"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="empty">
 <EventList>
@@ -105,20 +97,6 @@
 <SimpleIdentifier Name="MACH"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<LabelBlock>
-<IndexedIdentifier Name="break">
-<SimpleIdentifier Name="MACH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="finish">
-<SimpleIdentifier Name="MACH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="repair">
-<SimpleIdentifier Name="MACH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="start">
-<SimpleIdentifier Name="MACH"/>
-</IndexedIdentifier>
-</LabelBlock>
 <NodeList>
 <SimpleNode Name="working">
 <PointGeometry>
