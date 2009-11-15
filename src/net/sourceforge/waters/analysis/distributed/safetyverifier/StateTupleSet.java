@@ -23,9 +23,9 @@ public class StateTupleSet
   {
     int initialcap = PrimeFinder.nextPrime(initialcapacity);
     mStateLength = statelength;
-    
+
     mStrategy = new DirectHashStrategy();
-    
+
     mHash = new IntHashData(initialcap, mStrategy);
     mData = new MemorySlab();
   }
@@ -39,13 +39,12 @@ public class StateTupleSet
    * single operation. Adding a unique state will return the positive
    * index that can be used to access the state later.
    * @param state to add to the set.
-   * @return 
    */
   public int add(StateTuple state)
   {
     final int size = mSize;
     final int capacity = mHash.getCapacity();
-    
+
     if (size / (float)capacity > mLoadFactor)
       {
 	final int newcap = PrimeFinder.nextPrime(capacity * 2);
@@ -101,7 +100,7 @@ public class StateTupleSet
   }
 
   /**
-   * Gets a pointer to a stored state tuple if it exists, or -1 
+   * Gets a pointer to a stored state tuple if it exists, or -1
    * if it is not in the set.
    * @param state to lookup pointer for.
    * @return Pointer to state, or -1 if not present.
@@ -194,7 +193,7 @@ public class StateTupleSet
 	{
 	  hash = 31 * hash + ar[i];
 	}
-      
+
       return hash;
     }
 
@@ -203,13 +202,13 @@ public class StateTupleSet
     {
       final int end = start + length;
       int hash = 5381;
-      
+
       while (start < end)
 	{
 	  hash = ((hash << 5) + hash) + ar[start];
 	  start++;
 	}
-      
+
       return hash;
     }
 
@@ -217,13 +216,13 @@ public class StateTupleSet
     {
       final int end = start + length;
       int hash = 0;
-      
+
       while (start < end)
 	{
 	  hash = ar[start] + (hash << 6) + (hash << 16) - hash;
 	  start++;
 	}
-      
+
       return hash;
     }
   }
@@ -232,7 +231,7 @@ public class StateTupleSet
   private int mSize = 0;
   private final float mLoadFactor = 0.5f;
 
-  private HashStrategy mStrategy;
+  private final HashStrategy mStrategy;
 
   private final int mStateLength;
   private final IntHashData mHash;

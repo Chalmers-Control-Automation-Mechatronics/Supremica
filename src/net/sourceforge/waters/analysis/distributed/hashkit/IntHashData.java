@@ -26,7 +26,7 @@ package net.sourceforge.waters.analysis.distributed.hashkit;
  *
  * The methods in this class DO NOT do bounds checking. That's someone
  * else's job.
- * 
+ *
  * @author Sam Douglas
  */
 public class IntHashData
@@ -36,9 +36,9 @@ public class IntHashData
    * strategy. For good performance, the capacity should be a prime
    * number. The <code>hashkit.PrimeFinder</code> class can be used to
    * find a suitable size.
-   * @param Exact capacity to allocate
-   * @param Strategy for accessing data to compute equality and hash
-   *        functions.
+   * @param capacity  Exact capacity to allocate
+   * @param strategy  Strategy for accessing data to compute equality and hash
+   *                  functions.
    */
   public IntHashData(int capacity, HashStrategy strategy)
   {
@@ -46,7 +46,7 @@ public class IntHashData
     mData = new int[capacity];
     mState = new byte[capacity];
   }
-  
+
   /**
    * Gets the full capacity for the hash table. This is the total number
    * of slots allocated.
@@ -122,8 +122,8 @@ public class IntHashData
    * Stores a value into the specified hash table location and updates
    * the state to be occupied.
    * @param index of the slot to set data for
-   * @data data to store in slot
-   */ 
+   * @param data to store in slot
+   */
   public void store(int index, int data)
   {
     mData[index] = data;
@@ -148,8 +148,8 @@ public class IntHashData
     //clustering. This is done as according to TAOCP v3 p. 529 The
     //code is very similar to the primitive hash template in GNU Trove
     //2.1.0
-    if (state[index] != EMPTY && 
-	(state[index] == DELETED || 
+    if (state[index] != EMPTY &&
+	(state[index] == DELETED ||
 	 !mStrategy.equal(value, mData[index])))
       {
 	final int probe = 1 + (hash % (length - 2));
@@ -159,8 +159,8 @@ public class IntHashData
 	    if (index < 0)
 	      index += length;
 	  }
-	while (state[index] != EMPTY && 
-	       (state[index] == DELETED || 
+	while (state[index] != EMPTY &&
+	       (state[index] == DELETED ||
 		!mStrategy.equal(value, mData[index])));
       }
 
@@ -191,7 +191,7 @@ public class IntHashData
     else
       {
 	final int probe = 1 + (hash % (length - 2));
-	
+
 	//Find the first entry that isn't full. If the current slot is
 	//free, it would have been taken care of by a previous check.
 	if (state[index] != DELETED)
@@ -206,7 +206,7 @@ public class IntHashData
 	  }
 
 	//If the index was removed, continue probing to ensure the
-	//value does not appear in the table, but store the 
+	//value does not appear in the table, but store the
 	//index of the first removed item.
 	if (state[index] == DELETED)
 	  {
@@ -253,7 +253,7 @@ public class IntHashData
     else
       {
 	final int probe = 1 + (hash % (length - 2));
-	
+
 	//Find the first entry that isn't full. If the current slot is
 	//free, it would have been taken care of by a previous check.
 	if (state[index] != DELETED)
@@ -268,7 +268,7 @@ public class IntHashData
 	  }
 
 	//If the index was removed, continue probing to ensure the
-	//value does not appear in the table, but store the 
+	//value does not appear in the table, but store the
 	//index of the first removed item.
 	if (state[index] == DELETED)
 	  {
@@ -293,7 +293,7 @@ public class IntHashData
     final int[] oldData = mData;
     final byte[] oldState = mState;
     final int oldLength = oldState.length;
-    
+
     mData = new int[newCapacity];
     mState = new byte[newCapacity];
 
