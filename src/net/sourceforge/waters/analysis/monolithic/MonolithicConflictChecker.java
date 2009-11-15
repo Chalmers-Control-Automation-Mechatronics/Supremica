@@ -171,13 +171,27 @@ int stateid = premarked[index];
         final List<EventProxy> countertrace = new LinkedList<EventProxy>();
         // Find the unchecked state with the lowest
         // id, as this should give the shortest counterexample.
+        // or if a second marking condition is simultaneously used, look for the
+        //first non coreachable precondition marked state.
         int trace_start = Integer.MAX_VALUE;
-        for (int v = 0; v < numstates; v++) {
-          if (!coreachable.get(v)) {
-            trace_start = v;
-            break;
-          }
-        }
+        //if (premarked == null) {
+        	for (int v = 0; v < numstates; v++) {
+          		if (!coreachable.get(v)) {
+            		trace_start = v;
+            		break;
+          		}
+        	}
+		/*}else {
+	        for (int v = 0; v < numstates; v++) {
+				if (premarked.contains(v)) {
+          			if (!coreachable.get(v)) {
+            			trace_start = v;
+            			break;
+					}
+				}
+			}
+		}*/
+
         // Until we reach the start state...
         final TransitionSchema trans = mSyncProduct.transitions;
         while (trace_start != 0) {
