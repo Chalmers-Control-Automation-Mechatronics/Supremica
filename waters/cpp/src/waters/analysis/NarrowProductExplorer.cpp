@@ -445,7 +445,8 @@ expandNonblockingReachabilityState(uint32 source,
   }
   if (getConflictKind() != jni::ConflictKind_DEADLOCK) {
     return true;
-  } else if (getAutomatonEncoding().isMarkedStateTuple(sourcetuple)) {
+  } else if (getAutomatonEncoding().isMarkedStateTuple(sourcetuple) ||
+             !getAutomatonEncoding().isPreMarkedStateTuple(sourcetuple)) {
     setConflictKind(jni::ConflictKind_CONFLICT);
     return true;
   } else {

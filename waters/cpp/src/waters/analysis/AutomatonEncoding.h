@@ -93,6 +93,12 @@ public:
   inline bool isMarkedState(uint32 code) const
     {return code >= mFirstMarkedState;}
   inline bool isAllMarked() const {return mFirstMarkedState == 0;}
+  inline uint32 getNumberOfPreMarkedStates() const
+    {return mEndPreMarkedStates - mFirstPreMarkedState;}
+  inline bool isPreMarkedState(uint32 code) const
+    {return code >= mFirstPreMarkedState && code < mEndPreMarkedStates;}
+  inline bool isAllPreMarked() const
+    {return mFirstPreMarkedState == 0 && mEndPreMarkedStates == mNumStates;}
   inline int getNumberOfBits() const {return mNumBits;}
   inline int getAutomatonIndex() const {return mAutomatonIndex;}
   inline int getWordIndex() const {return mWordIndex;}
@@ -108,6 +114,8 @@ public:
   static int compare(const void* elem1, const void* elem2);
   int compareToByMarking(const AutomatonRecord* partner) const;
   static int compareByMarking(const void* elem1, const void* elem2);
+  int compareToByPreMarking(const AutomatonRecord* partner) const;
+  static int compareByPreMarking(const void* elem1, const void* elem2);
   static inline const HashAccessor* getHashAccessor()
     {return &theHashAccessor;}
 
@@ -211,6 +219,8 @@ public:
   bool isTriviallyBlocking() const {return mIsTriviallyBlocking;}
   bool isMarkedStateTuplePacked(const uint32* encoded) const;
   bool isMarkedStateTuple(const uint32* decoded) const;
+  bool isPreMarkedStateTuplePacked(const uint32* encoded) const;
+  bool isPreMarkedStateTuple(const uint32* decoded) const;
 
   //##########################################################################
   //# Masking
@@ -265,6 +275,8 @@ private:
   bool mIsTriviallyBlocking;
   const AutomatonRecord** mMarkingTestRecords;
   int mNumMarkingTestRecords;
+  const AutomatonRecord** mPreMarkingTestRecords;
+  int mNumPreMarkingTestRecords;
 };
 
 

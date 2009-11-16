@@ -107,7 +107,8 @@ AutomatonRecord(const jni::AutomatonGlue& aut,
     initNonMarking(cache, false);
   } else if (events.contains(&omega)) {
     if (alpha.isNull() || !events.contains(&alpha)) {
-      mFirstPreMarkedState = mEndPreMarkedStates = mNumStates;
+      mFirstPreMarkedState = 0;
+      mEndPreMarkedStates = mNumStates;
       initMarking(omega, mFirstMarkedState, cache);
     } else {
       initMarking(alpha, omega, cache);
@@ -116,7 +117,8 @@ AutomatonRecord(const jni::AutomatonGlue& aut,
     if (alpha.isNull() || !events.contains(&alpha)) {
       initNonMarking(cache, true);
     } else {
-      mFirstMarkedState = mEndPreMarkedStates = mNumStates;
+      mFirstPreMarkedState = 0;
+      mEndPreMarkedStates = mNumStates;
       initMarking(alpha, mFirstPreMarkedState, cache);
     }
   }
@@ -218,6 +220,30 @@ compareByMarking(const void* elem1, const void* elem2)
   const AutomatonRecord* val1 = *((const AutomatonRecord**) elem1);
   const AutomatonRecord* val2 = *((const AutomatonRecord**) elem2);
   return val1->compareToByMarking(val2);
+}
+
+int AutomatonRecord::
+compareToByPreMarking(const AutomatonRecord* partner)
+  const
+{
+  float prob1 = (float) getNumberOfPreMarkedStates() / (float) mNumStates;
+  float prob2 = (float) partner->getNumberOfPreMarkedStates() /
+                (float) partner->mNumStates;
+  if (prob1 < prob2) {
+    return -1;
+  } else if (prob1 > prob2) {
+    return 1;
+  } else {
+    return compareTo(partner);
+  }
+}
+
+int AutomatonRecord::
+compareByPreMarking(const void* elem1, const void* elem2)
+{
+  const AutomatonRecord* val1 = *((const AutomatonRecord**) elem1);
+  const AutomatonRecord* val2 = *((const AutomatonRecord**) elem2);
+  return val1->compareToByPreMarking(val2);
 }
 
 
@@ -431,7 +457,9 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
     mIsAllMarked(true),
     mIsTriviallyBlocking(false),
     mMarkingTestRecords(0),
-    mNumMarkingTestRecords(0)
+    mNumMarkingTestRecords(0),
+    mPreMarkingTestRecords(0),
+    mNumPreMarkingTestRecords(0)
 {
   bool hasinit = true;
   int totalbits = numtags;
@@ -534,6 +562,7 @@ AutomatonEncoding::
   delete [] mAutomatonRecords;
   delete [] mWordStop;
   delete [] mMarkingTestRecords;
+  delete [] mPreMarkingTestRecords;
 }
 
 
@@ -674,6 +703,35 @@ isMarkedStateTuple(const uint32* decoded)
     const AutomatonRecord* record = mMarkingTestRecords[a];
     const uint32 index = record->getAutomatonIndex();
     if (!record->isMarkedState(decoded[index])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool AutomatonEncoding::
+isPreMarkedStateTuplePacked(const uint32* encoded)
+  const
+{
+  for (int a = 0; a < mNumPreMarkingTestRecords; a++) {
+    const AutomatonRecord* record = mPreMarkingTestRecords[a];
+    const uint32 index = record->getAutomatonIndex();
+    const uint32 state = get(encoded, index);
+    if (!record->isPreMarkedState(state)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool AutomatonEncoding::
+isPreMarkedStateTuple(const uint32* decoded)
+  const
+{
+  for (int a = 0; a < mNumPreMarkingTestRecords; a++) {
+    const AutomatonRecord* record = mPreMarkingTestRecords[a];
+    const uint32 index = record->getAutomatonIndex();
+    if (!record->isPreMarkedState(decoded[index])) {
       return false;
     }
   }
@@ -825,6 +883,26 @@ setupMarkingTest()
     }
     qsort(mMarkingTestRecords, mNumMarkingTestRecords,
           sizeof(AutomatonRecord*), AutomatonRecord::compareByMarking);
+  }
+  if (mPreMarkingTestRecords == 0) {
+    int a;
+    for (a = 0; a < mNumRecords; a++) {
+      AutomatonRecord* record = mAutomatonRecords[a];
+      if (!record->isAllPreMarked()) {
+        mNumPreMarkingTestRecords++;
+      }
+    }
+    mPreMarkingTestRecords =
+      new const AutomatonRecord*[mNumPreMarkingTestRecords];
+    mNumPreMarkingTestRecords = 0;
+    for (a = 0; a < mNumRecords; a++) {
+      const AutomatonRecord* record = mAutomatonRecords[a];
+      if (!record->isAllPreMarked()) {
+        mPreMarkingTestRecords[mNumPreMarkingTestRecords++] = record;
+      }
+    }
+    qsort(mPreMarkingTestRecords, mNumPreMarkingTestRecords,
+          sizeof(AutomatonRecord*), AutomatonRecord::compareByPreMarking);
   }
 }
 

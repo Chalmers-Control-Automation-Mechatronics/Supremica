@@ -347,7 +347,7 @@ doNonblockingCoreachabilitySearch()
   mDFSStackSize = mNumStates < DFS_STACK_SIZE ? mNumStates : DFS_STACK_SIZE;
   mDFSStack = new uint32[mDFSStackSize];
   mDFSStackPos = 0;
-  mNumCoreachableStates = 0;
+  mNumCoreachableStates = mPreMarking.isNull() ? 0 : UNDEF_UINT32;
   uint32* currenttuple = 0;
   bool overflow = false;
   if (mTransitionLimit == 0) {
@@ -362,11 +362,11 @@ doNonblockingCoreachabilitySearch()
       }
       if (mEncoding->isMarkedStateTuplePacked(currentpacked)) {
         mEncoding->setTag(currentpacked, TAG_COREACHABLE);
-        if (++mNumCoreachableStates == mNumStates) {
+        if (mNumCoreachableStates != UNDEF_UINT32 &&
+            ++mNumCoreachableStates == mNumStates) {
           return true;
         }
         if (currenttuple == 0) { // storing
-          //mReverseTransitionStore->dump(mNumStates);
           exploreNonblockingCoreachabilityStateDFS(current);
         } else { // non-storing
           exploreNonblockingCoreachabilityStateDFS(currenttuple,
@@ -404,12 +404,13 @@ doNonblockingCoreachabilitySearch()
   delete [] currenttuple;
   for (uint32 current = 0; current < mNumStates; current++) {
     uint32* currentpacked = mStateSpace->get(current);
-    if (!mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
+    if (!mEncoding->hasTag(currentpacked, TAG_COREACHABLE) &&
+        mEncoding->isPreMarkedStateTuplePacked(currentpacked)) {
       mTraceState = current;
-      break;
+      return false;
     }
   }
-  return false;
+  return true;
 }
 
 void ProductExplorer::
@@ -538,7 +539,8 @@ storeInitialStates(bool initzero, bool donondet)
     uint32* sourcepacked = mStateSpace->get(source);                    \
     if (!mEncoding->hasTag(sourcepacked, TAG_COREACHABLE)) {            \
       mEncoding->setTag(sourcepacked, TAG_COREACHABLE);                 \
-      if (++mNumCoreachableStates == mNumStates) {                      \
+      if (mNumCoreachableStates != UNDEF_UINT32 &&                      \
+          ++mNumCoreachableStates == mNumStates) {                      \
         throw SearchAbort();                                            \
       } else if (mDFSStackPos < mDFSStackSize) {                        \
         mDFSStack[mDFSStackPos++] = source;                             \
