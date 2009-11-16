@@ -54,6 +54,7 @@ public:
   explicit BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
 				const jni::ProductDESGlue& des,
 				const jni::KindTranslatorGlue& translator,
+				const jni::EventGlue& premarking,
 				const jni::EventGlue& marking,
 				jni::ClassCache* cache);
   virtual ~BroadProductExplorer();

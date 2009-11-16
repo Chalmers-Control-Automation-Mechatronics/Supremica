@@ -152,6 +152,14 @@ public abstract class AbstractConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void testNeverMarked() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "never_marked.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testOrphanEvents() throws Exception
   {
     final String group = "tests";

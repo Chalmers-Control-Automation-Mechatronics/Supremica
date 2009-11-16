@@ -56,9 +56,10 @@ NarrowProductExplorer::
 NarrowProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
                       const jni::ProductDESGlue& des,
                       const jni::KindTranslatorGlue& translator,
+                      const jni::EventGlue& premarking,
                       const jni::EventGlue& marking,
                       jni::ClassCache* cache)
-  : ProductExplorer(factory, des, translator, marking, cache),
+  : ProductExplorer(factory, des, translator, premarking, marking, cache),
     mNumEventRecords(0),
     mFirstSpecOnlyUncontrollable(0),
     mNumPlants(0),
@@ -113,7 +114,7 @@ setup()
     if (aut->isPlant()) {
       mNumPlants++;
     }
-    const uint32 numinit = aut->getEndOfInitialStates();
+    const uint32 numinit = aut->getNumberOfInitialStates();
     switch (numinit) {
     case 0:
       setTrivial();

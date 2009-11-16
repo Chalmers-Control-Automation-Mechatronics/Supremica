@@ -61,12 +61,14 @@ ProductExplorer::
 ProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
                 const jni::ProductDESGlue& des,
 		const jni::KindTranslatorGlue& translator,
+                const jni::EventGlue& premarking,
                 const jni::EventGlue& marking,
 		jni::ClassCache* cache)
   : mCache(cache),
     mFactory(factory),
     mModel(des),
     mKindTranslator(translator),
+    mPreMarking(premarking),
     mMarking(marking),
     mStateLimit(UNDEF_UINT32),
     mTransitionLimit(UNDEF_UINT32),
@@ -149,11 +151,11 @@ runNonblockingCheck()
     mMode = EXPLORER_MODE_NONBLOCKING;
     setup();
     if (!mIsTrivial || mTraceState != UNDEF_UINT32) {
-      storeInitialStates(false);
       if (mIsTrivial) {
         result = false;
         // mDeadlock = "transitions enabled in mTraceState";
       } else {
+        storeInitialStates(false);
         result = doNonblockingReachabilitySearch();
         if (result) {
           mConflictKind = jni::ConflictKind_LIVELOCK;
@@ -230,7 +232,8 @@ setup()
   // Establish automaton encoding ...
   const int numtags = mMode == EXPLORER_MODE_SAFETY ? 0 : 1;
   mEncoding =
-    new AutomatonEncoding(mModel, mKindTranslator, mMarking, mCache, numtags);
+    new AutomatonEncoding(mModel, mKindTranslator,
+                          mPreMarking, mMarking, mCache, numtags);
   // mEncoding->dump();
   mNumAutomata = mEncoding->getNumberOfRecords();
   mNumStates = 0;
@@ -251,6 +254,7 @@ setup()
       setTrivial();
     } else if (mEncoding->isTriviallyBlocking()) {
       mStateSpace = new StateSpace(mEncoding, 1);
+      mDepthMap = new ArrayList<uint32>(2);
       storeInitialStates(false, false);
       setTraceState(0);
       setTrivial();
@@ -463,7 +467,7 @@ storeInitialStates(bool initzero, bool donondet)
     uint32* inittuple = new uint32[mNumAutomata];
     for (int a = 0; a < mNumAutomata; a++) {
       const AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
-      inittuple[a] = aut->getFirstInitialState();
+      inittuple[a] = aut->getFirstInitialState1();
     }
     getAutomatonEncoding().encode(inittuple, initpacked);
     delete [] inittuple;
@@ -633,6 +637,7 @@ public:
   ProductExplorer* createProductExplorer
     (const jni::NativeModelVerifierGlue& gchecker,
      const jni::KindTranslatorGlue& translator,
+     const jni::EventGlue& premarking,
      const jni::EventGlue& marking,
      jni::ClassCache& cache)
   {
@@ -640,11 +645,11 @@ public:
     jni::ProductDESGlue des = gchecker.getModelGlue(&cache);
     jni::ExplorerMode mode = gchecker.getExplorerModeGlue(&cache);
     if (mode == jni::ExplorerMode_NARROW) {
-      mProductExplorer =
-        new NarrowProductExplorer(factory, des, translator, marking, &cache);
+      mProductExplorer = new NarrowProductExplorer
+        (factory, des, translator, premarking, marking, &cache);
     } else {
-      mProductExplorer =
-        new BroadProductExplorer(factory, des, translator, marking, &cache);
+      mProductExplorer = new BroadProductExplorer
+        (factory, des, translator, premarking, marking, &cache);
     }
     const int limit = gchecker.getNodeLimit();
     if (limit != UNDEF_INT32) {
@@ -681,10 +686,11 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
       jni::NativeSafetyVerifierGlue gchecker(jchecker, &cache);
       jni::KindTranslatorGlue translator =
         gchecker.getKindTranslatorGlue(&cache);
-      jni::EventGlue marking(0, &cache);
+      jni::EventGlue nomarking(0, &cache);
       waters::ProductExplorerFinalizer finalizer;
       waters::ProductExplorer* checker =
-        finalizer.createProductExplorer(gchecker, translator, marking, cache);
+        finalizer.createProductExplorer(gchecker, translator,
+                                        nomarking, nomarking, cache);
       bool result = checker->runSafetyCheck();
       if (result) {
         jni::VerificationResultGlue vresult(result, 0, &cache);
@@ -718,9 +724,12 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
       jni::KindTranslatorGlue translator =
         gchecker.getKindTranslatorGlue(&cache);
       jni::EventGlue marking = gchecker.getUsedMarkingPropositionGlue(&cache);
+      jni::EventGlue premarking =
+        gchecker.getGeneralisedPreconditionGlue(&cache);
       waters::ProductExplorerFinalizer finalizer;
       waters::ProductExplorer* checker =
-        finalizer.createProductExplorer(gchecker, translator, marking, cache);
+        finalizer.createProductExplorer(gchecker, translator,
+                                        premarking, marking, cache);
       bool result = checker->runNonblockingCheck();
       if (result) {
         jni::VerificationResultGlue vresult(result, 0, &cache);

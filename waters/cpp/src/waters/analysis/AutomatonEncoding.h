@@ -72,6 +72,7 @@ public:
   //# Constructors & Destructors
   explicit AutomatonRecord(const jni::AutomatonGlue& aut,
 			   bool plant,
+			   const jni::EventGlue& alpha,
 			   const jni::EventGlue& omega,
 			   jni::ClassCache* cache);
   ~AutomatonRecord();
@@ -81,10 +82,11 @@ public:
   const jni::AutomatonGlue& getJavaAutomaton() const {return mJavaAutomaton;}
   inline bool isPlant() const {return mIsPlant;}
   inline uint32 getNumberOfStates() const {return mNumStates;}
-  inline uint32 getFirstInitialState() const {return mFirstInitialState;}
-  inline uint32 getEndOfInitialStates() const {return mEndInitialStates;}
-  inline uint32 getNumberOfInitialStates() const
-    {return mEndInitialStates - mFirstInitialState;}
+  inline uint32 getFirstInitialState1() const {return mFirstInitialState1;}
+  inline uint32 getEndOfInitialStates1() const {return mEndInitialStates1;}
+  inline uint32 getFirstInitialState2() const {return mFirstInitialState2;}
+  inline uint32 getEndOfInitialStates2() const {return mEndInitialStates2;}
+  uint32 getNumberOfInitialStates() const;
   inline uint32 getFirstMarkedState() const {return mFirstMarkedState;}
   inline uint32 getNumberOfMarkedStates() const
     {return mNumStates - mFirstMarkedState;}
@@ -126,8 +128,17 @@ private:
   //##########################################################################
   //# Auxiliary Methods
   void initNonMarking(jni::ClassCache* cache, bool allmarked);
-  void initMarking(const jni::EventGlue& omega, jni::ClassCache* cache);
+  void initMarking(const jni::EventGlue& marking,
+		   uint32& firstmarkedref,
+		   jni::ClassCache* cache);
+  void initMarking(const jni::EventGlue& alpha,
+		   const jni::EventGlue& omega,
+		   jni::ClassCache* cache);
   static int getCategory(const jni::StateGlue& state,
+			 const jni::EventGlue& marking,
+			 jni::ClassCache* cache);
+  static int getCategory(const jni::StateGlue& state,
+			 const jni::EventGlue& alpha,
 			 const jni::EventGlue& omega,
 			 jni::ClassCache* cache);
 
@@ -142,19 +153,18 @@ private:
   int mWordIndex;
   int mShift;
   uint32 mBitMask;
-  uint32 mFirstInitialState;
-  uint32 mEndInitialStates;
+  uint32 mFirstInitialState1;
+  uint32 mEndInitialStates1;
+  uint32 mFirstInitialState2;
+  uint32 mEndInitialStates2;
   uint32 mFirstMarkedState;
+  uint32 mFirstPreMarkedState;
+  uint32 mEndPreMarkedStates;
 
   //##########################################################################
   //# Class Constants
   static const AutomatonRecordHashAccessor theHashAccessor;
 
-  static const int CAT_NORMAL = 0;
-  static const int CAT_INIT = 1;
-  static const int CAT_MARKED = 2;
-  static const int CAT_INIT_MARKED = 3;
-  static const int CAT_COUNT = 4;
 };
 
 
@@ -170,6 +180,7 @@ public:
   //# Constructors & Destructors
   explicit AutomatonEncoding(const jni::ProductDESGlue& des,
 			     const jni::KindTranslatorGlue& translator,
+			     const jni::EventGlue& alpha,
 			     const jni::EventGlue& omega,
 			     jni::ClassCache* cache,
 			     int numtags = 0);

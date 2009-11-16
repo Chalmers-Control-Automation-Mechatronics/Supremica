@@ -87,6 +87,7 @@ public:
   explicit ProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
 			   const jni::ProductDESGlue& des,
 			   const jni::KindTranslatorGlue& translator,
+			   const jni::EventGlue& premarking,
 			   const jni::EventGlue& marking,
 			   jni::ClassCache* cache);
   virtual ~ProductExplorer();
@@ -175,6 +176,7 @@ private:
   jni::ProductDESProxyFactoryGlue mFactory;
   jni::ProductDESGlue mModel;
   jni::KindTranslatorGlue mKindTranslator;
+  jni::EventGlue mPreMarking;
   jni::EventGlue mMarking;
   uint32 mStateLimit;
   uint32 mTransitionLimit;

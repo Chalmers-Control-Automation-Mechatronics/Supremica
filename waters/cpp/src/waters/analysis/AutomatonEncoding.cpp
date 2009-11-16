@@ -89,6 +89,7 @@ const AutomatonRecordHashAccessor AutomatonRecord::theHashAccessor;
 AutomatonRecord::
 AutomatonRecord(const jni::AutomatonGlue& aut,
                 bool plant,
+                const jni::EventGlue& alpha,
                 const jni::EventGlue& omega,
                 jni::ClassCache* cache)
   : mJavaAutomaton(aut),
@@ -105,9 +106,19 @@ AutomatonRecord(const jni::AutomatonGlue& aut,
   if (omega.isNull()) {
     initNonMarking(cache, false);
   } else if (events.contains(&omega)) {
-    initMarking(omega, cache);
+    if (alpha.isNull() || !events.contains(&alpha)) {
+      mFirstPreMarkedState = mEndPreMarkedStates = mNumStates;
+      initMarking(omega, mFirstMarkedState, cache);
+    } else {
+      initMarking(alpha, omega, cache);
+    }
   } else {
-    initNonMarking(cache, true);
+    if (alpha.isNull() || !events.contains(&alpha)) {
+      initNonMarking(cache, true);
+    } else {
+      mFirstMarkedState = mEndPreMarkedStates = mNumStates;
+      initMarking(alpha, mFirstPreMarkedState, cache);
+    }
   }
 }
 
@@ -123,6 +134,15 @@ AutomatonRecord::
 
 //############################################################################
 //# AutomatonRecord: Simple Access
+
+uint32 AutomatonRecord::
+getNumberOfInitialStates()
+  const
+{
+  return
+    mEndInitialStates1 - mFirstInitialState1 +
+    mEndInitialStates2 - mFirstInitialState2;
+}
 
 jni::JavaString AutomatonRecord::
 getName()
@@ -251,14 +271,19 @@ initNonMarking(jni::ClassCache* cache, bool allmarked)
     }
     new (&mJavaStates[code]) jni::StateGlue(state);
   }
-  mFirstInitialState = 0;
-  mEndInitialStates = nextinit;
+  mFirstInitialState1 = 0;
+  mEndInitialStates1 = mFirstInitialState2 = mEndInitialStates2 = nextinit;
   mFirstMarkedState = allmarked ? 0 : mNumStates;
+  mFirstPreMarkedState = 0;
+  mEndPreMarkedStates = mNumStates;
 }
 
 void AutomatonRecord::
-initMarking(const jni::EventGlue& omega, jni::ClassCache* cache)
+initMarking(const jni::EventGlue& marking,
+            uint32& firstmarkedref,
+            jni::ClassCache* cache)
 {
+  static const int CAT_COUNT = 4;
   int cat;
   uint32 catindex[CAT_COUNT];
   for (cat = 0; cat < CAT_COUNT; cat++) {
@@ -269,7 +294,7 @@ initMarking(const jni::EventGlue& omega, jni::ClassCache* cache)
   while (iter1.hasNext()) {
     jobject javaobject = iter1.next();
     jni::StateGlue state(javaobject, cache);
-    cat = getCategory(state, omega, cache);
+    cat = getCategory(state, marking, cache);
     catindex[cat]++;
   }
   uint32 start = 0;
@@ -282,24 +307,79 @@ initMarking(const jni::EventGlue& omega, jni::ClassCache* cache)
   while (iter2.hasNext()) {
     jobject javaobject = iter2.next();
     jni::StateGlue state(javaobject, cache);
-    cat = getCategory(state, omega, cache);
+    cat = getCategory(state, marking, cache);
     const uint32 code = catindex[cat]++;
     new (&mJavaStates[code]) jni::StateGlue(state);
   }
-  mFirstInitialState = catindex[0];
-  mEndInitialStates = catindex[2];
-  mFirstMarkedState = catindex[1];
+  mFirstInitialState1 = catindex[0];
+  mEndInitialStates1 = mFirstInitialState2 = mEndInitialStates2 = catindex[2];
+  firstmarkedref = catindex[1];
+}
+
+void AutomatonRecord::
+initMarking(const jni::EventGlue& alpha,
+            const jni::EventGlue& omega,
+            jni::ClassCache* cache)
+{
+  static const int CAT_COUNT = 8;
+  int cat;
+  uint32 catindex[CAT_COUNT];
+  for (cat = 0; cat < CAT_COUNT; cat++) {
+    catindex[cat] = 0;
+  }
+  const jni::SetGlue states = mJavaAutomaton.getStatesGlue(cache);
+  const jni::IteratorGlue iter1 = states.iteratorGlue(cache);
+  while (iter1.hasNext()) {
+    jobject javaobject = iter1.next();
+    jni::StateGlue state(javaobject, cache);
+    cat = getCategory(state, alpha, omega, cache);
+    catindex[cat]++;
+  }
+  uint32 start = 0;
+  for (cat = 0; cat < CAT_COUNT; cat++) {
+    uint32 next = start + catindex[cat];
+    catindex[cat] = start;
+    start = next;
+  }
+  const jni::IteratorGlue iter2 = states.iteratorGlue(cache);
+  while (iter2.hasNext()) {
+    jobject javaobject = iter2.next();
+    jni::StateGlue state(javaobject, cache);
+    cat = getCategory(state, alpha, omega, cache);
+    const uint32 code = catindex[cat]++;
+    new (&mJavaStates[code]) jni::StateGlue(state);
+  }
+  mFirstInitialState1 = catindex[0];
+  mEndInitialStates1 = catindex[2]; 
+  mFirstInitialState2 = catindex[4];
+  mEndInitialStates2 = catindex[6];
+  mFirstPreMarkedState = catindex[1];
+  mEndPreMarkedStates = catindex[5];
+  mFirstMarkedState = catindex[3];
 }
 
 int AutomatonRecord::
 getCategory(const jni::StateGlue& state,
+            const jni::EventGlue& marking,
+            jni::ClassCache* cache)
+{
+  const int init = state.isInitial() ? 1 : 0;
+  jni::CollectionGlue props = state.getPropositionsGlue(cache);
+  const int marked = props.contains(&marking) ? 3 : 0;
+  return init ^ marked;
+}
+
+int AutomatonRecord::
+getCategory(const jni::StateGlue& state,
+            const jni::EventGlue& alpha,
             const jni::EventGlue& omega,
             jni::ClassCache* cache)
 {
-  int init = state.isInitial() ? 1 : 0;
+  const int init = state.isInitial() ? 1 : 0;
   jni::CollectionGlue props = state.getPropositionsGlue(cache);
-  int marked = props.contains(&omega) ? 3 : 0;
-  return init ^ marked;
+  const int hasalpha = props.contains(&alpha) ? 3 : 0;
+  const int lowers = init ^ hasalpha;
+  return props.contains(&omega) ? 8 - lowers : lowers;
 }
 
 
@@ -343,6 +423,7 @@ getKey(const void* value)
 AutomatonEncoding::
 AutomatonEncoding(const jni::ProductDESGlue& des,
                   const jni::KindTranslatorGlue& translator,
+                  const jni::EventGlue& alpha,
                   const jni::EventGlue& omega,
                   jni::ClassCache* cache,
                   int numtags)
@@ -376,7 +457,8 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
     default:
       continue;
     }
-    AutomatonRecord* record = new AutomatonRecord(aut, plant, omega, cache);
+    AutomatonRecord* record =
+      new AutomatonRecord(aut, plant, alpha, omega, cache);
     totalbits += record->getNumberOfBits();
     records[a++] = record;
     hasinit &= record->getNumberOfInitialStates() > 0;

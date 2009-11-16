@@ -56,9 +56,10 @@ BroadProductExplorer::
 BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
                      const jni::ProductDESGlue& des,
                      const jni::KindTranslatorGlue& translator,
+                     const jni::EventGlue& premarking,
                      const jni::EventGlue& marking,
                      jni::ClassCache* cache)
-  : ProductExplorer(factory, des, translator, marking, cache),
+  : ProductExplorer(factory, des, translator, premarking, marking, cache),
     mNumEventRecords(0),
     mEventRecords(0),
     mReversedEventRecords(0),
@@ -416,7 +417,7 @@ setupSafety()
   for (int a = 0; a < numaut; a++) {
     AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
     const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
-    const uint32 numinit = aut->getEndOfInitialStates();
+    const uint32 numinit = aut->getNumberOfInitialStates();
     switch (numinit) {
     case 0:
       setTrivial();
