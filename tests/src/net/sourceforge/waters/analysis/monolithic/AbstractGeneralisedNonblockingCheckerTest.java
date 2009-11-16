@@ -47,14 +47,7 @@ public class AbstractGeneralisedNonblockingCheckerTest
 
   //#########################################################################
   //#Test Cases --- paper (multi-coloured automata)
- /* public void testSyncG() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "paper";
-    final String name = "paper.wmod";
-    runModelVerifier(group, dir, name, true);
-  }
-*/
+
   public void testG1() throws Exception
   {
     final String group = "tests";
@@ -75,6 +68,14 @@ public class AbstractGeneralisedNonblockingCheckerTest
     final String dir = "paper";
     final String name = "g3.wmod";
     runModelVerifier(group, dir, name, false);
+  }
+
+    public void testG4() throws Exception
+    {
+      final String group = "tests";
+      final String dir = "paper";
+      final String name = "g4.wmod";
+      runModelVerifier(group, dir, name, false);
   }
 
 
