@@ -7,9 +7,12 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 
+import org.supremica.gui.TableSorter;
 import org.supremica.gui.WhiteScrollPane;
+import org.supremica.gui.ide.AnalyzerAutomataPanel;
 
 class SimulatorPanel
     extends MainPanel
@@ -17,17 +20,29 @@ class SimulatorPanel
     private static final long serialVersionUID = 1L;
 
     private final String name;
+    private final ModuleContainer moduleContainer;
 
-    SimulatorPanel(DocumentContainer moduleContainer, String name)
+    public SimulatorPanel(ModuleContainer moduleContainer, String name)
     {
       super(name);
       this.name = name;
+      this.moduleContainer = moduleContainer;
       mTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
       mTabbedPane.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
       mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
+      setupAutomata();
       setLeftComponent(mTabbedPane);
+      mDesktop.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
+      mDesktop.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
       setRightComponent(mDesktop);
+      //JInternalFrame test = new JInternalFrame();
 
+    }
+
+    public SimulatorPanel(AutomataContainer automataContainer, String name)
+    {
+      super(name);
+      throw new UnsupportedOperationException();
     }
 
     public String getName()
@@ -37,15 +52,12 @@ class SimulatorPanel
 
     private void setupAutomataTable()
     {
-      throw new UnsupportedOperationException();
-      //mAutomataTable = new JTable(dataModel);
-      //mScrollPane = new JScrollPane(mAutomataTable);
-
+      mAutomataTable = new JTable(new AbstractTunnelTable(moduleContainer));
     }
 
     private void setupAutomata()
     {
-
+      setupAutomataTable();
       mAutomataPanel.add(mAutomataTable);
       mTabbedPane.add(mAutomataPanel);
     }
