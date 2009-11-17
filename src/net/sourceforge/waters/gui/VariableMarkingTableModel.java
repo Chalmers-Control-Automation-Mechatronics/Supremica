@@ -26,18 +26,20 @@ import net.sourceforge.waters.subject.module.VariableMarkingSubject;
 
 public class VariableMarkingTableModel
   extends ListTableModel<VariableMarkingSubject>
-{  
+{
 
   //#########################################################################
   //# Constructors
-  VariableMarkingTableModel()
+  VariableMarkingTableModel(final ModuleContext context)
   {
-    this(new ArrayList<VariableMarkingSubject>());
+    this(new ArrayList<VariableMarkingSubject>(), context);
   }
 
-  VariableMarkingTableModel(final List<VariableMarkingSubject> list)
+  VariableMarkingTableModel(final List<VariableMarkingSubject> list,
+                            final ModuleContext context)
   {
     super(list, VariableMarkingSubject.class);
+    mModuleContext = context;
   }
 
 
@@ -56,7 +58,7 @@ public class VariableMarkingTableModel
       throw new ArrayIndexOutOfBoundsException
         ("Bad column number for markings table model!");
     }
-  } 
+  }
 
   public int getColumnCount()
   {
@@ -72,8 +74,8 @@ public class VariableMarkingTableModel
     } else {
       switch (column) {
       case 0:
-        // final IdentifierSubject prop = marking.getProposition();
-        return IconLoader.ICON_PROPOSITION;
+        final IdentifierSubject prop = marking.getProposition();
+        return mModuleContext.guessPropositionIcon(prop);
       case 1:
         return marking.getProposition();
       case 2:
@@ -121,6 +123,11 @@ public class VariableMarkingTableModel
       fireTableRowsUpdated(row, row);
     }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final ModuleContext mModuleContext;
 
 
   //#########################################################################

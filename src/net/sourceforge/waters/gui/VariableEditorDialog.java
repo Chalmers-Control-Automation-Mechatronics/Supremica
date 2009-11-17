@@ -165,7 +165,7 @@ public class VariableEditorDialog
     mInitialInput = new InitialStatePredicateCell(template);
     mInitialInput.addActionListener(commithandler);
     mInitialInput.setAllowNull(false);
- 
+
     final ActionListener dethandler = new ActionListener() {
         public void actionPerformed(final ActionEvent event)
         {
@@ -188,7 +188,7 @@ public class VariableEditorDialog
       template.getVariableMarkingsModifiable();
     final List<VariableMarkingSubject> copy =
       new ArrayList<VariableMarkingSubject>(markings);
-    mMarkingsModel = new VariableMarkingTableModel(copy);
+    mMarkingsModel = new VariableMarkingTableModel(copy, context);
     mMarkingsTable = new VariableMarkingTable(mMarkingsModel);
     mMarkingsTable.setTableHeader(null);
     mMarkingsTable.setShowGrid(false);
@@ -754,7 +754,7 @@ public class VariableEditorDialog
     {
        if (mDeterministicButton.isSelected()) {
         return "Enter the initial value of this variable.";
-      } else {      
+      } else {
         final String text = mNameInput.getText();
         final String name = text.length() == 0 ? "x" : text;
         final StringBuffer buffer = new StringBuffer(160);
@@ -999,7 +999,7 @@ public class VariableEditorDialog
                KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0));
       setEnabled(true);
     }
- 
+
     //#######################################################################
     //# Interface java.awt.event.ActionListener
     public void actionPerformed(final ActionEvent event)
@@ -1030,7 +1030,7 @@ public class VariableEditorDialog
                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
       setEnabled(false);
     }
- 
+
     //#######################################################################
     //# Interface java.awt.event.ActionListener
     public void actionPerformed(final ActionEvent event)
@@ -1062,7 +1062,7 @@ public class VariableEditorDialog
                                       InputEvent.CTRL_DOWN_MASK));
       setEnabled(false);
     }
- 
+
     //#######################################################################
     //# Interface java.awt.event.ActionListener
     public void actionPerformed(final ActionEvent event)
@@ -1094,7 +1094,7 @@ public class VariableEditorDialog
                                       InputEvent.CTRL_DOWN_MASK));
       setEnabled(false);
     }
- 
+
     //#######################################################################
     //# Interface java.awt.event.ActionListener
     public void actionPerformed(final ActionEvent event)

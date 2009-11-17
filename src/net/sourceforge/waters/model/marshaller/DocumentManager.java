@@ -73,8 +73,8 @@ import net.sourceforge.waters.model.unchecked.Casting;
 public class DocumentManager
 {
 
-  // #########################################################################
-  // # Constructors
+  //#########################################################################
+  //# Constructors
   /**
    * Creates a new document manager. Initially, the document manager will not
    * support marshalling or unmarshalling of any file types. To be useful, some
@@ -86,24 +86,24 @@ public class DocumentManager
   public DocumentManager()
   {
     mClassMarshallerMap =
-        new HashMap<Class<? extends DocumentProxy>,ProxyMarshaller<? extends DocumentProxy>>(
-            4);
+        new HashMap<Class<? extends DocumentProxy>,
+                    ProxyMarshaller<? extends DocumentProxy>>(4);
     mClassUnmarshallerMap =
-        new HashMap<Class<? extends DocumentProxy>,List<ProxyUnmarshaller<? extends DocumentProxy>>>(
-            4);
+        new HashMap<Class<? extends DocumentProxy>,
+                    List<ProxyUnmarshaller<? extends DocumentProxy>>>(4);
     mExtensionUnmarshallerMap =
         new HashMap<String,ProxyUnmarshaller<? extends DocumentProxy>>(4);
     mFileFilters = new LinkedList<FileFilter>();
     mDocumentCache = new HashMap<URI,DocumentEntry>(32);
   }
 
-  // #########################################################################
-  // # Accessing Documents
+
+  //#########################################################################
+  //# Accessing Documents
   /**
    * Loads a document relative to a URI. This methods loads a document with a
    * given name and location, automatically computing the file extension from
    * the expected class.
-   *
    * @param uri
    *          The URI to be used to resolve the name.
    * @param name
@@ -148,7 +148,6 @@ public class DocumentManager
   /**
    * Loads a document from a URI. This methods loads a document from a given
    * file name, guessing the expected class from the file name extension.
-   *
    * @param uri
    *          A URI specifying the location of the document to be retrieved.
    * @return The loaded document. This may be just a cached copy, or it may
@@ -186,7 +185,6 @@ public class DocumentManager
    * Loads a document from a file. This methods loads a document with a given
    * name and location, automatically computing the file extension from the
    * expected class.
-   *
    * @param path
    *          The directory containing the file to be loaded.
    * @param name
@@ -234,7 +232,6 @@ public class DocumentManager
   /**
    * Loads a document from a URL. This methods loads a document from a given
    * file name, guessing the expected class from the file name extension.
-   *
    * @param url
    *          A URL specifying the location of the document to be retrieved.
    * @return The loaded document. This may be just a cached copy, or it may
@@ -259,7 +256,6 @@ public class DocumentManager
   /**
    * Loads a document from a file. This methods loads a document from a given
    * file name, guessing the expected class from the file name extension.
-   *
    * @param filename
    *          The absolute path of the file to be loaded.
    * @return The loaded document. This may be just a cached copy, or it may
@@ -283,7 +279,6 @@ public class DocumentManager
    * since it has last been accessed through the document manager. The check is
    * only performed for file URIs, other URIs are assumed never to change their
    * contents, so this method always returns <CODE>false</CODE> for them.
-   *
    * @throws MalformedURLException
    *           if the given URI is not a proper URI.
    * @throws IllegalArgumentException
@@ -304,7 +299,6 @@ public class DocumentManager
    * Checks whether a cached document has been modified externally. This method
    * checks whether the file for the document, given by its file name, has been
    * modified since it has last been accessed through the document manager.
-   *
    * @throws IllegalArgumentException
    *           if the given file name does not represent a document currently in
    *           the cache.
@@ -324,7 +318,6 @@ public class DocumentManager
    * name, using the marshaller appropriate to the document's class. If the file
    * name differs from the document's current location, the document manager
    * cache will be updated to reflect the name change.
-   *
    * @param doc
    *          The document to be written.
    * @param filename
@@ -359,7 +352,6 @@ public class DocumentManager
    * location given by the document. It does not make any attempt to save the
    * document to disk. If the document manager has already stored a document at
    * the given location, the new document will replace the existing one.
-   *
    * @param doc
    *          The document to be added. It should provide a valid file location
    *          where the document can be looked up and saved.
@@ -398,8 +390,9 @@ public class DocumentManager
     return resolve(uri, base + ext);
   }
 
-  // #########################################################################
-  // # Registering Marshallers
+
+  //#########################################################################
+  //# Registering Marshallers
   /**
    * Registers a proxy marshaller.
    *
@@ -452,14 +445,14 @@ public class DocumentManager
     unmarshaller.setDocumentManager(this);
   }
 
-  // #########################################################################
-  // # Finding Marshallers
+
+  //#########################################################################
+  //# Finding Marshallers
   /**
    * Gets the marshaller used to marshal objects of a given class. If there is
    * no marshaller for exactly the given class, this method tries all
    * superclasses and superinterfaces and returns a marshaller for the first
    * supported class or interface found.
-   *
    * @param clazz
    *          The class of objects to be looked up.
    * @return The {@link ProxyMarshaller} used by this document manager to handle
@@ -484,7 +477,6 @@ public class DocumentManager
 
   /**
    * Gets the unmarshaller used to unmarshal objects of a given class.
-   *
    * @param clazz
    *          The class of objects to be looked up.
    * @return A list of {@link ProxyUnmarshaller} objects used by this document
@@ -511,8 +503,9 @@ public class DocumentManager
     return Collections.unmodifiableList(mFileFilters);
   }
 
-  // #########################################################################
-  // # Auxiliary Methods
+
+  //#########################################################################
+  //# Auxiliary Methods
   private DocumentProxy getCachedDocument(final URI uri)
       throws WatersUnmarshalException
   {
@@ -575,13 +568,13 @@ public class DocumentManager
   }
 
 
-  // #########################################################################
-  // # Inner Class DocumentEntry
+  //#########################################################################
+  //# Inner Class DocumentEntry
   private static class DocumentEntry
   {
 
-    // #######################################################################
-    // # Constructors
+    //#######################################################################
+    //# Constructors
     private DocumentEntry(final URI uri, final DocumentProxy doc,
         final long time)
     {
@@ -590,15 +583,15 @@ public class DocumentManager
       mOpeningTime = time;
     }
 
-    // #######################################################################
-    // # Simple Access
+    //#######################################################################
+    //# Simple Access
     private DocumentProxy getDocument()
     {
       return mDocument;
     }
 
-    // #######################################################################
-    // # Checking for File Modification
+    //#######################################################################
+    //# Checking for File Modification
     private boolean hasBeenModified() throws MalformedURLException
     {
       final File file = getFile();
@@ -622,19 +615,24 @@ public class DocumentManager
       }
     }
 
-    // #######################################################################
-    // # Data Members
+    //#######################################################################
+    //# Data Members
     private final URI mURI;
     private final DocumentProxy mDocument;
     private final long mOpeningTime;
 
   }
 
-  // #########################################################################
-  // # Data Members
-  private final Map<Class<? extends DocumentProxy>,ProxyMarshaller<? extends DocumentProxy>> mClassMarshallerMap;
-  private final Map<Class<? extends DocumentProxy>,List<ProxyUnmarshaller<? extends DocumentProxy>>> mClassUnmarshallerMap;
-  private final Map<String,ProxyUnmarshaller<? extends DocumentProxy>> mExtensionUnmarshallerMap;
+  //#########################################################################
+  //# Data Members
+  private final Map<Class<? extends DocumentProxy>,
+                    ProxyMarshaller<? extends DocumentProxy>>
+    mClassMarshallerMap;
+  private final Map<Class<? extends DocumentProxy>,
+                    List<ProxyUnmarshaller<? extends DocumentProxy>>>
+    mClassUnmarshallerMap;
+  private final Map<String,ProxyUnmarshaller<? extends DocumentProxy>>
+    mExtensionUnmarshallerMap;
   private final List<FileFilter> mFileFilters;
   private final Map<URI,DocumentEntry> mDocumentCache;
 
