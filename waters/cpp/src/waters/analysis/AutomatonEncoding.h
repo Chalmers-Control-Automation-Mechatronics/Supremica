@@ -215,7 +215,7 @@ public:
 
   //##########################################################################
   //# Marking
-  bool isAllMarked() const {return mIsAllMarked;}
+  bool isTriviallyNonblocking() const {return mIsTriviallyNonblocking;}
   bool isTriviallyBlocking() const {return mIsTriviallyBlocking;}
   bool isMarkedStateTuplePacked(const uint32* encoded) const;
   bool isMarkedStateTuple(const uint32* decoded) const;
@@ -271,7 +271,7 @@ private:
   int mNumRecords;
   int mNumWords;
   int* mWordStop;
-  bool mIsAllMarked;
+  bool mIsTriviallyNonblocking;
   bool mIsTriviallyBlocking;
   const AutomatonRecord** mMarkingTestRecords;
   int mNumMarkingTestRecords;

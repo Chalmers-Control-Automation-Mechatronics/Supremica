@@ -454,7 +454,7 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
                   jni::ClassCache* cache,
                   int numtags)
   : mNumTags(numtags),
-    mIsAllMarked(true),
+    mIsTriviallyNonblocking(false),
     mIsTriviallyBlocking(false),
     mMarkingTestRecords(0),
     mNumMarkingTestRecords(0),
@@ -462,6 +462,9 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
     mNumPreMarkingTestRecords(0)
 {
   bool hasinit = true;
+  bool allmarked = true;
+  bool allpremarked = true;
+  bool neverpre = false;
   int totalbits = numtags;
   int a, w;
 
@@ -490,10 +493,13 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
     totalbits += record->getNumberOfBits();
     records[a++] = record;
     hasinit &= record->getNumberOfInitialStates() > 0;
-    mIsAllMarked &= record->isAllMarked();
+    allmarked &= record->isAllMarked();
+    allpremarked &= record->isAllPreMarked();
+    neverpre |= record->getNumberOfPreMarkedStates() == 0;
     mIsTriviallyBlocking |= record->getNumberOfMarkedStates() == 0;
   }
-  mIsTriviallyBlocking &= hasinit;
+  mIsTriviallyBlocking &= allpremarked && hasinit;
+  mIsTriviallyNonblocking &= allmarked || neverpre;
   mNumRecords = a;
 
   // sort records ...

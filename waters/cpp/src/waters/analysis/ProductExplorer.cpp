@@ -250,7 +250,7 @@ setup()
     }
     break;
   case EXPLORER_MODE_NONBLOCKING:
-    if (mEncoding->isAllMarked()) {
+    if (mEncoding->isTriviallyNonblocking()) {
       setTrivial();
     } else if (mEncoding->isTriviallyBlocking()) {
       mStateSpace = new StateSpace(mEncoding, 1);
