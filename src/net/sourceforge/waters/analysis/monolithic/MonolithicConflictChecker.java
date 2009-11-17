@@ -181,6 +181,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
               break;
             }
           }
+          //if the state had a premarking, check if it is coreachable
           if (premarked) {
             if (!coreachable.get(stateid)) {
               firstBlockingState = stateid;
@@ -189,7 +190,9 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
             }
           }
         }
-      } else {
+      }
+      //all states must be coreachable if there is only one marking type
+      else {
         for (int stateid = 0; stateid < numstates; stateid++) {
           if (!coreachable.get(stateid)) {
             firstBlockingState = stateid;
