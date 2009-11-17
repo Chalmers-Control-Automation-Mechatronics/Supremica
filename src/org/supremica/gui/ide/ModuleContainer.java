@@ -57,8 +57,12 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
+import org.supremica.properties.Config;
+import org.supremica.properties.SupremicaPropertyChangeEvent;
+import org.supremica.properties.SupremicaPropertyChangeListener;
 
-public class ModuleContainer 
+
+public class ModuleContainer
     extends DocumentContainer
     implements UndoInterface, Subject, ChangeListener, ModelObserver
 {
@@ -68,7 +72,7 @@ public class ModuleContainer
     public ModuleContainer(final IDE ide, final ModuleSubject module)
     {
         super(ide, module);
-        
+
         mModuleContext = new ModuleContext(module);
         final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
         final OperatorTable optable = CompilerOperatorTable.getInstance();
@@ -77,8 +81,12 @@ public class ModuleContainer
 
         mTabPanel = new JTabbedPane();
         mEditorPanel = new EditorPanel(this, "Editor");
+        mSimulatorPanel = new SimulatorPanel(this, "Simulator");
         mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
         mTabPanel.add(mEditorPanel);
+        Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener(new SimulatorPropertyChangeListener());
+        if (Config.INCLUDE_WATERS_SIMULATOR.isTrue())
+          mTabPanel.add(mSimulatorPanel);
         mTabPanel.add(mAnalyzerPanel);
         mTabPanel.addChangeListener(this);
         mEditorPanel.showComment();
@@ -86,7 +94,7 @@ public class ModuleContainer
         final ListSubject<AbstractSubject> comps =
             module.getComponentListModifiable();
         comps.addModelObserver(this);
-        
+
         mTabPanel.addMouseListener(new java.awt.event.MouseAdapter()
         {
             public void mouseClicked(java.awt.event.MouseEvent e)
@@ -98,7 +106,7 @@ public class ModuleContainer
             }
         });
     }
-    
+
 
     //#######################################################################
     //# Overrides for Abstract Base Class
@@ -155,12 +163,12 @@ public class ModuleContainer
     {
         mObservers.add(o);
     }
-    
+
     public void detach(final Observer o)
     {
         mObservers.remove(o);
     }
-    
+
     public void fireEditorChangedEvent(final EditorChangedEvent event)
     {
         // Just in case they try to register or deregister observers
@@ -172,7 +180,7 @@ public class ModuleContainer
         getIDE().fireEditorChangedEvent(event);
     }
 
-    
+
     //#######################################################################
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
     /**
@@ -193,7 +201,7 @@ public class ModuleContainer
                     // deletions can be undone!
                 }
             }
-        }   
+        }
     }
 
 
@@ -203,12 +211,12 @@ public class ModuleContainer
     {
         return (ModuleSubject) getDocument();
     }
-    
+
     public ModuleContext getModuleContext()
     {
         return mModuleContext;
     }
-    
+
     public ExpressionParser getExpressionParser()
     {
         return mExpressionParser;
@@ -218,7 +226,7 @@ public class ModuleContainer
     {
         return mPrinter;
     }
-        
+
     public SimulatorPanel getSimulatorPanel()
     {
         if (simulatorPanel == null)
@@ -227,7 +235,7 @@ public class ModuleContainer
         }
         return simulatorPanel;
     }
-    
+
     ComponentEditorPanel createComponentEditorPanel
         (final SimpleComponentSubject comp)
     {
@@ -255,7 +263,7 @@ public class ModuleContainer
     {
         return mComponentToPanelMap.get(comp);
     }
-    
+
     public ComponentViewPanel getComponentViewPanel
         (final SimpleComponentSubject comp)
     {
@@ -277,7 +285,7 @@ public class ModuleContainer
         }
         return panel;
     }
-    
+
     public ComponentViewPanel getComponentViewPanel(String name)
     {
         List<Proxy> components = getModule().getComponentList();
@@ -300,10 +308,10 @@ public class ModuleContainer
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     public JFrame getFrame()
     {
         return getIDE().getFrame();
@@ -322,7 +330,7 @@ public class ModuleContainer
         c.execute();
         addUndoable(new UndoableCommand(c));
     }
-    
+
     public void addUndoable(UndoableEdit e)
     {
         if (e.isSignificant()) {
@@ -338,34 +346,34 @@ public class ModuleContainer
             mInsignificant.addEdit(e);
         }
     }
-    
+
     public boolean canRedo()
     {
         return mUndoManager.canRedo();
     }
-    
+
     public boolean canUndo()
     {
         return mUndoManager.canUndo();
     }
-    
+
     public void clearList()
     {
         mUndoManager.discardAllEdits();
 		mUndoIndex = 0;
         fireUndoRedoEvent();
     }
-    
+
     public String getRedoPresentationName()
     {
         return mUndoManager.getRedoPresentationName();
     }
-    
+
     public String getUndoPresentationName()
     {
         return mUndoManager.getUndoPresentationName();
     }
-    
+
     public void redo() throws CannotRedoException
     {
         mInsignificant.end();
@@ -375,7 +383,7 @@ public class ModuleContainer
 		mUndoIndex++;
         fireUndoRedoEvent();
    }
-    
+
     public void undo() throws CannotUndoException
     {
         mInsignificant.end();
@@ -411,9 +419,30 @@ public class ModuleContainer
 
 
     //#######################################################################
+    //# Inner Classes
+
+    private class SimulatorPropertyChangeListener implements SupremicaPropertyChangeListener
+    {
+
+      public void propertyChanged(SupremicaPropertyChangeEvent event)
+      {
+        if (Config.INCLUDE_WATERS_SIMULATOR.isTrue())
+        {
+          mTabPanel.add(mSimulatorPanel, 1);
+        }
+        else
+        {
+          mTabPanel.remove(mSimulatorPanel);
+        }
+      }
+
+    }
+
+    //#######################################################################
     //# Data Members
     private final JTabbedPane mTabPanel;
     private final EditorPanel mEditorPanel;
+    private final SimulatorPanel mSimulatorPanel;
     private final AnalyzerPanel mAnalyzerPanel;
     private SimulatorPanel simulatorPanel = null;
 
