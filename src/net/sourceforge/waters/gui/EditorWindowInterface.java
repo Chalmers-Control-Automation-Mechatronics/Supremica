@@ -10,8 +10,6 @@
 
 package net.sourceforge.waters.gui;
 
-import javax.swing.JFrame;
-
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
@@ -30,16 +28,14 @@ public interface EditorWindowInterface
     public SimpleComponentProxy getComponent();
 
     public ModuleWindowInterface getModuleWindowInterface();
-    
+
     public ControlledSurface getControlledSurface();
 
 	public GraphEventPanel getEventPanel();
-    
+
     public UndoInterface getUndoInterface();
 
-	// Deprecated.
+	@Deprecated
     public void copyAsWMFToClipboard();
 
-    public JFrame getFrame();
-    
 }

@@ -38,6 +38,7 @@ public class EditorCopyAsWMFAction
     /**
      * The code that is run when the action is invoked.
      */
+    @SuppressWarnings("deprecation")
     public void doAction()
     {
 		EditorWindowInterface editorWindow = ide.getActiveEditorWindowInterface();

@@ -10,6 +10,13 @@
 
 package org.supremica.gui.ide;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.DefaultFontMapper;
+import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfTemplate;
+import com.lowagie.text.pdf.PdfWriter;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -34,7 +41,6 @@ import javax.print.attribute.PrintRequestAttribute;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.JobName;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -60,13 +66,6 @@ import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
 import org.w3c.dom.DOMImplementation;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.DefaultFontMapper;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfTemplate;
-import com.lowagie.text.pdf.PdfWriter;
-
 
 /**
  * A Swing component for editing a Waters graph.
@@ -82,7 +81,7 @@ public class ComponentEditorPanel
     extends JPanel
     implements EditorWindowInterface, SupremicaPropertyChangeListener
 {
-    
+
     //########################################################################
     //# Constructor
     /**
@@ -109,10 +108,10 @@ public class ComponentEditorPanel
         mSurface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
         mSurface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
         mEventsPane = new GraphEventPanel(this, component, manager);
-        
+
         final LayoutManager layout = new BorderLayout();
         setLayout(layout);
-        
+
         final JScrollPane scrollsurface = new JScrollPane(mSurface);
         final JScrollPane scrollevents = new JScrollPane(mEventsPane);
         final JSplitPane split = new JSplitPane
@@ -136,34 +135,30 @@ public class ComponentEditorPanel
     {
         return mModuleContainer.getEditorPanel();
     }
-    
-    public JFrame getFrame()
-    {
-        return mModuleContainer.getFrame();
-    }
-    
+
     public ControlledSurface getControlledSurface()
     {
         return mSurface;
     }
-    
+
     public GraphEventPanel getEventPanel()
     {
         return mEventsPane;
     }
-    
+
     public UndoInterface getUndoInterface()
     {
         return mModuleContainer;
     }
-    
+
+    @Deprecated
     public void copyAsWMFToClipboard()
     {
         if (toClipboard == null)
         {
             toClipboard = GraphicsToClipboard.getInstance();
         }
-        
+
         //Rectangle2D bb = mSurface.getBoundingBox();
         //double minX = bb.getMinX();
         //double maxX = bb.getMaxX();
@@ -178,12 +173,12 @@ public class ComponentEditorPanel
         //width += (int)0.1*width;
         //height += (int)0.1*height;
         Graphics theGraphics = toClipboard.getGraphics(mSurface.getWidth(), mSurface.getHeight());
-        
+
         mSurface.print(theGraphics);
         toClipboard.copyToClipboard();
     }
-    
-    
+
+
     public void exportPDF()
     {
         // Get file to export to
@@ -196,19 +191,19 @@ public class ComponentEditorPanel
         {
             return;
         }
-        
+
         // Create output
         int width = mSurface.getWidth();
         int height = mSurface.getHeight();
         Document document = new Document(new com.lowagie.text.Rectangle(width, height));
-        
+
         try
         {
             PdfWriter writer= PdfWriter.getInstance(document,  new FileOutputStream(file));
-            
+
             document.addAuthor("Supremica");
             document.open();
-            
+
             PdfContentByte cb = writer.getDirectContent();
             PdfTemplate tp = cb.createTemplate(width, height);
             Graphics2D g2 = tp.createGraphics(width, height, new DefaultFontMapper());
@@ -217,7 +212,7 @@ public class ComponentEditorPanel
             //chart.draw(g2, rectangle2D);
             g2.dispose();
             cb.addTemplate(tp, 0, 0);
-            
+
         }
         catch (DocumentException de)
         {
@@ -227,17 +222,17 @@ public class ComponentEditorPanel
         {
             System.err.println(ioe.getMessage());
         }
-        
+
         document.close();
     }
-    
+
     /**
      * Prints postscript output to file (specified by user).
      */
     public void exportPostscript()
     {
         String psMimeType = "application/postscript";
-        
+
         StreamPrintServiceFactory[] factories =
             PrinterJob.lookupStreamPrintServices(psMimeType);
         if (factories.length > 0)
@@ -256,7 +251,7 @@ public class ComponentEditorPanel
                 {
                     return;
                 }
-                
+
                 // Get printerservice and set up PrintJob
                 FileOutputStream outstream = new FileOutputStream(file);
                 StreamPrintService psPrinter = factories[0].getPrintService(outstream);
@@ -268,7 +263,7 @@ public class ComponentEditorPanel
                 PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
                 PrintRequestAttribute jobName = new JobName("Supremica Printing", Locale.ENGLISH);
                 attributes.add(jobName);
-                
+
                 // Show printing dialog
                 //if (printJob.printDialog(attributes))
                 // Print!
@@ -288,7 +283,7 @@ public class ComponentEditorPanel
             mModuleContainer.getIDE().info("No Postscript printer service installed.");
         }
     }
-    
+
     public void exportSVG(){
         // Get file to export to
         JFileChooser chooser = new JFileChooser();
@@ -299,7 +294,7 @@ public class ComponentEditorPanel
         if (returnVal != JFileChooser.APPROVE_OPTION)
         {
             return;
-        }                
+        }
         // Get a DOMImplementation.
         DOMImplementation domImpl =
             GenericDOMImplementation.getDOMImplementation();
@@ -329,9 +324,9 @@ public class ComponentEditorPanel
         } catch (FileNotFoundException ex) {
             java.util.logging.Logger.getLogger(ComponentEditorPanel.class.getName()).log(Level.SEVERE, "file not found", ex);
         }
-        
+
     }
-        
+
     /**
      * Open a print dialog and let the user choose how to print.
      */
@@ -346,21 +341,21 @@ public class ComponentEditorPanel
                 return;
             }
             printJob.setPrintable(mSurface);
-            
+
             // Printing attributes
             PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
             PrintRequestAttribute name = new JobName("Supremica Printing", Locale.ENGLISH);
             attributes.add(name);
-            
+
             // Show printing dialog
             if (printJob.printDialog(attributes))
             {
                 LOGGER.debug("Printing...");
-                
+
                 // Print!
                 printJob.print();
                 //printJob.print(attributes);
-                
+
                 LOGGER.debug("Printing done!");
             }
         }

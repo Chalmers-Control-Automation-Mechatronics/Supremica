@@ -11,6 +11,7 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -1090,9 +1091,10 @@ public class ControlledSurface
                                    mSecondaryGraph.getEdgesModifiable());
     mEmbedder.addObserver(this);
     final Thread thread = new Thread(mEmbedder);
+    final Frame frame = (Frame) getTopLevelAncestor();
     final JDialog dialog =
-      new SpringAbortDialog(mRoot.getFrame(), name, mEmbedder, timeout);
-    dialog.setLocationRelativeTo(mRoot.getFrame());
+      new SpringAbortDialog(frame, name, mEmbedder, timeout);
+    dialog.setLocationRelativeTo(frame);
     dialog.setVisible(true);
     thread.start();
   }

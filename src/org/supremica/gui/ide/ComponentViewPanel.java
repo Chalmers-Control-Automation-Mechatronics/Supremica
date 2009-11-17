@@ -14,7 +14,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.LayoutManager;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -48,15 +47,15 @@ public class ComponentViewPanel
     implements EditorWindowInterface
 {
     private static final long serialVersionUID = 1L;
-    
-    private ModuleContainer mModuleContainer;
-    private ControlledSurface surface;
-    private GraphEventPanel events;
+
+    private final ModuleContainer mModuleContainer;
+    private final ControlledSurface surface;
+    private final GraphEventPanel events;
     private SimpleComponentSubject element = null;
     private ModuleSubject mModule = null;
     private GraphicsToClipboard toClipboard = null;
-    
-    
+
+
     /**
      * Creates a new component editor panel.
      * @param  moduleContainer  the module container as a handle to the
@@ -69,7 +68,7 @@ public class ComponentViewPanel
         final SimpleComponentSubject element,
         final Dimension size)
         throws GeometryAbsentException
-        
+
     {
         this.element = element;
         mModuleContainer = moduleContainer;
@@ -82,10 +81,10 @@ public class ComponentViewPanel
         surface.setPreferredSize(IDEDimensions.rightAnalyzerPreferredSize);
         surface.setMinimumSize(IDEDimensions.rightAnalyzerMinimumSize);
         events = new GraphEventPanel(this, element, manager);
-        
+
         final LayoutManager layout = new BorderLayout();
         setLayout(layout);
-        
+
         final JScrollPane scrollsurface = new JScrollPane(surface);
         final JScrollPane scrollevents = new JScrollPane(events);
         final JSplitPane split = new JSplitPane
@@ -104,17 +103,12 @@ public class ComponentViewPanel
     {
         return element;
     }
-    
-    public JFrame getFrame()
-    {
-        return mModuleContainer.getFrame();
-    }
-    
+
     public ControlledSurface getControlledSurface()
     {
         return surface;
     }
-    
+
     public GraphEventPanel getEventPanel()
     {
         return events;
@@ -129,14 +123,15 @@ public class ComponentViewPanel
     {
         return mModuleContainer;
     }
-    
+
+    @Deprecated
     public void copyAsWMFToClipboard()
     {
         if (toClipboard == null)
         {
             toClipboard = GraphicsToClipboard.getInstance();
         }
-        
+
         //Rectangle2D bb = surface.getBoundingBox();
         //double minX = bb.getMinX();
         //double maxX = bb.getMaxX();
@@ -151,9 +146,9 @@ public class ComponentViewPanel
         //width += (int)0.1*width;
         //height += (int)0.1*height;
         Graphics theGraphics = toClipboard.getGraphics(surface.getWidth(), surface.getHeight());
-        
+
         surface.print(theGraphics);
         toClipboard.copyToClipboard();
     }
-    
+
 }
