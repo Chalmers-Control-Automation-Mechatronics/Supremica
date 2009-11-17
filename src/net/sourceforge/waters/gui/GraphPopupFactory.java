@@ -12,6 +12,7 @@ package net.sourceforge.waters.gui;
 
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.swing.JCheckBoxMenuItem;
@@ -37,6 +38,7 @@ import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 class GraphPopupFactory
@@ -45,9 +47,11 @@ class GraphPopupFactory
 
   //#########################################################################
   //# Constructor
-  GraphPopupFactory(final WatersPopupActionManager master)
+  GraphPopupFactory(final WatersPopupActionManager master,
+                    final EditorWindowInterface editor)
   {
     super(master);
+    mEditorWindowInterface = editor;
   }
 
 
@@ -106,7 +110,7 @@ class GraphPopupFactory
   }
 
   public Object visitLabelBlockProxy(final LabelBlockProxy block)
-  { 
+  {
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
     final LabelBlockSubject subject = (LabelBlockSubject) block;
@@ -122,7 +126,7 @@ class GraphPopupFactory
   }
 
   public Object visitLabelGeometryProxy(final LabelGeometryProxy geo)
-  { 
+  {
     final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
     final SimpleNodeSubject node = (SimpleNodeSubject) subject.getParent();
     return visitSimpleNodeProxy(node);
@@ -152,39 +156,52 @@ class GraphPopupFactory
     final NodeSubject node = (NodeSubject) proxy;
     final SortedMap<String,IdentifierSubject> map =
       new TreeMap<String,IdentifierSubject>();
-    for (final AbstractSubject prop :
-           node.getPropositions().getEventListModifiable()) {
+    final Collection<AbstractSubject> props =
+      node.getPropositions().getEventListModifiable();
+    for (final AbstractSubject prop : props) {
       if (prop instanceof IdentifierSubject) {
         final IdentifierSubject ident = (IdentifierSubject) prop;
         final String name = ident.toString();
         map.put(name, ident);
       }
     }
-    final IdentifierSubject accepting;
+    final ModuleWindowInterface root =
+      mEditorWindowInterface.getModuleWindowInterface();
+    final ModuleContext context = root.getModuleContext();
+    final GraphEventPanel epanel = mEditorWindowInterface.getEventPanel();
+    final EventTableModel emodel = (EventTableModel) epanel.getModel();
+    for (int row = 0; row < emodel.getRowCount(); row++) {
+      final IdentifierSubject ident = emodel.getIdentifier(row);
+      final String name = ident.toString();
+      final EventKind kind = context.guessEventKind(ident);
+      if (kind == EventKind.PROPOSITION && !map.containsKey(name)) {
+        map.put(name, ident);
+      }
+    }
     if (!map.containsKey(EventDeclProxy.DEFAULT_MARKING_NAME)) {
-      accepting =
+      final IdentifierSubject accepting =
         new SimpleIdentifierSubject(EventDeclProxy.DEFAULT_MARKING_NAME);
       map.put(EventDeclProxy.DEFAULT_MARKING_NAME, accepting);
-    } else {
-      accepting = null;
     }
-    final IdentifierSubject forbidden;
     if (!map.containsKey(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-      forbidden =
+      final IdentifierSubject forbidden =
         new SimpleIdentifierSubject(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
       map.put(EventDeclProxy.DEFAULT_FORBIDDEN_NAME, forbidden);
-    } else {
-      forbidden = null;
     }
     final JMenu submenu = new JMenu("Marking");
     final WatersPopupActionManager master = getMaster();
     for (final IdentifierSubject ident : map.values()) {
       final IDEAction action = master.getNodeMarkingAction(node, ident);
       final JCheckBoxMenuItem item = new JCheckBoxMenuItem(action);
-      item.setSelected(ident != accepting && ident != forbidden);
+      item.setSelected(props.contains(ident));
       submenu.add(item);
     }
     return submenu;
   }
+
+
+  //#######################################################################
+  //# Data Members
+  private final EditorWindowInterface mEditorWindowInterface;
 
 }

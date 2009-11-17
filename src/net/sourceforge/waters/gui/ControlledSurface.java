@@ -163,7 +163,8 @@ public class ControlledSurface
     super(graph, module, new SubjectShapeProducer(graph, module));
     mRoot = root;
     mToolbar = toolbar;
-    mPopupFactory = manager == null ? null : new GraphPopupFactory(manager);
+    mPopupFactory =
+      manager == null ? null : new GraphPopupFactory(manager, root);
     setFocusable(true);
     final DropTargetListener dtListener = new DTListener();
     new DropTarget(this, dtListener);
@@ -446,7 +447,7 @@ public class ControlledSurface
          target instanceof GuardActionBlockProxy);
     } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
       final Proxy target = getPasteTarget();
-      return target instanceof NodeProxy;      
+      return target instanceof NodeProxy;
     } else {
       return false;
     }
@@ -535,7 +536,7 @@ public class ControlledSurface
            target.getClass().getName() + "1");
       }
     } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-      final String data = 
+      final String data =
         (String) transferable.getTransferData(DataFlavor.stringFlavor);
       final SimpleIdentifierElement ident = new SimpleIdentifierElement(data);
       final NodeSubject node = (NodeSubject) getPasteTarget();
@@ -546,7 +547,7 @@ public class ControlledSurface
     } else {
       throw new UnsupportedFlavorException(null);
     }
-    return inserts; 
+    return inserts;
   }
 
   public boolean canDelete(final List<? extends Proxy> items)
@@ -673,7 +674,7 @@ public class ControlledSurface
         final GraphInsertPosition inspos =
           (GraphInsertPosition) insert.getInsertPosition();
         final NodeSubject node = (NodeSubject) inspos.getParent();
-        node.setName(name);        
+        node.setName(name);
       }
     }
   }
@@ -719,7 +720,7 @@ public class ControlledSurface
         final SimpleIdentifierProxy oldvalue =
           (SimpleIdentifierProxy) inspos.getOldValue();
         final String oldname = oldvalue.getName();
-        node.setName(oldname);        
+        node.setName(oldname);
       }
     }
   }
@@ -734,7 +735,7 @@ public class ControlledSurface
         if (proxy instanceof IdentifierSubject ||
             proxy instanceof ForeachEventSubject) {
           final AbstractSubject subject = (AbstractSubject) proxy;
-          final ProxySubject parent = 
+          final ProxySubject parent =
             (ProxySubject) subject.getAncestor(LabelBlockSubject.class,
                                                SimpleNodeSubject.class);
           scrollable.add(parent);
@@ -806,7 +807,7 @@ public class ControlledSurface
       mObservers = null;
     }
   }
-  
+
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     if (mObservers != null) {
@@ -1336,7 +1337,7 @@ public class ControlledSurface
         break;
     default:
       break;
-    }    
+    }
   }
 
   private void updateGroupNodeHierarchy()
@@ -1714,7 +1715,7 @@ public class ControlledSurface
   private abstract class ToolController
     implements MouseListener, MouseMotionListener
   {
-    
+
     //#######################################################################
     //# Highlighting and Selecting
     int getHighlightPriority(ProxySubject item)
@@ -2185,7 +2186,7 @@ public class ControlledSurface
           final WatersPopupActionManager manager = mPopupFactory.getMaster();
           final IDEAction action =
             manager.getNodeSelfloopAction(mFocusedObject);
-          manager.invokeMouseClickAction(action, event);        
+          manager.invokeMouseClickAction(action, event);
         } else if (mFocusedObject instanceof EdgeSubject) {
           EditorEditEdgeDialog.showDialog((EdgeSubject) mFocusedObject, mRoot);
         } else if (mFocusedObject instanceof GuardActionBlockSubject) {
@@ -2419,7 +2420,7 @@ public class ControlledSurface
      * superclass method also.
      */
     void cancelDrag(final Point point)
-    { 
+    {
     }
 
     //#######################################################################
@@ -2784,7 +2785,7 @@ public class ControlledSurface
     }
 
     void commitSecondaryGraph()
-    { 
+    {
       super.commitSecondaryGraph();
       mMoveVisitor = null;
     }
@@ -2920,7 +2921,7 @@ public class ControlledSurface
     }
 
     void cancelDrag(final Point point)
-    {     
+    {
       super.cancelDrag(point);
       if (mClickedLabel != null) {
         if (wasControlDown()) {
@@ -4572,12 +4573,12 @@ public class ControlledSurface
   /**
    * List of currently selected items.
    */
-  private List<ProxySubject> mSelectedList = new LinkedList<ProxySubject>();
+  private final List<ProxySubject> mSelectedList = new LinkedList<ProxySubject>();
   /**
    * Set of currently selected items. This holds the same contents as
    * {@link #mSelectedList} in hash set, for faster lookup.
    */
-  private Set<ProxySubject> mSelectedSet = new HashSet<ProxySubject>();
+  private final Set<ProxySubject> mSelectedSet = new HashSet<ProxySubject>();
   /**
    * Set of items not to be drawn, because they are being dragged and
    * displayed through alternative means.
