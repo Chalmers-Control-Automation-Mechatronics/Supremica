@@ -14,10 +14,8 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public class Simulation
 {
-  HashMap<AutomatonProxy, StateProxy> allAutomatons; // The Map object is the current state of the key
-  ArrayList<EventProxy> validEvents;
-  HashMap<EventProxy, ArrayList<AutomatonProxy>> invalidEvents; //The Map object is the list of all the Automatons which are blocking the key
-
+  //###################################################################################
+  //# Accessor Functions
   @SuppressWarnings("unchecked")
   public ArrayList<EventProxy> getValidTransitions()
   {
@@ -46,6 +44,8 @@ public class Simulation
     return output;
   }
 
+  //###################################################################################
+  //# Constructor
   public Simulation(ModuleContainer module)
   {
     ProductDESProxy des = module.getCompiledDES();
@@ -54,6 +54,99 @@ public class Simulation
         if (state.isInitial())
           allAutomatons.put(automaton, state);
     findEventClassification();
+  }
+
+  //#####################################################################################################
+  //# Mutator Methods
+
+  public void SetState(AutomatonProxy automaton, StateProxy state)
+  {
+    if (!automaton.getStates().contains(state))
+    {
+      throw new IllegalArgumentException("ERROR: This state does not belong to this automaton");
+    }
+    if (allAutomatons.containsKey(automaton))
+      allAutomatons.put(automaton, state);
+    else
+      throw new IllegalArgumentException("ERROR: This automaton is not in this program");
+  }
+
+  public void singleStep(EventProxy event) throws UncontrollableException
+  {
+    if (testForControlability() != null)
+    {
+      Pair<EventProxy, AutomatonProxy> invalidEvent = testForControlability();
+      throw new UncontrollableException("ERROR: The event " + invalidEvent.getFirst().getName() + " is not controllable, inside the automaton " + invalidEvent.getSecond().getName());
+    }
+    if (isInInvalidEvent(event))
+    {
+      String errorMessage = "ERROR: The event " + event.getName() +
+        " cannot be compiled as the following automata are blocking it:";
+      for (AutomatonProxy automata : invalidEvents.get(event))
+        errorMessage += "\r\n" + automata.getName();
+      throw new IllegalArgumentException(errorMessage);
+    }
+    else if (!isInValidEvent(event))
+    {
+      String errorMessage = "ERROR: The event " + event.getName() +
+        " cannot be completed as it is not inside any automata";
+      throw new IllegalArgumentException(errorMessage);
+    }
+    else
+    {
+      for (AutomatonProxy automata : allAutomatons.keySet())
+      {
+        for (TransitionProxy trans : automata.getTransitions())
+        {
+          if (trans.getEvent() == event)
+          {
+            if (trans.getSource() == allAutomatons.get(automata))
+              allAutomatons.put(automata, trans.getTarget());
+            else
+              throw new IllegalArgumentException("DEBUG ERROR: Attempt to process an invalid transistion passed all tests. This shouldn't happen");
+          }
+        }
+      }
+    }
+  }
+
+  //###########################################################################################
+  //# Interface Object
+
+  public boolean Equals(Object e)
+  {
+    if (e.getClass() != Simulation.class) return false;
+    Simulation comparer = (Simulation)e;
+    HashMap<AutomatonProxy,StateProxy> comparerStates = comparer.getCurrentStates();
+    for (AutomatonProxy comparerAuto : comparerStates.keySet())
+    {
+      boolean found = false;
+      for (AutomatonProxy thisAuto : allAutomatons.keySet())
+      {
+        if ((comparerAuto == thisAuto) && (comparerStates.get(comparerAuto) == allAutomatons.get(thisAuto)))
+          found = true;
+      }
+      if (found == false)
+        return false;
+    }
+    return true;
+  }
+
+  //###########################################################################################
+  //# Auxillery Functions
+  private Pair<EventProxy, AutomatonProxy> testForControlability()
+  {
+    for (EventProxy event : invalidEvents.keySet())
+    {
+      for (AutomatonProxy automata : invalidEvents.get(event))
+      {
+        if (automata.getKind() == ComponentKind.SPEC)
+        {
+          return new Pair<EventProxy, AutomatonProxy> (event, automata);
+        }
+      }
+    }
+    return null;
   }
 
   private boolean isInValidEvent (EventProxy event)
@@ -115,57 +208,10 @@ public class Simulation
     }
   }
 
-  public void singleStep(EventProxy event) throws UncontrollableException
-  {
-    if (testForControlability() != null)
-    {
-      Pair<EventProxy, AutomatonProxy> invalidEvent = testForControlability();
-      throw new UncontrollableException("ERROR: The event " + invalidEvent.getFirst().getName() + " is not controllable, inside the automaton " + invalidEvent.getSecond().getName());
-    }
-    if (isInInvalidEvent(event))
-    {
-      String errorMessage = "ERROR: The event " + event.getName() +
-        " cannot be compiled as the following automata are blocking it:";
-      for (AutomatonProxy automata : invalidEvents.get(event))
-        errorMessage += "\r\n" + automata.getName();
-      throw new IllegalArgumentException(errorMessage);
-    }
-    else if (!isInValidEvent(event))
-    {
-      String errorMessage = "ERROR: The event " + event.getName() +
-        " cannot be completed as it is not inside any automata";
-      throw new IllegalArgumentException(errorMessage);
-    }
-    else
-    {
-      for (AutomatonProxy automata : allAutomatons.keySet())
-      {
-        for (TransitionProxy trans : automata.getTransitions())
-        {
-          if (trans.getEvent() == event)
-          {
-            if (trans.getSource() == allAutomatons.get(automata))
-              allAutomatons.put(automata, trans.getTarget());
-            else
-              throw new IllegalArgumentException("DEBUG ERROR: Attempt to process an invalid transistion passed all tests. This shouldn't happen");
-          }
-        }
-      }
-    }
-  }
+  //##################################################################################################
+  //# Data Members
+  HashMap<AutomatonProxy, StateProxy> allAutomatons; // The Map object is the current state of the key
+  ArrayList<EventProxy> validEvents;
+  HashMap<EventProxy, ArrayList<AutomatonProxy>> invalidEvents; //The Map object is the list of all the Automatons which are blocking the key
 
-  private Pair<EventProxy, AutomatonProxy> testForControlability()
-  {
-    for (EventProxy event : invalidEvents.keySet())
-    {
-      for (AutomatonProxy automata : invalidEvents.get(event))
-      {
-        if (automata.getKind() == ComponentKind.SPEC)
-        {
-          return new Pair<EventProxy, AutomatonProxy> (event, automata);
-        }
-      }
-    }
-    return null;
-  }
 }
