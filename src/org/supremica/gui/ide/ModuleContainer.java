@@ -46,10 +46,17 @@ import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -79,15 +86,24 @@ public class ModuleContainer
         final OperatorTable optable = CompilerOperatorTable.getInstance();
         mExpressionParser = new ExpressionParser(factory, optable);
         mPrinter = new HTMLPrinter();
+        final DocumentManager manager = ide.getDocumentManager();
+        final ProductDESProxyFactory desfactory =
+          ProductDESElementFactory.getInstance();
+        mCompiler = new ModuleCompiler(manager, desfactory, module);
+        mCompiler.setSourceInfoEnabled(true);
 
         mTabPanel = new JTabbedPane();
         mEditorPanel = new EditorPanel(this, "Editor");
         mSimulatorPanel = new SimulatorPanel(this, "Simulator");
         mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
         mTabPanel.add(mEditorPanel);
-        Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener(new SimulatorPropertyChangeListener());
-        if (Config.INCLUDE_WATERS_SIMULATOR.isTrue())
+        mSimulatorPropertyChangeListener =
+          new SimulatorPropertyChangeListener();
+        Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener
+          (mSimulatorPropertyChangeListener);
+        if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
           mTabPanel.add(mSimulatorPanel);
+        }
         mTabPanel.add(mAnalyzerPanel);
         mTabPanel.addChangeListener(this);
         mEditorPanel.showComment();
@@ -125,6 +141,8 @@ public class ModuleContainer
     public void close()
     {
         mEditorPanel.close();
+        Config.INCLUDE_WATERS_SIMULATOR.removePropertyChangeListener
+          (mSimulatorPropertyChangeListener);
     }
 
     public Component getPanel()
@@ -172,7 +190,7 @@ public class ModuleContainer
 
     public void fireEditorChangedEvent(final EditorChangedEvent event)
     {
-        // Just in case they try to register or deregister observers
+        // Just in case they try to register or unregister observers
         // in response to the update ...
         final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
         for (final Observer observer : copy) {
@@ -191,18 +209,27 @@ public class ModuleContainer
      */
     public void modelChanged(final ModelChangeEvent event)
     {
-        if (event.getKind() == ModelChangeEvent.ITEM_REMOVED) {
-            final Object value = event.getValue();
-            if (value instanceof SimpleComponentSubject) {
-                final ComponentEditorPanel panel =
-                    mEditorPanel.getActiveEditorWindowInterface();
-                if (panel != null && panel.getComponent() == value) {
-                    mEditorPanel.showComment();
-                    // Do not event try to close or dispose the graph panel:
-                    // deletions can be undone!
-                }
-            }
+      switch (event.getKind()) {
+      case ModelChangeEvent.ITEM_REMOVED:
+        final Object value = event.getValue();
+        if (value instanceof SimpleComponentSubject) {
+          final ComponentEditorPanel panel =
+            mEditorPanel.getActiveEditorWindowInterface();
+          if (panel != null && panel.getComponent() == value) {
+            mEditorPanel.showComment();
+            // Do not event try to close or dispose the graph panel:
+            // deletions can be undone!
+          }
         }
+        // fall through ...
+      case ModelChangeEvent.ITEM_ADDED:
+      case ModelChangeEvent.NAME_CHANGED:
+      case ModelChangeEvent.STATE_CHANGED:
+        mCompiledDES = null;
+        break;
+      default:
+        break;
+      }
     }
 
 
@@ -218,6 +245,20 @@ public class ModuleContainer
         return mModuleContext;
     }
 
+    public ProductDESProxy getCompiledDES()
+    {
+      return mCompiledDES;
+    }
+
+    public Map<Proxy,SourceInfo> getSourceInfoMap()
+    {
+      if (mCompiledDES == null) {
+        return null;
+      } else {
+        return mCompiler.getSourceInfoMap();
+      }
+    }
+
     public ExpressionParser getExpressionParser()
     {
         return mExpressionParser;
@@ -226,15 +267,6 @@ public class ModuleContainer
     public ProxyPrinter getPrinter()
     {
         return mPrinter;
-    }
-
-    public SimulatorPanel getSimulatorPanel()
-    {
-        if (simulatorPanel == null)
-        {
-            simulatorPanel = new SimulatorPanel(this, "Simulator");
-        }
-        return simulatorPanel;
     }
 
     ComponentEditorPanel createComponentEditorPanel
@@ -400,18 +432,35 @@ public class ModuleContainer
     //# Interface javax.swing.event.ChangeListener
     public void stateChanged(final ChangeEvent event)
     {
-        final Component selected = mTabPanel.getSelectedComponent();
-        if (selected == mAnalyzerPanel &&
-            !mAnalyzerPanel.updateAutomata()) {
-            mTabPanel.setSelectedComponent(mEditorPanel);
+      final Component selected = mTabPanel.getSelectedComponent();
+      try {
+        if (selected == mSimulatorPanel) {
+          recompile();
+        } else if (selected == mAnalyzerPanel) {
+          recompile();
+          mAnalyzerPanel.updateAutomata();
         }
         final EditorChangedEvent eevent = new MainPanelSwitchEvent(this);
         fireEditorChangedEvent(eevent);
+      } catch (final EvalException exception) {
+        final String msg = exception.getMessage();
+        final IDE ide = getIDE();
+        ide.error(msg);
+        mTabPanel.setSelectedComponent(mEditorPanel);
+      }
     }
 
 
     //#######################################################################
     //# Auxiliary Methods
+    private void recompile()
+      throws EvalException
+    {
+      if (mCompiledDES == null) {
+        mCompiledDES = mCompiler.compile();
+      }
+    }
+
     private void fireUndoRedoEvent()
     {
         final EditorChangedEvent event = new UndoRedoEvent(this);
@@ -421,18 +470,15 @@ public class ModuleContainer
 
     //#######################################################################
     //# Inner Classes
-
-    private class SimulatorPropertyChangeListener implements SupremicaPropertyChangeListener
+    private class SimulatorPropertyChangeListener
+      implements SupremicaPropertyChangeListener
     {
 
       public void propertyChanged(SupremicaPropertyChangeEvent event)
       {
-        if (Config.INCLUDE_WATERS_SIMULATOR.isTrue())
-        {
+        if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
           mTabPanel.add(mSimulatorPanel, 1);
-        }
-        else
-        {
+        } else {
           mTabPanel.remove(mSimulatorPanel);
         }
       }
@@ -445,7 +491,6 @@ public class ModuleContainer
     private final EditorPanel mEditorPanel;
     private final SimulatorPanel mSimulatorPanel;
     private final AnalyzerPanel mAnalyzerPanel;
-    private SimulatorPanel simulatorPanel = null;
 
     private final Map<SimpleComponentSubject,ComponentEditorPanel>
         mComponentToPanelMap =
@@ -455,9 +500,13 @@ public class ModuleContainer
         new HashMap<SimpleComponentSubject,ComponentViewPanel>();
 
     private final ModuleContext mModuleContext;
+    private final ModuleCompiler mCompiler;
     private final ExpressionParser mExpressionParser;
     private final ProxyPrinter mPrinter;
+    private ProductDESProxy mCompiledDES;
 
+    private final SupremicaPropertyChangeListener
+      mSimulatorPropertyChangeListener;
     private final UndoManager mUndoManager = new UndoManager();
     private CompoundEdit mInsignificant = new CompoundEdit();
 	private int mUndoIndex = 0;

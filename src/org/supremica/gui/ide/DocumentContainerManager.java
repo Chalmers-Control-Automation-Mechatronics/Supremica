@@ -136,7 +136,7 @@ public class DocumentContainerManager
             observer.update(event);
         }
         mIDE.fireEditorChangedEvent(event);
-    }    
+    }
 
 
     //#######################################################################
@@ -302,7 +302,7 @@ public class DocumentContainerManager
     private DocumentProxy load(final URI uri, final boolean maycancel)
     {
         try {
-            // The documentmanager does the loading, by extension.
+            // The document manager does the loading, by extension.
             return mDocumentManager.load(uri);
         } catch (final WatersUnmarshalException exception) {
             showIOError(exception, maycancel);
@@ -409,7 +409,7 @@ public class DocumentContainerManager
         final URI olduri = doc.getLocation();
         if (other != null && other != container) {
             final String text = getWarningText(file, WARN_FILE_OPEN);
-            final int choice = 
+            final int choice =
                 showWarningDialog(text, JOptionPane.OK_CANCEL_OPTION);
             if (choice != JOptionPane.OK_OPTION) {
                 return;
@@ -417,7 +417,7 @@ public class DocumentContainerManager
             closeContainer(other);
         } else if (file.exists() && !uri.equals(olduri)) {
             final String text = getWarningText(file, WARN_FILE_EXISTS);
-            final int choice = 
+            final int choice =
                 showWarningDialog(text, JOptionPane.OK_CANCEL_OPTION);
             if (choice != JOptionPane.OK_OPTION) {
                 return;
@@ -451,7 +451,7 @@ public class DocumentContainerManager
         final ProxyMarshaller<? extends DocumentProxy> marshaller =
             mDocumentManager.findProxyMarshaller(clazz);
         final FileFilter docfilter = marshaller.getDefaultFileFilter();
-        
+
         if (docfilter == filter) {
             final String ext = marshaller.getDefaultExtension();
             final File extfile =
@@ -467,14 +467,14 @@ public class DocumentContainerManager
                     !SupremicaUnmarshaller.validate(container.getAnalyzerPanel().getVisualProject()))
             {
                 final int choice = JOptionPane.showConfirmDialog
-                        (mIDE.getFrame(), "This project contains attributes not supported by the WMOD-format." + 
+                        (mIDE.getFrame(), "This project contains attributes not supported by the WMOD-format." +
                         "\nDo you want to save (and lose the unsupported features)?", "Warning", JOptionPane.YES_NO_OPTION);
                 if (choice != JOptionPane.YES_OPTION)
                 {
                     return;
                 }
             }
-            
+
             if (container instanceof ModuleContainer)
             {
                 final ModuleProxy module =
@@ -500,12 +500,6 @@ public class DocumentContainerManager
         }
         else if (doc instanceof ModuleProxy)
         {
-            // Converting Waters >> Supremica ...
-            if (container.isEditorActive())
-            {
-                container.getAnalyzerPanel().updateAutomata();
-            }
-
             // Here, the comment and the name disappears
             final Project project = container.getAnalyzerPanel().getVisualProject();
             marshalDocument(file, project, maycancel);
@@ -573,7 +567,7 @@ public class DocumentContainerManager
         final JFrame frame = mIDE.getFrame();
         final String msg = exception.getMessage();
         final String text =
-            "Error accesing file:\n" + wrapExceptionMessage(msg); 
+            "Error accesing file:\n" + wrapExceptionMessage(msg);
         final String title = "I/O Error";
         if (maycancel) {
             final int choice = JOptionPane.showConfirmDialog
