@@ -30,12 +30,12 @@ public class EditorColor
   //#########################################################################
   //# Colour Selection
   /**
-   * Returns the appropriate color for painting this object.
+   * Returns the appropriate colour for painting this object.
    */
   public static Color getColor(final Proxy o,
                                final EditorSurface.DRAGOVERSTATUS dragOver,
                                final boolean selected,
-			       final boolean error,
+                               final boolean error,
                                final boolean hasfocus)
   {
     // In order of importance
@@ -67,13 +67,13 @@ public class EditorColor
       return DEFAULTCOLOR;
     }
   }
-    
+
   /**
    * Returns a lighter shade of the color of the object for drawing a "shadow".
    */
   public static Color getShadowColor
     (final Proxy o,
-     final EditorSurface.DRAGOVERSTATUS dragOver, 
+     final EditorSurface.DRAGOVERSTATUS dragOver,
      final boolean selected,
      final boolean error,
      final boolean hasfocus)
@@ -83,7 +83,7 @@ public class EditorColor
   }
 
   /**
-   * Returns a transparent variant of the supplied color. The
+   * Returns a transparent variant of the supplied colour. The
    * alpha-value is changed to {@link #SHADOWALPHA}.
    */
   public static Color shadow(final Color color)
@@ -95,80 +95,83 @@ public class EditorColor
 
   //#########################################################################
   //# Public Colour Constants
-  /** The default color of text. */
+  /** The default background colour for all panels. */
+  public static final Color BACKGROUND = Color.WHITE;
+
+  /** The default colour of text. */
   public static final Color TEXTCOLOR = Color.BLACK;
-    
-  /** The default color of disabled text. */
+
+  /** The default colour of disabled text. */
   public static final Color DISABLEDCOLOR = Color.GRAY;
-    
-  /** The background color in the editor. */
+
+  /** The background colour in the editor. */
   public static final Color BACKGROUNDCOLOR = Color.WHITE;
-        
-  /** The color of the grid in the editor. */
+
+  /** The colour of the grid in the editor. */
   public static final Color GRIDCOLOR = new Color(0.875f, 0.875f, 0.875f);
-    
-  /** The default color of marked (accepting) nodes. */
+
+  /** The default colour of marked (accepting) nodes. */
   public static final Color DEFAULTMARKINGCOLOR = Color.GRAY;
-    
-  /** The color of guard expressions. */
+
+  /** The colour of guard expressions. */
   public static final Color GUARDCOLOR = Color.CYAN.darker().darker();
 
-  /** The color of action expressions. */
+  /** The colour of action expressions. */
   public static final Color ACTIONCOLOR = Color.RED.darker().darker();
-    
-  /** The color of the drag-select area. */
+
+  /** The colour of the drag-select area. */
   public static final Color DRAGSELECTCOLOR = new Color(0,0,255,32);
-    
-  /** The default color of objects. */
+
+  /** The default colour of objects. */
   public static final Color DEFAULTCOLOR = Color.BLACK;
 
-  /** The default color of node labels. */
+  /** The default colour of node labels. */
   public static final Color DEFAULTCOLOR_LABEL = Color.GREEN.darker().darker();
 
-  /** The default color of goup nodes. */
+  /** The default colour of group nodes. */
   public static final Color DEFAULTCOLOR_NODEGROUP = new Color(64,64,64);
-    
+
   /**
-   * The color of erring objects. For example colliding nodes and nodegroups.
+   * The colour of erring objects. For example colliding nodes and nodegroups.
    */
   public static final Color ERRORCOLOR = Color.RED;
   /**
-   * Slightly darker error color, to distinguish simple nodes from
+   * Slightly darker error colour, to distinguish simple nodes from
    * group nodes more clearly. Overkill?
    */
   public static final Color ERRORCOLOR_NODE = ERRORCOLOR.darker();
-    
+
   /**
-   * The color of selected objects in a graph with keyboard focus.
+   * The colour of selected objects in a graph with keyboard focus.
    */
   public static final Color GRAPH_SELECTED_FOCUSSED = Color.BLUE;
   /**
-   * The color of selected objects in a graph without keyboard focus.
+   * The colour of selected objects in a graph without keyboard focus.
    */
   public static final Color GRAPH_SELECTED_NOTFOCUSSED =
     new Color(64, 112, 128);
-    
+
   /**
-   * The color of objects when showing that stuff can be dropped on them.
+   * The colour of objects when showing that stuff can be dropped on them.
    */
   public static final Color CANDROPCOLOR = Color.GREEN.darker().darker();
 
   /**
-   * The color of objects when showing that stuff cannot be dropped on them.
+   * The colour of objects when showing that stuff cannot be dropped on them.
    */
   public static final Color CANTDROPCOLOR = Color.RED;
 
-  /** Invisible color. */
+  /** Invisible colour. */
   public static final Color INVISIBLE = new Color(0,0,0,0);
 
   /**
-   * The selection background color for list or tree view panels that
+   * The selection background colour for list or tree view panels that
    * are in focus.
    */
   public static final Color BACKGROUND_FOCUSSED = new Color(184, 208, 224);
 
   /**
-   * The selection background color for list or tree view panels that
+   * The selection background colour for list or tree view panels that
    * are not in focus.
    */
   public static final Color BACKGROUND_NOTFOCUSSED = new Color(232, 232, 232);
@@ -176,7 +179,7 @@ public class EditorColor
 
   //#########################################################################
   //# Private Class Constants
-  /** The alpha value of the shadow-colors. */
+  /** The alpha value of the shadow-colours. */
   private static final int SHADOWALPHA = 48;
-    
+
 }

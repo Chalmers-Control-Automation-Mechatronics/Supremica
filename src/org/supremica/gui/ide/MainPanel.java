@@ -18,6 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
+import net.sourceforge.waters.gui.EditorColor;
+
 import org.supremica.gui.WhiteScrollPane;
 
 
@@ -27,10 +29,11 @@ abstract class MainPanel
 
 	//######################################################################
     //# Constructor
-    public MainPanel(String name)
+    public MainPanel(final String name)
     {
-        this.name = name;
+        mName = name;
 
+        setBackground(EditorColor.BACKGROUND);
         setPreferredSize(IDEDimensions.mainPanelPreferredSize);
         setMinimumSize(IDEDimensions.mainPanelMinimumSize);
 
@@ -57,7 +60,7 @@ abstract class MainPanel
     //#
     public String getName()
     {
-        return name;
+        return mName;
     }
 
     void setLeftComponent(final JComponent newComponent)
@@ -105,7 +108,7 @@ abstract class MainPanel
 
     public JScrollPane getEmptyRightPanel()
     {
-        return emptyRightPanel;
+        return mEmptyRightPanel;
     }
 
     class EmptyRightPanel
@@ -125,10 +128,10 @@ abstract class MainPanel
     //# Data Members
     private final JSplitPane mSplitPane;
 
-    private EmptyRightPanel emptyRightPanel = new EmptyRightPanel();
-    private String name;
+    private final EmptyRightPanel mEmptyRightPanel = new EmptyRightPanel();
+    private final String mName;
 
-    
+
     //######################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
