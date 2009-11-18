@@ -319,6 +319,7 @@ public class EventEditorDialog
       mIndexTable.setSurrendersFocusOnKeystroke(true);
       mIndexTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
       mIndexTable.setFillsViewportHeight(true);
+      mIndexTable.setBackground(EditorColor.BACKGROUND);
       final Dimension minsize = new Dimension(0, 0);
       mIndexTable.setPreferredScrollableViewportSize(minsize);
       mIndexTable.setMinimumSize(minsize);

@@ -13,6 +13,7 @@ import javax.swing.border.Border;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
+import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.subject.base.DocumentSubject;
 
@@ -34,6 +35,7 @@ class CommentPanel extends JPanel
       final Border titleBorder = BorderFactory.createLoweredBevelBorder();
       final JTextPane titlePane = new JTextPane();
       titlePane.setBorder(titleBorder);
+      titlePane.setBackground(EditorColor.BACKGROUND);
       titlePane.setFont(new Font(null, Font.BOLD, 14));
       StyledDocument titleDoc = titlePane.getStyledDocument();
       titleDoc.insertString(titleDoc.getLength(), document.getName(), null);
@@ -42,6 +44,7 @@ class CommentPanel extends JPanel
       final Border commentBorder = BorderFactory.createLoweredBevelBorder();
       final JTextPane commentPane = new JTextPane();
       commentPane.setBorder(commentBorder);
+      commentPane.setBackground(EditorColor.BACKGROUND);
       commentPane.setFont(new Font(null, Font.PLAIN, 12));
       StyledDocument commentDoc = commentPane.getStyledDocument();
       commentDoc.insertString

@@ -27,13 +27,12 @@ abstract class MainPanel
     extends JPanel
 {
 
-	//######################################################################
+    //######################################################################
     //# Constructor
     public MainPanel(final String name)
     {
         mName = name;
 
-        setBackground(EditorColor.BACKGROUND);
         setPreferredSize(IDEDimensions.mainPanelPreferredSize);
         setMinimumSize(IDEDimensions.mainPanelMinimumSize);
 
