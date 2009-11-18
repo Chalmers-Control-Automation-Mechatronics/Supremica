@@ -4,100 +4,135 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import org.supremica.gui.ide.ModuleContainer;
+
 public class Simulation
 {
   HashMap<AutomatonProxy, StateProxy> allAutomatons; // The Map object is the current state of the key
-  ArrayList<TransitionProxy> validTransitions;
-  HashMap<TransitionProxy, ArrayList<AutomatonProxy>> invalidTransitions; //The Map object is the list of all the Automatons which are blocking the key
+  ArrayList<EventProxy> validEvents;
+  HashMap<EventProxy, ArrayList<AutomatonProxy>> invalidEvents; //The Map object is the list of all the Automatons which are blocking the key
 
-  public Simulation(ProductDESProxy entireSimulation)
+  @SuppressWarnings("unchecked")
+  public ArrayList<EventProxy> getValidTransitions()
   {
-    for (AutomatonProxy automaton : allAutomatons.keySet())
+    return (ArrayList<EventProxy>)validEvents.clone();
+  }
+
+  @SuppressWarnings("unchecked")
+  public HashMap<EventProxy, ArrayList<AutomatonProxy>> getInvalidEvents()
+  {
+    return (HashMap<EventProxy,ArrayList<AutomatonProxy>>) invalidEvents.clone();
+  }
+
+  @SuppressWarnings("unchecked")
+  public HashMap<AutomatonProxy, StateProxy> getCurrentStates()
+  {
+    return (HashMap<AutomatonProxy,StateProxy>) allAutomatons.clone();
+  }
+
+  public ArrayList<EventProxy> getAllEvents()
+  {
+    ArrayList<EventProxy> output = new ArrayList<EventProxy>();
+    for (EventProxy e : validEvents)
+      output.add(e);
+    for (EventProxy e : invalidEvents.keySet())
+      output.add(e);
+    return output;
+  }
+
+  public Simulation(ModuleContainer module)
+  {
+    ProductDESProxy des = module.getCompiledDES();
+    for (AutomatonProxy automaton : des.getAutomata())
       for (StateProxy state : automaton.getStates())
         if (state.isInitial())
           allAutomatons.put(automaton, state);
-    findTransitionClassification();
+    findEventClassification();
   }
 
-  private boolean isInValidTrans (TransitionProxy trans)
+  private boolean isInValidEvent (EventProxy event)
   {
-    for (TransitionProxy validTrans : validTransitions)
+    for (EventProxy validEvent : validEvents)
     {
-      if (validTrans.getEvent().getName().compareTo(trans.getEvent().getName()) == 0)
+      if (event == validEvent)
         return true;
     }
     return false;
   }
 
-  private boolean isInInvalidTrans(TransitionProxy trans)
+  private boolean isInInvalidEvent(EventProxy event)
   {
-    for (TransitionProxy invalidTrans : invalidTransitions.keySet())
+    for (EventProxy invalidEvent : invalidEvents.keySet())
     {
-      if (invalidTrans.getEvent().getName().compareTo(trans.getEvent().getName()) == 0)
+      if (invalidEvent == event)
         return true;
     }
     return false;
   }
 
-  private void findTransitionClassification()
+  private void findEventClassification()
   {
     for (AutomatonProxy automaton : allAutomatons.keySet())
     {
-      for (TransitionProxy transition : automaton.getTransitions())
+      for (EventProxy event : automaton.getEvents())
       {
-        if (transition.getSource() == allAutomatons.get(automaton))
+        for (TransitionProxy transition : automaton.getTransitions())
         {
-          if (!isInInvalidTrans(transition))
+          if (transition.getSource() == allAutomatons.get(automaton) && transition.getEvent() == event)
           {
-            if (!isInValidTrans(transition))
+            if (!isInInvalidEvent(event))
             {
-              validTransitions.add(transition);
+              if (!isInValidEvent(event))
+              {
+                validEvents.add(event);
+              }
             }
           }
-        }
-        else
-        {
-          if (isInInvalidTrans(transition))
+          else if (transition.getEvent() == event)
           {
-            ArrayList<AutomatonProxy> got = invalidTransitions.get(transition);
-            got.add(automaton);
-            invalidTransitions.put(transition, got);
-          }
-          else if (isInValidTrans(transition))
-          {
-            validTransitions.remove(transition);
-            ArrayList<AutomatonProxy> failAutomaton = new ArrayList<AutomatonProxy>();
-            failAutomaton.add(automaton);
-            invalidTransitions.put(transition, failAutomaton);
+            if (isInInvalidEvent(event))
+            {
+              ArrayList<AutomatonProxy> got = invalidEvents.get(event);
+              got.add(automaton);
+              invalidEvents.put(event, got);
+            }
+            else if (isInValidEvent(event))
+            {
+              validEvents.remove(event);
+              ArrayList<AutomatonProxy> failAutomaton = new ArrayList<AutomatonProxy>();
+              failAutomaton.add(automaton);
+              invalidEvents.put(event, failAutomaton);
+            }
           }
         }
       }
     }
   }
 
-  public void singleStep(TransitionProxy transition) throws UncontrollableException
+  public void singleStep(EventProxy event) throws UncontrollableException
   {
     if (testForControlability() != null)
     {
-      Pair<TransitionProxy, AutomatonProxy> invalidTrans = testForControlability();
-      throw new UncontrollableException("ERROR: The transition " + invalidTrans.getFirst() + " is not controllable, inside the automaton " + invalidTrans.getSecond());
+      Pair<EventProxy, AutomatonProxy> invalidEvent = testForControlability();
+      throw new UncontrollableException("ERROR: The event " + invalidEvent.getFirst().getName() + " is not controllable, inside the automaton " + invalidEvent.getSecond().getName());
     }
-    if (isInInvalidTrans(transition))
+    if (isInInvalidEvent(event))
     {
-      String errorMessage = "ERROR: The transition " + transition.getEvent().getName() +
+      String errorMessage = "ERROR: The event " + event.getName() +
         " cannot be compiled as the following automata are blocking it:";
-      for (AutomatonProxy automata : invalidTransitions.get(transition))
+      for (AutomatonProxy automata : invalidEvents.get(event))
         errorMessage += "\r\n" + automata.getName();
       throw new IllegalArgumentException(errorMessage);
     }
-    else if (!isInValidTrans(transition))
+    else if (!isInValidEvent(event))
     {
-      String errorMessage = "ERROR: The transition " + transition.getEvent().getName() +
+      String errorMessage = "ERROR: The event " + event.getName() +
         " cannot be completed as it is not inside any automata";
       throw new IllegalArgumentException(errorMessage);
     }
@@ -107,7 +142,7 @@ public class Simulation
       {
         for (TransitionProxy trans : automata.getTransitions())
         {
-          if (trans.getEvent().getName().compareTo(transition.getEvent().getName()) == 0)
+          if (trans.getEvent() == event)
           {
             if (trans.getSource() == allAutomatons.get(automata))
               allAutomatons.put(automata, trans.getTarget());
@@ -119,15 +154,15 @@ public class Simulation
     }
   }
 
-  private Pair<TransitionProxy, AutomatonProxy> testForControlability()
+  private Pair<EventProxy, AutomatonProxy> testForControlability()
   {
-    for (TransitionProxy trans : invalidTransitions.keySet())
+    for (EventProxy event : invalidEvents.keySet())
     {
-      for (AutomatonProxy automata : invalidTransitions.get(trans))
+      for (AutomatonProxy automata : invalidEvents.get(event))
       {
         if (automata.getKind() == ComponentKind.SPEC)
         {
-          return new Pair<TransitionProxy, AutomatonProxy> (trans, automata);
+          return new Pair<EventProxy, AutomatonProxy> (event, automata);
         }
       }
     }

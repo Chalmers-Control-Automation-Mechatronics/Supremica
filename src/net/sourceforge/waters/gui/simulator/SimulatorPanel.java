@@ -38,6 +38,7 @@ public class SimulatorPanel
   {
     setupAutomataTable();
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
+    mAutomataPanel.setLayout(new BorderLayout());
     mAutomataPanel.add(scroll, BorderLayout.CENTER);
     JButton stepButton = new JButton("Step");
     mAutomataPanel.add(stepButton, BorderLayout.SOUTH);
