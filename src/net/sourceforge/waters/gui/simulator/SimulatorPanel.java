@@ -13,60 +13,58 @@ import org.supremica.gui.ide.IDEDimensions;
 import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
 
+
 public class SimulatorPanel
-    extends MainPanel
+  extends MainPanel
 {
-    private static final long serialVersionUID = 1L;
 
-    private final String name;
-    private final ModuleContainer moduleContainer;
+  public SimulatorPanel(final ModuleContainer moduleContainer,
+                        final String name)
+  {
+    super(name);
+    mModuleContainer = moduleContainer;
+    mTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
+    mTabbedPane.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
+    mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
+    setupAutomata();
+    setLeftComponent(mTabbedPane);
+    mDesktop.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
+    mDesktop.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
+    setRightComponent(mDesktop);
+    //JInternalFrame test = new JInternalFrame();
+  }
 
-    public SimulatorPanel(ModuleContainer moduleContainer, String name)
-    {
-      super(name);
-      this.name = name;
-      this.moduleContainer = moduleContainer;
-      mTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
-      mTabbedPane.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
-      mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
-      setupAutomata();
-      setLeftComponent(mTabbedPane);
-      mDesktop.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
-      mDesktop.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
-      setRightComponent(mDesktop);
-      //JInternalFrame test = new JInternalFrame();
-    }
+  private void setupAutomata()
+  {
+    setupAutomataTable();
+    final JScrollPane scroll = new JScrollPane(mAutomataTable);
+    mAutomataPanel.add(scroll, BorderLayout.CENTER);
+    JButton stepButton = new JButton("Step");
+    mAutomataPanel.add(stepButton, BorderLayout.SOUTH);
+    mTabbedPane.addTab("Automata", mAutomataPanel);
+  }
 
-    public String getName()
-    {
-        return name;
-    }
-
-    private void setupAutomataTable()
-    {
-      mAutomataTable = new JTable(new AbstractTunnelTable(moduleContainer));
-    }
-
-    private void setupAutomata()
-    {
-      JScrollPane panel = new JScrollPane();
-      setupAutomataTable();
-      mAutomataPanel.add(mAutomataTable, BorderLayout.CENTER);
-      JButton stepButton = new JButton("Step");
-      mAutomataPanel.add(stepButton, BorderLayout.SOUTH);
-      panel.add(mAutomataPanel);
-      mTabbedPane.addTab("Automata", panel);
-    }
+  private void setupAutomataTable()
+  {
+    mAutomataTable = new JTable(new AbstractTunnelTable(mModuleContainer));
+  }
 
 
-  //#######################################################################
-    //# Data Members
-    JTabbedPane mTabbedPane = new JTabbedPane();
-    JDesktopPane mDesktop = new JDesktopPane();
-    JPanel mAutomataPanel = new JPanel();
-    JPanel mEventsPanel = new JPanel();
-    JPanel mTracePanel = new JPanel();
-    JTable mAutomataTable = new JTable();
-    JTable mEventsTable = new JTable();
-    JScrollPane mScrollPane = new JScrollPane();
+  //#########################################################################
+  //# Data Members
+  private final ModuleContainer mModuleContainer;
+  private JTabbedPane mTabbedPane = new JTabbedPane();
+  private final JDesktopPane mDesktop = new JDesktopPane();
+  private final JPanel mAutomataPanel = new JPanel();
+  //private final JPanel mEventsPanel = new JPanel();
+  //private final JPanel mTracePanel = new JPanel();
+  private JTable mAutomataTable = new JTable();
+  //private final JTable mEventsTable = new JTable();
+  //private final JScrollPane mScrollPane = new JScrollPane();
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

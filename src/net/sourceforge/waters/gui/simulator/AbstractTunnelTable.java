@@ -1,73 +1,45 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.supremica.gui.ide.ModuleContainer;
-import org.xml.sax.SAXException;
 
 
 public class AbstractTunnelTable extends AbstractTableModel
 {
 
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
-  private final ModuleContainer data;
-  private final Object[][] rawData;
-
-  public AbstractTunnelTable(ModuleContainer data)
+  //#########################################################################
+  //# Constructor
+  public AbstractTunnelTable(final ModuleContainer container)
   {
-    this.data= data;
-    Object[][] rawData = null;
-    ProductDESProxy convertedData = null;
+    //mModuleContainer = container;
     try {
-      convertedData = compile(data);
-    } catch (WatersUnmarshalException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
-    } catch (EvalException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
-    } catch (IOException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
-    } catch (JAXBException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
-    } catch (SAXException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
+      mCompiledDES = compile(container);
+    } catch (final EvalException exception) {
+      throw new WatersRuntimeException(exception);
+      // Exception should be caught and message displayed using JOptionPane.
+      // If exception occurs when compiling, the simulator tab cannot be
+      // activated.
     }
-    if (convertedData != null)
-    {
-      rawData = getRawData(convertedData);
-      this.rawData = rawData;
-    }
-    else
-    {
-      this.rawData = null;
-    }
+    mRawData = getRawData(mCompiledDES);
   }
 
+
+  //#########################################################################
+  //# Interface javax.swing.table.TableModel
   public int getColumnCount()
   {
     return 4;
@@ -75,49 +47,7 @@ public class AbstractTunnelTable extends AbstractTableModel
 
   public int getRowCount()
   {
-    try {
-      return compile(data).getAutomata().size();
-    } catch (WatersUnmarshalException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
-    } catch (EvalException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
-    } catch (IOException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
-    } catch (JAXBException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
-    } catch (SAXException exception) {
-      // TODO Auto-generated catch block
-      exception.printStackTrace();
-    }
-    return -1;
-  }
-
-  private ProductDESProxy compile (ModuleContainer data) throws WatersUnmarshalException, IOException, JAXBException, SAXException, EvalException
-  {
-    final DocumentManager manager = data.getIDE().getDocumentManager();
-    ProductDESElementFactory elementFactory = new ProductDESElementFactory();
-    ModuleCompiler compiler = new ModuleCompiler(manager, elementFactory, data.getModule());
-    return compiler.compile();
-  }
-
-  private Object[][] getRawData(ProductDESProxy data)
-  {
-    Object[][] output = new Object[getRowCount()][getColumnCount()];
-    Set<AutomatonProxy> graph = data.getAutomata();
-    int looper = 0;
-    for (AutomatonProxy automata : graph)
-    {
-      output[looper][0] = automata.getName();
-      output[looper][1] = ModuleContext.getComponentKindIcon(automata.getKind());
-      output[looper][2] = ModuleContext.getComponentKindIcon(automata.getKind());
-      output[looper][3] = ModuleContext.getComponentKindIcon(automata.getKind());
-      looper++;
-    }
-    return output;
+    return mCompiledDES.getAutomata().size();
   }
 
   public Class<?> getColumnClass(final int column)
@@ -137,36 +67,50 @@ public class AbstractTunnelTable extends AbstractTableModel
     }
   }
 
-  @SuppressWarnings("unused")
-  private SimpleComponentSubject getNextProxy(SimpleComponentSubject oldProxy, List<Proxy> componentList)
+  public Object getValueAt(final int row, final int col)
   {
-    int oldIndex = componentList.indexOf(oldProxy);
-    if (oldIndex != -1)
-    {
-      for (int looper = oldIndex + 1; looper < componentList.size(); looper++)
-      {
-        if (componentList.get(looper).getProxyInterface() == SimpleComponentProxy.class)
-        {
-          return (SimpleComponentSubject)componentList.get(looper);
-        }
-      }
-      return null;
-    }
-    else
-    {
-      for (int looper = 0; looper < componentList.size(); looper++)
-      {
-        if (componentList.get(looper).getProxyInterface() == SimpleComponentProxy.class)
-        {
-          return (SimpleComponentSubject)componentList.get(looper);
-        }
-      }
-      return null;
-    }
+    return mRawData[row][col];
   }
 
-  public Object getValueAt(int row, int col)
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private ProductDESProxy compile(ModuleContainer container)
+    throws EvalException
   {
-    return rawData[row][col];
+    final DocumentManager manager = container.getIDE().getDocumentManager();
+    final ProductDESProxyFactory factory =
+      ProductDESElementFactory.getInstance();
+    final ModuleCompiler compiler =
+      new ModuleCompiler(manager, factory, container.getModule());
+    return compiler.compile();
   }
+
+  private Object[][] getRawData(final ProductDESProxy des)
+  {
+    final Object[][] output = new Object[getRowCount()][getColumnCount()];
+    final Set<AutomatonProxy> automata = des.getAutomata();
+    int looper = 0;
+    for (final AutomatonProxy aut : automata) {
+      output[looper][0] = aut.getName();
+      output[looper][1] = ModuleContext.getComponentKindIcon(aut.getKind());
+      output[looper][2] = ModuleContext.getComponentKindIcon(aut.getKind());
+      output[looper][3] = ModuleContext.getComponentKindIcon(aut.getKind());
+      looper++;
+    }
+    return output;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  //private final ModuleContainer mModuleContainer;
+  private final ProductDESProxy mCompiledDES;
+  private final Object[][] mRawData;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }
