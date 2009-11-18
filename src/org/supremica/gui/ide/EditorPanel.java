@@ -219,7 +219,7 @@ public class EditorPanel
 
     //######################################################################
     //#
-    boolean setRightComponent(JComponent newComponent)
+    protected boolean setRightComponent(JComponent newComponent)
     {
         if (super.setRightComponent(newComponent)) {
             final EditorChangedEvent event = new SubPanelSwitchEvent(this);

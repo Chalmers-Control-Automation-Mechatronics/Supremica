@@ -23,7 +23,7 @@ import net.sourceforge.waters.gui.EditorColor;
 import org.supremica.gui.WhiteScrollPane;
 
 
-abstract class MainPanel
+public abstract class MainPanel
     extends JPanel
 {
 
@@ -62,12 +62,12 @@ abstract class MainPanel
         return mName;
     }
 
-    void setLeftComponent(final JComponent newComponent)
+    protected void setLeftComponent(final JComponent newComponent)
     {
         mSplitPane.setLeftComponent(newComponent);
     }
 
-    boolean setRightComponent(final JComponent newComponent)
+    protected boolean setRightComponent(final JComponent newComponent)
     {
         JComponent oldComponent = getRightComponent();
         if (oldComponent != newComponent)

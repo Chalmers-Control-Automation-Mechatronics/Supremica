@@ -1,11 +1,16 @@
-package org.supremica.gui.ide;
+package net.sourceforge.waters.gui.simulator;
 
+import java.awt.BorderLayout;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
@@ -13,8 +18,12 @@ import javax.swing.table.TableModel;
 import org.supremica.gui.TableSorter;
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.AnalyzerAutomataPanel;
+import org.supremica.gui.ide.AutomataContainer;
+import org.supremica.gui.ide.IDEDimensions;
+import org.supremica.gui.ide.MainPanel;
+import org.supremica.gui.ide.ModuleContainer;
 
-class SimulatorPanel
+public class SimulatorPanel
     extends MainPanel
 {
     private static final long serialVersionUID = 1L;
@@ -36,13 +45,6 @@ class SimulatorPanel
       mDesktop.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
       setRightComponent(mDesktop);
       //JInternalFrame test = new JInternalFrame();
-
-    }
-
-    public SimulatorPanel(AutomataContainer automataContainer, String name)
-    {
-      super(name);
-      throw new UnsupportedOperationException();
     }
 
     public String getName()
@@ -57,9 +59,13 @@ class SimulatorPanel
 
     private void setupAutomata()
     {
+      JScrollPane panel = new JScrollPane();
       setupAutomataTable();
-      mAutomataPanel.add(mAutomataTable);
-      mTabbedPane.add(mAutomataPanel);
+      mAutomataPanel.add(mAutomataTable, BorderLayout.CENTER);
+      JButton stepButton = new JButton("Step");
+      mAutomataPanel.add(stepButton, BorderLayout.SOUTH);
+      panel.add(mAutomataPanel);
+      mTabbedPane.addTab("Automata", panel);
     }
 
 

@@ -32,6 +32,9 @@ public class IDEDimensions
 	public static Dimension rightEmptyPreferredSize = leftEditorPreferredSize;
 	public static Dimension rightEmptyMinimumSize = leftEditorMinimumSize;
 
+	public static Dimension leftSimulatorTablePreferredSize = new Dimension(MAINWINDOWWIDTH*1/3 - 20, MAINWINDOWHEIGHT * 2 / 3 - 30);
+	public static Dimension leftSimulatorTableMinimumSize = new Dimension(80, 20);
+
 	private IDEDimensions()
 	{
 	}
