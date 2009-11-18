@@ -1,40 +1,25 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.table.AbstractTableModel;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.xsd.des.Automaton;
 
-import org.supremica.gui.Supremica;
 import org.supremica.gui.ide.ModuleContainer;
 import org.xml.sax.SAXException;
 
@@ -152,10 +137,10 @@ public class AbstractTunnelTable extends AbstractTableModel
     }
   }
 
+  @SuppressWarnings("unused")
   private SimpleComponentSubject getNextProxy(SimpleComponentSubject oldProxy, List<Proxy> componentList)
   {
     int oldIndex = componentList.indexOf(oldProxy);
-    SimpleComponentProxy first = null;
     if (oldIndex != -1)
     {
       for (int looper = oldIndex + 1; looper < componentList.size(); looper++)

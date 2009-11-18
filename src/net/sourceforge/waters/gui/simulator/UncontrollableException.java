@@ -1,13 +1,22 @@
 package net.sourceforge.waters.gui.simulator;
 
-public class UncontrollableException extends Exception
+import net.sourceforge.waters.model.base.WatersException;
+
+
+public class UncontrollableException extends WatersException
 {
+
   public UncontrollableException(String e)
   {
     super(e);
   }
+
   public UncontrollableException()
   {
-    super();
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 }

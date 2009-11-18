@@ -18,8 +18,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import net.sourceforge.waters.gui.EditorColor;
-
 import org.supremica.gui.WhiteScrollPane;
 
 
