@@ -73,24 +73,20 @@ public class InterfaceManager
           clsname = UIManager.getSystemLookAndFeelClassName();
           if (clsname.equals(GTK_CLASS_NAME)) {
             // GTK looks broken, only use when explicitly requested ...
-            lookAndFeel = "Metal";
-            clsname = null;
+            clsname = METAL_CLASS_NAME;
           }
-        }
-        if (clsname == null) {
-          if ("Metal".equalsIgnoreCase(lookAndFeel)) {
-            clsname = "javax.swing.plaf.metal.MetalLookAndFeel";
-          } else if ("Motif".equalsIgnoreCase(lookAndFeel)) {
-            clsname = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
-          } else if ("Windows".equalsIgnoreCase(lookAndFeel)) {
-            clsname = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-          } else if ("Mac".equalsIgnoreCase(lookAndFeel)) {
-            clsname = "javax.swing.plaf.mac.MacLookAndFeel";
-          } else if ("GTK".equalsIgnoreCase(lookAndFeel)) {
-            clsname = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
-          } else {
-            clsname = lookAndFeel;
-          }
+        } else if ("Metal".equalsIgnoreCase(lookAndFeel)) {
+          clsname = METAL_CLASS_NAME;
+        } else if ("Motif".equalsIgnoreCase(lookAndFeel)) {
+          clsname = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
+        } else if ("Windows".equalsIgnoreCase(lookAndFeel)) {
+          clsname = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+        } else if ("Mac".equalsIgnoreCase(lookAndFeel)) {
+          clsname = "javax.swing.plaf.mac.MacLookAndFeel";
+        } else if ("GTK".equalsIgnoreCase(lookAndFeel)) {
+          clsname = GTK_CLASS_NAME;
+        } else {
+          clsname = lookAndFeel;
         }
         UIManager.setLookAndFeel(clsname);
         /*
@@ -134,5 +130,7 @@ public class InterfaceManager
     //# Class Constants
     private static final String GTK_CLASS_NAME =
       "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+    private static final String METAL_CLASS_NAME =
+      "javax.swing.plaf.metal.MetalLookAndFeel";
 
 }
