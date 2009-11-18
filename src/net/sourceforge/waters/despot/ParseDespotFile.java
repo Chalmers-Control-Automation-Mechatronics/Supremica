@@ -20,10 +20,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.plain.module.LabelBlockElement;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.plain.module.PlainEventListElement;
-import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -56,7 +53,8 @@ public class ParseDespotFile
   // used to build up the module for the .wmod file we are converting into
   ModuleProxyFactory factory = ModuleElementFactory.getInstance();
 
-  public static void main(String[] args)
+  public static void main(String[] args) throws ParserConfigurationException,
+      SAXException, IOException
   {
 
     File file = new File("/home/rmf18/Desktop/Data/hsup1.des");
@@ -96,7 +94,7 @@ public class ParseDespotFile
    * @throws SAXException
    */
   private SimpleComponentProxy constructSimpleComponent(File despFile)
-  throws ParserConfigurationException, SAXException, IOException
+      throws ParserConfigurationException, SAXException, IOException
   {
 
     DocumentBuilder builder =
@@ -109,7 +107,7 @@ public class ParseDespotFile
       Element des = null;
 
       // File desFile = GraphProxy graph = constructGraph(desFile);
-      IdentifierProxy identifier = new SimpleIdentifierElement("name");
+      IdentifierProxy identifier = factory.createSimpleIdentifierProxy("name");
     }
 
     return null;
@@ -122,83 +120,78 @@ public class ParseDespotFile
    * @param file
    *          The despot file to parse.
    * @return
+   * @throws ParserConfigurationException
+   * @throws IOException
+   * @throws SAXException
    */
   private GraphProxy constructGraph(File file)
+      throws ParserConfigurationException, SAXException, IOException
   {
-    try {
-      DocumentBuilder builder =
-          DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      Document doc = builder.parse(file);
-      Element des = doc.getDocumentElement();
-      Element definition =
+
+    DocumentBuilder builder =
+        DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    Document doc = builder.parse(file);
+    // gets the root element
+    Element des = doc.getDocumentElement();
+    Element definition =
         (Element) des.getElementsByTagName("Definition").item(0);
-      doc.getDocumentElement().normalize();
 
-      // converts each State in the despot file into nodes for waters
-      NodeList states = doc.getElementsByTagName("*");
-      for (int i = 0; i < states.getLength(); i++) {
-
-        Element fstElmnt = (Element) states.item(i);
-        NodeList fstNmElmntLst = fstElmnt.getElementsByTagName("InitSt");
-        Element fstNmElmnt = (Element) fstNmElmntLst.item(0);
-        NodeList fstNm = fstNmElmnt.getChildNodes();
-        System.out.println("First Name : "  + ((Node) fstNm.item(0)).getNodeValue());
-        NodeList lstNmElmntLst = fstElmnt.getElementsByTagName("St");
-        Element lstNmElmnt = (Element) lstNmElmntLst.item(0);
-        NodeList lstNm = lstNmElmnt.getChildNodes();
-        System.out.println("Last Name : " + ((Node) lstNm.item(0)).getNodeValue());
-
-        Element state = (Element) states.item(i);
-        NodeProxy node = convertState(state);
-        nodes.add(node);
-        // stores the ID number and the index of this node in the list
-        storeStateId(state, i);
-      }
-
-      // create a hash map of the ID numbers and the name they belong to for the
-      // events
-      storeEvents(doc);
-
-      // converts each transition in the despot file into edges for waters
-      NodeList transitions = doc.getElementsByTagName("Transitions");
-      for (int i = 0; i < transitions.getLength(); i++) {
-        Element tr = (Element) transitions.item(i);
-
-        // gets the source and target states ID numbers
-        int srcID = Integer.parseInt(tr.getAttribute("fID"));
-        int targetID = Integer.parseInt(tr.getAttribute("tID"));
-        // checks if the transition already exists (i.e. so an event should be
-        // added to an existing edge rather than creating a new edge
-        boolean exists = false;
-        if (mTransitions.containsKey(srcID)) {
-          if (mTransitions.get(srcID).contains(targetID)) {
-            exists = true;
-          }
-        }
-        EdgeProxy edge = convertTransition(tr, exists);
-        if (!exists) {
-          edges.add(edge);
-          // stores this transition
-          storeTransition(tr);
-        } else {
-          // can find where this edge exists in the array list by using the hash
-          // map which references it using the IDs
-          int edgeIndex = mStates.get(srcID);
-          edges.set(edgeIndex, edge);
-        }
-
-      }
-      // NEED TO ADD BLOCKED EVENTS TO THIS GRAPHPROXY (rather than null)
-      return factory.createGraphProxy(true, null, nodes, edges, null);
-    } catch (Exception e) {
-      System.out.print(e.getMessage());
-      return null;
+    // converts each State in the despot file into nodes for waters
+    NodeList allStates = definition.getElementsByTagName("States");
+    Element states = (Element) allStates.item(0);
+    NodeList stElmntLst = states.getElementsByTagName("*");
+    for (int i = 0; i < stElmntLst.getLength(); i++) {
+      Element stElmnt = (Element) stElmntLst.item(i);
+      NodeProxy node = convertState(stElmnt);
+      nodes.add(node);
+      // stores the ID number and the index of this node in the list
+      storeStateId(stElmnt, i);
     }
+    // create a hash map of the ID numbers and the name they belong to for the
+    // events
+    NodeList allEvents = definition.getElementsByTagName("Events");
+    Element events = (Element) allEvents.item(0);
+    NodeList evElmntLst = events.getElementsByTagName("*");
+    storeEvents(evElmntLst);
+
+    // converts each transition in the despot file into edges for waters
+    NodeList transitionList = definition.getElementsByTagName("Trans-Function");
+    Element transitions = (Element) transitionList.item(0);
+    NodeList transElmntLst = transitions.getElementsByTagName("*");
+    for (int i = 0; i < transElmntLst.getLength(); i++) {
+      Element trElmnt = (Element) transElmntLst.item(i);
+
+      // gets the source and target states ID numbers
+      int srcID = Integer.parseInt(trElmnt.getAttribute("fID"));
+      int targetID = Integer.parseInt(trElmnt.getAttribute("tID"));
+      // checks if the transition already exists (i.e. so an event should be
+      // added to an existing edge rather than creating a new edge
+      boolean exists = false;
+      if (mTransitions.containsKey(srcID)) {
+        if (mTransitions.get(srcID).contains(targetID)) {
+          exists = true;
+        }
+      }
+      EdgeProxy edge = convertTransition(trElmnt, exists);
+      if (!exists) {
+        edges.add(edge);
+        // stores this transition
+        storeTransition(trElmnt);
+      } else {
+        // can find where this edge exists in the array list by using the hash
+        // map which references it using the IDs
+        int edgeIndex = mStates.get(srcID);
+        edges.set(edgeIndex, edge);
+      }
+
+    }
+    // NEED TO ADD BLOCKED EVENTS TO THIS GRAPHPROXY (rather than null)
+    return factory.createGraphProxy(true, null, nodes, edges, null);
+
   }
 
-  private void storeEvents(Document doc)
+  private void storeEvents(NodeList events)
   {
-    NodeList events = doc.getElementsByTagName("Events");
     for (int i = 0; i < events.getLength(); i++) {
       Element event = (Element) events.item(i);
       int eventID = Integer.parseInt(event.getAttribute("id"));
@@ -271,8 +264,9 @@ public class ParseDespotFile
       }
 
     }
-    eventList.add(new SimpleIdentifierElement(eventName));
-    LabelBlockProxy transEvents = new LabelBlockElement(eventList, null);
+    eventList.add(factory.createSimpleIdentifierProxy(eventName));
+    LabelBlockProxy transEvents =
+        factory.createLabelBlockProxy(eventList, null);
 
     return factory.createEdgeProxy(nodes.get(srcIndex), nodes.get(targetIndex),
         transEvents, null, null, null, null);
@@ -290,9 +284,9 @@ public class ParseDespotFile
   {
     final String marked = "1";
     final String stateName = state.getAttribute("nm");
-    if (state.getTagName() == "St") {
+    if (state.getTagName().equals("St")) {
       // checks if the state is marked (i.e. accepting)
-      if (state.getAttribute("mk") == marked) {
+      if (state.getAttribute("mk").equals(marked)) {
         return markState(state, false);
       } else {
         return factory.createSimpleNodeProxy(stateName);
@@ -301,7 +295,7 @@ public class ParseDespotFile
     // the state needs to be set as the initial state.
     else {
       // checks if the state is marked (i.e. accepting)
-      if (state.getAttribute("mk") == marked) {
+      if (state.getAttribute("mk").equals(marked)) {
         return markState(state, true);
       }
       return factory.createSimpleNodeProxy(stateName, null, true, null, null,
@@ -327,8 +321,8 @@ public class ParseDespotFile
 
     List<SimpleIdentifierProxy> markList =
         new ArrayList<SimpleIdentifierProxy>(1);
-    markList.add(new SimpleIdentifierElement(accepting));
-    PlainEventListProxy accept = new PlainEventListElement(markList);
+    markList.add(factory.createSimpleIdentifierProxy(accepting));
+    PlainEventListProxy accept = factory.createPlainEventListProxy(markList);
     if (!initial) {
       return factory.createSimpleNodeProxy(stateName, accept, false, null,
           null, null);
@@ -338,8 +332,9 @@ public class ParseDespotFile
     }
   }
 
-  private static class IdPair {
 
+  private static class IdPair
+  {
     private IdPair(final int source, final int target)
     {
       mSource = source;
@@ -360,7 +355,6 @@ public class ParseDespotFile
         return false;
       }
     }
-
     private final int mSource;
     private final int mTarget;
   }
