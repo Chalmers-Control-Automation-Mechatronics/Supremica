@@ -58,33 +58,42 @@ public class InterfaceManager
 {
 //	private static Logger logger = LoggerFactory.createLogger(InterfaceManager.class);
     private static InterfaceManager instance = null;
-    
+
     private InterfaceManager()
     {
     }
-    
+
     public void initLookAndFeel()
     {
-        try
-        {
-            String lookAndFeel = Config.GENERAL_LOOKANDFEEL.getAsString();
-
-            if ((lookAndFeel == null) || "System".equalsIgnoreCase(lookAndFeel))
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            else if ("Metal".equalsIgnoreCase(lookAndFeel))
-                UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-            else if ("Motif".equalsIgnoreCase(lookAndFeel))
-                UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-            else if ("Windows".equalsIgnoreCase(lookAndFeel))
-                UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            else if ("Mac".equalsIgnoreCase(lookAndFeel))
-                UIManager.setLookAndFeel("javax.swing.plaf.mac.MacLookAndFeel");
-            else if ("GTK".equalsIgnoreCase(lookAndFeel))
-                UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-            else
-                UIManager.setLookAndFeel(lookAndFeel);
-            
-            /*
+      try
+      {
+        String lookAndFeel = Config.GENERAL_LOOKANDFEEL.getAsString();
+        String clsname = null;
+        if ((lookAndFeel == null) || "System".equalsIgnoreCase(lookAndFeel)) {
+          clsname = UIManager.getSystemLookAndFeelClassName();
+          if (clsname.equals(GTK_CLASS_NAME)) {
+            // GTK looks broken, only use when explicitly requested ...
+            lookAndFeel = "Metal";
+            clsname = null;
+          }
+        }
+        if (clsname == null) {
+          if ("Metal".equalsIgnoreCase(lookAndFeel)) {
+            clsname = "javax.swing.plaf.metal.MetalLookAndFeel";
+          } else if ("Motif".equalsIgnoreCase(lookAndFeel)) {
+            clsname = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
+          } else if ("Windows".equalsIgnoreCase(lookAndFeel)) {
+            clsname = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+          } else if ("Mac".equalsIgnoreCase(lookAndFeel)) {
+            clsname = "javax.swing.plaf.mac.MacLookAndFeel";
+          } else if ("GTK".equalsIgnoreCase(lookAndFeel)) {
+            clsname = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+          } else {
+            clsname = lookAndFeel;
+          }
+        }
+        UIManager.setLookAndFeel(clsname);
+        /*
             // Debugging
             System.err.println("Chosen look and feel: " + lookAndFeel);
             System.err.println("Supported look and feels:");
@@ -92,31 +101,38 @@ public class InterfaceManager
             {
                 System.out.println("  " + info.getName() + " " + info.getClassName());
             }
-            */
-        }
-        catch (Exception ex)
+         */
+      }
+      catch (Exception ex)
+      {
+        System.err.println("Error while setting look and feel: " + ex);
+        System.err.println("Reverting to System look and feel.");
+        try
         {
-            System.err.println("Error while setting look and feel: " + ex);
-            System.err.println("Reverting to System look and feel.");
-            try
-            {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            }
-            catch (Exception nope)
-            {
-                System.err.println(nope);
-                System.exit(0);
-            }
+          UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
+        catch (Exception nope)
+        {
+          System.err.println(nope);
+          System.exit(0);
+        }
+      }
     }
-    
+
     public static synchronized InterfaceManager getInstance()
     {
         if (instance == null)
         {
             instance = new InterfaceManager();
         }
-        
+
         return instance;
     }
+
+
+    //########################################################################
+    //# Class Constants
+    private static final String GTK_CLASS_NAME =
+      "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+
 }
