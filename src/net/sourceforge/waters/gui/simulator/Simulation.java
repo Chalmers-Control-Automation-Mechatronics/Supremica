@@ -45,6 +45,22 @@ public class Simulation
     return output;
   }
 
+  public String getBlockingTextual()
+  {
+    String output = "";
+    output += "The automaton which are blocking the states are:\r\n";
+    for (EventProxy event : mInvalidEvents.keySet())
+    {
+      output += event.getName() + ":[";
+      for (AutomatonProxy proxy : mInvalidEvents.get(event))
+      {
+        output += proxy.getName() + ",";
+      }
+      output += "]\r\n";
+    }
+    return output;
+  }
+
   //###################################################################################
   //# Constructor
   public Simulation(ModuleContainer module)
@@ -92,7 +108,9 @@ public class Simulation
     if (testForControlability() != null)
     {
       Pair<EventProxy, AutomatonProxy> invalidEvent = testForControlability();
-      throw new UncontrollableException("ERROR: The event " + invalidEvent.getFirst().getName() + " is not controllable, inside the automaton " + invalidEvent.getSecond().getName());
+      throw new UncontrollableException("ERROR: The event " + invalidEvent.getFirst().getName()
+          + " is not controllable, inside the automaton " + invalidEvent.getSecond().getName()
+          + " Current state is: " + mAllAutomatons.get(invalidEvent.getSecond()).getName());
     }
     if (isInInvalidEvent(event))
     {
@@ -209,7 +227,7 @@ public class Simulation
 
   private void findEventClassification()
   {
-    mValidStates = new ArrayList<EventProxy>();
+   mValidStates = new ArrayList<EventProxy>();
     mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
     for (AutomatonProxy automaton : mAllAutomatons.keySet())
     {
@@ -234,26 +252,43 @@ public class Simulation
     {
       for (EventProxy event : automaton.getEvents())
       {
+        boolean locatedEvent = false;
         for (TransitionProxy transition : automaton.getTransitions())
         {
           if (transition.getSource() != mAllAutomatons.get(automaton) && transition.getEvent() == event)
           {
-            if (isInInvalidEvent(event))
-            {
-              ArrayList<AutomatonProxy> got = mInvalidEvents.get(event);
-              got.add(automaton);
-              mInvalidEvents.put(event, got);
-            }
-            else if (isInValidEvent(event))
-            {
-              mValidStates.remove(event);
-              ArrayList<AutomatonProxy> failAutomaton = new ArrayList<AutomatonProxy>();
-              failAutomaton.add(automaton);
-              mInvalidEvents.put(event, failAutomaton);
-            }
+            addNewInvalidEvent(event, automaton);
+            locatedEvent = true;
           }
         }
+        if (!locatedEvent)
+        {
+          addNewInvalidEvent(event, automaton);
+        }
       }
+    }
+  }
+
+  private void addNewInvalidEvent(EventProxy event, AutomatonProxy automaton)
+  {
+    if (isInInvalidEvent(event))
+    {
+      ArrayList<AutomatonProxy> got = mInvalidEvents.get(event);
+      got.add(automaton);
+      mInvalidEvents.put(event, got);
+    }
+    else if (isInValidEvent(event))
+    {
+      mValidStates.remove(event);
+      ArrayList<AutomatonProxy> failAutomaton = new ArrayList<AutomatonProxy>();
+      failAutomaton.add(automaton);
+      mInvalidEvents.put(event, failAutomaton);
+    }
+    else
+    {
+      ArrayList<AutomatonProxy> failAutomaton = new ArrayList<AutomatonProxy>();
+      failAutomaton.add(automaton);
+      mInvalidEvents.put(event, failAutomaton);
     }
   }
 

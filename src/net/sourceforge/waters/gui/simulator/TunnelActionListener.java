@@ -37,6 +37,8 @@ public class TunnelActionListener implements ActionListener, Observer
 
   public void actionPerformed(ActionEvent e)
   {
+    //System.out.println("DEBUG: Blocking events are:" + sim.getBlockingTextual());
+    System.out.println("DEBUG: All events are:" + sim.getAllEvents());
     ArrayList<EventProxy> possibleEvents = sim.getValidTransitions();
     if (possibleEvents.size() == 0)
       System.err.println("ERROR: BLOCKING: There are no possible transitions");
