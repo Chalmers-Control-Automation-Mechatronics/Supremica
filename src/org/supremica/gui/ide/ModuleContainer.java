@@ -436,6 +436,7 @@ public class ModuleContainer
       try {
         if (selected == mSimulatorPanel) {
           recompile();
+          mSimulatorPanel.updateAutomata();
         } else if (selected == mAnalyzerPanel) {
           recompile();
           mAnalyzerPanel.updateAutomata();

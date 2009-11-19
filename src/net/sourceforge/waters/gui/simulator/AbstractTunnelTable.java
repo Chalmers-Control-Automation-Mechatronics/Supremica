@@ -10,11 +10,14 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -32,6 +35,11 @@ public class AbstractTunnelTable extends AbstractTableModel implements Observer
     mModule = container;
     mModule.attach(this);
     mSim = new Simulation(container);
+  }
+
+  public Simulation getSim()
+  {
+    return mSim;
   }
 
 
@@ -77,11 +85,24 @@ public class AbstractTunnelTable extends AbstractTableModel implements Observer
   //#########################################################################
   //# Interface Observer
 
-  public void update(EditorChangedEvent e)
+  public void update()
   {
     mCompiledDES = mModule.getCompiledDES();
     mSim = new Simulation(mModule);
     mRawData = getRawData();
+    fireTableDataChanged();
+  }
+
+  public void updateSim(Simulation sim)
+  {
+    mSim = sim;
+    mRawData = getRawData();
+    fireTableDataChanged();
+  }
+
+  public void update(EditorChangedEvent e)
+  {
+    update();
   }
 
 
@@ -98,7 +119,10 @@ public class AbstractTunnelTable extends AbstractTableModel implements Observer
       for (final AutomatonProxy aut : automata) {
         output[looper][0] = aut.getName();
         output[looper][1] = "X";
-        //output[looper][2] = mModule.getModuleContext().getIcon(mSim.getCurrentStates().get(aut)); // This line of code causes a class cast exception
+        StateProxy currentState = mSim.getCurrentStates().get(aut);
+        SourceInfo info = mModule.getSourceInfoMap().get(currentState);
+        SimpleNodeProxy node = (SimpleNodeProxy)info.getSourceObject();
+        output[looper][2] = mModule.getModuleContext().getIcon(node);
         output[looper][3] = mSim.getCurrentStates().get(aut).getName();
         looper++;
       }

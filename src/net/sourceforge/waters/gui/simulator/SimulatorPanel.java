@@ -1,6 +1,8 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
@@ -41,6 +43,7 @@ public class SimulatorPanel
     mAutomataPanel.setLayout(new BorderLayout());
     mAutomataPanel.add(scroll, BorderLayout.CENTER);
     JButton stepButton = new JButton("Step");
+    stepButton.addActionListener(new TunnelActionListener(mAutomataTable , mModuleContainer));
     mAutomataPanel.add(stepButton, BorderLayout.SOUTH);
     mTabbedPane.addTab("Automata", mAutomataPanel);
   }
@@ -67,5 +70,11 @@ public class SimulatorPanel
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
+
+
+  public void updateAutomata()
+  {
+    ((AbstractTunnelTable)mAutomataTable.getModel()).update();
+  }
 
 }

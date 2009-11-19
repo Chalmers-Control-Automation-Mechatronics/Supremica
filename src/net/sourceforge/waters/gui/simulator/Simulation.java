@@ -9,6 +9,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -86,118 +87,7 @@ public class Simulation
       throw new IllegalArgumentException("ERROR: This automaton is not in this program");
   }
 
-
-
-  //#####################################################################################
-  //# Creation Methods
-  @SuppressWarnings("unchecked")
-  public Simulation singleStep(EventProxy event) throws UncontrollableException
-  {
-    ArrayList<EventProxy> events = (ArrayList<EventProxy>) mPreviousEvents.clone();
-    events.add(event);
-    Simulation output = new Simulation (mModule, events);
-    return output;
-  }
-
-  //###########################################################################################
-  //# Interface Object
-
-  public boolean Equals(Object e)
-  {
-    if (e.getClass() != Simulation.class) return false;
-    Simulation comparer = (Simulation)e;
-    HashMap<AutomatonProxy,StateProxy> comparerStates = comparer.getCurrentStates();
-    for (AutomatonProxy comparerAuto : comparerStates.keySet())
-    {
-      boolean found = false;
-      for (AutomatonProxy thisAuto : mAllAutomatons.keySet())
-      {
-        if ((comparerAuto == thisAuto) && (comparerStates.get(comparerAuto) == mAllAutomatons.get(thisAuto)))
-          found = true;
-      }
-      if (found == false)
-        return false;
-    }
-    return true;
-  }
-
-  //###########################################################################################
-  //# Auxillery Functions
-  private Pair<EventProxy, AutomatonProxy> testForControlability()
-  {
-    for (EventProxy event : mInvalidEvents.keySet())
-    {
-      for (AutomatonProxy automata : mInvalidEvents.get(event))
-      {
-        if (automata.getKind() == ComponentKind.SPEC)
-        {
-          return new Pair<EventProxy, AutomatonProxy> (event, automata);
-        }
-      }
-    }
-    return null;
-  }
-
-  private boolean isInValidEvent (EventProxy event)
-  {
-    for (EventProxy validEvent : mValidStates)
-    {
-      if (event == validEvent)
-        return true;
-    }
-    return false;
-  }
-
-  private boolean isInInvalidEvent(EventProxy event)
-  {
-    for (EventProxy invalidEvent : mInvalidEvents.keySet())
-    {
-      if (invalidEvent == event)
-        return true;
-    }
-    return false;
-  }
-
-  private void findEventClassification()
-  {
-    for (AutomatonProxy automaton : mAllAutomatons.keySet())
-    {
-      for (EventProxy event : automaton.getEvents())
-      {
-        for (TransitionProxy transition : automaton.getTransitions())
-        {
-          if (transition.getSource() == mAllAutomatons.get(automaton) && transition.getEvent() == event)
-          {
-            if (!isInInvalidEvent(event))
-            {
-              if (!isInValidEvent(event))
-              {
-                mValidStates.add(event);
-              }
-            }
-          }
-          else if (transition.getEvent() == event)
-          {
-            if (isInInvalidEvent(event))
-            {
-              ArrayList<AutomatonProxy> got = mInvalidEvents.get(event);
-              got.add(automaton);
-              mInvalidEvents.put(event, got);
-            }
-            else if (isInValidEvent(event))
-            {
-              mValidStates.remove(event);
-              ArrayList<AutomatonProxy> failAutomaton = new ArrayList<AutomatonProxy>();
-              failAutomaton.add(automaton);
-              mInvalidEvents.put(event, failAutomaton);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  private void singleStepMutable(EventProxy event) throws UncontrollableException
+  public void singleStepMutable(EventProxy event) throws UncontrollableException
   {
     if (testForControlability() != null)
     {
@@ -235,6 +125,136 @@ public class Simulation
         }
       }
     }
+    findEventClassification();
+  }
+
+  //#####################################################################################
+  //# Creation Methods
+  @SuppressWarnings("unchecked")
+  public Simulation singleStep(EventProxy event) throws UncontrollableException
+  {
+    ArrayList<EventProxy> events = (ArrayList<EventProxy>) mPreviousEvents.clone();
+    events.add(event);
+    Simulation output = new Simulation (mModule, events);
+    return output;
+  }
+
+  //###########################################################################################
+  //# Interface Object
+
+  public boolean Equals(Object e)
+  {
+    if (e.getClass() != Simulation.class) return false;
+    Simulation comparer = (Simulation)e;
+    HashMap<AutomatonProxy,StateProxy> comparerStates = comparer.getCurrentStates();
+    for (AutomatonProxy comparerAuto : comparerStates.keySet())
+    {
+      boolean found = false;
+      for (AutomatonProxy thisAuto : mAllAutomatons.keySet())
+      {
+        if ((comparerAuto == thisAuto) && (comparerStates.get(comparerAuto) == mAllAutomatons.get(thisAuto)))
+          found = true;
+      }
+      if (found == false)
+        return false;
+    }
+    return true;
+  }
+
+  public String toString()
+  {
+    String output = "";
+    for (AutomatonProxy auto : mAllAutomatons.keySet()){
+      output += auto.getName() + " -> " + mAllAutomatons.get(auto) + "||";
+    }
+    return output;
+  }
+
+  //###########################################################################################
+  //# Auxillery Functions
+  private Pair<EventProxy, AutomatonProxy> testForControlability()
+  {
+    for (EventProxy event : mInvalidEvents.keySet())
+    {
+      for (AutomatonProxy automata : mInvalidEvents.get(event))
+      {
+        if (automata.getKind() == ComponentKind.SPEC && event.getKind() == EventKind.UNCONTROLLABLE)
+        {
+          return new Pair<EventProxy, AutomatonProxy> (event, automata);
+        }
+      }
+    }
+    return null;
+  }
+
+  private boolean isInValidEvent (EventProxy event)
+  {
+    for (EventProxy validEvent : mValidStates)
+    {
+      if (event == validEvent)
+        return true;
+    }
+    return false;
+  }
+
+  private boolean isInInvalidEvent(EventProxy event)
+  {
+    for (EventProxy invalidEvent : mInvalidEvents.keySet())
+    {
+      if (invalidEvent == event)
+        return true;
+    }
+    return false;
+  }
+
+  private void findEventClassification()
+  {
+    mValidStates = new ArrayList<EventProxy>();
+    mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
+    for (AutomatonProxy automaton : mAllAutomatons.keySet())
+    {
+      for (EventProxy event : automaton.getEvents())
+      {
+        for (TransitionProxy transition : automaton.getTransitions())
+        {
+          if (transition.getSource() == mAllAutomatons.get(automaton) && transition.getEvent() == event)
+          {
+            if (!isInInvalidEvent(event))
+            {
+              if (!isInValidEvent(event))
+              {
+                mValidStates.add(event);
+              }
+            }
+          }
+        }
+      }
+    }
+    for (AutomatonProxy automaton : mAllAutomatons.keySet())
+    {
+      for (EventProxy event : automaton.getEvents())
+      {
+        for (TransitionProxy transition : automaton.getTransitions())
+        {
+          if (transition.getSource() != mAllAutomatons.get(automaton) && transition.getEvent() == event)
+          {
+            if (isInInvalidEvent(event))
+            {
+              ArrayList<AutomatonProxy> got = mInvalidEvents.get(event);
+              got.add(automaton);
+              mInvalidEvents.put(event, got);
+            }
+            else if (isInValidEvent(event))
+            {
+              mValidStates.remove(event);
+              ArrayList<AutomatonProxy> failAutomaton = new ArrayList<AutomatonProxy>();
+              failAutomaton.add(automaton);
+              mInvalidEvents.put(event, failAutomaton);
+            }
+          }
+        }
+      }
+    }
   }
 
   //##################################################################################################
@@ -244,5 +264,4 @@ public class Simulation
   HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the key
   ArrayList<EventProxy> mPreviousEvents;
   final ModuleContainer mModule;
-
 }
