@@ -27,13 +27,11 @@ public class AbstractTunnelTable extends AbstractTableModel implements Observer
   //# Constructor
   public AbstractTunnelTable(final ModuleContainer container)
   {
-    mCompiledDES = container.getCompiledDES();
-    if (mCompiledDES != null)
-      System.out.println("DEBUG: SUCCESS! The DES is now non-null");
+    mCompiledDES = null;
     mRawData = getRawData();
     mModule = container;
     mModule.attach(this);
-    //mSim = new Simulation(container);
+    mSim = new Simulation(container);
   }
 
 
@@ -46,8 +44,12 @@ public class AbstractTunnelTable extends AbstractTableModel implements Observer
 
   public int getRowCount()
   {
-    //return mCompiledDES.getAutomata().size();
-    return 1; // Temporary placeholder until the compiling is fixed.
+    if (mCompiledDES == null && mModule != null)
+      mCompiledDES = mModule.getCompiledDES();
+    if (mCompiledDES != null)
+      return mCompiledDES.getAutomata().size();
+    System.out.println("DEBUG: DES has not been successfully compiled");
+    return 0;
   }
 
   public Class<?> getColumnClass(final int column)
@@ -78,8 +80,8 @@ public class AbstractTunnelTable extends AbstractTableModel implements Observer
   public void update(EditorChangedEvent e)
   {
     mCompiledDES = mModule.getCompiledDES();
+    mSim = new Simulation(mModule);
     mRawData = getRawData();
-    //mSim = new Simulation(mModule);
   }
 
 
@@ -88,18 +90,22 @@ public class AbstractTunnelTable extends AbstractTableModel implements Observer
 
   private Object[][] getRawData()
   {
-    /*final Object[][] output = new Object[getRowCount()][getColumnCount()];
-    final Set<AutomatonProxy> automata = mSim.getCurrentStates().keySet();
-    int looper = 0;
-    for (final AutomatonProxy aut : automata) {
-      output[looper][0] = aut.getName();
-      output[looper][1] = "X";
-      output[looper][2] = mModule.getModuleContext().getIcon(mSim.getCurrentStates().get(aut));
-      output[looper][3] = mSim.getCurrentStates().get(aut).getName();
-      looper++;
+    if (mSim != null && mModule != null)
+    {
+      final Object[][] output = new Object[getRowCount()][getColumnCount()];
+      final Set<AutomatonProxy> automata = mSim.getCurrentStates().keySet();
+      int looper = 0;
+      for (final AutomatonProxy aut : automata) {
+        output[looper][0] = aut.getName();
+        output[looper][1] = "X";
+        //output[looper][2] = mModule.getModuleContext().getIcon(mSim.getCurrentStates().get(aut)); // This line of code causes a class cast exception
+        output[looper][3] = mSim.getCurrentStates().get(aut).getName();
+        looper++;
+      }
+      return output;
     }
-    return output;*/
-    return new Object[][]{{"A", "B", "C", "D"}}; // Temporary placeholder until the compiler works
+    else
+      return new Object[0][0];
   }
 
 
