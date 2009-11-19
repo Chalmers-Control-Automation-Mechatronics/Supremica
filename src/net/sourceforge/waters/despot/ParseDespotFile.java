@@ -58,6 +58,8 @@ public class ParseDespotFile
   // this list stores all the edges (transitions) for this automata
   List<EdgeProxy> edges = new ArrayList<EdgeProxy>();
 
+  //HashMap<String, EventDeclProxy>
+
   // used to build up the module for the .wmod file we are converting into
   ModuleProxyFactory factory = ModuleElementFactory.getInstance();
 
@@ -75,12 +77,16 @@ public class ParseDespotFile
     // currently parses the first subsystem only
     Element subsystem =
         (Element) project.getElementsByTagName("Subsystem").item(0);
+    //NodeList subsystems = project.getElementsByTagName("Subsystem");
+    //for(int j=0;j<subsystems.getLength();j++){
+    //Element subsystem = subsystems.item(j);
+
     NodeList automaton = subsystem.getElementsByTagName("*");
     for (int i = 0; i < automaton.getLength(); i++) {
       Element aut = (Element) automaton.item(i);
       if (aut.getTagName().equals("Supervisor")) {
         SimpleComponentProxy scp =
-            pdf.constructSimpleComponent(aut, ComponentKind.SUPERVISOR, path);
+            pdf.constructSimpleComponent(aut, ComponentKind.SPEC, path);
         System.out.println(scp);
       } else if (aut.getTagName().equals("Plant")) {
         SimpleComponentProxy scp =
