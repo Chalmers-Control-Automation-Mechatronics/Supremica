@@ -11,8 +11,8 @@
 package net.sourceforge.waters.samples.algorithms;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +45,7 @@ public class AdjacencyMap {
 
   public AdjacencyMap(final Collection<StateProxy> states, final int modes)
   {
-    mAdjacencyMap = new IdentityHashMap<StateProxy,Entry>(states.size());
+    mAdjacencyMap = new HashMap<StateProxy,Entry>(states.size());
     mModes = modes;
   }
 

@@ -51,12 +51,12 @@ public class Simulator
       final AutomatonEntry entry = new AutomatonEntry(aut);
       mAutomataMap.put(name, entry);
       for (final EventProxy event : aut.getEvents()) {
-	Collection<AutomatonEntry> affected = mEventMap.get(event);
-	if (affected == null) {
-	  affected = new LinkedList<AutomatonEntry>();
-	  mEventMap.put(event, affected);
-	}
-	affected.add(entry);
+        Collection<AutomatonEntry> affected = mEventMap.get(event);
+        if (affected == null) {
+          affected = new LinkedList<AutomatonEntry>();
+          mEventMap.put(event, affected);
+        }
+        affected.add(entry);
       }
     }
   }
@@ -108,19 +108,19 @@ public class Simulator
     if (mEligibleEvents == null) {
       final Collection<EventProxy> elig = new LinkedList<EventProxy>();
       for (final EventProxy event : getAllEvents()) {
-	final Collection<AutomatonEntry> entries = mEventMap.get(event);
-	boolean maybe = true;
-	if (entries != null) {
-	  for (final AutomatonEntry entry : entries) {
-	    if (entry.getSuccessorState(event) == null) {
-	      maybe = false;
-	      break;
-	    }
-	  }
-	}
-	if (maybe) {
-	  elig.add(event);
-	}
+        final Collection<AutomatonEntry> entries = mEventMap.get(event);
+        boolean enabled = true;
+        if (entries != null) {
+          for (final AutomatonEntry entry : entries) {
+            if (entry.getSuccessorState(event) == null) {
+              enabled = false;
+              break;
+            }
+          }
+        }
+        if (enabled) {
+          elig.add(event);
+        }
       }
       mEligibleEvents = Collections.unmodifiableCollection(elig);
     }
@@ -157,12 +157,14 @@ public class Simulator
     if (entries != null) {
       final StateProxy[] newstate = new StateProxy[entries.size()];
       int index = 0;
+      // Use two loops to guarantee the state remains unchanged if
+      // an exception is thrown.
       for (final AutomatonEntry entry : entries) {
-	newstate[index++] = entry.findSuccessorState(event);
+        newstate[index++] = entry.findSuccessorState(event);
       }
       index = 0;
       for (final AutomatonEntry entry : entries) {
-	entry.setState(newstate[index++]);
+        entry.setState(newstate[index++]);
       }
     }
   }
@@ -191,7 +193,7 @@ public class Simulator
     final AutomatonEntry entry = mAutomataMap.get(name);
     if (entry == null) {
       throw new IllegalArgumentException
-	("Simulator does not know anything about automaton '" + name + "'!");
+      ("Simulator does not know anything about automaton '" + name + "'!");
     }
     return entry;
   }
@@ -213,12 +215,6 @@ public class Simulator
 
     //#######################################################################
     //# Simple Access
-    @SuppressWarnings("unused")
-    private AutomatonProxy getAutomaton()
-    {
-      return mAutomaton;
-    }
-
     private StateProxy getState()
     {
       return mState;
@@ -233,9 +229,9 @@ public class Simulator
     {
       final StateProxy state = getSuccessorState(event);
       if (state == null) {
-	throw new IllegalArgumentException
-	  ("Automaton '" + mAutomaton.getName() + "' cannot execute event '" +
-	   event.getName() + "' in state '" + mState.getName() + "'!");
+        throw new IllegalArgumentException
+        ("Automaton '" + mAutomaton.getName() + "' cannot execute event '" +
+            event.getName() + "' in state '" + mState.getName() + "'!");
       }
       return state;
     }
@@ -244,12 +240,11 @@ public class Simulator
     {
       final Set<StateProxy> states = mAutomaton.getStates();
       if (!states.contains(state)) {
-	throw new IllegalArgumentException
-	  ("Automaton '" + mAutomaton.getName() +
-	   "' does not have the state '" + state.getName() + "'!");
+        throw new IllegalArgumentException
+        ("Automaton '" + mAutomaton.getName() +
+            "' does not have the state '" + state.getName() + "'!");
       }
     }
-
 
     //#######################################################################
     //# State Changes
@@ -257,28 +252,21 @@ public class Simulator
     {
       mState = null;
       for (final StateProxy state : mAutomaton.getStates()) {
-	if (state.isInitial()) {
-	  mState = state;
-	  break;
-	}
+        if (state.isInitial()) {
+          mState = state;
+          break;
+        }
       }
       if (mState == null) {
-	throw new IllegalArgumentException
-	  ("Automaton '" + mAutomaton.getName() + "' has no initial state!");
+        throw new IllegalArgumentException
+        ("Automaton '" + mAutomaton.getName() + "' has no initial state!");
       }
-    }
-
-    @SuppressWarnings("unused")
-    private void executeEvent(final EventProxy event)
-    {
-      mState = findSuccessorState(event);
     }
 
     private void setState(final StateProxy state)
     {
-      mState = state;      
+      mState = state;
     }
-
 
     //#######################################################################
     //# Data Members
