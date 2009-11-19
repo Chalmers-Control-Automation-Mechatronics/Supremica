@@ -161,7 +161,9 @@ public class ControlledSurface
                            final WatersPopupActionManager manager)
     throws GeometryAbsentException
   {
-    super(graph, module, new SubjectShapeProducer(graph, module));
+    super(graph, module,
+          new SubjectShapeProducer
+                (graph, root.getModuleWindowInterface().getModuleContext()));
     mRoot = root;
     mToolbar = toolbar;
     mPopupFactory =
@@ -1551,9 +1553,12 @@ public class ControlledSurface
   private boolean createSecondaryGraph()
   {
     if (mSecondaryGraph == null) {
+      final ModuleWindowInterface iface =
+        getEditorInterface().getModuleWindowInterface();
+      final ModuleContext context = iface.getModuleContext();
       mSecondaryGraph = new EditorGraph(getGraph());
       mSecondaryShapeProducer = new SubjectShapeProducer
-        (mSecondaryGraph, mSecondaryGraph, getModule());
+        (mSecondaryGraph, mSecondaryGraph, context);
       mSecondaryGraph.addModelObserver(mGraphModelObserver);
       return true;
     } else {

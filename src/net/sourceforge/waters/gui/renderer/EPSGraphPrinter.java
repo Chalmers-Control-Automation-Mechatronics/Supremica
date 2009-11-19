@@ -20,8 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.ModuleProxy;
 
 import org.apache.xmlgraphics.java2d.GraphicContext;
 import org.apache.xmlgraphics.java2d.ps.AbstractPSDocumentGraphics2D;
@@ -44,10 +44,10 @@ public class EPSGraphPrinter extends Renderer
   //#########################################################################
   //# Constructors
   public EPSGraphPrinter(final GraphProxy graph,
-			 final ModuleProxy module,
-			 final File file)
+                         final ModuleContext context,
+                         final File file)
   {
-    this(graph, new ProxyShapeProducer(graph, module), file);
+    this(graph, new ProxyShapeProducer(graph, context), file);
   }
 
   public EPSGraphPrinter(final GraphProxy graph,
@@ -115,7 +115,8 @@ public class EPSGraphPrinter extends Renderer
     final double y1 = point.getY();
     gen.writeln(gen.formatDouble(x1) + " " + gen.formatDouble(y1) + " M");
     gen.writeln("1 -1 scale");
-    gen.writeln("(" + text + ") t"); // Hm... gen replaces åäö with ???... 
+    // Hm ... gen replaces special characters with ??? ...
+    gen.writeln("(" + text + ") t");
     gen.writeln("grestore");
   }
 

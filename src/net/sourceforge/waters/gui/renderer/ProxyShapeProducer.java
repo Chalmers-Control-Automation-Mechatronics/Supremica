@@ -23,24 +23,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -51,16 +49,16 @@ public class ProxyShapeProducer
   //#########################################################################
   //# Constructors
   public ProxyShapeProducer(final GraphProxy graph,
-                            final ModuleProxy module)
+                            final ModuleContext context)
   {
     mGraph = graph;
-    mModule = module;
+    mContext = context;
     final int size = graph.getNodes().size() + graph.getEdges().size();
     final Map<Proxy,ProxyShape> map = new HashMap<Proxy,ProxyShape>(4 * size);
     mMap = Collections.synchronizedMap(map);
   }
 
-    
+
   //##########################################################################
   //# Clean up
   public void close()
@@ -82,7 +80,7 @@ public class ProxyShapeProducer
 
   public ModuleProxy getModule()
   {
-    return mModule;
+    return mContext.getModule();
   }
 
 
@@ -203,7 +201,7 @@ public class ProxyShapeProducer
     }
     return shape;
   }
-        
+
 
   //#########################################################################
   //# Auxiliary Access
@@ -224,7 +222,7 @@ public class ProxyShapeProducer
   {
     SimpleNodeProxyShape shape = (SimpleNodeProxyShape) lookup(simple);
     if (shape == null) {
-      shape = new SimpleNodeProxyShape(simple, mModule);
+      shape = new SimpleNodeProxyShape(simple, mContext);
       mMap.put(simple, shape);
     }
     return shape;
@@ -291,24 +289,11 @@ public class ProxyShapeProducer
       for (final Proxy proxy : block.getEventList()) {
         // Use different font for different event kinds.
         Font font = DEFAULT;
-        final String name;
-        if (proxy instanceof SimpleIdentifierProxy) {
-          final SimpleIdentifierProxy ident = (SimpleIdentifierProxy) proxy;
-          name = ident.getName();
-        } else if (proxy instanceof IndexedIdentifierProxy) {
-          final IndexedIdentifierProxy ident = (IndexedIdentifierProxy) proxy;
-          name = ident.getName();
-        } else {
-          name = null;
-        }
-        if (name != null) {
-          for (final EventDeclProxy event : mModule.getEventDeclList()) {
-            if (event.getName().equals(name)) {
-              if (event.getKind() == EventKind.UNCONTROLLABLE) {
-                font = UNCONTROLLABLE;
-              }
-              break;
-            }
+        if (proxy instanceof IdentifierProxy) {
+          final IdentifierProxy ident = (IdentifierProxy) proxy;
+          final EventKind kind = mContext.guessEventKind(ident);
+          if (kind == EventKind.UNCONTROLLABLE) {
+            font = UNCONTROLLABLE;
           }
         }
         final int ly = (int) Math.round(y + height);
@@ -336,7 +321,7 @@ public class ProxyShapeProducer
     }
     return shape;
   }
-    
+
   GuardActionBlockProxyShape createGuardActionBlockShape
     (final GuardActionBlockProxy block,
      final EdgeProxyShape eshape)
@@ -395,15 +380,15 @@ public class ProxyShapeProducer
     }
     return shape;
   }
-    
+
 
   //#########################################################################
   //# Data Members
   private final GraphProxy mGraph;
-  private final ModuleProxy mModule;
+  private final ModuleContext mContext;
   private final Map<Proxy,ProxyShape> mMap;
 
-    
+
   //#########################################################################
   //# Class Constants
   public static final Font DEFAULT = new Font("Dialog", Font.PLAIN, 12);

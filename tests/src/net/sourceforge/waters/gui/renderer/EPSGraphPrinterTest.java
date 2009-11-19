@@ -15,6 +15,7 @@ import java.util.Collection;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -155,17 +156,15 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
       throws IOException
     {
       try {
-	mModule = module;
-	visitModuleProxy(module);
+        mContext = new ModuleContext(module);
+        visitModuleProxy(module);
       } catch (final VisitorException exception) {
-	final Throwable cause = exception.getCause();
-	if (cause instanceof IOException) {
-	  throw (IOException) cause;
-	} else {
-	  throw exception.getRuntimeException();
-	}
-      } finally {
-	mModule = null;
+        final Throwable cause = exception.getCause();
+        if (cause instanceof IOException) {
+          throw (IOException) cause;
+        } else {
+          throw exception.getRuntimeException();
+        }
       }
     }
 
@@ -206,7 +205,7 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
 	final File file = new File(dir, name + ".eps");
 	final GraphProxy graph = comp.getGraph();
 	final EPSGraphPrinter printer =
-	  new EPSGraphPrinter(graph, mModule, file);
+	  new EPSGraphPrinter(graph, mContext, file);
 	printer.print();
 	return null;
       } catch (final IOException exception) {
@@ -214,15 +213,13 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
       }
     }
 
-    //#######################################################################
-    //# Data Members
-    private ModuleProxy mModule;
+    private ModuleContext mContext;
   }
 
 
   //#########################################################################
   //# Data Members
-  private DocumentManager mDocumentManager;	
+  private DocumentManager mDocumentManager;
   private EPSPrinterVisitor mPrinter;
 
 }

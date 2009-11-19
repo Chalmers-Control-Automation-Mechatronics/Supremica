@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.gui.renderer;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
@@ -20,6 +21,7 @@ import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -43,19 +45,23 @@ public class SubjectShapeProducer
   //##########################################################################
   //# Constructors
   public SubjectShapeProducer(final GraphSubject graph,
-                              final ModuleSubject module)
+                              final ModuleContext context)
   {
-    this(graph, graph, module);
+    this(graph, graph, context);
   }
 
   public SubjectShapeProducer(final GraphProxy graph,
                               final Subject subject,
-                              final ModuleSubject module)
+                              final ModuleContext context)
   {
-    super(graph, module);
+    super(graph, context);
     mSubject = subject;
     subject.addModelObserver(this);
-    module.getEventDeclListModifiable().addModelObserver(this);
+    final ModuleProxy module = context.getModule();
+    if (module instanceof ModuleSubject) {
+      final ModuleSubject modulesubject = (ModuleSubject) module;
+      modulesubject.getEventDeclListModifiable().addModelObserver(this);
+    }
     mRemoveMappingVisitor = new RemoveMappingVisitor();
   }
 

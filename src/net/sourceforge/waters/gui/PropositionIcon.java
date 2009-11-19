@@ -13,9 +13,15 @@ package net.sourceforge.waters.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;
+
+import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
 
 
 /**
@@ -26,12 +32,12 @@ import javax.swing.Icon;
  * @author Robi Malik
  */
 
-class PropositionIcon implements Icon
+public class PropositionIcon implements Icon
 {
 
   //#########################################################################
   //# Factory Methods
-  static PropositionIcon getIcon(final Color color)
+  public static PropositionIcon getIcon(final Color color)
   {
     if (color.equals(EditorColor.DEFAULTMARKINGCOLOR)) {
       return getDefaultMarkedIcon();
@@ -40,19 +46,7 @@ class PropositionIcon implements Icon
     }
   }
 
-  static PropositionIcon getIcon(final List<Color> colors)
-  {
-    if (colors.isEmpty()) {
-      return getUnmarkedIcon();
-    } else if (colors.size() == 1 &&
-            colors.iterator().next().equals(EditorColor.DEFAULTMARKINGCOLOR)) {
-      return getDefaultMarkedIcon();
-    } else {
-      return null;
-    }
-  }
-
-  static PropositionIcon getUnmarkedIcon()
+  public static PropositionIcon getUnmarkedIcon()
   {
     if (UNMARKED_ICON == null) {
       UNMARKED_ICON = new PropositionIcon(EditorColor.BACKGROUNDCOLOR);
@@ -60,7 +54,7 @@ class PropositionIcon implements Icon
     return UNMARKED_ICON;
   }
 
-  static PropositionIcon getDefaultMarkedIcon()
+  public static PropositionIcon getDefaultMarkedIcon()
   {
     if (MARKED_ICON == null) {
       MARKED_ICON = new PropositionIcon(EditorColor.DEFAULTMARKINGCOLOR);
@@ -70,10 +64,15 @@ class PropositionIcon implements Icon
 
 
   //#########################################################################
-  //# Constructor
+  //# Constructors
   private PropositionIcon(final Color color)
   {
-    mColor = color;
+    this(new ColorInfo(color));
+  }
+
+  private PropositionIcon(final ColorInfo info)
+  {
+    mColorInfo = info;
   }
 
 
@@ -92,16 +91,76 @@ class PropositionIcon implements Icon
   public void paintIcon(final Component comp, final Graphics graphics,
                         final int x, final int y)
   {
-    graphics.setColor(mColor);
-    graphics.fillOval(x + OFFSET, y + OFFSET, DIAMETER, DIAMETER);
-    graphics.setColor(EditorColor.DEFAULTCOLOR);
-    graphics.drawOval(x + OFFSET, y + OFFSET, DIAMETER, DIAMETER);
+    final Graphics2D g2d = (Graphics2D) graphics;
+    final int x0 = x + OFFSET;
+    final int y0 = y + OFFSET;
+    final Rectangle2D bounds =
+      new Rectangle(x0, y0, DIAMETER, DIAMETER);
+    SimpleNodeProxyShape.drawNode(g2d, bounds, mColorInfo.getColors());
+    g2d.setColor(EditorColor.DEFAULTCOLOR);
+    g2d.drawOval(x0, y0, DIAMETER, DIAMETER);
+    if (mColorInfo.isForbidden()) {
+      SimpleNodeProxyShape.drawForbidden(g2d, bounds);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class ColorInfo
+  public static class ColorInfo {
+
+    //#######################################################################
+    //# Constructors
+    public ColorInfo(final Color color)
+    {
+      this(Collections.singletonList(color), false);
+    }
+
+    public ColorInfo(final List<Color> list, final boolean forbidden)
+    {
+      mList = list;
+      mForbidden = forbidden;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    public List<Color> getColors()
+    {
+      return mList;
+    }
+
+    public boolean isForbidden()
+    {
+      return mForbidden;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    public PropositionIcon getIcon()
+    {
+      if (mForbidden) {
+        return new PropositionIcon(this);
+      } else if (mList.isEmpty()) {
+        return getUnmarkedIcon();
+      } else if (mList.size() == 1 &&
+          mList.iterator().next().equals(EditorColor.DEFAULTMARKINGCOLOR)) {
+        return getDefaultMarkedIcon();
+      } else {
+        return new PropositionIcon(this);
+      }
+    }
+
+
+    //#######################################################################
+    //# Data Members
+    private final List<Color> mList;
+    private final boolean mForbidden;
   }
 
 
   //#########################################################################
   //# Data Members
-  private final Color mColor;
+  private final ColorInfo mColorInfo;
 
 
   //#########################################################################

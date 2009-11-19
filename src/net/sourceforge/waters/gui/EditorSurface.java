@@ -50,27 +50,28 @@ import org.supremica.properties.Config;
  *
  * @author Gian Perrone
  */
+
 public class EditorSurface
     extends JComponent
     implements Printable, Renderable
 {
-    
+
     //##########################################################################
     //# Constructors
-    public EditorSurface(GraphProxy graph, ModuleProxy module)
+    public EditorSurface(final GraphProxy graph, final ModuleContext context)
     {
-        this(graph, module, new ProxyShapeProducer(graph, module));
+      this(graph, context.getModule(), new ProxyShapeProducer(graph, context));
     }
-    
-    public EditorSurface(GraphProxy graph, ModuleProxy module,
-        ProxyShapeProducer shapeProducer)
+
+    public EditorSurface(final GraphProxy graph, final ModuleProxy module,
+                         final ProxyShapeProducer shapeProducer)
     {
-        mGraph = graph;
-        mModule = module;
-        mShapeProducer = shapeProducer;
+      mGraph = graph;
+      mModule = module;
+      mShapeProducer = shapeProducer;
     }
-    
-    
+
+
   //##########################################################################
   //# Interface net.sourceforge.waters.gui.Renderable
   public RenderingInformation getRenderingInformation(Proxy o)
@@ -84,7 +85,7 @@ public class EditorSurface
                                   false, false, hasfocus),
        getPriority(o));
   }
-    
+
     protected int getPriority(Proxy o)
     {
         int priority = 0;
@@ -114,46 +115,46 @@ public class EditorSurface
         }
         return priority;
     }
-    
+
     public GraphProxy getGraph()
     {
         return mGraph;
     }
-    
+
     public ModuleProxy getModule()
     {
         return mModule;
     }
-    
+
     protected GraphProxy getDrawnGraph()
     {
         return getGraph();
     }
-    
+
     protected void paintGrid(Graphics g)
     {
         g.setColor(EditorColor.BACKGROUNDCOLOR);
         g.fillRect(0, 0, getWidth(), getHeight());
         g.setColor(EditorColor.GRIDCOLOR);
-        
+
         // Draw grid iff showGrid is true
         if (Config.GUI_EDITOR_SHOW_GRID.get())
         {
             int x = -(int)getLocation().getX();
             int y = -(int)getLocation().getY();
-            
+
             for (int i = 0; i < getWidth(); i += Config.GUI_EDITOR_GRID_SIZE.get())
             {
                 g.drawLine(i, y, i, getHeight());
             }
-            
+
             for (int i = 0; i < getHeight(); i += Config.GUI_EDITOR_GRID_SIZE.get())
             {
                 g.drawLine(x, i, getWidth(), i);
             }
         }
     }
-    
+
     /**
      * Called when printing.
      */
@@ -165,16 +166,16 @@ public class EditorSurface
         //AbstractRendererShape.setBasicStroke(AbstractRendererShape.DOUBLESTROKE); // Too thick
 
         // Clear selection?
-        
+
         // Paint the component on the supplied Graphics instance
         paintComponent(g, true);
 
         // Reset selection?
-        
+
         // Reset stroke
         AbstractRendererShape.setBasicStroke(AbstractRendererShape.SINGLESTROKE);
     }
-    
+
     /**
      * Called when painting.
      */
@@ -182,7 +183,7 @@ public class EditorSurface
     {
         paintComponent(g, false);
     }
-    
+
     /**
      * Paints the surface on {@code g}.
      */
@@ -205,12 +206,12 @@ public class EditorSurface
         renderer.renderGraph(getDrawnGraph(), getDrawnObjects(), this,
             getShapeProducer(), (Graphics2D)g);
     }
-    
+
     public List<MiscShape> getDrawnObjects()
     {
         return Collections.emptyList();
     }
-    
+
     /**
      * Calculates a dimension indicating the size of all objects currently
      * displayed by the shape producer.
@@ -223,42 +224,42 @@ public class EditorSurface
         final int height = (int) Math.ceil(area.getHeight());
         return new Dimension(width, height);
     }
-    
+
     public ProxyShapeProducer getShapeProducer()
     {
         return mShapeProducer;
     }
-    
+
     /**
      * Implementation of the Printable interface.
      */
     public int print(Graphics g, PageFormat pageFormat, int page)
     {
         //final double INCH = 72;
-        
+
         Graphics2D g2d;
-        
+
         // Validate the page number, we only print the first page
         if (page == 0)
         {
             g2d = (Graphics2D) g;
-            
+
             // Translate the origin so that (0,0) is in the upper left corner of the printable area
             g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-            
+
             /*
             // Print page margin (for debugging purposes)
             {
                 Line2D.Double line = new Line2D.Double();
                 int i;
                 g2d.setColor(Color.ORANGE);
-                
+
                 // Draw the vertical lines
                 line.setLine(0, 0, 0, pageFormat.getHeight());
                 g2d.draw(line);
                 line.setLine(pageFormat.getImageableWidth(), 0, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
                 g2d.draw(line);
-                
+
                 // Draw the horizontal lines
                 line.setLine(0, 0, pageFormat.getImageableWidth(), 0);
                 g2d.draw(line);
@@ -266,11 +267,11 @@ public class EditorSurface
                 g2d.draw(line);
             }
             */
-            
+
             // Get the bounds of the actual drawing
             final Rectangle2D area =
               getShapeProducer().getMinimumBoundingRectangle();
-            
+
             // This is the place to do rescaling if the figure won't fit on the page!
             double scaleX = pageFormat.getImageableWidth() / (area.getWidth());
             double scaleY = pageFormat.getImageableHeight() / (area.getHeight());
@@ -280,13 +281,13 @@ public class EditorSurface
                 System.out.println("Rescaling figure to fit page. Scale: " + scale);
                 g2d.scale(scale, scale);
             }
-            
+
             // Put drawing at (0, 0)
             g2d.translate(-area.getX(), -area.getY());
-            
+
             // Put the current figure into the Graphics object!
             print(g);
-            
+
             // OK to print!
             return (PAGE_EXISTS);
         }
@@ -295,16 +296,16 @@ public class EditorSurface
             return (NO_SUCH_PAGE);
         }
     }
-    
-    
+
+
     //##########################################################################
     //# Data Members
     private final GraphProxy mGraph;
     private final ModuleProxy mModule;
     private final ProxyShapeProducer mShapeProducer;
-    
+
     public static final int TEXTSHADOWMARGIN = 2;
-    
+
     /** Different status values for objects being dragged. */
     public enum DRAGOVERSTATUS
     {

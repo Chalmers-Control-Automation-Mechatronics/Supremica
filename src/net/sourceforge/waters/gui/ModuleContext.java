@@ -36,6 +36,7 @@ import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -73,17 +74,25 @@ public class ModuleContext
 
   //#########################################################################
   //# Constructor
-  public ModuleContext(final ModuleSubject module)
+  public ModuleContext(final ModuleProxy module)
   {
     mModule = module;
     mCanDropVisitor = new CanDropVisitor();
     mIdentifierNameVisitor = new IdentifierNameVisitor();
     mIconGetterVisitor = new IconGetterVisitor();
     mToolTipGetterVisitor = new ToolTipGetterVisitor();
-    mEventDeclListWrapper =
-      new ListSubjectWrapper(module.getEventDeclListModifiable());
-    mComponentListWrapper =
-      new ListSubjectWrapper(module.getComponentListModifiable());
+    if (module instanceof ModuleSubject) {
+      final ModuleSubject subject = (ModuleSubject) module;
+      mEventDeclListWrapper =
+        new ListSubjectWrapper(subject.getEventDeclListModifiable());
+      mComponentListWrapper =
+        new ListSubjectWrapper(subject.getComponentListModifiable());
+    } else {
+      mEventDeclListWrapper =
+        new ListSubjectWrapper(module.getEventDeclList());
+      mComponentListWrapper =
+        new ListSubjectWrapper(module.getComponentList());
+    }
     mPropositionColorCollectorVisitor =
       new PropositionColorCollectorVisitor();
   }
@@ -110,7 +119,7 @@ public class ModuleContext
 
   //#########################################################################
   //# Simple Access
-  public ModuleSubject getModule()
+  public ModuleProxy getModule()
   {
     return mModule;
   }
@@ -165,7 +174,7 @@ public class ModuleContext
 
   /**
    * Tries to determine an icon for a proposition with a given identifier.
-   * This method tries to be a bit smarter that {@link
+   * This method tries to be a bit smarter than {@link
    * #guessEventIcon(IdentifierProxy) guessEventIcon()} by checking the
    * names of the default propositions.
    * @return Always returns an icon, but it may be just the default
@@ -183,6 +192,18 @@ public class ModuleContext
     } else {
       return PropositionIcon.getDefaultMarkedIcon();
     }
+  }
+
+  /**
+   * Tries to determine the list of proposition for a given node.
+   * @return A {@link PropositionColors} object containing the list
+   *         of all colours found on the node, including a flag indicating
+   *         the presence of the 'forbidden' marking.
+   */
+  public PropositionIcon.ColorInfo guessPropositionColors
+    (final SimpleNodeProxy node)
+  {
+    return mPropositionColorCollectorVisitor.getPropositionColors(node);
   }
 
   /**
@@ -485,9 +506,17 @@ public class ModuleContext
 
     //#######################################################################
     //# Constructor
+    private ListSubjectWrapper(final List<? extends Proxy> list)
+    {
+      mList = list;
+      mListSubject = null;
+      mMap = null;
+    }
+
     private ListSubjectWrapper(final ListSubject<? extends ProxySubject> list)
     {
       mList = list;
+      mListSubject = list;
       mMap = null;
     }
 
@@ -504,7 +533,7 @@ public class ModuleContext
       if (mMap == null) {
         final int size = mList.size();
         mMap = new HashMap<String,IdentifiedProxy>(size);
-        for (final ProxySubject item : mList) {
+        for (final Proxy item : mList) {
           if (item instanceof IdentifiedProxy) {
             final IdentifiedProxy comp = (IdentifiedProxy) item;
             final IdentifierProxy ident = comp.getIdentifier();
@@ -516,7 +545,9 @@ public class ModuleContext
             }
           }
         }
-        mList.addModelObserver(this);
+        if (mListSubject != null) {
+          mListSubject.addModelObserver(this);
+        }
       }
       return mMap;
     }
@@ -547,7 +578,7 @@ public class ModuleContext
           final IdentifierProxy ident = comp.getIdentifier();
           if (ident instanceof SimpleIdentifierProxy) {
             mMap = null;
-            mList.removeModelObserver(this);
+            mListSubject.removeModelObserver(this);
           }
         }
         break;
@@ -560,7 +591,7 @@ public class ModuleContext
             source instanceof SimpleIdentifierProxy &&
             parent.getParent() == mList) {
           mMap = null;
-          mList.removeModelObserver(this);
+          mListSubject.removeModelObserver(this);
         }
         break;
       default:
@@ -570,7 +601,8 @@ public class ModuleContext
 
     //#######################################################################
     //# Data Members
-    private final ListSubject<? extends ProxySubject> mList;
+    private final List<? extends Proxy> mList;
+    private final ListSubject<? extends ProxySubject> mListSubject;
     private Map<String,IdentifiedProxy> mMap;
 
   }
@@ -755,13 +787,6 @@ public class ModuleContext
       return getComponentKindIcon(kind);
     }
 
-    public Icon visitSimpleNodeProxy(final SimpleNodeProxy node)
-    {
-      final List<Color> colors =
-        mPropositionColorCollectorVisitor.getPropositionColors(node);
-      return PropositionIcon.getIcon(colors);
-    }
-
     public Icon visitVariableComponentProxy
       (final VariableComponentProxy var)
     {
@@ -847,14 +872,17 @@ public class ModuleContext
 
     //#######################################################################
     //# Invocation
-    private List<Color> getPropositionColors(final SimpleNodeProxy node)
+    private PropositionIcon.ColorInfo getPropositionColors
+      (final SimpleNodeProxy node)
     {
       try {
         mColorList = new LinkedList<Color>();
         mColorSet = new HashSet<Color>();
+        mForbidden = false;
         final List<Proxy> props = node.getPropositions().getEventList();
         visitCollection(props);
-        final List<Color> result = mColorList;
+        final PropositionIcon.ColorInfo result =
+          new PropositionIcon.ColorInfo(mColorList, mForbidden);
         mColorList = null;
         mColorSet = null;
         return result;
@@ -879,13 +907,23 @@ public class ModuleContext
       visitCollection(body);
       return null;
     }
+
     public Object visitIdentifierProxy(final IdentifierProxy ident)
     {
       final EventDeclProxy decl = guessEventDecl(ident);
       final ColorGeometryProxy geo = decl.getColorGeometry();
-      for (final Color colour : geo.getColorSet()) {
-        if (mColorSet.add(colour)) {
-          mColorList.add(colour);
+      if (geo == null) {
+        final String name = decl.getName();
+        if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+          mForbidden = true;
+        } else if (mColorSet.add(EditorColor.DEFAULTMARKINGCOLOR)) {
+          mColorList.add(EditorColor.DEFAULTMARKINGCOLOR);
+        }
+      } else {
+        for (final Color colour : geo.getColorSet()) {
+          if (mColorSet.add(colour)) {
+            mColorList.add(colour);
+          }
         }
       }
       return null;
@@ -895,12 +933,13 @@ public class ModuleContext
     //# Data Members
     private List<Color> mColorList;
     private Set<Color> mColorSet;
+    private boolean mForbidden;
  }
 
 
   //#########################################################################
   //# Data Members
-  private final ModuleSubject mModule;
+  private final ModuleProxy mModule;
   private final CanDropVisitor mCanDropVisitor;
   private final IdentifierNameVisitor mIdentifierNameVisitor;
   private final IconGetterVisitor mIconGetterVisitor;

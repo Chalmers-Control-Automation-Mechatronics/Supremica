@@ -15,22 +15,15 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.ColorGeometryProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import org.supremica.properties.Config;
@@ -39,13 +32,14 @@ import org.supremica.properties.Config;
 public class SimpleNodeProxyShape
   extends AbstractProxyShape
 {
-    
+
   //#########################################################################
   //# Constructor
-  SimpleNodeProxyShape(SimpleNodeProxy proxy, ModuleProxy module)
+  SimpleNodeProxyShape(final SimpleNodeProxy node,
+                       final ModuleContext context)
   {
-    super(proxy);
-    mModule = module;
+    super(node);
+    mContext = context;
     final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
     final int diameter = radius + radius;
     final Point2D p = getProxy().getPointGeometry().getPoint();
@@ -56,8 +50,8 @@ public class SimpleNodeProxyShape
     mShape = new GeneralPath(mCircleShape);
 
     // Create handles
-    if (proxy.isInitial()) {
-      final Handle handle = new InitialStateHandle(proxy);
+    if (node.isInitial()) {
+      final Handle handle = new InitialStateHandle(node);
       mHandles = Collections.singletonList(handle);
       mShape.append(handle.getShape(), false);
     } else {
@@ -72,8 +66,8 @@ public class SimpleNodeProxyShape
   {
     return mShape;
   }
-    
-    
+
+
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.ProxyShape
   public SimpleNodeProxy getProxy()
@@ -85,140 +79,118 @@ public class SimpleNodeProxyShape
   {
     return mHandles;
   }
-  
-  
+
+
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.gui.renderer.AbstractProxyShape
-  public void draw(final Graphics2D g, final RenderingInformation status)
+  public void draw(final Graphics2D graphics,
+                   final RenderingInformation status)
   {
-    // Draw the filling (depends on marking)
     updateColors();
     // This rectangle is not the same as the one used to create the
     // mCircleShape! It gives rounding errors!
-    // Rectangle2D rect = mCircleShape.getBounds();
-    // This one is correct!
+    // Rectangle2D bounds = mCircleShape.getBounds();
     final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
     final int diameter = radius + radius;
-    final Rectangle2D rect =
+    final Rectangle2D bounds =
       new Rectangle2D.Double(mCircleShape.getX(), mCircleShape.getY(),
                              diameter, diameter);
-    Arc2D arc;
-    double i = 0;
-    double degrees = ((double)360 / (double)mColors.size());
-    if (mColors.isEmpty()) {
-      arc = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
-      g.setColor(FILLCOLOR);
-      g.fill(arc);
-    } else {
-      // Draw marking
-      final Object layoutMode = Config.GUI_EDITOR_LAYOUT_MODE.get();
-      if (layoutMode.equals(Config.LAYOUT_MODE_LEGALVALUES.ChalmersIDES)) {
-        // CHALMERS IDES MODE---SINGLE TYPE OF MARKING, DOUBLE CIRCLES
-        g.setColor(EditorColor.DEFAULTCOLOR);
-        g.setStroke(SINGLESTROKE);
-        arc = new Arc2D.Double(rect.getX()+2, rect.getY()+2,
-                               rect.getWidth()-4, rect.getHeight()-4,
-                               0, 360, Arc2D.OPEN);
-        g.draw(arc);
-      } else {
-        // DEFAULT MODE
-        for (final Color c : mColors) {
-          arc = new Arc2D.Double(rect, i, degrees, Arc2D.PIE);
-          g.setColor(c);
-          g.fill(arc);
-          i += degrees;
-        }
-      }
-    }
-        
+    drawNode(graphics, bounds, mColors);
     // Draw handles (initial state arrow)
     for (final Handle handle : mHandles) {
-      g.setColor(status.getColor());
-      handle.draw(g, status);
+      graphics.setColor(status.getColor());
+      handle.draw(graphics, status);
     }
-
-    // The above handle drawing should not be necessary (it's drawn below) but 
+    // The above handle drawing should not be necessary (it's drawn below) but
     // the initial arrow refuses to be drawn filled in the editor
     // (not in printed output!?)?
-      
     // Draw the basic shape (the outline + handles (initial state arrow))
-    super.draw(g, status);
-        
+    super.draw(graphics, status);
     // Cross out if forbidden
-    if (mIsForbidden) {
-      g.setColor(EditorColor.ERRORCOLOR);
-      g.setStroke(DOUBLESTROKE);
-      g.drawLine((int) rect.getMaxX(), (int) rect.getMaxY(),
-                 (int) rect.getMinX(), (int) rect.getMinY());
-      g.drawLine((int) rect.getMaxX(), (int) rect.getMinY(),
-                 (int) rect.getMinX(), (int) rect.getMaxY());
+    if (mForbidden) {
+      drawForbidden(graphics, bounds);
     }
   }
-    
+
 
   //#########################################################################
   //# Auxiliary Methods
   /**
-   * I think this method updates the set of colors used
+   * I think this method updates the set of colours used
    * (if this is a marked node).
    */
   private void updateColors()
   {
-    mColors.clear();
-    if (mModule != null) {
-      Map<String, EventDeclProxy> map = new HashMap<String, EventDeclProxy>
-        (mModule.getEventDeclList().size());
-      final List<Proxy> list = getProxy().getPropositions().getEventList();
-      if (list.isEmpty()) {
-        return;
-      }
-      for (EventDeclProxy e : mModule.getEventDeclList()) {
-        map.put(e.getName(), e);
-      }
-      for (final Proxy prop : list) {
-        // BUG: ForeachEventSubject not supported!
-        final String name;
-        if (prop instanceof SimpleIdentifierProxy) {
-          final SimpleIdentifierProxy ident = (SimpleIdentifierProxy) prop;
-          name = ident.getName();
-        } else if (prop instanceof IndexedIdentifierProxy) {
-          final IndexedIdentifierProxy ident = (IndexedIdentifierProxy) prop;
-          name = ident.getName();
-        } else {
-          continue;
+    final SimpleNodeProxy node = getProxy();
+    final PropositionIcon.ColorInfo info =
+      mContext.guessPropositionColors(node);
+    mColors = info.getColors();
+    mForbidden = info.isForbidden();
+  }
+
+
+  //#########################################################################
+  //# Static Drawing
+  public static void drawNode(final Graphics2D graphics,
+                              final Rectangle2D bounds,
+                              final List<Color> colors)
+  {
+    if (colors.isEmpty()) {
+      final Arc2D arc = new Arc2D.Double(bounds, 0, 360, Arc2D.OPEN);
+      graphics.setColor(FILLCOLOR);
+      graphics.fill(arc);
+    } else {
+      // Draw marking
+      final Object layoutMode = Config.GUI_EDITOR_LAYOUT_MODE.get();
+      if (layoutMode == Config.LAYOUT_MODE_LEGALVALUES.ChalmersIDES) {
+        // CHALMERS IDES MODE---SINGLE TYPE OF MARKING, DOUBLE CIRCLES
+        graphics.setColor(EditorColor.DEFAULTCOLOR);
+        graphics.setStroke(SINGLESTROKE);
+        final Arc2D arc = new Arc2D.Double
+          (bounds.getX() + 2, bounds.getY() + 2,
+           bounds.getWidth() - 4, bounds.getHeight()-4,
+           0, 360, Arc2D.OPEN);
+        graphics.draw(arc);
+      } else {
+        // DEFAULT MODE
+        double i = 0;
+        double degrees = 360.0 / (double) colors.size();
+        for (final Color c : colors) {
+          final Arc2D arc = new Arc2D.Double(bounds, i, degrees, Arc2D.PIE);
+          graphics.setColor(c);
+          graphics.fill(arc);
+          i += degrees;
         }
-        final EventDeclProxy decl = map.get(name);
-        if (decl == null) {
-          mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
-          continue;
-        }
-        if (decl.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-          mIsForbidden = true;
-          continue;
-        }
-        final ColorGeometryProxy geo = decl.getColorGeometry();
-        if (geo == null) {
-          mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
-          continue;
-        }
-        mColors.addAll(geo.getColorSet());
       }
     }
   }
-    
-    
+
+  public static void drawForbidden(final Graphics2D graphics,
+                                   final Rectangle2D bounds)
+  {
+    graphics.setColor(EditorColor.ERRORCOLOR);
+    graphics.setStroke(DOUBLESTROKE);
+    final int minx = (int) bounds.getMinX();
+    final int miny = (int) bounds.getMinY();
+    final int maxx = (int) bounds.getMaxX();
+    final int maxy = (int) bounds.getMaxY();
+    graphics.drawLine(minx, miny, maxx, maxy);
+    graphics.drawLine(maxx, miny, minx, maxy);
+  }
+
+
   //#########################################################################
   //# Data Members
-  private final ModuleProxy mModule;
+  private final ModuleContext mContext;
   private final Arc2D mCircleShape;
   private final GeneralPath mShape; // To incorporate the initial state arrow
   private final List<Handle> mHandles;
 
-  private Collection<Color> mColors = new ArrayList<Color>();
-  private boolean mIsForbidden = false;
-   
-    
+  private List<Color> mColors = new ArrayList<Color>();
+  private boolean mForbidden = false;
+
+
   //#########################################################################
   //# Class Constants
   public static final int DEFAULT_OFFSET_X = 5;
@@ -230,7 +202,7 @@ public class SimpleNodeProxyShape
   public static final int DEFAULT_INITARROW_Y = -5;
   public static final Point2D DEFAULT_INITARROW =
     new Point(DEFAULT_INITARROW_X, DEFAULT_INITARROW_Y);
-    
+
   private static final Color FILLCOLOR = Color.WHITE;
 
 }
