@@ -1,6 +1,8 @@
 package net.sourceforge.waters.despot;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +23,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -59,14 +62,48 @@ public class ParseDespotFile
   ModuleProxyFactory factory = ModuleElementFactory.getInstance();
 
   public static void main(String[] args) throws ParserConfigurationException,
-      SAXException, IOException
+      SAXException, IOException, URISyntaxException
   {
-
-    File file = new File("/home/rmf18/Desktop/Data/hsup1.des");
+    File file = new File("/home/rmf18/Desktop/Data/testHISC.desp");
+    URI path = file.toURI();
     ParseDespotFile pdf = new ParseDespotFile();
-    GraphProxy graph = pdf.constructGraph(file);
+    DocumentBuilder builder =
+        DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    Document doc = builder.parse(file);
+    // gets the root element
+    Element project = doc.getDocumentElement();
+    // currently parses the first subsystem only
+    Element subsystem =
+        (Element) project.getElementsByTagName("Subsystem").item(0);
+    NodeList automaton = subsystem.getElementsByTagName("*");
+    for (int i = 0; i < automaton.getLength(); i++) {
+      Element aut = (Element) automaton.item(i);
+      if (aut.getTagName().equals("Supervisor")) {
+        SimpleComponentProxy scp =
+            pdf.constructSimpleComponent(aut, ComponentKind.SUPERVISOR, path);
+        System.out.println(scp);
+      } else if (aut.getTagName().equals("Plant")) {
+        SimpleComponentProxy scp =
+            pdf.constructSimpleComponent(aut, ComponentKind.PLANT, path);
+        System.out.println(scp);
+      }
+      pdf.clearStructures();
+    }
 
-    System.out.println(graph);
+  }
+
+  /**
+   * Initialises the data structures used to store the states, events and
+   * transitions in the construction of a graph.
+   */
+  private void clearStructures()
+  {
+    mStates = new HashMap<Integer,Integer>();
+    mEvents = new HashMap<Integer,String>();
+    mTransitions = new HashMap<IdPair,Integer>();
+    nodes = new ArrayList<NodeProxy>();
+    edges = new ArrayList<EdgeProxy>();
+
   }
 
   /**
@@ -77,25 +114,22 @@ public class ParseDespotFile
    * @throws ParserConfigurationException
    * @throws IOException
    * @throws SAXException
+   * @throws URISyntaxException
    */
-  private SimpleComponentProxy constructSimpleComponent(File despFile)
-      throws ParserConfigurationException, SAXException, IOException
+  private SimpleComponentProxy constructSimpleComponent(Element automaton,
+      ComponentKind kind, URI path) throws ParserConfigurationException,
+      SAXException, IOException, URISyntaxException
   {
+    Element des = (Element) automaton.getElementsByTagName("*").item(0);
+    String autName = des.getAttribute("name");
+    String autFile = des.getAttribute("location");
+    URI uri = new URI(autFile);
 
-    DocumentBuilder builder =
-        DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    Document doc = builder.parse(despFile);
+    GraphProxy graph = constructGraph(path.resolve(uri));
+    IdentifierProxy identifier = factory.createSimpleIdentifierProxy(autName);
 
-    NodeList supervisors = doc.getElementsByTagName("Supervisor");
-    for (int i = 0; i < supervisors.getLength(); i++) {
-      Element supervisor = (Element) supervisors.item(i);
-      Element des = null;
+    return factory.createSimpleComponentProxy(identifier, kind, graph);
 
-      // File desFile = GraphProxy graph = constructGraph(desFile);
-      IdentifierProxy identifier = factory.createSimpleIdentifierProxy("name");
-    }
-
-    return null;
   }
 
   /**
@@ -109,9 +143,10 @@ public class ParseDespotFile
    * @throws IOException
    * @throws SAXException
    */
-  private GraphProxy constructGraph(File file)
+  private GraphProxy constructGraph(URI uri)
       throws ParserConfigurationException, SAXException, IOException
   {
+    File file = new File(uri);
     DocumentBuilder builder =
         DocumentBuilderFactory.newInstance().newDocumentBuilder();
     Document doc = builder.parse(file);
