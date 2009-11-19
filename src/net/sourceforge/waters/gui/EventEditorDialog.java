@@ -204,7 +204,7 @@ public class EventEditorDialog
         new IconRadioButton("Uncontrollable", IconLoader.ICON_UNCONTROLLABLE,
                             mKindGroup);
       mPropositionButton =
-        new IconRadioButton("Proposition", PropositionIcon.getDefaultIcon(),
+        new IconRadioButton("Proposition", PropositionIcon.getDefaultMarkedIcon(),
                             mKindGroup);
       mPropositionButton.setEnabled(advanced);
       switch (template.getKind()) {
@@ -319,7 +319,7 @@ public class EventEditorDialog
       mIndexTable.setSurrendersFocusOnKeystroke(true);
       mIndexTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
       mIndexTable.setFillsViewportHeight(true);
-      mIndexTable.setBackground(EditorColor.BACKGROUND);
+      mIndexTable.setBackground(EditorColor.BACKGROUNDCOLOR);
       final Dimension minsize = new Dimension(0, 0);
       mIndexTable.setPreferredScrollableViewportSize(minsize);
       mIndexTable.setMinimumSize(minsize);
@@ -900,7 +900,7 @@ public class EventEditorDialog
           });
       }
     } else {
-      final SimpleIdentifierSubject ident = 
+      final SimpleIdentifierSubject ident =
         (SimpleIdentifierSubject) mNameInput.getValue();
       final EventKind kind;
       if (mControllableButton.isSelected()) {
@@ -1117,7 +1117,7 @@ public class EventEditorDialog
                KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0));
       setEnabled(true);
     }
- 
+
     //#######################################################################
     //# Interface java.awt.event.ActionListener
     public void actionPerformed(final ActionEvent event)
@@ -1148,7 +1148,7 @@ public class EventEditorDialog
                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
       setEnabled(false);
     }
- 
+
     //#######################################################################
     //# Interface java.awt.event.ActionListener
     public void actionPerformed(final ActionEvent event)
@@ -1180,7 +1180,7 @@ public class EventEditorDialog
                                       InputEvent.CTRL_DOWN_MASK));
       setEnabled(false);
     }
- 
+
     //#######################################################################
     //# Interface java.awt.event.ActionListener
     public void actionPerformed(final ActionEvent event)
@@ -1212,7 +1212,7 @@ public class EventEditorDialog
                                       InputEvent.CTRL_DOWN_MASK));
       setEnabled(false);
     }
- 
+
     //#######################################################################
     //# Interface java.awt.event.ActionListener
     public void actionPerformed(final ActionEvent event)
@@ -1290,7 +1290,7 @@ public class EventEditorDialog
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-  
+
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
   private static final SimpleIdentifierSubject TEMPLATE_IDENT =
     new SimpleIdentifierSubject("");

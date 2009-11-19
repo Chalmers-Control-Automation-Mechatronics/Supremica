@@ -195,7 +195,7 @@ public class VariableEditorDialog
     mMarkingsTable.setSurrendersFocusOnKeystroke(true);
     mMarkingsTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
     mMarkingsTable.setFillsViewportHeight(true);
-    mMarkingsTable.setBackground(EditorColor.BACKGROUND);
+    mMarkingsTable.setBackground(EditorColor.BACKGROUNDCOLOR);
     final Dimension minsize = new Dimension(0, 0);
     mMarkingsTable.setMinimumSize(minsize);
     final Dimension prefsize = new Dimension(300, 0);

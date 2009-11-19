@@ -5,20 +5,13 @@ import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
 
-import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.gui.ide.ModuleContainer;
 

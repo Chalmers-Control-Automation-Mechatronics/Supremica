@@ -13,6 +13,9 @@ package net.sourceforge.waters.gui;
 import java.awt.Color;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -36,6 +39,7 @@ import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -60,7 +64,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  *
  * <P>The module context can be obtained from the module container
  * ({@link org.supremica.gui.ide.ModuleContainer}).</P>
- * 
+ *
  * @author Robi Malik
  */
 
@@ -80,6 +84,8 @@ public class ModuleContext
       new ListSubjectWrapper(module.getEventDeclListModifiable());
     mComponentListWrapper =
       new ListSubjectWrapper(module.getComponentListModifiable());
+    mPropositionColorCollectorVisitor =
+      new PropositionColorCollectorVisitor();
   }
 
 
@@ -173,9 +179,9 @@ public class ModuleContext
       return getIcon(decl);
     } else if (ident instanceof SimpleIdentifierProxy &&
                name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-      return IconLoader.ICON_FORBIDDEN;      
+      return IconLoader.ICON_FORBIDDEN;
     } else {
-      return PropositionIcon.getDefaultIcon();
+      return PropositionIcon.getDefaultMarkedIcon();
     }
   }
 
@@ -262,7 +268,7 @@ public class ModuleContext
         final String msg = buffer.toString();
         throw new ParseException(msg, 0);
       }
-    }      
+    }
   }
 
   /**
@@ -382,7 +388,7 @@ public class ModuleContext
         ("Unknown component kind: " + kind + "!");
     }
   }
-     
+
   public static String getComponentKindToolTip(final ComponentKind kind)
   {
     switch (kind) {
@@ -398,6 +404,12 @@ public class ModuleContext
       throw new IllegalArgumentException
         ("Unknown component kind: " + kind + "!");
     }
+  }
+
+  public static List<Color> getPropositionColours(final SimpleNodeProxy node)
+  {
+    final List<Color> result = new LinkedList<Color>();
+    return result;
   }
 
 
@@ -672,7 +684,7 @@ public class ModuleContext
 
   //#########################################################################
   //# Inner Class IconGetterVisitor
-  private static class IconGetterVisitor
+  private class IconGetterVisitor
     extends AbstractModuleProxyVisitor
   {
 
@@ -713,7 +725,7 @@ public class ModuleContext
         } else if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
 	  return IconLoader.ICON_FORBIDDEN;
 	} else {
-          return PropositionIcon.getDefaultIcon();
+          return PropositionIcon.getDefaultMarkedIcon();
 	}
       default:
 	throw new IllegalArgumentException
@@ -743,6 +755,13 @@ public class ModuleContext
       return getComponentKindIcon(kind);
     }
 
+    public Icon visitSimpleNodeProxy(final SimpleNodeProxy node)
+    {
+      final List<Color> colors =
+        mPropositionColorCollectorVisitor.getPropositionColors(node);
+      return PropositionIcon.getIcon(colors);
+    }
+
     public Icon visitVariableComponentProxy
       (final VariableComponentProxy var)
     {
@@ -763,9 +782,9 @@ public class ModuleContext
     private String getToolTipText(final Proxy proxy)
     {
       try {
-	return (String) proxy.acceptVisitor(this);
+    return (String) proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	throw exception.getRuntimeException();
+    throw exception.getRuntimeException();
       }
     }
 
@@ -783,14 +802,14 @@ public class ModuleContext
       final EventKind kind = decl.getKind();
       switch (kind) {
       case CONTROLLABLE:
-	return "Controllable event";
+    return "Controllable event";
       case UNCONTROLLABLE:
-	return "Uncontrollable event";
+    return "Uncontrollable event";
       case PROPOSITION:
-	return "Proposition";
+    return "Proposition";
       default:
-	throw new IllegalArgumentException
-	  ("Unknown event kind: " + kind + "!");
+    throw new IllegalArgumentException
+      ("Unknown event kind: " + kind + "!");
       }
     }
 
@@ -821,12 +840,73 @@ public class ModuleContext
 
 
   //#########################################################################
+  //# Inner Class PropositionColorCollectorVisitor
+  private class PropositionColorCollectorVisitor
+    extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private List<Color> getPropositionColors(final SimpleNodeProxy node)
+    {
+      try {
+        mColorList = new LinkedList<Color>();
+        mColorSet = new HashSet<Color>();
+        final List<Proxy> props = node.getPropositions().getEventList();
+        visitCollection(props);
+        final List<Color> result = mColorList;
+        mColorList = null;
+        mColorSet = null;
+        return result;
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    public Object visitProxy(final Proxy proxy)
+    {
+      return null;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    public Object visitForeachEventProxy(final ForeachEventProxy foreach)
+      throws VisitorException
+    {
+      final List<Proxy> body = foreach.getBody();
+      visitCollection(body);
+      return null;
+    }
+    public Object visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      final EventDeclProxy decl = guessEventDecl(ident);
+      final ColorGeometryProxy geo = decl.getColorGeometry();
+      for (final Color colour : geo.getColorSet()) {
+        if (mColorSet.add(colour)) {
+          mColorList.add(colour);
+        }
+      }
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private List<Color> mColorList;
+    private Set<Color> mColorSet;
+ }
+
+
+  //#########################################################################
   //# Data Members
   private final ModuleSubject mModule;
   private final CanDropVisitor mCanDropVisitor;
   private final IdentifierNameVisitor mIdentifierNameVisitor;
   private final IconGetterVisitor mIconGetterVisitor;
   private final ToolTipGetterVisitor mToolTipGetterVisitor;
+  private final PropositionColorCollectorVisitor
+    mPropositionColorCollectorVisitor;
 
   private final ListSubjectWrapper mEventDeclListWrapper;
   private final ListSubjectWrapper mComponentListWrapper;

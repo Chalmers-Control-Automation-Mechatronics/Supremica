@@ -209,26 +209,21 @@ public class ModuleContainer
      */
     public void modelChanged(final ModelChangeEvent event)
     {
-      switch (event.getKind()) {
-      case ModelChangeEvent.ITEM_REMOVED:
+      final int kind = event.getKind();
+      if (kind == ModelChangeEvent.ITEM_REMOVED) {
         final Object value = event.getValue();
         if (value instanceof SimpleComponentSubject) {
           final ComponentEditorPanel panel =
             mEditorPanel.getActiveEditorWindowInterface();
           if (panel != null && panel.getComponent() == value) {
             mEditorPanel.showComment();
-            // Do not event try to close or dispose the graph panel:
+            // Do not even try to close or dispose the graph panel:
             // deletions can be undone!
           }
         }
-        // fall through ...
-      case ModelChangeEvent.ITEM_ADDED:
-      case ModelChangeEvent.NAME_CHANGED:
-      case ModelChangeEvent.STATE_CHANGED:
+      }
+      if (kind != ModelChangeEvent.GEOMETRY_CHANGED) {
         mCompiledDES = null;
-        break;
-      default:
-        break;
       }
     }
 

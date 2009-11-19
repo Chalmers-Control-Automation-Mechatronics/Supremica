@@ -13,6 +13,8 @@ package net.sourceforge.waters.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.util.List;
+
 import javax.swing.Icon;
 
 
@@ -32,18 +34,38 @@ class PropositionIcon implements Icon
   static PropositionIcon getIcon(final Color color)
   {
     if (color.equals(EditorColor.DEFAULTMARKINGCOLOR)) {
-      return getDefaultIcon();
+      return getDefaultMarkedIcon();
     } else {
       return new PropositionIcon(color);
     }
   }
 
-  static PropositionIcon getDefaultIcon()
+  static PropositionIcon getIcon(final List<Color> colors)
   {
-    if (DEFAULT_ICON == null) {
-      DEFAULT_ICON = new PropositionIcon(EditorColor.DEFAULTMARKINGCOLOR);
+    if (colors.isEmpty()) {
+      return getUnmarkedIcon();
+    } else if (colors.size() == 1 &&
+            colors.iterator().next().equals(EditorColor.DEFAULTMARKINGCOLOR)) {
+      return getDefaultMarkedIcon();
+    } else {
+      return null;
     }
-    return DEFAULT_ICON;
+  }
+
+  static PropositionIcon getUnmarkedIcon()
+  {
+    if (UNMARKED_ICON == null) {
+      UNMARKED_ICON = new PropositionIcon(EditorColor.BACKGROUNDCOLOR);
+    }
+    return UNMARKED_ICON;
+  }
+
+  static PropositionIcon getDefaultMarkedIcon()
+  {
+    if (MARKED_ICON == null) {
+      MARKED_ICON = new PropositionIcon(EditorColor.DEFAULTMARKINGCOLOR);
+    }
+    return MARKED_ICON;
   }
 
 
@@ -72,7 +94,7 @@ class PropositionIcon implements Icon
   {
     graphics.setColor(mColor);
     graphics.fillOval(x + OFFSET, y + OFFSET, DIAMETER, DIAMETER);
-    graphics.setColor(Color.BLACK);
+    graphics.setColor(EditorColor.DEFAULTCOLOR);
     graphics.drawOval(x + OFFSET, y + OFFSET, DIAMETER, DIAMETER);
   }
 
@@ -88,6 +110,7 @@ class PropositionIcon implements Icon
   private static final int OFFSET = SIZE >> 2;
   private static final int DIAMETER = SIZE - OFFSET - OFFSET;
 
-  private static PropositionIcon DEFAULT_ICON;
+  private static PropositionIcon MARKED_ICON;
+  private static PropositionIcon UNMARKED_ICON;
 
 }

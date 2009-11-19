@@ -96,16 +96,13 @@ public class EditorColor
   //#########################################################################
   //# Public Colour Constants
   /** The default background colour for all panels. */
-  public static final Color BACKGROUND = Color.WHITE;
+  public static final Color BACKGROUNDCOLOR = Color.WHITE;
 
   /** The default colour of text. */
   public static final Color TEXTCOLOR = Color.BLACK;
 
   /** The default colour of disabled text. */
   public static final Color DISABLEDCOLOR = Color.GRAY;
-
-  /** The background colour in the editor. */
-  public static final Color BACKGROUNDCOLOR = Color.WHITE;
 
   /** The colour of the grid in the editor. */
   public static final Color GRIDCOLOR = new Color(0.875f, 0.875f, 0.875f);
