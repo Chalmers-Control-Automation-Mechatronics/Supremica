@@ -36,19 +36,24 @@ import org.xml.sax.SAXException;
 public class ParseDespotFile
 {
   // #Data Members
-  // stores the ID number and name of the <State> elements from .des files
-  HashMap<Integer,Integer> mStates;
-  // stores the ID number and name of the <Event> elements from .des files
-  HashMap<Integer,String> mEvents;
-  // stores the source states and a list of all the states their direct
-  // transitions
-  // go to. This is used to lookup quickly whether a state has more than one
-  // event on a transition to the same state
-  HashMap<Integer,HashSet<Integer>> mTransitions;
+  // stores the ID number the despot file uses to reference a state and the
+  // location of the state in the 'nodes' list
+  HashMap<Integer,Integer> mStates = new HashMap<Integer, Integer>();
+  // stores the ID number the despot file uses to reference an event and the
+  // name of the event
+  HashMap<Integer,String> mEvents=new HashMap<Integer, String>();
+  // (the above two hash maps are needed for finding the correct source/target
+  // state of a transition and correct event name
 
+  // maps the source state and target state together (as an IdPair) for a
+  // transition to the index number where this edge exists in the list 'edges'.
+  // This is used to lookup quickly whether an edge already exists.
+  HashMap<IdPair,Integer> mTransitions=new HashMap<IdPair, Integer>();
+
+  // this list stores all the nodes (states) for this automata
   List<NodeProxy> nodes = new ArrayList<NodeProxy>();
+  // this list stores all the edges (transitions) for this automata
   List<EdgeProxy> edges = new ArrayList<EdgeProxy>();
-  // List<EdgeProxy> eventDecls = new ArrayList<EdgeProxy>();
 
   // used to build up the module for the .wmod file we are converting into
   ModuleProxyFactory factory = ModuleElementFactory.getInstance();
@@ -60,28 +65,8 @@ public class ParseDespotFile
     File file = new File("/home/rmf18/Desktop/Data/hsup1.des");
     ParseDespotFile pdf = new ParseDespotFile();
     GraphProxy graph = pdf.constructGraph(file);
-    for (EdgeProxy edge : graph.getEdges()) {
-      System.out.println("Source: " + edge.getSource().getName() + " Target: "
-          + edge.getTarget().getName());
-      for (int i = 0; i < edge.getLabelBlock().getEventList().size(); i++) {
-        SimpleIdentifierProxy event =
-            (SimpleIdentifierProxy) edge.getLabelBlock().getEventList().get(i);
-        System.out.print("Event: " + event.getName());
-      }
-    }
-    System.out.println("States");
-    for (NodeProxy state : graph.getNodes()) {
-      System.out.println(state.getName());
-    }
-  }
 
-  /**
-   *
-   * @param file
-   */
-  private void parseDESFile(File despFile)
-  {
-
+    System.out.println(graph);
   }
 
   /**
@@ -127,7 +112,6 @@ public class ParseDespotFile
   private GraphProxy constructGraph(File file)
       throws ParserConfigurationException, SAXException, IOException
   {
-
     DocumentBuilder builder =
         DocumentBuilderFactory.newInstance().newDocumentBuilder();
     Document doc = builder.parse(file);
@@ -143,10 +127,10 @@ public class ParseDespotFile
     for (int i = 0; i < stElmntLst.getLength(); i++) {
       Element stElmnt = (Element) stElmntLst.item(i);
       NodeProxy node = convertState(stElmnt);
-      nodes.add(node);
-      // stores the ID number and the index of this node in the list
       storeStateId(stElmnt, i);
+      nodes.add(node);
     }
+
     // create a hash map of the ID numbers and the name they belong to for the
     // events
     NodeList allEvents = definition.getElementsByTagName("Events");
@@ -157,9 +141,11 @@ public class ParseDespotFile
     // converts each transition in the despot file into edges for waters
     NodeList transitionList = definition.getElementsByTagName("Trans-Function");
     Element transitions = (Element) transitionList.item(0);
-    NodeList transElmntLst = transitions.getElementsByTagName("*");
-    for (int i = 0; i < transElmntLst.getLength(); i++) {
-      Element trElmnt = (Element) transElmntLst.item(i);
+    NodeList transElmntLst = transitions.getElementsByTagName("Transitions");
+    Element tr = (Element)transElmntLst.item(0);
+    NodeList trList = tr.getElementsByTagName("*");
+    for (int i = 0; i < trList.getLength(); i++) {
+      Element trElmnt = (Element) trList.item(i);
 
       // gets the source and target states ID numbers
       int srcID = Integer.parseInt(trElmnt.getAttribute("fID"));
@@ -167,29 +153,58 @@ public class ParseDespotFile
       // checks if the transition already exists (i.e. so an event should be
       // added to an existing edge rather than creating a new edge
       boolean exists = false;
-      if (mTransitions.containsKey(srcID)) {
-        if (mTransitions.get(srcID).contains(targetID)) {
-          exists = true;
-        }
+      IdPair srcTargIds = new IdPair(srcID, targetID);
+      if (mTransitions.containsKey(srcTargIds)) {
+        exists = true;
       }
       EdgeProxy edge = convertTransition(trElmnt, exists);
       if (!exists) {
         edges.add(edge);
         // stores this transition
-        storeTransition(trElmnt);
+        storeTransition(trElmnt, i);
       } else {
-        // can find where this edge exists in the array list by using the hash
-        // map which references it using the IDs
-        int edgeIndex = mStates.get(srcID);
+        // can find where this edge exists in the 'edges' list by using the hash
+        // map which references it using the source and target IDs
+        int edgeIndex = mTransitions.get(srcTargIds);
         edges.set(edgeIndex, edge);
       }
 
     }
+
+    // gets the blocked events for this automata
+    NodeList transLoopList = transitions.getElementsByTagName("*");
+    LabelBlockProxy blockedEvents = findBlockedEvents(transLoopList);
+
     // NEED TO ADD BLOCKED EVENTS TO THIS GRAPHPROXY (rather than null)
     return factory.createGraphProxy(true, null, nodes, edges, null);
 
   }
 
+  /**
+   * Determines which events are blocked in this automata. Events are blocked if
+   * they don't appear on a transition or self loop.
+   *
+   * @param transLoopList
+   *          The list of Transitions and self-loops from the DOM.
+   * @return
+   */
+  private LabelBlockProxy findBlockedEvents(NodeList transLoopList)
+  { for (int i = 0; i < transLoopList.getLength(); i++) {
+    Element trElmnt = (Element) transLoopList.item(i);
+
+  }
+    // gets the source and target states ID numbers
+   // int srcID = Integer.parseInt(trElmnt.getAttribute("fID"));
+
+    return null;
+  }
+
+  /**
+   * Maps the ID's for all the events in the despot file to their name.
+   *
+   * @param events
+   *          The list of event elements from the DOM.
+   */
   private void storeEvents(NodeList events)
   {
     for (int i = 0; i < events.getLength(); i++) {
@@ -200,18 +215,30 @@ public class ParseDespotFile
     }
   }
 
-  private void storeTransition(Element transition)
+  /**
+   * Creates an IdPair for a transitions source and target states id's and maps
+   * it to the index of the transition in the 'edge' list.
+   *
+   * @param transition
+   * @param index
+   */
+  private void storeTransition(Element transition, int index)
   {
-    HashSet<Integer> currentTargets =
-        mTransitions.get(transition.getAttribute("fID"));
-    if (currentTargets == null) {
-      currentTargets = new HashSet<Integer>();
-    }
-    currentTargets.add(Integer.parseInt(transition.getAttribute("tID")));
-    mTransitions.put(Integer.parseInt(transition.getAttribute("fID")),
-        currentTargets);
+    int srcId = Integer.parseInt(transition.getAttribute("fID"));
+    int targetId = Integer.parseInt(transition.getAttribute("tID"));
+    IdPair srcTargIds = new IdPair(srcId, targetId);
+    mTransitions.put(srcTargIds, index);
   }
 
+  /**
+   * Adds to the hash map which maps the despot ID numbers to the position of
+   * the relevant NodeProxy in the 'nodes' list.
+   *
+   * @param state
+   *          The state being referenced, whose ID needs storing.
+   * @param index
+   *          The index number of the matching NodeProxy in the 'nodes' list.
+   */
   private void storeStateId(Element state, int index)
   {
     mStates.put(Integer.parseInt(state.getAttribute("id")), index);
@@ -238,7 +265,7 @@ public class ParseDespotFile
     // assigns the correct name to the edge
     String eventID = tr.getAttribute("eID");
     // assert mEvents.containsKey((eventID));
-    String eventName = mEvents.get(eventID);
+    String eventName = mEvents.get(Integer.parseInt(eventID));
     List<SimpleIdentifierProxy> eventList =
         new ArrayList<SimpleIdentifierProxy>();
 
@@ -249,7 +276,8 @@ public class ParseDespotFile
 
       // can find where this edge exists in the array list by using the hash
       // map which references it using the IDs
-      int edgeIndex = mStates.get(srcID);
+      IdPair srcTargIds = new IdPair(srcID, targetID);
+      int edgeIndex = mTransitions.get(srcTargIds);
 
       // gets the existing events
       List<Proxy> existingEvents =
@@ -333,6 +361,12 @@ public class ParseDespotFile
   }
 
 
+  /**
+   * A class used to pair the ID numbers for the source and target states of a
+   * transition/event.
+   *
+   * @author rmf18
+   */
   private static class IdPair
   {
     private IdPair(final int source, final int target)
@@ -355,7 +389,10 @@ public class ParseDespotFile
         return false;
       }
     }
+
+    // ID number of the source state of the transition as used by despot
     private final int mSource;
+    // ID number of the target state of the transition as used by despot
     private final int mTarget;
   }
 }
