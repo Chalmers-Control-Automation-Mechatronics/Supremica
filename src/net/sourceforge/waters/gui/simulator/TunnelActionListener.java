@@ -20,7 +20,7 @@ public class TunnelActionListener implements ActionListener, Observer
 
   public TunnelActionListener(JTable parent, ModuleContainer module)
   {
-    this.sim = ((AbstractTunnelTable)parent.getModel()).getSim();
+    this.sim = ((SimulationTable)parent.getModel()).getSim();
     this.parent = parent;
     module.attach(this);
   }
@@ -28,12 +28,12 @@ public class TunnelActionListener implements ActionListener, Observer
 
   public void update()
   {
-    this.sim = ((AbstractTunnelTable)parent.getModel()).getSim();
+    this.sim = ((SimulationTable)parent.getModel()).getSim();
   }
 
   public void update(EditorChangedEvent e)
   {
-    this.sim = ((AbstractTunnelTable)parent.getModel()).getSim();
+    this.sim = ((SimulationTable)parent.getModel()).getSim();
   }
 
   public void actionPerformed(ActionEvent e)
@@ -61,7 +61,7 @@ public class TunnelActionListener implements ActionListener, Observer
         System.err.println(exception.toString());
       }
     }
-    ((AbstractTunnelTable)parent.getModel()).updateSim(sim);
+    ((SimulationTable)parent.getModel()).updateSim(sim);
 
   }
 

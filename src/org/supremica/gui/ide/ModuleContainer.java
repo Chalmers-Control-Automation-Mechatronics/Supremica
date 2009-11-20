@@ -437,6 +437,7 @@ public class ModuleContainer
           mAnalyzerPanel.updateAutomata();
         }
         final EditorChangedEvent eevent = new MainPanelSwitchEvent(this);
+        // This line of code fires whenever a tab is changed.
         fireEditorChangedEvent(eevent);
       } catch (final EvalException exception) {
         final String msg = exception.getMessage();

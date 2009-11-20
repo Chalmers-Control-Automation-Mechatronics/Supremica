@@ -1,15 +1,27 @@
 package net.sourceforge.waters.gui.simulator;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.Icon;
 
+import net.sourceforge.waters.gui.EditorColor;
+import net.sourceforge.waters.gui.PropositionIcon;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.module.ColorGeometryProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -63,9 +75,53 @@ public class Simulation
     return output;
   }
 
-  public Icon getMarking(StateProxy state)
+  public Icon getMarking(StateProxy state, AutomatonProxy automaton)
   {
-    throw new UnsupportedOperationException();
+    if (!hasPropositions(automaton))
+      return PropositionIcon.getDefaultMarkedIcon();
+    final Collection<EventProxy> props = state.getPropositions();
+    if (props.isEmpty()) {
+      return PropositionIcon.getUnmarkedIcon();
+    } else {
+      final Map<Proxy,SourceInfo> infomap = mModule.getSourceInfoMap();
+      final int size = props.size();
+      final Set<Color> colorset = new HashSet<Color>(size);
+      final List<Color> colorlist = new ArrayList<Color>(size);
+      boolean forbidden = false;
+      for (final EventProxy prop : props) {
+        final SourceInfo info = infomap.get(prop);
+        final EventDeclProxy decl = (EventDeclProxy) info.getSourceObject();
+        final ColorGeometryProxy geo = decl.getColorGeometry();
+        if (geo != null) {
+          for (final Color color : geo.getColorSet()) {
+            if (colorset.add(color)) {
+              colorlist.add(color);
+            }
+          }
+        } else if (decl.getName().equals
+            (EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+          forbidden = true;
+        } else {
+          if (colorset.add(EditorColor.DEFAULTMARKINGCOLOR)) {
+            colorlist.add(EditorColor.DEFAULTMARKINGCOLOR);
+          }
+        }
+      }
+      final PropositionIcon.ColorInfo colorinfo =
+        new PropositionIcon.ColorInfo(colorlist, forbidden);
+      return colorinfo.getIcon();
+    }
+  }
+
+  public boolean changedLastStep(AutomatonProxy automaton)
+  {
+    return mEnabledLastStep.contains(automaton);
+  }
+
+  @SuppressWarnings("unchecked")
+  public ArrayList<EventProxy> getEventHistory()
+  {
+    return (ArrayList<EventProxy>) mPreviousEvents.clone();
   }
 
   //###################################################################################
@@ -86,6 +142,7 @@ public class Simulation
     }
     mModule = module;
     mPreviousEvents = new ArrayList<EventProxy>();
+    mEnabledLastStep = new ArrayList<AutomatonProxy>();
   }
 
   public Simulation(ModuleContainer module, ArrayList<EventProxy> events) throws UncontrollableException
@@ -136,6 +193,7 @@ public class Simulation
     else
     {
       mPreviousEvents.add(event);
+      mEnabledLastStep = new ArrayList<AutomatonProxy>();
       for (AutomatonProxy automata : mAllAutomatons.keySet())
       {
         for (TransitionProxy trans : automata.getTransitions())
@@ -144,6 +202,7 @@ public class Simulation
           {
             if (trans.getSource() == mAllAutomatons.get(automata))
               mAllAutomatons.put(automata, trans.getTarget());
+            mEnabledLastStep.add(automata);
           }
         }
       }
@@ -295,6 +354,16 @@ public class Simulation
     }
   }
 
+  private boolean hasPropositions(AutomatonProxy automaton)
+  {
+    for (EventProxy event : automaton.getEvents())
+    {
+      if (event.getKind() == EventKind.PROPOSITION)
+        return true;
+    }
+    return false;
+  }
+
   //##################################################################################################
   //# Data Members
   HashMap<AutomatonProxy, StateProxy> mAllAutomatons; // The Map object is the current state of the key
@@ -302,4 +371,5 @@ public class Simulation
   HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the key
   ArrayList<EventProxy> mPreviousEvents;
   final ModuleContainer mModule;
+  ArrayList<AutomatonProxy> mEnabledLastStep;
 }

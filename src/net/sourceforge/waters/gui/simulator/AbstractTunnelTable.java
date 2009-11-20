@@ -28,7 +28,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class AbstractTunnelTable extends AbstractTableModel implements Observer
+public class AbstractTunnelTable extends SimulationTable implements Observer
 {
 
   //#########################################################################
@@ -121,9 +121,9 @@ public class AbstractTunnelTable extends AbstractTableModel implements Observer
       int looper = 0;
       for (final AutomatonProxy aut : automata) {
         output[looper][0] = aut.getName();
-        output[looper][1] = "X";
+        output[looper][1] = mSim.changedLastStep(aut);
         StateProxy currentState = mSim.getCurrentStates().get(aut);
-        output[looper][2] = getStateIcon(currentState);
+        output[looper][2] = mSim.getMarking(currentState, aut);
         output[looper][3] = mSim.getCurrentStates().get(aut).getName();
         looper++;
       }
@@ -133,41 +133,6 @@ public class AbstractTunnelTable extends AbstractTableModel implements Observer
       return new Object[0][0];
   }
 
-  private Icon getStateIcon(final StateProxy state)
-  {
-    final Collection<EventProxy> props = state.getPropositions();
-    if (props.isEmpty()) {
-      return PropositionIcon.getUnmarkedIcon();
-    } else {
-      final Map<Proxy,SourceInfo> infomap = mModuleContainer.getSourceInfoMap();
-      final int size = props.size();
-      final Set<Color> colorset = new HashSet<Color>(size);
-      final List<Color> colorlist = new ArrayList<Color>(size);
-      boolean forbidden = false;
-      for (final EventProxy prop : props) {
-        final SourceInfo info = infomap.get(prop);
-        final EventDeclProxy decl = (EventDeclProxy) info.getSourceObject();
-        final ColorGeometryProxy geo = decl.getColorGeometry();
-        if (geo != null) {
-          for (final Color color : geo.getColorSet()) {
-            if (colorset.add(color)) {
-              colorlist.add(color);
-            }
-          }
-        } else if (decl.getName().equals
-            (EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-          forbidden = true;
-        } else {
-          if (colorset.add(EditorColor.DEFAULTMARKINGCOLOR)) {
-            colorlist.add(EditorColor.DEFAULTMARKINGCOLOR);
-          }
-        }
-      }
-      final PropositionIcon.ColorInfo colorinfo =
-        new PropositionIcon.ColorInfo(colorlist, forbidden);
-      return colorinfo.getIcon();
-    }
-  }
 
 
   //#########################################################################

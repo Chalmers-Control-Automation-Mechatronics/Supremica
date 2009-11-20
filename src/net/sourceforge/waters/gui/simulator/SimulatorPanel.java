@@ -27,6 +27,7 @@ public class SimulatorPanel
     mTabbedPane.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
     mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
     setupAutomata();
+    setupEvents();
     setLeftComponent(mTabbedPane);
     mDesktop.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
     mDesktop.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
@@ -51,6 +52,23 @@ public class SimulatorPanel
     mAutomataTable = new JTable(new AbstractTunnelTable(mModuleContainer));
   }
 
+  private void setupEvents()
+  {
+    setupEventsTable();
+    final JScrollPane scroll = new JScrollPane(mEventsTable);
+    mEventsPanel.setLayout(new BorderLayout());
+    mEventsPanel.add(scroll, BorderLayout.CENTER);
+    JButton stepButton = new JButton("Step");
+    stepButton.addActionListener(new TunnelActionListener(mEventsTable , mModuleContainer));
+    mEventsPanel.add(stepButton, BorderLayout.SOUTH);
+    mTabbedPane.addTab("Events", mEventsPanel);
+  }
+
+  private void setupEventsTable()
+  {
+    mEventsTable = new JTable(new EventTableModel(mModuleContainer));
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -58,10 +76,10 @@ public class SimulatorPanel
   private JTabbedPane mTabbedPane = new JTabbedPane();
   private final JDesktopPane mDesktop = new JDesktopPane();
   private final JPanel mAutomataPanel = new JPanel();
-  //private final JPanel mEventsPanel = new JPanel();
+  private final JPanel mEventsPanel = new JPanel();
   //private final JPanel mTracePanel = new JPanel();
   private JTable mAutomataTable = new JTable();
-  //private final JTable mEventsTable = new JTable();
+  private JTable mEventsTable = new JTable();
   //private final JScrollPane mScrollPane = new JScrollPane();
 
 
@@ -73,6 +91,11 @@ public class SimulatorPanel
   public void updateAutomata()
   {
     ((AbstractTunnelTable)mAutomataTable.getModel()).update();
+  }
+
+  public void updateEvents()
+  {
+    ((EventTableModel)mEventsTable.getModel()).update();
   }
 
 }
