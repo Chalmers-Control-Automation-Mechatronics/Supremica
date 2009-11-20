@@ -112,6 +112,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     super(model, marking, preMarking, factory);
   }
 
+
   // #########################################################################
   // # Invocation
   public boolean run() throws OverflowException
@@ -126,19 +127,18 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       // Set the marked states coreachable and explore their predecessors.
       final int numstates = mSyncProduct.getNumberOfStates();
       final BitSet coreachable = new BitSet(numstates);
-
       final EventProxy marking = getUsedMarkingProposition();
       final EventProxy preconditionMarking = getGeneralisedPrecondition();
       final SyncStateSchema stateSchema =
           new SyncStateSchema(model, mEventMap, marking, preconditionMarking);
+      final AutomatonSchema[] automata = stateSchema.getOrdering();
+      final int numaut = automata.length;
+      final int[] dstate = new int[numaut];
       boolean ok = true;
-
       for (int stateid = 0; stateid < numstates; stateid++) {
         final long state = mSyncProduct.getStateFromId(stateid);
         // Decode the state.
-        final int[] dstate = stateSchema.decodeState(state);
-        final AutomatonSchema[] automata = stateSchema.getOrdering();
-        assert automata.length == dstate.length;
+        stateSchema.decodeState(state, dstate);
         // check if the state is marked
         boolean marked = true;
         for (int i = 0; i < automata.length; i++) {
@@ -163,16 +163,13 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
 
       // if all precondition marked states are coreachable then the model
       // is nonblocking
-
       boolean nonblocking = true;
       int firstBlockingState = -1;
       if (preconditionMarking != null) {
         for (int stateid = 0; stateid < numstates; stateid++) {
           final long state = mSyncProduct.getStateFromId(stateid);
           // Decode the state.
-          final int[] dstate = stateSchema.decodeState(state);
-          final AutomatonSchema[] automata = stateSchema.getOrdering();
-          assert automata.length == dstate.length;
+          stateSchema.decodeState(state, dstate);
           // check if the state has a precondition marking
           boolean premarked = true;
           for (int i = 0; i < automata.length; i++) {
@@ -190,9 +187,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
             }
           }
         }
-      }
-      //all states must be coreachable if there is only one marking type
-      else {
+      } else {
+        //all states must be coreachable if there is only one marking type
         for (int stateid = 0; stateid < numstates; stateid++) {
           if (!coreachable.get(stateid)) {
             firstBlockingState = stateid;
@@ -213,21 +209,15 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         // Find the unchecked state with the lowest
         // id, as this should give the shortest counterexample.
         // or if a second marking condition is simultaneously used, look
-        // for the
-        // first non coreachable precondition marked state.
+        // for the first non-coreachable precondition marked state.
         int trace_start = firstBlockingState;
-
         // Until we reach the start state...
-        final TransitionSchema trans = mSyncProduct.transitions;
         while (trace_start != 0) {
-          final TransitionData td = trans.getTransitions(trace_start);
-          assert td != null : "This is impossible, every state is reachable!";
-          TIntHashSet incoming = td.in;
-          assert incoming != null : "Impossible? every state should be reachable!";
-          int lowtrans = select_lowest_transition(incoming, trans);
-          countertrace.add(0, mEventMap
-              .getEvent(trans.store.getEvent(lowtrans)));
-          trace_start = trans.store.getSource(lowtrans);
+          final TIntArrayList preds = mSyncProduct.getPredecessors(trace_start);
+          final int pred = preds.get(0);
+          final EventProxy event = mSyncProduct.findEvent(pred, trace_start);
+          countertrace.add(0, event);
+          trace_start = pred;
         }
         final ProductDESProxyFactory desFactory = getFactory();
         final String modelname = model.getName();
@@ -277,45 +267,18 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     if (maxdepth-- > 0) {
       coreachable.set(stateid);
       boolean result = true;
-      final TransitionSchema trans = mSyncProduct.transitions;
-      final TransitionData td = trans.getTransitions(stateid);
-      if (td != null) {
-        final TIntHashSet incoming = td.in;
-        if (incoming != null) {
-          final TIntIterator it = incoming.iterator();
-          while (it.hasNext()) {
-            final int t = it.next();
-            final int src = trans.store.getSource(t);
-            if (!coreachable.get(src)) {
-              result &= exploreBackwards(src, coreachable, maxdepth);
-            }
-          }
+      final TIntArrayList preds = mSyncProduct.getPredecessors(stateid);
+      final int len = preds.size();
+      for (int i = 0; i < len; i++) {
+        final int src = preds.get(i);
+        if (!coreachable.get(src)) {
+          result &= exploreBackwards(src, coreachable, maxdepth);
         }
       }
       return result;
     } else {
       return false;
     }
-  }
-
-  /**
-   * Check the transition set for the state with the lowest id, and return the
-   * id.
-   */
-  private int select_lowest_transition(TIntHashSet set, TransitionSchema ts)
-  {
-    int lowest = Integer.MAX_VALUE;
-    int lowesttr = 0;
-    TIntIterator it = set.iterator();
-    while (it.hasNext()) {
-      int tr = it.next();
-      int v = ts.store.getSource(tr);
-      if (v < lowest) {
-        lowest = v;
-        lowesttr = tr;
-      }
-    }
-    return lowesttr;
   }
 
   // #########################################################################
@@ -347,6 +310,9 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       // Create a new state schema for the product.
       mStateSchema =
           new SyncStateSchema(model, mEventMap, marking, preconditionMarking);
+      final int numaut = getNumberOfAutomata();
+      mSourceBuffer = new int[numaut];
+      mTargetBuffer = new int[numaut];
     }
 
     // #######################################################################
@@ -373,25 +339,45 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       return mNextStateIndex - mFringeIndex;
     }
 
-    // #######################################################################
-    // # Auxiliary Methods
+    private TIntArrayList getPredecessors(final int stateid)
+    {
+      return mPredecessors.get(stateid);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
     /**
      * Register a state in the synchronous product. If the state already exists
      * in the state mapping it will be given the existing id, otherwise a new
      * mapping will be assigned and the id returned.
      */
-    private int registerState(long state) throws OverflowException
+    private int addNewState(long state, int pred)
+      throws OverflowException
     {
       if (mStateMap.containsKey(state)) {
-        return mStateMap.get(state);
+        final int oldid = mStateMap.get(state);
+        if (oldid != pred && pred >= 0) {
+          final TIntArrayList preds = mPredecessors.get(oldid);
+          final int len = preds.size();
+          if (len == 0 || pred != preds.get(len - 1)) {
+            preds.add(pred);
+          }
+        }
+        return oldid;
+      } else {
+        final int newid = mNextStateIndex++;
+        if (mNextStateIndex > getNodeLimit()) {
+          throw new OverflowException(getNodeLimit());
+        }
+        mStateMap.put(state, newid);
+        statelist.add(state);
+        final TIntArrayList preds = new TIntArrayList();
+        if (pred >= 0) {
+          preds.add(pred);
+        }
+        mPredecessors.add(preds);
+        return newid;
       }
-      final int id = mNextStateIndex++;
-      if (mNextStateIndex > getNodeLimit()) {
-        throw new OverflowException(getNodeLimit());
-      }
-      mStateMap.put(state, id);
-      statelist.add(state);
-      return id;
     }
 
     /**
@@ -412,8 +398,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         assert state[i] != null : "Every automaton must have an initial state";
       }
       long init = mStateSchema.encodeState(state);
-      registerState(init);
-
+      addNewState(init, -1);
       // Expand all the states in the fringe, until no more
       // are added. This implies we have explored the entire
       // synchronous product.
@@ -434,54 +419,60 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       final int stateid = fringeGet();
       final long state = getStateFromId(stateid);
       // Decode the state.
-      final int[] dstate = mStateSchema.decodeState(state);
-      final int[] rstate = new int[dstate.length];
+      mStateSchema.decodeState(state, mSourceBuffer);
       final AutomatonSchema[] automata = mStateSchema.getOrdering();
-      assert automata.length == dstate.length;
-
-      /*
-       * // Does the current state need to be marked? boolean need_marking =
-       * true; for (int i = 0; i < automata.length; i++) { if
-       * (!automata[i].isMarked(dstate[i])) { need_marking = false; break; } }
-       * if (need_marking) { mMarkedStates.add(stateid); }
-       *
-       * // Does the current state need to have a precondition marking? boolean
-       * need_premarking = true; for (int i = 0; i < automata.length; i++) { if
-       * (!automata[i].isPreconditionMarked(dstate[i])) { need_premarking =
-       * false; break; } } if (need_premarking) {
-       * mPreconditionMarkedStates.add(stateid); }
-       */
 
       // Explore transitions ...
-      nextevent: for (int eventid = 0; eventid < mEventMap.size(); eventid++) {
+      nextevent:
+      for (int eventid = 0; eventid < mEventMap.size(); eventid++) {
         for (int autid = 0; autid < automata.length; autid++) {
           final AutomatonSchema schema = automata[autid];
-          final int src = dstate[autid];
+          final int src = mSourceBuffer[autid];
           final int target = schema.getSuccessorState(src, eventid);
           if (target < 0) {
             continue nextevent;
           }
-          rstate[autid] = target;
+          mTargetBuffer[autid] = target;
         }
         // Hopefully we have a new state! Encode away ...
-        final long newstate = mStateSchema.encodeState(rstate);
-        final int newid = registerState(newstate);
-        if (stateid != newid) {
-          transitions.addTransition(transitions.transitionFactory(stateid,
-              newid, eventid));
-        }
+        final long newstate = mStateSchema.encodeState(mTargetBuffer);
+        addNewState(newstate, stateid);
       }
     }
 
-    // #########################################################################
-    // # Data Members
+    private EventProxy findEvent(final int sourceid, final int targetid)
+    {
+      final AutomatonSchema[] automata = mStateSchema.getOrdering();
+      final int numaut = automata.length;
+      final long sourcepacked = getStateFromId(sourceid);
+      mStateSchema.decodeState(sourcepacked, mSourceBuffer);
+      final long targetpacked = getStateFromId(targetid);
+      mStateSchema.decodeState(targetpacked, mTargetBuffer);
+      final int numevents = mEventMap.size();
+      nextevent:
+        for (int eventid = 0; eventid < numevents; eventid++) {
+          for (int autid = 0; autid < numaut; autid++) {
+            final AutomatonSchema schema = automata[autid];
+            final int source = mSourceBuffer[autid];
+            final int target = schema.getSuccessorState(source, eventid);
+            if (target != mTargetBuffer[autid]) {
+              continue nextevent;
+            }
+          }
+          return mEventMap.getEvent(eventid);
+        }
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
     private final SyncStateSchema mStateSchema;
 
-    private final TransitionSchema transitions =
-        new TransitionSchema(false, true);
+    private final List<TIntArrayList> mPredecessors =
+      new BlockedArrayList<TIntArrayList>(TIntArrayList.class);
 
     /**
-     * A map of synchronous product states to integer ids, to allow the states
+     * A map of synchronous product states to integer IDs, to allow the states
      * to be more efficiently encoded.
      */
     private final TLongIntHashMap mStateMap = new TLongIntHashMap();
@@ -496,11 +487,14 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
      */
     private int mNextStateIndex = 0;
 
+    private final int[] mSourceBuffer;
+    private final int[] mTargetBuffer;
+
   }
 
 
-  // #########################################################################
-  // # Inner Class EventMap
+  //#########################################################################
+  //# Inner Class EventMap
   /**
    * A mapping of EventProxy objects to integer identifiers. These identifiers
    * are used when building the synchronous product.
@@ -508,8 +502,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
   private class EventMap
   {
 
-    // #######################################################################
-    // # Constructor
+    //#######################################################################
+    //# Constructor
     EventMap()
     {
       final ProductDESProxy model = getModel();
@@ -522,8 +516,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       }
     }
 
-    // #######################################################################
-    // # Simple Access
+    //#######################################################################
+    //# Simple Access
     int size()
     {
       return events.length;
@@ -541,15 +535,15 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       return eventmap.get(e);
     }
 
-    // #######################################################################
-    // # Data Members
+    //#######################################################################
+    //# Data Members
     private final EventProxy[] events;
     private final TObjectIntHashMap<EventProxy> eventmap;
   }
 
 
-  // #########################################################################
-  // # Inner Class SyncStateSchema
+  //#########################################################################
+  //# Inner Class SyncStateSchema
   /**
    * Represents a 'schema' for interpreting a state encoding for the synchronous
    * composition of automata.
@@ -560,8 +554,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
   private static class SyncStateSchema
   {
 
-    // #######################################################################
-    // # Constructor
+    //#######################################################################
+    //# Constructor
     /**
      * Construct a state schema given the automata to be used in the synchronous
      * product.
@@ -610,8 +604,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       }
     }
 
-    // #######################################################################
-    // # Simple Access
+    //#######################################################################
+    //# Simple Access
     AutomatonSchema[] getOrdering()
     {
       return mAutomata;
@@ -656,17 +650,15 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
      * Decode a state from the synchronous product into its states in individual
      * automata. The states are given as integers.
      */
-    int[] decodeState(long state)
+    void decodeState(final long state, final int[] tuple)
     {
-      int[] sarr = new int[mEncondings.length];
       for (int i = 0; i < mEncondings.length; i++) {
-        sarr[i] = mEncondings[i].decode(state);
+        tuple[i] = mEncondings[i].decode(state);
       }
-      return sarr;
     }
 
-    // #######################################################################
-    // # Data Members
+    //#######################################################################
+    //# Data Members
     private final AutomatonSchema[] mAutomata;
     /**
      * State encoding data for the synchronous product.
@@ -676,20 +668,22 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
   }
 
 
-  // #########################################################################
-  // # Inner Class AutomatonSchema
+  //#########################################################################
+  //# Inner Class AutomatonSchema
   /**
    * Represents an automaton. This class exists to help give an
-   * ordering/enumeration to states and transitions in an automata.
+   * ordering/enumeration to states and transitions in an automaton.
    */
   private static class AutomatonSchema
   {
 
-    // #######################################################################
-    // # Constructor
-    AutomatonSchema(final AutomatonProxy automaton, final EventMap eventmap,
-        final EventProxy marking, final EventProxy preMarking)
-    {
+    //#######################################################################
+    //# Constructor
+    AutomatonSchema(final AutomatonProxy automaton,
+        final EventMap eventmap,
+        final EventProxy marking,
+        final EventProxy preMarking)
+        {
       // Enumerate the state set for this automata.
       // This gives an ordering to the states.
       final Set<StateProxy> states = automaton.getStates();
@@ -713,11 +707,12 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         }
         // If the state contains the marking proposition,
         // add it to the set of marked states.
-        if (mMarkedStates != null && state.getPropositions().contains(marking)) {
+        if (mMarkedStates != null &&
+            state.getPropositions().contains(marking)) {
           mMarkedStates.add(i);
         }
-        if (mPreconditionMarkedStates != null
-            && state.getPropositions().contains(preMarking)) {
+        if (mPreconditionMarkedStates != null &&
+            state.getPropositions().contains(preMarking)) {
           mPreconditionMarkedStates.add(i);
         }
         mStates[i] = state;
@@ -741,7 +736,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         final int eventid = eventmap.getId(trans.getEvent());
         mTransitionTable[eventid][srcid] = destid;
       }
-    }
+        }
 
     /**
      * Gets the state number, given a state.
@@ -765,8 +760,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     }
 
     /**
-     * Returns the successor state for the given source state and event, or -1
-     * if the event is not enabled.
+     * Returns the successor state for the given source state and event,
+     * or -1 if the event is not enabled.
      */
     int getSuccessorState(final int src, final int event)
     {
@@ -796,18 +791,20 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       }
     }
 
-    // #######################################################################
-    // # Data Members
+
+    //#######################################################################
+    //# Data Members
     /**
-     * An array of states in the automata, with a fixed ordering.
+     * An array of states in the automata, with a
+     * fixed ordering.
      */
     private final StateProxy[] mStates;
     /**
-     * Gives a mapping of StateProxy object instances to their index in the
-     * state array.
+     * Gives a mapping of StateProxy object instances to
+     * their index in the state array.
      */
     private final TObjectIntHashMap<StateProxy> mStateMap =
-        new TObjectIntHashMap<StateProxy>();
+      new TObjectIntHashMap<StateProxy>();
     private final TIntHashSet mMarkedStates;
     private final TIntHashSet mPreconditionMarkedStates;
     private final int[][] mTransitionTable;
@@ -819,228 +816,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
   }
 
 
-  // #########################################################################
-  // # Inner Class TransitionSchema
-  private static class TransitionSchema
-  {
-    // #######################################################################
-    // # Constructor
-    TransitionSchema(boolean forward, boolean reverse)
-    {
-      transitions = new TLongObjectHashMap<TransitionData>();
-      storeforward = forward;
-      storereverse = reverse;
-    }
-
-    // #######################################################################
-    // # Simple Access
-    int transitionFactory(int src, int dest, int e)
-    {
-      return store.allocate(src, dest, e);
-    }
-
-    void addTransition(int t)
-    {
-      // Add the forward transition. Get the transition data
-      // for the source state and add the transition to that.
-      TransitionData td;
-      if (storeforward) {
-        td = makeTransitionData(store.getSource(t));
-        td.addOutTransition(t);
-      }
-      // Now do the same thing for the destination state, but
-      // add it as an incoming transition.
-      if (storereverse) {
-        td = makeTransitionData(store.getDestination(t));
-        td.addInTransition(t);
-      }
-    }
-
-    TransitionData getTransitions(final int state)
-    {
-      return transitions.get(state);
-    }
-
-    // #######################################################################
-    // # Auxiliary Methods
-    /**
-     * Get, or make transition data. This will get an existing transition data
-     * object for the given state, or it will create a new one and add it.
-     */
-    private TransitionData makeTransitionData(int state)
-    {
-      // Add the forwards transition data.
-      TransitionData td = transitions.get(state);
-      if (td == null) {
-        td = new TransitionData();
-        transitions.put(state, td);
-      }
-      return td;
-    }
-
-    // #######################################################################
-    // # Data Members
-    private final TransitionStore store = new TransitionStore();
-    private final TLongObjectHashMap<TransitionData> transitions;
-
-    private final boolean storeforward;
-    private final boolean storereverse;
-
-  }
-
-
-  // #########################################################################
-  // # Inner Class TransitionData
-  private static class TransitionData
-  {
-    // #######################################################################
-    // # Simple Access
-    void addOutTransition(int t)
-    {
-      if (out == null) {
-        out = new TIntHashSet();
-      }
-      out.add(t);
-    }
-
-    void addInTransition(int t)
-    {
-      if (in == null) {
-        in = new TIntHashSet();
-      }
-      in.add(t);
-    }
-
-    // #######################################################################
-    // # Data Members
-    private TIntHashSet in = null;
-    private TIntHashSet out = null;
-  }
-
-
-  // #########################################################################
-  // # Inner Class TransitionStore
-  /**
-   * An attempt to efficiently allocate memory for transitions in an automaton.
-   * This works by allocating into arrays. There is very little overhead as all
-   * transitions have the same lifetime and so deallocating is not an issue.
-   *
-   * Unlike an array list, this class uses an array of arrays, and simply
-   * allocates a new (possibly larger) array when the existing one is full.
-   *
-   * The transition is returned as a 32 bit integer which encodes an address
-   * into this store. The 8 lowest bits indicate which 'chunk' the data is in,
-   * the rest indicate the location in the current chunk.
-   *
-   * Each transition is stored as 3 integers, and chunk sizes will always be a
-   * multiple of 3.
-   */
-  private static class TransitionStore
-  {
-
-    // #######################################################################
-    // # Constructor
-    public TransitionStore()
-    {
-      chunkptr = 0;
-      pointer = 0;
-      data[0] = allocate_chunk(chunk_size(0));
-    }
-
-    // #######################################################################
-    // # Simple Access
-    /**
-     * Allocate a transition and set its source, destination and event values.
-     */
-    public int allocate(int source, int destination, int event)
-    {
-      // Is the current chunk full? If so, allocate a new
-      // one first and reset the allocation pointer.
-      if (pointer >= data[chunkptr].length) {
-        chunkptr++;
-        data[chunkptr] = allocate_chunk(chunk_size(chunkptr));
-        pointer = 0;
-      }
-
-      // Store and increment the allocation pointer.
-      int t = pointer;
-      pointer += TRANSITION_SIZE;
-      transition_count++;
-
-      // Mask the event to be 20 bits, and source/dest to be 22 bits
-      event &= 0xFFFFF;
-      source &= 0x3FFFFF;
-      destination &= 0x3FFFFF;
-
-      // Store the transition data.
-      data[chunkptr][t] = source;
-      data[chunkptr][t + 1] = destination;
-      data[chunkptr][t] |= (event << 22);
-      data[chunkptr][t + 1] |= ((event >> 10) << 22);
-
-      // Now encode the address.
-      return (t << 8) | (chunkptr & 255);
-    }
-
-    @SuppressWarnings("unused")
-    int transitionCount()
-    {
-      return transition_count;
-    }
-
-    int getSource(int trans)
-    {
-      return data[trans & 255][(trans >> 8)] & 0x3FFFFF;
-    }
-
-    int getDestination(int trans)
-    {
-      return data[trans & 255][(trans >> 8) + 1] & 0x3FFFFF;
-    }
-
-    int getEvent(int trans)
-    {
-      // Urgh. Decoding. Ugly.
-      int val = (data[trans & 255][(trans >> 8)]) >> 22;
-      return val | (((data[trans & 255][(trans >> 8) + 1]) >> 22) << 10);
-    }
-
-    // #######################################################################
-    // # Auxiliary Methods
-    private int[] allocate_chunk(int size)
-    {
-      // System.err.format ("Transitions: Allocating chunk of size %d\n",
-      // size);
-      return new int[size];
-    }
-
-    private int chunk_size(int chunknum)
-    {
-      // We don't want to keep doubling the size forever!
-      // Once we get to chunk 11 [~= 2 million transitions/24MB]
-      // just keep allocating in a linear fashion. This should
-      // be sufficient.
-      if (chunknum > 11)
-        chunknum = 11;
-
-      return (1024 * TRANSITION_SIZE) << chunknum;
-    }
-
-    // #######################################################################
-    // # Data Members
-    static final int TRANSITION_SIZE = 2;
-
-    private final int[][] data = new int[256][];
-
-    private int chunkptr;
-    private int pointer;
-    private int transition_count = 0;
-
-  }
-
-
-  // #########################################################################
-  // # Inner Class StateEncodingData
+  //#########################################################################
+  //# Inner Class StateEncodingData
   /**
    * Data for encoding an automaton's state in the synchronous product. Bits is
    * the number of bits needed to represent the state, and shift is the amount
@@ -1051,8 +828,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
   private static class StateEncodingData
   {
 
-    // #######################################################################
-    // # Constructor
+    //#######################################################################
+    //# Constructor
     StateEncodingData(int bits, int shift)
     {
       // Construct a mask for the state values.
@@ -1061,48 +838,42 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         tmask <<= 1;
         tmask |= 1;
       }
-      mask = tmask;
-      this.shift = shift;
+      mMask = tmask;
+      mShift = shift;
     }
 
-    // #######################################################################
-    // # Simple Access
+    //#######################################################################
+    //# Simple Access
     /**
-     * Encode the state for the current automata (s) into the synchronous
-     * product state sstate.
+     * Encode the state for the current automata (s)
+     * into the synchronous product state sstate.
      */
-    long encode(long sstate, int s)
+    long encode(final long sstate, final int s)
     {
-      // Shifted mask. This is used to clear the relevant bits
-      long shmask = mask << shift;
-      // Mask the value to be the correct size.
-      long value = (s & mask) << shift;
-      // Combine.
-      return (sstate & ~shmask) | value;
+      return sstate | (long) s << mShift;
     }
 
-    int decode(long sstate)
+    int decode(final long sstate)
     {
-      // This cast should be fine, there will never be
-      // more than 32bits of states in an automata.
-      long val = (sstate & (mask << shift)) >> shift;
-      assert val < Integer.MAX_VALUE : "Decoded value is way too big! (" + val
-          + ")";
-      return (int) val;
+      return (int) ((sstate >>> mShift) & mMask);
     }
 
-    // #######################################################################
-    // # Data Members
-    private final long mask;
-    private final int shift;
+    //#######################################################################
+    //# Data Members
+    private final long mMask;
+    private final int mShift;
 
   }
 
+
+  //#########################################################################
+  //# Data Members
   private EventMap mEventMap;
   private SyncProduct mSyncProduct;
 
-  // #########################################################################
-  // # Class Constants
+
+  //#########################################################################
+  //# Class Constants
   private static final int MAXDEPTH = 1024;
 
 }
