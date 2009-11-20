@@ -3,6 +3,7 @@ package net.sourceforge.waters.gui.simulator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -37,9 +38,9 @@ public class TunnelActionListener implements ActionListener, Observer
 
   public void actionPerformed(ActionEvent e)
   {
-    //System.out.println("DEBUG: Blocking events are:" + sim.getBlockingTextual());
-    System.out.println("DEBUG: All events are:" + sim.getAllEvents());
+    System.out.println("DEBUG: Blocking events are:" + sim.getBlockingTextual());
     ArrayList<EventProxy> possibleEvents = sim.getValidTransitions();
+    Collections.sort(possibleEvents);
     if (possibleEvents.size() == 0)
       System.err.println("ERROR: BLOCKING: There are no possible transitions");
     else if (possibleEvents.size() == 1)

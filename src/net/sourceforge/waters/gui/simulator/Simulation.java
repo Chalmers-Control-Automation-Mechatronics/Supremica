@@ -3,6 +3,8 @@ package net.sourceforge.waters.gui.simulator;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.Icon;
+
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -20,7 +22,7 @@ public class Simulation
   @SuppressWarnings("unchecked")
   public ArrayList<EventProxy> getValidTransitions()
   {
-    return (ArrayList<EventProxy>)mValidStates.clone();
+    return (ArrayList<EventProxy>)mEnabledEvents.clone();
   }
 
   @SuppressWarnings("unchecked")
@@ -38,7 +40,7 @@ public class Simulation
   public ArrayList<EventProxy> getAllEvents()
   {
     ArrayList<EventProxy> output = new ArrayList<EventProxy>();
-    for (EventProxy e : mValidStates)
+    for (EventProxy e : mEnabledEvents)
       output.add(e);
     for (EventProxy e : mInvalidEvents.keySet())
       output.add(e);
@@ -61,13 +63,18 @@ public class Simulation
     return output;
   }
 
+  public Icon getMarking(StateProxy state)
+  {
+    throw new UnsupportedOperationException();
+  }
+
   //###################################################################################
   //# Constructor
   public Simulation(ModuleContainer module)
   {
     ProductDESProxy des = module.getCompiledDES();
     mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
-    mValidStates = new ArrayList<EventProxy>();
+    mEnabledEvents = new ArrayList<EventProxy>();
     mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
     if (des != null)
     {
@@ -137,8 +144,6 @@ public class Simulation
           {
             if (trans.getSource() == mAllAutomatons.get(automata))
               mAllAutomatons.put(automata, trans.getTarget());
-            else
-              throw new IllegalArgumentException("DEBUG ERROR: Attempt to process an invalid transistion passed all tests. This shouldn't happen");
           }
         }
       }
@@ -194,12 +199,23 @@ public class Simulation
   {
     for (EventProxy event : mInvalidEvents.keySet())
     {
-      for (AutomatonProxy automata : mInvalidEvents.get(event))
+      if (event.getKind() == EventKind.UNCONTROLLABLE)
       {
-        if (automata.getKind() == ComponentKind.SPEC && event.getKind() == EventKind.UNCONTROLLABLE)
+        boolean blockingPlant = false;
+        Pair<EventProxy, AutomatonProxy> blockingSpec = null;
+        for (AutomatonProxy automata : mInvalidEvents.get(event))
         {
-          return new Pair<EventProxy, AutomatonProxy> (event, automata);
+          if (automata.getKind() == ComponentKind.SPEC)
+          {
+            blockingSpec =  new Pair<EventProxy, AutomatonProxy> (event, automata);
+          }
+          else if (automata.getKind() == ComponentKind.PLANT)
+          {
+            blockingPlant = true;
+          }
         }
+        if (!blockingPlant && blockingSpec != null)
+          return blockingSpec;
       }
     }
     return null;
@@ -207,7 +223,7 @@ public class Simulation
 
   private boolean isInValidEvent (EventProxy event)
   {
-    for (EventProxy validEvent : mValidStates)
+    for (EventProxy validEvent : mEnabledEvents)
     {
       if (event == validEvent)
         return true;
@@ -227,41 +243,28 @@ public class Simulation
 
   private void findEventClassification()
   {
-   mValidStates = new ArrayList<EventProxy>();
+    mEnabledEvents = new ArrayList<EventProxy>();
     mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
     for (AutomatonProxy automaton : mAllAutomatons.keySet())
     {
       for (EventProxy event : automaton.getEvents())
       {
+        boolean eventIsValidForAutomata = false;
         for (TransitionProxy transition : automaton.getTransitions())
         {
           if (transition.getSource() == mAllAutomatons.get(automaton) && transition.getEvent() == event)
           {
+            eventIsValidForAutomata = true;
             if (!isInInvalidEvent(event))
             {
               if (!isInValidEvent(event))
               {
-                mValidStates.add(event);
+                mEnabledEvents.add(event);
               }
             }
           }
         }
-      }
-    }
-    for (AutomatonProxy automaton : mAllAutomatons.keySet())
-    {
-      for (EventProxy event : automaton.getEvents())
-      {
-        boolean locatedEvent = false;
-        for (TransitionProxy transition : automaton.getTransitions())
-        {
-          if (transition.getSource() != mAllAutomatons.get(automaton) && transition.getEvent() == event)
-          {
-            addNewInvalidEvent(event, automaton);
-            locatedEvent = true;
-          }
-        }
-        if (!locatedEvent)
+        if (!eventIsValidForAutomata)
         {
           addNewInvalidEvent(event, automaton);
         }
@@ -279,7 +282,7 @@ public class Simulation
     }
     else if (isInValidEvent(event))
     {
-      mValidStates.remove(event);
+      mEnabledEvents.remove(event);
       ArrayList<AutomatonProxy> failAutomaton = new ArrayList<AutomatonProxy>();
       failAutomaton.add(automaton);
       mInvalidEvents.put(event, failAutomaton);
@@ -295,7 +298,7 @@ public class Simulation
   //##################################################################################################
   //# Data Members
   HashMap<AutomatonProxy, StateProxy> mAllAutomatons; // The Map object is the current state of the key
-  ArrayList<EventProxy> mValidStates;
+  ArrayList<EventProxy> mEnabledEvents;
   HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the key
   ArrayList<EventProxy> mPreviousEvents;
   final ModuleContainer mModule;
