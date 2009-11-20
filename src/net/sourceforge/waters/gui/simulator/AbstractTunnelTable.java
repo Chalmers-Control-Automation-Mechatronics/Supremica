@@ -24,11 +24,13 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.ModelObserver;
 
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class AbstractTunnelTable extends SimulationTable implements Observer
+public class AbstractTunnelTable extends SimulationTable implements Observer, ModelObserver
 {
 
   //#########################################################################
@@ -91,10 +93,13 @@ public class AbstractTunnelTable extends SimulationTable implements Observer
 
   public void update()
   {
-    mCompiledDES = mModuleContainer.getCompiledDES();
-    mSim = new Simulation(mModuleContainer);
-    mRawData = getRawData();
-    fireTableDataChanged();
+    if (mCompiledDES == null)
+    {
+      mCompiledDES = mModuleContainer.getCompiledDES();
+      mSim = new Simulation(mModuleContainer);
+      mRawData = getRawData();
+      fireTableDataChanged();
+    }
   }
 
   public void updateSim(Simulation sim)
@@ -106,7 +111,8 @@ public class AbstractTunnelTable extends SimulationTable implements Observer
 
   public void update(EditorChangedEvent e)
   {
-    update();
+    if (e.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH)
+      update();
   }
 
 
@@ -149,5 +155,13 @@ public class AbstractTunnelTable extends SimulationTable implements Observer
   private static final long serialVersionUID = 1L;
 
 
-
+  public void modelChanged(ModelChangeEvent event)
+  {
+    if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED)
+    {
+      mCompiledDES = null;
+      mSim = null;
+      mRawData = getRawData();
+    }
+  }
 }

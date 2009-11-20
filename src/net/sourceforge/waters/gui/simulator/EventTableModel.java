@@ -10,11 +10,13 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.ModelObserver;
 
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class EventTableModel extends SimulationTable implements Observer
+public class EventTableModel extends SimulationTable implements Observer, ModelObserver
 {
 
   public EventTableModel(final ModuleContainer container)
@@ -68,7 +70,8 @@ public class EventTableModel extends SimulationTable implements Observer
 
   public void update(EditorChangedEvent e)
   {
-    update();
+    if (e.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH)
+      update();
   }
 
   public void updateSim(Simulation sim)
@@ -80,10 +83,13 @@ public class EventTableModel extends SimulationTable implements Observer
 
   public void update()
   {
-    mCompiledDES = mModuleContainer.getCompiledDES();
-    mSim = new Simulation(mModuleContainer);
-    mRawData = getRawData();
-    fireTableDataChanged();
+    if (mCompiledDES == null)
+    {
+      mCompiledDES = mModuleContainer.getCompiledDES();
+      mSim = new Simulation(mModuleContainer);
+      mRawData = getRawData();
+      fireTableDataChanged();
+    }
   }
 
   //#################################################################################
@@ -96,6 +102,16 @@ public class EventTableModel extends SimulationTable implements Observer
   public Simulation getSim()
   {
     return mSim;
+  }
+
+  public void modelChanged(ModelChangeEvent event)
+  {
+    if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED)
+    {
+      mCompiledDES = null;
+      mSim = null;
+      mRawData = getRawData();
+    }
   }
 
 }
