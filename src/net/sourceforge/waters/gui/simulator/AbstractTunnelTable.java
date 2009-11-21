@@ -1,29 +1,14 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.table.AbstractTableModel;
 
-import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.module.ColorGeometryProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 

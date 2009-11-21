@@ -61,4 +61,36 @@
 </xs:simpleType>
 
 
+<!-- ==================================================================== -->
+<!-- Attributes                                                           -->
+<!-- ==================================================================== -->
+
+<xs:element name="AttributeMap">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="B:Attribute" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="Attribute">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+        <xs:attribute name="Value" type="xs:string" default=""/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+
 </xs:schema>

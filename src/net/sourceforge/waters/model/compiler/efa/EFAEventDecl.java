@@ -66,6 +66,11 @@ class EFAEventDecl {
     return mEventDecl.isObservable();
   }
 
+  Map<String,String> getAttributes()
+  {
+    return mEventDecl.getAttributes();
+  }
+
   boolean isBlocked()
   {
     return mIsBlocked;

@@ -104,7 +104,7 @@ public class ProductDESImporter
    * references to other files. Presently, this is only used to
    * obtain a default extension.
    */
-  public void setDocumentManager(DocumentManager manager)
+  public void setDocumentManager(final DocumentManager manager)
   {
     mDocumentManager = manager;
   }
@@ -250,8 +250,9 @@ public class ProductDESImporter
     final SimpleIdentifierProxy ident = importEvent(event);
     final EventKind kind = event.getKind();
     final boolean observable = event.isObservable();
+    final Map<String,String> attribs = event.getAttributes();
     return mFactory.createEventDeclProxy
-      (ident, kind, observable, ScopeKind.LOCAL, null, null);
+      (ident, kind, observable, ScopeKind.LOCAL, null, null, attribs);
   }
 
   private SimpleIdentifierProxy importEvent(final EventProxy event)
@@ -262,7 +263,7 @@ public class ProductDESImporter
 
   private SimpleNodeProxy importNode(final StateProxy state)
   {
-      
+
     final String name = state.getName();
     final boolean initial = state.isInitial();
     final Collection<EventProxy> props = state.getPropositions();

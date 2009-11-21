@@ -637,7 +637,7 @@ public class ScheduleDialog
                                                                                                        event.getKind(),
                                                                                                        event.isObservable(),
                                                                                                        net.sourceforge.waters.xsd.module.ScopeKind.LOCAL,
-                                                                                                       null, null);
+                                                                                                       null, null, null);
                                     module.getEventDeclListModifiable().add(decl);
                                 }
                             } 

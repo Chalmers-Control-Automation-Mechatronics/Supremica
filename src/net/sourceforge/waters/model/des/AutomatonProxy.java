@@ -10,6 +10,7 @@
 package net.sourceforge.waters.model.des;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -80,5 +81,15 @@ public interface AutomatonProxy
    *          guarantee the absence of duplicates.
    */
   public Collection<TransitionProxy> getTransitions();
+
+  /**
+   * Gets the attribute map for this automaton.
+   * The attribute map can be used by tools supporting external model
+   * formats to store information that does not appear in standard DES
+   * models.
+   * @return An immutable map mapping attribute names to values.
+   */
+  // @optional
+  public Map<String,String> getAttributes();
 
 }

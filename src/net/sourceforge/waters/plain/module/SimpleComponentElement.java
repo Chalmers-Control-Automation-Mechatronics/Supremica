@@ -12,7 +12,12 @@
 
 package net.sourceforge.waters.plain.module;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -40,15 +45,43 @@ public final class SimpleComponentElement
    * Creates a new simple component.
    * @param identifier The identifier defining the name of the new simple component.
    * @param kind The kind of the new simple component.
-   * @param graph The graph of the new simple component.
+   * @param graph The graph that defines the automaton of the new simple component.
+   * @param attributes The attribute map of the new simple component, or <CODE>null</CODE> if empty.
+   */
+  public SimpleComponentElement(final IdentifierProxy identifier,
+                                final ComponentKind kind,
+                                final GraphProxy graph,
+                                final Map<String,String> attributes)
+  {
+    super(identifier);
+    mKind = kind;
+    mGraph = graph;
+    if (attributes == null) {
+      mAttributes = null;
+    } else {
+      final Map<String,String> attributesModifiable =
+        new TreeMap<String,String>(attributes);
+      mAttributes =
+        Collections.unmodifiableMap(attributesModifiable);
+    }
+  }
+
+  /**
+   * Creates a new simple component using default values.
+   * This constructor creates a simple component with
+   * an empty attribute map.
+   * @param identifier The identifier defining the name of the new simple component.
+   * @param kind The kind of the new simple component.
+   * @param graph The graph that defines the automaton of the new simple component.
    */
   public SimpleComponentElement(final IdentifierProxy identifier,
                                 final ComponentKind kind,
                                 final GraphProxy graph)
   {
-    super(identifier);
-    mKind = kind;
-    mGraph = graph;
+    this(identifier,
+         kind,
+         graph,
+         null);
   }
 
 
@@ -73,7 +106,8 @@ public final class SimpleComponentElement
       final SimpleComponentProxy downcast = (SimpleComponentProxy) partner;
       return
         mKind.equals(downcast.getKind()) &&
-        mGraph.equalsByContents(downcast.getGraph());
+        mGraph.equalsByContents(downcast.getGraph()) &&
+        ProxyTools.equals(mAttributes, downcast.getAttributes());
     } else {
       return false;
     }
@@ -85,7 +119,8 @@ public final class SimpleComponentElement
       final SimpleComponentProxy downcast = (SimpleComponentProxy) partner;
       return
         mKind.equals(downcast.getKind()) &&
-        mGraph.equalsWithGeometry(downcast.getGraph());
+        mGraph.equalsWithGeometry(downcast.getGraph()) &&
+        ProxyTools.equals(mAttributes, downcast.getAttributes());
     } else {
       return false;
     }
@@ -98,6 +133,8 @@ public final class SimpleComponentElement
     result += mKind.hashCode();
     result *= 5;
     result += mGraph.hashCodeByContents();
+    result *= 5;
+    result += mAttributes.hashCode();
     return result;
   }
 
@@ -108,6 +145,8 @@ public final class SimpleComponentElement
     result += mKind.hashCode();
     result *= 5;
     result += mGraph.hashCodeWithGeometry();
+    result *= 5;
+    result += ProxyTools.hashCode(mAttributes);
     return result;
   }
 
@@ -134,15 +173,21 @@ public final class SimpleComponentElement
     return mGraph;
   }
 
+  public Map<String,String> getAttributes()
+  {
+    return mAttributes;
+  }
+
 
   //#########################################################################
   //# Data Members
   private final ComponentKind mKind;
   private final GraphProxy mGraph;
+  private final Map<String,String> mAttributes;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -3162288088134374148L;
+  private static final long serialVersionUID = 7425968769058743012L;
 
 }

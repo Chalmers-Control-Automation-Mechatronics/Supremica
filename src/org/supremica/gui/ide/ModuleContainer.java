@@ -264,6 +264,11 @@ public class ModuleContainer
         return mPrinter;
     }
 
+    public boolean isSimulatorActive()
+    {
+        return mTabPanel.getSelectedComponent() == mSimulatorPanel;
+    }
+
     ComponentEditorPanel createComponentEditorPanel
         (final SimpleComponentSubject comp)
     {

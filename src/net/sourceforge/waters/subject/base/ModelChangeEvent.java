@@ -225,7 +225,7 @@ public class ModelChangeEvent extends EventObject
   /**
    * Gets the value of this event.
    * The value provides additional information to identify the signalled
-   * change more specifically. 
+   * change more specifically.
    */
   public Object getValue()
   {

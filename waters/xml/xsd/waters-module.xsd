@@ -200,6 +200,7 @@
           <xs:element ref="M:RangeList" minOccurs="0"/>
           <xs:element name="Comment" type="xs:string" minOccurs="0"/>
           <xs:element ref="M:ColorGeometry" minOccurs="0"/>
+          <xs:element ref="B:AttributeMap" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="Kind" type="B:EventKind" use="required"/>
         <xs:attribute name="Observable" type="xs:boolean" default="true"/>
@@ -326,6 +327,7 @@
       <xs:extension base="M:IdentifiedType">
         <xs:sequence>
           <xs:element ref="M:Graph"/>
+          <xs:element ref="B:AttributeMap" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="Kind" type="B:ComponentKind" use="required"/>
       </xs:extension>

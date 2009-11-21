@@ -45,7 +45,7 @@ public class ProductDESElementFactory
     return INSTANCE;
   }
 
-  
+
   //#########################################################################
   //# Factory Methods
   public AutomatonElement createAutomatonProxy
@@ -53,10 +53,22 @@ public class ProductDESElementFactory
      final ComponentKind kind,
      final Collection<? extends EventProxy> events,
      final Collection<? extends StateProxy> states,
-     final Collection<? extends TransitionProxy> transitions)
+     final Collection<? extends TransitionProxy> transitions,
+     final Map<String,String> attribs)
   {
-    return new AutomatonElement(name, kind, events, states, transitions);
+    return new AutomatonElement(name, kind, events,
+                                states, transitions, attribs);
   }
+
+  public AutomatonElement createAutomatonProxy
+  (final String name,
+   final ComponentKind kind,
+   final Collection<? extends EventProxy> events,
+   final Collection<? extends StateProxy> states,
+   final Collection<? extends TransitionProxy> transitions)
+{
+  return new AutomatonElement(name, kind, events, states, transitions);
+}
 
   public AutomatonElement createAutomatonProxy
     (final String name,
@@ -90,10 +102,19 @@ public class ProductDESElementFactory
   public EventElement createEventProxy
     (final String name,
      final EventKind kind,
-     final boolean observable)
+     final boolean observable,
+     final Map<String,String> attribs)
   {
-    return new EventElement(name, kind, observable);
+    return new EventElement(name, kind, observable, attribs);
   }
+
+  public EventElement createEventProxy
+    (final String name,
+     final EventKind kind,
+     final boolean observable)
+{
+  return new EventElement(name, kind, observable);
+}
 
   public EventElement createEventProxy(final String name, final EventKind kind)
   {

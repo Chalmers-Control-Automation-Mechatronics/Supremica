@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.module;
 
+import java.util.Map;
+
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 /**
@@ -40,8 +42,25 @@ public interface SimpleComponentProxy extends ComponentProxy {
 
   //#########################################################################
   //# Getters and Setters
+  /**
+   * Gets the kind (plant, specification, etc.) of the automaton of this simple
+   * component.
+   */
   public ComponentKind getKind();
 
+  /**
+   * Gets the graph that defines the automaton of this simple component.
+   */
   public GraphProxy getGraph();
+
+  /**
+   * Gets the attribute map for this simple component.
+   * The attribute map can be used by tools supporting external model
+   * formats to store information that does not appear in standard DES
+   * models.
+   * @return An immutable map mapping attribute names to values.
+   */
+  // @optional
+  public Map<String,String> getAttributes();
 
 }

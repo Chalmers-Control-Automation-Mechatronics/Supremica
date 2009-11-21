@@ -134,7 +134,7 @@ public class EFACompiler
       mSplitComputer =
         new SplitComputer(mFactory, mOperatorTable, mRootContext);
       mTransitionRelationBuilder =
-        new EFATransitionRelationBuilder(mFactory, mOperatorTable, 
+        new EFATransitionRelationBuilder(mFactory, mOperatorTable,
                                          mRootContext,
                                          mSimpleExpressionCompiler);
       mVariableAutomatonBuilder =
@@ -319,7 +319,7 @@ public class EFACompiler
                            final ConstraintPropagator propagator,
                            final Collection<Proxy> locations)
     throws EvalException
-  {      
+  {
     final ConstraintList guard = propagator.getAllConstraints();
     //System.err.println(edecl.getEventDecl().getName() + " . " + guard);
     mTransitionRelationBuilder.addEventRecord(edecl, guard, locations);
@@ -725,10 +725,11 @@ public class EFACompiler
         final EFAEventDecl edecl = findEventDecl(ident);
         final EventKind kind = edecl.getKind();
         final boolean observable = edecl.isObservable();
+        final Map<String,String> attribs = edecl.getAttributes();
         for (final EFAEvent event : edecl.getEvents()) {
           final IdentifierProxy subident = event.createIdentifier(mFactory);
           final EventDeclProxy subdecl = mFactory.createEventDeclProxy
-            (subident, kind, observable, ScopeKind.LOCAL, null, null);
+            (subident, kind, observable, ScopeKind.LOCAL, null, null, attribs);
           mEventDeclarations.add(subdecl);
           addSourceInfo(subdecl, decl);
         }
@@ -768,7 +769,7 @@ public class EFACompiler
         final int numedges = edges.size();
         mEdgeList = new ArrayList<EdgeProxy>(numedges);
         visitCollection(edges);
-        mInBlockedEventsList = true;        
+        mInBlockedEventsList = true;
         mLabelList = new LinkedList<IdentifierProxy>();
         final LabelBlockProxy blocked0 = graph.getBlockedEvents();
         if (blocked0 != null) {
@@ -895,8 +896,9 @@ public class EFACompiler
         final ComponentKind kind = comp.getKind();
         final GraphProxy graph0 = comp.getGraph();
         final GraphProxy graph1 = visitGraphProxy(graph0);
+        final Map<String,String> attribs = comp.getAttributes();
         final SimpleComponentProxy result =
-          mFactory.createSimpleComponentProxy(ident1, kind, graph1);
+          mFactory.createSimpleComponentProxy(ident1, kind, graph1, attribs);
         addSourceInfo(result, comp);
         mComponents.add(result);
         return result;

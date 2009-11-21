@@ -17,6 +17,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -172,7 +173,8 @@ public interface ModuleProxyFactory
    * @param observable The observability status of the new event declaration.
    * @param scope The scope of the new event declaration.
    * @param ranges The list of index ranges of the new event declaration, or <CODE>null</CODE> if empty.
-   * @param colorGeometry The color information of the new event declaration, or <CODE>null</CODE>.
+   * @param colorGeometry The colour information of the new event declaration, or <CODE>null</CODE>.
+   * @param attributes The attribute map of the new event declaration, or <CODE>null</CODE> if empty.
    */
   public EventDeclProxy createEventDeclProxy
       (IdentifierProxy identifier,
@@ -180,15 +182,17 @@ public interface ModuleProxyFactory
        boolean observable,
        ScopeKind scope,
        Collection<? extends SimpleExpressionProxy> ranges,
-       ColorGeometryProxy colorGeometry);
+       ColorGeometryProxy colorGeometry,
+       Map<String,String> attributes);
 
   /**
    * Creates a new event declaration using default values.
    * This method creates an event declaration with
    * the observability status set to <CODE>true</CODE>,
    * the scope set to <CODE>ScopeKind.LOCAL</CODE>,
-   * an empty list of index ranges, and
-   * the color information set to <CODE>null</CODE>.
+   * an empty list of index ranges,
+   * the colour information set to <CODE>null</CODE>, and
+   * an empty attribute map.
    * @param identifier The identifier defining the name of the new event declaration.
    * @param kind The kind of the new event declaration.
    */
@@ -553,7 +557,22 @@ public interface ModuleProxyFactory
    * Creates a new simple component.
    * @param identifier The identifier defining the name of the new simple component.
    * @param kind The kind of the new simple component.
-   * @param graph The graph of the new simple component.
+   * @param graph The graph that defines the automaton of the new simple component.
+   * @param attributes The attribute map of the new simple component, or <CODE>null</CODE> if empty.
+   */
+  public SimpleComponentProxy createSimpleComponentProxy
+      (IdentifierProxy identifier,
+       ComponentKind kind,
+       GraphProxy graph,
+       Map<String,String> attributes);
+
+  /**
+   * Creates a new simple component using default values.
+   * This method creates a simple component with
+   * an empty attribute map.
+   * @param identifier The identifier defining the name of the new simple component.
+   * @param kind The kind of the new simple component.
+   * @param graph The graph that defines the automaton of the new simple component.
    */
   public SimpleComponentProxy createSimpleComponentProxy
       (IdentifierProxy identifier,

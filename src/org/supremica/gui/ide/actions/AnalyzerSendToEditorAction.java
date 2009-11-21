@@ -41,30 +41,30 @@ public class AnalyzerSendToEditorAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-        
+
     //#######################################################################
     //# Constructor
-    public AnalyzerSendToEditorAction(List<IDEAction> actionList)
+    public AnalyzerSendToEditorAction(final List<IDEAction> actionList)
     {
         super(actionList);
-        
+
         setEditorActiveRequired(false);
         setAnalyzerActiveRequired(true);
-        
+
         putValue(Action.NAME, "To editor");
         putValue(Action.SHORT_DESCRIPTION, "Send selected automata to editor");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_E));
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/toEditor16.gif")));
     }
-    
+
     //#######################################################################
     //# Invocation
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
-    
+
     /**
      * The code that is run when the action is invoked.
      */
@@ -72,11 +72,11 @@ public class AnalyzerSendToEditorAction
     {
         if (ide.getActiveDocumentContainer().getEditorPanel() != null)
         {
-            Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
-            
+            final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+
             // Compile into Waters module
-            ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
-            for (Automaton aut : selectedAutomata) {
+            final ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
+            for (final Automaton aut : selectedAutomata) {
 				try {
 					final SimpleComponentProxy comp =
 						importer.importComponent(aut);
@@ -89,7 +89,7 @@ public class AnalyzerSendToEditorAction
 					ide.getActiveDocumentContainer().getEditorPanel().
 						addComponent((AbstractSubject) comp);
 					// Add all (new) events to the module
-					ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
+					final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
 					boolean problem = false;
 					for (final EventProxy event: aut.getEvents()) {
 						final String name = event.getName();
@@ -103,18 +103,19 @@ public class AnalyzerSendToEditorAction
 													 event.getKind(),
 													 event.isObservable(),
 													 ScopeKind.LOCAL,
-													 null, null);
+													 null, null,
+													 event.getAttributes());
 							module.getEventDeclListModifiable().add(decl);
 						}
 					}
 					if (problem) {
 						JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", JOptionPane.WARNING_MESSAGE);
                     }
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					ide.getIDE().error("Could not add " + aut + " to editor." + ex);
 				}
 			}
         }
     }
-    
+
 }

@@ -2,14 +2,10 @@ package net.sourceforge.waters.gui.simulator;
 
 import java.util.Set;
 
-import javax.swing.table.AbstractTableModel;
-
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 
@@ -92,9 +88,8 @@ public class EventTableModel extends SimulationTable implements Observer, ModelO
     }
   }
 
-  //#################################################################################
+  //##########################################################################
   //# Data Members
-
   private ProductDESProxy mCompiledDES;
   private Object[][] mRawData;
   private final ModuleContainer mModuleContainer;
@@ -104,14 +99,21 @@ public class EventTableModel extends SimulationTable implements Observer, ModelO
     return mSim;
   }
 
+
+  //##########################################################################
+  //# Interface net.sourceforge.waters.subject.base.ModelObserver
   public void modelChanged(ModelChangeEvent event)
   {
-    if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED)
-    {
+    if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED) {
       mCompiledDES = null;
       mSim = null;
       mRawData = getRawData();
     }
   }
+
+
+  //#################################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

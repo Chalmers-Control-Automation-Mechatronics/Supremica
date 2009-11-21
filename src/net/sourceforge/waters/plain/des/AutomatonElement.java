@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -58,6 +60,7 @@ public final class AutomatonElement
    *                      or <CODE>null</CODE> if empty.
    * @param  transitions  The list of transitions for the new automaton,
    *                      or <CODE>null</CODE> if empty.
+   * @param  attribs      The attribute map for the new automaton.
    * @throws DuplicateNameException to indicate that some state or event
    *                      name is used more than once.
    * @throws NameNotFoundException to indicate that some transition refers
@@ -70,7 +73,8 @@ public final class AutomatonElement
                    final ComponentKind kind,
                    final Collection<? extends EventProxy> events,
                    final Collection<? extends StateProxy> states,
-                   final Collection<? extends TransitionProxy> transitions)
+                   final Collection<? extends TransitionProxy> transitions,
+                   final Map<String,String> attribs)
   {
     super(name);
     final EventSet eventscopy =
@@ -93,6 +97,33 @@ public final class AutomatonElement
       }
       mTransitions = Collections.unmodifiableList(transitionscopy);
     }
+    if (attribs == null) {
+      mAttributes = null;
+    } else {
+      final Map<String,String> attribscopy = new TreeMap<String,String>(attribs);
+      mAttributes = Collections.unmodifiableMap(attribscopy);
+    }
+  }
+
+  /**
+   * Creates a new automaton without attributes.
+   * @param  name         The name to be given to the new automaton.
+   * @param  kind         The kind (<I>plant</I>, <I>specification</I>, etc.)
+   *                      of the new automaton.
+   * @param  events       The event alphabet for the new automaton,
+   *                      or <CODE>null</CODE> if empty.
+   * @param  states       The state set for the new automaton,
+   *                      or <CODE>null</CODE> if empty.
+   * @param  transitions  The list of transitions for the new automaton,
+   *                      or <CODE>null</CODE> if empty.
+   */
+  AutomatonElement(final String name,
+                   final ComponentKind kind,
+                   final Collection<? extends EventProxy> events,
+                   final Collection<? extends StateProxy> states,
+                   final Collection<? extends TransitionProxy> transitions)
+  {
+    this(name, kind, events, states, transitions, null);
   }
 
   /**
@@ -171,6 +202,11 @@ public final class AutomatonElement
   public Collection<TransitionProxy> getTransitions()
   {
     return mTransitions;
+  }
+
+  public Map<String,String> getAttributes()
+  {
+    return mAttributes;
   }
 
 
@@ -324,6 +360,7 @@ public final class AutomatonElement
   private final Set<EventProxy> mEvents;
   private final Set<StateProxy> mStates;
   private final Collection<TransitionProxy> mTransitions;
+  private final Map<String,String> mAttributes;
 
 
   //#########################################################################

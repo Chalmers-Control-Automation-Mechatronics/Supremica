@@ -9,6 +9,10 @@
 
 package net.sourceforge.waters.plain.des;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -41,14 +45,36 @@ public final class EventElement
    * @param  kind        The kind of the new event.
    * @param  observable  <CODE>true</CODE> if the event is to be observable,
    *                     <CODE>false</CODE> otherwise.
+   * @param  attribs     The attribute map for the new event.
+   */
+  EventElement(final String name,
+               final EventKind kind,
+               final boolean observable,
+               final Map<String,String> attribs)
+  {
+    super(name);
+    mKind = kind;
+    mIsObservable = observable;
+    if (attribs == null) {
+      mAttributes = null;
+    } else {
+      final Map<String,String> attribscopy = new TreeMap<String,String>(attribs);
+      mAttributes = Collections.unmodifiableMap(attribscopy);
+    }
+  }
+
+  /**
+   * Creates an event without attributes.
+   * @param  name        The name of the new event.
+   * @param  kind        The kind of the new event.
+   * @param  observable  <CODE>true</CODE> if the event is to be observable,
+   *                     <CODE>false</CODE> otherwise.
    */
   EventElement(final String name,
                final EventKind kind,
                final boolean observable)
   {
-    super(name);
-    mKind = kind;
-    mIsObservable = observable;
+    this(name, kind, observable, null);
   }
 
   /**
@@ -92,6 +118,11 @@ public final class EventElement
     return mIsObservable;
   }
 
+  public Map<String,String> getAttributes()
+  {
+    return mAttributes;
+  }
+
 
   //#########################################################################
   //# Equals and Hashcode
@@ -109,7 +140,7 @@ public final class EventElement
 	(mIsObservable == event.isObservable());
     } else {
       return false;
-    }    
+    }
   }
 
   public int hashCodeByContents()
@@ -129,6 +160,7 @@ public final class EventElement
   //# Data Members
   private final EventKind mKind;
   private final boolean mIsObservable;
+  private final Map<String,String> mAttributes;
 
 
   //#########################################################################

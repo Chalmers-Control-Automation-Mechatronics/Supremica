@@ -35,7 +35,7 @@ public class ConvertModelLang {
   //# Constructors
   public ConvertModelLang(){
   }
-  
+
   public ConvertModelLang(final ProductDESProxy        model,
                           final KindTranslator         translator,
                           final ProductDESProxyFactory factory) {
@@ -76,108 +76,109 @@ public class ConvertModelLang {
     }
     final StateProxy onestate =
       mFactory.createStateProxy("s0", true, new HashSet<EventProxy>());
-    Set<EventProxy> onePropertyEvents = new HashSet<EventProxy>();
-    for (EventProxy e : mMadeEvents.keySet()) {
+    final Set<EventProxy> onePropertyEvents = new HashSet<EventProxy>();
+    for (final EventProxy e : mMadeEvents.keySet()) {
       onePropertyEvents.addAll(mMadeEvents.get(e));
     }
-    AutomatonProxy oneProperty =
+    final AutomatonProxy oneProperty =
       mFactory.createAutomatonProxy(":never",
                                     ComponentKind.PROPERTY,
                                     onePropertyEvents,
                                     Collections.singleton(onestate),
-                                    new HashSet<TransitionProxy>());
+                                    null,
+                                    null);
     newAutomata.add(oneProperty);
     newEvents.addAll(oneProperty.getEvents());
-   
-    ProductDESProxy newModel = mFactory.createProductDESProxy("convertedModel", newEvents, newAutomata);
+
+    final ProductDESProxy newModel = mFactory.createProductDESProxy("convertedModel", newEvents, newAutomata);
     return newModel;
   }
 
-  private AutomatonProxy convertSpec(AutomatonProxy a) {    
-    Map<EventProxy, EventProxy> uncont = new HashMap<EventProxy, EventProxy>();
-    Map<EventProxy,Set<StateProxy>> enabledStates = new HashMap<EventProxy,Set<StateProxy>>(); 
-    Set<EventProxy> enabledEvents = new HashSet<EventProxy>();
-    Set<EventProxy> notEnabledEvents = new HashSet<EventProxy>(a.getEvents());  
-    
-    for (TransitionProxy trans : a.getTransitions()) {
-      EventProxy e = trans.getEvent();
+  private AutomatonProxy convertSpec(final AutomatonProxy a) {
+    final Map<EventProxy, EventProxy> uncont = new HashMap<EventProxy, EventProxy>();
+    final Map<EventProxy,Set<StateProxy>> enabledStates = new HashMap<EventProxy,Set<StateProxy>>();
+    final Set<EventProxy> enabledEvents = new HashSet<EventProxy>();
+    final Set<EventProxy> notEnabledEvents = new HashSet<EventProxy>(a.getEvents());
+
+    for (final TransitionProxy trans : a.getTransitions()) {
+      final EventProxy e = trans.getEvent();
       if (enabledStates.get(e)!=null) {
         enabledStates.get(e).add(trans.getSource());
       } else {
-          Set<StateProxy> temp = new HashSet<StateProxy>();
+          final Set<StateProxy> temp = new HashSet<StateProxy>();
           temp.add(trans.getSource());
           enabledStates.put(e,temp);
         }
     }
-    for (EventProxy e : enabledStates.keySet()) {
+    for (final EventProxy e : enabledStates.keySet()) {
       if (enabledStates.get(e).size()==a.getStates().size()) {
         enabledEvents.add(e);
-      } 
+      }
     }
     System.out.println(enabledEvents.size()+" enabled events!!!");
     if (enabledEvents.isEmpty()) return a;
     notEnabledEvents.removeAll(enabledEvents);
-    Set<EventProxy> pe = new HashSet<EventProxy>();
-    for (EventProxy e : notEnabledEvents) { 
-      if (e.getKind()==EventKind.PROPOSITION) { 
+    final Set<EventProxy> pe = new HashSet<EventProxy>();
+    for (final EventProxy e : notEnabledEvents) {
+      if (e.getKind()==EventKind.PROPOSITION) {
         pe.add(e);
         continue;
-      }         
-      EventProxy newEvent = mFactory.createEventProxy(e.getName() + ":" + a.getName(),
+      }
+      final EventProxy newEvent = mFactory.createEventProxy(e.getName() + ":" + a.getName(),
                                                       EventKind.UNCONTROLLABLE);
       Set<EventProxy> temp = new HashSet<EventProxy>();
-      if (mMadeEvents.containsKey(e)) {          
+      if (mMadeEvents.containsKey(e)) {
         temp = mMadeEvents.get(e);
         temp.add(newEvent);
         mMadeEvents.put(e,temp);
-      } else {                    
+      } else {
           temp.add(newEvent);
-          mMadeEvents.put(e,temp);  
-      }  
-      uncont.put(e, newEvent); 
+          mMadeEvents.put(e,temp);
+      }
+      uncont.put(e, newEvent);
     }
     notEnabledEvents.removeAll(pe);
     System.out.println(notEnabledEvents.size()+" not enabled events!!!");
-    Set<StateProxy> states = new HashSet<StateProxy>(a.getStates());
-    Set<TransitionProxy> transitions =
+    final Set<StateProxy> states = new HashSet<StateProxy>(a.getStates());
+    final Set<TransitionProxy> transitions =
       new HashSet<TransitionProxy>(a.getTransitions());
-    Set<EventProxy> events = new HashSet<EventProxy>(a.getEvents());
+    final Set<EventProxy> events = new HashSet<EventProxy>(a.getEvents());
     events.addAll(uncont.values());
-    //Add selfloops when event is not enabled    
-    for (EventProxy e : notEnabledEvents) {
-      Set<StateProxy> notEnabledStates = new HashSet<StateProxy>(states);
+    //Add selfloops when event is not enabled
+    for (final EventProxy e : notEnabledEvents) {
+      final Set<StateProxy> notEnabledStates = new HashSet<StateProxy>(states);
       if (enabledStates.containsKey(e)) {
         notEnabledStates.removeAll(enabledStates.get(e));
       }
-	    for (StateProxy s : notEnabledStates) {
+	    for (final StateProxy s : notEnabledStates) {
 	      transitions.add
 	            (mFactory.createTransitionProxy(s, uncont.get(e), s));
 	    }
     }
-    AutomatonProxy plant =
+    final AutomatonProxy plant =
       mFactory.createAutomatonProxy(a.getName() + ":plant",
                                     ComponentKind.PLANT,
-                                    events, states, transitions);
-    
+                                    events, states, transitions, null);
+
     return plant;
   }
 
-  private AutomatonProxy convertPlant(AutomatonProxy a)
+  private AutomatonProxy convertPlant(final AutomatonProxy a)
   {
-    Set<EventProxy> same = new HashSet<EventProxy>(a.getEvents());
+    final Set<EventProxy> same = new HashSet<EventProxy>(a.getEvents());
     same.retainAll(mMadeEvents.keySet());
     if (same.isEmpty()) {
       return a;
     }
-    Collection<TransitionProxy> trans =
+    final Collection<TransitionProxy> trans =
       new ArrayList<TransitionProxy>(a.getTransitions());
-    Collection<EventProxy> events = new ArrayList<EventProxy>(a.getEvents());
-    for(EventProxy e : same) {
+    final Collection<EventProxy> events = new ArrayList<EventProxy>(a.getEvents());
+    for(final EventProxy e : same) {
       events.addAll(mMadeEvents.get(e));
     }
-    for (TransitionProxy t : a.getTransitions()) {
+    for (final TransitionProxy t : a.getTransitions()) {
       if (mMadeEvents.containsKey(t.getEvent())) {
-        for (EventProxy e : mMadeEvents.get(t.getEvent())) {
+        for (final EventProxy e : mMadeEvents.get(t.getEvent())) {
           trans.add(mFactory.createTransitionProxy(t.getSource(),
                                                    e,
                                                    t.getSource()));
@@ -186,19 +187,19 @@ public class ConvertModelLang {
     }
     return mFactory.createAutomatonProxy
       (a.getName() + ":plant", ComponentKind.PLANT,
-       events, a.getStates(), trans);
+       events, a.getStates(), trans, null);
   }
-  
-  public EventProxy getOriginalEvent(EventProxy newevent) {
-    for (EventProxy e : mMadeEvents.keySet()) {
+
+  public EventProxy getOriginalEvent(final EventProxy newevent) {
+    for (final EventProxy e : mMadeEvents.keySet()) {
       if (mMadeEvents.get(e).contains(newevent)) return e;
     }
     return newevent;
   }
 
-  
+
   private ProductDESProxy             mModel;
   private ProductDESProxyFactory      mFactory;
   private KindTranslator              mTranslator;
-  private Map<EventProxy, Set<EventProxy>> mMadeEvents;         
+  private Map<EventProxy, Set<EventProxy>> mMadeEvents;
 }

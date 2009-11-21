@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -51,14 +53,16 @@ public final class EventDeclElement
    * @param observable The observability status of the new event declaration.
    * @param scope The scope of the new event declaration.
    * @param ranges The list of index ranges of the new event declaration, or <CODE>null</CODE> if empty.
-   * @param colorGeometry The color information of the new event declaration, or <CODE>null</CODE>.
+   * @param colorGeometry The colour information of the new event declaration, or <CODE>null</CODE>.
+   * @param attributes The attribute map of the new event declaration, or <CODE>null</CODE> if empty.
    */
   public EventDeclElement(final IdentifierProxy identifier,
                           final EventKind kind,
                           final boolean observable,
                           final ScopeKind scope,
                           final Collection<? extends SimpleExpressionProxy> ranges,
-                          final ColorGeometryProxy colorGeometry)
+                          final ColorGeometryProxy colorGeometry,
+                          final Map<String,String> attributes)
   {
     super(identifier);
     mKind = kind;
@@ -73,6 +77,14 @@ public final class EventDeclElement
         Collections.unmodifiableList(rangesModifiable);
     }
     mColorGeometry = colorGeometry;
+    if (attributes == null) {
+      mAttributes = null;
+    } else {
+      final Map<String,String> attributesModifiable =
+        new TreeMap<String,String>(attributes);
+      mAttributes =
+        Collections.unmodifiableMap(attributesModifiable);
+    }
   }
 
   /**
@@ -80,8 +92,9 @@ public final class EventDeclElement
    * This constructor creates an event declaration with
    * the observability status set to <CODE>true</CODE>,
    * the scope set to <CODE>ScopeKind.LOCAL</CODE>,
-   * an empty list of index ranges, and
-   * the color information set to <CODE>null</CODE>.
+   * an empty list of index ranges,
+   * the colour information set to <CODE>null</CODE>, and
+   * an empty attribute map.
    * @param identifier The identifier defining the name of the new event declaration.
    * @param kind The kind of the new event declaration.
    */
@@ -92,6 +105,7 @@ public final class EventDeclElement
          kind,
          true,
          ScopeKind.LOCAL,
+         null,
          null,
          null);
   }
@@ -121,7 +135,8 @@ public final class EventDeclElement
         (mIsObservable == downcast.isObservable()) &&
         mScope.equals(downcast.getScope()) &&
         ProxyTools.isEqualListByContents
-          (mRanges, downcast.getRanges());
+          (mRanges, downcast.getRanges()) &&
+        ProxyTools.equals(mAttributes, downcast.getAttributes());
     } else {
       return false;
     }
@@ -137,7 +152,8 @@ public final class EventDeclElement
         mScope.equals(downcast.getScope()) &&
         ProxyTools.isEqualListWithGeometry
           (mRanges, downcast.getRanges()) &&
-        ProxyTools.equalsWithGeometry(mColorGeometry, downcast.getColorGeometry());
+        ProxyTools.equalsWithGeometry(mColorGeometry, downcast.getColorGeometry()) &&
+        ProxyTools.equals(mAttributes, downcast.getAttributes());
     } else {
       return false;
     }
@@ -156,6 +172,8 @@ public final class EventDeclElement
     result += mScope.hashCode();
     result *= 5;
     result += ProxyTools.getListHashCodeByContents(mRanges);
+    result *= 5;
+    result += mAttributes.hashCode();
     return result;
   }
 
@@ -174,6 +192,8 @@ public final class EventDeclElement
     result += ProxyTools.getListHashCodeWithGeometry(mRanges);
     result *= 5;
     result += ProxyTools.hashCodeWithGeometry(mColorGeometry);
+    result *= 5;
+    result += ProxyTools.hashCode(mAttributes);
     return result;
   }
 
@@ -215,6 +235,11 @@ public final class EventDeclElement
     return mColorGeometry;
   }
 
+  public Map<String,String> getAttributes()
+  {
+    return mAttributes;
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -223,10 +248,11 @@ public final class EventDeclElement
   private final ScopeKind mScope;
   private final List<SimpleExpressionProxy> mRanges;
   private final ColorGeometryProxy mColorGeometry;
+  private final Map<String,String> mAttributes;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 5145756044012763020L;
+  private static final long serialVersionUID = 1576812251080253312L;
 
 }

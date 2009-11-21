@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.marshaller;
 import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map;
 
 import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.Proxy;
@@ -22,6 +23,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
+import net.sourceforge.waters.xsd.base.AttributeMap;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -125,8 +127,10 @@ class JAXBProductDESImporter
       final Collection<TransitionProxy> transitions =
         new LinkedList<TransitionProxy>();
       mAutomatonTransitionListHandler.fromJAXB(this, element, transitions);
+      final AttributeMap attribsElement = element.getAttributeMap();
+      final Map<String,String> attribs = importAttributeMap(attribsElement);
       return mFactory.createAutomatonProxy
-        (name, kind, mAutomatonEvents, mAutomatonStates, transitions);
+        (name, kind, mAutomatonEvents, mAutomatonStates, transitions, attribs);
     } finally {
       mAutomatonEvents = null;
       mAutomatonStates = null;
@@ -139,7 +143,9 @@ class JAXBProductDESImporter
     final String name = element.getName();
     final EventKind kind = element.getKind();
     final boolean observable = element.isObservable();
-    return mFactory.createEventProxy(name, kind, observable);
+    final AttributeMap attribsElement = element.getAttributeMap();
+    final Map<String,String> attribs = importAttributeMap(attribsElement);
+    return mFactory.createEventProxy(name, kind, observable, attribs);
   }
 
   private StateProxy importState(final State element)
@@ -190,7 +196,7 @@ class JAXBProductDESImporter
     //#######################################################################
     //# Data Members
     private final IndexedSet<EventProxy> mAlphabet;
-    
+
   }
 
 

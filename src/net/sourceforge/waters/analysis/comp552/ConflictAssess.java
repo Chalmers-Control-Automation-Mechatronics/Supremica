@@ -176,7 +176,7 @@ public class ConflictAssess
         final SimpleExpressionProxy expr = parser.parse(text);
         final ParameterBindingProxy binding =
           moduleFactory.createParameterBindingProxy(name, expr);
-        bindings.add(binding);              
+        bindings.add(binding);
       }
       return bindings;
     } else {
@@ -349,7 +349,7 @@ public class ConflictAssess
       }
       return false;
     } else if (reversed) {
-      return true;      
+      return true;
     } else if (containsnull) {
       printGoodCounterExample(trace, " (BUT CONTAINS null)");
       mNumCorrectTraces++;
@@ -591,7 +591,7 @@ public class ConflictAssess
     final String autname = aut.getName();
     final ComponentKind kind = aut.getKind();
     return mDESFactory.createAutomatonProxy
-      (autname, kind, newevents, newstates, newtransitions);
+      (autname, kind, newevents, newstates, newtransitions, null);
   }
 
   private AutomatonProxy createPropertyAutomaton(final EventProxy newmarking)
@@ -602,7 +602,7 @@ public class ConflictAssess
     final StateProxy state = mDESFactory.createStateProxy("s0", true, null);
     final Collection<StateProxy> states = Collections.singletonList(state);
     return mDESFactory.createAutomatonProxy
-      (name, ComponentKind.PROPERTY, events, states, null);
+      (name, ComponentKind.PROPERTY, events, states, null, null);
   }
 
 
@@ -664,7 +664,7 @@ public class ConflictAssess
    * for more detailed information.
    * @param  args    Array of file names from the command line.
    */
-  public static void main(String[] args)
+  public static void main(final String[] args)
   {
     ConflictAssess assessor = null;
     try {

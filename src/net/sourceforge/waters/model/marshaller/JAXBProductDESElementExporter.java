@@ -35,6 +35,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
+import net.sourceforge.waters.xsd.base.AttributeMap;
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.base.NamedType;
 import net.sourceforge.waters.xsd.des.Automaton;
@@ -172,6 +173,11 @@ abstract class JAXBProductDESElementExporter
       final Set<TransitionProxy> transitions =
         new TreeSet<TransitionProxy>(proxy.getTransitions());
       mAutomatonTransitionListHandler.toJAXB(this, transitions, element);
+      final Map<String,String> attribs = proxy.getAttributes();
+      if (attribs != null) {
+        final AttributeMap attribsElement = createAttributeMap(attribs);
+        element.setAttributeMap(attribsElement);
+      }
     } finally {
       mAutomatonEvents = null;
       mAutomatonStates = null;
@@ -193,6 +199,11 @@ abstract class JAXBProductDESElementExporter
     element.setKind(proxy.getKind());
     if (!proxy.isObservable()) {
       element.setObservable(false);
+    }
+    final Map<String,String> attribs = proxy.getAttributes();
+    if (attribs != null) {
+      final AttributeMap attribsElement = createAttributeMap(attribs);
+      element.setAttributeMap(attribsElement);
     }
   }
 
@@ -369,7 +380,7 @@ abstract class JAXBProductDESElementExporter
     //#######################################################################
     //# Data Members
     private final IndexedSet<P> mAlphabet;
-    
+
   }
 
 

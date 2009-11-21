@@ -112,22 +112,22 @@ class ExtendedAutomata
 				factory.createSimpleIdentifierProxy(name);
 			if (kind.equals("co")) {
 				module.getEventDeclListModifiable().add
-					(factory.createEventDeclProxy(ident,EventKind.CONTROLLABLE,true,ScopeKind.LOCAL,null,null));
+					(factory.createEventDeclProxy(ident,EventKind.CONTROLLABLE,true,ScopeKind.LOCAL,null,null,null));
 			} 
 			else if (kind.equals("uo")) 
 			{
 				module.getEventDeclListModifiable().add
-					(factory.createEventDeclProxy(ident,EventKind.UNCONTROLLABLE,true,ScopeKind.LOCAL,null,null));
+					(factory.createEventDeclProxy(ident,EventKind.UNCONTROLLABLE,true,ScopeKind.LOCAL,null,null,null));
 			}
 			else if (kind.equals("cu")) 
 			{
 				module.getEventDeclListModifiable().add
-					(factory.createEventDeclProxy(ident,EventKind.CONTROLLABLE,false,ScopeKind.LOCAL,null,null));
+					(factory.createEventDeclProxy(ident,EventKind.CONTROLLABLE,false,ScopeKind.LOCAL,null,null,null));
 			}
 			else if (kind.equals("uu")) 
 			{
 				module.getEventDeclListModifiable().add
-					(factory.createEventDeclProxy(ident,EventKind.UNCONTROLLABLE,false,ScopeKind.LOCAL,null,null));
+					(factory.createEventDeclProxy(ident,EventKind.UNCONTROLLABLE,false,ScopeKind.LOCAL,null,null,null));
 			}
 		}
 	}

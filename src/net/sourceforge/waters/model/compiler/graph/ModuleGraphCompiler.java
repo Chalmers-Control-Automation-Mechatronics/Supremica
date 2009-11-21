@@ -55,7 +55,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
 {
- 
+
   //##########################################################################
   //# Constructors
   public ModuleGraphCompiler(final ProductDESProxyFactory factory,
@@ -103,7 +103,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   public Object visitEdgeProxy(final EdgeProxy edge)
   {
-    // Edges must be processed in the proper order: 
+    // Edges must be processed in the proper order:
     // innermost source nodes in group node hierarchy first.
     // Therefore, this following two-pass process ...
     final NodeProxy source = edge.getSource();
@@ -134,7 +134,9 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     final String name = ident.toString();
     final EventKind kind = decl.getKind();
     final boolean observable = decl.isObservable();
-    final EventProxy event = mFactory.createEventProxy(name, kind, observable);
+    final Map<String,String> attribs = decl.getAttributes();
+    final EventProxy event =
+      mFactory.createEventProxy(name, kind, observable, attribs);
     addGlobalEvent(ident, event);
     addSourceInfo(event, decl);
     return event;
@@ -189,7 +191,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       return event;
     } catch (final NondeterministicModuleException exception) {
       throw wrap(exception);
-    } 
+    }
   }
 
   public ProductDESProxy visitModuleProxy(final ModuleProxy module)
@@ -299,9 +301,10 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       final IdentifierProxy ident = comp.getIdentifier();
       final String name = ident.toString();
       final ComponentKind kind = comp.getKind();
+      final Map<String,String> attribs = comp.getAttributes();
       final AutomatonProxy aut =
         mFactory.createAutomatonProxy(name, kind, mLocalEventsList,
-                                      states, transitions);
+                                      states, transitions, attribs);
       addAutomaton(ident, aut);
       addSourceInfo(aut, comp);
       return aut;
@@ -593,7 +596,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     {
       return false;
     }
-    
+
     void explore()
     {
       if (!mIsReachable) {
@@ -637,7 +640,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     //#######################################################################
     //# Data Members
     private List<EventProxy> mPropositions;
-    private Map<EventProxy,List<CompiledTransition>> mOutgoingTransitions;
+    private final Map<EventProxy,List<CompiledTransition>> mOutgoingTransitions;
     private boolean mIsReachable;
     private StateProxy mState;
 

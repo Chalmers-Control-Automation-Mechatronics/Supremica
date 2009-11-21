@@ -15,6 +15,7 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -28,6 +29,7 @@ import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
+import net.sourceforge.waters.subject.base.AttributeMapSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 
@@ -55,14 +57,16 @@ public final class EventDeclSubject
    * @param observable The observability status of the new event declaration.
    * @param scope The scope of the new event declaration.
    * @param ranges The list of index ranges of the new event declaration, or <CODE>null</CODE> if empty.
-   * @param colorGeometry The color information of the new event declaration, or <CODE>null</CODE>.
+   * @param colorGeometry The colour information of the new event declaration, or <CODE>null</CODE>.
+   * @param attributes The attribute map of the new event declaration, or <CODE>null</CODE> if empty.
    */
   public EventDeclSubject(final IdentifierProxy identifier,
                           final EventKind kind,
                           final boolean observable,
                           final ScopeKind scope,
                           final Collection<? extends SimpleExpressionProxy> ranges,
-                          final ColorGeometryProxy colorGeometry)
+                          final ColorGeometryProxy colorGeometry,
+                          final Map<String,String> attributes)
   {
     super(identifier);
     mKind = kind;
@@ -79,6 +83,14 @@ public final class EventDeclSubject
     if (mColorGeometry != null) {
       mColorGeometry.setParent(this);
     }
+    if (attributes == null) {
+      mAttributes = null;
+    } else {
+      mAttributes = new AttributeMapSubject(attributes);
+    }
+    if (mAttributes != null) {
+      mAttributes.setParent(this);
+    }
   }
 
   /**
@@ -86,8 +98,9 @@ public final class EventDeclSubject
    * This constructor creates an event declaration with
    * the observability status set to <CODE>true</CODE>,
    * the scope set to <CODE>ScopeKind.LOCAL</CODE>,
-   * an empty list of index ranges, and
-   * the color information set to <CODE>null</CODE>.
+   * an empty list of index ranges,
+   * the colour information set to <CODE>null</CODE>, and
+   * an empty attribute map.
    * @param identifier The identifier defining the name of the new event declaration.
    * @param kind The kind of the new event declaration.
    */
@@ -98,6 +111,7 @@ public final class EventDeclSubject
          kind,
          true,
          ScopeKind.LOCAL,
+         null,
          null,
          null);
   }
@@ -149,6 +163,9 @@ public final class EventDeclSubject
       } else {
         mColorGeometry.assignFrom(colorGeometry);
       }
+      final AttributeMapSubject attributes =
+        downcast.getAttributesModifiable();
+      mAttributes.assignFrom(attributes);
       if (change) {
         fireStateChanged();
       }
@@ -173,7 +190,8 @@ public final class EventDeclSubject
         (mIsObservable == downcast.isObservable()) &&
         mScope.equals(downcast.getScope()) &&
         ProxyTools.isEqualListByContents
-          (mRanges, downcast.getRanges());
+          (mRanges, downcast.getRanges()) &&
+        ProxyTools.equals(mAttributes, downcast.getAttributes());
     } else {
       return false;
     }
@@ -189,7 +207,8 @@ public final class EventDeclSubject
         mScope.equals(downcast.getScope()) &&
         ProxyTools.isEqualListWithGeometry
           (mRanges, downcast.getRanges()) &&
-        ProxyTools.equalsWithGeometry(mColorGeometry, downcast.getColorGeometry());
+        ProxyTools.equalsWithGeometry(mColorGeometry, downcast.getColorGeometry()) &&
+        ProxyTools.equals(mAttributes, downcast.getAttributes());
     } else {
       return false;
     }
@@ -208,6 +227,8 @@ public final class EventDeclSubject
     result += mScope.hashCode();
     result *= 5;
     result += ProxyTools.getListHashCodeByContents(mRanges);
+    result *= 5;
+    result += mAttributes.hashCode();
     return result;
   }
 
@@ -226,6 +247,8 @@ public final class EventDeclSubject
     result += ProxyTools.getListHashCodeWithGeometry(mRanges);
     result *= 5;
     result += ProxyTools.hashCodeWithGeometry(mColorGeometry);
+    result *= 5;
+    result += ProxyTools.hashCode(mAttributes);
     return result;
   }
 
@@ -266,6 +289,16 @@ public final class EventDeclSubject
   public ColorGeometrySubject getColorGeometry()
   {
     return mColorGeometry;
+  }
+
+  public Map<String,String> getAttributes()
+  {
+    if (mAttributes == null) {
+      return null;
+    } else {
+      final Map<String,String> downcast = Casting.toMap(mAttributes);
+      return Collections.unmodifiableMap(downcast);
+    }
   }
 
 
@@ -316,7 +349,7 @@ public final class EventDeclSubject
   }
 
   /**
-   * Sets the color information for this event declaration.
+   * Sets the colour information for this event declaration.
    */
   public void setColorGeometry(final ColorGeometrySubject colorGeometry)
   {
@@ -333,6 +366,14 @@ public final class EventDeclSubject
     fireGeometryChanged(mColorGeometry);
   }
 
+  /**
+   * Gets the modifiable attribute map for this event declaration.
+   */
+  public AttributeMapSubject getAttributesModifiable()
+  {
+    return mAttributes;
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -341,5 +382,6 @@ public final class EventDeclSubject
   private ScopeKind mScope;
   private ListSubject<SimpleExpressionSubject> mRanges;
   private ColorGeometrySubject mColorGeometry;
+  private AttributeMapSubject mAttributes;
 
 }

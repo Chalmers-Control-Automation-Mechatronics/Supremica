@@ -32,6 +32,27 @@ public interface ProductDESProxyFactory
    *                     or <CODE>null</CODE> if empty.
    * @param transitions  The list of transitions of the new automaton,
    *                     or <CODE>null</CODE> if empty.
+   * @param attribs      The attribute map for the new automaton.
+   */
+  public AutomatonProxy createAutomatonProxy
+      (String name,
+       ComponentKind kind,
+       Collection<? extends EventProxy> events,
+       Collection<? extends StateProxy> states,
+       Collection<? extends TransitionProxy> transitions,
+       Map<String,String> attribs);
+
+  /**
+   * Creates a new automaton without attributes.
+   * @param name         The name of the new automaton.
+   * @param kind         The kind (<I>plant</I>, <I>specification</I>, etc.)
+   *                     of the new automaton.
+   * @param events       The event alphabet of the new automaton,
+   *                     or <CODE>null</CODE> if empty.
+   * @param states       The list of states of the new automaton,
+   *                     or <CODE>null</CODE> if empty.
+   * @param transitions  The list of transitions of the new automaton,
+   *                     or <CODE>null</CODE> if empty.
    */
   public AutomatonProxy createAutomatonProxy
       (String name,
@@ -110,6 +131,20 @@ public interface ProductDESProxyFactory
 
   /**
    * Creates a new event.
+   * @param name         The name of the new event.
+   * @param kind         The kind of the new event.
+   * @param observable   The observability status of the new event.
+   * @param attribs      The attribute map for the new event.
+   */
+  public EventProxy createEventProxy
+      (String name,
+       EventKind kind,
+       boolean observable,
+       Map<String,String> attribs);
+
+
+  /**
+   * Creates a new event without attributes.
    * @param name         The name of the new event.
    * @param kind         The kind of the new event.
    * @param observable   The observability status of the new event.
@@ -251,7 +286,7 @@ public interface ProductDESProxyFactory
 
   /**
    * Creates a new safety trace using default values. This method provides
-   * a simple interface to create a trace for a deterministic product DES. 
+   * a simple interface to create a trace for a deterministic product DES.
    * It creates a trace with a <CODE>null</CODE> file location, with no
    * comment, with a set of automata equal to that of the product DES, and
    * without any state information in the trace steps.

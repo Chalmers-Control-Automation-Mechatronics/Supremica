@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.des;
 
+import java.util.Map;
+
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -64,4 +66,15 @@ public interface EventProxy
    *         <CODE>false</CODE> otherwise.
    */
   public boolean isObservable();
+
+  /**
+   * Gets the attribute map for this event.
+   * The attribute map can be used by tools supporting external model
+   * formats to store information that does not appear in standard DES
+   * models.
+   * @return An immutable map mapping attribute names to values.
+   */
+  // @optional
+  public Map<String,String> getAttributes();
+
 }

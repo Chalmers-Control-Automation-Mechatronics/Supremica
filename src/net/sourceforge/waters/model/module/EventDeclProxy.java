@@ -10,6 +10,7 @@
 package net.sourceforge.waters.model.module;
 
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
@@ -95,16 +96,26 @@ public interface EventDeclProxy extends IdentifiedProxy {
   public List<SimpleExpressionProxy> getRanges();
 
   /**
-   * Gets the color information for this event declaration.
-   * Events of kind <I>proposition</I> may have a color associated to them,
+   * Gets the colour information for this event declaration.
+   * Events of kind <I>proposition</I> may have a colour associated to them,
    * which defines how nodes marked with the proposition are rendered. This
-   * information may be missing, in which case a default color is to be
+   * information may be missing, in which case a default colour is to be
    * used, and it is meaningless for events that are not of kind
    * <I>proposition</I>.
-   * @return A color geometry object, or <CODE>null</CODE> if none
+   * @return A colour geometry object, or <CODE>null</CODE> if none
    *         is specified.
    */
   public ColorGeometryProxy getColorGeometry();
+
+  /**
+   * Gets the attribute map for this event declaration.
+   * The attribute map can be used by tools supporting external model
+   * formats to store information that does not appear in standard DES
+   * models.
+   * @return An immutable map mapping attribute names to values.
+   */
+  // @optional
+  public Map<String,String> getAttributes();
 
   /**
    * The name to be used for the default marking proposition.

@@ -699,8 +699,9 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       }
       final GraphProxy graph = comp.getGraph();
       final GraphProxy newgraph = visitGraphProxy(graph);
+      final Map<String,String> attribs = comp.getAttributes();
       final SimpleComponentProxy newcomp =
-        mFactory.createSimpleComponentProxy(fullname, kind, newgraph);
+        mFactory.createSimpleComponentProxy(fullname, kind, newgraph, attribs);
       mNameSpace.addComponent(suffix, newcomp);
       mCompiledComponents.add(newcomp);
       addSourceInfo(newcomp, comp);
@@ -878,8 +879,9 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       namespace.getPrefixedIdentifier(suffix, mFactory);
     final EventKind kind = edecl.getKind();
     final boolean observable = edecl.isObservable();
+    final Map<String,String> attribs = edecl.getAttributes();
     final EventDeclProxy decl = mFactory.createEventDeclProxy
-      (ident, kind, observable, ScopeKind.LOCAL, null, null);
+      (ident, kind, observable, ScopeKind.LOCAL, null, null, attribs);
     mCompiledEvents.add(decl);
     addSourceInfo(decl, edecl);
     event.setIdentifier(ident);

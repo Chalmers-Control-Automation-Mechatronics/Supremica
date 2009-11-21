@@ -50,6 +50,8 @@
  */
 package org.supremica.automata;
 
+import java.util.Map;
+
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -64,7 +66,7 @@ public class LabeledEvent
     /** The label is what shows in the dot-figures, this is the
      * global identifier of an event, appearing in the alphabet. */
     private final String label;
-    
+
     private boolean controllable = true;
     private boolean prioritized = true;
     private boolean observable = true;
@@ -74,22 +76,22 @@ public class LabeledEvent
     private boolean proposition = false;
     private int expansionPriority = -1;
     private int index = -1;
-    
+
 //    public LabeledEvent()
 //    {}
-    
-    public LabeledEvent(String label)
+
+    public LabeledEvent(final String label)
     {
         this(label, false);
     }
-    
-    public LabeledEvent(String label, boolean isProposition)
+
+    public LabeledEvent(final String label, final boolean isProposition)
     {
         this.label = label;
         this.proposition = isProposition;
     }
-    
-    public LabeledEvent(LabeledEvent e)
+
+    public LabeledEvent(final LabeledEvent e)
     {
         label = e.label;
         controllable = e.controllable;
@@ -101,8 +103,8 @@ public class LabeledEvent
         proposition = e.proposition;
         index = e.index;
     }
-    
-    public LabeledEvent(LabeledEvent e, String newLabel)
+
+    public LabeledEvent(final LabeledEvent e, final String newLabel)
     {
         controllable = e.controllable;
         prioritized = e.prioritized;
@@ -114,11 +116,11 @@ public class LabeledEvent
         index = e.index;
         label = newLabel;
     }
-    
-    public LabeledEvent(EventProxy e)
+
+    public LabeledEvent(final EventProxy e)
     {
         label = e.getName();
-        EventKind watersKind = e.getKind();
+        final EventKind watersKind = e.getKind();
         if (watersKind == EventKind.CONTROLLABLE)
         {
             controllable = true;
@@ -131,126 +133,126 @@ public class LabeledEvent
         {
             proposition = true;
         }
-        
-        observable = e.isObservable();        
+
+        observable = e.isObservable();
     }
-    
+
     public LabeledEvent clone()
     {
         return new LabeledEvent(this);
     }
-    
+
     public String toString()
     {
         return "'" + label + "'";
     }
-    
+
     public String getLabel()
     {
         return label;
     }
-    
+
 //    /**
 //     * @deprecated
 //     * There is no reason why setlabel should not be immutable
 //     */
-////    @Deprecated    
+////    @Deprecated
 ////    public void setLabel(String label)
 ////    {
 ////        this.label = label;
 ////    }
-    
+
     public boolean isControllable()
     {
         return controllable;
     }
-    
-    public void setControllable(boolean controllable)
+
+    public void setControllable(final boolean controllable)
     {
         this.controllable = controllable;
     }
-    
+
     public boolean isObservable()
     {
         return observable;
     }
-    
-    public void setObservable(boolean observable)
+
+    public void setObservable(final boolean observable)
     {
         this.observable = observable;
     }
-    
+
     public boolean isOperatorIncrease()
     {
         return operatorIncrease;
     }
-    
-    public void setOperatorIncrease(boolean operatorIncrease)
+
+    public void setOperatorIncrease(final boolean operatorIncrease)
     {
         this.operatorIncrease = operatorIncrease;
     }
-    
+
     public boolean isOperatorReset()
     {
         return operatorReset;
     }
-    
-    public void setOperatorReset(boolean operatorReset)
+
+    public void setOperatorReset(final boolean operatorReset)
     {
         this.operatorReset = operatorReset;
     }
-    
+
     public boolean isImmediate()
     {
         return immediate;
     }
-    
-    public void setImmediate(boolean immediate)
+
+    public void setImmediate(final boolean immediate)
     {
         this.immediate = immediate;
     }
-    
+
     public boolean isPrioritized()
     {
         return prioritized;
     }
-    
-    public void setPrioritized(boolean prioritized)
+
+    public void setPrioritized(final boolean prioritized)
     {
         this.prioritized = prioritized;
     }
-    
+
     public boolean isUnobservable()
     {
         return !observable;
     }
-    
-    public void setUnobservable(boolean unobservable)
+
+    public void setUnobservable(final boolean unobservable)
     {
         this.observable = !unobservable;
     }
-    
+
     public boolean isProposition()
     {
         return proposition;
     }
-    
-    public void setProposition(boolean proposition)
+
+    public void setProposition(final boolean proposition)
     {
         this.proposition = proposition;
     }
-    
-    public void setExpansionPriority(int expansionPriority)
+
+    public void setExpansionPriority(final int expansionPriority)
     {
         this.expansionPriority = expansionPriority;
     }
-    
+
     public int getExpansionPriority()
     {
         return expansionPriority;
     }
-    
-    public boolean equals(Object other)
+
+    public boolean equals(final Object other)
     {
         if (other instanceof LabeledEvent)
         {
@@ -258,38 +260,38 @@ public class LabeledEvent
         }
         return false;
     }
-    
-    public boolean equals(String label)
+
+    public boolean equals(final String label)
     {
         return this.label.equals(label);
     }
-    
+
     public int hashCode()
     {
         return label.hashCode();
     }
-    
+
     public int getIndex()
     {
         return index;
     }
-    
-    void setIndex(int index)
+
+    void setIndex(final int index)
     {
         this.index = index;
     }
-    
+
 /*
         public int compareTo(Object event)
         {
                 return label.compareTo(((LabeledEvent) event).label);
         }
  */
-    public int compareTo(NamedProxy event)
+    public int compareTo(final NamedProxy event)
     {
         return label.compareTo(((LabeledEvent) event).label);
     }
-    
+
     /**
      * Ordinary LabeledEvents are not forbidden, but their children
      * ForbiddenEvents are. This is overridden in ForbiddenEvent to
@@ -299,7 +301,7 @@ public class LabeledEvent
     {
         return false;
     }
-    
+
 
     //#########################################################################
     //# Interface net.sourceforge.waters.model.base.Proxy
@@ -307,7 +309,7 @@ public class LabeledEvent
     {
         return EventProxy.class;
     }
-    
+
     public boolean equalsByContents(final Proxy partner)
     {
         if (getProxyInterface() == partner.getProxyInterface()) {
@@ -320,12 +322,12 @@ public class LabeledEvent
             return false;
         }
     }
-    
+
     public boolean equalsWithGeometry(final Proxy partner)
     {
         return equalsByContents(partner);
     }
-    
+
     public int hashCodeByContents()
     {
         int result = refHashCode();
@@ -338,17 +340,17 @@ public class LabeledEvent
         }
         return result;
     }
-    
+
     public int hashCodeWithGeometry()
     {
         return hashCodeByContents();
     }
-    
+
     public boolean refequals(final NamedProxy partner)
     {
         return getName().equals(partner.getName());
     }
-    
+
     public int refHashCode()
     {
         return getName().hashCode();
@@ -370,7 +372,7 @@ public class LabeledEvent
         return getLabel();
     }
 
-    
+
     //#########################################################################
     //# Interface net.sourceforge.waters.model.des.EventProxy
     //# (Some EventProxy methods are defined above.)
@@ -386,5 +388,10 @@ public class LabeledEvent
         }
         return EventKind.UNCONTROLLABLE;
     }
-    
+
+    public Map<String,String> getAttributes()
+    {
+      return null;
+    }
+
 }

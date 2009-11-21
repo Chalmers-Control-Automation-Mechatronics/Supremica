@@ -71,30 +71,30 @@ public class Automaton
     implements AutomatonProxy, Iterable<State>
 {
     private static Logger logger = LoggerFactory.createLogger(Automaton.class);
-    
+
     /**
      * The name of the automaton.
      */
     private String name;
-    
+
     /**
      * A temporary name, used as a suggestion for a name to the gui when
      * adding a new automaton, so that the gui can avoid giving two automata
      * the same name.
      */
     private String comment;
-    
+
     private final StateSet theStates = new StateSet();
     private final Alphabet alphabet;
     private int index = -1;
-    private Map<Integer,State> indexStateMap;
+    private final Map<Integer,State> indexStateMap;
     private State initialState;
     private boolean isDisabled = false;
     private AutomatonType type = AutomatonType.SPECIFICATION;
     private int uniqueStateIndex = 0;
-    
+
     private AutomatonListeners listeners = null;
-    
+
     /**
      * Creates an empty automaton. Always create with a name.
      */
@@ -104,71 +104,71 @@ public class Automaton
         alphabet = new Alphabet();
         indexStateMap = new HashMap<Integer,State>();
     }
-    
+
     /**
      * Creates an empty automaton with a specified name.
      */
-    public Automaton(String name)
+    public Automaton(final String name)
     {
         this();
-        
+
         this.name = name;
         //setName(name);
     }
-    
+
     /**
      * Creates an automaton that is a copy of another.
      */
-    public Automaton(Automaton orgAut)
+    public Automaton(final Automaton orgAut)
     {
         this();
         beginTransaction();
-        
+
         // Deep copy of alphabet...
         alphabet.union(new Alphabet(orgAut.getAlphabet()));
-        
+
         type = orgAut.type;
         name = orgAut.name == null ? "" : orgAut.name;
         comment = orgAut.comment == null ? "" : orgAut.comment;
-        
+
         // Create all states
-        for (State orgState : orgAut.iterableStates())
+        for (final State orgState : orgAut.iterableStates())
         {
-            State newState = new State(orgState);
-            
+            final State newState = new State(orgState);
+
             addState(newState);
         }
-        
-        for (Arc arc : orgAut.iterableArcs())
+
+        for (final Arc arc : orgAut.iterableArcs())
         {
             // We can use indices which is much faster, since the indices can not have changed!
             // No, we cannot! Inexplicably, the indices do change sometimes. If indices are used,
             // which is nice, AutomataIndexMap should be used in some form. /AK
-            State fromState = getStateWithName(arc.getFromState().getName());
-            State toState = getStateWithName(arc.getToState().getName());
+            final State fromState = getStateWithName(arc.getFromState().getName());
+            final State toState = getStateWithName(arc.getToState().getName());
             //State fromState = getStateWithIndex(arc.getFromState().getIndex());
             //State toState = getStateWithIndex(arc.getToState().getIndex());
-            LabeledEvent event = alphabet.getEvent(arc.getEvent().getLabel());
-            Arc newArc = new Arc(fromState, toState, event);
-            
+            final LabeledEvent event = alphabet.getEvent(arc.getEvent().getLabel());
+            final Arc newArc = new Arc(fromState, toState, event);
+
             addArc(newArc);
         }
-        
+
         endTransaction();
     }
-    
+
     /**
      * Sets the type of this automaton (e.g. AutomatonType.PLANT, AutomatonType.SPECIFICATION).
      *
      * @see AutomatonType
      */
-    public void setType(AutomatonType type)
+    public void setType(final AutomatonType type)
     {
         Args.checkForNull(type);
         this.type = type;
         notifyListeners();
     }
-    
+
     /**
      * Returns the type of this automaton.
      */
@@ -176,31 +176,31 @@ public class Automaton
     {
         return type;
     }
-    
+
     public boolean isSupervisor()
     {
         return type == AutomatonType.SUPERVISOR;
     }
-    
+
     public boolean isSpecification()
     {
         return type == AutomatonType.SPECIFICATION;
     }
-    
+
     public boolean isPlant()
     {
         return type == AutomatonType.PLANT;
     }
-    
+
     public boolean isUndefined()
     {
         return type == AutomatonType.UNDEFINED;
     }
-    
+
     /**
      * Sets the name of this automaton.
      */
-    public void setName(String name)
+    public void setName(final String name)
     throws IllegalArgumentException
     {
                 /*
@@ -209,12 +209,12 @@ public class Automaton
                                 throw new IllegalArgumentException("Name must be non-null");
                 }
                  */
-        String oldName = this.getName();
+        final String oldName = this.getName();
         this.name = name;
-        
+
         notifyListeners(AutomatonListeners.MODE_AUTOMATON_RENAMED, oldName);
     }
-    
+
     /**
      * Returns the name of the automaton, or, if there is no name, returns the comment.
      */
@@ -232,13 +232,13 @@ public class Automaton
             {
                 logger.error("Error in Automaton.java. Automaton with empty name and comment detected!");
             }
-            
+
             return "";
         }
-        
+
         return name;
     }
-    
+
     /**
      * Returns true if the automaton has a name (not comment) that is not null or empty.
      */
@@ -246,7 +246,7 @@ public class Automaton
     {
         return !((name == null) || (name == ""));
     }
-    
+
     /**
      * Returns the comment of the automaton.
      */
@@ -256,34 +256,34 @@ public class Automaton
         {
             return "";
         }
-        
+
         return comment;
     }
-    
+
     /**
      * Sets the comment of the automaton.
      */
-    public void setComment(String comment)
+    public void setComment(final String comment)
     throws IllegalArgumentException
     {
         if (comment == null)
         {
             throw new IllegalArgumentException("Comment must be non-null");
         }
-        
+
         this.comment = comment;
     }
-    
-    public void setDisabled(boolean isDisabled)
+
+    public void setDisabled(final boolean isDisabled)
     {
         this.isDisabled = isDisabled;
     }
-    
+
     public boolean isDisabled()
     {
         return isDisabled;
     }
-    
+
     //  When is the slow and beautiful fixx due? When EXACTLY does the indices "become different"?
     /**
      * Quick and ugly fixx, see bug report
@@ -295,71 +295,71 @@ public class Automaton
     public void remapStateIndices()
     {
         indexStateMap.clear();
-        for (State state : iterableStates())
+        for (final State state : iterableStates())
         {
             indexStateMap.put(state.getIndex(), state);
         }
     }
-    
+
     /**
      * Logs a sorted list of the state indices.
      */
     @SuppressWarnings("unused")
 	private void checkStateIndices()
     {
-        TreeSet<Integer> sort = new TreeSet<Integer>();
-        
-        for (State state : iterableStates())
+        final TreeSet<Integer> sort = new TreeSet<Integer>();
+
+        for (final State state : iterableStates())
         {
             sort.add(state.getIndex());
         }
-        
-        for (Integer i : sort )
+
+        for (final Integer i : sort )
         {
             logger.error(i.toString());
         }
     }
-    
+
     /**
      * Adds a state to this automaton. If this is supposed to be the initial state, make
      * sure that the state is set to be initial BEFORE adding it with this method.
      *
      * @return 1 if the state is already in the automaton, otherwise returns 0.
      */
-    public int addState(State state)
+    public int addState(final State state)
     throws IllegalArgumentException
     {
         if (state == null)
         {
             throw new IllegalArgumentException("State must be non-null");
         }
-        
+
         if (theStates.contains(state))
         {
             logger.warn("Automaton " + this + " already contains the state " + state + ".");
             return 1;
         }
-        
+
         theStates.add(state);
-        
+
         if (state.getIndex() == -1)
         {
             state.setIndex(getUniqueStateIndex());
         }
-        
+
         //idStateMap.put(state.getId(), state);
         indexStateMap.put(state.getIndex(), state);
-        
+
         if (state.isInitial())
         {
             this.initialState = state;
         }
-        
+
         notifyListeners(AutomatonListeners.MODE_STATE_ADDED, state);
-        
+
         return 0;
     }
-    
+
     /**
      * Returns a list of control inconsisten events among the given
      * states are consistent.  We have an inconsistency if an event is
@@ -369,31 +369,31 @@ public class Automaton
      * forbidden state.  The states in stateset must be contained in
      * the current automaton.
      */
-    public Alphabet getControlInconsistentEvents(StateSet stateset)
+    public Alphabet getControlInconsistentEvents(final StateSet stateset)
     {
-        Alphabet explicitlyForbiddenEvents = new Alphabet();
-        
+        final Alphabet explicitlyForbiddenEvents = new Alphabet();
+
         // We start by computing the set of explicitly
         // forbidden events
-        for (State currState : iterableStates())
+        for (final State currState : iterableStates())
         {
-            for (Iterator<Arc> arcIt = currState.outgoingArcsIterator();
+            for (final Iterator<Arc> arcIt = currState.outgoingArcsIterator();
             arcIt.hasNext(); )
             {
-                Arc currArc = arcIt.next();
-                State toState = currArc.getToState();
-                
+                final Arc currArc = arcIt.next();
+                final State toState = currArc.getToState();
+
                 if (toState.isForbidden())
                 {
-                    LabeledEvent currEvent = currArc.getEvent();
-                    
+                    final LabeledEvent currEvent = currArc.getEvent();
+
                     if (!explicitlyForbiddenEvents.contains(currEvent))
                     {
                         try
                         {
                             explicitlyForbiddenEvents.addEvent(currEvent);
                         }
-                        catch (Exception ex)
+                        catch (final Exception ex)
                         {
                             logger.error("Could not add event in getControlInconsistentStates", ex);
                         }
@@ -401,34 +401,34 @@ public class Automaton
                 }
             }
         }
-        
+
         // We continuing by iterating over the
         // all explicitly allowed events and check
         // that those are not in the list of explicitly
         // forbidden events
-        Alphabet controlInconsistentEvents = new Alphabet();
-        
-        for (State currState : iterableStates())
+        final Alphabet controlInconsistentEvents = new Alphabet();
+
+        for (final State currState : iterableStates())
         {
-            
-            for (Iterator<Arc> arcIt = currState.outgoingArcsIterator();
+
+            for (final Iterator<Arc> arcIt = currState.outgoingArcsIterator();
             arcIt.hasNext(); )
             {
-                Arc currArc = arcIt.next();
-                State toState = currArc.getToState();
-                
+                final Arc currArc = arcIt.next();
+                final State toState = currArc.getToState();
+
                 if (!toState.isForbidden())
-                    
+
                 {
-                    LabeledEvent currEvent = currArc.getEvent();
-                    
+                    final LabeledEvent currEvent = currArc.getEvent();
+
                     if (explicitlyForbiddenEvents.contains(currEvent))
                     {
                         try
                         {
                             controlInconsistentEvents.addEvent(currEvent);
                         }
-                        catch (Exception ex)
+                        catch (final Exception ex)
                         {
                             logger.error("Could not add event in getControlInconsistentStates", ex);
                         }
@@ -436,34 +436,34 @@ public class Automaton
                 }
             }
         }
-        
+
         return controlInconsistentEvents;
     }
-    
+
     /**
      * Sets an explicitly allowed arc (event) to point to a forbidden
      * state if that events is involved in a control
      * inconsistency. See getControlInconsistentEvents.
      */
-    public Alphabet resolveControlInconsistencies(StateSet stateset)
+    public Alphabet resolveControlInconsistencies(final StateSet stateset)
     {
-        Alphabet explicitlyForbiddenEvents = new Alphabet();
-        Map<LabeledEvent, State> eventToStateMap = new HashMap<LabeledEvent, State>();
-        
+        final Alphabet explicitlyForbiddenEvents = new Alphabet();
+        final Map<LabeledEvent, State> eventToStateMap = new HashMap<LabeledEvent, State>();
+
         // We start by computing the set of explicitly
         // forbidden events
-        for (State currState : iterableStates())
+        for (final State currState : iterableStates())
         {
-            for (Iterator<Arc> arcIt = currState.outgoingArcsIterator();
+            for (final Iterator<Arc> arcIt = currState.outgoingArcsIterator();
             arcIt.hasNext(); )
             {
-                Arc currArc = arcIt.next();
-                State toState = currArc.getToState();
-                
+                final Arc currArc = arcIt.next();
+                final State toState = currArc.getToState();
+
                 if (toState.isForbidden())
                 {
-                    LabeledEvent currEvent = currArc.getEvent();
-                    
+                    final LabeledEvent currEvent = currArc.getEvent();
+
                     if (!explicitlyForbiddenEvents.contains(currEvent))
                     {
                         try
@@ -471,7 +471,7 @@ public class Automaton
                             explicitlyForbiddenEvents.addEvent(currEvent);
                             eventToStateMap.put(currEvent, toState);
                         }
-                        catch (Exception ex)
+                        catch (final Exception ex)
                         {
                             logger.error("Could not add event in resolveControlInconsistencies", ex);
                         }
@@ -479,35 +479,35 @@ public class Automaton
                 }
             }
         }
-        
+
         // We continuing by iterating over the
         // all explicitly allowed events and check
         // that those are not in the list of explicitly
         // forbidden events
-        Alphabet controlInconsistentEvents = new Alphabet();
-        
-        for (State currState : iterableStates())
+        final Alphabet controlInconsistentEvents = new Alphabet();
+
+        for (final State currState : iterableStates())
         {
-            for (Iterator<Arc> arcIt = currState.outgoingArcsIterator();
+            for (final Iterator<Arc> arcIt = currState.outgoingArcsIterator();
             arcIt.hasNext(); )
             {
-                Arc currArc = arcIt.next();
-                State toState = currArc.getToState();
-                
+                final Arc currArc = arcIt.next();
+                final State toState = currArc.getToState();
+
                 if (!toState.isForbidden())
                 {
-                    LabeledEvent currEvent = currArc.getEvent();
-                    
+                    final LabeledEvent currEvent = currArc.getEvent();
+
                     if (explicitlyForbiddenEvents.contains(currEvent))
                     {
                         try
                         {
-                            State forbiddenState = eventToStateMap.get(currEvent);
-                            
+                            final State forbiddenState = eventToStateMap.get(currEvent);
+
                             currArc.setToState(forbiddenState);
                             controlInconsistentEvents.addEvent(currEvent);
                         }
-                        catch (Exception ex)
+                        catch (final Exception ex)
                         {
                             logger.error("Could not add event in getControlInconsistentStates", ex);
                         }
@@ -515,10 +515,10 @@ public class Automaton
                 }
             }
         }
-        
+
         return controlInconsistentEvents;
     }
-    
+
     /**
      * An event is redundant if it is self-looped in all states and
      *  * The event is controllable or
@@ -531,22 +531,22 @@ public class Automaton
     public Alphabet getRedundantEvents()
     {
         assert(isDeterministic());
-        
-        Alphabet result = new Alphabet();
-        
-        loop: for (Iterator<LabeledEvent> evIt = eventIterator(); evIt.hasNext(); )
+
+        final Alphabet result = new Alphabet();
+
+        loop: for (final Iterator<LabeledEvent> evIt = eventIterator(); evIt.hasNext(); )
         {
-            LabeledEvent event = evIt.next();
-            for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
+            final LabeledEvent event = evIt.next();
+            for (final Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
             {
-                State state = stIt.next();
+                final State state = stIt.next();
                 if (!state.doesDefine(event))
                 {
                     continue loop;
                 }
-                for (Iterator<MultiArc> multiArcIt = state.outgoingMultiArcIterator(); multiArcIt.hasNext(); )
+                for (final Iterator<MultiArc> multiArcIt = state.outgoingMultiArcIterator(); multiArcIt.hasNext(); )
                 {
-                    MultiArc multiArc = multiArcIt.next();
+                    final MultiArc multiArc = multiArcIt.next();
                     if (multiArc.contains(event) && !multiArc.isSelfLoop())
                     {
                         continue loop;
@@ -560,71 +560,71 @@ public class Automaton
                 result.addEvent(event);
             }
         }
-        
+
         return result;
     }
-    
-    public boolean isInAlphabet(LabeledEvent event)
+
+    public boolean isInAlphabet(final LabeledEvent event)
     {
         return alphabet.contains(event);
     }
-    
+
     /**
      * If a state with this id (and/or name?) already exists, return the existing state
      * Else, add this state and return it
      */
-    public State addStateChecked(State state)
+    public State addStateChecked(final State state)
     throws IllegalArgumentException
     {
         if (state == null)
         {
             throw new IllegalArgumentException("State must be non-null");
         }
-        
-        State existing = getStateWithName(state.getName());
+
+        final State existing = getStateWithName(state.getName());
         if (existing != null)
         {
             return existing;
         }
-        
+
         // else, add it as usual
         addState(state);
-        
+
         return state;
     }
-    
-    public void removeState(State state)
+
+    public void removeState(final State state)
     throws IllegalArgumentException
     {
         if (state == null)
         {
             throw new IllegalArgumentException("State must be non-null");
         }
-        
+
         if (state == initialState)
         {
             initialState = null;
         }
-        
+
         theStates.remove(state);
         state.removeArcs();
         //String id = state.getId();
         //idStateMap.remove(id);
-        int index = state.getIndex();
+        final int index = state.getIndex();
         indexStateMap.remove(index);
         notifyListeners(AutomatonListeners.MODE_STATE_REMOVED, state);
     }
-    
+
     public boolean hasInitialState()
     {
         return initialState != null;
     }
-    
+
     public State getInitialState()
     {
         return initialState;
     }
-    
+
     /**
      * Returns true if this is the null automaton, i.e. this
      * automaton does not have an initial state.
@@ -633,43 +633,43 @@ public class Automaton
     {
         return !hasInitialState();
     }
-    
+
     // This is a fixx, for now - see bug report
-    public void setInitialState(State state)
+    public void setInitialState(final State state)
     throws IllegalArgumentException
     {
         if (state == null)
         {
             throw new IllegalArgumentException("State must be non-null");
         }
-        
-        State oldinit = getInitialState();
-        State newinit = getStateWithName(state.getName());
-        
+
+        final State oldinit = getInitialState();
+        final State newinit = getStateWithName(state.getName());
+
         if (newinit == null)
         {
             throw new IllegalStateException("No such state, " + state);
         }
-        
+
         newinit.setInitial(true);
-        
+
         initialState = newinit;
-        
+
         if (oldinit != null)
         {
             oldinit.setInitial(false);
         }
     }
-    
+
     /**
      * Returns a uniquely named (and id'ed) state.
      * Passing null or empty prefix sets prefix to 'q'
      * The new state is not added to the state set
      */
-    public State createUniqueState(String prefix)
+    public State createUniqueState(final String prefix)
     {
         StringBuffer name = null;
-        
+
         if ((prefix == null) || prefix.equals(""))
         {
             name = new StringBuffer("r");
@@ -678,20 +678,20 @@ public class Automaton
         {
             name = new StringBuffer(prefix);
         }
-        
+
         while (containsStateWithName(name.toString()))
         {
             name.append(uniqueStateIndex++);
         }
-        
+
         return new State(name.toString());
     }
-    
+
     public State createUniqueState()
     {
         return createUniqueState("p");
     }
-    
+
     /**
      * Returns true if it finds an accepting state, else returns false
      * Iterates over all states _only_if_ no accepting states exist (or only
@@ -699,19 +699,19 @@ public class Automaton
      */
     public boolean hasAcceptingState()
     {
-        for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+        for (final Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
         {
-            State currState = stateIt.next();
-            
+            final State currState = stateIt.next();
+
             if (currState.isAccepting())
             {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Returns true if it finds a nonaccepting state, else returns false
      * Iterates over all states _only_if_ no accepting states exist (or only
@@ -719,83 +719,83 @@ public class Automaton
      */
     public boolean hasNonacceptingState()
     {
-        for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+        for (final Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
         {
-            State currState = stateIt.next();
-            
+            final State currState = stateIt.next();
+
             if (!currState.isAccepting())
             {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * True if automaton has at least one self loop.
      */
     public boolean hasSelfLoop()
     {
-        for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+        for (final Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
         {
-            Arc currArc = arcIt.next();
-            
+            final Arc currArc = arcIt.next();
+
             if (currArc.isSelfLoop())
             {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Examines if the automaton is deterministic.
      * @return true if automaton is deterministic.
      */
     public boolean isDeterministic()
     {
-        HashSet<String> foundEvents = new HashSet<String>();
-        
-        for (Iterator<State> stIt = stateIterator();	stIt.hasNext(); )
+        final HashSet<String> foundEvents = new HashSet<String>();
+
+        for (final Iterator<State> stIt = stateIterator();	stIt.hasNext(); )
         {
-            State currState = stIt.next();
-            
+            final State currState = stIt.next();
+
             foundEvents.clear();
-            
-            for (Iterator<Arc> evIt = currState.outgoingArcsIterator(); evIt.hasNext(); )
+
+            for (final Iterator<Arc> evIt = currState.outgoingArcsIterator(); evIt.hasNext(); )
             {
-                LabeledEvent currEvent = evIt.next().getEvent();
-                
+                final LabeledEvent currEvent = evIt.next().getEvent();
+
                 // Epsilon event?
                 if (!currEvent.isObservable())
                 {
                     return false;
                 }
-                
+
                 // Has this event been seen in another transition from this state?
-                boolean newElement = foundEvents.add(currEvent.getLabel());
+                final boolean newElement = foundEvents.add(currEvent.getLabel());
                 if (!newElement)
                 {
                     return false;
                 }
             }
         }
-        
+
         return true;
     }
-    
+
     public boolean isAllEventsPrioritized()
     {
         return alphabet.isAllEventsPrioritized();
     }
-    
+
     public boolean isAllEventsObservable()
     {
         return alphabet.isAllEventsObservable();
     }
-    
+
     /**
      * When adding an arc, both the two states associated with the
      * arc _must_ already be contained in the automaton, otherwise the
@@ -803,20 +803,20 @@ public class Automaton
      *
      * What about the event? //MF
      */
-    public void addArc(Arc arc)
+    public void addArc(final Arc arc)
     throws IllegalArgumentException
     {
         if (arc == null)
         {
             throw new IllegalArgumentException("Arc must be non-null");
         }
-        
+
         // Add the arc to the individual states
         arc.getFromState().addOutgoingArc(arc);
         arc.getToState().addIncomingArc(arc);
     }
-    
-    public void removeArc(Arc arc)
+
+    public void removeArc(final Arc arc)
     throws IllegalArgumentException
     {
         if (arc == null)
@@ -825,19 +825,19 @@ public class Automaton
         }
         arc.clear();
     }
-    
-    public boolean containsState(State state)
+
+    public boolean containsState(final State state)
     throws IllegalArgumentException
     {
         if (state == null)
         {
             throw new IllegalArgumentException("State must be non-null");
         }
-        
+
         //return idStateMap.containsKey(state.getId());
         return theStates.contains(state);
     }
-    
+
     /**
      * Gets the states in this automaton.
      */
@@ -845,36 +845,36 @@ public class Automaton
     {
         return theStates;
     }
-    
+
     public IterableStates iterableStates()
     {
         return new IterableStates(theStates);
     }
-    
+
     public IterableEvents iterableEvents()
     {
         return new IterableEvents(alphabet);
     }
-    
+
     public IterableArcs iterableArcs()
     {
         return new IterableArcs(theStates);
     }
-    
+
     public Iterator<Arc> arcIterator()
     {
         return theStates.outgoingArcsIterator();
     }
-    
+
 /*
         public List<Arc> getArcs()
         {
                 List<Arc> arcList = new LinkedList<Arc>();
- 
+
                 return Collections.unmodifiableList(arcList);
         }
  */
-    
+
     // Note, searches on id - only call this with states in this automaton
         /*
         public State getState(State state)
@@ -884,11 +884,11 @@ public class Automaton
                 {
                         throw new IllegalArgumentException("State must be non-null");
                 }
-         
+
                 //return (State) idStateMap.get(state.getId());
         }
          */
-    
+
     /**
      * Given this state, which belongs to this stateset, return a unique id-string
      */
@@ -899,120 +899,120 @@ public class Automaton
                 return state.getId();    // at the moment do the simplest thing
         }
          */
-    
+
     /**
      * True if a state with the name exists, otherwise false.
      */
-    public boolean containsStateWithName(String name)
+    public boolean containsStateWithName(final String name)
     throws IllegalArgumentException
     {
         if (name == null)
         {
             throw new IllegalArgumentException("Name must be non-null");
         }
-        
-        State theState = getStateWithName(name);
-        
+
+        final State theState = getStateWithName(name);
+
         return theState != null;
     }
-    
+
     /**
      * Returns the state with the asked for name if it exists, otherwise null.
      */
-    public State getStateWithName(String name)
+    public State getStateWithName(final String name)
     throws IllegalArgumentException
     {
         if (name == null)
         {
             throw new IllegalArgumentException("Name must be non-null");
         }
-        
-        for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
+
+        for (final Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
         {
-            State currState = stIt.next();
-            
+            final State currState = stIt.next();
+
             if (currState.getName().equals(name))
             {
                 return currState;
             }
         }
-        
+
         return null;
     }
-    
+
         /*
         private boolean containsStateWithId(String id)
         {
                 return idStateMap.containsKey(id);
         }
          */
-    
+
         /*
         private State getStateWithId(String id)
         {
                 return (State) idStateMap.get(id);
         }
          */
-    
+
     // The index stuff should be exclusive to AutomataIndexForm, but how to manage that?
-    
+
     /**
      * This is an ugly method that is only needed when dealing
      * with automataIndexForm. All methods that works with index
      * needs special initialisation that is not automatically done.
      * This method is not recommended for general use.
      */
-    public boolean containsStateWithIndex(int index)
+    public boolean containsStateWithIndex(final int index)
     {
         return indexStateMap.containsKey(index);
     }
-    
+
     /**
      * This is an ugly method that only is needed when dealing
      * with automataIndexForm. All methods that works with index
      * needs special initialisation that is not automatically done.
      * This method is not recommended for general use.
      */
-    public State getStateWithIndex(int index)
+    public State getStateWithIndex(final int index)
     {
         return indexStateMap.get(index);
     }
-    
+
     // end index stuff
-    
+
     /**
      * Returns an iterator to all states in this automaton
      * that has an event with eventLabel as an outoing event.
      */
-    public Iterator<State> statesThatEnableEventIterator(String eventLabel)
+    public Iterator<State> statesThatEnableEventIterator(final String eventLabel)
     throws IllegalStateException
     {
         if (eventLabel == null)
         {
             throw new IllegalArgumentException("EventLabel must be non-null");
         }
-        
-        Iterator<State> stIt = new InternalStateIterator(eventLabel, true);
+
+        final Iterator<State> stIt = new InternalStateIterator(eventLabel, true);
         return stIt;
     }
-    
+
     /**
      * Returns true if the event with label eventLabel is prioritized in this
      * automaton. If the event is not included in this automaton or is not
      * prioritized then it returns false.
      */ // should throw exception if the event is not in this alphabet? //MF
-    public boolean isEventPrioritized(String eventLabel)
+    public boolean isEventPrioritized(final String eventLabel)
     throws IllegalArgumentException
     {
         if (eventLabel == null)
         {
             throw new IllegalArgumentException("EventLabel must be non-null");
         }
-        
+
         if (alphabet.contains(eventLabel))
         {
-            LabeledEvent thisEvent = alphabet.getEvent(eventLabel);
-            
+            final LabeledEvent thisEvent = alphabet.getEvent(eventLabel);
+
             return thisEvent.isPrioritized();
         }
         else
@@ -1020,7 +1020,7 @@ public class Automaton
             return false;
         }
     }
-    
+
     /**
      * Returns number of states in this automaton.
      */
@@ -1028,7 +1028,7 @@ public class Automaton
     {
         return theStates.size();
     }
-    
+
     /**
      * Returns number of events in this automaton's alphabet.
      */
@@ -1036,21 +1036,21 @@ public class Automaton
     {
         return alphabet.size();
     }
-    
+
     /**
      * Returns number of transitions in this automaton.
      */
     public int nbrOfTransitions()
     {
         int amount = 0;
-        for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+        for (final Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
         {
             arcIt.next();
             amount++;
         }
-        
+
         return amount;
-        
+
                 /*
                 // Calculate the sum of the outgoing arcs in the states
                 int amount = 0;
@@ -1058,176 +1058,176 @@ public class Automaton
                 {
                         amount += stIt.next().nbrOfOutgoingArcs();
                 }
-                 
+
                 return amount;
                  */
     }
-    
+
     /**
      * Returns number of transitions in this automaton that are associated with epsilon-events.
      */
     public int nbrOfEpsilonTransitions()
     {
         int amount = 0;
-        
-        for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+
+        for (final Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
         {
-            Arc currArc = arcIt.next();
-            
+            final Arc currArc = arcIt.next();
+
             if (!currArc.getEvent().isObservable())
             {
                 amount++;
             }
         }
-        
+
         return amount;
     }
-    
+
     /**
      * Amount of selfloops in automaton.
      */
     public int nbrOfSelfLoops()
     {
         int amount = 0;
-        
-        for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+
+        for (final Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
         {
-            Arc currArc = arcIt.next();
-            
+            final Arc currArc = arcIt.next();
+
             if (currArc.isSelfLoop())
             {
                 amount++;
             }
         }
-        
+
         return amount;
     }
-    
+
     /**
      * Amount of selfloops of the events in anAlphabet
      */
-    public int nbrOfSelfLoops(Alphabet anAlphabet)
+    public int nbrOfSelfLoops(final Alphabet anAlphabet)
     {
         int amount = 0;
-        
-        for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+
+        for (final Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
         {
-            Arc currArc = arcIt.next();
-            
+            final Arc currArc = arcIt.next();
+
             if (currArc.isSelfLoop() && anAlphabet.contains(currArc.getEvent()))
             {
                 amount++;
             }
         }
-        
+
         return amount;
     }
-    
+
     public int nbrOfAcceptingStates()
     {
         int nbrOfAcceptingStates = 0;
-        for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
+        for (final Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
         {
-            State currState = stIt.next();
-            
+            final State currState = stIt.next();
+
             if (currState.isAccepting())
             {
                 nbrOfAcceptingStates++;
             }
         }
-        
+
         return nbrOfAcceptingStates;
     }
-    
+
     public int nbrOfForbiddenStates()
     {
         int nbrOfForbiddenStates = 0;
-        for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
+        for (final Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
         {
-            State currState = stIt.next();
-            
+            final State currState = stIt.next();
+
             if (currState.isForbidden())
             {
                 nbrOfForbiddenStates++;
             }
         }
-        
+
         return nbrOfForbiddenStates;
     }
-    
+
     public int nbrOfAcceptingAndForbiddenStates()
     {
         int nbrOfAcceptingAndForbiddenStates = 0;
-        for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
+        for (final Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
         {
-            State currState = stIt.next();
-            
+            final State currState = stIt.next();
+
             if (currState.isAccepting() && currState.isForbidden())
             {
                 nbrOfAcceptingAndForbiddenStates++;
             }
         }
-        
+
         return nbrOfAcceptingAndForbiddenStates;
     }
-    
+
     /**
      * Returns depth of automaton.
      */
     public int depth()
     {
         int depth = 0;
-        for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
+        for (final Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
         {
             // Measure the shortest trace to the state.
-            State currState = stIt.next();
+            final State currState = stIt.next();
             int stateDepth;
-            
+
             try
             {
                 stateDepth = getTrace(currState).size();
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error(ex);
-                
+
                 return Integer.MAX_VALUE;
             }
-            
+
             if (stateDepth > depth)
             {
                 depth = stateDepth;
             }
         }
-        
+
         return depth;
     }
-    
+
     /**
      * Returns sum of depths of transitions of events in anAlphabet.
      */
-    public int depthSum(Alphabet anAlphabet)
+    public int depthSum(final Alphabet anAlphabet)
     {
         int depthSum = 0;
-        for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
+        for (final Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
         {
             // Measure the shortest trace to the state.
-            State currState = stIt.next();
+            final State currState = stIt.next();
             int stateDepth;
-            
+
             try
             {
                 stateDepth = getTrace(currState).size();
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error(ex);
-                
+
                 return Integer.MAX_VALUE;
             }
-            
+
             // Calculate sum of
-            for (Iterator<Arc> arcIterator = currState.outgoingArcsIterator();
+            for (final Iterator<Arc> arcIterator = currState.outgoingArcsIterator();
             arcIterator.hasNext(); )
             {
                 if (anAlphabet.contains(arcIterator.next().getEvent()))
@@ -1236,10 +1236,10 @@ public class Automaton
                 }
             }
         }
-        
+
         return depthSum;
     }
-    
+
     /**
      * Returns an iterator over the states.
      */
@@ -1247,7 +1247,7 @@ public class Automaton
     {
         return theStates.iterator();
     }
-    
+
     /**
      * Returns the state iterator.
      */
@@ -1255,7 +1255,7 @@ public class Automaton
     {
         return stateIterator();
     }
-    
+
     /**
      * Use this iterator instead of stateIterator when you add or
      * remove states in this automaton.
@@ -1264,17 +1264,17 @@ public class Automaton
     {
         return (new StateSet(theStates)).iterator();
     }
-    
+
     public Iterator<LabeledEvent> eventIterator()
     {
         return alphabet.iterator();
     }
-    
+
     public Collection<?> eventCollection()
     {
         return alphabet.values();
     }
-    
+
     /**
      * Returns the alphabet of the automaton.
      */
@@ -1282,7 +1282,7 @@ public class Automaton
     {
         return alphabet;
     }
-    
+
     /**
      * Returns the observable alphabet of the automaton.
      */
@@ -1290,7 +1290,7 @@ public class Automaton
     {
         return new Alphabet(alphabet, false);
     }
-    
+
     /**
      * In some situation, for example in the dot output
      * not all state identities can be accepeted. For example
@@ -1300,65 +1300,65 @@ public class Automaton
     public void normalizeStateIdentities()
     {
         setStateIndices();
-        
-        for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+
+        for (final Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
         {
-            State currState = stateIt.next();
-            
+            final State currState = stateIt.next();
+
             currState.setName("n" + currState.getIndex());
         }
-        
+
         remapStateIndices();
     }
-    
+
     public void setIndices()
     {
         setIndices(0);
     }
-    
-    void setIndices(int automatonIndex)
+
+    void setIndices(final int automatonIndex)
     {
         index = automatonIndex;
-        
+
         alphabet.setIndices();
         setStateIndices();
     }
-    
-    void setIndices(int automatonIndex, Alphabet otherAlphabet)
+
+    void setIndices(final int automatonIndex, final Alphabet otherAlphabet)
     {
         index = automatonIndex;
-        
+
         alphabet.setIndices(otherAlphabet);
         setStateIndices();
     }
-    
+
     private void setStateIndices()
     {
         int i = 0;
-        
-        for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+
+        for (final Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
         {
-            State currState = stateIt.next();
-            
+            final State currState = stateIt.next();
+
             currState.setIndex(i++);
         }
     }
-    
-    void setIndex(int index)
+
+    void setIndex(final int index)
     {
         this.index = index;
     }
-    
+
     public int getIndex()
     {
         return index;
     }
-    
+
     public int getSynchIndex()
     {
         return getIndex();
     }
-    
+
     /**
      * Don't do this in public
      */
@@ -1368,138 +1368,138 @@ public class Automaton
         {
             uniqueStateIndex++;
         }
-        
+
         return uniqueStateIndex;
     }
-    
+
     public void clearVisitedStates()
     {
-        for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+        for (final Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
         {
-            State currState = stateIt.next();
-            
+            final State currState = stateIt.next();
+
             currState.setVisited(false);
         }
     }
-    
+
     public void clearSelectedStates()
     {
-        for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+        for (final Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
         {
-            State currState = stateIt.next();
-            
+            final State currState = stateIt.next();
+
             currState.setSelected(false);
         }
     }
-    
+
     private void removeAssociatedStateFromUnvisitedStates()
     {
-        for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+        for (final Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
         {
-            State currState = stateIt.next();
-            
+            final State currState = stateIt.next();
+
             if (!currState.isVisited())
             {
                 currState.setAssociatedState(null);
             }
         }
     }
-    
+
     // Do these really belong here? I think not. Better use a wrapper //MF
     /**
      * Returns the shortest trace from the initial state to toState.
      */
-    public LabelTrace getTrace(State toState)
+    public LabelTrace getTrace(final State toState)
     throws Exception, IllegalArgumentException, IllegalStateException
     {
         if (toState == null)
         {
             throw new IllegalArgumentException("Automaton.getTrace: toState must be non-null");
         }
-        
+
         if (!hasInitialState())
         {
             throw new IllegalStateException("There is no initial state");
         }
-        
+
         return getTrace(getInitialState(), toState);
     }
-    
+
     /**
      * Returns the shortest trace from fromState to toState,
      */
-    public LabelTrace getTrace(State fromState, State toState)
+    public LabelTrace getTrace(final State fromState, final State toState)
     throws Exception, IllegalArgumentException
     {
         if (fromState == null)
         {
             throw new IllegalArgumentException("Automaton.getTrace: fromState must be non-null");
         }
-        
+
         if (toState == null)
         {
             throw new IllegalArgumentException("Automaton.getTrace: toState must be non-null");
         }
-        
+
         computeShortestPath(fromState);
-        
-        LabelTrace theTrace = new LabelTrace();
-        
+
+        final LabelTrace theTrace = new LabelTrace();
+
         // Remove the associated state from all states that
         // is not on the way between fromState and toState.
         State thisState = toState;
-        
+
         thisState.setVisited(true);
-        
+
         State prevState = thisState.getAssociatedState();
-        
+
         while (prevState != null)
         {
-            LabeledEvent currEvent = getLabeledEvent(prevState, thisState);
-            
+            final LabeledEvent currEvent = getLabeledEvent(prevState, thisState);
+
             if (currEvent == null)
             {
                 throw new SupremicaException("Could not find an arc from " + prevState.getName() + " to " + thisState.getName());
             }
-            
+
             theTrace.addFirst(currEvent.getLabel());
-            
+
             thisState = prevState;
             prevState = prevState.getAssociatedState();
         }
-        
+
         reverseAssociatedState(toState);
-        
+
         return theTrace;
     }
-    
-    private void computeShortestPath(State fromState)
+
+    private void computeShortestPath(final State fromState)
     throws IllegalArgumentException
     {
         if (fromState == null)
         {
             throw new IllegalArgumentException("Automaton.getTrace: fromState is null");
         }
-        
+
         clearVisitedStates();
-        
+
         // This implements a breath first search
-        LinkedList<State> openStates = new LinkedList<State>();
-        
+        final LinkedList<State> openStates = new LinkedList<State>();
+
         fromState.setAssociatedState(null);
         openStates.addLast(fromState);
         fromState.setVisited(true);
-        
+
         while (openStates.size() > 0)
         {
-            State currState = openStates.removeFirst();
-            
-            for (Iterator<?> arcIt = currState.outgoingArcsIterator();
+            final State currState = openStates.removeFirst();
+
+            for (final Iterator<?> arcIt = currState.outgoingArcsIterator();
             arcIt.hasNext(); )
             {
-                Arc currArc = (Arc) arcIt.next();
-                State currToState = currArc.getToState();
-                
+                final Arc currArc = (Arc) arcIt.next();
+                final State currToState = currArc.getToState();
+
                 if (!currToState.isVisited())
                 {
                     currToState.setAssociatedState(currState);
@@ -1509,40 +1509,40 @@ public class Automaton
             }
         }
     }
-    
+
     /**
      * In computeShortestPath the associatedStates are backwards. I.e. they
      * point from the to states towards the initial state. After the computation
      * we want the arcs in the opposite direction.
      */
-    private void reverseAssociatedState(State toState)
+    private void reverseAssociatedState(final State toState)
     {
         clearVisitedStates();
         reverseAssociatedState(toState, null);
         removeAssociatedStateFromUnvisitedStates();
     }
-    
-    private void reverseAssociatedState(State currState, State nextState)
+
+    private void reverseAssociatedState(final State currState, final State nextState)
     {
         if (currState == null)
         {
             return;
         }
-        
+
         currState.setVisited(true);
-        
+
         if (currState.getAssociatedState() == null)
         {
             currState.setAssociatedState(nextState);
             return;
         }
-        
+
         reverseAssociatedState(currState.getAssociatedState(), currState);
         currState.setAssociatedState(nextState);
     }
-    
+
     // End path-computing stuff that does not really belong here //MF
-    
+
     /**
      * Change the marking of all states in the automaon.
      */
@@ -1550,14 +1550,14 @@ public class Automaton
     {
         setAllStatesAccepting(false);
     }
-    public void setAllStatesAccepting(boolean keepForbidden)
+    public void setAllStatesAccepting(final boolean keepForbidden)
     {
         beginTransaction();
-        
-        for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+
+        for (final Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
         {
-            State currState = stateIt.next();
-            
+            final State currState = stateIt.next();
+
             if (keepForbidden)
             {
                 if (!currState.isForbidden())
@@ -1571,66 +1571,66 @@ public class Automaton
                 currState.setForbidden(false);
             }
         }
-        
+
         invalidate();
         endTransaction();
     }
-    
+
     /**
      * Makes all accepting states non-accepting
      * and all non-accepting states accepting.
      */
     public void invertMarking()
     {
-        for (State currState : this)
+        for (final State currState : this)
         {
             currState.setAccepting(!currState.isAccepting());
         }
     }
-    
+
     /**
      * Returns an event on an arc that starts in fromState and ends in toState.
      * If no such event exists, null is returned.
      */
-    public LabeledEvent getLabeledEvent(State fromState, State toState)
+    public LabeledEvent getLabeledEvent(final State fromState, final State toState)
     throws Exception
     {
-        for (Iterator<Arc> arcIt = fromState.outgoingArcsIterator();
+        for (final Iterator<Arc> arcIt = fromState.outgoingArcsIterator();
         arcIt.hasNext(); )
         {
-            Arc currArc = arcIt.next();
-            State currToState = currArc.getToState();
-            
+            final Arc currArc = arcIt.next();
+            final State currToState = currArc.getToState();
+
             if (currToState == toState)
             {
                 return currArc.getEvent();
             }
         }
-        
+
         return null;
     }
-    
+
     /**
      * Hides (makes unobservable) the supplied events. Optionally preserving controllability.
      *
      * Selfloops that hare hidden are removed!
      */
-    public void hide(Alphabet hideThese, boolean preserveControllability)
+    public void hide(final Alphabet hideThese, final boolean preserveControllability)
     {
         // Don't hide nothing!
         if ((hideThese == null) || (hideThese.size() == 0))
         {
             return;
         }
-        
+
         // Remove the hidden events from alphabet
         getAlphabet().minus(hideThese);
-        
+
         // Do we care about controllability?
         if (!preserveControllability)
         {
             // Get/create silent event tau
-            String silentName = Config.MINIMIZATION_SILENT_EVENT_NAME.getAsString();
+            final String silentName = Config.MINIMIZATION_SILENT_EVENT_NAME.getAsString();
             LabeledEvent tau = getAlphabet().getEvent(silentName);
             if (tau == null)
             {
@@ -1647,18 +1647,18 @@ public class Automaton
                     return;
                 }
             }
-            
+
             // Modify arcs
             final LinkedList<Arc> toBeRemoved = new LinkedList<Arc>();
-            for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+            for (final Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
             {
-                Arc arc = arcIt.next();
-                
+                final Arc arc = arcIt.next();
+
                 // Hide this one?
                 if (hideThese.contains(arc.getEvent()))
                 {
                     arc.setEvent(tau);
-                    
+
                     // Remove if silent selfloop!
                     if (arc.isSelfLoop())
                     {
@@ -1666,7 +1666,7 @@ public class Automaton
                     }
                 }
             }
-            for (Arc arc: toBeRemoved)
+            for (final Arc arc: toBeRemoved)
             {
                 removeArc(arc);
             }
@@ -1675,7 +1675,7 @@ public class Automaton
         {
             // Get/create silent events tau_c and tau_u
             // tau_c
-            String silentCName = Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getAsString();
+            final String silentCName = Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getAsString();
             LabeledEvent tau_c = getAlphabet().getEvent(silentCName);
             if(hideThese.getControllableAlphabet().size() > 0)
             {
@@ -1696,9 +1696,9 @@ public class Automaton
                     }
                 }
             }
-            
+
             // tau_u
-            String silentUName = Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString();
+            final String silentUName = Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString();
             LabeledEvent tau_u = getAlphabet().getEvent(silentUName);
             if (hideThese.getUncontrollableAlphabet().size() > 0)
             {
@@ -1719,19 +1719,19 @@ public class Automaton
                     }
                 }
             }
-            
+
             // Modify arcs
             final LinkedList<Arc> toBeRemoved = new LinkedList<Arc>();
-            for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+            for (final Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
             {
-                Arc arc = arcIt.next();
-                
+                final Arc arc = arcIt.next();
+
                 // Remove if silent selfloop!
                 if (hideThese.contains(arc.getEvent()) && arc.isSelfLoop())
                 {
                     toBeRemoved.add(arc);
                 }
-                
+
                 // Hide this one?
                 if (hideThese.contains(arc.getEvent()))
                 {
@@ -1741,13 +1741,13 @@ public class Automaton
                         arc.setEvent(tau_u);
                 }
             }
-            for (Arc arc: toBeRemoved)
+            for (final Arc arc: toBeRemoved)
             {
                 removeArc(arc);
             }
         }
     }
-    
+
     public void removeAllStates()
     {
         beginTransaction();
@@ -1755,83 +1755,83 @@ public class Automaton
         indexStateMap.clear();
         theStates.clear();
         //theArcs.clear();
-        
+
         initialState = null;
-        
+
         if (listeners != null)
         {
             listeners.setUpdateNeeded(true);
         }
-        
+
         endTransaction();
     }
-    
+
     /*
     public State getState(int x, int y)
     {
         Iterator stateIt = stateIterator();
-     
+
         while (stateIt.hasNext())
         {
             State currState = (State) stateIt.next();
-     
+
             if (currState.contains(x, y))
             {
                 return currState;
             }
         }
-     
+
         return null;
     }
-     
+
     // What does layout, height, width etc has to do with automaton? this does not belong here! wrap! //MF
     public boolean hasLayout()
     {
         return hasLayout;
     }
-     
+
     public void setHasLayout(boolean hasLayout)
     {
         this.hasLayout = hasLayout;
     }
-     
+
     public int getWidth()
     {
         return width;
     }
-     
+
     public void setWidth(int width)
     {
         this.width = width;
     }
-     
+
     public int getHeight()
     {
         return height;
     }
-     
+
     public void setHeight(int height)
     {
         this.height = height;
     }
-     
+
     public boolean validLayout()
     {
         if ((width < 0) || (height < 0))
         {
             return false;
         }
-     
+
         for (Iterator stateIt = stateIterator(); stateIt.hasNext(); )
         {
             State currState = (State) stateIt.next();
-     
+
             if (!currState.validLayout())
             {
                 return false;
             }
         }
-     
+
         return true;
     }
     // End layout stuff that does not belong in this interface
@@ -1840,28 +1840,28 @@ public class Automaton
     {
         return alphabet.nbrOfControllableEvents();
     }
-    
+
     public int nbrOfPrioritizedEvents()
     {
         return alphabet.nbrOfPrioritizedEvents();
     }
-    
+
     public int nbrOfImmediateEvents()
     {
         return alphabet.nbrOfImmediateEvents();
     }
-    
+
     public int nbrOfEpsilonEvents()
     {
         return alphabet.nbrOfUnobservableEvents();
     }
-    
+
     public int nbrOfUnobservableEvents()
     {
         return alphabet.nbrOfUnobservableEvents();
     }
-    
-    public boolean equals(Object other)
+
+    public boolean equals(final Object other)
     {
         if (other instanceof Automaton)
         {
@@ -1869,7 +1869,7 @@ public class Automaton
         }
         return false;
     }
-    
+
     /**
      * Returns true if there are no obvious differences between this
      * automaton and the other. Note, that this method only compares the
@@ -1880,24 +1880,24 @@ public class Automaton
      * This class should have methods like isIsomorphic() and languageEqual()
      * // yes, definitively there should be a CompareAutomata class //MF
      */
-    public boolean equalAutomaton(Automaton other)
+    public boolean equalAutomaton(final Automaton other)
     {
         // Should type, name, comment really be considered?
         if (!getName().equals(other.getName()))
         {
             return false;
         }
-        
+
         if (getType() != other.getType())
         {
             return false;
         }
-        
+
         if (!getComment().equals(other.getComment()))
         {
             return false;
         }
-        
+
         // The following stuff seems useful to consider
         if (hasAcceptingState() != other.hasAcceptingState())
         {
@@ -1931,51 +1931,51 @@ public class Automaton
         {
             return false;
         }
-        
+
         return true;
     }
-    
-    public void setCorrespondingAutomatonProxy(AutomatonProxy correspondingAutomatonProxy)
+
+    public void setCorrespondingAutomatonProxy(final AutomatonProxy correspondingAutomatonProxy)
     {
         this.correspondingAutomatonProxy = correspondingAutomatonProxy;
     }
-    
+
     public boolean hasCorrespondingAutomatonProxy()
     {
         return correspondingAutomatonProxy != null;
     }
-    
+
     public AutomatonProxy getCorrespondingAutomatonProxy()
     {
         return correspondingAutomatonProxy;
     }
-    
-    
+
+
     public Listeners getListeners()
     {
         if (listeners == null)
         {
             listeners = new AutomatonListeners(this);
         }
-        
+
         return listeners;
     }
-    
-    public void addListener(AutomatonListener listener)
+
+    public void addListener(final AutomatonListener listener)
     {
-        Listeners currListeners = getListeners();
-        
+        final Listeners currListeners = getListeners();
+
         currListeners.addListener(listener);
     }
-    
-    private void notifyListeners(int mode, Object o)
+
+    private void notifyListeners(final int mode, final Object o)
     {
         if (listeners != null)
         {
             listeners.notifyListeners(mode, o);
         }
     }
-    
+
     private void notifyListeners()
     {
         if (listeners != null)
@@ -1983,7 +1983,7 @@ public class Automaton
             listeners.notifyListeners();
         }
     }
-    
+
     public void invalidate()
     {
         if (listeners != null)
@@ -1991,7 +1991,7 @@ public class Automaton
             listeners.notifyListeners();
         }
     }
-    
+
     public void beginTransaction()
     {
         // System.err.println("beginTransaction");
@@ -2000,7 +2000,7 @@ public class Automaton
             listeners.beginTransaction();
         }
     }
-    
+
     public void endTransaction()
     {
         // System.err.println("endTransaction");
@@ -2009,10 +2009,10 @@ public class Automaton
             listeners.endTransaction();
         }
     }
-    
-    public void updated(Object o)
+
+    public void updated(final Object o)
     {}
-    
+
     public int hashCode()
     {
         // Generate hascode from name, or if that's null, from the comment
@@ -2024,15 +2024,15 @@ public class Automaton
         {
             return comment.hashCode();
         }
-        
+
         logger.error("Error in Automaton.java. Some automaton has both name and comment empty! This is NOT recommended!");
-        
+
         return 0;
     }
-    
+
     // These are unary Automaton operators, they do belong here //MF
     // So move them somewhere else! That's how things get done around here... :o) //Hugo
-    
+
     /**
      * Saturate the automaton with arcs on events not defined for a
      * state, going to a uniquely named dump state.
@@ -2044,41 +2044,41 @@ public class Automaton
     {
         return saturateDump(getAlphabet());
     }
-    
+
     /**
      * Saturate with dump-state for a certain sub-alphabet.
      * We assume that alpha is a subset of the alphabet of the automaton.
      */
-    public boolean saturateDump(Alphabet alpha)
+    public boolean saturateDump(final Alphabet alpha)
     {
         assert(alpha.isSubsetOf(getAlphabet()));
-        
+
         boolean done_something = false; // keep track so we don't add dump-states over and over
-        
+
         // Create uniquely named dump state
-        State dump = createUniqueState("dump");
+        final State dump = createUniqueState("dump");
         addState(dump);
         // saturate, else something will always be done
         saturate(dump, alpha, dump);
-        
-        for (Iterator<State> state_it = safeStateIterator(); state_it.hasNext(); )
+
+        for (final Iterator<State> state_it = safeStateIterator(); state_it.hasNext(); )
         {
-            State state = state_it.next();
+            final State state = state_it.next();
             done_something |= saturate(state, alpha, dump);	// saturate to the dump-state
         }
-        
+
         // Remove all outgoing arcs from the dump-state.
         dump.removeOutgoingArcs();
-        
+
         // Need to remove dump state including its self-loop arcs?
         if (done_something == false)
         {
             removeState(dump);
         }
-        
+
         return done_something;
     }
-    
+
     /**
      * Saturate the automaton with self-loops on events not defined
      * for a state.  This unary operation makes the automaton
@@ -2089,26 +2089,26 @@ public class Automaton
     {
         return saturateLoop(getAlphabet());
     }
-    
+
     /**
      * Saturate with self-loops for a certain sub-alphabet.  Beware,
      * we assume that alpha is a subset of the alphabet of the
      * automaton
      */
-    public boolean saturateLoop(Alphabet alpha)
+    public boolean saturateLoop(final Alphabet alpha)
     {
         boolean done_something = false;
-        
-        Iterator<State> state_it = safeStateIterator();
+
+        final Iterator<State> state_it = safeStateIterator();
         while(state_it.hasNext())
         {
-            State state = state_it.next(); // Why doesn't a Iterator<State> return a State?
+            final State state = state_it.next(); // Why doesn't a Iterator<State> return a State?
             done_something |= saturate(state, alpha, state);	// saturate with self-loops
         }
-        
+
         return done_something;
     }
-    
+
     /**
      * Add an arc <from_state, event, to-state> for each event in
      * alpha that is not defined in from_state. Returns true if
@@ -2119,13 +2119,13 @@ public class Automaton
      * certain state (plus the ones we're adding while we work!)
      * ... at the moment -- there *must* be a better way!
      */
-    private boolean saturate(State from_state, Alphabet alpha, State to_state)
+    private boolean saturate(final State from_state, final Alphabet alpha, final State to_state)
     {
         boolean done_something = false;
-        Iterator<LabeledEvent> event_it = alpha.iterator();
+        final Iterator<LabeledEvent> event_it = alpha.iterator();
         while(event_it.hasNext())
         {
-            LabeledEvent event = event_it.next();
+            final LabeledEvent event = event_it.next();
             if(from_state.doesDefine(event) == false) // this event not defined for this state, add it
             {
                 addArc(new Arc(from_state, to_state, event));
@@ -2134,7 +2134,7 @@ public class Automaton
         }
         return done_something;
     }
-    
+
     /**
      * Returns the alphabet of obviously "inadequate" events (there
      * may be (but rarely are) more). With "adequate" as defined in
@@ -2156,10 +2156,10 @@ public class Automaton
     }
     public Alphabet getInadequateEvents(final boolean ignoreBlockingStates)
     {
-        Alphabet inadequate = new Alphabet();
-        
+        final Alphabet inadequate = new Alphabet();
+
         // For all events...
-        eventLoop: for (LabeledEvent event: getAlphabet())
+        eventLoop: for (final LabeledEvent event: getAlphabet())
         {
             // Ignore unobservable events and, if controllability is important, also uncontrollable plant events
             if (event.isUnobservable() || (!ignoreBlockingStates && isPlant() && !event.isControllable()))
@@ -2167,18 +2167,18 @@ public class Automaton
                 continue eventLoop;
             }
             // ... and all states ...
-            stateLoop: for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
+            stateLoop: for (final Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
             {
-                State state = stIt.next();
+                final State state = stIt.next();
                 // If blocking, we don't care
                 if (ignoreBlockingStates && !state.isAccepting() && state.isDeadlock())
                 {
                     continue stateLoop;
                 }
                 // ... otherwise there must be a self-loop ...
-                for (Iterator<Arc> arcIt = state.outgoingArcsIterator(); arcIt.hasNext(); )
+                for (final Iterator<Arc> arcIt = state.outgoingArcsIterator(); arcIt.hasNext(); )
                 {
-                    Arc arc = arcIt.next();
+                    final Arc arc = arcIt.next();
                     if (arc.isSelfLoop() && arc.getEvent().equals(event))
                     {
                         continue stateLoop;
@@ -2191,22 +2191,22 @@ public class Automaton
         }
         return inadequate;
     }
-    
+
     /**
      * Returns the alphabet of "blocked" events, that is, events that are disabled
      * in all states in this automaton.
      */
     public Alphabet getBlockedEvents()
     {
-        Alphabet foundEvents = new Alphabet();
-        
-        int unobservable = getAlphabet().nbrOfUnobservableEvents();
-        int observable = getAlphabet().size() - unobservable;
-        
+        final Alphabet foundEvents = new Alphabet();
+
+        final int unobservable = getAlphabet().nbrOfUnobservableEvents();
+        final int observable = getAlphabet().size() - unobservable;
+
         // Check events that occur in transitions!
-        for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+        for (final Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
         {
-            Arc arc = arcIt.next();
+            final Arc arc = arcIt.next();
             // Already found or unobservable?
             if (arc.getEvent().isUnobservable() || foundEvents.contains(arc.getEvent()))
                 continue;
@@ -2215,20 +2215,20 @@ public class Automaton
             if (foundEvents.size() == observable)
                 return null;
         }
-        
+
         return AlphabetHelpers.minus(getAlphabet(), foundEvents);
     }
-    
-    public static void main(String[] args)
-    {
-        Automaton theAutomaton = new Automaton();
-        State stateZero = new State("zero");
 
-        
+    public static void main(final String[] args)
+    {
+        final Automaton theAutomaton = new Automaton();
+        final State stateZero = new State("zero");
+
+
         theAutomaton.addState(stateZero);
-        
-        State st = theAutomaton.getStateWithIndex(0);    // should be stateZero (not?)
-        
+
+        final State st = theAutomaton.getStateWithIndex(0);    // should be stateZero (not?)
+
         if (st == null)
         {
             System.err.println("st == null");
@@ -2238,200 +2238,200 @@ public class Automaton
             System.err.println("st != null");
         }
     }
-    
+
     static class InternalEventIterator
         implements Iterator<LabeledEvent>
     {
         private final Iterator<?> arcIt;
-        
-        public InternalEventIterator(Iterator<?> arcIt)
+
+        public InternalEventIterator(final Iterator<?> arcIt)
         {
             this.arcIt = arcIt;
         }
-        
+
         public boolean hasNext()
         {
             return arcIt.hasNext();
         }
-        
+
         public LabeledEvent next()
         {
-            Arc nextArc = (Arc) arcIt.next();
-            
+            final Arc nextArc = (Arc) arcIt.next();
+
             // String eventId = nextArc.getEventId();
             LabeledEvent nextEvent = null;
-            
+
             try
             {
                 nextEvent = nextArc.getEvent();    // eventId);
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error("Automaton::InternalEventIterator.next: Error in getEvent", ex);
                 logger.debug(ex.getStackTrace());
             }
-            
+
             return nextEvent;
         }
-        
+
         public void remove()
         {
             throw new UnsupportedOperationException();
         }
     }
-    
+
     class InternalStateIterator
         implements Iterator<State>
     {
         private final Iterator<Arc> arcIt;
         private State currState = null;
-        private String eventLabel;
-        private boolean outgoing;
-        
-        public InternalStateIterator(String eventLabel, boolean outgoing)
+        private final String eventLabel;
+        private final boolean outgoing;
+
+        public InternalStateIterator(final String eventLabel, final boolean outgoing)
         {
             this.eventLabel = eventLabel;
             this.outgoing = outgoing;
             this.arcIt = arcIterator();
             this.currState = null;
-            
+
             findNext();
         }
-        
+
         public boolean hasNext()
         {
             return currState != null;
         }
-        
+
         public State next()
         {
-            State returnState = currState;
-            
+            final State returnState = currState;
+
             findNext();
-            
+
             return returnState;
         }
-        
+
         public void remove()
         {
             throw new UnsupportedOperationException();
         }
-        
+
         private void findNext()
         {
             while (arcIt.hasNext())
             {
-                Arc currArc = arcIt.next();
-                String currLabel = currArc.getLabel();
-                
+                final Arc currArc = arcIt.next();
+                final String currLabel = currArc.getLabel();
+
                 if (eventLabel.equals(currLabel))
                 {
                     if (outgoing)
                     {
                         currState = currArc.getFromState();
-                        
+
                         return;
                     }
                     else
                     {
                         currState = currArc.getToState();
-                        
+
                         return;
                     }
                 }
             }
-            
+
             currState = null;
         }
     }
-    
+
     // These are useful for debugging (etc)
     public String toDebugString()
     {
-        StringBuffer sbuf = new StringBuffer();
-        
+        final StringBuffer sbuf = new StringBuffer();
+
         sbuf.append(getName());
         sbuf.append("::");
-        
-        for (Iterator<?> it = arcIterator(); it.hasNext(); )
+
+        for (final Iterator<?> it = arcIterator(); it.hasNext(); )
         {
-            Arc arc = (Arc) it.next();
-            
+            final Arc arc = (Arc) it.next();
+
             sbuf.append(arc.toString());
         }
-        
+
         return sbuf.toString();
     }
-    
+
     public String toString()
     {
         return "'" + getName() + "'";
     }
-    
+
     // toCode writes Java code - Note, the names are used as-is, which means there may be blanks in variabel names!
     public String toCode()
     {
-        StringBuffer sbuf = new StringBuffer();
-        
+        final StringBuffer sbuf = new StringBuffer();
+
         sbuf.append("Automaton " + getName() + " = new Automaton(\"" + getName() + "\");");
         sbuf.append("\t\t{\t\t\t" + getName() + ".setType(AutomatonType." + getType().toString() + ");\n");
-        
-        for (Iterator<State> sit = stateIterator(); sit.hasNext(); )
+
+        for (final Iterator<State> sit = stateIterator(); sit.hasNext(); )
         {
-            State state = sit.next();
-            
+            final State state = sit.next();
+
             sbuf.append("State " + state.getName() + " = new State(\"" + state.getName() + "\");");
             sbuf.append("\t" + state.getName() + ".setCost(" + state.getCost() + ");");
             sbuf.append("\t" + getName() + ".addState(" + state.getName() + ");");
-            
+
             if (state.isInitial())
             {
                 sbuf.append("\t" + getName() + ".setInitialState(" + state.getName() + ");");
             }
-            
+
             if (state.isAccepting())
             {
                 sbuf.append("\t" + state.getName() + ".setAccepting(true);");
             }
-            
+
             sbuf.append("\n");
         }
-        
-        for (Iterator<LabeledEvent> eit = getAlphabet().iterator(); eit.hasNext(); )
+
+        for (final Iterator<LabeledEvent> eit = getAlphabet().iterator(); eit.hasNext(); )
         {
-            LabeledEvent ev = eit.next();
-            
+            final LabeledEvent ev = eit.next();
+
             sbuf.append("LabeledEvent " + ev.getLabel() + " = new LabeledEvent(\"" + ev.getLabel() + "\");");
             sbuf.append("\t" + getName() + ".getAlphabet().addEvent(" + ev.getLabel() + ");\n");
         }
-        
-        for (Iterator<Arc> ait = arcIterator(); ait.hasNext(); )
+
+        for (final Iterator<Arc> ait = arcIterator(); ait.hasNext(); )
         {
-            Arc arc = ait.next();
-            
+            final Arc arc = ait.next();
+
             sbuf.append(getName() + ".addArc(new Arc(" + arc.getFromState().getName() + ", " + arc.getToState().getName() + ", " + arc.getEvent().getLabel() + "));\n");
         }
-        
+
         sbuf.append("}\n");
-        
+
         return sbuf.toString();
     }
-    
+
     private AutomatonProxy correspondingAutomatonProxy = null;
-    
+
     public Automaton clone()
     {
         return new Automaton(this);
     }
-    
-    
+
+
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.Proxy
     public Class<AutomatonProxy> getProxyInterface()
     {
         return AutomatonProxy.class;
     }
-    
+
     public boolean equalsByContents(final Proxy partner)
     {
         if (getProxyInterface() == partner.getProxyInterface())
@@ -2452,12 +2452,12 @@ public class Automaton
             return false;
         }
     }
-    
+
     public boolean equalsWithGeometry(final Proxy partner)
     {
         return equalsByContents(partner);
     }
-    
+
     public int hashCodeByContents()
     {
         int result = refHashCode();
@@ -2471,27 +2471,27 @@ public class Automaton
         result += ProxyTools.getSetHashCodeByContents(getTransitions());
         return result;
     }
-    
+
     public int hashCodeWithGeometry()
     {
         return hashCodeByContents();
     }
-    
+
     public boolean refequals(final NamedProxy partner)
     {
         return getName().equals(partner.getName());
     }
-    
+
     public int refHashCode()
     {
         return getName().hashCode();
     }
-    
-    public int compareTo(NamedProxy partner)
+
+    public int compareTo(final NamedProxy partner)
     {
         return getName().compareTo(((Automaton) partner).getName());
     }
-    
+
     public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
     {
@@ -2499,87 +2499,92 @@ public class Automaton
             (ProductDESProxyVisitor) visitor;
         return desvisitor.visitAutomatonProxy(this);
     }
-    
-    
+
+
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.AutomatonProxy
     public ComponentKind getKind()
     {
         return AutomatonType.toKind(type);
     }
-    
+
     public Set<StateProxy> getStates()
     {
         return getStateSet().getWatersStates();
     }
-    
+
     public Collection<TransitionProxy> getTransitions()
     {
-        LinkedList<TransitionProxy> transitions = new LinkedList<TransitionProxy>();
-        
-        for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+        final LinkedList<TransitionProxy> transitions = new LinkedList<TransitionProxy>();
+
+        for (final Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
         {
-            Arc currArc = arcIt.next();
+            final Arc currArc = arcIt.next();
             transitions.add(currArc);
         }
-        
+
         return transitions;
     }
-    
+
     public Set<EventProxy> getEvents()
     {
-        Set <EventProxy> currSet = getAlphabet().getWatersEvents();
+        final Set <EventProxy> currSet = getAlphabet().getWatersEvents();
         if (hasAcceptingState()) // Always add? If "accepting" is not in the alphabet, all states should be marked!
             currSet.add(State.acceptingProposition);
         if (nbrOfForbiddenStates() > 0)
             currSet.add(State.forbiddenProposition);
         return currSet;
     }
-    
+
+    public Map<String,String> getAttributes()
+    {
+      return null;
+    }
+
     // Events are (supposed to be) immutable, you cannot change the label once constructed
     // Most of the effects of this can be overcome by this method
     // We do not test if the old_event actually exists in the alphabet, we merely (try to) remove it
     // We do not test if new_event already exists, merely (try to) add it
-    public boolean replaceEvent(LabeledEvent old_event, LabeledEvent new_event)
+    public boolean replaceEvent(final LabeledEvent old_event, final LabeledEvent new_event)
     {
         boolean done_anything = false; // not yet...
         // We start with removing teh old event, and adding teh new event, '
         // to minimize the risk for ending up in an inconsistent state, due to exceptions
         // remove old_event from the alphabet - *no* testing for existence, may throw!
         getAlphabet().removeEvent(old_event);
-        
+
         // add new_event to the alphabet - *no* testing for duplicates, may throw!
         getAlphabet().addEvent(new_event);
-        
+
         // note that if addEvent above throws, we have removed the old event, but not added the new one
         // if the removeEvent throws we have done nothing, but a catcher will never know the difference,
         // since both removeEvent and addEvent throw IllegalArgumentException. Is this good?
-        
+
         // iterate over all arcs
         // if the arc refers to old_event, make it refer to new_event
-        for (Iterator<Arc> ait = arcIterator(); ait.hasNext(); )
+        for (final Iterator<Arc> ait = arcIterator(); ait.hasNext(); )
         {
-            Arc arc = ait.next();
-            LabeledEvent event = arc.getEvent();
+            final Arc arc = ait.next();
+            final LabeledEvent event = arc.getEvent();
             if(event == old_event)	// yes, we test for equality of the references (hard core equality, not for sissies! :-)
             {
                 arc.setEvent(new_event);
                 done_anything = true;	// now we've done something
             }
         }
-        
+
         return done_anything;
     }
-    
-     public void replaceState(State old_state, State new_state)
+
+     public void replaceState(final State old_state, final State new_state)
     {
         getStateSet().remove(old_state);
         getStateSet().add(new_state);
     }
-    
+
     // Since events are immutable, renaming is actually replacing the old with a new
     // The new one will be created with default properties (controllability etc), is that OK?
-    public boolean renameEvent(LabeledEvent old_event, final String new_label)
+    public boolean renameEvent(final LabeledEvent old_event, final String new_label)
     {
         return replaceEvent(old_event, new LabeledEvent(new_label));
     }

@@ -17,6 +17,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -194,14 +195,16 @@ public class ModuleElementFactory
        final boolean observable,
        final ScopeKind scope,
        final Collection<? extends SimpleExpressionProxy> ranges,
-       final ColorGeometryProxy colorGeometry)
+       final ColorGeometryProxy colorGeometry,
+       final Map<String,String> attributes)
   {
     return new EventDeclElement(identifier,
                                 kind,
                                 observable,
                                 scope,
                                 ranges,
-                                colorGeometry);
+                                colorGeometry,
+                                attributes);
   }
 
   public EventDeclElement createEventDeclProxy
@@ -488,6 +491,18 @@ public class ModuleElementFactory
   {
     return new QualifiedIdentifierElement(baseIdentifier,
                                           componentIdentifier);
+  }
+
+  public SimpleComponentElement createSimpleComponentProxy
+      (final IdentifierProxy identifier,
+       final ComponentKind kind,
+       final GraphProxy graph,
+       final Map<String,String> attributes)
+  {
+    return new SimpleComponentElement(identifier,
+                                      kind,
+                                      graph,
+                                      attributes);
   }
 
   public SimpleComponentElement createSimpleComponentProxy

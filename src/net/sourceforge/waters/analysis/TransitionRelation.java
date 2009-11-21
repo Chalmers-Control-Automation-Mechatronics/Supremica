@@ -36,7 +36,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 public class TransitionRelation
 {
-  //note make certain 
+  //note make certain
   private final TIntHashSet[][] mSuccessors;
   private final TIntHashSet[][] mPredecessors;
   private final TIntHashSet[] mActiveEvents;
@@ -48,32 +48,32 @@ public class TransitionRelation
   private final EventProxy mMarkedEvent;
   private final String mName;
   private final Map<Set<Set<EventProxy>>, EventProxy> mAnnToEvent;
-  
-  public TransitionRelation(AutomatonProxy aut, EventProxy marked)
+
+  public TransitionRelation(final AutomatonProxy aut, final EventProxy marked)
   {
     this(aut, marked, aut.getEvents());
   }
-  
+
   @SuppressWarnings("unchecked")
-  public TransitionRelation(AutomatonProxy aut, EventProxy marked,
+  public TransitionRelation(final AutomatonProxy aut, final EventProxy marked,
                             Set<EventProxy> eventsall)
   {
     eventsall = new THashSet<EventProxy>(eventsall);
     eventsall.addAll(aut.getEvents());
-    Set<EventProxy> allselflooped = new THashSet<EventProxy>(eventsall);
+    final Set<EventProxy> allselflooped = new THashSet<EventProxy>(eventsall);
     allselflooped.removeAll(aut.getEvents());
     allselflooped.remove(marked);
     mName = aut.getName();
     mMarkedEvent = marked;
-    EventProxy[] events = new EventProxy[aut.getEvents().size()];
+    final EventProxy[] events = new EventProxy[aut.getEvents().size()];
     mEvents = eventsall.toArray(events);
-    TObjectIntHashMap<EventProxy> eventToInt = 
+    final TObjectIntHashMap<EventProxy> eventToInt =
       new TObjectIntHashMap<EventProxy>(mEvents.length);
     for (int i = 0; i < mEvents.length; i++) {
       eventToInt.put(mEvents[i], i);
     }
     mEventToInt = eventToInt;
-    TObjectIntHashMap<StateProxy> stateToInt = 
+    final TObjectIntHashMap<StateProxy> stateToInt =
       new TObjectIntHashMap<StateProxy>();
     int numstates = 0;
     mSuccessors = new TIntHashSet[aut.getStates().size()][mEvents.length];
@@ -82,7 +82,7 @@ public class TransitionRelation
     mAnnotations = new Set[aut.getStates().size()];
     mMarked = new boolean[aut.getStates().size()];
     mIsInitial = new boolean[aut.getStates().size()];
-    for (StateProxy s : aut.getStates()) {
+    for (final StateProxy s : aut.getStates()) {
       stateToInt.put(s, numstates);
       if (s.getPropositions().contains(marked) ||
 	  !aut.getEvents().contains(marked)) {
@@ -91,13 +91,13 @@ public class TransitionRelation
       if (s.isInitial()) {
         makeInitialState(numstates, true);
       }
-      Set<Set<EventProxy>> anns = getAnnotations(s.getPropositions());
+      final Set<Set<EventProxy>> anns = getAnnotations(s.getPropositions());
       //System.out.println("build annotation:" + anns);
       if (anns != null) {
-        Set<TIntHashSet> annints = new HashSet<TIntHashSet>(anns.size());
-        for (Set<EventProxy> ann : anns) {
-          TIntHashSet annint = new TIntHashSet(ann.size());
-          for (EventProxy event : ann) {
+        final Set<TIntHashSet> annints = new HashSet<TIntHashSet>(anns.size());
+        for (final Set<EventProxy> ann : anns) {
+          final TIntHashSet annint = new TIntHashSet(ann.size());
+          for (final EventProxy event : ann) {
             annint.add(eventToInt.get(event));
           }
           annints.add(annint);
@@ -107,49 +107,49 @@ public class TransitionRelation
       // TODO work out annotations
       numstates++;
     }
-    for (TransitionProxy tran : aut.getTransitions()) {
-      int s = stateToInt.get(tran.getSource());
-      int t = stateToInt.get(tran.getTarget());
-      int e = eventToInt.get(tran.getEvent());
-      TIntHashSet succ = getFromArray(s, e, mSuccessors);
+    for (final TransitionProxy tran : aut.getTransitions()) {
+      final int s = stateToInt.get(tran.getSource());
+      final int t = stateToInt.get(tran.getTarget());
+      final int e = eventToInt.get(tran.getEvent());
+      final TIntHashSet succ = getFromArray(s, e, mSuccessors);
       succ.add(t);
-      TIntHashSet pred = getFromArray(t, e, mPredecessors);
+      final TIntHashSet pred = getFromArray(t, e, mPredecessors);
       pred.add(s);
-      TIntHashSet active = getFromArray(s, mActiveEvents);
+      final TIntHashSet active = getFromArray(s, mActiveEvents);
       active.add(e);
     }
-    for (EventProxy event : allselflooped) {
-      int e = eventToInt.get(event);
+    for (final EventProxy event : allselflooped) {
+      final int e = eventToInt.get(event);
       for (int s = 0; s < numberOfStates(); s++) {
         addTransition(s, e, s);
       }
     }
     mAnnToEvent = new THashMap<Set<Set<EventProxy>>, EventProxy>();
   }
-  
-  public void setMarkingToStatesWithOutgoing(Collection<EventProxy> events)
+
+  public void setMarkingToStatesWithOutgoing(final Collection<EventProxy> events)
   {
-    int[] evs = new int[events.size()];
+    final int[] evs = new int[events.size()];
     int i = 0;
-    for (EventProxy e : events) {evs[i] = mEventToInt.get(e); i++;}
+    for (final EventProxy e : events) {evs[i] = mEventToInt.get(e); i++;}
     STATES:
     for (int s = 0; s < mSuccessors.length; s++) {
       markState(s, false);
       for (i = 0; i < evs.length; i++) {
-        int e = evs[i];
+        final int e = evs[i];
         if (mSuccessors[s][e] != null && !mSuccessors[s][e].isEmpty()) {
           markState(s, true); continue STATES;
         }
       }
     }
   }
-  
-  public Set<TIntHashSet> getAnnotation(int state)
+
+  public Set<TIntHashSet> getAnnotation(final int state)
   {
     return mAnnotations[state];
   }
- 
-  public void setAnnotation(int state, Set<TIntHashSet> annotation)
+
+  public void setAnnotation(final int state, final Set<TIntHashSet> annotation)
   {
     mAnnotations[state] = annotation;
     //System.out.println("annotation size:" + annotation.size());
@@ -172,28 +172,28 @@ public class TransitionRelation
       }
     }*/
   }
-  
-  private static Set<Set<EventProxy>> getAnnotations(Collection<EventProxy> props)
+
+  private static Set<Set<EventProxy>> getAnnotations(final Collection<EventProxy> props)
   {
-    Iterator<EventProxy> it = props.iterator();
+    final Iterator<EventProxy> it = props.iterator();
     while (it.hasNext()) {
-      EventProxy e = it.next();
+      final EventProxy e = it.next();
       if (e instanceof AnnotationEvent) {
-        AnnotationEvent a = (AnnotationEvent)e;
+        final AnnotationEvent a = (AnnotationEvent)e;
         return a.getAnnotations();
       }
     }
     return null;
   }
-  
-  public EventProxy getAnnotationEvent(Set<TIntHashSet> annotations) {
+
+  public EventProxy getAnnotationEvent(final Set<TIntHashSet> annotations) {
     if (annotations == null || annotations.isEmpty()) {return null;}
-    Set<Set<EventProxy>> res = new THashSet<Set<EventProxy>>();
-    for (TIntHashSet ann : annotations) {
+    final Set<Set<EventProxy>> res = new THashSet<Set<EventProxy>>();
+    for (final TIntHashSet ann : annotations) {
       final Set<EventProxy> set = new THashSet<EventProxy>();
       ann.forEach(new TIntProcedure() {
-        public boolean execute(int e) {
-          EventProxy event = mEvents[e];
+        public boolean execute(final int e) {
+          final EventProxy event = mEvents[e];
           assert(event != null);
           set.add(event);
           return true;
@@ -209,36 +209,36 @@ public class TransitionRelation
     //System.out.println("annotation:" + res);
     return event;
   }
-  
+
   public int numberOfStates()
   {
     return mSuccessors.length;
   }
-  
+
   public int numberOfEvents()
   {
     return mEvents.length;
   }
-  
+
   public AutomatonProxy getAutomaton(final ProductDESProxyFactory factory)
   {
     final Collection<TransitionProxy> trans = new ArrayList<TransitionProxy>();
     final List<StateProxy> states = new ArrayList<StateProxy>();
     final Collection<EventProxy> events = new ArrayList<EventProxy>();
     for (int s = 0; s < mAnnotations.length; s++) {
-      Set<EventProxy> props = new THashSet<EventProxy>();
-      Set<TIntHashSet> anns = mAnnotations[s];
+      final Set<EventProxy> props = new THashSet<EventProxy>();
+      final Set<TIntHashSet> anns = mAnnotations[s];
       if (anns != null) {
         anns.remove(getActiveEvents(s));
       }
-      EventProxy annotation = getAnnotationEvent(anns);
+      final EventProxy annotation = getAnnotationEvent(anns);
       if (annotation != null) {
         props.add(annotation);
       }
       if (isMarked(s) && mMarkedEvent != null) {
         props.add(mMarkedEvent);
       }
-      boolean isInitial = isInitial(s);
+      final boolean isInitial = isInitial(s);
       states.add(new AnnotatedMemStateProxy(s, props, isInitial));
     }
     //System.out.println(mAnnToEvent.size());
@@ -248,11 +248,11 @@ public class TransitionRelation
       for (int e = 0; e < mSuccessors[s].length; e++) {
         final EventProxy event = mEvents[e];
         if (event == mMarkedEvent || event == null) {continue;}
-        TIntHashSet succs = mSuccessors[s][e];
+        final TIntHashSet succs = mSuccessors[s][e];
         if (succs == null) {continue;}
         succs.forEach(new TIntProcedure() {
-          public boolean execute(int succ) {
-            StateProxy target = states.get(succ);
+          public boolean execute(final int succ) {
+            final StateProxy target = states.get(succ);
             trans.add(factory.createTransitionProxy(source, event, target));
             return true;
           }
@@ -262,7 +262,7 @@ public class TransitionRelation
     for (int e = 0; e < mEvents.length; e++) {
       if (mEvents[e] != null) {events.add(mEvents[e]);}
     }
-    List<StateProxy> tempstates = new ArrayList<StateProxy>();;
+    final List<StateProxy> tempstates = new ArrayList<StateProxy>();;
     for (int s = 0; s < states.size(); s++) {
       if (hasPredecessors(s)) {
         tempstates.add(states.get(s));
@@ -271,21 +271,21 @@ public class TransitionRelation
     return factory.createAutomatonProxy(mName, ComponentKind.PLANT,
                                         events, tempstates, trans);
   }
-  
-  public boolean isMarked(int state)
+
+  public boolean isMarked(final int state)
   {
     return mMarked[state];
   }
-  
-  public boolean isInitial(int state)
+
+  public boolean isInitial(final int state)
   {
     return mIsInitial[state];
   }
-  
-  public void markState(int state, boolean value)
+
+  public void markState(final int state, final boolean value)
   {
     mMarked[state] = value;
-    TIntHashSet active = getFromArray(state, mActiveEvents);
+    final TIntHashSet active = getFromArray(state, mActiveEvents);
     if (mEventToInt.containsKey(mMarkedEvent)) {
       if (value) {
         active.add(mEventToInt.get(mMarkedEvent));
@@ -294,13 +294,13 @@ public class TransitionRelation
       }
     }
   }
-  
-  public void makeInitialState(int state, boolean value)
+
+  public void makeInitialState(final int state, final boolean value)
   {
     mIsInitial[state] = value;
   }
-  
-  public TIntHashSet getActiveEvents(int state)
+
+  public TIntHashSet getActiveEvents(final int state)
   {
     /*if (mActiveEvents[state] != null) {
       int[] array = mActiveEvents[state].toArray();
@@ -321,7 +321,7 @@ public class TransitionRelation
       }
     }
     return new TIntHashSet(mActiveEvents[state].toArray());*/
-    TIntHashSet ae = new TIntHashSet();
+    final TIntHashSet ae = new TIntHashSet();
     for (int e = 0; e < mSuccessors[state].length; e++) {
       if (mEvents[e] == mMarkedEvent) {
         if (mMarked[state]) {
@@ -333,62 +333,62 @@ public class TransitionRelation
     }
     return ae;
   }
-  
-  public void removeOutgoing(int state, int event)
+
+  public void removeOutgoing(final int state, final int event)
   {
-    TIntHashSet succs = mSuccessors[state][event];
+    final TIntHashSet succs = mSuccessors[state][event];
     if (succs == null) {return;}
-    int[] arr = succs.toArray();
+    final int[] arr = succs.toArray();
     for (int i = 0; i < arr.length; i++) {
-      int suc = arr[i];
+      final int suc = arr[i];
       removeTransition(state, event, suc);
     }
   }
-  
-  public void removeSharedSuccessors(int has, int remove)
+
+  public void removeSharedSuccessors(final int has, final int remove)
   {
     for (int e = 0; e < mSuccessors[has].length; e++) {
-      TIntHashSet hassuccs = mSuccessors[has][e];
+      final TIntHashSet hassuccs = mSuccessors[has][e];
       if (hassuccs == null) {continue;}
-      int[] succs = hassuccs.toArray();
+      final int[] succs = hassuccs.toArray();
       for (int i = 0; i < succs.length; i++) {
         removeTransition(remove, e, succs[i]);
       }
     }
   }
-  
-  public void removeEvent(int event)
+
+  public void removeEvent(final int event)
   {
     mEvents[event] = null;
     for (int s = 0; s < mSuccessors.length; s++) {
-      TIntHashSet succ = mSuccessors[s][event];
+      final TIntHashSet succ = mSuccessors[s][event];
       if (succ == null) {continue;}
-      int[] intsuccs = succ.toArray();
+      final int[] intsuccs = succ.toArray();
       for (int i = 0; i < intsuccs.length; i++) {
-        int t = intsuccs[i];
+        final int t = intsuccs[i];
         removeTransition(s, event, t);
       }
     }
   }
-  
+
   public String getName()
   {
     return mName;
   }
-  
-  public EventProxy getEvent(int event)
+
+  public EventProxy getEvent(final int event)
   {
     return mEvents[event];
   }
-  
-  public int getEventInt(EventProxy event)
+
+  public int getEventInt(final EventProxy event)
   {
     return mEventToInt.get(event);
   }
-  
+
   public Set<EventProxy> getEvents()
   {
-    Set<EventProxy> events = new HashSet<EventProxy>();
+    final Set<EventProxy> events = new HashSet<EventProxy>();
     for (int i = 0; i < mEvents.length; i++) {
       if (mEvents[i] != null) {
         events.add(mEvents[i]);
@@ -396,30 +396,30 @@ public class TransitionRelation
     }
     return events;
   }
-  
-  public void removeAllIncoming(int s)
+
+  public void removeAllIncoming(final int s)
   {
     markState(s, false);
     for (int e = 0;  e < mPredecessors[s].length; e++) {
-      TIntHashSet preds = mPredecessors[s][e];
+      final TIntHashSet preds = mPredecessors[s][e];
       if (preds == null) {continue;}
-      int[] arpreds = preds.toArray();
+      final int[] arpreds = preds.toArray();
       for (int i = 0; i < arpreds.length; i++) {
-        int pred = arpreds[i];
+        final int pred = arpreds[i];
         removeTransition(pred, e, s);
       }
     }
   }
-  
-  public void removeAllAnnotations(int event)
+
+  public void removeAllAnnotations(final int event)
   {
     System.out.println("remove annotations: " + event);
     for (int s = 0; s < mAnnotations.length; s++) {
-      Set<TIntHashSet> anns = mAnnotations[s];
+      final Set<TIntHashSet> anns = mAnnotations[s];
       if (anns != null) {
-        Iterator<TIntHashSet> it = anns.iterator();
+        final Iterator<TIntHashSet> it = anns.iterator();
         while (it.hasNext()) {
-          TIntHashSet ann = it.next();
+          final TIntHashSet ann = it.next();
           System.out.println(Arrays.toString(ann.toArray()));
           if (ann.contains(event)) {
             System.out.println("removed");
@@ -429,34 +429,34 @@ public class TransitionRelation
       }
     }
   }
-  
-  public boolean isMarkingEvent(int event)
+
+  public boolean isMarkingEvent(final int event)
   {
     return mEvents[event] == mMarkedEvent;
   }
-  
-  public int eventToInt(EventProxy event)
+
+  public int eventToInt(final EventProxy event)
   {
     return mEventToInt.get(event);
   }
-  
-  public int mergeEvents(Collection<EventProxy> events)
+
+  public int mergeEvents(final Collection<EventProxy> events)
   {
-    Iterator<EventProxy> it = events.iterator();
-    EventProxy first = it.next();
-    int f = mEventToInt.get(first);
+    final Iterator<EventProxy> it = events.iterator();
+    final EventProxy first = it.next();
+    final int f = mEventToInt.get(first);
     while (it.hasNext()) {
-      int next = mEventToInt.get(it.next());
+      final int next = mEventToInt.get(it.next());
       for (int s = 0; s < mSuccessors.length; s++) {
         TIntHashSet toremove = mSuccessors[s][next];
         if (toremove != null) {
-          TIntHashSet tau = getFromArray(s, f, mSuccessors);
+          final TIntHashSet tau = getFromArray(s, f, mSuccessors);
           tau.addAll(toremove.toArray());
           mSuccessors[s][next] = null;
         }
         toremove = mPredecessors[s][next];
         if (toremove != null) {
-          TIntHashSet tau = getFromArray(s, f, mPredecessors);
+          final TIntHashSet tau = getFromArray(s, f, mPredecessors);
           tau.addAll(toremove.toArray());
           mPredecessors[s][next] = null;
         }
@@ -465,25 +465,25 @@ public class TransitionRelation
     }
     return f;
   }
-  
-  public int mergeEvents(Collection<EventProxy> events,
-                         ProductDESProxyFactory factory)
+
+  public int mergeEvents(final Collection<EventProxy> events,
+                         final ProductDESProxyFactory factory)
   {
-    Iterator<EventProxy> it = events.iterator();
-    EventProxy first = it.next();
-    int f = mEventToInt.get(first);
+    final Iterator<EventProxy> it = events.iterator();
+    final EventProxy first = it.next();
+    final int f = mEventToInt.get(first);
     while (it.hasNext()) {
-      int next = mEventToInt.get(it.next());
+      final int next = mEventToInt.get(it.next());
       for (int s = 0; s < mSuccessors.length; s++) {
         TIntHashSet toremove = mSuccessors[s][next];
         if (toremove != null) {
-          TIntHashSet tau = getFromArray(s, f, mSuccessors);
+          final TIntHashSet tau = getFromArray(s, f, mSuccessors);
           tau.addAll(toremove.toArray());
           mSuccessors[s][next] = null;
         }
         toremove = mPredecessors[s][next];
         if (toremove != null) {
-          TIntHashSet tau = getFromArray(s, f, mPredecessors);
+          final TIntHashSet tau = getFromArray(s, f, mPredecessors);
           tau.addAll(toremove.toArray());
           mPredecessors[s][next] = null;
         }
@@ -493,37 +493,37 @@ public class TransitionRelation
     mEvents[f] = factory.createEventProxy("tau:" + mName, EventKind.UNCONTROLLABLE);
     return f;
   }
-  
-  public TIntHashSet[] getAllSuccessors(int state)
+
+  public TIntHashSet[] getAllSuccessors(final int state)
   {
     return mSuccessors[state];
   }
-  
-  public TIntHashSet getSuccessors(int state, int event)
+
+  public TIntHashSet getSuccessors(final int state, final int event)
   {
     return mSuccessors[state][event];
   }
-  
-  public TIntHashSet[] getAllPredecessors(int state)
+
+  public TIntHashSet[] getAllPredecessors(final int state)
   {
     return mPredecessors[state];
   }
-  
-  public TIntHashSet getPredecessors(int state, int event)
+
+  public TIntHashSet getPredecessors(final int state, final int event)
   {
     return mPredecessors[state][event];
   }
-  
-  public Set<TIntHashSet> subsets(Collection<TIntHashSet> from,
-                                         Set<TIntHashSet> to)
+
+  public Set<TIntHashSet> subsets(final Collection<TIntHashSet> from,
+                                         final Set<TIntHashSet> to)
   {
-    Set<TIntHashSet> tobeadded = new THashSet<TIntHashSet>();
+    final Set<TIntHashSet> tobeadded = new THashSet<TIntHashSet>();
     outside:
-    for (TIntHashSet ann : from) {
+    for (final TIntHashSet ann : from) {
       boolean subset = false;
-      Iterator<TIntHashSet> it = to.iterator();
+      final Iterator<TIntHashSet> it = to.iterator();
       while(it.hasNext()) {
-        TIntHashSet ann2 = it.next();
+        final TIntHashSet ann2 = it.next();
         if (ann2.size() >= ann.size()) {
           // TODO can be optimized so not creating the array everytime
           if (ann2.containsAll(ann.toArray())) {
@@ -545,35 +545,35 @@ public class TransitionRelation
     to.addAll(tobeadded);
     return to;
   }
-  
-  public boolean hasPredecessors(int state)
+
+  public boolean hasPredecessors(final int state)
   {
     if (isInitial(state)) {return true;}
     if (mPredecessors[state] != null) {
       for (int e = 0; e < mPredecessors[state].length; e++) {
-        TIntHashSet preds = mPredecessors[state][e];
+        final TIntHashSet preds = mPredecessors[state][e];
         if (preds != null && !preds.isEmpty()) {return true;}
       }
     }
     return false;
   }
-  
-  public boolean equivalentIncoming(int state1, int state2)
+
+  public boolean equivalentIncoming(final int state1, final int state2)
   {
     if (isInitial(state1) != isInitial(state2)) {return false;}
     for (int e = 0; e < mEvents.length; e++) {
-      TIntHashSet preds1 = mPredecessors[state1][e];
-      TIntHashSet preds2 = mPredecessors[state2][e];
-      boolean empty1 = preds1 == null || preds1.isEmpty();
-      boolean empty2 = preds2 == null || preds2.isEmpty();
+      final TIntHashSet preds1 = mPredecessors[state1][e];
+      final TIntHashSet preds2 = mPredecessors[state2][e];
+      final boolean empty1 = preds1 == null || preds1.isEmpty();
+      final boolean empty2 = preds2 == null || preds2.isEmpty();
       if (empty1 && empty2) {continue;}
       if (empty1 != empty2) {return false;}
       if (!preds1.equals(preds2)) {return false;}
     }
     return true;
   }
-  
-  public void addAnnotations(int from, int to)
+
+  public void addAnnotations(final int from, final int to)
   {
     Set<TIntHashSet> fann = mAnnotations[from];
     if (fann == null) {
@@ -589,8 +589,8 @@ public class TransitionRelation
     mAnnotations[from] = null;
     mAnnotations[to] = tann;
   }
-  
-  private TIntHashSet getFromArray(int i, TIntHashSet[] array)
+
+  private TIntHashSet getFromArray(final int i, final TIntHashSet[] array)
   {
     TIntHashSet intset = array[i];
     if (intset == null) {
@@ -599,8 +599,8 @@ public class TransitionRelation
     }
     return intset;
   }
-  
-  private TIntHashSet getFromArray(int i, int j, TIntHashSet[][] array)
+
+  private TIntHashSet getFromArray(final int i, final int j, final TIntHashSet[][] array)
   {
     TIntHashSet intset = array[i][j];
     if (intset == null) {
@@ -609,152 +609,152 @@ public class TransitionRelation
     }
     return intset;
   }
-  
+
   public void moveAllSuccessors(final int from, final int to)
   {
     if (from == to) {return;}
     markState(to, mMarked[to] || mMarked[from]);
     markState(from, false);
     for (int e = 0; e < mEvents.length; e++) {
-      TIntHashSet succs = mSuccessors[from][e];
+      final TIntHashSet succs = mSuccessors[from][e];
       if (succs == null) {continue;}
-      int[] arsuccs = succs.toArray();
+      final int[] arsuccs = succs.toArray();
       for (int i = 0; i < arsuccs.length; i++) {
-        int succ = arsuccs[i];
+        final int succ = arsuccs[i];
         removeTransition(from, e, succ);
         addTransition(to, e, succ);
       }
     }
   }
-  
+
   public void addAllSuccessors(final int from, final int to)
   {
     if (from == to) {return;}
     markState(to, mMarked[to] || mMarked[from]);
     for (int e = 0; e < mEvents.length; e++) {
-      TIntHashSet succs = mSuccessors[from][e];
+      final TIntHashSet succs = mSuccessors[from][e];
       if (succs == null) {continue;}
-      int[] arsuccs = succs.toArray();
+      final int[] arsuccs = succs.toArray();
       for (int i = 0; i < arsuccs.length; i++) {
-        int succ = arsuccs[i];
+        final int succ = arsuccs[i];
         addTransition(to, e, succ);
       }
     }
   }
-  
+
   public void moveAllPredeccessors(final int from, final int to)
   {
     if (from == to) {return;}
     makeInitialState(to, mIsInitial[to] || mIsInitial[from]);
     makeInitialState(from, false);
     for (int e = 0; e < mEvents.length; e++) {
-      TIntHashSet preds = mPredecessors[from][e];
+      final TIntHashSet preds = mPredecessors[from][e];
       if (preds != null) {
-        int[] arpreds = preds.toArray();
+        final int[] arpreds = preds.toArray();
         for (int i = 0; i < arpreds.length; i++) {
-          int pred = arpreds[i];
+          final int pred = arpreds[i];
           removeTransition(pred, e, from);
           addTransition(pred, e, to);
         }
       }
     }
   }
-  
+
   public void addAllPredeccessors(final int from, final int to)
   {
     if (from == to) {return;}
     makeInitialState(to, mIsInitial[to] || mIsInitial[from]);
     for (int e = 0; e < mEvents.length; e++) {
-      TIntHashSet preds = mPredecessors[from][e];
+      final TIntHashSet preds = mPredecessors[from][e];
       if (preds != null) {
-        int[] arpreds = preds.toArray();
+        final int[] arpreds = preds.toArray();
         for (int i = 0; i < arpreds.length; i++) {
-          int pred = arpreds[i];
+          final int pred = arpreds[i];
           addTransition(pred, e, to);
         }
       }
     }
   }
-  
-  public void removeAllSelfLoops(int e)
+
+  public void removeAllSelfLoops(final int e)
   {
     for (int s = 0; s < mSuccessors.length; s++) {
-      TIntHashSet succs = mSuccessors[s][e];
+      final TIntHashSet succs = mSuccessors[s][e];
       if (succs == null) {continue;}
       if (succs.contains(s)) {removeTransition(s, e, s);}
     }
   }
-  
-  public void removeTransition(int s, int e, int t)
+
+  public void removeTransition(final int s, final int e, final int t)
   {
-    TIntHashSet succ = getFromArray(s, e, mSuccessors);
-    TIntHashSet pred = getFromArray(t, e, mPredecessors);
+    final TIntHashSet succ = getFromArray(s, e, mSuccessors);
+    final TIntHashSet pred = getFromArray(t, e, mPredecessors);
     succ.remove(t);
     pred.remove(s);
     if (succ.isEmpty()) {
       mSuccessors[s][e] = null;
-      TIntHashSet active = getFromArray(s, mActiveEvents);
+      final TIntHashSet active = getFromArray(s, mActiveEvents);
       active.remove(e);
     }
     if (pred.isEmpty()) {
       mPredecessors[t][e] = null;
     }
   }
-  
+
   public void removeAllOutgoing(final int s)
   {
     markState(s, false);
     for (int e = 0;  e < mSuccessors[s].length; e++) {
-      TIntHashSet succs = mSuccessors[s][e];
+      final TIntHashSet succs = mSuccessors[s][e];
       if (succs == null) {continue;}
-      int[] arsuccs = succs.toArray();
+      final int[] arsuccs = succs.toArray();
       for (int i = 0; i < arsuccs.length; i++) {
-        int succ = arsuccs[i];
+        final int succ = arsuccs[i];
         removeTransition(s, e, succ);
       }
     }
   }
-  
-  public void addTransition(int s, int e, int t)
+
+  public void addTransition(final int s, final int e, final int t)
   {
-    TIntHashSet succ = getFromArray(s, e, mSuccessors);
-    TIntHashSet pred = getFromArray(t, e, mPredecessors);
+    final TIntHashSet succ = getFromArray(s, e, mSuccessors);
+    final TIntHashSet pred = getFromArray(t, e, mPredecessors);
     succ.add(t);
     pred.add(s);
-    TIntHashSet active = getFromArray(s, mActiveEvents);
+    final TIntHashSet active = getFromArray(s, mActiveEvents);
     active.add(e);
   }
-  
-  public void mergewithannotations(int[] stuff)
+
+  public void mergewithannotations(final int[] stuff)
   {
-    int to = stuff[0];
+    final int to = stuff[0];
     for (int i = 1; i < stuff.length; i++) {
-      int from = stuff[i];
+      final int from = stuff[i];
       addAnnotations(from, to);
       moveAllSuccessors(from, to);
       moveAllPredeccessors(from, to);
     }
   }
-  
-  public void merge(int[] stuff)
+
+  public void merge(final int[] stuff)
   {
-    int to = stuff[0];
+    final int to = stuff[0];
     for (int i = 1; i < stuff.length; i++) {
-      int from = stuff[i];
+      final int from = stuff[i];
       moveAllSuccessors(from, to);
       moveAllPredeccessors(from, to);
     }
   }
-  
+
   public Collection<EventProxy> getAllSelfLoops()
   {
-    Collection<EventProxy> selfs = new ArrayList<EventProxy>();
+    final Collection<EventProxy> selfs = new ArrayList<EventProxy>();
     SELFLOOPS:
     for (int e = 0; e < mEvents.length; e++) {
-      if (mEvents[e] == null || mEvents[e].equals(mMarkedEvent)) {continue;} 
+      if (mEvents[e] == null || mEvents[e].equals(mMarkedEvent)) {continue;}
       for (int s = 0; s < mSuccessors.length; s++) {
         if (!hasPredecessors(s)) {continue;}
-        TIntHashSet succs = mSuccessors[s][e];
+        final TIntHashSet succs = mSuccessors[s][e];
         if (succs == null || succs.isEmpty()) {continue;}
         if (succs.size() > 1 || !succs.contains(s)) {continue SELFLOOPS;}
       }
@@ -762,17 +762,17 @@ public class TransitionRelation
     }
     return selfs;
   }
-  
+
   public Collection<EventProxy> getAllwaysEnabled()
   {
-    Collection<EventProxy> selfs = new ArrayList<EventProxy>();
+    final Collection<EventProxy> selfs = new ArrayList<EventProxy>();
     ENABLED:
     for (int e = 0; e < mEvents.length; e++) {
-      if (mEvents[e] == null) {continue;} 
+      if (mEvents[e] == null) {continue;}
       for (int s = 0; s < mSuccessors.length; s++) {
         if (!hasPredecessors(s)) {continue;}
-        Set<TIntHashSet> annotations = getAnnotations2(s);
-        for (TIntHashSet ann : annotations) {
+        final Set<TIntHashSet> annotations = getAnnotations2(s);
+        for (final TIntHashSet ann : annotations) {
           if (!ann.contains(e)) {continue ENABLED;}
         }
       }
@@ -781,13 +781,13 @@ public class TransitionRelation
     System.out.println(selfs);
     return selfs;
   }
-  
-  private Set<TIntHashSet> getAnnotations2(int state)
+
+  private Set<TIntHashSet> getAnnotations2(final int state)
   {
     return mAnnotations[state] == null ? Collections.singleton(getActiveEvents(state))
                                        : mAnnotations[state];
   }
-  
+
   public int unreachableStates()
   {
     int num = 0;

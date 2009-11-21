@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -951,8 +952,10 @@ public class EventEditorDialog
         geo = new ColorGeometrySubject(set);
       }
       final SelectionOwner panel = mRoot.getEventsPanel();
+      final Map<String,String> attribs = mEventDecl.getAttributes();
       final EventDeclSubject template =
-        new EventDeclSubject(ident, kind, observable, scope, ranges, geo);
+        new EventDeclSubject(ident, kind, observable,
+                             scope, ranges, geo, attribs);
       if (mEventDecl == null) {
         final Command command = new InsertCommand(template, panel);
         mEventDecl = template;

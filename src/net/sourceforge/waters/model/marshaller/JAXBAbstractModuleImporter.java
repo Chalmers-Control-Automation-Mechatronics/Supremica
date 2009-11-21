@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.Proxy;
@@ -64,6 +63,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
+import net.sourceforge.waters.xsd.base.AttributeMap;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -342,7 +342,7 @@ public abstract class JAXBAbstractModuleImporter
     };
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.LabelBlock.class, handler);
-    
+
     handler = new ImportHandler() {
       public LabelGeometryProxy importElement(final ElementType element)
         throws WatersUnmarshalException
@@ -608,8 +608,8 @@ public abstract class JAXBAbstractModuleImporter
     final ScopeKind scope = element.getScope();
     return mFactory.createConstantAliasProxy(identifier, expression, scope);
   }
-  
-  
+
+
 //EFA----------------------
   private GuardActionBlockProxy importGuardActionBlock
     (final GuardActionBlock element)
@@ -660,7 +660,7 @@ public abstract class JAXBAbstractModuleImporter
 
     final LabelBlock labelBlockElement = element.getLabelBlock();
     final LabelBlockProxy labelBlock = importLabelBlock(labelBlockElement);
-    
+
     final GuardActionBlock guardActionBlockElement =
       element.getGuardActionBlock();
     final GuardActionBlockProxy guardActionBlock =
@@ -733,12 +733,15 @@ public abstract class JAXBAbstractModuleImporter
     final ColorGeometry colorGeometryElement = element.getColorGeometry();
     final ColorGeometryProxy colorGeometry =
       importColorGeometry(colorGeometryElement);
+    final AttributeMap attribsElement = element.getAttributeMap();
+    final Map<String,String> attribs = importAttributeMap(attribsElement);
     return mFactory.createEventDeclProxy(identifier,
                                          kind,
                                          observable,
                                          scope,
                                          ranges,
-                                         colorGeometry);
+                                         colorGeometry,
+                                         attribs);
   }
 
   private ForeachComponentProxy importForeachComponent
@@ -1011,7 +1014,10 @@ public abstract class JAXBAbstractModuleImporter
     final ComponentKind kind = element.getKind();
     final Graph graphElement = element.getGraph();
     final GraphProxy graph = importGraph(graphElement);
-    return mFactory.createSimpleComponentProxy(identifier, kind, graph);
+    final AttributeMap attribsElement = element.getAttributeMap();
+    final Map<String,String> attribs = importAttributeMap(attribsElement);
+    return mFactory.createSimpleComponentProxy
+      (identifier, kind, graph, attribs);
   }
 
   private SimpleIdentifierProxy importSimpleIdentifier

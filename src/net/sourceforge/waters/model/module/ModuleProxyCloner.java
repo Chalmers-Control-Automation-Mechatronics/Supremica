@@ -235,12 +235,14 @@ public class ModuleProxyCloner
     final ColorGeometryProxy colorGeometry0 = proxy.getColorGeometry();
     final ColorGeometryProxy colorGeometry =
       colorGeometry0 == null ? null : visitColorGeometryProxy(colorGeometry0);
+    final Map<String,String> attributes = proxy.getAttributes();
     return mFactory.createEventDeclProxy(identifier,
                                          kind,
                                          observable,
                                          scope,
                                          ranges,
-                                         colorGeometry);
+                                         colorGeometry,
+                                         attributes);
   }
 
   public EventListExpressionProxy visitEventListExpressionProxy
@@ -573,9 +575,11 @@ public class ModuleProxyCloner
     final ComponentKind kind = proxy.getKind();
     final GraphProxy graph0 = proxy.getGraph();
     final GraphProxy graph = visitGraphProxy(graph0);
+    final Map<String,String> attributes = proxy.getAttributes();
     return mFactory.createSimpleComponentProxy(identifier,
                                                kind,
-                                               graph);
+                                               graph,
+                                               attributes);
   }
 
   public SimpleExpressionProxy visitSimpleExpressionProxy

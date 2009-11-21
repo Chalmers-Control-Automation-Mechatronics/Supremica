@@ -12,7 +12,11 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Collections;
+import java.util.Map;
+
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -20,6 +24,8 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.unchecked.Casting;
+import net.sourceforge.waters.subject.base.AttributeMapSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -42,16 +48,44 @@ public final class SimpleComponentSubject
    * Creates a new simple component.
    * @param identifier The identifier defining the name of the new simple component.
    * @param kind The kind of the new simple component.
-   * @param graph The graph of the new simple component.
+   * @param graph The graph that defines the automaton of the new simple component.
+   * @param attributes The attribute map of the new simple component, or <CODE>null</CODE> if empty.
    */
   public SimpleComponentSubject(final IdentifierProxy identifier,
                                 final ComponentKind kind,
-                                final GraphProxy graph)
+                                final GraphProxy graph,
+                                final Map<String,String> attributes)
   {
     super(identifier);
     mKind = kind;
     mGraph = (GraphSubject) graph;
     mGraph.setParent(this);
+    if (attributes == null) {
+      mAttributes = null;
+    } else {
+      mAttributes = new AttributeMapSubject(attributes);
+    }
+    if (mAttributes != null) {
+      mAttributes.setParent(this);
+    }
+  }
+
+  /**
+   * Creates a new simple component using default values.
+   * This constructor creates a simple component with
+   * an empty attribute map.
+   * @param identifier The identifier defining the name of the new simple component.
+   * @param kind The kind of the new simple component.
+   * @param graph The graph that defines the automaton of the new simple component.
+   */
+  public SimpleComponentSubject(final IdentifierProxy identifier,
+                                final ComponentKind kind,
+                                final GraphProxy graph)
+  {
+    this(identifier,
+         kind,
+         graph,
+         null);
   }
 
 
@@ -77,6 +111,9 @@ public final class SimpleComponentSubject
       }
       final GraphSubject graph = downcast.getGraph();
       mGraph.assignFrom(graph);
+      final AttributeMapSubject attributes =
+        downcast.getAttributesModifiable();
+      mAttributes.assignFrom(attributes);
       if (change) {
         fireStateChanged();
       }
@@ -98,7 +135,8 @@ public final class SimpleComponentSubject
       final SimpleComponentProxy downcast = (SimpleComponentProxy) partner;
       return
         mKind.equals(downcast.getKind()) &&
-        mGraph.equalsByContents(downcast.getGraph());
+        mGraph.equalsByContents(downcast.getGraph()) &&
+        ProxyTools.equals(mAttributes, downcast.getAttributes());
     } else {
       return false;
     }
@@ -110,7 +148,8 @@ public final class SimpleComponentSubject
       final SimpleComponentProxy downcast = (SimpleComponentProxy) partner;
       return
         mKind.equals(downcast.getKind()) &&
-        mGraph.equalsWithGeometry(downcast.getGraph());
+        mGraph.equalsWithGeometry(downcast.getGraph()) &&
+        ProxyTools.equals(mAttributes, downcast.getAttributes());
     } else {
       return false;
     }
@@ -123,6 +162,8 @@ public final class SimpleComponentSubject
     result += mKind.hashCode();
     result *= 5;
     result += mGraph.hashCodeByContents();
+    result *= 5;
+    result += mAttributes.hashCode();
     return result;
   }
 
@@ -133,6 +174,8 @@ public final class SimpleComponentSubject
     result += mKind.hashCode();
     result *= 5;
     result += mGraph.hashCodeWithGeometry();
+    result *= 5;
+    result += ProxyTools.hashCode(mAttributes);
     return result;
   }
 
@@ -159,9 +202,22 @@ public final class SimpleComponentSubject
     return mGraph;
   }
 
+  public Map<String,String> getAttributes()
+  {
+    if (mAttributes == null) {
+      return null;
+    } else {
+      final Map<String,String> downcast = Casting.toMap(mAttributes);
+      return Collections.unmodifiableMap(downcast);
+    }
+  }
+
 
   //#########################################################################
   //# Setters
+  /**
+   * Sets the kind (plant, specification, etc.
+   */
   public void setKind(final ComponentKind kind)
   {
     if (mKind.equals(kind)) {
@@ -171,6 +227,9 @@ public final class SimpleComponentSubject
     fireStateChanged();
   }
 
+  /**
+   * Sets the graph that defines the automaton of this simple component.
+   */
   public void setGraph(final GraphSubject graph)
   {
     if (mGraph == graph) {
@@ -182,10 +241,19 @@ public final class SimpleComponentSubject
     fireStateChanged();
   }
 
+  /**
+   * Gets the modifiable attribute map for this simple component.
+   */
+  public AttributeMapSubject getAttributesModifiable()
+  {
+    return mAttributes;
+  }
+
 
   //#########################################################################
   //# Data Members
   private ComponentKind mKind;
   private GraphSubject mGraph;
+  private AttributeMapSubject mAttributes;
 
 }

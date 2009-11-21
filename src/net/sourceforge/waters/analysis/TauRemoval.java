@@ -39,7 +39,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class TauRemoval
-{  
+{
   private static int INDEX = 1;
   private static int[] TARJAN = null;
   private static int[] LOWLINK = null;
@@ -51,31 +51,31 @@ public class TauRemoval
     new THashMap<TIntHashSet, TIntHashSet>();
   private static THashMap<Set<Set<EventProxy>>, AnnotationEvent> EVENTSETS =
     new THashMap<Set<Set<EventProxy>>, AnnotationEvent>();
-  
+
 
   @SuppressWarnings("unchecked")
-  public static AutomatonProxy tauRemoval(AutomatonProxy graph,
-                                          Set<EventProxy> taus,
-                                          EventProxy mark,
-                                          ProductDESProxyFactory factory)
+  public static AutomatonProxy tauRemoval(final AutomatonProxy graph,
+                                          final Set<EventProxy> taus,
+                                          final EventProxy mark,
+                                          final ProductDESProxyFactory factory)
     throws Exception
   {
-    TIntHashSet[] tautransitions = new TIntHashSet[graph.getStates().size()];
-    THashSet<int[]>[] statetransitions =
+    final TIntHashSet[] tautransitions = new TIntHashSet[graph.getStates().size()];
+    final THashSet<int[]>[] statetransitions =
       new THashSet[graph.getStates().size()];
     StateProxy[] states = new StateProxy[graph.getStates().size()];
     EventProxy[] events = new EventProxy[graph.getEvents().size()];
     states = graph.getStates().toArray(states);
     events = graph.getEvents().toArray(events);
-    TObjectIntHashMap<StateProxy> sti =
+    final TObjectIntHashMap<StateProxy> sti =
       new TObjectIntHashMap<StateProxy>(states.length);
-    TObjectIntHashMap<EventProxy> eti =
+    final TObjectIntHashMap<EventProxy> eti =
       new TObjectIntHashMap<EventProxy>(events.length);
-    boolean[] marked = new boolean[graph.getStates().size()];
-    boolean[] isInitial = new boolean[graph.getStates().size()];
+    final boolean[] marked = new boolean[graph.getStates().size()];
+    final boolean[] isInitial = new boolean[graph.getStates().size()];
     for (int i = 0; i < states.length; i++) {
       if (states[i].isInitial()) {
-        StateProxy t = states[0]; states[0] = states[i]; states[i] = t; break;
+        final StateProxy t = states[0]; states[0] = states[i]; states[i] = t; break;
       }
     }
     for (int i = 0; i < states.length; i++) {
@@ -89,7 +89,7 @@ public class TauRemoval
     System.out.println("SETUP");
     setupTransitions(graph.getTransitions(), taus, eti, sti,
                      statetransitions, tautransitions);
-    CertainConflict con = new CertainConflict(statetransitions, tautransitions,
+    final CertainConflict con = new CertainConflict(statetransitions, tautransitions,
                                               marked, isInitial);
     con.run();
     System.out.println("TARJAN");
@@ -99,33 +99,35 @@ public class TauRemoval
     //System.out.println("SUBSETS");
     //removeSubsets(statetransitions, tautransitions, marked);
     System.out.println("ANNOTATE");
-    Set<TIntHashSet>[] annotations = annotatedGraph(statetransitions,
+    final Set<TIntHashSet>[] annotations = annotatedGraph(statetransitions,
                                                     tautransitions,
                                                     marked);
     System.out.println("INCOMING");
     //equivalentIncoming(statetransitions, annotations, marked, isInitial);
     System.out.println("FINISH UP");
-    EventProxy tau = factory.createEventProxy(":tau:" + graph.getName(),
+    final EventProxy tau = factory.createEventProxy(":tau:" + graph.getName(),
                                               EventKind.UNCONTROLLABLE);
     for (int i = 0; i < states.length; i++) {
-      AnnotationEvent annotation = getEventSet(annotations[i], events, mark);
-      EventProxy m = marked[i] ? mark : null;
-      Collection<EventProxy> props = new ArrayList<EventProxy>();
+      final AnnotationEvent annotation = getEventSet(annotations[i], events, mark);
+      final EventProxy m = marked[i] ? mark : null;
+      final Collection<EventProxy> props = new ArrayList<EventProxy>();
       if (annotation != null) {props.add(annotation);}
       if (m != null) {props.add(m);}
       states[i] = new AnnotatedMemStateProxy(i, props, isInitial[i]);
     }
-    List<TransitionProxy> newtrans = newTransitions(statetransitions,
+    final List<TransitionProxy> newtrans = newTransitions(statetransitions,
                                                     tautransitions, states,
                                                     events,
                                                     graph.getTransitions().size(),
                                                     tau, factory);
-    THashSet<EventProxy> ev = new THashSet<EventProxy>(graph.getEvents());
+    final THashSet<EventProxy> ev = new THashSet<EventProxy>(graph.getEvents());
     taus.remove(mark);
     ev.removeAll(taus); ev.add(tau);
     System.out.println("TauTransitions:" + newtrans.size());
-    AutomatonProxy result = factory.createAutomatonProxy(graph.getName(), ComponentKind.PLANT,
-                                                         ev, Arrays.asList(states), newtrans);
+    AutomatonProxy result =
+      factory.createAutomatonProxy(graph.getName(), ComponentKind.PLANT,
+                                   ev, Arrays.asList(states), newtrans,
+                                   null);
     /*if (graph.getStates().size() < 10) {
       System.out.println("thing");
       System.out.println(graph);
@@ -133,26 +135,26 @@ public class TauRemoval
       System.out.println(result);
       System.exit(1);
     }*/
-    BiSimulator sim = new BiSimulator(result, mark, factory);
+    final BiSimulator sim = new BiSimulator(result, mark, factory);
     result = sim.run();
     result = unnanotateAutomaton(result, mark, factory);
     SETS.clear();
     EVENTSETS.clear();
     return result;
   }
-  
-  private static AnnotationEvent getEventSet(Set<TIntHashSet> ans,
-                                             EventProxy[] events,
-                                             EventProxy marked)
+
+  private static AnnotationEvent getEventSet(final Set<TIntHashSet> ans,
+                                             final EventProxy[] events,
+                                             final EventProxy marked)
   {
     if (ans == null) {return null;}
-    Set<Set<EventProxy>> result = new THashSet<Set<EventProxy>>(ans.size());
-    for (TIntHashSet an : ans) {
-      Set<EventProxy> newevents = new THashSet<EventProxy>(an.size());
-      TIntIterator it = an.iterator();
+    final Set<Set<EventProxy>> result = new THashSet<Set<EventProxy>>(ans.size());
+    for (final TIntHashSet an : ans) {
+      final Set<EventProxy> newevents = new THashSet<EventProxy>(an.size());
+      final TIntIterator it = an.iterator();
       while (it.hasNext()) {
-        int ev = it.next();
-        EventProxy event = ev == -1 ? marked : events[ev];
+        final int ev = it.next();
+        final EventProxy event = ev == -1 ? marked : events[ev];
         newevents.add(event);
       }
       result.add(newevents);
@@ -164,39 +166,39 @@ public class TauRemoval
     }
     return event;
   }
-  
-  private static List<TransitionProxy> 
-    newTransitions(THashSet<int[]>[] statetransitions,
-                   TIntHashSet[] tautransitions,
-                   StateProxy[] states, EventProxy[] events,
-                   int transitionnumber, EventProxy tau,
-                   ProductDESProxyFactory factory)
+
+  private static List<TransitionProxy>
+    newTransitions(final THashSet<int[]>[] statetransitions,
+                   final TIntHashSet[] tautransitions,
+                   final StateProxy[] states, final EventProxy[] events,
+                   final int transitionnumber, final EventProxy tau,
+                   final ProductDESProxyFactory factory)
   {
-    List<TransitionProxy> newtransitions = 
+    final List<TransitionProxy> newtransitions =
       new ArrayList<TransitionProxy>(transitionnumber * 3);
     for (int i = 0; i < statetransitions.length; i++) {
       if (statetransitions[i] != null) {
-        StateProxy s = states[i];
-        for (int[] tran: statetransitions[i]) {
-          EventProxy e = events[tran[0]];
-          StateProxy t = states[tran[1]];
+        final StateProxy s = states[i];
+        for (final int[] tran: statetransitions[i]) {
+          final EventProxy e = events[tran[0]];
+          final StateProxy t = states[tran[1]];
           newtransitions.add(factory.createTransitionProxy(s, e, t));
         }
       }
     }
     for (int i = 0; i < tautransitions.length; i++) {
       if (tautransitions[i] != null) {
-        StateProxy s = states[i];
-        TIntIterator it = tautransitions[i].iterator();
+        final StateProxy s = states[i];
+        final TIntIterator it = tautransitions[i].iterator();
         while (it.hasNext()) {
-          StateProxy t = states[it.next()];
+          final StateProxy t = states[it.next()];
           newtransitions.add(factory.createTransitionProxy(s, tau, t));
         }
       }
     }
     return newtransitions;
   }
-  
+
   private static void setupTransitions(final Collection<TransitionProxy> transitions,
                                        final Set<EventProxy> taus,
                                        final TObjectIntHashMap<EventProxy> eti,
@@ -204,10 +206,10 @@ public class TauRemoval
                                        final THashSet<int[]>[] statetransitions,
                                        final TIntHashSet[] tautransitions)
   {
-    for (TransitionProxy t : transitions) {
-      int source = sti.get(t.getSource());
-      int event = eti.get(t.getEvent());
-      int target = sti.get(t.getTarget());
+    for (final TransitionProxy t : transitions) {
+      final int source = sti.get(t.getSource());
+      final int event = eti.get(t.getEvent());
+      final int target = sti.get(t.getTarget());
       if (taus.contains(t.getEvent())) {
         if (source == target) {
           continue;
@@ -228,22 +230,22 @@ public class TauRemoval
       }
     }
   }
-  
-  private static void tarjan(TIntHashSet[] tautransitions, int state,
-                             boolean[] marked)
+
+  private static void tarjan(final TIntHashSet[] tautransitions, final int state,
+                             final boolean[] marked)
   {
     TARJAN[state] = INDEX;
     LOWLINK[state] = INDEX;
     INDEX++;
-    TIntHashSet successors = tautransitions[state];
+    final TIntHashSet successors = tautransitions[state];
     if (successors == null) {
       return;
     }
     ONSTACK[state] = true;
     STACK.push(state);
-    TIntIterator targets = successors.iterator();
+    final TIntIterator targets = successors.iterator();
     while (targets.hasNext()) {
-      int suc = targets.next();
+      final int suc = targets.next();
       if(ONSTACK[suc]) {
         LOWLINK[state] = TARJAN[suc] < LOWLINK[state] ? TARJAN[suc]
                                                       : LOWLINK[state];
@@ -255,9 +257,9 @@ public class TauRemoval
       if (marked[suc]) {marked[state] = true;}
     }
     if (TARJAN[state] == LOWLINK[state]) {
-      int mapto = state + 1;
+      final int mapto = state + 1;
       while (true) {
-        int pop = STACK.pop();
+        final int pop = STACK.pop();
         ONSTACK[pop] = false;
         if (pop == state) {
           break;
@@ -266,10 +268,10 @@ public class TauRemoval
       }
     }
   }
-  
-  private static void removeTauLoops(THashSet<int[]>[] statetransitions,
-                                     TIntHashSet[] tautransitions,
-                                     boolean[] marked)
+
+  private static void removeTauLoops(final THashSet<int[]>[] statetransitions,
+                                     final TIntHashSet[] tautransitions,
+                                     final boolean[] marked)
   {
     TARJAN = new int[statetransitions.length];
     LOWLINK = new int[statetransitions.length];
@@ -288,16 +290,16 @@ public class TauRemoval
     if (STATEMAPSTO.size() == 0) {
       return;
     }
-    TIntHashSet set = new TIntHashSet();
-    Collection<int[]> arset = new THashSet<int[]>(ArrayHash.ARRAYHASH);
+    final TIntHashSet set = new TIntHashSet();
+    final Collection<int[]> arset = new THashSet<int[]>(ArrayHash.ARRAYHASH);
     for (int i = 0; i < statetransitions.length; i++) {
-      THashSet<int[]> trans = statetransitions[i];
+      final THashSet<int[]> trans = statetransitions[i];
       if (trans != null) {
-        Iterator<int[]> it = trans.iterator();
+        final Iterator<int[]> it = trans.iterator();
         arset.clear();
         while (it.hasNext()) {
-          int[] tran = it.next();
-          int newtarget = STATEMAPSTO.get(tran[1]);
+          final int[] tran = it.next();
+          final int newtarget = STATEMAPSTO.get(tran[1]);
           if (newtarget == 0) {
             continue;
           }
@@ -307,13 +309,13 @@ public class TauRemoval
         }
         trans.addAll(arset);
       }
-      TIntHashSet tau = tautransitions[i];
+      final TIntHashSet tau = tautransitions[i];
       set.clear();
       if (tau != null) {
-        TIntIterator it = tau.iterator();
+        final TIntIterator it = tau.iterator();
         while (it.hasNext()) {
-          int targ = it.next();
-          int newtarg = STATEMAPSTO.get(targ);
+          final int targ = it.next();
+          final int newtarg = STATEMAPSTO.get(targ);
           if (newtarg == 0) {
             continue;
           }
@@ -330,9 +332,9 @@ public class TauRemoval
       }
       addto--;
 
-      THashSet<int[]> trans = statetransitions[i];
+      final THashSet<int[]> trans = statetransitions[i];
       if (trans != null) {
-        THashSet<int[]> addtotrans = statetransitions[addto];
+        final THashSet<int[]> addtotrans = statetransitions[addto];
         if (addtotrans == null) {
           statetransitions[addto] = trans;
         } else {
@@ -340,9 +342,9 @@ public class TauRemoval
         }
         statetransitions[i] = null;
       }
-      TIntHashSet tau = tautransitions[i];
+      final TIntHashSet tau = tautransitions[i];
       if (tau != null) {
-        TIntHashSet addtotrans = tautransitions[addto];
+        final TIntHashSet addtotrans = tautransitions[addto];
         if (addtotrans == null) {
           tautransitions[addto] = tau;
         } else {
@@ -353,16 +355,16 @@ public class TauRemoval
     }
     STATEMAPSTO.clear();
   }
-  
-  private static void removeFollowons(THashSet<int[]>[] statetransitions,
-                                      TIntHashSet[] tautransitions, int state)
+
+  private static void removeFollowons(final THashSet<int[]>[] statetransitions,
+                                      final TIntHashSet[] tautransitions, final int state)
   {
     VISITED[state] = true;
-    TIntHashSet targets = tautransitions[state];
-    TIntIterator targs = targets.iterator();
-    TIntHashSet newtargets = new TIntHashSet();
+    final TIntHashSet targets = tautransitions[state];
+    final TIntIterator targs = targets.iterator();
+    final TIntHashSet newtargets = new TIntHashSet();
     while (targs.hasNext()) {
-      int target = targs.next();
+      final int target = targs.next();
       if (tautransitions[target] == null || tautransitions[target].isEmpty()) {
         newtargets.add(target);
         continue;
@@ -377,18 +379,18 @@ public class TauRemoval
         } else {
           statetransitions[state].addAll(statetransitions[target]);
         }
-      }  
+      }
       newtargets.addAll(tautransitions[target].toArray());
     }
     tautransitions[state] = newtargets;
   }
-  
-  private static void removeFollowOnTau(THashSet<int[]>[] statetransitions,
-                                        TIntHashSet[] tautransitions)
+
+  private static void removeFollowOnTau(final THashSet<int[]>[] statetransitions,
+                                        final TIntHashSet[] tautransitions)
   {
     VISITED = new boolean[tautransitions.length];
     for (int i = 0; i < tautransitions.length; i++) {
-      TIntHashSet targets = tautransitions[i];
+      final TIntHashSet targets = tautransitions[i];
       if (VISITED[i] || targets == null) {
         continue;
       }
@@ -396,16 +398,16 @@ public class TauRemoval
     }
     VISITED = null;
   }
-  
-  private static TIntHashSet getActiveEvents(THashSet<int[]> statetransitions,
-                                             boolean[] marked, int state)
+
+  private static TIntHashSet getActiveEvents(final THashSet<int[]> statetransitions,
+                                             final boolean[] marked, final int state)
   {
-    TIntHashSet active = new TIntHashSet();
+    final TIntHashSet active = new TIntHashSet();
     if (statetransitions == null) {
       return active;
     }
     if (marked[state]) {active.add(-1);}
-    for (int[] tran : statetransitions) {
+    for (final int[] tran : statetransitions) {
       active.add(tran[0]);
     }
     TIntHashSet result = SETS.get(active);
@@ -415,12 +417,12 @@ public class TauRemoval
     }
     return result;
   }
-  
-  private static void addTransitions(THashSet<int[]>[] statetransitions,
-                                     int from, int to)
+
+  private static void addTransitions(final THashSet<int[]>[] statetransitions,
+                                     final int from, final int to)
   {
-    THashSet<int[]> fromtrans = statetransitions[from];
-    THashSet<int[]> totrans = statetransitions[to];
+    final THashSet<int[]> fromtrans = statetransitions[from];
+    final THashSet<int[]> totrans = statetransitions[to];
     if (fromtrans == null) {
       return;
     }
@@ -430,23 +432,23 @@ public class TauRemoval
     }
     totrans.addAll(fromtrans);
   }
-  
+
   @SuppressWarnings("unused")
-  private static void removeSubsets(THashSet<int[]>[] statetransitions,
-                                    TIntHashSet[] tautransitions,
-                                    boolean[] marked)
+  private static void removeSubsets(final THashSet<int[]>[] statetransitions,
+                                    final TIntHashSet[] tautransitions,
+                                    final boolean[] marked)
   {
-    TIntHashSet[] activeEvents = new TIntHashSet[statetransitions.length];
-    TIntArrayList stilltau = new TIntArrayList();
+    final TIntHashSet[] activeEvents = new TIntHashSet[statetransitions.length];
+    final TIntArrayList stilltau = new TIntArrayList();
     for (int i = 0; i < tautransitions.length; i++) {
-      TIntHashSet taus = tautransitions[i];
+      final TIntHashSet taus = tautransitions[i];
       if (taus == null) {
         continue;
       }
       TIntIterator it = taus.iterator();
       stilltau.clear();
       while (it.hasNext()) {
-        int target = it.next();
+        final int target = it.next();
         TIntHashSet ae = activeEvents[target];
         if (ae == null) {
           ae = getActiveEvents(statetransitions[target], marked, target);
@@ -455,8 +457,8 @@ public class TauRemoval
         boolean added = true;
         boolean subset = false;
         for (int j = 0; j < stilltau.size(); j++) {
-          int othertau = stilltau.get(j);
-          TIntHashSet ae2 = activeEvents[othertau];
+          final int othertau = stilltau.get(j);
+          final TIntHashSet ae2 = activeEvents[othertau];
           if (ae2.size() < ae.size()) {
             if (subset) {
               continue;
@@ -481,7 +483,7 @@ public class TauRemoval
       taus.retainAll(stilltau.toNativeArray());
       it = taus.iterator();
       while (it.hasNext()) {
-        int target = it.next();
+        final int target = it.next();
         if (statetransitions[i] != null) {
           statetransitions[i].removeAll(statetransitions[target]);
         }
@@ -490,15 +492,15 @@ public class TauRemoval
     }
     SETS.clear();
   }
-  
-  private static void generatepreds(THashSet<int[]>[] statetransitions,
-                                    THashSet<int[]>[] predtransitions)
+
+  private static void generatepreds(final THashSet<int[]>[] statetransitions,
+                                    final THashSet<int[]>[] predtransitions)
   {
     for (int source = 0; source < statetransitions.length; source++) {
-      THashSet<int[]> trans = statetransitions[source];
+      final THashSet<int[]> trans = statetransitions[source];
       if (trans == null) {continue;}
-      for (int[] tran : trans) {
-        int target = tran[1]; int event = tran[0];
+      for (final int[] tran : trans) {
+        final int target = tran[1]; final int event = tran[0];
         THashSet<int[]> preds = predtransitions[target];
         if (preds == null) {
           preds = new THashSet<int[]>(1, ArrayHash.ARRAYHASH);
@@ -508,17 +510,17 @@ public class TauRemoval
       }
     }
   }
-  
+
   @SuppressWarnings("unused")
-  private static void generatepreds(TIntHashSet[] tautransitions,
-                                    TIntHashSet[] predtaus)
+  private static void generatepreds(final TIntHashSet[] tautransitions,
+                                    final TIntHashSet[] predtaus)
   {
     for (int source = 0; source < tautransitions.length; source++) {
-      TIntHashSet trans = tautransitions[source];
+      final TIntHashSet trans = tautransitions[source];
       if (trans == null) {continue;}
-      TIntIterator it = trans.iterator();
+      final TIntIterator it = trans.iterator();
       while (it.hasNext()) {
-        int target = it.next();
+        final int target = it.next();
         TIntHashSet preds = predtaus[target];
         if (preds == null) {
           preds = new TIntHashSet(1);
@@ -528,26 +530,26 @@ public class TauRemoval
       }
     }
   }
-  
+
   @SuppressWarnings("unchecked")
   private static Set<TIntHashSet>[] annotatedGraph
-    (THashSet<int[]>[] statetransitions,
-     TIntHashSet[] tautransitions,
-     boolean[] marked)
+    (final THashSet<int[]>[] statetransitions,
+     final TIntHashSet[] tautransitions,
+     final boolean[] marked)
   {
-    TIntHashSet[] activeEvents = new TIntHashSet[statetransitions.length];
-    Set<TIntHashSet>[] annotations = new Set[statetransitions.length];
-    TIntArrayList stilltau = new TIntArrayList();
+    final TIntHashSet[] activeEvents = new TIntHashSet[statetransitions.length];
+    final Set<TIntHashSet>[] annotations = new Set[statetransitions.length];
+    final TIntArrayList stilltau = new TIntArrayList();
     for (int i = 0; i < tautransitions.length; i++) {
-      TIntHashSet taus = tautransitions[i];
+      final TIntHashSet taus = tautransitions[i];
       if (taus == null) {
         continue;
       }
       tautransitions[i] = null;
-      TIntIterator it = taus.iterator();
+      final TIntIterator it = taus.iterator();
       stilltau.clear();
       while (it.hasNext()) {
-        int target = it.next();
+        final int target = it.next();
         TIntHashSet ae = activeEvents[target];
         if (ae == null) {
           ae = getActiveEvents(statetransitions[target], marked, target);
@@ -557,8 +559,8 @@ public class TauRemoval
         boolean added = true;
         boolean subset = false;
         for (int j = 0; j < stilltau.size(); j++) {
-          int othertau = stilltau.get(j);
-          TIntHashSet ae2 = activeEvents[othertau];
+          final int othertau = stilltau.get(j);
+          final TIntHashSet ae2 = activeEvents[othertau];
           if (ae2.size() < ae.size()) {
             if (subset) {
               continue;
@@ -580,25 +582,25 @@ public class TauRemoval
       }
       annotations[i] = new THashSet<TIntHashSet>(stilltau.size());
       for (int j = 0; j < stilltau.size(); j++) {
-        int target = stilltau.get(j); annotations[i].add(activeEvents[target]);
+        final int target = stilltau.get(j); annotations[i].add(activeEvents[target]);
       }
       stilltau.clear();
     }
     SETS.clear();
     return annotations;
   }
-  
-  private static Set<TIntHashSet> merge(Set<TIntHashSet> an1, 
-                                        Set<TIntHashSet> an2)
+
+  private static Set<TIntHashSet> merge(final Set<TIntHashSet> an1,
+                                        final Set<TIntHashSet> an2)
   {
-    Iterator<TIntHashSet> it1 = an1.iterator();
+    final Iterator<TIntHashSet> it1 = an1.iterator();
     OUTERLOOP:
     while (it1.hasNext()) {
-      TIntHashSet annotation1 = it1.next();
-      Iterator<TIntHashSet> it2 = an2.iterator();
+      final TIntHashSet annotation1 = it1.next();
+      final Iterator<TIntHashSet> it2 = an2.iterator();
       boolean subset = false;
       while (it2.hasNext()) {
-        TIntHashSet annotation2 = it2.next();
+        final TIntHashSet annotation2 = it2.next();
         if (!subset) {
           if (annotation1.size() == annotation2.size()) {
             if (annotation1.equals(annotation2)) {
@@ -620,21 +622,21 @@ public class TauRemoval
     an2.addAll(an1);
     return an2;
   }
-  
+
   @SuppressWarnings({ "unchecked", "unused" })
-  private static void equivalentIncoming(THashSet<int[]>[] statetransitions,
-                                         Set<TIntHashSet>[] annotations,
-                                         boolean[] marked, boolean[] initial)
+  private static void equivalentIncoming(final THashSet<int[]>[] statetransitions,
+                                         final Set<TIntHashSet>[] annotations,
+                                         final boolean[] marked, final boolean[] initial)
   {
-    THashSet<int[]>[] preds = new THashSet[statetransitions.length];
+    final THashSet<int[]>[] preds = new THashSet[statetransitions.length];
     generatepreds(statetransitions, preds);
-    boolean[] onstack = new boolean[marked.length];
-    TIntStack stack = new TIntStack(statetransitions.length);
+    final boolean[] onstack = new boolean[marked.length];
+    final TIntStack stack = new TIntStack(statetransitions.length);
     for (int i = 0; i < statetransitions.length; i++) {
       stack.push(i); onstack[i] = true;
     }
     while(stack.size() != 0) {
-      int state = stack.pop(); onstack[state] = false;
+      final int state = stack.pop(); onstack[state] = false;
       if (preds[state] == null) {continue;}
       for (int other = 0; other < preds.length; other++) {
         if (other == state) {continue;}
@@ -663,51 +665,51 @@ public class TauRemoval
       }
     }
   }
-  
-  private static void movetransitions(THashSet<int[]>[] statetransitions,
-                                      THashSet<int[]>[] preds, int state,
-                                      int other, TIntStack stack,
-                                      boolean[] onstack)
+
+  private static void movetransitions(final THashSet<int[]>[] statetransitions,
+                                      final THashSet<int[]>[] preds, final int state,
+                                      final int other, final TIntStack stack,
+                                      final boolean[] onstack)
   {
-    THashSet<int[]> trans1 = statetransitions[state];
-    THashSet<int[]> trans2 = statetransitions[other];
+    final THashSet<int[]> trans1 = statetransitions[state];
+    final THashSet<int[]> trans2 = statetransitions[other];
     if (trans2 == null) {return;}
-    for (int[] tran : trans2) {
+    for (final int[] tran : trans2) {
       trans1.add(tran);
-      int target = tran[1]; int event = tran[0];
-      THashSet<int[]> pred = preds[target];
+      final int target = tran[1]; final int event = tran[0];
+      final THashSet<int[]> pred = preds[target];
       pred.remove(new int[] {event, other});
       pred.add(new int[] {event, state});
       if (!onstack[target]) {onstack[target] = true; stack.push(target);}
     }
   }
-  
-  private static void removePreds(THashSet<int[]>[] preds,
-                                  THashSet<int[]>[] statetransitions, int other,
-                                  boolean[] initial)
+
+  private static void removePreds(final THashSet<int[]>[] preds,
+                                  final THashSet<int[]>[] statetransitions, final int other,
+                                  final boolean[] initial)
   {
-    THashSet<int[]> pre = preds[other];
-    for (int[] tran : pre) {
-      int p = tran[1]; int e = tran[0];
-      THashSet<int[]> succ = statetransitions[p];
+    final THashSet<int[]> pre = preds[other];
+    for (final int[] tran : pre) {
+      final int p = tran[1]; final int e = tran[0];
+      final THashSet<int[]> succ = statetransitions[p];
       succ.remove(new int[] {e, other});
     }
     preds[other] = null;
     initial[other] = false;
   }
-  
+
   private static class CertainConflict
   {
     private final THashSet<int[]>[] mStatetransitions;
     private final TIntHashSet[] mTautransitions;
     private final TIntHashSet[] mPreds;
-    private boolean[] mMarked;
-    private boolean[] mReachable;
-    private boolean[] mIsInitial;
-    
-    public CertainConflict(THashSet<int[]>[] statetransitions,
-                           TIntHashSet[] tautransitions,
-                           boolean[] marked, boolean isInitial[])
+    private final boolean[] mMarked;
+    private final boolean[] mReachable;
+    private final boolean[] mIsInitial;
+
+    public CertainConflict(final THashSet<int[]>[] statetransitions,
+                           final TIntHashSet[] tautransitions,
+                           final boolean[] marked, final boolean isInitial[])
     {
       mStatetransitions = statetransitions;
       mTautransitions = tautransitions;
@@ -717,16 +719,16 @@ public class TauRemoval
       mIsInitial = isInitial;
       generatepreds(mStatetransitions, mTautransitions, mPreds);
     }
-    
-    private static void generatepreds(THashSet<int[]>[] statetransitions,
-                                      TIntHashSet[] tautransitions,
-                                      TIntHashSet[] predtrans)
+
+    private static void generatepreds(final THashSet<int[]>[] statetransitions,
+                                      final TIntHashSet[] tautransitions,
+                                      final TIntHashSet[] predtrans)
     {
       for (int source = 0; source < statetransitions.length; source++) {
-        THashSet<int[]> trans = statetransitions[source];
+        final THashSet<int[]> trans = statetransitions[source];
         if (trans == null) {continue;}
-        for (int[] tran : trans) {
-          int target = tran[1];
+        for (final int[] tran : trans) {
+          final int target = tran[1];
           TIntHashSet preds = predtrans[target];
           if (preds == null) {
             preds = new TIntHashSet();
@@ -736,11 +738,11 @@ public class TauRemoval
         }
       }
       for (int source = 0; source < tautransitions.length; source++) {
-        TIntHashSet trans = tautransitions[source];
+        final TIntHashSet trans = tautransitions[source];
         if (trans == null) {continue;}
-        TIntIterator it = trans.iterator();
+        final TIntIterator it = trans.iterator();
         while (it.hasNext()) {
-          int target = it.next();
+          final int target = it.next();
           TIntHashSet preds = predtrans[target];
           if (preds == null) {
             preds = new TIntHashSet(1);
@@ -750,19 +752,19 @@ public class TauRemoval
         }
       }
     }
-    
-    private void backtrack(int state)
+
+    private void backtrack(final int state)
     {
       if(mReachable[state]) {return;} //already done this state
       mReachable[state] = true;
-      TIntHashSet preds = mPreds[state];
+      final TIntHashSet preds = mPreds[state];
       if (preds == null) {return;}
-      TIntIterator it = preds.iterator();
+      final TIntIterator it = preds.iterator();
       while (it.hasNext()) {//mark all state which can reach this state as reachable
-        int pred = it.next(); backtrack(pred);
+        final int pred = it.next(); backtrack(pred);
       }
     }
-    
+
     public void run()
     {
       for (int state = 0; state < mMarked.length; state++) {
@@ -771,8 +773,8 @@ public class TauRemoval
         }
       }
       int dumpstate = -1;
-      TIntHashSet redirect = new TIntHashSet();
-      TIntStack stack = new TIntStack();
+      final TIntHashSet redirect = new TIntHashSet();
+      final TIntStack stack = new TIntStack();
       for (int state = 0; state < mReachable.length; state++) {
         if (!mReachable[state]) {
           dumpstate = dumpstate == -1 ? state : dumpstate;
@@ -781,7 +783,7 @@ public class TauRemoval
         }
       }
       while (stack.size() != 0) {
-        int state = stack.pop();
+        final int state = stack.pop();
         mStatetransitions[state] = null;
         mTautransitions[state] = null;
         if (mIsInitial[state]) {
@@ -795,25 +797,25 @@ public class TauRemoval
           }
           mIsInitial[dumpstate] = true;
         }
-        TIntHashSet preds = mPreds[state];
+        final TIntHashSet preds = mPreds[state];
         if (preds == null) {continue;}
-        TIntIterator it = preds.iterator();
+        final TIntIterator it = preds.iterator();
         while (it.hasNext()) {
-          int pred = it.next();
+          final int pred = it.next();
           if (redirect.contains(pred)) {
             continue; //has or will be nulled;
           }
-          TIntHashSet taus = mTautransitions[pred];
+          final TIntHashSet taus = mTautransitions[pred];
           if (taus != null) {
             if (taus.contains(state)) {
               redirect.add(pred); stack.push(pred); continue; // is another dumpstate
             }
           }
-          THashSet<int[]> succs = mStatetransitions[pred];
+          final THashSet<int[]> succs = mStatetransitions[pred];
           if (succs == null) {continue;}
           Iterator<int[]> trans = succs.iterator();
-          TIntHashSet todumpstate = new TIntHashSet(); //TODO don't make these objects often;
-          List<int[]> tobeadded = new ArrayList<int[]>();
+          final TIntHashSet todumpstate = new TIntHashSet(); //TODO don't make these objects often;
+          final List<int[]> tobeadded = new ArrayList<int[]>();
           while (trans.hasNext()) {
             int[] tran = trans.next();
             if (tran[1] == state) {
@@ -824,7 +826,7 @@ public class TauRemoval
           trans = succs.iterator();
           boolean alldump = true;
           while (trans.hasNext()) {
-            int[] tran = trans.next();
+            final int[] tran = trans.next();
             if (todumpstate.contains(tran[0])) {
               it.remove(); continue;
             }
@@ -840,14 +842,14 @@ public class TauRemoval
       }
     }
   }
-  
-  private static Set<Set<EventProxy>> getAnnotations(Collection<EventProxy> props)
+
+  private static Set<Set<EventProxy>> getAnnotations(final Collection<EventProxy> props)
   {
-    Iterator<EventProxy> it = props.iterator();
+    final Iterator<EventProxy> it = props.iterator();
     while (it.hasNext()) {
-      EventProxy e = it.next();
+      final EventProxy e = it.next();
       if (e instanceof AnnotationEvent) {
-        AnnotationEvent a = (AnnotationEvent)e;
+        final AnnotationEvent a = (AnnotationEvent)e;
         return a.getAnnotations();
       }
     }
@@ -873,7 +875,7 @@ public class TauRemoval
     }
     TIntArrayList[][] transitions = new TIntArrayList[snumber][enumber];
     TIntHashSet[] activeEvents = new TIntHashSet[snumber];
-    Map<TIntHashSet, TIntArrayList> statesWithAnnotation = 
+    Map<TIntHashSet, TIntArrayList> statesWithAnnotation =
       new THashMap<TIntHashSet, TIntArrayList>();
     Collection<TransitionProxy> newTransitions = new ArrayList<TransitionProxy>();
     List<StateProxy> nextStates = new ArrayList<StateProxy>();
@@ -1024,16 +1026,16 @@ public class TauRemoval
                                         nextStates, newTransitions);
   }
   */
-  public static AutomatonProxy unnanotateAutomaton(AutomatonProxy a, EventProxy marked,
-                                                    ProductDESProxyFactory factory)
+  public static AutomatonProxy unnanotateAutomaton(final AutomatonProxy a, final EventProxy marked,
+                                                    final ProductDESProxyFactory factory)
   {
-    Map<StateProxy, Collection<TransitionProxy>> transitions =
+    final Map<StateProxy, Collection<TransitionProxy>> transitions =
       new THashMap<StateProxy, Collection<TransitionProxy>>();
-    Map<StateProxy, Set<EventProxy>> activeEvents = 
+    final Map<StateProxy, Set<EventProxy>> activeEvents =
       new THashMap<StateProxy, Set<EventProxy>>();
-    Collection<TransitionProxy> newTransitions = new ArrayList<TransitionProxy>();
-    Collection<StateProxy> nextStates = new ArrayList<StateProxy>();
-    for (TransitionProxy t : a.getTransitions()) {
+    final Collection<TransitionProxy> newTransitions = new ArrayList<TransitionProxy>();
+    final Collection<StateProxy> nextStates = new ArrayList<StateProxy>();
+    for (final TransitionProxy t : a.getTransitions()) {
       Collection<TransitionProxy> trans = transitions.get(t.getSource());
       if (trans == null) {
         trans = new ArrayList<TransitionProxy>();
@@ -1050,17 +1052,17 @@ public class TauRemoval
       }
       ae.add(t.getEvent());
     }
-    Map<StateProxy, Collection<StateProxy>> newStates =
+    final Map<StateProxy, Collection<StateProxy>> newStates =
       new THashMap<StateProxy, Collection<StateProxy>>();
     int statenum = 0;
-    Collection<EventProxy> markedcol = Collections.singleton(marked);
-    Collection<EventProxy> notmarked = Collections.emptySet();
-    for (StateProxy s : a.getStates()) {
-      Set<Set<EventProxy>> annotations = getAnnotations(s.getPropositions());
-      Collection<StateProxy> ns = new ArrayList<StateProxy>();
-      boolean isInitial = s.isInitial();
+    final Collection<EventProxy> markedcol = Collections.singleton(marked);
+    final Collection<EventProxy> notmarked = Collections.emptySet();
+    for (final StateProxy s : a.getStates()) {
+      final Set<Set<EventProxy>> annotations = getAnnotations(s.getPropositions());
+      final Collection<StateProxy> ns = new ArrayList<StateProxy>();
+      final boolean isInitial = s.isInitial();
       if (annotations == null) {
-        StateProxy state = new AnnotatedMemStateProxy(statenum,
+        final StateProxy state = new AnnotatedMemStateProxy(statenum,
                                                       s.getPropositions(),
                                                       isInitial);
         statenum++;
@@ -1070,11 +1072,11 @@ public class TauRemoval
         Set<EventProxy> active = activeEvents.get(s);
         active = active == null ? new THashSet<EventProxy>() :
                                   new THashSet<EventProxy>(activeEvents.get(s));
-        for (Set<EventProxy> act : annotations) {
-          Collection<EventProxy> props = act.contains(marked) ? markedcol
+        for (final Set<EventProxy> act : annotations) {
+          final Collection<EventProxy> props = act.contains(marked) ? markedcol
                                                               : notmarked;
-                                         
-          StateProxy state = new AnnotatedMemStateProxy(statenum, props,
+
+          final StateProxy state = new AnnotatedMemStateProxy(statenum, props,
                                                         isInitial);
           statenum++;
           ns.add(state);
@@ -1082,9 +1084,9 @@ public class TauRemoval
           active.removeAll(act);
         }
         if (!active.isEmpty()) {
-          Collection<EventProxy> props = s.getPropositions().contains(marked) ?
+          final Collection<EventProxy> props = s.getPropositions().contains(marked) ?
                                          markedcol : notmarked;
-          StateProxy state = new AnnotatedMemStateProxy(statenum, props,
+          final StateProxy state = new AnnotatedMemStateProxy(statenum, props,
                                                         isInitial);
           statenum++;
           ns.add(state);
@@ -1094,13 +1096,13 @@ public class TauRemoval
       newStates.put(s, ns);
       nextStates.addAll(ns);
     }
-    for (TransitionProxy t : a.getTransitions()) {
-      Collection<StateProxy> possibleSources = newStates.get(t.getSource());
-      Collection<StateProxy> targets = newStates.get(t.getTarget());
-      EventProxy event = t.getEvent();
-      for (StateProxy source : possibleSources) {
+    for (final TransitionProxy t : a.getTransitions()) {
+      final Collection<StateProxy> possibleSources = newStates.get(t.getSource());
+      final Collection<StateProxy> targets = newStates.get(t.getTarget());
+      final EventProxy event = t.getEvent();
+      for (final StateProxy source : possibleSources) {
         if (!activeEvents.get(source).contains(event)) {continue;}
-        for (StateProxy target : targets) {
+        for (final StateProxy target : targets) {
           newTransitions.add(factory.createTransitionProxy(source, event,
                                                            target));
         }
@@ -1109,16 +1111,17 @@ public class TauRemoval
     return factory.createAutomatonProxy(a.getName(),
                                         ComponentKind.PLANT,
                                         a.getEvents(),
-                                        nextStates, newTransitions);
+                                        nextStates,
+                                        newTransitions);
   }
-  
+
   private static class ArrayHash
     implements TObjectHashingStrategy<int[]>
   {
 	private static final long serialVersionUID = 1L;
 	private static final ArrayHash ARRAYHASH = new ArrayHash();
 
-    public int computeHashCode(int[] arr)
+    public int computeHashCode(final int[] arr)
     {
       int hashcode = 7;
       for (int i = 0 ; i < arr.length; i++) {
@@ -1126,8 +1129,8 @@ public class TauRemoval
       }
       return hashcode;
     }
-    
-    public boolean equals(int[] arr1, int[] arr2)
+
+    public boolean equals(final int[] arr1, final int[] arr2)
     {
       if (arr1.length != arr2.length) {
         return false;

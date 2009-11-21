@@ -24,7 +24,7 @@ import net.sourceforge.waters.model.printer.ProxyPrinter;
  * to access the parent. The listeners are implemented in two different
  * ways in the subclasses {@link ImmutableSubject} and {@link
  * MutableSubject}.
- * 
+ *
  * @author Robi Malik
  */
 
@@ -235,7 +235,12 @@ public abstract class AbstractSubject
 
   public String getShortClassName()
   {
-    final Class<? extends AbstractSubject> clazz = getClass();
+    return getShortClassName(this);
+  }
+
+  public static String getShortClassName(final Object object)
+  {
+    final Class<?> clazz = object.getClass();
     final String fullclazzname = clazz.getName();
     final int dotpos = fullclazzname.lastIndexOf('.');
     return fullclazzname.substring(dotpos + 1);

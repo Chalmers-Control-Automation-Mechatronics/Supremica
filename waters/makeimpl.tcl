@@ -622,9 +622,13 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	  Java_WriteLn $stream $umap \
 	      "    $membername = new ${impltype}($paramname);"
 	} else {
-          set call [Java_AttribGetEmptyCollectionsCall $attrib $impl]
+          if {[string compare $eqstatus "optional"] == 0} {
+            set empty "null"
+          } else {
+            set empty [Java_AttribGetEmptyCollectionsCall $attrib $impl]
+          }
 	  Java_WriteLn $stream $umap "    if ($paramname == null) \{"
-	  Java_WriteLn $stream $umap "      $membername = $call;"
+	  Java_WriteLn $stream $umap "      $membername = $empty;"
 	  Java_WriteLn $stream $umap "    \} else \{"
 	  Java_WriteLn $stream $umap \
               "      final $type ${paramname}Modifiable ="
@@ -642,8 +646,13 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	Java_WriteLn $stream $umap "        ($paramname, $elemtype.class);"
         Java_WriteLn $stream $umap "    \}"
       } else {
+        if {[string compare $eqstatus "optional"] == 0} {
+          set empty "null"
+        } else {
+          set empty "new ${impltype}()"
+        }
         Java_WriteLn $stream $umap "    if ($paramname == null) \{"
-	Java_WriteLn $stream $umap "      $membername = new ${impltype}();"
+	Java_WriteLn $stream $umap "      $membername = $empty;"
         Java_WriteLn $stream $umap "    \} else \{"
 	Java_WriteLn $stream $umap \
 	    "      $membername = new ${impltype}($paramname);"
@@ -1156,6 +1165,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	set membername [Java_AttribGetMemberName $attrib $impl]
 	set caster [Java_AttribGetCastTransformerName $attrib $impl]
 	set transformer [Java_AttribGetCollectionTransformerName $attrib $impl]
+        set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
 	Java_WriteLn $stream $umap "  public $type ${gettername}()"
 	Java_WriteLn $stream $umap "  \{"
         if {[regexp {2D$} $type all]} {
@@ -1163,6 +1173,15 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	} elseif {[string compare $transformer ""] == 0 ||
                   [string compare $impl "plain"] == 0} {
 	  Java_WriteLn $stream $umap "    return $membername;"
+	} elseif {[string compare $eqstatus "optional"] == 0} {
+	  Java_WriteLn $stream $umap "    if ($membername == null) \{"
+	  Java_WriteLn $stream $umap "      return null;"
+	  Java_WriteLn $stream $umap "    \} else \{"
+	  Java_WriteLn $stream $umap \
+	      "      final $type downcast = Casting.${caster}($membername);"
+	  Java_WriteLn $stream $umap \
+	      "      return Collections.${transformer}(downcast);"
+	  Java_WriteLn $stream $umap "    \}"
 	} else {
 	  Java_WriteLn $stream $umap \
 	      "    final $type downcast = Casting.${caster}($membername);"
@@ -1779,7 +1798,9 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
             }
           } elseif {$iscoll} {
             regexp {<(.*)>} $decltype all elemtype
-            regsub {^[A-Z].*<} $decltype "Collection<" decltype
+            if {![regexp {^Map<} $decltype all]} {
+              regsub {^[A-Z].*<} $decltype "Collection<" decltype
+            }
             if {![regexp {Proxy$} $elemtype all]} {
               set method "use"
             } elseif {[string compare $elemtype "NodeProxy"] == 0} {
@@ -1924,9 +1945,9 @@ proc Java_CollectGlobalImports {importMapName} {
   set importMap(HashSet) "java.util"
   set importMap(LinkedList) "java.util"
   set importMap(List) "java.util"
-  set importMap(List) "java.util"
   set importMap(Map) "java.util"
   set importMap(Set) "java.util"
+  set importMap(TreeMap) "java.util"
 
   set packprefix "net.sourceforge.waters"
   set packsuffixes [list "model.base" "model.module" "model.des" \
@@ -2284,6 +2305,12 @@ proc Java_AttribGetImplementationType {attrib impl classMapName} {
     return "ArrayList<$elemtype>"
   } elseif {[regexp {^Set<(.*)>$} $type all elemtype]} {
     return "HashSet<$elemtype>"
+  } elseif {[regexp {^Map<String,String>$} $type all]} {
+    if {[string compare $impl "plain"] == 0} {
+      return "TreeMap<String,String>"
+    } else {
+      return "AttributeMapSubject"
+    }
   } else {
     set suffix [Java_GetImplObjectName $impl]
     regsub {Proxy$} $type $suffix type
@@ -2315,6 +2342,8 @@ proc Java_AttribGetMemberType {attrib impl classMapName} {
     return "Simple${colltype}Subject<$elemtype>"
   } elseif {[regexp {^NodeSet} $impltype all]} {
     return $impltype
+  } elseif {[regexp {^AttributeMap} $impltype all]} {
+    return $impltype
   } else {
     return [Java_GetImplClassName $decltype $impl]
   }
@@ -2328,7 +2357,8 @@ proc Java_AttribGetCollectionTransformerName {attrib impl} {
   set decltype [Java_AttribGetDeclaredType $attrib $impl]
   if {[regexp {^(Collection)<} $decltype all collectiontype] ||
       [regexp {^(List)<} $decltype all collectiontype] ||
-      [regexp {^(Set)<} $decltype all collectiontype]} {
+      [regexp {^(Set)<} $decltype all collectiontype] ||
+      [regexp {^(Map)<} $decltype all collectiontype]} {
     return "unmodifiable$collectiontype"
   } else {
     return ""
@@ -2339,7 +2369,8 @@ proc Java_AttribGetCastTransformerName {attrib impl} {
   set decltype [Java_AttribGetDeclaredType $attrib $impl]
   if {[regexp {^(Collection)<} $decltype all collectiontype] ||
       [regexp {^(List)<} $decltype all collectiontype] ||
-      [regexp {^(Set)<} $decltype all collectiontype]} {
+      [regexp {^(Set)<} $decltype all collectiontype] ||
+      [regexp {^(Map)<} $decltype all collectiontype]} {
     return "to$collectiontype"
   } else {
     return ""
@@ -2431,7 +2462,8 @@ proc Java_GetImplClassName {type impl} {
 proc Java_IsCollectionType {type} {
   if {[regexp {^Collection<.*>$} $type all] ||
       [regexp {^List<.*>$} $type all] ||
-      [regexp {^Set<.*>$} $type all]} {
+      [regexp {^Set<.*>$} $type all] ||
+      [regexp {^Map<.*>$} $type all]} {
     return 1
   } else {
     return 0

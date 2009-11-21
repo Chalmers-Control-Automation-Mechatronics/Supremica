@@ -14,6 +14,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.IndexedList;
@@ -66,6 +67,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
 
+import net.sourceforge.waters.xsd.base.AttributeMap;
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.module.Actions;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
@@ -628,7 +630,7 @@ public class JAXBModuleExporter
       element.setScope(scope);
     }
   }
-  
+
   private void copyEdgeProxy
       (final EdgeProxy proxy,
        final Edge element)
@@ -640,7 +642,7 @@ public class JAXBModuleExporter
     final NodeProxy targetProxy = proxy.getTarget();
     element.setTarget(targetProxy.getName());
 
-    
+
     final LabelBlockProxy labelBlockProxy = proxy.getLabelBlock();
 
     if (!labelBlockProxy.getEventList().isEmpty()) {
@@ -648,7 +650,7 @@ public class JAXBModuleExporter
         visitLabelBlockProxy(labelBlockProxy);
       element.setLabelBlock(labelBlockElement);
     }
-    
+
     //------------------EFA
     final GuardActionBlockProxy guardActionBlockProxy = proxy.getGuardActionBlock();
     if(guardActionBlockProxy != null) {
@@ -657,7 +659,7 @@ public class JAXBModuleExporter
     	element.setGuardActionBlock(guardActionBlockElement);
     }
     //------------------
-    
+
     final SplineGeometryProxy geometryProxy = proxy.getGeometry();
     if (geometryProxy != null) {
       final SplineGeometry geometryElement =
@@ -728,6 +730,11 @@ public class JAXBModuleExporter
       final ColorGeometry colorGeometryElement =
         visitColorGeometryProxy(colorGeometryProxy);
       element.setColorGeometry(colorGeometryElement);
+    }
+    final Map<String,String> attribs = proxy.getAttributes();
+    if (attribs != null) {
+      final AttributeMap attribsElement = createAttributeMap(attribs);
+      element.setAttributeMap(attribsElement);
     }
   }
 
@@ -1043,6 +1050,11 @@ public class JAXBModuleExporter
     final GraphProxy graphProxy = proxy.getGraph();
     final Graph graphElement = visitGraphProxy(graphProxy);
     element.setGraph(graphElement);
+    final Map<String,String> attribs = proxy.getAttributes();
+    if (attribs != null) {
+      final AttributeMap attribsElement = createAttributeMap(attribs);
+      element.setAttributeMap(attribsElement);
+    }
   }
 
   private void copySimpleExpressionProxy
