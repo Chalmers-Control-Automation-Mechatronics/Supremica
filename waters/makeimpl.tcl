@@ -772,12 +772,13 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	set gettername [Java_AttribGetGetterName $attrib $impl]
         set refstatus [Java_AttribGetRefStatus $attrib $impl]
         set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-        if {[Java_IsCollectionType $decltype]} {
+        set iscollection [Java_IsCollectionType $decltype]
+        if {$iscollection} {
           set gettername "${gettername}Modifiable"
         }
         Java_WriteLn $stream $umap \
             "      final $type $paramname = downcast.${gettername}();"
-        if {[Java_IsCollectionType $decltype]} {
+        if {$iscollection && [string compare $eqstatus "required"] == 0} {
           Java_WriteLn $stream $umap \
               "      $membername.assignFrom($paramname);"
         } elseif {[regexp {2D$} $type all]} {
@@ -787,7 +788,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
               "        $membername = ($type) $paramname.clone();"
           Java_WriteLn $stream $umap "        change = true;"
           Java_WriteLn $stream $umap "      \}"
-        } elseif {![info exists classMap($decltype)] ||
+        } elseif {!$iscollection && ![info exists classMap($decltype)] ||
                   [string compare $refstatus "ref"] == 0} {
           Java_WriteLn $stream $umap "      if ($membername != $paramname) \{"
           Java_WriteLn $stream $umap "        $membername = $paramname;"
@@ -808,8 +809,13 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
                 "        // nothing"
             Java_WriteLn $stream $umap \
                 "      \} else if ($membername == null) \{"
-            Java_WriteLn $stream $umap \
-                "        $membername = $paramname.clone();"
+            if {$iscollection} {
+              Java_WriteLn $stream $umap \
+                  "        $membername = new ${type}($paramname);"
+            } else {
+              Java_WriteLn $stream $umap \
+                  "        $membername = $paramname.clone();"
+            }
             Java_WriteLn $stream $umap \
                 "        $membername.setParent(this);"
             if {[string compare $eqstatus "geometry"] == 0} {
@@ -831,7 +837,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
             }
             set closer "\} else "
           }
-          if {[Java_ClassIsAbstract $classMap($decltype)]} {
+          if {!$iscollection && [Java_ClassIsAbstract $classMap($decltype)]} {
             set test "$membername.getClass() != $paramname.getClass()"
             Java_WriteLn $stream $umap \
                 "      ${closer}if ($test) \{"
