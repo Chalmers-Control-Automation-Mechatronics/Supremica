@@ -952,7 +952,8 @@ public class EventEditorDialog
         geo = new ColorGeometrySubject(set);
       }
       final SelectionOwner panel = mRoot.getEventsPanel();
-      final Map<String,String> attribs = mEventDecl.getAttributes();
+      final Map<String,String> attribs =
+        mEventDecl == null ? null : mEventDecl.getAttributes();
       final EventDeclSubject template =
         new EventDeclSubject(ident, kind, observable,
                              scope, ranges, geo, attribs);

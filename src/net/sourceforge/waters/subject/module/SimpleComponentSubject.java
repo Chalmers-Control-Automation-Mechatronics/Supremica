@@ -113,7 +113,19 @@ public final class SimpleComponentSubject
       mGraph.assignFrom(graph);
       final AttributeMapSubject attributes =
         downcast.getAttributesModifiable();
-      mAttributes.assignFrom(attributes);
+      if (mAttributes == attributes) {
+        // nothing
+      } else if (mAttributes == null) {
+        mAttributes = new AttributeMapSubject(attributes);
+        mAttributes.setParent(this);
+        change = true;
+      } else if (attributes == null) {
+        mAttributes.setParent(null);
+        mAttributes = null;
+        change = true;
+      } else {
+        mAttributes.assignFrom(attributes);
+      }
       if (change) {
         fireStateChanged();
       }
