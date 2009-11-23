@@ -42,9 +42,14 @@ public class SimulatorPanel
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
     mAutomataPanel.setLayout(new BorderLayout());
     mAutomataPanel.add(scroll, BorderLayout.CENTER);
+    final JPanel buttonPanel = new JPanel();
     final JButton stepButton = new JButton("Step");
     stepButton.addActionListener(new TunnelActionListener(mAutomataTable , mModuleContainer));
-    mAutomataPanel.add(stepButton, BorderLayout.SOUTH);
+    buttonPanel.add(stepButton, BorderLayout.WEST);
+    final JButton undoButton = new JButton("Undo");
+    undoButton.addActionListener(new UndoActionListener(mAutomataTable, mModuleContainer));
+    buttonPanel.add(undoButton, BorderLayout.EAST);
+    mAutomataPanel.add(buttonPanel, BorderLayout.SOUTH);
     mTabbedPane.addTab("Automata", mAutomataPanel);
   }
 
@@ -59,9 +64,14 @@ public class SimulatorPanel
     final JScrollPane scroll = new JScrollPane(mEventsTable);
     mEventsPanel.setLayout(new BorderLayout());
     mEventsPanel.add(scroll, BorderLayout.CENTER);
+    final JPanel buttonPanel = new JPanel();
     final JButton stepButton = new JButton("Step");
-    stepButton.addActionListener(new TunnelActionListener(mEventsTable , mModuleContainer));
-    mEventsPanel.add(stepButton, BorderLayout.SOUTH);
+    stepButton.addActionListener(new TunnelActionListener(mAutomataTable , mModuleContainer));
+    buttonPanel.add(stepButton, BorderLayout.WEST);
+    final JButton undoButton = new JButton("Undo");
+    undoButton.addActionListener(new UndoActionListener(mAutomataTable, mModuleContainer));
+    buttonPanel.add(undoButton, BorderLayout.EAST);
+    mEventsPanel.add(buttonPanel, BorderLayout.SOUTH);
     mTabbedPane.addTab("Events", mEventsPanel);
   }
 

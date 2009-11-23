@@ -2,8 +2,6 @@ package net.sourceforge.waters.gui.simulator;
 
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
-import java.util.Set;
-
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -61,10 +59,10 @@ public class EventTableModel extends SimulationTable implements Observer, ModelO
   private void getRawData()
   {
     update();
-    if (mCompiledDES != null && mModuleContainer != null)
+    if (mSim != null && mModuleContainer != null)
     {
       final Object[][] output = new Object[getRowCount()][getColumnCount()];
-      final Set<EventProxy> allEvents = mCompiledDES.getEvents();
+      final ArrayList<EventProxy> allEvents = mSim.getAllEvents();
       int looper = 0;
       for (final EventProxy event : allEvents) {
         output[looper][0] = event.getName();

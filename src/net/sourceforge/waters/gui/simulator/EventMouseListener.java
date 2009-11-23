@@ -19,8 +19,7 @@ public class EventMouseListener extends MouseAdapter implements SimulationObserv
         for (int column = 0; column < parent.getColumnCount(); column++)
         {
           if (parent.getCellRect(row, column, true).contains(e.getPoint()))
-            System.out.println("TEMPORARY: Event selected: Event offset: " + row);
-            // Code designed to deal with what happens when a row on an event table occurs, happens here.
+            System.out.println(mSim.getBlockingTextual(mSim.getAllEvents().get(row)));
         }
       }
     }

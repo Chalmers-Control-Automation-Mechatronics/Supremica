@@ -3,6 +3,7 @@ package net.sourceforge.waters.gui.simulator;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,10 +57,9 @@ public class Simulation implements ModelObserver, Observer
   public ArrayList<EventProxy> getAllEvents()
   {
     final ArrayList<EventProxy> output = new ArrayList<EventProxy>();
-    for (final EventProxy e : mEnabledEvents)
-      output.add(e);
-    for (final EventProxy e : mInvalidEvents.keySet())
-      output.add(e);
+    for (final EventProxy event : mCompiledDES.getEvents())
+      output.add(event);
+    Collections.sort(output);
     return output;
   }
 
@@ -75,6 +75,24 @@ public class Simulation implements ModelObserver, Observer
         output += proxy.getName() + ",";
       }
       output += "]\r\n";
+    }
+    return output;
+  }
+  public String getBlockingTextual(final EventProxy event)
+  {
+    String output = "";
+    if (mInvalidEvents.containsKey(event))
+    {
+      output += "The automatons which are blocking the event " +  event.getName() + " are: [";
+      for (final AutomatonProxy proxy : mInvalidEvents.get(event))
+      {
+        output += proxy.getName() + ",";
+      }
+      output += "]\r\n";
+    }
+    else
+    {
+      output += "The event " + event.getName() + " isn't blocked, and can be fired";
     }
     return output;
   }
@@ -153,6 +171,8 @@ public class Simulation implements ModelObserver, Observer
     mModule = module;
     mPreviousEvents = new ArrayList<EventProxy>();
     mEnabledLastStep = new ArrayList<AutomatonProxy>();
+    mPreviousAutomatonStates = new ArrayList<HashMap<AutomatonProxy, StateProxy>>();
+    mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
   }
 
   public Simulation(final ModuleContainer module, final ArrayList<EventProxy> events) throws UncontrollableException
@@ -177,8 +197,13 @@ public class Simulation implements ModelObserver, Observer
       throw new IllegalArgumentException("ERROR: This automaton is not in this program");
   }
 
+  @SuppressWarnings("unchecked")
   public void singleStepMutable(final EventProxy event) throws UncontrollableException
   {
+    if (event == null)
+    {
+      return;
+    }
     if (testForControlability() != null)
     {
       final Pair<EventProxy, AutomatonProxy> invalidEvent = testForControlability();
@@ -203,6 +228,8 @@ public class Simulation implements ModelObserver, Observer
     else
     {
       mPreviousEvents.add(event);
+      mPreviousAutomatonStates.add((HashMap<AutomatonProxy,StateProxy>) mAllAutomatons.clone());
+      mPreviousEnabledLastStep.add(mEnabledLastStep);
       mEnabledLastStep = new ArrayList<AutomatonProxy>();
       for (final AutomatonProxy automata : mAllAutomatons.keySet())
       {
@@ -222,6 +249,26 @@ public class Simulation implements ModelObserver, Observer
     (mModule, SimulationChangeEvent.MODEL_CHANGED);
     fireSimulationChangeEvent(simEvent);
     System.out.println("Event successfully completed:" + event);
+  }
+
+  public void reverseSingleStep()
+  {
+    if (mPreviousEvents.size() == 0)
+      throw new IllegalArgumentException("No events have been performed on this simulation yet");
+    else
+    {
+      final EventProxy event = mPreviousEvents.get(mPreviousEvents.size() - 1);
+      mPreviousEvents.remove(mPreviousEvents.size() - 1);
+      mAllAutomatons = mPreviousAutomatonStates.get(mPreviousAutomatonStates.size() - 1);
+      mPreviousAutomatonStates.remove(mPreviousAutomatonStates.size() - 1);
+      mEnabledLastStep = mPreviousEnabledLastStep.get(mPreviousEnabledLastStep.size() - 1);
+      mPreviousEnabledLastStep.remove(mPreviousEnabledLastStep.size() - 1);
+      findEventClassification();
+      final SimulationChangeEvent simEvent = new SimulationChangeEvent
+      (mModule, SimulationChangeEvent.MODEL_CHANGED);
+      fireSimulationChangeEvent(simEvent);
+      System.out.println("Event successfully completed:" + event);
+    }
   }
 
   //#####################################################################################
@@ -472,6 +519,8 @@ public class Simulation implements ModelObserver, Observer
   ArrayList<EventProxy> mEnabledEvents;
   HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the key
   ArrayList<EventProxy> mPreviousEvents;
+  ArrayList<HashMap<AutomatonProxy, StateProxy>> mPreviousAutomatonStates;
+  ArrayList<ArrayList<AutomatonProxy>> mPreviousEnabledLastStep;
   final ModuleContainer mModule;
   ArrayList<AutomatonProxy> mEnabledLastStep;
   ArrayList<SimulationObserver> mSimulationObservers;
