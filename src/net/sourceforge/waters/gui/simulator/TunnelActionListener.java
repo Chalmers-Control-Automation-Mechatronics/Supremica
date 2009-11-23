@@ -18,7 +18,7 @@ import org.supremica.gui.ide.ModuleContainer;
 public class TunnelActionListener implements ActionListener, Observer
 {
 
-  public TunnelActionListener(JTable parent, ModuleContainer module)
+  public TunnelActionListener(final JTable parent, final ModuleContainer module)
   {
     this.sim = ((SimulationTable)parent.getModel()).getSim();
     this.parent = parent;
@@ -31,15 +31,14 @@ public class TunnelActionListener implements ActionListener, Observer
     this.sim = ((SimulationTable)parent.getModel()).getSim();
   }
 
-  public void update(EditorChangedEvent e)
+  public void update(final EditorChangedEvent e)
   {
     this.sim = ((SimulationTable)parent.getModel()).getSim();
   }
 
-  public void actionPerformed(ActionEvent e)
+  public void actionPerformed(final ActionEvent e)
   {
-    System.out.println("DEBUG: Blocking events are:" + sim.getBlockingTextual());
-    ArrayList<EventProxy> possibleEvents = sim.getValidTransitions();
+    final ArrayList<EventProxy> possibleEvents = sim.getValidTransitions();
     Collections.sort(possibleEvents);
     if (possibleEvents.size() == 0)
       System.err.println("ERROR: BLOCKING: There are no possible transitions");
@@ -47,7 +46,7 @@ public class TunnelActionListener implements ActionListener, Observer
     {
       try {
         sim.singleStepMutable(possibleEvents.get(0));
-      } catch (UncontrollableException exception) {
+      } catch (final UncontrollableException exception) {
         // TODO Auto-generated catch block
         System.err.println(exception.toString());
       }
@@ -56,21 +55,20 @@ public class TunnelActionListener implements ActionListener, Observer
     {
       try {
         sim.singleStepMutable(findOptions(possibleEvents));
-      } catch (UncontrollableException exception) {
+      } catch (final UncontrollableException exception) {
         // TODO Auto-generated catch block
         System.err.println(exception.toString());
       }
     }
-    ((SimulationTable)parent.getModel()).updateSim(sim);
 
   }
 
-  private EventProxy findOptions (ArrayList<EventProxy> possibleEvents)
+  private EventProxy findOptions (final ArrayList<EventProxy> possibleEvents)
   {
     do
     {
-      Object[] possibilities = possibleEvents.toArray();
-      EventProxy event = (EventProxy)JOptionPane.showInputDialog(
+      final Object[] possibilities = possibleEvents.toArray();
+      final EventProxy event = (EventProxy)JOptionPane.showInputDialog(
                           parent,
                           "There are multiple events possible. Which one do you wish to fire?",
                           "Multiple Options available",
@@ -81,7 +79,7 @@ public class TunnelActionListener implements ActionListener, Observer
 
       //If a string was returned, say so.
       if ((event != null)) {
-          for (EventProxy findEvent : possibleEvents)
+          for (final EventProxy findEvent : possibleEvents)
           {
             if (findEvent == event)
               return event;

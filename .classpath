@@ -3,9 +3,9 @@
 	<classpathentry excluding="org/supremica/automata/algorithms/Guard/QMCMinimizer/|org/supremica/external/fbd2smv/|org/supremica/external/genericPLCProgramDescription/|org/supremica/external/iec61131/|org/supremica/external/iec61499fb2efa/|org/supremica/external/interfaceExample/|org/supremica/external/jgrafchart/|org/supremica/external/operationframeworkto61131/|org/supremica/external/processAlgebraPetriNet/|org/supremica/external/rac/|org/supremica/external/relationExtraction/|org/supremica/external/robotCoordination/|org/supremica/external/specificationSynthesis/" kind="src" path="src"/>
 	<classpathentry kind="src" path="waters/java/src"/>
 	<classpathentry kind="src" path="tests/src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/unjared"/>
-	<classpathentry kind="lib" path="dist/Supremica.jar"/>
-	<classpathentry kind="lib" path="dist/SupremicaLib.jar"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="lib/unjared"/>
+	<classpathentry exported="true" kind="lib" path="dist/Supremica.jar"/>
+	<classpathentry exported="true" kind="lib" path="dist/SupremicaLib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

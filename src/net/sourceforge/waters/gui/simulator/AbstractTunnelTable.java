@@ -20,13 +20,13 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
 
   //#########################################################################
   //# Constructor
-  public AbstractTunnelTable(final ModuleContainer container)
+  public AbstractTunnelTable(final ModuleContainer container, final Simulation sim)
   {
+    super(sim);
     mCompiledDES = null;
-    mRawData = getRawData();
+    getRawData();
     mModuleContainer = container;
     mModuleContainer.attach(this);
-    mSim = new Simulation(container);
   }
 
   public Simulation getSim()
@@ -73,6 +73,23 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
     return mRawData[row][col];
   }
 
+  public String getColumnName(final int columnVal)
+  {
+    switch (columnVal)
+    {
+    case 0:
+      return "Automata";
+    case 1:
+      return "Active";
+    case 2:
+      return "Colour";
+    case 3:
+      return "State";
+     default:
+       return "Invalid";
+    }
+  }
+
   //#########################################################################
   //# Interface Observer
 
@@ -81,20 +98,13 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
     if (mCompiledDES == null)
     {
       mCompiledDES = mModuleContainer.getCompiledDES();
-      mSim = new Simulation(mModuleContainer);
-      mRawData = getRawData();
+      mSim.resetSimulation();
+      getRawData();
       fireTableDataChanged();
     }
   }
 
-  public void updateSim(Simulation sim)
-  {
-    mSim = sim;
-    mRawData = getRawData();
-    fireTableDataChanged();
-  }
-
-  public void update(EditorChangedEvent e)
+  public void update(final EditorChangedEvent e)
   {
     if (e.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH)
       update();
@@ -103,7 +113,7 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
 
   //#########################################################################
   //# Auxiliary Methods
-  private Object[][] getRawData()
+  private void getRawData()
   {
     if (mSim != null && mModuleContainer != null)
     {
@@ -113,15 +123,15 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
       for (final AutomatonProxy aut : automata) {
         output[looper][0] = aut.getName();
         output[looper][1] = mSim.changedLastStep(aut);
-        StateProxy currentState = mSim.getCurrentStates().get(aut);
+        final StateProxy currentState = mSim.getCurrentStates().get(aut);
         output[looper][2] = mSim.getMarking(currentState, aut);
         output[looper][3] = mSim.getCurrentStates().get(aut).getName();
         looper++;
       }
-      return output;
+      mRawData = output;
     }
     else
-      return new Object[0][0];
+      mRawData = new Object[0][0];
   }
 
 
@@ -132,7 +142,6 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
   private ProductDESProxy mCompiledDES;
   private Object[][] mRawData;
   private final ModuleContainer mModuleContainer;
-  private Simulation mSim;
 
 
   //#########################################################################
@@ -140,13 +149,18 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
   private static final long serialVersionUID = 1L;
 
 
-  public void modelChanged(ModelChangeEvent event)
+  public void modelChanged(final ModelChangeEvent event)
   {
     if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED)
     {
       mCompiledDES = null;
-      mSim = null;
-      mRawData = getRawData();
+      getRawData();
     }
+  }
+
+  public void simulationChanged(final SimulationChangeEvent event)
+  {
+    getRawData();
+    fireTableDataChanged();
   }
 }
