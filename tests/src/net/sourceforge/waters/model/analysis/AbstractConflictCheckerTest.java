@@ -855,6 +855,15 @@ public abstract class AbstractConflictCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  /**
+   * Checks the correctness of a conflict counterexample.
+   * A conflict counterexample has to be a {@link ConflictTraceProxy},
+   * its event sequence has to be accepted by all automata in the given
+   * model, and it must take the model to a blocking state. The latter
+   * condition is checked by means of a language inclusion check.
+   * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
+   * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
+   */
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace)
     throws Exception
@@ -877,7 +886,7 @@ public abstract class AbstractConflictCheckerTest
       createLanguageInclusionChecker(ldes, factory);
     final boolean blocking = lchecker.run();
     if (!blocking) {
-      final TraceProxy ltrace = lchecker.getCounterExample(); 
+      final TraceProxy ltrace = lchecker.getCounterExample();
       final File filename = saveCounterExample(ltrace);
       fail("Counterexample does not lead to blocking state (trace written to" +
            filename + ")!");
@@ -887,9 +896,33 @@ public abstract class AbstractConflictCheckerTest
 
   //#########################################################################
   //# May be Overridden by Subclasses
+  /**
+   * <P>
+   * Creates a language inclusion checker for counterexample verification.
+   * </P>
+   * <P>
+   * To check whether a counterexample indeed leads to a blocking state, a
+   * language inclusion check is performed to determine whether a marked state
+   * is reachable from the end state of the counterexample.
+   * </P>
+   * <P>
+   * Depending on the size of the model, this language inclusion check may be a
+   * difficult problem on its own. This default implementation returns a
+   * {@link NativeLanguageInclusionChecker} if available, otherwise resorts to a
+   * {@link MonolithicLanguageInclusionChecker.} This should be enough for the
+   * test cases contained in this class. Subclasses that involve more advanced
+   * conflict checkers with larger tests may have to override this method.
+   * </P>
+   *
+   * @param des
+   *          A language inclusion model to be verified.
+   * @param factory
+   *          The factory to be used for trace construction.
+   * @return A language inclusion checker to verify the given model.
+   */
   protected LanguageInclusionChecker
-    createLanguageInclusionChecker(ProductDESProxy des,
-                                   ProductDESProxyFactory factory)
+    createLanguageInclusionChecker(final ProductDESProxy des,
+                                   final ProductDESProxyFactory factory)
   {
     if (mLanguageInclusionChecker == null) {
       try {
@@ -904,7 +937,7 @@ public abstract class AbstractConflictCheckerTest
       }
     }
     mLanguageInclusionChecker.setModel(des);
-    return mLanguageInclusionChecker;      
+    return mLanguageInclusionChecker;
   }
 
 

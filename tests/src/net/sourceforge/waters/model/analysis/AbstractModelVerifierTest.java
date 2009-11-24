@@ -175,16 +175,41 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 
   //#########################################################################
   //# To be Overridden/Used by Subclasses
+  /**
+   * Performs preliminary checks on the counterexample.
+   * This method performs some simple checks on the counterexample to make
+   * sure that it can be saved. The more advanced semantic checks are
+   * performed by {@link #checkCounterExample(ProductDESProxy,TraceProxy)
+   * after the counterexample has been written to a file.
+   * @param trace The counterexample to be checked.
+   * @throws junit.framework.AssertionFailedError to indicate that the
+   *   counterexample does not pass the test.
+   */
   protected void precheckCounterExample(final TraceProxy trace)
   {
-    assertNotNull("Counterexample is NULL!", trace); 
-    assertNotNull("NULL product DES in trace!", trace.getProductDES()); 
+    assertNotNull("Counterexample is NULL!", trace);
+    assertNotNull("NULL product DES in trace!", trace.getProductDES());
     assertFalse("NULL automaton in trace!",
                 trace.getAutomata().contains(null));
     assertFalse("NULL event in trace!",
                 trace.getEvents().contains(null));
   }
 
+  /**
+   * Checks whether the given counterexample is indeed a counterexample
+   * for the property considered in this test. This method should perform
+   * a detailed semantic check to confirm that the given counterexample
+   * is indeed correct. The default implementation merely checks whether
+   * the automata and events contained in the counterexample can be found
+   * in the model. All subclasses should override this method to implement
+   * specific tests.
+   * @param des     The model to be verified.
+   * @param trace   The counterexample obtained by from the model
+   *                checker under test.
+   * @throws junit.framework.AssertionFailedError to indicate that the
+   *                counterexample is not a correct counterexample for
+   *                the property.
+   */
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace)
     throws Exception
@@ -232,6 +257,14 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 
   //#########################################################################
   //# To be Provided by Subclasses
+  /**
+   * Creates an instance of the model verifier under test.
+   * This method instantiates the class of the model verifier tested by
+   * the particular subclass of this test, and configures it as needed.
+   * @param  factory   The factory used by the model verifier for trace
+   *                   construction.
+   * @return An instance of the model verifier
+   */
   protected abstract ModelVerifier
     createModelVerifier(ProductDESProxyFactory factory);
 
