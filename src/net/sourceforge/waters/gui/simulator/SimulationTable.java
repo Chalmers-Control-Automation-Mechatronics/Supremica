@@ -4,10 +4,6 @@ import javax.swing.table.AbstractTableModel;
 
 public abstract class SimulationTable extends AbstractTableModel implements SimulationObserver
 {
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
 
   public SimulationTable(final Simulation sim)
   {
@@ -15,7 +11,16 @@ public abstract class SimulationTable extends AbstractTableModel implements Simu
     sim.attach(this);
   }
 
-  public abstract Simulation getSim();
+  public Simulation getSim()
+  {
+    return mSim;
+  }
 
-  public Simulation mSim;
+  private final Simulation mSim;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }

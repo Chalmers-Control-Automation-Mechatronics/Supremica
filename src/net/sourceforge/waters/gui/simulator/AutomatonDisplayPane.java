@@ -4,13 +4,11 @@ import javax.swing.JPanel;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.EditorSurface.DRAGOVERSTATUS;
-import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.Renderable;
 import net.sourceforge.waters.gui.renderer.RenderingInformation;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -74,7 +72,7 @@ public class AutomatonDisplayPane extends JPanel implements Renderable
     renderer.renderGraph(getGraph(), new ArrayList<MiscShape>(), this,
         getShapeProducer(), (Graphics2D)g);
   }
-  */
+
   private GraphProxy getGraph()
   {
     throw new UnsupportedOperationException();
@@ -85,5 +83,11 @@ public class AutomatonDisplayPane extends JPanel implements Renderable
     //return new SubjectShapeProducer (getGraph(), new ModuleContext());
     return null;
   }
+  */
+
+
+  //#################################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

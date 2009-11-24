@@ -1,20 +1,17 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.util.ArrayList;
+
 import javax.swing.ImageIcon;
 
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.subject.base.ModelChangeEvent;
-import net.sourceforge.waters.subject.base.ModelObserver;
-
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class AbstractTunnelTable extends SimulationTable implements Observer, ModelObserver
+public class AbstractTunnelTable
+  extends SimulationTable
+  implements SimulationObserver
 {
 
   //#########################################################################
@@ -22,15 +19,8 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
   public AbstractTunnelTable(final ModuleContainer container, final Simulation sim)
   {
     super(sim);
-    mCompiledDES = null;
     getRawData();
     mModuleContainer = container;
-    mModuleContainer.attach(this);
-  }
-
-  public Simulation getSim()
-  {
-    return mSim;
   }
 
 
@@ -43,11 +33,7 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
 
   public int getRowCount()
   {
-    if (mCompiledDES == null) {
-      return 0;
-    } else {
-      return mSim.getAutomata().size();
-    }
+    return getSim().getAutomata().size();
   }
 
   public Class<?> getColumnClass(final int column)
@@ -77,36 +63,24 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
     switch (columnVal)
     {
     case 0:
-      return "Automata";
+      return "Automaton";
     case 1:
       return "Active";
     case 2:
-      return "Colour";
+      return "Marking";
     case 3:
       return "State";
-     default:
-       return "Invalid";
+    default:
+      return "Invalid";
     }
   }
 
-  //#########################################################################
-  //# Interface Observer
-
-  public void update()
+  //##########################################################################
+  //# Interface net.sourceforge.waters.gui.simulator.SimulationObserver
+  public void simulationChanged(final SimulationChangeEvent event)
   {
-    if (mCompiledDES == null)
-    {
-      mCompiledDES = mModuleContainer.getCompiledDES();
-      mSim.resetSimulation();
-      getRawData();
-      fireTableDataChanged();
-    }
-  }
-
-  public void update(final EditorChangedEvent e)
-  {
-    if (e.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH)
-      update();
+    getRawData();
+    fireTableDataChanged();
   }
 
 
@@ -114,17 +88,17 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
   //# Auxiliary Methods
   private void getRawData()
   {
-    if (mSim != null && mModuleContainer != null)
+    if (getSim() != null && mModuleContainer != null)
     {
       final Object[][] output = new Object[getRowCount()][getColumnCount()];
-      final ArrayList<AutomatonProxy> automata = mSim.getAutomata();
+      final ArrayList<AutomatonProxy> automata = getSim().getAutomata();
       int looper = 0;
       for (final AutomatonProxy aut : automata) {
         output[looper][0] = aut.getName();
-        output[looper][1] = mSim.changedLastStep(aut);
-        final StateProxy currentState = mSim.getCurrentStates().get(aut);
-        output[looper][2] = mSim.getMarking(currentState, aut);
-        output[looper][3] = mSim.getCurrentStates().get(aut).getName();
+        output[looper][1] = getSim().changedLastStep(aut);
+        final StateProxy currentState = getSim().getCurrentStates().get(aut);
+        output[looper][2] = getSim().getMarking(currentState, aut);
+        output[looper][3] = getSim().getCurrentStates().get(aut).getName();
         looper++;
       }
       mRawData = output;
@@ -134,11 +108,9 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
   }
 
 
-
   //#########################################################################
   //# Data Members
   //private final ModuleContainer mModuleContainer;
-  private ProductDESProxy mCompiledDES;
   private Object[][] mRawData;
   private final ModuleContainer mModuleContainer;
 
@@ -147,19 +119,4 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
   //# Class Constants
   private static final long serialVersionUID = 1L;
 
-
-  public void modelChanged(final ModelChangeEvent event)
-  {
-    if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED)
-    {
-      mCompiledDES = null;
-      getRawData();
-    }
-  }
-
-  public void simulationChanged(final SimulationChangeEvent event)
-  {
-    getRawData();
-    fireTableDataChanged();
-  }
 }

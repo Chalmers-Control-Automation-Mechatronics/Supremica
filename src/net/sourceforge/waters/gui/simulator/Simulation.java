@@ -27,14 +27,38 @@ import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
+
 public class Simulation implements ModelObserver, Observer
 {
-  //###################################################################################
+
+  //#########################################################################
+  //# Constructors
+  public Simulation(final ModuleContainer container)
+  {
+    mSimulationObservers = new ArrayList<SimulationObserver>();
+    mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
+    mEnabledEvents = new ArrayList<EventProxy>();
+    mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
+    mModuleContainer = container;
+    mPreviousEvents = new ArrayList<EventProxy>();
+    mEnabledLastStep = new ArrayList<AutomatonProxy>();
+    mPreviousAutomatonStates = new ArrayList<HashMap<AutomatonProxy, StateProxy>>();
+    mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
+    final ModuleSubject module = container.getModule();
+    module.addModelObserver(this);
+    container.attach(this);
+    final ProductDESProxy des = container.getCompiledDES();
+    setCompiledDES(des);
+  }
+
+
+  //#########################################################################
   //# Accessor Functions
   @SuppressWarnings("unchecked")
   public ArrayList<EventProxy> getValidTransitions()
@@ -54,13 +78,16 @@ public class Simulation implements ModelObserver, Observer
     return (HashMap<AutomatonProxy,StateProxy>) mAllAutomatons.clone();
   }
 
-  public ArrayList<EventProxy> getAllEvents()
+  public List<EventProxy> getAllEvents()
   {
-    final ArrayList<EventProxy> output = new ArrayList<EventProxy>();
-    for (final EventProxy event : mCompiledDES.getEvents())
-      output.add(event);
-    Collections.sort(output);
-    return output;
+    if (mCompiledDES == null) {
+      return Collections.emptyList();
+    } else {
+      final Collection<EventProxy> events = mCompiledDES.getEvents();
+      final List<EventProxy> output = new ArrayList<EventProxy>(events);
+      Collections.sort(output);
+      return output;
+    }
   }
 
   public String getBlockingTextual()
@@ -78,6 +105,7 @@ public class Simulation implements ModelObserver, Observer
     }
     return output;
   }
+
   public String getBlockingTextual(final EventProxy event)
   {
     String output = "";
@@ -105,7 +133,7 @@ public class Simulation implements ModelObserver, Observer
     if (props.isEmpty()) {
       return PropositionIcon.getUnmarkedIcon();
     } else {
-      final Map<Proxy,SourceInfo> infomap = mModule.getSourceInfoMap();
+      final Map<Proxy,SourceInfo> infomap = mModuleContainer.getSourceInfoMap();
       final int size = props.size();
       final Set<Color> colorset = new HashSet<Color>(size);
       final List<Color> colorlist = new ArrayList<Color>(size);
@@ -160,40 +188,9 @@ public class Simulation implements ModelObserver, Observer
     return mCompiledDES;
   }
 
-  //###################################################################################
-  //# Constructor
-  public Simulation(final ModuleContainer module)
-  {
-    mCompiledDES = module.getCompiledDES();
-    mSimulationObservers = new ArrayList<SimulationObserver>();
-    mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
-    mEnabledEvents = new ArrayList<EventProxy>();
-    mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
-    if (mCompiledDES != null)
-    {
-      for (final AutomatonProxy automaton : mCompiledDES.getAutomata())
-        for (final StateProxy state : automaton.getStates())
-          if (state.isInitial())
-            mAllAutomatons.put(automaton, state);
-      findEventClassification();
-    }
-    mModule = module;
-    mPreviousEvents = new ArrayList<EventProxy>();
-    mEnabledLastStep = new ArrayList<AutomatonProxy>();
-    mPreviousAutomatonStates = new ArrayList<HashMap<AutomatonProxy, StateProxy>>();
-    mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
-  }
 
-  public Simulation(final ModuleContainer module, final ArrayList<EventProxy> events) throws UncontrollableException
-  {
-    this(module);
-    for (final EventProxy event : events)
-      singleStepMutable(event);
-  }
-
-  //#####################################################################################################
+  //#########################################################################
   //# Mutator Methods
-
   public void setState(final AutomatonProxy automaton, final StateProxy state)
   {
     if (!automaton.getStates().contains(state))
@@ -255,7 +252,7 @@ public class Simulation implements ModelObserver, Observer
     }
     findEventClassification();
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
-    (mModule, SimulationChangeEvent.MODEL_CHANGED);
+      (this, SimulationChangeEvent.MODEL_CHANGED);
     fireSimulationChangeEvent(simEvent);
     System.out.println("Event successfully completed:" + event);
   }
@@ -274,28 +271,15 @@ public class Simulation implements ModelObserver, Observer
       mPreviousEnabledLastStep.remove(mPreviousEnabledLastStep.size() - 1);
       findEventClassification();
       final SimulationChangeEvent simEvent = new SimulationChangeEvent
-      (mModule, SimulationChangeEvent.MODEL_CHANGED);
+        (this, SimulationChangeEvent.MODEL_CHANGED);
       fireSimulationChangeEvent(simEvent);
       System.out.println("Event successfully completed:" + event);
     }
   }
 
-  //#####################################################################################
-  //# Creation Methods
-  @SuppressWarnings("unchecked")
-  public Simulation singleStep(final EventProxy event) throws UncontrollableException
-  {
-    final ArrayList<EventProxy> events = (ArrayList<EventProxy>) mPreviousEvents.clone();
-    events.add(event);
-    final Simulation output = new Simulation (mModule, events);
-    final SimulationChangeEvent simEvent = new SimulationChangeEvent (mModule, SimulationChangeEvent.MODEL_CHANGED);
-    fireSimulationChangeEvent(simEvent);
-    return output;
-  }
 
-  //###########################################################################################
+  //#########################################################################
   //# Interface Object
-
   public boolean Equals(final Object e)
   {
     if (e.getClass() != Simulation.class) return false;
@@ -324,7 +308,8 @@ public class Simulation implements ModelObserver, Observer
     return output;
   }
 
-  //##################################################################
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
   // This event is received when the user has made changes to the
   // model in the editor. The handler invalidates the current
@@ -337,7 +322,8 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-  //##################################################################
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Observer
   // This event is received when a new tab has been activated in a
   // module container, after recompiling the module. If the activated
@@ -348,14 +334,15 @@ public class Simulation implements ModelObserver, Observer
   public void update(final EditorChangedEvent event)
   {
     if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH &&
-        mModule.isSimulatorActive()) {
-      final ProductDESProxy newdes = mModule.getCompiledDES();
+        mModuleContainer.isSimulatorActive()) {
+      final ProductDESProxy newdes = mModuleContainer.getCompiledDES();
       setCompiledDES(newdes);
     }
   }
 
-  //###########################################################################################
-  //# Auxillery Functions
+
+  //#########################################################################
+  //# Auxiliary Functions
   private Pair<EventProxy, AutomatonProxy> testForControlability()
   {
     for (final EventProxy event : mInvalidEvents.keySet())
@@ -466,24 +453,24 @@ public class Simulation implements ModelObserver, Observer
     return false;
   }
 
-  //Stores a new compiled DES. Recomputes all data associated with it
-  // and notifies registered views of the change.
+  /**
+   * Stores a new compiled DES. Recomputes all data associated with it
+   * and notifies registered views of the change.
+   */
   private void setCompiledDES(final ProductDESProxy des)
   {
     if (des != mCompiledDES) {
       mCompiledDES = des;
-      // Also reset the simulation state to the initial state
-      // of the model.
+      resetSimulation();
       final SimulationChangeEvent event = new SimulationChangeEvent
-          (mModule, SimulationChangeEvent.MODEL_CHANGED);
+          (this, SimulationChangeEvent.MODEL_CHANGED);
       fireSimulationChangeEvent(event);
     }
   }
 
   public void attach(final SimulationObserver observer)
   {
-    if (!mSimulationObservers.contains(observer))
-    {
+    if (!mSimulationObservers.contains(observer)) {
       mSimulationObservers.add(observer);
     }
   }
@@ -495,18 +482,16 @@ public class Simulation implements ModelObserver, Observer
 
   private void fireSimulationChangeEvent(final SimulationChangeEvent event)
   {
-    final ArrayList<SimulationObserver> temp = new ArrayList<SimulationObserver>();
-    for (final SimulationObserver e : mSimulationObservers)
-      temp.add(e);
-    for (final SimulationObserver observer : temp)
-    {
+    final ArrayList<SimulationObserver> temp =
+      new ArrayList<SimulationObserver>(mSimulationObservers);
+    for (final SimulationObserver observer : temp) {
       observer.simulationChanged(event);
     }
   }
 
   public void resetSimulation()
   {
-    mCompiledDES = mModule.getCompiledDES();
+    mCompiledDES = mModuleContainer.getCompiledDES();
     mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
     mEnabledEvents = new ArrayList<EventProxy>();
     mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
@@ -522,16 +507,18 @@ public class Simulation implements ModelObserver, Observer
     mEnabledLastStep = new ArrayList<AutomatonProxy>();
   }
 
-  //##################################################################################################
+  //#########################################################################
   //# Data Members
-  HashMap<AutomatonProxy, StateProxy> mAllAutomatons; // The Map object is the current state of the key
-  ArrayList<EventProxy> mEnabledEvents;
-  HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the key
-  ArrayList<EventProxy> mPreviousEvents;
-  ArrayList<HashMap<AutomatonProxy, StateProxy>> mPreviousAutomatonStates;
-  ArrayList<ArrayList<AutomatonProxy>> mPreviousEnabledLastStep;
-  final ModuleContainer mModule;
-  ArrayList<AutomatonProxy> mEnabledLastStep;
-  ArrayList<SimulationObserver> mSimulationObservers;
-  ProductDESProxy mCompiledDES;
+  // The Map object is the current state of the key
+  private HashMap<AutomatonProxy,StateProxy> mAllAutomatons;
+  private ArrayList<EventProxy> mEnabledEvents;
+  private HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the key
+  private ArrayList<EventProxy> mPreviousEvents;
+  private final ArrayList<HashMap<AutomatonProxy, StateProxy>> mPreviousAutomatonStates;
+  private final ArrayList<ArrayList<AutomatonProxy>> mPreviousEnabledLastStep;
+  private final ModuleContainer mModuleContainer;
+  private ArrayList<AutomatonProxy> mEnabledLastStep;
+  private final ArrayList<SimulationObserver> mSimulationObservers;
+  private ProductDESProxy mCompiledDES;
+
 }

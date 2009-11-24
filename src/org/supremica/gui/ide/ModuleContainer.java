@@ -114,7 +114,7 @@ public class ModuleContainer
 
         mTabPanel.addMouseListener(new java.awt.event.MouseAdapter()
         {
-            public void mouseClicked(java.awt.event.MouseEvent e)
+            public void mouseClicked(final java.awt.event.MouseEvent e)
             {
                 if (mTabPanel.getSelectedComponent().getName().equals(mAnalyzerPanel.getName()))
                 {
@@ -283,7 +283,7 @@ public class ModuleContainer
                 panel = new ComponentEditorPanel(this, comp, oldsize);
                 mComponentToPanelMap.put(comp, panel);
             }
-            catch (GeometryAbsentException g)
+            catch (final GeometryAbsentException g)
             {
                 JOptionPane.showMessageDialog(getIDE(), g.getMessage());
             }
@@ -311,7 +311,7 @@ public class ModuleContainer
                 panel = new ComponentViewPanel(this, comp, oldsize);
                 mComponentToViewPanelMap.put(comp, panel);
             }
-            catch (GeometryAbsentException g)
+            catch (final GeometryAbsentException g)
             {
                 JOptionPane.showMessageDialog(getIDE(), g.getMessage());
             }
@@ -319,14 +319,14 @@ public class ModuleContainer
         return panel;
     }
 
-    public ComponentViewPanel getComponentViewPanel(String name)
+    public ComponentViewPanel getComponentViewPanel(final String name)
     {
-        List<Proxy> components = getModule().getComponentList();
-        for (Proxy proxy : components)
+        final List<Proxy> components = getModule().getComponentList();
+        for (final Proxy proxy : components)
         {
             if (proxy instanceof NamedProxy)
             {
-                NamedProxy namedProxy = (NamedProxy)proxy;
+                final NamedProxy namedProxy = (NamedProxy)proxy;
                 if (name.equals(namedProxy.getName()))
                 {
                     if (proxy instanceof SimpleComponentSubject)
@@ -358,13 +358,13 @@ public class ModuleContainer
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.command.UndoInterface
-    public void executeCommand(Command c)
+    public void executeCommand(final Command c)
     {
         c.execute();
         addUndoable(new UndoableCommand(c));
     }
 
-    public void addUndoable(UndoableEdit e)
+    public void addUndoable(final UndoableEdit e)
     {
         if (e.isSignificant()) {
             mInsignificant.end();
@@ -436,7 +436,6 @@ public class ModuleContainer
       try {
         if (selected == mSimulatorPanel) {
           recompile();
-          mSimulatorPanel.updateAutomata();
         } else if (selected == mAnalyzerPanel) {
           recompile();
           mAnalyzerPanel.updateAutomata();
@@ -476,7 +475,7 @@ public class ModuleContainer
       implements SupremicaPropertyChangeListener
     {
 
-      public void propertyChanged(SupremicaPropertyChangeEvent event)
+      public void propertyChanged(final SupremicaPropertyChangeEvent event)
       {
         if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
           mTabPanel.add(mSimulatorPanel, 1);

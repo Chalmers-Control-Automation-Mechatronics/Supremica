@@ -1,29 +1,27 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.observer.Observer;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.subject.base.ModelChangeEvent;
-import net.sourceforge.waters.subject.base.ModelObserver;
+import java.util.List;
 
+import net.sourceforge.waters.model.des.EventProxy;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class EventTableModel extends SimulationTable implements Observer, ModelObserver
+public class EventTableModel
+  extends SimulationTable
 {
 
+  //##########################################################################
+  //# Data Members
   public EventTableModel(final ModuleContainer container, final Simulation sim)
   {
     super(sim);
-    mCompiledDES = null;
-    getRawData();
     mModuleContainer = container;
-    mModuleContainer.attach(this);
+    getRawData();
   }
 
+
+  //##########################################################################
+  //# Overrides for javax.swing.table.TableModel
   public int getColumnCount()
   {
     return 2;
@@ -31,11 +29,7 @@ public class EventTableModel extends SimulationTable implements Observer, ModelO
 
   public int getRowCount()
   {
-    if (mCompiledDES == null) {
-      return 0;
-    } else {
-      return mCompiledDES.getEvents().size();
-    }
+    return getSim().getAllEvents().size();
   }
 
   public Object getValueAt(final int rowIndex, final int columnIndex)
@@ -58,16 +52,15 @@ public class EventTableModel extends SimulationTable implements Observer, ModelO
 
   private void getRawData()
   {
-    update();
-    if (mSim != null && mModuleContainer != null)
+    if (getSim() != null && mModuleContainer != null)
     {
       final Object[][] output = new Object[getRowCount()][getColumnCount()];
-      final ArrayList<EventProxy> allEvents = mSim.getAllEvents();
+      final List<EventProxy> allEvents = getSim().getAllEvents();
       int looper = 0;
       for (final EventProxy event : allEvents) {
         output[looper][0] = event.getName();
-        if (mSim.getEventHistory().size() != 0)
-          output[looper][1] = mSim.getEventHistory().get(mSim.getEventHistory().size() - 1) == event;
+        if (getSim().getEventHistory().size() != 0)
+          output[looper][1] = getSim().getEventHistory().get(getSim().getEventHistory().size() - 1) == event;
         else
           output[looper][1] = "false";
         looper++;
@@ -79,59 +72,23 @@ public class EventTableModel extends SimulationTable implements Observer, ModelO
   }
 
 
-  public void update(final EditorChangedEvent e)
-  {
-    if (e.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH)
-      update();
-  }
-
-  public void update()
-  {
-    if (mCompiledDES == null && mModuleContainer != null)
-    {
-      mCompiledDES = mModuleContainer.getCompiledDES();
-      mSim.resetSimulation();
-      getRawData();
-      fireTableDataChanged();
-    }
-  }
-
   //##########################################################################
-  //# Data Members
-  private ProductDESProxy mCompiledDES;
-  private Object[][] mRawData;
-  private final ModuleContainer mModuleContainer;
-
-  //#########################################################################
-  //# Class SimulationTable
-
-  public Simulation getSim()
-  {
-    return mSim;
-  }
-
-
-  //##########################################################################
-  //# Interface net.sourceforge.waters.subject.base.ModelObserver
-  public void modelChanged(final ModelChangeEvent event)
-  {
-    if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED) {
-      mCompiledDES = null;
-      getRawData();
-    }
-  }
-
-
-  //#################################################################################
-  //# Class Constants
-  private static final long serialVersionUID = 1L;
-  private final ArrayList<ItemListener> allListeners = new ArrayList<ItemListener>();
-  private final int rowSelected = -1;
-
+  //# Interface net.sourceforge.waters.gui.simulator.SimulationObserver
   public void simulationChanged(final SimulationChangeEvent event)
   {
     getRawData();
     fireTableDataChanged();
   }
+
+
+  //##########################################################################
+  //# Data Members
+  private Object[][] mRawData;
+  private final ModuleContainer mModuleContainer;
+
+
+  //#################################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

@@ -89,8 +89,7 @@ public class SimulatorPanel
     final ListSelectionModel listMod =  mEventsTable.getSelectionModel();
     listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     listMod.addListSelectionListener(mEventsTable);
-    mEventsTable.addMouseListener(new EventMouseListener (mSimulation, mEventsTable));
-
+    mEventsTable.addMouseListener(new EventMouseListener(mSimulation, mEventsTable));
   }
 
 
@@ -112,16 +111,5 @@ public class SimulatorPanel
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-
-
-  public void updateAutomata()
-  {
-    ((AbstractTunnelTable)mAutomataTable.getModel()).update();
-  }
-
-  public void updateEvents()
-  {
-    ((EventTableModel)mEventsTable.getModel()).update();
-  }
 
 }
