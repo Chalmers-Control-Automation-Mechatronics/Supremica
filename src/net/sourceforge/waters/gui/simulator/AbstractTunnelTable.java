@@ -1,7 +1,6 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.util.Set;
-
+import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -47,7 +46,7 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
     if (mCompiledDES == null) {
       return 0;
     } else {
-      return mCompiledDES.getAutomata().size();
+      return mSim.getAutomata().size();
     }
   }
 
@@ -118,7 +117,7 @@ public class AbstractTunnelTable extends SimulationTable implements Observer, Mo
     if (mSim != null && mModuleContainer != null)
     {
       final Object[][] output = new Object[getRowCount()][getColumnCount()];
-      final Set<AutomatonProxy> automata = mSim.getCurrentStates().keySet();
+      final ArrayList<AutomatonProxy> automata = mSim.getAutomata();
       int looper = 0;
       for (final AutomatonProxy aut : automata) {
         output[looper][0] = aut.getName();

@@ -5,25 +5,27 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JTable;
 
-public class EventMouseListener extends MouseAdapter implements SimulationObserver
+import net.sourceforge.waters.model.des.AutomatonProxy;
+
+public class AutomatonMouseListener extends MouseAdapter implements SimulationObserver
 {
-  public EventMouseListener(final Simulation sim, final JTable table)
+  public AutomatonMouseListener(final Simulation sim, final JTable table, final AutomatonDesktopPane desktop)
   {
     this.mSim = sim;
     this.parent = table;
+    this.output = desktop;
     mSim.attach(this);
   }
 
   public void mouseClicked(final MouseEvent e){
-      for (int row = 0; row < parent.getRowCount(); row++)
-      {
-        for (int column = 0; column < parent.getColumnCount(); column++)
-        {
-          if (parent.getCellRect(row, column, true).contains(e.getPoint()))
-            System.out.println(mSim.getBlockingTextual(mSim.getAllEvents().get(row)));
-        }
-      }
+    final int row = parent.rowAtPoint(e.getPoint());
+    if (row != -1)
+    {
+      final AutomatonProxy toAdd = mSim.getAutomata().get(row);
+      output.addAutomaton(toAdd);
+      System.out.println("DEBUG: Reached " + row);
     }
+  }
 
   //#######################################################################################
   //# Interface Simulation Observer
@@ -35,4 +37,5 @@ public class EventMouseListener extends MouseAdapter implements SimulationObserv
 
   private final Simulation mSim;
   private final JTable parent;
+  private final AutomatonDesktopPane output;
 }

@@ -2,7 +2,6 @@ package net.sourceforge.waters.gui.simulator;
 
 import java.awt.BorderLayout;
 import javax.swing.JButton;
-import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -30,10 +29,14 @@ public class SimulatorPanel
     setupAutomata();
     setupEvents();
     setLeftComponent(mTabbedPane);
+    setupDesktop();
+  }
+
+  private void setupDesktop()
+  {
     mDesktop.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
     mDesktop.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
     setRightComponent(mDesktop);
-    //JInternalFrame test = new JInternalFrame();
   }
 
   private void setupAutomata()
@@ -56,6 +59,10 @@ public class SimulatorPanel
   private void setupAutomataTable()
   {
     mAutomataTable = new JTable(new AbstractTunnelTable(mModuleContainer, mSimulation));
+    mAutomataTable.addMouseListener(new AutomatonMouseListener(mSimulation, mAutomataTable, mDesktop));
+    final ListSelectionModel listMod =  mAutomataTable.getSelectionModel();
+    listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    listMod.addListSelectionListener(mAutomataTable);
   }
 
   private void setupEvents()
@@ -91,7 +98,7 @@ public class SimulatorPanel
   //# Data Members
   private final ModuleContainer mModuleContainer;
   private JTabbedPane mTabbedPane = new JTabbedPane();
-  private final JDesktopPane mDesktop = new JDesktopPane();
+  private final AutomatonDesktopPane mDesktop = new AutomatonDesktopPane();
   private final JPanel mAutomataPanel = new JPanel();
   private final JPanel mEventsPanel = new JPanel();
   private final Simulation mSimulation;

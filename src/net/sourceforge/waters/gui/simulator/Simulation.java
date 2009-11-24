@@ -146,6 +146,15 @@ public class Simulation implements ModelObserver, Observer
     return (ArrayList<EventProxy>) mPreviousEvents.clone();
   }
 
+  public ArrayList<AutomatonProxy> getAutomata()
+  {
+    final ArrayList<AutomatonProxy> output = new ArrayList<AutomatonProxy>();
+    for (final AutomatonProxy automaton : mAllAutomatons.keySet())
+      output.add(automaton);
+    Collections.sort(output);
+    return output;
+  }
+
   ProductDESProxy getCompiledDES()
   {
     return mCompiledDES;
