@@ -39,6 +39,8 @@ public class AutomatonDisplayPane extends JPanel implements Renderable
     final SimpleComponentProxy component = (SimpleComponentProxy) container.getSourceInfoMap().get(automaton).getSourceObject();
     mGraph = component.getGraph();
     mContext = context;
+    setBackground(EditorColor.BACKGROUNDCOLOR);
+    setSize(200,400);
   }
 
   public RenderingInformation getRenderingInformation(final Proxy proxy)
@@ -86,6 +88,7 @@ public class AutomatonDisplayPane extends JPanel implements Renderable
 
   protected void paintComponent(final Graphics g)
   {
+    super.paintComponent(g);
     final Renderer renderer = new Renderer();
     renderer.renderGraph(mGraph, new ArrayList<MiscShape>(), this,
         getShapeProducer(), (Graphics2D)g);

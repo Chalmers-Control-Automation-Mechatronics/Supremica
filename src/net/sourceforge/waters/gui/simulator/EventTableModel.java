@@ -44,7 +44,7 @@ public class EventTableModel
     case 0:
       return "Event";
     case 1:
-      return "Active";
+      return "Enabled";
     default:
       return "Invalid";
     }
@@ -59,10 +59,7 @@ public class EventTableModel
       int looper = 0;
       for (final EventProxy event : allEvents) {
         output[looper][0] = event.getName();
-        if (getSim().getEventHistory().size() != 0)
-          output[looper][1] = getSim().getEventHistory().get(getSim().getEventHistory().size() - 1) == event;
-        else
-          output[looper][1] = "false";
+        output[looper][1] = getSim().getValidTransitions().contains(event);
         looper++;
       }
       mRawData = output;

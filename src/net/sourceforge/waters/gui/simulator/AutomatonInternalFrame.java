@@ -3,6 +3,7 @@ package net.sourceforge.waters.gui.simulator;
 import java.awt.Dimension;
 
 import javax.swing.JInternalFrame;
+import javax.swing.JScrollPane;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
@@ -18,7 +19,8 @@ public class AutomatonInternalFrame extends JInternalFrame
     setVisible(true);
     setSize(new Dimension(300,100));
     setLocation(100, 100);
-    this.add(new AutomatonDisplayPane(automaton, container));
+    final JScrollPane scrollPane = new JScrollPane(new AutomatonDisplayPane(automaton, container));
+    this.add(scrollPane);
   }
 
   public void dispose()

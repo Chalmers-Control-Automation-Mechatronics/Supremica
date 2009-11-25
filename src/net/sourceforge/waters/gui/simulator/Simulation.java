@@ -85,7 +85,10 @@ public class Simulation implements ModelObserver, Observer
       return Collections.emptyList();
     } else {
       final Collection<EventProxy> events = mCompiledDES.getEvents();
-      final List<EventProxy> output = new ArrayList<EventProxy>(events);
+      final ArrayList<EventProxy> output = new ArrayList<EventProxy>();
+      for (final EventProxy event : events)
+        if (event.getKind() != EventKind.PROPOSITION)
+          output.add(event);
       Collections.sort(output);
       return output;
     }

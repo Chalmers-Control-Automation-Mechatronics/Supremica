@@ -18,12 +18,15 @@ public class AutomatonMouseListener extends MouseAdapter implements SimulationOb
   }
 
   public void mouseClicked(final MouseEvent e){
-    final int row = parent.rowAtPoint(e.getPoint());
-    if (row != -1)
+    if (e.getClickCount() == 2)
     {
-      final AutomatonProxy toAdd = mSim.getAutomata().get(row);
-      output.addAutomaton(toAdd, mSim.getContainer());
-      System.out.println("DEBUG: Reached " + row);
+      final int row = parent.rowAtPoint(e.getPoint());
+      if (row != -1)
+      {
+        final AutomatonProxy toAdd = mSim.getAutomata().get(row);
+        output.addAutomaton(toAdd, mSim.getContainer());
+        System.out.println("DEBUG: Reached " + row);
+      }
     }
   }
 
