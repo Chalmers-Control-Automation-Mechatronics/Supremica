@@ -2,8 +2,9 @@ package net.sourceforge.waters.gui.simulator;
 
 import java.util.ArrayList;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
-
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import org.supremica.gui.ide.ModuleContainer;
@@ -13,6 +14,8 @@ public class AbstractTunnelTable
   extends SimulationTable
   implements SimulationObserver
 {
+
+
 
   //#########################################################################
   //# Constructor
@@ -28,7 +31,7 @@ public class AbstractTunnelTable
   //# Interface javax.swing.table.TableModel
   public int getColumnCount()
   {
-    return 4;
+    return 5;
   }
 
   public int getRowCount()
@@ -40,12 +43,14 @@ public class AbstractTunnelTable
   {
     switch (column) {
     case 0:
-      return String.class;
+      return Icon.class;
     case 1:
       return String.class;
     case 2:
-      return ImageIcon.class;
+      return String.class;
     case 3:
+      return ImageIcon.class;
+    case 4:
       return String.class;
     default:
       throw new ArrayIndexOutOfBoundsException
@@ -55,6 +60,7 @@ public class AbstractTunnelTable
 
   public Object getValueAt(final int row, final int col)
   {
+    resizeWindow();
     return mRawData[row][col];
   }
 
@@ -63,17 +69,21 @@ public class AbstractTunnelTable
     switch (columnVal)
     {
     case 0:
-      return "Automaton";
+      return "";
     case 1:
-      return "Active";
+      return "Automaton";
     case 2:
-      return "Marking";
+      return "Act";
     case 3:
+      return "Mrk";
+    case 4:
       return "State";
     default:
       return "Invalid";
     }
   }
+
+
 
   //##########################################################################
   //# Interface net.sourceforge.waters.gui.simulator.SimulationObserver
@@ -94,17 +104,23 @@ public class AbstractTunnelTable
       final ArrayList<AutomatonProxy> automata = getSim().getAutomata();
       int looper = 0;
       for (final AutomatonProxy aut : automata) {
-        output[looper][0] = aut.getName();
-        output[looper][1] = getSim().changedLastStep(aut);
+        output[looper][0] = ModuleContext.getComponentKindIcon(aut.getKind());
+        output[looper][1] = aut.getName();
+        output[looper][2] = getSim().changedLastStep(aut);
         final StateProxy currentState = getSim().getCurrentStates().get(aut);
-        output[looper][2] = getSim().getMarking(currentState, aut);
-        output[looper][3] = getSim().getCurrentStates().get(aut).getName();
+        output[looper][3] = getSim().getMarking(currentState, aut);
+        output[looper][4] = getSim().getCurrentStates().get(aut).getName();
         looper++;
       }
       mRawData = output;
     }
     else
       mRawData = new Object[0][0];
+  }
+
+  private void resizeWindow()
+  {
+
   }
 
 

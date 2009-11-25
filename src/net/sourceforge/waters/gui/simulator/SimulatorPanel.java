@@ -59,6 +59,20 @@ public class SimulatorPanel
   private void setupAutomataTable()
   {
     mAutomataTable = new JTable(new AbstractTunnelTable(mModuleContainer, mSimulation));
+    final int width = 245; // DEBUG: Hardcoded as mAutomataTable.getColumnModel().getWidth() doesn't work (it gives 375 instead of 260)
+    mAutomataTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    if (mAutomataTable.getColumnModel().getColumnCount() == 0)
+    {
+      System.out.println("DEBUG: ERROR: 0 columns in AutomatonTable " + mAutomataTable.toString());
+    }
+    else
+      {
+      mAutomataTable.getColumnModel().getColumn(0).setPreferredWidth((int)(width * 0.1));
+      mAutomataTable.getColumnModel().getColumn(1).setPreferredWidth((int)(width * 0.35));
+      mAutomataTable.getColumnModel().getColumn(2).setPreferredWidth((int)(width * 0.1));
+      mAutomataTable.getColumnModel().getColumn(3).setPreferredWidth((int)(width * 0.1));
+      mAutomataTable.getColumnModel().getColumn(4).setPreferredWidth((int)(width * 0.35));
+    }
     mAutomataTable.addMouseListener(new AutomatonMouseListener(mSimulation, mAutomataTable, mDesktop));
     final ListSelectionModel listMod =  mAutomataTable.getSelectionModel();
     listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

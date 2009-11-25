@@ -19,8 +19,9 @@ public class AutomatonInternalFrame extends JInternalFrame
     setVisible(true);
     setSize(new Dimension(300,100));
     setLocation(100, 100);
+    moveToFront();
     final JScrollPane scrollPane = new JScrollPane(new AutomatonDisplayPane(automaton, container));
-    this.add(scrollPane);
+    this.getContentPane().add(scrollPane);
   }
 
   public void dispose()

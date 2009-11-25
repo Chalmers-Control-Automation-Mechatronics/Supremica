@@ -1,10 +1,9 @@
 package net.sourceforge.waters.gui.simulator;
 
+import java.awt.Canvas;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
-
-import javax.swing.JPanel;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -29,7 +28,7 @@ import net.sourceforge.waters.subject.module.GraphSubject;
 
 import org.supremica.gui.ide.ModuleContainer;
 
-public class AutomatonDisplayPane extends JPanel implements Renderable
+public class AutomatonDisplayPane extends Canvas implements Renderable
 {
 
   public AutomatonDisplayPane(final AutomatonProxy automaton, final ModuleContainer container)
@@ -40,7 +39,6 @@ public class AutomatonDisplayPane extends JPanel implements Renderable
     mGraph = component.getGraph();
     mContext = context;
     setBackground(EditorColor.BACKGROUNDCOLOR);
-    setSize(200,400);
   }
 
   public RenderingInformation getRenderingInformation(final Proxy proxy)
@@ -86,12 +84,18 @@ public class AutomatonDisplayPane extends JPanel implements Renderable
   }
 
 
-  protected void paintComponent(final Graphics g)
+  public void paint(final Graphics g)
   {
-    super.paintComponent(g);
+    super.paint(g);
     final Renderer renderer = new Renderer();
     renderer.renderGraph(mGraph, new ArrayList<MiscShape>(), this,
         getShapeProducer(), (Graphics2D)g);
+  }
+
+  public void repaint()
+  {
+    super.repaint();
+    paint(this.getGraphics());
   }
 
   private ProxyShapeProducer getShapeProducer()
