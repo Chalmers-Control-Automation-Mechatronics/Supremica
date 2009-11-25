@@ -27,6 +27,7 @@ import net.sourceforge.waters.gui.observer.Subject;
  * </P>
  * <UL>
  * <LI>{@link #MODEL_CHANGED}</LI>
+ * <LI>{@link #STATE_CHANGED}</LI>
  * </UL>
  * <P>
  * In addition, each event has its <EMPH>source</EMPH> that identifies the item
@@ -71,9 +72,10 @@ public class SimulationChangeEvent extends EventObject
   }
 
   /**
-   * Gets the specific kind of notification. There is only one possible value:
+   * Gets the specific kind of notification. There are two possible values
    * <UL>
    * <LI>{@link #MODEL_CHANGED)</LI>
+   * <LI>{@link #STATE_CHANGED)</LI>
    * </UL>
    */
   public int getKind()

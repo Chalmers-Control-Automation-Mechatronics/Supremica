@@ -155,7 +155,7 @@ public class SimpleNodeProxyShape
       } else {
         // DEFAULT MODE
         double i = 0;
-        double degrees = 360.0 / (double) colors.size();
+        final double degrees = 360.0 / (double) colors.size();
         for (final Color c : colors) {
           final Arc2D arc = new Arc2D.Double(bounds, i, degrees, Arc2D.PIE);
           graphics.setColor(c);

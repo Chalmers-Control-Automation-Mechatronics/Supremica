@@ -50,6 +50,7 @@ public class Simulation implements ModelObserver, Observer
     mEnabledLastStep = new ArrayList<AutomatonProxy>();
     mPreviousAutomatonStates = new ArrayList<HashMap<AutomatonProxy, StateProxy>>();
     mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
+    mContainer = container;
     final ModuleSubject module = container.getModule();
     module.addModelObserver(this);
     container.attach(this);
@@ -168,6 +169,11 @@ public class Simulation implements ModelObserver, Observer
     return mEnabledLastStep.contains(automaton);
   }
 
+  public ModuleContainer getContainer()
+  {
+    return mContainer;
+  }
+
   @SuppressWarnings("unchecked")
   public ArrayList<EventProxy> getEventHistory()
   {
@@ -252,7 +258,7 @@ public class Simulation implements ModelObserver, Observer
     }
     findEventClassification();
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
-      (this, SimulationChangeEvent.MODEL_CHANGED);
+      (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
     System.out.println("Event successfully completed:" + event);
   }
@@ -271,7 +277,7 @@ public class Simulation implements ModelObserver, Observer
       mPreviousEnabledLastStep.remove(mPreviousEnabledLastStep.size() - 1);
       findEventClassification();
       final SimulationChangeEvent simEvent = new SimulationChangeEvent
-        (this, SimulationChangeEvent.MODEL_CHANGED);
+        (this, SimulationChangeEvent.STATE_CHANGED);
       fireSimulationChangeEvent(simEvent);
       System.out.println("Event successfully completed:" + event);
     }
@@ -520,5 +526,5 @@ public class Simulation implements ModelObserver, Observer
   private ArrayList<AutomatonProxy> mEnabledLastStep;
   private final ArrayList<SimulationObserver> mSimulationObservers;
   private ProductDESProxy mCompiledDES;
-
+  private final ModuleContainer mContainer;
 }

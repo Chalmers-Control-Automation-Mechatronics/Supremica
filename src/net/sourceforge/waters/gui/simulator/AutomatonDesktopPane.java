@@ -5,15 +5,17 @@ import java.util.ArrayList;
 import javax.swing.JDesktopPane;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
+import org.supremica.gui.ide.ModuleContainer;
+
 public class AutomatonDesktopPane extends JDesktopPane
 {
 
-  public void addAutomaton(final AutomatonProxy automaton)
+  public void addAutomaton(final AutomatonProxy automaton, final ModuleContainer container)
   {
     if (!allAutomaton.contains(automaton))
     {
       allAutomaton.add(automaton);
-      add(new AutomatonInternalFrame(automaton, this));
+      add(new AutomatonInternalFrame(automaton, this, container));
     }
   }
 
