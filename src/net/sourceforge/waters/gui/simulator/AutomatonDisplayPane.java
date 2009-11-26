@@ -1,9 +1,13 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.awt.Canvas;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+
+import javax.swing.JPanel;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -28,7 +32,7 @@ import net.sourceforge.waters.subject.module.GraphSubject;
 
 import org.supremica.gui.ide.ModuleContainer;
 
-public class AutomatonDisplayPane extends Canvas implements Renderable
+public class AutomatonDisplayPane extends JPanel implements Renderable
 {
 
   public AutomatonDisplayPane(final AutomatonProxy automaton, final ModuleContainer container)
@@ -36,9 +40,11 @@ public class AutomatonDisplayPane extends Canvas implements Renderable
     super();
     final ModuleContext context = container.getModuleContext();
     final SimpleComponentProxy component = (SimpleComponentProxy) container.getSourceInfoMap().get(automaton).getSourceObject();
+    setBackground(EditorColor.BACKGROUNDCOLOR);
     mGraph = component.getGraph();
     mContext = context;
-    setBackground(EditorColor.BACKGROUNDCOLOR);
+    final Rectangle2D imageRect = getShapeProducer().getMinimumBoundingRectangle();
+    setPreferredSize(new Dimension((int)imageRect.getWidth(), (int)imageRect.getHeight()));
   }
 
   public RenderingInformation getRenderingInformation(final Proxy proxy)
@@ -87,15 +93,19 @@ public class AutomatonDisplayPane extends Canvas implements Renderable
   public void paint(final Graphics g)
   {
     super.paint(g);
+    System.out.println("DEBUG: Painted");
     final Renderer renderer = new Renderer();
+    final Rectangle2D imageRect = getShapeProducer().getMinimumBoundingRectangle();
+    final Rectangle2D graphicsRect = g.getClipBounds();
+    final double scaleX = graphicsRect.getWidth() / imageRect.getWidth();
+    final double scaleY = graphicsRect.getHeight() / imageRect.getHeight();
+    final double min = Math.min(scaleX, scaleY);
+    final AffineTransform trans = ((Graphics2D)g).getTransform();
+    ((Graphics2D)g).scale(min, min);
     renderer.renderGraph(mGraph, new ArrayList<MiscShape>(), this,
         getShapeProducer(), (Graphics2D)g);
-  }
-
-  public void repaint()
-  {
-    super.repaint();
-    paint(this.getGraphics());
+    System.out.println("DEBUG: Clip Bounds are " + g.getClipBounds());
+    ((Graphics2D)g).setTransform(trans);
   }
 
   private ProxyShapeProducer getShapeProducer()
@@ -109,5 +119,6 @@ public class AutomatonDisplayPane extends Canvas implements Renderable
   private static final long serialVersionUID = 1L;
   private final GraphProxy mGraph;
   private final ModuleContext mContext;
+
 
 }

@@ -15,7 +15,9 @@ public class AutomatonDesktopPane extends JDesktopPane
     if (!allAutomaton.contains(automaton))
     {
       allAutomaton.add(automaton);
-      add(new AutomatonInternalFrame(automaton, this, container));
+      final AutomatonInternalFrame newFrame = new AutomatonInternalFrame(automaton, this, container);
+      add(newFrame);
+      newFrame.moveToFront();
     }
   }
 

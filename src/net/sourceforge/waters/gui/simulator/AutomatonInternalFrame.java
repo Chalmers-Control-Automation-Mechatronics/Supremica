@@ -1,10 +1,6 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.awt.Dimension;
-
 import javax.swing.JInternalFrame;
-import javax.swing.JScrollPane;
-
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -17,11 +13,9 @@ public class AutomatonInternalFrame extends JInternalFrame
     mDesktopParent = parent;
     mAutomaton = automaton;
     setVisible(true);
-    setSize(new Dimension(300,100));
-    setLocation(100, 100);
-    moveToFront();
-    final JScrollPane scrollPane = new JScrollPane(new AutomatonDisplayPane(automaton, container));
-    this.getContentPane().add(scrollPane);
+    final AutomatonDisplayPane displayPane = new AutomatonDisplayPane(automaton, container);
+    this.getContentPane().add(displayPane);
+    this.pack();
   }
 
   public void dispose()
@@ -29,7 +23,6 @@ public class AutomatonInternalFrame extends JInternalFrame
     super.dispose();
     mDesktopParent.removeAutomaton(mAutomaton);
   }
-
 
   //#########################################################################
   //# Data Members
