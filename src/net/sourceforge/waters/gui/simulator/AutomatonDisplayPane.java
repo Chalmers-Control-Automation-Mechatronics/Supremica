@@ -5,7 +5,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -21,7 +22,6 @@ import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -40,10 +40,11 @@ public class AutomatonDisplayPane extends JPanel implements Renderable
     super();
     final ModuleContext context = container.getModuleContext();
     final SimpleComponentProxy component = (SimpleComponentProxy) container.getSourceInfoMap().get(automaton).getSourceObject();
-    setBackground(EditorColor.BACKGROUNDCOLOR);
-    mGraph = component.getGraph();
+    mGraph = (GraphSubject) component.getGraph();
     mContext = context;
-    final Rectangle2D imageRect = getShapeProducer().getMinimumBoundingRectangle();
+    setBackground(EditorColor.BACKGROUNDCOLOR);
+    mShapeProducer = new SubjectShapeProducer(mGraph, mContext);
+    final Rectangle2D imageRect = mShapeProducer.getMinimumBoundingRectangle();
     setPreferredSize(new Dimension((int)imageRect.getWidth(), (int)imageRect.getHeight()));
   }
 
@@ -93,32 +94,30 @@ public class AutomatonDisplayPane extends JPanel implements Renderable
   public void paint(final Graphics g)
   {
     super.paint(g);
-    System.out.println("DEBUG: Painted");
+    final Graphics2D g2d = (Graphics2D) g;
+    final AffineTransform trans = g2d.getTransform();
     final Renderer renderer = new Renderer();
-    final Rectangle2D imageRect = getShapeProducer().getMinimumBoundingRectangle();
-    final Rectangle2D graphicsRect = g.getClipBounds();
-    final double scaleX = graphicsRect.getWidth() / imageRect.getWidth();
-    final double scaleY = graphicsRect.getHeight() / imageRect.getHeight();
+    final Rectangle2D imageRect = mShapeProducer.getMinimumBoundingRectangle();
+    final Dimension panelSize = getSize();
+    final double scaleX = panelSize.getWidth() / imageRect.getWidth();
+    final double scaleY = panelSize.getHeight() / imageRect.getHeight();
     final double min = Math.min(scaleX, scaleY);
-    final AffineTransform trans = ((Graphics2D)g).getTransform();
-    ((Graphics2D)g).scale(min, min);
-    renderer.renderGraph(mGraph, new ArrayList<MiscShape>(), this,
-        getShapeProducer(), (Graphics2D)g);
-    System.out.println("DEBUG: Clip Bounds are " + g.getClipBounds());
-    ((Graphics2D)g).setTransform(trans);
+    g2d.scale(min, min);
+    final List<MiscShape> empty = Collections.emptyList();
+    renderer.renderGraph(mGraph, empty, this, mShapeProducer, g2d);
+    g2d.setTransform(trans);
   }
 
-  private ProxyShapeProducer getShapeProducer()
-  {
-    return new SubjectShapeProducer ((GraphSubject) mGraph, mContext);
-  }
+
+  //#################################################################################
+  //# Data Members
+  private final GraphSubject mGraph;
+  private final ModuleContext mContext;
+  private final ProxyShapeProducer mShapeProducer;
 
 
   //#################################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-  private final GraphProxy mGraph;
-  private final ModuleContext mContext;
-
 
 }
