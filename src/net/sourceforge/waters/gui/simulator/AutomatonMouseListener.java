@@ -24,7 +24,7 @@ public class AutomatonMouseListener extends MouseAdapter implements SimulationOb
       if (row != -1)
       {
         final AutomatonProxy toAdd = mSim.getAutomata().get(row);
-        output.addAutomaton(toAdd, mSim.getContainer());
+        output.addAutomaton(toAdd, mSim.getContainer(), mSim);
         System.out.println("DEBUG: Reached " + row);
       }
     }

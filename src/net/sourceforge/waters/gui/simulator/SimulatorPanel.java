@@ -59,8 +59,7 @@ public class SimulatorPanel
   private void setupAutomataTable()
   {
     mAutomataTable = new JTable(new AbstractTunnelTable(mModuleContainer, mSimulation));
-    final int width = 245; // DEBUG: Hardcoded as mAutomataTable.getColumnModel().getWidth() doesn't work (it gives 375 instead of 260)
-    mAutomataTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    final int width = 245; // DEBUG: Arbitrary value: Any value will work, but this is close to the 'normal' value
     if (mAutomataTable.getColumnModel().getColumnCount() == 0)
     {
       System.out.println("DEBUG: ERROR: 0 columns in AutomatonTable " + mAutomataTable.toString());
@@ -94,6 +93,10 @@ public class SimulatorPanel
     buttonPanel.add(undoButton, BorderLayout.EAST);
     mEventsPanel.add(buttonPanel, BorderLayout.SOUTH);
     mTabbedPane.addTab("Events", mEventsPanel);
+    final int width = 245; // DEBUG: Arbitrary value: Any value will work, but this is close to the 'normal' value
+    mEventsTable.getColumnModel().getColumn(0).setPreferredWidth((int)(width * 0.1));
+    mEventsTable.getColumnModel().getColumn(1).setPreferredWidth((int)(width * 0.8));
+    mEventsTable.getColumnModel().getColumn(2).setPreferredWidth((int)(width * 0.1));
   }
 
   private void setupEventsTable()

@@ -24,7 +24,7 @@ public class EventTableModel
   //# Overrides for javax.swing.table.TableModel
   public int getColumnCount()
   {
-    return 2;
+    return 3;
   }
 
   public int getRowCount()
@@ -42,8 +42,10 @@ public class EventTableModel
     switch (rowIndex)
     {
     case 0:
-      return "Event";
+      return "";
     case 1:
+      return "Event";
+    case 2:
       return "Enabled";
     default:
       return "Invalid";
@@ -58,8 +60,9 @@ public class EventTableModel
       final List<EventProxy> allEvents = getSim().getAllEvents();
       int looper = 0;
       for (final EventProxy event : allEvents) {
-        output[looper][0] = event.getName();
-        output[looper][1] = getSim().getValidTransitions().contains(event);
+        output[looper][0] = null; // This line of code will design the icon for the event
+        output[looper][1] = event.getName();
+        output[looper][2] = getSim().getValidTransitions().contains(event);
         looper++;
       }
       mRawData = output;

@@ -7,13 +7,13 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public class AutomatonInternalFrame extends JInternalFrame
 {
-  public AutomatonInternalFrame(final AutomatonProxy automaton, final AutomatonDesktopPane parent, final ModuleContainer container)
+  public AutomatonInternalFrame(final AutomatonProxy automaton, final AutomatonDesktopPane parent, final ModuleContainer container, final Simulation mSim)
   {
     super(automaton.getName(), true, true, false, true);
     mDesktopParent = parent;
     mAutomaton = automaton;
     setVisible(true);
-    final AutomatonDisplayPane displayPane = new AutomatonDisplayPane(automaton, container);
+    final AutomatonDisplayPane displayPane = new AutomatonDisplayPane(automaton, container, mSim);
     this.getContentPane().add(displayPane);
     this.pack();
   }

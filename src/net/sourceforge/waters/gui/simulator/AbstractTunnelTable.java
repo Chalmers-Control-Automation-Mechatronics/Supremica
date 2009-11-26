@@ -60,7 +60,6 @@ public class AbstractTunnelTable
 
   public Object getValueAt(final int row, final int col)
   {
-    resizeWindow();
     return mRawData[row][col];
   }
 
@@ -116,11 +115,6 @@ public class AbstractTunnelTable
     }
     else
       mRawData = new Object[0][0];
-  }
-
-  private void resizeWindow()
-  {
-
   }
 
 

@@ -50,6 +50,7 @@ public class Simulation implements ModelObserver, Observer
     mEnabledLastStep = new ArrayList<AutomatonProxy>();
     mPreviousAutomatonStates = new ArrayList<HashMap<AutomatonProxy, StateProxy>>();
     mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
+    mPreviousTransitionHistory = new ArrayList<HashMap<AutomatonProxy, TransitionProxy>>();
     mContainer = container;
     final ModuleSubject module = container.getModule();
     module.addModelObserver(this);
@@ -197,6 +198,13 @@ public class Simulation implements ModelObserver, Observer
     return mCompiledDES;
   }
 
+  public TransitionProxy getPreviousTransition(final AutomatonProxy automaton)
+  {
+    if (mPreviousTransitionHistory.size() == 0)
+      return null;
+    else
+      return mPreviousTransitionHistory.get(mPreviousTransitionHistory.size() - 1).get(automaton);
+  }
 
   //#########################################################################
   //# Mutator Methods
@@ -246,18 +254,25 @@ public class Simulation implements ModelObserver, Observer
       mPreviousAutomatonStates.add((HashMap<AutomatonProxy,StateProxy>) mAllAutomatons.clone());
       mPreviousEnabledLastStep.add(mEnabledLastStep);
       mEnabledLastStep = new ArrayList<AutomatonProxy>();
+      final HashMap<AutomatonProxy, TransitionProxy> thisStateTransitionFire = new HashMap<AutomatonProxy, TransitionProxy>();
       for (final AutomatonProxy automata : mAllAutomatons.keySet())
       {
+        boolean moved = false;
         for (final TransitionProxy trans : automata.getTransitions())
         {
           if (trans.getEvent() == event)
           {
-            if (trans.getSource() == mAllAutomatons.get(automata))
+            if (trans.getSource() == mAllAutomatons.get(automata) && !moved)
+            {
               mAllAutomatons.put(automata, trans.getTarget());
+              thisStateTransitionFire.put(automata, trans);
+              moved = true;
+            }
             mEnabledLastStep.add(automata);
           }
         }
       }
+      mPreviousTransitionHistory.add(thisStateTransitionFire);
     }
     findEventClassification();
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
@@ -278,6 +293,7 @@ public class Simulation implements ModelObserver, Observer
       mPreviousAutomatonStates.remove(mPreviousAutomatonStates.size() - 1);
       mEnabledLastStep = mPreviousEnabledLastStep.get(mPreviousEnabledLastStep.size() - 1);
       mPreviousEnabledLastStep.remove(mPreviousEnabledLastStep.size() - 1);
+      mPreviousTransitionHistory.remove(mPreviousTransitionHistory.size() - 1);
       findEventClassification();
       final SimulationChangeEvent simEvent = new SimulationChangeEvent
         (this, SimulationChangeEvent.STATE_CHANGED);
@@ -525,6 +541,7 @@ public class Simulation implements ModelObserver, Observer
   private ArrayList<EventProxy> mPreviousEvents;
   private final ArrayList<HashMap<AutomatonProxy, StateProxy>> mPreviousAutomatonStates;
   private final ArrayList<ArrayList<AutomatonProxy>> mPreviousEnabledLastStep;
+  private final ArrayList<HashMap<AutomatonProxy, TransitionProxy>> mPreviousTransitionHistory;
   private final ModuleContainer mModuleContainer;
   private ArrayList<AutomatonProxy> mEnabledLastStep;
   private final ArrayList<SimulationObserver> mSimulationObservers;

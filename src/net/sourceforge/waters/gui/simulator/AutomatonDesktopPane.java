@@ -10,12 +10,12 @@ import org.supremica.gui.ide.ModuleContainer;
 public class AutomatonDesktopPane extends JDesktopPane
 {
 
-  public void addAutomaton(final AutomatonProxy automaton, final ModuleContainer container)
+  public void addAutomaton(final AutomatonProxy automaton, final ModuleContainer container, final Simulation mSim)
   {
     if (!allAutomaton.contains(automaton))
     {
       allAutomaton.add(automaton);
-      final AutomatonInternalFrame newFrame = new AutomatonInternalFrame(automaton, this, container);
+      final AutomatonInternalFrame newFrame = new AutomatonInternalFrame(automaton, this, container, mSim);
       add(newFrame);
       newFrame.moveToFront();
     }
