@@ -7,6 +7,8 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public class AutomatonInternalFrame extends JInternalFrame
 {
+  //#################################################################################
+  //# Constructors
   public AutomatonInternalFrame(final AutomatonProxy automaton, final AutomatonDesktopPane parent, final ModuleContainer container, final Simulation mSim)
   {
     super(automaton.getName(), true, true, false, true);
@@ -15,9 +17,12 @@ public class AutomatonInternalFrame extends JInternalFrame
     setVisible(true);
     final AutomatonDisplayPane displayPane = new AutomatonDisplayPane(automaton, container, mSim);
     this.getContentPane().add(displayPane);
+    this.addMouseListener(new InternalFrameMouseAdapter(this));
     this.pack();
   }
 
+  //#################################################################################
+  //# Class JInternalFrame
   public void dispose()
   {
     super.dispose();

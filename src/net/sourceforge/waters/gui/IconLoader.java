@@ -23,11 +23,11 @@ public class IconLoader
         final Class<?> cls = IconLoader.class;
         final String resourcename = "/icons/" + name + ".gif";
         final URL resource = cls.getResource(resourcename);
-        
+
         return new ImageIcon(resource);
     }
 
-    
+
     //#########################################################################
     //# Class Constants
     private static final String NAME_AUTOMATON = "waters/automaton16";
@@ -43,8 +43,10 @@ public class IconLoader
     private static final String NAME_SUPERVISOR = "waters/supervisor";
     private static final String NAME_UNCONTROLLABLE = "waters/uncontrollable";
     private static final String NAME_VARIABLE = "waters/variable";
-    
-    
+    private static final String NAME_CROSS = "waters/cross16";
+    private static final String NAME_TICK = "waters/tick16";
+
+
     //#########################################################################
     //# Class Constants
     public static final ImageIcon ICON_AUTOMATON = getIcon(NAME_AUTOMATON);
@@ -64,6 +66,8 @@ public class IconLoader
     public static final ImageIcon ICON_UNCONTROLLABLE =
 		getIcon(NAME_UNCONTROLLABLE);
     public static final ImageIcon ICON_VARIABLE = getIcon(NAME_VARIABLE);
+    public static final ImageIcon ICON_CROSS = getIcon(NAME_CROSS);
+    public static final ImageIcon ICON_TICK = getIcon(NAME_TICK);
 
-    
+
 }

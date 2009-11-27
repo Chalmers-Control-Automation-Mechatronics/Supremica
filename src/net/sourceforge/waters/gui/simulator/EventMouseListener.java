@@ -9,6 +9,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 
 public class EventMouseListener extends MouseAdapter implements SimulationObserver
 {
+  //#################################################################################
+  //# Constructors
   public EventMouseListener(final Simulation sim, final JTable table)
   {
     this.mSim = sim;
@@ -16,6 +18,8 @@ public class EventMouseListener extends MouseAdapter implements SimulationObserv
     mSim.attach(this);
   }
 
+  //#################################################################################
+  //# Class MouseAdapter
   public void mouseClicked(final MouseEvent e){
       if (e.getClickCount() == 2)
       {
@@ -47,9 +51,11 @@ public class EventMouseListener extends MouseAdapter implements SimulationObserv
 
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    // TODO Auto-generated method stub
+    // If needed to update
   }
 
+  //#################################################################################
+  //# Data Members
   private final Simulation mSim;
   private final JTable parent;
 }

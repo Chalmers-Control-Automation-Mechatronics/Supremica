@@ -9,6 +9,8 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 
 public class AutomatonMouseListener extends MouseAdapter implements SimulationObserver
 {
+  //#################################################################################
+  //# Constructors
   public AutomatonMouseListener(final Simulation sim, final JTable table, final AutomatonDesktopPane desktop)
   {
     this.mSim = sim;
@@ -17,16 +19,15 @@ public class AutomatonMouseListener extends MouseAdapter implements SimulationOb
     mSim.attach(this);
   }
 
+  //#################################################################################
+  //# Class MouseAdapter
   public void mouseClicked(final MouseEvent e){
-    if (e.getClickCount() == 2)
+
+    final int row = parent.rowAtPoint(e.getPoint());
+    if (row != -1)
     {
-      final int row = parent.rowAtPoint(e.getPoint());
-      if (row != -1)
-      {
-        final AutomatonProxy toAdd = mSim.getAutomata().get(row);
-        output.addAutomaton(toAdd, mSim.getContainer(), mSim);
-        System.out.println("DEBUG: Reached " + row);
-      }
+      final AutomatonProxy toAdd = mSim.getAutomata().get(row);
+      output.addAutomaton(toAdd, mSim.getContainer(), mSim, e.getClickCount());
     }
   }
 
@@ -35,8 +36,11 @@ public class AutomatonMouseListener extends MouseAdapter implements SimulationOb
 
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    // TODO Auto-generated method stub
+    // If needed
   }
+
+  //#################################################################################
+  //# Data Members
 
   private final Simulation mSim;
   private final JTable parent;

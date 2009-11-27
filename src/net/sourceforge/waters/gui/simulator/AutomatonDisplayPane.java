@@ -43,10 +43,9 @@ import org.supremica.gui.ide.ModuleContainer;
 public class AutomatonDisplayPane extends JPanel implements Renderable, SimulationObserver
 {
 
-  private final Simulation mSim;
-  private final AutomatonProxy mAutomaton;
-  private final ModuleContainer mContainer;
 
+  //#################################################################################
+  //# Constructors
   public AutomatonDisplayPane(final AutomatonProxy automaton, final ModuleContainer container, final Simulation sim)
   {
     super();
@@ -65,6 +64,8 @@ public class AutomatonDisplayPane extends JPanel implements Renderable, Simulati
     mAutomaton = automaton;
   }
 
+  //#################################################################################
+  //# Interface Renderable
   public RenderingInformation getRenderingInformation(final Proxy proxy)
   {
     final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
@@ -87,6 +88,8 @@ public class AutomatonDisplayPane extends JPanel implements Renderable, Simulati
     return getRenderingInformation(false, proxy);
   }
 
+  //#################################################################################
+  //# Auxillary Functions
   private RenderingInformation getRenderingInformation(final boolean active, final Proxy proxy)
   {
     return new RenderingInformation
@@ -98,6 +101,8 @@ public class AutomatonDisplayPane extends JPanel implements Renderable, Simulati
      getPriority(proxy));
   }
 
+  //#################################################################################
+  //# Class JPanel
   protected int getPriority(final Proxy o)
   {
       int priority = 0;
@@ -152,6 +157,9 @@ public class AutomatonDisplayPane extends JPanel implements Renderable, Simulati
   private final GraphSubject mGraph;
   private final ModuleContext mContext;
   private final ProxyShapeProducer mShapeProducer;
+  private final Simulation mSim;
+  private final AutomatonProxy mAutomaton;
+  private final ModuleContainer mContainer;
 
 
   //#################################################################################
@@ -160,7 +168,7 @@ public class AutomatonDisplayPane extends JPanel implements Renderable, Simulati
 
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    paint(getGraphics());
+    repaint();
   }
 
 }

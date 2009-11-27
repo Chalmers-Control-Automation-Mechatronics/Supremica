@@ -10,25 +10,22 @@ import net.sourceforge.waters.model.des.StateProxy;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class AbstractTunnelTable
-  extends SimulationTable
-  implements SimulationObserver
+public class AbstractTunnelTable extends SimulationTable implements
+    SimulationObserver
 {
 
-
-
-  //#########################################################################
-  //# Constructor
-  public AbstractTunnelTable(final ModuleContainer container, final Simulation sim)
+  // #########################################################################
+  // # Constructor
+  public AbstractTunnelTable(final ModuleContainer container,
+      final Simulation sim)
   {
     super(sim);
     getRawData();
     mModuleContainer = container;
   }
 
-
-  //#########################################################################
-  //# Interface javax.swing.table.TableModel
+  // #########################################################################
+  // # Interface javax.swing.table.TableModel
   public int getColumnCount()
   {
     return 5;
@@ -47,14 +44,14 @@ public class AbstractTunnelTable
     case 1:
       return String.class;
     case 2:
-      return String.class;
+      return Icon.class;
     case 3:
       return ImageIcon.class;
     case 4:
       return String.class;
     default:
-      throw new ArrayIndexOutOfBoundsException
-        ("Bad column number for markings table model!");
+      throw new ArrayIndexOutOfBoundsException(
+          "Bad column number for markings table model!");
     }
   }
 
@@ -65,8 +62,7 @@ public class AbstractTunnelTable
 
   public String getColumnName(final int columnVal)
   {
-    switch (columnVal)
-    {
+    switch (columnVal) {
     case 0:
       return "";
     case 1:
@@ -82,51 +78,44 @@ public class AbstractTunnelTable
     }
   }
 
-
-
-  //##########################################################################
-  //# Interface net.sourceforge.waters.gui.simulator.SimulationObserver
+  // ##########################################################################
+  // # Interface net.sourceforge.waters.gui.simulator.SimulationObserver
   public void simulationChanged(final SimulationChangeEvent event)
   {
     getRawData();
     fireTableDataChanged();
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
+  // #########################################################################
+  // # Auxiliary Methods
   private void getRawData()
   {
-    if (getSim() != null && mModuleContainer != null)
-    {
+    if (getSim() != null && mModuleContainer != null) {
       final Object[][] output = new Object[getRowCount()][getColumnCount()];
       final ArrayList<AutomatonProxy> automata = getSim().getAutomata();
       int looper = 0;
       for (final AutomatonProxy aut : automata) {
         output[looper][0] = ModuleContext.getComponentKindIcon(aut.getKind());
         output[looper][1] = aut.getName();
-        output[looper][2] = getSim().changedLastStep(aut);
+        output[looper][2] = ModuleContext.getBooleanIcon(getSim().changedLastStep(aut));
         final StateProxy currentState = getSim().getCurrentStates().get(aut);
         output[looper][3] = getSim().getMarking(currentState, aut);
         output[looper][4] = getSim().getCurrentStates().get(aut).getName();
         looper++;
       }
       mRawData = output;
-    }
-    else
+    } else
       mRawData = new Object[0][0];
   }
 
-
-  //#########################################################################
-  //# Data Members
-  //private final ModuleContainer mModuleContainer;
+  // #########################################################################
+  // # Data Members
+  // private final ModuleContainer mModuleContainer;
   private Object[][] mRawData;
   private final ModuleContainer mModuleContainer;
 
-
-  //#########################################################################
-  //# Class Constants
+  // #########################################################################
+  // # Class Constants
   private static final long serialVersionUID = 1L;
 
 }

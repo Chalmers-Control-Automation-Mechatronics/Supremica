@@ -23,17 +23,18 @@ public class SimulatorPanel
     super(name);
     mSimulation = new Simulation(moduleContainer);
     mModuleContainer = moduleContainer;
+    setupDesktop();
     mTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
     mTabbedPane.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
     mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
     setupAutomata();
     setupEvents();
     setLeftComponent(mTabbedPane);
-    setupDesktop();
   }
 
   private void setupDesktop()
   {
+    mDesktop = new AutomatonDesktopPane(mModuleContainer, mSimulation);
     mDesktop.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
     mDesktop.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
     setRightComponent(mDesktop);
@@ -114,7 +115,7 @@ public class SimulatorPanel
   //# Data Members
   private final ModuleContainer mModuleContainer;
   private JTabbedPane mTabbedPane = new JTabbedPane();
-  private final AutomatonDesktopPane mDesktop = new AutomatonDesktopPane();
+  private AutomatonDesktopPane mDesktop;
   private final JPanel mAutomataPanel = new JPanel();
   private final JPanel mEventsPanel = new JPanel();
   private final Simulation mSimulation;

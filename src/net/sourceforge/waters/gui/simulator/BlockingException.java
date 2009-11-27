@@ -3,7 +3,9 @@ package net.sourceforge.waters.gui.simulator;
 public class BlockingException extends Exception
 {
 
-  public BlockingException(String e)
+  //#################################################################################
+  //# Constructors
+  public BlockingException(final String e)
   {
     super(e);
   }
@@ -12,9 +14,8 @@ public class BlockingException extends Exception
   {
   }
 
-  /**
-   *
-   */
+  //#################################################################################
+  //# Class Constants
   private static final long serialVersionUID = 1L;
 
 }

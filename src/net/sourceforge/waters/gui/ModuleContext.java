@@ -409,6 +409,27 @@ public class ModuleContext
         ("Unknown component kind: " + kind + "!");
     }
   }
+  public static Icon getEventKindIcon(final EventKind event)
+  {
+    switch (event){
+    case CONTROLLABLE:
+      return IconLoader.ICON_CONTROLLABLE;
+    case UNCONTROLLABLE:
+      return IconLoader.ICON_UNCONTROLLABLE;
+    case PROPOSITION:
+      return IconLoader.ICON_PROPOSITION;
+    default:
+      throw new IllegalArgumentException
+        ("Unknown event kind: " + event + "!");
+    }
+  }
+  public static Icon getBooleanIcon(final boolean bool)
+  {
+    if (bool)
+      return IconLoader.ICON_TICK;
+    else
+      return IconLoader.ICON_CROSS;
+  }
 
   public static String getComponentKindToolTip(final ComponentKind kind)
   {
