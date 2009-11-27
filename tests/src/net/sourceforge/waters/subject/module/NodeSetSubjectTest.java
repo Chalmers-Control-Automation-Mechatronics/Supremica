@@ -163,7 +163,7 @@ public class NodeSetSubjectTest extends AbstractWatersTest
 
   private GraphSubject createGraph(final List<NodeSubject> testlist)
   {
-    return new GraphSubject(true, null, testlist, null, null);
+    return new GraphSubject(true, null, testlist, null);
   }
 
   private void checkGraph(final GraphSubject graph,

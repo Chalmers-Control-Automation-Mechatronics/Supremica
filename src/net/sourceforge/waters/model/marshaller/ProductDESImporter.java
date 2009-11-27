@@ -230,7 +230,7 @@ public class ProductDESImporter
       final Collection<SimpleNodeProxy> nodes = mCurrentNodeMap.values();
       final GraphProxy graph =
         mFactory.createGraphProxy(deterministic, blockedblock,
-                                  nodes, edges, null);
+                                  nodes, edges);
       final SimpleIdentifierProxy ident =
         mFactory.createSimpleIdentifierProxy(name);
       return mFactory.createSimpleComponentProxy(ident, kind, graph);

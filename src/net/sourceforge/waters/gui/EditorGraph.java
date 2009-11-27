@@ -36,7 +36,6 @@ import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
@@ -121,10 +120,10 @@ class EditorGraph
 
     for (final NodeSubject node : graph.getNodesModifiable()) {
       if (node instanceof SimpleNodeSubject) {
-        SimpleNodeSubject simple = (SimpleNodeSubject) node;
+        final SimpleNodeSubject simple = (SimpleNodeSubject) node;
         addSimpleNode(simple);
       } else if (node instanceof GroupNodeSubject) {
-        GroupNodeSubject group = (GroupNodeSubject) node;
+        final GroupNodeSubject group = (GroupNodeSubject) node;
         addGroupNode(group);
       }
     }
@@ -188,11 +187,6 @@ class EditorGraph
     return mGraph.isDeterministic();
   }
 
-  public BoxGeometryProxy getGeometry()
-  {
-    return mGraph.getGeometry();
-  }
-
 
   //#########################################################################
   //# Accessing the Fake Maps
@@ -206,7 +200,7 @@ class EditorGraph
     return mOriginalGetter.getOriginal(fake);
   }
 
-  Collection<EdgeSubject> getNodeEdges(NodeSubject n)
+  Collection<EdgeSubject> getNodeEdges(final NodeSubject n)
   {
     return Collections.unmodifiableCollection(mObserverMap.get(n).getEdges());
   }
@@ -338,7 +332,7 @@ class EditorGraph
       throw new IllegalArgumentException("Group node " + group0 +
                                          " has no geometry!");
     } else {
-      GroupNodeSubject group1 = group0.clone();
+      final GroupNodeSubject group1 = group0.clone();
       mNodes.add(group1);
       mObserverMap.put(group1, new EditorGroupNode(group1));
       new GroupNodeChangeRecord(group0, group1);
@@ -732,7 +726,7 @@ class EditorGraph
         if (esource instanceof SimpleNodeSubject &&
             value instanceof LabelGeometrySubject) {
           item = (LabelGeometrySubject) value;
-          
+
         } else {
           item = (ProxySubject) esource;
         }
@@ -749,20 +743,20 @@ class EditorGraph
   private abstract class EditorNode
     implements ModelObserver
   {
-    protected EditorNode(NodeSubject node)
+    protected EditorNode(final NodeSubject node)
     {
       mNode = node;
       mEdges = new HashMap<EdgeSubject, Boolean>();
     }
 
-    public void removeEdge(EdgeSubject edge)
+    public void removeEdge(final EdgeSubject edge)
     {
       if (mEdges.remove(edge) != null) {
         edge.removeModelObserver(this);
       }
     }
 
-    public void addEdge(EdgeSubject edge)
+    public void addEdge(final EdgeSubject edge)
     {
       if (mEdges.put(edge, new Boolean(true)) != null) {
         edge.addModelObserver(this);
@@ -774,10 +768,10 @@ class EditorGraph
       return Collections.unmodifiableSet(mEdges.keySet());
     }
 
-    public void modelChanged(ModelChangeEvent event)
+    public void modelChanged(final ModelChangeEvent event)
     {
       if (event.getSource() instanceof EdgeSubject) {
-        EdgeSubject e = (EdgeSubject) event.getSource();
+        final EdgeSubject e = (EdgeSubject) event.getSource();
         if (e.getSource() != getNodeSubject() &&
             e.getTarget() != getNodeSubject()) {
           removeEdge(e);
@@ -897,7 +891,7 @@ class EditorGraph
         }
         mPoint = newpos;
       }
-    }           
+    }
 
     //#######################################################################
     //# Data Members
@@ -912,7 +906,7 @@ class EditorGraph
   {
     //#######################################################################
     //# Constructors
-    public EditorGroupNode(GroupNodeSubject node)
+    public EditorGroupNode(final GroupNodeSubject node)
     {
       super(node);
       mRect = node.getGeometry().getRectangle();
@@ -1118,7 +1112,7 @@ class EditorGraph
     //#######################################################################
     //# Data Members
     private ProxySubject mOriginal;
-    private ProxySubject mFake;
+    private final ProxySubject mFake;
     private int mChangeKind;
   }
 
@@ -1164,7 +1158,7 @@ class EditorGraph
         return original;
       } else {
         final Point2D pos = getFake().getPointGeometry().getPoint();
-        final SimpleNodeSubject node = 
+        final SimpleNodeSubject node =
           GraphTools.getCreatedSimpleNode(mGraph, pos);
         setOriginal(node);
         return node;
@@ -1195,7 +1189,7 @@ class EditorGraph
         } else {
           return new EditCommand(original, fake, surface, name);
         }
-      }          
+      }
     }
   }
 
@@ -1456,7 +1450,7 @@ class EditorGraph
       } else {
         return null;
       }
-    } 
+    }
 
     //#######################################################################
     //# Auxiliary Methods
@@ -1834,7 +1828,7 @@ class EditorGraph
   private final OriginalGetterVisitor mOriginalGetter;
   private final ChangeRecordCreatorVisitor mChangeRecordCreator;
 
-  
+
   //#########################################################################
   //# Class Constants
   private static final int PASS0_UNLINK = 0;

@@ -447,7 +447,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
         mCurrentBlockedEvents == null ? null :
         createLabelBlock(mCurrentBlockedEvents);
       return mFactory.createGraphProxy
-        (deterministic, blocked1, mCurrentNodes, mCurrentEdges, null);
+        (deterministic, blocked1, mCurrentNodes, mCurrentEdges);
     } finally {
       mCurrentNodes = null;
       mNodeMap = null;

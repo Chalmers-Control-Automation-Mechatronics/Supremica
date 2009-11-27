@@ -791,7 +791,7 @@ public class EFACompiler
           mFactory.createLabelBlockProxy(mLabelList, null);
         final boolean deterministic = graph.isDeterministic();
         return mFactory.createGraphProxy
-          (deterministic, blocked1, mNodeList, mEdgeList, null);
+          (deterministic, blocked1, mNodeList, mEdgeList);
       } finally {
         mEFAAlphabet = null;
         mNodeList = null;

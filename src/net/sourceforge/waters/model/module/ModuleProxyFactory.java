@@ -281,23 +281,20 @@ public interface ModuleProxyFactory
    * @param blockedEvents The list of blocked events of the new graph, or <CODE>null</CODE>.
    * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
    * @param edges The collection of edges of the new graph, or <CODE>null</CODE> if empty.
-   * @param geometry The geometric information of the new graph, or <CODE>null</CODE>.
    */
   public GraphProxy createGraphProxy
       (boolean deterministic,
        LabelBlockProxy blockedEvents,
        Collection<? extends NodeProxy> nodes,
-       Collection<? extends EdgeProxy> edges,
-       BoxGeometryProxy geometry);
+       Collection<? extends EdgeProxy> edges);
 
   /**
    * Creates a new graph using default values.
    * This method creates a graph with
    * the determinism status set to <CODE>true</CODE>,
    * the list of blocked events set to <CODE>null</CODE>,
-   * an empty set of nodes,
-   * an empty collection of edges, and
-   * the geometric information set to <CODE>null</CODE>.
+   * an empty set of nodes, and
+   * an empty collection of edges.
    */
   public GraphProxy createGraphProxy();
 

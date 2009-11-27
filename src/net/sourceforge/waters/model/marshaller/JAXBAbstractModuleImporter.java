@@ -814,13 +814,10 @@ public abstract class JAXBAbstractModuleImporter
       mGraphNodeListHandler.fromJAXBChecked(this, element, mGraphNodeList);
       final List<EdgeProxy> edges = new LinkedList<EdgeProxy>();
       mGraphEdgeListHandler.fromJAXB(this, element, edges);
-      final BoxGeometry geometryElement = element.getBoxGeometry();
-      final BoxGeometryProxy geometry = importBoxGeometry(geometryElement);
       return mFactory.createGraphProxy(deterministic,
                                        blockedEvents,
                                        mGraphNodeList,
-                                       edges,
-                                       geometry);
+                                       edges);
     } finally {
       mGraphNodeList = null;
     }

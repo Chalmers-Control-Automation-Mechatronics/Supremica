@@ -1090,7 +1090,7 @@ public class AutomataSynchronizerHelper
         boolean deterministic = true;
         final GraphProxy graph =
 	  mFactory.createGraphProxy(deterministic, blockedblock,
-				    nodes, mEdges, null);
+				    nodes, mEdges);
         String name = "Synchronized Automaton";
         final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(name);
 

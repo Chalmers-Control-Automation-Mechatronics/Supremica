@@ -20,7 +20,6 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -54,13 +53,11 @@ public final class GraphSubject
    * @param blockedEvents The list of blocked events of the new graph, or <CODE>null</CODE>.
    * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
    * @param edges The collection of edges of the new graph, or <CODE>null</CODE> if empty.
-   * @param geometry The geometric information of the new graph, or <CODE>null</CODE>.
    */
   public GraphSubject(final boolean deterministic,
                       final LabelBlockProxy blockedEvents,
                       final Collection<? extends NodeProxy> nodes,
-                      final Collection<? extends EdgeProxy> edges,
-                      final BoxGeometryProxy geometry)
+                      final Collection<? extends EdgeProxy> edges)
   {
     mIsDeterministic = deterministic;
     mBlockedEvents = (LabelBlockSubject) blockedEvents;
@@ -80,10 +77,6 @@ public final class GraphSubject
         (edges, EdgeSubject.class);
     }
     mEdges.setParent(this);
-    mGeometry = (BoxGeometrySubject) geometry;
-    if (mGeometry != null) {
-      mGeometry.setParent(this);
-    }
   }
 
   /**
@@ -91,14 +84,12 @@ public final class GraphSubject
    * This constructor creates a graph with
    * the determinism status set to <CODE>true</CODE>,
    * the list of blocked events set to <CODE>null</CODE>,
-   * an empty set of nodes,
-   * an empty collection of edges, and
-   * the geometric information set to <CODE>null</CODE>.
+   * an empty set of nodes, and
+   * an empty collection of edges.
    */
   public GraphSubject()
   {
     this(true,
-         null,
          null,
          null,
          null);
@@ -143,20 +134,6 @@ public final class GraphSubject
       mNodes.assignFrom(nodes);
       final ListSubject<EdgeSubject> edges = downcast.getEdgesModifiable();
       mEdges.assignFrom(edges);
-      final BoxGeometrySubject geometry = downcast.getGeometry();
-      if (mGeometry == geometry) {
-        // nothing
-      } else if (mGeometry == null) {
-        mGeometry = geometry.clone();
-        mGeometry.setParent(this);
-        fireGeometryChanged(mGeometry);
-      } else if (geometry == null) {
-        mGeometry.setParent(null);
-        mGeometry = null;
-        fireGeometryChanged(null);
-      } else {
-        mGeometry.assignFrom(geometry);
-      }
       if (change) {
         fireStateChanged();
       }
@@ -198,8 +175,7 @@ public final class GraphSubject
         ProxyTools.isEqualSetWithGeometry
           (mNodes, downcast.getNodes()) &&
         ProxyTools.isEqualCollectionWithGeometry
-          (mEdges, downcast.getEdges()) &&
-        ProxyTools.equalsWithGeometry(mGeometry, downcast.getGeometry());
+          (mEdges, downcast.getEdges());
     } else {
       return false;
     }
@@ -234,8 +210,6 @@ public final class GraphSubject
     result += ProxyTools.getSetHashCodeWithGeometry(mNodes);
     result *= 5;
     result += ProxyTools.getCollectionHashCodeWithGeometry(mEdges);
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mGeometry);
     return result;
   }
 
@@ -272,11 +246,6 @@ public final class GraphSubject
   {
     final Collection<EdgeProxy> downcast = Casting.toCollection(mEdges);
     return Collections.unmodifiableCollection(downcast);
-  }
-
-  public BoxGeometrySubject getGeometry()
-  {
-    return mGeometry;
   }
 
 
@@ -328,24 +297,6 @@ public final class GraphSubject
     return mEdges;
   }
 
-  /**
-   * Sets the geometric information for this graph.
-   */
-  public void setGeometry(final BoxGeometrySubject geometry)
-  {
-    if (mGeometry == geometry) {
-      return;
-    }
-    if (geometry != null) {
-      geometry.setParent(this);
-    }
-    if (mGeometry != null) {
-      mGeometry.setParent(null);
-    }
-    mGeometry = geometry;
-    fireGeometryChanged(mGeometry);
-  }
-
 
   //#########################################################################
   //# Data Members
@@ -353,6 +304,5 @@ public final class GraphSubject
   private LabelBlockSubject mBlockedEvents;
   private IndexedSetSubject<NodeSubject> mNodes;
   private ListSubject<EdgeSubject> mEdges;
-  private BoxGeometrySubject mGeometry;
 
 }

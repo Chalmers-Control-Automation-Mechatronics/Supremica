@@ -66,13 +66,4 @@ public interface GraphProxy extends Proxy
    */
   public Collection<EdgeProxy> getEdges();
 
-  /**
-   * Gets the geometric information for this graph.
-   * The geometry of a graph defines its position and size in a larger
-   * display, such as a simulator that shows multiple graphs simultaneously.
-   * @return A {@link BoxGeometryProxy} identifying the position and size
-   *         of the graph, or <CODE>null</CODE>
-   */
-  public BoxGeometryProxy getGeometry();
-
 }

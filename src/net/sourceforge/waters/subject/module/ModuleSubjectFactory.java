@@ -279,14 +279,12 @@ public class ModuleSubjectFactory
       (final boolean deterministic,
        final LabelBlockProxy blockedEvents,
        final Collection<? extends NodeProxy> nodes,
-       final Collection<? extends EdgeProxy> edges,
-       final BoxGeometryProxy geometry)
+       final Collection<? extends EdgeProxy> edges)
   {
     return new GraphSubject(deterministic,
                             blockedEvents,
                             nodes,
-                            edges,
-                            geometry);
+                            edges);
   }
 
   public GraphSubject createGraphProxy()

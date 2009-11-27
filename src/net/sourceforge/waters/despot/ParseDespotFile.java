@@ -187,7 +187,7 @@ public class ParseDespotFile
     final NodeList transLoopList = transitions.getElementsByTagName("*");
     final LabelBlockProxy blockedEvents = findBlockedEvents(transLoopList);
 
-    return mFactory.createGraphProxy(true, blockedEvents, mNodes, mEdges, null);
+    return mFactory.createGraphProxy(true, blockedEvents, mNodes, mEdges);
 
   }
 
