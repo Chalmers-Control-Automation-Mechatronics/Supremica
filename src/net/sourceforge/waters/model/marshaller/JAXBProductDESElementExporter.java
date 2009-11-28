@@ -174,10 +174,8 @@ abstract class JAXBProductDESElementExporter
         new TreeSet<TransitionProxy>(proxy.getTransitions());
       mAutomatonTransitionListHandler.toJAXB(this, transitions, element);
       final Map<String,String> attribs = proxy.getAttributes();
-      if (attribs != null) {
-        final AttributeMap attribsElement = createAttributeMap(attribs);
-        element.setAttributeMap(attribsElement);
-      }
+      final AttributeMap attribsElement = createAttributeMap(attribs);
+      element.setAttributeMap(attribsElement);
     } finally {
       mAutomatonEvents = null;
       mAutomatonStates = null;
@@ -201,10 +199,8 @@ abstract class JAXBProductDESElementExporter
       element.setObservable(false);
     }
     final Map<String,String> attribs = proxy.getAttributes();
-    if (attribs != null) {
-      final AttributeMap attribsElement = createAttributeMap(attribs);
-      element.setAttributeMap(attribsElement);
-    }
+    final AttributeMap attribsElement = createAttributeMap(attribs);
+    element.setAttributeMap(attribsElement);
   }
 
   private void copyLoopTraceProxy(final LoopTraceProxy proxy,

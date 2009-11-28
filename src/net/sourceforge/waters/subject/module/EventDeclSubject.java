@@ -84,13 +84,11 @@ public final class EventDeclSubject
       mColorGeometry.setParent(this);
     }
     if (attributes == null) {
-      mAttributes = null;
+      mAttributes = new AttributeMapSubject();
     } else {
       mAttributes = new AttributeMapSubject(attributes);
     }
-    if (mAttributes != null) {
-      mAttributes.setParent(this);
-    }
+    mAttributes.setParent(this);
   }
 
   /**
@@ -165,19 +163,7 @@ public final class EventDeclSubject
       }
       final AttributeMapSubject attributes =
         downcast.getAttributesModifiable();
-      if (mAttributes == attributes) {
-        // nothing
-      } else if (mAttributes == null) {
-        mAttributes = new AttributeMapSubject(attributes);
-        mAttributes.setParent(this);
-        change = true;
-      } else if (attributes == null) {
-        mAttributes.setParent(null);
-        mAttributes = null;
-        change = true;
-      } else {
-        mAttributes.assignFrom(attributes);
-      }
+      mAttributes.assignFrom(attributes);
       if (change) {
         fireStateChanged();
       }
@@ -203,7 +189,7 @@ public final class EventDeclSubject
         mScope.equals(downcast.getScope()) &&
         ProxyTools.isEqualListByContents
           (mRanges, downcast.getRanges()) &&
-        ProxyTools.equals(mAttributes, downcast.getAttributes());
+        mAttributes.equals(downcast.getAttributes());
     } else {
       return false;
     }
@@ -220,7 +206,7 @@ public final class EventDeclSubject
         ProxyTools.isEqualListWithGeometry
           (mRanges, downcast.getRanges()) &&
         ProxyTools.equalsWithGeometry(mColorGeometry, downcast.getColorGeometry()) &&
-        ProxyTools.equals(mAttributes, downcast.getAttributes());
+        mAttributes.equals(downcast.getAttributes());
     } else {
       return false;
     }
@@ -260,7 +246,7 @@ public final class EventDeclSubject
     result *= 5;
     result += ProxyTools.hashCodeWithGeometry(mColorGeometry);
     result *= 5;
-    result += ProxyTools.hashCode(mAttributes);
+    result += mAttributes.hashCode();
     return result;
   }
 
@@ -305,12 +291,8 @@ public final class EventDeclSubject
 
   public Map<String,String> getAttributes()
   {
-    if (mAttributes == null) {
-      return null;
-    } else {
-      final Map<String,String> downcast = Casting.toMap(mAttributes);
-      return Collections.unmodifiableMap(downcast);
-    }
+    final Map<String,String> downcast = Casting.toMap(mAttributes);
+    return Collections.unmodifiableMap(downcast);
   }
 
 

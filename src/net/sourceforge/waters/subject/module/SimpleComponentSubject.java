@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -61,13 +60,11 @@ public final class SimpleComponentSubject
     mGraph = (GraphSubject) graph;
     mGraph.setParent(this);
     if (attributes == null) {
-      mAttributes = null;
+      mAttributes = new AttributeMapSubject();
     } else {
       mAttributes = new AttributeMapSubject(attributes);
     }
-    if (mAttributes != null) {
-      mAttributes.setParent(this);
-    }
+    mAttributes.setParent(this);
   }
 
   /**
@@ -113,19 +110,7 @@ public final class SimpleComponentSubject
       mGraph.assignFrom(graph);
       final AttributeMapSubject attributes =
         downcast.getAttributesModifiable();
-      if (mAttributes == attributes) {
-        // nothing
-      } else if (mAttributes == null) {
-        mAttributes = new AttributeMapSubject(attributes);
-        mAttributes.setParent(this);
-        change = true;
-      } else if (attributes == null) {
-        mAttributes.setParent(null);
-        mAttributes = null;
-        change = true;
-      } else {
-        mAttributes.assignFrom(attributes);
-      }
+      mAttributes.assignFrom(attributes);
       if (change) {
         fireStateChanged();
       }
@@ -148,7 +133,7 @@ public final class SimpleComponentSubject
       return
         mKind.equals(downcast.getKind()) &&
         mGraph.equalsByContents(downcast.getGraph()) &&
-        ProxyTools.equals(mAttributes, downcast.getAttributes());
+        mAttributes.equals(downcast.getAttributes());
     } else {
       return false;
     }
@@ -161,7 +146,7 @@ public final class SimpleComponentSubject
       return
         mKind.equals(downcast.getKind()) &&
         mGraph.equalsWithGeometry(downcast.getGraph()) &&
-        ProxyTools.equals(mAttributes, downcast.getAttributes());
+        mAttributes.equals(downcast.getAttributes());
     } else {
       return false;
     }
@@ -187,7 +172,7 @@ public final class SimpleComponentSubject
     result *= 5;
     result += mGraph.hashCodeWithGeometry();
     result *= 5;
-    result += ProxyTools.hashCode(mAttributes);
+    result += mAttributes.hashCode();
     return result;
   }
 
@@ -216,12 +201,8 @@ public final class SimpleComponentSubject
 
   public Map<String,String> getAttributes()
   {
-    if (mAttributes == null) {
-      return null;
-    } else {
-      final Map<String,String> downcast = Casting.toMap(mAttributes);
-      return Collections.unmodifiableMap(downcast);
-    }
+    final Map<String,String> downcast = Casting.toMap(mAttributes);
+    return Collections.unmodifiableMap(downcast);
   }
 
 

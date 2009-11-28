@@ -732,10 +732,8 @@ public class JAXBModuleExporter
       element.setColorGeometry(colorGeometryElement);
     }
     final Map<String,String> attribs = proxy.getAttributes();
-    if (attribs != null) {
-      final AttributeMap attribsElement = createAttributeMap(attribs);
-      element.setAttributeMap(attribsElement);
-    }
+    final AttributeMap attribsElement = createAttributeMap(attribs);
+    element.setAttributeMap(attribsElement);
   }
 
   private void copyExpressionProxy
@@ -1045,10 +1043,8 @@ public class JAXBModuleExporter
     final Graph graphElement = visitGraphProxy(graphProxy);
     element.setGraph(graphElement);
     final Map<String,String> attribs = proxy.getAttributes();
-    if (attribs != null) {
-      final AttributeMap attribsElement = createAttributeMap(attribs);
-      element.setAttributeMap(attribsElement);
-    }
+    final AttributeMap attribsElement = createAttributeMap(attribs);
+    element.setAttributeMap(attribsElement);
   }
 
   private void copySimpleExpressionProxy

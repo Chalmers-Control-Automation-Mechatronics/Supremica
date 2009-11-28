@@ -60,7 +60,8 @@ public final class AutomatonElement
    *                      or <CODE>null</CODE> if empty.
    * @param  transitions  The list of transitions for the new automaton,
    *                      or <CODE>null</CODE> if empty.
-   * @param  attribs      The attribute map for the new automaton.
+   * @param  attribs      The attribute map for the new automaton,
+   *                      or <CODE>null</CODE> if empty.
    * @throws DuplicateNameException to indicate that some state or event
    *                      name is used more than once.
    * @throws NameNotFoundException to indicate that some transition refers
@@ -98,7 +99,7 @@ public final class AutomatonElement
       mTransitions = Collections.unmodifiableList(transitionscopy);
     }
     if (attribs == null) {
-      mAttributes = null;
+      mAttributes = Collections.emptyMap();
     } else {
       final Map<String,String> attribscopy = new TreeMap<String,String>(attribs);
       mAttributes = Collections.unmodifiableMap(attribscopy);
@@ -225,7 +226,8 @@ public final class AutomatonElement
         mKind.equals(aut.getKind()) &&
         ProxyTools.isEqualSetByContents(mEvents, aut.getEvents()) &&
         ProxyTools.isEqualSetByContents(mStates, aut.getStates()) &&
-        ProxyTools.isEqualSetByContents(mTransitions, aut.getTransitions());
+        ProxyTools.isEqualSetByContents(mTransitions, aut.getTransitions()) &&
+        mAttributes.equals(aut.getAttributes());
     } else {
       return false;
     }
@@ -242,6 +244,8 @@ public final class AutomatonElement
     result += ProxyTools.getSetHashCodeByContents(mStates);
     result *= 5;
     result += ProxyTools.getSetHashCodeByContents(mTransitions);
+    result *= 5;
+    result += mAttributes.hashCode();
     return result;
   }
 

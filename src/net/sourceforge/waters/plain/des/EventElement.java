@@ -45,7 +45,8 @@ public final class EventElement
    * @param  kind        The kind of the new event.
    * @param  observable  <CODE>true</CODE> if the event is to be observable,
    *                     <CODE>false</CODE> otherwise.
-   * @param  attribs     The attribute map for the new event.
+   * @param  attribs     The attribute map for the new event,
+   *                     or <CODE>null</CODE> if empty.
    */
   EventElement(final String name,
                final EventKind kind,
@@ -56,7 +57,7 @@ public final class EventElement
     mKind = kind;
     mIsObservable = observable;
     if (attribs == null) {
-      mAttributes = null;
+      mAttributes = Collections.emptyMap();
     } else {
       final Map<String,String> attribscopy = new TreeMap<String,String>(attribs);
       mAttributes = Collections.unmodifiableMap(attribscopy);
@@ -136,8 +137,9 @@ public final class EventElement
     if (super.equalsByContents(partner)) {
       final EventProxy event = (EventProxy) partner;
       return
-	mKind.equals(event.getKind()) &&
-	(mIsObservable == event.isObservable());
+        mKind.equals(event.getKind()) &&
+        (mIsObservable == event.isObservable()) &&
+        mAttributes.equals(event.getAttributes());
     } else {
       return false;
     }
@@ -152,6 +154,8 @@ public final class EventElement
     if (mIsObservable) {
       result++;
     }
+    result *= 5;
+    result += mAttributes.hashCode();
     return result;
   }
 

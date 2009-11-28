@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -57,7 +56,7 @@ public final class SimpleComponentElement
     mKind = kind;
     mGraph = graph;
     if (attributes == null) {
-      mAttributes = null;
+      mAttributes = Collections.emptyMap();
     } else {
       final Map<String,String> attributesModifiable =
         new TreeMap<String,String>(attributes);
@@ -107,7 +106,7 @@ public final class SimpleComponentElement
       return
         mKind.equals(downcast.getKind()) &&
         mGraph.equalsByContents(downcast.getGraph()) &&
-        ProxyTools.equals(mAttributes, downcast.getAttributes());
+        mAttributes.equals(downcast.getAttributes());
     } else {
       return false;
     }
@@ -120,7 +119,7 @@ public final class SimpleComponentElement
       return
         mKind.equals(downcast.getKind()) &&
         mGraph.equalsWithGeometry(downcast.getGraph()) &&
-        ProxyTools.equals(mAttributes, downcast.getAttributes());
+        mAttributes.equals(downcast.getAttributes());
     } else {
       return false;
     }
@@ -146,7 +145,7 @@ public final class SimpleComponentElement
     result *= 5;
     result += mGraph.hashCodeWithGeometry();
     result *= 5;
-    result += ProxyTools.hashCode(mAttributes);
+    result += mAttributes.hashCode();
     return result;
   }
 

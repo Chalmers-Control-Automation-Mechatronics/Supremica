@@ -2413,7 +2413,7 @@ proc Java_AttribGetDefaultValue {attrib impl} {
 proc Java_AttribGetEmptyCollectionsCall {attrib impl} {
   set emptytype [Java_AttribGetEmptyCollectionType $attrib $impl]
   if {[Java_IsCollectionType $emptytype] &&
-      [regexp {^([A-Z][a-z]+)<[A-Za-z0-9_]+>$} \
+      [regexp {^([A-Z][a-z]+)<[A-Za-z0-9_,]+>$} \
            $emptytype all collectiontype]} {
     return "Collections.empty${collectiontype}()"
   } else {

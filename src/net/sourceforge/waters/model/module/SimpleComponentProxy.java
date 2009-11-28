@@ -60,7 +60,6 @@ public interface SimpleComponentProxy extends ComponentProxy {
    * models.
    * @return An immutable map mapping attribute names to values.
    */
-  // @optional
   public Map<String,String> getAttributes();
 
 }

@@ -51,19 +51,23 @@ abstract class JAXBDocumentExporter
   //# Exporting Element
   AttributeMap createAttributeMap(final Map<String,String> attribs)
   {
-    final AttributeMap mapElement = mFactory.createAttributeMap();
-    final List<Attribute> list = mapElement.getList();
-    for (final Map.Entry<String,String> entry : attribs.entrySet()) {
-      final String name = entry.getKey();
-      final String value = entry.getValue();
-      final Attribute element = mFactory.createAttribute();
-      element.setName(name);
-      if (!value.equals("")) {
-        element.setValue(value);
+    if (attribs.isEmpty()) {
+      return null;
+    } else {
+      final AttributeMap mapElement = mFactory.createAttributeMap();
+      final List<Attribute> list = mapElement.getList();
+      for (final Map.Entry<String,String> entry : attribs.entrySet()) {
+        final String name = entry.getKey();
+        final String value = entry.getValue();
+        final Attribute element = mFactory.createAttribute();
+        element.setName(name);
+        if (!value.equals("")) {
+          element.setValue(value);
+        }
+        list.add(element);
       }
-      list.add(element);
+      return mapElement;
     }
-    return mapElement;
   }
 
 

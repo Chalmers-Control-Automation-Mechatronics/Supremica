@@ -114,9 +114,11 @@ public interface EventDeclProxy extends IdentifiedProxy {
    * models.
    * @return An immutable map mapping attribute names to values.
    */
-  // @optional
   public Map<String,String> getAttributes();
 
+
+  //#########################################################################
+  //# Class Constants
   /**
    * The name to be used for the default marking proposition.
    * This constant is provided for use by tools that do not support

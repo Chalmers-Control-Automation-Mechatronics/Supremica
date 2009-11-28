@@ -78,7 +78,7 @@ public final class EventDeclElement
     }
     mColorGeometry = colorGeometry;
     if (attributes == null) {
-      mAttributes = null;
+      mAttributes = Collections.emptyMap();
     } else {
       final Map<String,String> attributesModifiable =
         new TreeMap<String,String>(attributes);
@@ -136,7 +136,7 @@ public final class EventDeclElement
         mScope.equals(downcast.getScope()) &&
         ProxyTools.isEqualListByContents
           (mRanges, downcast.getRanges()) &&
-        ProxyTools.equals(mAttributes, downcast.getAttributes());
+        mAttributes.equals(downcast.getAttributes());
     } else {
       return false;
     }
@@ -153,7 +153,7 @@ public final class EventDeclElement
         ProxyTools.isEqualListWithGeometry
           (mRanges, downcast.getRanges()) &&
         ProxyTools.equalsWithGeometry(mColorGeometry, downcast.getColorGeometry()) &&
-        ProxyTools.equals(mAttributes, downcast.getAttributes());
+        mAttributes.equals(downcast.getAttributes());
     } else {
       return false;
     }
@@ -193,7 +193,7 @@ public final class EventDeclElement
     result *= 5;
     result += ProxyTools.hashCodeWithGeometry(mColorGeometry);
     result *= 5;
-    result += ProxyTools.hashCode(mAttributes);
+    result += mAttributes.hashCode();
     return result;
   }
 
