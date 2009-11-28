@@ -1,7 +1,10 @@
 package net.sourceforge.waters.gui.simulator;
 
 import javax.swing.JInternalFrame;
+
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.subject.module.GraphSubject;
 
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -9,29 +12,38 @@ public class AutomatonInternalFrame extends JInternalFrame
 {
   //#################################################################################
   //# Constructors
-  public AutomatonInternalFrame(final AutomatonProxy automaton, final AutomatonDesktopPane parent, final ModuleContainer container, final Simulation mSim)
+  public AutomatonInternalFrame(final AutomatonProxy automaton,
+                                final GraphSubject graph,
+                                final AutomatonDesktopPane parent,
+                                final ModuleContainer container,
+                                final Simulation sim)
+    throws GeometryAbsentException
   {
     super(automaton.getName(), true, true, false, true);
     mDesktopParent = parent;
     mAutomaton = automaton;
+    mDisplayPane = new AutomatonDisplayPane(automaton, graph, container, sim);
+    setContentPane(mDisplayPane);
+    addMouseListener(new InternalFrameMouseAdapter(this));
     setVisible(true);
-    final AutomatonDisplayPane displayPane = new AutomatonDisplayPane(automaton, container, mSim);
-    this.getContentPane().add(displayPane);
-    this.addMouseListener(new InternalFrameMouseAdapter(this));
-    this.pack();
+    pack();
   }
+
 
   //#################################################################################
   //# Class JInternalFrame
   public void dispose()
   {
-    super.dispose();
+    mDisplayPane.close();
     mDesktopParent.removeAutomaton(mAutomaton);
+    super.dispose();
   }
+
 
   //#########################################################################
   //# Data Members
   private final AutomatonProxy mAutomaton;
+  private final AutomatonDisplayPane mDisplayPane;
   private final AutomatonDesktopPane mDesktopParent;
 
 

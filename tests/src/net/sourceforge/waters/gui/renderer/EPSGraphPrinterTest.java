@@ -15,7 +15,6 @@ import java.util.Collection;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -43,7 +42,7 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
     return new TestSuite(EPSGraphPrinterTest.class);
   }
 
-  public static void main(String args[])
+  public static void main(final String args[])
   {
     junit.textui.TestRunner.run(suite());
   }
@@ -156,7 +155,6 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
       throws IOException
     {
       try {
-        mContext = new ModuleContext(module);
         visitModuleProxy(module);
       } catch (final VisitorException exception) {
         final Throwable cause = exception.getCause();
@@ -204,8 +202,7 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
 	final String name = comp.getName();
 	final File file = new File(dir, name + ".eps");
 	final GraphProxy graph = comp.getGraph();
-	final EPSGraphPrinter printer =
-	  new EPSGraphPrinter(graph, mContext, file);
+	final EPSGraphPrinter printer = new EPSGraphPrinter(graph, file);
 	printer.print();
 	return null;
       } catch (final IOException exception) {
@@ -213,7 +210,6 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
       }
     }
 
-    private ModuleContext mContext;
   }
 
 

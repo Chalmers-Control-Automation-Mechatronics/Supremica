@@ -106,7 +106,7 @@ class EventDeclDeleteVisitor
   void insertItems(List<InsertInfo> inserts)
   {
     final EditorWindowInterface iface = mRoot.getActiveEditorWindowInterface();
-    final ControlledSurface surface;
+    final GraphEditorPanel surface;
     final GraphProxy visiblegraph;
     if (iface == null) {
       surface = null;

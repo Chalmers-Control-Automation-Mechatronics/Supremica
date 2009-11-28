@@ -23,7 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.EditorColor;
+import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
@@ -35,11 +36,9 @@ import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
-import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class ProxyShapeProducer
@@ -49,10 +48,10 @@ public class ProxyShapeProducer
   //#########################################################################
   //# Constructors
   public ProxyShapeProducer(final GraphProxy graph,
-                            final ModuleContext context)
+                            final RenderingContext context)
   {
     mGraph = graph;
-    mContext = context;
+    mRenderingContext = context;
     final int size = graph.getNodes().size() + graph.getEdges().size();
     final Map<Proxy,ProxyShape> map = new HashMap<Proxy,ProxyShape>(4 * size);
     mMap = Collections.synchronizedMap(map);
@@ -78,9 +77,9 @@ public class ProxyShapeProducer
     return mGraph;
   }
 
-  public ModuleProxy getModule()
+  public RenderingContext getRenderingContext()
   {
-    return mContext.getModule();
+    return mRenderingContext;
   }
 
 
@@ -184,7 +183,7 @@ public class ProxyShapeProducer
     return shape;
   }
 
-  public SimpleNodeProxyShape visitSimpleNodeProxy(SimpleNodeProxy simple)
+  public SimpleNodeProxyShape visitSimpleNodeProxy(final SimpleNodeProxy simple)
   {
     final SimpleNodeProxyShape shape = createSimpleNodeProxyShape(simple);
     final LabelGeometryProxy geo = simple.getLabelGeometry();
@@ -222,7 +221,9 @@ public class ProxyShapeProducer
   {
     SimpleNodeProxyShape shape = (SimpleNodeProxyShape) lookup(simple);
     if (shape == null) {
-      shape = new SimpleNodeProxyShape(simple, mContext);
+      final PropositionIcon.ColorInfo colorinfo =
+        mRenderingContext.getColorInfo(simple);
+      shape = new SimpleNodeProxyShape(simple, colorinfo);
       mMap.put(simple, shape);
     }
     return shape;
@@ -233,7 +234,7 @@ public class ProxyShapeProducer
   {
     LabelProxyShape shape = (LabelProxyShape) lookup(geo);
     if (shape == null) {
-      shape = new LabelProxyShape(simple, DEFAULT);
+      shape = new LabelProxyShape(simple, EditorColor.DEFAULT_FONT);
       mMap.put(geo, shape);
     }
     return shape;
@@ -281,20 +282,17 @@ public class ProxyShapeProducer
       } else {
         // Oh no! It's the blocked events list!
         final TextLayout text =
-          new TextLayout(BLOCKED_HEADER, BOLD,
+          new TextLayout(BLOCKED_HEADER, EditorColor.HEADER_FONT,
                          new FontRenderContext(null, true, true));
         width = text.getBounds().getWidth();
       }
       final int lx = (int) Math.round(x) + 1;
       for (final Proxy proxy : block.getEventList()) {
         // Use different font for different event kinds.
-        Font font = DEFAULT;
+        Font font = EditorColor.DEFAULT_FONT;
         if (proxy instanceof IdentifierProxy) {
           final IdentifierProxy ident = (IdentifierProxy) proxy;
-          final EventKind kind = mContext.guessEventKind(ident);
-          if (kind == EventKind.UNCONTROLLABLE) {
-            font = UNCONTROLLABLE;
-          }
+          font = mRenderingContext.getFont(ident);
         }
         final int ly = (int) Math.round(y + height);
         final LabelShape lshape = new LabelShape(proxy, lx, ly, font);
@@ -314,8 +312,8 @@ public class ProxyShapeProducer
       if (eshape != null) {
         shape = new LabelBlockProxyShape(block, bounds);
       } else {
-        shape = new LabeledLabelBlockProxyShape(block, bounds,
-                                                BLOCKED_HEADER, BOLD);
+        shape = new LabeledLabelBlockProxyShape
+          (block, bounds, BLOCKED_HEADER, EditorColor.HEADER_FONT);
       }
       mMap.put(block, shape);
     }
@@ -348,7 +346,7 @@ public class ProxyShapeProducer
       for (final SimpleExpressionProxy guard : guards) {
         final int ly = (int) Math.round(y + height);
         final LabelShape lshape =
-          new LabelShape(guard, lx, ly, DEFAULT, "guard");
+          new LabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT, "guard");
         mMap.put(guard, lshape);
         final RoundRectangle2D lrect = lshape.getShape();
         height += lrect.getHeight();
@@ -363,7 +361,7 @@ public class ProxyShapeProducer
       for (final BinaryExpressionProxy action : actions) {
         final int ly = (int) Math.round(y + height);
         final LabelShape lshape =
-          new LabelShape(action, lx, ly, DEFAULT, "action");
+          new LabelShape(action, lx, ly, EditorColor.DEFAULT_FONT, "action");
         mMap.put(action, lshape);
         final RoundRectangle2D lrect = lshape.getShape();
         height += lrect.getHeight();
@@ -385,16 +383,12 @@ public class ProxyShapeProducer
   //#########################################################################
   //# Data Members
   private final GraphProxy mGraph;
-  private final ModuleContext mContext;
+  private final RenderingContext mRenderingContext;
   private final Map<Proxy,ProxyShape> mMap;
 
 
   //#########################################################################
   //# Class Constants
-  public static final Font DEFAULT = new Font("Dialog", Font.PLAIN, 12);
-  public static final Font BOLD = DEFAULT.deriveFont(Font.BOLD);
-  public static final Font UNCONTROLLABLE = DEFAULT.deriveFont(Font.ITALIC);
-
   private static final String BLOCKED_HEADER = "BLOCKED:";
 
 }

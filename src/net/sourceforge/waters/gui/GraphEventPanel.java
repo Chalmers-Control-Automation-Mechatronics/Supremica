@@ -268,7 +268,7 @@ public class GraphEventPanel
   {
     clearSelection();
     if (propagate) {
-      final ControlledSurface surface = mRoot.getControlledSurface();
+      final GraphEditorPanel surface = mRoot.getControlledSurface();
       surface.clearSelection(propagate);
     }
   }
@@ -310,7 +310,7 @@ public class GraphEventPanel
     if (row0 >= 0) {
       addRowSelectionInterval(row0, row1);
     }
-    final ControlledSurface surface = mRoot.getControlledSurface();
+    final GraphEditorPanel surface = mRoot.getControlledSurface();
     surface.addToSelection(others);  
   }
 
@@ -337,7 +337,7 @@ public class GraphEventPanel
     if (row0 >= 0) {
       removeRowSelectionInterval(row0, row1);
     }
-    final ControlledSurface surface = mRoot.getControlledSurface();
+    final GraphEditorPanel surface = mRoot.getControlledSurface();
     surface.removeFromSelection(others);  
   }
 

@@ -54,7 +54,7 @@ public class SpringEmbedder
   {
     this(graph, System.currentTimeMillis());
   }
-  
+
   public SpringEmbedder(final Collection<NodeSubject> nodes,
                         final Collection<EdgeSubject> edges)
   {
@@ -75,7 +75,7 @@ public class SpringEmbedder
          graph.getBlockedEvents(),
          seed);
   }
-  
+
   public SpringEmbedder(final Collection<NodeSubject> nodes,
                         final Collection<EdgeSubject> edges,
                         final LabelBlockSubject blocked,
@@ -95,13 +95,13 @@ public class SpringEmbedder
   {
     mObservers.add(observer);
   }
-  
+
   public void removeObserver(final EmbedderObserver observer)
   {
     mObservers.remove(observer);
   }
 
-  
+
   //#########################################################################
   //# Interface java.lang.Runnable
   public void run()
@@ -118,10 +118,53 @@ public class SpringEmbedder
         }
       });
   }
-  
+
 
   //#########################################################################
   //# Geometry Setup
+  /**
+   * Checks whether this embedder's graph needs geometry.
+   * This method checks whether the nodes of the embedder's graph have
+   * got geometry associated with them, without making any changes to
+   * the graph.
+   * @return <CODE>true</CODE> if any is missing geometry.
+   *         In this case, a call to {@link #setUpGeometry()} would
+   *         change the graph.
+   * @throws GeometryAbsentException if a group node without geometry
+   *         has been found. Group nodes cannot be assigned geometry
+   *         automatically, and therefore the graph cannot be rendered
+   *         when this exception is thrown.
+   *
+   */
+  public boolean needsGeometry()
+    throws GeometryAbsentException
+  {
+    if (mBlocked != null) {
+      if (mBlocked.getGeometry() == null) {
+        return true;
+      }
+    }
+    for (final NodeSubject node : mNodes) {
+      if (node instanceof SimpleNodeSubject) {
+        final SimpleNodeSubject simple = (SimpleNodeSubject) node;
+        if (simple.getPointGeometry() == null) {
+          return true;
+        }
+      } else if (node instanceof GroupNodeSubject) {
+        final GroupNodeSubject group = (GroupNodeSubject) node;
+        if (group.getGeometry() == null) {
+          throw new GeometryAbsentException
+            ("There is no geometry information for group node '" +
+             group.getName() + "' in this graph!");
+        }
+      } else {
+        throw new ClassCastException
+          ("Unknown node type: " + node.getClass().getName() + "!");
+      }
+    }
+    return false;
+  }
+
   /**
    * Sets up initial geometry for this embedder's graph.
    * This method checks whether the nodes of the embedder's graph have
@@ -230,7 +273,7 @@ public class SpringEmbedder
   public static void stopAll()
   {
     synchronized(mSpringEmbedders) {
-      for (SpringEmbedder embedder : mSpringEmbedders) {
+      for (final SpringEmbedder embedder : mSpringEmbedders) {
         embedder.stop();
       }
     }
@@ -240,7 +283,7 @@ public class SpringEmbedder
   {
     mStop = true;
   }
-  
+
 
   //#########################################################################
   //# Observer Pattern
@@ -249,7 +292,7 @@ public class SpringEmbedder
     // Just in case they try to change the list in response to the call ...
     final Collection<EmbedderObserver> copy =
       new ArrayList<EmbedderObserver>(mObservers);
-    for (EmbedderObserver observer : copy) {
+    for (final EmbedderObserver observer : copy) {
       observer.embedderChanged(event);
     }
   }
@@ -332,7 +375,7 @@ public class SpringEmbedder
           final EdgeWrapperPair pair = new EdgeWrapperPair(edge1, edge2);
           mMultiEdgePairs.add(pair);
         }
-      }        
+      }
     }
     int maxfanout = 1;
     for (final NodeWrapper wrapper : mNodeWrappers) {
@@ -640,7 +683,7 @@ public class SpringEmbedder
     {
       setNewPoint(mOldPoint);
     }
- 
+
     void updatePoint()
     {
       mOldPoint = mNewPoint;

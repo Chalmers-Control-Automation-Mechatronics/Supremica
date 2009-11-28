@@ -2,10 +2,18 @@ package net.sourceforge.waters.gui.simulator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JDesktopPane;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+
+import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 public class AutomatonDesktopPane extends JDesktopPane implements SimulationObserver
@@ -22,20 +30,30 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
 
   //#########################################################################
   //# Mutator Methods
-  public void addAutomaton(final AutomatonProxy automaton, final ModuleContainer container, final Simulation mSim, final int clicks)
+  public void addAutomaton(final AutomatonProxy automaton,
+      final ModuleContainer container, final Simulation sim, final int clicks)
   {
-    if (!openAutomaton.containsKey(automaton))
-    {
-      if (clicks == 2)
-      {
-        final AutomatonInternalFrame newFrame = new AutomatonInternalFrame(automaton, this, container, mSim);
-        add(newFrame);
-        newFrame.moveToFront();
-        openAutomaton.put(automaton, newFrame);
+    if (!openAutomaton.containsKey(automaton)) {
+      if (clicks == 2) {
+        final Map<Proxy,SourceInfo> infomap = container.getSourceInfoMap();
+        final Proxy source = infomap.get(automaton).getSourceObject();
+        if (source instanceof SimpleComponentSubject) {
+          final SimpleComponentSubject comp = (SimpleComponentSubject) source;
+          final GraphSubject graph = comp.getGraph();
+          try {
+            final AutomatonInternalFrame newFrame = new AutomatonInternalFrame
+              (automaton, graph, this, container, sim);
+            add(newFrame);
+            newFrame.moveToFront();
+            openAutomaton.put(automaton, newFrame);
+          } catch (final GeometryAbsentException exception) {
+            final IDE ide = container.getIDE();
+            final String msg = exception.getMessage();
+            ide.error(msg);
+          }
+        }
       }
-    }
-    else
-    {
+    } else {
       selectAutomaton(clicks, automaton);
     }
   }

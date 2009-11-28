@@ -227,7 +227,7 @@ class EditorGraph
    * @return The command that will transform the graph, or <CODE>null</CODE>
    *         if no change has been detected.
    */
-  Command createUpdateCommand(final ControlledSurface surface,
+  Command createUpdateCommand(final GraphEditorPanel surface,
                               final String description,
                               final boolean selecting)
   {
@@ -287,9 +287,13 @@ class EditorGraph
       cmd.setUpdatesSelection(selecting);
       return cmd;
     default:
-      final CompoundCommand compound =
-        new UpdateCommand(modified, added, removed,
-                          surface, description, selecting);
+      final CompoundCommand compound;
+      if (surface == null) {
+        compound = new CompoundCommand(description);
+      } else {
+        compound = new UpdateCommand(modified, added, removed,
+                                     surface, description, selecting);
+      }
       compound.addCommands(commands);
       compound.end();
       return compound;
@@ -301,7 +305,7 @@ class EditorGraph
   //# Auxiliary Methods
   /**
    * Creates a copy of the given edge and adds it to this graph.
-   * @param  edge0   The egde in the original graph a copy of which
+   * @param  edge0   The edge in the original graph a copy of which
    *                 is to be added.
    */
   private EdgeSubject addEdge(final EdgeSubject edge0)
@@ -1071,26 +1075,26 @@ class EditorGraph
       }
     }
 
-    AbstractEditCommand createInsertCommand(final ControlledSurface surface)
+    AbstractEditCommand createInsertCommand(final GraphEditorPanel surface)
     {
       return new InsertCommand(createOriginal(), surface, false);
     }
 
-    AbstractEditCommand createDeleteCommand(final ControlledSurface surface)
+    AbstractEditCommand createDeleteCommand(final GraphEditorPanel surface)
     {
       final List<ProxySubject> origs = Collections.singletonList(mOriginal);
       final List<InsertInfo> deletes = surface.getDeletionVictims(origs);
       return new DeleteCommand(deletes, surface, false);
     }
 
-    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
+    AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
       throw new UnsupportedOperationException
         ("EditorGraph does not support automatic movement for class " +
          mFake.getClass().getName() + "!");
     }
 
-    AbstractEditCommand getUpdateCommand(final ControlledSurface surface,
+    AbstractEditCommand getUpdateCommand(final GraphEditorPanel surface,
                                          final int pass)
     {
       if (pass == getPass()) {
@@ -1165,7 +1169,7 @@ class EditorGraph
       }
     }
 
-    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
+    AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
       final SimpleNodeSubject original = getOriginal();
       final PointGeometrySubject oldgeo = original.getPointGeometry();
@@ -1242,7 +1246,7 @@ class EditorGraph
       }
     }
 
-    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
+    AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
       final GroupNodeSubject original = getOriginal();
       final BoxGeometrySubject oldgeo = original.getGeometry();
@@ -1367,7 +1371,7 @@ class EditorGraph
       }
     }
 
-    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
+    AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
       final EdgeSubject original = getOriginal();
       final SplineGeometrySubject oldgeo = original.getGeometry();
@@ -1404,7 +1408,7 @@ class EditorGraph
         }
       }
     }
-    AbstractEditCommand getUpdateCommand(final ControlledSurface surface,
+    AbstractEditCommand getUpdateCommand(final GraphEditorPanel surface,
                                          final int pass)
     {
       final EdgeSubject fake = getFake();
@@ -1455,7 +1459,7 @@ class EditorGraph
     //#######################################################################
     //# Auxiliary Methods
     private AbstractEditCommand createEditCommand
-      (final ControlledSurface surface, final String name)
+      (final GraphEditorPanel surface, final String name)
     {
       final EdgeSubject original = getOriginal();
       final EdgeSubject fake = getFake();
@@ -1507,7 +1511,7 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
-    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
+    AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
       return
         new MoveCommand(getOriginal(), getFake(), surface, "Label Movement");
@@ -1549,7 +1553,7 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
-    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
+    AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
       final LabelBlockSubject original = getOriginal();
       final LabelGeometrySubject oldgeo = original.getGeometry();
@@ -1598,7 +1602,7 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
-    AbstractEditCommand createMoveCommand(final ControlledSurface surface)
+    AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
       final GuardActionBlockSubject original = getOriginal();
       final LabelGeometrySubject oldgeo = original.getGeometry();

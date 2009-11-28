@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.despot
-//# CLASS:   HISCConstants
+//# CLASS:   HISCAttributes
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -30,26 +30,26 @@ import java.util.Map;
  *     SimpleComponentProxy} and automata
  *     ({@link net.sourceforge.waters.model.des.AutomatonProxy AutomatonProxy}
  *     can be designated as an <I>HISC interface</I> using the key
- *     <CODE>&quot;HISC:Interface&quot;</CODE> {@link #INTERFACE_KEY}.
+ *     <CODE>&quot;HISC:Interface&quot;</CODE> ({@link #INTERFACE_KEY}).
  *     If the key is present in an attribute map, the corresponding
  *     automaton is designated as an HISC interface automaton, otherwise
  *     it is a normal automaton. The value associated with the key is
  *     irrelevant and should be kept to <CODE>&quot;&quot;</CODE>.
  *     For convenience, Boolean methods are provided to read or write
- *     the interface designation from attribute maps.</LI>
+ *     the interface designation in attribute maps.</LI>
  * <LI>Event declarations
  *     ({@link net.sourceforge.waters.model.module.EventDeclProxy
  *     EventDeclProxy} and events
  *     ({@link net.sourceforge.waters.model.des.EventProxy EventProxy}
  *     can be assigned an HISC event type using the key
- *     <CODE>&quot;HISC:EventType&quot;</CODE> {@link #EVENTTYPE_KEY}.
+ *     <CODE>&quot;HISC:EventType&quot;</CODE> ({@link #EVENTTYPE_KEY}).
  *     Its associated values can be <CODE>&quot;REQUEST&quot;</CODE>,
  *     <CODE>&quot;ANSWER&quot;</CODE>, or <CODE>&quot;LOWDATA&quot;</CODE>;
  *     if the key is missing for an event, this defines the event to be
  *     of <I>default</I> or <I>local</I> type.
  *     For convenience, an enumeration {@link EventType} containing these
  *     values is provided, along with methods to read and write its values
- *     from attribute maps.</LI>
+ *     in attribute maps.</LI>
  * </UL>
  *
  * <P>This class contains only static methods and constants.</P>

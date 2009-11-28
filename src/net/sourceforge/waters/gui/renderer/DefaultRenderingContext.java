@@ -2,15 +2,20 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.gui.renderer
-//# CLASS:   DefaultRenderable
+//# CLASS:   DefaultRenderingContext
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
 
+import java.awt.Font;
+import java.util.List;
+
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.EditorSurface;
+import net.sourceforge.waters.gui.GraphPanel;
+import net.sourceforge.waters.gui.PropositionIcon;
+import net.sourceforge.waters.gui.PropositionIcon.ColorInfo;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -22,10 +27,12 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 
 /**
- * A simple implementation of the {@link Renderable} interface that
+ * A simple implementation of the {@link RenderingContext} interface that
  * provides basic formatting and colouring, while suppressing all highlighting.
  * It can be passed to printers, or extended for more sophisticated
  * formatting.
@@ -33,35 +40,51 @@ import net.sourceforge.waters.model.module.NodeProxy;
  * @author Robi Malik
  */
 
-public class DefaultRenderable
+public class DefaultRenderingContext
   extends AbstractModuleProxyVisitor
-  implements Renderable
+  implements RenderingContext
 {
 
   //#########################################################################
   //# Constructors
-  protected DefaultRenderable()
+  protected DefaultRenderingContext()
   {
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.gui.renderer.Renderable
+  //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
+  public ColorInfo getColorInfo(final SimpleNodeProxy node)
+  {
+    final PlainEventListProxy props = node.getPropositions();
+    final List<Proxy> elist = props.getEventList();
+    if (elist.isEmpty()) {
+      return PropositionIcon.getUnmarkedColors();
+    } else {
+      return PropositionIcon.getDefaultMarkedColors();
+    }
+  }
+
+  public Font getFont(final IdentifierProxy ident)
+  {
+    return EditorColor.DEFAULT_FONT;
+  }
+
   public RenderingInformation getRenderingInformation(final Proxy proxy)
   {
     return new RenderingInformation
       (false, false,
        EditorColor.getColor
-         (proxy, EditorSurface.DRAGOVERSTATUS.NOTDRAG, false, false, true),
+         (proxy, GraphPanel.DragOverStatus.NOTDRAG, false, false, true),
        EditorColor.getShadowColor
-         (proxy, EditorSurface.DRAGOVERSTATUS.NOTDRAG, false, false, true),
+         (proxy, GraphPanel.DragOverStatus.NOTDRAG, false, false, true),
        getPriority(proxy));
   }
 
 
   //###########################################################################
   //# Auxiliary Methods
-  private int getPriority(final Proxy proxy)
+  protected int getPriority(final Proxy proxy)
   {
     try {
       return (Integer) proxy.acceptVisitor(this);
@@ -116,11 +139,15 @@ public class DefaultRenderable
 
   //#########################################################################
   //# Singleton Pattern
-  public static DefaultRenderable getInstance()
+  public static DefaultRenderingContext getInstance()
   {
-    return INSTANCE;
+    return SingletonHolder.INSTANCE;
   }
 
-  private static final DefaultRenderable INSTANCE = new DefaultRenderable();
+  private static class SingletonHolder
+  {
+    private static final DefaultRenderingContext INSTANCE =
+      new DefaultRenderingContext();
+  }
 
 }

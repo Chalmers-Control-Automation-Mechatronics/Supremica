@@ -49,7 +49,8 @@ public class PropositionIcon implements Icon
   public static PropositionIcon getUnmarkedIcon()
   {
     if (UNMARKED_ICON == null) {
-      UNMARKED_ICON = new PropositionIcon(EditorColor.BACKGROUNDCOLOR);
+      final ColorInfo info = getUnmarkedColors();
+      UNMARKED_ICON = new PropositionIcon(info);
     }
     return UNMARKED_ICON;
   }
@@ -57,9 +58,26 @@ public class PropositionIcon implements Icon
   public static PropositionIcon getDefaultMarkedIcon()
   {
     if (MARKED_ICON == null) {
-      MARKED_ICON = new PropositionIcon(EditorColor.DEFAULTMARKINGCOLOR);
+      final ColorInfo info = getDefaultMarkedColors();
+      MARKED_ICON = new PropositionIcon(info);
     }
     return MARKED_ICON;
+  }
+
+  public static ColorInfo getUnmarkedColors()
+  {
+    if (UNMARKED_COLORS == null) {
+      UNMARKED_COLORS = new ColorInfo(EditorColor.BACKGROUNDCOLOR);
+    }
+    return UNMARKED_COLORS;
+  }
+
+  public static ColorInfo getDefaultMarkedColors()
+  {
+    if (MARKED_COLORS == null) {
+      MARKED_COLORS = new ColorInfo(EditorColor.DEFAULTMARKINGCOLOR);
+    }
+    return MARKED_COLORS;
   }
 
 
@@ -168,6 +186,9 @@ public class PropositionIcon implements Icon
   private static final int SIZE = IconLoader.ICON_EVENT.getIconHeight();
   private static final int OFFSET = SIZE >> 2;
   private static final int DIAMETER = SIZE - OFFSET - OFFSET;
+
+  private static ColorInfo MARKED_COLORS;
+  private static ColorInfo UNMARKED_COLORS;
 
   private static PropositionIcon MARKED_ICON;
   private static PropositionIcon UNMARKED_ICON;

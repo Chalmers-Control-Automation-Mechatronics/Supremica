@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters GUI
 //# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   ControlledSurface
+//# CLASS:   GraphEditorPanel
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -11,7 +11,6 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -57,7 +56,6 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 
 import net.sourceforge.waters.gui.actions.IDEAction;
@@ -77,14 +75,13 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.gui.renderer.Handle;
 import net.sourceforge.waters.gui.renderer.MiscShape;
+import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShape;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
+import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.gui.renderer.RenderingInformation;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
-import net.sourceforge.waters.gui.springembedder.EmbedderObserver;
-import net.sourceforge.waters.gui.springembedder.SpringAbortDialog;
-import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.gui.transfer.GraphTransferable;
 import net.sourceforge.waters.gui.transfer.GuardActionBlockTransferable;
 import net.sourceforge.waters.gui.transfer.IdentifierTransferable;
@@ -146,25 +143,35 @@ import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
-public class ControlledSurface
-  extends EditorSurface
-  implements SelectionOwner, Observer, EmbedderObserver,
-             FocusListener, DragGestureListener,
+/**
+ * A component to edit a graph. The graph editor panel is used by
+ * the IDE to edit a ({@link GraphProxy}). It contains all the mouse
+ * handlers to support the various editing tools, cut-copy-paste, as
+ * well as drag-and-drop.
+ *
+ * @author Robi Malik, Gian Perrone
+ */
+
+public class GraphEditorPanel
+  extends DoubleBufferedGraphPanel
+  implements SelectionOwner, Observer, FocusListener, DragGestureListener,
              SupremicaPropertyChangeListener
 {
   //#########################################################################
   //# Constructors
-  public ControlledSurface(final GraphSubject graph,
-                           final ModuleSubject module,
-                           final EditorWindowInterface root,
-                           final ControlledToolbar toolbar,
-                           final WatersPopupActionManager manager)
+  public GraphEditorPanel(final GraphSubject graph,
+                          final ModuleSubject module,
+                          final EditorWindowInterface root,
+                          final ControlledToolbar toolbar,
+                          final WatersPopupActionManager manager)
     throws GeometryAbsentException
   {
-    super(graph, module,
-          new SubjectShapeProducer
-                (graph, root.getModuleWindowInterface().getModuleContext()));
+    super(graph, module);
     mRoot = root;
+    mRenderingContext = new EditorRenderingContext();
+    final ProxyShapeProducer producer =
+      new SubjectShapeProducer(graph, module, mRenderingContext);
+    setShapeProducer(producer);
     mToolbar = toolbar;
     mPopupFactory =
       manager == null ? null : new GraphPopupFactory(manager, root);
@@ -173,19 +180,13 @@ public class ControlledSurface
     new DropTarget(this, dtListener);
     addKeyListener(new KeySpy());
     updateTool();
-
-    final SpringEmbedder embedder = new SpringEmbedder(graph);
-    final boolean runEmbedder = embedder.setUpGeometry();
-    if (runEmbedder) {
-      runEmbedder(false);
-    }
+    ensureGeometryExists();
     mHasGroupNodes = GraphTools.updateGroupNodeHierarchy(graph);
     mNeedsHierarchyUpdate = false;
     mSizeMayHaveChanged = true;
-
     mIsPermanentFocusOwner = false;
+    registerGraphObserver();
     addFocusListener(this);
-    graph.addModelObserver(mGraphModelObserver);
     module.getEventDeclListModifiable().addModelObserver
       (mEventDeclListModelObserver);
     if (root != null) {
@@ -200,7 +201,7 @@ public class ControlledSurface
   /**
    * Creates an immutable controlled surface.
    */
-  public ControlledSurface(final GraphSubject graph,
+  public GraphEditorPanel(final GraphSubject graph,
                            final ModuleSubject module)
     throws GeometryAbsentException
   {
@@ -223,30 +224,6 @@ public class ControlledSurface
   public ModuleSubject getModule()
   {
     return (ModuleSubject) super.getModule();
-  }
-
-  public GraphSubject getGraph()
-  {
-    return (GraphSubject) super.getGraph();
-  }
-
-  public GraphProxy getDrawnGraph()
-  {
-    if (mSecondaryGraph != null) {
-      return mSecondaryGraph;
-    } else {
-      return super.getGraph();
-    }
-  }
-
-  public SubjectShapeProducer getShapeProducer()
-  {
-    if (mSecondaryGraph != null) {
-      assert(mSecondaryShapeProducer != null);
-      return mSecondaryShapeProducer;
-    } else {
-      return (SubjectShapeProducer) super.getShapeProducer();
-    }
   }
 
   /**
@@ -457,7 +434,7 @@ public class ControlledSurface
   }
 
   @SuppressWarnings("unchecked")
-  public List<InsertInfo> getInsertInfo(Transferable transferable)
+  public List<InsertInfo> getInsertInfo(final Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
     final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
@@ -633,7 +610,7 @@ public class ControlledSurface
   }
 
   @SuppressWarnings("unchecked")
-  public void insertItems(List<InsertInfo> inserts)
+  public void insertItems(final List<InsertInfo> inserts)
   {
     final GraphSubject graph = getGraph();
     for (final InsertInfo insert : inserts) {
@@ -682,7 +659,7 @@ public class ControlledSurface
     }
   }
 
-  public void deleteItems(List<InsertInfo> inserts)
+  public void deleteItems(final List<InsertInfo> inserts)
   {
     final GraphSubject graph = getGraph();
     final Collection<NodeSubject> nodes = graph.getNodesModifiable();
@@ -776,10 +753,7 @@ public class ControlledSurface
 
   public void close()
   {
-    final ProxyShapeProducer shaper = getShapeProducer();
-    shaper.close();
-    final GraphSubject graph = getGraph();
-    graph.removeModelObserver(mGraphModelObserver);
+    super.close();
     final ModuleSubject module = getModule();
     module.getEventDeclListModifiable().removeModelObserver
       (mEventDeclListModelObserver);
@@ -830,7 +804,7 @@ public class ControlledSurface
   {
     switch (event.getKind()) {
     case TOOL_SWITCH:
-      if (mEmbedder == null) {
+      if (!isEmbedderRunning()) {
         updateTool();
       }
       break;
@@ -858,8 +832,7 @@ public class ControlledSurface
       // ***
       break;
     case EMBEDDER_STOP:
-      mEmbedder.removeObserver(this);
-      mEmbedder = null;
+      closeEmbedder();
       commitSecondaryGraph("Automatic Layout", false, mIsEmbedderUndoable);
       clearSecondaryGraph();
       updateTool();
@@ -871,13 +844,13 @@ public class ControlledSurface
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.subject.base.ModelObserver
-  public void modelChanged(final ModelChangeEvent event)
+  //# Repaint Support
+  protected void graphChanged(final ModelChangeEvent event)
   {
     checkGroupNodeHierarchyUpdate(event);
     updateError();
     mController.updateHighlighting();
-    repaint();
+    super.graphChanged(event);
     mSizeMayHaveChanged = true;
   }
 
@@ -939,7 +912,7 @@ public class ControlledSurface
     }
   }
 
-  void adjustSize()
+  protected void adjustSize()
   {
     if (mSizeMayHaveChanged) {
       mSizeMayHaveChanged = false;
@@ -951,7 +924,7 @@ public class ControlledSurface
     }
   }
 
-  Dimension calculatePreferredSize()
+  protected Dimension calculatePreferredSize()
   {
     final Rectangle2D area = getShapeProducer().getMinimumBoundingRectangle();
     final int width = (int) Math.ceil(area.getWidth());
@@ -1084,21 +1057,7 @@ public class ControlledSurface
   public void runEmbedder(final boolean undoable)
   {
     mIsEmbedderUndoable = undoable;
-    createSecondaryGraph();
-    final SimpleComponentSubject comp =
-      (SimpleComponentSubject) getGraph().getParent();
-    final String name = comp == null ? "graph" : comp.getName();
-    final long timeout = Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get();
-    mEmbedder = new SpringEmbedder(mSecondaryGraph.getNodesModifiable(),
-                                   mSecondaryGraph.getEdgesModifiable());
-    mEmbedder.addObserver(this);
-    final Thread thread = new Thread(mEmbedder);
-    final Frame frame = (Frame) getTopLevelAncestor();
-    final JDialog dialog =
-      new SpringAbortDialog(frame, name, mEmbedder, timeout);
-    dialog.setLocationRelativeTo(frame);
-    dialog.setVisible(true);
-    thread.start();
+    runEmbedder();
   }
 
 
@@ -1200,16 +1159,6 @@ public class ControlledSurface
 
   //#########################################################################
   //# Rendering Hints
-  public ProxySubject getOriginal(final ProxySubject item)
-  {
-    assert(item != null);
-    if (mSecondaryGraph == null) {
-      return item;
-    } else {
-      return mSecondaryGraph.getOriginal(item);
-    }
-  }
-
   private boolean isRenderedSelected(final ProxySubject item)
   {
     final ProxySubject original = getOriginal(item);
@@ -1265,43 +1214,6 @@ public class ControlledSurface
     }
   }
 
-  public RenderingInformation getRenderingInformation(final Proxy proxy)
-  {
-    final ProxySubject item = (ProxySubject) proxy;
-    final boolean focused = isRenderedFocused(item);
-    final boolean selected = isRenderedSelected(item);
-    final boolean showHandles;
-    if (!selected) {
-      showHandles = false;
-    } else if (mInternalDragAction != null) {
-      // *** BUG ***
-      // Label block boundary treated as handle---ugly!
-      // ***
-      showHandles = item instanceof LabelBlockSubject;
-    } else {
-      showHandles = mController.canBeSelected(item);
-    }
-    final boolean error = isError(item);
-    int priority = getPriority(item);
-    if (mDontDraw.contains(item)) {
-      priority = -1;
-    } else if (selected) {
-      priority += 6;
-    }
-    final DRAGOVERSTATUS dragover;
-    if (focused && mInternalDragAction != null) {
-      dragover = mInternalDragAction.getExternalDragStatus();
-    } else {
-      dragover = DRAGOVERSTATUS.NOTDRAG;
-    }
-    return new RenderingInformation
-      (showHandles, focused,
-       EditorColor.getColor(item, dragover, selected,
-                            error, mIsPermanentFocusOwner),
-       EditorColor.getShadowColor(item, dragover, selected,
-                                  error, mIsPermanentFocusOwner),
-       priority);
-  }
 
   public List<MiscShape> getDrawnObjects()
   {
@@ -1421,14 +1333,14 @@ public class ControlledSurface
     }
   }
 
-  private boolean overlap(Shape s1, Shape s2)
+  private boolean overlap(final Shape s1, final Shape s2)
   {
     if (s1.equals(s2))
       {
         return true;
       }
-    Rectangle2D r1 = s1.getBounds2D();
-    Rectangle2D r2 = s2.getBounds2D();
+    final Rectangle2D r1 = s1.getBounds2D();
+    final Rectangle2D r2 = s2.getBounds2D();
     return r1.intersects(r2) && !(r1.contains(r2) || r2.contains(r1));
   }
 
@@ -1549,40 +1461,20 @@ public class ControlledSurface
 
 
   //#########################################################################
-  //# Controller Auxiliaries
-  private boolean createSecondaryGraph()
+  //# Secondary Graph
+  protected void commitSecondaryGraph(final String description)
   {
-    if (mSecondaryGraph == null) {
-      final ModuleWindowInterface iface =
-        getEditorInterface().getModuleWindowInterface();
-      final ModuleContext context = iface.getModuleContext();
-      mSecondaryGraph = new EditorGraph(getGraph());
-      mSecondaryShapeProducer = new SubjectShapeProducer
-        (mSecondaryGraph, mSecondaryGraph, context);
-      mSecondaryGraph.addModelObserver(mGraphModelObserver);
-      return true;
-    } else {
-      return false;
-    }
+    commitSecondaryGraph(description, false, false);
   }
 
-  private void clearSecondaryGraph()
+  protected void commitSecondaryGraph(final String description,
+                                      final boolean selecting,
+                                      final boolean undoable)
   {
-    if (mSecondaryGraph != null) {
-      mSecondaryGraph.removeModelObserver(mGraphModelObserver);
-      mSecondaryGraph = null;
-      mSecondaryShapeProducer = null;
-      repaint();
-    }
-  }
-
-  private void commitSecondaryGraph(final String description,
-                                    final boolean selecting,
-                                    final boolean undoable)
-  {
-    if (mSecondaryGraph != null) {
+    final EditorGraph graph = getSecondaryGraph();
+    if (graph != null) {
       final Command cmd =
-        mSecondaryGraph.createUpdateCommand(this, description, selecting);
+        graph.createUpdateCommand(this, description, selecting);
       if (cmd == null) {
         // ignore
       } else if (undoable) {
@@ -1641,20 +1533,56 @@ public class ControlledSurface
   }
 
 
-  //#########################################################################
-  //# Inner Class GraphModelObserver
-  private class GraphModelObserver implements ModelObserver
+  //##########################################################################
+  //# Inner Class EditorRenderingContext
+  private class EditorRenderingContext extends ModuleRenderingContext
   {
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.subject.base.ModelObserver
-    public void modelChanged(final ModelChangeEvent event)
+    //# Constructor
+    private EditorRenderingContext()
     {
-      checkGroupNodeHierarchyUpdate(event);
-      updateError();
-      mController.updateHighlighting();
-      repaint();
-      mSizeMayHaveChanged = true;
+      super(mRoot.getModuleWindowInterface().getModuleContext());
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
+    public RenderingInformation getRenderingInformation(final Proxy proxy)
+    {
+      final ProxySubject item = (ProxySubject) proxy;
+      final boolean focused = isRenderedFocused(item);
+      final boolean selected = isRenderedSelected(item);
+      final boolean showHandles;
+      if (!selected) {
+        showHandles = false;
+      } else if (mInternalDragAction != null) {
+        // *** BUG ***
+        // Label block boundary treated as handle---ugly!
+        // ***
+        showHandles = item instanceof LabelBlockSubject;
+      } else {
+        showHandles = mController.canBeSelected(item);
+      }
+      final boolean error = isError(item);
+      int priority = getPriority(item);
+      if (mDontDraw.contains(item)) {
+        priority = -1;
+      } else if (selected) {
+        priority += 6;
+      }
+      final DragOverStatus dragover;
+      if (focused && mInternalDragAction != null) {
+        dragover = mInternalDragAction.getExternalDragStatus();
+      } else {
+        dragover = DragOverStatus.NOTDRAG;
+      }
+      return new RenderingInformation
+        (showHandles, focused,
+         EditorColor.getColor(item, dragover, selected,
+                              error, mIsPermanentFocusOwner),
+         EditorColor.getShadowColor(item, dragover, selected,
+                                    error, mIsPermanentFocusOwner),
+         priority);
     }
 
   }
@@ -1725,7 +1653,7 @@ public class ControlledSurface
 
     //#######################################################################
     //# Highlighting and Selecting
-    int getHighlightPriority(ProxySubject item)
+    int getHighlightPriority(final ProxySubject item)
     {
       return -1;
     }
@@ -1808,13 +1736,13 @@ public class ControlledSurface
     {
       requestFocusInWindow();
       mPopupFactory.maybeShowPopup
-        (ControlledSurface.this, event, mFocusedObject);
+        (GraphEditorPanel.this, event, mFocusedObject);
     }
 
     public void mouseReleased(final MouseEvent event)
     {
       mPopupFactory.maybeShowPopup
-        (ControlledSurface.this, event, mFocusedObject);
+        (GraphEditorPanel.this, event, mFocusedObject);
       if (mInternalDragAction != null) {
         final Point point = event.getPoint();
         if (mInternalDragAction.hasDragged()) {
@@ -2125,7 +2053,7 @@ public class ControlledSurface
       abortExternalDrag(event);
       requestFocusInWindow();
       mPopupFactory.maybeShowPopup
-        (ControlledSurface.this, event, mFocusedObject);
+        (GraphEditorPanel.this, event, mFocusedObject);
       if (event.getButton() == MouseEvent.BUTTON1) {
         if (event.isControlDown()) {
           mInternalDragAction = new InternalDragActionSelect(event);
@@ -2208,7 +2136,7 @@ public class ControlledSurface
       abortExternalDrag(event);
       requestFocusInWindow();
       mPopupFactory.maybeShowPopup
-        (ControlledSurface.this, event, mFocusedObject);
+        (GraphEditorPanel.this, event, mFocusedObject);
       if (event.getButton() == MouseEvent.BUTTON1) {
         final ProxySubject item = getItemToBeSelected(event);
         if (item == null || event.isControlDown()) {
@@ -2437,9 +2365,9 @@ public class ControlledSurface
       return -1;
     }
 
-    DRAGOVERSTATUS getExternalDragStatus()
+    DragOverStatus getExternalDragStatus()
     {
-      return DRAGOVERSTATUS.NOTDRAG;
+      return DragOverStatus.NOTDRAG;
     }
 
     //#######################################################################
@@ -2511,17 +2439,17 @@ public class ControlledSurface
     //# Simple Access
     boolean createSecondaryGraph()
     {
-      return ControlledSurface.this.createSecondaryGraph();
+      return GraphEditorPanel.this.createSecondaryGraph();
     }
 
     void clearSecondaryGraph()
     {
-      ControlledSurface.this.clearSecondaryGraph();
+      GraphEditorPanel.this.clearSecondaryGraph();
     }
 
     void commitSecondaryGraph()
     {
-      ControlledSurface.this.commitSecondaryGraph(null, true, true);
+      GraphEditorPanel.this.commitSecondaryGraph(null, true, true);
     }
 
     //#######################################################################
@@ -2684,7 +2612,7 @@ public class ControlledSurface
     {
       if (mLabelBlock != null) {
         final Point point = getDragStart();
-        return ControlledSurface.this.getLabelToBeSelected(mLabelBlock, point);
+        return GraphEditorPanel.this.getLabelToBeSelected(mLabelBlock, point);
       } else {
         return null;
       }
@@ -2835,14 +2763,14 @@ public class ControlledSurface
       super(event);
       mClickedLabel = label;
       addToSelection(mClickedLabel);
-      mExternalDragStatus = DRAGOVERSTATUS.NOTDRAG;
+      mExternalDragStatus = DragOverStatus.NOTDRAG;
     }
 
     private InternalDragActionDND(final Point point)
     {
       super(point, point, false);
       mClickedLabel = null;
-      mExternalDragStatus = DRAGOVERSTATUS.NOTDRAG;
+      mExternalDragStatus = DragOverStatus.NOTDRAG;
     }
 
     //#######################################################################
@@ -2889,10 +2817,10 @@ public class ControlledSurface
         mDropIndex = -1;
       }
       if (elist == null) {
-        mExternalDragStatus = DRAGOVERSTATUS.CANTDROP;
+        mExternalDragStatus = DragOverStatus.CANTDROP;
         event.acceptDrag(0);
       } else {
-        mExternalDragStatus = DRAGOVERSTATUS.CANDROP;
+        mExternalDragStatus = DragOverStatus.CANDROP;
         event.acceptDrag(DnDConstants.ACTION_COPY);
       }
       if (line == null ? mLine != null : !line.equals(mLine)) {
@@ -2907,19 +2835,19 @@ public class ControlledSurface
       final Point point = event.getLocation();
       commitDrag(point);
       try {
-        if (mExternalDragStatus == DRAGOVERSTATUS.CANDROP) {
+        if (mExternalDragStatus == DragOverStatus.CANDROP) {
           final Transferable transferable = event.getTransferable();
           final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
           mIdentifierPasteVisitor.addInsertInfo
             (mFocusedObject, mDropIndex, transferable, inserts);
           final Command cmd =
-            new InsertCommand(inserts, ControlledSurface.this);
+            new InsertCommand(inserts, GraphEditorPanel.this);
           getUndoInterface().executeCommand(cmd);
           event.dropComplete(true);
         } else {
           event.dropComplete(false);
         }
-        mExternalDragStatus = DRAGOVERSTATUS.NOTDRAG;
+        mExternalDragStatus = DragOverStatus.NOTDRAG;
       } catch (final UnsupportedFlavorException exception) {
         throw new IllegalArgumentException(exception);
       } catch (final IOException exception) {
@@ -2953,7 +2881,7 @@ public class ControlledSurface
       }
     }
 
-    DRAGOVERSTATUS getExternalDragStatus()
+    DragOverStatus getExternalDragStatus()
     {
       return mExternalDragStatus;
     }
@@ -3002,7 +2930,7 @@ public class ControlledSurface
     private final ProxySubject mClickedLabel;
     private Line2D mLine;
     private int mDropIndex;
-    private DRAGOVERSTATUS mExternalDragStatus;
+    private DragOverStatus mExternalDragStatus;
 
   }
 
@@ -3049,7 +2977,7 @@ public class ControlledSurface
     private SimpleNodeSubject getNodeCopy()
     {
       if (mNodeCopy == null) {
-        mNodeCopy = (SimpleNodeSubject) mSecondaryGraph.getCopy(mNode);
+        mNodeCopy = (SimpleNodeSubject) getSecondaryGraph().getCopy(mNode);
       }
       return mNodeCopy;
     }
@@ -3186,7 +3114,7 @@ public class ControlledSurface
     boolean createSecondaryGraph()
     {
       if (super.createSecondaryGraph()) {
-        mGroupCopy = (GroupNodeSubject) mSecondaryGraph.getCopy(mGroup);
+        mGroupCopy = (GroupNodeSubject) getSecondaryGraph().getCopy(mGroup);
         mEdges = new LinkedList<EdgeSubject>();
         for (final EdgeSubject edge : getGraph().getEdgesModifiable()) {
           if (edge.getSource() == mGroup || edge.getTarget() == mGroup) {
@@ -3207,7 +3135,7 @@ public class ControlledSurface
         final List<GroupNodeSubject> groups =
           Collections.singletonList(mGroup);
         final List<InsertInfo> deletes = getDeletionVictims(groups);
-        final Command cmd = new DeleteCommand(deletes, ControlledSurface.this);
+        final Command cmd = new DeleteCommand(deletes, GraphEditorPanel.this);
         getUndoInterface().executeCommand(cmd);
       } else {
         super.commitSecondaryGraph();
@@ -3219,6 +3147,7 @@ public class ControlledSurface
     boolean continueDrag(final Point point)
     {
       if (super.continueDrag(point)) {
+        final EditorGraph graph = getSecondaryGraph();
         final Rectangle2D rect = getCurrentRectangle();
         mGroupCopy.getGeometry().setRectangle(rect);
         for (final EdgeSubject edge : mEdges) {
@@ -3229,8 +3158,8 @@ public class ControlledSurface
               final Point2D neo = rescalePoint(old);
               final double dx = neo.getX() - old.getX();
               final double dy = neo.getY() - old.getY();
-              mSecondaryGraph.moveEdgeStart(edge, dx, dy);
-              mSecondaryGraph.transformEdge(edge, true);
+              graph.moveEdgeStart(edge, dx, dy);
+              graph.transformEdge(edge, true);
             }
           }
           if (edge.getTarget() == mGroup) {
@@ -3240,8 +3169,8 @@ public class ControlledSurface
               final Point2D neo = rescalePoint(old);
               final double dx = neo.getX() - old.getX();
               final double dy = neo.getY() - old.getY();
-              mSecondaryGraph.moveEdgeEnd(edge, dx, dy);
-              mSecondaryGraph.transformEdge(edge, false);
+              graph.moveEdgeEnd(edge, dx, dy);
+              graph.transformEdge(edge, false);
             }
           }
           // *** BUG ***
@@ -3379,7 +3308,7 @@ public class ControlledSurface
         if (mFocusedObject == null) {
           focused = null;
         } else {
-          focused = (NodeSubject) mSecondaryGraph.getCopy(mFocusedObject);
+          focused = (NodeSubject) getSecondaryGraph().getCopy(mFocusedObject);
           current = GeometryTools.getDefaultPosition(focused, current);
         }
         if (mIsSource) {
@@ -3446,20 +3375,20 @@ public class ControlledSurface
     private void createCopiedEdge()
     {
       if (mCopiedEdge == null) {
+        final EditorGraph graph = getSecondaryGraph();
         if (mSource != null) {
-          final NodeSubject source =
-            (NodeSubject) mSecondaryGraph.getCopy(mSource);
+          final NodeSubject source = (NodeSubject) graph.getCopy(mSource);
           final PointGeometrySubject geo =
             source instanceof GroupNodeSubject ?
             new PointGeometrySubject(mAnchor) :
             null;
           mCopiedEdge =
             new EdgeSubject(source, null, null, null, null, geo, null);
-          mSecondaryGraph.getEdgesModifiable().add(mCopiedEdge);
-          mOrigEdge = (EdgeSubject) mSecondaryGraph.getOriginal(mCopiedEdge);
+          graph.getEdgesModifiable().add(mCopiedEdge);
+          mOrigEdge = (EdgeSubject) graph.getOriginal(mCopiedEdge);
           replaceSelection(mOrigEdge);
         } else {
-          mCopiedEdge = (EdgeSubject) mSecondaryGraph.getCopy(mOrigEdge);
+          mCopiedEdge = (EdgeSubject) graph.getCopy(mOrigEdge);
           GeometryTools.createDefaultGeometry(mCopiedEdge);
         }
       }
@@ -3549,7 +3478,7 @@ public class ControlledSurface
     private void moveAll(final int dx, final int dy)
     {
       try {
-        assert(mSecondaryGraph != null);
+        assert(getSecondaryGraph() != null);
         mDeltaX = dx;
         mDeltaY = dy;
         for (final ProxySubject item : mMovedObjects) {
@@ -3564,7 +3493,7 @@ public class ControlledSurface
 	private void move(final ProxySubject item, final int dx, final int dy)
     {
       try {
-        assert(mSecondaryGraph != null);
+        assert(getSecondaryGraph() != null);
         mDeltaX = dx;
         mDeltaY = dy;
         item.acceptVisitor(this);
@@ -3580,7 +3509,7 @@ public class ControlledSurface
     {
       final EdgeSubject edge0 = (EdgeSubject) edge;
       if (mEdgeMap == null) {
-        mSecondaryGraph.moveEdgeHandle(edge0, mDeltaX, mDeltaY);
+        getSecondaryGraph().moveEdgeHandle(edge0, mDeltaX, mDeltaY);
       } else {
         final MovingEdge entry = mEdgeMap.get(edge0);
         entry.move(mDeltaX, mDeltaY);
@@ -3591,7 +3520,7 @@ public class ControlledSurface
     public Object visitGroupNodeProxy(final GroupNodeProxy group)
     {
       final GroupNodeSubject group0 = (GroupNodeSubject) group;
-      mSecondaryGraph.moveGroupNode(group0, mDeltaX, mDeltaY);
+      getSecondaryGraph().moveGroupNode(group0, mDeltaX, mDeltaY);
       return null;
     }
 
@@ -3605,7 +3534,7 @@ public class ControlledSurface
     {
       if (!isParentMoved(block)) {
         final GuardActionBlockSubject block0 = (GuardActionBlockSubject) block;
-        mSecondaryGraph.moveGuardActionBlock(block0, mDeltaX, mDeltaY);
+        getSecondaryGraph().moveGuardActionBlock(block0, mDeltaX, mDeltaY);
       }
       return null;
     }
@@ -3619,7 +3548,7 @@ public class ControlledSurface
     {
       if (!isParentMoved(block)) {
         final LabelBlockSubject block0 = (LabelBlockSubject) block;
-        mSecondaryGraph.moveLabelBlock(block0, mDeltaX, mDeltaY);
+        getSecondaryGraph().moveLabelBlock(block0, mDeltaX, mDeltaY);
       }
       return null;
     }
@@ -3628,7 +3557,7 @@ public class ControlledSurface
     {
       if (!isParentMoved(label)) {
         final LabelGeometrySubject label0 = (LabelGeometrySubject) label;
-        mSecondaryGraph.moveLabelGeometry(label0, mDeltaX, mDeltaY);
+        getSecondaryGraph().moveLabelGeometry(label0, mDeltaX, mDeltaY);
       }
       return null;
     }
@@ -3636,7 +3565,7 @@ public class ControlledSurface
     public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
     {
       final SimpleNodeSubject node0 = (SimpleNodeSubject) node;
-      mSecondaryGraph.moveSimpleNode(node0, mDeltaX, mDeltaY);
+      getSecondaryGraph().moveSimpleNode(node0, mDeltaX, mDeltaY);
       return null;
     }
 
@@ -3701,23 +3630,24 @@ public class ControlledSurface
     //# Moving
     void move(final double dx, final double dy)
     {
+      final EditorGraph graph = getSecondaryGraph();
       if (mMovingSource) {
-        mSecondaryGraph.moveEdgeStart(mEdge, dx, dy);
+        graph.moveEdgeStart(mEdge, dx, dy);
       }
       if (mMovingTarget) {
-        mSecondaryGraph.moveEdgeEnd(mEdge, dx, dy);
+        graph.moveEdgeEnd(mEdge, dx, dy);
       }
       switch (mType) {
       case MOVE_DONT:
         break;
       case MOVE_FOLLOW:
-        mSecondaryGraph.moveEdgeHandle(mEdge, dx, dy);
+        graph.moveEdgeHandle(mEdge, dx, dy);
         break;
       case MOVE_SOURCE:
-        mSecondaryGraph.transformEdge(mEdge, true);
+        graph.transformEdge(mEdge, true);
         break;
       case MOVE_TARGET:
-        mSecondaryGraph.transformEdge(mEdge, false);
+        graph.transformEdge(mEdge, false);
         break;
       default:
         throw new IllegalStateException("Unknown move type: " + mType + "!");
@@ -3775,7 +3705,7 @@ public class ControlledSurface
   private class KeySpy
     extends KeyAdapter
   {
-    public void keyPressed(KeyEvent e)
+    public void keyPressed(final KeyEvent e)
     {
       // to be reimplemented
       if (e.getKeyCode() == KeyEvent.VK_UP ||
@@ -3783,22 +3713,22 @@ public class ControlledSurface
         {
           //System.err.println("UP");
           boolean hasMoved = false;
-          CompoundCommand upMove = new CompoundCommand("Move Event");
-          for (ProxySubject o : mSelectedList)
+          final CompoundCommand upMove = new CompoundCommand("Move Event");
+          for (final ProxySubject o : mSelectedList)
             {
               if (o instanceof LabelBlockSubject)
                 {
-                  LabelBlockSubject l = (LabelBlockSubject)o;
+                  final LabelBlockSubject l = (LabelBlockSubject)o;
                   if (hasSelected(l))
                     {
-                      List<AbstractSubject> labels =
+                      final List<AbstractSubject> labels =
                         new ArrayList<AbstractSubject>(l.getEventListModifiable());
                       labels.retainAll(mSelectedList);
                       //System.err.println(labels);
                       int index = l.getEventList().size();
-                      for (AbstractSubject i : labels)
+                      for (final AbstractSubject i : labels)
                         {
-                          int index2 = l.getEventList().indexOf(i);
+                          final int index2 = l.getEventList().indexOf(i);
                           if (index2 < index)
                             {
                               index = index2;
@@ -3809,7 +3739,7 @@ public class ControlledSurface
                           index--;
                         }
                       hasMoved = true;
-                      Command c =
+                      final Command c =
                         new ReorganizeListCommand(l, labels, index);
                       upMove.addCommand(c);
                     }
@@ -3826,22 +3756,22 @@ public class ControlledSurface
         {
           //System.err.println("Down");
           boolean hasMoved = false;
-          CompoundCommand downMove = new CompoundCommand("Move Event");
-          for (ProxySubject o : mSelectedList)
+          final CompoundCommand downMove = new CompoundCommand("Move Event");
+          for (final ProxySubject o : mSelectedList)
             {
               if (o instanceof LabelBlockSubject)
                 {
-                  LabelBlockSubject l = (LabelBlockSubject)o;
+                  final LabelBlockSubject l = (LabelBlockSubject)o;
                   if (hasSelected(l))
                     {
-                      List<AbstractSubject> labels =
+                      final List<AbstractSubject> labels =
                         new ArrayList<AbstractSubject>(l.getEventListModifiable());
                       labels.retainAll(mSelectedList);
                       //System.err.println(labels);
                       int index = 0;
-                      for (AbstractSubject i : labels)
+                      for (final AbstractSubject i : labels)
                         {
-                          int index2 = l.getEventList().indexOf(i);
+                          final int index2 = l.getEventList().indexOf(i);
                           if (index2 > index)
                             {
                               index = index2;
@@ -3853,7 +3783,7 @@ public class ControlledSurface
                         }
 
                       hasMoved = true;
-                      Command c =
+                      final Command c =
                         new ReorganizeListCommand(l, labels, index);
                       downMove.addCommand(c);
                     }
@@ -3891,11 +3821,11 @@ public class ControlledSurface
       final LabelGeometrySubject geo = node.getLabelGeometry();
       final Point2D pgeo = node.getPointGeometry().getPoint();
       final Point2D lgeo = geo.getOffset();
-      final Rectangle rect = ControlledSurface.this.getVisibleRect();
+      final Rectangle rect = GraphEditorPanel.this.getVisibleRect();
       int x = (int) Math.round(pgeo.getX() + lgeo.getX());
-      int y = (int) Math.round(pgeo.getY() + lgeo.getY());
+      final int y = (int) Math.round(pgeo.getY() + lgeo.getY());
       int width = STATE_INPUT_WIDTH;
-      int height = getPreferredSize().height;
+      final int height = getPreferredSize().height;
       if (width > rect.width) {
         width = rect.width;
       }
@@ -3934,15 +3864,15 @@ public class ControlledSurface
         };
       addEscapeAction(escape);
 
-      ControlledSurface.this.add(this);
+      GraphEditorPanel.this.add(this);
       setVisible(true);
       requestFocusInWindow();
       mDontDraw.add(geo);
-      ControlledSurface.this.repaint();
+      GraphEditorPanel.this.repaint();
     }
 
     //#######################################################################
-    //# Cancalling
+    //# Cancelling
     private void cancel()
     {
       if (mNode != null) {
@@ -3950,8 +3880,8 @@ public class ControlledSurface
         mNode = null;
         mDontDraw.remove(geo);
         // Warning: ControlledSurface.remove() calls commitEdit() again !!!
-        ControlledSurface.this.remove(this);
-        ControlledSurface.this.repaint();
+        GraphEditorPanel.this.remove(this);
+        GraphEditorPanel.this.repaint();
       }
     }
 
@@ -3970,7 +3900,7 @@ public class ControlledSurface
         newnode.setName(newname);
         final Command cmd =
           new EditCommand(mNode, newnode,
-                          ControlledSurface.this, "State Renaming");
+                          GraphEditorPanel.this, "State Renaming");
         getUndoInterface().executeCommand(cmd);
       }
     }
@@ -4445,7 +4375,7 @@ public class ControlledSurface
         int pos = startpos < 0 ? list.size() : startpos;
         for (final Proxy proxy : data) {
           final ProxySubject newident = (ProxySubject) cloner.getClone(proxy);
-          ControlledSurface.this.addInsertInfo(inserts, newident, list, pos++);
+          GraphEditorPanel.this.addInsertInfo(inserts, newident, list, pos++);
         }
       }
     }
@@ -4604,20 +4534,9 @@ public class ControlledSurface
    */
   private Point mCurrentPoint;
   /**
-   * A temporary copy of the currently shown graph.  It contains the
-   * uncommitted changes while the user is dragging some objects with the
-   * mouse in an incomplete move operation. This variable is
-   * <CODE>null</CODE> if no move operation is in progress. The secondary
-   * graph is created at the start of each move operation, and disposed
-   * after committing the changes.
+   * The rendering context passed to the shape producers.
    */
-  private EditorGraph mSecondaryGraph = null;
-  /**
-   * The shape producer associated with the secondary graph.
-   * It is non-null if and only if the secondary graph is non-null, i.e.,
-   * while a move operation is in progress.
-   */
-  private SubjectShapeProducer mSecondaryShapeProducer = null;
+  private final RenderingContext mRenderingContext;
   /**
    * A flag, indicating that the secondary graph is being committed.
    */
@@ -4627,10 +4546,6 @@ public class ControlledSurface
    * or <CODE>null</CODE>.
    */
   private InternalDragAction mInternalDragAction;
-  /**
-   * The current spring embedder, if any is running.
-   */
-  private SpringEmbedder mEmbedder;
   /**
    * Whether the current spring embedding is undoable.
    * This is false for the initial layout of a graph without geometry.
@@ -4661,8 +4576,6 @@ public class ControlledSurface
 
   private final PopupFactory mPopupFactory;
 
-  private final GraphModelObserver mGraphModelObserver =
-    new GraphModelObserver();
   private final EventDeclListModelObserver mEventDeclListModelObserver =
     new EventDeclListModelObserver();
   private final SelectableVisitor mSelectableVisitor = new SelectableVisitor();

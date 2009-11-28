@@ -15,7 +15,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
-import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -49,7 +49,7 @@ public class GraphLayoutAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    final ControlledSurface surface = getActiveControlledSurface();
+    final GraphEditorPanel surface = getActiveControlledSurface();
     if (surface != null) {
       surface.runEmbedder(true);
     }
@@ -64,7 +64,7 @@ public class GraphLayoutAction
     case CONTAINER_SWITCH:
     case MAINPANEL_SWITCH:
     case SUBPANEL_SWITCH:
-      final ControlledSurface surface = getActiveControlledSurface();
+      final GraphEditorPanel surface = getActiveControlledSurface();
       if (surface == null) {
         setEnabled(false);
         observeGraph(null);

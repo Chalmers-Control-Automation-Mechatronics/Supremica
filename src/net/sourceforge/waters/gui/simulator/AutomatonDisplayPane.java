@@ -1,162 +1,206 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.awt.Color;
+
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-
+import net.sourceforge.waters.gui.DoubleBufferedGraphPanel;
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.EditorSurface.DRAGOVERSTATUS;
-import net.sourceforge.waters.gui.renderer.MiscShape;
+import net.sourceforge.waters.gui.PropositionIcon;
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
-import net.sourceforge.waters.gui.renderer.Renderable;
-import net.sourceforge.waters.gui.renderer.Renderer;
+import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.gui.renderer.RenderingInformation;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.LabelBlockProxy;
-import net.sourceforge.waters.model.module.LabelGeometryProxy;
-import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
-import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 
 import org.supremica.gui.ide.ModuleContainer;
 
-public class AutomatonDisplayPane extends JPanel implements Renderable, SimulationObserver
+
+public class AutomatonDisplayPane
+  extends DoubleBufferedGraphPanel
+  implements SimulationObserver
 {
 
-
-  //#################################################################################
+  //##########################################################################
   //# Constructors
-  public AutomatonDisplayPane(final AutomatonProxy automaton, final ModuleContainer container, final Simulation sim)
+  public AutomatonDisplayPane(final AutomatonProxy automaton,
+                              final GraphSubject graph,
+                              final ModuleContainer container,
+                              final Simulation sim)
+    throws GeometryAbsentException
   {
-    super();
-    mContainer = container;
-    final ModuleContext context = container.getModuleContext();
-    final SimpleComponentProxy component = (SimpleComponentProxy) container.getSourceInfoMap().get(automaton).getSourceObject();
-    mGraph = (GraphSubject) component.getGraph();
-    mContext = context;
-    setBackground(EditorColor.BACKGROUNDCOLOR);
-    mShapeProducer = new SubjectShapeProducer(mGraph, mContext);
-    final Rectangle2D imageRect = mShapeProducer.getMinimumBoundingRectangle();
-    setPreferredSize(new Dimension((int)imageRect.getWidth(), (int)imageRect.getHeight()));
-    setBorder(BorderFactory.createLineBorder(Color.black));
-    sim.attach(this);
+    super(graph, container.getModule());
     mSim = sim;
     mAutomaton = automaton;
-  }
-
-  //#################################################################################
-  //# Interface Renderable
-  public RenderingInformation getRenderingInformation(final Proxy proxy)
-  {
-    final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
-    final TransitionProxy currentTrans = mSim.getPreviousTransition(mAutomaton);
-    if (proxy.getClass() == SimpleNodeSubject.class)
-    {
-      if (mContainer.getSourceInfoMap().get(currentState).getSourceObject() == proxy)
-        return getRenderingInformation(true, proxy);
+    mContainer = container;
+    final ModuleSubject module = container.getModule();
+    final RenderingContext context = new SimulatorRenderingContext();
+    final ProxyShapeProducer producer =
+      new SubjectShapeProducer(graph, module, context);
+    setShapeProducer(producer);
+    final int width;
+    final int height;
+    if (ensureGeometryExists()) {
+      // Spring embedder is running, guessing window size ...
+      final int numstates = automaton.getStates().size();
+      width = height = 136 + 24 * numstates;
+    } else {
+      final Rectangle2D imageRect = producer.getMinimumBoundingRectangle();
+      width = (int) Math.ceil(imageRect.getWidth());
+      height = (int) Math.ceil(imageRect.getHeight());
     }
-    if (proxy.getClass() == SimpleIdentifierSubject.class && currentTrans != null)
-    {
-      if (mContainer.getSourceInfoMap().get(currentTrans).getSourceObject() == proxy)
-        return getRenderingInformation(true, proxy);
-    }
-    if (proxy.getClass() == EdgeSubject.class && currentTrans != null)
-    {
-      if (((IdentifierSubject)mContainer.getSourceInfoMap().get(currentTrans).getSourceObject()).getAncestor(EdgeSubject.class) == proxy)
-        return getRenderingInformation(true, proxy);
-    }
-    return getRenderingInformation(false, proxy);
+    setPreferredSize(new Dimension(width, height));
+    setBackground(EditorColor.BACKGROUNDCOLOR);
+    sim.attach(this);
   }
 
-  //#################################################################################
-  //# Auxillary Functions
-  private RenderingInformation getRenderingInformation(final boolean active, final Proxy proxy)
+
+  //##########################################################################
+  //# Interface net.sourceforge.waters.gui.simulator.SimulatorObserver
+  public void simulationChanged(final SimulationChangeEvent event)
   {
-    return new RenderingInformation
-    (false, false,
-     EditorColor.getColor(proxy, DRAGOVERSTATUS.NOTDRAG,
-                          active, false, active),
-     EditorColor.getShadowColor(proxy, DRAGOVERSTATUS.NOTDRAG,
-                          active, false, active),
-     getPriority(proxy));
-  }
-
-  //#################################################################################
-  //# Class JPanel
-  protected int getPriority(final Proxy o)
-  {
-      int priority = 0;
-      if (o instanceof EdgeProxy)
-      {
-          priority = 1;
-      }
-      else if (o instanceof NodeProxy)
-      {
-          priority = 2;
-      }
-      else if (o instanceof LabelGeometryProxy)
-      {
-          priority = 3;
-      }
-      else if (o instanceof LabelBlockProxy)
-      {
-          priority = 4;
-      }
-      else if (o instanceof GuardActionBlockProxy)
-      {
-          priority = 5;
-      }
-      else if (o instanceof IdentifierProxy)
-      {
-          priority = 6;
-      }
-      return priority;
+    repaint();
   }
 
 
+  //##########################################################################
+  //# Repainting
   public void paint(final Graphics g)
   {
-    super.paint(g);
+    g.setColor(getBackground());
+    g.fillRect(0, 0, getWidth(), getHeight());
     final Graphics2D g2d = (Graphics2D) g;
     final AffineTransform trans = g2d.getTransform();
-    final Renderer renderer = new Renderer();
-    final Rectangle2D imageRect = mShapeProducer.getMinimumBoundingRectangle();
+    final ProxyShapeProducer producer = getShapeProducer();
+    final Rectangle2D imageRect = producer.getMinimumBoundingRectangle();
     final Dimension panelSize = getSize();
     final double scaleX = panelSize.getWidth() / imageRect.getWidth();
     final double scaleY = panelSize.getHeight() / imageRect.getHeight();
     final double min = Math.min(scaleX, scaleY);
     g2d.scale(min, min);
-    final List<MiscShape> empty = Collections.emptyList();
-    renderer.renderGraph(mGraph, empty, this, mShapeProducer, g2d);
+    super.paint(g2d);
     g2d.setTransform(trans);
+  }
+
+  protected void paintGrid(final Graphics g)
+  {
+  }
+
+  public void close()
+  {
+    mSim.detach(this);
+    super.close();
+  }
+
+
+  //##########################################################################
+  //# Inner Class SimulatorRenderingContext
+  private class SimulatorRenderingContext extends ModuleRenderingContext
+  {
+
+    //#######################################################################
+    //# Constructor
+    private SimulatorRenderingContext()
+    {
+      super(mContainer.getModuleContext());
+      final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+      final Collection<StateProxy> states = mAutomaton.getStates();
+      final int size = states.size();
+      mStateMap = new HashMap<SimpleNodeProxy,StateProxy>(size);
+      for (final StateProxy state : states) {
+        final SourceInfo info = infomap.get(state);
+        final SimpleNodeProxy node = (SimpleNodeProxy) info.getSourceObject();
+        mStateMap.put(node, state);
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
+    public PropositionIcon.ColorInfo getColorInfo(final SimpleNodeProxy node)
+    {
+      // The spring embedder modifies a copy of our graph. When it is running,
+      // the items being displayed are not in our compiled graph ...
+      final Proxy orig = getOriginal(node);
+      final StateProxy state = mStateMap.get(orig);
+      return mSim.getMarkingColorInfo(state, mAutomaton);
+    }
+
+    public RenderingInformation getRenderingInformation(final Proxy proxy)
+    {
+      // The spring embedder modifies a copy of our graph. When it is running,
+      // the items being displayed are not in our compiled graph ...
+      final Proxy orig = getOriginal(proxy);
+      if (orig == null) {
+        // *** BUG? ***
+        // Identifiers have no original, this may cause failure to
+        // highlight them while spring embedding.
+        return super.getRenderingInformation(proxy);
+      } else if (orig instanceof SimpleNodeProxy) {
+        final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
+        if (mContainer.getSourceInfoMap().get(currentState).getSourceObject() ==
+            orig) {
+          return getActiveRenderingInformation(orig);
+        }
+      }
+      final TransitionProxy currentTrans = mSim.getPreviousTransition(mAutomaton);
+      if (currentTrans != null) {
+        final Proxy currentTransSource =
+          mContainer.getSourceInfoMap().get(currentTrans).getSourceObject();
+        if (orig instanceof IdentifierProxy) {
+          if (currentTransSource == orig) {
+            return getActiveRenderingInformation(orig);
+          }
+        } else if (orig instanceof EdgeProxy) {
+          final IdentifierSubject ident =
+            (IdentifierSubject) currentTransSource;
+          if (ident.getAncestor(EdgeSubject.class) == orig) {
+            return getActiveRenderingInformation(orig);
+          }
+        }
+      }
+      return super.getRenderingInformation(orig);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private RenderingInformation getActiveRenderingInformation
+      (final Proxy proxy)
+    {
+      return new RenderingInformation
+        (false, true,
+         EditorColor.SIMULATION_ACTIVE,
+         EditorColor.shadow(EditorColor.SIMULATION_ACTIVE),
+         getPriority(proxy));
+    }
+
+    //########################################################################
+    //# Data Members
+    private final Map<SimpleNodeProxy,StateProxy> mStateMap;
+
   }
 
 
   //#################################################################################
   //# Data Members
-  private final GraphSubject mGraph;
-  private final ModuleContext mContext;
-  private final ProxyShapeProducer mShapeProducer;
   private final Simulation mSim;
   private final AutomatonProxy mAutomaton;
   private final ModuleContainer mContainer;
@@ -165,10 +209,5 @@ public class AutomatonDisplayPane extends JPanel implements Renderable, Simulati
   //#################################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-
-  public void simulationChanged(final SimulationChangeEvent event)
-  {
-    repaint();
-  }
 
 }

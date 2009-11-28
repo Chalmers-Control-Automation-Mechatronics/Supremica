@@ -130,13 +130,22 @@ public class Simulation implements ModelObserver, Observer
     return output;
   }
 
-  public Icon getMarking(final StateProxy state, final AutomatonProxy automaton)
+  public Icon getMarkingIcon(final StateProxy state,
+                             final AutomatonProxy automaton)
   {
-    if (!hasPropositions(automaton))
-      return PropositionIcon.getDefaultMarkedIcon();
+    final PropositionIcon.ColorInfo info = getMarkingColorInfo(state, automaton);
+    return info.getIcon();
+  }
+
+  public PropositionIcon.ColorInfo getMarkingColorInfo
+    (final StateProxy state, final AutomatonProxy automaton)
+  {
+    if (!hasPropositions(automaton)) {
+      return PropositionIcon.getDefaultMarkedColors();
+    }
     final Collection<EventProxy> props = state.getPropositions();
     if (props.isEmpty()) {
-      return PropositionIcon.getUnmarkedIcon();
+      return PropositionIcon.getUnmarkedColors();
     } else {
       final Map<Proxy,SourceInfo> infomap = mModuleContainer.getSourceInfoMap();
       final int size = props.size();
@@ -162,9 +171,7 @@ public class Simulation implements ModelObserver, Observer
           }
         }
       }
-      final PropositionIcon.ColorInfo colorinfo =
-        new PropositionIcon.ColorInfo(colorlist, forbidden);
-      return colorinfo.getIcon();
+      return new PropositionIcon.ColorInfo(colorlist, forbidden);
     }
   }
 

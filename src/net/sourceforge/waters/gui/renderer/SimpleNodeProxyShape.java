@@ -17,12 +17,10 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
@@ -36,10 +34,9 @@ public class SimpleNodeProxyShape
   //#########################################################################
   //# Constructor
   SimpleNodeProxyShape(final SimpleNodeProxy node,
-                       final ModuleContext context)
+                       final PropositionIcon.ColorInfo info)
   {
     super(node);
-    mContext = context;
     final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
     final int diameter = radius + radius;
     final Point2D p = getProxy().getPointGeometry().getPoint();
@@ -48,6 +45,8 @@ public class SimpleNodeProxyShape
                              diameter, diameter);
     mCircleShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
     mShape = new GeneralPath(mCircleShape);
+    mColors = info.getColors();
+    mForbidden = info.isForbidden();
 
     // Create handles
     if (node.isInitial()) {
@@ -87,7 +86,6 @@ public class SimpleNodeProxyShape
   public void draw(final Graphics2D graphics,
                    final RenderingInformation status)
   {
-    updateColors();
     // This rectangle is not the same as the one used to create the
     // mCircleShape! It gives rounding errors!
     // Rectangle2D bounds = mCircleShape.getBounds();
@@ -111,22 +109,6 @@ public class SimpleNodeProxyShape
     if (mForbidden) {
       drawForbidden(graphics, bounds);
     }
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  /**
-   * I think this method updates the set of colours used
-   * (if this is a marked node).
-   */
-  private void updateColors()
-  {
-    final SimpleNodeProxy node = getProxy();
-    final PropositionIcon.ColorInfo info =
-      mContext.guessPropositionColors(node);
-    mColors = info.getColors();
-    mForbidden = info.isForbidden();
   }
 
 
@@ -182,13 +164,11 @@ public class SimpleNodeProxyShape
 
   //#########################################################################
   //# Data Members
-  private final ModuleContext mContext;
   private final Arc2D mCircleShape;
   private final GeneralPath mShape; // To incorporate the initial state arrow
   private final List<Handle> mHandles;
-
-  private List<Color> mColors = new ArrayList<Color>();
-  private boolean mForbidden = false;
+  private final List<Color> mColors;
+  private final boolean mForbidden;
 
 
   //#########################################################################

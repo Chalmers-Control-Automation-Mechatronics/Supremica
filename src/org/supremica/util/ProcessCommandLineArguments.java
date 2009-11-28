@@ -70,10 +70,9 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
-import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -124,11 +123,11 @@ public class ProcessCommandLineArguments
      * Processes an array of arguments. Returns a list of files to be
      * opened on startup.
      */
-    public static List<File> process(String[] args)
+    public static List<File> process(final String[] args)
     {
         boolean quit = false;
         boolean verbose = false;
-        List<File> filesToOpen = new LinkedList<File>();
+        final List<File> filesToOpen = new LinkedList<File>();
 
         for (int i = 0; i < args.length; i++)
         {
@@ -153,8 +152,8 @@ public class ProcessCommandLineArguments
                 // Load properties
                 if (++i < args.length)
                 {
-                    String fileName = args[i];
-                    File propFile = new File(fileName);
+                    final String fileName = args[i];
+                    final File propFile = new File(fileName);
 
                     try
                     {
@@ -170,7 +169,7 @@ public class ProcessCommandLineArguments
                             Config.VERBOSE_MODE.set(true);
                         }
                     }
-                    catch (Exception e)
+                    catch (final Exception e)
                     {
                         System.err.println("Error reading properties file: " + propFile.getAbsolutePath());
                     }
@@ -181,11 +180,11 @@ public class ProcessCommandLineArguments
                 // Create eps figs for all components in the supplied file
                 while ((i+1 < args.length) && !(args[i+1].startsWith("-")))
                 {
-                    String fileName = args[++i];
-                    File figFile = new File(fileName);
+                    final String fileName = args[++i];
+                    final File figFile = new File(fileName);
 
                     // Set up document manager ...
-                    DocumentManager documentManager = new DocumentManager();
+                    final DocumentManager documentManager = new DocumentManager();
                     ProductDESImporter importer;
                     try
                     {
@@ -214,12 +213,12 @@ public class ProcessCommandLineArguments
 
                         importer = new ProductDESImporter(factory);
                     }
-                    catch (SAXException ex)
+                    catch (final SAXException ex)
                     {
                         System.err.println("SAXException when initialising document manager: " + ex);
                         return null;
                     }
-                    catch (JAXBException ex)
+                    catch (final JAXBException ex)
                     {
                         System.err.println("JAXBException when initialising document manager: " + ex);
                         return null;
@@ -229,7 +228,7 @@ public class ProcessCommandLineArguments
                     try
                     {
                         // Load file
-                        DocumentProxy doc = documentManager.load(figFile);
+                        final DocumentProxy doc = documentManager.load(figFile);
 
                         // Build module
                         ModuleProxy module;
@@ -249,22 +248,22 @@ public class ProcessCommandLineArguments
                         // Loop throgh components and print eps-figures
                         //module.acceptVisitor(new EPSPrinterVisitor(module));
                         final List<Proxy> components = module.getComponentList();
-                        AbstractProxyVisitor visitor = new EPSPrinterVisitor(module, verbose);
+                        final AbstractProxyVisitor visitor = new EPSPrinterVisitor(module, verbose);
                         visitor.visitCollection(components);
                     }
-                    catch (IOException ex)
+                    catch (final IOException ex)
                     {
                         System.err.println("IO problem: " + ex);
                     }
-                    catch (WatersUnmarshalException ex)
+                    catch (final WatersUnmarshalException ex)
                     {
                         System.err.println("Problem unmarshalling: " + ex);
                     }
-                    catch (ClassCastException ex)
+                    catch (final ClassCastException ex)
                     {
                         System.err.println("Only import of modules is supported: " + ex);
                     }
-                    catch (VisitorException ex)
+                    catch (final VisitorException ex)
                     {
                         System.err.println("Problems when visiting module: " + ex);
                     }
@@ -278,11 +277,11 @@ public class ProcessCommandLineArguments
                 // Create eps figs for all components in the supplied file
                 while ((i+1 < args.length) && !(args[i+1].startsWith("-")))
                 {
-                    String fileName = args[++i];
-                    File figFile = new File(fileName);
+                    final String fileName = args[++i];
+                    final File figFile = new File(fileName);
 
                     // Set up document manager ...
-                    DocumentManager documentManager = new DocumentManager();
+                    final DocumentManager documentManager = new DocumentManager();
                     ProductDESImporter importer;
                     try
                     {
@@ -311,12 +310,12 @@ public class ProcessCommandLineArguments
 
                         importer = new ProductDESImporter(factory);
                     }
-                    catch (SAXException ex)
+                    catch (final SAXException ex)
                     {
                         System.err.println("SAXException when initialising document manager: " + ex);
                         return null;
                     }
-                    catch (JAXBException ex)
+                    catch (final JAXBException ex)
                     {
                         System.err.println("JAXBException when initialising document manager: " + ex);
                         return null;
@@ -326,7 +325,7 @@ public class ProcessCommandLineArguments
                     try
                     {
                         // Load file
-                        DocumentProxy doc = documentManager.load(figFile);
+                        final DocumentProxy doc = documentManager.load(figFile);
 
                         // Build module
                         ModuleProxy module;
@@ -349,11 +348,11 @@ public class ProcessCommandLineArguments
                         //AbstractProxyVisitor visitor = new EPSPrinterVisitor(module, verbose);
                         //visitor.visitCollection(components);
 
-                        for(Proxy p: components){
+                        for(final Proxy p: components){
                             if(!(p instanceof SimpleComponentProxy))
                                 continue;
-                            SimpleComponentProxy component = (SimpleComponentProxy)p;
-                            ControlledSurface mSurface = new ControlledSurface
+                            final SimpleComponentProxy component = (SimpleComponentProxy)p;
+                            final GraphEditorPanel mSurface = new GraphEditorPanel
                                     ( (GraphSubject) component.getGraph()
                                     , (ModuleSubject) module
                                     , (EditorWindowInterface) null
@@ -362,13 +361,13 @@ public class ProcessCommandLineArguments
                                             public Tool getTool() {
                                                 return ControlledToolbar.Tool.SELECT;
                                             }
-                                            public void attach(Observer o) {
+                                            public void attach(final Observer o) {
                                                 throw new UnsupportedOperationException("Not supported yet.");
                                             }
-                                            public void detach(Observer o) {
+                                            public void detach(final Observer o) {
                                                 throw new UnsupportedOperationException("Not supported yet.");
                                             }
-                                            public void fireEditorChangedEvent(EditorChangedEvent e) {
+                                            public void fireEditorChangedEvent(final EditorChangedEvent e) {
                                                 throw new UnsupportedOperationException("Not supported yet.");
                                             }
                                         }
@@ -379,21 +378,21 @@ public class ProcessCommandLineArguments
                             //mSurface.setMinimumSize(new Dimension(640, 480));
 
                             // Get a DOMImplementation.
-                            DOMImplementation domImpl =
+                            final DOMImplementation domImpl =
                                 GenericDOMImplementation.getDOMImplementation();
 
                             // Create an instance of org.w3c.dom.Document.
-                            String svgNS = "http://www.w3.org/2000/svg";
-                            org.w3c.dom.Document document = domImpl.createDocument(svgNS, "svg", null);
+                            final String svgNS = "http://www.w3.org/2000/svg";
+                            final org.w3c.dom.Document document = domImpl.createDocument(svgNS, "svg", null);
 
                             // Create an instance of the SVG Generator.
-                            SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+                            final SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
 
                             // Ask the test to render into the SVG Graphics2D implementation.
                             //Graphics2D
                             final JScrollPane scrollsurface = new JScrollPane(mSurface);
 
-                            JFrame frame = new JFrame("ToolBarDemo");
+                            final JFrame frame = new JFrame("ToolBarDemo");
                             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
                             //Add content to the window.
@@ -408,8 +407,8 @@ public class ProcessCommandLineArguments
 
                             // Finally, stream out SVG to the standard output using
                             // UTF-8 encoding.
-                            boolean useCSS = true; // we want to use CSS style attributes
-                            Writer out =
+                            final boolean useCSS = true; // we want to use CSS style attributes
+                            final Writer out =
                                     new OutputStreamWriter(
                                       new FileOutputStream(
                                         new File(
@@ -424,11 +423,11 @@ public class ProcessCommandLineArguments
                             svgGenerator.stream(out, useCSS);
                         }
                     }
-                    catch (IOException ex)
+                    catch (final IOException ex)
                     {
                         System.err.println("IO problem: " + ex);
                     }
-                    catch (WatersUnmarshalException ex)
+                    catch (final WatersUnmarshalException ex)
                     {
                         System.err.println("Problem unmarshalling: " + ex);
                     }
@@ -437,7 +436,7 @@ public class ProcessCommandLineArguments
                         System.err.println
                             ("Trying to print component without geometry!");
                     }
-                    catch (ClassCastException ex)
+                    catch (final ClassCastException ex)
                     {
                         System.err.println("Only import of modules is supported: " + ex);
                     }
@@ -458,8 +457,8 @@ public class ProcessCommandLineArguments
             }
             else
             {
-                String filename = args[i];
-                File  currFile = new File(filename);
+                final String filename = args[i];
+                final File  currFile = new File(filename);
                 if (!currFile.exists())
                 {
                     System.out.println("Invalid usage: '" + args[i] + "'.\n");
@@ -515,7 +514,7 @@ class EPSPrinterVisitor
 
     //#######################################################################
     //# Constructor
-    EPSPrinterVisitor(final ModuleProxy module, boolean verbose)
+    EPSPrinterVisitor(final ModuleProxy module, final boolean verbose)
     {
         mModule = module;
         this.verbose = verbose;
@@ -547,9 +546,7 @@ class EPSPrinterVisitor
             final String name = comp.getName();
             final File file = new File(name + ".eps");
             final GraphProxy graph = comp.getGraph();
-            final ModuleContext context = new ModuleContext(mModule);
-            final EPSGraphPrinter printer =
-                new EPSGraphPrinter(graph, context, file);
+            final EPSGraphPrinter printer = new EPSGraphPrinter(graph, file);
             printer.print();
 
             // Log

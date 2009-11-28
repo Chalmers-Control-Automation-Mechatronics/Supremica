@@ -288,7 +288,7 @@ public class EventTableModel
     if (iface == null) {
       return false;
     } else {
-      final ControlledSurface surface = iface.getControlledSurface();
+      final GraphEditorPanel surface = iface.getControlledSurface();
       return surface.getGraph() == mGraph;
     }
   }

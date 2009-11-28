@@ -45,7 +45,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.GraphEventPanel;
@@ -102,7 +102,7 @@ public class ComponentEditorPanel
         mModule = moduleContainer.getModule();
 		final IDE ide = moduleContainer.getIDE();
 		final WatersPopupActionManager manager = ide.getPopupActionManager();
-        mSurface = new ControlledSurface
+        mSurface = new GraphEditorPanel
             (component.getGraph(), mModule, this,
 			 (ControlledToolbar) ide.getToolBar(), manager);
         mSurface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
@@ -136,7 +136,7 @@ public class ComponentEditorPanel
         return mModuleContainer.getEditorPanel();
     }
 
-    public ControlledSurface getControlledSurface()
+    public GraphEditorPanel getControlledSurface()
     {
         return mSurface;
     }
@@ -378,7 +378,7 @@ public class ComponentEditorPanel
     //########################################################################
     //# Data Members
     private final ModuleContainer mModuleContainer;
-    private final ControlledSurface mSurface;
+    private final GraphEditorPanel mSurface;
     private final GraphEventPanel mEventsPane;
     private final SimpleComponentSubject mComponent;
     private final ModuleSubject mModule;

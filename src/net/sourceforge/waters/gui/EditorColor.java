@@ -11,6 +11,7 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.Color;
+import java.awt.Font;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
@@ -33,16 +34,16 @@ public class EditorColor
    * Returns the appropriate colour for painting this object.
    */
   public static Color getColor(final Proxy o,
-                               final EditorSurface.DRAGOVERSTATUS dragOver,
+                               final GraphPanel.DragOverStatus dragOver,
                                final boolean selected,
                                final boolean error,
                                final boolean hasfocus)
   {
     // In order of importance
-    if (dragOver != EditorSurface.DRAGOVERSTATUS.NOTDRAG) {
-      if (dragOver == EditorSurface.DRAGOVERSTATUS.CANDROP) {
+    if (dragOver != GraphPanel.DragOverStatus.NOTDRAG) {
+      if (dragOver == GraphPanel.DragOverStatus.CANDROP) {
         return CANDROPCOLOR;
-      } else if (dragOver == EditorSurface.DRAGOVERSTATUS.CANTDROP) {
+      } else if (dragOver == GraphPanel.DragOverStatus.CANTDROP) {
         return CANTDROPCOLOR;
       }
     } else if (error) {
@@ -73,7 +74,7 @@ public class EditorColor
    */
   public static Color getShadowColor
     (final Proxy o,
-     final EditorSurface.DRAGOVERSTATUS dragOver,
+     final GraphPanel.DragOverStatus dragOver,
      final boolean selected,
      final boolean error,
      final boolean hasfocus)
@@ -149,6 +150,11 @@ public class EditorColor
     new Color(64, 112, 128);
 
   /**
+   * The colour for active events in the simulator.
+   */
+  public static final Color SIMULATION_ACTIVE = new Color(192, 0, 128);
+
+  /**
    * The colour of objects when showing that stuff can be dropped on them.
    */
   public static final Color CANDROPCOLOR = Color.GREEN.darker().darker();
@@ -172,6 +178,25 @@ public class EditorColor
    * are not in focus.
    */
   public static final Color BACKGROUND_NOTFOCUSSED = new Color(232, 232, 232);
+
+
+  //#########################################################################
+  //# Public Font Constants
+  /**
+   * The default font in the graph window.
+   */
+  public static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
+  /**
+   * An enhanced version of the default font for headers.
+   * This presently is only used for the header of blocked events lists.
+   */
+  public static final Font HEADER_FONT = DEFAULT_FONT.deriveFont(Font.BOLD);
+  /**
+   * The default font for uncontrollable events.
+   * This is an italic version of the default font.
+   */
+  public static final Font UNCONTROLLABLE_FONT =
+    DEFAULT_FONT.deriveFont(Font.ITALIC);
 
 
   //#########################################################################

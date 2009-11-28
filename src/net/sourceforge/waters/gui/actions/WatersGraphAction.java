@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.GraphEventPanel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -92,7 +92,7 @@ public abstract class WatersGraphAction
    * @return  The currently active controlled surface, or <CODE>null</CODE>
    *          if no graph is being edited.
    */
-  ControlledSurface getActiveControlledSurface()
+  GraphEditorPanel getActiveControlledSurface()
   {
     final EditorWindowInterface gui = getActiveEditorWindowInterface();
     return gui == null ? null : gui.getControlledSurface();

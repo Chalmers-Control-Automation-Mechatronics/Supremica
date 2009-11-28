@@ -99,7 +99,7 @@ public class AbstractTunnelTable extends SimulationTable implements
         output[looper][1] = aut.getName();
         output[looper][2] = ModuleContext.getBooleanIcon(getSim().changedLastStep(aut));
         final StateProxy currentState = getSim().getCurrentStates().get(aut);
-        output[looper][3] = getSim().getMarking(currentState, aut);
+        output[looper][3] = getSim().getMarkingIcon(currentState, aut);
         output[looper][4] = getSim().getCurrentStates().get(aut).getName();
         looper++;
       }

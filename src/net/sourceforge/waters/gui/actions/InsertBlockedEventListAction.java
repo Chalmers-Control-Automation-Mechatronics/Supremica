@@ -15,7 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -61,7 +61,7 @@ public class InsertBlockedEventListAction
     if (point == null) {
       setEnabled(false);
     } else {
-      final ControlledSurface surface = getActiveControlledSurface();
+      final GraphEditorPanel surface = getActiveControlledSurface();
       final GraphSubject graph = surface.getGraph();
       final boolean enabled = graph.getBlockedEvents() == null;
       setEnabled(enabled);
@@ -73,7 +73,7 @@ public class InsertBlockedEventListAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    final ControlledSurface surface = getActiveControlledSurface();
+    final GraphEditorPanel surface = getActiveControlledSurface();
     final Point point = mPoint == null ? surface.getPastePosition() : mPoint;
     final LabelGeometrySubject geo = new LabelGeometrySubject(point);
     final LabelBlockSubject blocked = new LabelBlockSubject(null, geo);
@@ -115,7 +115,7 @@ public class InsertBlockedEventListAction
   //# Auxiliary Methods
   private void updateEnabledStatus()
   {
-    final ControlledSurface surface = getActiveControlledSurface();
+    final GraphEditorPanel surface = getActiveControlledSurface();
     if (surface == null) {
       setObservedGraph(null);
       setEnabled(false);

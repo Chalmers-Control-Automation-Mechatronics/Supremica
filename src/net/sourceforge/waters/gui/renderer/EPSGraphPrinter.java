@@ -20,7 +20,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.module.GraphProxy;
 
 import org.apache.xmlgraphics.java2d.GraphicContext;
@@ -43,19 +42,24 @@ public class EPSGraphPrinter extends Renderer
 
   //#########################################################################
   //# Constructors
+  public EPSGraphPrinter(final GraphProxy graph, final File file)
+  {
+    this (graph, new DefaultRenderingContext(), file);
+  }
+
   public EPSGraphPrinter(final GraphProxy graph,
-                         final ModuleContext context,
+                         final RenderingContext context,
                          final File file)
   {
     this(graph, new ProxyShapeProducer(graph, context), file);
   }
 
   public EPSGraphPrinter(final GraphProxy graph,
-			 final ProxyShapeProducer shaper,
-			 final File file)
+                         final ProxyShapeProducer producer,
+                         final File file)
   {
     mGraph = graph;
-    mProxyShapeProducer = shaper;
+    mProxyShapeProducer = producer;
     mFile = file;
   }
 
@@ -72,13 +76,12 @@ public class EPSGraphPrinter extends Renderer
       mGraphics.setCustomTextHandler(this);
       mGraphics.setGraphicContext(new GraphicContext());
       final Rectangle2D bounds =
-	mProxyShapeProducer.getMinimumBoundingRectangle();
+        mProxyShapeProducer.getMinimumBoundingRectangle();
       mGraphics.translate(-bounds.getX(), -bounds.getY());
       final int width = (int) Math.ceil(bounds.getWidth());
       final int height = (int) Math.ceil(bounds.getHeight());
       mGraphics.setupDocument(stream, width, height);
-      final Renderable renderable = DefaultRenderable.getInstance();
-      renderGraph(mGraph, null, renderable, mProxyShapeProducer, mGraphics);
+      renderGraph(mGraph, null, mProxyShapeProducer, mGraphics);
       mGraphics.finish();
     } finally {
       close(stream);

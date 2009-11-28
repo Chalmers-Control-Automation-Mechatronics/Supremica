@@ -19,7 +19,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
@@ -54,7 +54,7 @@ public class GraphSaveEPSAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    final ControlledSurface surface = getActiveControlledSurface();
+    final GraphEditorPanel surface = getActiveControlledSurface();
     if (surface != null) {
       final IDE ide = getIDE();
       final ModuleProxy module = surface.getModule();

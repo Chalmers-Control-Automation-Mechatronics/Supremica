@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.gui.renderer;
 
-import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
@@ -21,7 +20,6 @@ import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
-import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -45,22 +43,23 @@ public class SubjectShapeProducer
   //##########################################################################
   //# Constructors
   public SubjectShapeProducer(final GraphSubject graph,
-                              final ModuleContext context)
+                              final ModuleSubject module,
+                              final RenderingContext context)
   {
-    this(graph, graph, context);
+    this(graph, graph, module, context);
   }
 
   public SubjectShapeProducer(final GraphProxy graph,
                               final Subject subject,
-                              final ModuleContext context)
+                              final ModuleSubject module,
+                              final RenderingContext context)
   {
     super(graph, context);
     mSubject = subject;
     subject.addModelObserver(this);
-    final ModuleProxy module = context.getModule();
-    if (module instanceof ModuleSubject) {
-      final ModuleSubject modulesubject = (ModuleSubject) module;
-      modulesubject.getEventDeclListModifiable().addModelObserver(this);
+    mModule = module;
+    if (module != null) {
+      module.getEventDeclListModifiable().addModelObserver(this);
     }
     mRemoveMappingVisitor = new RemoveMappingVisitor();
   }
@@ -70,8 +69,9 @@ public class SubjectShapeProducer
   //# Clean up
   public void close()
   {
-    final ModuleSubject module = (ModuleSubject) getModule();
-    module.getEventDeclListModifiable().removeModelObserver(this);
+    if (mModule != null) {
+      mModule.getEventDeclListModifiable().removeModelObserver(this);
+    }
     mSubject.removeModelObserver(this);
     super.close();
   }
@@ -209,7 +209,7 @@ public class SubjectShapeProducer
     }
   }
 
-  public SimpleNodeProxyShape visitSimpleNodeProxy(SimpleNodeProxy simple)
+  public SimpleNodeProxyShape visitSimpleNodeProxy(final SimpleNodeProxy simple)
   {
     return createSimpleNodeProxyShape(simple);
   }
@@ -290,6 +290,7 @@ public class SubjectShapeProducer
   //##########################################################################
   //# Data Members
   private final Subject mSubject;
+  private final ModuleSubject mModule;
   private final RemoveMappingVisitor mRemoveMappingVisitor;
 
   private LabelBlockProxy mOldBlockedEventsList = null;
