@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters GUI
 //# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   DoubleBufferedGraphPanel
+//# CLASS:   BackupGraphPanel
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -42,35 +42,34 @@ import org.supremica.properties.Config;
  * </P>
  *
  * <P>
- * The double-buffered graph panel can manage two copies of a graph (
- * {@link GraphProxy}) to be displayed and edited. The <I>primary graph</I> is
- * monitored subject ({@link GraphSubject}) that can be edited in a controlled
- * way. The <I>secondary graph</I> is copy created from the primary graph when a
- * major modification is initiated, such as running the spring embedder (
- * {@link SpringEmbedder}) or a drag operation. During such operations, the
+ * The backup graph panel can manage two copies of a graph ({@link GraphProxy})
+ * to be displayed and edited. The <I>primary graph</I> is monitored subject
+ * ({@link GraphSubject}) that can be edited in a controlled way. The
+ * <I>secondary graph</I> is copy created from the primary graph when a major
+ * modification is initiated, such as running the spring embedder
+ * ({@link SpringEmbedder}) or a drag operation. During such operations, the
  * secondary graph can be updated frequently; but only when the operation
  * completes, the changes are committed to the primary graph using a single
  * command.
  * </P>
  *
  * <P>
- * In addition, the double-buffered graph panel provides support to detect
- * graphs with insufficient geometry information and invoke the spring embedder
+ * In addition, the backup graph panel provides support to detect graphs
+ * with insufficient geometry information, and invoke the spring embedder
  * and animate its progress for such graphs.
  * </P>
  *
  * @author Robi Malik
  */
 
-public class DoubleBufferedGraphPanel
+public class BackupGraphPanel
   extends GraphPanel
   implements EmbedderObserver
 {
 
   //#########################################################################
   //# Constructors
-  public DoubleBufferedGraphPanel(final GraphSubject graph,
-                                  final ModuleSubject module)
+  public BackupGraphPanel(final GraphSubject graph, final ModuleSubject module)
   {
     super(graph, module);
   }
@@ -107,14 +106,9 @@ public class DoubleBufferedGraphPanel
     }
   }
 
-  public boolean isEmbedderRunning()
-  {
-    return mEmbedder != null;
-  }
-
 
   //#########################################################################
-  //# Interfacenet.sourceforge.waters.gui.springembedder.EmbedderObserver
+  //# Interface net.sourceforge.waters.gui.springembedder.EmbedderObserver
   public void embedderChanged(final EmbedderEvent event)
   {
     if (event.getType() == EmbedderEvent.EmbedderEventType.EMBEDDER_STOP) {
@@ -168,7 +162,8 @@ public class DoubleBufferedGraphPanel
       mEmbedder.setUpGeometry();
       // ***BUG***
       // For clean undo, geometry should only be added to the secondary graph;
-      // Unfortunately, this will cause exceptions... ~~~Robi
+      // Unfortunately, this does not work yet and will cause exceptions...
+      // ~~~Robi
       createSecondaryGraph();
       final SimpleComponentSubject comp =
         (SimpleComponentSubject) getGraph().getParent();
@@ -187,6 +182,11 @@ public class DoubleBufferedGraphPanel
     } catch (final GeometryAbsentException exception) {
       throw new WatersRuntimeException(exception);
     }
+  }
+
+  protected boolean isEmbedderRunning()
+  {
+    return mEmbedder != null;
   }
 
   protected void closeEmbedder()

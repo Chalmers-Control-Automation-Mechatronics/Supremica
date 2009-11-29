@@ -153,7 +153,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  */
 
 public class GraphEditorPanel
-  extends DoubleBufferedGraphPanel
+  extends BackupGraphPanel
   implements SelectionOwner, Observer, FocusListener, DragGestureListener,
              SupremicaPropertyChangeListener
 {

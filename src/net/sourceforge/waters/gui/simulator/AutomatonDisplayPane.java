@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.waters.gui.DoubleBufferedGraphPanel;
+import net.sourceforge.waters.gui.BackupGraphPanel;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
@@ -36,7 +36,7 @@ import org.supremica.gui.ide.ModuleContainer;
 
 
 public class AutomatonDisplayPane
-  extends DoubleBufferedGraphPanel
+  extends BackupGraphPanel
   implements SimulationObserver
 {
 
