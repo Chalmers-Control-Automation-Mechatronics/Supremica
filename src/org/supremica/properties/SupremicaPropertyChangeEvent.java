@@ -51,7 +51,7 @@ public class SupremicaPropertyChangeEvent extends EventObject
     private final String mNewValue;
 
 
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
 
