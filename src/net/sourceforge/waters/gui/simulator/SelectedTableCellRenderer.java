@@ -1,7 +1,8 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
+
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -24,17 +25,19 @@ public class SelectedTableCellRenderer extends DefaultTableCellRenderer
   public Component getTableCellRendererComponent
     (final JTable table, final Object value, final boolean selected, final boolean focused, final int row, final int column)
   {
-    setEnabled(table == null || table.isEnabled()); // see question above
+    final Component tableCellRenderer = super.getTableCellRendererComponent(table, value, selected, focused, row, column);
 
     if (mDesktop.automatonIsOpen(mSim.getAutomata().get(row)))
-      //this.setFont(new Font("Times New Roman", Font.BOLD, 12));
-      this.setBackground(Color.GREEN);
+    {
+      System.out.println("Automaton is Open");
+      final Font oldFont = tableCellRenderer.getFont();
+      tableCellRenderer.setFont(oldFont.deriveFont(Font.BOLD));
+    }
     else
-      //this.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-      this.setBackground(null);
-    super.getTableCellRendererComponent(table, value, selected, focused, row, column);
-
-    return this;
+    {
+      System.out.println("Automaton is Closed");
+    }
+    return tableCellRenderer;
   }
 }
 

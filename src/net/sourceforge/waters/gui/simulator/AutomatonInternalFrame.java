@@ -1,5 +1,7 @@
 package net.sourceforge.waters.gui.simulator;
 
+import java.awt.geom.Rectangle2D;
+
 import javax.swing.JInternalFrame;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
@@ -37,6 +39,17 @@ public class AutomatonInternalFrame extends JInternalFrame
     mDisplayPane.close();
     mDesktopParent.removeAutomaton(mAutomaton);
     super.dispose();
+  }
+
+  public void reshape(final int x, final int y, final int wantedWidth, final int wantedHeight)
+  {
+    final Rectangle2D preferredSize = mDisplayPane.getMinimumBoundingRectangle();
+    final int preferredWidth = (int) preferredSize.getWidth();
+    final int preferredHeight = (int) preferredSize.getHeight();
+    final int finalWidth = ((wantedWidth + wantedHeight) * preferredWidth) / (preferredHeight + preferredWidth);
+    final int finalHeight = (preferredHeight * finalWidth) / preferredWidth;
+    super.reshape(x, y, finalWidth, finalHeight);
+    super.repaint();
   }
 
 

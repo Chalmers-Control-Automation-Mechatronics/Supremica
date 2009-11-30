@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JDesktopPane;
+
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
@@ -21,16 +24,17 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
-public class AutomatonDesktopPane extends JDesktopPane implements SimulationObserver
+public class AutomatonDesktopPane extends JDesktopPane implements SimulationObserver, Observer
 {
-
   //#########################################################################
   //# Constructor
   public AutomatonDesktopPane(final ModuleContainer container,
                               final Simulation sim)
   {
-    onReOpen(container, sim);
     sim.attach(this);
+    container.attach(this);
+    mSim = sim;
+    mContainer = container;
   }
 
 
@@ -38,25 +42,27 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
   //# Access Methods
   public boolean automatonIsOpen(final AutomatonProxy automaton)
   {
-    return openAutomaton.containsKey(automaton);
+    return openAutomaton.containsKey(automaton.getName());
   }
 
 
   //#########################################################################
   //# Mutator Methods
-  public void addAutomaton(final AutomatonProxy aut,
+  public void addAutomaton(final String aut,
       final ModuleContainer container, final Simulation sim, final int clicks)
   {
+    if (aut == null)
+      return;
     if (!openAutomaton.containsKey(aut)) {
       if (clicks == 2) {
         final Map<Proxy,SourceInfo> infomap = container.getSourceInfoMap();
-        final Proxy source = infomap.get(aut).getSourceObject(); // Reaches here on successful run
+        final Proxy source = infomap.get(sim.getAutomatonFromName(aut)).getSourceObject();
         if (source instanceof SimpleComponentSubject) {
           final SimpleComponentSubject comp = (SimpleComponentSubject) source;
           final GraphSubject graph = comp.getGraph();
           try {
             final AutomatonInternalFrame newFrame = new AutomatonInternalFrame
-              (aut, graph, this, container, sim);
+              (sim.getAutomatonFromName(aut), graph, this, container, sim);
             newFrame.setLocation(findCoords(newFrame.getSize()));
             add(newFrame);
             newFrame.moveToFront();
@@ -118,13 +124,15 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
 
   public void onReOpen(final ModuleContainer container, final Simulation sim)
   {
+    System.out.println("DEBUG: oldOpen:" + oldOpen);
     for (final String name : oldOpen.keySet()) {
-      final AutomatonProxy aut = sim.getAutomatonFromName(name);
-      addAutomaton(aut, container, sim, 2);
+      addAutomaton(name, container, sim, 2);
+      openAutomaton.get(name).setPreferredSize(new Dimension((int)oldOpen.get(name).getWidth(), (int)oldOpen.get(name).getHeight()));
+      openAutomaton.get(name).setLocation((int)oldOpen.get(name).getX(), (int)oldOpen.get(name).getY());
     }
   }
 
-  private void selectAutomaton(final int clicks, final AutomatonProxy aut)
+  private void selectAutomaton(final int clicks, final String aut)
   {
     try {
       final AutomatonInternalFrame frame = openAutomaton.get(aut);
@@ -149,15 +157,17 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
   //# Interface SimulationObserver
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    oldOpen.clear();
     if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED) {
-      final List<Map.Entry<AutomatonProxy,AutomatonInternalFrame>> entries =
-        new ArrayList<Map.Entry<AutomatonProxy,AutomatonInternalFrame>>
+      if (openAutomaton.keySet().size() == 0)
+        return;
+      System.out.println("DEBUG: Cleared");
+      oldOpen.clear();
+      final List<Map.Entry<String,AutomatonInternalFrame>> entries =
+        new ArrayList<Map.Entry<String,AutomatonInternalFrame>>
           (openAutomaton.entrySet());
-      for (final Map.Entry<AutomatonProxy,AutomatonInternalFrame> entry :
+      for (final Map.Entry<String,AutomatonInternalFrame> entry :
            entries) {
-        final AutomatonProxy aut = entry.getKey();
-        final String name = aut.getName();
+        final String name = entry.getKey();
         final AutomatonInternalFrame frame = entry.getValue();
         final Rectangle bounds = frame.getBounds();
         oldOpen.put(name, bounds);
@@ -165,18 +175,29 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
       }
       openAutomaton.clear();
     }
+    System.out.println("DEBUG: OldOpen: " + oldOpen);
+  }
+
+  //#########################################################################
+  //# Interface ModelObserver
+
+
+  public void update(final EditorChangedEvent event)
+  {
+    if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH)
+    onReOpen(mContainer, mSim);
   }
 
   //#########################################################################
   //# Data Members
-  private final HashMap<AutomatonProxy,AutomatonInternalFrame> openAutomaton =
-    new HashMap<AutomatonProxy,AutomatonInternalFrame>();
+  private final HashMap<String,AutomatonInternalFrame> openAutomaton =
+    new HashMap<String,AutomatonInternalFrame>();
   private final HashMap<String, Rectangle> oldOpen =
     new HashMap<String, Rectangle>();
+  private final Simulation mSim;
+  private final ModuleContainer mContainer;
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = -5528014241244952875L;
-
-
 }

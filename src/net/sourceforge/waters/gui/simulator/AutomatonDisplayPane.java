@@ -117,7 +117,13 @@ public class AutomatonDisplayPane
     super.close();
   }
 
+  //##########################################################################
+  //# Accessor Methods
 
+  public Rectangle2D getMinimumBoundingRectangle()
+  {
+    return getShapeProducer().getMinimumBoundingRectangle();
+  }
   //##########################################################################
   //# Inner Class SimulatorRenderingContext
   private class SimulatorRenderingContext extends ModuleRenderingContext

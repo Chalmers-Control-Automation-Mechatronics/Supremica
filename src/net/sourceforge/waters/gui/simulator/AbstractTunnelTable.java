@@ -4,9 +4,13 @@ import java.util.ArrayList;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+
+import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.subject.module.VariableComponentSubject;
+
 import org.supremica.gui.ide.ModuleContainer;
 
 
@@ -96,7 +100,10 @@ public class AbstractTunnelTable extends SimulationTable implements
       final ArrayList<AutomatonProxy> automata = getSim().getAutomata();
       int looper = 0;
       for (final AutomatonProxy aut : automata) {
-        output[looper][0] = ModuleContext.getComponentKindIcon(aut.getKind());
+        if (mModuleContainer.getSourceInfoMap().get(aut).getSourceObject().getClass() == VariableComponentSubject.class)
+          output[looper][0] = IconLoader.ICON_VARIABLE;
+        else
+          output[looper][0] = ModuleContext.getComponentKindIcon(aut.getKind());
         output[looper][1] = aut.getName();
         output[looper][2] = ModuleContext.getBooleanIcon(getSim().changedLastStep(aut));
         final StateProxy currentState = getSim().getCurrentStates().get(aut);
