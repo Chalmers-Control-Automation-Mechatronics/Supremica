@@ -158,11 +158,6 @@ public class SubjectShapeProducer
 
   //##########################################################################
   //# Smarter Lookup Using Parents
-  public EdgeProxyShape visitEdgeProxy(final EdgeProxy edge)
-  {
-    return createEdgeProxyShape(edge);
-  }
-
   public GuardActionBlockProxyShape visitGuardActionBlockProxy
     (final GuardActionBlockProxy block)
   {
@@ -207,11 +202,6 @@ public class SubjectShapeProducer
       final SimpleNodeSubject node = (SimpleNodeSubject) subject.getParent();
       return createLabelProxyShape(geo, node);
     }
-  }
-
-  public SimpleNodeProxyShape visitSimpleNodeProxy(final SimpleNodeProxy simple)
-  {
-    return createSimpleNodeProxyShape(simple);
   }
 
 

@@ -106,7 +106,6 @@ public class ProxyShapeProducer
     }
     for (final EdgeProxy edge : mGraph.getEdges()) {
       getShape(edge);
-      getShape(edge.getLabelBlock());
     }
   }
 
