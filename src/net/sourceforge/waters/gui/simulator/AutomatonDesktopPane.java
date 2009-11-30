@@ -8,8 +8,8 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
 import javax.swing.JDesktopPane;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
@@ -26,40 +26,41 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
 
   //#########################################################################
   //# Constructor
-
-  public AutomatonDesktopPane(final ModuleContainer container, final Simulation mSim)
+  public AutomatonDesktopPane(final ModuleContainer container,
+                              final Simulation sim)
   {
-    super();
-    onReOpen(container, mSim);
-    mSim.attach(this);
+    onReOpen(container, sim);
+    sim.attach(this);
   }
 
-  //#########################################################################
-  //# Accessor Methods
 
+  //#########################################################################
+  //# Access Methods
   public boolean automatonIsOpen(final AutomatonProxy automaton)
   {
     return openAutomaton.containsKey(automaton);
   }
+
+
   //#########################################################################
   //# Mutator Methods
-  public void addAutomaton(final String automaton,
+  public void addAutomaton(final AutomatonProxy aut,
       final ModuleContainer container, final Simulation sim, final int clicks)
   {
-    if (!openAutomaton.containsKey(automaton)) {
+    if (!openAutomaton.containsKey(aut)) {
       if (clicks == 2) {
         final Map<Proxy,SourceInfo> infomap = container.getSourceInfoMap();
-        final Proxy source = infomap.get(sim.getAutomatonFromName(automaton)).getSourceObject(); // Reaches here on successful run
+        final Proxy source = infomap.get(aut).getSourceObject(); // Reaches here on successful run
         if (source instanceof SimpleComponentSubject) {
           final SimpleComponentSubject comp = (SimpleComponentSubject) source;
           final GraphSubject graph = comp.getGraph();
           try {
             final AutomatonInternalFrame newFrame = new AutomatonInternalFrame
-              (automaton, graph, this, container, sim);
+              (aut, graph, this, container, sim);
             newFrame.setLocation(findCoords(newFrame.getSize()));
             add(newFrame);
             newFrame.moveToFront();
-            openAutomaton.put(automaton, newFrame);
+            openAutomaton.put(aut, newFrame);
           } catch (final GeometryAbsentException exception) {
             final IDE ide = container.getIDE();
             final String msg = exception.getMessage();
@@ -68,7 +69,7 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
         }
       }
     } else {
-      selectAutomaton(clicks, automaton);
+      selectAutomaton(clicks, aut);
     }
   }
 
@@ -110,65 +111,68 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
     return new Point(0,0);
   }
 
-  public void removeAutomaton(final String automaton)
+  public void removeAutomaton(final AutomatonProxy aut)
   {
-    if (openAutomaton.containsKey(automaton))
-    {
-      openAutomaton.remove(automaton);
+    openAutomaton.remove(aut);
+  }
+
+  public void onReOpen(final ModuleContainer container, final Simulation sim)
+  {
+    for (final String name : oldOpen.keySet()) {
+      final AutomatonProxy aut = sim.getAutomatonFromName(name);
+      addAutomaton(aut, container, sim, 2);
     }
   }
 
-  public void onReOpen(final ModuleContainer container, final Simulation mSim)
+  private void selectAutomaton(final int clicks, final AutomatonProxy aut)
   {
-    for (final String proxy : oldOpen.keySet())
-    {
-      addAutomaton(proxy, container, mSim, 2);
+    try {
+      final AutomatonInternalFrame frame = openAutomaton.get(aut);
+      switch (clicks) {
+      case 1:
+        frame.setSelected(true);
+        break;
+      case 2:
+        frame.setSelected(true);
+        frame.moveToFront();
+        break;
+      default:
+        break;
+      }
+    } catch (final PropertyVetoException exception) {
+      // Can't select frame---too bad ...
     }
   }
 
-  private void selectAutomaton(final int clicks, final String automaton)
-  {
-    if (clicks == 1)
-    {
-      try {
-        openAutomaton.get(automaton).setSelected(true);
-      } catch (final PropertyVetoException exception) {
-        // TODO Auto-generated catch block
-        exception.printStackTrace();
-      }
-    }
-    else if (clicks == 2)
-    {
-      try {
-        openAutomaton.get(automaton).setSelected(true);
-      } catch (final PropertyVetoException exception) {
-        // TODO Auto-generated catch block
-        exception.printStackTrace();
-      }
-      openAutomaton.get(automaton).moveToFront();
-    }
-  }
 
   //#########################################################################
   //# Interface SimulationObserver
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    oldOpen = new HashMap<String, Rectangle>();
-    if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED)
-    {
-      for (final String automaton : openAutomaton.keySet())
-      {
-        oldOpen.put(automaton, openAutomaton.get(automaton).getBounds());
-        openAutomaton.get(automaton).dispose();
-        removeAutomaton(automaton);
+    oldOpen.clear();
+    if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED) {
+      final List<Map.Entry<AutomatonProxy,AutomatonInternalFrame>> entries =
+        new ArrayList<Map.Entry<AutomatonProxy,AutomatonInternalFrame>>
+          (openAutomaton.entrySet());
+      for (final Map.Entry<AutomatonProxy,AutomatonInternalFrame> entry :
+           entries) {
+        final AutomatonProxy aut = entry.getKey();
+        final String name = aut.getName();
+        final AutomatonInternalFrame frame = entry.getValue();
+        final Rectangle bounds = frame.getBounds();
+        oldOpen.put(name, bounds);
+        frame.dispose();
       }
+      openAutomaton.clear();
     }
   }
 
   //#########################################################################
   //# Data Members
-  HashMap<String, AutomatonInternalFrame> openAutomaton = new HashMap<String, AutomatonInternalFrame>();
-  HashMap<String, Rectangle> oldOpen = new HashMap<String, Rectangle>();
+  private final HashMap<AutomatonProxy,AutomatonInternalFrame> openAutomaton =
+    new HashMap<AutomatonProxy,AutomatonInternalFrame>();
+  private final HashMap<String, Rectangle> oldOpen =
+    new HashMap<String, Rectangle>();
 
   //#########################################################################
   //# Class Constants

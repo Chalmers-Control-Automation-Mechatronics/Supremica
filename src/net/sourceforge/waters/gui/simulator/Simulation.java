@@ -533,7 +533,6 @@ public class Simulation implements ModelObserver, Observer
 
   public void resetSimulation()
   {
-    mCompiledDES = mModuleContainer.getCompiledDES();
     mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
     mEnabledEvents = new ArrayList<EventProxy>();
     mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();

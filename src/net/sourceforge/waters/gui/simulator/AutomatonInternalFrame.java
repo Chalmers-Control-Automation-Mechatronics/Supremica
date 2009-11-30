@@ -12,17 +12,17 @@ public class AutomatonInternalFrame extends JInternalFrame
 {
   //#################################################################################
   //# Constructors
-  public AutomatonInternalFrame(final String automaton,
+  public AutomatonInternalFrame(final AutomatonProxy aut,
                                 final GraphSubject graph,
                                 final AutomatonDesktopPane parent,
                                 final ModuleContainer container,
                                 final Simulation sim)
     throws GeometryAbsentException
   {
-    super(automaton, true, true, false, true);
+    super(aut.getName(), true, true, false, true);
     mDesktopParent = parent;
-    mAutomaton = sim.getAutomatonFromName(automaton);
-    mDisplayPane = new AutomatonDisplayPane(automaton, graph, container, sim);
+    mAutomaton = aut;
+    mDisplayPane = new AutomatonDisplayPane(aut, graph, container, sim);
     setContentPane(mDisplayPane);
     addMouseListener(new InternalFrameMouseAdapter(this));
     setVisible(true);
@@ -30,17 +30,17 @@ public class AutomatonInternalFrame extends JInternalFrame
   }
 
 
-  //#################################################################################
+  //##########################################################################
   //# Class JInternalFrame
   public void dispose()
   {
     mDisplayPane.close();
-    mDesktopParent.removeAutomaton(mAutomaton.getName());
+    mDesktopParent.removeAutomaton(mAutomaton);
     super.dispose();
   }
 
 
-  //#########################################################################
+  //##########################################################################
   //# Data Members
   private final AutomatonProxy mAutomaton;
   private final AutomatonDisplayPane mDisplayPane;

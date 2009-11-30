@@ -23,6 +23,7 @@ import net.sourceforge.waters.gui.renderer.RenderingInformation;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -43,7 +44,7 @@ public class AutomatonDisplayPane
 
   //##########################################################################
   //# Constructors
-  public AutomatonDisplayPane(final String automatonName,
+  public AutomatonDisplayPane(final AutomatonProxy aut,
                               final GraphSubject graph,
                               final ModuleContainer container,
                               final Simulation sim)
@@ -51,9 +52,7 @@ public class AutomatonDisplayPane
   {
     super(graph, container.getModule());
     mSim = sim;
-    mAutomatonName = automatonName;
-    if (mAutomatonName == null)
-      close();
+    mAutomaton = aut;
     mContainer = container;
     final ModuleSubject module = container.getModule();
     final RenderingContext context = new SimulatorRenderingContext();
@@ -64,7 +63,7 @@ public class AutomatonDisplayPane
     final int height;
     if (ensureGeometryExists()) {
       // Spring embedder is running, guessing window size ...
-      final int numstates = mSim.getAutomatonFromName(mAutomatonName).getStates().size();
+      final int numstates = aut.getStates().size();
       width = height = 136 + 24 * numstates;
     } else {
       final Rectangle2D imageRect = producer.getMinimumBoundingRectangle();
@@ -130,7 +129,7 @@ public class AutomatonDisplayPane
     {
       super(mContainer.getModuleContext());
       final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-      final Collection<StateProxy> states = mSim.getAutomatonFromName(mAutomatonName).getStates();
+      final Collection<StateProxy> states = mAutomaton.getStates();
       final int size = states.size();
       mStateMap = new HashMap<SimpleNodeProxy,StateProxy>(size);
       for (final StateProxy state : states) {
@@ -148,7 +147,12 @@ public class AutomatonDisplayPane
       // the items being displayed are not in our compiled graph ...
       final Proxy orig = getOriginal(node);
       final StateProxy state = mStateMap.get(orig);
-      return mSim.getMarkingColorInfo(state, mSim.getAutomatonFromName(mAutomatonName));
+      if (state != null) {
+        return mSim.getMarkingColorInfo(state, mAutomaton);
+      } else {
+        // This state was a victim of compiler optimisation ..,
+        return PropositionIcon.getUnmarkedColors();
+      }
     }
 
     public RenderingInformation getRenderingInformation(final Proxy proxy)
@@ -162,13 +166,13 @@ public class AutomatonDisplayPane
         // highlight them while spring embedding.
         return super.getRenderingInformation(proxy);
       } else if (orig instanceof SimpleNodeProxy) {
-        final StateProxy currentState = mSim.getCurrentStates().get(mSim.getAutomatonFromName(mAutomatonName));
+        final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
         if (mContainer.getSourceInfoMap().get(currentState).getSourceObject() ==
             orig) {
           return getActiveRenderingInformation(orig);
         }
       }
-      final TransitionProxy currentTrans = mSim.getPreviousTransition(mSim.getAutomatonFromName(mAutomatonName));
+      final TransitionProxy currentTrans = mSim.getPreviousTransition(mAutomaton);
       if (currentTrans != null) {
         final Proxy currentTransSource =
           mContainer.getSourceInfoMap().get(currentTrans).getSourceObject();
@@ -209,7 +213,7 @@ public class AutomatonDisplayPane
   //#################################################################################
   //# Data Members
   private final Simulation mSim;
-  private final String mAutomatonName;
+  private final AutomatonProxy mAutomaton;
   private final ModuleContainer mContainer;
 
 
