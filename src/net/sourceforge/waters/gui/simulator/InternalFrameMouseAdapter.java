@@ -13,18 +13,16 @@ public class InternalFrameMouseAdapter extends MouseAdapter
 
   public InternalFrameMouseAdapter(final JInternalFrame frame)
   {
-    parent = frame;
+
   }
   //#################################################################################
   //# Class MouseAdapter
   public void mouseClicked(final MouseEvent e){
 
-    parent.moveToFront();
+   //parent.moveToFront();
   }
 
   //#################################################################################
   //# Data Variables
-
-  private final JInternalFrame parent;
 
 }

@@ -1,6 +1,8 @@
 package net.sourceforge.waters.gui.simulator;
 
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -96,7 +98,11 @@ public class AutomatonDisplayPane
     final double scaleX = panelSize.getWidth() / imageRect.getWidth();
     final double scaleY = panelSize.getHeight() / imageRect.getHeight();
     final double min = Math.min(scaleX, scaleY);
+    g2d.setColor(Color.RED);
+    g2d.setStroke(new BasicStroke(4f));
     g2d.scale(min, min);
+    g2d.translate(-imageRect.getX(), -imageRect.getY());
+    g2d.drawRect((int)imageRect.getX(), (int)imageRect.getY(), (int)imageRect.getWidth(), (int)imageRect.getHeight());
     super.paint(g2d);
     g2d.setTransform(trans);
   }

@@ -7,7 +7,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-
 import org.supremica.gui.ide.IDEDimensions;
 import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
@@ -61,6 +60,7 @@ public class SimulatorPanel
   {
     mAutomataTable = new JTable(new AbstractTunnelTable(mModuleContainer, mSimulation));
     final int width = 245; // DEBUG: Arbitrary value: Any value will work, but this is close to the 'normal' value
+    mAutomataTable.setDefaultRenderer(mAutomataTable.getColumnClass(1), new SelectedTableCellRenderer(mSimulation, mDesktop));
     if (mAutomataTable.getColumnModel().getColumnCount() == 0)
     {
       System.out.println("DEBUG: ERROR: 0 columns in AutomatonTable " + mAutomataTable.toString());
