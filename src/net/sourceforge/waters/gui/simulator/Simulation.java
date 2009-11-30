@@ -213,6 +213,16 @@ public class Simulation implements ModelObserver, Observer
       return mPreviousTransitionHistory.get(mPreviousTransitionHistory.size() - 1).get(automaton);
   }
 
+  public AutomatonProxy getAutomatonFromName(final String automatonFind)
+  {
+    for (final AutomatonProxy automaton : mAllAutomatons.keySet())
+    {
+      if (automaton.getName().compareTo(automatonFind) == 0)
+        return automaton;
+    }
+    return null;
+  }
+
   //#########################################################################
   //# Mutator Methods
   public void setState(final AutomatonProxy automaton, final StateProxy state)

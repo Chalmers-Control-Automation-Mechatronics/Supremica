@@ -31,6 +31,7 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
   {
     super();
     onReOpen(container, mSim);
+    mSim.attach(this);
   }
 
   //#########################################################################
@@ -42,13 +43,13 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
   }
   //#########################################################################
   //# Mutator Methods
-  public void addAutomaton(final AutomatonProxy automaton,
+  public void addAutomaton(final String automaton,
       final ModuleContainer container, final Simulation sim, final int clicks)
   {
     if (!openAutomaton.containsKey(automaton)) {
       if (clicks == 2) {
         final Map<Proxy,SourceInfo> infomap = container.getSourceInfoMap();
-        final Proxy source = infomap.get(automaton).getSourceObject();
+        final Proxy source = infomap.get(sim.getAutomatonFromName(automaton)).getSourceObject(); // Reaches here on successful run
         if (source instanceof SimpleComponentSubject) {
           final SimpleComponentSubject comp = (SimpleComponentSubject) source;
           final GraphSubject graph = comp.getGraph();
@@ -109,7 +110,7 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
     return new Point(0,0);
   }
 
-  public void removeAutomaton(final AutomatonProxy automaton)
+  public void removeAutomaton(final String automaton)
   {
     if (openAutomaton.containsKey(automaton))
     {
@@ -119,13 +120,13 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
 
   public void onReOpen(final ModuleContainer container, final Simulation mSim)
   {
-    for (final AutomatonProxy proxy : oldOpen)
+    for (final String proxy : oldOpen.keySet())
     {
       addAutomaton(proxy, container, mSim, 2);
     }
   }
 
-  private void selectAutomaton(final int clicks, final AutomatonProxy automaton)
+  private void selectAutomaton(final int clicks, final String automaton)
   {
     if (clicks == 1)
     {
@@ -152,12 +153,12 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
   //# Interface SimulationObserver
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    oldOpen = new ArrayList<AutomatonProxy>();
+    oldOpen = new HashMap<String, Rectangle>();
     if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED)
     {
-      for (final AutomatonProxy automaton : openAutomaton.keySet())
+      for (final String automaton : openAutomaton.keySet())
       {
-        oldOpen.add(automaton);
+        oldOpen.put(automaton, openAutomaton.get(automaton).getBounds());
         openAutomaton.get(automaton).dispose();
         removeAutomaton(automaton);
       }
@@ -166,8 +167,8 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
 
   //#########################################################################
   //# Data Members
-  HashMap<AutomatonProxy, AutomatonInternalFrame> openAutomaton = new HashMap<AutomatonProxy, AutomatonInternalFrame>();
-  ArrayList<AutomatonProxy> oldOpen = new ArrayList<AutomatonProxy>();
+  HashMap<String, AutomatonInternalFrame> openAutomaton = new HashMap<String, AutomatonInternalFrame>();
+  HashMap<String, Rectangle> oldOpen = new HashMap<String, Rectangle>();
 
   //#########################################################################
   //# Class Constants

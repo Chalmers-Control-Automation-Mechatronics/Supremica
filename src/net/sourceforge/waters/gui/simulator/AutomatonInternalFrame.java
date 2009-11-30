@@ -12,16 +12,16 @@ public class AutomatonInternalFrame extends JInternalFrame
 {
   //#################################################################################
   //# Constructors
-  public AutomatonInternalFrame(final AutomatonProxy automaton,
+  public AutomatonInternalFrame(final String automaton,
                                 final GraphSubject graph,
                                 final AutomatonDesktopPane parent,
                                 final ModuleContainer container,
                                 final Simulation sim)
     throws GeometryAbsentException
   {
-    super(automaton.getName(), true, true, false, true);
+    super(automaton, true, true, false, true);
     mDesktopParent = parent;
-    mAutomaton = automaton;
+    mAutomaton = sim.getAutomatonFromName(automaton);
     mDisplayPane = new AutomatonDisplayPane(automaton, graph, container, sim);
     setContentPane(mDisplayPane);
     addMouseListener(new InternalFrameMouseAdapter(this));
@@ -35,7 +35,7 @@ public class AutomatonInternalFrame extends JInternalFrame
   public void dispose()
   {
     mDisplayPane.close();
-    mDesktopParent.removeAutomaton(mAutomaton);
+    mDesktopParent.removeAutomaton(mAutomaton.getName());
     super.dispose();
   }
 
