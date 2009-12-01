@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JTable;
 
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -15,18 +16,26 @@ import org.supremica.gui.ide.ModuleContainer;
 
 
 public class AbstractTunnelTable extends SimulationTable implements
-    SimulationObserver
+    SimulationObserver, InternalFrameObserver
 {
+
 
 
   // #########################################################################
   // # Constructor
   public AbstractTunnelTable(final ModuleContainer container,
-      final Simulation sim)
+      final Simulation sim, final AutomatonDesktopPane desktop)
   {
     super(sim);
     getRawData();
     mModuleContainer = container;
+    mParent = null;
+    desktop.attach(this);
+  }
+
+  public void attachTable(final JTable table)
+  {
+    mParent = table;
   }
 
   // #########################################################################
@@ -116,11 +125,30 @@ public class AbstractTunnelTable extends SimulationTable implements
       mRawData = new Object[0][0];
   }
 
+  //###########################################################################
+  //# Interface InternalFrameObserver
+  public void onFrameEvent(final InternalFrameEvent event)
+  {
+    if (event.isOpeningEvent())
+    {
+      event.getFrame().attach(this);
+      System.out.println("DEBUG: Attached");
+    }
+    else
+    {
+      event.getFrame().detach(this);
+      System.out.println("DEBUG: Detached");
+    }
+    mParent.repaint();
+    System.out.println("DEBUG: Repainted");
+  }
+
   // #########################################################################
   // # Data Members
   // private final ModuleContainer mModuleContainer;
   private Object[][] mRawData;
   private final ModuleContainer mModuleContainer;
+  private JTable mParent;
 
   // #########################################################################
   // # Class Constants

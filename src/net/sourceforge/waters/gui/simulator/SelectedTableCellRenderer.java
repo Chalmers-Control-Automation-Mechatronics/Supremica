@@ -29,13 +29,8 @@ public class SelectedTableCellRenderer extends DefaultTableCellRenderer
 
     if (mDesktop.automatonIsOpen(mSim.getAutomata().get(row)))
     {
-      System.out.println("Automaton is Open");
       final Font oldFont = tableCellRenderer.getFont();
       tableCellRenderer.setFont(oldFont.deriveFont(Font.BOLD));
-    }
-    else
-    {
-      System.out.println("Automaton is Closed");
     }
     return tableCellRenderer;
   }

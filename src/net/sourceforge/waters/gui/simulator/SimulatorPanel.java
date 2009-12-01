@@ -58,7 +58,8 @@ public class SimulatorPanel
 
   private void setupAutomataTable()
   {
-    mAutomataTable = new JTable(new AbstractTunnelTable(mModuleContainer, mSimulation));
+    mAutomataTable = new JTable(new AbstractTunnelTable(mModuleContainer, mSimulation, mDesktop));
+    ((AbstractTunnelTable)mAutomataTable.getModel()).attachTable(mAutomataTable);
     final int width = 245; // DEBUG: Arbitrary value: Any value will work, but this is close to the 'normal' value
     mAutomataTable.setDefaultRenderer(mAutomataTable.getColumnClass(1), new SelectedTableCellRenderer(mSimulation, mDesktop));
     if (mAutomataTable.getColumnModel().getColumnCount() == 0)

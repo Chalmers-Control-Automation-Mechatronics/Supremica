@@ -8,8 +8,11 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import javax.swing.JDesktopPane;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -24,7 +27,7 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
-public class AutomatonDesktopPane extends JDesktopPane implements SimulationObserver, Observer
+public class AutomatonDesktopPane extends JDesktopPane implements SimulationObserver, InternalFrameObserver, Observer
 {
   //#########################################################################
   //# Constructor
@@ -35,6 +38,7 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
     container.attach(this);
     mSim = sim;
     mContainer = container;
+    observers = new HashSet<InternalFrameObserver>();
   }
 
 
@@ -56,17 +60,22 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
     if (!openAutomaton.containsKey(aut)) {
       if (clicks == 2) {
         final Map<Proxy,SourceInfo> infomap = container.getSourceInfoMap();
-        final Proxy source = infomap.get(sim.getAutomatonFromName(aut)).getSourceObject();
+        final AutomatonProxy realAuto = sim.getAutomatonFromName(aut);
+        if (realAuto == null)
+          return;
+        final Proxy source = infomap.get(realAuto).getSourceObject();
         if (source instanceof SimpleComponentSubject) {
           final SimpleComponentSubject comp = (SimpleComponentSubject) source;
           final GraphSubject graph = comp.getGraph();
           try {
             final AutomatonInternalFrame newFrame = new AutomatonInternalFrame
-              (sim.getAutomatonFromName(aut), graph, this, container, sim);
+              (realAuto, graph, this, container, sim);
             newFrame.setLocation(findCoords(newFrame.getSize()));
             add(newFrame);
             newFrame.moveToFront();
             openAutomaton.put(aut, newFrame);
+            fireFrameOpenedEvent(aut, newFrame);
+            newFrame.attach(this);
           } catch (final GeometryAbsentException exception) {
             final IDE ide = container.getIDE();
             final String msg = exception.getMessage();
@@ -117,7 +126,7 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
     return new Point(0,0);
   }
 
-  public void removeAutomaton(final AutomatonProxy aut)
+  public void removeAutomaton(final String aut)
   {
     openAutomaton.remove(aut);
   }
@@ -127,8 +136,11 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
     System.out.println("DEBUG: oldOpen:" + oldOpen);
     for (final String name : oldOpen.keySet()) {
       addAutomaton(name, container, sim, 2);
-      openAutomaton.get(name).setPreferredSize(new Dimension((int)oldOpen.get(name).getWidth(), (int)oldOpen.get(name).getHeight()));
-      openAutomaton.get(name).setLocation((int)oldOpen.get(name).getX(), (int)oldOpen.get(name).getY());
+      if (openAutomaton.get(name) != null)
+      {
+        openAutomaton.get(name).setPreferredSize(new Dimension((int)oldOpen.get(name).getWidth(), (int)oldOpen.get(name).getHeight()));
+        openAutomaton.get(name).setLocation((int)oldOpen.get(name).getX(), (int)oldOpen.get(name).getY());
+      }
     }
   }
 
@@ -189,6 +201,40 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
   }
 
   //#########################################################################
+  //# Interface InternalFrameObserver
+
+  public void onFrameEvent(final InternalFrameEvent event)
+  {
+    System.out.println("DEBUG: Removed");
+    if (!event.isOpeningEvent())
+      removeAutomaton(event.getName());
+  }
+
+
+  //#########################################################################
+  //# Dealing with attached InternalFrameObservers
+
+  public void attach (final InternalFrameObserver observer)
+  {
+    observers.add(observer);
+  }
+
+  public void detach (final InternalFrameObserver observer)
+  {
+    observers.remove(observer);
+  }
+
+  private void fireFrameOpenedEvent(final String mAutomaton, final AutomatonInternalFrame opening)
+  {
+    final Set<InternalFrameObserver> temp =
+      new HashSet<InternalFrameObserver>(observers);
+    for (final InternalFrameObserver observer : temp)
+    {
+      observer.onFrameEvent(new InternalFrameEvent(mAutomaton, opening, true));
+    }
+  }
+
+  //#########################################################################
   //# Data Members
   private final HashMap<String,AutomatonInternalFrame> openAutomaton =
     new HashMap<String,AutomatonInternalFrame>();
@@ -196,8 +242,10 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
     new HashMap<String, Rectangle>();
   private final Simulation mSim;
   private final ModuleContainer mContainer;
+  private final Set<InternalFrameObserver> observers;
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = -5528014241244952875L;
+
 }
