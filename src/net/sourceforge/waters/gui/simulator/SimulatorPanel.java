@@ -69,10 +69,18 @@ public class SimulatorPanel
     else
       {
       mAutomataTable.getColumnModel().getColumn(0).setPreferredWidth((int)(width * 0.1));
+      mAutomataTable.getColumnModel().getColumn(0).addPropertyChangeListener(
+          new PreserveWidthComponentListener(mAutomataTable.getColumnModel(), 0));
       mAutomataTable.getColumnModel().getColumn(1).setPreferredWidth((int)(width * 0.35));
       mAutomataTable.getColumnModel().getColumn(2).setPreferredWidth((int)(width * 0.1));
+      mAutomataTable.getColumnModel().getColumn(2).addPropertyChangeListener(
+          new PreserveWidthComponentListener(mAutomataTable.getColumnModel(), 2));
       mAutomataTable.getColumnModel().getColumn(3).setPreferredWidth((int)(width * 0.1));
+      mAutomataTable.getColumnModel().getColumn(3).addPropertyChangeListener(
+          new PreserveWidthComponentListener(mAutomataTable.getColumnModel(), 3));
       mAutomataTable.getColumnModel().getColumn(4).setPreferredWidth((int)(width * 0.35));
+      System.out.println("Preferred Widths are: " + mAutomataTable.getColumnModel().getColumn(4).getPreferredWidth() + " and "
+          + mAutomataTable.getColumnModel().getColumn(0).getPreferredWidth());
     }
     mAutomataTable.addMouseListener(new AutomatonMouseListener(mSimulation, mAutomataTable, mDesktop));
     final ListSelectionModel listMod =  mAutomataTable.getSelectionModel();
