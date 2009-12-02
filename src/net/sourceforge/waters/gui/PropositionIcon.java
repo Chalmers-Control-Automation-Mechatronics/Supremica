@@ -122,11 +122,12 @@ public class PropositionIcon implements Icon
     }
   }
 
+
   //#######################################################################
-  //# Interface Object
+  //# Overrides for java.lang.Object
   public String toString()
   {
-    return mColorInfo.getColors().toString();
+    return mColorInfo.toString();
   }
 
 
@@ -157,6 +158,17 @@ public class PropositionIcon implements Icon
     public boolean isForbidden()
     {
       return mForbidden;
+    }
+
+    //#######################################################################
+    //# Overrides for java.lang.Object
+    public String toString()
+    {
+      if (mForbidden) {
+        return mList.toString() + ",forbidden";
+      } else {
+        return mList.toString();
+      }
     }
 
     //#######################################################################
