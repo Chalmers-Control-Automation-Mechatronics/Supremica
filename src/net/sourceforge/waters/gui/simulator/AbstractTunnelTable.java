@@ -1,6 +1,9 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -31,6 +34,8 @@ public class AbstractTunnelTable extends SimulationTable implements
     mModuleContainer = container;
     mParent = null;
     desktop.attach(this);
+    mComparator = new AutomatonTableComparitor<Object>();
+    observers = new HashSet<TableOrderObserver>();
   }
 
   public void attachTable(final JTable table)
@@ -71,7 +76,7 @@ public class AbstractTunnelTable extends SimulationTable implements
 
   public Object getValueAt(final int row, final int col)
   {
-    return mRawData[row][col];
+    return mRawData.get(row).get(col);
   }
 
   public String getColumnName(final int columnVal)
@@ -91,6 +96,26 @@ public class AbstractTunnelTable extends SimulationTable implements
       return "Invalid";
     }
   }
+  //#########################################################################
+  // # Processing TableOrderObservers
+
+  @SuppressWarnings("unchecked")
+  public void tableOrderChanged()
+  {
+    final HashSet<TableOrderObserver> clone = (HashSet<TableOrderObserver>)observers.clone();
+    for (final TableOrderObserver observer : clone)
+      observer.processTableReorder(new TableOrderChangedEvent(this));
+    getRawData();
+  }
+
+  public void attach (final TableOrderObserver observer)
+  {
+    observers.add(observer);
+  }
+  public void detach (final TableOrderObserver observer)
+  {
+    observers.remove(observer);
+  }
 
   // ##########################################################################
   // # Interface net.sourceforge.waters.gui.simulator.SimulationObserver
@@ -105,24 +130,44 @@ public class AbstractTunnelTable extends SimulationTable implements
   private void getRawData()
   {
     if (getSim() != null && mModuleContainer != null) {
-      final Object[][] output = new Object[getRowCount()][getColumnCount()];
+      final List<List<Object>> output = new ArrayList<List<Object>>();
       final ArrayList<AutomatonProxy> automata = getSim().getAutomata();
-      int looper = 0;
       for (final AutomatonProxy aut : automata) {
+        final List<Object> row = new ArrayList<Object>();
         if (mModuleContainer.getSourceInfoMap().get(aut).getSourceObject().getClass() == VariableComponentSubject.class)
-          output[looper][0] = IconLoader.ICON_VARIABLE;
+          row.add(IconLoader.ICON_VARIABLE);
         else
-          output[looper][0] = ModuleContext.getComponentKindIcon(aut.getKind());
-        output[looper][1] = aut.getName();
-        output[looper][2] = ModuleContext.getBooleanIcon(getSim().changedLastStep(aut));
+          row.add(ModuleContext.getComponentKindIcon(aut.getKind()));
+        row.add(aut.getName());
+        row.add(ModuleContext.getBooleanIcon(getSim().changedLastStep(aut)));
         final StateProxy currentState = getSim().getCurrentStates().get(aut);
-        output[looper][3] = getSim().getMarkingIcon(currentState, aut);
-        output[looper][4] = getSim().getCurrentStates().get(aut).getName();
-        looper++;
+        row.add(getSim().getMarkingIcon(currentState, aut));
+        row.add(getSim().getCurrentStates().get(aut).getName());
+        output.add(row);
       }
+      Collections.sort(output, mComparator);
+      System.out.println("DEBUG: Comparator:" + mComparator);
       mRawData = output;
     } else
-      mRawData = new Object[0][0];
+      mRawData = new ArrayList<List<Object>>();
+  }
+
+  // ###########################################################################
+  // # Accessor Methods
+  /**
+   * Gets the automaton represented by the indexth row of the sorted table
+   * @param index The index of the row of the table
+   * @return The automaton represented at that index
+   */
+  public AutomatonProxy getAutomaton(final int index, final Simulation mSimulation)
+  {
+    final String finder = (String)mRawData.get(index).get(1);
+    return mSimulation.getAutomatonFromName(finder);
+  }
+
+  public AutomatonTableComparitor<Object> getComparitor()
+  {
+    return mComparator;
   }
 
   //###########################################################################
@@ -146,12 +191,13 @@ public class AbstractTunnelTable extends SimulationTable implements
   // #########################################################################
   // # Data Members
   // private final ModuleContainer mModuleContainer;
-  private Object[][] mRawData;
+  private List<List<Object>> mRawData;
   private final ModuleContainer mModuleContainer;
   private JTable mParent;
+  private final AutomatonTableComparitor<Object> mComparator;
+  private final HashSet<TableOrderObserver> observers;
 
   // #########################################################################
   // # Class Constants
   private static final long serialVersionUID = 1L;
-
 }

@@ -1,7 +1,5 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.awt.Dimension;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import javax.swing.JInternalFrame;
@@ -31,7 +29,7 @@ public class AutomatonInternalFrame extends JInternalFrame
     addMouseListener(new InternalFrameMouseAdapter(this));
     setVisible(true);
     pack();
-    setBounds(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    addComponentListener();
     observers = new ArrayList<InternalFrameObserver>();
   }
 
@@ -44,22 +42,9 @@ public class AutomatonInternalFrame extends JInternalFrame
     super.dispose();
   }
 
-  public void setBounds(final int x, final int y, int wantedWidth, int wantedHeight)
+  private void addComponentListener()
   {
-    final int extraWidth;
-    final int extraHeight;
-    extraWidth = this.getWidth() - (int)mDisplayPane.getWidth();
-    extraHeight = this.getHeight() - (int)mDisplayPane.getHeight();
-    wantedWidth -= extraWidth;
-    wantedHeight -= extraHeight;
-    final Rectangle2D preferredSize = mDisplayPane.getMinimumBoundingRectangle();
-    final int preferredWidth = (int) preferredSize.getWidth();
-    final int preferredHeight = (int) preferredSize.getHeight();
-    final int finalWidth = ((wantedWidth + wantedHeight) * preferredWidth) / (preferredHeight + preferredWidth);
-    final int finalHeight = (preferredHeight * finalWidth) / preferredWidth;
-    mDisplayPane.setPreferredSize(new Dimension(finalWidth, finalHeight));
-    super.setBounds(x, y, finalWidth + extraWidth - 1, finalHeight + extraHeight- 1);
-    super.repaint();
+    this.addComponentListener(new PreserveAspectComponentListener(this, mDisplayPane));
   }
 
   //##########################################################################

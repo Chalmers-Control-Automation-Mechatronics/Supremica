@@ -78,6 +78,7 @@ public class SimulatorPanel
     final ListSelectionModel listMod =  mAutomataTable.getSelectionModel();
     listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     listMod.addListSelectionListener(mAutomataTable);
+    mAutomataTable.getTableHeader().addMouseListener(new TableHeaderMouseAdapter(mAutomataTable, mAutomataTable.getTableHeader()));
   }
 
   private void setupEvents()

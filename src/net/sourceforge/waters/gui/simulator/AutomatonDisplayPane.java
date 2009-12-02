@@ -51,6 +51,7 @@ public class AutomatonDisplayPane
     throws GeometryAbsentException
   {
     super(graph, container.getModule());
+    System.out.println("DEBUG: Opening");
     mSim = sim;
     mAutomaton = aut;
     mContainer = container;

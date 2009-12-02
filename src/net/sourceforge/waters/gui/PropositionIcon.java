@@ -122,6 +122,13 @@ public class PropositionIcon implements Icon
     }
   }
 
+  //#######################################################################
+  //# Interface Object
+  public String toString()
+  {
+    return mColorInfo.getColors().toString();
+  }
+
 
   //#########################################################################
   //# Inner Class ColorInfo

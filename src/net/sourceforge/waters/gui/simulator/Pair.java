@@ -23,6 +23,11 @@ public class Pair<A, B>
     return b;
   }
 
+  public String toString()
+  {
+    return "{" + a + "," + b + "}";
+  }
+
   // #################################################################################
   // # Data Members
   A a;

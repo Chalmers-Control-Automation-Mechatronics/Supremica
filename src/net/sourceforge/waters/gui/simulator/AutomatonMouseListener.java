@@ -26,7 +26,7 @@ public class AutomatonMouseListener extends MouseAdapter implements SimulationOb
     final int row = parent.rowAtPoint(e.getPoint());
     if (row != -1)
     {
-      final AutomatonProxy toAdd = mSim.getAutomata().get(row);
+      final AutomatonProxy toAdd = ((AbstractTunnelTable)parent.getModel()).getAutomaton(row, mSim);
       output.addAutomaton(toAdd.getName(), mSim.getContainer(), mSim, e.getClickCount());
       // parent.clearSelection();
     }
