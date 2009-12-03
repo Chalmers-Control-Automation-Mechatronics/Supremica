@@ -106,6 +106,11 @@ public class BackupGraphPanel
     }
   }
 
+  public boolean isEmbedderRunning()
+  {
+    return mEmbedder != null;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.springembedder.EmbedderObserver
@@ -146,7 +151,8 @@ public class BackupGraphPanel
   protected boolean ensureGeometryExists()
     throws GeometryAbsentException
   {
-    final SpringEmbedder embedder = createEmbedder();
+    final GraphSubject graph = getGraph();
+    final SpringEmbedder embedder = new SpringEmbedder(graph);
     final boolean needEmbedder = embedder.needsGeometry();
     if (needEmbedder) {
       mEmbedder = embedder;
@@ -189,11 +195,6 @@ public class BackupGraphPanel
     } catch (final GeometryAbsentException exception) {
       throw new WatersRuntimeException(exception);
     }
-  }
-
-  protected boolean isEmbedderRunning()
-  {
-    return mEmbedder != null;
   }
 
   protected void closeEmbedder()

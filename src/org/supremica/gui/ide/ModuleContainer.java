@@ -91,6 +91,11 @@ public class ModuleContainer
           ProductDESElementFactory.getInstance();
         mCompiler = new ModuleCompiler(manager, desfactory, module);
         mCompiler.setSourceInfoEnabled(true);
+        mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
+        mCompilerPropertyChangeListener =
+          new CompilerPropertyChangeListener();
+        Config.OPTIMIZING_COMPILER.addPropertyChangeListener
+          (mCompilerPropertyChangeListener);
 
         mTabPanel = new JTabbedPane();
         mEditorPanel = new EditorPanel(this, "Editor");
@@ -140,9 +145,11 @@ public class ModuleContainer
 
     public void close()
     {
-        mEditorPanel.close();
-        Config.INCLUDE_WATERS_SIMULATOR.removePropertyChangeListener
-          (mSimulatorPropertyChangeListener);
+      mEditorPanel.close();
+      Config.OPTIMIZING_COMPILER.removePropertyChangeListener
+        (mCompilerPropertyChangeListener);
+      Config.INCLUDE_WATERS_SIMULATOR.removePropertyChangeListener
+        (mSimulatorPropertyChangeListener);
     }
 
     public Component getPanel()
@@ -470,9 +477,24 @@ public class ModuleContainer
 
 
     //#######################################################################
-    //# Inner Classes
-    private class SimulatorPropertyChangeListener
+    //# Inner Class CompilerPropertyChangeListener
+    private class CompilerPropertyChangeListener
       implements SupremicaPropertyChangeListener
+    {
+
+      public void propertyChanged(final SupremicaPropertyChangeEvent event)
+      {
+        mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
+        mCompiledDES = null;
+      }
+
+    }
+
+
+    //#######################################################################
+    //# Inner Class SimulatorPropertyChangeListener
+    private class SimulatorPropertyChangeListener
+    implements SupremicaPropertyChangeListener
     {
 
       public void propertyChanged(final SupremicaPropertyChangeEvent event)
@@ -483,8 +505,8 @@ public class ModuleContainer
           mTabPanel.remove(mSimulatorPanel);
         }
       }
-
     }
+
 
     //#######################################################################
     //# Data Members
@@ -506,6 +528,8 @@ public class ModuleContainer
     private final ProxyPrinter mPrinter;
     private ProductDESProxy mCompiledDES;
 
+    private final CompilerPropertyChangeListener
+      mCompilerPropertyChangeListener;
     private final SupremicaPropertyChangeListener
       mSimulatorPropertyChangeListener;
     private final UndoManager mUndoManager = new UndoManager();
