@@ -1,23 +1,18 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.geom.Rectangle2D;
 
-public class PreserveAspectComponentListener implements ComponentListener, InternalFrameMouseupObserver
+public class PreserveAspectComponentListener implements ComponentListener
 {
-
-
-
   public PreserveAspectComponentListener(final AutomatonInternalFrame frame, final AutomatonDisplayPane pane)
   {
     mFrame = frame;
     mDisplayPane = pane;
     oldBounds = frame.getBounds();
-    topRight = new Point((int)(frame.getLocation().getX() + frame.getWidth()), (int)frame.getLocation().getY());
   }
 
   public void componentHidden(final ComponentEvent e)
@@ -34,16 +29,31 @@ public class PreserveAspectComponentListener implements ComponentListener, Inter
   {
     return (Math.abs(a - b) < delta);
   }
+  private boolean close (final double a, final double b, final double delta)
+  {
+    return (Math.abs(a - b) < delta);
+  }
 
   public void componentResized(final ComponentEvent e)
   {
     final int finalWidth;
     final int finalHeight;
-    final Rectangle2D preferredSize = mDisplayPane.getMinimumBoundingRectangle();
-    final int preferredWidth = (int) preferredSize.getWidth();
-    final int preferredHeight = (int) preferredSize.getHeight();
-    finalWidth = Math.max(mDisplayPane.getWidth(), (preferredWidth * mDisplayPane.getHeight()) / preferredHeight);
-    finalHeight = Math.max(mDisplayPane.getHeight(), (preferredHeight * mDisplayPane.getWidth()) / preferredWidth);
+    final Rectangle2D automatonSize = mDisplayPane.getMinimumBoundingRectangle();
+    final int automatonWidth = (int) automatonSize.getWidth();
+    final int automatonHeight = (int) automatonSize.getHeight();
+    final boolean growing = getGrowing(getResizeCorner());
+    if (growing)
+    {
+      finalWidth = Math.max(mDisplayPane.getWidth(), (automatonWidth * mDisplayPane.getHeight()) / automatonHeight);
+      finalHeight = Math.max(mDisplayPane.getHeight(), (automatonHeight * mDisplayPane.getWidth()) / automatonWidth);
+      System.out.println("DEBUG: Growing");
+    }
+    else
+    {
+      finalWidth = Math.min(mDisplayPane.getWidth(), (automatonWidth * mDisplayPane.getHeight()) / automatonHeight);
+      finalHeight = Math.min(mDisplayPane.getHeight(), (automatonHeight * mDisplayPane.getWidth()) / automatonWidth);
+      System.out.println("DEBUG: Shrinking");
+    }
     // To prevent it from shrinking by itself, prevent it growing by 2x2 pixels
     if (!close(finalWidth, mDisplayPane.getWidth(), 2) || !close(finalHeight, mDisplayPane.getHeight(), 2))
     {
@@ -51,51 +61,6 @@ public class PreserveAspectComponentListener implements ComponentListener, Inter
       mFrame.pack();
       mDisplayPane.repaint();
     }
-    /*
-     * Psuedo code for improved resizing code:
-     * ResizeDirection = findDirectionOfResize();
-     * Relative relativeDimension;
-     * Constant constantCorner;
-     * switch (ResizeDirection)
-     * {
-     *  case (TOP_LEFT):
-     *      relativeDimension = MAXIMUM;
-     *      constantCorner = BOTTOM_LEFT;
-     *      break;
-     *  case (TOP):
-     *      relativeDimension = HEIGHT;
-     *      constantCorner = BOTTOM_RIGHT;
-     *      break;
-     *  case (TOP_RIGHT):
-     *      relativeDimension = MAXIMUM;
-     *      constantCorner = BOTTOM_LEFT;
-     *      break;
-     *  case (RIGHT):
-     *      relativeDimension = WIDTH;
-     *      constantCorner = TOP_LEFT;
-     *      break;
-     *  case (BOTTOM_RIGHT):
-     *      relativeDimension = MAXIMUM;
-     *      constantCorner = TOP_LEFT;
-     *      break;
-     *  case (BOTTOM):
-     *      relativeDimension = HEIGHT;
-     *      constantCorner = TOP_LEFT;
-     *      break;
-     *  case (BOTTOM_LEFT):
-     *      relativeDimension = MAXIMUM;
-     *      constantCorner = TOP_RIGHT;
-     *      break;
-     *  case (LEFT):
-     *      relativeDimension = WIDTH;
-     *      constantCorner = BOTTOM_LEFT;
-     *      break;
-     *  default:
-     *      error_msg();
-     * }
-     * newDimensions(preferredWidth, preferredHeight, relativeDimensions, constantCorner);
-     *
-     */
   }
 
   public void componentShown(final ComponentEvent e)
@@ -106,68 +71,74 @@ public class PreserveAspectComponentListener implements ComponentListener, Inter
   // ########################################################################
   // # Auxillary Functions
 
-  private void newDimensions(final int automatonWidth, final int automatonHeight, final Relative relative, final Constant constant)
+  private boolean getGrowing(final Direction constantEdge)
   {
-    final int finalWidth;
-    final int finalHeight;
-    switch (relative)
+    System.out.println("Constant edge is:" + constantEdge);
+    final boolean heightGrow = oldBounds.getHeight() < mFrame.getBounds().getHeight();
+    final boolean widthGrow = oldBounds.getWidth() < mFrame.getBounds().getWidth();
+    if (constantEdge == null)
+      return true; // If nothing is changing
+    switch (constantEdge)
     {
-    case MAXIMUM:
-      finalWidth = Math.max(mDisplayPane.getWidth(), (automatonWidth * mDisplayPane.getHeight()) / automatonHeight);
-      finalHeight = Math.max(mDisplayPane.getHeight(), (automatonHeight  * mDisplayPane.getWidth()) / automatonWidth);
-      break;
-    case HEIGHT:
-      finalWidth = (automatonWidth * mDisplayPane.getHeight()) / automatonHeight;
-      finalHeight = mDisplayPane.getHeight();
-      break;
-    case WIDTH:
-      finalWidth = mDisplayPane.getWidth();
-      finalHeight = (automatonHeight * mDisplayPane.getWidth()) / automatonWidth;
-      break;
+    case TOP_LEFT:
+      return (heightGrow || widthGrow);
+    case BOTTOM_LEFT:
+      return (heightGrow && widthGrow);
+    case BOTTOM_RIGHT:
+      return (heightGrow && widthGrow);
+    case TOP_RIGHT:
+      System.out.println("TOP RIGHT fired: Growing: " + widthGrow);
+      return (widthGrow);
+    case TOP:
+      return (heightGrow);
+    case LEFT:
+      return (widthGrow);
+    case RIGHT:
+      return (widthGrow);
+    case BOTTOM:
+      return (heightGrow);
     default:
-        throw new UnsupportedOperationException("Illegal Relative Setting");
+      throw new UnsupportedOperationException("Direction is not supported");
     }
-    if (!close(finalWidth, mDisplayPane.getWidth(), 2) || !close(finalHeight, mDisplayPane.getHeight(), 2))
-    {
-      mDisplayPane.setPreferredSize(new Dimension(finalWidth, finalHeight));
-      mFrame.pack();
-      mDisplayPane.repaint();
-    }
-    final Point topRightCorner = new Point(oldBounds.getLocation().x, oldBounds.getLocation().y);
-    final Point bottomRightCorner = new Point(oldBounds.getLocation().x, (int)(oldBounds.getLocation().y + oldBounds.getHeight()));
-    final Point topLeftCorner = new Point((int)(oldBounds.getLocation().x + oldBounds.getWidth()), oldBounds.getLocation().y);
-    final Point bottomLeftCorner = new Point((int)(oldBounds.getLocation().x + oldBounds.getWidth()),
-        (int)(oldBounds.getLocation().y + oldBounds.getHeight()));
-    switch (constant)
-    {
-    case TOP_RIGHT_CORNER:
-      mFrame.setLocation(topRightCorner);
-      break;
-    case TOP_LEFT_CORNER:
-      mFrame.setLocation(new Point((int)(topLeftCorner.getX() - mFrame.getWidth()), (int)topLeftCorner.getY()));
-      break;
-    case BOTTOM_RIGHT_CORNER:
-      mFrame.setLocation(new Point((int)bottomRightCorner.getX(), (int)(bottomRightCorner.getY() - mFrame.getHeight())));
-      break;
-    case BOTTOM_LEFT_CORNER:
-      mFrame.setLocation(new Point((int)(bottomLeftCorner.getX() - mFrame.getWidth()),
-          (int)(bottomLeftCorner.getY() - mFrame.getHeight())));
-      break;
-      default:
-        throw new UnsupportedOperationException("Illegal Constant Setting");
-    }
+  }
+
+  private Direction getResizeCorner()
+  {
+    final Rectangle newBounds = mFrame.getBounds();
+    final boolean leftEdge = close(oldBounds.getX(), newBounds.getX(), 0.01);
+    final boolean rightEdge = close(oldBounds.getX() + oldBounds.getWidth(), newBounds.getX() + newBounds.getWidth(), 0.01);
+    final boolean topEdge = close(oldBounds.getY(), newBounds.getY(), 0.01);
+    final boolean bottomEdge = close(oldBounds.getY() + oldBounds.getHeight(), newBounds.getY() + newBounds.getHeight(), 0.01);
+    if (leftEdge && rightEdge && topEdge)
+      return Direction.TOP;
+    if (rightEdge && topEdge && bottomEdge)
+      return Direction.LEFT;
+    if (leftEdge && rightEdge && bottomEdge)
+      return Direction.BOTTOM;
+    if (leftEdge && topEdge && bottomEdge)
+      return Direction.RIGHT;
+    if (leftEdge && topEdge)
+      return Direction.TOP_LEFT;
+    if (rightEdge && bottomEdge)
+      return Direction.BOTTOM_RIGHT;
+    if (bottomEdge && rightEdge)
+      return Direction.BOTTOM_LEFT;
+    if (rightEdge && topEdge)
+      return Direction.TOP_RIGHT;
+    System.out.println("DEBUG: ERROR: Constant Edge is NULL!! Values are TOP "
+        + topEdge + " BOTTOM + " + bottomEdge + " LEFT " + leftEdge + " RIGHT " + rightEdge);
+    return null;
   }
 
   // ########################################################################
   // # Interface InternalFrameMouseupObserver
 
-  public void performMouseUpEvent(final InternalFrameMouseupEvent event)
+  public void setBounds(final Rectangle bounds)
   {
-    topRight = new Point((int)(mFrame.getLocation().getX() + mFrame.getWidth()), (int)mFrame.getLocation().getY());
+    oldBounds = bounds;
   }
 
   private final AutomatonInternalFrame mFrame;
   private final AutomatonDisplayPane mDisplayPane;
-  private final Rectangle oldBounds;
-  private Point topRight;
+  private Rectangle oldBounds;
 }

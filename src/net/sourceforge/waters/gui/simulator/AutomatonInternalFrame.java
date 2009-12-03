@@ -1,5 +1,9 @@
 package net.sourceforge.waters.gui.simulator;
 
+import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.JInternalFrame;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
@@ -20,11 +24,10 @@ public class AutomatonInternalFrame extends JInternalFrame
     throws GeometryAbsentException
   {
     super(aut.getName(), true, true, false, true);
-    mAutomaton = aut;
     mDisplayPane = new AutomatonDisplayPane(aut, graph, container, sim);
     setContentPane(mDisplayPane);
     mDisplayPane.repaint();
-    addMouseListener(new InternalFrameMouseAdapter(this));
+    addMouseListener(new InternalFrameMouseAdapter());
     setVisible(true);
     pack();
     addComponentListener();
@@ -32,13 +35,27 @@ public class AutomatonInternalFrame extends JInternalFrame
 
   private void addComponentListener()
   {
-    this.addComponentListener(new PreserveAspectComponentListener(this, mDisplayPane));
+    aspectComponentListener = new PreserveAspectComponentListener(this, mDisplayPane);
+    this.addComponentListener(aspectComponentListener);
+  }
+
+  //##########################################################################
+  //# Inner class
+  private class InternalFrameMouseAdapter extends MouseAdapter
+  {
+
+    //#################################################################################
+    //# Class MouseAdapter
+    public void mouseReleased(final MouseEvent e){
+      aspectComponentListener.setBounds(new Rectangle(getBounds()));
+    }
+
   }
 
   //##########################################################################
   //# Data Members
-  private final AutomatonProxy mAutomaton;
   private final AutomatonDisplayPane mDisplayPane;
+  private PreserveAspectComponentListener aspectComponentListener;
 
 
   //#########################################################################
