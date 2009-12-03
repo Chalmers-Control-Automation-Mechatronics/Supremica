@@ -146,8 +146,7 @@ public class BackupGraphPanel
   protected boolean ensureGeometryExists()
     throws GeometryAbsentException
   {
-    final GraphSubject graph = getGraph();
-    final SpringEmbedder embedder = new SpringEmbedder(graph);
+    final SpringEmbedder embedder = createEmbedder();
     final boolean needEmbedder = embedder.needsGeometry();
     if (needEmbedder) {
       mEmbedder = embedder;
@@ -155,6 +154,14 @@ public class BackupGraphPanel
     }
     return needEmbedder;
   }
+
+  protected SpringEmbedder createEmbedder()
+  {
+    final GraphSubject graph = getGraph();
+    mEmbedder = new SpringEmbedder(graph);
+    return mEmbedder;
+  }
+
 
   protected void runEmbedder()
   {

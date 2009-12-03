@@ -9,6 +9,7 @@
 
 package org.supremica.gui.ide;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -71,12 +72,12 @@ public class IDEMenuBar
 
         private TemplateItem item = null;
 
-        public NewFromTemplateHandler(TemplateItem item)
+        public NewFromTemplateHandler(final TemplateItem item)
         {
             this.item = item;
         }
 
-        public void actionPerformed(ActionEvent e)
+        public void actionPerformed(final ActionEvent e)
         {
             try
             {
@@ -84,7 +85,7 @@ public class IDEMenuBar
                 final URL url = TemplateItem.class.getResource(path);
                 final URI uri = url.toURI();
                 final DocumentContainerManager manager =
-                    ide.getDocumentContainerManager();
+                    mIDE.getDocumentContainerManager();
                 manager.openContainer(uri);
             }
             catch (final URISyntaxException exception)
@@ -96,16 +97,16 @@ public class IDEMenuBar
 
     //#######################################################################
     //# Constructor
-    public IDEMenuBar(IDE ide)
+    public IDEMenuBar(final IDE ide)
     {
-        this.ide = ide;
+        this.mIDE = ide;
         initMenubar();
         ide.attach(this);
     }
 
     private void initMenubar()
     {
-        final Actions actions = ide.getActions();
+        final Actions actions = mIDE.getActions();
 
         // File
         JMenu menu = new JMenu("File");
@@ -123,11 +124,11 @@ public class IDEMenuBar
         menu.addSeparator();
         final Action importAction = actions.getAction(ImportAction.class);
         menu.add(importAction);
-        menu.add(ide.getActions().editorPrintAction.getMenuItem());
-        menu.add(ide.getActions().editorSavePostscriptAction.getMenuItem());
+        menu.add(mIDE.getActions().editorPrintAction.getMenuItem());
+        menu.add(mIDE.getActions().editorSavePostscriptAction.getMenuItem());
 		final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
         menu.add(epsprint);
-        menu.add(ide.getActions().editorSavePDFAction.getMenuItem());
+        menu.add(mIDE.getActions().editorSavePDFAction.getMenuItem());
         menu.addSeparator();
         final Action exit = actions.getAction(ExitAction.class);
         menu.add(exit);
@@ -201,25 +202,25 @@ public class IDEMenuBar
             viewMenu.add(actions.analyzerViewModularStructureAction.getMenuItem());
         }
         menu.add(viewMenu);
-        menu.add(ide.getActions().analyzerSynchronizerAction.getMenuItem());
-        menu.add(ide.getActions().analyzerSynthesizerAction.getMenuItem());
-        menu.add(ide.getActions().analyzerVerifierAction.getMenuItem());
-        menu.add(ide.getActions().analyzerMinimizeAction.getMenuItem());
-        menu.add(ide.getActions().analyzerEventHiderAction.getMenuItem());
-        menu.add(ide.getActions().analyzerPurgeAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerSynchronizerAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerSynthesizerAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerVerifierAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerMinimizeAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerEventHiderAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerPurgeAction.getMenuItem());
         menu.addSeparator();
-        menu.add(ide.getActions().analyzerExploreStatesAction.getMenuItem());
-        menu.add(ide.getActions().analyzerFindStatesAction.getMenuItem());
-        menu.add(ide.getActions().analyzerWorkbenchAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerExploreStatesAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerFindStatesAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerWorkbenchAction.getMenuItem());
         menu.addSeparator();
-        menu.add(ide.getActions().analyzerStatisticsAction.getMenuItem());
-        menu.add(ide.getActions().analyzerExportAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerStatisticsAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerExportAction.getMenuItem());
         menu.addSeparator();
-        menu.add(ide.getActions().analyzerDeleteSelectedAction.getMenuItem());
-        menu.add(ide.getActions().analyzerDeleteAllAction.getMenuItem());
-        menu.add(ide.getActions().analyzerRenameAction.getMenuItem());
-        menu.add(ide.getActions().analyzerSendToEditorAction.getMenuItem());
-        menu.add(ide.getActions().analyzerGuardAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerDeleteSelectedAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerDeleteAllAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerRenameAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerSendToEditorAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerGuardAction.getMenuItem());
         analyzerMenu = menu;
         analyzerMenu.setEnabled(false);
         add(menu);
@@ -228,33 +229,33 @@ public class IDEMenuBar
         if (Config.INCLUDE_ANIMATOR.isTrue())
         {
             menu = new JMenu("Simulate");
-            menu.add(ide.getActions().simulatorLaunchAnimatorAction);
-            menu.add(ide.getActions().simulatorLaunchSimulatorAction);
-            menu.add(ide.getActions().simulatorClearSimulationData);
+            menu.add(mIDE.getActions().simulatorLaunchAnimatorAction);
+            menu.add(mIDE.getActions().simulatorLaunchSimulatorAction);
+            menu.add(mIDE.getActions().simulatorClearSimulationData);
             add(menu);
         }
-        
+
         // Examples
         menu = new JMenu("Examples");
         //menu.setMnemonic(KeyEvent.VK_X);
-        menu.add(ide.getActions().toolsTestCasesAction.getMenuItem());
+        menu.add(mIDE.getActions().toolsTestCasesAction.getMenuItem());
         add(menu);
 
         // File.NewFromTemplate
-        ExampleTemplates exTempl = ExampleTemplates.getInstance();
-        for (Iterator<TemplateGroup> groupIt = exTempl.iterator(); groupIt.hasNext(); )
+        final ExampleTemplates exTempl = ExampleTemplates.getInstance();
+        for (final Iterator<TemplateGroup> groupIt = exTempl.iterator(); groupIt.hasNext(); )
         {
-            TemplateGroup currGroup = (TemplateGroup) groupIt.next();
-            JMenu menuFileNewFromTemplateGroup = new JMenu();
+            final TemplateGroup currGroup = (TemplateGroup) groupIt.next();
+            final JMenu menuFileNewFromTemplateGroup = new JMenu();
 
             menuFileNewFromTemplateGroup.setText(currGroup.getName());
             menuFileNewFromTemplateGroup.setToolTipText(currGroup.getShortDescription());
             menu.add(menuFileNewFromTemplateGroup);
 
-            for (Iterator<TemplateItem> itemIt = currGroup.iterator(); itemIt.hasNext(); )
+            for (final Iterator<TemplateItem> itemIt = currGroup.iterator(); itemIt.hasNext(); )
             {
-                TemplateItem currItem = (TemplateItem) itemIt.next();
-                JMenuItem menuItem = new JMenuItem();
+                final TemplateItem currItem = (TemplateItem) itemIt.next();
+                final JMenuItem menuItem = new JMenuItem();
                 menuItem.setText(currItem.getName());
                 menuItem.setToolTipText(currItem.getShortDescription());
 
@@ -268,7 +269,7 @@ public class IDEMenuBar
         // menu.setMnemonic(KeyEvent.VK_C); // ALT-C - Create component?
         add(menu);
         //menu.add(ide.getActions().editorOptionsAction.getMenuItem());
-        menu.add(ide.getActions().analyzerOptionsAction.getMenuItem());
+        menu.add(mIDE.getActions().analyzerOptionsAction.getMenuItem());
 
         // Modules
         mModulesMenu = new JMenu("Modules");
@@ -284,19 +285,19 @@ public class IDEMenuBar
         	add(menu);
         	if (Config.INCLUDE_SOCEDITOR.isTrue())
         	{
-        		menu.add(ide.getActions().toolsSOCEditorAction.getMenuItem());
+        		menu.add(mIDE.getActions().toolsSOCEditorAction.getMenuItem());
         	}
 
         }
-        
+
         // Help
         menu = new JMenu();
         menu.setText("Help");
         menu.setMnemonic(KeyEvent.VK_H);
         add(menu);
-        menu.add(ide.getActions().helpWebAction.getMenuItem());
+        menu.add(mIDE.getActions().helpWebAction.getMenuItem());
         menu.addSeparator();
-        menu.add(ide.getActions().helpAboutAction.getMenuItem());
+        menu.add(mIDE.getActions().helpAboutAction.getMenuItem());
     }
 
 
@@ -323,16 +324,25 @@ public class IDEMenuBar
     //# Auxiliary Methods
     private void updateEnabledStatus()
     {
-        final boolean editor = ide.editorActive();
-        final boolean analyzer = ide.analyzerActive();
-        editorMenu.setEnabled(editor);
-        analyzerMenu.setEnabled(analyzer);
+      boolean editor = false;
+      boolean analyzer = false;
+      final DocumentContainer container = mIDE.getActiveDocumentContainer();
+      if (container != null) {
+        final Component active = container.getActivePanel();
+        if (active == container.getEditorPanel()) {
+          editor = true;
+        } else if (active == container.getAnalyzerPanel()) {
+          analyzer = true;
+        }
+      }
+      editorMenu.setEnabled(editor);
+      analyzerMenu.setEnabled(analyzer);
     }
 
     private void updateModulesMenu()
     {
         final DocumentContainerManager manager =
-            ide.getDocumentContainerManager();
+            mIDE.getDocumentContainerManager();
         final DocumentContainer active = manager.getActiveContainer();
         mModulesMenu.removeAll();
         int count = 0;
@@ -378,7 +388,7 @@ public class IDEMenuBar
             public void actionPerformed(final ActionEvent event)
             {
                 final DocumentContainerManager manager =
-                    ide.getDocumentContainerManager();
+                    mIDE.getDocumentContainerManager();
                 manager.setActiveContainer(container);
             }
         };
@@ -389,7 +399,7 @@ public class IDEMenuBar
 
     //#######################################################################
     //# Data Members
-    private final IDE ide;
+    private final IDE mIDE;
     private JMenu editorMenu;
     private JMenu analyzerMenu;
     private JMenu mModulesMenu;

@@ -46,14 +46,10 @@ public class AutomataContainer
     {
         return mAnalyzerPanel;
     }
-    public boolean isEditorActive()
-    {
-        return false;
-    }
 
-    public boolean isAnalyzerActive()
+    public Component getActivePanel()
     {
-        return true;
+        return mAnalyzerPanel;
     }
 
     public String getTypeString()

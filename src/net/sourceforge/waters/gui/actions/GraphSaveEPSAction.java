@@ -54,7 +54,7 @@ public class GraphSaveEPSAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    final GraphEditorPanel surface = getActiveControlledSurface();
+    final GraphEditorPanel surface = getActiveGraphEditorPanel();
     if (surface != null) {
       final IDE ide = getIDE();
       final ModuleProxy module = surface.getModule();

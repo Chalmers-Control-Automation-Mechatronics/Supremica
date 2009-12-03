@@ -94,10 +94,10 @@ public class IDE
         mSplitPaneVertical.setDividerLocation(0.8);
         mSplitPaneVertical.setResizeWeight(1.0);
         contents.add(mSplitPaneVertical, BorderLayout.CENTER);
-        
+
         final File startdir = new File(Config.FILE_OPEN_PATH.getAsString());
         mFileChooser = new JFileChooser(startdir);
-        
+
         // Initialise document managers
         mDocumentContainerManager = new DocumentContainerManager(this);
         mDocumentContainerManager.attach(this);
@@ -123,29 +123,29 @@ public class IDE
         }
     }
 
-    
+
     //#######################################################################
     //# Simple Access
     public String getName()
     {
         return IDENAME;
     }
-    
+
     public JFrame getFrame()
     {
         return this;
     }
-    
+
     public IDE getIDE()
     {
         return this;
     }
-    
+
     public IDEToolBar getToolBar()
     {
         return mToolBar;
     }
-    
+
     public Actions getActions()
     {
         return mActions;
@@ -175,14 +175,14 @@ public class IDE
     {
         return mFileChooser;
     }
-    
-    
+
+
     //#######################################################################
     //# Listeners
     /**
      * Overriden to exit safely when the application window is closed.
      */
-    protected void processWindowEvent(WindowEvent event)
+    protected void processWindowEvent(final WindowEvent event)
     {
         if (event.getID() == WindowEvent.WINDOW_CLOSING)
         {
@@ -196,8 +196,8 @@ public class IDE
             super.processWindowEvent(event);
         }
     }
-    
-    
+
+
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.observer.Observer
     public void update(final EditorChangedEvent event)
@@ -223,7 +223,7 @@ public class IDE
         }
         fireEditorChangedEvent(event);
     }
-    
+
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.observer.Subject
@@ -231,12 +231,12 @@ public class IDE
     {
         mObservers.add(observer);
     }
-    
+
     public void detach(final Observer observer)
     {
         mObservers.remove(observer);
     }
-    
+
     public void fireEditorChangedEvent(final EditorChangedEvent event)
     {
         /*
@@ -251,60 +251,42 @@ public class IDE
             observer.update(event);
         }
     }
-    
-    
+
+
     //#######################################################################
     //# Public Shortcuts
     //# (use with caution --- these should be considered as deprecated)
     public DocumentContainer getActiveDocumentContainer()
     {
-        return mDocumentContainerManager.getActiveContainer();
+        if (mDocumentContainerManager == null) {
+          return null;
+        } else {
+          return mDocumentContainerManager.getActiveContainer();
+        }
     }
-    
+
     public EditorWindowInterface getActiveEditorWindowInterface()
     {
         return getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface();
     }
-    
-    public boolean editorActive()
-    {
-        if (mDocumentContainerManager == null) {
-            return false;
-        } else {
-            final DocumentContainer active =
-                mDocumentContainerManager.getActiveContainer();
-            return active != null && active.isEditorActive();
-        }
-    }
-    
-    public boolean analyzerActive()
-    {
-        if (mDocumentContainerManager == null) {
-            return false;
-        } else {
-            final DocumentContainer active =
-                mDocumentContainerManager.getActiveContainer();
-            return active != null && active.isAnalyzerActive();
-        }
-    }
-    
+
     public Project getActiveProject()
     {
         final DocumentContainer active =
             mDocumentContainerManager.getActiveContainer();
         return active.getAnalyzerPanel().getVisualProject();
     }
-    
+
     private boolean openFiles(final List<File> filesToOpen)
     {
         return mDocumentContainerManager.openContainers(filesToOpen);
     }
-    
+
     private void openEmptyDocument()
     {
         mDocumentContainerManager.newModuleContainer();
     }
-    
+
     public String getWindowTitle()
     {
         final DocumentContainer container =
@@ -332,46 +314,46 @@ public class IDE
             }
             return buffer.toString();
         }
-        
+
     }
-    
-    
+
+
     //#######################################################################
     //# Interface org.supremica.gui.ide.IDEReportInterface
-    public void error(String msg)
+    public void error(final String msg)
     {
         logger.error(msg);
     }
-    
-    public void error(String msg, Throwable t)
+
+    public void error(final String msg, final Throwable t)
     {
         logger.error(msg, t);
     }
-    
-    public void info(String msg)
+
+    public void info(final String msg)
     {
         logger.info(msg);
     }
-    
-    public void warn(String msg)
+
+    public void warn(final String msg)
     {
         logger.warn(msg);
     }
-    
-    public void debug(String msg)
+
+    public void debug(final String msg)
     {
         logger.debug(msg);
     }
-    
-    
+
+
     //#######################################################################
     //# Main Program
-    public static void main(String args[])
+    public static void main(final String args[])
     throws Exception
     {
         // Process command line arguments
         final List<File> files = ProcessCommandLineArguments.process(args);
-        
+
         // Initialise logging
         SupremicaLoggerFactory.initialiseSupremicaLoggerFactory();
         logger = SupremicaLoggerFactory.createLogger(IDE.class);
@@ -390,12 +372,12 @@ public class IDE
         {
             ide.openEmptyDocument();
         }
-        
+
         // Show!
         ide.setVisible(true);
     }
-    
-    
+
+
     //#######################################################################
     //# Data Members
     // GUI Components
@@ -418,16 +400,16 @@ public class IDE
     // "IDE", _both_ should give output, to console and logdisplay,
     // respectively.
     private static Logger logger = null;
-    public static void setLogger(Logger aLogger) {
+    public static void setLogger(final Logger aLogger) {
     	logger = aLogger;
     }
-    
+
     //#######################################################################
     //# Static Class Constants
     private static final long serialVersionUID = 1L;
     private static final String IDENAME = "Supremica";
     //private static final InterfaceManager manager;
-    
+
     static
     {
         Locale.setDefault(Locale.ENGLISH);

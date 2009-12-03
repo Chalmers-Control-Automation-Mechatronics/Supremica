@@ -45,14 +45,11 @@ public class IDESelectAllAction
   extends IDEAction
 {
 
-    IDE ide;
-
   //#########################################################################
-  //# Constructors
+  //# Constructor
   IDESelectAllAction(final IDE ide)
   {
     super(ide);
-    this.ide = ide;
     putValue(Action.NAME, "Select All");
     putValue(Action.SHORT_DESCRIPTION, "Select all items in the panel");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);

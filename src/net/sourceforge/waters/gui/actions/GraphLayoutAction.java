@@ -49,7 +49,7 @@ public class GraphLayoutAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    final GraphEditorPanel surface = getActiveControlledSurface();
+    final GraphEditorPanel surface = getActiveGraphEditorPanel();
     if (surface != null) {
       surface.runEmbedder(true);
     }
@@ -64,7 +64,7 @@ public class GraphLayoutAction
     case CONTAINER_SWITCH:
     case MAINPANEL_SWITCH:
     case SUBPANEL_SWITCH:
-      final GraphEditorPanel surface = getActiveControlledSurface();
+      final GraphEditorPanel surface = getActiveGraphEditorPanel();
       if (surface == null) {
         setEnabled(false);
         observeGraph(null);

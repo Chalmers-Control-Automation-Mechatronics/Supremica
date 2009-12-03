@@ -112,7 +112,7 @@ class EventDeclDeleteVisitor
       surface = null;
       visiblegraph = null;
     } else {
-      surface = iface.getControlledSurface();
+      surface = iface.getGraphEditorPanel();
       visiblegraph = surface.getGraph();
     }
     final ModuleSubject module = mRoot.getModuleSubject();
@@ -168,7 +168,7 @@ class EventDeclDeleteVisitor
           final EditorWindowInterface iface =
             mRoot.getEditorWindowInterface(comp);
           if (iface != null) {
-            final SelectionOwner panel = iface.getControlledSurface();
+            final SelectionOwner panel = iface.getGraphEditorPanel();
             final List<ProxySubject> list = Collections.singletonList(proxy);
             panel.removeFromSelection(list);
           }
@@ -364,7 +364,7 @@ class EventDeclDeleteVisitor
         // Select them ...
         comp.acceptVisitor(this);
         final List<Proxy> selection = findSelection(mDeletionVictims);
-        final SelectionOwner panel = iface.getControlledSurface();
+        final SelectionOwner panel = iface.getGraphEditorPanel();
         panel.replaceSelection(selection);
         panel.scrollToVisible(selection);
         mDeletionVictims.clear();

@@ -104,7 +104,7 @@ public class ComponentViewPanel
         return element;
     }
 
-    public GraphEditorPanel getControlledSurface()
+    public GraphEditorPanel getGraphEditorPanel()
     {
         return surface;
     }

@@ -75,15 +75,14 @@ public abstract class WatersAction
   ModuleWindowInterface getActiveModuleWindowInterface()
   {
     final IDE ide = getIDE();
-    if (!ide.editorActive()) {
-      return null;
-    }
     final DocumentContainer container = ide.getActiveDocumentContainer();
-    if (container == null || !(container instanceof ModuleContainer)) {
+    if (container == null ||
+        container.getActivePanel() != container.getEditorPanel() ||
+        !(container instanceof ModuleContainer)) {
       return null;
     }
     final ModuleContainer mcontainer = (ModuleContainer) container;
-    return mcontainer.getEditorPanel();    
+    return mcontainer.getEditorPanel();
   }
 
   /**
@@ -111,14 +110,12 @@ public abstract class WatersAction
   UndoInterface getActiveUndoInterface()
   {
     final IDE ide = getIDE();
-    if (!ide.editorActive()) {
-      return null;
-    }
     final DocumentContainer container = ide.getActiveDocumentContainer();
-    if (container == null || !(container instanceof UndoInterface)) {
+    if (container instanceof UndoInterface) {
+      return (UndoInterface) container;
+    } else {
       return null;
     }
-    return (UndoInterface) container;
   }
 
 

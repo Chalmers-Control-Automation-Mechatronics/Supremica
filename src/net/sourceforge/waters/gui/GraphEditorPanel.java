@@ -1057,6 +1057,7 @@ public class GraphEditorPanel
   public void runEmbedder(final boolean undoable)
   {
     mIsEmbedderUndoable = undoable;
+    createEmbedder();
     runEmbedder();
   }
 

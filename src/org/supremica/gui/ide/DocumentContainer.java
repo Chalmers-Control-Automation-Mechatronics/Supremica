@@ -19,7 +19,7 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 
 public abstract class DocumentContainer
 {
-    
+
     //#######################################################################
     //# Constructor
     public DocumentContainer(final IDE ide, final DocumentProxy document)
@@ -27,25 +27,25 @@ public abstract class DocumentContainer
         mIDE = ide;
         mDocument = document;
     }
-    
-    
+
+
     //#######################################################################
     //# Simple Access
     public IDE getIDE()
     {
         return mIDE;
     }
-    
+
     public String getName()
     {
         return mDocument.getName();
     }
-    
+
     public DocumentProxy getDocument()
     {
         return mDocument;
     }
-    
+
 
     //#######################################################################
     //# To be Overriden by Subclasses
@@ -68,20 +68,18 @@ public abstract class DocumentContainer
 	public void close()
 	{
 	}
-    
-    public abstract Component getPanel();
-    
-    public abstract EditorPanel getEditorPanel();
-    
-    public abstract AnalyzerPanel getAnalyzerPanel();
-    
-    public abstract boolean isEditorActive();
-    
-    public abstract boolean isAnalyzerActive();
-    
-    public abstract String getTypeString();    
 
-    
+    public abstract Component getPanel();
+
+    public abstract EditorPanel getEditorPanel();
+
+    public abstract AnalyzerPanel getAnalyzerPanel();
+
+    public abstract Component getActivePanel();
+
+    public abstract String getTypeString();
+
+
     //#######################################################################
     //# Titling
     public File getFileLocation()
@@ -89,7 +87,7 @@ public abstract class DocumentContainer
         final DocumentProxy doc = getDocument();
         return getFileLocation(doc);
     }
-    
+
     public String getWindowTitle()
     {
         final String type = getTypeString();
@@ -110,8 +108,8 @@ public abstract class DocumentContainer
         }
         return buffer.toString();
     }
-    
-    
+
+
     //#######################################################################
     //# Auxiliary Static Access
     static File getFileLocation(final DocumentProxy doc)
@@ -125,11 +123,11 @@ public abstract class DocumentContainer
             return null;
         }
     }
-    
-    
+
+
     //#######################################################################
     //# Data Members
     private final DocumentProxy mDocument;
     private final IDE mIDE;
-    
+
 }

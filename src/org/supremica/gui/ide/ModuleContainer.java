@@ -160,14 +160,9 @@ public class ModuleContainer
         return mAnalyzerPanel;
     }
 
-    public boolean isEditorActive()
+    public Component getActivePanel()
     {
-        return mTabPanel.getSelectedComponent() == mEditorPanel;
-    }
-
-    public boolean isAnalyzerActive()
-    {
-        return mTabPanel.getSelectedComponent() == mAnalyzerPanel;
+      return mTabPanel.getSelectedComponent();
     }
 
     public String getTypeString()
@@ -230,6 +225,11 @@ public class ModuleContainer
 
     //#######################################################################
     //# Simple Access
+    public SimulatorPanel getSimulatorPanel()
+    {
+      return mSimulatorPanel;
+    }
+
     public ModuleSubject getModule()
     {
         return (ModuleSubject) getDocument();

@@ -29,7 +29,7 @@ public interface EditorWindowInterface
 
     public ModuleWindowInterface getModuleWindowInterface();
 
-    public GraphEditorPanel getControlledSurface();
+    public GraphEditorPanel getGraphEditorPanel();
 
 	public GraphEventPanel getEventPanel();
 

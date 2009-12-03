@@ -136,7 +136,7 @@ public class ComponentEditorPanel
         return mModuleContainer.getEditorPanel();
     }
 
-    public GraphEditorPanel getControlledSurface()
+    public GraphEditorPanel getGraphEditorPanel()
     {
         return mSurface;
     }

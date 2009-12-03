@@ -463,8 +463,9 @@ public class DocumentContainerManager
             // Converting Supremica >> Waters ...
             // If analyzer active, check if there are unsupported features
             // in the project ...
-            if (container.isAnalyzerActive() &&
-                    !SupremicaUnmarshaller.validate(container.getAnalyzerPanel().getVisualProject()))
+            final AnalyzerPanel analyzer = container.getAnalyzerPanel();
+            if (container.getActivePanel() == analyzer &&
+                !SupremicaUnmarshaller.validate(analyzer.getVisualProject()))
             {
                 final int choice = JOptionPane.showConfirmDialog
                         (mIDE.getFrame(), "This project contains attributes not supported by the WMOD-format." +

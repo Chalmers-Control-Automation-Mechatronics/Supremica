@@ -61,7 +61,7 @@ public class InsertBlockedEventListAction
     if (point == null) {
       setEnabled(false);
     } else {
-      final GraphEditorPanel surface = getActiveControlledSurface();
+      final GraphEditorPanel surface = getActiveGraphEditorPanel();
       final GraphSubject graph = surface.getGraph();
       final boolean enabled = graph.getBlockedEvents() == null;
       setEnabled(enabled);
@@ -73,7 +73,7 @@ public class InsertBlockedEventListAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    final GraphEditorPanel surface = getActiveControlledSurface();
+    final GraphEditorPanel surface = getActiveGraphEditorPanel();
     final Point point = mPoint == null ? surface.getPastePosition() : mPoint;
     final LabelGeometrySubject geo = new LabelGeometrySubject(point);
     final LabelBlockSubject blocked = new LabelBlockSubject(null, geo);
@@ -115,7 +115,7 @@ public class InsertBlockedEventListAction
   //# Auxiliary Methods
   private void updateEnabledStatus()
   {
-    final GraphEditorPanel surface = getActiveControlledSurface();
+    final GraphEditorPanel surface = getActiveGraphEditorPanel();
     if (surface == null) {
       setObservedGraph(null);
       setEnabled(false);

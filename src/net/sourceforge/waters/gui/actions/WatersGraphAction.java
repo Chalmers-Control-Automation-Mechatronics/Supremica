@@ -13,10 +13,9 @@ package net.sourceforge.waters.gui.actions;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.GraphEventPanel;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
-import org.supremica.gui.ide.ModuleContainer;
 
 
 /**
@@ -75,16 +74,8 @@ public abstract class WatersGraphAction
    */
   EditorWindowInterface getActiveEditorWindowInterface()
   {
-    final IDE ide = getIDE();
-    if (!ide.editorActive()) {
-      return null;
-    }
-    final DocumentContainer container = ide.getActiveDocumentContainer();
-    if (container == null || !(container instanceof ModuleContainer)) {
-      return null;
-    }
-    final ModuleContainer mcontainer = (ModuleContainer) container;
-    return mcontainer.getActiveEditorWindowInterface();
+    final ModuleWindowInterface iface = getActiveModuleWindowInterface();
+    return iface == null ? null : iface.getActiveEditorWindowInterface();
   }
 
   /**
@@ -92,10 +83,10 @@ public abstract class WatersGraphAction
    * @return  The currently active controlled surface, or <CODE>null</CODE>
    *          if no graph is being edited.
    */
-  GraphEditorPanel getActiveControlledSurface()
+  GraphEditorPanel getActiveGraphEditorPanel()
   {
     final EditorWindowInterface gui = getActiveEditorWindowInterface();
-    return gui == null ? null : gui.getControlledSurface();
+    return gui == null ? null : gui.getGraphEditorPanel();
   }
 
   /**
