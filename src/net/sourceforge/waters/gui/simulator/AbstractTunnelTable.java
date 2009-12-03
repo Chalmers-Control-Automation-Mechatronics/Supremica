@@ -175,7 +175,6 @@ public class AbstractTunnelTable extends SimulationTable implements
   public void onFrameEvent(final InternalFrameEvent event)
   {
     mParent.repaint();
-    System.out.println("DEBUG: Repainted");
   }
 
   // #########################################################################

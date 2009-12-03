@@ -200,15 +200,6 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
     onReOpen(mContainer, mSim);
   }
 
-  //#########################################################################
-  //# Interface InternalFrameObserver
-
-  public void onFrameEvent(final InternalFrameEvent event)
-  {
-    System.out.println("DEBUG: Removed");
-    if (!event.isOpeningEvent())
-      removeAutomaton(event.getName());
-  }
 
 
   //#########################################################################
