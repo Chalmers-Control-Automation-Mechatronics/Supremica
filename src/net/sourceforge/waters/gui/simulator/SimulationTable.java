@@ -5,16 +5,24 @@ import javax.swing.table.AbstractTableModel;
 public abstract class SimulationTable extends AbstractTableModel implements SimulationObserver
 {
 
+  // #########################################################################
+  // # Constructors
+
   public SimulationTable(final Simulation sim)
   {
     this.mSim = sim;
     sim.attach(this);
   }
 
+  // #########################################################################
+  // # Simple Access
   public Simulation getSim()
   {
     return mSim;
   }
+
+  // #########################################################################
+  // # Data Members
 
   private final Simulation mSim;
 

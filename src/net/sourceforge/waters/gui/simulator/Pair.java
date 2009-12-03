@@ -12,7 +12,7 @@ public class Pair<A, B>
   }
 
   // #################################################################################
-  // # Accessor Methods
+  // # Simple Access
   public A getFirst()
   {
     return a;

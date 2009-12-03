@@ -43,15 +43,13 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
 
 
   //#########################################################################
-  //# Access Methods
+  //# Simple Access
+
   public boolean automatonIsOpen(final AutomatonProxy automaton)
   {
     return openAutomaton.containsKey(automaton.getName());
   }
 
-
-  //#########################################################################
-  //# Mutator Methods
   public void addAutomaton(final String aut,
       final ModuleContainer container, final Simulation sim, final int clicks)
   {
@@ -164,6 +162,39 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
     }
   }
 
+  //#########################################################################
+  //# Dealing with attached InternalFrameObservers
+
+  public void attach (final InternalFrameObserver observer)
+  {
+    observers.add(observer);
+  }
+
+  public void detach (final InternalFrameObserver observer)
+  {
+    observers.remove(observer);
+  }
+
+  private void fireFrameOpenedEvent(final String mAutomaton, final AutomatonInternalFrame opening)
+  {
+    final Set<InternalFrameObserver> temp =
+      new HashSet<InternalFrameObserver>(observers);
+    for (final InternalFrameObserver observer : temp)
+    {
+      observer.onFrameEvent(new InternalFrameEvent(mAutomaton, opening, true));
+    }
+  }
+
+  private void fireFrameClosedEvent(final String mAutomaton, final AutomatonInternalFrame closing)
+  {
+    final Set<InternalFrameObserver> temp =
+      new HashSet<InternalFrameObserver>(observers);
+    for (final InternalFrameObserver observer : temp)
+    {
+      observer.onFrameEvent(new InternalFrameEvent(mAutomaton, closing, false));
+    }
+  }
+
 
   //#########################################################################
   //# Interface SimulationObserver
@@ -200,43 +231,9 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
     onReOpen(mContainer, mSim);
   }
 
-
-
-  //#########################################################################
-  //# Dealing with attached InternalFrameObservers
-
-  public void attach (final InternalFrameObserver observer)
-  {
-    observers.add(observer);
-  }
-
-  public void detach (final InternalFrameObserver observer)
-  {
-    observers.remove(observer);
-  }
-
-  private void fireFrameOpenedEvent(final String mAutomaton, final AutomatonInternalFrame opening)
-  {
-    final Set<InternalFrameObserver> temp =
-      new HashSet<InternalFrameObserver>(observers);
-    for (final InternalFrameObserver observer : temp)
-    {
-      observer.onFrameEvent(new InternalFrameEvent(mAutomaton, opening, true));
-    }
-  }
-
-  private void fireFrameClosedEvent(final String mAutomaton, final AutomatonInternalFrame closing)
-  {
-    final Set<InternalFrameObserver> temp =
-      new HashSet<InternalFrameObserver>(observers);
-    for (final InternalFrameObserver observer : temp)
-    {
-      observer.onFrameEvent(new InternalFrameEvent(mAutomaton, closing, false));
-    }
-  }
-
   //#########################################################################
   //# Data Members
+
   private final HashMap<String,AutomatonInternalFrame> openAutomaton =
     new HashMap<String,AutomatonInternalFrame>();
   private final HashMap<String, Rectangle> oldOpen =
@@ -247,6 +244,7 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
 
   //#########################################################################
   //# Class Constants
+
   private static final long serialVersionUID = -5528014241244952875L;
 
 }

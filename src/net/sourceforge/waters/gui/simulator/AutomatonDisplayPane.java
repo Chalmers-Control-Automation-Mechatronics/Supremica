@@ -76,6 +76,12 @@ public class AutomatonDisplayPane
     sim.attach(this);
   }
 
+  //##########################################################################
+  //# Simple Access
+  public Rectangle2D getMinimumBoundingRectangle()
+  {
+    return getShapeProducer().getMinimumBoundingRectangle();
+  }
 
   //##########################################################################
   //# Interface net.sourceforge.waters.gui.simulator.SimulatorObserver
@@ -86,7 +92,8 @@ public class AutomatonDisplayPane
 
 
   //##########################################################################
-  //# Repainting
+  //# Class BackupGraphPanel
+
   public void paint(final Graphics g)
   {
     g.setColor(getBackground());
@@ -94,7 +101,7 @@ public class AutomatonDisplayPane
     final Graphics2D g2d = (Graphics2D) g;
     final AffineTransform trans = g2d.getTransform();
     final ProxyShapeProducer producer = getShapeProducer();
-    final Rectangle2D imageRect = producer.getMinimumBoundingRectangle(); // Fails here
+    final Rectangle2D imageRect = producer.getMinimumBoundingRectangle();
     final Dimension panelSize = getSize();
     final double scaleX = panelSize.getWidth() / imageRect.getWidth();
     final double scaleY = panelSize.getHeight() / imageRect.getHeight();
@@ -119,14 +126,8 @@ public class AutomatonDisplayPane
   }
 
   //##########################################################################
-  //# Accessor Methods
-
-  public Rectangle2D getMinimumBoundingRectangle()
-  {
-    return getShapeProducer().getMinimumBoundingRectangle();
-  }
-  //##########################################################################
   //# Inner Class SimulatorRenderingContext
+
   private class SimulatorRenderingContext extends ModuleRenderingContext
   {
 
@@ -216,13 +217,11 @@ public class AutomatonDisplayPane
 
   }
 
-
   //#################################################################################
   //# Data Members
   private final Simulation mSim;
   private final AutomatonProxy mAutomaton;
   private final ModuleContainer mContainer;
-
 
   //#################################################################################
   //# Class Constants

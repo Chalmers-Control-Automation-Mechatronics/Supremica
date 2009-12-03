@@ -16,6 +16,9 @@ public class SimulatorPanel
   extends MainPanel
 {
 
+  // #########################################################################
+  // # Constructor
+
   public SimulatorPanel(final ModuleContainer moduleContainer,
                         final String name)
   {
@@ -30,6 +33,9 @@ public class SimulatorPanel
     setupEvents();
     setLeftComponent(mTabbedPane);
   }
+
+  // #########################################################################
+  // # Auxillary Methods
 
   private void setupDesktop()
   {

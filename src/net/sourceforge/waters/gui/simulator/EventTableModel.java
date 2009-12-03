@@ -21,6 +21,13 @@ public class EventTableModel
     getRawData();
   }
 
+  //##########################################################################
+  //# Interface SimulationObserver
+  public void simulationChanged(final SimulationChangeEvent event)
+  {
+    getRawData();
+    fireTableDataChanged();
+  }
 
   //##########################################################################
   //# Class TableModel
@@ -87,16 +94,6 @@ public class EventTableModel
     else
       mRawData = new Object[0][0];
   }
-
-
-  //##########################################################################
-  //# Interface SimulationObserver
-  public void simulationChanged(final SimulationChangeEvent event)
-  {
-    getRawData();
-    fireTableDataChanged();
-  }
-
 
   //##########################################################################
   //# Data Members

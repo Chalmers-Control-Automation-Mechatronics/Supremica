@@ -12,7 +12,8 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public class UndoActionListener implements ActionListener, Observer
 {
-
+  // #########################################################################
+  // # Constructors
   public UndoActionListener(final JTable parent, final ModuleContainer module)
   {
     this.sim = ((SimulationTable) parent.getModel()).getSim();
@@ -20,6 +21,16 @@ public class UndoActionListener implements ActionListener, Observer
     module.attach(this);
   }
 
+  // #########################################################################
+  // # Simple Access
+
+  public void update()
+  {
+    this.sim = ((SimulationTable) parent.getModel()).getSim();
+  }
+
+  // #########################################################################
+  // # Interface ActionListener
   public void actionPerformed(final ActionEvent e)
   {
     this.sim.reverseSingleStep();
@@ -27,17 +38,15 @@ public class UndoActionListener implements ActionListener, Observer
 
   //#################################################################################################
   //## Interface Observer
-  public void update()
-  {
-    this.sim = ((SimulationTable) parent.getModel()).getSim();
-  }
 
   public void update(final EditorChangedEvent e)
   {
     this.sim = ((SimulationTable) parent.getModel()).getSim();
   }
 
+  // #########################################################################
+  // # Data Members
+
   Simulation sim;
   JTable parent;
-
 }

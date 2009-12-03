@@ -5,10 +5,8 @@ import java.util.EventObject;
 public class TableOrderChangedEvent extends EventObject
 {
 
-  /**
-   *
-   */
-  private static final long serialVersionUID = 7165158300769771603L;
+  // #########################################################################
+  // # Constructor
 
   public TableOrderChangedEvent(final AbstractTunnelTable table)
   {
@@ -16,10 +14,21 @@ public class TableOrderChangedEvent extends EventObject
     mTable = table;
   }
 
+  // #########################################################################
+  // # Simple Access
+
   public AbstractTunnelTable getTable()
   {
     return mTable;
   }
 
+  // #########################################################################
+  // # Data Members
+
   private final AbstractTunnelTable mTable;
+
+  // #########################################################################
+  // # Class Constants
+
+  private static final long serialVersionUID = 7165158300769771603L;
 }

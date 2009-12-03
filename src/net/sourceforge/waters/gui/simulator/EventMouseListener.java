@@ -7,7 +7,7 @@ import javax.swing.JTable;
 
 import net.sourceforge.waters.model.des.EventProxy;
 
-public class EventMouseListener extends MouseAdapter implements SimulationObserver
+public class EventMouseListener extends MouseAdapter
 {
   //#################################################################################
   //# Constructors
@@ -15,12 +15,12 @@ public class EventMouseListener extends MouseAdapter implements SimulationObserv
   {
     this.mSim = sim;
     this.parent = table;
-    mSim.attach(this);
   }
 
   //#################################################################################
   //# Class MouseAdapter
-  public void mouseClicked(final MouseEvent e){
+  public void mouseClicked(final MouseEvent e)
+  {
       if (e.getClickCount() == 2)
       {
         for (int row = 0; row < parent.getRowCount(); row++)
@@ -44,14 +44,6 @@ public class EventMouseListener extends MouseAdapter implements SimulationObserv
           }
         }
       }
-    }
-
-  //#######################################################################################
-  //# Interface Simulation Observer
-
-  public void simulationChanged(final SimulationChangeEvent event)
-  {
-    // If needed to update
   }
 
   //#################################################################################

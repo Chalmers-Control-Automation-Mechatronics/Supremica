@@ -12,12 +12,16 @@ import java.lang.Comparable;
 
 public class AutomatonTableComparitor<K> implements Comparator<K>
 {
-
+  // #########################################################################
+  // # Constructor
   public AutomatonTableComparitor()
   {
     sortingMethods = new ArrayList<Pair<Boolean, Integer>>();
     sortingMethods.add(new Pair<Boolean, Integer>(true, 1));
   }
+
+  // #########################################################################
+  // # Simple Access
 
   public void addNewSortingMethod(final int column)
   {
@@ -35,6 +39,14 @@ public class AutomatonTableComparitor<K> implements Comparator<K>
     else
       sortingMethods.add(0, new Pair<Boolean, Integer>(true, column));
   }
+
+  public String toString()
+  {
+    return sortingMethods.toString();
+  }
+
+  // #########################################################################
+  // # Interface Comparator
 
   @SuppressWarnings("unchecked")
   public int compare(final Object o1, final Object o2)
@@ -71,6 +83,9 @@ public class AutomatonTableComparitor<K> implements Comparator<K>
     return 0;
   }
 
+  // #########################################################################
+  // # Auxillary Methods
+
   @SuppressWarnings("unchecked")
   private boolean checkValid(final Object object)
   {
@@ -85,10 +100,6 @@ public class AutomatonTableComparitor<K> implements Comparator<K>
   // ####################################################################
   // # Data Members
 
-  public String toString()
-  {
-    return sortingMethods.toString();
-  }
 
   private final ArrayList<Pair<Boolean, Integer>> sortingMethods;
 

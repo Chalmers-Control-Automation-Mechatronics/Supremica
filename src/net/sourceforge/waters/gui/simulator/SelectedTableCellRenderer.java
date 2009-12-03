@@ -8,13 +8,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 public class SelectedTableCellRenderer extends DefaultTableCellRenderer
 {
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1086293271366963464L;
-  private final Simulation mSim;
-  private final AutomatonDesktopPane mDesktop;
 
+  // #########################################################################
+  // # Constructor
   public SelectedTableCellRenderer(final Simulation sim, final AutomatonDesktopPane desktop)
   {
     super();
@@ -22,6 +18,8 @@ public class SelectedTableCellRenderer extends DefaultTableCellRenderer
     mDesktop = desktop;
   }
 
+  // #########################################################################
+  // # Class DefaultTableCellRender
   public Component getTableCellRendererComponent
     (final JTable table, final Object value, final boolean selected, final boolean focused, final int row, final int column)
   {
@@ -34,5 +32,11 @@ public class SelectedTableCellRenderer extends DefaultTableCellRenderer
     }
     return tableCellRenderer;
   }
+
+  // #########################################################################
+  // # Data Members
+  private static final long serialVersionUID = 1086293271366963464L;
+  private final Simulation mSim;
+  private final AutomatonDesktopPane mDesktop;
 }
 

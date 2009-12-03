@@ -12,6 +12,7 @@ public class BlockingException extends Exception
 
   public BlockingException()
   {
+    super();
   }
 
   //#################################################################################

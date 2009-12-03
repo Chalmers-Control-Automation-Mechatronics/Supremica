@@ -37,6 +37,9 @@ public class AutomatonInternalFrame extends JInternalFrame
     addComponentListener();
   }
 
+  // #########################################################################
+  // # Simple Access
+
   private void addComponentListener()
   {
     aspectComponentListener = new PreserveAspectComponentListener(this, mDisplayPane);

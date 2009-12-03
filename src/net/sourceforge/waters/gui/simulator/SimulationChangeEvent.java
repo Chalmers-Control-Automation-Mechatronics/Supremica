@@ -62,7 +62,7 @@ public class SimulationChangeEvent extends EventObject
   }
 
   //#########################################################################
-  //# Getters
+  //# Simple Access
   /**
    * Gets the source of this event.
    */

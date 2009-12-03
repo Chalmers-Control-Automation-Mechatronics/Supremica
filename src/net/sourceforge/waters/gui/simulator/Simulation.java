@@ -61,7 +61,7 @@ public class Simulation implements ModelObserver, Observer
 
 
   //#########################################################################
-  //# Accessor Functions
+  //# Simple Access
   @SuppressWarnings("unchecked")
   public ArrayList<EventProxy> getValidTransitions()
   {
@@ -223,8 +223,6 @@ public class Simulation implements ModelObserver, Observer
     return null;
   }
 
-  //#########################################################################
-  //# Mutator Methods
   public void setState(final AutomatonProxy automaton, final StateProxy state)
   {
     if (!automaton.getStates().contains(state))
@@ -319,9 +317,8 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-
   //#########################################################################
-  //# Interface Object
+  //# Class Object
   public boolean Equals(final Object e)
   {
     if (e.getClass() != Simulation.class) return false;
@@ -550,8 +547,8 @@ public class Simulation implements ModelObserver, Observer
 
   //#########################################################################
   //# Data Members
-  // The Map object is the current state of the key
-  private HashMap<AutomatonProxy,StateProxy> mAllAutomatons;
+
+  private HashMap<AutomatonProxy,StateProxy> mAllAutomatons; // The Map object is the current state of the key
   private ArrayList<EventProxy> mEnabledEvents;
   private HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the key
   private ArrayList<EventProxy> mPreviousEvents;

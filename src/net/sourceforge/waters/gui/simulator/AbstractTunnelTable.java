@@ -38,9 +38,49 @@ public class AbstractTunnelTable extends SimulationTable implements
     observers = new HashSet<TableOrderObserver>();
   }
 
+  // #########################################################################
+  // # Simple Access
+
   public void attachTable(final JTable table)
   {
     mParent = table;
+  }
+
+  /**
+   * Gets the automaton represented by the indexth row of the sorted table
+   * @param index The index of the row of the table
+   * @return The automaton represented at that index
+   */
+  public AutomatonProxy getAutomaton(final int index, final Simulation mSimulation)
+  {
+    final String finder = (String)mRawData.get(index).get(1);
+    return mSimulation.getAutomatonFromName(finder);
+  }
+
+  public AutomatonTableComparitor<Object> getComparitor()
+  {
+    return mComparator;
+  }
+
+  //#########################################################################
+  // # Processing TableOrderObservers
+
+  @SuppressWarnings("unchecked")
+  public void tableOrderChanged()
+  {
+    final HashSet<TableOrderObserver> clone = (HashSet<TableOrderObserver>)observers.clone();
+    for (final TableOrderObserver observer : clone)
+      observer.processTableReorder(new TableOrderChangedEvent(this));
+    getRawData();
+  }
+
+  public void attach (final TableOrderObserver observer)
+  {
+    observers.add(observer);
+  }
+  public void detach (final TableOrderObserver observer)
+  {
+    observers.remove(observer);
   }
 
   // #########################################################################
@@ -96,26 +136,6 @@ public class AbstractTunnelTable extends SimulationTable implements
       return "Invalid";
     }
   }
-  //#########################################################################
-  // # Processing TableOrderObservers
-
-  @SuppressWarnings("unchecked")
-  public void tableOrderChanged()
-  {
-    final HashSet<TableOrderObserver> clone = (HashSet<TableOrderObserver>)observers.clone();
-    for (final TableOrderObserver observer : clone)
-      observer.processTableReorder(new TableOrderChangedEvent(this));
-    getRawData();
-  }
-
-  public void attach (final TableOrderObserver observer)
-  {
-    observers.add(observer);
-  }
-  public void detach (final TableOrderObserver observer)
-  {
-    observers.remove(observer);
-  }
 
   // ##########################################################################
   // # Interface net.sourceforge.waters.gui.simulator.SimulationObserver
@@ -123,6 +143,13 @@ public class AbstractTunnelTable extends SimulationTable implements
   {
     getRawData();
     fireTableDataChanged();
+  }
+
+  //###########################################################################
+  //# Interface InternalFrameObserver
+  public void onFrameEvent(final InternalFrameEvent event)
+  {
+    mParent.repaint();
   }
 
   // #########################################################################
@@ -150,31 +177,6 @@ public class AbstractTunnelTable extends SimulationTable implements
       mRawData = output;
     } else
       mRawData = new ArrayList<List<Object>>();
-  }
-
-  // ###########################################################################
-  // # Accessor Methods
-  /**
-   * Gets the automaton represented by the indexth row of the sorted table
-   * @param index The index of the row of the table
-   * @return The automaton represented at that index
-   */
-  public AutomatonProxy getAutomaton(final int index, final Simulation mSimulation)
-  {
-    final String finder = (String)mRawData.get(index).get(1);
-    return mSimulation.getAutomatonFromName(finder);
-  }
-
-  public AutomatonTableComparitor<Object> getComparitor()
-  {
-    return mComparator;
-  }
-
-  //###########################################################################
-  //# Interface InternalFrameObserver
-  public void onFrameEvent(final InternalFrameEvent event)
-  {
-    mParent.repaint();
   }
 
   // #########################################################################

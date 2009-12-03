@@ -13,6 +13,8 @@ import javax.swing.Timer;
 
 public class PreserveAspectComponentListener implements ComponentListener
 {
+  // #########################################################################
+  // # Constructor
   public PreserveAspectComponentListener(final AutomatonInternalFrame frame,
       final AutomatonDisplayPane pane)
   {
@@ -22,6 +24,17 @@ public class PreserveAspectComponentListener implements ComponentListener
     draggingEnabled = true;
   }
 
+  // ########################################################################
+  // # Interface InternalFrameMouseupObserver
+
+  public void setBounds(final Rectangle bounds)
+  {
+    oldBounds = bounds;
+    System.out.println("Bounds Changed");
+  }
+
+  // #########################################################################
+  // # Class Component Listener
   public void componentHidden(final ComponentEvent e)
   {
     // Do nothing
@@ -34,16 +47,6 @@ public class PreserveAspectComponentListener implements ComponentListener
       oldBounds = mFrame.getBounds();
       //System.out.println("Bounds Changed. Reason: " + e.getID());
     }
-  }
-
-  private boolean close(final int a, final int b, final int delta)
-  {
-    return (Math.abs(a - b) < delta);
-  }
-
-  private boolean close(final double a, final double b, final double delta)
-  {
-    return (Math.abs(a - b) < delta);
   }
 
   public void componentResized(final ComponentEvent e)
@@ -101,7 +104,17 @@ public class PreserveAspectComponentListener implements ComponentListener
   // ########################################################################
   // # Auxillary Functions
 
-  public void enableDragging()
+  private boolean close(final int a, final int b, final int delta)
+  {
+    return (Math.abs(a - b) < delta);
+  }
+
+  private boolean close(final double a, final double b, final double delta)
+  {
+    return (Math.abs(a - b) < delta);
+  }
+
+  private void enableDragging()
   {
     draggingEnabled = true;
   }
@@ -174,14 +187,10 @@ public class PreserveAspectComponentListener implements ComponentListener
     return Direction.ILLEGAL;
   }
 
-  // ########################################################################
-  // # Interface InternalFrameMouseupObserver
 
-  public void setBounds(final Rectangle bounds)
-  {
-    oldBounds = bounds;
-    System.out.println("Bounds Changed");
-  }
+
+  // #########################################################################
+  // # Data Members
 
   private final AutomatonInternalFrame mFrame;
   private final AutomatonDisplayPane mDisplayPane;
@@ -189,7 +198,7 @@ public class PreserveAspectComponentListener implements ComponentListener
   private boolean draggingEnabled;
 
   // ########################################################################
-  // # Static Constants
+  // # Class Constants
 
   private final int MINIMUM_CHANGE_TO_RESIZE = 2; // The minimum change in size which corresponds to needing a resize to take place.
     // Prevents the frame from automatically shrinking. It might be able to safely set it to 0.

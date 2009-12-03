@@ -6,7 +6,10 @@ import net.sourceforge.waters.model.base.WatersException;
 public class UncontrollableException extends WatersException
 {
 
-  public UncontrollableException(String e)
+  // #########################################################################
+  // # Constructors
+
+  public UncontrollableException(final String e)
   {
     super(e);
   }

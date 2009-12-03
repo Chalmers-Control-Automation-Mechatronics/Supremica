@@ -13,10 +13,12 @@ import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.des.EventProxy;
 
 import org.supremica.gui.ide.ModuleContainer;
-
-
+// Move to inner class?? Or is it too long??
 public class TunnelActionListener implements ActionListener, Observer
 {
+
+  // #########################################################################
+  // # Constructor
 
   public TunnelActionListener(final JTable parent, final ModuleContainer module)
   {
@@ -25,15 +27,24 @@ public class TunnelActionListener implements ActionListener, Observer
     module.attach(this);
   }
 
+  // #########################################################################
+  // # Simple Access
+
   public void update()
   {
     this.sim = ((SimulationTable) parent.getModel()).getSim();
   }
 
+  // #########################################################################
+  // # Interface Observer
+
   public void update(final EditorChangedEvent e)
   {
     this.sim = ((SimulationTable) parent.getModel()).getSim();
   }
+
+  // #########################################################################
+  // # Interface ActionListener
 
   public void actionPerformed(final ActionEvent e)
   {
@@ -56,8 +67,10 @@ public class TunnelActionListener implements ActionListener, Observer
         System.err.println(exception.toString());
       }
     }
-
   }
+
+  // #########################################################################
+  // # Auxillary Methods
 
   private EventProxy findOptions(final ArrayList<EventProxy> possibleEvents)
   {
@@ -85,6 +98,9 @@ public class TunnelActionListener implements ActionListener, Observer
             "Illegal Choice", JOptionPane.ERROR_MESSAGE); // ,supremicaIcon
     return null;
   }
+
+  // #########################################################################
+  // # Data Members
 
   Simulation sim;
   JTable parent;

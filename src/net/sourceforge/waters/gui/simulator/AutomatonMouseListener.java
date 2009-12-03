@@ -7,7 +7,7 @@ import javax.swing.JTable;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
-public class AutomatonMouseListener extends MouseAdapter implements SimulationObserver
+public class AutomatonMouseListener extends MouseAdapter
 {
   //#################################################################################
   //# Constructors
@@ -16,7 +16,6 @@ public class AutomatonMouseListener extends MouseAdapter implements SimulationOb
     this.mSim = sim;
     this.parent = table;
     this.output = desktop;
-    mSim.attach(this);
   }
 
   //#################################################################################
@@ -28,16 +27,7 @@ public class AutomatonMouseListener extends MouseAdapter implements SimulationOb
     {
       final AutomatonProxy toAdd = ((AbstractTunnelTable)parent.getModel()).getAutomaton(row, mSim);
       output.addAutomaton(toAdd.getName(), mSim.getContainer(), mSim, e.getClickCount());
-      // parent.clearSelection();
     }
-  }
-
-  //#######################################################################################
-  //# Interface Simulation Observer
-
-  public void simulationChanged(final SimulationChangeEvent event)
-  {
-    // If needed
   }
 
   //#################################################################################
