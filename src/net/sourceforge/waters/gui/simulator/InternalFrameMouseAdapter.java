@@ -22,6 +22,10 @@ public class InternalFrameMouseAdapter extends MouseAdapter
    //parent.moveToFront();
   }
 
+  public void mouseReleased(final MouseEvent e){
+    System.out.println("DEBUG: Mouse has been released");
+  }
+
   //#################################################################################
   //# Data Variables
 

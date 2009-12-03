@@ -27,7 +27,7 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
-public class AutomatonDesktopPane extends JDesktopPane implements SimulationObserver, InternalFrameObserver, Observer
+public class AutomatonDesktopPane extends JDesktopPane implements SimulationObserver, Observer
 {
   //#########################################################################
   //# Constructor
@@ -75,7 +75,6 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
             newFrame.moveToFront();
             openAutomaton.put(aut, newFrame);
             fireFrameOpenedEvent(aut, newFrame);
-            newFrame.attach(this);
           } catch (final GeometryAbsentException exception) {
             final IDE ide = container.getIDE();
             final String msg = exception.getMessage();
@@ -128,6 +127,7 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
 
   public void removeAutomaton(final String aut)
   {
+    fireFrameClosedEvent(aut, openAutomaton.get(aut));
     openAutomaton.remove(aut);
   }
 
@@ -231,6 +231,16 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
     for (final InternalFrameObserver observer : temp)
     {
       observer.onFrameEvent(new InternalFrameEvent(mAutomaton, opening, true));
+    }
+  }
+
+  private void fireFrameClosedEvent(final String mAutomaton, final AutomatonInternalFrame closing)
+  {
+    final Set<InternalFrameObserver> temp =
+      new HashSet<InternalFrameObserver>(observers);
+    for (final InternalFrameObserver observer : temp)
+    {
+      observer.onFrameEvent(new InternalFrameEvent(mAutomaton, closing, false));
     }
   }
 

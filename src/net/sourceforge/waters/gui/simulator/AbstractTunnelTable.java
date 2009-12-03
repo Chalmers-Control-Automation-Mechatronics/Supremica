@@ -174,16 +174,6 @@ public class AbstractTunnelTable extends SimulationTable implements
   //# Interface InternalFrameObserver
   public void onFrameEvent(final InternalFrameEvent event)
   {
-    if (event.isOpeningEvent())
-    {
-      event.getFrame().attach(this);
-      System.out.println("DEBUG: Attached");
-    }
-    else
-    {
-      event.getFrame().detach(this);
-      System.out.println("DEBUG: Detached");
-    }
     mParent.repaint();
     System.out.println("DEBUG: Repainted");
   }

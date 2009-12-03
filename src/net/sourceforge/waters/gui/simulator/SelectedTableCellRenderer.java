@@ -27,7 +27,7 @@ public class SelectedTableCellRenderer extends DefaultTableCellRenderer
   {
     final Component tableCellRenderer = super.getTableCellRendererComponent(table, value, selected, focused, row, column);
 
-    if (mDesktop.automatonIsOpen(mSim.getAutomata().get(row)))
+    if (mDesktop.automatonIsOpen(((AbstractTunnelTable)table.getModel()).getAutomaton(row, mSim)))
     {
       final Font oldFont = tableCellRenderer.getFont();
       tableCellRenderer.setFont(oldFont.deriveFont(Font.BOLD));

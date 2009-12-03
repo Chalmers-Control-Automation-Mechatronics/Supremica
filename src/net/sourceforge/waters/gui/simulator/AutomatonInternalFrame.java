@@ -1,7 +1,5 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.util.ArrayList;
-
 import javax.swing.JInternalFrame;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
@@ -30,16 +28,6 @@ public class AutomatonInternalFrame extends JInternalFrame
     setVisible(true);
     pack();
     addComponentListener();
-    observers = new ArrayList<InternalFrameObserver>();
-  }
-
-
-  //##########################################################################
-  //# Class JInternalFrame
-  public void dispose()
-  {
-    fireFrameClosedEvent();
-    super.dispose();
   }
 
   private void addComponentListener()
@@ -48,34 +36,9 @@ public class AutomatonInternalFrame extends JInternalFrame
   }
 
   //##########################################################################
-  //# Dealing with attached InternalFrameObservers
-
-  public void attach (final InternalFrameObserver observer)
-  {
-    if (!observers.contains(observer))
-      observers.add(observer);
-  }
-
-  public void detach (final InternalFrameObserver observer)
-  {
-    observers.remove(observer);
-  }
-
-  public void fireFrameClosedEvent()
-  {
-    final ArrayList<InternalFrameObserver> temp =
-      new ArrayList<InternalFrameObserver>(observers);
-    for (final InternalFrameObserver observer : temp)
-    {
-      observer.onFrameEvent(new InternalFrameEvent(mAutomaton.getName(), this, false));
-    }
-  }
-
-  //##########################################################################
   //# Data Members
   private final AutomatonProxy mAutomaton;
   private final AutomatonDisplayPane mDisplayPane;
-  private final ArrayList<InternalFrameObserver> observers;
 
 
   //#########################################################################
