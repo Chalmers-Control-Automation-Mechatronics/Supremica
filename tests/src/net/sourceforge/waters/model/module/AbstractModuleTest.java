@@ -74,6 +74,24 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     testMarshal("handwritten", "nodegroup2");
   }
 
+  public void testMarshal_parManEg_I_mfb_highlevel()
+    throws Exception
+  {
+    testMarshal("tests", "hisc", "parManEg_I_mfb_highlevel");
+  }
+
+  public void testMarshal_parManEg_I_mfb_lowlevel()
+    throws Exception
+  {
+    testMarshal("tests", "hisc", "parManEg_I_mfb_lowlevel");
+  }
+
+  public void testMarshal_rhone_subsystem1_ld()
+    throws Exception
+  {
+    testMarshal("tests", "hisc", "rhone_subsystem1_ld");
+  }
+
   public void testMarshal_small_factory_2()
     throws Exception
   {
@@ -278,6 +296,24 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     testCrossClone("handwritten", "nodegroup2");
   }
 
+  public void testCrossClone_parManEg_I_mfb_highlevel()
+    throws Exception
+  {
+    testCrossClone("tests", "hisc", "parManEg_I_mfb_highlevel");
+  }
+
+  public void testCrossClone_parManEg_I_mfb_lowlevel()
+    throws Exception
+  {
+    testCrossClone("tests", "hisc", "parManEg_I_mfb_lowlevel");
+  }
+
+  public void testCrossClone_rhone_subsystem1_ld()
+    throws Exception
+  {
+    testCrossClone("tests", "hisc", "rhone_subsystem1_ld");
+  }
+
   public void testCrossClone_small_factory_2()
     throws Exception
   {
@@ -355,7 +391,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final PointGeometryProxy arrowgeo =
       factory.createPointGeometryProxy(arrow);
     final SimpleNodeProxy node =
-      factory.createSimpleNodeProxy("s0", props, true, 
+      factory.createSimpleNodeProxy("s0", props, true,
                                     pointgeo, arrowgeo, null);
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
     final GraphProxy graph =
@@ -574,7 +610,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   //# Overrides for junit.framework.TestCase
   protected void setUp()
     throws Exception
-  { 
+  {
     super.setUp();
     final ModuleProxyFactory factory = getModuleProxyFactory();
     final ModuleProxyFactory altfactory = getAlternateModuleProxyFactory();
