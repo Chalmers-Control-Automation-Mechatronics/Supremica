@@ -62,7 +62,7 @@ package org.supremica.properties;
 public class DoubleProperty
     extends Property
 {
-    
+
     //#######################################################################
     //# Constructors
     public DoubleProperty(final PropertyType type,
@@ -72,7 +72,7 @@ public class DoubleProperty
     {
         this(type, key, value, comment, false);
     }
-    
+
     public DoubleProperty(final PropertyType type,
         final String key,
         final double value,
@@ -82,7 +82,7 @@ public class DoubleProperty
         this(type, key, value, comment, immutable,
             Double.MIN_VALUE, Double.MAX_VALUE);
     }
-    
+
     public DoubleProperty(final PropertyType type,
         final String key,
         final double value,
@@ -92,7 +92,7 @@ public class DoubleProperty
     {
         this(type, key, value, comment, immutable, min, Double.MAX_VALUE);
     }
-    
+
     public DoubleProperty(final PropertyType type,
         final String key,
         final double value,
@@ -108,57 +108,59 @@ public class DoubleProperty
         mMax = max;
         checkValid(value);
     }
-    
-    
+
+
     //#######################################################################
     //# Overrides for Abstract Base Class Property
     public void set(final String value)
     {
         set(Double.parseDouble(value));
     }
-    
+
     public String getAsString()
     {
         return Double.toString(mValue);
     }
-    
+
     public boolean currentValueDifferentFromDefaultValue()
     {
         return mDefaultValue != mValue;
     }
-    
-    
+
+
     //#######################################################################
     //# Specific Access
     public double get()
     {
         return mValue;
     }
-    
+
     public double getMinValue()
     {
         return mMin;
     }
-    
+
     public double getMaxValue()
     {
         return mMax;
     }
-    
+
     public void set(final double value)
     {
+      if (mValue != value) {
         checkMutable();
         checkValid(value);
         final String oldvalue = getAsString();
         mValue = value;
         firePropertyChanged(oldvalue);
+      }
     }
-    
-    public boolean isValid(double value)
+
+    public boolean isValid(final double value)
     {
         return value >= mMin && value <= mMax;
     }
-    
+
     public void checkValid(final double value)
     {
         if (!isValid(value))
@@ -168,16 +170,16 @@ public class DoubleProperty
                 ": " + value + "!");
         }
     }
-    
-    
+
+
     //#######################################################################
     //# Data Members
     private final double mDefaultValue;
     private final double mMin;
     private final double mMax;
-    
+
     private double mValue;
-    
+
 }
 
 

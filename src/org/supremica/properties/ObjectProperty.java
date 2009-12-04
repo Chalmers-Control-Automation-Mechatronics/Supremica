@@ -60,28 +60,28 @@ package org.supremica.properties;
 public class ObjectProperty
     extends Property
 {
-    private String defaultValue;
+    private final String defaultValue;
     private Object mValue;
-    private Object[] legalValues;
-    
-    public ObjectProperty(PropertyType type, String key, Object value, String comment)
+    private final Object[] legalValues;
+
+    public ObjectProperty(final PropertyType type, final String key, final Object value, final String comment)
     {
         this(type, key, value, comment, null);
     }
-    
-    public ObjectProperty(PropertyType type, String key, Object value, String comment, Object[] legalValues)
+
+    public ObjectProperty(final PropertyType type, final String key, final Object value, final String comment, final Object[] legalValues)
     {
         this(type, key, value, comment, legalValues, false);
     }
-    
-    public ObjectProperty(PropertyType type, String key, Object value, String comment, Object[] legalValues, boolean immutable)
+
+    public ObjectProperty(final PropertyType type, final String key, final Object value, final String comment, final Object[] legalValues, final boolean immutable)
     {
         super(type, key, comment, immutable);
         this.defaultValue = value.toString();
         mValue = value.toString();
         this.legalValues = legalValues;
     }
-    
+
     public Object get()
     {
         if (mValue instanceof String)
@@ -89,7 +89,7 @@ public class ObjectProperty
         else
             return mValue;
     }
-    
+
     public String getAsString()
     {
         return get().toString();
@@ -101,22 +101,26 @@ public class ObjectProperty
         set(parseObject(value));
         firePropertyChanged(oldvalue.toString());
     }
-   
+
     public void set(final Object value)
     {
+      if (mValue != value) {
         checkValid(value);
         checkMutable();
+        final String oldvalue = getAsString();
         mValue = value;
+        firePropertyChanged(oldvalue);
+      }
     }
-        
+
     /**
      * Parses a String.
      */
-    private Object parseObject(String value)
+    private Object parseObject(final String value)
     {
         if (legalValues != null)
         {
-            for (Object object: legalValues)
+            for (final Object object: legalValues)
             {
                 if (object.toString().equals(value))
                 {
@@ -130,8 +134,8 @@ public class ObjectProperty
             return value;
         }
     }
-    
-    public boolean isValid(Object value)
+
+    public boolean isValid(final Object value)
     {
         if (value == null)
         {
@@ -159,12 +163,12 @@ public class ObjectProperty
                  ": " + value + "!");
         }
     }
-    
+
     public Object[] legalValues()
     {
-        return legalValues;        
+        return legalValues;
     }
- 
+
     /*
     public String[] legalValuesAsStrings()
     {
@@ -173,27 +177,27 @@ public class ObjectProperty
         {
             legalValuesAsStrings[i] = legalValues[i].toString();
         }
-        return legalValuesAsStrings;        
+        return legalValuesAsStrings;
     }
      */
-    
+
     public String valueToEscapedString()
     {
         return ObjectProperty.convert(getAsString(), false);
     }
-    
+
     public boolean currentValueDifferentFromDefaultValue()
     {
         return !defaultValue.equals(mValue);
     }
-    
+
     // --------------------------------------------------------------
     // ALL OF THIS IS COMING FROM THE JAVA SDK CODE (Properties.java)
-    private static char toHex(int nibble)
+    private static char toHex(final int nibble)
     {
         return hexDigit[(nibble & 0xF)];
     }
-    
+
     /** A table of hex digits */
     private static final char[] hexDigit = { '0', '1', '2', '3', '4', '5',
     '6', '7', '8', '9', 'A', 'B',
@@ -205,53 +209,53 @@ public class ObjectProperty
     private static final String specialSaveChars = "=: \t\r\n\f#!";
     @SuppressWarnings("unused")
 	private static final String whiteSpaceChars = " \t\r\n\f";
-    
-    private static String convert(String theString, boolean escapeSpace)
+
+    private static String convert(final String theString, final boolean escapeSpace)
     {
-        int len = theString.length();
-        StringBuffer outBuffer = new StringBuffer(len * 2);
-        
+        final int len = theString.length();
+        final StringBuffer outBuffer = new StringBuffer(len * 2);
+
         for (int x = 0; x < len; x++)
         {
-            char aChar = theString.charAt(x);
-            
+            final char aChar = theString.charAt(x);
+
             switch (aChar)
             {
-                
+
                 case ' ' :
                     if ((x == 0) || escapeSpace)
                     {
                         outBuffer.append('\\');
                     }
-                    
+
                     outBuffer.append(' ');
                     break;
-                    
+
                 case '\\' :
                     outBuffer.append('\\');
                     outBuffer.append('\\');
                     break;
-                    
+
                 case '\t' :
                     outBuffer.append('\\');
                     outBuffer.append('t');
                     break;
-                    
+
                 case '\n' :
                     outBuffer.append('\\');
                     outBuffer.append('n');
                     break;
-                    
+
                 case '\r' :
                     outBuffer.append('\\');
                     outBuffer.append('r');
                     break;
-                    
+
                 case '\f' :
                     outBuffer.append('\\');
                     outBuffer.append('f');
                     break;
-                    
+
                 default :
                     if ((aChar < 0x0020) || (aChar > 0x007e))
                     {
@@ -268,12 +272,12 @@ public class ObjectProperty
                         {
                             outBuffer.append('\\');
                         }
-                        
+
                         outBuffer.append(aChar);
                     }
             }
         }
-        
+
         return outBuffer.toString();
     }
 }

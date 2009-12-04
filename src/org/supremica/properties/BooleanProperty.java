@@ -91,8 +91,8 @@ public class BooleanProperty
     {
       if (mValue != value) {
         checkMutable();
-        mValue = value;
         final String oldvalue = getAsString();
+        mValue = value;
         firePropertyChanged(oldvalue);
       }
     }
