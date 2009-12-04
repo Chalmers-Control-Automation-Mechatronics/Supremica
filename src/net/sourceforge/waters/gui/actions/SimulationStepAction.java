@@ -12,13 +12,18 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.Action;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
+import net.sourceforge.waters.gui.simulator.UncontrollableException;
+import net.sourceforge.waters.model.des.EventProxy;
 
 import org.supremica.gui.ide.IDE;
 
@@ -47,8 +52,24 @@ public class SimulationStepAction
   {
     final SimulatorPanel panel = getActiveSimulatorPanel();
     if (panel != null) {
-      // final Simulation sim = getObservedSimulation();
-      // sim.step();
+      final Simulation sim = getObservedSimulation();
+      final ArrayList<EventProxy> possibleEvents = sim.getValidTransitions();
+      Collections.sort(possibleEvents);
+      if (possibleEvents.size() == 1) {
+        try {
+          sim.step(possibleEvents.get(0));
+        } catch (final UncontrollableException exception) {
+          // TODO Auto-generated catch block
+          System.err.println(exception.toString());
+        }
+      } else {
+        try {
+          sim.step(findOptions(possibleEvents));
+        } catch (final UncontrollableException exception) {
+          // TODO Auto-generated catch block
+          System.err.println(exception.toString());
+        }
+      }
     }
   }
 
@@ -60,10 +81,32 @@ public class SimulationStepAction
     final Simulation sim = getObservedSimulation();
     if (sim == null) {
       setEnabled(false);
+      System.out.println("DEBUG [SimulationStepAction]: Simulation is null");
     } else {
-      // TODO Check the status of the simulation
-      // and call setEnabled() to enable or disable this action.
+      setEnabled(sim.getValidTransitions().size() != 0);
     }
+  }
+
+  private EventProxy findOptions(final ArrayList<EventProxy> possibleEvents)
+  {
+    final Object[] possibilities = possibleEvents.toArray();
+    final EventProxy event =
+        (EventProxy) JOptionPane
+            .showInputDialog(
+                getIDE(),
+                "There are multiple events possible. Which one do you wish to fire?",
+                "Multiple Options available", JOptionPane.QUESTION_MESSAGE,
+                null, // The supremica icon goes here
+                possibilities, possibilities[0]);
+
+    // If a string was returned, say so.
+    if ((event != null)) {
+      for (final EventProxy findEvent : possibleEvents) {
+        if (findEvent == event)
+          return event;
+      }
+    }
+    return null;
   }
 
 

@@ -206,6 +206,11 @@ public class Simulation implements ModelObserver, Observer
     return mCompiledDES;
   }
 
+  public int getCurrentTime()
+  {
+    return currentTime;
+  }
+
   public TransitionProxy getPreviousTransition(final AutomatonProxy automaton)
   {
     if (currentTime == 0)
