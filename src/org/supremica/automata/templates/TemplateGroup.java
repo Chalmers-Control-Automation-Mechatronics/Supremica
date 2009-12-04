@@ -51,21 +51,21 @@ package org.supremica.automata.templates;
 
 import java.util.*;
 
-public class TemplateGroup
+public class TemplateGroup implements Iterable<TemplateItem>
 {
-    private List<TemplateItem> items = new LinkedList<TemplateItem>();
+    private final List<TemplateItem> items = new LinkedList<TemplateItem>();
     @SuppressWarnings("unused")
-	private TemplateTypes type;
-    private String name;
-    private String shortDescription;
-    
-    public TemplateGroup(TemplateTypes type)
+	private final TemplateTypes type;
+    private final String name;
+    private final String shortDescription;
+
+    public TemplateGroup(final TemplateTypes type)
     {
 	this.type = type;
 	this.name = type.getName();
 	this.shortDescription = type.getShortDescription();
     }
-    
+
     public String getName()
     {
     	return name;
@@ -76,11 +76,11 @@ public class TemplateGroup
     	return shortDescription;
     }
 
-    public void addItem(TemplateItem item)
+    public void addItem(final TemplateItem item)
     {
     	items.add(item);
     }
-    
+
     public Iterator<TemplateItem> iterator()
     {
 	return items.iterator();

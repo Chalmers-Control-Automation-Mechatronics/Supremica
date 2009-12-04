@@ -21,11 +21,11 @@ public class SimulationReplayStepAction
   SimulationReplayStepAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "Step");
+    putValue(Action.NAME, "Replay Step");
     putValue(Action.SHORT_DESCRIPTION, "Replay the next event");
-    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_R);
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_T);
     putValue(Action.ACCELERATOR_KEY,
-             KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK)); // Get better Accelerator Key
+             KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK)); // Get better Accelerator Key
   }
 
 

@@ -4,8 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
-import javax.swing.KeyStroke;
-
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
@@ -23,9 +21,7 @@ public class SimulationResetAction
     super(ide);
     putValue(Action.NAME, "Reset");
     putValue(Action.SHORT_DESCRIPTION, "Reset the Simulation");
-    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_T);
-    putValue(Action.ACCELERATOR_KEY,
-             KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.ALT_MASK)); // Get better Accelerator
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_R);
   }
 
 

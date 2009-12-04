@@ -34,9 +34,17 @@ public class SimulatorPanel
     setLeftComponent(mTabbedPane);
   }
 
-  // #########################################################################
-  // # Auxillary Methods
 
+  // #########################################################################
+  // # Simple Access
+  public Simulation getSimulation()
+  {
+    return mSimulation;
+  }
+
+
+  // #########################################################################
+  // # Auxiliary Methods
   private void setupDesktop()
   {
     mDesktop = new AutomatonDesktopPane(mModuleContainer, mSimulation);

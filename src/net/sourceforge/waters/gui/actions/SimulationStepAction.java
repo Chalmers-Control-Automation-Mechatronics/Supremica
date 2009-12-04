@@ -42,7 +42,7 @@ public class SimulationStepAction
     putValue(Action.SHORT_DESCRIPTION, "Execute an event");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
     putValue(Action.ACCELERATOR_KEY,
-	         KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.ALT_MASK));
+	         KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.ALT_MASK));
   }
 
 

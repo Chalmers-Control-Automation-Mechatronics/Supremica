@@ -47,8 +47,8 @@ public abstract class WatersSimulationAction
         setEnabled(false);
         observeSimulation(null);
       } else {
-        // final Simulation sim = panel.getSimulation();
-        // observeSimulation(sim);
+        final Simulation sim = panel.getSimulation();
+        observeSimulation(sim);
         updateEnabledStatus();
       }
       break;
