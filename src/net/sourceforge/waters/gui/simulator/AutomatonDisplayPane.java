@@ -1,8 +1,6 @@
 package net.sourceforge.waters.gui.simulator;
 
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -56,7 +54,6 @@ public class AutomatonDisplayPane
   {
     super(graph, container.getModule());
     mParent = parent;
-    System.out.println("DEBUG: Opening");
     mSim = sim;
     mAutomaton = aut;
     mContainer = container;
@@ -70,7 +67,7 @@ public class AutomatonDisplayPane
     if (ensureGeometryExists()) {
       // Spring embedder is running, guessing window size ...
       final int numstates = aut.getStates().size();
-      width = height = 136 + 24 * numstates;
+      width = height = 128 + 32 * numstates;
     } else {
       final Rectangle2D imageRect = producer.getMinimumBoundingRectangle();
       width = (int) Math.ceil(imageRect.getWidth());
@@ -88,6 +85,7 @@ public class AutomatonDisplayPane
     return getShapeProducer().getMinimumBoundingRectangle();
   }
 
+
   //##########################################################################
   //# Interface net.sourceforge.waters.gui.simulator.SimulatorObserver
   public void simulationChanged(final SimulationChangeEvent event)
@@ -98,7 +96,6 @@ public class AutomatonDisplayPane
 
   //##########################################################################
   //# Class BackupGraphPanel
-
   public void paint(final Graphics g)
   {
     g.setColor(getBackground());
@@ -111,11 +108,8 @@ public class AutomatonDisplayPane
     final double scaleX = panelSize.getWidth() / imageRect.getWidth();
     final double scaleY = panelSize.getHeight() / imageRect.getHeight();
     final double min = Math.min(scaleX, scaleY);
-    g2d.setColor(Color.RED);
-    g2d.setStroke(new BasicStroke(4f));
     g2d.scale(min, min);
     g2d.translate(-imageRect.getX(), -imageRect.getY());
-    g2d.drawRect((int)imageRect.getX(), (int)imageRect.getY(), (int)imageRect.getWidth(), (int)imageRect.getHeight());
     super.paint(g2d);
     g2d.setTransform(trans);
   }
@@ -133,29 +127,15 @@ public class AutomatonDisplayPane
   public void embedderChanged(final EmbedderEvent event)
   {
     super.embedderChanged(event);
-    if (event.getType() == EmbedderEventType.EMBEDDER_STOP)
-    {
-      final Rectangle2D automatonSize =
-        this.getMinimumBoundingRectangle();
-      final double automatonWidth = (int) automatonSize.getWidth();
-      final double automatonHeight = (int) automatonSize.getHeight();
-      System.out.println("DEBUG: Old size: " + this.getWidth() + "," + this.getHeight());
-      final double finalWidth =
-        Math.min(this.getWidth(),
-            (automatonWidth * this.getHeight()) / automatonHeight);
-      final double finalHeight =
-        Math.min(this.getHeight(),
-            (automatonHeight * this.getWidth()) / automatonWidth);
-      setPreferredSize(new Dimension((int)finalWidth, (int)finalHeight));
-      mParent.pack();
-      System.out.println("DEBUG: New size set: " + finalWidth + "," + finalHeight);
-      repaint();
+    if (event.getType() == EmbedderEventType.EMBEDDER_STOP) {
+      mParent.adjustSize(false);
+      mParent.storeReferenceFrame();
     }
   }
 
+
   //##########################################################################
   //# Inner Class SimulatorRenderingContext
-
   private class SimulatorRenderingContext extends ModuleRenderingContext
   {
 
