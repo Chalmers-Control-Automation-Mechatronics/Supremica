@@ -33,7 +33,7 @@ public class EventMouseListener extends MouseAdapter
               if (mSim.getValidTransitions().contains(event))
               {
                 try {
-                  mSim.singleStepMutable(event);
+                  mSim.step(event);
                 } catch (final UncontrollableException exception) {
                   System.out.println(exception.getMessage());
                 }

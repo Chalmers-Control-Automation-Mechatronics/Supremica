@@ -21,6 +21,8 @@ import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.gui.renderer.RenderingInformation;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
+import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
+import net.sourceforge.waters.gui.springembedder.EmbedderEvent.EmbedderEventType;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -42,15 +44,18 @@ public class AutomatonDisplayPane
   implements SimulationObserver
 {
 
+
   //##########################################################################
   //# Constructors
   public AutomatonDisplayPane(final AutomatonProxy aut,
                               final GraphSubject graph,
                               final ModuleContainer container,
-                              final Simulation sim)
+                              final Simulation sim,
+                              final AutomatonInternalFrame parent)
     throws GeometryAbsentException
   {
     super(graph, container.getModule());
+    mParent = parent;
     System.out.println("DEBUG: Opening");
     mSim = sim;
     mAutomaton = aut;
@@ -123,6 +128,29 @@ public class AutomatonDisplayPane
   {
     mSim.detach(this);
     super.close();
+  }
+
+  public void embedderChanged(final EmbedderEvent event)
+  {
+    super.embedderChanged(event);
+    if (event.getType() == EmbedderEventType.EMBEDDER_STOP)
+    {
+      final Rectangle2D automatonSize =
+        this.getMinimumBoundingRectangle();
+      final double automatonWidth = (int) automatonSize.getWidth();
+      final double automatonHeight = (int) automatonSize.getHeight();
+      System.out.println("DEBUG: Old size: " + this.getWidth() + "," + this.getHeight());
+      final double finalWidth =
+        Math.min(this.getWidth(),
+            (automatonWidth * this.getHeight()) / automatonHeight);
+      final double finalHeight =
+        Math.min(this.getHeight(),
+            (automatonHeight * this.getWidth()) / automatonWidth);
+      setPreferredSize(new Dimension((int)finalWidth, (int)finalHeight));
+      mParent.pack();
+      System.out.println("DEBUG: New size set: " + finalWidth + "," + finalHeight);
+      repaint();
+    }
   }
 
   //##########################################################################
@@ -222,6 +250,7 @@ public class AutomatonDisplayPane
   private final Simulation mSim;
   private final AutomatonProxy mAutomaton;
   private final ModuleContainer mContainer;
+  private final AutomatonInternalFrame mParent;
 
   //#################################################################################
   //# Class Constants

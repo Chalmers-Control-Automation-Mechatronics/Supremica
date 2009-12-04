@@ -33,7 +33,7 @@ public class UndoActionListener implements ActionListener, Observer
   // # Interface ActionListener
   public void actionPerformed(final ActionEvent e)
   {
-    this.sim.reverseSingleStep();
+    this.sim.stepBack();
   }
 
   //#################################################################################################

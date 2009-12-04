@@ -52,6 +52,7 @@ public abstract class WatersActionManager
     addAction(new InsertVariableAction(ide));
     addAction(new ShowGraphAction(ide));
     addAction(new ShowModuleCommentAction(ide));
+    addAction(new SimulationStepAction(ide));
     addAction(new ToolEdgeAction(ide));
     addAction(new ToolGroupNodeAction(ide));
     addAction(new ToolNodeAction(ide));

@@ -51,12 +51,12 @@ public class PreserveAspectComponentListener implements ComponentListener
 
   public void componentResized(final ComponentEvent e)
   {
-    final int finalWidth;
-    final int finalHeight;
+    final double finalWidth;
+    final double finalHeight;
     final Rectangle2D automatonSize =
         mDisplayPane.getMinimumBoundingRectangle();
-    final int automatonWidth = (int) automatonSize.getWidth();
-    final int automatonHeight = (int) automatonSize.getHeight();
+    final double automatonWidth = automatonSize.getWidth();
+    final double automatonHeight = automatonSize.getHeight();
     final Direction resizeCorner = getResizeCorner();
     if (resizeCorner != Direction.NONE && resizeCorner != Direction.ILLEGAL) {
       final boolean growing = getGrowing(resizeCorner);
@@ -81,7 +81,7 @@ public class PreserveAspectComponentListener implements ComponentListener
       // pixels
       if (!close(finalWidth, mDisplayPane.getWidth(), MINIMUM_CHANGE_TO_RESIZE)
           || !close(finalHeight, mDisplayPane.getHeight(), MINIMUM_CHANGE_TO_RESIZE)) {
-        mDisplayPane.setPreferredSize(new Dimension(finalWidth, finalHeight));
+        mDisplayPane.setPreferredSize(new Dimension((int)finalWidth, (int)finalHeight));
         mFrame.pack();
         mDisplayPane.repaint();
       }
@@ -103,11 +103,6 @@ public class PreserveAspectComponentListener implements ComponentListener
 
   // ########################################################################
   // # Auxillary Functions
-
-  private boolean close(final int a, final int b, final int delta)
-  {
-    return (Math.abs(a - b) < delta);
-  }
 
   private boolean close(final double a, final double b, final double delta)
   {
@@ -202,7 +197,7 @@ public class PreserveAspectComponentListener implements ComponentListener
 
   private final int MINIMUM_CHANGE_TO_RESIZE = 2; // The minimum change in size which corresponds to needing a resize to take place.
     // Prevents the frame from automatically shrinking. It might be able to safely set it to 0.
-  private final int MINIMUM_CHANGE_TO_NON_CONSTANT_BORDER = 40; // The minimum difference in location before a border is defined as being 'moved'
+  private final int MINIMUM_CHANGE_TO_NON_CONSTANT_BORDER = 3; // The minimum difference in location before a border is defined as being 'moved'
     // Too high, and there will be many Direction.NONE calls, preventing the frame from resizing. Too low, and there will be many
     // Direction.ILLEGAL calls, preventing the frame from resizing.
 

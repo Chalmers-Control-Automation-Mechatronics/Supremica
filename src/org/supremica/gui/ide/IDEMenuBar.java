@@ -37,6 +37,7 @@ import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.ShowGraphAction;
 import net.sourceforge.waters.gui.actions.ShowModuleCommentAction;
+import net.sourceforge.waters.gui.actions.SimulationStepAction;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
 import net.sourceforge.waters.gui.actions.WatersUndoAction;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -189,6 +190,11 @@ public class IDEMenuBar
         editorMenu.setEnabled(false);
         add(menu);
 
+        // Simulate
+        menu = new JMenu("Simulate");
+        final Action step = actions.getAction(SimulationStepAction.class);
+        menu.add(step);
+        add(menu);
 
         // Analyze
         menu = new JMenu("Analyze");

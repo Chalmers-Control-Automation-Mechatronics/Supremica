@@ -54,14 +54,14 @@ public class TunnelActionListener implements ActionListener, Observer
       System.err.println("ERROR: BLOCKING: There are no possible transitions");
     else if (possibleEvents.size() == 1) {
       try {
-        sim.singleStepMutable(possibleEvents.get(0));
+        sim.step(possibleEvents.get(0));
       } catch (final UncontrollableException exception) {
         // TODO Auto-generated catch block
         System.err.println(exception.toString());
       }
     } else {
       try {
-        sim.singleStepMutable(findOptions(possibleEvents));
+        sim.step(findOptions(possibleEvents));
       } catch (final UncontrollableException exception) {
         // TODO Auto-generated catch block
         System.err.println(exception.toString());

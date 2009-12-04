@@ -28,7 +28,7 @@ public class AutomatonInternalFrame extends JInternalFrame
   {
     super(aut.getName(), true, true, false, true);
     mParent = parent;
-    mDisplayPane = new AutomatonDisplayPane(aut, graph, container, sim);
+    mDisplayPane = new AutomatonDisplayPane(aut, graph, container, sim, this);
     setContentPane(mDisplayPane);
     mDisplayPane.repaint();
     addMouseListener(new InternalFrameMouseAdapter());
