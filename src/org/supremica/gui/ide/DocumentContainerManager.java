@@ -135,7 +135,6 @@ public class DocumentContainerManager
         for (final Observer observer : copy) {
             observer.update(event);
         }
-        mIDE.fireEditorChangedEvent(event);
     }
 
 
