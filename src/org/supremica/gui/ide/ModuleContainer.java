@@ -271,11 +271,6 @@ public class ModuleContainer
         return mPrinter;
     }
 
-    public boolean isSimulatorActive()
-    {
-        return mTabPanel.getSelectedComponent() == mSimulatorPanel;
-    }
-
     ComponentEditorPanel createComponentEditorPanel
         (final SimpleComponentSubject comp)
     {
@@ -494,7 +489,7 @@ public class ModuleContainer
     //#######################################################################
     //# Inner Class SimulatorPropertyChangeListener
     private class SimulatorPropertyChangeListener
-    implements SupremicaPropertyChangeListener
+      implements SupremicaPropertyChangeListener
     {
 
       public void propertyChanged(final SupremicaPropertyChangeEvent event)

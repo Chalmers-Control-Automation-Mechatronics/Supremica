@@ -150,6 +150,12 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "markus2");
   }
 
+  public void testCompile_parManEg_I_mfb_lowlevel()
+    throws IOException, WatersException
+  {
+    compile("tests", "hisc", "parManEg_I_mfb_lowlevel");
+  }
+
   public void testCompile_PLanTS()
     throws IOException, WatersException
   {
@@ -394,7 +400,7 @@ public abstract class AbstractCompilerTest
   public void testCompile_error2_small()
     throws IOException, WatersException
   {
-    compileError("handwritten", "error2_small",null, 
+    compileError("handwritten", "error2_small",null,
                  UndefinedIdentifierException.class,
                  "required parameter 'break'");
   }
@@ -416,7 +422,7 @@ public abstract class AbstractCompilerTest
   public void testCompile_error5_small()
     throws IOException, WatersException
   {
-    compileError("handwritten", "error5_small", null, 
+    compileError("handwritten", "error5_small", null,
                  UndefinedIdentifierException.class, "'finish_before'");
   }
 

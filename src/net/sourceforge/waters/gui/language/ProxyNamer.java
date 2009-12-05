@@ -33,6 +33,7 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -69,7 +70,7 @@ public class ProxyNamer {
    * Gets a name for a single item.
    * @param  proxy      The item to be named.
    * @return The name, with capitalised initials.
-   */ 
+   */
   public static String getItemClassName(final Proxy proxy)
   {
     return INSTANCE.getNameSingular(proxy);
@@ -78,10 +79,10 @@ public class ProxyNamer {
   /**
    * Gets a name for a single item with a prefixed article "a" or "an".
    * This method can generate descriptive text fragments such as "a
-   * component" or "an event". 
+   * component" or "an event".
    * @param  proxy      The item to be named.
    * @return The name, all lower case.
-   */ 
+   */
   public static String getUnqualifiedClassName(final Proxy proxy)
   {
     return INSTANCE.getNameUnqualified(proxy);
@@ -93,7 +94,7 @@ public class ProxyNamer {
    * @param  plural     <CODE>true</CODE> if the name should be returned in
    *                    plural form.
    * @return The name, with capitalised initials.
-   */ 
+   */
   public static String getItemClassName(final Proxy proxy,
                                         final boolean plural)
   {
@@ -111,7 +112,7 @@ public class ProxyNamer {
    * @return The name, with capitalised initials, or <CODE>null</CODE>
    *         if the collection is empty, or if no common supertype could
    *         be found.
-   */ 
+   */
   public static String getCollectionClassName
     (final Collection<? extends Proxy> collection)
   {
@@ -155,6 +156,8 @@ public class ProxyNamer {
                 EdgeProxy.class, true);
     createEntry(NodeProxy.class, "Node");
     createEntry(ParameterBindingProxy.class, "Binding");
+    createEntry(QualifiedIdentifierProxy.class, "Label",
+                IdentifierProxy.class, false);
     createEntry(SimpleComponentProxy.class, "Automaton", "Automata",
                 ComponentProxy.class, false);
     createEntry(SimpleIdentifierProxy.class, "Label",
@@ -273,7 +276,7 @@ public class ProxyNamer {
       }
       final NameEntry entry = getEntry(iface);
       return count == 1 ? entry.getSingular() : entry.getPlural();
-    }      
+    }
   }
 
   private String getNameUnqualified(final Proxy proxy)

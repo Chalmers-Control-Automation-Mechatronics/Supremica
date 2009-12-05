@@ -15,6 +15,7 @@ import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import org.supremica.gui.ide.DocumentContainer;
+import org.supremica.gui.ide.EditorPanel;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -77,7 +78,7 @@ public abstract class WatersAction
     final IDE ide = getIDE();
     final DocumentContainer container = ide.getActiveDocumentContainer();
     if (container == null ||
-        container.getActivePanel() != container.getEditorPanel() ||
+        !(container.getActivePanel() instanceof EditorPanel) ||
         !(container instanceof ModuleContainer)) {
       return null;
     }

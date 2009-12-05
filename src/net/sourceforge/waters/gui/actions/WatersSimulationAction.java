@@ -10,6 +10,8 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import java.awt.Component;
+
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationChangeEvent;
@@ -76,9 +78,9 @@ public abstract class WatersSimulationAction
       return null;
     }
     final ModuleContainer mcontainer = (ModuleContainer) container;
-    final SimulatorPanel simulator = mcontainer.getSimulatorPanel();
-    if (mcontainer.getActivePanel() == simulator) {
-      return simulator;
+    final Component panel = mcontainer.getActivePanel();
+    if (panel instanceof SimulatorPanel) {
+      return (SimulatorPanel) panel;
     } else {
       return null;
     }

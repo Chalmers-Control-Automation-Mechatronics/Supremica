@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="parManEg_I_mfb_lowlevel" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+<Comment>Low level of Parallel Manufacturing Example of Ryan Leduc's PhD thesis.
+Should pass all HISC property checks for the low level.
+35 reachable states, controllable and nonconflicting.</Comment>
+<ns2:EventList>
+<ns2:Event Kind="PROPOSITION" Name=":accepting"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="attch_case"/>
+<ns2:Event Kind="CONTROLLABLE" Name="attch_ptA"/>
+<ns2:Event Kind="CONTROLLABLE" Name="attch_ptB"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="cmpl_A"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="cmpl_B"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="compl_case"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="compl_pol"/>
+<ns2:Event Kind="CONTROLLABLE" Name="dip_acid"/>
+<ns2:Event Kind="CONTROLLABLE" Name="finA_attch"/>
+<ns2:Event Kind="CONTROLLABLE" Name="finB_attch"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="fin_exit">
+<AttributeMap>
+<Attribute Value="ANSWER" Name="HISC:EventType"/>
+</AttributeMap>
+</ns2:Event>
+<ns2:Event Kind="CONTROLLABLE" Name="partLvExit"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="part_arr1"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="part_arr2"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="part_arr3"/>
+<ns2:Event Kind="CONTROLLABLE" Name="part_ent">
+<AttributeMap>
+<Attribute Value="REQUEST" Name="HISC:EventType"/>
+</AttributeMap>
+</ns2:Event>
+<ns2:Event Kind="CONTROLLABLE" Name="part_lv1"/>
+<ns2:Event Kind="CONTROLLABLE" Name="part_lv2"/>
+<ns2:Event Kind="CONTROLLABLE" Name="part_lv3"/>
+<ns2:Event Kind="CONTROLLABLE" Name="polish"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="recog_A"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="recog_B"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="ret_pt"/>
+<ns2:Event Kind="CONTROLLABLE" Name="start_case"/>
+<ns2:Event Kind="CONTROLLABLE" Name="start_pol"/>
+<ns2:Event Kind="CONTROLLABLE" Name="str_exit"/>
+<ns2:Event Kind="CONTROLLABLE" Name="str_ptA"/>
+<ns2:Event Kind="CONTROLLABLE" Name="str_ptB"/>
+<ns2:Event Kind="CONTROLLABLE" Name="str_rlse"/>
+<ns2:Event Kind="CONTROLLABLE" Name="take_pt"/>
+</ns2:EventList>
+<ns2:AutomataList>
+<ns2:Automaton Kind="SPEC" Name="interface_I">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="fin_exit"/>
+<ns2:EventRef Name="part_ent"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="s0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="s1"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="s1" Source="s0" Event="part_ent"/>
+<ns2:Transition Target="s0" Source="s1" Event="fin_exit"/>
+</ns2:TransitionList>
+<AttributeMap>
+<Attribute Name="HISC:Interface"/>
+</AttributeMap>
+</ns2:Automaton>
+<ns2:Automaton Kind="SPEC" Name="lAffixPartAorB_I">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="attch_ptA"/>
+<ns2:EventRef Name="attch_ptB"/>
+<ns2:EventRef Name="cmpl_A"/>
+<ns2:EventRef Name="cmpl_B"/>
+<ns2:EventRef Name="finA_attch"/>
+<ns2:EventRef Name="finB_attch"/>
+<ns2:EventRef Name="ret_pt"/>
+<ns2:EventRef Name="str_ptA"/>
+<ns2:EventRef Name="str_ptB"/>
+<ns2:EventRef Name="take_pt"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="s0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="s1"/>
+<ns2:State Name="s10"/>
+<ns2:State Name="s2"/>
+<ns2:State Name="s3"/>
+<ns2:State Name="s4"/>
+<ns2:State Name="s5"/>
+<ns2:State Name="s6"/>
+<ns2:State Name="s7"/>
+<ns2:State Name="s8"/>
+<ns2:State Name="s9"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="s1" Source="s0" Event="attch_ptA"/>
+<ns2:Transition Target="s4" Source="s0" Event="attch_ptB"/>
+<ns2:Transition Target="s2" Source="s1" Event="take_pt"/>
+<ns2:Transition Target="s6" Source="s10" Event="ret_pt"/>
+<ns2:Transition Target="s7" Source="s2" Event="str_ptA"/>
+<ns2:Transition Target="s0" Source="s3" Event="finA_attch"/>
+<ns2:Transition Target="s5" Source="s4" Event="take_pt"/>
+<ns2:Transition Target="s9" Source="s5" Event="str_ptB"/>
+<ns2:Transition Target="s0" Source="s6" Event="finB_attch"/>
+<ns2:Transition Target="s8" Source="s7" Event="cmpl_A"/>
+<ns2:Transition Target="s3" Source="s8" Event="ret_pt"/>
+<ns2:Transition Target="s10" Source="s9" Event="cmpl_B"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="lAttchCase_I">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="attch_case"/>
+<ns2:EventRef Name="compl_case"/>
+<ns2:EventRef Name="start_case"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="s0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="s1"/>
+<ns2:State Name="s2"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="s1" Source="s0" Event="start_case"/>
+<ns2:Transition Target="s2" Source="s1" Event="attch_case"/>
+<ns2:Transition Target="s0" Source="s2" Event="compl_case"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="lAttchPart_I">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="cmpl_A"/>
+<ns2:EventRef Name="cmpl_B"/>
+<ns2:EventRef Name="ret_pt"/>
+<ns2:EventRef Name="str_ptA"/>
+<ns2:EventRef Name="str_ptB"/>
+<ns2:EventRef Name="take_pt"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="s0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="s1"/>
+<ns2:State Name="s2"/>
+<ns2:State Name="s3"/>
+<ns2:State Name="s4"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="s1" Source="s0" Event="take_pt"/>
+<ns2:Transition Target="s2" Source="s1" Event="str_ptA"/>
+<ns2:Transition Target="s3" Source="s1" Event="str_ptB"/>
+<ns2:Transition Target="s4" Source="s2" Event="cmpl_A"/>
+<ns2:Transition Target="s4" Source="s3" Event="cmpl_B"/>
+<ns2:Transition Target="s0" Source="s4" Event="ret_pt"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="SPEC" Name="lDoPolishSeq_I">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="dip_acid"/>
+<ns2:EventRef Name="polish"/>
+<ns2:EventRef Name="start_pol"/>
+<ns2:EventRef Name="str_rlse"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="s0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="s1"/>
+<ns2:State Name="s2"/>
+<ns2:State Name="s3"/>
+<ns2:State Name="s4"/>
+<ns2:State Name="s5"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="s1" Source="s0" Event="start_pol"/>
+<ns2:Transition Target="s2" Source="s1" Event="dip_acid"/>
+<ns2:Transition Target="s3" Source="s2" Event="polish"/>
+<ns2:Transition Target="s4" Source="s3" Event="dip_acid"/>
+<ns2:Transition Target="s5" Source="s4" Event="polish"/>
+<ns2:Transition Target="s0" Source="s5" Event="str_rlse"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="SPEC" Name="lInterface_I">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="attch_ptA"/>
+<ns2:EventRef Name="attch_ptB"/>
+<ns2:EventRef Name="compl_case"/>
+<ns2:EventRef Name="compl_pol"/>
+<ns2:EventRef Name="finA_attch"/>
+<ns2:EventRef Name="finB_attch"/>
+<ns2:EventRef Name="start_case"/>
+<ns2:EventRef Name="start_pol"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="s0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="s1"/>
+<ns2:State Name="s2"/>
+<ns2:State Name="s3"/>
+<ns2:State Name="s4"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="s2" Source="s0" Event="attch_ptA"/>
+<ns2:Transition Target="s3" Source="s0" Event="attch_ptB"/>
+<ns2:Transition Target="s4" Source="s0" Event="start_case"/>
+<ns2:Transition Target="s1" Source="s0" Event="start_pol"/>
+<ns2:Transition Target="s0" Source="s1" Event="compl_pol"/>
+<ns2:Transition Target="s0" Source="s2" Event="finA_attch"/>
+<ns2:Transition Target="s0" Source="s3" Event="finB_attch"/>
+<ns2:Transition Target="s0" Source="s4" Event="compl_case"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="lPathFlow_I">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="fin_exit"/>
+<ns2:EventRef Name="partLvExit"/>
+<ns2:EventRef Name="part_arr1"/>
+<ns2:EventRef Name="part_arr2"/>
+<ns2:EventRef Name="part_arr3"/>
+<ns2:EventRef Name="part_ent"/>
+<ns2:EventRef Name="part_lv1"/>
+<ns2:EventRef Name="part_lv2"/>
+<ns2:EventRef Name="part_lv3"/>
+<ns2:EventRef Name="recog_A"/>
+<ns2:EventRef Name="recog_B"/>
+<ns2:EventRef Name="str_exit"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="s0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="s1"/>
+<ns2:State Name="s2"/>
+<ns2:State Name="s3"/>
+<ns2:State Name="s4"/>
+<ns2:State Name="s5"/>
+<ns2:State Name="s6"/>
+<ns2:State Name="s7"/>
+<ns2:State Name="s8"/>
+<ns2:State Name="s9"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="s1" Source="s0" Event="part_ent"/>
+<ns2:Transition Target="s2" Source="s1" Event="part_arr1"/>
+<ns2:Transition Target="s3" Source="s2" Event="part_lv1"/>
+<ns2:Transition Target="s4" Source="s3" Event="partLvExit"/>
+<ns2:Transition Target="s9" Source="s3" Event="str_exit"/>
+<ns2:Transition Target="s5" Source="s4" Event="part_arr2"/>
+<ns2:Transition Target="s6" Source="s5" Event="recog_A"/>
+<ns2:Transition Target="s6" Source="s5" Event="recog_B"/>
+<ns2:Transition Target="s7" Source="s6" Event="part_lv2"/>
+<ns2:Transition Target="s8" Source="s7" Event="part_arr3"/>
+<ns2:Transition Target="s1" Source="s8" Event="part_lv3"/>
+<ns2:Transition Target="s0" Source="s9" Event="fin_exit"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="lPolishPart_I">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="compl_pol"/>
+<ns2:EventRef Name="dip_acid"/>
+<ns2:EventRef Name="polish"/>
+<ns2:EventRef Name="start_pol"/>
+<ns2:EventRef Name="str_rlse"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="s0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="s1"/>
+<ns2:State Name="s2"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="s1" Source="s0" Event="start_pol"/>
+<ns2:Transition Target="s1" Source="s1" Event="dip_acid"/>
+<ns2:Transition Target="s1" Source="s1" Event="polish"/>
+<ns2:Transition Target="s2" Source="s1" Event="str_rlse"/>
+<ns2:Transition Target="s0" Source="s2" Event="compl_pol"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="SPEC" Name="lSeqTasks_I">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="attch_ptA"/>
+<ns2:EventRef Name="attch_ptB"/>
+<ns2:EventRef Name="compl_case"/>
+<ns2:EventRef Name="compl_pol"/>
+<ns2:EventRef Name="finA_attch"/>
+<ns2:EventRef Name="finB_attch"/>
+<ns2:EventRef Name="fin_exit"/>
+<ns2:EventRef Name="partLvExit"/>
+<ns2:EventRef Name="part_arr1"/>
+<ns2:EventRef Name="part_arr2"/>
+<ns2:EventRef Name="part_arr3"/>
+<ns2:EventRef Name="part_ent"/>
+<ns2:EventRef Name="part_lv1"/>
+<ns2:EventRef Name="part_lv2"/>
+<ns2:EventRef Name="part_lv3"/>
+<ns2:EventRef Name="recog_A"/>
+<ns2:EventRef Name="recog_B"/>
+<ns2:EventRef Name="start_case"/>
+<ns2:EventRef Name="start_pol"/>
+<ns2:EventRef Name="str_exit"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="s0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="s1"/>
+<ns2:State Name="s10"/>
+<ns2:State Name="s11"/>
+<ns2:State Name="s12"/>
+<ns2:State Name="s13"/>
+<ns2:State Name="s14"/>
+<ns2:State Name="s15"/>
+<ns2:State Name="s16"/>
+<ns2:State Name="s2"/>
+<ns2:State Name="s3"/>
+<ns2:State Name="s4"/>
+<ns2:State Name="s5"/>
+<ns2:State Name="s6"/>
+<ns2:State Name="s7"/>
+<ns2:State Name="s8"/>
+<ns2:State Name="s9"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="s0" Source="s0" Event="fin_exit"/>
+<ns2:Transition Target="s1" Source="s0" Event="part_ent"/>
+<ns2:Transition Target="s2" Source="s1" Event="part_arr1"/>
+<ns2:Transition Target="s11" Source="s10" Event="part_lv2"/>
+<ns2:Transition Target="s12" Source="s11" Event="part_arr3"/>
+<ns2:Transition Target="s13" Source="s12" Event="start_case"/>
+<ns2:Transition Target="s14" Source="s13" Event="compl_case"/>
+<ns2:Transition Target="s15" Source="s14" Event="part_lv3"/>
+<ns2:Transition Target="s16" Source="s15" Event="part_arr1"/>
+<ns2:Transition Target="s16" Source="s16" Event="part_lv1"/>
+<ns2:Transition Target="s0" Source="s16" Event="str_exit"/>
+<ns2:Transition Target="s3" Source="s2" Event="start_pol"/>
+<ns2:Transition Target="s4" Source="s3" Event="compl_pol"/>
+<ns2:Transition Target="s5" Source="s4" Event="part_lv1"/>
+<ns2:Transition Target="s5" Source="s5" Event="part_arr2"/>
+<ns2:Transition Target="s5" Source="s5" Event="partLvExit"/>
+<ns2:Transition Target="s6" Source="s5" Event="recog_A"/>
+<ns2:Transition Target="s7" Source="s5" Event="recog_B"/>
+<ns2:Transition Target="s8" Source="s6" Event="attch_ptA"/>
+<ns2:Transition Target="s9" Source="s7" Event="attch_ptB"/>
+<ns2:Transition Target="s10" Source="s8" Event="finA_attch"/>
+<ns2:Transition Target="s10" Source="s9" Event="finB_attch"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+</ns2:AutomataList>
+</ns2:ProductDES>

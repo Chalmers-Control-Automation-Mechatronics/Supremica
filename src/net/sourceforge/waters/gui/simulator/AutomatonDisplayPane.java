@@ -128,6 +128,7 @@ public class AutomatonDisplayPane
   {
     super.embedderChanged(event);
     if (event.getType() == EmbedderEventType.EMBEDDER_STOP) {
+      mParent.storeReferenceFrame();
       mParent.adjustSize(false);
       mParent.storeReferenceFrame();
     }

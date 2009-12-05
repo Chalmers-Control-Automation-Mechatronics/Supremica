@@ -386,7 +386,7 @@ public class Simulation implements ModelObserver, Observer
   public void update(final EditorChangedEvent event)
   {
     if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH &&
-        mModuleContainer.isSimulatorActive()) {
+        mModuleContainer.getActivePanel() instanceof SimulatorPanel) {
       final ProductDESProxy newdes = mModuleContainer.getCompiledDES();
       setCompiledDES(newdes);
     }
