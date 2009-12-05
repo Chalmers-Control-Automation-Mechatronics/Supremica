@@ -1,4 +1,4 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- tab-width: 4  indent-tabs-mode: null  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica IDE
 //# PACKAGE: org.supremica.gui.ide
@@ -65,9 +65,97 @@ import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
+/**
+ * <P>
+ * The IDE's main menu bar.
+ * </P>
+ *
+ * <P>
+ * The menu bar is updated dynamically when panels are switched, e.g., when the
+ * user changes from the editor to the analyser, or when certain configuration
+ * options are changed. This is achieved by registering an {@link Observer} on
+ * the {@link IDE}, and a {@link SupremicaPropertyChangeListener} on each of the
+ * properties concerned.
+ * </P>
+ *
+ * <P>
+ * To add a new menu item, first implement its action, and then add it to a menu
+ * in method {@link #createMenus()}. When creating menu items with hotkeys,
+ * please check and update the list of used hotkeys in the comments below.
+ * </P>
+ *
+ * <P>
+ * To add a new menu, add a new data member for it at the end of the class,
+ * initialise it in method {@link #createMenus()}, and add it to the menu bar in
+ * method {@link #addMenus()}.
+ * </P>
+ *
+ * @see net.sourceforge.waters.gui.actions.WatersActionManager
+ * @see org.supremica.gui.ide.actions.Actions
+ *
+ * @author Knut &Aring;kesson, Robi Malik
+ */
+
+/*
+ * ALT-Hotkeys:
+ *   ALT-a: Create/New automaton
+ *   ALT-b: Simulator/Step back
+ *   ALT-c: Create menu
+ *   ALT-d: Edit menu
+ *   ALT-e: Create/New event
+ *   ALT-f: File menu
+ *   ALT-g:
+ *   ALT-h: Help menu
+ *   ALT-i:
+ *   ALT-j:
+ *   ALT-k:
+ *   ALT-l:
+ *   ALT-m: Modules menu
+ *   ALT-n:
+ *   ALT-o: Configure menu
+ *   ALT-p: Simulator/Step
+ *   ALT-q: Simulator/Replay Step
+ *   ALT-r:
+ *   ALT-s: Simulator menu
+ *   ALT-t: Tools menu
+ *   ALT-u:
+ *   ALT-v: Create/New variable
+ *   ALT-w:
+ *   ALT-x: Examples menu
+ *   ALT-y:
+ *   ALT-z: Analyze menu
+ *
+ * CTRL-Hotkeys:
+ *   CTRL-a: Edit/Select all
+ *   CTRL-b:
+ *   CTRL-c: Edit/Copy
+ *   CTRL-d:
+ *   CTRL-e:
+ *   CTRL-f:
+ *   CTRL-g:
+ *   CTRL-h:
+ *   CTRL-i:
+ *   CTRL-j:
+ *   CTRL-k:
+ *   CTRL-l: Edit/Layout graph
+ *   CTRL-m:
+ *   CTRL-n: File/New
+ *   CTRL-o: File/Open
+ *   CTRL-p: File/Print
+ *   CTRL-q: File/Exit
+ *   CTRL-r:
+ *   CTRL-s: File/Save
+ *   CTRL-t: Examples/Dynamic examples
+ *   CTRL-u:
+ *   CTRL-v: Edit/Paste, Analyze/Verify
+ *   CTRL-w: Analyze/Workbench
+ *   CTRL-x: Edit/Cut
+ *   CTRL-y: Edit/Redo
+ *   CTRL-z: Edit/Undo
+ */
+
 public class IDEMenuBar
   extends JMenuBar
-  implements Observer, SupremicaPropertyChangeListener
 {
 
   // #########################################################################
@@ -78,99 +166,21 @@ public class IDEMenuBar
     createMenus();
     addMenus();
     updateModulesMenu();
-    ide.attach(this);
-    Config.INCLUDE_EXTERNALTOOLS.addPropertyChangeListener(this);
-    Config.INCLUDE_SOCEDITOR.addPropertyChangeListener(this);
-    Config.INCLUDE_ANIMATOR.addPropertyChangeListener(this);
-  }
-
-
-  // #########################################################################
-  // # Interface net.sourceforge.waters.gui.observer.Observer
-  public void update(final EditorChangedEvent event)
-  {
-    switch (event.getKind()) {
-    case CONTAINER_SWITCH:
-      updateModulesMenu();
-      rebuildMenus();
-      break;
-    case MAINPANEL_SWITCH:
-      rebuildMenus();
-      break;
-    default:
-      break;
-    }
-  }
-
-
-  // #########################################################################
-  // # Interface org.supremica.properties.SupremicaPropertyChangeListener
-  public void propertyChanged(final SupremicaPropertyChangeEvent event)
-  {
-    mToolsMenu = null;
-    rebuildMenus();
+    final IDEListener ideListener = new IDEListener();
+    ide.attach(ideListener);
+    final SupremicaPropertyChangeListener createListener =
+      new CreatePropertyListener();
+    Config.INCLUDE_INSTANTION.addPropertyChangeListener(createListener);
+    final SupremicaPropertyChangeListener toolsListener =
+      new ToolsPropertyListener();
+    Config.INCLUDE_EXTERNALTOOLS.addPropertyChangeListener(toolsListener);
+    Config.INCLUDE_SOCEDITOR.addPropertyChangeListener(toolsListener);
+    Config.INCLUDE_ANIMATOR.addPropertyChangeListener(toolsListener);
   }
 
 
   // #########################################################################
   // # Initialisation
-  /*
-   * ALT-Hotkeys:
-   *   ALT-a: Create/New automaton
-   *   ALT-b: Simulator/Step back
-   *   ALT-c: Create menu
-   *   ALT-d: Edit menu
-   *   ALT-e: Create/New event
-   *   ALT-f: File menu
-   *   ALT-g:
-   *   ALT-h: Help menu
-   *   ALT-i:
-   *   ALT-j:
-   *   ALT-k:
-   *   ALT-l:
-   *   ALT-m: Modules menu
-   *   ALT-n:
-   *   ALT-o: Configure menu
-   *   ALT-p: Simulator/Step
-   *   ALT-q: Simulator/Replay Step
-   *   ALT-r:
-   *   ALT-s: Simulator menu
-   *   ALT-t: Tools menu
-   *   ALT-u:
-   *   ALT-v: Create/New variable
-   *   ALT-w:
-   *   ALT-x: Examples menu
-   *   ALT-y:
-   *   ALT-z: Analyze menu
-   *
-   * CTRL-Hotkeys:
-   *   CTRL-a: Edit/Select all
-   *   CTRL-b:
-   *   CTRL-c: Edit/Copy
-   *   CTRL-d:
-   *   CTRL-e:
-   *   CTRL-f:
-   *   CTRL-g:
-   *   CTRL-h:
-   *   CTRL-i:
-   *   CTRL-j:
-   *   CTRL-k:
-   *   CTRL-l: Edit/Layout graph
-   *   CTRL-m:
-   *   CTRL-n: File/New
-   *   CTRL-o: File/Open
-   *   CTRL-p: File/Print
-   *   CTRL-q: File/Exit
-   *   CTRL-r:
-   *   CTRL-s: File/Save
-   *   CTRL-t: Examples/Dynamic examples
-   *   CTRL-u:
-   *   CTRL-v: Edit/Paste, Analyze/Verify
-   *   CTRL-w: Analyze/Workbench
-   *   CTRL-x: Edit/Cut
-   *   CTRL-y: Edit/Redo
-   *   CTRL-z: Edit/Undo
-   */
   private void createMenus()
   {
     final Actions actions = mIDE.getActions();
@@ -237,72 +247,78 @@ public class IDEMenuBar
       mEditMenu.add(layout);
     }
 
-    // Create
-    // Why not "Insert"? All MS programs use insert. ~~~Robi
-    if (mCreateMenu == null) {
-      mCreateMenu = new JMenu("Create");
-      mCreateMenu.setMnemonic(KeyEvent.VK_C);
-      final Action inscomp =
-        actions.getAction(InsertSimpleComponentAction.class);
-      mCreateMenu.add(inscomp);
-      final Action insvar = actions.getAction(InsertVariableAction.class);
-      mCreateMenu.add(insvar);
-      final Action insforeach =
-        actions.getAction(InsertForeachComponentAction.class);
-      mCreateMenu.add(insforeach);
-      final Action insevent = actions.getAction(InsertEventDeclAction.class);
-      mCreateMenu.add(insevent);
-      // menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());
-      // menu.add(ide.getActions().editorAddBindingAction.getMenuItem());
-    }
-
-    // Simulate
-    if (mSimulateMenu == null) {
-      mSimulateMenu = new JMenu("Simulate");
-      mSimulateMenu.setMnemonic(KeyEvent.VK_S);
-      final Action reset = actions.getAction(SimulationResetAction.class);
-      mSimulateMenu.add(reset);
-      final Action step = actions.getAction(SimulationStepAction.class);
-      mSimulateMenu.add(step);
-      final Action replayStep =
-        actions.getAction(SimulationReplayStepAction.class);
-      mSimulateMenu.add(replayStep);
-      final Action stepBack = actions.getAction(SimulationStepBackAction.class);
-      mSimulateMenu.add(stepBack);
-    }
-
-    // Analyze
-    if (mAnalyzeMenu == null) {
-      mAnalyzeMenu = new JMenu("Analyze");
-      mAnalyzeMenu.setMnemonic(KeyEvent.VK_Z); // ALT-A - create automaton?
-      // View (submenu)
-      final JMenu viewMenu = new JMenu("View");
-      {
-        viewMenu.add(actions.analyzerViewAutomatonAction.getMenuItem());
-        viewMenu.add(actions.analyzerViewAlphabetAction.getMenuItem());
-        viewMenu.add(actions.analyzerViewStatesAction.getMenuItem());
-        viewMenu.add(actions.analyzerViewModularStructureAction.getMenuItem());
+    final Component panel = getActivePanel();
+    if (panel != null) {
+      // Create
+      // Why not "Insert"? All MS programs use insert. ~~~Robi
+      if (mCreateMenu == null && panel instanceof EditorPanel) {
+        mCreateMenu = new JMenu("Create");
+        mCreateMenu.setMnemonic(KeyEvent.VK_C);
+        final Action inscomp =
+          actions.getAction(InsertSimpleComponentAction.class);
+        mCreateMenu.add(inscomp);
+        final Action insvar = actions.getAction(InsertVariableAction.class);
+        mCreateMenu.add(insvar);
+        if (Config.INCLUDE_INSTANTION.isTrue()) {
+          final Action insforeach =
+            actions.getAction(InsertForeachComponentAction.class);
+          mCreateMenu.add(insforeach);
+        }
+        final Action insevent = actions.getAction(InsertEventDeclAction.class);
+        mCreateMenu.add(insevent);
+        // menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());
+        // menu.add(ide.getActions().editorAddBindingAction.getMenuItem());
       }
-      mAnalyzeMenu.add(viewMenu);
-      mAnalyzeMenu.add(actions.analyzerSynchronizerAction.getMenuItem());
-      mAnalyzeMenu.add(actions.analyzerSynthesizerAction.getMenuItem());
-      mAnalyzeMenu.add(actions.analyzerVerifierAction.getMenuItem());
-      mAnalyzeMenu.add(actions.analyzerMinimizeAction.getMenuItem());
-      mAnalyzeMenu.add(actions.analyzerEventHiderAction.getMenuItem());
-      mAnalyzeMenu.add(actions.analyzerPurgeAction.getMenuItem());
-      mAnalyzeMenu.addSeparator();
-      mAnalyzeMenu.add(actions.analyzerExploreStatesAction.getMenuItem());
-      mAnalyzeMenu.add(actions.analyzerFindStatesAction.getMenuItem());
-      mAnalyzeMenu.add(actions.analyzerWorkbenchAction.getMenuItem());
-      mAnalyzeMenu.addSeparator();
-      mAnalyzeMenu.add(actions.analyzerStatisticsAction.getMenuItem());
-      mAnalyzeMenu.add(actions.analyzerExportAction.getMenuItem());
-      mAnalyzeMenu.addSeparator();
-      mAnalyzeMenu.add(actions.analyzerDeleteSelectedAction.getMenuItem());
-      mAnalyzeMenu.add(actions.analyzerDeleteAllAction.getMenuItem());
-      mAnalyzeMenu.add(actions.analyzerRenameAction.getMenuItem());
-      mAnalyzeMenu.add(actions.analyzerSendToEditorAction.getMenuItem());
-      mAnalyzeMenu.add(actions.analyzerGuardAction.getMenuItem());
+
+      // Simulate
+      if (mSimulateMenu == null && panel instanceof SimulatorPanel) {
+        mSimulateMenu = new JMenu("Simulate");
+        mSimulateMenu.setMnemonic(KeyEvent.VK_S);
+        final Action reset = actions.getAction(SimulationResetAction.class);
+        mSimulateMenu.add(reset);
+        final Action step = actions.getAction(SimulationStepAction.class);
+        mSimulateMenu.add(step);
+        final Action replayStep =
+          actions.getAction(SimulationReplayStepAction.class);
+        mSimulateMenu.add(replayStep);
+        final Action stepBack =
+          actions.getAction(SimulationStepBackAction.class);
+        mSimulateMenu.add(stepBack);
+      }
+
+      // Analyze
+      if (mAnalyzeMenu == null && panel instanceof AnalyzerPanel) {
+        mAnalyzeMenu = new JMenu("Analyze");
+        mAnalyzeMenu.setMnemonic(KeyEvent.VK_Z); // ALT-A - create automaton?
+        // View (submenu)
+        final JMenu viewMenu = new JMenu("View");
+        {
+          viewMenu.add(actions.analyzerViewAutomatonAction.getMenuItem());
+          viewMenu.add(actions.analyzerViewAlphabetAction.getMenuItem());
+          viewMenu.add(actions.analyzerViewStatesAction.getMenuItem());
+          viewMenu.add(actions.analyzerViewModularStructureAction.getMenuItem());
+        }
+        mAnalyzeMenu.add(viewMenu);
+        mAnalyzeMenu.add(actions.analyzerSynchronizerAction.getMenuItem());
+        mAnalyzeMenu.add(actions.analyzerSynthesizerAction.getMenuItem());
+        mAnalyzeMenu.add(actions.analyzerVerifierAction.getMenuItem());
+        mAnalyzeMenu.add(actions.analyzerMinimizeAction.getMenuItem());
+        mAnalyzeMenu.add(actions.analyzerEventHiderAction.getMenuItem());
+        mAnalyzeMenu.add(actions.analyzerPurgeAction.getMenuItem());
+        mAnalyzeMenu.addSeparator();
+        mAnalyzeMenu.add(actions.analyzerExploreStatesAction.getMenuItem());
+        mAnalyzeMenu.add(actions.analyzerFindStatesAction.getMenuItem());
+        mAnalyzeMenu.add(actions.analyzerWorkbenchAction.getMenuItem());
+        mAnalyzeMenu.addSeparator();
+        mAnalyzeMenu.add(actions.analyzerStatisticsAction.getMenuItem());
+        mAnalyzeMenu.add(actions.analyzerExportAction.getMenuItem());
+        mAnalyzeMenu.addSeparator();
+        mAnalyzeMenu.add(actions.analyzerDeleteSelectedAction.getMenuItem());
+        mAnalyzeMenu.add(actions.analyzerDeleteAllAction.getMenuItem());
+        mAnalyzeMenu.add(actions.analyzerRenameAction.getMenuItem());
+        mAnalyzeMenu.add(actions.analyzerSendToEditorAction.getMenuItem());
+        mAnalyzeMenu.add(actions.analyzerGuardAction.getMenuItem());
+      }
     }
 
     // Tools
@@ -376,9 +392,8 @@ public class IDEMenuBar
   {
     add(mFileMenu);
     add(mEditMenu);
-    final DocumentContainer container = mIDE.getActiveDocumentContainer();
-    if (container != null) {
-      final Component panel = container.getActivePanel();
+    final Component panel = getActivePanel();
+    if (panel != null) {
       if (panel instanceof EditorPanel) {
         add(mCreateMenu);
       } else if (panel instanceof SimulatorPanel) {
@@ -403,6 +418,16 @@ public class IDEMenuBar
     addMenus();
     revalidate();
     repaint();
+  }
+
+  private Component getActivePanel()
+  {
+    final DocumentContainer container = mIDE.getActiveDocumentContainer();
+    if (container == null) {
+      return null;
+    } else {
+      return container.getActivePanel();
+    }
   }
 
 
@@ -456,6 +481,60 @@ public class IDEMenuBar
     };
     item.addActionListener(listener);
     return item;
+  }
+
+
+  // #########################################################################
+  // # Inner Class IDEListener
+  private class IDEListener
+    implements Observer
+  {
+    // #######################################################################
+    // # Interface net.sourceforge.waters.gui.observer.Observer
+    public void update(final EditorChangedEvent event)
+    {
+      switch (event.getKind()) {
+      case CONTAINER_SWITCH:
+        updateModulesMenu();
+        rebuildMenus();
+        break;
+      case MAINPANEL_SWITCH:
+        rebuildMenus();
+        break;
+      default:
+        break;
+      }
+    }
+  }
+
+
+  // #########################################################################
+  // # Inner Class CreatePropertyListener
+  private class CreatePropertyListener
+    implements SupremicaPropertyChangeListener
+  {
+    // #######################################################################
+    // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    public void propertyChanged(final SupremicaPropertyChangeEvent event)
+    {
+      mCreateMenu = null;
+      rebuildMenus();
+    }
+  }
+
+
+  // #########################################################################
+  // # Inner Class ToolsPropertyListener
+  private class ToolsPropertyListener
+    implements SupremicaPropertyChangeListener
+  {
+    // #######################################################################
+    // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    public void propertyChanged(final SupremicaPropertyChangeEvent event)
+    {
+      mToolsMenu = null;
+      rebuildMenus();
+    }
   }
 
 
