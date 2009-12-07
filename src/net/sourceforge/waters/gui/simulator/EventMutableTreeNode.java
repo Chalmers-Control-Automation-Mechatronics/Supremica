@@ -3,6 +3,7 @@ package net.sourceforge.waters.gui.simulator;
 import java.util.ArrayList;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -18,8 +19,8 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   {
     super("Event", true);
     sim.attach(this);
-    setupAllEvents(sim);
     mParent = parent;
+    setupAllEvents(sim);
   }
 
   // #################################################################
@@ -50,6 +51,7 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
         eventToAdd.add(new AutomatonLeafNode(automaton));
       }
     }
+    mParent.expandPath(new TreePath(this));
   }
 
   // ##################################################################
