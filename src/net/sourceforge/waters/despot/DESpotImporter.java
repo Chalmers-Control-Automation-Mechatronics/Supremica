@@ -2,18 +2,32 @@ package net.sourceforge.waters.despot;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.swing.filechooser.FileFilter;
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
+import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
+import net.sourceforge.waters.model.marshaller.WatersMarshalException;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -26,6 +40,7 @@ import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.module.EventDecl;
 import org.w3c.dom.Document;
@@ -38,23 +53,108 @@ import org.xml.sax.SAXException;
  * @author Rachel Francis
  */
 
-public class ParseDespotFile
+public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 {
 
   // #########################################################################
-  // # Main
-  public static void main(final String[] args)
-      throws ParserConfigurationException, SAXException, IOException,
-      URISyntaxException
+  // # Constructors
+  public DESpotImporter(final ModuleProxyFactory factory,
+      final DocumentManager docman)
   {
-    final File file = new File("/home/rmf18/Desktop/Data/testHISC.desp");
-    final URI path = file.toURI();
-    final ParseDespotFile pdf = new ParseDespotFile();
+    this(null, factory, docman);
+  }
+
+  public DESpotImporter(final File outputdir, final ModuleProxyFactory factory,
+      final DocumentManager docman)
+  {
+    mOutputDir = outputdir;
+    mFactory = factory;
+
+    mDocumentManager = docman;
+
+  }
+
+  // #########################################################################
+  // # Interface
+  // net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller
+  public File getOutputDirectory()
+  {
+    return mOutputDir;
+  }
+
+  public void setOutputDirectory(final File outputdir)
+  {
+    mOutputDir = outputdir;
+  }
+
+  public ModuleProxy unmarshalCopying(final URI uri) throws IOException,
+      WatersMarshalException, WatersUnmarshalException
+  {
+    try {
+      return convertDESpotHierarchy(uri);
+    } catch (final ParserConfigurationException exception) {
+      throw new WatersUnmarshalException(exception);
+    } catch (final SAXException exception) {
+      throw new WatersUnmarshalException(exception);
+    } catch (final URISyntaxException exception) {
+      throw new WatersUnmarshalException(exception);
+    }
+  }
+
+  // #########################################################################
+  // # Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
+  public ModuleProxy unmarshal(final URI uri) throws IOException,
+      WatersUnmarshalException
+  {
+    try {
+      return unmarshalCopying(uri);
+    } catch (final WatersMarshalException exception) {
+      throw new WatersUnmarshalException(exception);
+    }
+  }
+
+  public Class<ModuleProxy> getDocumentClass()
+  {
+    return ModuleProxy.class;
+  }
+
+  public String getDefaultExtension()
+  {
+    return DESPOTEXT;
+  }
+
+  public Collection<String> getSupportedExtensions()
+  {
+    return EXTENSIONS;
+  }
+
+  public Collection<FileFilter> getSupportedFileFilters()
+  {
+    return FILTERS;
+  }
+
+  public DocumentManager getDocumentManager()
+  {
+    return mDocumentManager;
+  }
+
+  public void setDocumentManager(final DocumentManager manager)
+  {
+    mDocumentManager = manager;
+  }
+
+  private ModuleProxy convertDESpotHierarchy(final URI uri)
+      throws ParserConfigurationException, SAXException, IOException,
+      URISyntaxException, WatersMarshalException
+  {
+    final URL url = uri.toURL();
+    final InputStream stream = url.openStream();
     final DocumentBuilder builder =
         DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    final Document doc = builder.parse(file);
+    final Document doc = builder.parse(stream);
     // gets the root element
     final Element project = doc.getDocumentElement();
+    ModuleProxy root = null;
 
     final NodeList subsystems = project.getElementsByTagName("Subsystem");
     for (int j = 0; j < subsystems.getLength(); j++) {
@@ -66,19 +166,48 @@ public class ParseDespotFile
         final Element aut = (Element) automaton.item(i);
         if (aut.getTagName().equals("Supervisor")) {
           final SimpleComponentProxy scp =
-              pdf.constructSimpleComponent(aut, ComponentKind.SPEC, path);
+              constructSimpleComponent(aut, ComponentKind.SPEC, uri);
           System.out.println(scp);
         } else if (aut.getTagName().equals("Plant")) {
           final SimpleComponentProxy scp =
-              pdf.constructSimpleComponent(aut, ComponentKind.PLANT, path);
+              constructSimpleComponent(aut, ComponentKind.PLANT, uri);
           System.out.println(scp);
         }
-        pdf.clearStructures();
+        clearStructures();
       }
 
-      final ModuleProxy module = pdf.constructModule(subsystem);
+      final ModuleProxy module = constructModule(subsystem);
+      final ProxyMarshaller<ModuleProxy> marshaller =
+          mDocumentManager.findProxyMarshaller(ModuleProxy.class);
+      final String ext = marshaller.getDefaultExtension();
+      final String filename = subsystem.getAttribute("name");
+      final File file = new File(mOutputDir, filename + ext);
+      mDocumentManager.saveAs(module, file);
       System.out.println(module);
+      if (j == 0) {
+        root = module;
+      }
     }
+    return root;
+
+  }
+
+  // #########################################################################
+  // # Main
+  public static void main(final String[] args)
+      throws ParserConfigurationException, SAXException, IOException,
+      URISyntaxException, JAXBException, WatersMarshalException, WatersUnmarshalException
+  {
+    final File file = new File("/home/rmf18/Desktop/Data/testHISC.desp");
+    final URI path = file.toURI();
+    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+    final OperatorTable opTable = CompilerOperatorTable.getInstance();
+    final ProxyMarshaller<ModuleProxy> marshaller = new JAXBModuleMarshaller(factory, opTable);
+    final DocumentManager docManager = new DocumentManager();
+    docManager.registerMarshaller(marshaller);
+    final File outputFile = new File("/home/rmf18/Desktop/DESpot");
+    final DESpotImporter pdf = new DESpotImporter(outputFile, factory, docManager);
+    pdf.unmarshalCopying(path);
 
   }
 
@@ -108,13 +237,15 @@ public class ParseDespotFile
       final IdentifierProxy identifier =
           mFactory.createSimpleIdentifierProxy(eventName);
       final String eventKind = event.getAttribute("ctrl");
-      final EventDeclProxy eventDecl;
+      //final EventDeclProxy eventDecl;
       if (eventKind.equals("1")) {
-       // eventDecl =
-        //    mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,true,ScopeKind.REQUIRED_PARAMETER,null,null);
+        // eventDecl =
+        // mFactory.createEventDeclProxy(identifier,
+        // EventKind.CONTROLLABLE,true,ScopeKind.REQUIRED_PARAMETER,null,null);
       } else if (eventKind.equals("0")) {
-       // eventDecl =
-        //    mFactory.createEventDeclProxy(identifier, EventKind.UNCONTROLLABLE,true,null,null);
+        // eventDecl =
+        // mFactory.createEventDeclProxy(identifier,
+        // EventKind.UNCONTROLLABLE,true,null,null);
       }
     }
     return null;
@@ -505,7 +636,18 @@ public class ParseDespotFile
    * The factory used to build up the modules for the <CODE>.wmod</CODE> files
    * we are converting into.
    */
-  private final ModuleProxyFactory mFactory =
-      ModuleElementFactory.getInstance();
+  private final ModuleProxyFactory mFactory;
+  // # Data Members
+  private File mOutputDir;
 
+  private DocumentManager mDocumentManager;
+
+  private static final String DESPOTEXT = ".desp";
+  private static final Collection<String> EXTENSIONS =
+      Collections.singletonList(DESPOTEXT);
+  private static final FileFilter DESPOTFILTER =
+      new StandardExtensionFileFilter(DESPOTEXT, "DESpot project files [*"
+          + DESPOTEXT + "]");
+  private static final Collection<FileFilter> FILTERS =
+      Collections.singletonList(DESPOTFILTER);
 }

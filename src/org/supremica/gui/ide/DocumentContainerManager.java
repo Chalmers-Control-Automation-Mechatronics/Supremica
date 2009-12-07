@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.xml.bind.JAXBException;
 
+import net.sourceforge.waters.despot.DESpotImporter;
 import net.sourceforge.waters.gui.observer.ContainerSwitchEvent;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -111,7 +112,9 @@ public class DocumentContainerManager
         final File mazeinputs = null;
         final CopyingProxyUnmarshaller<ModuleProxy> mazeImporter =
           new MazeCompiler(mazeinputs, factory, mDocumentManager);
+        final CopyingProxyUnmarshaller<ModuleProxy> despotImporter = new DESpotImporter(factory, mDocumentManager);
         mModuleImporters.add(mazeImporter);
+        mModuleImporters.add(despotImporter);
     }
 
 
