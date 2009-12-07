@@ -120,7 +120,7 @@ public class SimulatorPanel
 
   private void setupEventsTable()
   {
-    mEventsTree = new EventJTree(mSimulation, mDesktop);
+    mEventsTree = new EventJTree(mSimulation, mDesktop, mModuleContainer);
     //mEventsTable.addMouseListener(new EventMouseListener(mSimulation, mEventsTable));
   }
 
