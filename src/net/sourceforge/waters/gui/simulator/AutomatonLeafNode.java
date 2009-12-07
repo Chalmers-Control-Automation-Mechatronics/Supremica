@@ -1,0 +1,22 @@
+package net.sourceforge.waters.gui.simulator;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+
+import net.sourceforge.waters.model.des.AutomatonProxy;
+
+public class AutomatonLeafNode extends DefaultMutableTreeNode
+{public AutomatonLeafNode(final AutomatonProxy event)
+  {
+    super(event.getName(), false);
+    mAutomata = event;
+  }
+
+  public AutomatonProxy getAutomata()
+  {
+    return mAutomata;
+  }
+
+  private final AutomatonProxy mAutomata;
+
+  private static final long serialVersionUID = 4785226183311677790L;
+}

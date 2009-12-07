@@ -49,7 +49,7 @@ public class SimulationReplayStepAction
     if (sim == null) {
       setEnabled(false);
     } else {
-      setEnabled(sim.getEventHistory().size() == sim.getCurrentTime());
+      setEnabled(sim.getEventHistory().size() != sim.getCurrentTime() + 1);
     }
   }
 

@@ -38,8 +38,8 @@ public class EventMouseListener extends MouseAdapter
                   System.out.println(exception.getMessage());
                 }
               }
-              else
-                System.out.println(mSim.getBlockingTextual(event));
+              //else
+                //System.out.println(mSim.getBlockingTextual(event));
             }
           }
         }

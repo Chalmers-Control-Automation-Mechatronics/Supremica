@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import org.supremica.gui.ide.IDEDimensions;
 import org.supremica.gui.ide.MainPanel;
@@ -103,7 +104,7 @@ public class SimulatorPanel
   private void setupEvents()
   {
     setupEventsTable();
-    final JScrollPane scroll = new JScrollPane(mEventsTable);
+    final JScrollPane scroll = new JScrollPane(mEventsTree);
     mEventsPanel.setLayout(new BorderLayout());
     mEventsPanel.add(scroll, BorderLayout.CENTER);
     final JPanel buttonPanel = new JPanel();
@@ -115,20 +116,12 @@ public class SimulatorPanel
     buttonPanel.add(undoButton, BorderLayout.EAST);
     mEventsPanel.add(buttonPanel, BorderLayout.SOUTH);
     mTabbedPane.addTab("Events", mEventsPanel);
-    final int width = 245; // DEBUG: Arbitrary value: Any value will work, but this is close to the 'normal' value
-    mEventsTable.getColumnModel().getColumn(0).setPreferredWidth((int)(width * 0.1));
-    mEventsTable.getColumnModel().getColumn(1).setPreferredWidth((int)(width * 0.8));
-    mEventsTable.getColumnModel().getColumn(2).setPreferredWidth((int)(width * 0.1));
   }
 
   private void setupEventsTable()
   {
-    mEventsTableModel = new EventTableModel(mModuleContainer, mSimulation);
-    mEventsTable = new JTable(mEventsTableModel);
-    final ListSelectionModel listMod =  mEventsTable.getSelectionModel();
-    listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    listMod.addListSelectionListener(mEventsTable);
-    mEventsTable.addMouseListener(new EventMouseListener(mSimulation, mEventsTable));
+    mEventsTree = new EventJTree(mSimulation, mDesktop);
+    //mEventsTable.addMouseListener(new EventMouseListener(mSimulation, mEventsTable));
   }
 
 
@@ -142,8 +135,7 @@ public class SimulatorPanel
   private final Simulation mSimulation;
   //private final JPanel mTracePanel = new JPanel();
   private JTable mAutomataTable = new JTable();
-  private JTable mEventsTable = new JTable();
-  private EventTableModel  mEventsTableModel;
+  private JTree mEventsTree;
   //private final JScrollPane mScrollPane = new JScrollPane();
 
 
