@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+
 import javax.swing.filechooser.FileFilter;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
@@ -42,7 +44,9 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.module.EventDecl;
+import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -165,25 +169,36 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       for (int i = 0; i < automaton.getLength(); i++) {
         final Element aut = (Element) automaton.item(i);
         if (aut.getTagName().equals("Supervisor")) {
-          final SimpleComponentProxy scp =
-              constructSimpleComponent(aut, ComponentKind.SPEC, uri);
-          System.out.println(scp);
+
+          constructSimpleComponent(aut, ComponentKind.SPEC, uri);
+
         } else if (aut.getTagName().equals("Plant")) {
-          final SimpleComponentProxy scp =
-              constructSimpleComponent(aut, ComponentKind.PLANT, uri);
-          System.out.println(scp);
+
+          constructSimpleComponent(aut, ComponentKind.PLANT, uri);
+
         }
         clearStructures();
       }
 
+      //adds the accepting proposition to the events list
+      final IdentifierProxy identifier =
+        mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
+final EventDeclProxy accepting = mFactory.createEventDeclProxy(identifier, EventKind.PROPOSITION,
+    true, ScopeKind.OPTIONAL_PARAMETER, null, null, null);
+mEvents.put(EventDeclProxy.DEFAULT_MARKING_NAME,accepting);
+
+
+
       final ModuleProxy module = constructModule(subsystem);
+      mAutomaton.clear();
+      mEvents.clear();
       final ProxyMarshaller<ModuleProxy> marshaller =
           mDocumentManager.findProxyMarshaller(ModuleProxy.class);
       final String ext = marshaller.getDefaultExtension();
       final String filename = subsystem.getAttribute("name");
       final File file = new File(mOutputDir, filename + ext);
       mDocumentManager.saveAs(module, file);
-      System.out.println(module);
+
       if (j == 0) {
         root = module;
       }
@@ -196,17 +211,20 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   // # Main
   public static void main(final String[] args)
       throws ParserConfigurationException, SAXException, IOException,
-      URISyntaxException, JAXBException, WatersMarshalException, WatersUnmarshalException
+      URISyntaxException, JAXBException, WatersMarshalException,
+      WatersUnmarshalException
   {
     final File file = new File("/home/rmf18/Desktop/Data/testHISC.desp");
     final URI path = file.toURI();
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final OperatorTable opTable = CompilerOperatorTable.getInstance();
-    final ProxyMarshaller<ModuleProxy> marshaller = new JAXBModuleMarshaller(factory, opTable);
+    final ProxyMarshaller<ModuleProxy> marshaller =
+        new JAXBModuleMarshaller(factory, opTable);
     final DocumentManager docManager = new DocumentManager();
     docManager.registerMarshaller(marshaller);
     final File outputFile = new File("/home/rmf18/Desktop/DESpot");
-    final DESpotImporter pdf = new DESpotImporter(outputFile, factory, docManager);
+    final DESpotImporter pdf =
+        new DESpotImporter(outputFile, factory, docManager);
     pdf.unmarshalCopying(path);
 
   }
@@ -220,7 +238,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   private void clearStructures()
   {
     mStates.clear();
-    mEvents.clear();
     mEventIDs.clear();
     mTransitions.clear();
     mNodes.clear();
@@ -230,33 +247,76 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   // #########################################################################
   // # Element Conversion
 
-  private EventDeclProxy constructEventDecl(final Element event)
+  /**
+   * Checks if an event already exists. If the event hasn't been used already an
+   * EventDeclProxy is created and stored.
+   */
+  private void constructEventDecl(final Element event)
   {
     final String eventName = event.getAttribute("nm");
     if (!mEvents.containsKey(eventName)) {
       final IdentifierProxy identifier =
           mFactory.createSimpleIdentifierProxy(eventName);
       final String eventKind = event.getAttribute("ctrl");
-      //final EventDeclProxy eventDecl;
+      final String eventType = event.getAttribute("type");
+      EventDeclProxy eventDecl = null;
+      // the event is controllable
       if (eventKind.equals("1")) {
-        // eventDecl =
-        // mFactory.createEventDeclProxy(identifier,
-        // EventKind.CONTROLLABLE,true,ScopeKind.REQUIRED_PARAMETER,null,null);
-      } else if (eventKind.equals("0")) {
-        // eventDecl =
-        // mFactory.createEventDeclProxy(identifier,
-        // EventKind.UNCONTROLLABLE,true,null,null);
+        if (eventType.equals("r")) {
+          eventDecl =
+              mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,
+                  true, ScopeKind.REQUIRED_PARAMETER, null, null,
+                  HISCAttributes.ATTRIBUTES_REQUEST);
+        } else if (eventType.equals("a")) {
+          eventDecl =
+              mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,
+                  true, ScopeKind.REQUIRED_PARAMETER, null, null,
+                  HISCAttributes.ATTRIBUTES_ANSWER);
+        } else if (eventType.equals("d")) {
+          eventDecl =
+              mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,
+                  true, ScopeKind.LOCAL, null, null, null);
+        } else if (eventType.equals("ld")) {
+          eventDecl =
+              mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,
+                  true, ScopeKind.REQUIRED_PARAMETER, null, null,
+                  HISCAttributes.ATTRIBUTES_LOWDATA);
+        }
       }
+      // the event is uncontrollable
+      else if (eventKind.equals("0")) {
+        if (eventType.equals("r")) {
+          eventDecl =
+              mFactory.createEventDeclProxy(identifier,
+                  EventKind.UNCONTROLLABLE, true, ScopeKind.REQUIRED_PARAMETER,
+                  null, null, HISCAttributes.ATTRIBUTES_REQUEST);
+        } else if (eventType.equals("a")) {
+          eventDecl =
+              mFactory.createEventDeclProxy(identifier,
+                  EventKind.UNCONTROLLABLE, true, ScopeKind.REQUIRED_PARAMETER,
+                  null, null, HISCAttributes.ATTRIBUTES_ANSWER);
+        } else if (eventType.equals("d")) {
+          eventDecl =
+              mFactory.createEventDeclProxy(identifier,
+                  EventKind.UNCONTROLLABLE, true, ScopeKind.LOCAL, null, null,
+                  null);
+        } else if (eventType.equals("ld")) {
+          eventDecl =
+              mFactory.createEventDeclProxy(identifier,
+                  EventKind.UNCONTROLLABLE, true, ScopeKind.REQUIRED_PARAMETER,
+                  null, null, HISCAttributes.ATTRIBUTES_LOWDATA);
+        }
+      }
+      mEvents.put(eventName, eventDecl);
     }
-    return null;
   }
 
   /**
    * Constructs the SimpleComponent section for the module of a
    * <CODE>.wmod</CODE> file.
    */
-  private SimpleComponentProxy constructSimpleComponent(
-      final Element automaton, final ComponentKind kind, final URI path)
+  private void constructSimpleComponent(final Element automaton,
+      final ComponentKind kind, final URI path)
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException
   {
@@ -269,7 +329,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final IdentifierProxy identifier =
         mFactory.createSimpleIdentifierProxy(autName);
 
-    return mFactory.createSimpleComponentProxy(identifier, kind, graph);
+    mAutomaton
+        .add(mFactory.createSimpleComponentProxy(identifier, kind, graph));
   }
 
   /**
@@ -280,8 +341,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    */
   private ModuleProxy constructModule(final Element subsystem)
   {
-    return mFactory.createModuleProxy(subsystem.getAttribute("name"), URI
-        .create("testModule"));
+
+    return mFactory.createModuleProxy(subsystem.getAttribute("name"), null, URI
+        .create("testModule"), null, mEvents.values(), null, mAutomaton);
   }
 
   /**
@@ -397,8 +459,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       }
 
     }
-    return mFactory.createLabelBlockProxy(blockedEventList, null);
-
+    if (blockedEventList.size() == 0) {
+      return null;
+    } else {
+      return mFactory.createLabelBlockProxy(blockedEventList, null);
+    }
   }
 
   /**
@@ -626,11 +691,16 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * This list stores all the edges (transitions) for the current automaton.
    */
   private final List<EdgeProxy> mEdges = new ArrayList<EdgeProxy>();
-
+  /**
+   * List that stores all the automata (SimpleComponent's) for a module.
+   */
+  private final List<SimpleComponentProxy> mAutomaton =
+      new ArrayList<SimpleComponentProxy>();
   /**
    * Maps the name of an event to the EventDecl for that event.
    */
-  private final Map<String,EventDecl> mEvents = new HashMap<String,EventDecl>();
+  private final Map<String,EventDeclProxy> mEvents =
+      new TreeMap<String,EventDeclProxy>();
 
   /**
    * The factory used to build up the modules for the <CODE>.wmod</CODE> files

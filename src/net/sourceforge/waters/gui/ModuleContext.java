@@ -932,18 +932,20 @@ public class ModuleContext
     public Object visitIdentifierProxy(final IdentifierProxy ident)
     {
       final EventDeclProxy decl = guessEventDecl(ident);
-      final ColorGeometryProxy geo = decl.getColorGeometry();
-      if (geo == null) {
-        final String name = decl.getName();
-        if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-          mForbidden = true;
-        } else if (mColorSet.add(EditorColor.DEFAULTMARKINGCOLOR)) {
-          mColorList.add(EditorColor.DEFAULTMARKINGCOLOR);
-        }
-      } else {
-        for (final Color colour : geo.getColorSet()) {
-          if (mColorSet.add(colour)) {
-            mColorList.add(colour);
+      if (decl != null) {
+        final ColorGeometryProxy geo = decl.getColorGeometry();
+        if (geo == null) {
+          final String name = decl.getName();
+          if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+            mForbidden = true;
+          } else if (mColorSet.add(EditorColor.DEFAULTMARKINGCOLOR)) {
+            mColorList.add(EditorColor.DEFAULTMARKINGCOLOR);
+          }
+        } else {
+          for (final Color colour : geo.getColorSet()) {
+            if (mColorSet.add(colour)) {
+              mColorList.add(colour);
+            }
           }
         }
       }
