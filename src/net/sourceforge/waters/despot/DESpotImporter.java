@@ -260,11 +260,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         // referencing it
         if (evElmt.getAttribute("Scope").equals(ScopeKind.REQUIRED_PARAMETER)) {
 if(!mEvents.containsKey(eventName)){
-  final IdentifierProxy eventIdent =
+            final IdentifierProxy eventIdent =
     mFactory.createSimpleIdentifierProxy(eventName);
   final String eventKind = evElmt.getAttribute("Kind");
-  final EventDeclProxy event = mFactory.createEventDeclProxy(eventIdent, eventKind, true,ScopeKind.REQUIRED_PARAMETER,null, null, null);
-mEvents.put(eventName, value)
+  //final EventDeclProxy event = mFactory.createEventDeclProxy(eventIdent, eventKind, true,ScopeKind.REQUIRED_PARAMETER,null, null, null);
+//mEvents.put(eventName, value)
         }}
         bindings.add(mFactory.createParameterBindingProxy(evElmt
             .getAttribute("Name"), identifier));
