@@ -185,6 +185,12 @@ public class Simulation implements ModelObserver, Observer
     return (ArrayList<EventProxy>) mPreviousEvents.clone();
   }
 
+  @SuppressWarnings("unchecked")
+  public ArrayList<HashMap<AutomatonProxy, StateProxy>> getAutomatonHistory()
+  {
+   return (ArrayList<HashMap<AutomatonProxy, StateProxy>>) mPreviousAutomatonStates.clone();
+  }
+
   public ArrayList<AutomatonProxy> getAutomata()
   {
     final ArrayList<AutomatonProxy> output = new ArrayList<AutomatonProxy>();

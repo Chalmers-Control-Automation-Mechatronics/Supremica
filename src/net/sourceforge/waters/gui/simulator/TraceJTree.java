@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -26,19 +27,20 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
-public class EventJTree extends JTree
+public class TraceJTree extends JTree
 {
-  public EventJTree(final Simulation sim, final AutomatonDesktopPane desktop, final ModuleContainer container)
+
+  public TraceJTree(final Simulation sim, final AutomatonDesktopPane desktop, final ModuleContainer container)
   {
     super();
-    this.setCellRenderer(new EventTreeCellRenderer());
+    this.setCellRenderer(new TraceTreeCellRenderer());
     mSim = sim;
     mDesktop = desktop;
     mContainer = container;
-    final EventMutableTreeNode root = new EventMutableTreeNode(sim, this);
+    final TraceMutableTreeNode root = new TraceMutableTreeNode(sim, this);
     this.setModel(new DefaultTreeModel(root, false));
     this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-    setRootVisible(false);
+    //setRootVisible(false);
     setShowsRootHandles(true);
     //setAutoscrolls(true);
     setToggleClickCount(0);
@@ -49,22 +51,13 @@ public class EventJTree extends JTree
       {
         if (e.getClickCount() == 2)
         {
-          final TreePath path = EventJTree.this.getClosestPathForLocation((int)e.getPoint().getX(), (int)e.getPoint().getY());
+          final TreePath path = TraceJTree.this.getClosestPathForLocation((int)e.getPoint().getX(), (int)e.getPoint().getY());
           final MutableTreeNode node = (MutableTreeNode)path.getLastPathComponent();
           if (node == null)
             return; // Nothing is selected
           if (node.getClass() == EventBranchNode.class)
           {
-            try {
-              if (sim.getValidTransitions().contains(((EventBranchNode)node).getEvent()))
-                sim.step(((EventBranchNode)node).getEvent());
-              else
-                System.out.println("ERROR: That event is blocked");
-            } catch (final UncontrollableException exception) {
-              System.out.println("ERROR: Uncontrollable Event detected: " + exception.getMessage() + ". No event has been fired.");
-            } catch (final IllegalArgumentException exception) {
-              System.out.println(exception.getMessage() + ". No event has been fired");
-            }
+            throw new UnsupportedOperationException("Trace-back on click not implemented yet");
           }
           else if (node.getClass() == AutomatonLeafNode.class)
           {
@@ -76,12 +69,12 @@ public class EventJTree extends JTree
     });
   }
 
-  private class EventTreeCellRenderer
+  private class TraceTreeCellRenderer
   extends DefaultTreeCellRenderer
   {
     //#######################################################################
     //# Constructor
-    private EventTreeCellRenderer()
+    private TraceTreeCellRenderer()
     {
       setTextSelectionColor(EditorColor.TEXTCOLOR);
     }
@@ -150,6 +143,7 @@ public class EventJTree extends JTree
       {
         super.getTreeCellRendererComponent
           (tree, value, sel, expanded, leaf, row, hasFocus);
+        System.out.println("DEBUG: Children:" + ((DefaultMutableTreeNode)value).getChildCount());
         return this;
       }
     }

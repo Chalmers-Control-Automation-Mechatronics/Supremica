@@ -1,23 +1,20 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.StateProxy;
 
-public class EventMutableTreeNode extends DefaultMutableTreeNode implements SimulationObserver
+public class TraceMutableTreeNode extends DefaultMutableTreeNode implements SimulationObserver
 {
-
-
   // ################################################################
   // # Constructor
-
-  public EventMutableTreeNode(final Simulation sim, final EventJTree parent)
+  public TraceMutableTreeNode(final Simulation sim, final TraceJTree parent)
   {
-    super("Event", true);
+    super("Trace", true);
     sim.attach(this);
     mParent = parent;
     setupAllEvents(sim);
@@ -38,17 +35,17 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   private void setupAllEvents(final Simulation sim)
   {
     this.removeAllChildren();
-    for (final EventProxy event : sim.getAllEvents())
+    for (int looper = 0; looper < sim.getEventHistory().size(); looper++)
     {
-      final ArrayList<AutomatonProxy> automatonInEvent = new ArrayList<AutomatonProxy>();
-      for (final AutomatonProxy automaton : sim.getAutomata())
-        if (automaton.getEvents().contains(event))
-          automatonInEvent.add(automaton);
-      final DefaultMutableTreeNode eventToAdd= new EventBranchNode(event);
+      System.out.println("DEBUG: Looped " + looper + " times, out of " + sim.getEventHistory().size() + " total times.");
+      final EventBranchNode eventToAdd = new EventBranchNode(sim.getEventHistory().get(looper));
+      HashMap<AutomatonProxy, StateProxy> stateInEvent = new HashMap<AutomatonProxy, StateProxy>();
+      stateInEvent = sim.getAutomatonHistory().get(looper);
       this.add(eventToAdd);
-      for (final AutomatonProxy automaton : automatonInEvent)
+      System.out.println("DEBUG: Added event: " + eventToAdd);
+      for (final AutomatonProxy automaton : stateInEvent.keySet())
       {
-        eventToAdd.add(new AutomatonLeafNode(automaton, null));
+        eventToAdd.add(new AutomatonLeafNode(automaton, stateInEvent.get(automaton)));
       }
     }
     mParent.expandPath(new TreePath(this));
@@ -57,10 +54,11 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   // ##################################################################
   // # Data Members
 
-  private final EventJTree mParent;
+  private final TraceJTree mParent;
 
   // ##################################################################
   // # Class Constants
 
   private static final long serialVersionUID = 4899696734198560636L;
+
 }

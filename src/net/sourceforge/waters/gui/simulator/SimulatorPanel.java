@@ -31,6 +31,7 @@ public class SimulatorPanel
     mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
     setupAutomata();
     setupEvents();
+    setupTrace();
     setLeftComponent(mTabbedPane);
   }
 
@@ -89,23 +90,23 @@ public class SimulatorPanel
     mAutomataTable.getTableHeader().addMouseListener(new TableHeaderMouseAdapter(mAutomataTable, mAutomataTable.getTableHeader()));
   }
 
+  private void setupTrace()
+  {
+    mTraceTree = new TraceJTree(mSimulation, mDesktop, mModuleContainer);
+    final JScrollPane scroll = new JScrollPane(mTraceTree);
+    mTracePanel.setLayout(new BorderLayout());
+    mTracePanel.add(scroll, BorderLayout.CENTER);
+    mTabbedPane.addTab("Trace", mTracePanel);
+  }
+
   private void setupEvents()
   {
-    setupEventsTable();
+    mEventsTree = new EventJTree(mSimulation, mDesktop, mModuleContainer);
     final JScrollPane scroll = new JScrollPane(mEventsTree);
     mEventsPanel.setLayout(new BorderLayout());
     mEventsPanel.add(scroll, BorderLayout.CENTER);
-    final JPanel buttonPanel = new JPanel();
-    mEventsPanel.add(buttonPanel, BorderLayout.SOUTH);
     mTabbedPane.addTab("Events", mEventsPanel);
   }
-
-  private void setupEventsTable()
-  {
-    mEventsTree = new EventJTree(mSimulation, mDesktop, mModuleContainer);
-    //mEventsTable.addMouseListener(new EventMouseListener(mSimulation, mEventsTable));
-  }
-
 
   //#########################################################################
   //# Data Members
@@ -113,10 +114,12 @@ public class SimulatorPanel
   private JTabbedPane mTabbedPane = new JTabbedPane();
   private AutomatonDesktopPane mDesktop;
   private final JPanel mAutomataPanel = new JPanel();
+  private final JPanel mTracePanel = new JPanel();
   private final JPanel mEventsPanel = new JPanel();
   private final Simulation mSimulation;
   //private final JPanel mTracePanel = new JPanel();
   private JTable mAutomataTable = new JTable();
+  private JTree mTraceTree;
   private JTree mEventsTree;
   //private final JScrollPane mScrollPane = new JScrollPane();
 
