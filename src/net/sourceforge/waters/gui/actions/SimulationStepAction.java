@@ -19,6 +19,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
@@ -81,7 +82,6 @@ public class SimulationStepAction
     final Simulation sim = getObservedSimulation();
     if (sim == null) {
       setEnabled(false);
-      System.out.println("DEBUG [SimulationStepAction]: Simulation is null");
     } else {
       setEnabled(sim.getValidTransitions().size() != 0);
     }
@@ -96,7 +96,7 @@ public class SimulationStepAction
                 getIDE(),
                 "There are multiple events possible. Which one do you wish to fire?",
                 "Multiple Options available", JOptionPane.QUESTION_MESSAGE,
-                null, // The supremica icon goes here
+                IconLoader.ICON_EVENT, // The supremica icon goes here
                 possibilities, possibilities[0]);
 
     // If a string was returned, say so.

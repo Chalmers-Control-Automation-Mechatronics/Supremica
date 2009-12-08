@@ -173,7 +173,6 @@ public class AbstractTunnelTable extends SimulationTable implements
         output.add(row);
       }
       Collections.sort(output, mComparator);
-      System.out.println("DEBUG: Comparator:" + mComparator);
       mRawData = output;
     } else
       mRawData = new ArrayList<List<Object>>();

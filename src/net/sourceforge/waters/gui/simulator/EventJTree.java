@@ -43,6 +43,7 @@ public class EventJTree extends JTree
     setShowsRootHandles(true);
     //setAutoscrolls(true);
     setToggleClickCount(0);
+    this.setLargeModel(false);
     // Expand all foreach-component entries.
 
     this.addMouseListener(new MouseAdapter(){
@@ -57,11 +58,14 @@ public class EventJTree extends JTree
           if (node.getClass() == EventBranchNode.class)
           {
             try {
-              sim.step(((EventBranchNode)node).getEvent());
+              if (sim.getValidTransitions().contains(((EventBranchNode)node).getEvent()))
+                sim.step(((EventBranchNode)node).getEvent());
+              else
+                System.out.println("ERROR: That event is blocked");
             } catch (final UncontrollableException exception) {
-              exception.printStackTrace();
+              System.out.println("ERROR: Uncontrollable Event detected: " + exception.getMessage() + ". No event has been fired.");
             } catch (final IllegalArgumentException exception) {
-              exception.printStackTrace();
+              System.out.println(exception.getMessage() + ". No event has been fired");
             }
           }
           else if (node.getClass() == AutomatonLeafNode.class)
@@ -72,20 +76,6 @@ public class EventJTree extends JTree
         }
       }
     });
-  }
-
-
-
-  public void expandPath(final TreePath e)
-  {
-    super.expandPath(e);
-    System.out.println("DEBUG: Expanded with object : " + e);
-  }
-
-  public void expandRow(final int row)
-  {
-    super.expandRow(row);
-    System.out.println("DEBUG: Expanded row : " + row);
   }
 
   private class EventTreeCellRenderer
@@ -152,7 +142,6 @@ public class EventJTree extends JTree
         output.add(left, BorderLayout.WEST);
         output.add(center, BorderLayout.CENTER);
         output.add(right, BorderLayout.EAST);
-        System.out.println("DEBUG: Dimensions are:" + left.getSize() + " , " + center.getSize() + " , " + right.getSize());
         return output;
       }
       else

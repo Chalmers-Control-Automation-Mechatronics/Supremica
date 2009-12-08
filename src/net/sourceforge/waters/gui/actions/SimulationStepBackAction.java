@@ -50,7 +50,6 @@ public class SimulationStepBackAction
       setEnabled(false);
     } else {
       setEnabled(sim.getCurrentTime() != -1);
-      System.out.println("DEBUG: Current Time is: " + sim.getCurrentTime());
     }
   }
 

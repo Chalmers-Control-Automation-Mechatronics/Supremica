@@ -131,7 +131,6 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
 
   public void onReOpen(final ModuleContainer container, final Simulation sim)
   {
-    System.out.println("DEBUG: oldOpen:" + oldOpen);
     for (final String name : oldOpen.keySet()) {
       addAutomaton(name, container, sim, 2);
       if (openAutomaton.get(name) != null)
@@ -203,7 +202,6 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
     if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED) {
       if (openAutomaton.keySet().size() == 0)
         return;
-      System.out.println("DEBUG: Cleared");
       oldOpen.clear();
       final List<Map.Entry<String,AutomatonInternalFrame>> entries =
         new ArrayList<Map.Entry<String,AutomatonInternalFrame>>
@@ -218,7 +216,6 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
       }
       openAutomaton.clear();
     }
-    System.out.println("DEBUG: OldOpen: " + oldOpen);
   }
 
   //#########################################################################

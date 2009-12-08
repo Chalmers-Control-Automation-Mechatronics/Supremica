@@ -290,8 +290,6 @@ public class Simulation implements ModelObserver, Observer
     {
       removeFutureEvents();
       mPreviousEvents.add(event);
-      mPreviousAutomatonStates.add((HashMap<AutomatonProxy,StateProxy>) mAllAutomatons.clone());
-      mPreviousEnabledLastStep.add(mEnabledLastStep);
       mEnabledLastStep = new ArrayList<AutomatonProxy>();
       final HashMap<AutomatonProxy, TransitionProxy> thisStateTransitionFire = new HashMap<AutomatonProxy, TransitionProxy>();
       for (final AutomatonProxy automata : mAllAutomatons.keySet())
@@ -311,6 +309,8 @@ public class Simulation implements ModelObserver, Observer
           }
         }
       }
+      mPreviousAutomatonStates.add((HashMap<AutomatonProxy,StateProxy>) mAllAutomatons.clone());
+      mPreviousEnabledLastStep.add(mEnabledLastStep);
       mPreviousTransitionHistory.add(thisStateTransitionFire);
       currentTime++;
     }

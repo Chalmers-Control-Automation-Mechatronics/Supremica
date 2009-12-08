@@ -1,7 +1,6 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.awt.BorderLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -61,12 +60,6 @@ public class SimulatorPanel
     mAutomataPanel.setLayout(new BorderLayout());
     mAutomataPanel.add(scroll, BorderLayout.CENTER);
     final JPanel buttonPanel = new JPanel();
-    final JButton stepButton = new JButton("Step");
-    stepButton.addActionListener(new TunnelActionListener(mAutomataTable , mModuleContainer));
-    buttonPanel.add(stepButton, BorderLayout.WEST);
-    final JButton undoButton = new JButton("Undo");
-    undoButton.addActionListener(new UndoActionListener(mAutomataTable, mModuleContainer));
-    buttonPanel.add(undoButton, BorderLayout.EAST);
     mAutomataPanel.add(buttonPanel, BorderLayout.SOUTH);
     mTabbedPane.addTab("Automata", mAutomataPanel);
   }
@@ -77,12 +70,8 @@ public class SimulatorPanel
     ((AbstractTunnelTable)mAutomataTable.getModel()).attachTable(mAutomataTable);
     final int width = 245; // DEBUG: Arbitrary value: Any value will work, but this is close to the 'normal' value
     mAutomataTable.setDefaultRenderer(mAutomataTable.getColumnClass(1), new SelectedTableCellRenderer(mSimulation, mDesktop));
-    if (mAutomataTable.getColumnModel().getColumnCount() == 0)
+    if (mAutomataTable.getColumnModel().getColumnCount() != 0)
     {
-      System.out.println("DEBUG: ERROR: 0 columns in AutomatonTable " + mAutomataTable.toString());
-    }
-    else
-      {
       mAutomataTable.getColumnModel().getColumn(0).setPreferredWidth((int)(width * 0.1));
       mAutomataTable.getColumnModel().getColumn(0).setMaxWidth((int)(width * 0.1));
       mAutomataTable.getColumnModel().getColumn(1).setPreferredWidth((int)(width * 0.35));
@@ -91,10 +80,9 @@ public class SimulatorPanel
       mAutomataTable.getColumnModel().getColumn(3).setPreferredWidth((int)(width * 0.1));
       mAutomataTable.getColumnModel().getColumn(3).setMaxWidth((int)(width * 0.1));
       mAutomataTable.getColumnModel().getColumn(4).setPreferredWidth((int)(width * 0.35));
-      System.out.println("Preferred Widths are: " + mAutomataTable.getColumnModel().getColumn(4).getPreferredWidth() + " and "
-          + mAutomataTable.getColumnModel().getColumn(0).getPreferredWidth());
     }
     mAutomataTable.addMouseListener(new AutomatonMouseListener(mSimulation, mAutomataTable, mDesktop));
+    mAutomataTable.getTableHeader().setReorderingAllowed(false);
     final ListSelectionModel listMod =  mAutomataTable.getSelectionModel();
     listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     listMod.addListSelectionListener(mAutomataTable);
@@ -108,12 +96,6 @@ public class SimulatorPanel
     mEventsPanel.setLayout(new BorderLayout());
     mEventsPanel.add(scroll, BorderLayout.CENTER);
     final JPanel buttonPanel = new JPanel();
-    final JButton stepButton = new JButton("Step");
-    stepButton.addActionListener(new TunnelActionListener(mAutomataTable , mModuleContainer));
-    buttonPanel.add(stepButton, BorderLayout.WEST);
-    final JButton undoButton = new JButton("Undo");
-    undoButton.addActionListener(new UndoActionListener(mAutomataTable, mModuleContainer));
-    buttonPanel.add(undoButton, BorderLayout.EAST);
     mEventsPanel.add(buttonPanel, BorderLayout.SOUTH);
     mTabbedPane.addTab("Events", mEventsPanel);
   }
