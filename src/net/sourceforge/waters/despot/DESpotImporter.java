@@ -32,14 +32,15 @@ import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
@@ -161,7 +162,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     ModuleProxy root = null;
 
     final NodeList subsystems = project.getElementsByTagName("Subsystem");
-    for (int j = 0; j < subsystems.getLength(); j++) {
+    for (int j = (subsystems.getLength() - 1); j >= 0; j--) {
       final Element subsystem =
           (Element) project.getElementsByTagName("Subsystem").item(j);
 
@@ -176,21 +177,26 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
           constructSimpleComponent(aut, ComponentKind.PLANT, uri);
 
+        } else if (aut.getTagName().equals("Uses")) {
+          constructModuleInstance(aut);
         }
         clearStructures();
       }
 
-      //adds the accepting proposition to the events list
+      // adds the accepting proposition to the events list
       final IdentifierProxy identifier =
-        mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
-final EventDeclProxy accepting = mFactory.createEventDeclProxy(identifier, EventKind.PROPOSITION,
-    true, ScopeKind.OPTIONAL_PARAMETER, null, null, null);
-mEvents.put(EventDeclProxy.DEFAULT_MARKING_NAME,accepting);
-
-
+          mFactory
+              .createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
+      final EventDeclProxy accepting =
+          mFactory.createEventDeclProxy(identifier, EventKind.PROPOSITION,
+              true, ScopeKind.OPTIONAL_PARAMETER, null, null, null);
+      mEvents.put(EventDeclProxy.DEFAULT_MARKING_NAME, accepting);
 
       final ModuleProxy module = constructModule(subsystem);
-      mAutomaton.clear();
+      if (j == 0) {
+        root = module;
+      }
+      mComponents.clear();
       mEvents.clear();
       final ProxyMarshaller<ModuleProxy> marshaller =
           mDocumentManager.findProxyMarshaller(ModuleProxy.class);
@@ -199,11 +205,66 @@ mEvents.put(EventDeclProxy.DEFAULT_MARKING_NAME,accepting);
       final File file = new File(mOutputDir, filename + ext);
       mDocumentManager.saveAs(module, file);
 
-      if (j == 0) {
-        root = module;
-      }
     }
     return root;
+
+  }
+
+  /**
+   * This method creates an instance of a module. The referenced module is
+   * opened and the DOM is traversed to read the events to create parameter
+   * bindings. One call to this method creates all the required instance for the
+   * current module.
+   *
+   * @param uses
+   * @throws ParserConfigurationException
+   * @throws SAXException
+   * @throws IOException
+   * @throws URISyntaxException
+   */
+  private void constructModuleInstance(final Element uses)
+      throws ParserConfigurationException, SAXException, IOException,
+      URISyntaxException
+  {
+    final NodeList interfaceList = uses.getElementsByTagName("*");
+    for (int i = 0; i < interfaceList.getLength(); i++) {
+      final Element interfaceRef = (Element) interfaceList.item(i);
+      final String moduleName = interfaceRef.getAttribute("provider");
+
+      // locates where the referenced module is
+      final String absPath = this.getOutputDirectory().getAbsolutePath();
+
+      final File file = new File(absPath + "/" + moduleName + ".wmod");
+      final DocumentBuilder builder =
+          DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      final Document doc = builder.parse(file);
+
+      final List<ParameterBindingProxy> bindings =
+          new ArrayList<ParameterBindingProxy>();
+
+      // creates the parameter bindings for each event in the module
+      final Element module = doc.getDocumentElement();
+      final Element eventList =
+          (Element) module.getElementsByTagName("EventDeclList").item(0);
+
+      final NodeList allEvents = eventList.getElementsByTagName("EventDecl");
+      final Element events = (Element) allEvents.item(0);
+      final NodeList evElmtLs = events.getElementsByTagName("*");
+      for (int j = 0; j < evElmtLs.getLength(); j++) {
+        final Element evElmt = (Element) evElmtLs.item(j);
+        if (!evElmt.getAttribute("Kind").toUpperCase().equals("PROPOSITION")) {
+          final ExpressionProxy identifier =
+              mFactory.createSimpleIdentifierProxy(evElmt.getAttribute("Name"));
+          bindings.add(mFactory.createParameterBindingProxy(evElmt
+              .getAttribute("Name"), identifier));
+        }
+
+      }
+      final SimpleIdentifierProxy identifier =
+          mFactory.createSimpleIdentifierProxy(moduleName);
+      mComponents.add(mFactory.createInstanceProxy(identifier, moduleName,
+          bindings));
+    }
 
   }
 
@@ -329,8 +390,8 @@ mEvents.put(EventDeclProxy.DEFAULT_MARKING_NAME,accepting);
     final IdentifierProxy identifier =
         mFactory.createSimpleIdentifierProxy(autName);
 
-    mAutomaton
-        .add(mFactory.createSimpleComponentProxy(identifier, kind, graph));
+    mComponents.add(mFactory
+        .createSimpleComponentProxy(identifier, kind, graph));
   }
 
   /**
@@ -343,7 +404,7 @@ mEvents.put(EventDeclProxy.DEFAULT_MARKING_NAME,accepting);
   {
 
     return mFactory.createModuleProxy(subsystem.getAttribute("name"), null, URI
-        .create("testModule"), null, mEvents.values(), null, mAutomaton);
+        .create("testModule"), null, mEvents.values(), null, mComponents);
   }
 
   /**
@@ -692,10 +753,10 @@ mEvents.put(EventDeclProxy.DEFAULT_MARKING_NAME,accepting);
    */
   private final List<EdgeProxy> mEdges = new ArrayList<EdgeProxy>();
   /**
-   * List that stores all the automata (SimpleComponent's) for a module.
+   * List that stores all the components for a module, such as the automata
+   * (SimpleComponent's) or instances of other modules.
    */
-  private final List<SimpleComponentProxy> mAutomaton =
-      new ArrayList<SimpleComponentProxy>();
+  private final List<Proxy> mComponents = new ArrayList<Proxy>();
   /**
    * Maps the name of an event to the EventDecl for that event.
    */
