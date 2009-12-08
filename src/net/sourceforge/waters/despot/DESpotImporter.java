@@ -252,12 +252,22 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final NodeList evElmtLs = events.getElementsByTagName("*");
       for (int j = 0; j < evElmtLs.getLength(); j++) {
         final Element evElmt = (Element) evElmtLs.item(j);
-        if (!evElmt.getAttribute("Kind").toUpperCase().equals("PROPOSITION")) {
-          final ExpressionProxy identifier =
-              mFactory.createSimpleIdentifierProxy(evElmt.getAttribute("Name"));
-          bindings.add(mFactory.createParameterBindingProxy(evElmt
-              .getAttribute("Name"), identifier));
-        }
+        final String eventName = evElmt.getAttribute("Name");
+        final ExpressionProxy identifier =
+            mFactory.createSimpleIdentifierProxy(eventName);
+        // if the parameter is required and not already used by the module
+        // referencing it, add it to the list of events for the module
+        // referencing it
+        if (evElmt.getAttribute("Scope").equals(ScopeKind.REQUIRED_PARAMETER)) {
+if(!mEvents.containsKey(eventName)){
+  final IdentifierProxy eventIdent =
+    mFactory.createSimpleIdentifierProxy(eventName);
+  final String eventKind = evElmt.getAttribute("Kind");
+  final EventDeclProxy event = mFactory.createEventDeclProxy(eventIdent, eventKind, true,ScopeKind.REQUIRED_PARAMETER,null, null, null);
+mEvents.put(eventName, value)
+        }}
+        bindings.add(mFactory.createParameterBindingProxy(evElmt
+            .getAttribute("Name"), identifier));
 
       }
       final SimpleIdentifierProxy identifier =
