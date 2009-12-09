@@ -201,14 +201,16 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           constructSimpleComponent(aut, ComponentKind.PLANT, uri);
 
         } else if (aut.getTagName().equals("Implements")) {
-          final Element interfaceRef =
-              (Element) aut.getElementsByTagName("*").item(0);
-          final String interfaceNm = interfaceRef.getAttribute("name");
-          final String interfaceLocation = interfaceMap.get(interfaceNm);
+         /* final Element interfaceRef = (Element) aut.getFirstChild();
 
-          // NEED A WAY HERE TO IDENTIFY THIS SPEC IS AN INTERFACE
-          constructSimpleComponent(interfaceNm, interfaceLocation,
-              ComponentKind.SPEC, uri);
+          if (interfaceRef != null) {
+            final String interfaceNm = interfaceRef.getAttribute("name");
+            final String interfaceLocation = interfaceMap.get(interfaceNm);
+
+            // NEED A WAY HERE TO IDENTIFY THIS SPEC AS AN INTERFACE
+            constructSimpleComponent(interfaceNm, interfaceLocation,
+                ComponentKind.SPEC, uri);
+          }*/
         } else if (aut.getTagName().equals("Uses")) {
           constructModuleInstance(aut);
         }
@@ -231,6 +233,31 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     }
     return root;
 
+  }
+
+  /*
+   * This method checks if an identifier (i.e., names of automata, events,
+   * states) is in the correct format for waters (as DESpot allows characters
+   * which waters does not). If it is not, the identifier name is translated to
+   * something accepted by waters and returned.
+   */
+  private String formatIdentifier(String name)
+  {
+    int index = name.indexOf("-");
+    while (index != -1) {
+      //replaces - with {-}
+      final String newName = "{" + name + "}";
+      name = newName;
+      index  = name.indexOf("-", index + 2);
+    }
+    index = name.indexOf(".");
+    while (index != -1) {
+      //replaces . with :
+      final String newName = name.substring(0, index) + ":" + name.substring(index + 1, name.length());
+      name = newName;
+      index  = name.indexOf(".", index + 1);
+    }
+    return name;
   }
 
   /**
@@ -276,14 +303,14 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         final Element evElmt = (Element) allEvents.item(j);
         final String eventName = evElmt.getAttribute("Name");
         final ExpressionProxy identifier =
-            mFactory.createSimpleIdentifierProxy(eventName);
+            mFactory.createSimpleIdentifierProxy(formatIdentifier(eventName));
         // if the parameter is not already used by the module
         // referencing it, add it to the list of events for the module
         // referencing it
 
         /*
          * if (!mEvents.containsKey(eventName)) { final IdentifierProxy
-         * eventIdent = mFactory.createSimpleIdentifierProxy(eventName); final
+         * eventIdent = mFactory.createSimpleIdentifierProxy(formatIdentifier(eventName)); final
          * String eventKind = evElmt.getAttribute("Kind"); final String
          * scopeKind = evElmt.getAttribute("Scope"); EventDeclProxy event =
          * null;
@@ -341,7 +368,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
       }
       final SimpleIdentifierProxy identifier =
-          mFactory.createSimpleIdentifierProxy(moduleName);
+          mFactory.createSimpleIdentifierProxy(formatIdentifier(moduleName));
       mComponents.add(mFactory.createInstanceProxy(identifier, moduleName,
           bindings));
     }
@@ -394,7 +421,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    */
   private void constructEventDecl(final Element event)
   {
-    final String eventName = event.getAttribute("nm");
+    final String eventName = formatIdentifier(event.getAttribute("nm"));
     if (!mEvents.containsKey(eventName)) {
       final IdentifierProxy identifier =
           mFactory.createSimpleIdentifierProxy(eventName);
@@ -468,7 +495,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
     final GraphProxy graph = constructGraph(path.resolve(uri));
     final IdentifierProxy identifier =
-        mFactory.createSimpleIdentifierProxy(autName);
+        mFactory.createSimpleIdentifierProxy(formatIdentifier(autName));
 
     mComponents.add(mFactory
         .createSimpleComponentProxy(identifier, kind, graph));
@@ -478,7 +505,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * Constructs the SimpleComponent section for the module of a
    * <CODE>.wmod</CODE> file.
    */
-  private void constructSimpleComponent(final String desName,
+ /* private void constructSimpleComponent(final String desName,
       final String desLocation, final ComponentKind kind, final URI path)
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException
@@ -487,11 +514,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
     final GraphProxy graph = constructGraph(path.resolve(uri));
     final IdentifierProxy identifier =
-        mFactory.createSimpleIdentifierProxy(desName);
+        mFactory.createSimpleIdentifierProxy(formatIdentifier(desName));
 
     mComponents.add(mFactory
         .createSimpleComponentProxy(identifier, kind, graph));
-  }
+  }*/
 
   /**
    * Constructs a ModuleProxy for a given subsystem.
@@ -638,7 +665,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     for (int i = 0; i < events.getLength(); i++) {
       final Element event = (Element) events.item(i);
       final int eventID = Integer.parseInt(event.getAttribute("id"));
-      final String eventName = event.getAttribute("nm");
+      final String eventName = formatIdentifier(event.getAttribute("nm"));
       mEventIDs.put(eventID, eventName);
       constructEventDecl(event);
     }
@@ -713,11 +740,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       for (int i = 0; i < existingEvents.size(); i++) {
         final SimpleIdentifierProxy event =
             (SimpleIdentifierProxy) existingEvents.get(i);
-        eventList.add(mFactory.createSimpleIdentifierProxy(event.getName()));
+        eventList.add(mFactory.createSimpleIdentifierProxy(formatIdentifier(event.getName())));
       }
 
     }
-    eventList.add(mFactory.createSimpleIdentifierProxy(eventName));
+    eventList.add(mFactory.createSimpleIdentifierProxy(formatIdentifier(eventName)));
     final LabelBlockProxy transEvents =
         mFactory.createLabelBlockProxy(eventList, null);
 
@@ -735,7 +762,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   private NodeProxy convertState(final Element state)
   {
     final String marked = "1";
-    final String stateName = state.getAttribute("nm");
+    final String stateName = formatIdentifier(state.getAttribute("nm"));
     if (state.getTagName().equals("St")) {
       // checks if the state is marked (i.e. accepting)
       if (state.getAttribute("mk").equals(marked)) {
@@ -766,7 +793,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    */
   private NodeProxy markState(final Element state, final Boolean initial)
   {
-    final String stateName = state.getAttribute("nm");
+    final String stateName = formatIdentifier(state.getAttribute("nm"));
     // holds the :accepting constant
     final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
 
