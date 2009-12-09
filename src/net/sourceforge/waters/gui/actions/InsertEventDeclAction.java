@@ -17,14 +17,14 @@ import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.EventEditorDialog;
+import net.sourceforge.waters.gui.EventDeclEditorDialog;
 import org.supremica.gui.ide.IDE;
 
 
 /**
  * The action to create a new event declaration for a module.
  * This action merely popups the variable creation dialog
- * ({@link EventEditorDialog});
+ * ({@link EventDeclEditorDialog});
  * the actual variable creation is done when the dialog is committed.
  *
  * @author Robi Malik
@@ -54,7 +54,7 @@ public class InsertEventDeclAction
   {
     final ModuleWindowInterface root = getActiveModuleWindowInterface();
     if (root != null) {
-      new EventEditorDialog(root);
+      new EventDeclEditorDialog(root);
     }
   }
 

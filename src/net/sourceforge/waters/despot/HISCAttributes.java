@@ -10,8 +10,18 @@
 
 package net.sourceforge.waters.despot;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 
 
 /**
@@ -126,6 +136,46 @@ public class HISCAttributes
     }
   }
 
+  /**
+   * Returns a list of HISC attribute names that can be used for an item
+   * of the given type. This can be used by the GUI to provide suggestions
+   * to the user when editing attribute lists.
+   * @param  clazz  A proxy class or interface for which attributes are sought.
+   * @return The attribute names for objects of this type, in any order.
+   *         If no attributes are applicable, an empty collection is returned.
+   */
+  public static Collection<String> getApplicableKeys
+    (final Class<? extends Proxy> clazz)
+  {
+    if (clazz.isAssignableFrom(EventDeclProxy.class) ||
+        clazz.isAssignableFrom(EventProxy.class)) {
+      return ATTRIBUTES_FOR_EVENT;
+    } else if (clazz.isAssignableFrom(SimpleComponentProxy.class) ||
+               clazz .isAssignableFrom(AutomatonProxy.class)) {
+      return ATTRIBUTES_FOR_AUTOMATON;
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  /**
+   * Returns a list of HISC attribute values that can be used for an attribute
+   * with the given name. This can be used by the GUI to provide suggestions
+   * to the user when editing attribute lists.
+   * @param  attrib  The name of the attribute to be given a value.
+   * @return List of attribute value strings in the order suggested to the
+   *         user. If the attribute takes no value, an empty list is returned.
+   */
+  public static List<String> getApplicableValues(final String attrib)
+  {
+    final List<String> values = ATTRIBUTE_VALUES.get(attrib);
+    if (values == null) {
+      return Collections.emptyList();
+    } else {
+      return values;
+    }
+  }
+
 
   //#########################################################################
   //# Inner Enumeration Class EventKind
@@ -192,4 +242,23 @@ public class HISCAttributes
   public static final Map<String,String> ATTRIBUTES_INTERFACE =
     Collections.singletonMap(INTERFACE_KEY, "");
 
+
+  //#########################################################################
+  //# Attribute List Constants
+  private static final Collection<String> ATTRIBUTES_FOR_AUTOMATON =
+    Collections.singletonList(INTERFACE_KEY);
+  private static final Collection<String> ATTRIBUTES_FOR_EVENT =
+    Collections.singletonList(EVENTTYPE_KEY);
+
+  private static final Map<String,List<String>> ATTRIBUTE_VALUES =
+    new HashMap<String,List<String>>(2);
+  static {
+    final List<String> types = new ArrayList<String>(3);
+    types.add(EventType.ANSWER.toString());
+    types.add(EventType.LOWDATA.toString());
+    types.add(EventType.REQUEST.toString());
+    ATTRIBUTE_VALUES.put(EVENTTYPE_KEY, types);
+    final List<String> empty = Collections.emptyList();
+    ATTRIBUTE_VALUES.put(INTERFACE_KEY, empty);
+  }
 }

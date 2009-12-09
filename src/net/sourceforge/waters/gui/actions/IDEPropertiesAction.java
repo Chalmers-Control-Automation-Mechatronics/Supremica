@@ -15,7 +15,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.EditorEditEdgeDialog;
-import net.sourceforge.waters.gui.EventEditorDialog;
+import net.sourceforge.waters.gui.EventDeclEditorDialog;
 import net.sourceforge.waters.gui.ForeachComponentEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.SimpleComponentEditorDialog;
@@ -172,7 +172,7 @@ public class IDEPropertiesAction
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
         final EventDeclSubject subject = (EventDeclSubject) decl;
-        new EventEditorDialog(root, subject);
+        new EventDeclEditorDialog(root, subject);
       }
       return true;
     }

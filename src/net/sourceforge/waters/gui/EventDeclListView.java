@@ -661,7 +661,7 @@ public class EventDeclListView
         final int index = locationToIndex(point);
         if (index >= 0 && index < mModel.getSize()) {
           final EventDeclSubject decl = mModel.getElementAt(index);
-          new EventEditorDialog(mRoot, decl);
+          new EventDeclEditorDialog(mRoot, decl);
         }
       }
     }

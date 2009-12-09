@@ -994,7 +994,7 @@ public class VariableEditorDialog
     private AddMarkingAction()
     {
       putValue(Action.NAME, "Add");
-      putValue(Action.SHORT_DESCRIPTION, "Create a new index range");
+      putValue(Action.SHORT_DESCRIPTION, "Create a new marking");
       putValue(Action.MNEMONIC_KEY, KeyEvent.VK_INSERT);
       putValue(Action.ACCELERATOR_KEY,
                KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0));
@@ -1025,7 +1025,7 @@ public class VariableEditorDialog
     private RemoveMarkingsAction()
     {
       putValue(Action.NAME, "Remove");
-      putValue(Action.SHORT_DESCRIPTION, "Delete all selected index ranges");
+      putValue(Action.SHORT_DESCRIPTION, "Delete all selected markings");
       putValue(Action.MNEMONIC_KEY, KeyEvent.VK_DELETE);
       putValue(Action.ACCELERATOR_KEY,
                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
@@ -1056,7 +1056,7 @@ public class VariableEditorDialog
     private MoveMarkingsUpAction()
     {
       putValue(Action.NAME, "Up");
-      putValue(Action.SHORT_DESCRIPTION, "Move selected index ranges up");
+      putValue(Action.SHORT_DESCRIPTION, "Move selected markings up");
       putValue(Action.MNEMONIC_KEY, KeyEvent.VK_UP);
       putValue(Action.ACCELERATOR_KEY,
                KeyStroke.getKeyStroke(KeyEvent.VK_UP,
@@ -1088,7 +1088,7 @@ public class VariableEditorDialog
     private MoveMarkingsDownAction()
     {
       putValue(Action.NAME, "Down");
-      putValue(Action.SHORT_DESCRIPTION, "Move selected index ranges down");
+      putValue(Action.SHORT_DESCRIPTION, "Move selected markings down");
       putValue(Action.MNEMONIC_KEY, KeyEvent.VK_DOWN);
       putValue(Action.ACCELERATOR_KEY,
                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,

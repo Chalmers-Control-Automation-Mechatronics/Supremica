@@ -68,7 +68,7 @@ class ComponentsTreeModel
     mListeners = null;
   }
 
-    
+
   //#########################################################################
   //# Interface javax.swing.tree.TreeModel
   public void addTreeModelListener(final TreeModelListener listener)
@@ -90,7 +90,7 @@ class ComponentsTreeModel
          " has no children!");
     } else {
       return children.get(index);
-    }    
+    }
   }
 
   public int getChildCount(final Object parent)
@@ -156,7 +156,7 @@ class ComponentsTreeModel
       switch (event.getKind()) {
       case ModelChangeEvent.ITEM_ADDED:
         {
-          final ProxySubject value = (ProxySubject) event.getValue();
+          final Object value = event.getValue();
           if (isInTree(value)) {
             final ProxySubject parent = (ProxySubject) source.getParent();
             final int index = event.getIndex();
@@ -173,7 +173,7 @@ class ComponentsTreeModel
       case ModelChangeEvent.ITEM_REMOVED:
         {
           final ProxySubject parent = (ProxySubject) source.getParent();
-          final Proxy value = (Proxy) event.getValue();
+          final Object value = event.getValue();
            if (canBeInTree(value) && isInTree(parent)) {
             final int index = event.getIndex();
             final TreeModelEvent newevent =
@@ -222,9 +222,19 @@ class ComponentsTreeModel
     return new TreePath(path);
   }
 
+  boolean isInTree(final Object node)
+  {
+    return node instanceof ProxySubject && isInTree((ProxySubject) node);
+  }
+
   boolean isInTree(final ProxySubject node)
   {
     return canBeInTree(node) && getRootInTree(node) == mModule;
+  }
+
+  boolean canBeInTree(final Object node)
+  {
+    return node instanceof Proxy && canBeInTree((Proxy) node);
   }
 
   boolean canBeInTree(final Proxy node)
@@ -383,7 +393,7 @@ class ComponentsTreeModel
       }
       return (ProxySubject) subject;
     }
-           
+
     private boolean canBeInTree(final Subject subject)
     {
       if (subject instanceof Proxy) {
@@ -450,7 +460,7 @@ class ComponentsTreeModel
 
   //#########################################################################
   //# Data Members
-  private ModuleSubject mModule;
+  private final ModuleSubject mModule;
   private Collection<TreeModelListener> mListeners;
 
   private final ChildrenGetterVisitor mChildrenGetterVisitor;

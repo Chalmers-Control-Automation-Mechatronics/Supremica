@@ -36,14 +36,11 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -72,6 +69,7 @@ import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.module.ColorGeometrySubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
@@ -83,38 +81,38 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 import org.supremica.properties.Config;
 
 
-public class EventEditorDialog
+public class EventDeclEditorDialog
   extends JDialog
 {
 
   //#########################################################################
   //# Constructor
-  public EventEditorDialog(final ModuleWindowInterface root)
+  public EventDeclEditorDialog(final ModuleWindowInterface root)
   {
     this(root, false);
   }
 
-  public EventEditorDialog(final ModuleWindowInterface root,
-                           final EventDeclSubject decl)
+  public EventDeclEditorDialog(final ModuleWindowInterface root,
+                               final EventDeclSubject decl)
   {
     this(root, usesMoreOptions(decl), decl);
   }
 
-  public EventEditorDialog(final ModuleWindowInterface root,
-                           final boolean moreoptions)
+  public EventDeclEditorDialog(final ModuleWindowInterface root,
+                               final boolean moreoptions)
   {
     this(root, moreoptions, null);
   }
 
-  public EventEditorDialog(final ModuleWindowInterface root,
-                           final boolean moreoptions,
-                           final EventDeclSubject decl)
+  public EventDeclEditorDialog(final ModuleWindowInterface root,
+                               final boolean moreoptions,
+                               final EventDeclSubject decl)
   {
     super(root.getRootWindow());
     if (decl == null) {
-      setTitle("Creating new event declation");
+      setTitle("Creating new event declaration");
     } else {
-      setTitle("Editing event declation '" + decl.getName() + "'");
+      setTitle("Editing event declaration '" + decl.getName() + "'");
     }
     mRoot = root;
     mDisplayingMoreOptions = moreoptions;
@@ -171,7 +169,7 @@ public class EventEditorDialog
   //# Initialisation and Layout of Components
   /**
    * Initialise buttons and components that have not yet been initialised.
-   * If {@link #mDisplayingMoreOptions} is <CODE>true</CODE> all components
+   * If {@link #mDisplayingMoreOptions} is <CODE>true</CODE>, all components
    * of the full dialog are initialised, otherwise only those needed by the
    * reduced version.
    */
@@ -353,32 +351,27 @@ public class EventEditorDialog
             handleIndexTableClick(event);
           }
         });
-      mAddAction = new AddIndexRangeAction();
-      final JRootPane root = getRootPane();
-      final String name = (String) mAddAction.getValue(Action.NAME);
-      final KeyStroke key =
-        (KeyStroke) mAddAction.getValue(Action.ACCELERATOR_KEY);
-      final InputMap imap =
-        root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-      final ActionMap amap = root.getActionMap();
-      imap.put(key, name);
-      amap.put(name, mAddAction);
-      mAddButton = new JButton(mAddAction);
-      mAddButton.setRequestFocusEnabled(false);
-      mRemoveAction = new RemoveIndexRangesAction();
-      mIndexTable.addKeyboardAction(mRemoveAction);
-      mRemoveButton = new JButton(mRemoveAction);
-      mRemoveButton.setRequestFocusEnabled(false);
-      mUpAction = new MoveIndexRangesUpAction();
-      mIndexTable.addKeyboardAction(mUpAction);
-      mUpButton = new JButton(mUpAction);
-      mUpButton.setRequestFocusEnabled(false);
-      mDownAction = new MoveIndexRangesDownAction();
-      mIndexTable.addKeyboardAction(mDownAction);
-      mDownButton = new JButton(mDownAction);
-      mDownButton.setRequestFocusEnabled(false);
+      mIndexAddAction = new AddIndexRangeAction();
+      mIndexTable.addKeyboardAction(mIndexAddAction);
+      mIndexAddButton = new JButton(mIndexAddAction);
+      mIndexAddButton.setRequestFocusEnabled(false);
+      mIndexRemoveAction = new RemoveIndexRangesAction();
+      mIndexTable.addKeyboardAction(mIndexRemoveAction);
+      mIndexRemoveButton = new JButton(mIndexRemoveAction);
+      mIndexRemoveButton.setRequestFocusEnabled(false);
+      mIndexUpAction = new MoveIndexRangesUpAction();
+      mIndexTable.addKeyboardAction(mIndexUpAction);
+      mIndexUpButton = new JButton(mIndexUpAction);
+      mIndexUpButton.setRequestFocusEnabled(false);
+      mIndexDownAction = new MoveIndexRangesDownAction();
+      mIndexTable.addKeyboardAction(mIndexDownAction);
+      mIndexDownButton = new JButton(mIndexDownAction);
+      mIndexDownButton.setRequestFocusEnabled(false);
       updateListControlEnabled();
       layoutIndexPanel();
+      final Map<String,String> attribs = template.getAttributes();
+      mAttributesPanel = new EventDeclAttributesPanel(attribs);
+      mAttributesPanel.setFocusTraversalKeys(forward, backward);
     }
   }
 
@@ -414,6 +407,8 @@ public class EventEditorDialog
       constraints.fill = GridBagConstraints.BOTH;
       layout.setConstraints(mIndexPanel, constraints);
       contents.add(mIndexPanel);
+      layout.setConstraints(mAttributesPanel, constraints);
+      contents.add(mAttributesPanel);
       constraints.weighty = 0.0;
       constraints.fill = GridBagConstraints.HORIZONTAL;
     }
@@ -597,17 +592,17 @@ public class EventEditorDialog
     constraints.gridx++;
     constraints.weightx = 0.0;
     constraints.gridheight = 1;
-    layout.setConstraints(mAddButton, constraints);
-    mIndexPanel.add(mAddButton);
+    layout.setConstraints(mIndexAddButton, constraints);
+    mIndexPanel.add(mIndexAddButton);
     constraints.gridy++;
-    layout.setConstraints(mRemoveButton, constraints);
-    mIndexPanel.add(mRemoveButton);
+    layout.setConstraints(mIndexRemoveButton, constraints);
+    mIndexPanel.add(mIndexRemoveButton);
     constraints.gridy++;
-    layout.setConstraints(mUpButton, constraints);
-    mIndexPanel.add(mUpButton);
+    layout.setConstraints(mIndexUpButton, constraints);
+    mIndexPanel.add(mIndexUpButton);
     constraints.gridy++;
-    layout.setConstraints(mDownButton, constraints);
-    mIndexPanel.add(mDownButton);
+    layout.setConstraints(mIndexDownButton, constraints);
+    mIndexPanel.add(mIndexDownButton);
   }
 
 
@@ -625,7 +620,30 @@ public class EventEditorDialog
 
 
   //#########################################################################
-  //# Action Listeners
+  //# Auxiliary Methods
+  /**
+   * Checks whether it is unsafe the current input to commit the currently
+   * edited text field. If this method returns <CODE>true</CODE>, it is
+   * unsafe to commit the current dialog contents, and shifting the focus
+   * is to be avoided.
+   * @return <CODE>true</CODE> if the component currently owning the focus
+   *         is to be parsed and has been found to contain invalid information,
+   *         <CODE>false</CODE> otherwise.
+   */
+  private boolean isInputLocked()
+  {
+    if (mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus()) {
+      return true;
+    } else if (mIndexTable != null && mIndexTable.isEditing()) {
+      final SimpleExpressionEditor editor =
+        (SimpleExpressionEditor) mIndexTable.getCellEditor();
+      final SimpleExpressionCell cell = editor.getComponent();
+      return !cell.shouldYieldFocus();
+    } else {
+      return false;
+    }
+  }
+
   /**
    * Changes the amount of options shown by the dialog.
    * If showing the reduced dialog, it will switch to the full version, and
@@ -713,19 +731,19 @@ public class EventEditorDialog
   {
     final int selcount = mIndexTable.getSelectedRowCount();
     if (selcount > 0) {
-      mRemoveAction.setEnabled(true);
+      mIndexRemoveAction.setEnabled(true);
       final ListSelectionModel selmodel = mIndexTable.getSelectionModel();
       final int maxindex = selmodel.getMaxSelectionIndex();
       final int minindex = selmodel.getMinSelectionIndex();
       final int lastrow = mIndexTable.getRowCount() - 1;
-      mUpAction.setEnabled(minindex > 0 ||
+      mIndexUpAction.setEnabled(minindex > 0 ||
                            minindex + selcount - 1 < maxindex);
-      mDownAction.setEnabled(maxindex < lastrow ||
+      mIndexDownAction.setEnabled(maxindex < lastrow ||
                              maxindex - selcount + 1 > minindex);
     } else {
-      mRemoveAction.setEnabled(false);
-      mUpAction.setEnabled(false);
-      mDownAction.setEnabled(false);
+      mIndexRemoveAction.setEnabled(false);
+      mIndexUpAction.setEnabled(false);
+      mIndexDownAction.setEnabled(false);
     }
   }
 
@@ -916,11 +934,8 @@ public class EventEditorDialog
       final boolean observable;
       final ScopeKind scope;
       final List<SimpleExpressionSubject> ranges;
-      if (mIndexPanel == null) {
-        observable = true;
-        scope = ScopeKind.LOCAL;
-        ranges = null;
-      } else {
+      final Map<String,String> attribs;
+      if (mIndexPanel != null) {
         observable = mObservableButton.isSelected();
         if (!mParameterButton.isSelected()) {
           scope = ScopeKind.LOCAL;
@@ -942,6 +957,17 @@ public class EventEditorDialog
           }
         }
         // ***
+        attribs = mAttributesPanel.getTableData();
+      } else if (mEventDecl == null) {
+        observable = true;
+        scope = ScopeKind.LOCAL;
+        ranges = null;
+        attribs = null;
+      } else {
+        observable = mEventDecl.isObservable();
+        scope = mEventDecl.getScope();
+        ranges = mEventDecl.getRangesModifiable();
+        attribs = mEventDecl.getAttributesModifiable();
       }
       final ColorGeometrySubject geo;
       if (kind != EventKind.PROPOSITION ||
@@ -952,8 +978,6 @@ public class EventEditorDialog
         geo = new ColorGeometrySubject(set);
       }
       final SelectionOwner panel = mRoot.getEventsPanel();
-      final Map<String,String> attribs =
-        mEventDecl == null ? null : mEventDecl.getAttributes();
       final EventDeclSubject template =
         new EventDeclSubject(ident, kind, observable,
                              scope, ranges, geo, attribs);
@@ -992,7 +1016,8 @@ public class EventEditorDialog
     return
       !decl.isObservable() ||
       decl.getScope() != ScopeKind.LOCAL ||
-      !decl.getRanges().isEmpty();
+      !decl.getRanges().isEmpty() ||
+      !decl.getAttributes().isEmpty();
   }
 
 
@@ -1224,7 +1249,33 @@ public class EventEditorDialog
       moveIndexRangesDown();
     }
 
-    //#########################################################################
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class EventDeclAttributesPanel
+  private class EventDeclAttributesPanel extends AttributesPanel
+  {
+
+    //#######################################################################
+    //# Constructor
+    private EventDeclAttributesPanel(final Map<String,String> attribs)
+    {
+      super(EventDeclProxy.class, attribs);
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.gui.AttributesPanel
+    boolean isInputLocked()
+    {
+      return EventDeclEditorDialog.this.isInputLocked();
+    }
+
+    //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
 
@@ -1255,14 +1306,15 @@ public class EventEditorDialog
   private JPanel mIndexPanel;
   private ListTableModel<SimpleExpressionSubject> mIndexModel;
   private NonTypingTable mIndexTable;
-  private Action mAddAction;
-  private Action mRemoveAction;
-  private Action mUpAction;
-  private Action mDownAction;
-  private JButton mAddButton;
-  private JButton mRemoveButton;
-  private JButton mUpButton;
-  private JButton mDownButton;
+  private Action mIndexAddAction;
+  private Action mIndexRemoveAction;
+  private Action mIndexUpAction;
+  private Action mIndexDownAction;
+  private JButton mIndexAddButton;
+  private JButton mIndexRemoveButton;
+  private JButton mIndexUpButton;
+  private JButton mIndexDownButton;
+  private AttributesPanel mAttributesPanel;
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
@@ -1276,7 +1328,7 @@ public class EventEditorDialog
    *
    * <P>This is a reference to the actual object that is being edited.  If
    * a new event declaration is being created, it is <CODE>null</CODE>
-   * until the dialog is commited and the actually created subject is
+   * until the dialog is committed and the actually created subject is
    * assigned.</P>
    *
    * <P>The edited state is stored only in the dialog. Changes are only

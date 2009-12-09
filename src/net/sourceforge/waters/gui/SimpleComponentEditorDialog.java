@@ -16,6 +16,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
@@ -37,6 +38,7 @@ import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -145,6 +147,10 @@ public class SimpleComponentEditorDialog
     mDeterministicButton = new JCheckBox((String) null, deterministic);
     mDeterministicButton.setRequestFocusEnabled(false);
 
+    // Attributes panel ...
+    mAttributesPanel =
+      new SimpleComponentAttributesPanel(template.getAttributes());
+
     // Error panel ...
     mErrorPanel = new RaisedDialogPanel();
     mErrorLabel = new ErrorLabel();
@@ -238,7 +244,7 @@ public class SimpleComponentEditorDialog
     mainlayout.setConstraints(mDeterministicButton, constraints);
     mMainPanel.add(mDeterministicButton);
 
-    // Error and buttons panel do not need layouting.
+    // Attributes, error, and buttons panel do not need layouting.
 
     // Finally, build the full dialog ...
     final Container contents = getContentPane();
@@ -248,11 +254,17 @@ public class SimpleComponentEditorDialog
     constraints.gridy = GridBagConstraints.RELATIVE;
     constraints.gridwidth = GridBagConstraints.REMAINDER;
     constraints.weightx = 1.0;
-    constraints.weighty = 1.0;
-    constraints.fill = GridBagConstraints.BOTH;
+    constraints.weighty = 0.0;
+    constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.insets = new Insets(0, 0, 0, 0);
     layout.setConstraints(mMainPanel, constraints);
     contents.add(mMainPanel);
+    constraints.weighty = 1.0;
+    constraints.fill = GridBagConstraints.BOTH;
+    layout.setConstraints(mAttributesPanel, constraints);
+    contents.add(mAttributesPanel);
+    constraints.weighty = 0.0;
+    constraints.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(mErrorPanel, constraints);
     contents.add(mErrorPanel);
     layout.setConstraints(mButtonsPanel, constraints);
@@ -290,11 +302,12 @@ public class SimpleComponentEditorDialog
         throw new IllegalStateException("Component kind not selected!");
       }
       final boolean deterministic = mDeterministicButton.isSelected();
+      final Map<String,String> attribs = mAttributesPanel.getTableData();
       if (mComponent == null) {
         final GraphSubject graph =
           new GraphSubject(deterministic, null, null, null);
         final SimpleComponentSubject template =
-          new SimpleComponentSubject(ident, kind, graph);
+          new SimpleComponentSubject(ident, kind, graph, attribs);
         final SelectionOwner panel = mRoot.getComponentsPanel();
         final Command command = new InsertCommand(template, panel);
         mComponent = template;
@@ -308,7 +321,7 @@ public class SimpleComponentEditorDialog
         final GraphSubject graph = mComponent.getGraph().clone();
         graph.setDeterministic(deterministic);
         final SimpleComponentSubject template =
-          new SimpleComponentSubject(ident, kind, graph);
+          new SimpleComponentSubject(ident, kind, graph, attribs);
         if (!mComponent.equalsWithGeometry(template)) {
           final SelectionOwner panel = mRoot.getComponentsPanel();
           final Command command = new EditCommand(mComponent, template, panel);
@@ -339,6 +352,32 @@ public class SimpleComponentEditorDialog
 
 
   //#########################################################################
+  //# Inner Class SimpleComponentAttributesPanel
+  private class SimpleComponentAttributesPanel extends AttributesPanel
+  {
+
+    //#######################################################################
+    //# Constructor
+    private SimpleComponentAttributesPanel(final Map<String,String> attribs)
+    {
+      super(SimpleComponentProxy.class, attribs);
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.gui.AttributesPanel
+    boolean isInputLocked()
+    {
+      return SimpleComponentEditorDialog.this.isInputLocked();
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   // Dialog state
   private final ModuleWindowInterface mRoot;
@@ -355,7 +394,7 @@ public class SimpleComponentEditorDialog
   private IconRadioButton mSpecButton;
   private IconRadioButton mSupervisorButton;
   private JCheckBox mDeterministicButton;
-
+  private AttributesPanel mAttributesPanel;
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
