@@ -161,8 +161,31 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final Element project = doc.getDocumentElement();
     ModuleProxy root = null;
 
+    // maps the name of the interfaces to their filenames for this module
+    final Map<String,String> interfaceMap = new HashMap<String,String>();
+    final NodeList interfaces = project.getElementsByTagName("Interface");
+    for (int j = 0; j < interfaces.getLength(); j++) {
+      final Element interfaceDES = (Element) interfaces.item(j);
+      final Element des =
+          (Element) interfaceDES.getElementsByTagName("*").item(0);
+
+      final String name = interfaceDES.getAttribute("name");
+      final String location = des.getAttribute("location");
+      interfaceMap.put(name, location);
+    }
+
     final NodeList subsystems = project.getElementsByTagName("Subsystem");
     for (int j = (subsystems.getLength() - 1); j >= 0; j--) {
+
+      // adds the accepting proposition to the events list
+      final IdentifierProxy identifier =
+          mFactory
+              .createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
+      final EventDeclProxy accepting =
+          mFactory.createEventDeclProxy(identifier, EventKind.PROPOSITION,
+              true, ScopeKind.OPTIONAL_PARAMETER, null, null, null);
+      mEvents.put(EventDeclProxy.DEFAULT_MARKING_NAME, accepting);
+
       final Element subsystem =
           (Element) project.getElementsByTagName("Subsystem").item(j);
 
@@ -177,20 +200,20 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
           constructSimpleComponent(aut, ComponentKind.PLANT, uri);
 
+        } else if (aut.getTagName().equals("Implements")) {
+          final Element interfaceRef =
+              (Element) aut.getElementsByTagName("*").item(0);
+          final String interfaceNm = interfaceRef.getAttribute("name");
+          final String interfaceLocation = interfaceMap.get(interfaceNm);
+
+          // NEED A WAY HERE TO IDENTIFY THIS SPEC IS AN INTERFACE
+          constructSimpleComponent(interfaceNm, interfaceLocation,
+              ComponentKind.SPEC, uri);
         } else if (aut.getTagName().equals("Uses")) {
           constructModuleInstance(aut);
         }
         clearStructures();
       }
-
-      // adds the accepting proposition to the events list
-      final IdentifierProxy identifier =
-          mFactory
-              .createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
-      final EventDeclProxy accepting =
-          mFactory.createEventDeclProxy(identifier, EventKind.PROPOSITION,
-              true, ScopeKind.OPTIONAL_PARAMETER, null, null, null);
-      mEvents.put(EventDeclProxy.DEFAULT_MARKING_NAME, accepting);
 
       final ModuleProxy module = constructModule(subsystem);
       if (j == 0) {
@@ -248,26 +271,73 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           (Element) module.getElementsByTagName("EventDeclList").item(0);
 
       final NodeList allEvents = eventList.getElementsByTagName("EventDecl");
-      final Element events = (Element) allEvents.item(0);
-      final NodeList evElmtLs = events.getElementsByTagName("*");
-      for (int j = 0; j < evElmtLs.getLength(); j++) {
-        final Element evElmt = (Element) evElmtLs.item(j);
+
+      for (int j = 0; j < allEvents.getLength(); j++) {
+        final Element evElmt = (Element) allEvents.item(j);
         final String eventName = evElmt.getAttribute("Name");
         final ExpressionProxy identifier =
             mFactory.createSimpleIdentifierProxy(eventName);
-        // if the parameter is required and not already used by the module
+        // if the parameter is not already used by the module
         // referencing it, add it to the list of events for the module
         // referencing it
-        if (evElmt.getAttribute("Scope").equals(ScopeKind.REQUIRED_PARAMETER)) {
-if(!mEvents.containsKey(eventName)){
-            final IdentifierProxy eventIdent =
-    mFactory.createSimpleIdentifierProxy(eventName);
-  final String eventKind = evElmt.getAttribute("Kind");
-  //final EventDeclProxy event = mFactory.createEventDeclProxy(eventIdent, eventKind, true,ScopeKind.REQUIRED_PARAMETER,null, null, null);
-//mEvents.put(eventName, value)
-        }}
-        bindings.add(mFactory.createParameterBindingProxy(evElmt
-            .getAttribute("Name"), identifier));
+
+        /*
+         * if (!mEvents.containsKey(eventName)) { final IdentifierProxy
+         * eventIdent = mFactory.createSimpleIdentifierProxy(eventName); final
+         * String eventKind = evElmt.getAttribute("Kind"); final String
+         * scopeKind = evElmt.getAttribute("Scope"); EventDeclProxy event =
+         * null;
+         *
+         * // allows for HISC attribute data final Element attrMapElmnt =
+         * (Element) evElmt.getElementsByTagName("*").item(0); final Element
+         * attrElmnt = (Element) attrMapElmnt.getElementsByTagName("*").item(0);
+         *
+         * final String attr = attrElmnt.getAttribute("Value");
+         *
+         * if (!scopeKind.equals("")) { if (attr.equals("")) { event =
+         * mFactory.createEventDeclProxy(eventIdent, EventKind
+         * .fromValue(eventKind), true, ScopeKind .fromValue(scopeKind), null,
+         * null, null); } else if (attr.equals("REQUEST")) { event =
+         * mFactory.createEventDeclProxy(eventIdent, EventKind
+         * .fromValue(eventKind), true, ScopeKind .fromValue(scopeKind), null,
+         * null, HISCAttributes.ATTRIBUTES_REQUEST); } else if
+         * (attr.equals("ANSWER")) { event =
+         * mFactory.createEventDeclProxy(eventIdent, EventKind
+         * .fromValue(eventKind), true, ScopeKind .fromValue(scopeKind), null,
+         * null, HISCAttributes.ATTRIBUTES_ANSWER); } else if
+         * (attr.equals("LOWDATA")) { event =
+         * mFactory.createEventDeclProxy(eventIdent, EventKind
+         * .fromValue(eventKind), true, ScopeKind .fromValue(scopeKind), null,
+         * null, HISCAttributes.ATTRIBUTES_LOWDATA); } else if
+         * (attr.equals("INTERFACE")) { event =
+         * mFactory.createEventDeclProxy(eventIdent, EventKind
+         * .fromValue(eventKind), true, ScopeKind .fromValue(scopeKind), null,
+         * null, HISCAttributes.ATTRIBUTES_INTERFACE); }
+         *
+         * } else { if (attr.equals("")) { event =
+         * mFactory.createEventDeclProxy(eventIdent, EventKind
+         * .fromValue(eventKind), true, null, null, null, null); } else if
+         * (attr.equals("REQUEST")) { event =
+         * mFactory.createEventDeclProxy(eventIdent, EventKind
+         * .fromValue(eventKind), true, null, null, null,
+         * HISCAttributes.ATTRIBUTES_REQUEST); } else if (attr.equals("ANSWER"))
+         * { event = mFactory.createEventDeclProxy(eventIdent, EventKind
+         * .fromValue(eventKind), true, null, null, null,
+         * HISCAttributes.ATTRIBUTES_ANSWER); } else if (attr.equals("LOWDATA"))
+         * { event = mFactory.createEventDeclProxy(eventIdent, EventKind
+         * .fromValue(eventKind), true, null, null, null,
+         * HISCAttributes.ATTRIBUTES_LOWDATA); } else if
+         * (attr.equals("INTERFACE")) { event =
+         * mFactory.createEventDeclProxy(eventIdent, EventKind
+         * .fromValue(eventKind), true, null, null, null,
+         * HISCAttributes.ATTRIBUTES_INTERFACE); } } mEvents.put(eventName,
+         * event);
+         *
+         * }
+         */
+
+        bindings.add(mFactory
+            .createParameterBindingProxy(eventName, identifier));
 
       }
       final SimpleIdentifierProxy identifier =
@@ -399,6 +469,25 @@ if(!mEvents.containsKey(eventName)){
     final GraphProxy graph = constructGraph(path.resolve(uri));
     final IdentifierProxy identifier =
         mFactory.createSimpleIdentifierProxy(autName);
+
+    mComponents.add(mFactory
+        .createSimpleComponentProxy(identifier, kind, graph));
+  }
+
+  /**
+   * Constructs the SimpleComponent section for the module of a
+   * <CODE>.wmod</CODE> file.
+   */
+  private void constructSimpleComponent(final String desName,
+      final String desLocation, final ComponentKind kind, final URI path)
+      throws ParserConfigurationException, SAXException, IOException,
+      URISyntaxException
+  {
+    final URI uri = new URI(desLocation);
+
+    final GraphProxy graph = constructGraph(path.resolve(uri));
+    final IdentifierProxy identifier =
+        mFactory.createSimpleIdentifierProxy(desName);
 
     mComponents.add(mFactory
         .createSimpleComponentProxy(identifier, kind, graph));
