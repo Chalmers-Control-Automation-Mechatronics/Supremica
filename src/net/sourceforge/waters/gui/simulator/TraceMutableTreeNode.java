@@ -1,12 +1,11 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.util.HashMap;
-
+import java.util.ArrayList;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 
 public class TraceMutableTreeNode extends DefaultMutableTreeNode implements SimulationObserver
 {
@@ -35,17 +34,31 @@ public class TraceMutableTreeNode extends DefaultMutableTreeNode implements Simu
   private void setupAllEvents(final Simulation sim)
   {
     this.removeAllChildren();
-    for (int looper = 0; looper < sim.getEventHistory().size(); looper++)
+    /*for (int looper = sim.getEventHistory().size() - 1; looper >= 0; looper--)
     {
-      System.out.println("DEBUG: Looped " + looper + " times, out of " + sim.getEventHistory().size() + " total times.");
-      final EventBranchNode eventToAdd = new EventBranchNode(sim.getEventHistory().get(looper));
+      final DefaultMutableTreeNode eventToAdd = new EventBranchNode(sim.getEventHistory().get(looper));
       HashMap<AutomatonProxy, StateProxy> stateInEvent = new HashMap<AutomatonProxy, StateProxy>();
       stateInEvent = sim.getAutomatonHistory().get(looper);
       this.add(eventToAdd);
-      System.out.println("DEBUG: Added event: " + eventToAdd);
       for (final AutomatonProxy automaton : stateInEvent.keySet())
       {
         eventToAdd.add(new AutomatonLeafNode(automaton, stateInEvent.get(automaton)));
+      }
+    }*/
+    for (int looper = sim.getEventHistory().size() - 1; looper >= 0; looper--)
+    {
+      //System.out.println("DEBUG: Size = " + sim.getEventHistory().size());
+      //System.out.println("DEBUG: Data = " + sim.getEventHistory());
+      final EventProxy event = sim.getEventHistory().get(looper);
+      final DefaultMutableTreeNode eventToAdd= new EventBranchNode(event);
+      final ArrayList<AutomatonProxy> automatonInEvent = new ArrayList<AutomatonProxy>();
+      for (final AutomatonProxy automaton : sim.getAutomata())
+        if (automaton.getEvents().contains(event))
+          automatonInEvent.add(automaton);
+      this.add(eventToAdd);
+      for (final AutomatonProxy automaton : automatonInEvent)
+      {
+        eventToAdd.add(new AutomatonLeafNode(automaton, sim.getCurrentStates().get(automaton)));
       }
     }
     mParent.expandPath(new TreePath(this));

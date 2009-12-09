@@ -40,7 +40,7 @@ public class EventJTree extends JTree
     this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
     setShowsRootHandles(true);
-    //setAutoscrolls(true);
+    setAutoscrolls(true);
     setToggleClickCount(0);
     // Expand all foreach-component entries.
 
@@ -132,10 +132,7 @@ public class EventJTree extends JTree
         else
           center.setIcon(IconLoader.ICON_TICK);
         StateProxy currentState;
-        if (autoNode.getOverloadedState() == null)
-          currentState = mSim.getCurrentStates().get(autoProxy);
-        else
-          currentState = autoNode.getOverloadedState();
+        currentState = mSim.getCurrentStates().get(autoProxy);
         final JLabel right = new JLabel(currentState.getName());
         right.setIcon(mSim.getMarkingIcon(currentState, autoProxy));
         left.setPreferredSize(new Dimension(automataColumnWidth[0], rowHeight));
