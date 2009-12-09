@@ -3,8 +3,10 @@ package net.sourceforge.waters.gui.simulator;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,8 +20,6 @@ import javax.swing.tree.TreeSelectionModel;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -28,16 +28,16 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
-public class TraceJTree extends JTree implements Observer
+public class TraceJTree extends JTree implements InternalFrameObserver
 {
-
   public TraceJTree(final Simulation sim, final AutomatonDesktopPane desktop, final ModuleContainer container)
   {
     super();
     this.setCellRenderer(new TraceTreeCellRenderer());
-    container.attach(this);
     mSim = sim;
     mDesktop = desktop;
+    desktop.attach(this);
+    automatonAreOpen = new ArrayList<String>();
     mContainer = container;
     final TraceMutableTreeNode root = new TraceMutableTreeNode(sim, this);
     this.setModel(new DefaultTreeModel(root, false));
@@ -46,6 +46,7 @@ public class TraceJTree extends JTree implements Observer
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
+    this.setLargeModel(false);
     // Expand all foreach-component entries.
 
     this.addMouseListener(new MouseAdapter(){
@@ -59,7 +60,22 @@ public class TraceJTree extends JTree implements Observer
             return; // Nothing is selected
           if (node.getClass() == EventBranchNode.class)
           {
-            throw new UnsupportedOperationException("Trace-back on click not implemented yet");
+            final EventBranchNode eventNode = (EventBranchNode)node;
+            final int targetTime = eventNode.getTime();
+            int currentTime = sim.getCurrentTime();
+            while (currentTime != targetTime)
+            {
+              if (targetTime < currentTime)
+              {
+                sim.stepBack();
+                currentTime--;
+              }
+              else if (targetTime > currentTime)
+              {
+                sim.replayStep();
+                currentTime++;
+              }
+            }
           }
           else if (node.getClass() == AutomatonLeafNode.class)
           {
@@ -71,18 +87,41 @@ public class TraceJTree extends JTree implements Observer
     });
   }
 
-  // #####################################################################################################
-  // # Interface Observer
 
+  // ############################################################################
+  // # Simple Access
 
-  public void update(final EditorChangedEvent e)
+  public void forceRecalculation()
   {
-    if (e.getKind() == EditorChangedEvent.Kind.CONTAINER_SWITCH)
-    {
-      System.out.println("DEBUG: CONTAINER_SWITCH");
-      this.setCellRenderer(new TraceTreeCellRenderer());
-    }
+    final TraceMutableTreeNode node = new TraceMutableTreeNode(mSim, this);
+    this.setModel(new DefaultTreeModel(node, false));
+    System.out.println("DEBUG: Current Model is: " + node.getData(0));
   }
+
+  //##################################################################
+  // # Interface InternalFrameObserver
+
+  public void onFrameEvent(final InternalFrameEvent event)
+  {
+    if (event.isOpeningEvent())
+    {
+      if (!automatonAreOpen.contains(event.getName()))
+      {
+        automatonAreOpen.add(event.getName());
+      }
+    }
+    else
+    {
+      if (automatonAreOpen.contains(event.getName()))
+      {
+        automatonAreOpen.remove(event.getName());
+      }
+    }
+    repaint();
+  }
+
+  // ############################################################################
+  // # Inner Classes
 
   private class TraceTreeCellRenderer
   extends DefaultTreeCellRenderer
@@ -146,6 +185,16 @@ public class TraceJTree extends JTree implements Observer
          left.setPreferredSize(new Dimension(automataColumnWidth[0], rowHeight));
          center.setPreferredSize(new Dimension(automataColumnWidth[1], rowHeight));
          right.setPreferredSize(new Dimension(automataColumnWidth[2], rowHeight));
+         if (automatonAreOpen.contains(autoProxy.getName()))
+         {
+           left.setFont(left.getFont().deriveFont(Font.BOLD));
+           right.setFont(right.getFont().deriveFont(Font.BOLD));
+         }
+         else
+         {
+           left.setFont(left.getFont().deriveFont(Font.PLAIN));
+           right.setFont(right.getFont().deriveFont(Font.PLAIN));
+         }
          output.add(left, BorderLayout.WEST);
          output.add(center, BorderLayout.CENTER);
          output.add(right, BorderLayout.EAST);
@@ -167,10 +216,11 @@ public class TraceJTree extends JTree implements Observer
   private final AutomatonDesktopPane mDesktop;
   private final Simulation mSim;
   private final ModuleContainer mContainer;
+  private final ArrayList<String> automatonAreOpen;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
   private static final int[] eventColumnWidth = {180, 20};
-  private static final int rowHeight = 20;
+  private static final int rowHeight = 10;
 
 }

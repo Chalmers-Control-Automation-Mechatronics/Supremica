@@ -7,6 +7,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
+
+import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.IDEDimensions;
 import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
@@ -62,11 +64,13 @@ public class SimulatorPanel
     mAutomataPanel.add(scroll, BorderLayout.CENTER);
     final JPanel buttonPanel = new JPanel();
     mAutomataPanel.add(buttonPanel, BorderLayout.SOUTH);
-    mTabbedPane.addTab("Automata", mAutomataPanel);
+    final WhiteScrollPane pane = new WhiteScrollPane(mAutomataTable);
+    mTabbedPane.addTab("Automata", pane);
   }
 
   private void setupAutomataTable()
   {
+
     mAutomataTable = new JTable(new AbstractTunnelTable(mModuleContainer, mSimulation, mDesktop));
     ((AbstractTunnelTable)mAutomataTable.getModel()).attachTable(mAutomataTable);
     final int width = 245; // DEBUG: Arbitrary value: Any value will work, but this is close to the 'normal' value
@@ -88,6 +92,7 @@ public class SimulatorPanel
     listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     listMod.addListSelectionListener(mAutomataTable);
     mAutomataTable.getTableHeader().addMouseListener(new TableHeaderMouseAdapter(mAutomataTable, mAutomataTable.getTableHeader()));
+    mAutomataTable.setShowGrid(!DISABLE_AUTOMATON_GRIDLINES);
   }
 
   private void setupTrace()
@@ -127,5 +132,6 @@ public class SimulatorPanel
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
+  private static final boolean DISABLE_AUTOMATON_GRIDLINES = true;
 
 }

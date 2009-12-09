@@ -32,6 +32,8 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
     mParent.repaint();
   }
 
+
+
   // ##################################################################
   // # Auxillary Functions
 
@@ -44,7 +46,7 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
       for (final AutomatonProxy automaton : sim.getAutomata())
         if (automaton.getEvents().contains(event))
           automatonInEvent.add(automaton);
-      final DefaultMutableTreeNode eventToAdd= new EventBranchNode(event);
+      final DefaultMutableTreeNode eventToAdd= new EventBranchNode(event, sim.getCurrentTime());
       this.add(eventToAdd);
       for (final AutomatonProxy automaton : automatonInEvent)
       {
@@ -63,4 +65,5 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   // # Class Constants
 
   private static final long serialVersionUID = 4899696734198560636L;
+
 }

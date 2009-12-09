@@ -3,8 +3,10 @@ package net.sourceforge.waters.gui.simulator;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,7 +28,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
-public class EventJTree extends JTree
+public class EventJTree extends JTree implements InternalFrameObserver
 {
   public EventJTree(final Simulation sim, final AutomatonDesktopPane desktop, final ModuleContainer container)
   {
@@ -34,6 +36,8 @@ public class EventJTree extends JTree
     this.setCellRenderer(new EventTreeCellRenderer());
     mSim = sim;
     mDesktop = desktop;
+    desktop.attach(this);
+    automatonAreOpen = new ArrayList<String>();
     mContainer = container;
     final EventMutableTreeNode root = new EventMutableTreeNode(sim, this);
     this.setModel(new DefaultTreeModel(root, false));
@@ -74,6 +78,28 @@ public class EventJTree extends JTree
         }
       }
     });
+  }
+
+  //##################################################################
+  // # Interface InternalFrameObserver
+
+  public void onFrameEvent(final InternalFrameEvent event)
+  {
+    if (event.isOpeningEvent())
+    {
+      if (!automatonAreOpen.contains(event.getName()))
+      {
+        automatonAreOpen.add(event.getName());
+      }
+    }
+    else
+    {
+      if (automatonAreOpen.contains(event.getName()))
+      {
+        automatonAreOpen.remove(event.getName());
+      }
+    }
+    repaint();
   }
 
   private class EventTreeCellRenderer
@@ -138,6 +164,16 @@ public class EventJTree extends JTree
         left.setPreferredSize(new Dimension(automataColumnWidth[0], rowHeight));
         center.setPreferredSize(new Dimension(automataColumnWidth[1], rowHeight));
         right.setPreferredSize(new Dimension(automataColumnWidth[2], rowHeight));
+        if (automatonAreOpen.contains(autoProxy.getName()))
+        {
+          left.setFont(left.getFont().deriveFont(Font.BOLD));
+          right.setFont(right.getFont().deriveFont(Font.BOLD));
+        }
+        else
+        {
+          left.setFont(left.getFont().deriveFont(Font.PLAIN));
+          right.setFont(right.getFont().deriveFont(Font.PLAIN));
+        }
         output.add(left, BorderLayout.WEST);
         output.add(center, BorderLayout.CENTER);
         output.add(right, BorderLayout.EAST);
@@ -159,6 +195,7 @@ public class EventJTree extends JTree
   private final AutomatonDesktopPane mDesktop;
   private final Simulation mSim;
   private final ModuleContainer mContainer;
+  private final ArrayList<String> automatonAreOpen;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
