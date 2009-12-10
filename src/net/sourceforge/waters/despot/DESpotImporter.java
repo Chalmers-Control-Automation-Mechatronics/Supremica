@@ -1,5 +1,6 @@
 package net.sourceforge.waters.despot;
 
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,11 +38,13 @@ import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
@@ -202,7 +205,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
             final String interfaceNm = interfaceRef.getAttribute("name");
             final String interfaceLocation = interfaceMap.get(interfaceNm);
 
-            // NEED A WAY HERE TO IDENTIFY THIS SPEC AS AN INTERFACE
             constructSimpleComponent(interfaceNm, interfaceLocation,
                 ComponentKind.SPEC, uri);
           }
@@ -468,8 +470,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final IdentifierProxy identifier =
         mFactory.createSimpleIdentifierProxy(formatIdentifier(desName));
 
-    mComponents.add(mFactory
-        .createSimpleComponentProxy(identifier, kind, graph));
+    mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
+        graph, HISCAttributes.ATTRIBUTES_INTERFACE));
   }
 
   /**
@@ -717,22 +719,45 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   {
     final String marked = "1";
     final String stateName = formatIdentifier(state.getAttribute("nm"));
+    // reads and stores the geometry (layout) data for the node
+    String xPosStr = state.getAttribute("sx");
+    String yPosStr = state.getAttribute("sy");
+    PointGeometryProxy nodePos = null;
+    double xPos;
+    double yPos;
+    if (!xPosStr.equals("") && !yPosStr.equals("")) {
+      xPos = Double.parseDouble(xPosStr);
+      yPos = Double.parseDouble(yPosStr);
+      final Point2D nodePoint = new Point2D.Double(xPos, yPos);
+      nodePos = mFactory.createPointGeometryProxy(nodePoint);
+    }
+    xPosStr = state.getAttribute("lx");
+    yPosStr = state.getAttribute("ly");
+    LabelGeometryProxy labelPos = null;
+    if (!xPosStr.equals("") && !yPosStr.equals("")) {
+      xPos = Double.parseDouble(xPosStr);
+      yPos = Double.parseDouble(yPosStr);
+      final Point2D labelPoint = new Point2D.Double(xPos, yPos);
+      labelPos = mFactory.createLabelGeometryProxy(labelPoint);
+    }
+
     if (state.getTagName().equals("St")) {
       // checks if the state is marked (i.e. accepting)
       if (state.getAttribute("mk").equals(marked)) {
-        return markState(state, false);
+        return markState(state, false, nodePos, labelPos);
       } else {
-        return mFactory.createSimpleNodeProxy(stateName);
+        return mFactory.createSimpleNodeProxy(stateName, null, false, nodePos,
+            null, labelPos);
       }
     }
     // the state needs to be set as the initial state.
     else {
       // checks if the state is marked (i.e. accepting)
       if (state.getAttribute("mk").equals(marked)) {
-        return markState(state, true);
+        return markState(state, true, nodePos, labelPos);
       }
-      return mFactory.createSimpleNodeProxy(stateName, null, true, null, null,
-          null);
+      return mFactory.createSimpleNodeProxy(stateName, null, true, nodePos,
+          null, labelPos);
     }
 
   }
@@ -744,8 +769,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    *          The marked state.
    * @param initial
    *          States whether this is the initial state.
+   * @param labelPos
+   * @param nodePos
    */
-  private NodeProxy markState(final Element state, final Boolean initial)
+  private NodeProxy markState(final Element state, final Boolean initial,
+      final PointGeometryProxy nodePos, final LabelGeometryProxy labelPos)
   {
     final String stateName = formatIdentifier(state.getAttribute("nm"));
     // holds the :accepting constant
@@ -757,11 +785,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final PlainEventListProxy accept =
         mFactory.createPlainEventListProxy(markList);
     if (!initial) {
-      return mFactory.createSimpleNodeProxy(stateName, accept, false, null,
-          null, null);
+      return mFactory.createSimpleNodeProxy(stateName, accept, false, nodePos,
+          null, labelPos);
     } else {
-      return mFactory.createSimpleNodeProxy(stateName, accept, true, null,
-          null, null);
+      return mFactory.createSimpleNodeProxy(stateName, accept, true, nodePos,
+          null, labelPos);
     }
   }
 
@@ -774,13 +802,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    */
   private static class LevelComparator implements Comparator<Element>
   {
-
     public int compare(final Element e1, final Element e2)
     {
       final String LEVEL = "level";
       final Integer e1Level = Integer.parseInt(e1.getAttribute(LEVEL));
       final Integer e2Level = Integer.parseInt(e2.getAttribute(LEVEL));
-
+      // I SUSPECT THIS IS CURRENTLY ORDERING LOWEST TO HIGHEST, WHICH IS THE
+      // OPPOSITE OF WHAT I WANT
       return e1Level.compareTo(e2Level);
     }
 
