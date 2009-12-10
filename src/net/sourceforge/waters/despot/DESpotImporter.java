@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -148,6 +149,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     mDocumentManager = manager;
   }
 
+  @SuppressWarnings("unchecked")
   private ModuleProxy convertDESpotHierarchy(final URI uri)
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException, WatersMarshalException
@@ -159,7 +161,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final Document doc = builder.parse(stream);
     // gets the root element
     final Element project = doc.getDocumentElement();
-    ModuleProxy root = null;
+    ModuleProxy module = null;
 
     // maps the name of the interfaces to their filenames for this module
     final Map<String,String> interfaceMap = new HashMap<String,String>();
@@ -168,23 +170,19 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final Element interfaceDES = (Element) interfaces.item(j);
       final Element des =
           (Element) interfaceDES.getElementsByTagName("*").item(0);
-
       final String name = interfaceDES.getAttribute("name");
       final String location = des.getAttribute("location");
       interfaceMap.put(name, location);
     }
 
-    final NodeList subsystems = project.getElementsByTagName("Subsystem");
-    for (int j = (subsystems.getLength() - 1); j >= 0; j--) {
-
+    final ArrayList<Element> subsystems =
+        (ArrayList<Element>) project.getElementsByTagName("Subsystem");
+    // sorts the subsystems in order of their level (lowest to highest)
+    Collections.sort(subsystems, new LevelComparator());
+    System.out.print(subsystems);
+    for (int j = 0; j < subsystems.size(); j++) {
       // adds the accepting proposition to the events list
-      final IdentifierProxy identifier =
-          mFactory
-              .createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
-      final EventDeclProxy accepting =
-          mFactory.createEventDeclProxy(identifier, EventKind.PROPOSITION,
-              true, ScopeKind.OPTIONAL_PARAMETER, null, null, null);
-      mEvents.put(EventDeclProxy.DEFAULT_MARKING_NAME, accepting);
+      addAcceptingProp();
 
       final Element subsystem =
           (Element) project.getElementsByTagName("Subsystem").item(j);
@@ -193,16 +191,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       for (int i = 0; i < automaton.getLength(); i++) {
         final Element aut = (Element) automaton.item(i);
         if (aut.getTagName().equals("Supervisor")) {
-
           constructSimpleComponent(aut, ComponentKind.SPEC, uri);
 
         } else if (aut.getTagName().equals("Plant")) {
-
           constructSimpleComponent(aut, ComponentKind.PLANT, uri);
 
         } else if (aut.getTagName().equals("Implements")) {
-         /* final Element interfaceRef = (Element) aut.getFirstChild();
-
+          final Element interfaceRef = (Element) aut.getFirstChild();
           if (interfaceRef != null) {
             final String interfaceNm = interfaceRef.getAttribute("name");
             final String interfaceLocation = interfaceMap.get(interfaceNm);
@@ -210,17 +205,18 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
             // NEED A WAY HERE TO IDENTIFY THIS SPEC AS AN INTERFACE
             constructSimpleComponent(interfaceNm, interfaceLocation,
                 ComponentKind.SPEC, uri);
-          }*/
+          }
+
         } else if (aut.getTagName().equals("Uses")) {
           constructModuleInstance(aut);
         }
         clearStructures();
       }
 
-      final ModuleProxy module = constructModule(subsystem);
-      if (j == 0) {
-        root = module;
-      }
+      module = constructModule(subsystem);
+      // stores the module
+      mModules.put(module.getName(), module);
+
       mComponents.clear();
       mEvents.clear();
       final ProxyMarshaller<ModuleProxy> marshaller =
@@ -231,7 +227,22 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       mDocumentManager.saveAs(module, file);
 
     }
-    return root;
+    return module;
+
+  }
+
+  /*
+   * This method adds the accepting proposition to the list of events.
+   */
+  private void addAcceptingProp()
+  {
+    final IdentifierProxy identifier =
+        mFactory
+            .createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
+    final EventDeclProxy accepting =
+        mFactory.createEventDeclProxy(identifier, EventKind.PROPOSITION, true,
+            ScopeKind.OPTIONAL_PARAMETER, null, null, null);
+    mEvents.put(EventDeclProxy.DEFAULT_MARKING_NAME, accepting);
 
   }
 
@@ -245,26 +256,26 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   {
     int index = name.indexOf("-");
     while (index != -1) {
-      //replaces - with {-}
+      // replaces - with {-}
       final String newName = "{" + name + "}";
       name = newName;
-      index  = name.indexOf("-", index + 2);
+      index = name.indexOf("-", index + 2);
     }
     index = name.indexOf(".");
     while (index != -1) {
-      //replaces . with :
-      final String newName = name.substring(0, index) + ":" + name.substring(index + 1, name.length());
+      // replaces . with :
+      final String newName =
+          name.substring(0, index) + ":"
+              + name.substring(index + 1, name.length());
       name = newName;
-      index  = name.indexOf(".", index + 1);
+      index = name.indexOf(".", index + 1);
     }
     return name;
   }
 
   /**
-   * This method creates an instance of a module. The referenced module is
-   * opened and the DOM is traversed to read the events to create parameter
-   * bindings. One call to this method creates all the required instance for the
-   * current module.
+   * This method creates an instance of a module. One call to this method
+   * creates all the required instance for the current module.
    *
    * @param uses
    * @throws ParserConfigurationException
@@ -273,102 +284,42 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @throws URISyntaxException
    */
   private void constructModuleInstance(final Element uses)
-      throws ParserConfigurationException, SAXException, IOException,
-      URISyntaxException
   {
     final NodeList interfaceList = uses.getElementsByTagName("*");
     for (int i = 0; i < interfaceList.getLength(); i++) {
       final Element interfaceRef = (Element) interfaceList.item(i);
       final String moduleName = interfaceRef.getAttribute("provider");
 
-      // locates where the referenced module is
-      final String absPath = this.getOutputDirectory().getAbsolutePath();
-
-      final File file = new File(absPath + "/" + moduleName + ".wmod");
-      final DocumentBuilder builder =
-          DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      final Document doc = builder.parse(file);
+      // gets the module to create an instance of
+      final ModuleProxy module = mModules.get(moduleName);
 
       final List<ParameterBindingProxy> bindings =
           new ArrayList<ParameterBindingProxy>();
 
       // creates the parameter bindings for each event in the module
-      final Element module = doc.getDocumentElement();
-      final Element eventList =
-          (Element) module.getElementsByTagName("EventDeclList").item(0);
+      final List<EventDeclProxy> eventList = module.getEventDeclList();
 
-      final NodeList allEvents = eventList.getElementsByTagName("EventDecl");
-
-      for (int j = 0; j < allEvents.getLength(); j++) {
-        final Element evElmt = (Element) allEvents.item(j);
-        final String eventName = evElmt.getAttribute("Name");
+      for (int j = 0; j < eventList.size(); j++) {
+        final EventDeclProxy event = eventList.get(j);
+        final String eventName = event.getName();
         final ExpressionProxy identifier =
-            mFactory.createSimpleIdentifierProxy(formatIdentifier(eventName));
-        // if the parameter is not already used by the module
-        // referencing it, add it to the list of events for the module
-        // referencing it
+            mFactory.createSimpleIdentifierProxy(eventName);
 
-        /*
-         * if (!mEvents.containsKey(eventName)) { final IdentifierProxy
-         * eventIdent = mFactory.createSimpleIdentifierProxy(formatIdentifier(eventName)); final
-         * String eventKind = evElmt.getAttribute("Kind"); final String
-         * scopeKind = evElmt.getAttribute("Scope"); EventDeclProxy event =
-         * null;
-         *
-         * // allows for HISC attribute data final Element attrMapElmnt =
-         * (Element) evElmt.getElementsByTagName("*").item(0); final Element
-         * attrElmnt = (Element) attrMapElmnt.getElementsByTagName("*").item(0);
-         *
-         * final String attr = attrElmnt.getAttribute("Value");
-         *
-         * if (!scopeKind.equals("")) { if (attr.equals("")) { event =
-         * mFactory.createEventDeclProxy(eventIdent, EventKind
-         * .fromValue(eventKind), true, ScopeKind .fromValue(scopeKind), null,
-         * null, null); } else if (attr.equals("REQUEST")) { event =
-         * mFactory.createEventDeclProxy(eventIdent, EventKind
-         * .fromValue(eventKind), true, ScopeKind .fromValue(scopeKind), null,
-         * null, HISCAttributes.ATTRIBUTES_REQUEST); } else if
-         * (attr.equals("ANSWER")) { event =
-         * mFactory.createEventDeclProxy(eventIdent, EventKind
-         * .fromValue(eventKind), true, ScopeKind .fromValue(scopeKind), null,
-         * null, HISCAttributes.ATTRIBUTES_ANSWER); } else if
-         * (attr.equals("LOWDATA")) { event =
-         * mFactory.createEventDeclProxy(eventIdent, EventKind
-         * .fromValue(eventKind), true, ScopeKind .fromValue(scopeKind), null,
-         * null, HISCAttributes.ATTRIBUTES_LOWDATA); } else if
-         * (attr.equals("INTERFACE")) { event =
-         * mFactory.createEventDeclProxy(eventIdent, EventKind
-         * .fromValue(eventKind), true, ScopeKind .fromValue(scopeKind), null,
-         * null, HISCAttributes.ATTRIBUTES_INTERFACE); }
-         *
-         * } else { if (attr.equals("")) { event =
-         * mFactory.createEventDeclProxy(eventIdent, EventKind
-         * .fromValue(eventKind), true, null, null, null, null); } else if
-         * (attr.equals("REQUEST")) { event =
-         * mFactory.createEventDeclProxy(eventIdent, EventKind
-         * .fromValue(eventKind), true, null, null, null,
-         * HISCAttributes.ATTRIBUTES_REQUEST); } else if (attr.equals("ANSWER"))
-         * { event = mFactory.createEventDeclProxy(eventIdent, EventKind
-         * .fromValue(eventKind), true, null, null, null,
-         * HISCAttributes.ATTRIBUTES_ANSWER); } else if (attr.equals("LOWDATA"))
-         * { event = mFactory.createEventDeclProxy(eventIdent, EventKind
-         * .fromValue(eventKind), true, null, null, null,
-         * HISCAttributes.ATTRIBUTES_LOWDATA); } else if
-         * (attr.equals("INTERFACE")) { event =
-         * mFactory.createEventDeclProxy(eventIdent, EventKind
-         * .fromValue(eventKind), true, null, null, null,
-         * HISCAttributes.ATTRIBUTES_INTERFACE); } } mEvents.put(eventName,
-         * event);
-         *
-         * }
-         */
+        // No binding parameter is created if the event is local
+        if (!event.getScope().equals(ScopeKind.LOCAL)) {
 
-        bindings.add(mFactory
-            .createParameterBindingProxy(eventName, identifier));
-
+          // if the parameter is not already used by the module
+          // referencing it, add it to the list of events for the module
+          // referencing it
+          if (!mEvents.containsKey(eventName)) {
+            mEvents.put(eventName, event);
+          }
+          bindings.add(mFactory.createParameterBindingProxy(eventName,
+              identifier));
+        }
       }
       final SimpleIdentifierProxy identifier =
-          mFactory.createSimpleIdentifierProxy(formatIdentifier(moduleName));
+          mFactory.createSimpleIdentifierProxy(moduleName);
       mComponents.add(mFactory.createInstanceProxy(identifier, moduleName,
           bindings));
     }
@@ -505,7 +456,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * Constructs the SimpleComponent section for the module of a
    * <CODE>.wmod</CODE> file.
    */
- /* private void constructSimpleComponent(final String desName,
+
+  private void constructSimpleComponent(final String desName,
       final String desLocation, final ComponentKind kind, final URI path)
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException
@@ -518,7 +470,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
     mComponents.add(mFactory
         .createSimpleComponentProxy(identifier, kind, graph));
-  }*/
+  }
 
   /**
    * Constructs a ModuleProxy for a given subsystem.
@@ -740,11 +692,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       for (int i = 0; i < existingEvents.size(); i++) {
         final SimpleIdentifierProxy event =
             (SimpleIdentifierProxy) existingEvents.get(i);
-        eventList.add(mFactory.createSimpleIdentifierProxy(formatIdentifier(event.getName())));
+        eventList.add(mFactory
+            .createSimpleIdentifierProxy(formatIdentifier(event.getName())));
       }
 
     }
-    eventList.add(mFactory.createSimpleIdentifierProxy(formatIdentifier(eventName)));
+    eventList.add(mFactory
+        .createSimpleIdentifierProxy(formatIdentifier(eventName)));
     final LabelBlockProxy transEvents =
         mFactory.createLabelBlockProxy(eventList, null);
 
@@ -809,6 +763,27 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       return mFactory.createSimpleNodeProxy(stateName, accept, true, null,
           null, null);
     }
+  }
+
+
+  // #########################################################################
+  // # Inner Class LevelComparator
+  /**
+   * A class used to compare the values of the levels of subsystems. This class
+   * is used as a comparator for the sort method.
+   */
+  private static class LevelComparator implements Comparator<Element>
+  {
+
+    public int compare(final Element e1, final Element e2)
+    {
+      final String LEVEL = "level";
+      final Integer e1Level = Integer.parseInt(e1.getAttribute(LEVEL));
+      final Integer e2Level = Integer.parseInt(e2.getAttribute(LEVEL));
+
+      return e1Level.compareTo(e2Level);
+    }
+
   }
 
 
@@ -889,6 +864,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   private final Map<String,EventDeclProxy> mEvents =
       new TreeMap<String,EventDeclProxy>();
 
+  /**
+   * Maps the name of a module to its ModuleProxy.
+   */
+  private final Map<String,ModuleProxy> mModules =
+      new HashMap<String,ModuleProxy>();
   /**
    * The factory used to build up the modules for the <CODE>.wmod</CODE> files
    * we are converting into.
