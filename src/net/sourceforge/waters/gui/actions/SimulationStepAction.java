@@ -16,10 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.Action;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import net.sourceforge.waters.gui.IconLoader;
+import net.sourceforge.waters.gui.simulator.EventChooserDialog;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
@@ -89,18 +88,13 @@ public class SimulationStepAction
 
   private EventProxy findOptions(final ArrayList<EventProxy> possibleEvents)
   {
-    final Object[] possibilities = possibleEvents.toArray();
-    final EventProxy event =
-        (EventProxy) JOptionPane
-            .showInputDialog(
-                getIDE(),
-                "There are multiple events possible. Which one do you wish to fire?",
-                "Multiple Options available", JOptionPane.QUESTION_MESSAGE,
-                IconLoader.ICON_EVENT, // The supremica icon goes here
-                possibilities, possibilities[0]);
-
-    // If a string was returned, say so.
-    if ((event != null)) {
+    final EventProxy[] possibilities = new EventProxy[possibleEvents.size()];
+    for (int looper = 0; looper < possibleEvents.size(); looper++)
+      possibilities[looper] = possibleEvents.get(looper);
+    final EventChooserDialog dialog = new EventChooserDialog(this.getIDE().getFrame(), possibilities);
+    dialog.setVisible(true);
+    final EventProxy event = dialog.getSelectedEvent();
+    if ((event != null && !dialog.wasCancelled())) {
       for (final EventProxy findEvent : possibleEvents) {
         if (findEvent == event)
           return event;

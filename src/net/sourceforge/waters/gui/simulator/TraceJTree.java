@@ -46,8 +46,6 @@ public class TraceJTree extends JTree implements InternalFrameObserver
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
-    this.setLargeModel(false);
-    // Expand all foreach-component entries.
 
     this.addMouseListener(new MouseAdapter(){
       public void mouseClicked(final MouseEvent e)
@@ -95,7 +93,6 @@ public class TraceJTree extends JTree implements InternalFrameObserver
   {
     final TraceMutableTreeNode node = new TraceMutableTreeNode(mSim, this);
     this.setModel(new DefaultTreeModel(node, false));
-    System.out.println("DEBUG: Current Model is: " + node.getData(0));
   }
 
   //##################################################################
@@ -160,6 +157,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver
          right.setPreferredSize(new Dimension(eventColumnWidth[1], rowHeight));
          output.add(left, BorderLayout.WEST);
          output.add(right, BorderLayout.EAST);
+         System.out.println("DEBUG: HEIGHT: " + output.getPreferredSize());
          return output;
        }
        else if (value.getClass() == AutomatonLeafNode.class)
@@ -221,6 +219,6 @@ public class TraceJTree extends JTree implements InternalFrameObserver
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
   private static final int[] eventColumnWidth = {180, 20};
-  private static final int rowHeight = 10;
+  private static final int rowHeight = 16;
 
 }
