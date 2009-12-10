@@ -703,22 +703,32 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         eventList.add(mFactory
             .createSimpleIdentifierProxy(formatIdentifier(event.getName())));
       }
-
     }
 
     eventList.add(mFactory
         .createSimpleIdentifierProxy(formatIdentifier(eventName)));
+    // reads and stores the position of the label for the edge
+    String xPosStr = tr.getAttribute("lx");
+    String yPosStr = tr.getAttribute("ly");
+    LabelGeometryProxy labelPos = null;
+    if (!xPosStr.equals("") && !yPosStr.equals("")) {
+      final double xPos = Double.parseDouble(xPosStr);
+      final double yPos = Double.parseDouble(yPosStr);
+      final Point2D labelPoint = new Point2D.Double(xPos, yPos);
+      labelPos = mFactory.createLabelGeometryProxy(labelPoint);
+    }
     final LabelBlockProxy transEvents =
-        mFactory.createLabelBlockProxy(eventList, null);
+        mFactory.createLabelBlockProxy(eventList, labelPos);
 
     // reads and stores the geometry (layout) data for the edge
     final List<Point2D> points = new ArrayList<Point2D>();
     final NodeList posList = tr.getElementsByTagName("Pos");
-    if (posList != null) {
+    SplineGeometryProxy edgeShape = null;
+    if (posList.getLength() > 0) {
       for (int i = 0; i < posList.getLength(); i++) {
         final Element pos = (Element) posList.item(i);
-        final String xPosStr = pos.getAttribute("x");
-        final String yPosStr = pos.getAttribute("y");
+        xPosStr = pos.getAttribute("x");
+        yPosStr = pos.getAttribute("y");
         double xPos;
         double yPos;
         if (!xPosStr.equals("") && !yPosStr.equals("")) {
@@ -728,9 +738,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           points.add(point);
         }
       }
+      edgeShape =
+          mFactory.createSplineGeometryProxy(points, SplineKind.INTERPOLATING);
     }
-    final SplineGeometryProxy edgeShape =
-        mFactory.createSplineGeometryProxy(points, SplineKind.INTERPOLATING);
 
     return mFactory.createEdgeProxy(mNodes.get(srcIndex), mNodes
         .get(targetIndex), transEvents, null, edgeShape, null, null);
