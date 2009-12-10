@@ -110,11 +110,11 @@ public class DocumentContainerManager
         mModuleImporters =
           new LinkedList<CopyingProxyUnmarshaller<ModuleProxy>>();
         final File mazeinputs = null;
+        final CopyingProxyUnmarshaller<ModuleProxy> despotImporter = new DESpotImporter(factory, mDocumentManager);
         final CopyingProxyUnmarshaller<ModuleProxy> mazeImporter =
           new MazeCompiler(mazeinputs, factory, mDocumentManager);
-        final CopyingProxyUnmarshaller<ModuleProxy> despotImporter = new DESpotImporter(factory, mDocumentManager);
-        mModuleImporters.add(mazeImporter);
         mModuleImporters.add(despotImporter);
+        mModuleImporters.add(mazeImporter);
     }
 
 
