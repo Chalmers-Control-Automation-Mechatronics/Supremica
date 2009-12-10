@@ -15,7 +15,7 @@ import java.util.EventObject;
 
 /**
  * <P>A notification sent by a the spring embedder to inform its observers
- * abouts its progress.</P>
+ * about its progress.</P>
  *
  * @see EmbedderObserver
  *
@@ -23,7 +23,7 @@ import java.util.EventObject;
  */
 public class EmbedderEvent extends EventObject
 {
-  
+
   //#########################################################################
   //# Static Creator Methods
   /**
@@ -60,7 +60,7 @@ public class EmbedderEvent extends EventObject
     super(embedder);
     mType = type;
   }
-  
+
 
   //#########################################################################
   //# Simple Access

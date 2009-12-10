@@ -309,7 +309,7 @@ public class EventDeclListView
   }
 
   @SuppressWarnings("unchecked")
-  public List<InsertInfo> getInsertInfo(Transferable transferable)
+  public List<InsertInfo> getInsertInfo(final Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
     final ModuleContext context = mRoot.getModuleContext();
@@ -344,12 +344,12 @@ public class EventDeclListView
     return mDeleteVisitor.getDeletionVictims(decls);
   }
 
-  public void insertItems(List<InsertInfo> inserts)
+  public void insertItems(final List<InsertInfo> inserts)
   {
     mDeleteVisitor.insertItems(inserts);
   }
 
-  public void deleteItems(List<InsertInfo> deletes)
+  public void deleteItems(final List<InsertInfo> deletes)
   {
     mDeleteVisitor.deleteItems(deletes);
   }
@@ -406,7 +406,7 @@ public class EventDeclListView
       mObservers = null;
     }
   }
-  
+
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     if (mObservers != null) {
@@ -454,11 +454,11 @@ public class EventDeclListView
     final Transferable trans = createTransferable(data);
     try {
       event.startDrag(DragSource.DefaultCopyDrop, trans);
-    } catch (InvalidDnDOperationException exception) {
+    } catch (final InvalidDnDOperationException exception) {
       throw new IllegalArgumentException(exception);
     }
   }
-  
+
 
   //#########################################################################
   //# Interface javax.swing.event.ListSelectionListener
@@ -537,113 +537,6 @@ public class EventDeclListView
 
 
   //#########################################################################
-  //# Inner Class EventDeclPopup
-  /*
-  private class EventDeclPopup extends JPopupMenu
-  {
-    //#######################################################################
-    //# Constructor
-    EventDeclPopup(final MouseEvent event)
-    {
-      final Iterable<EventDeclSubject> decls;
-      final Point point = event.getPoint();
-      final int index = locationToIndex(point);
-      if (index < 0 || index >= mModel.getSize())
-      {
-        decls = new ArrayList<EventDeclSubject>();
-      } else
-      {
-        final EventDeclSubject clicked = mModel.getElementAt(index);
-        decls = Collections.singletonList(clicked);
-      }
-      int declcount = 0;
-      int kindcount = 0;
-      EventKind kind = null;
-      int obscount = 0;
-      boolean observable = true;
-      for (final EventDeclSubject decl : decls) {
-        declcount++;
-        switch (kindcount) {
-        case 0:
-          kind = decl.getKind();
-          kindcount = 1;
-          break;
-        case 1:
-          if (kind != decl.getKind()) {
-            kindcount = 2;
-            kind = null;
-          }
-          break;
-        default:
-          break;
-        }
-        switch (obscount) {
-        case 0:
-          observable = decl.isObservable();
-          obscount = 1;
-          break;
-        case 1:
-          if (observable != decl.isObservable()) {
-            obscount = 2;
-          }
-          break;
-        default:
-          break;
-        }
-      }
-
-      final JMenu kindMenu = new JMenu("Set kind");
-      add(kindMenu);
-      for (final EventKind itemkind : EventKind.values()) {
-        final String title = getTitle(itemkind);
-        final boolean selected = kindcount == 1 && itemkind == kind;
-        final JRadioButtonMenuItem item =
-          new JRadioButtonMenuItem(title, selected);
-        item.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-              doSetEventsKind(decls, itemkind);
-            }
-          });
-        kindMenu.add(item);
-      }
-      kindMenu.addSeparator();
-      final JRadioButtonMenuItem observableItem =
-        new JRadioButtonMenuItem("Observable", obscount == 1 && observable);
-      observableItem.addActionListener(new ActionListener() {
-          public void actionPerformed(final ActionEvent event) {
-            doSetEventsObservable(decls, true);
-          }
-        });
-      kindMenu.add(observableItem);
-      final JRadioButtonMenuItem unobservableItem =
-        new JRadioButtonMenuItem("Unobservable", obscount == 1 && !observable);
-      unobservableItem.addActionListener(new ActionListener() {
-          public void actionPerformed(final ActionEvent event) {
-            doSetEventsObservable(decls, false);
-          }
-        });
-      kindMenu.add(unobservableItem);
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private String getTitle(final EventKind kind)
-    {
-      final String text = kind.toString();
-      final int len = text.length();
-      final StringBuffer buffer = new StringBuffer(len);
-      buffer.append(text.charAt(0));
-      for (int i = 1; i < len; i++) {
-        final char upper = text.charAt(i);
-        final char lower = Character.toLowerCase(upper);
-        buffer.append(lower);
-      }
-      return buffer.toString();
-    }
-  }
-  */
-
-  //#########################################################################
   //# Inner Class EventDeclMouseListener
   /**
    * A simple mouse listener to trigger opening the event declaration
@@ -704,7 +597,7 @@ public class EventDeclListView
 
   private List<Observer> mObservers;
 
-  
+
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;

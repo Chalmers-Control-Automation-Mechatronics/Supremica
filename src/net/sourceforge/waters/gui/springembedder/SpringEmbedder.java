@@ -262,6 +262,7 @@ public class SpringEmbedder
                           LabelBlockProxyShape.DEFAULT_OFFSET_Y + 10));
         edge.getGuardActionBlock().setGeometry(offset);
       }
+      edge.setGeometry(null);
     }
 
     return runEmbedder;
