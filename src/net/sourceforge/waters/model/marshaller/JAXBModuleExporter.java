@@ -1179,20 +1179,22 @@ public class JAXBModuleExporter
   //# Creating Geometry Elements
   private static Box createBox(final Rectangle2D rect2d)
   {
-    Rectangle rect;
     if (rect2d instanceof Rectangle) {
-      rect = (Rectangle) rect2d;
+      final Rectangle rect = (Rectangle) rect2d;
+      return createBox(rect.x, rect.y, rect.width, rect.height);
     } else {
-      rect = new Rectangle();
-      rect.setRect(rect2d);
+      final int x = (int) Math.round(rect2d.getX());
+      final int y = (int) Math.round(rect2d.getY());
+      final int width = (int) Math.round(rect2d.getWidth());
+      final int height = (int) Math.round(rect2d.getHeight());
+      return createBox(x, y, width, height);
     }
-    return createBox(rect.x, rect.y, rect.width, rect.height);
   }
 
   private static Box createBox(final int x,
-                                   final int y,
-                                   final int width,
-                                   final int height)
+                               final int y,
+                               final int width,
+                               final int height)
   {
     final Box box = mFactory.createBox();
     box.setX(x);
@@ -1204,14 +1206,14 @@ public class JAXBModuleExporter
 
   private static Point createPoint(final Point2D point2d)
   {
-    java.awt.Point point;
     if (point2d instanceof java.awt.Point) {
-      point = (java.awt.Point) point2d;
+      final java.awt.Point point = (java.awt.Point) point2d;
+      return createPoint(point.x, point.y);
     } else {
-      point = new java.awt.Point();
-      point.setLocation(point2d);
+      final int x = (int) Math.round(point2d.getX());
+      final int y = (int) Math.round(point2d.getY());
+      return createPoint(x, y);
     }
-    return createPoint(point.x, point.y);
   }
 
   private static Point createPoint(final int x, final int y)
