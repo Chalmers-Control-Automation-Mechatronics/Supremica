@@ -46,11 +46,13 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
+import net.sourceforge.waters.xsd.module.SplineKind;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -152,7 +154,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     mDocumentManager = manager;
   }
 
-  @SuppressWarnings("unchecked")
   private ModuleProxy convertDESpotHierarchy(final URI uri)
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException, WatersMarshalException
@@ -177,18 +178,22 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final String location = des.getAttribute("location");
       interfaceMap.put(name, location);
     }
+    final NodeList subsystemList = project.getElementsByTagName("Subsystem");
+    // extracts each subsystem element and puts them into an array list
+    final ArrayList<Element> subsystems = new ArrayList<Element>();
+    for (int i = 0; i < subsystemList.getLength(); i++) {
+      final Element subsystem = (Element) subsystemList.item(i);
+      subsystems.add(subsystem);
+    }
 
-    final ArrayList<Element> subsystems =
-        (ArrayList<Element>) project.getElementsByTagName("Subsystem");
     // sorts the subsystems in order of their level (lowest to highest)
     Collections.sort(subsystems, new LevelComparator());
-    System.out.print(subsystems);
+
     for (int j = 0; j < subsystems.size(); j++) {
       // adds the accepting proposition to the events list
       addAcceptingProp();
 
-      final Element subsystem =
-          (Element) project.getElementsByTagName("Subsystem").item(j);
+      final Element subsystem = subsystems.get(j);
 
       final NodeList automaton = subsystem.getElementsByTagName("*");
       for (int i = 0; i < automaton.getLength(); i++) {
@@ -200,7 +205,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           constructSimpleComponent(aut, ComponentKind.PLANT, uri);
 
         } else if (aut.getTagName().equals("Implements")) {
-          final Element interfaceRef = (Element) aut.getFirstChild();
+          final Element interfaceRef =
+              (Element) aut.getElementsByTagName("*").item(0);
           if (interfaceRef != null) {
             final String interfaceNm = interfaceRef.getAttribute("name");
             final String interfaceLocation = interfaceMap.get(interfaceNm);
@@ -314,7 +320,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           // referencing it, add it to the list of events for the module
           // referencing it
           if (!mEvents.containsKey(eventName)) {
-            mEvents.put(eventName, event);
+            final EventDeclProxy eventCopy = (EventDeclProxy) event.clone();
+            mEvents.put(eventName, eventCopy);
           }
           bindings.add(mFactory.createParameterBindingProxy(eventName,
               identifier));
@@ -670,7 +677,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
     // assigns the correct name to the edge
     final String eventID = tr.getAttribute("eID");
-    // assert mEvents.containsKey((eventID));
     final String eventName = mEventIDs.get(Integer.parseInt(eventID));
     final List<SimpleIdentifierProxy> eventList =
         new ArrayList<SimpleIdentifierProxy>();
@@ -699,13 +705,35 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       }
 
     }
+
     eventList.add(mFactory
         .createSimpleIdentifierProxy(formatIdentifier(eventName)));
     final LabelBlockProxy transEvents =
         mFactory.createLabelBlockProxy(eventList, null);
 
+    // reads and stores the geometry (layout) data for the edge
+    final List<Point2D> points = new ArrayList<Point2D>();
+    final NodeList posList = tr.getElementsByTagName("Pos");
+    if (posList != null) {
+      for (int i = 0; i < posList.getLength(); i++) {
+        final Element pos = (Element) posList.item(i);
+        final String xPosStr = pos.getAttribute("x");
+        final String yPosStr = pos.getAttribute("y");
+        double xPos;
+        double yPos;
+        if (!xPosStr.equals("") && !yPosStr.equals("")) {
+          xPos = Double.parseDouble(xPosStr);
+          yPos = Double.parseDouble(yPosStr);
+          final Point2D point = new Point2D.Double(xPos, yPos);
+          points.add(point);
+        }
+      }
+    }
+    final SplineGeometryProxy edgeShape =
+        mFactory.createSplineGeometryProxy(points, SplineKind.INTERPOLATING);
+
     return mFactory.createEdgeProxy(mNodes.get(srcIndex), mNodes
-        .get(targetIndex), transEvents, null, null, null, null);
+        .get(targetIndex), transEvents, null, edgeShape, null, null);
 
   }
 
@@ -797,8 +825,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   // #########################################################################
   // # Inner Class LevelComparator
   /**
-   * A class used to compare the values of the levels of subsystems. This class
-   * is used as a comparator for the sort method.
+   * A class used to compare the values of the levels of subsystems. Low level
+   * subsystems are ordered before high level subsystems. This class is used as
+   * a comparator for the sort method.
    */
   private static class LevelComparator implements Comparator<Element>
   {
@@ -807,9 +836,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final String LEVEL = "level";
       final Integer e1Level = Integer.parseInt(e1.getAttribute(LEVEL));
       final Integer e2Level = Integer.parseInt(e2.getAttribute(LEVEL));
-      // I SUSPECT THIS IS CURRENTLY ORDERING LOWEST TO HIGHEST, WHICH IS THE
-      // OPPOSITE OF WHAT I WANT
-      return e1Level.compareTo(e2Level);
+
+      return (e1Level > e2Level ? -1 : (e1Level == e2Level ? 0 : 1));
     }
 
   }
