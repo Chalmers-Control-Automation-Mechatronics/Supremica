@@ -275,7 +275,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       // replaces - with {-}
       final String newName = "{" + name + "}";
       name = newName;
-      //index = name.indexOf("-", index + 2);
+      // index = name.indexOf("-", index + 2);
     }
     index = name.indexOf(".");
     while (index != -1) {
@@ -594,31 +594,25 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param transLoopList
    *          The list of Transitions and selfloops from the DOM.
    */
-  private LabelBlockProxy findBlockedEvents(final NodeList transLoopList)
+  private LabelBlockProxy findBlockedEvents(final NodeList transitions)
   {
     boolean found = false;
     final List<SimpleIdentifierProxy> blockedEventList =
         new ArrayList<SimpleIdentifierProxy>();
     for (final int eventID : mEventIDs.keySet()) {
       found = false;
-      for (int i = 0; i < transLoopList.getLength(); i++) {
-        final Element trElmnt = (Element) transLoopList.item(i);
-        final NodeList transitions = trElmnt.getElementsByTagName("Tr");
-        for (int j = 0; j < transitions.getLength(); j++) {
-          final Element tr = (Element) transitions.item(j);
-          if (Integer.parseInt(tr.getAttribute("eID")) == eventID) {
-            found = true;
-            break;
-          }
-        }
-        if (found)
+
+      for (int j = 0; j < transitions.getLength(); j++) {
+        final Element tr = (Element) transitions.item(j);
+        if (Integer.parseInt(tr.getAttribute("eID")) == eventID) {
+          found = true;
           break;
+        }
       }
       if (!found) {
         blockedEventList.add(mFactory.createSimpleIdentifierProxy(mEventIDs
             .get(eventID)));
       }
-
     }
     if (blockedEventList.size() == 0) {
       return null;
@@ -713,13 +707,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       for (int i = 0; i < existingEvents.size(); i++) {
         final SimpleIdentifierProxy event =
             (SimpleIdentifierProxy) existingEvents.get(i);
-        eventList.add(mFactory
-            .createSimpleIdentifierProxy(formatIdentifier(event.getName())));
+        eventList.add(mFactory.createSimpleIdentifierProxy(event.getName()));
       }
     }
 
-    eventList.add(mFactory
-        .createSimpleIdentifierProxy(formatIdentifier(eventName)));
+    eventList.add(mFactory.createSimpleIdentifierProxy(eventName));
     // reads and stores the position of the label for the edge
     String xPosStr = tr.getAttribute("lx");
     String yPosStr = tr.getAttribute("ly");
@@ -734,7 +726,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         mFactory.createLabelBlockProxy(eventList, labelPos);
 
     // reads and stores the geometry (layout) data for the edge
-    final List<Point2D> points = new ArrayList<Point2D>();
+    final List<Point2D> points = new ArrayList<Point2D>(0);
     final NodeList posList = tr.getElementsByTagName("Pos");
     SplineGeometryProxy edgeShape = null;
     if (posList.getLength() > 0) {
