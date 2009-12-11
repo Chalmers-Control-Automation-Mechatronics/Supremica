@@ -1,9 +1,9 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -141,6 +141,9 @@ public class TraceJTree extends JTree implements InternalFrameObserver
        {
          final JPanel output = new JPanel();
          output.setBackground(EditorColor.BACKGROUNDCOLOR);
+         final GridBagLayout layout = new GridBagLayout();
+         layout.columnWidths = eventColumnWidth;
+         output.setLayout(layout);
          final EventBranchNode eventNode = (EventBranchNode)value;
          final EventProxy event = eventNode.getEvent();
          final JLabel left = new JLabel(event.getName());
@@ -148,16 +151,12 @@ public class TraceJTree extends JTree implements InternalFrameObserver
            left.setIcon(IconLoader.ICON_CONTROLLABLE);
          else
            left.setIcon(IconLoader.ICON_UNCONTROLLABLE);
-         final JLabel right = new JLabel();
-         if (mSim.getValidTransitions().contains(event))
-           right.setIcon(IconLoader.ICON_TICK);
+         if (eventNode.getTime() == TraceJTree.this.mSim.getCurrentTime())
+           left.setFont(left.getFont().deriveFont(Font.BOLD));
          else
-           right.setIcon(IconLoader.ICON_CROSS);
+           left.setFont(left.getFont().deriveFont(Font.PLAIN));
          left.setPreferredSize(new Dimension(eventColumnWidth[0], rowHeight));
-         right.setPreferredSize(new Dimension(eventColumnWidth[1], rowHeight));
-         output.add(left, BorderLayout.WEST);
-         output.add(right, BorderLayout.EAST);
-         System.out.println("DEBUG: HEIGHT: " + output.getPreferredSize());
+         output.add(left);
          return output;
        }
        else if (value.getClass() == AutomatonLeafNode.class)
@@ -166,6 +165,9 @@ public class TraceJTree extends JTree implements InternalFrameObserver
          final AutomatonProxy autoProxy = autoNode.getAutomata();
          final JPanel output = new JPanel();
          output.setBackground(EditorColor.BACKGROUNDCOLOR);
+         final GridBagLayout layout = new GridBagLayout();
+         layout.columnWidths = automataColumnWidth;
+         output.setLayout(layout);
          final JLabel left = new JLabel(autoProxy.getName());
          if (mContainer.getSourceInfoMap().get(autoProxy).getSourceObject().getClass() == VariableComponentSubject.class)
            left.setIcon(IconLoader.ICON_VARIABLE);
@@ -193,9 +195,9 @@ public class TraceJTree extends JTree implements InternalFrameObserver
            left.setFont(left.getFont().deriveFont(Font.PLAIN));
            right.setFont(right.getFont().deriveFont(Font.PLAIN));
          }
-         output.add(left, BorderLayout.WEST);
-         output.add(center, BorderLayout.CENTER);
-         output.add(right, BorderLayout.EAST);
+         output.add(left);
+         output.add(center);
+         output.add(right);
          return output;
        }
        else
@@ -218,7 +220,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
-  private static final int[] eventColumnWidth = {180, 20};
-  private static final int rowHeight = 16;
+  private static final int[] eventColumnWidth = {180};
+  private static final int rowHeight = 20;
 
 }

@@ -1,9 +1,9 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -123,6 +123,9 @@ public class EventJTree extends JTree implements InternalFrameObserver
       {
         final JPanel output = new JPanel();
         output.setBackground(EditorColor.BACKGROUNDCOLOR);
+        final GridBagLayout layout = new GridBagLayout();
+        layout.columnWidths = eventColumnWidth;
+        output.setLayout(layout);
         final EventBranchNode eventNode = (EventBranchNode)value;
         final EventProxy event = eventNode.getEvent();
         final JLabel left = new JLabel(event.getName());
@@ -137,8 +140,8 @@ public class EventJTree extends JTree implements InternalFrameObserver
           right.setIcon(IconLoader.ICON_CROSS);
         left.setPreferredSize(new Dimension(eventColumnWidth[0], rowHeight));
         right.setPreferredSize(new Dimension(eventColumnWidth[1], rowHeight));
-        output.add(left, BorderLayout.WEST);
-        output.add(right, BorderLayout.EAST);
+        output.add(left);
+        output.add(right);
         return output;
       }
       else if (value.getClass() == AutomatonLeafNode.class)
@@ -146,6 +149,9 @@ public class EventJTree extends JTree implements InternalFrameObserver
         final AutomatonLeafNode autoNode = (AutomatonLeafNode) value;
         final AutomatonProxy autoProxy = autoNode.getAutomata();
         final JPanel output = new JPanel();
+        final GridBagLayout layout = new GridBagLayout();
+        layout.columnWidths = automataColumnWidth;
+        output.setLayout(layout);
         output.setBackground(EditorColor.BACKGROUNDCOLOR);
         final JLabel left = new JLabel(autoProxy.getName());
         if (mContainer.getSourceInfoMap().get(autoProxy).getSourceObject().getClass() == VariableComponentSubject.class)
@@ -174,9 +180,9 @@ public class EventJTree extends JTree implements InternalFrameObserver
           left.setFont(left.getFont().deriveFont(Font.PLAIN));
           right.setFont(right.getFont().deriveFont(Font.PLAIN));
         }
-        output.add(left, BorderLayout.WEST);
-        output.add(center, BorderLayout.CENTER);
-        output.add(right, BorderLayout.EAST);
+        output.add(left);
+        output.add(center);
+        output.add(right);
         return output;
       }
       else

@@ -1,10 +1,18 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -12,7 +20,9 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.BevelBorder;
 
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -21,27 +31,56 @@ import net.sourceforge.waters.model.des.EventProxy;
 public class EventChooserDialog extends JDialog
 {
 
+
   // #######################################################################
   // # Constructor
 
-  public EventChooserDialog(final JFrame owner, final EventProxy[] events)
+  public EventChooserDialog(final JFrame owner, final JLabel[] labels, final EventProxy[] correspondingEvent)
   {
     super(owner, "Multiple Options available", true);
     cancelled = true;
     final JPanel panel = new JPanel();
     panel.setLayout(new BorderLayout());
-    mList = new JList(events);
+    mList = new JList(labels);
     mList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     mList.setSelectedIndex(0);
-    mList.setPreferredSize(DEFAULT_LIST_DIMENSION);
+    mList.setCellRenderer(new ListCellRenderer(){
+
+      public Component getListCellRendererComponent(final JList list, final Object value,
+          final int index, final boolean isSelected, final boolean cellHasFocus)
+      {
+        final JLabel output = (JLabel) value;
+        if (isSelected)
+          output.setBackground(Color.blue);
+        if (cellHasFocus)
+          output.setFont(output.getFont().deriveFont(Font.BOLD));
+        else
+          output.setFont(output.getFont().deriveFont(Font.PLAIN));
+        return output;
+      }
+    });
+    mList.setPreferredSize(new Dimension(DEFAULT_LIST_WIDTH, labels.length * DEFAULT_ROW_HEIGHT));
+      // This code correctly assigns the width, but not the height
+    mList.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+    eventList = correspondingEvent;
     final JScrollPane scrollPane = new JScrollPane(mList);
     panel.add(scrollPane, BorderLayout.CENTER);
     final JPanel buttonPanel = new JPanel();
-    buttonPanel.setLayout(new BorderLayout());
     final JButton selectButton = new JButton("Select Event");
     final JButton cancelButton = new JButton("Cancel");
-    buttonPanel.add(selectButton, BorderLayout.WEST);
-    buttonPanel.add(cancelButton, BorderLayout.EAST);
+    final double maximumWidth = Math.max(selectButton.getPreferredSize().getWidth(), cancelButton.getPreferredSize().getWidth());
+    selectButton.setPreferredSize(new Dimension((int)maximumWidth, (int)selectButton.getPreferredSize().getHeight()));
+    cancelButton.setPreferredSize(new Dimension((int)maximumWidth, (int)cancelButton.getPreferredSize().getHeight()));
+    final GridBagLayout layout = new GridBagLayout();
+    layout.columnWidths = new int[]{(int)((DEFAULT_LIST_WIDTH - maximumWidth * 2) / 2),
+      (int)maximumWidth,
+      (int)maximumWidth,
+      (int)((DEFAULT_LIST_WIDTH - maximumWidth * 2) / 2)};
+    System.out.println("DEBUG: Widths are: " + (int)((DEFAULT_LIST_WIDTH - maximumWidth * 2) / 2) + " and " + maximumWidth);
+    buttonPanel.setLayout(layout);
+    buttonPanel.add(new JLabel()); // To keep the empty tile empty
+    buttonPanel.add(selectButton);
+    buttonPanel.add(cancelButton);
     panel.add(buttonPanel, BorderLayout.SOUTH);
     final JLabel topLabel = new JLabel("Select the Event you wish to fire");
     topLabel.setIcon(IconLoader.ICON_EVENT);
@@ -78,6 +117,28 @@ public class EventChooserDialog extends JDialog
         }
       }
     });
+    mList.addKeyListener(new KeyListener()
+    {
+      public void keyPressed(final KeyEvent e)
+      {
+        if (e.getKeyCode() == 10) // <ENTER> Key
+        {
+          cancelled = false;
+          EventChooserDialog.this.dispose();
+        }
+      }
+
+      public void keyReleased(final KeyEvent e)
+      {
+        // Do Nothing
+      }
+
+      public void keyTyped(final KeyEvent e)
+      {
+        // Do Nothing
+      }
+
+    });
   }
 
   // ####################################################################
@@ -85,7 +146,7 @@ public class EventChooserDialog extends JDialog
 
   public EventProxy getSelectedEvent()
   {
-    return (EventProxy)mList.getSelectedValue();
+    return (EventProxy)eventList[mList.getSelectedIndex()];
   }
   public boolean wasCancelled()
   {
@@ -97,11 +158,13 @@ public class EventChooserDialog extends JDialog
 
   private final JList mList;
   private boolean cancelled;
+  private final EventProxy[] eventList;
 
   // ####################################################################
   // # Class Constants
   private static final long serialVersionUID = -4465845587624430860L;
-  private static final Dimension DEFAULT_LIST_DIMENSION = new Dimension(250, 250);
+  private static final int DEFAULT_LIST_WIDTH = 250;
+  private static final int DEFAULT_ROW_HEIGHT = 20;
   private static final Point DEFAULT_STARTING_LOCATION = new Point(100, 100);
 
 }

@@ -295,6 +295,7 @@ public class Simulation implements ModelObserver, Observer
     else
     {
       removeFutureEvents();
+      debugPrintCurrentStates();
       mPreviousEvents.add(event);
       mEnabledLastStep = new ArrayList<AutomatonProxy>();
       final HashMap<AutomatonProxy, TransitionProxy> thisStateTransitionFire = new HashMap<AutomatonProxy, TransitionProxy>();
@@ -547,6 +548,7 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void moveSafely(final boolean forward)
   {
     if (forward)
@@ -586,8 +588,8 @@ public class Simulation implements ModelObserver, Observer
     }
     else
     {
-      mAllAutomatons = mPreviousAutomatonStates.get(currentTime);
-      mEnabledLastStep = mPreviousEnabledLastStep.get(currentTime);
+      mAllAutomatons = (HashMap<AutomatonProxy, StateProxy>)mPreviousAutomatonStates.get(currentTime).clone();
+      mEnabledLastStep = (ArrayList<AutomatonProxy>)mPreviousEnabledLastStep.get(currentTime).clone();
       findEventClassification();
     }
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
@@ -608,6 +610,18 @@ public class Simulation implements ModelObserver, Observer
       mPreviousEnabledLastStep.remove(currentTime + 1);
       mPreviousTransitionHistory.remove(currentTime + 1);
     }
+  }
+
+  private void debugPrintCurrentStates()
+  {
+    String output = "DEBUG: Current states at " + currentTime + " are: ";
+    for (int looper = 0; looper < mPreviousAutomatonStates.size(); looper++)
+    {
+      output += "\r\n " + looper + ": ";
+      for (final StateProxy state: mPreviousAutomatonStates.get(looper).values())
+        output += state.getName() + ",";
+    }
+    System.out.println(output);
   }
 
   //#########################################################################

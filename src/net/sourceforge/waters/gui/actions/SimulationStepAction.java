@@ -16,14 +16,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.Action;
+import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
+import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.simulator.EventChooserDialog;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.gui.simulator.UncontrollableException;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.IDE;
 
@@ -88,10 +91,22 @@ public class SimulationStepAction
 
   private EventProxy findOptions(final ArrayList<EventProxy> possibleEvents)
   {
-    final EventProxy[] possibilities = new EventProxy[possibleEvents.size()];
+    final JLabel[] possibilities = new JLabel[possibleEvents.size()];
+    final EventProxy[] events = new EventProxy[possibleEvents.size()];
     for (int looper = 0; looper < possibleEvents.size(); looper++)
-      possibilities[looper] = possibleEvents.get(looper);
-    final EventChooserDialog dialog = new EventChooserDialog(this.getIDE().getFrame(), possibilities);
+    {
+      final EventProxy event = possibleEvents.get(looper);
+      final JLabel toAdd = new JLabel(event.getName());
+      if (event.getKind() == EventKind.CONTROLLABLE)
+        toAdd.setIcon(IconLoader.ICON_CONTROLLABLE);
+      else if (event.getKind() == EventKind.UNCONTROLLABLE)
+        toAdd.setIcon(IconLoader.ICON_UNCONTROLLABLE);
+      else
+        toAdd.setIcon(IconLoader.ICON_PROPOSITION);
+      possibilities[looper] = toAdd;
+      events[looper] = event;
+    }
+    final EventChooserDialog dialog = new EventChooserDialog(this.getIDE().getFrame(), possibilities, events);
     dialog.setVisible(true);
     final EventProxy event = dialog.getSelectedEvent();
     if ((event != null && !dialog.wasCancelled())) {
