@@ -78,6 +78,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   public DESpotImporter(final File outputdir, final ModuleProxyFactory factory,
       final DocumentManager docman)
   {
+    if ((outputdir != null) && !outputdir.exists()) {
+      outputdir.mkdirs();
+    }
     mOutputDir = outputdir;
     mFactory = factory;
 
@@ -95,6 +98,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   public void setOutputDirectory(final File outputdir)
   {
+    if (!outputdir.exists()) {
+      outputdir.mkdirs();
+    }
     mOutputDir = outputdir;
   }
 
@@ -199,9 +205,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       for (int i = 0; i < automaton.getLength(); i++) {
         final Element aut = (Element) automaton.item(i);
         if (aut.getTagName().equals("Supervisor")) {
+          // builds all specification automata
           constructSimpleComponent(aut, ComponentKind.SPEC, uri);
 
         } else if (aut.getTagName().equals("Plant")) {
+          // builds all plant automata
           constructSimpleComponent(aut, ComponentKind.PLANT, uri);
 
         } else if (aut.getTagName().equals("Implements")) {
@@ -263,11 +271,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   private String formatIdentifier(String name)
   {
     int index = name.indexOf("-");
-    while (index != -1) {
+    if (index != -1) {
       // replaces - with {-}
       final String newName = "{" + name + "}";
       name = newName;
-      index = name.indexOf("-", index + 2);
+      //index = name.indexOf("-", index + 2);
     }
     index = name.indexOf(".");
     while (index != -1) {
@@ -448,17 +456,22 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException
   {
-    final Element des = (Element) automaton.getElementsByTagName("*").item(0);
-    final String autName = des.getAttribute("name");
-    final String autFile = des.getAttribute("location");
-    final URI uri = new URI(autFile);
+    final NodeList desList = automaton.getElementsByTagName("*");
+    for (int i = 0; i < desList.getLength(); i++) {
+      clearStructures();
+      final Element des = (Element) desList.item(i);
+      final String autName = des.getAttribute("name");
+      final String autFile = des.getAttribute("location");
+      final URI uri = new URI(autFile);
 
-    final GraphProxy graph = constructGraph(path.resolve(uri));
-    final IdentifierProxy identifier =
-        mFactory.createSimpleIdentifierProxy(formatIdentifier(autName));
+      final GraphProxy graph = constructGraph(path.resolve(uri));
+      final IdentifierProxy identifier =
+          mFactory.createSimpleIdentifierProxy(formatIdentifier(autName));
 
-    mComponents.add(mFactory
-        .createSimpleComponentProxy(identifier, kind, graph));
+      mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
+          graph));
+    }
+
   }
 
   /**
@@ -538,7 +551,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final NodeList transElmntLst =
         transitions.getElementsByTagName("Transitions");
     final Element transition = (Element) transElmntLst.item(0);
-    final NodeList trList = transition.getElementsByTagName("*");
+    final NodeList trList = transition.getElementsByTagName("Tr");
     for (int i = 0; i < trList.getLength(); i++) {
       final Element trElmnt = (Element) trList.item(i);
 
@@ -567,7 +580,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     }
 
     // gets the blocked events for this automata
-    final NodeList transLoopList = transitions.getElementsByTagName("*");
+    final NodeList transLoopList = transitions.getElementsByTagName("Tr");
     final LabelBlockProxy blockedEvents = findBlockedEvents(transLoopList);
 
     return mFactory.createGraphProxy(true, blockedEvents, mNodes, mEdges);
@@ -590,7 +603,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       found = false;
       for (int i = 0; i < transLoopList.getLength(); i++) {
         final Element trElmnt = (Element) transLoopList.item(i);
-        final NodeList transitions = trElmnt.getElementsByTagName("*");
+        final NodeList transitions = trElmnt.getElementsByTagName("Tr");
         for (int j = 0; j < transitions.getLength(); j++) {
           final Element tr = (Element) transitions.item(j);
           if (Integer.parseInt(tr.getAttribute("eID")) == eventID) {
