@@ -39,7 +39,7 @@ public class EventJTree extends JTree implements InternalFrameObserver
     desktop.attach(this);
     automatonAreOpen = new ArrayList<String>();
     mContainer = container;
-    final EventMutableTreeNode root = new EventMutableTreeNode(sim, this);
+    final EventMutableTreeNode root = new EventMutableTreeNode(sim, this, 1, 0);
     this.setModel(new DefaultTreeModel(root, false));
     this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
