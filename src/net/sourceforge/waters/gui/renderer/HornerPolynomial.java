@@ -200,6 +200,30 @@ public class HornerPolynomial
 
   //#########################################################################
   //# Derivatives
+  public HornerPolynomial normalize()
+  {
+    if (mDegree == 0) {
+      return this;
+    }
+    int i;
+    for (i = 0; i <= mDegree; i++) {
+      if (mCoefficients[i] != 0.0) {
+        break;
+      }
+    }
+    if (i == 0) {
+      return this;
+    } else {
+      final int newdegree = mDegree - i;
+      final HornerPolynomial result = new HornerPolynomial(newdegree);
+      final double[] newcoeff = result.mCoefficients;
+      for (int j = 0; j <= newdegree; j++) {
+        newcoeff[j] = mCoefficients[j + i];
+      }
+      return result;
+    }
+  }
+
   public HornerPolynomial getFirstDerivative()
   {
     if (mDegree == 0) {
@@ -263,21 +287,46 @@ public class HornerPolynomial
 
   public double[] findQuadraticRoots()
   {
-    final double apex = findQuadraticApex();
-    final double det = apex * apex - mCoefficients[2] / mCoefficients[0];
-    if (det < 0.0) {
+    switch (mDegree) {
+    case 0:
       return null;
-    } else if (det == 0.0) {
-      final double[] roots = new double[1];
-      roots[0] = apex;
-      return roots;
-    } else {
-      final double sqrt = Math.sqrt(det);
-      final double[] roots = new double[2];
-      roots[0] = apex - sqrt;
-      roots[1] = apex + sqrt;
-      return roots;
+    case 1:
+      {
+        final double[] roots = new double[1];
+        roots[0] = - mCoefficients[1] / mCoefficients[0];
+        return roots;
+      }
+    case 2:
+      final double apex = findQuadraticApex();
+      final double det = apex * apex - mCoefficients[2] / mCoefficients[0];
+      if (det < 0.0) {
+        return null;
+      } else if (det == 0.0) {
+        final double[] roots = new double[1];
+        roots[0] = apex;
+        return roots;
+      } else {
+        final double sqrt = Math.sqrt(det);
+        final double[] roots = new double[2];
+        roots[0] = apex - sqrt;
+        roots[1] = apex + sqrt;
+        return roots;
+      }
+    default:
+      throw new IllegalStateException
+        ("Quadratic curve cannot have degree of more than 2, but has degree " +
+         mDegree + "!");
     }
+  }
+
+
+  //#########################################################################
+  //# Solving Cubics
+  public double[] findCubicExtremals()
+  {
+    final HornerPolynomial derivative = getFirstDerivative();
+    final HornerPolynomial normderivative = derivative.normalize();
+    return normderivative.findQuadraticRoots();
   }
 
 

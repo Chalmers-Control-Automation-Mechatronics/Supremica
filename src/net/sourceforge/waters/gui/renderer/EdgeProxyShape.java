@@ -17,7 +17,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-   
+
 import net.sourceforge.waters.model.module.EdgeProxy;
 
 import org.supremica.properties.Config;
@@ -56,7 +56,7 @@ abstract class EdgeProxyShape
 
   /**
    * Gets the turning point of this edge.
-   * The morning point is a point about half-way on the edge.
+   * The turning point is a point about half-way on the edge.
    */
   abstract Point2D getTurningPoint();
 
@@ -192,7 +192,7 @@ abstract class EdgeProxyShape
   void createHandle(final Point2D point, final Handle.HandleType type)
   {
     final Handle handle = new DefaultHandle(point, type);
-    mHandles.add(handle);    
+    mHandles.add(handle);
   }
 
   boolean isInClickBounds(final int x, final int y)
@@ -231,10 +231,10 @@ abstract class EdgeProxyShape
           ARROW_ANGLE = 0.2 * Math.PI;
       else
           ARROW_ANGLE = 0.3 * Math.PI;
-  };  
+  };
   static final double ARROW_SIN = Math.sin(0.5 * ARROW_ANGLE);
   static final double ARROW_COS = Math.cos(0.5 * ARROW_ANGLE);
-  
+
   /**
    * The height of the arrow, i.e., the distance it covers on the line.
    */

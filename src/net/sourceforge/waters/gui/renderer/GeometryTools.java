@@ -14,6 +14,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -53,7 +54,7 @@ public final class GeometryTools
     }
     mTranslator.translate(item, delta);
   }
-  
+
 
   //#########################################################################
   //# Nodes
@@ -222,12 +223,12 @@ public final class GeometryTools
 
   /**
    * Gets the position of the control point of an edge.
-   * This method tries to find a bezier control point for the
+   * This method tries to find a B&eacute;zier control point for the
    * given edge.
    * @throws IllegalArgumentException if the spline geometry has
    *         more than one control point.
    */
-  public static Point2D getControlPoint1(final EdgeProxy edge)
+  public static Point2D getSingleBezierControlPoint(final EdgeProxy edge)
   {
     final SplineGeometryProxy geo = edge.getGeometry();
     if (geo == null) {
@@ -277,6 +278,72 @@ public final class GeometryTools
   }
 
   /**
+   * Gets the positions of the two control points of a cubic edge.
+   * This method tries to find two B&eacute;zier control points for the
+   * given edge.
+   * @throws IllegalArgumentException if the spline geometry has
+   *         more than two control points.
+   */
+  public static Point2D[] getCubicBezierControlPoints(final EdgeProxy edge)
+  {
+    final Point2D[] points = new Point2D[2];
+    final Point2D start = getStartPoint(edge);
+    final Point2D end = getEndPoint(edge);
+    final SplineGeometryProxy geo = edge.getGeometry();
+    final List<Point2D> geopoints;
+    final int geosize;
+    if (geo == null) {
+      geopoints = null;
+      geosize = 0;
+    } else {
+      geopoints = geo.getPoints();
+      geosize = geopoints.size();
+    }
+    switch (geosize) {
+    case 0:
+      points[0] = getPointOnLine(start, end, ONE_THIRD);
+      points[1] = getPointOnLine(start, end, 2.0 * ONE_THIRD);
+      return points;
+    case 1:
+      final Point2D control = getSingleBezierControlPoint(edge);
+      points[0] = getPointOnQuadratic(start, control, end, ONE_THIRD);
+      points[1] = getPointOnQuadratic(start, control, end, 2.0 * ONE_THIRD);
+      break;
+    case 2:
+      final Iterator<Point2D> iter = geopoints.iterator();
+      points[0] = iter.next();
+      points[1] = iter.next();
+      if (geo.getKind() == SplineKind.BEZIER) {
+        return points;
+      }
+      break;
+    default:
+      throw new IllegalArgumentException
+        ("Unsupported number of control points in spline!");
+    }
+    final double factor = 0.046875; // 3/64
+    final double xi0 = start.getX();
+    final double yi0 = start.getY();
+    final double xi1 = points[0].getX();
+    final double yi1 = points[0].getY();
+    final double xi2 = points[1].getX();
+    final double yi2 = points[1].getY();
+    final double xi3 = end.getX();
+    final double yi3 = end.getY();
+    final double x1 =
+      factor * (54.0 * xi1 - 27.0 * xi2 - 15.0 * xi0 + 6.0 * xi3);
+    final double y1 =
+      factor * (54.0 * yi1 - 27.0 * yi2 - 15.0 * yi0 + 6.0 * yi3);
+    final double x2 =
+      factor * (54.0 * xi2 - 27.0 * xi1 - 15.0 * xi3 + 6.0 * xi0);
+    final double y2 =
+      factor * (54.0 * yi2 - 27.0 * yi1 - 15.0 * yi3 + 6.0 * yi0);
+    points[0].setLocation(x1, y1);
+    points[1].setLocation(x2, y2);
+    return points;
+  }
+
+  /**
    * Gets the centre point of an edge.
    * This method computes the centre between the start and end points
    * of the given edge. It does <I>not</I> consider the edge's spline
@@ -286,9 +353,9 @@ public final class GeometryTools
   {
     final Point2D start = getStartPoint(edge);
     if (isSelfloop(edge)) {
-      final double x = start.getX() + TieEdgeProxyShape.DEFAULT_OFFSET_X; 
+      final double x = start.getX() + TieEdgeProxyShape.DEFAULT_OFFSET_X;
       final double y = start.getY() + TieEdgeProxyShape.DEFAULT_OFFSET_Y;
-      return new Point2D.Double(x, y); 
+      return new Point2D.Double(x, y);
     } else {
       final Point2D end = getEndPoint(edge);
       return getMidPoint(start, end);
@@ -311,7 +378,7 @@ public final class GeometryTools
     } else {
       final Point2D start = getStartPoint(edge);
       final Point2D end = getEndPoint(edge);
-      final Point2D ctrl = getControlPoint1(edge);
+      final Point2D ctrl = getSingleBezierControlPoint(edge);
       return findClosestPointOnQuadratic(start, ctrl, end, point);
     }
   }
@@ -360,10 +427,10 @@ public final class GeometryTools
 
 
   /**
-   * Finds the point closest to a point 'p' on the bezier quadratic
+   * Finds the point closest to a point 'p' on the B&eacute;zier quadratic
    * curve between two points 'pt1' and 'pt2', and with control point 'c'.
    * @param pt1              One end of the curve.
-   * @param c                The Bezier control point of the curve.
+   * @param c                The B&eacute;zier control point of the curve.
    * @param pt2              The other end of the curve.
    * @param p                The point to find the closest point to.
    * @return The point closest to point 'p' on the curve.
@@ -441,12 +508,12 @@ public final class GeometryTools
   }
 
   /**
-   * Calculates a bounding box for a biquadratic curve.
+   * Calculates a bounding box for a quadratic B&eacute;zier spline.
    * This method calculates a tight and exact bounding box by taking
    * into account all three control points and calculating extremals.
-   * @param pt1              One end of the curve.
-   * @param c                The Bezier control point of the curve.
-   * @param pt2              The other end of the curve.
+   * @param  pt1             One end of the curve.
+   * @param  c               The B&eacute;zier control point of the curve.
+   * @param  pt2             The other end of the curve.
    * @return A tight bounding box of the curve.
    */
   public static Rectangle2D getQuadraticBoundingBox(final Point2D pt1,
@@ -504,12 +571,118 @@ public final class GeometryTools
   }
 
   /**
+   * Calculates a bounding box for a cubic B&eacute;zier spline.
+   * This method calculates a tight and exact bounding box by taking
+   * into account all four control points and calculating extremals.
+   * @param  pt1             One end of the curve.
+   * @param  c1              The first B&eacute;zier control point of the
+   *                         curve.
+   * @param  c1              The second B&eacute;zier control point of the
+   *                         curve.
+   * @param  pt2             The other end of the curve.
+   * @return A tight bounding box of the curve.
+   */
+  public static Rectangle2D getCubicBoundingBox(final Point2D pt1,
+                                                final Point2D c1,
+                                                final Point2D c2,
+                                                final Point2D pt2)
+  {
+    double xmin, xmax, ymin, ymax;
+    final double x0 = pt1.getX();
+    final double x1 = c1.getX();
+    final double x2 = c2.getX();
+    final double x3 = pt2.getX();
+    if (x0 < x3) {
+      xmin = x0;
+      xmax = x3;
+    } else {
+      xmin = x3;
+      xmax = x0;
+    }
+    final double ax3 = x3 - 3 * x2 + 3 * x1 - x0;
+    final double ax2 = 3 * (x2 - 2 * x1 + x0);
+    final double ax1 = 3 * (x1 - x0);
+    final double ax0 = x0;
+    final HornerPolynomial px = new HornerPolynomial(ax3, ax2, ax1, ax0);
+    final HornerPolynomial nx = px.normalize();
+    final double[] ex = nx.findCubicExtremals();
+    if (ex != null) {
+      for (final double t : ex) {
+        if (t > 0.0 && t < 1.0) {
+          final double x = nx.getValue(t);
+          if (x < xmin) {
+            xmin = x;
+          } else if (x > xmax) {
+            xmax = x;
+          }
+        }
+      }
+    }
+    final double y0 = pt1.getY();
+    final double y1 = c1.getY();
+    final double y2 = c2.getY();
+    final double y3 = pt2.getY();
+    if (y0 < y3) {
+      ymin = y0;
+      ymax = y3;
+    } else {
+      ymin = y3;
+      ymax = y0;
+    }
+    final double ay3 = y3 - 3 * y2 + 3 * y1 - y0;
+    final double ay2 = 3 * (y2 - 2 * y1 + y0);
+    final double ay1 = 3 * (y1 - y0);
+    final double ay0 = y0;
+    final HornerPolynomial py = new HornerPolynomial(ay3, ay2, ay1, ay0);
+    final HornerPolynomial ny = py.normalize();
+    final double[] ey = ny.findCubicExtremals();
+    if (ey != null) {
+      for (final double t : ey) {
+        if (t > 0.0 && t < 1.0) {
+          final double y = ny.getValue(t);
+          if (y < ymin) {
+            ymin = y;
+          } else if (y > ymax) {
+            ymax = y;
+          }
+        }
+      }
+    }
+    return new Rectangle2D.Double(xmin, ymin, xmax - xmin, ymax - ymin);
+  }
+
+  /**
    * Calculates the middle between two given points.
    */
   public static Point2D getMidPoint(final Point2D p1, final Point2D p2)
   {
     final double x = 0.5 * (p1.getX() + p2.getX());
     final double y = 0.5 * (p1.getY() + p2.getY());
+    return new Point2D.Double(x, y);
+  }
+
+  /**
+   * Calculates a point along the line between two other points.
+   * @param  p1     The start point of the line.
+   * @param  p2     The end point of the line.
+   * @param  offset The relative distance travelled along the line.
+   *                If set to&nbsp;<CODE>0</CODE>,
+   *                the method returns&nbsp;<CODE>p1</CODE>;
+   *                If set to&nbsp;<CODE>1</CODE>,
+   *                the method returns&nbsp;<CODE>p2</CODE>;
+   *                For offsets between <CODE>0</CODE>
+   *                and&nbsp;<CODE>1</CODE>, a point between the start and
+   *                end of the line is returned.
+   */
+  public static Point2D getPointOnLine
+    (final Point2D p1, final Point2D p2, final double offset)
+  {
+    final double x1 = p1.getX();
+    final double y1 = p1.getY();
+    final double x2 = p2.getX();
+    final double y2 = p2.getY();
+    final double x = x1 + offset * (x2 - x1);
+    final double y = y1 + offset * (y2 - y1);
     return new Point2D.Double(x, y);
   }
 
@@ -767,7 +940,7 @@ public final class GeometryTools
     // Looking for intersection point closest to point,
     // which is on the rectangle ...
     double best = Double.MAX_VALUE;
-    Point2D found  = new Point2D.Double();
+    final Point2D found  = new Point2D.Double();
     // Try verticals
     if (Math.abs(xp - xc) > EPSILON) {
       // y = yc + (x - xc) * slope
@@ -969,7 +1142,7 @@ public final class GeometryTools
     }
 
   }
-  
+
 
   //#########################################################################
   //# Inner Class TopLeftPositionVisitor
@@ -1009,7 +1182,7 @@ public final class GeometryTools
     }
 
   }
-  
+
 
   //#########################################################################
   //# Inner Class DefaultPositionVisitor
@@ -1048,7 +1221,7 @@ public final class GeometryTools
     private Point2D mTarget;
 
   }
-  
+
 
   //#########################################################################
   //# Singleton Variables for Visitors
@@ -1070,5 +1243,10 @@ public final class GeometryTools
    * The square of {@link #EPSILON}.
    */
   public static final double EPSILON_SQ = EPSILON * EPSILON;
+
+  /**
+   * One third.
+   */
+  private static final double ONE_THIRD = 1.0 / 3.0;
 
 }

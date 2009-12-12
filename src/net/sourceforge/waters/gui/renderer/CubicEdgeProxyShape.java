@@ -9,33 +9,35 @@
 
 package net.sourceforge.waters.gui.renderer;
 
-import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.Line2D;
+import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.QuadCurve2D;
 import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.waters.model.module.EdgeProxy;
 
 
-class QuadraticEdgeProxyShape
+class CubicEdgeProxyShape
   extends EdgeProxyShape
 {
 
   //#########################################################################
   //# Constructors
-  QuadraticEdgeProxyShape(final EdgeProxy edge)
+  CubicEdgeProxyShape(final EdgeProxy edge)
   {
     super(edge);
-    mControl = GeometryTools.getSingleBezierControlPoint(edge);
-    mStart = GeometryTools.getRadialStartPoint(edge, mControl);
-    mEnd = GeometryTools.getRadialEndPoint(edge, mControl);
-    mCurve = new QuadCurve2D.Double(mStart.getX(), mStart.getY(),
-				    mControl.getX(), mControl.getY(), 
-				    mEnd.getX(), mEnd.getY());
-    mArrowTip = calculateInnerArrowTipPosition();
-    createHandles();
+    final Point2D[] controls = GeometryTools.getCubicBezierControlPoints(edge);
+    mControl1 = controls[0];
+    mControl2 = controls[1];
+    mStart = GeometryTools.getRadialStartPoint(edge, mControl1);
+    mEnd = GeometryTools.getRadialEndPoint(edge, mControl2);
+    mCurve = new CubicCurve2D.Double(mStart.getX(), mStart.getY(),
+                                     mControl1.getX(), mControl1.getY(),
+                                     mControl2.getX(), mControl2.getY(),
+                                     mEnd.getX(), mEnd.getY());
+    mArrowTip = getTurningPoint();
+    //mArrowTip = calculateInnerArrowTipPosition();
+    //createHandles();
   }
 
 
@@ -43,25 +45,13 @@ class QuadraticEdgeProxyShape
   //# Overrides for net.sourceforge.waters.gui.renderer.RendererShape
   public Rectangle2D getBounds2D()
   {
-    return GeometryTools.getQuadraticBoundingBox(mStart, mControl, mEnd);
+    return GeometryTools.getCubicBoundingBox
+      (mStart, mControl1, mControl2, mEnd);
   }
 
   public boolean isClicked(final int x, final int y)
   {
-    if (getClickedHandle(x, y) != null) {
-      return true;
-    } else if (!isInClickBounds(x, y)) {
-      return false;
-    } else {
-      final Rectangle rect =
-	new Rectangle(x - CLICK_TOLERANCE, y - CLICK_TOLERANCE,
-		      2 * CLICK_TOLERANCE, 2 * CLICK_TOLERANCE);
-      if (!mCurve.intersects(rect) || mCurve.contains(rect)) {
-	return false;
-      }
-      final Line2D base = new Line2D.Double(mStart, mEnd);
-      return !base.intersects(rect);
-    }
+    return false;
   }
 
 
@@ -84,10 +74,12 @@ class QuadraticEdgeProxyShape
 
   Point2D getTurningPoint()
   {
-    final double x =
-      0.25 * (mStart.getX() + 2.0 * mControl.getX() + mEnd.getX());
-    final double y =
-      0.25 * (mStart.getY() + 2.0 * mControl.getY() + mEnd.getY());
+    final double x = 0.125 * (mStart.getX() +
+                              3.0 * (mControl1.getX()  + mControl2.getX()) +
+                              mEnd.getX());
+    final double y = 0.125 * (mStart.getY() +
+                              3.0 * (mControl1.getY()  + mControl2.getY()) +
+                              mEnd.getY());
     return new Point2D.Double(x, y);
   }
 
@@ -96,14 +88,22 @@ class QuadraticEdgeProxyShape
     return mArrowTip;
   }
 
+  Point2D getMidDirection()
+  {
+    // *** BUG ***
+    // Not correct---must calculate derivative ...
+    return GeometryTools.getNormalizedDirection(mControl1, mControl2);
+  }
+
   Point2D getEndDirection()
   {
-    return GeometryTools.getNormalizedDirection(mControl, mEnd);
+    return GeometryTools.getNormalizedDirection(mControl2, mEnd);
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
+  /*
   private Point2D calculateInnerArrowTipPosition()
   {
     final Point2D turn = getTurningPoint();
@@ -119,14 +119,16 @@ class QuadraticEdgeProxyShape
         (mStart, mControl, mEnd, rawtip);
     }
   }
+  */
 
 
   //#########################################################################
   //# Data Members
   private final Point2D mStart;
   private final Point2D mEnd;
-  private final Point2D mControl;
-  private final QuadCurve2D mCurve;
+  private final Point2D mControl1;
+  private final Point2D mControl2;
+  private final CubicCurve2D mCurve;
   private final Point2D mArrowTip;
 
 }

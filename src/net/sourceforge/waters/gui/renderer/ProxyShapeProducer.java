@@ -39,6 +39,7 @@ import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.SplineGeometryProxy;
 
 
 public class ProxyShapeProducer
@@ -243,12 +244,26 @@ public class ProxyShapeProducer
   {
     EdgeProxyShape shape = (EdgeProxyShape) lookup(edge);
     if (shape == null) {
+      final SplineGeometryProxy geo = edge.getGeometry();
       if (GeometryTools.isSelfloop(edge)) {
         shape = new TieEdgeProxyShape(edge);
-      } else if (edge.getGeometry() == null) {
+      } else if (geo == null) {
         shape = new StraightEdgeProxyShape(edge);
       } else {
-        shape = new QuadraticEdgeProxyShape(edge);
+        switch (geo.getPoints().size()) {
+        case 0:
+          shape = new StraightEdgeProxyShape(edge);
+          break;
+        case 1:
+          shape = new QuadraticEdgeProxyShape(edge);
+          break;
+        case 2:
+          shape = new CubicEdgeProxyShape(edge);
+          break;
+        default:
+          throw new IllegalArgumentException
+            ("Unsupported number of control points in spline!");
+        }
       }
       mMap.put(edge, shape);
     }
