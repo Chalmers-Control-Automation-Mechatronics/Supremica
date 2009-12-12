@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="cubics" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment>A simple example to test cubic spline rendering.</ns2:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="e"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="bezier">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="192" X="64"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="0" X="26"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="64" X="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point Y="192" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S3">
+<PointGeometry>
+<Point Y="64" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S4">
+<PointGeometry>
+<Point Y="320" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="BEZIER">
+<Point Y="192" X="32"/>
+<Point Y="64" X="32"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S2" Source="S1">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="BEZIER">
+<Point Y="64" X="112"/>
+<Point Y="192" X="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S3" Source="S2">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="BEZIER">
+<Point Y="64" X="208"/>
+<Point Y="192" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S4" Source="S2">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="BEZIER">
+<Point Y="352" X="224"/>
+<Point Y="160" X="224"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="interpolating">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="192" X="64"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="0" X="26"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="64" X="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point Y="192" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S3">
+<PointGeometry>
+<Point Y="64" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S4">
+<PointGeometry>
+<Point Y="320" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="192" X="32"/>
+<Point Y="64" X="32"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S2" Source="S1">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="64" X="112"/>
+<Point Y="192" X="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S3" Source="S2">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="64" X="208"/>
+<Point Y="192" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S4" Source="S2">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="352" X="224"/>
+<Point Y="160" X="224"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
