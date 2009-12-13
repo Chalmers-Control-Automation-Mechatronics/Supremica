@@ -321,7 +321,7 @@ public final class GeometryTools
       throw new IllegalArgumentException
         ("Unsupported number of control points in spline!");
     }
-    final double factor = 0.046875; // 3/64
+    final double factor = 0.5 * ONE_THIRD;  // 1/6
     final double xi0 = start.getX();
     final double yi0 = start.getY();
     final double xi1 = points[0].getX();
@@ -331,13 +331,13 @@ public final class GeometryTools
     final double xi3 = end.getX();
     final double yi3 = end.getY();
     final double x1 =
-      factor * (54.0 * xi1 - 27.0 * xi2 - 15.0 * xi0 + 6.0 * xi3);
+      factor * (18.0 * xi1 - 9.0 * xi2 - 5.0 * xi0 + 2.0 * xi3);
     final double y1 =
-      factor * (54.0 * yi1 - 27.0 * yi2 - 15.0 * yi0 + 6.0 * yi3);
+      factor * (18.0 * yi1 - 9.0 * yi2 - 5.0 * yi0 + 2.0 * yi3);
     final double x2 =
-      factor * (54.0 * xi2 - 27.0 * xi1 - 15.0 * xi3 + 6.0 * xi0);
+      factor * (18.0 * xi2 - 9.0 * xi1 - 5.0 * xi3 + 2.0 * xi0);
     final double y2 =
-      factor * (54.0 * yi2 - 27.0 * yi1 - 15.0 * yi3 + 6.0 * yi0);
+      factor * (18.0 * yi2 - 9.0 * yi1 - 5.0 * yi3 + 2.0 * yi0);
     points[0].setLocation(x1, y1);
     points[1].setLocation(x2, y2);
     return points;

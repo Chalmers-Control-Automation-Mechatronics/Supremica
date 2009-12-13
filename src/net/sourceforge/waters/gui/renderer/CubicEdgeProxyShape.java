@@ -35,8 +35,7 @@ class CubicEdgeProxyShape
                                      mControl1.getX(), mControl1.getY(),
                                      mControl2.getX(), mControl2.getY(),
                                      mEnd.getX(), mEnd.getY());
-    mArrowTip = getTurningPoint();
-    //mArrowTip = calculateInnerArrowTipPosition();
+    calculateMidPoint();
     //createHandles();
   }
 
@@ -90,9 +89,7 @@ class CubicEdgeProxyShape
 
   Point2D getMidDirection()
   {
-    // *** BUG ***
-    // Not correct---must calculate derivative ...
-    return GeometryTools.getNormalizedDirection(mControl1, mControl2);
+    return mMidDirection;
   }
 
   Point2D getEndDirection()
@@ -103,23 +100,44 @@ class CubicEdgeProxyShape
 
   //#########################################################################
   //# Auxiliary Methods
-  /*
-  private Point2D calculateInnerArrowTipPosition()
+  private void calculateMidPoint()
   {
-    final Point2D turn = getTurningPoint();
-    final Point2D dir = getMidDirection();
-    final double dist = 0.5 * EdgeProxyShape.ARROW_HEIGHT;
-    final double x = turn.getX() + dist * dir.getX();
-    final double y = turn.getY() + dist * dir.getY();
-    final Point2D rawtip = new Point2D.Double(x, y);
-    if (mStart.distanceSq(mEnd) < EdgeProxyShape.ARROW_HEIGHT_SQ) {
-      return rawtip;
+    final Point2D midpoint = getTurningPoint();
+    final double dx =
+      mEnd.getX() + mControl2.getX() - mControl1.getX() - mStart.getX();
+    final double dy =
+      mEnd.getY() + mControl2.getY() - mControl1.getY() - mStart.getY();
+    final boolean d =
+      Math.abs(dx) > GeometryTools.EPSILON ||
+      Math.abs(dy) > GeometryTools.EPSILON;
+    if (d) {
+      mMidDirection = new Point2D.Double(dx, dy);
+      GeometryTools.normalize(mMidDirection);
     } else {
-      return GeometryTools.findClosestPointOnQuadratic
-        (mStart, mControl, mEnd, rawtip);
+      mMidDirection = super.getMidDirection();
     }
+    final double dist = 0.5 * EdgeProxyShape.ARROW_HEIGHT;
+    double x = midpoint.getX() + dist * mMidDirection.getX();
+    double y = midpoint.getY() + dist * mMidDirection.getY();
+    if (d) {
+      final double dt = dist / Math.sqrt(dx * dx + dy * dy);
+      final double t1 = 0.5 + dt;
+      final double t2 = 0.5 - dt;
+      final double xalt =
+        mStart.getX() * t2 * t2 * t2 + mControl1.getX() * t2 * t2 * t1 +
+        mControl2.getX() * t2 * t1 * t1 + mEnd.getX() * t1 * t1 * t1;
+      final double yalt =
+        mStart.getY() * t2 * t2 * t2 + mControl1.getY() * t2 * t2 * t1 +
+        mControl2.getY() * t2 * t1 * t1 + mEnd.getY() * t1 * t1 * t1;
+      final double dxa = x - xalt;
+      final double dya = y - yalt;
+      if (dxa * dxa + dya * dya < 4.0) {
+        x = xalt;
+        y = yalt;
+      }
+    }
+    mArrowTip = new Point2D.Double(x, y);
   }
-  */
 
 
   //#########################################################################
@@ -129,6 +147,8 @@ class CubicEdgeProxyShape
   private final Point2D mControl1;
   private final Point2D mControl2;
   private final CubicCurve2D mCurve;
-  private final Point2D mArrowTip;
+
+  private Point2D mMidDirection;
+  private Point2D mArrowTip;
 
 }
