@@ -209,7 +209,7 @@ public class ComponentsTree
   public void addToSelection(final List<? extends Proxy> items)
   {
     final ComponentsTreeModel model = getComponentsTreeModel();
-    for (final Proxy proxy : items) { 
+    for (final Proxy proxy : items) {
       final ProxySubject subject = (ProxySubject) proxy;
       final TreePath path = model.createPath(subject);
       addSelectionPath(path);
@@ -292,7 +292,7 @@ public class ComponentsTree
       (WatersDataFlavor.MODULE_COMPONENT_LIST);
   }
 
-  public List<InsertInfo> getInsertInfo(Transferable transferable)
+  public List<InsertInfo> getInsertInfo(final Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
     final List<Proxy> data =
@@ -366,7 +366,7 @@ public class ComponentsTree
     return result;
   }
 
-  public void insertItems(List<InsertInfo> inserts)
+  public void insertItems(final List<InsertInfo> inserts)
   {
     for (final InsertInfo insert : inserts) {
       final ProxySubject victim = (ProxySubject) insert.getProxy();
@@ -379,7 +379,7 @@ public class ComponentsTree
     }
   }
 
-  public void deleteItems(List<InsertInfo> deletes)
+  public void deleteItems(final List<InsertInfo> deletes)
   {
     final int size = deletes.size();
     final ListIterator<InsertInfo> iter = deletes.listIterator(size);
@@ -455,7 +455,7 @@ public class ComponentsTree
       mObservers = null;
     }
   }
-  
+
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     if (mObservers != null) {
@@ -593,6 +593,7 @@ public class ComponentsTree
     //# Constructor
     private ComponentsTreeCellRenderer()
     {
+
       setTextSelectionColor(EditorColor.TEXTCOLOR);
     }
 
@@ -647,7 +648,7 @@ public class ComponentsTree
         final IDEAction action = getDoubleClickAction(proxy);
         if (action != null) {
           final WatersPopupActionManager manager = mPopupFactory.getMaster();
-          manager.invokeMouseClickAction(action, event);        
+          manager.invokeMouseClickAction(action, event);
         }
       }
     }

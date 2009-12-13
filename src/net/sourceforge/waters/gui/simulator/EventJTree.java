@@ -39,7 +39,11 @@ public class EventJTree extends JTree implements InternalFrameObserver
     desktop.attach(this);
     automatonAreOpen = new ArrayList<String>();
     mContainer = container;
-    final EventMutableTreeNode root = new EventMutableTreeNode(sim, this, 1, 0);
+    mSortingMethods = new ArrayList<Pair<Boolean, Integer>>();
+    mSortingMethods.add(new Pair<Boolean, Integer>(true, 2));
+    mSortingMethods.add(new Pair<Boolean, Integer>(true, 0));
+    mSortingMethods.add(new Pair<Boolean, Integer>(true, 1));
+    final EventMutableTreeNode root = new EventMutableTreeNode(sim, this, mSortingMethods);
     this.setModel(new DefaultTreeModel(root, false));
     this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
@@ -101,6 +105,18 @@ public class EventJTree extends JTree implements InternalFrameObserver
     }
     repaint();
   }
+
+  // ########################################################################
+  // # Auxillary Classes
+
+  public void forceRecalculation()
+  {
+    final EventMutableTreeNode node = new EventMutableTreeNode(mSim, this, mSortingMethods);
+    this.setModel(new DefaultTreeModel(node, false));
+  }
+
+  // ########################################################################
+  // # Inner Classes
 
   private class EventTreeCellRenderer
   extends DefaultTreeCellRenderer
@@ -202,6 +218,7 @@ public class EventJTree extends JTree implements InternalFrameObserver
   private final Simulation mSim;
   private final ModuleContainer mContainer;
   private final ArrayList<String> automatonAreOpen;
+  private final ArrayList<Pair<Boolean, Integer>> mSortingMethods;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};

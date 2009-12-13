@@ -8,21 +8,20 @@ import javax.swing.tree.TreePath;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 public class EventMutableTreeNode extends DefaultMutableTreeNode implements SimulationObserver
 {
   // ################################################################
   // # Constructor
 
-  public EventMutableTreeNode(final Simulation sim, final EventJTree parent, final int sortByName, final int sortByEnabled)
+  public EventMutableTreeNode(final Simulation sim, final EventJTree parent, final List<Pair<Boolean, Integer>> sortingMethods)
   {
     super("Event", true);
     sim.attach(this);
     mParent = parent;
     mSim = sim;
-    mSortByName = sortByName;
-    mSortByEnabled = sortByEnabled;
-    setupAllEvents(sim, sortByName, sortByEnabled);
+    setupAllEvents(sim, sortingMethods);
   }
 
   // #################################################################
@@ -30,19 +29,17 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
 
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    setupAllEvents(event.getSource(), mSortByName, mSortByEnabled);
-    mParent.repaint();
+    mSim.detach(this);
+    mParent.forceRecalculation();
   }
-
-
 
   // ##################################################################
   // # Auxillary Functions
 
-  private void setupAllEvents(final Simulation sim, final int sortByName, final int sortByOrder)
+  private void setupAllEvents(final Simulation sim, final List<Pair<Boolean, Integer>> sortingMethods)
   {
     this.removeAllChildren();
-    final ArrayList<Integer> sortedIndexes = sortArrayList(sim.getAllEvents(), sortByName, sortByOrder);
+    final ArrayList<Integer> sortedIndexes = sortArrayList(sim.getAllEvents(), sortingMethods);
     for (final Integer index : sortedIndexes)
     {
       final EventProxy event = sim.getAllEvents().get(index);
@@ -61,79 +58,60 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   }
 
 
-  private ArrayList<Integer> sortArrayList (final List<EventProxy> raw, final int sortByName, final int sortByEnabled)
+  private ArrayList<Integer> sortArrayList (final List<EventProxy> raw, final List<Pair<Boolean, Integer>> sortingMethods)
   {
     final ArrayList<Integer> output = new ArrayList<Integer>();
     final ArrayList<EventProxy> temp = new ArrayList<EventProxy>();
     for (int looper = 0; looper < raw.size(); looper++)
     {
-      final int index = findIndex(temp, raw.get(looper), sortByName, sortByEnabled);
+      final int index = findIndex(temp, raw.get(looper), sortingMethods);
       output.add(index, looper);
       temp.add(index, raw.get(looper));
     }
     return output;
   }
-  private int findIndex(final ArrayList<EventProxy> sorted, final EventProxy toAdd, final int sortByName, final int sortByEnabled)
+  private int findIndex(final ArrayList<EventProxy> sorted, final EventProxy toAdd, final List<Pair<Boolean, Integer>> sortingMethods)
   {
-    if (Math.abs(sortByName) < Math.abs(sortByEnabled) && sortByEnabled >= 0 && !mSim.getValidTransitions().contains(toAdd))
-      return sorted.size();
-    else if (Math.abs(sortByName) < Math.abs(sortByEnabled) && sortByEnabled < 0 && mSim.getValidTransitions().contains(toAdd))
-      return sorted.size();
     for (int looper = 0; looper < sorted.size(); looper++)
     {
-      if (!isLowerThan(toAdd, sorted.get(looper), sortByName, sortByEnabled))
+      if (!isLowerThan(toAdd, sorted.get(looper), sortingMethods))
         return looper;
     }
     return sorted.size();
   }
+
   /**
-   * Returns TRUE if a is greater than b
-   * @param a
-   * @param b
-   * @param sortByName Defines how the definition of 'lower' involves the name. If it is zero, then it is not used for the definition
-   * If it is greater than zero, then it sorts using alphabetical order. If it is less than zero, then it sorts using reverse alphabetical
-   * order. If the magnitude of this value is greater than or equal to the magnitude of sortByEnabled, this sorting method takes presedence
-   * Otherwise, it only matters if the two events are both enabled or both disabled.
-   * @param sortByEnabled Defines how the definition of 'lower' involves whether this event is enabled or not. If it is zero, then it is
-   * not used for the definition. If it is greater than zero, then it sorts it, with the enabled events first. If it is less than zero, then
-   * it sorts it with the disabled events first. If the magnitude of this value is strictly greater than the magnitude of sortByName, this
-   * sorting method takes presedence. Otherwise, it only matters if the two events have the same name.
-   * @return
+   * Returns TRUE if a is lower in the tree than b
    */
-  private boolean isLowerThan(final EventProxy a, final EventProxy b, final int sortByName, final int sortByEnabled)
+  private boolean isLowerThan(final EventProxy a, final EventProxy b, final List<Pair<Boolean, Integer>> sortingMethods)
   {
-    if (Math.abs(sortByName) >= Math.abs(sortByEnabled))
+    if (sortingMethods.size() == 0)
     {
-      int i = sortByName(a, b);
-      if (i < 0)
-        return sortByName >= 0;
-      else if (i > 0)
-        return sortByName < 0;
-      else
-      {
-        i = sortByEnabled(a, b);
-        if (i > 0)
-          return sortByEnabled >= 0;
-        else
-          return sortByEnabled < 0;
-      }
+      System.out.println("ERROR: Two apparently equal values have been compared");
+      return false;
     }
-    else
+    final int sortingMethod = sortingMethods.get(0).getSecond();
+    final boolean isAscending = sortingMethods.get(0).getFirst();
+    int compare;
+    switch (sortingMethod)
     {
-      int i = sortByEnabled(a, b);
-      if (i > 0)
-        return sortByEnabled < 0;
-      else if (i < 0)
-        return sortByEnabled >= 0;
-      else
-      {
-        i = sortByName(a, b);
-        if (i < 0)
-          return sortByName >= 0;
-        else
-          return sortByName < 0;
-      }
+    case 0:
+      compare = sortByType(a, b);
+      break;
+    case 1:
+      compare = sortByName(a, b);
+      break;
+    case 2:
+      compare = sortByEnabled(a, b);
+      break;
+    default:
+      throw new UnsupportedOperationException("Unsupported Sort Method");
     }
+    if ((compare < 0 && isAscending) || (compare > 0 && !isAscending))
+      return true;
+    if ((compare < 0 && !isAscending || compare > 0 && isAscending))
+      return false;
+    return isLowerThan(a, b, sortingMethods.subList(1, sortingMethods.size()));
   }
 
   /**
@@ -171,13 +149,36 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
     }
   }
 
+  /**
+   * Returns a POSITIVE NUMBER if a is a controllable and b isn't, NEGATIVE if b is controllable and a isn't, and ZERO if they are the same
+   * @param a
+   * @param b
+   * @return
+   */
+    public int sortByType(final EventProxy a, final EventProxy b)
+   {
+     if (a.getKind() == EventKind.CONTROLLABLE)
+     {
+       if (b.getKind() == EventKind.CONTROLLABLE)
+         return 0;
+       else
+         return 1;
+     }
+     else
+     {
+       if (b.getKind() == EventKind.CONTROLLABLE)
+         return -1;
+       else
+         return 0;
+     }
+   }
+
+
   // ##################################################################
   // # Data Members
 
   private final EventJTree mParent;
   private final Simulation mSim;
-  private final int mSortByName;
-  private final int mSortByEnabled;
 
   // ##################################################################
   // # Class Constants

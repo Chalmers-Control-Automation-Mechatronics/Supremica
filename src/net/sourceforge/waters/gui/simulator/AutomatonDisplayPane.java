@@ -24,6 +24,7 @@ import net.sourceforge.waters.gui.springembedder.EmbedderEvent.EmbedderEventType
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -174,6 +175,8 @@ public class AutomatonDisplayPane
 
     public RenderingInformation getRenderingInformation(final Proxy proxy)
     {
+      boolean proxyIsActive = false;
+      boolean proxyIsEnabled = false;
       // The spring embedder modifies a copy of our graph. When it is running,
       // the items being displayed are not in our compiled graph ...
       final Proxy orig = getOriginal(proxy);
@@ -186,25 +189,60 @@ public class AutomatonDisplayPane
         final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
         if (mContainer.getSourceInfoMap().get(currentState).getSourceObject() ==
             orig) {
-          return getActiveRenderingInformation(orig);
+          proxyIsActive = true;
         }
       }
-      final TransitionProxy currentTrans = mSim.getPreviousTransition(mAutomaton);
-      if (currentTrans != null) {
-        final Proxy currentTransSource =
-          mContainer.getSourceInfoMap().get(currentTrans).getSourceObject();
-        if (orig instanceof IdentifierProxy) {
-          if (currentTransSource == orig) {
-            return getActiveRenderingInformation(orig);
-          }
-        } else if (orig instanceof EdgeProxy) {
-          final IdentifierSubject ident =
-            (IdentifierSubject) currentTransSource;
-          if (ident.getAncestor(EdgeSubject.class) == orig) {
-            return getActiveRenderingInformation(orig);
+      else
+      {
+        final TransitionProxy currentTrans = mSim.getPreviousTransition(mAutomaton);
+        if (currentTrans != null) {
+          final Proxy currentTransSource =
+            mContainer.getSourceInfoMap().get(currentTrans).getSourceObject();
+          if (orig instanceof IdentifierProxy) {
+            if (currentTransSource == orig) {
+              proxyIsActive = true;
+            }
+          } else if (orig instanceof EdgeProxy) {
+            final IdentifierSubject ident =
+              (IdentifierSubject) currentTransSource;
+            if (ident.getAncestor(EdgeSubject.class) == orig) {
+              proxyIsActive = true;
+            }
           }
         }
       }
+      for (final EventProxy event : mSim.getValidTransitions())
+      {
+        for (final TransitionProxy trans : mAutomaton.getTransitions())
+        {
+          if (trans.getEvent() == event && trans.getSource() == mSim.getCurrentStates().get(mAutomaton))
+          {
+            final Proxy currentTransSource =
+              mContainer.getSourceInfoMap().get(trans).getSourceObject();
+            if (orig instanceof IdentifierProxy) {
+              if (currentTransSource == orig) {
+                proxyIsEnabled = true;
+              }
+            } else if (orig instanceof EdgeProxy) {
+              final IdentifierSubject ident =
+                (IdentifierSubject) currentTransSource;
+              if (ident.getAncestor(EdgeSubject.class) == orig) {
+                proxyIsEnabled = true;
+              }
+            }
+          }
+        }
+      }
+      if (proxyIsActive && !proxyIsEnabled)
+      {
+        return getActiveRenderingInformation(orig);
+      }
+      if (proxyIsEnabled && !proxyIsActive)
+      {
+        return getEnabledRenderingInformation(orig);
+      }
+      if (proxyIsEnabled && proxyIsActive)
+        return getActiveEnabledRenderingInformation(orig);
       return super.getRenderingInformation(orig);
     }
 
@@ -219,6 +257,26 @@ public class AutomatonDisplayPane
          EditorColor.shadow(EditorColor.SIMULATION_ACTIVE),
          getPriority(proxy));
     }
+
+    private RenderingInformation getEnabledRenderingInformation
+      (final Proxy proxy)
+    {
+      return new RenderingInformation
+      (false, true,
+          EditorColor.SIMULATION_ENABLED,
+          EditorColor.shadow(EditorColor.SIMULATION_ENABLED),
+          getPriority(proxy));
+    }
+
+    private RenderingInformation getActiveEnabledRenderingInformation
+    (final Proxy proxy)
+  {
+    return new RenderingInformation
+    (false, true,
+        EditorColor.SIMULATION_ACTIVE_ENABLED,
+        EditorColor.shadow(EditorColor.SIMULATION_ACTIVE_ENABLED),
+        getPriority(proxy));
+  }
 
     //########################################################################
     //# Data Members
