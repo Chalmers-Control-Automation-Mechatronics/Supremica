@@ -53,6 +53,14 @@ public abstract class AbstractConflictCheckerTest
 
 
   //#########################################################################
+  //# Simple Access
+  protected ConflictChecker getModelVerifier()
+  {
+    return (ConflictChecker) super.getModelVerifier();
+  }
+
+
+  //#########################################################################
   //# Test Cases --- handcrafted
   public void testEmpty()
     throws Exception

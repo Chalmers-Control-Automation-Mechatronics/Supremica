@@ -268,6 +268,18 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
   protected abstract ModelVerifier
     createModelVerifier(ProductDESProxyFactory factory);
 
+  /**
+   * Configures the model verifier under test for a given product DES.
+   * This method is called just before the model verifier is started
+   * for each model to be tested. Subclasses that override this method
+   * should call the superclass method first.
+   * @param  des       The model to be verified for the current test case.
+   */
+  protected void configureModelVerifier(final ProductDESProxy des)
+  {
+    mModelVerifier.setModel(des);
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -276,7 +288,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     throws Exception
   {
     getLogger().info("Checking " + des.getName() + " ...");
-    mModelVerifier.setModel(des);
+    configureModelVerifier(des);
     final boolean result = mModelVerifier.run();
     TraceProxy counterexample = null;
     if (!result) {
