@@ -46,6 +46,7 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
@@ -78,9 +79,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   public DESpotImporter(final File outputdir, final ModuleProxyFactory factory,
       final DocumentManager docman)
   {
-    if ((outputdir != null) && !outputdir.exists()) {
-      outputdir.mkdirs();
-    }
     mOutputDir = outputdir;
     mFactory = factory;
 
@@ -98,9 +96,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   public void setOutputDirectory(final File outputdir)
   {
-    if (!outputdir.exists()) {
-      outputdir.mkdirs();
-    }
     mOutputDir = outputdir;
   }
 
@@ -186,11 +181,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     }
     final NodeList subsystemList = project.getElementsByTagName("Subsystem");
     // extracts each subsystem element and puts them into an array list
-    final ArrayList<Element> subsystems = new ArrayList<Element>();
-    for (int i = 0; i < subsystemList.getLength(); i++) {
-      final Element subsystem = (Element) subsystemList.item(i);
-      subsystems.add(subsystem);
-    }
+    final ArrayList<Element> subsystems = convertNodeList(subsystemList);
 
     // sorts the subsystems in order of their level (lowest to highest)
     Collections.sort(subsystems, new LevelComparator());
@@ -239,12 +230,31 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           mDocumentManager.findProxyMarshaller(ModuleProxy.class);
       final String ext = marshaller.getDefaultExtension();
       final String filename = subsystem.getAttribute("name");
+      if (!mOutputDir.exists()) {
+        mOutputDir.mkdirs();
+      }
       final File file = new File(mOutputDir, filename + ext);
       mDocumentManager.saveAs(module, file);
 
     }
     return module;
+  }
 
+  /**
+   * Converts a node list read from the DOM into an array list.
+   *
+   * @param nodeList
+   * @return
+   */
+  private ArrayList<Element> convertNodeList(final NodeList nodeList)
+  {
+    // extracts each subsystem element and puts them into an array list
+    final ArrayList<Element> list = new ArrayList<Element>();
+    for (int i = 0; i < nodeList.getLength(); i++) {
+      final Element subsystem = (Element) nodeList.item(i);
+      list.add(subsystem);
+    }
+    return list;
   }
 
   /*
@@ -532,7 +542,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final NodeList stElmntLst = states.getElementsByTagName("*");
     for (int i = 0; i < stElmntLst.getLength(); i++) {
       final Element stElmnt = (Element) stElmntLst.item(i);
-      final NodeProxy node = convertState(stElmnt);
+      final SimpleNodeProxy node = convertState(stElmnt);
       storeStateId(stElmnt, i);
       mNodes.add(node);
     }
@@ -728,10 +738,17 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     // reads and stores the geometry (layout) data for the edge
     final List<Point2D> points = new ArrayList<Point2D>(0);
     final NodeList posList = tr.getElementsByTagName("Pos");
+    final List<Element> geoList = convertNodeList(posList);
+    // DESpot files list points on the edge in opposite order to waters
+    Collections.reverse(geoList);
     SplineGeometryProxy edgeShape = null;
-    if (posList.getLength() > 0) {
-      for (int i = 0; i < posList.getLength(); i++) {
-        final Element pos = (Element) posList.item(i);
+    if (geoList.size() > 0) {
+      for (int i = 0; i < geoList.size(); i++) {
+        final Element pos = (Element) geoList.get(i);
+        final Point2D sourcePos =
+            mNodes.get(srcIndex).getPointGeometry().getPoint();
+        final Point2D targetPos =
+            mNodes.get(targetIndex).getPointGeometry().getPoint();
         xPosStr = pos.getAttribute("x");
         yPosStr = pos.getAttribute("y");
         double xPos;
@@ -740,7 +757,14 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           xPos = Double.parseDouble(xPosStr);
           yPos = Double.parseDouble(yPosStr);
           final Point2D point = new Point2D.Double(xPos, yPos);
-          points.add(point);
+          // if the distance between the new <Pos> and the source or target
+          // state is less than 12 then that is within the area of the node
+          // itself and the control point is unnecessary
+          final double nodeAreaSq = 12 * 12;
+          if ((point.distanceSq(sourcePos) > nodeAreaSq)
+              && (point.distanceSq(targetPos) > nodeAreaSq)) {
+            points.add(point);
+          }
         }
       }
       edgeShape =
@@ -758,7 +782,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param state
    *          The state to be converted.
    */
-  private NodeProxy convertState(final Element state)
+  private SimpleNodeProxy convertState(final Element state)
   {
     final String marked = "1";
     final String stateName = formatIdentifier(state.getAttribute("nm"));
@@ -815,7 +839,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param labelPos
    * @param nodePos
    */
-  private NodeProxy markState(final Element state, final Boolean initial,
+  private SimpleNodeProxy markState(final Element state, final Boolean initial,
       final PointGeometryProxy nodePos, final LabelGeometryProxy labelPos)
   {
     final String stateName = formatIdentifier(state.getAttribute("nm"));
@@ -919,7 +943,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   /**
    * This list stores all the nodes (states) for the current automaton.
    */
-  private final List<NodeProxy> mNodes = new ArrayList<NodeProxy>();
+  private final List<SimpleNodeProxy> mNodes = new ArrayList<SimpleNodeProxy>();
   /**
    * This list stores all the edges (transitions) for the current automaton.
    */
