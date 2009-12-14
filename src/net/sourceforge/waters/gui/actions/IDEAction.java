@@ -10,7 +10,10 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import java.awt.event.ActionEvent;
+
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -22,15 +25,14 @@ import org.supremica.gui.ide.IDE;
 
 /**
  * <P>A common base class for all actions in the IDE.</P>
- * 
+ *
  * <P>This is an implementation of Swing's SWING {@link Action} interface,
  * with some support to integrate into the Waters/Supremica IDE.</P>
  *
  * <DL>
  * <DT>Creation.</DT> <DD>All actions are created by the {@link
  * WatersActionManager}, and can be retrieved through its {@link
- * WatersActionManager#getClass(Class) getClass()} method. There is no
- * other way to create or obtain action objects.</DD>
+ * WatersActionManager#getAction(Class) getAction()} method.</DD>
  *
  * <DT>Invocation.</DT> <DD>All actions implement the {@link
  * java.awt.event.ActionListener} interface. The {@link
@@ -52,9 +54,9 @@ import org.supremica.gui.ide.IDE;
  * may use it to provide more convenient access.</DD>
  * </DL>
  *
- * This class has been rewritten to replace the old actions in package
+ * <P>This class has been rewritten to replace the old actions in package
  * <CODE>org.supremica.gui.ide.actions</CODE>, which cannot support
- * enablement and disablement.
+ * enablement and disablement.</P>
  *
  * @author Robi Malik
  */
@@ -94,7 +96,7 @@ public abstract class IDEAction
   }
 
   /**
-   * Gets the current selection owner.  
+   * Gets the current selection owner.
    * This method returns the panel of the IDE that currently owns the
    * keyboard focus, if that panel implements the {@link SelectionOwner}
    * interface; <CODE>null</CODE> otherwise.
@@ -105,12 +107,12 @@ public abstract class IDEAction
   }
 
   /**
-   * Gets the currently focussed object.
+   * Gets the currently focused object.
    * This method retrieves the selection owner from the IDE, and identifies
    * the item that was last clicked or selected in that component. It is
    * this item that should be the target of 'properties' or similar actions.
-   * @return The currently focussed object, or <CODE>null</CODE> if no
-   *         focussed object can be identified.
+   * @return The currently focused object, or <CODE>null</CODE> if no
+   *         focused object can be identified.
    */
   public Proxy getSelectionAnchor()
   {
@@ -120,6 +122,27 @@ public abstract class IDEAction
     } else {
       return panel.getSelectionAnchor();
     }
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  /**
+   * Programmatically executes this action.
+   * This method simply calls this action's
+   * {@link #actionPerformed(ActionEvent) actionPerformed()}
+   * method with an appropriate {@link ActionEvent}.
+   * @param  source   The originator of the event. This parameter will be
+   *                  used as the event source of the {@link ActionEvent}.
+   *                  It should identify the button or panel from which the
+   *                  action has been triggered.
+   */
+  public void execute(final Object source)
+  {
+    final String name = (String) getValue(Action.NAME);
+    final ActionEvent event =
+      new ActionEvent(source, ActionEvent.ACTION_PERFORMED, name);
+    actionPerformed(event);
   }
 
 
