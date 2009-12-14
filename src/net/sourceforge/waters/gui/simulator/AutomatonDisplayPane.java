@@ -312,24 +312,24 @@ public class AutomatonDisplayPane
       (final Proxy proxy)
     {
       return new RenderingInformation
-      (false, true,
+         (false, true,
           EditorColor.SIMULATION_ENABLED,
           EditorColor.shadow(EditorColor.SIMULATION_ENABLED),
           getPriority(proxy));
     }
 
     private RenderingInformation getActiveEnabledRenderingInformation
-    (final Proxy proxy)
-  {
-    return new RenderingInformation
-    (false, true,
-        EditorColor.SIMULATION_ACTIVE_ENABLED,
-        EditorColor.shadow(EditorColor.SIMULATION_ACTIVE_ENABLED),
-        getPriority(proxy));
-  }
+      (final Proxy proxy)
+    {
+      return new RenderingInformation
+         (false, true,
+          EditorColor.SIMULATION_ENABLED,
+          EditorColor.shadow(EditorColor.SIMULATION_ACTIVE),
+          getPriority(proxy));
+    }
 
     private RenderingInformation getSelectedRenderingInformation
-    (final Proxy proxy)
+      (final Proxy proxy)
     {
       return new RenderingInformation
       (false, true,

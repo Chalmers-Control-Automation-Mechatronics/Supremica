@@ -150,34 +150,6 @@ public class EditorColor
     new Color(64, 112, 128);
 
   /**
-   * The colour for active events in the simulator.
-   */
-  public static final Color SIMULATION_ACTIVE = new Color(192, 0, 128);
-
-  /**
-   * The colour for enabled events in the simulator.
-   */
-  public static final Color SIMULATION_ENABLED = Color.GREEN.brighter().brighter();
-
-  /**
-   * The colour for events which are both active and enabled, within the simulator
-   */
-  public static final Color SIMULATION_ACTIVE_ENABLED = Color.cyan.darker();
-
-  /**
-   * The colour for selected events in the simulator
-   */
-  public static final Color SIMULATION_SELECTED = Color.pink;
-
-  /*
-   * Placeholders, if needed
-   *
-   * public static final Color SIMULATION_ACTIVE_SELECTED;
-   * public static final Color SIMULATION_ENABLED_SELECTED;
-   * public static final Color SIMULATION_ACTIVE_ENABLED_SELECTED;
-   */
-
-  /**
    * The colour of objects when showing that stuff can be dropped on them.
    */
   public static final Color CANDROPCOLOR = Color.GREEN.darker().darker();
@@ -201,6 +173,34 @@ public class EditorColor
    * are not in focus.
    */
   public static final Color BACKGROUND_NOTFOCUSSED = new Color(232, 232, 232);
+
+  /**
+   * The colour for active events in the simulator.
+   */
+  public static final Color SIMULATION_ACTIVE = new Color(192, 0, 128);
+
+  /**
+   * The colour for enabled events in the simulator.
+   */
+  public static final Color SIMULATION_ENABLED = CANDROPCOLOR;
+
+  /**
+   * The colour for events which are both active and enabled, within the simulator
+   */
+  public static final Color SIMULATION_ACTIVE_ENABLED = Color.cyan.darker();
+
+  /**
+   * The colour for selected events in the simulator
+   */
+  public static final Color SIMULATION_SELECTED = Color.pink;
+
+  /*
+   * Placeholders, if needed
+   *
+   * public static final Color SIMULATION_ACTIVE_SELECTED;
+   * public static final Color SIMULATION_ENABLED_SELECTED;
+   * public static final Color SIMULATION_ACTIVE_ENABLED_SELECTED;
+   */
 
 
   //#########################################################################
