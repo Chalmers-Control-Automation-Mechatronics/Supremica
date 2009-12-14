@@ -74,7 +74,6 @@ import org.supremica.automata.algorithms.Forbidder;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomataListener;
-import org.supremica.gui.VisualProject;
 import org.supremica.properties.Config;
 
 // ----------------------------------------------------------------------------------
@@ -1070,7 +1069,7 @@ class FindStatesFrame
 		}
 	}
 
-	class CancelButton
+        class CancelButton
 		extends JButton
 	{
 		private static final long serialVersionUID = 1L;
@@ -1096,7 +1095,7 @@ class FindStatesFrame
 			dispose();
 		}
 	}
-
+        
 	private void goAhead(boolean present)
 	{
 		try

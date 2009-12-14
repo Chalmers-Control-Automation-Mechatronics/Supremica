@@ -283,7 +283,7 @@
                  ${supremica_basedir}/external/operationframeworkto61131/**"
                source="1.5"
                fork="true"
-               memoryMaximumSize="128M">
+               memoryMaximumSize="512M">
             <classpath>    
                 <pathelement location="${lib}/${unjared}"/>
             </classpath>

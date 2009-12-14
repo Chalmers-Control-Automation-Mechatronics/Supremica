@@ -163,6 +163,7 @@ public class Actions extends WatersActionManager
     public IDEAction analyzerSatAction = new AnalyzerSatAction(mIDEActions);
     public IDEAction analyzerSMVAction = new AnalyzerSMVAction(mIDEActions);
     public IDEAction analyzerDeadEventsDetectorAction = new AnalyzerDeadEventsDetectorAction(mIDEActions);
+    public IDEAction analyzerModularForbidder = new AnalyzerModularForbidderAction(mIDEActions);
 
     // Examples Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(mIDEActions);
