@@ -73,7 +73,7 @@ public class TraceMutableTreeNode extends DefaultMutableTreeNode implements Simu
   private void setupAllEvents(final Simulation sim)
   {
     this.removeAllChildren();
-    for (int looper = sim.getEventHistory().size() - 1; looper >= 0; looper--)
+    for (int looper = 0; looper < sim.getEventHistory().size(); looper++)
     {
       final EventProxy event = sim.getEventHistory().get(looper);
       final DefaultMutableTreeNode eventToAdd= new EventBranchNode(event, looper);
@@ -82,7 +82,8 @@ public class TraceMutableTreeNode extends DefaultMutableTreeNode implements Simu
       this.add(eventToAdd);
       for (final AutomatonProxy automaton : stateInEvent.keySet())
       {
-        eventToAdd.add(new AutomatonLeafNode(automaton, stateInEvent.get(automaton)));
+        if (automaton.getEvents().contains(event))
+          eventToAdd.add(new AutomatonLeafNode(automaton, stateInEvent.get(automaton)));
       }
     }
     mParent.expandPath(new TreePath(this));

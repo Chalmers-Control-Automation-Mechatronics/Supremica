@@ -10,14 +10,14 @@ import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -37,6 +37,7 @@ public class EventJTree extends JTree implements InternalFrameObserver
     this.setCellRenderer(new EventTreeCellRenderer());
     mSim = sim;
     mDesktop = desktop;
+    mPane = null;
     desktop.attach(this);
     automatonAreOpen = new ArrayList<String>();
     mContainer = container;
@@ -49,6 +50,11 @@ public class EventJTree extends JTree implements InternalFrameObserver
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
+    totalEventWidth = 0;
+    for (final Integer intVal : eventColumnWidth)
+    {
+      totalEventWidth += intVal;
+    }
     // Expand all foreach-component entries.
 
     this.addMouseListener(new MouseAdapter(){
@@ -81,6 +87,11 @@ public class EventJTree extends JTree implements InternalFrameObserver
         }
       }
     });
+  }
+
+  public void addScrollPane(final JScrollPane scroll)
+  {
+    mPane = scroll;
   }
 
   // ##################################################################
@@ -169,14 +180,12 @@ public class EventJTree extends JTree implements InternalFrameObserver
   // # Inner Classes
 
   private class EventTreeCellRenderer
-  extends DefaultTreeCellRenderer
+  implements TreeCellRenderer
   {
     //#######################################################################
     //# Constructor
     private EventTreeCellRenderer()
     {
-      this.add(new JPanel());
-      setTextSelectionColor(EditorColor.TEXTCOLOR);
     }
 
     //#######################################################################
@@ -187,16 +196,15 @@ public class EventJTree extends JTree implements InternalFrameObserver
        final int row, final boolean hasFocus)
     {
       //final JPanel output = (JPanel) ((EventTreeCellRenderer)super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus)).getComponent(0);
-      final JPanel output = new JPanel();
+      panel  = new JPanel();
+
       if (value.getClass() == EventBranchNode.class)
       {
-        output.setBackground(EditorColor.BACKGROUNDCOLOR);
         final GridBagLayout layout = new GridBagLayout();
-        layout.columnWidths = eventColumnWidth;
-        output.setLayout(layout);
+        panel.setLayout(layout);
         final EventBranchNode eventNode = (EventBranchNode)value;
         final EventProxy event = eventNode.getEvent();
-        final JLabel left = new JLabel(event.getName());
+        left = new JLabel(event.getName());
         if (event.getKind() == EventKind.CONTROLLABLE)
           left.setIcon(IconLoader.ICON_CONTROLLABLE);
         else
@@ -205,16 +213,23 @@ public class EventJTree extends JTree implements InternalFrameObserver
           left.setFont(left.getFont().deriveFont(Font.BOLD));
         else
           left.setFont(left.getFont().deriveFont(Font.PLAIN));
-        final JLabel right = new JLabel();
+        right = new JLabel();
         if (mSim.getValidTransitions().contains(event))
           right.setIcon(IconLoader.ICON_TICK);
         else
           right.setIcon(IconLoader.ICON_CROSS);
-        left.setPreferredSize(new Dimension(eventColumnWidth[0], rowHeight));
-        right.setPreferredSize(new Dimension(eventColumnWidth[1], rowHeight));
-        output.add(left);
-        output.add(right);
-        return output;
+        final int width = mPane.getWidth();
+        final int rightWidth = (width - noduleWidth) / (1 + (eventColumnWidth[0] / eventColumnWidth[1]));
+        final int leftWidth = (eventColumnWidth[0] / eventColumnWidth[1]) * rightWidth;
+        layout.columnWidths = new int[]{leftWidth, rightWidth};
+        System.out.println("DEBUG: Width: " + mPane.getWidth()
+            + " Left width: " + leftWidth
+            + " Right width: " + rightWidth);
+        left.setPreferredSize(new Dimension(leftWidth, rowHeight));
+        right.setPreferredSize(new Dimension(rightWidth, rowHeight));
+        panel.add(left);
+        panel.add(right);
+        return panel;
       }
       else if (value.getClass() == AutomatonLeafNode.class)
       {
@@ -222,21 +237,20 @@ public class EventJTree extends JTree implements InternalFrameObserver
         final AutomatonProxy autoProxy = autoNode.getAutomata();
         final GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = automataColumnWidth;
-        output.setLayout(layout);
-        output.setBackground(EditorColor.BACKGROUNDCOLOR);
-        final JLabel left = new JLabel(autoProxy.getName());
+        panel.setLayout(layout);
+        left = new JLabel(autoProxy.getName());
         if (mContainer.getSourceInfoMap().get(autoProxy).getSourceObject().getClass() == VariableComponentSubject.class)
           left.setIcon(IconLoader.ICON_VARIABLE);
         else
           left.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
-        final JLabel center = new JLabel();
+        center = new JLabel();
         if (mSim.getBlocking(((EventBranchNode)autoNode.getParent()).getEvent()).contains(autoProxy))
           center.setIcon(IconLoader.ICON_CROSS);
         else
           center.setIcon(IconLoader.ICON_TICK);
         StateProxy currentState;
         currentState = mSim.getCurrentStates().get(autoProxy);
-        final JLabel right = new JLabel(currentState.getName());
+        right = new JLabel(currentState.getName());
         right.setIcon(mSim.getMarkingIcon(currentState, autoProxy));
         left.setPreferredSize(new Dimension(automataColumnWidth[0], rowHeight));
         center.setPreferredSize(new Dimension(automataColumnWidth[1], rowHeight));
@@ -251,18 +265,24 @@ public class EventJTree extends JTree implements InternalFrameObserver
           left.setFont(left.getFont().deriveFont(Font.PLAIN));
           right.setFont(right.getFont().deriveFont(Font.PLAIN));
         }
-        output.add(left);
-        output.add(center);
-        output.add(right);
-        return output;
+        panel.add(left);
+        panel.add(center);
+        panel.add(right);
+        return panel;
       }
       else
       {
-        super.getTreeCellRendererComponent
-          (tree, value, sel, expanded, leaf, row, hasFocus);
-        return this;
+        return new JPanel();
       }
     }
+
+    // ###########################################################################
+    // # Data Members
+
+    private JPanel panel;
+    private JLabel left;
+    private JLabel right;
+    private JLabel center;
 
     // ###########################################################################
     // # Class Constants
@@ -275,10 +295,13 @@ public class EventJTree extends JTree implements InternalFrameObserver
   private final ArrayList<String> automatonAreOpen;
   private final ArrayList<Pair<Boolean, Integer>> mSortingMethods;
   private final ArrayList<EventProxy> selectedEvents;
+  private JScrollPane mPane;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
+  private static int totalEventWidth;
   private static final int[] eventColumnWidth = {180, 20};
+  private static final int noduleWidth = 20;
   public static final int rowHeight = 20;
 
 }

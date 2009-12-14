@@ -78,6 +78,8 @@ public class SimulatorPanel
     ((AbstractTunnelTable)mAutomataTable.getModel()).attachTable(mAutomataTable);
     final int width = 245; // DEBUG: Arbitrary value: Any value will work, but this is close to the 'normal' value
     mAutomataTable.setDefaultRenderer(mAutomataTable.getColumnClass(1), new SelectedTableCellRenderer(mSimulation, mDesktop));
+    mAutomataTable.setDefaultRenderer(mAutomataTable.getColumnClass(0), new SelectedTableCellRenderer(mSimulation, mDesktop));
+    mAutomataTable.setDefaultRenderer(mAutomataTable.getColumnClass(3), new SelectedTableCellRenderer(mSimulation, mDesktop));
     if (mAutomataTable.getColumnModel().getColumnCount() != 0)
     {
       mAutomataTable.getColumnModel().getColumn(0).setPreferredWidth((int)(width * 0.1));
@@ -111,6 +113,7 @@ public class SimulatorPanel
   {
     mEventsTree = new EventJTree(mSimulation, mDesktop, mModuleContainer);
     final JScrollPane scroll = new JScrollPane(mEventsTree);
+    mEventsTree.addScrollPane(scroll);
     mEventsPanel.setLayout(new BorderLayout());
     mEventsPanel.add(scroll, BorderLayout.CENTER);
     final SorterButton typeButton = new SorterButton("Type", mEventsTree, 0);

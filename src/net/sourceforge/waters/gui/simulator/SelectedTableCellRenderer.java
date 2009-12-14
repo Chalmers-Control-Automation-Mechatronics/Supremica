@@ -2,12 +2,19 @@ package net.sourceforge.waters.gui.simulator;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.GridBagLayout;
 
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
-public class SelectedTableCellRenderer extends DefaultTableCellRenderer
+import net.sourceforge.waters.gui.EditorColor;
+
+public class SelectedTableCellRenderer implements TableCellRenderer
 {
+
 
   // #########################################################################
   // # Constructor
@@ -16,6 +23,8 @@ public class SelectedTableCellRenderer extends DefaultTableCellRenderer
     super();
     mSim = sim;
     mDesktop = desktop;
+    mPanel = new JPanel();
+    mLabel = new JLabel();
   }
 
   // #########################################################################
@@ -23,14 +32,38 @@ public class SelectedTableCellRenderer extends DefaultTableCellRenderer
   public Component getTableCellRendererComponent
     (final JTable table, final Object value, final boolean selected, final boolean focused, final int row, final int column)
   {
-    final Component tableCellRenderer = super.getTableCellRendererComponent(table, value, selected, focused, row, column);
-
-    if (mDesktop.automatonIsOpen(((AbstractTunnelTable)table.getModel()).getAutomaton(row, mSim)))
+    mPanel = new JPanel();
+    mPanel.setLayout(new GridBagLayout());
+    if (selected)
     {
-      final Font oldFont = tableCellRenderer.getFont();
-      tableCellRenderer.setFont(oldFont.deriveFont(Font.BOLD));
+      mPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
     }
-    return tableCellRenderer;
+    else
+    {
+      mPanel.setBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
+    }
+    if (column == 1 || column == 4)
+    {
+      if (mDesktop.automatonIsOpen(((AbstractTunnelTable)table.getModel()).getAutomaton(row, mSim)))
+      {
+        final Font oldFont = mPanel.getFont();
+        mPanel.setFont(oldFont.deriveFont(Font.BOLD));
+      }
+      else
+      {
+        final Font oldFont = mPanel.getFont();
+        mPanel.setFont(oldFont.deriveFont(Font.PLAIN));
+      }
+      mLabel = new JLabel(String.valueOf(value));
+      mPanel.add(mLabel);
+    }
+    else
+    {
+      final JLabel mLabel = new JLabel();
+      mLabel.setIcon((Icon)value);
+      mPanel.add(mLabel);
+    }
+    return mPanel;
   }
 
   // #########################################################################
@@ -38,5 +71,7 @@ public class SelectedTableCellRenderer extends DefaultTableCellRenderer
   private static final long serialVersionUID = 1086293271366963464L;
   private final Simulation mSim;
   private final AutomatonDesktopPane mDesktop;
+  private JPanel mPanel;
+  private JLabel mLabel;
 }
 
