@@ -165,6 +165,19 @@ public class EditorColor
   public static final Color SIMULATION_ACTIVE_ENABLED = Color.cyan.darker();
 
   /**
+   * The colour for selected events in the simulator
+   */
+  public static final Color SIMULATION_SELECTED = Color.pink;
+
+  /*
+   * Placeholders, if needed
+   *
+   * public static final Color SIMULATION_ACTIVE_SELECTED;
+   * public static final Color SIMULATION_ENABLED_SELECTED;
+   * public static final Color SIMULATION_ACTIVE_ENABLED_SELECTED;
+   */
+
+  /**
    * The colour of objects when showing that stuff can be dropped on them.
    */
   public static final Color CANDROPCOLOR = Color.GREEN.darker().darker();

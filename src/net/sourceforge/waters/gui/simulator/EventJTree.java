@@ -30,6 +30,7 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public class EventJTree extends JTree implements InternalFrameObserver
 {
+
   public EventJTree(final Simulation sim, final AutomatonDesktopPane desktop, final ModuleContainer container)
   {
     super();
@@ -40,9 +41,7 @@ public class EventJTree extends JTree implements InternalFrameObserver
     automatonAreOpen = new ArrayList<String>();
     mContainer = container;
     mSortingMethods = new ArrayList<Pair<Boolean, Integer>>();
-    mSortingMethods.add(new Pair<Boolean, Integer>(true, 2));
-    mSortingMethods.add(new Pair<Boolean, Integer>(true, 0));
-    mSortingMethods.add(new Pair<Boolean, Integer>(true, 1));
+    selectedEvents = new ArrayList<EventProxy>();
     final EventMutableTreeNode root = new EventMutableTreeNode(sim, this, mSortingMethods);
     this.setModel(new DefaultTreeModel(root, false));
     this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -82,6 +81,57 @@ public class EventJTree extends JTree implements InternalFrameObserver
         }
       }
     });
+  }
+
+  // ##################################################################
+  // # Simple Access
+
+  public void sortBy(final int index)
+  {
+    int oldIndex = -1;
+    boolean oldAscending = false;
+    for (int looper = 0; looper < mSortingMethods.size(); looper++)
+    {
+      if (mSortingMethods.get(looper).getSecond() == index)
+      {
+        oldIndex = looper;
+        oldAscending = mSortingMethods.get(looper).getFirst();
+      }
+    }
+    if (oldIndex != -1)
+    {
+      if (oldIndex != 0)
+      {
+        final Pair<Boolean, Integer> oldMethod = mSortingMethods.get(oldIndex);
+        mSortingMethods.remove(oldIndex);
+        mSortingMethods.add(0, oldMethod);
+      }
+      else
+      {
+        final Pair<Boolean, Integer> newMethod = new Pair<Boolean, Integer>(!oldAscending, index);
+        mSortingMethods.remove(oldIndex);
+        mSortingMethods.add(0, newMethod);
+      }
+    }
+    else
+    {
+      final Pair<Boolean, Integer> newMethod = new Pair<Boolean, Integer>(true, index);
+      mSortingMethods.add(0, newMethod);
+    }
+  }
+
+  public void addSelectedEvent(final EventProxy event)
+  {
+    if (!selectedEvents.contains(event))
+      selectedEvents.add(event);
+    repaint();
+  }
+
+  public void removeSelectedEvent(final EventProxy event)
+  {
+    if (selectedEvents.contains(event))
+      selectedEvents.remove(event);
+    repaint();
   }
 
   //##################################################################
@@ -125,6 +175,7 @@ public class EventJTree extends JTree implements InternalFrameObserver
     //# Constructor
     private EventTreeCellRenderer()
     {
+      this.add(new JPanel());
       setTextSelectionColor(EditorColor.TEXTCOLOR);
     }
 
@@ -135,9 +186,10 @@ public class EventJTree extends JTree implements InternalFrameObserver
        final boolean expanded, final boolean leaf,
        final int row, final boolean hasFocus)
     {
+      //final JPanel output = (JPanel) ((EventTreeCellRenderer)super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus)).getComponent(0);
+      final JPanel output = new JPanel();
       if (value.getClass() == EventBranchNode.class)
       {
-        final JPanel output = new JPanel();
         output.setBackground(EditorColor.BACKGROUNDCOLOR);
         final GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = eventColumnWidth;
@@ -149,6 +201,10 @@ public class EventJTree extends JTree implements InternalFrameObserver
           left.setIcon(IconLoader.ICON_CONTROLLABLE);
         else
           left.setIcon(IconLoader.ICON_UNCONTROLLABLE);
+        if (selectedEvents.contains(event))
+          left.setFont(left.getFont().deriveFont(Font.BOLD));
+        else
+          left.setFont(left.getFont().deriveFont(Font.PLAIN));
         final JLabel right = new JLabel();
         if (mSim.getValidTransitions().contains(event))
           right.setIcon(IconLoader.ICON_TICK);
@@ -164,7 +220,6 @@ public class EventJTree extends JTree implements InternalFrameObserver
       {
         final AutomatonLeafNode autoNode = (AutomatonLeafNode) value;
         final AutomatonProxy autoProxy = autoNode.getAutomata();
-        final JPanel output = new JPanel();
         final GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = automataColumnWidth;
         output.setLayout(layout);
@@ -219,10 +274,11 @@ public class EventJTree extends JTree implements InternalFrameObserver
   private final ModuleContainer mContainer;
   private final ArrayList<String> automatonAreOpen;
   private final ArrayList<Pair<Boolean, Integer>> mSortingMethods;
+  private final ArrayList<EventProxy> selectedEvents;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
   private static final int[] eventColumnWidth = {180, 20};
-  private static final int rowHeight = 20;
+  public static final int rowHeight = 20;
 
 }

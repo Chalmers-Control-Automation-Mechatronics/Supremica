@@ -87,8 +87,7 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   {
     if (sortingMethods.size() == 0)
     {
-      System.out.println("ERROR: Two apparently equal values have been compared");
-      return false;
+      return true;
     }
     final int sortingMethod = sortingMethods.get(0).getSecond();
     final boolean isAscending = sortingMethods.get(0).getFirst();

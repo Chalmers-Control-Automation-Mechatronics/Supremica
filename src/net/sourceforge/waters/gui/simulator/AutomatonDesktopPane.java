@@ -21,6 +21,7 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
@@ -158,6 +159,22 @@ public class AutomatonDesktopPane extends JDesktopPane implements SimulationObse
       }
     } catch (final PropertyVetoException exception) {
       // Can't select frame---too bad ...
+    }
+  }
+
+  public void addSelectedEvent(final EventProxy event)
+  {
+    for (final AutomatonInternalFrame autoFrame : openAutomaton.values())
+    {
+      autoFrame.addSelectedEvent(event);
+    }
+  }
+
+  public void removeSelectedEvent(final EventProxy event)
+  {
+    for (final AutomatonInternalFrame autoFrame : openAutomaton.values())
+    {
+      autoFrame.removeSelectedEvent(event);
     }
   }
 

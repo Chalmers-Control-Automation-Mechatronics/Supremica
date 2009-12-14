@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,6 +59,7 @@ public class AutomatonDisplayPane
     mSim = sim;
     mAutomaton = aut;
     mContainer = container;
+    selectedEvents = new ArrayList<EventProxy>();
     final ModuleSubject module = container.getModule();
     final RenderingContext context = new SimulatorRenderingContext();
     final ProxyShapeProducer producer =
@@ -84,6 +86,20 @@ public class AutomatonDisplayPane
   public Rectangle2D getMinimumBoundingRectangle()
   {
     return getShapeProducer().getMinimumBoundingRectangle();
+  }
+
+  public void addSelectedEvent(final EventProxy event)
+  {
+    if (!selectedEvents.contains(event))
+      selectedEvents.add(event);
+    repaint();
+  }
+
+  public void removeSelectedEvent(final EventProxy event)
+  {
+    if (selectedEvents.contains(event))
+      selectedEvents.remove(event);
+    repaint();
   }
 
 
@@ -177,6 +193,7 @@ public class AutomatonDisplayPane
     {
       boolean proxyIsActive = false;
       boolean proxyIsEnabled = false;
+      boolean proxyIsSelected = false;
       // The spring embedder modifies a copy of our graph. When it is running,
       // the items being displayed are not in our compiled graph ...
       final Proxy orig = getOriginal(proxy);
@@ -233,6 +250,40 @@ public class AutomatonDisplayPane
           }
         }
       }
+      for (final EventProxy event : selectedEvents)
+      {
+        for (final TransitionProxy trans : mAutomaton.getTransitions())
+        {
+          if (trans.getEvent() == event)
+          {
+            final Proxy currentTransSource =
+              mContainer.getSourceInfoMap().get(trans).getSourceObject();
+            if (orig instanceof IdentifierProxy) {
+              if (currentTransSource == orig) {
+                proxyIsSelected = true;
+              }
+            } else if (orig instanceof EdgeProxy) {
+              final IdentifierSubject ident =
+                (IdentifierSubject) currentTransSource;
+              if (ident.getAncestor(EdgeSubject.class) == orig) {
+                proxyIsSelected = true;
+              }
+            }
+          }
+        }
+      }
+      return getRawRenderingInformation(orig, proxyIsActive, proxyIsEnabled, proxyIsSelected);
+    }
+
+
+
+    //#######################################################################
+    //# Auxiliary Methods
+
+    private RenderingInformation getRawRenderingInformation(final Proxy orig, final boolean proxyIsActive, final boolean proxyIsEnabled, final boolean proxyIsSelected)
+    {
+      if (proxyIsSelected)
+        return getSelectedRenderingInformation(orig);
       if (proxyIsActive && !proxyIsEnabled)
       {
         return getActiveRenderingInformation(orig);
@@ -246,8 +297,7 @@ public class AutomatonDisplayPane
       return super.getRenderingInformation(orig);
     }
 
-    //#######################################################################
-    //# Auxiliary Methods
+
     private RenderingInformation getActiveRenderingInformation
       (final Proxy proxy)
     {
@@ -278,6 +328,16 @@ public class AutomatonDisplayPane
         getPriority(proxy));
   }
 
+    private RenderingInformation getSelectedRenderingInformation
+    (final Proxy proxy)
+    {
+      return new RenderingInformation
+      (false, true,
+          EditorColor.SIMULATION_SELECTED,
+          EditorColor.shadow(EditorColor.SIMULATION_SELECTED),
+          getPriority(proxy));
+    }
+
     //########################################################################
     //# Data Members
     private final Map<SimpleNodeProxy,StateProxy> mStateMap;
@@ -290,6 +350,7 @@ public class AutomatonDisplayPane
   private final AutomatonProxy mAutomaton;
   private final ModuleContainer mContainer;
   private final AutomatonInternalFrame mParent;
+  private final ArrayList<EventProxy> selectedEvents;
 
   //#################################################################################
   //# Class Constants
