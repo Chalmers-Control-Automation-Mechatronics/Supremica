@@ -9,13 +9,22 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.util.ArrayList;
+import java.util.Set;
 
-public abstract class AbstractGeneralisedConflictCheckerTest
-  extends AbstractConflictCheckerTest
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
+
+
+public abstract class AbstractGeneralisedConflictCheckerTest extends
+    AbstractConflictCheckerTest
 {
 
-  //#########################################################################
-  //# Entry points in junit.framework.TestCase
+  // #########################################################################
+  // # Entry points in junit.framework.TestCase
   public AbstractGeneralisedConflictCheckerTest()
   {
   }
@@ -25,31 +34,57 @@ public abstract class AbstractGeneralisedConflictCheckerTest
     super(name);
   }
 
+  protected void configureModelVerifier(final ProductDESProxy des)
+  {
+    super.configureModelVerifier(des);
+    final Set<EventProxy> events = des.getEvents();
+    // checks that this des does include the precondition marking
+    for (final EventProxy event : events) {
+      if (event.getName().equals(":alpha")
+          && event.getKind().equals(EventKind.PROPOSITION)) {
 
-  //#########################################################################
-  //#Test Cases --- paper (multi-coloured automata)
+        final ConflictChecker modelVer = getModelVerifier();
+        modelVer.setGeneralisedPrecondition(event);
+        return;
+      }
+    }
+
+    fail("File does " + des.getName()
+        + " not contain a proposition named :alpha.");
+
+  }
+
+  protected void configure(final ModuleCompiler compiler)
+  {
+    super.configure(compiler);
+    final ArrayList<String> propositions = new ArrayList<String>(2);
+    propositions.add(":alpha");
+    propositions.add(EventDeclProxy.DEFAULT_MARKING_NAME);
+    compiler.setEnabledPropositionNames(propositions);
+  }
+
+  // #########################################################################
+  // #Test Cases --- paper (multi-coloured automata)
   public void testG1() throws Exception
   {
     final String group = "tests";
-    final String dir = "paper";
+    final String dir = "generalisedNonblocking";
     final String name = "g1.wmod";
     runModelVerifier(group, dir, name, true);
   }
 
-  /*
   public void testG2() throws Exception
   {
     final String group = "tests";
-    final String dir = "paper";
+    final String dir = "generalisedNonblocking";
     final String name = "g2.wmod";
     runModelVerifier(group, dir, name, true);
   }
-  */
 
   public void testG3() throws Exception
   {
     final String group = "tests";
-    final String dir = "paper";
+    final String dir = "generalisedNonblocking";
     final String name = "g3.wmod";
     runModelVerifier(group, dir, name, false);
   }
@@ -57,7 +92,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest
   public void testG4() throws Exception
   {
     final String group = "tests";
-    final String dir = "paper";
+    final String dir = "generalisedNonblocking";
     final String name = "g4.wmod";
     runModelVerifier(group, dir, name, false);
   }

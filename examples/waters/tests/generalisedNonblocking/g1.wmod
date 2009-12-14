@@ -5,7 +5,7 @@
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="e1"/>
         <EventDecl Kind="CONTROLLABLE" Name="e2"/>
-        <EventDecl Kind="PROPOSITION" Name="alpha">
+        <EventDecl Kind="PROPOSITION" Name=":alpha">
             <ColorGeometry>
                 <Color Red="209" Green="190" Blue="190"/>
             </ColorGeometry>
@@ -17,7 +17,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <EventList>
-                            <SimpleIdentifier Name="alpha"/>
+                            <SimpleIdentifier Name=":alpha"/>
                         </EventList>
                         <PointGeometry>
                             <Point Y="32" X="160"/>

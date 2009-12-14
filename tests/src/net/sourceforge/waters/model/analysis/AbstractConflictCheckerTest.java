@@ -852,9 +852,7 @@ public abstract class AbstractConflictCheckerTest
   //# net.sourceforge.waters.analysis.AbstractAnalysisTest
   protected void configure(final ModuleCompiler compiler)
   {
-    final Collection<String> marking =
-      Collections.singletonList(EventDeclProxy.DEFAULT_MARKING_NAME);
-    compiler.setEnabledPropositionNames(marking);
+
     final Collection<String> empty = Collections.emptyList();
     compiler.setEnabledPropertyNames(empty);
   }

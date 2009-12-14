@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -281,11 +282,19 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   private String formatIdentifier(String name)
   {
     int index = name.indexOf("-");
-    if (index != -1) {
-      // replaces - with {-}
-      final String newName = "{" + name + "}";
+    while (index != -1) {
+      // replaces - with _ where possible
+      final String newName =
+          name.substring(0, index) + "_"
+              + name.substring(index + 1, name.length());
       name = newName;
-      // index = name.indexOf("-", index + 2);
+      index = name.indexOf("-", index + 1);
+    }
+    int count = 1;
+    while (mIdentifiers.contains(name)) {
+      final String newName = name + "_" + count;
+      name = newName;
+      count++;
     }
     index = name.indexOf(".");
     while (index != -1) {
@@ -388,6 +397,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     mTransitions.clear();
     mNodes.clear();
     mEdges.clear();
+    mIdentifiers.clear();
   }
 
   // #########################################################################
@@ -403,6 +413,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     if (!mEvents.containsKey(eventName)) {
       final IdentifierProxy identifier =
           mFactory.createSimpleIdentifierProxy(eventName);
+      mIdentifiers.add(eventName);
       final String eventKind = event.getAttribute("ctrl");
       final String eventType = event.getAttribute("type");
       EventDeclProxy eventDecl = null;
@@ -958,6 +969,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    */
   private final Map<String,EventDeclProxy> mEvents =
       new TreeMap<String,EventDeclProxy>();
+
+  /*
+   * A map of the identifiers created.
+   */
+  private final HashSet<String> mIdentifiers = new HashSet<String>();
 
   /**
    * Maps the name of a module to its ModuleProxy.
