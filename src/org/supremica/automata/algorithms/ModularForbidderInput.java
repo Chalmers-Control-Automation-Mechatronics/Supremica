@@ -66,9 +66,10 @@ import org.supremica.automata.Automaton;
 public class ModularForbidderInput
 {
     private static final long serialVersionUID = 1L;
+    @SuppressWarnings("unused")
     private static Logger logger = LoggerFactory.createLogger(ModularForbidderInput.class);
 
-    private ArrayList<SubState> subStates;
+    private final ArrayList<SubState> subStates;
 
     public ModularForbidderInput()
     {
@@ -77,7 +78,7 @@ public class ModularForbidderInput
 
     public void createSubState()
     {
-        SubState ss = new SubState();
+        final SubState ss = new SubState();
         subStates.add(ss);
     }
 
@@ -86,14 +87,14 @@ public class ModularForbidderInput
      * @param automataToExt
      * @param localStateIndex
      */
-    public void createSubState(Automata automataToExt, int[] localStateIndex)
+    public void createSubState(final Automata automataToExt, final int[] localStateIndex)
     {
         createSubState();
-        Iterator<Automaton> it = automataToExt.iterator();
+        final Iterator<Automaton> it = automataToExt.iterator();
         while(it.hasNext())
         {
-            Automaton a = it.next();
-            int s = localStateIndex[automataToExt.getAutomatonIndex(a)];
+            final Automaton a = it.next();
+            final int s = localStateIndex[automataToExt.getAutomatonIndex(a)];
             addLocalStateIn(a, s, subStates.size()-1);
         }
     }
@@ -105,10 +106,10 @@ public class ModularForbidderInput
      * @param stateIndex
      * @param subStateIndex
      */
-    public void addLocalStateIn(Automaton automaton, int stateIndex, int subStateIndex)
+    public void addLocalStateIn(final Automaton automaton, final int stateIndex, final int subStateIndex)
     {
-        SubState ss = (SubState) subStates.get(subStateIndex);
-        State state = automaton.getStateWithIndex(stateIndex);
+        final SubState ss = (SubState) subStates.get(subStateIndex);
+        final State state = automaton.getStateWithIndex(stateIndex);
         ss.addLocalState(automaton, state);
     }
 
@@ -116,14 +117,14 @@ public class ModularForbidderInput
     {
         return subStates;
     }
-    
-    /** 
+
+    /**
      * @return all automata in all local-states = all sub-states
      */
     public Automata getTotalAutomata()
     {
-        Automata a = new Automata();
-        Iterator<SubState> it = subStates.iterator();
+        final Automata a = new Automata();
+        final Iterator<SubState> it = subStates.iterator();
         while(it.hasNext())
         {
             a.addAutomata(it.next().getAutomataInSubState());
@@ -137,7 +138,7 @@ public class ModularForbidderInput
      */
     public class SubState
     {
-        private ArrayList<LocalState> localStates;
+        private final ArrayList<LocalState> localStates;
 
         public SubState()
         {
@@ -150,9 +151,9 @@ public class ModularForbidderInput
          * @param automaton
          * @param state
          */
-        public void addLocalState(Automaton automaton, State state)
+        public void addLocalState(final Automaton automaton, final State state)
         {
-            LocalState ls = new LocalState(automaton, state);
+            final LocalState ls = new LocalState(automaton, state);
             localStates.add(ls);
         }
 
@@ -167,8 +168,8 @@ public class ModularForbidderInput
          */
         public Automata getAutomataInSubState()
         {
-            Automata a = new Automata();
-            Iterator<LocalState> it = localStates.iterator();
+            final Automata a = new Automata();
+            final Iterator<LocalState> it = localStates.iterator();
             while(it.hasNext())
             {
                 a.addAutomaton(it.next().getAutomaton());
@@ -186,7 +187,7 @@ public class ModularForbidderInput
         private Automaton a = null;
         private State s = null;
 
-        public LocalState(Automaton automaton, State state)
+        public LocalState(final Automaton automaton, final State state)
         {
             set(automaton,state);
         }
@@ -201,7 +202,7 @@ public class ModularForbidderInput
             return a;
         }
 
-        public void set(Automaton automaton, State state)
+        public void set(final Automaton automaton, final State state)
         {
             this.a = automaton;
             this.s = state;

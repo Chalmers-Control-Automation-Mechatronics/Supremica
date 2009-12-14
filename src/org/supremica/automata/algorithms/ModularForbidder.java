@@ -85,19 +85,19 @@ public class ModularForbidder
     private ArrayList<ForbiddenEvent> alphaEvent;
     private ModularForbidderInput.SubState subState;
 
-    private String extensionPrefix = "@ "; //Prefic used in names/labels for new events and automata
+    private final String extensionPrefix = "@ "; //Prefic used in names/labels for new events and automata
 
     /**
      * The constructor is the only method called from the outside
      * @param input This class is based on data according to this structure
      * @param project
      */
-    public ModularForbidder(ModularForbidderInput input, Project project)
+    public ModularForbidder(final ModularForbidderInput input, final Project project)
     {
         init(input, project);
     }
-    
-    private void init(ModularForbidderInput input, Project project)
+
+    private void init(final ModularForbidderInput input, final Project project)
     {
         this.project = project;
 
@@ -116,23 +116,23 @@ public class ModularForbidder
     {
         //Self-loop extension manager
         extensionManager();
-      
+
         //Perform PSC if MPMS
         possibleSynkOfSpecifications();
 
         //All events can now be prioritized for later synthesis
         restorePriority();
-        
+
         /*-----------------------------------
          * All subStates are now of type MPSP
          * --------------------------------*/
 
         //Create supervisors for the sub-specifications
         //createSupervisors();
-        
+
         return createdAutomata;
     }
-    
+
     /**
      * Handles all local-states
      * Each automaton is extended with right self-loop event(s).
@@ -140,24 +140,24 @@ public class ModularForbidder
     private void extensionManager()
     {
         //Go through all sub-states
-        Iterator<ModularForbidderInput.SubState> ssit = ss.iterator();
+        final Iterator<ModularForbidderInput.SubState> ssit = ss.iterator();
         while(ssit.hasNext())
         {
             subState = ssit.next();
-            ArrayList<ModularForbidderInput.LocalState> ls = subState.getLocalStates();
+            final ArrayList<ModularForbidderInput.LocalState> ls = subState.getLocalStates();
 
             // Create single project-global unique forbidden event
-            ForbiddenEvent x_event = new ForbiddenEvent(project.getUniqueEventLabel(extensionPrefix));
+            final ForbiddenEvent x_event = new ForbiddenEvent(project.getUniqueEventLabel(extensionPrefix));
             x_event.setControllable(false);
             x_event.setPrioritized(false); //If we need synk between sub-specificatinos later
             alphaEvent.add(x_event);
             logger.debug(x_event.getLabel());
 
             //Go through all local-states for current sub-state
-            Iterator<ModularForbidderInput.LocalState> lsit = ls.iterator();
+            final Iterator<ModularForbidderInput.LocalState> lsit = ls.iterator();
             while(lsit.hasNext())
             {
-                ModularForbidderInput.LocalState localState = lsit.next();
+                final ModularForbidderInput.LocalState localState = lsit.next();
 
                 //Add self-loop with right event to current local-state
                 extendAutomaton(localState.getAutomaton(),localState.getState(), x_event);
@@ -176,15 +176,15 @@ public class ModularForbidder
                 x_event.setPrioritized(true);
             }
         }
-    }    
-    
+    }
+
     /**
      * Handle difference between how plant and specification automaton should be extended with self-loops
      * @param automaton
      * @param state
      * @param x_event
      */
-    private void extendAutomaton(Automaton automaton, State state, ForbiddenEvent x_event)
+    private void extendAutomaton(final Automaton automaton, final State state, final ForbiddenEvent x_event)
     {
         // Add the event - beware, adding an existig event throws exception
         if(automaton.getAlphabet().contains(x_event) == false)
@@ -200,62 +200,62 @@ public class ModularForbidder
         }
         else
         {
-            Iterator<State> it = automaton.stateIterator();
+            final Iterator<State> it = automaton.stateIterator();
             while(it.hasNext())
             {
-                State currentState = it.next();
+                final State currentState = it.next();
                 if(!currentState.equalState(state))
                 {
                     addSelfLoop(automaton,currentState,x_event);
                 }
             }
             logger.info(automaton.getName()+" is extended");
-        } 
+        }
     }
-    
-    private void addSelfLoop(Automaton automaton, State state, ForbiddenEvent event)
+
+    private void addSelfLoop(final Automaton automaton, final State state, final ForbiddenEvent event)
     {
         automaton.addArc(new Arc(state, state, event));
     }
-    
+
     /**
      * Creates a new specification with one state and one event in alphabet
      * The event is blocked from occurring
      * @param x_event
      */
-    private void createSpecification(ForbiddenEvent x_event)
+    private void createSpecification(final ForbiddenEvent x_event)
     {
-        Automaton spec = new Automaton(x_event.getLabel()); // same name as the event-label
+        final Automaton spec = new Automaton(x_event.getLabel()); // same name as the event-label
         spec.setType(AutomatonType.SPECIFICATION);
         spec.getAlphabet().addEvent(x_event);
-        State init_state = new State("q0");
+        final State init_state = new State("q0");
         init_state.setInitial(true);
         init_state.setAccepting(true);
         spec.addState(init_state);
         logger.info(spec.getName()+" created for event "+x_event.getLabel());
         createdAutomata.addAutomaton(spec);
     }
-    
+
     /**
      * Prioritized synchronization of multiple sub-specifications in sub-state
      * All events are prioritized besides the event connected to the sub-state
      */
     private void possibleSynkOfSpecifications()
-    {    
+    {
         // Get the initial options
         SynchronizationOptions synchronizationOptions;
         try
         {
             synchronizationOptions = new SynchronizationOptions();
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Error constructing synchronizationOptions: " + ex.getMessage());
             logger.debug(ex.getStackTrace());
             return;
         }
-        
-        Iterator<ModularForbidderInput.SubState> it = ss.iterator();
+
+        final Iterator<ModularForbidderInput.SubState> it = ss.iterator();
         while(it.hasNext())
         {
             subState = it.next();
@@ -264,21 +264,21 @@ public class ModularForbidder
                 AutomataSynchronizer PSCspec;
                 PSCspec = new AutomataSynchronizer(subState.getAutomataInSubState().getSpecificationAutomata(),synchronizationOptions);
                 PSCspec.execute();
-                
-                Automaton newSpec = PSCspec.getAutomaton();
+
+                final Automaton newSpec = PSCspec.getAutomaton();
                 newSpec.setName(extensionPrefix+newSpec.getName());
                 createdAutomata.addAutomaton(newSpec);
             }
         }
     }
-    
+
     /**
      * In order to restore priority after PSC
      */
     private void restorePriority()
     {
         //All x_event have Prioritized(true) from now on
-        Iterator<ForbiddenEvent> it = alphaEvent.iterator();
+        final Iterator<ForbiddenEvent> it = alphaEvent.iterator();
         while(it.hasNext())
         {
             it.next().setPrioritized(true);
@@ -288,6 +288,7 @@ public class ModularForbidder
     /**
      * To create supervisor for each sub-specification
      */
+    @SuppressWarnings("unused")
     private void createSupervisors()
     {
         // Get the initial options
@@ -296,20 +297,20 @@ public class ModularForbidder
         {
             synthesizerOptions = new SynthesizerOptions();
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Error constructing synthesizerOptions: " + ex.getMessage());
             logger.debug(ex.getStackTrace());
             return;
         }
-        
+
         // Get the initial options
         SynchronizationOptions synchronizationOptions;
         try
         {
             synchronizationOptions = new SynchronizationOptions();
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Error constructing synchronizationOptions: " + ex.getMessage());
             logger.debug(ex.getStackTrace());
@@ -318,19 +319,19 @@ public class ModularForbidder
 
         //create supervisor
         Automata sup;
-        Automata allAutomata = givenAutomata;
+        final Automata allAutomata = givenAutomata;
         allAutomata.addAutomata(createdAutomata);
-        AutomataSynthesizer supSynth = new AutomataSynthesizer(allAutomata, synchronizationOptions, synthesizerOptions); 
+        final AutomataSynthesizer supSynth = new AutomataSynthesizer(allAutomata, synchronizationOptions, synthesizerOptions);
         try
         {
             sup = supSynth.execute();
             createdAutomata.addAutomata(sup);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Error constructing sup: " + ex.getMessage());
             logger.debug(ex.getStackTrace());
             return;
         }
-    }   
+    }
 }
