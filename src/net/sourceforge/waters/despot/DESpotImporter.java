@@ -733,54 +733,90 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     }
 
     eventList.add(mFactory.createSimpleIdentifierProxy(eventName));
-    // reads and stores the position of the label for the edge
-    String xPosStr = tr.getAttribute("lx");
-    String yPosStr = tr.getAttribute("ly");
-    LabelGeometryProxy labelPos = null;
-    if (!xPosStr.equals("") && !yPosStr.equals("")) {
-      final double xPos = Double.parseDouble(xPosStr);
-      final double yPos = Double.parseDouble(yPosStr);
-      final Point2D labelPoint = new Point2D.Double(xPos, yPos);
-      labelPos = mFactory.createLabelGeometryProxy(labelPoint);
-    }
-    final LabelBlockProxy transEvents =
-        mFactory.createLabelBlockProxy(eventList, labelPos);
 
     // reads and stores the geometry (layout) data for the edge
     final List<Point2D> points = new ArrayList<Point2D>(0);
     final NodeList posList = tr.getElementsByTagName("Pos");
     final List<Element> geoList = convertNodeList(posList);
-    // DESpot files list points on the edge in opposite order to waters
-    Collections.reverse(geoList);
+    // remove first and last point because they are within the range of the
+    // source/target nodes
+    int numCtrlPoints = geoList.size();
+    if (numCtrlPoints >= 2) {
+      geoList.remove(numCtrlPoints - 1);
+      geoList.remove(0);
+      // DESpot files list points on the edge in opposite order to waters
+      Collections.reverse(geoList);
+    }
     SplineGeometryProxy edgeShape = null;
-    if (geoList.size() > 0) {
-      for (int i = 0; i < geoList.size(); i++) {
+    numCtrlPoints = geoList.size();
+    if (numCtrlPoints > 0) {
+      for (int i = 0; i < numCtrlPoints; i++) {
         final Element pos = (Element) geoList.get(i);
-        final Point2D sourcePos =
-            mNodes.get(srcIndex).getPointGeometry().getPoint();
-        final Point2D targetPos =
-            mNodes.get(targetIndex).getPointGeometry().getPoint();
-        xPosStr = pos.getAttribute("x");
-        yPosStr = pos.getAttribute("y");
+        /*
+         * final Point2D sourcePos =
+         * mNodes.get(srcIndex).getPointGeometry().getPoint(); final Point2D
+         * targetPos = mNodes.get(targetIndex).getPointGeometry().getPoint();
+         */
+        final String xPosStr = pos.getAttribute("x");
+        final String yPosStr = pos.getAttribute("y");
         double xPos;
         double yPos;
         if (!xPosStr.equals("") && !yPosStr.equals("")) {
           xPos = Double.parseDouble(xPosStr);
           yPos = Double.parseDouble(yPosStr);
           final Point2D point = new Point2D.Double(xPos, yPos);
-          // if the distance between the new <Pos> and the source or target
-          // state is less than 12 then that is within the area of the node
-          // itself and the control point is unnecessary
-          final double nodeAreaSq = 12 * 12;
-          if ((point.distanceSq(sourcePos) > nodeAreaSq)
-              && (point.distanceSq(targetPos) > nodeAreaSq)) {
-            points.add(point);
-          }
+          points.add(point);
+
         }
+        edgeShape =
+            mFactory
+                .createSplineGeometryProxy(points, SplineKind.INTERPOLATING);
       }
-      edgeShape =
-          mFactory.createSplineGeometryProxy(points, SplineKind.INTERPOLATING);
     }
+
+    // reads and stores the position of the label for the edge
+    final String xPosStr = tr.getAttribute("lx");
+    final String yPosStr = tr.getAttribute("ly");
+    LabelGeometryProxy labelPos = null;
+    if (!xPosStr.equals("") && !yPosStr.equals("")) {
+      final double lblXPos = Double.parseDouble(xPosStr);
+      final double lblYPos = Double.parseDouble(yPosStr);
+      final Point2D abslblPoint = new Point2D.Double(lblXPos, lblYPos);
+
+      // DESpot files give an absolute position for the label, waters require a
+      // position relative to the edge
+      Point2D relLblPoint = null;
+      double centreX = 0;
+      double centreY = 0;
+      if (numCtrlPoints == 0) {
+        final Point2D srcPos =
+            mNodes.get(srcIndex).getPointGeometry().getPoint();
+        final Point2D targPos =
+            mNodes.get(targetIndex).getPointGeometry().getPoint();
+        centreX = ((srcPos.getX() - targPos.getX()) / 2) + targPos.getX();
+        centreY = ((srcPos.getY() - targPos.getY()) / 2) + targPos.getY();
+
+      } else if ((numCtrlPoints % 2) != 0) {
+        final Element centrePos = geoList.get(numCtrlPoints / 2);
+        centreX = Double.parseDouble(centrePos.getAttribute("x"));
+        centreY = Double.parseDouble(centrePos.getAttribute("y"));
+      } else {
+        final Element centrePos1 = geoList.get(numCtrlPoints / 2);
+        final Element centrePos2 = geoList.get((numCtrlPoints / 2) - 1);
+        double cntrPos1 = Double.parseDouble(centrePos1.getAttribute("x"));
+        double cntrPos2 = Double.parseDouble(centrePos2.getAttribute("x"));
+        centreX = ((cntrPos1 - cntrPos2) / 2) + cntrPos2;
+        cntrPos1 = Double.parseDouble(centrePos1.getAttribute("y"));
+        cntrPos2 = Double.parseDouble(centrePos2.getAttribute("y"));
+        centreY = ((cntrPos1 - cntrPos2) / 2) + cntrPos2;
+      }
+      relLblPoint =
+          new Point2D.Double(abslblPoint.getX() - centreX, abslblPoint.getY()
+              - centreY);
+      labelPos = mFactory.createLabelGeometryProxy(relLblPoint);
+    }
+    final LabelBlockProxy transEvents =
+        mFactory.createLabelBlockProxy(eventList, labelPos);
 
     return mFactory.createEdgeProxy(mNodes.get(srcIndex), mNodes
         .get(targetIndex), transEvents, null, edgeShape, null, null);
@@ -945,7 +981,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   /**
    * Maps the source state and target state together (as an IdPair) for a
-   * transition to the index number where this edge exists in the list 'edges'.
+   * transition to the index number where this edge exists in the list 'mEdges'.
    * This is used to lookup quickly whether an edge already exists.
    */
   private final Map<IdPair,Integer> mTransitions =
