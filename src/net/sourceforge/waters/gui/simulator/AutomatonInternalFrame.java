@@ -14,7 +14,6 @@ import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -56,20 +55,6 @@ public class AutomatonInternalFrame extends JInternalFrame
     mParent.removeAutomaton(this.getTitle());
     mDisplayPane.close();
     super.dispose();
-  }
-
-  // ##########################################################################
-  // # Simple Access
-
-  public void removeSelectedEvent(final EventProxy event)
-  {
-    mDisplayPane.removeSelectedEvent(event);
-  }
-
-
-  public void addSelectedEvent(final EventProxy event)
-  {
-    mDisplayPane.addSelectedEvent(event);
   }
 
   //##########################################################################

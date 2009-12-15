@@ -194,6 +194,11 @@ public class EditorColor
    */
   public static final Color SIMULATION_SELECTED = Color.pink;
 
+  /**
+   *  The colour for selected, enabled, and active events in the simulator
+   */
+  public static final Color SIMULATION_EVERYTHING = Color.magenta.brighter();
+
   /*
    * Placeholders, if needed
    *

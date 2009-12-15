@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -28,7 +31,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
-public class EventJTree extends JTree implements InternalFrameObserver
+public class EventJTree extends JTree implements InternalFrameObserver, ComponentListener
 {
 
   public EventJTree(final Simulation sim, final AutomatonDesktopPane desktop, final ModuleContainer container)
@@ -92,6 +95,7 @@ public class EventJTree extends JTree implements InternalFrameObserver
   public void addScrollPane(final JScrollPane scroll)
   {
     mPane = scroll;
+    mPane.addComponentListener(this);
   }
 
   // ##################################################################
@@ -168,6 +172,28 @@ public class EventJTree extends JTree implements InternalFrameObserver
   }
 
   // ########################################################################
+  // # Interface ComponentListener
+  public void componentHidden(final ComponentEvent e)
+  {
+    //Do nothing
+  }
+
+  public void componentMoved(final ComponentEvent e)
+  {
+    // Do nothing
+  }
+
+  public void componentResized(final ComponentEvent e)
+  {
+    forceRecalculation();
+  }
+
+  public void componentShown(final ComponentEvent e)
+  {
+    forceRecalculation();
+  }
+
+  // ########################################################################
   // # Auxillary Classes
 
   public void forceRecalculation()
@@ -197,7 +223,10 @@ public class EventJTree extends JTree implements InternalFrameObserver
     {
       //final JPanel output = (JPanel) ((EventTreeCellRenderer)super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus)).getComponent(0);
       panel  = new JPanel();
-
+      if (sel)
+        panel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
+      else
+        panel.setBackground(EditorColor.BACKGROUNDCOLOR);
       if (value.getClass() == EventBranchNode.class)
       {
         final GridBagLayout layout = new GridBagLayout();
@@ -221,10 +250,6 @@ public class EventJTree extends JTree implements InternalFrameObserver
         final int width = mPane.getWidth();
         final int rightWidth = (width - noduleWidth) / (1 + (eventColumnWidth[0] / eventColumnWidth[1]));
         final int leftWidth = (eventColumnWidth[0] / eventColumnWidth[1]) * rightWidth;
-        layout.columnWidths = new int[]{leftWidth, rightWidth};
-        System.out.println("DEBUG: Width: " + mPane.getWidth()
-            + " Left width: " + leftWidth
-            + " Right width: " + rightWidth);
         left.setPreferredSize(new Dimension(leftWidth, rowHeight));
         right.setPreferredSize(new Dimension(rightWidth, rowHeight));
         panel.add(left);
@@ -301,7 +326,7 @@ public class EventJTree extends JTree implements InternalFrameObserver
   private static final int[] automataColumnWidth = {110, 20, 60};
   private static int totalEventWidth;
   private static final int[] eventColumnWidth = {180, 20};
-  private static final int noduleWidth = 20;
+  private static final int noduleWidth = 30;
   public static final int rowHeight = 20;
 
 }

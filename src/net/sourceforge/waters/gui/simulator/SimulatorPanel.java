@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 
 import org.supremica.gui.WhiteScrollPane;
@@ -104,6 +103,7 @@ public class SimulatorPanel
   {
     mTraceTree = new TraceJTree(mSimulation, mDesktop, mModuleContainer);
     final JScrollPane scroll = new JScrollPane(mTraceTree);
+    mTraceTree.addScrollPane(scroll);
     mTracePanel.setLayout(new BorderLayout());
     mTracePanel.add(scroll, BorderLayout.CENTER);
     mTabbedPane.addTab("Trace", mTracePanel);
@@ -145,7 +145,7 @@ public class SimulatorPanel
   private final Simulation mSimulation;
   //private final JPanel mTracePanel = new JPanel();
   private JTable mAutomataTable = new JTable();
-  private JTree mTraceTree;
+  private TraceJTree mTraceTree;
   private EventJTree mEventsTree;
   //private final JScrollPane mScrollPane = new JScrollPane();
 

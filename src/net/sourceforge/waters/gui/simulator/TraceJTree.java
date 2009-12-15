@@ -4,12 +4,15 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -28,7 +31,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
-public class TraceJTree extends JTree implements InternalFrameObserver
+public class TraceJTree extends JTree implements InternalFrameObserver, ComponentListener
 {
   public TraceJTree(final Simulation sim, final AutomatonDesktopPane desktop, final ModuleContainer container)
   {
@@ -36,6 +39,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver
     this.setCellRenderer(new TraceTreeCellRenderer());
     mSim = sim;
     mDesktop = desktop;
+    mPane = null;
     desktop.attach(this);
     automatonAreOpen = new ArrayList<String>();
     mContainer = container;
@@ -46,7 +50,11 @@ public class TraceJTree extends JTree implements InternalFrameObserver
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
-
+    totalEventWidth = 0;
+    for (final Integer intVal : eventColumnWidth)
+    {
+      totalEventWidth += intVal;
+    }
     this.addMouseListener(new MouseAdapter(){
       public void mouseClicked(final MouseEvent e)
       {
@@ -85,6 +93,11 @@ public class TraceJTree extends JTree implements InternalFrameObserver
     });
   }
 
+  public void addScrollPane(final JScrollPane scroll)
+  {
+    mPane = scroll;
+    mPane.addComponentListener(this);
+  }
 
   // ############################################################################
   // # Simple Access
@@ -117,6 +130,28 @@ public class TraceJTree extends JTree implements InternalFrameObserver
     repaint();
   }
 
+  //########################################################################
+  // # Interface ComponentListener
+  public void componentHidden(final ComponentEvent e)
+  {
+    //Do nothing
+  }
+
+  public void componentMoved(final ComponentEvent e)
+  {
+    // Do nothing
+  }
+
+  public void componentResized(final ComponentEvent e)
+  {
+    forceRecalculation();
+  }
+
+  public void componentShown(final ComponentEvent e)
+  {
+    forceRecalculation();
+  }
+
   // ############################################################################
   // # Inner Classes
 
@@ -144,7 +179,6 @@ public class TraceJTree extends JTree implements InternalFrameObserver
        if (value.getClass() == EventBranchNode.class)
        {
          final GridBagLayout layout = new GridBagLayout();
-         layout.columnWidths = eventColumnWidth;
          panel.setLayout(layout);
          final EventBranchNode eventNode = (EventBranchNode)value;
          left = new JLabel(String.valueOf(eventNode.getTime() + 1));
@@ -164,8 +198,12 @@ public class TraceJTree extends JTree implements InternalFrameObserver
            right.setFont(right.getFont().deriveFont(Font.PLAIN));
            left.setFont(left.getFont().deriveFont(Font.PLAIN));
          }
-         left.setPreferredSize(new Dimension(eventColumnWidth[0], rowHeight));
-         right.setPreferredSize(new Dimension(eventColumnWidth[1], rowHeight));
+         final int width = mPane.getWidth();
+         final int rightWidth = (width - noduleWidth) / (1 + (eventColumnWidth[0] / eventColumnWidth[1]));
+         final int leftWidth = (eventColumnWidth[0] / eventColumnWidth[1]) * rightWidth;
+         left.setPreferredSize(new Dimension(leftWidth, rowHeight));
+         right.setPreferredSize(new Dimension(rightWidth, rowHeight));
+         layout.columnWidths = new int[]{leftWidth, rightWidth};
          panel.add(left);
          panel.add(right);
          return panel;
@@ -231,10 +269,13 @@ public class TraceJTree extends JTree implements InternalFrameObserver
   private final Simulation mSim;
   private final ModuleContainer mContainer;
   private final ArrayList<String> automatonAreOpen;
+  private JScrollPane mPane;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
   private static final int[] eventColumnWidth = {20, 180};
+  private static int totalEventWidth;
+  private static final int noduleWidth = 30;
   private static final int rowHeight = 20;
 
 }
