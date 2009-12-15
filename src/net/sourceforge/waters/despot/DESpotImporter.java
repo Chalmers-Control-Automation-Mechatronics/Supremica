@@ -781,7 +781,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     if (!xPosStr.equals("") && !yPosStr.equals("")) {
       final double lblXPos = Double.parseDouble(xPosStr);
       final double lblYPos = Double.parseDouble(yPosStr);
-      final Point2D abslblPoint = new Point2D.Double(lblXPos, lblYPos);
+      Point2D abslblPoint = new Point2D.Double(lblXPos, lblYPos);
 
       // DESpot files give an absolute position for the label, waters require a
       // position relative to the edge
@@ -793,8 +793,15 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
             mNodes.get(srcIndex).getPointGeometry().getPoint();
         final Point2D targPos =
             mNodes.get(targetIndex).getPointGeometry().getPoint();
-        centreX = ((srcPos.getX() - targPos.getX()) / 2) + targPos.getX();
-        centreY = ((srcPos.getY() - targPos.getY()) / 2) + targPos.getY();
+
+        if (srcID != targetID) {
+          centreX = ((srcPos.getX() - targPos.getX()) / 2) + targPos.getX();
+          centreY = ((srcPos.getY() - targPos.getY()) / 2) + targPos.getY();
+        } else {
+          // handles a self loop
+          abslblPoint = new Point2D.Double(centreX * 2, centreX * 2);
+
+        }
 
       } else if ((numCtrlPoints % 2) != 0) {
         final Element centrePos = geoList.get(numCtrlPoints / 2);
