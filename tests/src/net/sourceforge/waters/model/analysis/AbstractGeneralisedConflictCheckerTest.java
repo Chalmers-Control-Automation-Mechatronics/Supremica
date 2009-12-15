@@ -50,6 +50,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     for (final EventProxy event : events) {
       if (event.getName().equals(":alpha")
           && event.getKind().equals(EventKind.PROPOSITION)) {
+        mAlpha = event;
         final ConflictChecker modelVer = getModelVerifier();
         modelVer.setGeneralisedPrecondition(event);
         return;
@@ -85,20 +86,26 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
       final TraceProxy trace) throws Exception
   {
     super.checkCounterExample(des, trace);
-    final Map<AutomatonProxy,StateProxy> endState = getEndState(des, trace);
-    boolean marked = false;
-    for (final StateProxy state : endState.values()) {
-      for (final EventProxy proposition : state.getPropositions()) {
-        if (proposition.getKind().equals(EventKind.PROPOSITION)
-            && proposition.getName().equals(":alpha")) {
-          marked = true;
-          break;
+    // checks if the marking proposition :alpha is in the alphabet
+    final Set<EventProxy> alphabet = des.getEvents();
+    if (alphabet.contains(mAlpha)) {
+      final Map<AutomatonProxy,StateProxy> endState = getEndState(des, trace);
+      boolean marked = false;
+      for (final AutomatonProxy aut : endState.keySet()) {
+        final StateProxy state = endState.get(aut);
+        for (final EventProxy proposition : state.getPropositions()) {
+          if (proposition.equals(mAlpha)) {
+            marked = true;
+            break;
+          }
         }
-      }
-      if (!marked) {
-        fail("Counterexample does not lead to an end state which contains the proposition named :alpha");
-        ;
-        return;
+        if (!marked) {
+          fail("Counterexample leads to an end state where automaton "
+              + aut.getName() + " is in state " + state.getName()
+              + " which does not contain the proposition named :alpha");
+          ;
+          return;
+        }
       }
     }
   }
@@ -113,8 +120,6 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
         new HashMap<AutomatonProxy,StateProxy>(size);
     for (final AutomatonProxy aut : automata) {
       final StateProxy state = checkCounterExample(aut, counterexample);
-      assertNotNull("Counterexample not accepted by automaton " + aut.getName()
-          + "!", state);
       tuple.put(aut, state);
     }
     return tuple;
@@ -153,5 +158,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     final String name = "g4.wmod";
     runModelVerifier(group, dir, name, false);
   }
+
+  private EventProxy mAlpha = null;
 
 }
