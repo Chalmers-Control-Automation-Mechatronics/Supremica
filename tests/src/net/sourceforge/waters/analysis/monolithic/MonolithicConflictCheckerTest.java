@@ -12,22 +12,21 @@ package net.sourceforge.waters.analysis.monolithic;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.
-  AbstractGeneralisedConflictCheckerTest;
+import net.sourceforge.waters.model.analysis.AbstractGeneralisedConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class MonolithicConflictCheckerTest
-  extends AbstractGeneralisedConflictCheckerTest
+public class MonolithicConflictCheckerTest extends
+    AbstractGeneralisedConflictCheckerTest
 {
 
-  //#########################################################################
-  //# Entry points in junit.framework.TestCase
-  public static Test suite() {
-    TestSuite testSuite =
-      new TestSuite(MonolithicConflictCheckerTest.class);
+  // #########################################################################
+  // # Entry points in junit.framework.TestCase
+  public static Test suite()
+  {
+    final TestSuite testSuite =
+        new TestSuite(MonolithicConflictCheckerTest.class);
     return testSuite;
   }
 
@@ -36,20 +35,18 @@ public class MonolithicConflictCheckerTest
     junit.textui.TestRunner.run(suite());
   }
 
-
-  //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ConflictChecker
-    createModelVerifier(final ProductDESProxyFactory factory)
+  // #########################################################################
+  // # Overrides for abstract base class
+  // # net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  protected ConflictChecker createModelVerifier(
+      final ProductDESProxyFactory factory)
   {
     return new MonolithicConflictChecker(factory);
   }
 
-
-  //#########################################################################
-  //# Overridden Test Cases
-  public void testHISCRhoneSubsystem1Patch0() throws Exception
+  // #########################################################################
+  // # Overridden Test Cases
+ /* public void testHISCRhoneSubsystem1Patch0() throws Exception
   {
     try {
       super.testHISCRhoneSubsystem1Patch0();
@@ -74,6 +71,6 @@ public class MonolithicConflictCheckerTest
     } catch (final OverflowException exception) {
       // never mind
     }
-  }
+  }*/
 
 }

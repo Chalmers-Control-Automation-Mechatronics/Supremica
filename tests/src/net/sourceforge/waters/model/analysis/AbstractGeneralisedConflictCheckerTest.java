@@ -10,11 +10,19 @@
 package net.sourceforge.waters.model.analysis;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -38,20 +46,17 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
   {
     super.configureModelVerifier(des);
     final Set<EventProxy> events = des.getEvents();
-    // checks that this des does include the precondition marking
+    // checks that this des does include the precondition marking :alpha
     for (final EventProxy event : events) {
       if (event.getName().equals(":alpha")
           && event.getKind().equals(EventKind.PROPOSITION)) {
-
         final ConflictChecker modelVer = getModelVerifier();
         modelVer.setGeneralisedPrecondition(event);
         return;
       }
     }
-
-    fail("File does " + des.getName()
-        + " not contain a proposition named :alpha.");
-
+    fail("File, " + des.getName()
+        + ", does not contain a proposition named :alpha.");
   }
 
   protected void configure(final ModuleCompiler compiler)
@@ -61,6 +66,58 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     propositions.add(":alpha");
     propositions.add(EventDeclProxy.DEFAULT_MARKING_NAME);
     compiler.setEnabledPropositionNames(propositions);
+  }
+
+  // #########################################################################
+  // # Overrides for abstract base class
+  // # net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  /**
+   * Checks the correctness of a conflict counterexample. A conflict
+   * counterexample has to be a {@link ConflictTraceProxy}, its event sequence
+   * has to be accepted by all automata in the given model, and it must take the
+   * model to a blocking state which has the precondition marking :alpha. The
+   * latter condition is checked by means of a language inclusion check.
+   *
+   * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
+   * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
+   */
+  protected void checkCounterExample(final ProductDESProxy des,
+      final TraceProxy trace) throws Exception
+  {
+    super.checkCounterExample(des, trace);
+    final Map<AutomatonProxy,StateProxy> endState = getEndState(des, trace);
+    boolean marked = false;
+    for (final StateProxy state : endState.values()) {
+      for (final EventProxy proposition : state.getPropositions()) {
+        if (proposition.getKind().equals(EventKind.PROPOSITION)
+            && proposition.getName().equals(":alpha")) {
+          marked = true;
+          break;
+        }
+      }
+      if (!marked) {
+        fail("Counterexample does not lead to an end state which contains the proposition named :alpha");
+        ;
+        return;
+      }
+    }
+  }
+
+  private Map<AutomatonProxy,StateProxy> getEndState(final ProductDESProxy des,
+      final TraceProxy trace)
+  {
+    final ConflictTraceProxy counterexample = (ConflictTraceProxy) trace;
+    final Collection<AutomatonProxy> automata = des.getAutomata();
+    final int size = automata.size();
+    final Map<AutomatonProxy,StateProxy> tuple =
+        new HashMap<AutomatonProxy,StateProxy>(size);
+    for (final AutomatonProxy aut : automata) {
+      final StateProxy state = checkCounterExample(aut, counterexample);
+      assertNotNull("Counterexample not accepted by automaton " + aut.getName()
+          + "!", state);
+      tuple.put(aut, state);
+    }
+    return tuple;
   }
 
   // #########################################################################
