@@ -359,7 +359,8 @@ public class AutomatonDisplayPane
           for (final TransitionProxy trans : mAutomaton.getTransitions()) {
             final Proxy source = infomap.get(trans).getSourceObject();
             final AbstractSubject subject = (AbstractSubject) source;
-            if (subject.getAncestor(EdgeSubject.class) == mFocusedItem) {
+            if (subject.getAncestor(EdgeSubject.class) == mFocusedItem
+                && mSim.getValidTransitions().contains(trans.getEvent())) {
               possibleEvents.add(trans.getEvent());
             }
           }

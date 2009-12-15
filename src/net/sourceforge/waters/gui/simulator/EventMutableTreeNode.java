@@ -15,13 +15,14 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   // ################################################################
   // # Constructor
 
-  public EventMutableTreeNode(final Simulation sim, final EventJTree parent, final List<Pair<Boolean, Integer>> sortingMethods)
+  public EventMutableTreeNode(final Simulation sim, final EventJTree parent, final List<Pair<Boolean, Integer>> sortingMethods,
+      final ArrayList<String> expandedNodes)
   {
     super("Event", true);
     sim.attach(this);
     mParent = parent;
     mSim = sim;
-    setupAllEvents(sim, sortingMethods);
+    setupAllEvents(sim, sortingMethods, expandedNodes);
   }
 
   // #################################################################
@@ -36,9 +37,11 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   // ##################################################################
   // # Auxillary Functions
 
-  private void setupAllEvents(final Simulation sim, final List<Pair<Boolean, Integer>> sortingMethods)
+  private void setupAllEvents(final Simulation sim, final List<Pair<Boolean, Integer>> sortingMethods,
+      final ArrayList<String> expandedNodes)
   {
     this.removeAllChildren();
+    //mParent.expandPath(new TreePath(this));
     final ArrayList<Integer> sortedIndexes = sortArrayList(sim.getAllEvents(), sortingMethods);
     for (final Integer index : sortedIndexes)
     {
@@ -53,8 +56,15 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
       {
         eventToAdd.add(new AutomatonLeafNode(automaton, null));
       }
+      for (int looper = 0; looper < expandedNodes.size(); looper++)
+      {
+        final String name = expandedNodes.get(looper);
+        if (event.getName().compareTo(name) == 0)
+        {
+          mParent.expandPath(new TreePath(eventToAdd.getPath()));
+        }
+      }
     }
-    mParent.expandPath(new TreePath(this));
   }
 
 

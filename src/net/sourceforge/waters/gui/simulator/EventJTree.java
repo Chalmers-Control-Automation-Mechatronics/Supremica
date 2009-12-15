@@ -9,12 +9,14 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -45,8 +47,8 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
     automatonAreOpen = new ArrayList<String>();
     mContainer = container;
     mSortingMethods = new ArrayList<Pair<Boolean, Integer>>();
-    selectedEvents = new ArrayList<EventProxy>();
-    final EventMutableTreeNode root = new EventMutableTreeNode(sim, this, mSortingMethods);
+    expandedNodes = new ArrayList<String>();
+    final EventMutableTreeNode root = new EventMutableTreeNode(sim, this, mSortingMethods, expandedNodes);
     this.setModel(new DefaultTreeModel(root, false));
     this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
@@ -87,6 +89,31 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
             final AutomatonProxy toAdd = ((AutomatonLeafNode)node).getAutomata();
             mDesktop.addAutomaton(toAdd.getName(), mSim.getContainer(), mSim, 2);
           }
+        }
+      }
+    });
+    this.addTreeWillExpandListener(new TreeWillExpandListener(){
+
+      public void treeWillCollapse(final TreeExpansionEvent event)
+          throws ExpandVetoException
+      {
+        if (event.getPath().getLastPathComponent().getClass() == EventBranchNode.class)
+        {
+          expandedNodes.remove(((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName());
+        }
+      }
+
+      public void treeWillExpand(final TreeExpansionEvent event)
+          throws ExpandVetoException
+      {
+        if (event.getPath().getLastPathComponent().getClass() == EventBranchNode.class)
+        {
+          for (final String name : expandedNodes)
+          {
+            if (((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName().compareTo(name) == 0)
+              return;
+          }
+          expandedNodes.add(((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName());
         }
       }
     });
@@ -133,20 +160,6 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
       final Pair<Boolean, Integer> newMethod = new Pair<Boolean, Integer>(true, index);
       mSortingMethods.add(0, newMethod);
     }
-  }
-
-  public void addSelectedEvent(final EventProxy event)
-  {
-    if (!selectedEvents.contains(event))
-      selectedEvents.add(event);
-    repaint();
-  }
-
-  public void removeSelectedEvent(final EventProxy event)
-  {
-    if (selectedEvents.contains(event))
-      selectedEvents.remove(event);
-    repaint();
   }
 
   //##################################################################
@@ -198,8 +211,8 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
 
   public void forceRecalculation()
   {
-    final EventMutableTreeNode node = new EventMutableTreeNode(mSim, this, mSortingMethods);
-    this.setModel(new DefaultTreeModel(node, false));
+    final EventMutableTreeNode root = new EventMutableTreeNode(mSim, this, mSortingMethods, expandedNodes);
+    this.setModel(new DefaultTreeModel(root, false));
   }
 
   // ########################################################################
@@ -238,10 +251,6 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
           left.setIcon(IconLoader.ICON_CONTROLLABLE);
         else
           left.setIcon(IconLoader.ICON_UNCONTROLLABLE);
-        if (selectedEvents.contains(event))
-          left.setFont(left.getFont().deriveFont(Font.BOLD));
-        else
-          left.setFont(left.getFont().deriveFont(Font.PLAIN));
         right = new JLabel();
         if (mSim.getValidTransitions().contains(event))
           right.setIcon(IconLoader.ICON_TICK);
@@ -319,8 +328,8 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
   private final ModuleContainer mContainer;
   private final ArrayList<String> automatonAreOpen;
   private final ArrayList<Pair<Boolean, Integer>> mSortingMethods;
-  private final ArrayList<EventProxy> selectedEvents;
   private JScrollPane mPane;
+  private final ArrayList<String> expandedNodes;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};

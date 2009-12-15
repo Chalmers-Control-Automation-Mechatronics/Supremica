@@ -8,6 +8,7 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
 import net.sourceforge.waters.gui.EditorColor;
@@ -40,22 +41,23 @@ public class SelectedTableCellRenderer implements TableCellRenderer
     }
     else
     {
-      mPanel.setBackground(EditorColor.BACKGROUND_NOTFOCUSSED);
+      mPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
     }
     if (column == 1 || column == 4)
     {
+      mLabel = new JLabel(String.valueOf(value), SwingConstants.LEFT);
+      mPanel.setAlignmentY(JPanel.LEFT_ALIGNMENT);
+      mPanel.add(mLabel);
       if (mDesktop.automatonIsOpen(((AbstractTunnelTable)table.getModel()).getAutomaton(row, mSim)))
       {
         final Font oldFont = mPanel.getFont();
-        mPanel.setFont(oldFont.deriveFont(Font.BOLD));
+        mLabel.setFont(oldFont.deriveFont(Font.BOLD));
       }
       else
       {
         final Font oldFont = mPanel.getFont();
-        mPanel.setFont(oldFont.deriveFont(Font.PLAIN));
+        mLabel.setFont(oldFont.deriveFont(Font.PLAIN));
       }
-      mLabel = new JLabel(String.valueOf(value));
-      mPanel.add(mLabel);
     }
     else
     {

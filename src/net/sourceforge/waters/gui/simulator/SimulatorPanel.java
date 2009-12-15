@@ -74,6 +74,7 @@ public class SimulatorPanel
   {
 
     mAutomataTable = new JTable(new AbstractTunnelTable(mModuleContainer, mSimulation, mDesktop));
+    mAutomataTable.setRowHeight(AUTOMATA_TABLE_HEIGHT);
     ((AbstractTunnelTable)mAutomataTable.getModel()).attachTable(mAutomataTable);
     final int width = 245; // DEBUG: Arbitrary value: Any value will work, but this is close to the 'normal' value
     mAutomataTable.setDefaultRenderer(mAutomataTable.getColumnClass(1), new SelectedTableCellRenderer(mSimulation, mDesktop));
@@ -155,5 +156,6 @@ public class SimulatorPanel
   private static final long serialVersionUID = 1L;
   private static final boolean DISABLE_AUTOMATON_GRIDLINES = true;
   private static final int[] WIDTH_OF_BUTTON_COLUMNS = new int[]{65, 110, 60};
+  private static final int AUTOMATA_TABLE_HEIGHT = 20;
 
 }
