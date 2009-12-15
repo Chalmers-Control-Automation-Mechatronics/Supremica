@@ -11,7 +11,6 @@ package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
@@ -68,8 +67,6 @@ public class LabelBlockProxyShape
   public void draw(final Graphics2D g2d, final RenderingInformation status)
   {
     final Shape shape = getShape();
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                         RenderingHints.VALUE_ANTIALIAS_ON);
     if (status.isFocused()) {
       g2d.setColor(status.getShadowColor());
       g2d.setStroke(SHADOWSTROKE);

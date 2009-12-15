@@ -89,8 +89,16 @@ public class EditorColor
    */
   public static Color shadow(final Color color)
   {
-    return new Color(color.getRed(), color.getGreen(), color.getBlue(),
-                     SHADOWALPHA);
+    return shadow(color, SHADOWALPHA);
+  }
+
+  /**
+   * Returns a transparent variant of the supplied colour. The
+   * alpha-value is changed to the given value.
+   */
+  public static Color shadow(final Color color, final int alpha)
+  {
+    return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
   }
 
 
@@ -130,7 +138,7 @@ public class EditorColor
   public static final Color DEFAULTCOLOR_NODEGROUP = new Color(64,64,64);
 
   /**
-   * The colour of erring objects. For example colliding nodes and nodegroups.
+   * The colour of erring objects. For example colliding nodes and node groups.
    */
   public static final Color ERRORCOLOR = Color.RED;
   /**
@@ -185,27 +193,16 @@ public class EditorColor
   public static final Color SIMULATION_ENABLED = CANDROPCOLOR;
 
   /**
-   * The colour for events which are both active and enabled, within the simulator
+   * The colour for enabled events that are in focus in the simulator
    */
-  public static final Color SIMULATION_ACTIVE_ENABLED = Color.cyan.darker();
+  public static final Color SIMULATION_FOCUSED_SHADOW =
+    shadow(Color.YELLOW, 144);
 
   /**
-   * The colour for selected events in the simulator
+   * The colour for disabled events that are in focus in the simulator
    */
-  public static final Color SIMULATION_SELECTED = Color.pink;
-
-  /**
-   *  The colour for selected, enabled, and active events in the simulator
-   */
-  public static final Color SIMULATION_EVERYTHING = Color.magenta.brighter();
-
-  /*
-   * Placeholders, if needed
-   *
-   * public static final Color SIMULATION_ACTIVE_SELECTED;
-   * public static final Color SIMULATION_ENABLED_SELECTED;
-   * public static final Color SIMULATION_ACTIVE_ENABLED_SELECTED;
-   */
+  public static final Color SIMULATION_DISABLED_FOCUSED =
+    GRAPH_SELECTED_NOTFOCUSSED;
 
 
   //#########################################################################

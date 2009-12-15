@@ -1,17 +1,34 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Simulator
+//# PACKAGE: net.sourceforge.waters.gui.simulator
+//# CLASS:   AutomatonDisplayPane
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.gui.simulator;
 
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JLabel;
@@ -30,20 +47,22 @@ import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent.EmbedderEventType;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -69,8 +88,8 @@ public class AutomatonDisplayPane
     mSim = sim;
     mAutomaton = aut;
     mContainer = container;
-    hoveredEdge = null;
-    hoveredLabel = null;
+    mFocusedItem = null;
+    mTransform = mInverseTransform = null;
     final ModuleSubject module = container.getModule();
     final RenderingContext context = new SimulatorRenderingContext();
     final ProxyShapeProducer producer =
@@ -90,119 +109,12 @@ public class AutomatonDisplayPane
     setPreferredSize(new Dimension(width, height));
     setBackground(EditorColor.BACKGROUNDCOLOR);
     sim.attach(this);
-    this.addMouseListener(new MouseListener(){
-
-      public void mouseClicked(final MouseEvent e)
-      {
-        if (e.getClickCount() == 2)
-        {
-          final ArrayList<EventProxy> possibleEvents = new ArrayList<EventProxy>();
-          if (hoveredLabel != null)
-          {
-            for (final TransitionProxy trans : mAutomaton.getTransitions())
-            {
-              final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-              final SimpleIdentifierSubject identifier = (SimpleIdentifierSubject) infomap.get(trans).getSourceObject();
-              if (identifier == hoveredLabel && mSim.getValidTransitions().contains(trans.getEvent()))
-                possibleEvents.add(trans.getEvent());
-            }
-          }
-          else if (hoveredEdge != null)
-          {
-            for (final TransitionProxy trans : mAutomaton.getTransitions())
-            {
-              final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-              final SimpleIdentifierSubject identifier = (SimpleIdentifierSubject) infomap.get(trans).getSourceObject();
-              if (hoveredEdge.getLabelBlock().getEventList().contains(identifier) && mSim.getValidTransitions().contains(trans.getEvent()))
-                possibleEvents.add(trans.getEvent());
-            }
-          }
-          final EventProxy firedEvent = findOptions(possibleEvents);
-          if (firedEvent != null)
-            try {
-              mSim.step(firedEvent);
-            } catch (final UncontrollableException exception) {
-              System.out.println("ERROR: " + exception.getMessage() + ". Event will not be fired");
-            }
-        }
-      }
-
-      public void mouseEntered(final MouseEvent e)
-      {
-        final EdgeProxy newhoveredEdge = getNearestEdge(e);
-        if (newhoveredEdge != hoveredEdge)
-        {
-          hoveredEdge = newhoveredEdge;
-          repaint();
-        }
-        final IdentifierProxy newHoveredLabel = getNearestLabel(e);
-        if (newHoveredLabel != hoveredLabel)
-        {
-          hoveredLabel = newHoveredLabel;
-          repaint();
-        }
-      }
-
-      public void mouseExited(final MouseEvent e)
-      {
-        if (hoveredEdge != null)
-        {
-          hoveredEdge = null;
-          repaint();
-        }
-        if (hoveredLabel != null)
-        {
-          hoveredLabel = null;
-          repaint();
-        }
-      }
-
-      public void mousePressed(final MouseEvent e)
-      {
-        // Do nothing
-      }
-
-      public void mouseReleased(final MouseEvent e)
-      {
-        // Do nothing
-      }
-
-    });
-    this.addMouseMotionListener(new MouseMotionListener(){
-
-      public void mouseDragged(final MouseEvent e)
-      {
-        final EdgeProxy newhoveredEdge = getNearestEdge(e);
-        if (newhoveredEdge != hoveredEdge)
-        {
-          hoveredEdge = newhoveredEdge;
-          repaint();
-        }
-        final IdentifierProxy newHoveredLabel = getNearestLabel(e);
-        if (newHoveredLabel != hoveredLabel)
-        {
-          hoveredLabel = newHoveredLabel;
-          repaint();
-        }
-      }
-
-      public void mouseMoved(final MouseEvent e)
-      {
-        final EdgeProxy newhoveredEdge = getNearestEdge(e);
-        if (newhoveredEdge != hoveredEdge)
-        {
-          hoveredEdge = newhoveredEdge;
-          repaint();
-        }
-        final IdentifierProxy newHoveredLabel = getNearestLabel(e);
-        if (newHoveredLabel != hoveredLabel)
-        {
-          hoveredLabel = newHoveredLabel;
-          repaint();
-        }
-      }
-    });
+    final MouseHandler handler = new MouseHandler();
+    addMouseListener(handler);
+    addMouseMotionListener(handler);
+    addComponentListener(new ResizeHandler());
   }
+
 
   //##########################################################################
   //# Simple Access
@@ -221,35 +133,7 @@ public class AutomatonDisplayPane
 
 
   //##########################################################################
-  //# Class BackupGraphPanel
-  public void paint(final Graphics g)
-  {
-    g.setColor(getBackground());
-    g.fillRect(0, 0, getWidth(), getHeight());
-    final Graphics2D g2d = (Graphics2D) g;
-    final AffineTransform trans = g2d.getTransform();
-    final ProxyShapeProducer producer = getShapeProducer();
-    final Rectangle2D imageRect = producer.getMinimumBoundingRectangle();
-    final Dimension panelSize = getSize();
-    final double scaleX = panelSize.getWidth() / imageRect.getWidth();
-    final double scaleY = panelSize.getHeight() / imageRect.getHeight();
-    final double min = Math.min(scaleX, scaleY);
-    g2d.scale(min, min);
-    g2d.translate(-imageRect.getX(), -imageRect.getY());
-    super.paint(g2d);
-    g2d.setTransform(trans);
-  }
-
-  protected void paintGrid(final Graphics g)
-  {
-  }
-
-  public void close()
-  {
-    mSim.detach(this);
-    super.close();
-  }
-
+  //# Interface net.sourceforge.waters.gui.springembedder.EmbedderObserver
   public void embedderChanged(final EmbedderEvent event)
   {
     super.embedderChanged(event);
@@ -257,61 +141,173 @@ public class AutomatonDisplayPane
       mParent.storeReferenceFrame();
       mParent.adjustSize(false);
       mParent.storeReferenceFrame();
+      mTransform = mInverseTransform = null;
     }
   }
 
-  // ##########################################################################
-  // # Auxillary Functions
 
-  public EdgeProxy getNearestEdge(final MouseEvent e)
+  //#########################################################################
+  //# Repaint Support
+  public void close()
   {
-    for (final EdgeProxy edge : getGraph().getEdges())
-    {
-      final ProxyShape shape = getShapeProducer().getShape(edge);
-      if (shape.isClicked(e.getX(), e.getY()))
-      {
-        System.out.println("DEBUG: Edge Detected");
+    mSim.detach(this);
+    super.close();
+  }
+
+  protected void graphChanged(final ModelChangeEvent event)
+  {
+    super.graphChanged(event);
+    mTransform = mInverseTransform = null;
+  }
+
+
+  //##########################################################################
+  //# Repainting
+  public void paint(final Graphics g)
+  {
+    g.setColor(getBackground());
+    g.fillRect(0, 0, getWidth(), getHeight());
+    final Graphics2D g2d = (Graphics2D) g;
+    final AffineTransform old = g2d.getTransform();
+    final AffineTransform transform = createTransform();
+    final AffineTransform copy = new AffineTransform(old);
+    copy.concatenate(transform);
+    g2d.setTransform(copy);
+    super.paint(g2d);
+    g2d.setTransform(old);
+  }
+
+  protected void paintGrid(final Graphics g)
+  {
+  }
+
+
+  //##########################################################################
+  //# Auxiliary Methods
+  private AffineTransform createTransform()
+  {
+    if (mTransform == null) {
+      final ProxyShapeProducer producer = getShapeProducer();
+      final Rectangle2D imageRect = producer.getMinimumBoundingRectangle();
+      final Dimension panelSize = getSize();
+      final double scaleX = panelSize.getWidth() / imageRect.getWidth();
+      final double scaleY = panelSize.getHeight() / imageRect.getHeight();
+      final double min = Math.min(scaleX, scaleY);
+      mTransform = new AffineTransform();
+      mTransform.scale(min, min);
+      mTransform.translate(-imageRect.getX(), -imageRect.getY());
+    }
+    return mTransform;
+  }
+
+  private AffineTransform createInverseTransform()
+  {
+    if (mInverseTransform == null) {
+      try {
+        final AffineTransform transform = createTransform();
+        mInverseTransform = transform.createInverse();
+      } catch (final NoninvertibleTransformException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+    return mInverseTransform;
+  }
+
+  /**
+   * Tries to find an item for highlighting under the mouse cursor.
+   * This method searches the graph for an item ({@link EdgeProxy} or
+   * {@link IdentifierProxy}) under the muse cursor that can be highlighted
+   * in the simulator GUI. If both an identifier and an edge is present,
+   * the identifier will be returned.
+   * @param  event     Mouse event identifying current pointer position.
+   * @return Item at the given position, or <CODE>null</CODE> if nothing
+   *         suitable was found.
+   */
+  private Proxy getClickedItem(final MouseEvent event)
+  {
+    final AffineTransform inverse = createInverseTransform();
+    final Point location = event.getPoint();
+    final Point2D orig = inverse.transform(location, null);
+    final int x = (int) Math.round(orig.getX());
+    final int y = (int) Math.round(orig.getY());
+    final GraphProxy graph = getGraph();
+    final ProxyShapeProducer producer = getShapeProducer();
+    // Labels have precedence over edges.
+    for (final EdgeProxy edge : graph.getEdges()) {
+      for (final Proxy proxy : edge.getLabelBlock().getEventList()) {
+        final ProxyShape shape = producer.getShape(proxy);
+        if (shape.isClicked(x, y)) {
+          return proxy;
+        }
+      }
+    }
+    for (final EdgeProxy edge : graph.getEdges()) {
+      final ProxyShape shape = producer.getShape(edge);
+      if (shape.isClicked(x, y)) {
         return edge;
       }
     }
     return null;
   }
-  public IdentifierProxy getNearestLabel(final MouseEvent e)
+
+  /**
+   * Updates the focused item.
+   * This method checks whether the item under the mouse cursor is
+   * different from the current focused item ({@link #mFocusedItem}),
+   * and if so, replaces the focused item and triggers redrawing of
+   * the graph.
+   */
+  private void updateFocusedItem(final MouseEvent event)
   {
-    for (final EdgeProxy edge : getGraph().getEdges())
-    {
-      for (final Proxy identifier : edge.getLabelBlock().getEventList())
-      {
-        if (identifier.getClass() == ForeachEventProxy.class)
-        {
-          throw new UnsupportedOperationException("Foreach block selection not supported");
-        }
-        else
-        {
-          final IdentifierProxy identifierProxy = (IdentifierProxy)identifier;
-          final ProxyShape shape = getShapeProducer().getShape(identifierProxy);
-          if (shape.isClicked(e.getX(), e.getY()))
-          {
-            return identifierProxy;
+    final Proxy clicked = getClickedItem(event);
+    if (clicked != mFocusedItem) {
+      mFocusedItem = clicked;
+      repaint();
+    }
+  }
+
+  /**
+   * Tests whether the given item represents an enabled transition.
+   * @param  clicked   The item to be examined, which should be of type
+   *                   {@link IdentifierProxy} or {@link EdgeProxy}.
+   * @return <CODE>true</CODE> if the given item represents a transition
+   *         that is enabled in the current simulation state;
+   *         <CODE>false</CODE> otherwise.
+   */
+  private boolean isEnabled(final Proxy clicked)
+  {
+    final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+    final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
+    for (final EventProxy event : mSim.getValidTransitions()) {
+      for (final TransitionProxy trans : mAutomaton.getTransitions()) {
+        if (trans.getEvent() == event && trans.getSource() == currentState) {
+          final Proxy source = infomap.get(trans).getSourceObject();
+          if (clicked instanceof IdentifierProxy) {
+            if (source == clicked) {
+              return true;
+            }
+          } else {
+            final AbstractSubject subject = (AbstractSubject) source;
+            if (subject.getAncestor(EdgeSubject.class) == clicked) {
+              return true;
+            }
           }
         }
       }
     }
-    return null;
+    return false;
   }
 
-  private EventProxy findOptions(final ArrayList<EventProxy> possibleEvents)
+  private EventProxy findOptions(final List<EventProxy> possibleEvents)
   {
     if (possibleEvents.size() == 0)
       return null;
     else if (possibleEvents.size() == 1)
       return possibleEvents.get(0);
-    else
-    {
+    else {
       final JLabel[] possibilities = new JLabel[possibleEvents.size()];
       final EventProxy[] events = new EventProxy[possibleEvents.size()];
-      for (int looper = 0; looper < possibleEvents.size(); looper++)
-      {
+      for (int looper = 0; looper < possibleEvents.size(); looper++) {
         final EventProxy event = possibleEvents.get(looper);
         final JLabel toAdd = new JLabel(event.getName());
         if (event.getKind() == EventKind.CONTROLLABLE)
@@ -323,7 +319,8 @@ public class AutomatonDisplayPane
         possibilities[looper] = toAdd;
         events[looper] = event;
       }
-      final EventChooserDialog dialog = new EventChooserDialog(mContainer.getIDE(), possibilities, events);
+      final EventChooserDialog dialog =
+          new EventChooserDialog(mContainer.getIDE(), possibilities, events);
       dialog.setVisible(true);
       final EventProxy event = dialog.getSelectedEvent();
       if ((event != null && !dialog.wasCancelled())) {
@@ -334,6 +331,97 @@ public class AutomatonDisplayPane
       }
       return null;
     }
+  }
+
+
+  //##########################################################################
+  //# Inner Class MouseHandler
+  private class MouseHandler implements MouseListener, MouseMotionListener
+  {
+
+    //########################################################################
+    //# Interface java.awt.event.MouseListener
+    public void mouseClicked(final MouseEvent event)
+    {
+      if (event.getClickCount() == 2 &&
+          mFocusedItem != null && isEnabled(mFocusedItem)) {
+        final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+        final List<EventProxy> possibleEvents = new ArrayList<EventProxy>();
+        if (mFocusedItem instanceof IdentifierProxy) {
+          for (final TransitionProxy trans : mAutomaton.getTransitions()) {
+            final Proxy source = infomap.get(trans).getSourceObject();
+            if (source == mFocusedItem &&
+                mSim.getValidTransitions().contains(trans.getEvent())) {
+              possibleEvents.add(trans.getEvent());
+            }
+          }
+        } else if (mFocusedItem instanceof EdgeProxy) {
+          for (final TransitionProxy trans : mAutomaton.getTransitions()) {
+            final Proxy source = infomap.get(trans).getSourceObject();
+            final AbstractSubject subject = (AbstractSubject) source;
+            if (subject.getAncestor(EdgeSubject.class) == mFocusedItem) {
+              possibleEvents.add(trans.getEvent());
+            }
+          }
+        }
+        final EventProxy firedEvent = findOptions(possibleEvents);
+        if (firedEvent != null) {
+          try {
+            mSim.step(firedEvent);
+          } catch (final UncontrollableException exception) {
+            System.out.println("ERROR: " + exception.getMessage()
+                + ". Event will not be fired");
+          }
+        }
+      }
+    }
+
+    public void mouseEntered(final MouseEvent event)
+    {
+      updateFocusedItem(event);
+    }
+
+    public void mouseExited(final MouseEvent event)
+    {
+      updateFocusedItem(event);
+    }
+
+    public void mousePressed(final MouseEvent event)
+    {
+      // Do nothing
+    }
+
+    public void mouseReleased(final MouseEvent event)
+    {
+      // Do nothing
+    }
+
+    //########################################################################
+    //# Interface java.awt.event.MouseMotionListener
+    public void mouseDragged(final MouseEvent event)
+    {
+      updateFocusedItem(event);
+    }
+
+    public void mouseMoved(final MouseEvent event)
+    {
+      updateFocusedItem(event);
+    }
+  }
+
+
+  //##########################################################################
+  //# Inner Class ResizeHandler
+  private class ResizeHandler extends ComponentAdapter
+  {
+
+    //########################################################################
+    //# Inner Class ResizeHandler
+    public void componentResized(final ComponentEvent event)
+    {
+      mTransform = mInverseTransform = null;
+    }
+
   }
 
 
@@ -388,152 +476,81 @@ public class AutomatonDisplayPane
         // highlight them while spring embedding.
         return super.getRenderingInformation(proxy);
       } else if (orig instanceof SimpleNodeProxy) {
+        final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
         final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
-        if (mContainer.getSourceInfoMap().get(currentState).getSourceObject() ==
-            orig) {
+        if (infomap.get(currentState).getSourceObject() == orig) {
           proxyIsActive = true;
         }
-      }
-      else
-      {
-        final TransitionProxy currentTrans = mSim.getPreviousTransition(mAutomaton);
+      } else if (orig instanceof IdentifierProxy ||
+                 orig instanceof EdgeProxy) {
+        final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+        final TransitionProxy currentTrans =
+          mSim.getPreviousTransition(mAutomaton);
         if (currentTrans != null) {
-          final Proxy currentTransSource =
-            mContainer.getSourceInfoMap().get(currentTrans).getSourceObject();
+          final Proxy source = infomap.get(currentTrans).getSourceObject();
           if (orig instanceof IdentifierProxy) {
-            if (currentTransSource == orig) {
+            if (source == orig) {
               proxyIsActive = true;
             }
-          } else if (orig instanceof EdgeProxy) {
-            final IdentifierSubject ident =
-              (IdentifierSubject) currentTransSource;
-            if (ident.getAncestor(EdgeSubject.class) == orig) {
+          } else {
+            final AbstractSubject subject = (AbstractSubject) source;
+            if (subject.getAncestor(EdgeSubject.class) == orig) {
               proxyIsActive = true;
             }
           }
         }
-      }
-      for (final EventProxy event : mSim.getValidTransitions())
-      {
-        for (final TransitionProxy trans : mAutomaton.getTransitions())
-        {
-          if (trans.getEvent() == event && trans.getSource() == mSim.getCurrentStates().get(mAutomaton))
-          {
-            final Proxy currentTransSource =
-              mContainer.getSourceInfoMap().get(trans).getSourceObject();
-            if (orig instanceof IdentifierProxy) {
-              if (currentTransSource == orig) {
-                proxyIsEnabled = true;
-              }
-            } else if (orig instanceof EdgeProxy) {
-              final IdentifierSubject ident =
-                (IdentifierSubject) currentTransSource;
-              if (ident.getAncestor(EdgeSubject.class) == orig) {
-                proxyIsEnabled = true;
-              }
-            }
+        if (isEnabled(orig)) {
+          proxyIsEnabled = true;
+        }
+        if (orig == mFocusedItem) {
+          proxyIsSelected = true;
+        } else if (orig instanceof IdentifierSubject) {
+          final AbstractSubject subject = (AbstractSubject) orig;
+          if (subject.getAncestor(EdgeSubject.class) == mFocusedItem) {
+            proxyIsSelected = true;
           }
         }
       }
-      for (final EventProxy event : mSim.getValidTransitions())
-      {
-        for (final TransitionProxy trans : mAutomaton.getTransitions())
-        {
-          if (trans.getEvent() == event && trans.getSource() == mSim.getCurrentStates().get(mAutomaton))
-          {
-            final Proxy currentTransSource =
-              mContainer.getSourceInfoMap().get(trans).getSourceObject();
-            if (orig instanceof IdentifierProxy) {
-              if (currentTransSource == orig && orig == hoveredLabel) {
-                proxyIsSelected = true;
-              }
-            } else if (orig instanceof EdgeProxy) {
-              final IdentifierSubject ident =
-                (IdentifierSubject) currentTransSource;
-              if (ident.getAncestor(EdgeSubject.class) == orig && (ident.getAncestor(EdgeSubject.class) == hoveredEdge)) {
-                proxyIsSelected = true;
-              }
-            }
-          }
-        }
-      }
-      return getRawRenderingInformation(orig, proxyIsActive, proxyIsEnabled, proxyIsSelected);
+      return getRawRenderingInformation
+        (orig, proxyIsActive, proxyIsEnabled, proxyIsSelected);
     }
-
-
 
     //#######################################################################
     //# Auxiliary Methods
-
-    private RenderingInformation getRawRenderingInformation(final Proxy orig, final boolean proxyIsActive, final boolean proxyIsEnabled, final boolean proxyIsSelected)
+    private RenderingInformation getRawRenderingInformation
+      (final Proxy orig, final boolean proxyIsActive,
+       final boolean proxyIsEnabled, final boolean proxyIsSelected)
     {
-      if (proxyIsActive && proxyIsSelected && proxyIsEnabled)
-        return getEverythingRenderingInformation(orig);
-      if (proxyIsEnabled && proxyIsSelected)
-      {
-        return getSelectedEnabledRenderingInformation(orig);
+      if (proxyIsActive || proxyIsEnabled || proxyIsSelected) {
+        final Color foreground;
+        final Color shadow;
+        if (proxyIsEnabled) {
+          foreground = EditorColor.SIMULATION_ENABLED;
+        } else if (proxyIsActive) {
+          foreground = EditorColor.SIMULATION_ACTIVE;
+        } else {
+          foreground = EditorColor.DEFAULTCOLOR;
+        }
+        if (proxyIsSelected) {
+          if (proxyIsEnabled) {
+            shadow = EditorColor.SIMULATION_FOCUSED_SHADOW;
+          } else {
+            shadow = EditorColor.shadow(EditorColor.SIMULATION_DISABLED_FOCUSED);
+          }
+        } else {
+          if (proxyIsActive) {
+            shadow = EditorColor.shadow(EditorColor.SIMULATION_ACTIVE);
+          } else if (proxyIsEnabled) {
+            shadow = EditorColor.shadow(EditorColor.SIMULATION_ENABLED);
+          } else {
+            shadow = null;
+          }
+        }
+        return new RenderingInformation(false, true, foreground, shadow,
+                                        getPriority(orig));
+      } else {
+        return super.getRenderingInformation(orig);
       }
-      if (proxyIsActive && !proxyIsEnabled)
-      {
-        return getActiveRenderingInformation(orig);
-      }
-      if (proxyIsEnabled && !proxyIsActive)
-      {
-        return getEnabledRenderingInformation(orig);
-      }
-      if (proxyIsEnabled && proxyIsActive)
-        return getActiveEnabledRenderingInformation(orig);
-      return super.getRenderingInformation(orig);
-    }
-
-
-    private RenderingInformation getEverythingRenderingInformation(final Proxy orig)
-    {
-      return new RenderingInformation
-      (false, true,
-       EditorColor.SIMULATION_EVERYTHING,
-       EditorColor.shadow(EditorColor.SIMULATION_EVERYTHING),
-       getPriority(orig));
-    }
-
-    private RenderingInformation getSelectedEnabledRenderingInformation(
-        final Proxy orig)
-    {
-      return new RenderingInformation
-      (false, true,
-          EditorColor.SIMULATION_SELECTED,
-          EditorColor.shadow(EditorColor.SIMULATION_SELECTED),
-          getPriority(orig));
-    }
-
-    private RenderingInformation getActiveRenderingInformation
-      (final Proxy proxy)
-    {
-      return new RenderingInformation
-        (false, true,
-         EditorColor.SIMULATION_ACTIVE,
-         EditorColor.shadow(EditorColor.SIMULATION_ACTIVE),
-         getPriority(proxy));
-    }
-
-    private RenderingInformation getEnabledRenderingInformation
-      (final Proxy proxy)
-    {
-      return new RenderingInformation
-         (false, true,
-          EditorColor.SIMULATION_ENABLED,
-          EditorColor.shadow(EditorColor.SIMULATION_ENABLED),
-          getPriority(proxy));
-    }
-
-    private RenderingInformation getActiveEnabledRenderingInformation
-      (final Proxy proxy)
-    {
-      return new RenderingInformation
-         (false, true,
-          EditorColor.SIMULATION_ENABLED,
-          EditorColor.shadow(EditorColor.SIMULATION_ACTIVE),
-          getPriority(proxy));
     }
 
     //########################################################################
@@ -542,16 +559,19 @@ public class AutomatonDisplayPane
 
   }
 
-  //#################################################################################
+  //##########################################################################
   //# Data Members
   private final Simulation mSim;
   private final AutomatonProxy mAutomaton;
   private final ModuleContainer mContainer;
   private final AutomatonInternalFrame mParent;
-  private EdgeProxy hoveredEdge;
-  private IdentifierProxy hoveredLabel;
 
-  //#################################################################################
+  private AffineTransform mTransform;
+  private AffineTransform mInverseTransform;
+  private Proxy mFocusedItem;
+
+
+  //##########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
 

@@ -66,7 +66,7 @@ public class GraphTools {
     final boolean initial = nodes.isEmpty();
     final PointGeometrySubject geo = new PointGeometrySubject(pos);
     final LabelGeometrySubject label =
-      new LabelGeometrySubject(LabelProxyShape.DEFAULTOFFSET);
+      new LabelGeometrySubject(LabelProxyShape.DEFAULT_OFFSET);
     final PointGeometrySubject initgeo =
       initial ? new PointGeometrySubject(new Point(-5, -5)) : null;
     return new SimpleNodeSubject(name, null, initial, geo, initgeo, label);

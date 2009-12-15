@@ -10,6 +10,7 @@
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -91,6 +92,11 @@ public class Renderer
         }
       }
     }
+
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                              RenderingHints.VALUE_ANTIALIAS_ON);
+    graphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
+                              RenderingHints.VALUE_FRACTIONALMETRICS_ON);
     while (!queue.isEmpty()) {
       final ShapeToRender shape = queue.poll();
       shape.draw(graphics);
@@ -100,7 +106,7 @@ public class Renderer
         shape.draw(graphics);
       }
     }
-    }
+  }
 
     protected void drawShape(final ProxyShape p, final RenderingInformation status,
         final Graphics2D graphics)

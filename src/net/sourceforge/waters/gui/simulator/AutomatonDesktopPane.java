@@ -15,6 +15,7 @@ import java.util.Set;
 
 import javax.swing.JDesktopPane;
 
+import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
@@ -27,24 +28,27 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
-public class AutomatonDesktopPane extends JDesktopPane implements SimulationObserver, Observer
+
+public class AutomatonDesktopPane
+  extends JDesktopPane
+  implements SimulationObserver, Observer
 {
   //#########################################################################
   //# Constructor
   public AutomatonDesktopPane(final ModuleContainer container,
                               final Simulation sim)
   {
-    sim.attach(this);
-    container.attach(this);
     mSim = sim;
     mContainer = container;
     observers = new HashSet<InternalFrameObserver>();
+    setBackground(EditorColor.BACKGROUNDCOLOR);
+    sim.attach(this);
+    container.attach(this);
   }
 
 
   //#########################################################################
   //# Simple Access
-
   public boolean automatonIsOpen(final AutomatonProxy automaton)
   {
     return openAutomaton.containsKey(automaton.getName());
