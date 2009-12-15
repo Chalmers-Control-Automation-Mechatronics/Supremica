@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class MonolithicConflictCheckerTest extends
+public class MonolithicGeneralisedConflictCheckerTest extends
     AbstractGeneralisedConflictCheckerTest
 {
 
@@ -26,7 +26,7 @@ public class MonolithicConflictCheckerTest extends
   public static Test suite()
   {
     final TestSuite testSuite =
-        new TestSuite(MonolithicConflictCheckerTest.class);
+        new TestSuite(MonolithicGeneralisedConflictCheckerTest.class);
     return testSuite;
   }
 
@@ -45,32 +45,6 @@ public class MonolithicConflictCheckerTest extends
   }
 
   // #########################################################################
-  // # Overridden Test Cases
- /* public void testHISCRhoneSubsystem1Patch0() throws Exception
-  {
-    try {
-      super.testHISCRhoneSubsystem1Patch0();
-    } catch (final OverflowException exception) {
-      // never mind
-    }
-  }
 
-  public void testHISCRhoneSubsystem1Patch1() throws Exception
-  {
-    try {
-      super.testHISCRhoneSubsystem1Patch1();
-    } catch (final OverflowException exception) {
-      // never mind
-    }
-  }
-
-  public void testHISCRhoneSubsystem1Patch2() throws Exception
-  {
-    try {
-      super.testHISCRhoneSubsystem1Patch2();
-    } catch (final OverflowException exception) {
-      // never mind
-    }
-  }*/
 
 }
