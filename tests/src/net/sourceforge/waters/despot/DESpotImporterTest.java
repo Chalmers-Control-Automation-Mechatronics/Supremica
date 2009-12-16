@@ -32,6 +32,7 @@ import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.ModuleIdentifierChecker;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -280,6 +281,7 @@ public class DESpotImporterTest extends AbstractWatersTest
             final File outfile = new File(outdirname, extname);
             final URI outuri = outfile.toURI();
             final ModuleProxy outmodule = mModuleMarshaller.unmarshal(outuri);
+            mIdentifierChecker.check(outmodule);
             final File expectfile = new File(indirname, extname);
             if (expectfile.exists()) {
               final URI expecturi = expectfile.toURI();
@@ -322,6 +324,7 @@ public class DESpotImporterTest extends AbstractWatersTest
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mImporter = new DESpotImporter(moduleFactory, mDocumentManager);
+    mIdentifierChecker = ModuleIdentifierChecker.getInstance();
   }
 
   protected void tearDown()
@@ -333,6 +336,7 @@ public class DESpotImporterTest extends AbstractWatersTest
     mProductDESMarshaller = null;
     mDocumentManager = null;
     mImporter = null;
+    mIdentifierChecker = null;
   }
 
 
@@ -345,5 +349,6 @@ public class DESpotImporterTest extends AbstractWatersTest
   private JAXBProductDESMarshaller mProductDESMarshaller;
   private DocumentManager mDocumentManager;
   private DESpotImporter mImporter;
+  private ModuleIdentifierChecker mIdentifierChecker;
 
 }

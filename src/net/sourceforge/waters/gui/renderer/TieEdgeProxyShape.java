@@ -19,7 +19,7 @@ import java.awt.geom.Point2D;
 import net.sourceforge.waters.model.module.EdgeProxy;
 
 
-class TieEdgeProxyShape
+public class TieEdgeProxyShape
   extends EdgeProxyShape
 {
 
@@ -87,8 +87,8 @@ class TieEdgeProxyShape
       return false;
     } else {
       final Rectangle rect =
-	new Rectangle(x - CLICK_TOLERANCE, y - CLICK_TOLERANCE,
-		      2 * CLICK_TOLERANCE, 2 * CLICK_TOLERANCE);
+        new Rectangle(x - CLICK_TOLERANCE, y - CLICK_TOLERANCE,
+                      2 * CLICK_TOLERANCE, 2 * CLICK_TOLERANCE);
       return mTie.intersects(rect) && !mTie.contains(rect);
     }
   }
@@ -158,17 +158,25 @@ class TieEdgeProxyShape
   /**
    * The height and width of a selfloop with default geometry.
    */
-  static final double DEFAULT_SIZE = 48.0;
+  public static final double DEFAULT_SIZE = 48.0;
   /**
    * The x component of the default control point given to a selfloop
    * without explicit geometry.
    */
-  static final double DEFAULT_OFFSET_X =
+  public static final double DEFAULT_OFFSET_X =
     (SELFLOOP_SIN + 1.0) / (2.0 * SELFLOOP_SIN + SQRT2) * SQRT2 * DEFAULT_SIZE;
   /**
    * The y component of the default control point given to a selfloop
    * without explicit geometry.
    */
-  static final double DEFAULT_OFFSET_Y = - DEFAULT_OFFSET_X;
+  public static final double DEFAULT_OFFSET_Y = - DEFAULT_OFFSET_X;
+
+  /**
+   * The distance of the control point of a selfloop to the node,
+   * when the height and with of the selfloop are both equal to one and
+   * the selfloop has standard 45degrees (north-east) orientation.
+   */
+  public static final double DEFAULT_DISTANCE_UNIT =
+    2.0 * (SELFLOOP_SIN + 1.0) / (2.0 * SELFLOOP_SIN + SQRT2);
 
 }

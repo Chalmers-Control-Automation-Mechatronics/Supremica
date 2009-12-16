@@ -60,7 +60,7 @@ import org.supremica.automata.Automaton;
 
 /**
  * Input class to ModularForbidder
- * 
+ *
  * Two ways to fill a ModularForbidder object mfi
  * 1:
  * mfi.createSubState()
@@ -76,7 +76,7 @@ import org.supremica.automata.Automaton;
 public class ModularForbidderInput
 {
     private static final long serialVersionUID = 1L;
-    @SuppressWarnings("unused")
+
     private static Logger logger = LoggerFactory.createLogger(ModularForbidderInput.class);
 
     private final ArrayList<SubState> subStates;
@@ -106,7 +106,7 @@ public class ModularForbidderInput
         {
             final Automaton a = it.next();
             final int s = localStateIndex[automataToExt.getAutomatonIndex(a)];
-            
+
             if(!addLocalStateIn(a, s, subStates.size()-1))
             {
                 return false;
@@ -137,7 +137,7 @@ public class ModularForbidderInput
             logger.error(getClass().getSimpleName()+" - subStateIndex or stateIndex is out of array");
             return false;
         }
-        
+
     }
 
     public ArrayList<SubState> getSubStates()
