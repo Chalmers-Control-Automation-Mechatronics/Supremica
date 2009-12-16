@@ -85,10 +85,10 @@ public class ModularForbidder
     private ArrayList<ForbiddenEvent> alphaEvent;
     private ModularForbidderInput.SubState subState;
 
-    private final String extensionPrefix = "@ "; //Prefic used in names/labels for new events and automata
+    private final String extensionPrefix = "@_"; //Prefix used in names/labels for new events and automata
 
     /**
-     * The constructor is the only method called from the outside
+     * 
      * @param input This class is based on data according to this structure
      * @param project
      */

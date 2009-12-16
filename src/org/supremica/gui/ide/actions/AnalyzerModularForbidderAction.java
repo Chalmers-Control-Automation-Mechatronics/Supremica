@@ -63,13 +63,14 @@ public class AnalyzerModularForbidderAction
             while(it.hasNext())
             {
                 mfi.addLocalStateIn(it.next(), 2, 0);
+
             }
             
-            mfi.createSubState();
-            it = automata.iterator();
+            //mfi.createSubState();
+            it = automata.getSpecificationAutomata().iterator();
             while(it.hasNext())
             {
-                mfi.addLocalStateIn(it.next(), 1, 1);
+                mfi.addLocalStateIn(it.next(), 0, 0);
             }
             
             

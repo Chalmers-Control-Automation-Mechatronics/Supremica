@@ -60,6 +60,16 @@ import org.supremica.automata.Automaton;
 
 /**
  * Input class to ModularForbidder
+ * 
+ * Two ways to fill a ModularForbidder object mfi
+ * 1:
+ * mfi.createSubState()
+ * while(automata)
+ *  addLocalStateIn(Automaton,int,mfi.subStates.size()-1)
+ * end
+ * 2:
+ * mfi.createSubState(Aautomata,int[])
+ *
  * @author patrik
  * @since December 14, 2009
  */
@@ -83,11 +93,12 @@ public class ModularForbidderInput
     }
 
     /**
-     * Creates a new sub-state based on some automata and their local-state indexes
-     * @param automataToExt
-     * @param localStateIndex
+     * Creates a new sub-state based on automata and their local-state indexes
+     * @param automataToExt [automaton1,...]
+     * @param localStateIndex [index of state in automaton1,...]
+     * @return true if all automata is added to the new sub-state, else false
      */
-    public void createSubState(final Automata automataToExt, final int[] localStateIndex)
+    public boolean createSubState(final Automata automataToExt, final int[] localStateIndex)
     {
         createSubState();
         final Iterator<Automaton> it = automataToExt.iterator();
@@ -95,8 +106,13 @@ public class ModularForbidderInput
         {
             final Automaton a = it.next();
             final int s = localStateIndex[automataToExt.getAutomatonIndex(a)];
-            addLocalStateIn(a, s, subStates.size()-1);
+            
+            if(!addLocalStateIn(a, s, subStates.size()-1))
+            {
+                return false;
+            }
         }
+        return true;
     }
 
     /**
@@ -105,12 +121,23 @@ public class ModularForbidderInput
      * @param automaton
      * @param stateIndex
      * @param subStateIndex
+     * @return true if all indexes are ok, else false
      */
-    public void addLocalStateIn(final Automaton automaton, final int stateIndex, final int subStateIndex)
+    public boolean addLocalStateIn(final Automaton automaton, final int stateIndex, final int subStateIndex)
     {
-        final SubState ss = (SubState) subStates.get(subStateIndex);
-        final State state = automaton.getStateWithIndex(stateIndex);
-        ss.addLocalState(automaton, state);
+        if(subStateIndex>=0 && subStateIndex<subStates.size() && automaton.containsStateWithIndex(stateIndex))
+        {
+            final SubState ss = (SubState) subStates.get(subStateIndex);
+            final State state = automaton.getStateWithIndex(stateIndex);
+            ss.addLocalState(automaton, state);
+            return true;
+        }
+        else
+        {
+            logger.error(getClass().getSimpleName()+" - subStateIndex or stateIndex is out of array");
+            return false;
+        }
+        
     }
 
     public ArrayList<SubState> getSubStates()
@@ -119,7 +146,7 @@ public class ModularForbidderInput
     }
 
     /**
-     * @return all automata in all local-states = all sub-states
+     * @return all automata in all local-states = in all sub-states
      */
     public Automata getTotalAutomata()
     {
@@ -163,8 +190,8 @@ public class ModularForbidderInput
         }
 
         /**
-         * Returns all automata in all local-states for this sub-state
-         * @return
+         *
+         * @return All automata in all local-states for this sub-state
          */
         public Automata getAutomataInSubState()
         {
@@ -209,5 +236,4 @@ public class ModularForbidderInput
         }
 
     }
-
 }
