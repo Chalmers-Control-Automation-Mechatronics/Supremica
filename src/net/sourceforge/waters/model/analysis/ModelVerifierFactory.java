@@ -55,13 +55,22 @@ public interface ModelVerifierFactory
   //# Command Line Arguments
   /**
    * Configures the given model verifier according to any command line
-   * arguments passed to this factory.
+   * arguments passed to this factory. This method is called while
+   * parsing command line arguments, before loading of any models.
+   * Hence, the model verifier does not yet have its input model when
+   * this method is called.
    * @return A string array containing all arguments that could not
    *         be processed. These arguments are to be considered as
    *         file names by the command line tool.
    */
   public List<String> configure(ModelVerifier verifier);
 
+  /**
+   * Configures the given model verifier after command line arguments
+   * parsing and compiling of models. This method is called just before
+   * running the model verifier to provide a second pass of configuration.
+   * When it is called, the model verifier's input model is available.
+   */
   public void postConfigure(ModelVerifier verifier);
 
   /**
