@@ -1,7 +1,9 @@
 package net.sourceforge.waters.despot;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -41,7 +43,14 @@ public class SICPropertyVBuilder
    */
   public Collection<EventProxy> getAnswerEvents()
   {
-    return null;
+    final Set<EventProxy> allEvents = mModel.getEvents();
+    final List<EventProxy> answerEvents = new ArrayList<EventProxy>(0);
+    for (final EventProxy event : allEvents) {
+      if (event.getAttributes().equals(HISCAttributes.ATTRIBUTES_ANSWER)) {
+        answerEvents.add(event);
+      }
+    }
+    return answerEvents;
   }
 
   /**
@@ -57,21 +66,29 @@ public class SICPropertyVBuilder
   }
 
   @SuppressWarnings("unused")
-  private AutomatonProxy createModifiedLowLevelAutomaton
-    (final AutomatonProxy aut, final EventProxy answer)
-  {
-    return null;
-  }
-
-  @SuppressWarnings("unused")
   private AutomatonProxy createTestForAnswer(final EventProxy answer)
   {
     return null;
   }
 
   @SuppressWarnings("unused")
-  private AutomatonProxy createModifiedInterfaceAutomaton
-    (final AutomatonProxy aut)
+  /**
+   * This returns a new AutomatonProxy which is an altered version of the interface automaton passed to the method.
+   */
+  private AutomatonProxy createModifiedInterfaceAutomaton(
+      final AutomatonProxy aut, final EventProxy answer)
+  {
+    return null;
+  }
+
+  @SuppressWarnings("unused")
+  /**
+   * This returns a new AutomatonProxy which is an altered version of the low level automaton passed to the method.
+   * All states are marked with the :alpha precondition and :accepting marking.
+   * Instead of explicitly making these markings for every state, the existing markings are removed from the event alphabet of the given automaton.
+   */
+  private AutomatonProxy createModifiedLowLevelAutomaton(
+      final AutomatonProxy aut)
   {
     return null;
   }
@@ -81,7 +98,6 @@ public class SICPropertyVBuilder
   /**
    * The model which is being changed.
    */
-  @SuppressWarnings("unused")
   private ProductDESProxy mModel;
 
   @SuppressWarnings("unused")
