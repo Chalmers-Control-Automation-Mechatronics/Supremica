@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+//import net.sourceforge.waters.gui.renderer.TieEdgeProxyShape;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -781,7 +782,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     if (!xPosStr.equals("") && !yPosStr.equals("")) {
       final double lblXPos = Double.parseDouble(xPosStr);
       final double lblYPos = Double.parseDouble(yPosStr);
-      Point2D abslblPoint = new Point2D.Double(lblXPos, lblYPos);
+      final Point2D abslblPoint = new Point2D.Double(lblXPos, lblYPos);
 
       // DESpot files give an absolute position for the label, waters require a
       // position relative to the edge
@@ -793,14 +794,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
             mNodes.get(srcIndex).getPointGeometry().getPoint();
         final Point2D targPos =
             mNodes.get(targetIndex).getPointGeometry().getPoint();
-
         if (srcID != targetID) {
           centreX = ((srcPos.getX() - targPos.getX()) / 2) + targPos.getX();
           centreY = ((srcPos.getY() - targPos.getY()) / 2) + targPos.getY();
-        } else {
-          // handles a self loop
-          abslblPoint = new Point2D.Double(centreX * 2, centreX * 2);
-
         }
 
       } else if ((numCtrlPoints % 2) != 0) {
@@ -817,10 +813,12 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         cntrPos2 = Double.parseDouble(centrePos2.getAttribute("y"));
         centreY = ((cntrPos1 - cntrPos2) / 2) + cntrPos2;
       }
-      relLblPoint =
-          new Point2D.Double(abslblPoint.getX() - centreX, abslblPoint.getY()
-              - centreY);
-      labelPos = mFactory.createLabelGeometryProxy(relLblPoint);
+      if (srcID != targetID) {
+        relLblPoint =
+            new Point2D.Double(abslblPoint.getX() - centreX, abslblPoint.getY()
+                - centreY);
+        labelPos = mFactory.createLabelGeometryProxy(relLblPoint);
+      }
     }
     final LabelBlockProxy transEvents =
         mFactory.createLabelBlockProxy(eventList, labelPos);
