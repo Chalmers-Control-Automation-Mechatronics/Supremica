@@ -1,25 +1,96 @@
 package net.sourceforge.waters.despot;
 
+import java.util.Collection;
+import java.util.List;
+
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public interface SICPropertyVBuilder
+public class SICPropertyVBuilder
 {
+  public SICPropertyVBuilder(final ProductDESProxyFactory factory)
+  {
+    mFactory = factory;
+    mModel = null;
+  }
+
+  public SICPropertyVBuilder(final ProductDESProxyFactory factory,
+      final ProductDESProxy model)
+  {
+    mModel = model;
+    mFactory = factory;
+  }
+
   /**
-   * Builds a model for a given answer event.
-   * @param answerNm The name of the answer event.
+   * Sets the model which is having SIC Property V checked.
+   *
+   * @param model
+   */
+  public void setInputModel(final ProductDESProxy model)
+  {
+    mModel = model;
+  }
+
+  /**
+   * Gets all the answer events that belong to the model.
+   *
    * @return
    */
-  public ProductDESProxy getModel(String answerNm);
+  public Collection<EventProxy> getAnswerEvents()
+  {
+    return null;
+  }
 
-  public AutomatonProxy changeInterface(AutomatonProxy aut);
+  /**
+   * Builds a model for a given answer event.
+   *
+   * @param answerNm
+   *          The name of the answer event.
+   * @return
+   */
+  public ProductDESProxy getModel(final EventProxy answer)
+  {
+    return null;
+  }
 
-  public AutomatonProxy changeLowlevel(AutomatonProxy aut);
+  @SuppressWarnings("unused")
+  private AutomatonProxy changeLowlevel(final AutomatonProxy aut,
+      final EventProxy answer)
+  {
+    return null;
+  }
 
-  public AutomatonProxy createT();
+  @SuppressWarnings("unused")
+  private AutomatonProxy createT(final EventProxy answer)
+  {
+    return null;
+  }
 
-  //may later return something different
-  public ConflictTraceProxy getCounterExample();
+  @SuppressWarnings("unused")
+  private AutomatonProxy changeInterface(final AutomatonProxy aut)
+  {
+    return null;
+  }
+
+  // #########################################################################
+  // # Data Members
+  /**
+   * The model which is being changed.
+   */
+  @SuppressWarnings("unused")
+  private ProductDESProxy mModel;
+
+  @SuppressWarnings("unused")
+  private final ProductDESProxyFactory mFactory;
+
+  /**
+   * A list of the low level automaton that are created with the new marking
+   * rules.
+   */
+  @SuppressWarnings("unused")
+  private List<AutomatonProxy> mLowLvlAutomata;
+
 }
