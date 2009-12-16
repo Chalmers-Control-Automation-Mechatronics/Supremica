@@ -1,9 +1,14 @@
 package net.sourceforge.waters.gui.simulator;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.StateProxy;
 
 public class EventBranchNode extends DefaultMutableTreeNode
 {
@@ -13,6 +18,25 @@ public class EventBranchNode extends DefaultMutableTreeNode
     mEvent = event;
     mTime = currentTime;
 
+  }
+
+  public void addAutomata(final Simulation sim, final HashMap<AutomatonProxy, StateProxy> currentStates)
+  {
+    if (this.getChildAt(0).getClass() != AutomatonLeafNode.class)
+    {
+      this.removeAllChildren();
+      final ArrayList<AutomatonProxy> automatonInEvent = new ArrayList<AutomatonProxy>();
+      for (final AutomatonProxy automaton : sim.getAutomata())
+        if (automaton.getEvents().contains(mEvent))
+          automatonInEvent.add(automaton);
+      for (final AutomatonProxy automaton : automatonInEvent)
+      {
+        if (currentStates == null)
+          this.add(new AutomatonLeafNode(automaton, null));
+        else
+          this.add(new AutomatonLeafNode(automaton, currentStates.get(automaton)));
+      }
+    }
   }
 
   public EventProxy getEvent()

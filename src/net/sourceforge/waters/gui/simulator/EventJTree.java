@@ -109,6 +109,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
               return;
           }
           expandedNodes.add(((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName());
+         ((EventBranchNode)event.getPath().getLastPathComponent()).addAutomata(mSim, null);
         }
       }
     });
@@ -208,14 +209,18 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
   {
     final EventMutableTreeNode root = new EventMutableTreeNode(mSim, this, mSortingMethods, expandedNodes);
     this.setModel(new DefaultTreeModel(root, false));
-    /*for (int looper = 0; looper < expandedNodes.size(); looper++)
+    for (int looper = 0; looper < expandedNodes.size(); looper++)
     {
       final String name = expandedNodes.get(looper);
-      if (event.getName().compareTo(name) == 0)
+      for (int nodeIndex = 0; nodeIndex < root.getChildCount(); nodeIndex++)
       {
-        mParent.expandPath(new TreePath(eventToAdd.getPath()));
+        if (((EventBranchNode)root.getChildAt(nodeIndex)).getEvent().getName().compareTo(name) == 0)
+        {
+          ((EventBranchNode)root.getChildAt(nodeIndex)).addAutomata(mSim, null);
+          this.expandPath(new TreePath(((EventBranchNode)root.getChildAt(nodeIndex)).getPath()));
+        }
       }
-    }*/
+    }
   }
 
   // ########################################################################

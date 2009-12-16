@@ -7,17 +7,18 @@ import java.awt.event.ComponentListener;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.table.JTableHeader;
 
 @SuppressWarnings("serial")
 public class SorterButtonPanel extends JPanel implements ComponentListener
 {
 
-  public SorterButtonPanel(final EventJTree mEventsTree, final JScrollPane parent)
+  public SorterButtonPanel(final EventJTree mEventsTree, final JScrollPane parent, final JTableHeader header)
   {
     mParent = parent;
-    typeButton = new SorterButton("Type", mEventsTree, 0);
-    nameButton = new SorterButton("Name", mEventsTree, 1);
-    enabledButton = new SorterButton("Enb", mEventsTree, 2);
+    typeButton = new SorterButton("Type", mEventsTree, 0, header);
+    nameButton = new SorterButton("Name", mEventsTree, 1, header);
+    enabledButton = new SorterButton("Enb", mEventsTree, 2, header);
     resizeButtons();
     this.add(typeButton);
     this.add(nameButton);
@@ -60,7 +61,7 @@ public class SorterButtonPanel extends JPanel implements ComponentListener
     typeButton.setPreferredSize(new Dimension(typeWidth, rowHeight));
     layout.columnWidths = new int[]{enabledWidth + 2, nameWidth + 2, typeWidth + 2};
     this.setLayout(layout);
-    repaint();
+    validate();
   }
 
   private double sum(final int[] a)
@@ -76,6 +77,6 @@ public class SorterButtonPanel extends JPanel implements ComponentListener
   private final SorterButton nameButton;
   private final SorterButton enabledButton;
   private static final int[] WIDTH_OF_BUTTON_COLUMNS = new int[]{65, 110, 60};
-  private static final int bufferRegion = -50;
+  private static final int bufferRegion = -10;
   private static final int rowHeight = 20;
 }

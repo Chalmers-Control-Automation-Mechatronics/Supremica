@@ -14,7 +14,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -43,6 +46,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
     desktop.attach(this);
     automatonAreOpen = new ArrayList<String>();
     mContainer = container;
+    expandedNodes = new ArrayList<String>();
     final TraceMutableTreeNode root = new TraceMutableTreeNode(sim, this);
     this.setModel(new DefaultTreeModel(root, false));
     this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -91,6 +95,33 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
         }
       }
     });
+    this.addTreeWillExpandListener(new TreeWillExpandListener(){
+
+      public void treeWillCollapse(final TreeExpansionEvent event)
+          throws ExpandVetoException
+      {
+        if (event.getPath().getLastPathComponent().getClass() == EventBranchNode.class)
+        {
+          expandedNodes.remove(((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName());
+        }
+      }
+
+      public void treeWillExpand(final TreeExpansionEvent event)
+          throws ExpandVetoException
+      {
+        if (event.getPath().getLastPathComponent().getClass() == EventBranchNode.class)
+        {
+          for (final String name : expandedNodes)
+          {
+            if (((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName().compareTo(name) == 0)
+              return;
+          }
+          expandedNodes.add(((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName());
+          ((EventBranchNode)event.getPath().getLastPathComponent()).addAutomata(mSim,
+              mSim.getAutomatonHistory().get((((EventBranchNode)event.getPath().getLastPathComponent()).getTime())));
+        }
+      }
+    });
   }
 
   public void addScrollPane(final JScrollPane scroll)
@@ -106,6 +137,19 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
   {
     final TraceMutableTreeNode node = new TraceMutableTreeNode(mSim, this);
     this.setModel(new DefaultTreeModel(node, false));
+    for (int looper = 0; looper < expandedNodes.size(); looper++)
+    {
+      final String name = expandedNodes.get(looper);
+      for (int nodeIndex = 0; nodeIndex < node.getChildCount(); nodeIndex++)
+      {
+        if (((EventBranchNode)node.getChildAt(nodeIndex)).getEvent().getName().compareTo(name) == 0)
+        {
+          ((EventBranchNode)node.getChildAt(nodeIndex)).addAutomata(mSim,
+              mSim.getAutomatonHistory().get(((EventBranchNode)node.getChildAt(nodeIndex)).getTime()));
+          this.expandPath(new TreePath(((EventBranchNode)node.getChildAt(nodeIndex)).getPath()));
+        }
+      }
+    }
   }
 
   //##################################################################
@@ -284,6 +328,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
   private final ModuleContainer mContainer;
   private final ArrayList<String> automatonAreOpen;
   private JScrollPane mPane;
+  private final ArrayList<String> expandedNodes;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -44,16 +43,9 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
     for (final Integer index : sortedIndexes)
     {
       final EventProxy event = sim.getAllEvents().get(index);
-      final ArrayList<AutomatonProxy> automatonInEvent = new ArrayList<AutomatonProxy>();
-      for (final AutomatonProxy automaton : sim.getAutomata())
-        if (automaton.getEvents().contains(event))
-          automatonInEvent.add(automaton);
       final DefaultMutableTreeNode eventToAdd= new EventBranchNode(event, sim.getCurrentTime());
       this.add(eventToAdd);
-      for (final AutomatonProxy automaton : automatonInEvent)
-      {
-        eventToAdd.add(new AutomatonLeafNode(automaton, null));
-      }
+      eventToAdd.add(new DefaultMutableTreeNode("Placeholder. You shouldn't ever see this"));
     }
   }
 

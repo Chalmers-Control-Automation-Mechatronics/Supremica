@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.simulator.Simulation;
@@ -26,6 +27,7 @@ public class SimulationStepBackAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_B);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.ALT_MASK)); // Get a better Accelerator
+    putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/tick16.gif")));
   }
 
 

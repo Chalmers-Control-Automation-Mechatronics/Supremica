@@ -1,20 +1,10 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.util.HashMap;
-
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.StateProxy;
 
 public class TraceMutableTreeNode extends DefaultMutableTreeNode implements SimulationObserver
 {
-
-
-
-
   // ################################################################
   // # Constructor
   public TraceMutableTreeNode(final Simulation sim, final TraceJTree parent)
@@ -78,15 +68,8 @@ public class TraceMutableTreeNode extends DefaultMutableTreeNode implements Simu
       final EventProxy event = sim.getEventHistory().get(looper);
       final DefaultMutableTreeNode eventToAdd= new EventBranchNode(event, looper);
       this.add(eventToAdd);
-      final HashMap<AutomatonProxy, StateProxy> stateInEvent = sim.getAutomatonHistory().get(looper);
-      this.add(eventToAdd);
-      for (final AutomatonProxy automaton : stateInEvent.keySet())
-      {
-        if (automaton.getEvents().contains(event))
-          eventToAdd.add(new AutomatonLeafNode(automaton, stateInEvent.get(automaton)));
-      }
+      eventToAdd.add(new DefaultMutableTreeNode("Placeholder. You shouldn't ever see this"));
     }
-    mParent.expandPath(new TreePath(this));
   }
 
   // ##################################################################

@@ -26,6 +26,10 @@ import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
 import net.sourceforge.waters.gui.actions.IDEPasteAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
+import net.sourceforge.waters.gui.actions.SimulationReplayStepAction;
+import net.sourceforge.waters.gui.actions.SimulationResetAction;
+import net.sourceforge.waters.gui.actions.SimulationStepAction;
+import net.sourceforge.waters.gui.actions.SimulationStepBackAction;
 import net.sourceforge.waters.gui.actions.ToolEdgeAction;
 import net.sourceforge.waters.gui.actions.ToolGroupNodeAction;
 import net.sourceforge.waters.gui.actions.ToolNodeAction;
@@ -40,6 +44,7 @@ import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.NewAction;
 import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.gui.ide.actions.SaveAction;
+import org.supremica.properties.Config;
 
 
 /**
@@ -98,6 +103,14 @@ public class IDEToolBar
 		addAction(actions.getAction(ToolNodeAction.class), group, false);
 		addAction(actions.getAction(ToolGroupNodeAction.class), group, false);
 		addAction(actions.getAction(ToolEdgeAction.class), group, false);
+		addSeparator();
+		if (Config.INCLUDE_WATERS_SIMULATOR.isTrue())
+		{
+    		addAction(actions.getAction(SimulationStepAction.class));
+    		addAction(actions.getAction(SimulationStepBackAction.class));
+    		addAction(actions.getAction(SimulationReplayStepAction.class));
+    		addAction(actions.getAction(SimulationResetAction.class));
+		}
     }
 
 

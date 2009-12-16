@@ -114,7 +114,7 @@ public class SimulatorPanel
     mEventsTree.addScrollPane(scroll);
     mEventsPanel.setLayout(new BorderLayout());
     mEventsPanel.add(scroll, BorderLayout.CENTER);
-    mEventsPanel.add(new SorterButtonPanel(mEventsTree, scroll), BorderLayout.NORTH);
+    mEventsPanel.add(new SorterButtonPanel(mEventsTree, scroll, mAutomataTable.getTableHeader()), BorderLayout.NORTH);
     mTabbedPane.addTab("Events", mEventsPanel);
   }
 
