@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -40,7 +38,7 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   private void setupAllEvents(final Simulation sim, final List<Pair<Boolean, Integer>> sortingMethods,
       final ArrayList<String> expandedNodes)
   {
-    this.removeAllChildren();
+    //this.removeAllChildren();
     //mParent.expandPath(new TreePath(this));
     final ArrayList<Integer> sortedIndexes = sortArrayList(sim.getAllEvents(), sortingMethods);
     for (final Integer index : sortedIndexes)
@@ -61,7 +59,7 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
         final String name = expandedNodes.get(looper);
         if (event.getName().compareTo(name) == 0)
         {
-          mParent.expandPath(new TreePath(eventToAdd.getPath()));
+          //mParent.expandPath(new TreePath(eventToAdd.getPath()));
         }
       }
     }
