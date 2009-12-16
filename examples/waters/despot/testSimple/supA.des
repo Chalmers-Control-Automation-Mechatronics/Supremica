@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="supA" type="regular">
+            <Integrity status="not-verified" date-stamp="Wed Oct 29 21:45:16 2008"/>
+        </Header>
+        <States count="4" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="1"/>
+            <St id="2" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="3" nm="s3" al="s3" mk="0" rch="1"/>
+            <St id="4" nm="s4" al="s4" mk="0" rch="1"/>
+        </States>
+        <Events count="3" ctrl-count="1" unctrl-count="2" def-count="3">
+            <Ev id="1" nm="ev1" al="ev1" ctrl="0" type="d"/>
+            <Ev id="2" nm="ev2" al="ev2" ctrl="0" type="d"/>
+            <Ev id="3" nm="ev3" al="ev3" ctrl="1" type="d"/>
+        </Events>
+        <Trans-Function count="9">
+            <Transitions count="5">
+                <Tr fID="4" eID="1" tID="1"/>
+                <Tr fID="2" eID="2" tID="3"/>
+                <Tr fID="3" eID="2" tID="4"/>
+                <Tr fID="3" eID="1" tID="1"/>
+                <Tr fID="1" eID="1" tID="2"/>
+            </Transitions>
+            <Self-Loops count="1">
+                <Sl eID="3"/>
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

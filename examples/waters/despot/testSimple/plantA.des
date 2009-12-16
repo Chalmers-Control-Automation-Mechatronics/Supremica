@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="plantA" type="regular">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="1" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="0"/>
+        </States>
+        <Events count="0" ctrl-count="0" unctrl-count="0" def-count="0">
+        </Events>
+        <Trans-Function count="0">
+            <Transitions count="0">
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

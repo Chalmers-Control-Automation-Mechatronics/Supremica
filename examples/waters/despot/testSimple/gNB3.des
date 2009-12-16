@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="gNB3" type="subsystem">
+            <Integrity status="not-verified" date-stamp="Wed May 14 18:42:02 2008"/>
+        </Header>
+        <States count="3" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="1"/>
+            <St id="2" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="5" nm="s5" al="s5" mk="0" rch="0"/>
+        </States>
+        <Events count="2" ctrl-count="0" unctrl-count="2" def-count="2" ans-count="0" req-count="0">
+            <Ev id="1" nm="ev1" al="ev1" ctrl="0" type="d"/>
+            <Ev id="2" nm="ev2" al="ev2" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="3">
+            <Transitions count="3">
+                <Tr fID="1" eID="1" tID="2"/>
+                <Tr fID="5" eID="1" tID="5"/>
+                <Tr fID="2" eID="2" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

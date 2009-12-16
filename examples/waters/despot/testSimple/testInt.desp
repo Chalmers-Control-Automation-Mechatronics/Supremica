@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="testInt" type="flat">
+        <Integrity status="no" dateStamp="Wed Oct 29 21:44:09 2008"/>
+        <Properties controllable="not-verified" ctrl-date-stamp="" non-blocking="not-verified" non-block-stamp=""/>
+    </Header>
+    <Subsystem name="testInt">
+        <Supervisor>
+            <Des name="supA" location="supA.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="plantA" location="plantA.des"/>
+        </Plant>
+    </Subsystem>
+</Project>

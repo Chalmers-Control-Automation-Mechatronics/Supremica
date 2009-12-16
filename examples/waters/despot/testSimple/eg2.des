@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="eg2" type="regular">
+            <Integrity status="valid" date-stamp="Fri May 16 17:24:19 2008"/>
+        </Header>
+        <States count="3" marked-count="1">
+            <InitSt id="1" nm="I2" al="I2" mk="1" rch="1"/>
+            <St id="2" nm="w2" al="w2" mk="0" rch="1"/>
+            <St id="3" nm="d2" al="d2" mk="0" rch="1"/>
+        </States>
+        <Events count="4" ctrl-count="2" unctrl-count="2" def-count="4">
+            <Ev id="1" nm="a2" al="a2" ctrl="1" type="d"/>
+            <Ev id="2" nm="b" al="b" ctrl="0" type="d"/>
+            <Ev id="3" nm="l2" al="l2" ctrl="0" type="d"/>
+            <Ev id="4" nm="u2" al="u2" ctrl="1" type="d"/>
+        </Events>
+        <Trans-Function count="4">
+            <Transitions count="4">
+                <Tr fID="2" eID="2" tID="1"/>
+                <Tr fID="2" eID="3" tID="3"/>
+                <Tr fID="1" eID="1" tID="2"/>
+                <Tr fID="3" eID="4" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

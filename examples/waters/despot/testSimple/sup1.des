@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="sup1" type="subsystem">
+            <Integrity status="not-verified" date-stamp="Thu Sep 11 21:19:50 2008"/>
+        </Header>
+        <States count="2" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="0" rch="1" sx="160" sy="160" lx="20" ly="20"/>
+            <St id="2" nm="s2" al="s2" mk="1" rch="1" sx="320" sy="160" lx="20" ly="20"/>
+        </States>
+        <Events count="3" ctrl-count="0" unctrl-count="3" def-count="3" ans-count="0" req-count="0">
+            <Ev id="1" nm="ev1" al="ev1" ctrl="0" type="d"/>
+            <Ev id="2" nm="ev2" al="ev2" ctrl="0" type="d"/>
+            <Ev id="3" nm="ev6" al="ev6" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="2">
+            <Transitions count="2">
+                <Tr fID="2" eID="2" tID="1" cnt="3" lx="189.955" ly="102.73">
+                    <Pos x="170" y="153.537"/>
+                    <Pos x="242" y="107"/>
+                    <Pos x="310" y="153.205"/>
+                </Tr>
+                <Tr fID="1" eID="1" tID="2" cnt="3" lx="268.013" ly="194.457">
+                    <Pos x="310" y="165.422"/>
+                    <Pos x="237" y="205"/>
+                    <Pos x="170" y="165.844"/>
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

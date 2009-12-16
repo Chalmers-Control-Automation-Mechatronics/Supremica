@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="testNB" type="flat">
+        <Integrity status="yes" dateStamp="Tue May 20 19:58:15 2008"/>
+        <Properties controllable="yes" ctrl-date-stamp="Wed May 14 18:08:53 2008" non-blocking="yes" non-block-stamp="Tue May 20 19:58:49 2008"/>
+    </Header>
+    <Subsystem name="testNB">
+        <Supervisor>
+            <Des name="supNB1" location="supNB1.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="gNB1" location="gNB1.des"/>
+        </Plant>
+    </Subsystem>
+</Project>

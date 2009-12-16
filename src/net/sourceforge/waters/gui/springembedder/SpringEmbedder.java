@@ -141,7 +141,7 @@ public class SpringEmbedder
   {
     if (mBlocked != null) {
       if (mBlocked.getGeometry() == null) {
-        return true;
+        mBlocked.setGeometry(new LabelGeometrySubject(new Point(5, 5)));
       }
     }
     for (final NodeSubject node : mNodes) {
@@ -183,15 +183,6 @@ public class SpringEmbedder
     throws GeometryAbsentException
   {
     boolean runEmbedder = false;
-    if (mBlocked != null) {
-      if (mBlocked.getGeometry() == null) {
-        // *** BUG ***
-        // Must calculate better position!
-        // ***
-        mBlocked.setGeometry(new LabelGeometrySubject(new Point(5, 5)));
-      }
-    }
-
     for (final NodeSubject node : mNodes) {
       if (node instanceof SimpleNodeSubject) {
         final SimpleNodeSubject simple = (SimpleNodeSubject) node;

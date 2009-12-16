@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="tmp1" type="subsystem">
+            <Integrity status="not-verified" date-stamp="Thu Sep 11 20:56:41 2008"/>
+        </Header>
+        <States count="4" marked-count="2">
+            <InitSt id="2" nm="st2" al="st2" mk="1" rch="1" sx="320" sy="160" lx="20" ly="20"/>
+            <St id="1" nm="st1" al="st1" mk="0" rch="1" sx="159" sy="161" lx="-23" ly="13"/>
+            <St id="3" nm="S3" al="S3" mk="0" rch="1" sx="160" sy="320" lx="20" ly="20"/>
+            <St id="4" nm="s5" al="s5" mk="1" rch="1" sx="320" sy="320" lx="18" ly="-15"/>
+        </States>
+        <Events count="6" ctrl-count="1" unctrl-count="5" def-count="6" ans-count="0" req-count="0">
+            <Ev id="1" nm="ev1" al="ev1" ctrl="0" type="d"/>
+            <Ev id="2" nm="ev2" al="ev2" ctrl="0" type="d"/>
+            <Ev id="4" nm="ev3" al="ev3" ctrl="0" type="d"/>
+            <Ev id="5" nm="ev5" al="ev5" ctrl="1" type="d"/>
+            <Ev id="6" nm="ev6" al="ev6" ctrl="0" type="d"/>
+            <Ev id="7" nm="ev7" al="ev7" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="20">
+            <Transitions count="8">
+                <Tr fID="1" eID="2" tID="2" cnt="3" lx="274.315" ly="159.374">
+                    <Pos x="310" y="164.125"/>
+                    <Pos x="240" y="193"/>
+                    <Pos x="169" y="164.951"/>
+                </Tr>
+                <Tr fID="1" eID="1" tID="1" ang="5.49779" lx="42.7631" ly="11.77">
+                </Tr>
+                <Tr fID="1" eID="7" tID="3" cnt="2" lx="178" ly="278.823">
+                    <Pos x="159.937" y="310"/>
+                    <Pos x="159.063" y="171"/>
+                </Tr>
+                <Tr fID="2" eID="2" tID="1" cnt="3" lx="204.99" ly="156.373">
+                    <Pos x="169" y="155.533"/>
+                    <Pos x="234" y="120"/>
+                    <Pos x="310" y="155.349"/>
+                </Tr>
+                <Tr fID="2" eID="1" tID="2" ang="5.49779" lx="42.7631" ly="11.77">
+                </Tr>
+                <Tr fID="3" eID="1" tID="3" ang="2.35619" lx="42.7631" ly="11.77">
+                </Tr>
+                <Tr fID="3" eID="7" tID="4" cnt="3" lx="273.301" ly="278.044">
+                    <Pos x="310" y="315.769"/>
+                    <Pos x="242" y="287"/>
+                    <Pos x="170" y="315.976"/>
+                </Tr>
+                <Tr fID="4" eID="1" tID="4" ang="5.49779" lx="37.1062" ly="40.0543">
+                </Tr>
+            </Transitions>
+            <Self-Loops count="3">
+                <Sl eID="4"/>
+                <Sl eID="5"/>
+                <Sl eID="6"/>
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

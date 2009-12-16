@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="test2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ev1"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ev2"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ev3"/>
+<EventDecl Kind="CONTROLLABLE" Name="ev5"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ev6"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ev7"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="sup1">
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="ev6"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s1">
+<PointGeometry>
+<Point Y="160" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="20" X="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="160" X="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="20" X="20"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="s1" Source="s2">
+<LabelBlock>
+<SimpleIdentifier Name="ev2"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-4" X="-52"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="107" X="242"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="s2" Source="s1">
+<LabelBlock>
+<SimpleIdentifier Name="ev1"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="31"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="205" X="237"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="tmp1">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="st2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="160" X="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="20" X="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="st1">
+<PointGeometry>
+<Point Y="161" X="159"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="13" X="-23"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S3">
+<PointGeometry>
+<Point Y="320" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="20" X="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s5">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="320" X="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="18"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="st2" Source="st1">
+<LabelBlock>
+<SimpleIdentifier Name="ev2"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-34" X="34"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="193" X="240"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="st1" Source="st1">
+<LabelBlock>
+<SimpleIdentifier Name="ev1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="S3" Source="st1">
+<LabelBlock>
+<SimpleIdentifier Name="ev7"/>
+<LabelGeometry Anchor="NW">
+<Point Y="38" X="19"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="st1" Source="st2">
+<LabelBlock>
+<SimpleIdentifier Name="ev2"/>
+<LabelGeometry Anchor="NW">
+<Point Y="36" X="-29"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="120" X="234"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="st2" Source="st2">
+<LabelBlock>
+<SimpleIdentifier Name="ev1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="S3" Source="S3">
+<LabelBlock>
+<SimpleIdentifier Name="ev1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s5" Source="S3">
+<LabelBlock>
+<SimpleIdentifier Name="ev7"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="31"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="287" X="242"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="s5" Source="s5">
+<LabelBlock>
+<SimpleIdentifier Name="ev1"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

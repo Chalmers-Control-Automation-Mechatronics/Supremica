@@ -48,6 +48,49 @@ public class DESpotImporterTest extends AbstractWatersTest
 
   //#########################################################################
   //# Test Cases
+  public void testImport_test2()
+    throws IOException, WatersMarshalException, WatersUnmarshalException,
+           EvalException
+  {
+    // This fails because <Self-Loops> entries are not handled correctly.
+    testImport("testSimple", "test2");
+  }
+
+  public void testImport_testCont1()
+    throws IOException, WatersMarshalException, WatersUnmarshalException,
+           EvalException
+  {
+    testImport("testSimple", "testCont1");
+  }
+
+  public void testImport_testInt()
+    throws IOException, WatersMarshalException, WatersUnmarshalException,
+           EvalException
+  {
+    testImport("testSimple", "testInt");
+  }
+
+  public void testImport_testNB()
+    throws IOException, WatersMarshalException, WatersUnmarshalException,
+           EvalException
+  {
+    testImport("testSimple", "testNB");
+  }
+
+  public void testImport_testNB2()
+    throws IOException, WatersMarshalException, WatersUnmarshalException,
+           EvalException
+  {
+    testImport("testSimple", "testNB2");
+  }
+
+  public void testImport_testSync()
+    throws IOException, WatersMarshalException, WatersUnmarshalException,
+           EvalException
+  {
+    testImport("testSimple", "testSync");
+  }
+
   public void testImport_testHISC()
     throws IOException, WatersMarshalException, WatersUnmarshalException,
            EvalException
@@ -187,7 +230,7 @@ public class DESpotImporterTest extends AbstractWatersTest
     final File wmodfilename = new File(outdirname, wmodextname);
     assertEquals("Unexpected location of output file!",
                  wmodfilename, module.getFileLocation());
-    parseGeneratedModules(despotURI, outdirname);
+    parseGeneratedModules(despotURI, indirname, outdirname);
     final ModuleCompiler compiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     final ProductDESProxy des = compiler.compile();
@@ -213,6 +256,7 @@ public class DESpotImporterTest extends AbstractWatersTest
   }
 
   private void parseGeneratedModules(final URI despotURI,
+                                     final File indirname,
                                      final File outdirname)
     throws IOException, WatersUnmarshalException
   {
@@ -233,9 +277,21 @@ public class DESpotImporterTest extends AbstractWatersTest
           if (element.getTagName().equals("Subsystem")) {
             final String name = element.getAttribute("name");
             final String extname = name + ext;
-            final File file = new File(outdirname, extname);
-            final URI uri = file.toURI();
-            mModuleMarshaller.unmarshal(uri);
+            final File outfile = new File(outdirname, extname);
+            final URI outuri = outfile.toURI();
+            final ModuleProxy outmodule = mModuleMarshaller.unmarshal(outuri);
+            final File expectfile = new File(indirname, extname);
+            if (expectfile.exists()) {
+              final URI expecturi = expectfile.toURI();
+              final ModuleProxy expectmodule =
+                mModuleMarshaller.unmarshal(expecturi);
+              assertTrue("Unexpected module contents after parse back!",
+                         outmodule.equalsByContents(expectmodule));
+              /*
+              assertTrue("Unexpected module geometry after parse back!",
+                         outmodule.equalsWithGeometry(expectmodule));
+              */
+            }
           }
         }
       }

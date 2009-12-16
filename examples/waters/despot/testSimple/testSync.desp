@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="testSync" type="flat">
+        <Integrity status="yes" dateStamp=""/>
+        <Properties controllable="not-verified" ctrl-date-stamp="" non-blocking="yes" non-block-stamp="Fri May 16 17:52:31 2008"/>
+    </Header>
+    <Subsystem name="testSync">
+        <Supervisor>
+        </Supervisor>
+        <Plant>
+            <Des name="eg1" location="eg1.des"/>
+            <Des name="eg2" location="eg2.des"/>
+        </Plant>
+    </Subsystem>
+</Project>
