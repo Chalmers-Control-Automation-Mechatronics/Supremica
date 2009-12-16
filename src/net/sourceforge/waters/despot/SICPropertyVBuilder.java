@@ -51,26 +51,27 @@ public class SICPropertyVBuilder
    *          The name of the answer event.
    * @return
    */
-  public ProductDESProxy getModel(final EventProxy answer)
+  public ProductDESProxy createModelForAnswer(final EventProxy answer)
   {
     return null;
   }
 
   @SuppressWarnings("unused")
-  private AutomatonProxy changeLowlevel(final AutomatonProxy aut,
-      final EventProxy answer)
+  private AutomatonProxy createModifiedLowLevelAutomaton
+    (final AutomatonProxy aut, final EventProxy answer)
   {
     return null;
   }
 
   @SuppressWarnings("unused")
-  private AutomatonProxy createT(final EventProxy answer)
+  private AutomatonProxy createTestForAnswer(final EventProxy answer)
   {
     return null;
   }
 
   @SuppressWarnings("unused")
-  private AutomatonProxy changeInterface(final AutomatonProxy aut)
+  private AutomatonProxy createModifiedInterfaceAutomaton
+    (final AutomatonProxy aut)
   {
     return null;
   }
@@ -91,6 +92,6 @@ public class SICPropertyVBuilder
    * rules.
    */
   @SuppressWarnings("unused")
-  private List<AutomatonProxy> mLowLvlAutomata;
+  private List<AutomatonProxy> mLowLevelAutomata;
 
 }
