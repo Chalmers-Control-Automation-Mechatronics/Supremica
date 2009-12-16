@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="Attach-Part-to-Assembly" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+            <Reachable status="yes" date-stamp=""/>
+            <Nonblocking status="yes" date-stamp=""/>
+        </Header>
+        <States count="5" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="?" sx="120" sy="120" lx="20" ly="20"/>
+            <St id="2" nm="s2-attch-pt" al="s2-attch-pt" mk="0" rch="?" sx="240" sy="120" lx="20" ly="20"/>
+            <St id="3" nm="s3" al="s3" mk="0" rch="?" sx="360" sy="120" lx="20" ly="20"/>
+            <St id="4" nm="s4" al="s4" mk="0" rch="?" sx="120" sy="240" lx="20" ly="20"/>
+            <St id="5" nm="s5" al="s5" mk="0" rch="?" sx="240" sy="240" lx="20" ly="20"/>
+        </States>
+        <Events count="6" ctrl-count="3" unctrl-count="3" def-count="6" ans-count="0" req-count="0">
+            <Ev id="1" nm="take-part" al="take-pt" ctrl="1" type="d"/>
+            <Ev id="2" nm="start-part-a" al="str-ptA" ctrl="1" type="d"/>
+            <Ev id="3" nm="complete-part-a" al="compl-A" ctrl="0" type="d"/>
+            <Ev id="4" nm="complete-part-b" al="compl-B" ctrl="0" type="d"/>
+            <Ev id="5" nm="start-part-b" al="str-ptB" ctrl="1" type="d"/>
+            <Ev id="6" nm="return-part" al="ret-pt" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="6">
+            <Transitions count="6">
+                <Tr fID="5" eID="6" tID="1" lx="139.317" ly="164.773" cnt="2">
+                    <Pos x="130" y="130"/>
+                    <Pos x="230" y="230"/>
+                </Tr>
+                <Tr fID="1" eID="1" tID="2" lx="198.823" ly="102" cnt="2">
+                    <Pos x="230" y="120"/>
+                    <Pos x="130" y="120"/>
+                </Tr>
+                <Tr fID="4" eID="4" tID="5" lx="198.823" ly="222" cnt="2">
+                    <Pos x="230" y="240"/>
+                    <Pos x="130" y="240"/>
+                </Tr>
+                <Tr fID="3" eID="3" tID="5" lx="284.773" ly="220.683" cnt="2">
+                    <Pos x="250" y="230"/>
+                    <Pos x="350" y="130"/>
+                </Tr>
+                <Tr fID="2" eID="5" tID="4" lx="164.773" ly="220.683" cnt="2">
+                    <Pos x="130" y="230"/>
+                    <Pos x="230" y="130"/>
+                </Tr>
+                <Tr fID="2" eID="2" tID="3" lx="318.823" ly="102" cnt="2">
+                    <Pos x="350" y="120"/>
+                    <Pos x="250" y="120"/>
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

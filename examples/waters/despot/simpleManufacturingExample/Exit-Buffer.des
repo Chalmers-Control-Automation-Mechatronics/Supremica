@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="Exit-Buffer" type="subsystem">
+            <Integrity status="valid" date-stamp="Wed Oct 28 14:33:51 2009"/>
+            <Reachable status="yes" date-stamp="Wed Oct 28 14:33:51 2009"/>
+            <Nonblocking status="yes" date-stamp=""/>
+        </Header>
+        <States count="3" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="1" sx="160" sy="160" lx="20" ly="20"/>
+            <St id="2" nm="s2" al="s2" mk="0" rch="1" sx="320" sy="160" lx="20" ly="20"/>
+            <St id="3" nm="s3" al="s3" mk="0" rch="1" sx="206" sy="340" lx="20" ly="20"/>
+        </States>
+        <Events count="3" ctrl-count="2" unctrl-count="1" def-count="3" ans-count="0" req-count="0">
+            <Ev id="1" nm="start-exit" al="str-exit" ctrl="1" type="d"/>
+            <Ev id="2" nm="finish-exit" al="fin-exit" ctrl="0" type="d"/>
+            <Ev id="3" nm="take-item" al="tk-it" ctrl="1" type="d"/>
+        </Events>
+        <Trans-Function count="6">
+            <Transitions count="6">
+                <Tr fID="2" eID="1" tID="2" lx="42.7631" ly="11.77" ang="0">
+                </Tr>
+                <Tr fID="2" eID="3" tID="1" lx="201.177" ly="178" cnt="2">
+                    <Pos x="170" y="160"/>
+                    <Pos x="310" y="160"/>
+                </Tr>
+                <Tr fID="2" eID="2" tID="3" lx="234.773" ly="304.999" cnt="3">
+                    <Pos x="208.87" y="330"/>
+                    <Pos x="237" y="232"/>
+                    <Pos x="310" y="168.675"/>
+                </Tr>
+                <Tr fID="3" eID="3" tID="2" lx="293.701" ly="196.698" cnt="3">
+                    <Pos x="317.85" y="170"/>
+                    <Pos x="297" y="267"/>
+                    <Pos x="216" y="331.978"/>
+                </Tr>
+                <Tr fID="1" eID="1" tID="1" lx="42.7631" ly="11.77" ang="0">
+                </Tr>
+                <Tr fID="1" eID="2" tID="2" lx="278.823" ly="142" cnt="2">
+                    <Pos x="310" y="160"/>
+                    <Pos x="170" y="160"/>
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

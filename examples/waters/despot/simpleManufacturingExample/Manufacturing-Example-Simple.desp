@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="Manufacturing-Example-Simple" type="HISC" degree="1">
+        <Integrity status="yes" dateStamp="Tue May 13 21:37:19 2008"/>
+        <Properties controllable="yes" ctrl-date-stamp="Tue May 13 21:37:26 2008" non-blocking="yes" non-block-stamp="Wed Oct 08 20:37:15 2008"/>
+    </Header>
+    <Subsystem name="High-Level Subsystem" level="0" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements/>
+        <Supervisor>
+            <Des name="Exit-Buffer" location="Exit-Buffer.des"/>
+            <Des name="Sequence-Tasks" location="Sequence-Tasks.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="Packaging-System" location="Packaging-System.des"/>
+            <Des name="Path-Flow-Model" location="Path-Flow-Model.des"/>
+        </Plant>
+        <Uses>
+            <InterfaceRef name="Pack-Line-Interface" provider="Manuf-Cells"/>
+        </Uses>
+    </Subsystem>
+    <Interface name="Pack-Line-Interface">
+        <Des name="cell-protocol" location="cell-protocol.des"/>
+    </Interface>
+    <Subsystem name="Manuf-Cells" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="Pack-Line-Interface"/>
+        </Implements>
+        <Supervisor>
+            <Des name="Affix-Part" location="Affix-Part.des"/>
+            <Des name="Polishing-Sequence" location="Polishing-Sequence.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="Attach-Case-to-Assembly" location="Attach-Case.des"/>
+            <Des name="Attach-Part-to-Assembly" location="Attach-Part.des"/>
+            <Des name="Augmentation" location="Augmentation.des"/>
+            <Des name="Polish-Part" location="Polish-Part.des"/>
+        </Plant>
+        <Uses/>
+    </Subsystem>
+</Project>

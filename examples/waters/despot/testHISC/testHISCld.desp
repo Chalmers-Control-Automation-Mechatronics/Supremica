@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="testHISCld" type="HISC" degree="2">
+        <Integrity status="ERROR: Unknown integrity value" dateStamp=""/>
+        <Properties controllable="not-verified" ctrl-date-stamp="" non-blocking="not-verified" non-block-stamp=""/>
+    </Header>
+    <Subsystem name="High-Level Subsystem" level="0" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements/>
+        <Supervisor>
+        </Supervisor>
+        <Plant>
+        </Plant>
+        <Uses>
+            <InterfaceRef name="intf1" provider="low1"/>
+            <InterfaceRef name="intf2" provider="low2"/>
+        </Uses>
+    </Subsystem>
+    <Interface name="intf1">
+        <Des name="theIntfA" location="theIntfA.des"/>
+    </Interface>
+    <Interface name="intf2">
+    </Interface>
+    <Subsystem name="low1" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="intf1"/>
+        </Implements>
+        <Supervisor>
+        </Supervisor>
+        <Plant>
+        </Plant>
+        <Uses/>
+    </Subsystem>
+    <Subsystem name="low2" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="intf2"/>
+        </Implements>
+        <Supervisor>
+        </Supervisor>
+        <Plant>
+        </Plant>
+        <Uses/>
+    </Subsystem>
+</Project>

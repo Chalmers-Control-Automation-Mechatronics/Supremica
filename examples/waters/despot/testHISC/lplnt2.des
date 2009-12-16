@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="lplnt2" type="subsystem">
+            <Integrity status="not-verified" date-stamp="Wed May 14 17:30:14 2008"/>
+        </Header>
+        <States count="2" marked-count="1">
+            <InitSt id="1" nm="lX1" al="lX1" mk="1" rch="1"/>
+            <St id="2" nm="lX2" al="lX2" mk="0" rch="1"/>
+        </States>
+        <Events count="2" ctrl-count="2" unctrl-count="0" def-count="0" ans-count="1" req-count="1">
+            <Ev id="1" nm="a1" al="a1" ctrl="1" type="a"/>
+            <Ev id="2" nm="r1" al="r1" ctrl="1" type="r"/>
+        </Events>
+        <Trans-Function count="2">
+            <Transitions count="2">
+                <Tr fID="1" eID="2" tID="2"/>
+                <Tr fID="2" eID="1" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

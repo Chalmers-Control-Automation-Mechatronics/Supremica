@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="Augmentation" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+            <Reachable status="yes" date-stamp=""/>
+            <Nonblocking status="yes" date-stamp=""/>
+        </Header>
+        <States count="1" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="?" sx="240" sy="240" lx="-37" ly="-3"/>
+        </States>
+        <Events count="4" ctrl-count="4" unctrl-count="0" def-count="0" ans-count="2" req-count="2">
+            <Ev id="1" nm="attach-part-a" al="attch-ptA" ctrl="1" type="r"/>
+            <Ev id="2" nm="attach-part-b" al="attch-ptB" ctrl="1" type="r"/>
+            <Ev id="3" nm="finish-attach-a" al="finA-attch" ctrl="1" type="a"/>
+            <Ev id="4" nm="finish-attach-b" al="finB-attch" ctrl="1" type="a"/>
+        </Events>
+        <Trans-Function count="4">
+            <Transitions count="4">
+                <Tr fID="1" eID="4" tID="1" lx="55.7631" ly="6.77001" ang="0">
+                </Tr>
+                <Tr fID="1" eID="3" tID="1" lx="55.7631" ly="6.77001" ang="0">
+                </Tr>
+                <Tr fID="1" eID="2" tID="1" lx="55.7631" ly="6.77001" ang="0">
+                </Tr>
+                <Tr fID="1" eID="1" tID="1" lx="55.7631" ly="6.77001" ang="0">
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

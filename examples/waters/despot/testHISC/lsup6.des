@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="lsup6" type="subsystem">
+            <Integrity status="not-verified" date-stamp="Wed May 14 17:29:47 2008"/>
+        </Header>
+        <States count="4" marked-count="2">
+            <InitSt id="1" nm="hX1" al="hX1" mk="1" rch="1"/>
+            <St id="2" nm="hX2" al="hX2" mk="0" rch="1"/>
+            <St id="3" nm="hX3" al="hX3" mk="0" rch="1"/>
+            <St id="4" nm="hX4" al="hX4" mk="1" rch="1"/>
+        </States>
+        <Events count="5" ctrl-count="4" unctrl-count="1" def-count="2" ans-count="1" req-count="2">
+            <Ev id="1" nm="a2" al="a2" ctrl="1" type="a"/>
+            <Ev id="2" nm="r2" al="r2" ctrl="1" type="r"/>
+            <Ev id="3" nm="r3" al="r3" ctrl="1" type="r"/>
+            <Ev id="6" nm="lev1" al="lev1" ctrl="0" type="d"/>
+            <Ev id="7" nm="lev2" al="lev2" ctrl="1" type="d"/>
+        </Events>
+        <Trans-Function count="7">
+            <Transitions count="7">
+                <Tr fID="1" eID="3" tID="4"/>
+                <Tr fID="1" eID="2" tID="2"/>
+                <Tr fID="2" eID="6" tID="3"/>
+                <Tr fID="3" eID="1" tID="1"/>
+                <Tr fID="3" eID="7" tID="3"/>
+                <Tr fID="4" eID="3" tID="1"/>
+                <Tr fID="4" eID="2" tID="2"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

@@ -18,17 +18,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.filechooser.FileFilter;
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
@@ -49,9 +45,6 @@ import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
-//import net.sourceforge.waters.gui.renderer.TieEdgeProxyShape;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
@@ -70,8 +63,8 @@ import org.xml.sax.SAXException;
 public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 {
 
-  // #########################################################################
-  // # Constructors
+  //#########################################################################
+  //# Constructors
   public DESpotImporter(final ModuleProxyFactory factory,
       final DocumentManager docman)
   {
@@ -83,14 +76,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   {
     mOutputDir = outputdir;
     mFactory = factory;
-
     mDocumentManager = docman;
-
   }
 
-  // #########################################################################
-  // # Interface
-  // net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller
+
+  //#########################################################################
+  //# Interface
+  //# net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller
   public File getOutputDirectory()
   {
     return mOutputDir;
@@ -115,8 +107,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     }
   }
 
-  // #########################################################################
-  // # Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
   public ModuleProxy unmarshal(final URI uri) throws IOException,
       WatersUnmarshalException
   {
@@ -157,6 +150,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     mDocumentManager = manager;
   }
 
+
+  //#########################################################################
+  //# Algorithm
   private ModuleProxy convertDESpotHierarchy(final URI uri)
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException, WatersMarshalException
@@ -219,7 +215,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         } else if (aut.getTagName().equals("Uses")) {
           constructModuleInstance(aut);
         }
-        clearStructures();
+        clearGraphStructures();
       }
 
       module = constructModule(subsystem);
@@ -244,9 +240,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   /**
    * Converts a node list read from the DOM into an array list.
-   *
-   * @param nodeList
-   * @return
    */
   private ArrayList<Element> convertNodeList(final NodeList nodeList)
   {
@@ -312,12 +305,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   /**
    * This method creates an instance of a module. One call to this method
    * creates all the required instance for the current module.
-   *
-   * @param uses
-   * @throws ParserConfigurationException
-   * @throws SAXException
-   * @throws IOException
-   * @throws URISyntaxException
    */
   private void constructModuleInstance(final Element uses)
   {
@@ -363,35 +350,14 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   }
 
-  // #########################################################################
-  // # Main
-  public static void main(final String[] args)
-      throws ParserConfigurationException, SAXException, IOException,
-      URISyntaxException, JAXBException, WatersMarshalException,
-      WatersUnmarshalException
-  {
-    final File file = new File("/home/rmf18/Desktop/Data/testHISC.desp");
-    final URI path = file.toURI();
-    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
-    final OperatorTable opTable = CompilerOperatorTable.getInstance();
-    final ProxyMarshaller<ModuleProxy> marshaller =
-        new JAXBModuleMarshaller(factory, opTable);
-    final DocumentManager docManager = new DocumentManager();
-    docManager.registerMarshaller(marshaller);
-    final File outputFile = new File("/home/rmf18/Desktop/DESpot");
-    final DESpotImporter pdf =
-        new DESpotImporter(outputFile, factory, docManager);
-    pdf.unmarshalCopying(path);
 
-  }
-
-  // #########################################################################
-  // # Initialisation
+  //#########################################################################
+  //# Initialisation
   /**
    * Initialises the data structures used to store the states, events and
    * transitions in the construction of a graph.
    */
-  private void clearStructures()
+  private void clearGraphStructures()
   {
     mStates.clear();
     mEventIDs.clear();
@@ -401,9 +367,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     mIdentifiers.clear();
   }
 
-  // #########################################################################
-  // # Element Conversion
 
+  //#########################################################################
+  //# Element Conversion
   /**
    * Checks if an event already exists. If the event hasn't been used already an
    * EventDeclProxy is created and stored.
@@ -480,7 +446,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   {
     final NodeList desList = automaton.getElementsByTagName("*");
     for (int i = 0; i < desList.getLength(); i++) {
-      clearStructures();
+      clearGraphStructures();
       final Element des = (Element) desList.item(i);
       final String autName = des.getAttribute("name");
       final String autFile = des.getAttribute("location");
@@ -500,7 +466,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * Constructs the SimpleComponent section for the module of a
    * <CODE>.wmod</CODE> file.
    */
-
   private void constructSimpleComponent(final String desName,
       final String desLocation, final ComponentKind kind, final URI path)
       throws ParserConfigurationException, SAXException, IOException,
@@ -518,9 +483,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   /**
    * Constructs a ModuleProxy for a given subsystem.
-   *
-   * @param subsystem
-   * @return
    */
   private ModuleProxy constructModule(final Element subsystem)
   {
@@ -888,8 +850,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    *          The marked state.
    * @param initial
    *          States whether this is the initial state.
-   * @param labelPos
-   * @param nodePos
    */
   private SimpleNodeProxy markState(final Element state, final Boolean initial,
       final PointGeometryProxy nodePos, final LabelGeometryProxy labelPos)
@@ -913,8 +873,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   }
 
 
-  // #########################################################################
-  // # Inner Class LevelComparator
+  //#########################################################################
+  //# Inner Class LevelComparator
   /**
    * A class used to compare the values of the levels of subsystems. Low level
    * subsystems are ordered before high level subsystems. This class is used as
@@ -934,8 +894,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   }
 
 
-  // #########################################################################
-  // # Inner Class IdPair
+  //#########################################################################
+  //# Inner Class IdPair
   /**
    * A class used to pair the ID numbers for the source and target states of a
    * transition/event.
@@ -969,8 +929,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     private final int mTarget;
   }
 
-  // #########################################################################
-  // # Data Members
+
+  //#########################################################################
+  //# Data Members
   /**
    * Stores the ID number the despot file uses to reference a state and the
    * location of the state in the 'nodes' list.
@@ -1026,11 +987,14 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * we are converting into.
    */
   private final ModuleProxyFactory mFactory;
-  // # Data Members
+
   private File mOutputDir;
 
   private DocumentManager mDocumentManager;
 
+
+  //#########################################################################
+  //# Class Constants
   private static final String DESPOTEXT = ".desp";
   private static final Collection<String> EXTENSIONS =
       Collections.singletonList(DESPOTEXT);

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="Polishing-Sequence" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+            <Reachable status="yes" date-stamp=""/>
+            <Nonblocking status="yes" date-stamp=""/>
+        </Header>
+        <States count="6" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="?" sx="120" sy="120" lx="20" ly="20"/>
+            <St id="2" nm="s2-pol-seq" al="s2-pol-seq" mk="0" rch="?" sx="240" sy="120" lx="20" ly="20"/>
+            <St id="3" nm="s3" al="s3" mk="0" rch="?" sx="360" sy="120" lx="20" ly="20"/>
+            <St id="4" nm="s4" al="s4" mk="0" rch="?" sx="120" sy="240" lx="20" ly="20"/>
+            <St id="5" nm="s5" al="s5" mk="0" rch="?" sx="240" sy="240" lx="20" ly="20"/>
+            <St id="6" nm="s6" al="s6" mk="0" rch="?" sx="360" sy="240" lx="20" ly="20"/>
+        </States>
+        <Events count="4" ctrl-count="4" unctrl-count="0" def-count="3" ans-count="0" req-count="1">
+            <Ev id="1" nm="start-polish" al="str-pol" ctrl="1" type="r"/>
+            <Ev id="2" nm="dip-acid" al="dip-acid" ctrl="1" type="d"/>
+            <Ev id="3" nm="polish" al="pol" ctrl="1" type="d"/>
+            <Ev id="4" nm="start-release" al="str-rlse" ctrl="1" type="d"/>
+        </Events>
+        <Trans-Function count="6">
+            <Transitions count="6">
+                <Tr fID="4" eID="2" tID="5" lx="198.823" ly="222" cnt="2">
+                    <Pos x="230" y="240"/>
+                    <Pos x="130" y="240"/>
+                </Tr>
+                <Tr fID="6" eID="4" tID="1" lx="149.836" ly="155.042" cnt="2">
+                    <Pos x="130" y="125"/>
+                    <Pos x="350" y="235"/>
+                </Tr>
+                <Tr fID="1" eID="1" tID="2" lx="198.823" ly="102" cnt="2">
+                    <Pos x="230" y="120"/>
+                    <Pos x="130" y="120"/>
+                </Tr>
+                <Tr fID="3" eID="3" tID="4" lx="165.935" ly="237.157" cnt="2">
+                    <Pos x="130" y="235"/>
+                    <Pos x="350" y="125"/>
+                </Tr>
+                <Tr fID="2" eID="2" tID="3" lx="318.823" ly="102" cnt="2">
+                    <Pos x="350" y="120"/>
+                    <Pos x="250" y="120"/>
+                </Tr>
+                <Tr fID="5" eID="3" tID="6" lx="318.823" ly="222" cnt="2">
+                    <Pos x="350" y="240"/>
+                    <Pos x="250" y="240"/>
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

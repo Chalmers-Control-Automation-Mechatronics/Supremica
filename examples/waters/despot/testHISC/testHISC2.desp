@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="testHISC2" type="HISC" degree="2">
+        <Integrity status="yes" dateStamp="Thu May 15 21:25:34 2008"/>
+        <Properties controllable="yes" ctrl-date-stamp="Thu May 15 15:05:25 2008" non-blocking="yes" non-block-stamp="Thu May 15 14:04:37 2008"/>
+    </Header>
+    <Subsystem name="High-Level Subsystem" level="0" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements/>
+        <Supervisor>
+            <Des name="hsup1" location="hsup1.des"/>
+            <Des name="hsup2" location="hsup2.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="hplnt1" location="hplnt2.des"/>
+            <Des name="hplnt2" location="hplnt1.des"/>
+        </Plant>
+        <Uses>
+            <InterfaceRef name="intf2" provider="low2"/>
+            <InterfaceRef name="intf1" provider="low1"/>
+        </Uses>
+    </Subsystem>
+    <Interface name="intf1">
+        <Des name="ides3" location="ides3.des"/>
+    </Interface>
+    <Interface name="intf2">
+        <Des name="ides1" location="ides1.des"/>
+    </Interface>
+    <Subsystem name="low1" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="intf1"/>
+        </Implements>
+        <Supervisor>
+            <Des name="lsup1" location="lsup1.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="lplnt1" location="lplnt1.des"/>
+        </Plant>
+        <Uses/>
+    </Subsystem>
+    <Subsystem name="low2" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="intf2"/>
+        </Implements>
+        <Supervisor>
+            <Des name="lsup2" location="lsup2.des"/>
+            <Des name="lsup3" location="lsup3.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="lplnt2" location="lplnt2.des"/>
+            <Des name="lplnt3" location="lplnt3.des"/>
+        </Plant>
+        <Uses/>
+    </Subsystem>
+</Project>

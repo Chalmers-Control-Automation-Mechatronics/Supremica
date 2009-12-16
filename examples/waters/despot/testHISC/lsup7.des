@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="lsup7" type="subsystem">
+            <Integrity status="not-verified" date-stamp="Wed May 14 17:29:58 2008"/>
+        </Header>
+        <States count="2" marked-count="1">
+            <InitSt id="1" nm="lX1" al="lX1" mk="1" rch="1"/>
+            <St id="2" nm="lX2" al="lX2" mk="0" rch="1"/>
+        </States>
+        <Events count="3" ctrl-count="3" unctrl-count="0" def-count="0" ans-count="2" req-count="1">
+            <Ev id="1" nm="a1" al="a1" ctrl="1" type="a"/>
+            <Ev id="2" nm="r1" al="r1" ctrl="1" type="r"/>
+            <Ev id="3" nm="a2-2" al="a2-2" ctrl="1" type="a"/>
+        </Events>
+        <Trans-Function count="3">
+            <Transitions count="3">
+                <Tr fID="2" eID="3" tID="1"/>
+                <Tr fID="2" eID="1" tID="1"/>
+                <Tr fID="1" eID="2" tID="2"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="hsup6" type="subsystem">
+            <Integrity status="not-verified" date-stamp="Thu May 15 18:49:04 2008"/>
+        </Header>
+        <States count="1" marked-count="1">
+            <InitSt id="1" nm="hX1" al="hX1" mk="1" rch="1"/>
+        </States>
+        <Events count="3" ctrl-count="3" unctrl-count="0" def-count="0" ans-count="1" req-count="1">
+            <Ev id="1" nm="a1" al="a1" ctrl="1" type="a"/>
+            <Ev id="2" nm="r1" al="r1" ctrl="1" type="r"/>
+            <Ev id="4" nm="ld1" al="ld1" ctrl="1" type="ld"/>
+        </Events>
+        <Trans-Function count="2">
+            <Transitions count="0">
+            </Transitions>
+            <Self-Loops count="2">
+                <Sl eID="1"/>
+                <Sl eID="2"/>
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

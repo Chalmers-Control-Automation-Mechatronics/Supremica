@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="Polish-Part" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+            <Reachable status="yes" date-stamp=""/>
+            <Nonblocking status="yes" date-stamp=""/>
+        </Header>
+        <States count="3" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="?" sx="160" sy="160" lx="20" ly="20"/>
+            <St id="2" nm="s2-polish" al="s2-polish" mk="0" rch="?" sx="320" sy="160" lx="-9" ly="-40"/>
+            <St id="3" nm="s3" al="s3" mk="0" rch="?" sx="160" sy="320" lx="20" ly="20"/>
+        </States>
+        <Events count="5" ctrl-count="4" unctrl-count="1" def-count="3" ans-count="1" req-count="1">
+            <Ev id="1" nm="start-polish" al="str-pol" ctrl="1" type="r"/>
+            <Ev id="2" nm="dip-acid" al="dip-acid" ctrl="1" type="d"/>
+            <Ev id="3" nm="polish" al="pol" ctrl="1" type="d"/>
+            <Ev id="4" nm="start-release" al="str-rlse" ctrl="1" type="d"/>
+            <Ev id="5" nm="complete-polish" al="compl-pol" ctrl="0" type="a"/>
+        </Events>
+        <Trans-Function count="5">
+            <Transitions count="5">
+                <Tr fID="3" eID="5" tID="1" lx="35" ly="214.177" cnt="2">
+                    <Pos x="160" y="170"/>
+                    <Pos x="160" y="310"/>
+                </Tr>
+                <Tr fID="2" eID="2" tID="2" lx="57.7631" ly="17.77" ang="0">
+                </Tr>
+                <Tr fID="2" eID="3" tID="2" lx="57.7631" ly="17.77" ang="0">
+                </Tr>
+                <Tr fID="2" eID="4" tID="3" lx="220.773" ly="267.683" cnt="2">
+                    <Pos x="170" y="310"/>
+                    <Pos x="310" y="170"/>
+                </Tr>
+                <Tr fID="1" eID="1" tID="2" lx="198.823" ly="126" cnt="2">
+                    <Pos x="310" y="160"/>
+                    <Pos x="170" y="160"/>
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

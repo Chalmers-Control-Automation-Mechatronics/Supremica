@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="testHISC9" type="HISC" degree="2">
+        <Integrity status="yes" dateStamp="Thu May 15 21:22:44 2008"/>
+        <Properties controllable="yes" ctrl-date-stamp="Thu May 15 15:35:43 2008" non-blocking="yes" non-block-stamp="Thu May 15 15:39:37 2008"/>
+    </Header>
+    <Subsystem name="High-Level Subsystem" level="0" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements/>
+        <Supervisor>
+            <Des name="hsup1" location="hsup1.des"/>
+            <Des name="hsup2" location="hsup2.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="hplnt1" location="hplnt2.des"/>
+            <Des name="hplnt2" location="hplnt1.des"/>
+        </Plant>
+        <Uses>
+            <InterfaceRef name="intf1" provider="low1"/>
+            <InterfaceRef name="intf2" provider="low2"/>
+        </Uses>
+    </Subsystem>
+    <Interface name="intf1">
+        <Des name="ides3" location="ides3.des"/>
+    </Interface>
+    <Interface name="intf2">
+        <Des name="ides4" location="ides4.des"/>
+    </Interface>
+    <Subsystem name="low1" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="intf1"/>
+        </Implements>
+        <Supervisor>
+            <Des name="lsup4" location="lsup4.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="lplnt5" location="lplnt5.des"/>
+        </Plant>
+        <Uses/>
+    </Subsystem>
+    <Subsystem name="low2" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="intf2"/>
+        </Implements>
+        <Supervisor>
+            <Des name="lsup7" location="lsup7.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="lplnt8" location="lplnt8.des"/>
+        </Plant>
+        <Uses/>
+    </Subsystem>
+</Project>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="Path-Flow-Model" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+            <Reachable status="yes" date-stamp=""/>
+            <Nonblocking status="yes" date-stamp=""/>
+        </Header>
+        <States count="10" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="?" sx="96" sy="96" lx="16" ly="9"/>
+            <St id="2" nm="s2" al="s2" mk="0" rch="?" sx="78" sy="188" lx="20" ly="20"/>
+            <St id="3" nm="s3" al="s3" mk="0" rch="?" sx="278" sy="192" lx="1" ly="12"/>
+            <St id="4" nm="s4" al="s4" mk="0" rch="?" sx="384" sy="96" lx="20" ly="20"/>
+            <St id="5" nm="s5" al="s5" mk="0" rch="?" sx="486" sy="146" lx="8" ly="-11"/>
+            <St id="6" nm="s6" al="s6" mk="0" rch="?" sx="476" sy="238" lx="12" ly="5"/>
+            <St id="7" nm="s7" al="s7" mk="0" rch="?" sx="482" sy="379" lx="20" ly="20"/>
+            <St id="8" nm="s8" al="s8" mk="0" rch="?" sx="337" sy="387" lx="-12" ly="14"/>
+            <St id="9" nm="s9" al="s9" mk="0" rch="?" sx="77" sy="389" lx="0" ly="17"/>
+            <St id="10" nm="s10" al="s10" mk="0" rch="?" sx="204" sy="17" lx="-46" ly="-17"/>
+        </States>
+        <Events count="12" ctrl-count="6" unctrl-count="6" def-count="12" ans-count="0" req-count="0">
+            <Ev id="1" nm="part-enter" al="part-ent" ctrl="1" type="d"/>
+            <Ev id="2" nm="part-arrive-1" al="part-arr1" ctrl="0" type="d"/>
+            <Ev id="3" nm="part-leave-1" al="part-lv1" ctrl="1" type="d"/>
+            <Ev id="4" nm="start-exit" al="str-exit" ctrl="1" type="d"/>
+            <Ev id="5" nm="finish-exit" al="fin-exit" ctrl="0" type="d"/>
+            <Ev id="6" nm="part-leave-exit" al="partLvExit" ctrl="1" type="d"/>
+            <Ev id="7" nm="part-arrive-2" al="part-arr2" ctrl="0" type="d"/>
+            <Ev id="8" nm="recognize-part-a" al="recog-a" ctrl="0" type="d"/>
+            <Ev id="9" nm="recognize-part-b" al="recog-b" ctrl="0" type="d"/>
+            <Ev id="10" nm="part-leave-2" al="part-lv2" ctrl="1" type="d"/>
+            <Ev id="11" nm="part-arrive-3" al="part-arr3" ctrl="0" type="d"/>
+            <Ev id="12" nm="part-leave-3" al="part-lv3" ctrl="1" type="d"/>
+        </Events>
+        <Trans-Function count="12">
+            <Transitions count="12">
+                <Tr fID="3" eID="3" tID="4" lx="324.766" ly="161.443" cnt="2">
+                    <Pos x="374" y="105.057"/>
+                    <Pos x="288" y="182.057"/>
+                </Tr>
+                <Tr fID="9" eID="12" tID="2" lx="76.7962" ly="257.087" cnt="2">
+                    <Pos x="77.9502" y="198"/>
+                    <Pos x="77.0495" y="380"/>
+                </Tr>
+                <Tr fID="5" eID="7" tID="6" lx="481.758" ly="182.183" cnt="2">
+                    <Pos x="476.181" y="227"/>
+                    <Pos x="484.678" y="156"/>
+                </Tr>
+                <Tr fID="4" eID="4" tID="10" lx="252.37" ly="65.3384" cnt="2">
+                    <Pos x="213" y="21.3675"/>
+                    <Pos x="374" y="91.6598"/>
+                </Tr>
+                <Tr fID="4" eID="6" tID="5" lx="427.008" ly="94.1394" cnt="2">
+                    <Pos x="475" y="141.078"/>
+                    <Pos x="394" y="101.104"/>
+                </Tr>
+                <Tr fID="6" eID="8" tID="7" lx="353.962" ly="286.977" cnt="2">
+                    <Pos x="482.514" y="369"/>
+                    <Pos x="476.568" y="248"/>
+                </Tr>
+                <Tr fID="6" eID="9" tID="7" lx="353.962" ly="286.977" cnt="2">
+                    <Pos x="482.514" y="369"/>
+                    <Pos x="476.568" y="248"/>
+                </Tr>
+                <Tr fID="7" eID="10" tID="8" lx="379.115" ly="385.722" cnt="2">
+                    <Pos x="347" y="386.456"/>
+                    <Pos x="473" y="379.548"/>
+                </Tr>
+                <Tr fID="1" eID="1" tID="2" lx="91.2714" ly="134.64" cnt="2">
+                    <Pos x="80.8747" y="178"/>
+                    <Pos x="94.2641" y="106"/>
+                </Tr>
+                <Tr fID="8" eID="11" tID="9" lx="154.385" ly="394.516" cnt="2">
+                    <Pos x="87" y="389.882"/>
+                    <Pos x="327" y="387.077"/>
+                </Tr>
+                <Tr fID="10" eID="5" tID="1" lx="147.775" ly="51.5235" cnt="2">
+                    <Pos x="106" y="88.5458"/>
+                    <Pos x="193" y="24.3685"/>
+                </Tr>
+                <Tr fID="2" eID="2" tID="3" lx="144.092" ly="192.397" cnt="2">
+                    <Pos x="268" y="190.855"/>
+                    <Pos x="88" y="188.2"/>
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>
