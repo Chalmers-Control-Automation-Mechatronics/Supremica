@@ -1,9 +1,6 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -117,21 +114,7 @@ public class SimulatorPanel
     mEventsTree.addScrollPane(scroll);
     mEventsPanel.setLayout(new BorderLayout());
     mEventsPanel.add(scroll, BorderLayout.CENTER);
-    final SorterButton typeButton = new SorterButton("Type", mEventsTree, 0);
-    final SorterButton nameButton = new SorterButton("Name", mEventsTree, 1);
-    final SorterButton enabledButton = new SorterButton("Enb", mEventsTree, 2);
-    typeButton.setPreferredSize(new Dimension(WIDTH_OF_BUTTON_COLUMNS[0], EventJTree.rowHeight));
-    nameButton.setPreferredSize(new Dimension(WIDTH_OF_BUTTON_COLUMNS[1], EventJTree.rowHeight));
-    enabledButton.setPreferredSize(new Dimension(WIDTH_OF_BUTTON_COLUMNS[2], EventJTree.rowHeight));
-    final JPanel buttonPanel = new JPanel();
-    final GridBagLayout layout = new GridBagLayout();
-    layout.columnWidths = WIDTH_OF_BUTTON_COLUMNS;
-    layout.rowHeights = new int[]{EventJTree.rowHeight};
-    buttonPanel.setLayout(layout);
-    buttonPanel.add(typeButton);
-    buttonPanel.add(nameButton);
-    buttonPanel.add(enabledButton);
-    mEventsPanel.add(buttonPanel, BorderLayout.NORTH);
+    mEventsPanel.add(new SorterButtonPanel(mEventsTree, scroll), BorderLayout.NORTH);
     mTabbedPane.addTab("Events", mEventsPanel);
   }
 
@@ -155,7 +138,6 @@ public class SimulatorPanel
   //# Class Constants
   private static final long serialVersionUID = 1L;
   private static final boolean DISABLE_AUTOMATON_GRIDLINES = true;
-  private static final int[] WIDTH_OF_BUTTON_COLUMNS = new int[]{65, 110, 60};
   private static final int AUTOMATA_TABLE_HEIGHT = 20;
 
 }

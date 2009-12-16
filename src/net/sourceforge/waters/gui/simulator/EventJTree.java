@@ -55,11 +55,6 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
-    totalEventWidth = 0;
-    for (final Integer intVal : eventColumnWidth)
-    {
-      totalEventWidth += intVal;
-    }
     // Expand all foreach-component entries.
 
     this.addMouseListener(new MouseAdapter(){
@@ -213,6 +208,14 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
   {
     final EventMutableTreeNode root = new EventMutableTreeNode(mSim, this, mSortingMethods, expandedNodes);
     this.setModel(new DefaultTreeModel(root, false));
+    /*for (int looper = 0; looper < expandedNodes.size(); looper++)
+    {
+      final String name = expandedNodes.get(looper);
+      if (event.getName().compareTo(name) == 0)
+      {
+        mParent.expandPath(new TreePath(eventToAdd.getPath()));
+      }
+    }*/
   }
 
   // ########################################################################
@@ -257,8 +260,8 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
         else
           right.setIcon(IconLoader.ICON_CROSS);
         final int width = mPane.getWidth();
-        final int rightWidth = (width - noduleWidth) / (1 + (eventColumnWidth[0] / eventColumnWidth[1]));
-        final int leftWidth = (eventColumnWidth[0] / eventColumnWidth[1]) * rightWidth;
+        final int rightWidth = (width * eventColumnWidth[1] - noduleWidth * eventColumnWidth[1]) / (sum(eventColumnWidth));
+        final int leftWidth = (width * eventColumnWidth[0] - noduleWidth * eventColumnWidth[0]) / (sum(eventColumnWidth));
         left.setPreferredSize(new Dimension(leftWidth, rowHeight));
         right.setPreferredSize(new Dimension(rightWidth, rowHeight));
         panel.add(left);
@@ -270,7 +273,6 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
         final AutomatonLeafNode autoNode = (AutomatonLeafNode) value;
         final AutomatonProxy autoProxy = autoNode.getAutomata();
         final GridBagLayout layout = new GridBagLayout();
-        layout.columnWidths = automataColumnWidth;
         panel.setLayout(layout);
         left = new JLabel(autoProxy.getName());
         if (mContainer.getSourceInfoMap().get(autoProxy).getSourceObject().getClass() == VariableComponentSubject.class)
@@ -286,9 +288,14 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
         currentState = mSim.getCurrentStates().get(autoProxy);
         right = new JLabel(currentState.getName());
         right.setIcon(mSim.getMarkingIcon(currentState, autoProxy));
-        left.setPreferredSize(new Dimension(automataColumnWidth[0], rowHeight));
-        center.setPreferredSize(new Dimension(automataColumnWidth[1], rowHeight));
-        right.setPreferredSize(new Dimension(automataColumnWidth[2], rowHeight));
+        final int width = mPane.getWidth();
+        final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));
+        final int centerWidth = (width * automataColumnWidth[1] - 2 * noduleWidth * automataColumnWidth[1]) / (sum(automataColumnWidth));
+        final int leftWidth = (width * automataColumnWidth[0] - 2 * noduleWidth * automataColumnWidth[0]) / (sum(automataColumnWidth));
+        left.setPreferredSize(new Dimension(leftWidth, rowHeight));
+        center.setPreferredSize(new Dimension(centerWidth, rowHeight));
+        right.setPreferredSize(new Dimension(rightWidth, rowHeight));
+        layout.columnWidths = new int[]{leftWidth, centerWidth, rightWidth};
         if (automatonAreOpen.contains(autoProxy.getName()))
         {
           left.setFont(left.getFont().deriveFont(Font.BOLD));
@@ -308,6 +315,14 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
       {
         return new JPanel();
       }
+    }
+
+    private int sum (final int[] a)
+    {
+      int o = 0;
+      for (int i = 0; i < a.length; i++)
+        o+=a[i];
+      return o;
     }
 
     // ###########################################################################
@@ -333,7 +348,6 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
-  private static int totalEventWidth;
   private static final int[] eventColumnWidth = {180, 20};
   private static final int noduleWidth = 30;
   public static final int rowHeight = 20;

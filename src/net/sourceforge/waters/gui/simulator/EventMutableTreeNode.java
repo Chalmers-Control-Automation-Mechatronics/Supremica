@@ -54,14 +54,6 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
       {
         eventToAdd.add(new AutomatonLeafNode(automaton, null));
       }
-      for (int looper = 0; looper < expandedNodes.size(); looper++)
-      {
-        final String name = expandedNodes.get(looper);
-        if (event.getName().compareTo(name) == 0)
-        {
-          //mParent.expandPath(new TreePath(eventToAdd.getPath()));
-        }
-      }
     }
   }
 

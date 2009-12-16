@@ -199,11 +199,13 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
            left.setFont(left.getFont().deriveFont(Font.PLAIN));
          }
          final int width = mPane.getWidth();
-         final int rightWidth = (width - noduleWidth) / (1 + (eventColumnWidth[0] / eventColumnWidth[1]));
-         final int leftWidth = (eventColumnWidth[0] / eventColumnWidth[1]) * rightWidth;
+         final int rightWidth = (width * eventColumnWidth[1] - noduleWidth * eventColumnWidth[1]) / (sum(eventColumnWidth));
+         final int leftWidth = (width * eventColumnWidth[0] - noduleWidth * eventColumnWidth[0]) / (sum(eventColumnWidth));
          left.setPreferredSize(new Dimension(leftWidth, rowHeight));
          right.setPreferredSize(new Dimension(rightWidth, rowHeight));
          layout.columnWidths = new int[]{leftWidth, rightWidth};
+         System.out.println("DEBUG: Widths: " + leftWidth + "/" + rightWidth);
+         layout.rowHeights = new int[]{rowHeight};
          panel.add(left);
          panel.add(right);
          return panel;
@@ -213,7 +215,6 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
          final AutomatonLeafNode autoNode = (AutomatonLeafNode) value;
          final AutomatonProxy autoProxy = autoNode.getAutomata();
          final GridBagLayout layout = new GridBagLayout();
-         layout.columnWidths = automataColumnWidth;
          panel.setLayout(layout);
          left = new JLabel(autoProxy.getName());
          if (mContainer.getSourceInfoMap().get(autoProxy).getSourceObject().getClass() == VariableComponentSubject.class)
@@ -229,9 +230,14 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
          currentState = autoNode.getOverloadedState();
          right = new JLabel(currentState.getName());
          right.setIcon(mSim.getMarkingIcon(currentState, autoProxy));
-         left.setPreferredSize(new Dimension(automataColumnWidth[0], rowHeight));
-         center.setPreferredSize(new Dimension(automataColumnWidth[1], rowHeight));
-         right.setPreferredSize(new Dimension(automataColumnWidth[2], rowHeight));
+         final int width = mPane.getWidth();
+         final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));
+         final int centerWidth = (width * automataColumnWidth[1] - 2 * noduleWidth * automataColumnWidth[1]) / (sum(automataColumnWidth));
+         final int leftWidth = (width * automataColumnWidth[0] - 2 * noduleWidth * automataColumnWidth[0]) / (sum(automataColumnWidth));
+         left.setPreferredSize(new Dimension(leftWidth, rowHeight));
+         center.setPreferredSize(new Dimension(centerWidth, rowHeight));
+         right.setPreferredSize(new Dimension(rightWidth, rowHeight));
+         layout.columnWidths = new int[]{leftWidth, centerWidth, rightWidth};
          if (automatonAreOpen.contains(autoProxy.getName()))
          {
            left.setFont(left.getFont().deriveFont(Font.BOLD));
@@ -251,6 +257,14 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
        {
          return new JPanel();
        }
+    }
+
+    private int sum (final int[] a)
+    {
+      int o = 0;
+      for (int i = 0; i < a.length; i++)
+        o+=a[i];
+      return o;
     }
 
     // ###########################################################################

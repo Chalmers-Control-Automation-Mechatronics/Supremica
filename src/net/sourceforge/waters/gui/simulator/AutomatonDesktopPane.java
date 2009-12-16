@@ -41,6 +41,7 @@ public class AutomatonDesktopPane
     mSim = sim;
     mContainer = container;
     observers = new HashSet<InternalFrameObserver>();
+    overflowOpen = new ArrayList<String>();
     setBackground(EditorColor.BACKGROUNDCOLOR);
     sim.attach(this);
     container.attach(this);
@@ -72,7 +73,7 @@ public class AutomatonDesktopPane
           try {
             final AutomatonInternalFrame newFrame = new AutomatonInternalFrame
               (realAuto, graph, this, container, sim);
-            newFrame.setLocation(findCoords(newFrame.getSize()));
+            newFrame.setLocation(findCoords(newFrame.getSize(), aut));
             add(newFrame);
             newFrame.moveToFront();
             openAutomaton.put(aut, newFrame);
@@ -89,7 +90,7 @@ public class AutomatonDesktopPane
     }
   }
 
-  private Point findCoords(final Dimension size)
+  private Point findCoords(final Dimension size, final String name)
   {
     final ArrayList<Rectangle> bannedRegions = new ArrayList<Rectangle>();
     final ArrayList<Rectangle> otherScreens = new ArrayList<Rectangle>();
@@ -124,13 +125,44 @@ public class AutomatonDesktopPane
           return new Point(x, y);
       }
     }
+    for (int coords = 0; coords < Math.min(this.getHeight(), this.getWidth()) / 10; coords ++)
+    {
+      if (overflowOpen.size() == coords)
+      {
+        overflowOpen.add(name);
+        return new Point(coords * 10, coords * 10);
+      }
+      if (overflowOpen.get(coords) == null)
+      {
+        overflowOpen.add(name);
+        return new Point(coords * 10, coords * 10);
+      }
+    }
     return new Point(0,0);
   }
 
   public void removeAutomaton(final String aut)
   {
     fireFrameClosedEvent(aut, openAutomaton.get(aut));
+    if (overflowOpen.contains(aut))
+    {
+      overflowOpen.set(overflowOpen.indexOf(aut), null);
+      cleanup(overflowOpen);
+    }
     openAutomaton.remove(aut);
+  }
+
+  private void cleanup(final ArrayList<String> array)
+  {
+    for (int looper = array.size() - 1; looper >= 0; looper--)
+    {
+      if (array.get(looper) == null)
+      {
+        array.remove(looper);
+      }
+      else
+        return;
+    }
   }
 
   public void onReOpen(final ModuleContainer container, final Simulation sim)
@@ -242,6 +274,7 @@ public class AutomatonDesktopPane
   private final Simulation mSim;
   private final ModuleContainer mContainer;
   private final Set<InternalFrameObserver> observers;
+  private final ArrayList<String> overflowOpen;
 
   //#########################################################################
   //# Class Constants
