@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="New Module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment></ns2:Comment>
+<Module Name="g1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A simple test from the paper by Robi Malik and Ryan Leduc, "Generalised Nonblocking", WODES 2008, to see whether generalised nonblocking is checked correctly.
+This model is generalised nonblocking with respect to precondition :alpha.
+</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="e1"/>

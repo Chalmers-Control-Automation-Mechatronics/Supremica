@@ -405,7 +405,7 @@ getCategory(const jni::StateGlue& state,
   jni::CollectionGlue props = state.getPropositionsGlue(cache);
   const int hasalpha = props.contains(&alpha) ? 3 : 0;
   const int lowers = init ^ hasalpha;
-  return props.contains(&omega) ? 8 - lowers : lowers;
+  return props.contains(&omega) ? 7 - lowers : lowers;
 }
 
 

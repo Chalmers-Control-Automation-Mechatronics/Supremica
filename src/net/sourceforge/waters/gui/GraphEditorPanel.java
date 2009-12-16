@@ -1346,7 +1346,7 @@ public class GraphEditorPanel
   }
 
   /**
-   * Finds all focusable objects at a given positition.
+   * Finds all focusable objects at a given position.
    * This method examines the graph and determines which objects are
    * active, i.e., can be selected by a click at the given position
    * in the current context.

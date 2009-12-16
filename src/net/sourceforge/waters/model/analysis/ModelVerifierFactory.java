@@ -62,6 +62,8 @@ public interface ModelVerifierFactory
    */
   public List<String> configure(ModelVerifier verifier);
 
+  public void postConfigure(ModelVerifier verifier);
+
   /**
    * Configures the given compiler according to any command line
    * arguments passed to this factory.

@@ -25,6 +25,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -47,16 +48,21 @@ public abstract class AbstractModelVerifierFactory
   {
     mArgumentList = null;
     mArgumentMap = null;
+    mMarkingArgument = null;
+    mPreMarkingArgument = null;
   }
 
   protected AbstractModelVerifierFactory(final List<String> arglist)
   {
     mArgumentList = arglist;
     mArgumentMap = new HashMap<String,CommandLineArgument>(16);
+    mMarkingArgument = new MarkingArgument();
+    mPreMarkingArgument = new PreMarkingArgument();
     addArgument(new HelpArgument());
     addArgument(new LimitArgument());
     addArgument(new TransitionLimitArgument());
-    addArgument(new MarkingArgument());
+    addArgument(mMarkingArgument);
+    addArgument(mPreMarkingArgument);
     addArgument(new PropertyArgument());
   }
 
@@ -101,7 +107,7 @@ public abstract class AbstractModelVerifierFactory
   public List<String> configure(final ModelVerifier verifier)
   {
     if (mArgumentList != null && mArgumentMap != null) {
-      Collection<CommandLineArgument> used =
+      final Collection<CommandLineArgument> used =
         new HashSet<CommandLineArgument>();
       final List<String> filenames = new LinkedList<String>();
       final Iterator<String> iter = mArgumentList.iterator();
@@ -131,7 +137,7 @@ public abstract class AbstractModelVerifierFactory
   public void configure(final ModuleCompiler compiler)
   {
     if (mArgumentList != null && mArgumentMap != null) {
-      Collection<CommandLineArgument> used =
+      final Collection<CommandLineArgument> used =
         new HashSet<CommandLineArgument>();
       final Iterator<String> iter = mArgumentList.iterator();
       while (iter.hasNext()) {
@@ -149,6 +155,26 @@ public abstract class AbstractModelVerifierFactory
     }
   }
 
+  public void postConfigure(final ModelVerifier checker)
+  {
+    if (checker instanceof ConflictChecker) {
+      final ConflictChecker cchecker = (ConflictChecker) checker;
+      final ProductDESProxy model = checker.getModel();
+      final String markingname = mMarkingArgument.getValue();
+      if (markingname != null) {
+        final EventProxy marking =
+          AbstractConflictChecker.getMarkingProposition(model, markingname);
+        cchecker.setMarkingProposition(marking);
+      }
+      final String premarkingname = mPreMarkingArgument.getValue();
+      if (premarkingname != null) {
+        final EventProxy premarking =
+          AbstractConflictChecker.getMarkingProposition(model, premarkingname);
+        cchecker.setGeneralisedPrecondition(premarking);
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -158,7 +184,7 @@ public abstract class AbstractModelVerifierFactory
     final String clsname = getClass().getName();
     final int dotpos = clsname.lastIndexOf('.');
     final String msg =
-      clsname.substring(dotpos + 1) + " does not support " + 
+      clsname.substring(dotpos + 1) + " does not support " +
       checkname + " check!";
     return new UnsupportedOperationException(msg);
   }
@@ -267,7 +293,7 @@ public abstract class AbstractModelVerifierFactory
 
 
   //#########################################################################
-  //# Inner Class PropertyArgument
+  //# Inner Class MarkingArgument
   private static class MarkingArgument
     extends CommandLineArgumentString
   {
@@ -276,7 +302,7 @@ public abstract class AbstractModelVerifierFactory
     private MarkingArgument()
     {
       super("-marking",
-            "Name of marking propsosition for conflict check");
+            "Name of marking proposition for conflict check");
     }
 
     //#######################################################################
@@ -285,20 +311,79 @@ public abstract class AbstractModelVerifierFactory
     protected void configure(final ModuleCompiler compiler)
     {
       final String name = getValue();
-      final Collection<String> props = Collections.singletonList(name);
+      final Collection<String> current = compiler.getEnabledPropertyNames();
+      final Collection<String> props;
+      if (current == null || current.isEmpty()) {
+        props = Collections.singletonList(name);
+      } else if (current.contains(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+        final int size = current.size();
+        if (size == 1) {
+          props = Collections.singletonList(name);
+        } else {
+          props = new ArrayList<String>(size);
+          for (final String prop : current) {
+            if (!prop.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+              props.add(prop);
+            }
+          }
+          props.add(name);
+        }
+      } else {
+        final int size = current.size() + 1;
+        props = new ArrayList<String>(size);
+        props.addAll(current);
+        props.add(name);
+      }
       compiler.setEnabledPropositionNames(props);
     }
 
     protected void configure(final ModelVerifier verifier)
     {
-      if (verifier instanceof ConflictChecker) {
-        final ConflictChecker checker = (ConflictChecker) verifier;
-        final ProductDESProxy model = checker.getModel();
-        final String name = getValue();
-        final EventProxy event =
-          AbstractConflictChecker.getMarkingProposition(model, name);
-        checker.setMarkingProposition(event);
+      if (!(verifier instanceof ConflictChecker)) {
+        fail("Command line option " + getName() +
+             " is only supported for conflict check!");
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class PreMarkingArgument
+  private static class PreMarkingArgument
+    extends CommandLineArgumentString
+  {
+    //#######################################################################
+    //# Constructors
+    private PreMarkingArgument()
+    {
+      super("-premarking",
+            "Name of precondition marking proposition " +
+            " for generalised conflict check");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModuleCompiler compiler)
+    {
+      final String name = getValue();
+      final Collection<String> current = compiler.getEnabledPropertyNames();
+      final Collection<String> props;
+      if (current == null || current.isEmpty()) {
+        props = new ArrayList<String>(2);
+        props.add(EventDeclProxy.DEFAULT_MARKING_NAME);
       } else {
+        final int size = current.size() + 1;
+        props = new ArrayList<String>(size);
+        props.addAll(current);
+      }
+      props.add(name);
+      compiler.setEnabledPropositionNames(props);
+    }
+
+    protected void configure(final ModelVerifier verifier)
+    {
+      if (!(verifier instanceof ConflictChecker)) {
         fail("Command line option " + getName() +
              " is only supported for conflict check!");
       }
@@ -424,5 +509,7 @@ public abstract class AbstractModelVerifierFactory
   //# Data Members
   private final List<String> mArgumentList;
   private final Map<String,CommandLineArgument> mArgumentMap;
+  private final CommandLineArgumentString mMarkingArgument;
+  private final CommandLineArgumentString mPreMarkingArgument;
 
 }

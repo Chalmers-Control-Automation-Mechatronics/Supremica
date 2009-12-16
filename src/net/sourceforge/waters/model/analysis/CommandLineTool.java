@@ -65,7 +65,7 @@ public class CommandLineTool
    * for more detailed information.
    * @param  args    Array of file names from the command line.
    */
-  public static void main(String[] args)
+  public static void main(final String[] args)
   {
     try {
       if (args.length < 2) {
@@ -74,7 +74,7 @@ public class CommandLineTool
            "[options] <checker> <file> ...");
         System.exit(1);
       }
-      
+
       final ModuleProxyFactory moduleFactory =
         ModuleElementFactory.getInstance();
       final ProductDESProxyFactory desFactory =
@@ -108,7 +108,7 @@ public class CommandLineTool
             if (bindings == null) {
               bindings = new LinkedList<ParameterBindingProxy>();
             }
-            bindings.add(binding);              
+            bindings.add(binding);
           } else {
             arglist.add(arg);
           }
@@ -119,7 +119,7 @@ public class CommandLineTool
           arglist.add(arg);
         }
       }
-      
+
       final ClassLoader loader = CommandLineTool.class.getClassLoader();
       try {
         final Class<?> lclazz = loader.loadClass(LOGGERFACTORY);
@@ -193,6 +193,7 @@ public class CommandLineTool
 
         final long start = System.currentTimeMillis();
         checker.setModel(des);
+        factory.postConfigure(checker);
         try {
           checker.run();
           final VerificationResult result = checker.getAnalysisResult();
