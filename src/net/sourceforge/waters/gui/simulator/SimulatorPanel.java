@@ -6,6 +6,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.JTableHeader;
 
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.IDEDimensions;
@@ -114,7 +115,24 @@ public class SimulatorPanel
     mEventsTree.addScrollPane(scroll);
     mEventsPanel.setLayout(new BorderLayout());
     mEventsPanel.add(scroll, BorderLayout.CENTER);
-    mEventsPanel.add(new SorterButtonPanel(mEventsTree, scroll, mAutomataTable.getTableHeader()), BorderLayout.NORTH);
+    final JTable psuedoTable = new JTable(0, 3);
+    final JTableHeader header = new JTableHeader();
+    final int width = 245; // DEBUG: Arbitrary value: Any value will work, but this is close to the 'normal' value
+    psuedoTable.getColumnModel().getColumn(0).setPreferredWidth((int)(width * 0.2));
+    psuedoTable.getColumnModel().getColumn(0).setMaxWidth((int)(width * 0.2));
+    psuedoTable.getColumnModel().getColumn(0).setHeaderValue("Type");
+    psuedoTable.getColumnModel().getColumn(1).setPreferredWidth((int)(width * 0.6));
+    psuedoTable.getColumnModel().getColumn(1).setHeaderValue("Name");
+    psuedoTable.getColumnModel().getColumn(2).setPreferredWidth((int)(width * 0.2));
+    psuedoTable.getColumnModel().getColumn(2).setMaxWidth((int)(width * 0.2));
+    psuedoTable.getColumnModel().getColumn(2).setHeaderValue("Ebd");
+    header.addMouseListener(new TreePseudoTable(mEventsTree, header));
+    header.setReorderingAllowed(false);
+    header.setVisible(true);
+    psuedoTable.setTableHeader(header);
+    //final JScrollPane topPane = new JScrollPane(psuedoTable);
+    //mEventsPanel.add(topPane, BorderLayout.NORTH);
+    mEventsPanel.add(psuedoTable, BorderLayout.NORTH);
     mTabbedPane.addTab("Events", mEventsPanel);
   }
 
