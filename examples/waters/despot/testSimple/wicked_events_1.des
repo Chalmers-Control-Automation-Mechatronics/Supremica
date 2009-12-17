@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="wicked_events_1" type="subsystem"/>
+        <States count="4" marked-count="0">
+            <InitSt id="1" nm="s1" al="s1" mk="0" rch="1"/>
+            <St id="2" nm="s2" al="s2" mk="0" rch="0"/>
+            <St id="3" nm="s3" al="s3" mk="0" rch="0"/>
+            <St id="4" nm="s4" al="s4" mk="0" rch="0"/>
+        </States>
+        <Events count="4" ctrl-count="4" unctrl-count="0" def-count="4" ans-count="0" req-count="0">
+            <Ev id="1" nm="e--x" al="e--x" ctrl="1" type="d"/>
+            <Ev id="2" nm="e-_x" al="e-_x" ctrl="1" type="d"/>
+            <Ev id="3" nm="e_-x" al="e_-x" ctrl="1" type="d"/>
+            <Ev id="4" nm="e__x" al="e__x" ctrl="1" type="d"/>
+        </Events>
+        <Trans-Function count="0">
+            <Transitions count="4"/>
+              <Tr fID="1" eID="1" tID="2"/>
+              <Tr fID="2" eID="2" tID="3"/>
+              <Tr fID="3" eID="3" tID="4"/>
+              <Tr fID="4" eID="4" tID="1"/>
+            <Self-Loops count="0"/>
+        </Trans-Function>
+    </Definition>
+</DES>

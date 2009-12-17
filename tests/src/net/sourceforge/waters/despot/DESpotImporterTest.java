@@ -92,6 +92,20 @@ public class DESpotImporterTest extends AbstractWatersTest
     testImport("testSimple", "testSync");
   }
 
+  public void testImport_wicked_events()
+    throws IOException, WatersMarshalException, WatersUnmarshalException,
+           EvalException
+  {
+    testImport("testSimple", "wicked_events");
+  }
+
+  public void testImport_wicked_states()
+    throws IOException, WatersMarshalException, WatersUnmarshalException,
+           EvalException
+  {
+    testImport("testSimple", "wicked_states");
+  }
+
   public void testImport_testHISC()
     throws IOException, WatersMarshalException, WatersUnmarshalException,
            EvalException

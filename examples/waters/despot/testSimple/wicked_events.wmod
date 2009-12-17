@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="wicked_events" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_1"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_1_1"/>
+<EventDecl Kind="CONTROLLABLE" Name="e__x"/>
+<EventDecl Kind="CONTROLLABLE" Name="e__x_1"/>
+<EventDecl Kind="CONTROLLABLE" Name="e__x_2"/>
+<EventDecl Kind="CONTROLLABLE" Name="e__x_3"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="wicked_events_1">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1"/>
+<SimpleNode Name="s2"/>
+<SimpleNode Name="s3"/>
+<SimpleNode Name="s4"/>
+</NodeList>
+<EdgeList>
+<Edge Target="s1" Source="s2">
+<LabelBlock>
+<SimpleIdentifier Name="e__x"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s2" Source="s3">
+<LabelBlock>
+<SimpleIdentifier Name="e__x_1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s3" Source="s4">
+<LabelBlock>
+<SimpleIdentifier Name="e__x_2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s4" Source="s1">
+<LabelBlock>
+<SimpleIdentifier Name="e__x_3"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="wicked_events_2">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1"/>
+<SimpleNode Name="s2"/>
+<SimpleNode Name="s3"/>
+<SimpleNode Name="s4"/>
+</NodeList>
+<EdgeList>
+<Edge Target="s1" Source="s2">
+<LabelBlock>
+<SimpleIdentifier Name="e__x_3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s2" Source="s3">
+<LabelBlock>
+<SimpleIdentifier Name="e__x_2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s3" Source="s4">
+<LabelBlock>
+<SimpleIdentifier Name="e_1_1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s4" Source="s1">
+<LabelBlock>
+<SimpleIdentifier Name="e_1"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="wicked_events_3">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1"/>
+<SimpleNode Name="s2"/>
+<SimpleNode Name="s3"/>
+<SimpleNode Name="s4"/>
+</NodeList>
+<EdgeList>
+<Edge Target="s1" Source="s1">
+<LabelBlock>
+<SimpleIdentifier Name="e__x"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s1" Source="s2">
+<LabelBlock>
+<SimpleIdentifier Name="e__x_3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s2" Source="s3">
+<LabelBlock>
+<SimpleIdentifier Name="e__x_2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s3" Source="s4">
+<LabelBlock>
+<SimpleIdentifier Name="e__x_1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s4" Source="s1">
+<LabelBlock>
+<SimpleIdentifier Name="e__x"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
