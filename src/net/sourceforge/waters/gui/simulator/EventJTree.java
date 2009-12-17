@@ -156,6 +156,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
       final Pair<Boolean, Integer> newMethod = new Pair<Boolean, Integer>(true, index);
       mSortingMethods.add(0, newMethod);
     }
+    forceRecalculation();
   }
 
   //##################################################################
