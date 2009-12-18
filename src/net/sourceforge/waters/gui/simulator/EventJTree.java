@@ -47,7 +47,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
     mContainer = container;
     mSortingMethods = new ArrayList<Pair<Boolean, Integer>>();
     expandedNodes = new ArrayList<String>();
-    this.setModel(new EventTreeModel(mSim));
+    this.setModel(new EventTreeModel(mSim, mSortingMethods));
     this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
     setShowsRootHandles(true);
@@ -115,6 +115,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
   public void addPane(final JScrollPane pane)
   {
     mPane = pane;
+    mPane.addComponentListener(this);
   }
 
   // ##################################################################
@@ -160,7 +161,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
 
   public void forceRecalculation()
   {
-    this.setModel(new EventTreeModel(mSim));
+    this.setModel(new EventTreeModel(mSim, mSortingMethods));
     for (int looper = 0; looper < expandedNodes.size(); looper++)
     {
       final String name = expandedNodes.get(looper);

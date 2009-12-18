@@ -17,7 +17,6 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   {
     super("Event", true);
     sim.attach(this);
-    mParent = parent;
     mSim = sim;
     setupAllEvents(sim, sortingMethods, expandedNodes);
   }
@@ -168,7 +167,6 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   // ##################################################################
   // # Data Members
 
-  private final EventJTree mParent;
   private final Simulation mSim;
 
   // ##################################################################

@@ -20,7 +20,7 @@ public class SorterButton extends JButton
       public void mouseClicked(final MouseEvent evt)
       {
         tree.sortBy(index);
-        //tree.forceRecalculation();
+        System.out.println("DEBUG: Sorted by :" + index);
       }
     });
   }

@@ -62,7 +62,8 @@ public class TraceTreeModel
   {
     if (Simulation.class.isInstance(parent))
     {
-      return ((Simulation)parent).getAllEvents().size();
+      System.out.println("DEBUG: Event History Size" + ((Simulation)parent).getEventHistory().size());
+      return ((Simulation)parent).getEventHistory().size();
     }
     else if (EventProxy.class.isInstance(parent))
     {
