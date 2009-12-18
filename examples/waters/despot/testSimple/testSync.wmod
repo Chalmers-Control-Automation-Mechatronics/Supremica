@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="testSync" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="a1"/>
+<EventDecl Kind="CONTROLLABLE" Name="a2"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="b"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="l1"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="l2"/>
+<EventDecl Kind="CONTROLLABLE" Name="u1"/>
+<EventDecl Kind="CONTROLLABLE" Name="u2"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="eg1">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="I1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="w1"/>
+<SimpleNode Name="d1"/>
+</NodeList>
+<EdgeList>
+<Edge Source="I1" Target="w1">
+<LabelBlock>
+<SimpleIdentifier Name="a1"/>
+</LabelBlock>
+</Edge>
+<Edge Source="w1" Target="d1">
+<LabelBlock>
+<SimpleIdentifier Name="l1"/>
+</LabelBlock>
+</Edge>
+<Edge Source="w1" Target="I1">
+<LabelBlock>
+<SimpleIdentifier Name="b"/>
+</LabelBlock>
+</Edge>
+<Edge Source="d1" Target="I1">
+<LabelBlock>
+<SimpleIdentifier Name="u1"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="eg2">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="I2">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="w2"/>
+<SimpleNode Name="d2"/>
+</NodeList>
+<EdgeList>
+<Edge Source="I2" Target="w2">
+<LabelBlock>
+<SimpleIdentifier Name="a2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="w2" Target="d2">
+<LabelBlock>
+<SimpleIdentifier Name="l2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="w2" Target="I2">
+<LabelBlock>
+<SimpleIdentifier Name="b"/>
+</LabelBlock>
+</Edge>
+<Edge Source="d2" Target="I2">
+<LabelBlock>
+<SimpleIdentifier Name="u2"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

@@ -118,6 +118,7 @@ public class ModuleIdentifierChecker
   public Object visitModuleProxy(final ModuleProxy module)
     throws VisitorException
   {
+    mCurrentModule = module;
     final Collection<ConstantAliasProxy> constants =
       module.getConstantAliasList();
     visitCollection(constants);
@@ -127,6 +128,7 @@ public class ModuleIdentifierChecker
     visitCollection(aliases);
     final Collection<Proxy> components = module.getComponentList();
     visitCollection(components);
+    mCurrentModule = null;
     return null;
   }
 
@@ -182,12 +184,15 @@ public class ModuleIdentifierChecker
       buffer.append(name);
       buffer.append("' of a ");
       buffer.append(getShortClassName(mNameOwner));
-      if (mCurrentComponent != null) {
-        buffer.append(" in the component '");
+      buffer.append(" in ");
+      if (mCurrentComponent == null) {
+        buffer.append("module '");
+        buffer.append(mCurrentModule.getName());
+      } else {
+        buffer.append("component '");
         buffer.append(mCurrentComponent.getName());
-        buffer.append("'");
       }
-      buffer.append(" is not a proper Waters identifier!");
+      buffer.append("' is not a proper Waters identifier!");
       Assert.fail(buffer.toString());
     }
   }
@@ -206,6 +211,7 @@ public class ModuleIdentifierChecker
   private final ExpressionParser mParser;
 
   private NamedProxy mNameOwner;
+  private ModuleProxy mCurrentModule;
   private SimpleComponentProxy mCurrentComponent;
 
 }
