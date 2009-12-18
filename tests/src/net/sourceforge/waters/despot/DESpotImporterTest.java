@@ -302,10 +302,8 @@ public class DESpotImporterTest extends AbstractWatersTest
                 mModuleMarshaller.unmarshal(expecturi);
               assertTrue("Unexpected module contents after parse back!",
                          outmodule.equalsByContents(expectmodule));
-              /*
               assertTrue("Unexpected module geometry after parse back!",
                          outmodule.equalsWithGeometry(expectmodule));
-              */
             }
           }
         }

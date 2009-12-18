@@ -120,6 +120,9 @@
 <LabelBlock>
 <SimpleIdentifier Name="ev1"/>
 </LabelBlock>
+<SplineGeometry>
+<Point Y="206" X="196"/>
+</SplineGeometry>
 </Edge>
 <Edge Target="S3" Source="st1">
 <LabelBlock>
@@ -144,11 +147,17 @@
 <LabelBlock>
 <SimpleIdentifier Name="ev1"/>
 </LabelBlock>
+<SplineGeometry>
+<Point Y="205" X="357"/>
+</SplineGeometry>
 </Edge>
 <Edge Target="S3" Source="S3">
 <LabelBlock>
 <SimpleIdentifier Name="ev1"/>
 </LabelBlock>
+<SplineGeometry>
+<Point Y="363" X="200"/>
+</SplineGeometry>
 </Edge>
 <Edge Target="s5" Source="S3">
 <LabelBlock>
@@ -165,6 +174,9 @@
 <LabelBlock>
 <SimpleIdentifier Name="ev1"/>
 </LabelBlock>
+<SplineGeometry>
+<Point Y="365" X="357"/>
+</SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>

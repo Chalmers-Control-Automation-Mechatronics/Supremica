@@ -734,8 +734,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     // handles a self loop edge
     else if ((srcID == targetID) && (tr.getAttribute("ang") != "")) {
       final double ang = Double.parseDouble(tr.getAttribute("ang"));
-      // Convert angle to radians and subtract 45 degrees
-      final double radang = Math.toRadians(ang - 45.0);
+      // Convert angle to radians and add 45 degrees
+      final double radang = Math.toRadians(ang + 45.0);
       // Get scale factor for Waters selfloop of size 48
       final double scale = 48.0 * TieEdgeProxyShape.DEFAULT_DISTANCE_UNIT;
       // Compute relative coordinates of the control point
