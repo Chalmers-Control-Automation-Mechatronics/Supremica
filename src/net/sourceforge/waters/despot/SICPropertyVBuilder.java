@@ -1,19 +1,33 @@
 package net.sourceforge.waters.despot;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.valid.ValidUnmarshaller;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.analysis.comp552.ConflictMain;
 import net.sourceforge.waters.despot.HISCAttributes;
 
 
@@ -26,8 +40,8 @@ public class SICPropertyVBuilder
     mModel = null;
   }
 
-  public SICPropertyVBuilder(final ProductDESProxyFactory factory,
-      final ProductDESProxy model)
+  public SICPropertyVBuilder(final ProductDESProxy model,
+      final ProductDESProxyFactory factory)
   {
     mModel = model;
     mFactory = factory;
@@ -53,7 +67,7 @@ public class SICPropertyVBuilder
     final Set<EventProxy> allEvents = mModel.getEvents();
     final List<EventProxy> answerEvents = new ArrayList<EventProxy>(0);
     for (final EventProxy event : allEvents) {
-      if (event.getAttributes().equals(HISCAttributes.ATTRIBUTES_ANSWER)) {
+      if (HISCAttributes.getEventType(event.getAttributes()) == HISCAttributes.EventType.ANSWER) {
         answerEvents.add(event);
       }
     }
@@ -75,7 +89,7 @@ public class SICPropertyVBuilder
     if (mLowLevelAutomata == null) {
       mLowLevelAutomata = new ArrayList<AutomatonProxy>();
       for (final AutomatonProxy aut : mModel.getAutomata()) {
-        if (!aut.getAttributes().equals(HISCAttributes.ATTRIBUTES_INTERFACE)) {
+        if (!HISCAttributes.isInterface(aut.getAttributes())) {
           newAutomaton.add(createModifiedLowLevelAutomaton(aut));
         }
       }
@@ -84,7 +98,7 @@ public class SICPropertyVBuilder
     }
     // modifies the models interfaces dependent on the answer event specified
     for (final AutomatonProxy aut : mModel.getAutomata()) {
-      if (aut.getAttributes().equals(HISCAttributes.ATTRIBUTES_INTERFACE)) {
+      if (HISCAttributes.isInterface(aut.getAttributes())) {
         newAutomaton.add(createModifiedInterfaceAutomaton(aut, answer));
       }
     }
@@ -216,13 +230,14 @@ public class SICPropertyVBuilder
         answerTransitions.add(transition);
       }
     }
+    final EventProxy alpha =
+        mFactory.createEventProxy(mAlpha, EventKind.PROPOSITION, true);
     for (final StateProxy state : modifiedInterface.getStates()) {
       for (final TransitionProxy transition : answerTransitions) {
         if (transition.getSource().equals(state)) {
           final List<EventProxy> propositions =
               (List<EventProxy>) state.getPropositions();
-          final EventProxy alpha =
-              mFactory.createEventProxy(mAlpha, EventKind.PROPOSITION, true);
+
           if (!propositions.contains(alpha)) {
             propositions.add(alpha);
           }
@@ -270,6 +285,77 @@ public class SICPropertyVBuilder
             newStates, aut.getTransitions(), aut.getAttributes());
     mLowLevelAutomata.add(modifiedLowLevelAutomaton);
     return modifiedLowLevelAutomaton;
+  }
+
+  // #########################################################################
+  // # Main Method for Testing
+  /**
+   * Main method. This is a main method to check a set of files for conflicts.
+   * Please refer to the class documentation ({@link ConflictMain}) for more
+   * detailed information.
+   *
+   * @param args
+   *          Array of file names from the command line.
+   */
+  public static void main(final String[] args)
+  {
+    try {
+      final ModuleProxyFactory moduleFactory =
+          ModuleElementFactory.getInstance();
+      final ProductDESProxyFactory desFactory =
+          ProductDESElementFactory.getInstance();
+      final OperatorTable optable = CompilerOperatorTable.getInstance();
+      final ValidUnmarshaller importer =
+          new ValidUnmarshaller(moduleFactory, optable);
+      final JAXBModuleMarshaller moduleMarshaller =
+          new JAXBModuleMarshaller(moduleFactory, optable, false);
+      final JAXBProductDESMarshaller desMarshaller =
+          new JAXBProductDESMarshaller(desFactory);
+      final DocumentManager docManager = new DocumentManager();
+      docManager.registerUnmarshaller(desMarshaller);
+      docManager.registerUnmarshaller(moduleMarshaller);
+      docManager.registerUnmarshaller(importer);
+
+      for (int i = 0; i < args.length; i++) {
+        final String name = args[i];
+        final File filename = new File(name);
+        final DocumentProxy doc = docManager.load(filename);
+        final ProductDESProxy des;
+        if (doc instanceof ProductDESProxy) {
+          des = (ProductDESProxy) doc;
+        } else {
+          final ModuleProxy module = (ModuleProxy) doc;
+          final ModuleCompiler compiler =
+              new ModuleCompiler(docManager, desFactory, module);
+          des = compiler.compile();
+        }
+        final SICPropertyVBuilder builder =
+            new SICPropertyVBuilder(des, desFactory);
+        System.out.print(des.getName() + " ... ");
+        System.out.flush();
+
+        final List<EventProxy> answerEvents =
+            (List<EventProxy>) builder.getAnswerEvents();
+        for (final EventProxy answer : answerEvents) {
+          final ProductDESProxy modifiedDES =
+              builder.createModelForAnswer(answer);
+          System.out.print(modifiedDES);
+        }
+        System.out.print("run");
+        /*
+         * if (result) { System.out.println("nonconflicting"); } else {
+         * System.out.println("CONFLICTING");
+         * System.out.println("Counterexample:"); final ConflictTraceProxy
+         * counterex = builder.getCounterExample();
+         * System.out.println(counterex.toString()); }
+         */
+      }
+
+    } catch (final Throwable exception) {
+      System.err.println("FATAL ERROR !!!");
+      System.err.println(exception.getClass().getName() + " caught in main()!");
+      exception.printStackTrace(System.err);
+    }
   }
 
   // #########################################################################
