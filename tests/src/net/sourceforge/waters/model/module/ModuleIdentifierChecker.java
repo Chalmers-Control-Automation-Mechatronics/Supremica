@@ -10,6 +10,7 @@
 package net.sourceforge.waters.model.module;
 
 import java.util.Collection;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -83,9 +84,27 @@ public class ModuleIdentifierChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  public Object visitEdgeProxy(final EdgeProxy edge)
+    throws VisitorException
+  {
+    final EventListExpressionProxy block = edge.getLabelBlock();
+    return visitEventListExpressionProxy(block);
+  }
+
+  public Object visitEventListExpressionProxy
+      (final EventListExpressionProxy expr)
+    throws VisitorException
+  {
+    final List<Proxy> elist = expr.getEventList();
+    visitCollection(elist);
+    return null;
+  }
+
   public Object visitForeachProxy(final ForeachProxy foreach)
     throws VisitorException
   {
+    final String name = foreach.getName();
+    checkName(name, foreach);
     final Collection<Proxy> body = foreach.getBody();
     visitCollection(body);
     return null;
@@ -94,8 +113,14 @@ public class ModuleIdentifierChecker
   public Object visitGraphProxy(final GraphProxy graph)
     throws VisitorException
   {
+    final EventListExpressionProxy blocked = graph.getBlockedEvents();
+    if (blocked != null) {
+      visitEventListExpressionProxy(blocked);
+    }
     final Collection<NodeProxy> nodes = graph.getNodes();
     visitCollection(nodes);
+    final Collection<EdgeProxy> edges = graph.getEdges();
+    visitCollection(edges);
     return null;
   }
 
@@ -104,7 +129,9 @@ public class ModuleIdentifierChecker
   {
     mNameOwner = proxy;
     final IdentifierProxy identifier = proxy.getIdentifier();
-    return identifier.acceptVisitor(this);
+    identifier.acceptVisitor(this);
+    mNameOwner = null;
+    return null;
   }
 
   public Object visitIndexedIdentifierProxy(final IndexedIdentifierProxy ident)
@@ -135,9 +162,8 @@ public class ModuleIdentifierChecker
   public Object visitNodeProxy(final NodeProxy node)
     throws VisitorException
   {
-    mNameOwner = node;
     final String name = node.getName();
-    checkName(name);
+    checkName(name, node);
     return null;
   }
 
@@ -148,8 +174,7 @@ public class ModuleIdentifierChecker
     final IdentifierProxy base = ident.getBaseIdentifier();
     base.acceptVisitor(this);
     final IdentifierProxy comp = ident.getComponentIdentifier();
-    comp.acceptVisitor(this);
-    return null;
+    return comp.acceptVisitor(this);
   }
 
   public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
@@ -171,9 +196,24 @@ public class ModuleIdentifierChecker
     return null;
   }
 
+  public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
+    throws VisitorException
+  {
+    visitNodeProxy(node);
+    final EventListExpressionProxy props = node.getPropositions();
+    return visitEventListExpressionProxy(props);
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
+  private void checkName(final String name, final NamedProxy owner)
+  {
+    mNameOwner = owner;
+    checkName(name);
+    mNameOwner = null;
+  }
+
   private void checkName(final String name)
   {
     try {
@@ -182,8 +222,11 @@ public class ModuleIdentifierChecker
       final StringBuffer buffer = new StringBuffer();
       buffer.append("The name '");
       buffer.append(name);
-      buffer.append("' of a ");
-      buffer.append(getShortClassName(mNameOwner));
+      buffer.append("'");
+      if (mNameOwner != null) {
+        buffer.append(" of a ");
+        buffer.append(getShortClassName(mNameOwner));
+      }
       buffer.append(" in ");
       if (mCurrentComponent == null) {
         buffer.append("module '");

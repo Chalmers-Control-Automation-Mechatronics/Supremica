@@ -311,8 +311,15 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final NodeList interfaceList = uses.getElementsByTagName("*");
     for (int i = 0; i < interfaceList.getLength(); i++) {
       final Element interfaceRef = (Element) interfaceList.item(i);
-      final String moduleName =
-          formatIdentifier(interfaceRef.getAttribute("provider"));
+      final String moduleName = interfaceRef.getAttribute("provider");
+      // final String moduleName =
+      //   formatIdentifier(interfaceRef.getAttribute("provider"));
+      // Note, an instance has two names. The *identifier* identifies the
+      // instance within the calling module, while the *module name*
+      // specifies the file name of the submodule to be instantiated.
+      // They can be different, e.g., in small factory the 'machine'
+      // module is instantiated as 'machine1' and 'machine2'. Only the
+      // *identifier* must obey syntax restrictions.
 
       // gets the module to create an instance of
       final ModuleProxy module = mModules.get(moduleName);
