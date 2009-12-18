@@ -27,7 +27,6 @@ public class SimulatorPanel
   {
     super(name);
     mSimulation = new Simulation(moduleContainer);
-    System.out.println("DEBUG: SimulationDES is " + mSimulation.getCompiledDES());
     mModuleContainer = moduleContainer;
     setupDesktop();
     mTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);

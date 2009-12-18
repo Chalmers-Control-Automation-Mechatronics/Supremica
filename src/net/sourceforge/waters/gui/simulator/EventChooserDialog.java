@@ -76,7 +76,6 @@ public class EventChooserDialog extends JDialog
       (int)maximumWidth,
       (int)maximumWidth,
       (int)((DEFAULT_LIST_WIDTH - maximumWidth * 2) / 2)};
-    System.out.println("DEBUG: Widths are: " + (int)((DEFAULT_LIST_WIDTH - maximumWidth * 2) / 2) + " and " + maximumWidth);
     buttonPanel.setLayout(layout);
     buttonPanel.add(new JLabel()); // To keep the empty tile empty
     buttonPanel.add(selectButton);

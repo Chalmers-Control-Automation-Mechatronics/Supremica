@@ -19,7 +19,6 @@ public class TreePseudoTable extends MouseAdapter
   public void mouseClicked(final MouseEvent e){
     final int column = mParent.columnAtPoint(e.getPoint());
     mTree.sortBy(column);
-    System.out.println("DEBUG: Sorted by " + column);
   }
 
   private final EventJTree mTree;

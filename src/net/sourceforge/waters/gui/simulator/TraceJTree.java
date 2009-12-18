@@ -248,7 +248,6 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
          left.setPreferredSize(new Dimension(leftWidth, rowHeight));
          right.setPreferredSize(new Dimension(rightWidth, rowHeight));
          layout.columnWidths = new int[]{leftWidth, rightWidth};
-         System.out.println("DEBUG: Widths: " + leftWidth + "/" + rightWidth);
          layout.rowHeights = new int[]{rowHeight};
          panel.add(left);
          panel.add(right);

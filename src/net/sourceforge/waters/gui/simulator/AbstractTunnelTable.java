@@ -36,7 +36,6 @@ public class AbstractTunnelTable extends SimulationTable implements
     desktop.attach(this);
     mComparator = new AutomatonTableComparitor<Object>();
     observers = new HashSet<TableOrderObserver>();
-    System.out.println("DEBUG: If this is null, then the table made a null DES table: " + sim.getCompiledDES());
   }
 
   // #########################################################################
