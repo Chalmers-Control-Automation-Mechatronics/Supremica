@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="testInt" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ev1"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ev2"/>
+<EventDecl Kind="CONTROLLABLE" Name="ev3"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="supA">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="s2"/>
+<SimpleNode Name="s3"/>
+<SimpleNode Name="s4"/>
+</NodeList>
+<EdgeList>
+<Edge Target="s4" Source="s3">
+<LabelBlock>
+<SimpleIdentifier Name="ev2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s1" Source="s3">
+<LabelBlock>
+<SimpleIdentifier Name="ev1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s3" Source="s2">
+<LabelBlock>
+<SimpleIdentifier Name="ev2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s2" Source="s1">
+<LabelBlock>
+<SimpleIdentifier Name="ev1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="s1" Source="s4">
+<LabelBlock>
+<SimpleIdentifier Name="ev1"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="plantA">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

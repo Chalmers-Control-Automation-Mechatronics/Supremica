@@ -275,14 +275,18 @@ public class DESpotImporterTest extends AbstractWatersTest
     throws IOException, WatersUnmarshalException
   {
     try {
-      final String ext = mModuleMarshaller.getDefaultExtension();
       final URL url = despotURI.toURL();
       final InputStream stream = url.openStream();
-      DocumentBuilder builder;
-      builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      final Document doc = builder.parse(stream);
-      stream.close();
+      final Document doc;
+      try {
+        final DocumentBuilder builder =
+          DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        doc = builder.parse(stream);
+      } finally {
+        stream.close();
+      }
       final Element root = doc.getDocumentElement();
+      final String ext = mModuleMarshaller.getDefaultExtension();
       for (Node node = root.getFirstChild();
            node != null;
            node = node.getNextSibling()) {
