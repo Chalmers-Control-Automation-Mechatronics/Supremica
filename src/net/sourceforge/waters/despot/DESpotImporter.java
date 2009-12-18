@@ -220,14 +220,14 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
       module = constructModule(subsystem);
       // stores the module
-      mModules.put(formatIdentifier(module.getName()), module);
+      mModules.put(module.getName(), module);
 
       mComponents.clear();
       mEvents.clear();
       final ProxyMarshaller<ModuleProxy> marshaller =
           mDocumentManager.findProxyMarshaller(ModuleProxy.class);
       final String ext = marshaller.getDefaultExtension();
-      final String filename = formatIdentifier(subsystem.getAttribute("name"));
+      final String filename = subsystem.getAttribute("name");
       if (!mOutputDir.exists()) {
         mOutputDir.mkdirs();
       }
@@ -486,9 +486,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   private ModuleProxy constructModule(final Element subsystem)
   {
 
-    return mFactory.createModuleProxy(formatIdentifier(subsystem
-        .getAttribute("name")), null, URI.create("testModule"), null, mEvents
-        .values(), null, mComponents);
+    return mFactory.createModuleProxy(subsystem.getAttribute("name"), null, URI
+        .create("testModule"), null, mEvents.values(), null, mComponents);
   }
 
   /**
@@ -564,7 +563,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     }
 
     // gets the blocked events for this automata
-    final NodeList transLoopList = transitions.getElementsByTagName("Tr");
+    final NodeList transLoopList = transitions.getElementsByTagName("*");
     final LabelBlockProxy blockedEvents = findBlockedEvents(transLoopList);
 
     return mFactory.createGraphProxy(true, blockedEvents, mNodes, mEdges);
@@ -573,10 +572,10 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   /**
    * Determines which events are blocked in this automata. Events are blocked if
-   * they do not appear on a transition or selfloop.
+   * they do not appear on a transition or self-loop.
    *
    * @param transLoopList
-   *          The list of Transitions and selfloops from the DOM.
+   *          The list of Transitions and self-loops from the DOM.
    */
   private LabelBlockProxy findBlockedEvents(final NodeList transitions)
   {
@@ -585,12 +584,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         new ArrayList<SimpleIdentifierProxy>();
     for (final int eventID : mEventIDs.keySet()) {
       found = false;
-
       for (int j = 0; j < transitions.getLength(); j++) {
         final Element tr = (Element) transitions.item(j);
-        if (Integer.parseInt(tr.getAttribute("eID")) == eventID) {
-          found = true;
-          break;
+        if (tr.getAttribute("eID") != "") {
+          if (Integer.parseInt(tr.getAttribute("eID")) == eventID) {
+            found = true;
+            break;
+          }
         }
       }
       if (!found) {

@@ -53,7 +53,6 @@ public class DESpotImporterTest extends AbstractWatersTest
     throws IOException, WatersMarshalException, WatersUnmarshalException,
            EvalException
   {
-    // This fails because <Self-Loops> entries are not handled correctly.
     testImport("testSimple", "test2");
   }
 
