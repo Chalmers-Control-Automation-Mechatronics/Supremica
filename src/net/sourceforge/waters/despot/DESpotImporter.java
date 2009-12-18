@@ -220,14 +220,14 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
       module = constructModule(subsystem);
       // stores the module
-      mModules.put(module.getName(), module);
+      mModules.put(formatIdentifier(module.getName()), module);
 
       mComponents.clear();
       mEvents.clear();
       final ProxyMarshaller<ModuleProxy> marshaller =
           mDocumentManager.findProxyMarshaller(ModuleProxy.class);
       final String ext = marshaller.getDefaultExtension();
-      final String filename = subsystem.getAttribute("name");
+      final String filename = formatIdentifier(subsystem.getAttribute("name"));
       if (!mOutputDir.exists()) {
         mOutputDir.mkdirs();
       }
