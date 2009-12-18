@@ -15,9 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -33,7 +31,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
-public class EventJTree extends JTree implements InternalFrameObserver, ComponentListener
+public class EventJTree extends JTree implements InternalFrameObserver, SimulationObserver, ComponentListener
 {
 
   public EventJTree(final Simulation sim, final AutomatonDesktopPane desktop, final ModuleContainer container)
@@ -44,12 +42,12 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
     mDesktop = desktop;
     mPane = null;
     desktop.attach(this);
+    sim.attach(this);
     automatonAreOpen = new ArrayList<String>();
     mContainer = container;
     mSortingMethods = new ArrayList<Pair<Boolean, Integer>>();
     expandedNodes = new ArrayList<String>();
-    final EventMutableTreeNode root = new EventMutableTreeNode(sim, this, mSortingMethods, expandedNodes);
-    this.setModel(new DefaultTreeModel(root, false));
+    this.setModel(new EventTreeModel(mSim));
     this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
     setShowsRootHandles(true);
@@ -63,14 +61,14 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
         if (e.getClickCount() == 2)
         {
           final TreePath path = EventJTree.this.getClosestPathForLocation((int)e.getPoint().getX(), (int)e.getPoint().getY());
-          final MutableTreeNode node = (MutableTreeNode)path.getLastPathComponent();
+          final Object node = path.getLastPathComponent();
           if (node == null)
             return; // Nothing is selected
-          if (node.getClass() == EventBranchNode.class)
+          if (EventProxy.class.isInstance(node))
           {
             try {
-              if (sim.getValidTransitions().contains(((EventBranchNode)node).getEvent()))
-                sim.step(((EventBranchNode)node).getEvent());
+              if (sim.getValidTransitions().contains((EventProxy)node))
+                sim.step((EventProxy)node);
               else
                 System.out.println("ERROR: That event is blocked");
             } catch (final UncontrollableException exception) {
@@ -79,9 +77,9 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
               System.out.println(exception.getMessage() + ". No event has been fired");
             }
           }
-          else if (node.getClass() == AutomatonLeafNode.class)
+          else if (AutomatonProxy.class.isInstance(node))
           {
-            final AutomatonProxy toAdd = ((AutomatonLeafNode)node).getAutomata();
+            final AutomatonProxy toAdd = (AutomatonProxy)node;
             mDesktop.addAutomaton(toAdd.getName(), mSim.getContainer(), mSim, 2);
           }
         }
@@ -92,33 +90,31 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
       public void treeWillCollapse(final TreeExpansionEvent event)
           throws ExpandVetoException
       {
-        if (event.getPath().getLastPathComponent().getClass() == EventBranchNode.class)
+        if (EventProxy.class.isInstance(event.getPath().getLastPathComponent()))
         {
-          expandedNodes.remove(((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName());
+          expandedNodes.remove(((EventProxy)event.getPath().getLastPathComponent()).getName());
         }
       }
 
       public void treeWillExpand(final TreeExpansionEvent event)
           throws ExpandVetoException
       {
-        if (event.getPath().getLastPathComponent().getClass() == EventBranchNode.class)
+        if (EventProxy.class.isInstance(event.getPath().getLastPathComponent()))
         {
           for (final String name : expandedNodes)
           {
-            if (((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName().compareTo(name) == 0)
+            if (((EventProxy)event.getPath().getLastPathComponent()).getName().compareTo(name) == 0)
               return;
           }
-          expandedNodes.add(((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName());
-         ((EventBranchNode)event.getPath().getLastPathComponent()).addAutomata(mSim, null);
+          expandedNodes.add(((EventProxy)event.getPath().getLastPathComponent()).getName());
         }
       }
     });
   }
 
-  public void addScrollPane(final JScrollPane scroll)
+  public void addPane(final JScrollPane pane)
   {
-    mPane = scroll;
-    mPane.addComponentListener(this);
+    mPane = pane;
   }
 
   // ##################################################################
@@ -159,6 +155,53 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
     forceRecalculation();
   }
 
+  // ##################################################################
+  // # Interface SimulationObserver
+
+  public void forceRecalculation()
+  {
+    this.setModel(new EventTreeModel(mSim));
+    for (int looper = 0; looper < expandedNodes.size(); looper++)
+    {
+      final String name = expandedNodes.get(looper);
+      for (int nodeIndex = 0; nodeIndex < mSim.getAllEvents().size(); nodeIndex++)
+      {
+        if (mSim.getAllEvents().get(nodeIndex).getName().compareTo(name) == 0)
+        {
+          this.expandPath(new TreePath(new Object[]{mSim, mSim.getAllEvents().get(nodeIndex)}));
+        }
+      }
+    }
+  }
+
+  public void simulationChanged(final SimulationChangeEvent event)
+  {
+    forceRecalculation();
+  }
+
+  // #################################################################
+  // # Interface ComponentListener
+
+  public void componentHidden(final ComponentEvent e)
+  {
+    // Do nothing
+  }
+
+  public void componentMoved(final ComponentEvent e)
+  {
+    // Do nothing
+  }
+
+  public void componentResized(final ComponentEvent e)
+  {
+    forceRecalculation();
+  }
+
+  public void componentShown(final ComponentEvent e)
+  {
+    forceRecalculation();
+  }
+
   //##################################################################
   // # Interface InternalFrameObserver
 
@@ -182,49 +225,6 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
   }
 
   // ########################################################################
-  // # Interface ComponentListener
-  public void componentHidden(final ComponentEvent e)
-  {
-    //Do nothing
-  }
-
-  public void componentMoved(final ComponentEvent e)
-  {
-    // Do nothing
-  }
-
-  public void componentResized(final ComponentEvent e)
-  {
-    forceRecalculation();
-  }
-
-  public void componentShown(final ComponentEvent e)
-  {
-    forceRecalculation();
-  }
-
-  // ########################################################################
-  // # Auxillary Classes
-
-  public void forceRecalculation()
-  {
-    final EventMutableTreeNode root = new EventMutableTreeNode(mSim, this, mSortingMethods, expandedNodes);
-    this.setModel(new DefaultTreeModel(root, false));
-    for (int looper = 0; looper < expandedNodes.size(); looper++)
-    {
-      final String name = expandedNodes.get(looper);
-      for (int nodeIndex = 0; nodeIndex < root.getChildCount(); nodeIndex++)
-      {
-        if (((EventBranchNode)root.getChildAt(nodeIndex)).getEvent().getName().compareTo(name) == 0)
-        {
-          ((EventBranchNode)root.getChildAt(nodeIndex)).addAutomata(mSim, null);
-          this.expandPath(new TreePath(((EventBranchNode)root.getChildAt(nodeIndex)).getPath()));
-        }
-      }
-    }
-  }
-
-  // ########################################################################
   // # Inner Classes
 
   private class EventTreeCellRenderer
@@ -243,18 +243,16 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
        final boolean expanded, final boolean leaf,
        final int row, final boolean hasFocus)
     {
-      //final JPanel output = (JPanel) ((EventTreeCellRenderer)super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus)).getComponent(0);
       panel  = new JPanel();
       if (sel)
         panel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
       else
         panel.setBackground(EditorColor.BACKGROUNDCOLOR);
-      if (value.getClass() == EventBranchNode.class)
+      if (EventProxy.class.isInstance(value))
       {
         final GridBagLayout layout = new GridBagLayout();
         panel.setLayout(layout);
-        final EventBranchNode eventNode = (EventBranchNode)value;
-        final EventProxy event = eventNode.getEvent();
+        final EventProxy event = (EventProxy)value;
         left = new JLabel(event.getName());
         if (event.getKind() == EventKind.CONTROLLABLE)
           left.setIcon(IconLoader.ICON_CONTROLLABLE);
@@ -274,10 +272,9 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
         panel.add(right);
         return panel;
       }
-      else if (value.getClass() == AutomatonLeafNode.class)
+      else if (AutomatonProxy.class.isInstance(value))
       {
-        final AutomatonLeafNode autoNode = (AutomatonLeafNode) value;
-        final AutomatonProxy autoProxy = autoNode.getAutomata();
+        final AutomatonProxy autoProxy = (AutomatonProxy)value;
         final GridBagLayout layout = new GridBagLayout();
         panel.setLayout(layout);
         left = new JLabel(autoProxy.getName());
@@ -286,10 +283,10 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
         else
           left.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
         center = new JLabel();
-        if (mSim.getBlocking(((EventBranchNode)autoNode.getParent()).getEvent()).contains(autoProxy))
-          center.setIcon(IconLoader.ICON_CROSS);
-        else
-          center.setIcon(IconLoader.ICON_TICK);
+        //if (mSim.getBlocking(((EventBranchNode)autoNode.getParent()).getEvent()).contains(autoProxy))
+        //  center.setIcon(IconLoader.ICON_CROSS);
+        //else
+        center.setIcon(IconLoader.ICON_TICK); // TODO: Determine what event is this automatons parent
         StateProxy currentState;
         currentState = mSim.getCurrentStates().get(autoProxy);
         right = new JLabel(currentState.getName());
@@ -349,8 +346,8 @@ public class EventJTree extends JTree implements InternalFrameObserver, Componen
   private final ModuleContainer mContainer;
   private final ArrayList<String> automatonAreOpen;
   private final ArrayList<Pair<Boolean, Integer>> mSortingMethods;
-  private JScrollPane mPane;
   private final ArrayList<String> expandedNodes;
+  private JScrollPane mPane;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};

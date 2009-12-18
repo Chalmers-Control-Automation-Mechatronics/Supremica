@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,8 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.Icon;
-import javax.swing.tree.TreeNode;
-
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -36,7 +33,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class Simulation implements ModelObserver, Observer//, TreeNode
+public class Simulation implements ModelObserver, Observer
 {
 
   //#########################################################################
@@ -367,59 +364,6 @@ public class Simulation implements ModelObserver, Observer//, TreeNode
     }
     return output;
   }
-
-  // ########################################################################
-  // # Interface TreeNode
-
-  @SuppressWarnings("unchecked")
-  public Enumeration children()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  public boolean getAllowsChildren()
-  {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-
-  public TreeNode getChildAt(final int childIndex)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  public int getChildCount()
-  {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-
-  public int getIndex(final TreeNode node)
-  {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-
-  public TreeNode getParent()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  public boolean isLeaf()
-  {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer

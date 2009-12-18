@@ -28,7 +28,7 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   public void simulationChanged(final SimulationChangeEvent event)
   {
     mSim.detach(this);
-    mParent.forceRecalculation();
+    //mParent.forceRecalculation();
   }
 
   // ##################################################################

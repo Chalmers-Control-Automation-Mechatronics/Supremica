@@ -27,6 +27,7 @@ public class SimulatorPanel
   {
     super(name);
     mSimulation = new Simulation(moduleContainer);
+    System.out.println("DEBUG: SimulationDES is " + mSimulation.getCompiledDES());
     mModuleContainer = moduleContainer;
     setupDesktop();
     mTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
@@ -113,7 +114,7 @@ public class SimulatorPanel
   {
     mEventsTree = new EventJTree(mSimulation, mDesktop, mModuleContainer);
     final JScrollPane scroll = new JScrollPane(mEventsTree);
-    mEventsTree.addScrollPane(scroll);
+    mEventsTree.addPane(scroll);
     mEventsPanel.setLayout(new BorderLayout());
     mEventsPanel.add(scroll, BorderLayout.CENTER);
     final JTableHeader header = new JTableHeader();
