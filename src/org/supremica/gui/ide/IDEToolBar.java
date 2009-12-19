@@ -138,7 +138,7 @@ public class IDEToolBar
 
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
-    // Just in case they try to register or deregister observers
+    // Just in case they try to register or unregister observers
     // in response to the update ...
     final List<Observer> copy = new LinkedList<Observer>(mObservers);
     for (final Observer observer : copy) {
@@ -152,10 +152,17 @@ public class IDEToolBar
   //# Interface net.sourceforge.waters.gui.observer.Observer
   public void update(final EditorChangedEvent event)
   {
-    removeAll();
-    createButtons();
-    revalidate();
-    repaint();
+    switch (event.getKind()) {
+    case CONTAINER_SWITCH:
+    case MAINPANEL_SWITCH:
+      removeAll();
+      createButtons();
+      revalidate();
+      repaint();
+      break;
+    default:
+      break;
+    }
   }
 
 

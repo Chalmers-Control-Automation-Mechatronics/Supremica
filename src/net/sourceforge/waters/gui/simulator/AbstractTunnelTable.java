@@ -34,7 +34,7 @@ public class AbstractTunnelTable extends SimulationTable implements
     mModuleContainer = container;
     mParent = null;
     desktop.attach(this);
-    mComparator = new AutomatonTableComparitor<Object>();
+    mComparator = new AutomatonTableComparator<Object>();
     observers = new HashSet<TableOrderObserver>();
   }
 
@@ -57,7 +57,7 @@ public class AbstractTunnelTable extends SimulationTable implements
     return mSimulation.getAutomatonFromName(finder);
   }
 
-  public AutomatonTableComparitor<Object> getComparitor()
+  public AutomatonTableComparator<Object> getComparitor()
   {
     return mComparator;
   }
@@ -184,7 +184,7 @@ public class AbstractTunnelTable extends SimulationTable implements
   private List<List<Object>> mRawData;
   private final ModuleContainer mModuleContainer;
   private JTable mParent;
-  private final AutomatonTableComparitor<Object> mComparator;
+  private final AutomatonTableComparator<Object> mComparator;
   private final HashSet<TableOrderObserver> observers;
 
   // #########################################################################

@@ -1,0 +1,174 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.gui.simulator
+//# CLASS:   AutomataTable
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.gui.simulator;
+
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+
+import net.sourceforge.waters.model.des.AutomatonProxy;
+
+import org.supremica.gui.ide.ModuleContainer;
+
+
+class AutomataTable extends JTable
+{
+
+  //#########################################################################
+  //# Constructor
+  AutomataTable(final ModuleContainer container,
+                final Simulation sim,
+                final AutomatonDesktopPane desktop)
+  {
+    super(new AbstractTunnelTable(container, sim, desktop));
+    mSimulation = sim;
+    mDesktop = desktop;
+    final AbstractTunnelTable model = getModel();
+    model.attachTable(this);
+    setRowHeight(AUTOMATA_TABLE_HEIGHT);
+    final TableCellRenderer textrenderer = new TextCellRenderer();
+    setDefaultRenderer(String.class, textrenderer);
+    final TableCellRenderer iconrenderer = new IconCellRenderer();
+    setDefaultRenderer(ImageIcon.class, iconrenderer);
+    setDefaultRenderer(Icon.class, iconrenderer);
+    final TableColumnModel colmodel = getColumnModel();
+    if (colmodel.getColumnCount() != 0) {
+      colmodel.getColumn(0).setPreferredWidth(NARROW_WIDTH);
+      colmodel.getColumn(0).setMaxWidth(NARROW_WIDTH);
+      colmodel.getColumn(1).setPreferredWidth(BROAD_WIDTH);
+      colmodel.getColumn(2).setPreferredWidth(NARROW_WIDTH);
+      colmodel.getColumn(2).setMaxWidth(NARROW_WIDTH);
+      colmodel.getColumn(3).setPreferredWidth(NARROW_WIDTH);
+      colmodel.getColumn(3).setMaxWidth(NARROW_WIDTH);
+      colmodel.getColumn(4).setPreferredWidth(BROAD_WIDTH);
+    }
+    addMouseListener(new AutomatonMouseListener());
+    getTableHeader().setReorderingAllowed(false);
+    final ListSelectionModel listMod = getSelectionModel();
+    listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    getTableHeader().addMouseListener
+      (new TableHeaderMouseAdapter(this, getTableHeader()));
+    setShowGrid(!DISABLE_AUTOMATON_GRIDLINES);
+  }
+
+
+  //#########################################################################
+  //# Overrides for javax.swing.JTable
+  public AbstractTunnelTable getModel()
+  {
+    return (AbstractTunnelTable) super.getModel();
+  }
+
+
+  //#########################################################################
+  //# Inner Class TextCellRenderer
+  private class TextCellRenderer extends DefaultTableCellRenderer
+  {
+
+    //#######################################################################
+    //# Interface javax.swing.table.TableCellRenderer
+    public Component getTableCellRendererComponent
+      (final JTable table, final Object value, final boolean selected,
+       final boolean focused, final int row, final int column)
+    {
+      final Component cell = super.getTableCellRendererComponent
+        (table, value, selected, false, row, column);
+      final AbstractTunnelTable model = getModel();
+      if (mDesktop.automatonIsOpen(model.getAutomaton(row, mSimulation))) {
+        final Font oldFont = cell.getFont();
+        cell.setFont(oldFont.deriveFont(Font.BOLD));
+      }
+      return cell;
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class TextCellRenderer
+  private class IconCellRenderer extends DefaultTableCellRenderer
+  {
+
+    //#######################################################################
+    //# Interface javax.swing.table.TableCellRenderer
+    public Component getTableCellRendererComponent
+      (final JTable table, final Object value, final boolean selected,
+       final boolean focused, final int row, final int column)
+    {
+      final JLabel cell = (JLabel) super.getTableCellRendererComponent
+        (table, value, selected, false, row, column);
+      final Icon icon = (Icon) value;
+      cell.setIcon(icon);
+      cell.setText(null);
+      return cell;
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class AutomatonMouseListener
+  private class AutomatonMouseListener extends MouseAdapter
+  {
+
+    //#######################################################################
+    //# Interface java.awt.event.MouseListener
+    public void mouseClicked(final MouseEvent event)
+    {
+      final int row = rowAtPoint(event.getPoint());
+      if (row >= 0) {
+        final AutomatonProxy toAdd = getModel().getAutomaton(row, mSimulation);
+        mDesktop.addAutomaton(toAdd.getName(), mSimulation.getContainer(),
+                              mSimulation, event.getClickCount());
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final Simulation mSimulation;
+  private final AutomatonDesktopPane mDesktop;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final boolean DISABLE_AUTOMATON_GRIDLINES = true;
+
+  private static final int AUTOMATA_TABLE_HEIGHT = 20;
+
+  // DEBUG: Arbitrary value: Any value will work,
+  // but this is close to the 'normal' value
+  private static final int DUMMY_WIDTH = 245;
+  private static final int NARROW_WIDTH = DUMMY_WIDTH / 10;
+  private static final int BROAD_WIDTH = 35 * DUMMY_WIDTH / 100;
+
+  private static final long serialVersionUID = 1L;
+
+}

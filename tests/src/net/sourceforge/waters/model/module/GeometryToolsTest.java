@@ -1,18 +1,16 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui.renderer
+//# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   GeometryToolsTest
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.gui.renderer;
+package net.sourceforge.waters.model.module;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
-
-import net.sourceforge.waters.model.module.GeometryTools;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -29,7 +27,7 @@ public class GeometryToolsTest extends TestCase
     return new TestSuite(GeometryToolsTest.class);
   }
 
-  public static void main(String args[])
+  public static void main(final String args[])
   {
     junit.textui.TestRunner.run(suite());
   }

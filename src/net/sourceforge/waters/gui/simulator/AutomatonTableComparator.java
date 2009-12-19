@@ -10,11 +10,11 @@ import net.sourceforge.waters.gui.PropositionIcon;
 
 import java.lang.Comparable;
 
-public class AutomatonTableComparitor<K> implements Comparator<K>
+public class AutomatonTableComparator<K> implements Comparator<K>
 {
   // #########################################################################
   // # Constructor
-  public AutomatonTableComparitor()
+  public AutomatonTableComparator()
   {
     sortingMethods = new ArrayList<Pair<Boolean, Integer>>();
     sortingMethods.add(new Pair<Boolean, Integer>(true, 1));
