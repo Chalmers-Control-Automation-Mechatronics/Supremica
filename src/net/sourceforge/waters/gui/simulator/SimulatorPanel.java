@@ -59,8 +59,7 @@ public class SimulatorPanel
 
   private void setupAutomata()
   {
-    mAutomataTable =
-      new AutomataTable(mModuleContainer, mSimulation, mDesktop);
+    mAutomataTable = new AutomataTable(mSimulation, mDesktop);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
     mAutomataPanel.setLayout(new BorderLayout());
     mAutomataPanel.add(scroll, BorderLayout.CENTER);

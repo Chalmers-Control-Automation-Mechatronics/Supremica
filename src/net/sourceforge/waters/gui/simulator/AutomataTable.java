@@ -20,12 +20,11 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
-
-import org.supremica.gui.ide.ModuleContainer;
 
 
 class AutomataTable extends JTable
@@ -33,15 +32,11 @@ class AutomataTable extends JTable
 
   //#########################################################################
   //# Constructor
-  AutomataTable(final ModuleContainer container,
-                final Simulation sim,
-                final AutomatonDesktopPane desktop)
+  AutomataTable(final Simulation sim, final AutomatonDesktopPane desktop)
   {
-    super(new AbstractTunnelTable(container, sim, desktop));
+    super(new AutomataTableModel(sim, desktop));
     mSimulation = sim;
     mDesktop = desktop;
-    final AbstractTunnelTable model = getModel();
-    model.attachTable(this);
     setRowHeight(AUTOMATA_TABLE_HEIGHT);
     final TableCellRenderer textrenderer = new TextCellRenderer();
     setDefaultRenderer(String.class, textrenderer);
@@ -63,17 +58,16 @@ class AutomataTable extends JTable
     getTableHeader().setReorderingAllowed(false);
     final ListSelectionModel listMod = getSelectionModel();
     listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    getTableHeader().addMouseListener
-      (new TableHeaderMouseAdapter(this, getTableHeader()));
+    getTableHeader().addMouseListener(new TableHeaderMouseListener());
     setShowGrid(!DISABLE_AUTOMATON_GRIDLINES);
   }
 
 
   //#########################################################################
   //# Overrides for javax.swing.JTable
-  public AbstractTunnelTable getModel()
+  public AutomataTableModel getModel()
   {
-    return (AbstractTunnelTable) super.getModel();
+    return (AutomataTableModel) super.getModel();
   }
 
 
@@ -90,8 +84,8 @@ class AutomataTable extends JTable
     {
       final Component cell = super.getTableCellRendererComponent
         (table, value, selected, false, row, column);
-      final AbstractTunnelTable model = getModel();
-      if (mDesktop.automatonIsOpen(model.getAutomaton(row, mSimulation))) {
+      final AutomataTableModel model = getModel();
+      if (mDesktop.automatonIsOpen(model.getAutomaton(row))) {
         final Font oldFont = cell.getFont();
         cell.setFont(oldFont.deriveFont(Font.BOLD));
       }
@@ -140,11 +134,34 @@ class AutomataTable extends JTable
     //# Interface java.awt.event.MouseListener
     public void mouseClicked(final MouseEvent event)
     {
-      final int row = rowAtPoint(event.getPoint());
-      if (row >= 0) {
-        final AutomatonProxy toAdd = getModel().getAutomaton(row, mSimulation);
-        mDesktop.addAutomaton(toAdd.getName(), mSimulation.getContainer(),
-                              mSimulation, event.getClickCount());
+      if (event.getButton() == MouseEvent.BUTTON1) {
+        final int row = rowAtPoint(event.getPoint());
+        if (row >= 0) {
+          final AutomataTableModel model = getModel();
+          final AutomatonProxy toAdd = model.getAutomaton(row);
+          mDesktop.addAutomaton(toAdd.getName(), mSimulation.getContainer(),
+                                mSimulation, event.getClickCount());
+        }
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class TableHeaderMouseListener
+  private class TableHeaderMouseListener extends MouseAdapter
+  {
+
+    //#######################################################################
+    //# Interface java.awt.event.MouseListener
+    public void mouseClicked(final MouseEvent event)
+    {
+      if (event.getButton() == MouseEvent.BUTTON1) {
+        final JTableHeader header = getTableHeader();
+        final int column = header.columnAtPoint(event.getPoint());
+        final AutomataTableModel model = getModel();
+        model.addSortingMethod(column);
       }
     }
 

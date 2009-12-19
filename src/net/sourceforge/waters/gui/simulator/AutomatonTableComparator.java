@@ -10,20 +10,22 @@ import net.sourceforge.waters.gui.PropositionIcon;
 
 import java.lang.Comparable;
 
-public class AutomatonTableComparator<K> implements Comparator<K>
+
+class AutomatonTableComparator implements Comparator<Object>
 {
-  // #########################################################################
-  // # Constructor
-  public AutomatonTableComparator()
+
+  //#########################################################################
+  //# Constructor
+  AutomatonTableComparator()
   {
     sortingMethods = new ArrayList<Pair<Boolean, Integer>>();
     sortingMethods.add(new Pair<Boolean, Integer>(true, 1));
   }
 
-  // #########################################################################
-  // # Simple Access
 
-  public void addNewSortingMethod(final int column)
+  //#########################################################################
+  //# Simple Access
+  void addNewSortingMethod(final int column)
   {
     Pair<Boolean, Integer> remove = null;
     for (final Pair<Boolean, Integer> method : sortingMethods)
@@ -45,9 +47,8 @@ public class AutomatonTableComparator<K> implements Comparator<K>
     return sortingMethods.toString();
   }
 
-  // #########################################################################
-  // # Interface Comparator
-
+  //#########################################################################
+  //# Interface Comparator
   @SuppressWarnings("unchecked")
   public int compare(final Object o1, final Object o2)
   {
@@ -83,9 +84,8 @@ public class AutomatonTableComparator<K> implements Comparator<K>
     return 0;
   }
 
-  // #########################################################################
-  // # Auxillary Methods
-
+  //#########################################################################
+  //# Auxiliary Methods
   @SuppressWarnings("unchecked")
   private boolean checkValid(final Object object)
   {
@@ -97,10 +97,9 @@ public class AutomatonTableComparator<K> implements Comparator<K>
         && array.get(4).getClass() == String.class);
   }
 
-  // ####################################################################
-  // # Data Members
 
-
-  private final ArrayList<Pair<Boolean, Integer>> sortingMethods;
+  //#########################################################################
+  //# Data Members
+  private final List<Pair<Boolean, Integer>> sortingMethods;
 
 }

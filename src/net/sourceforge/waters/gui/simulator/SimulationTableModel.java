@@ -2,29 +2,42 @@ package net.sourceforge.waters.gui.simulator;
 
 import javax.swing.table.AbstractTableModel;
 
-public abstract class SimulationTable extends AbstractTableModel implements SimulationObserver
+import org.supremica.gui.ide.ModuleContainer;
+
+
+abstract class SimulationTableModel
+  extends AbstractTableModel
+  implements SimulationObserver
 {
 
   // #########################################################################
   // # Constructors
-
-  public SimulationTable(final Simulation sim)
+  SimulationTableModel(final Simulation sim)
   {
-    this.mSim = sim;
+    mSimulation = sim;
     sim.attach(this);
   }
 
   // #########################################################################
   // # Simple Access
-  public Simulation getSim()
+  Simulation getSimulation()
   {
-    return mSim;
+    return mSimulation;
   }
+
+  ModuleContainer getModuleContainer()
+  {
+    if (mSimulation == null) {
+      return null;
+    } else {
+      return mSimulation.getContainer();
+    }
+  }
+
 
   // #########################################################################
   // # Data Members
-
-  private final Simulation mSim;
+  private final Simulation mSimulation;
 
 
   //#########################################################################

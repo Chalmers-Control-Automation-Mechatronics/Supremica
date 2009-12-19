@@ -178,16 +178,14 @@ public class Simulation implements ModelObserver, Observer
     return mContainer;
   }
 
-  @SuppressWarnings("unchecked")
-  public ArrayList<EventProxy> getEventHistory()
+  public List<EventProxy> getEventHistory()
   {
-    return (ArrayList<EventProxy>) mPreviousEvents.clone();
+    return Collections.unmodifiableList(mPreviousEvents);
   }
 
-  @SuppressWarnings("unchecked")
-  public ArrayList<HashMap<AutomatonProxy, StateProxy>> getAutomatonHistory()
+  public List<HashMap<AutomatonProxy, StateProxy>> getAutomatonHistory()
   {
-   return (ArrayList<HashMap<AutomatonProxy, StateProxy>>) mPreviousAutomatonStates.clone();
+   return Collections.unmodifiableList(mPreviousAutomatonStates);
   }
 
   public ArrayList<AutomatonProxy> getAutomata()
@@ -337,25 +335,6 @@ public class Simulation implements ModelObserver, Observer
 
   //#########################################################################
   //# Class Object
-  public boolean Equals(final Object e)
-  {
-    if (e.getClass() != Simulation.class) return false;
-    final Simulation comparer = (Simulation)e;
-    final HashMap<AutomatonProxy,StateProxy> comparerStates = comparer.getCurrentStates();
-    for (final AutomatonProxy comparerAuto : comparerStates.keySet())
-    {
-      boolean found = false;
-      for (final AutomatonProxy thisAuto : mAllAutomatons.keySet())
-      {
-        if ((comparerAuto == thisAuto) && (comparerStates.get(comparerAuto) == mAllAutomatons.get(thisAuto)))
-          found = true;
-      }
-      if (found == false)
-        return false;
-    }
-    return true;
-  }
-
   public String toString()
   {
     String output = "";
@@ -364,6 +343,7 @@ public class Simulation implements ModelObserver, Observer
     }
     return output;
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
@@ -611,7 +591,6 @@ public class Simulation implements ModelObserver, Observer
 
   //#########################################################################
   //# Data Members
-
   private HashMap<AutomatonProxy,StateProxy> mAllAutomatons; // The Map object is the current state of the key
   private ArrayList<EventProxy> mEnabledEvents;
   private HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the key
