@@ -12,8 +12,11 @@ package net.sourceforge.waters.gui.renderer;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-    
+
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.GeometryTools;
+
+import org.supremica.properties.Config;
 
 
 
@@ -26,10 +29,11 @@ class StraightEdgeProxyShape
   StraightEdgeProxyShape(final EdgeProxy edge)
   {
     super(edge);
+    final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
     final Point2D start = GeometryTools.getStartPoint(edge);
     final Point2D end = GeometryTools.getEndPoint(edge);
-    mStart = GeometryTools.getRadialStartPoint(edge, end);
-    mEnd = GeometryTools.getRadialEndPoint(edge, start);
+    mStart = GeometryTools.getRadialStartPoint(edge, end, radius);
+    mEnd = GeometryTools.getRadialEndPoint(edge, start, radius);
     mLine = new Line2D.Double(mStart, mEnd);
     final double distance = mStart.distance(mEnd);
     if (distance == 0.0) {

@@ -4,9 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
+import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
@@ -27,8 +27,7 @@ public class SimulationReplayStepAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_T);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK)); // Get better Accelerator Key
-    putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/tick16.gif")));
-
+    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_REPLAY);
   }
 
 

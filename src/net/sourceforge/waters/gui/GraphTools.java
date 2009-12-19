@@ -21,8 +21,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.gui.renderer.LabelProxyShape;
+import net.sourceforge.waters.model.module.GeometryTools;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;

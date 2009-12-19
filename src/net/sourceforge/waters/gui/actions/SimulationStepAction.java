@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
@@ -46,8 +45,8 @@ public class SimulationStepAction
     putValue(Action.SHORT_DESCRIPTION, "Execute an event");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
     putValue(Action.ACCELERATOR_KEY,
-	         KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.ALT_MASK));
-    putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/tick16.gif")));
+             KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.ALT_MASK));
+    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_STEP);
   }
 
 

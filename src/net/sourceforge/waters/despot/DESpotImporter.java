@@ -22,7 +22,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sourceforge.waters.gui.renderer.TieEdgeProxyShape;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -33,6 +32,7 @@ import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
+import net.sourceforge.waters.model.module.GeometryTools;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -744,7 +744,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       // Convert angle to radians and add 45 degrees
       final double radang = Math.toRadians(ang + 45.0);
       // Get scale factor for Waters selfloop of size 48
-      final double scale = 48.0 * TieEdgeProxyShape.DEFAULT_DISTANCE_UNIT;
+      final double scale = 48.0 * GeometryTools.SELFLOOP_DISTANCE_UNIT;
       // Compute relative coordinates of the control point
       final double dx = scale * Math.cos(radang);
       final double dy = scale * Math.sin(radang);

@@ -17,6 +17,9 @@ import java.awt.geom.QuadCurve2D;
 import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.GeometryTools;
+
+import org.supremica.properties.Config;
 
 
 class QuadraticEdgeProxyShape
@@ -28,11 +31,12 @@ class QuadraticEdgeProxyShape
   QuadraticEdgeProxyShape(final EdgeProxy edge)
   {
     super(edge);
+    final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
     mControl = GeometryTools.getSingleBezierControlPoint(edge);
-    mStart = GeometryTools.getRadialStartPoint(edge, mControl);
-    mEnd = GeometryTools.getRadialEndPoint(edge, mControl);
+    mStart = GeometryTools.getRadialStartPoint(edge, mControl, radius);
+    mEnd = GeometryTools.getRadialEndPoint(edge, mControl, radius);
     mCurve = new QuadCurve2D.Double(mStart.getX(), mStart.getY(),
-				    mControl.getX(), mControl.getY(), 
+				    mControl.getX(), mControl.getY(),
 				    mEnd.getX(), mEnd.getY());
     mArrowTip = calculateInnerArrowTipPosition();
     createHandles();

@@ -30,6 +30,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.GeometryTools;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;

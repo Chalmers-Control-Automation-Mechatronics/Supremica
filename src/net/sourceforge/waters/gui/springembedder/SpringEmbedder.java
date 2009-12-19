@@ -26,10 +26,10 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
-import net.sourceforge.waters.gui.renderer.GeometryTools;
-import net.sourceforge.waters.gui.renderer.HornerPolynomial;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
+import net.sourceforge.waters.model.module.GeometryTools;
+import net.sourceforge.waters.model.module.HornerPolynomial;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;

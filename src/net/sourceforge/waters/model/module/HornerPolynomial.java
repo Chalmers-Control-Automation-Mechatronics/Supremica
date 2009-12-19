@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.gui.renderer;
+package net.sourceforge.waters.model.module;
 
 import java.util.List;
 

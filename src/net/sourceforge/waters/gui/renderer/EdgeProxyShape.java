@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.GeometryTools;
 
 import org.supremica.properties.Config;
 

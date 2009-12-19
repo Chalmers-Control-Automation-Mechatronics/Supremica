@@ -15,6 +15,9 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.GeometryTools;
+
+import org.supremica.properties.Config;
 
 
 class CubicEdgeProxyShape
@@ -27,10 +30,11 @@ class CubicEdgeProxyShape
   {
     super(edge);
     final Point2D[] controls = GeometryTools.getCubicBezierControlPoints(edge);
+    final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
     mControl1 = controls[0];
     mControl2 = controls[1];
-    mStart = GeometryTools.getRadialStartPoint(edge, mControl1);
-    mEnd = GeometryTools.getRadialEndPoint(edge, mControl2);
+        mStart = GeometryTools.getRadialStartPoint(edge, mControl1, radius);
+    mEnd = GeometryTools.getRadialEndPoint(edge, mControl2, radius);
     mCurve = new CubicCurve2D.Double(mStart.getX(), mStart.getY(),
                                      mControl1.getX(), mControl1.getY(),
                                      mControl2.getX(), mControl2.getY(),

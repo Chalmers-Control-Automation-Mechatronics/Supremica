@@ -17,9 +17,12 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.GeometryTools;
+
+import org.supremica.properties.Config;
 
 
-public class TieEdgeProxyShape
+class TieEdgeProxyShape
   extends EdgeProxyShape
 {
 
@@ -37,7 +40,7 @@ public class TieEdgeProxyShape
     mMidDirection = new Point2D.Double(-dy, dx);
     GeometryTools.normalize(mMidDirection);
     final double dist = Math.sqrt(dx * dx + dy * dy);
-    final double radius = SELFLOOP_RADIUS * dist;
+    final double radius = GeometryTools.SELFLOOP_RADIUS * dist;
     final double diameter = 2.0 * radius;
     final double factor =
       dist > GeometryTools.EPSILON ? (dist - radius) / dist : 0.0;
@@ -46,14 +49,15 @@ public class TieEdgeProxyShape
     final double ax = cx - radius;
     final double ay = cy - radius;
     final double startangle =
-      Math.atan2(dy, dx) + Math.PI + 0.5 * SELFLOOP_APERTURE;
+      Math.atan2(dy, dx) + Math.PI + 0.5 * GeometryTools.SELFLOOP_APERTURE;
     final double startdeg = 90.0 - Math.toDegrees(startangle);
-    mArc = new Arc2D.Double(ax, ay, diameter, diameter,
-			    startdeg, SELFLOOP_EXTENT, Arc2D.OPEN);
+    mArc = new Arc2D.Double(ax, ay, diameter, diameter, startdeg,
+                            GeometryTools.SELFLOOP_EXTENT, Arc2D.OPEN);
+    final int noderadius = Config.GUI_EDITOR_NODE_RADIUS.get();
     final Point2D tangent1 = mArc.getEndPoint();
     final Point2D tangent2 = mArc.getStartPoint();
-    mStart = GeometryTools.getRadialStartPoint(edge, tangent1);
-    mEnd = GeometryTools.getRadialEndPoint(edge, tangent2);
+    mStart = GeometryTools.getRadialStartPoint(edge, tangent1, noderadius);
+    mEnd = GeometryTools.getRadialEndPoint(edge, tangent2, noderadius);
     final Line2D line1 = new Line2D.Double(mStart, tangent1);
     final Line2D line2 = new Line2D.Double(tangent2, mEnd);
     mTie = new GeneralPath(GeneralPath.WIND_NON_ZERO, 3);
@@ -142,41 +146,5 @@ public class TieEdgeProxyShape
   private final Point2D mInnerArrowTipPoint;
   private final Arc2D mArc;
   private final GeneralPath mTie;
-
-
-  //#########################################################################
-  //# Class Constants
-  static final double SQRT2 = Math.sqrt(2.0);
-
-  static final double SELFLOOP_APERTURE = 0.4 * Math.PI;  // 72deg
-  static final double SELFLOOP_SIN = Math.sin(0.5 * SELFLOOP_APERTURE);
-  static final double SELFLOOP_COS = Math.cos(0.5 * SELFLOOP_APERTURE);
-  static final double SELFLOOP_RADIUS = SELFLOOP_SIN / (1.0 + SELFLOOP_SIN);
-  static final double SELFLOOP_EXTENT =
-    180.0 + Math.toDegrees(SELFLOOP_APERTURE);
-
-  /**
-   * The height and width of a selfloop with default geometry.
-   */
-  public static final double DEFAULT_SIZE = 48.0;
-  /**
-   * The x component of the default control point given to a selfloop
-   * without explicit geometry.
-   */
-  public static final double DEFAULT_OFFSET_X =
-    (SELFLOOP_SIN + 1.0) / (2.0 * SELFLOOP_SIN + SQRT2) * SQRT2 * DEFAULT_SIZE;
-  /**
-   * The y component of the default control point given to a selfloop
-   * without explicit geometry.
-   */
-  public static final double DEFAULT_OFFSET_Y = - DEFAULT_OFFSET_X;
-
-  /**
-   * The distance of the control point of a selfloop to the node,
-   * when the height and with of the selfloop are both equal to one and
-   * the selfloop has standard 45degrees (north-east) orientation.
-   */
-  public static final double DEFAULT_DISTANCE_UNIT =
-    2.0 * (SELFLOOP_SIN + 1.0) / (2.0 * SELFLOOP_SIN + SQRT2);
 
 }

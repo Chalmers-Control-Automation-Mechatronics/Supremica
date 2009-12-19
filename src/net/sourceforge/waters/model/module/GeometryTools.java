@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.gui.renderer;
+package net.sourceforge.waters.model.module;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -20,16 +20,6 @@ import java.util.List;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.BoxGeometryProxy;
-import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
-import net.sourceforge.waters.model.module.LabelBlockProxy;
-import net.sourceforge.waters.model.module.LabelGeometryProxy;
-import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.PointGeometryProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -38,8 +28,6 @@ import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 
 import net.sourceforge.waters.xsd.module.SplineKind;
-
-import org.supremica.properties.Config;
 
 
 public final class GeometryTools
@@ -353,8 +341,8 @@ public final class GeometryTools
   {
     final Point2D start = getStartPoint(edge);
     if (isSelfloop(edge)) {
-      final double x = start.getX() + TieEdgeProxyShape.DEFAULT_OFFSET_X;
-      final double y = start.getY() + TieEdgeProxyShape.DEFAULT_OFFSET_Y;
+      final double x = start.getX() + SELFLOOP_OFFSET_X;
+      final double y = start.getY() + SELFLOOP_OFFSET_Y;
       return new Point2D.Double(x, y);
     } else {
       final Point2D end = getEndPoint(edge);
@@ -829,24 +817,27 @@ public final class GeometryTools
   }
 
   public static Point2D getRadialStartPoint(final EdgeProxy edge,
-                                            final Point2D dir)
+                                            final Point2D dir,
+                                            final int radius)
   {
     final NodeProxy source = edge.getSource();
     final PointGeometryProxy start = edge.getStartPoint();
-    return getRadialPoint(source, start, dir);
+    return getRadialPoint(source, start, dir, radius);
   }
 
   public static Point2D getRadialEndPoint(final EdgeProxy edge,
-                                          final Point2D dir)
+                                          final Point2D dir,
+                                          final int radius)
   {
     final NodeProxy target = edge.getTarget();
     final PointGeometryProxy end = edge.getEndPoint();
-    return getRadialPoint(target, end, dir);
+    return getRadialPoint(target, end, dir, radius);
   }
 
   public static Point2D getRadialPoint(final NodeProxy node,
                                        final PointGeometryProxy geo,
-                                       final Point2D dir)
+                                       final Point2D dir,
+                                       final int radius)
   {
     if (node == null) {
       return geo.getPoint();
@@ -854,7 +845,7 @@ public final class GeometryTools
       final SimpleNodeProxy simple = (SimpleNodeProxy) node;
       final Point2D pos = getPosition(simple);
       final Point2D normdir = getNormalizedDirection(pos, dir);
-      return getRadialPoint(simple, normdir);
+      return getRadialPoint(simple, normdir, radius);
     } else if (node instanceof GroupNodeProxy) {
       if (geo != null) {
         return geo.getPoint();
@@ -869,12 +860,12 @@ public final class GeometryTools
   }
 
   public static Point2D getRadialPoint(final SimpleNodeProxy node,
-                                       final Point2D normdir)
+                                       final Point2D normdir,
+                                       final int radius)
   {
     final Point2D center = getPosition(node);
     final double dx = normdir.getX();
     final double dy = normdir.getY();
-    final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
     final double x = center.getX() + radius * dx;
     final double y = center.getY() + radius * dy;
     return new Point2D.Double(x, y);
@@ -1248,5 +1239,54 @@ public final class GeometryTools
    * One third.
    */
   private static final double ONE_THIRD = 1.0 / 3.0;
+
+  /**
+   * Square root of 2.
+   */
+  public static final double SQRT2 = Math.sqrt(2.0);
+
+  /**
+   * The default opening angle of a selfloop. The aperture of a selfloop
+   * defines the angle between its two lines connecting to the node.
+   * This is currently set to 72 degrees.
+   */
+  public static final double SELFLOOP_APERTURE = 0.4 * Math.PI;  // 72deg
+
+  private static final double SELFLOOP_SIN = Math.sin(0.5 * SELFLOOP_APERTURE);
+
+  /**
+   * The relative radius of the circular component of a selfloop.
+   */
+  public static final double SELFLOOP_RADIUS =
+    SELFLOOP_SIN / (1.0 + SELFLOOP_SIN);
+  /**
+   * The arc angle of the circular component of a selfloop with default shape.
+   */
+  public static final double SELFLOOP_EXTENT =
+    180.0 + Math.toDegrees(SELFLOOP_APERTURE);
+
+  /**
+   * The height and width of a selfloop with default geometry.
+   */
+  public static final double SELFLOOP_SIZE = 48.0;
+  /**
+   * The x component of the default control point given to a selfloop
+   * without explicit geometry.
+   */
+  public static final double SELFLOOP_OFFSET_X =
+    (SELFLOOP_SIN + 1.0) / (2.0 * SELFLOOP_SIN + SQRT2) * SQRT2 * SELFLOOP_SIZE;
+  /**
+   * The y component of the default control point given to a selfloop
+   * without explicit geometry.
+   */
+  public static final double SELFLOOP_OFFSET_Y = - SELFLOOP_OFFSET_X;
+
+  /**
+   * The distance of the control point of a selfloop to the node,
+   * when the height and with of the selfloop are both equal to one and
+   * the selfloop has standard 45degrees (north-east) orientation.
+   */
+  public static final double SELFLOOP_DISTANCE_UNIT =
+    2.0 * (SELFLOOP_SIN + 1.0) / (2.0 * SELFLOOP_SIN + SQRT2);
 
 }
