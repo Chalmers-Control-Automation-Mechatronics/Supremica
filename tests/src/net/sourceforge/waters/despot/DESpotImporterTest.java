@@ -109,6 +109,16 @@ public class DESpotImporterTest extends AbstractWatersTest
     throws IOException, WatersMarshalException, WatersUnmarshalException,
            EvalException
   {
+    // TODO
+    // To support multi-level hierarchies, interface events should only be
+    // declared REQUIRED_PARAMETER if they occur in at least one interface
+    // implemented by the subsystem.
+    // Are components named correctly? Presently, the names in .desp take
+    // precedence over names in .des. This is reasonable, but different from
+    // DESpot's behaviour.
+    // Interface automata are named according to the <Interface> element.
+    // Fair enough, but what if there is more than one <Des> nested within
+    // an <Interface>?
     testImport("testHISC", "testHISC");
   }
 
@@ -244,7 +254,7 @@ public class DESpotImporterTest extends AbstractWatersTest
     final File wmodfilename = new File(outdirname, wmodextname);
     assertEquals("Unexpected location of output file!",
                  wmodfilename, module.getFileLocation());
-    parseGeneratedModules(despotURI, indirname, outdirname);
+    parseGeneratedModules(name, despotURI, indirname, outdirname);
     final ModuleCompiler compiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     final ProductDESProxy des = compiler.compile();
@@ -269,7 +279,8 @@ public class DESpotImporterTest extends AbstractWatersTest
     ensureParentDirectoryExists(outdirname);
   }
 
-  private void parseGeneratedModules(final URI despotURI,
+  private void parseGeneratedModules(final String testname,
+                                     final URI despotURI,
                                      final File indirname,
                                      final File outdirname)
     throws IOException, WatersUnmarshalException
@@ -293,13 +304,17 @@ public class DESpotImporterTest extends AbstractWatersTest
         if (node instanceof Element) {
           final Element element = (Element) node;
           if (element.getTagName().equals("Subsystem")) {
-            final String name = element.getAttribute("name");
-            final String extname = name + ext;
+            final String sysname = element.getAttribute("name");
+            final String extname = sysname + ext;
             final File outfile = new File(outdirname, extname);
             final URI outuri = outfile.toURI();
             final ModuleProxy outmodule = mModuleMarshaller.unmarshal(outuri);
             mIdentifierChecker.check(outmodule);
-            final File expectfile = new File(indirname, extname);
+            File expectfile = new File(indirname, extname);
+            if (!expectfile.exists()) {
+              final String altextname = testname + "-" + extname;
+              expectfile = new File(indirname, altextname);
+            }
             if (expectfile.exists()) {
               final URI expecturi = expectfile.toURI();
               final ModuleProxy expectmodule =
