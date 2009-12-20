@@ -12,5 +12,5 @@
 <stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit3"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sourceforge.waters.despot.DESpotImporterTest"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dwaters.test.inputdir=${workspace_loc:waters}/examples&#10;-Dwaters.test.outputdir=${workspace_loc:waters}/logs/results&#10;-Djava.library.path=${workspace_loc:waters}/dist&#10;-Xmx512m"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dwaters.test.inputdir=&quot;${workspace_loc:waters}/examples&quot;&#13;&#10;-Dwaters.test.outputdir=&quot;${workspace_loc:waters}/logs/results&quot;&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#13;&#10;-Xmx512m"/>
 </launchConfiguration>
