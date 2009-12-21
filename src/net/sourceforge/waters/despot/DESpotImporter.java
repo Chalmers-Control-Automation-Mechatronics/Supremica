@@ -2,6 +2,7 @@ package net.sourceforge.waters.despot;
 
 import java.awt.geom.Point2D;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -179,11 +180,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         if (file.exists()) {
           interfaceMap.put(name, location);
         } else {
-          System.out
-              .println("Warning: The interface file "
-                  + fileURI
-                  + " could not be found. The automaton in that file was not converted.");
-          continue;
+          throw new FileNotFoundException();
         }
       }
     }
@@ -531,11 +528,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final DocumentBuilder builder =
         DocumentBuilderFactory.newInstance().newDocumentBuilder();
     if (!file.exists()) {
-      System.out
-          .println("Warning: The DES file "
-              + uri
-              + " could not be found. The automaton in that file was not converted.");
-      return null;
+      throw new FileNotFoundException();
     }
     final Document doc = builder.parse(file);
     // gets the root element
