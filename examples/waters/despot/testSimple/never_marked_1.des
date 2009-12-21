@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DES desVer="1.0">
     <Definition desDefVer="1.0">
-        <Header name="never_marked" type="subsystem"/>
+        <Header name="never_marked_1" type="subsystem"/>
         <States count="1" marked-count="0">
             <InitSt id="1" nm="st" al="st" mk="0" rch="1"/>
         </States>

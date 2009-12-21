@@ -8,13 +8,13 @@
             <St id="3" nm="s3" al="s3" mk="0" rch="0"/>
             <St id="4" nm="s4" al="s4" mk="0" rch="0"/>
         </States>
-        <Events count="4" ctrl-count="4" unctrl-count="0" def-count="4" ans-count="0" req-count="0">
+        <Events count="4" ctrl-count="3" unctrl-count="1" def-count="4" ans-count="0" req-count="0">
             <Ev id="1" nm="e_-x" al="e_-x" ctrl="1" type="d"/>
             <Ev id="2" nm="e__x" al="e__x" ctrl="1" type="d"/>
             <Ev id="3" nm="e--x" al="e--x" ctrl="0" type="d"/>
             <Ev id="4" nm="e-_x" al="e-_x" ctrl="1" type="d"/>
         </Events>
-        <Trans-Function count="0">
+        <Trans-Function count="5">
             <Transitions count="5">
               <Tr fID="1" eID="3" tID="1"/>
               <Tr fID="1" eID="2" tID="2"/>

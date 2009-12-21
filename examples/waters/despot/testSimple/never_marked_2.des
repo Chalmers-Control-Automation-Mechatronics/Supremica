@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="never_marked_2" type="subsystem"/>
+        <States count="2" marked-count="0">
+            <InitSt id="1" nm="s1" al="s1" mk="0" rch="1"/>
+            <St id="2" nm="s2" al="s2" mk="0" rch="1"/>
+        </States>
+        <Events count="2" ctrl-count="1" unctrl-count="1" def-count="2" ans-count="0" req-count="0">
+            <Ev id="1" nm="c" al="c" ctrl="1" type="d"/>
+            <Ev id="2" nm="u" al="u" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="1">
+            <Transitions count="1">
+                <Tr fID="1" eID="1" tID="2"/>
+            </Transitions>
+            <Self-Loops count="0"/>
+        </Trans-Function>
+    </Definition>
+</DES>
