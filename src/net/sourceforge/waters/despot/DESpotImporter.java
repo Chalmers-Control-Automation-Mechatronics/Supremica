@@ -172,9 +172,19 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final Element des =
           (Element) interfaceDES.getElementsByTagName("*").item(0);
       final String name = interfaceDES.getAttribute("name");
-      if (des.getAttribute("location") != "") {
+      if ((des != null) && (des.getAttribute("location") != "")) {
         final String location = des.getAttribute("location");
-        interfaceMap.put(name, location);
+        final URI fileURI = uri.resolve(location);
+        final File file = new File(fileURI);
+        if (file.exists()) {
+          interfaceMap.put(name, location);
+        } else {
+          System.out
+              .println("Warning: The interface file "
+                  + fileURI
+                  + " could not be found. The automaton in that file was not converted.");
+          continue;
+        }
       }
     }
     final NodeList subsystemList = project.getElementsByTagName("Subsystem");
@@ -185,9 +195,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     Collections.sort(subsystems, new LevelComparator());
 
     for (int j = 0; j < subsystems.size(); j++) {
-      // adds the accepting proposition to the events list
-      addAcceptingProp();
-
       final Element subsystem = subsystems.get(j);
 
       final NodeList automaton = subsystem.getElementsByTagName("*");
@@ -207,9 +214,10 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           if (interfaceRef != null) {
             final String interfaceNm = interfaceRef.getAttribute("name");
             final String interfaceLocation = interfaceMap.get(interfaceNm);
-
-            constructSimpleComponent(interfaceNm, interfaceLocation,
-                ComponentKind.SPEC, uri);
+            if (interfaceLocation != null) {
+              constructSimpleComponent(interfaceNm, interfaceLocation,
+                  ComponentKind.SPEC, uri);
+            }
           }
 
         } else if (aut.getTagName().equals("Uses")) {
@@ -217,25 +225,31 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         }
         clearGraphStructures();
       }
-
-      module = constructModule(subsystem);
-      // stores the module
-      mModules.put(module.getName(), module);
-
-      mComponents.clear();
-      mEvents.clear();
-      final ProxyMarshaller<ModuleProxy> marshaller =
-          mDocumentManager.findProxyMarshaller(ModuleProxy.class);
-      final String ext = marshaller.getDefaultExtension();
-      final String filename = subsystem.getAttribute("name");
-      if (!mOutputDir.exists()) {
-        mOutputDir.mkdirs();
+      if (mEvents.size() > 0) {
+        // adds the accepting proposition to the events list
+        addAcceptingProp();
       }
-      final File file = new File(mOutputDir, filename + ext);
-      mDocumentManager.saveAs(module, file);
+      module = constructModule(subsystem);
+      if (module != null) {
+        // stores the module
+        mModules.put(module.getName(), module);
+
+        mComponents.clear();
+        mEvents.clear();
+        final ProxyMarshaller<ModuleProxy> marshaller =
+            mDocumentManager.findProxyMarshaller(ModuleProxy.class);
+        final String ext = marshaller.getDefaultExtension();
+        final String filename = subsystem.getAttribute("name");
+        if (!mOutputDir.exists()) {
+          mOutputDir.mkdirs();
+        }
+        final File file = new File(mOutputDir, filename + ext);
+        mDocumentManager.saveAs(module, file);
+      }
 
     }
     return module;
+
   }
 
   /**
@@ -276,28 +290,26 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   private String formatIdentifier(String name)
   {
     int index = name.indexOf("-");
-    while (index != -1) {
+    if (index != -1) {
       // replaces - with _ where possible
-      final String newName =
-          name.substring(0, index) + "_"
-              + name.substring(index + 1, name.length());
+      final String newName = name.replaceAll("-", "_");
       name = newName;
-      index = name.indexOf("-", index + 1);
     }
     int count = 1;
-    while (mIdentifiers.contains(name)) {
+    if (mIdentifiers.contains(name)) {
       final String newName = name + "_" + count;
+      name = newName;
+    }
+    while (mIdentifiers.contains(name)) {
+      final String newName = name.substring(0, name.length() - 1) + count;
       name = newName;
       count++;
     }
     index = name.indexOf(".");
-    while (index != -1) {
+    if (index != -1) {
       // replaces . with :
-      final String newName =
-          name.substring(0, index) + ":"
-              + name.substring(index + 1, name.length());
+      final String newName = name.replaceAll(".", ":");
       name = newName;
-      index = name.indexOf(".", index + 1);
     }
     return name;
   }
@@ -313,7 +325,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final Element interfaceRef = (Element) interfaceList.item(i);
       final String moduleName = interfaceRef.getAttribute("provider");
       // final String moduleName =
-      //   formatIdentifier(interfaceRef.getAttribute("provider"));
+      // formatIdentifier(interfaceRef.getAttribute("provider"));
       // Note, an instance has two names. The *identifier* identifies the
       // instance within the calling module, while the *module name*
       // specifies the file name of the submodule to be instantiated.
@@ -323,6 +335,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
       // gets the module to create an instance of
       final ModuleProxy module = mModules.get(moduleName);
+      if (module == null) {
+        return;
+      }
 
       final List<ParameterBindingProxy> bindings =
           new ArrayList<ParameterBindingProxy>();
@@ -459,11 +474,15 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final URI uri = new URI(autFile);
 
       final GraphProxy graph = constructGraph(path.resolve(uri));
-      final IdentifierProxy identifier =
-          mFactory.createSimpleIdentifierProxy(formatIdentifier(autName));
+      if (graph != null) {
+        final IdentifierProxy identifier =
+            mFactory.createSimpleIdentifierProxy(formatIdentifier(autName));
 
-      mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
-          graph));
+        mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
+            graph));
+      } else {
+        continue;
+      }
     }
 
   }
@@ -480,11 +499,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final URI uri = new URI(desLocation);
 
     final GraphProxy graph = constructGraph(path.resolve(uri));
-    final IdentifierProxy identifier =
-        mFactory.createSimpleIdentifierProxy(formatIdentifier(desName));
+    if (graph != null) {
+      final IdentifierProxy identifier =
+          mFactory.createSimpleIdentifierProxy(formatIdentifier(desName));
 
-    mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
-        graph, HISCAttributes.ATTRIBUTES_INTERFACE));
+      mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
+          graph, HISCAttributes.ATTRIBUTES_INTERFACE));
+    }
   }
 
   /**
@@ -492,7 +513,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    */
   private ModuleProxy constructModule(final Element subsystem)
   {
-
     return mFactory.createModuleProxy(subsystem.getAttribute("name"), null, URI
         .create("testModule"), null, mEvents.values(), null, mComponents);
   }
@@ -510,6 +530,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final File file = new File(uri);
     final DocumentBuilder builder =
         DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    if (!file.exists()) {
+      System.out
+          .println("Warning: The DES file "
+              + uri
+              + " could not be found. The automaton in that file was not converted.");
+      return null;
+    }
     final Document doc = builder.parse(file);
     // gets the root element
     final Element des = doc.getDocumentElement();
@@ -558,8 +585,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final EdgeProxy edge = convertTransition(trElmnt, exists);
       if (!exists) {
         mEdges.add(edge);
+        final int index = mEdges.indexOf(edge);
         // stores this transition
-        storeTransition(trElmnt, i);
+        storeTransition(trElmnt, index);
       } else {
         // can find where this edge exists in the 'edges' list by using the hash
         // map which references it using the source and target IDs
@@ -842,7 +870,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final Point2D labelPoint = new Point2D.Double(xPos, yPos);
       labelPos = mFactory.createLabelGeometryProxy(labelPoint);
     }
-
+    mIdentifiers.add(stateName);
     if (state.getTagName().equals("St")) {
       // checks if the state is marked (i.e. accepting)
       if (state.getAttribute("mk").equals(marked)) {
@@ -875,7 +903,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   private SimpleNodeProxy markState(final Element state, final Boolean initial,
       final PointGeometryProxy nodePos, final LabelGeometryProxy labelPos)
   {
-    final String stateName = formatIdentifier(state.getAttribute("nm"));
+    final String stateName = state.getAttribute("nm");
     // holds the :accepting constant
     final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
 
