@@ -242,6 +242,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         }
         final File file = new File(mOutputDir, filename + ext);
         mDocumentManager.saveAs(module, file);
+        mAutIdentifiers.clear();
       }
 
     }
@@ -376,6 +377,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * Initialises the data structures used to store the states, events and
    * transitions in the construction of a graph.
    */
+  @SuppressWarnings("unchecked")
   private void clearGraphStructures()
   {
     mStates.clear();
@@ -384,6 +386,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     mNodes.clear();
     mEdges.clear();
     mIdentifiers.clear();
+    mIdentifiers = (HashSet<String>) mAutIdentifiers.clone();
   }
 
   // #########################################################################
@@ -466,14 +469,16 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     for (int i = 0; i < desList.getLength(); i++) {
       clearGraphStructures();
       final Element des = (Element) desList.item(i);
-      final String autName = des.getAttribute("name");
+      final String autName = formatIdentifier(des.getAttribute("name"));
       final String autFile = des.getAttribute("location");
       final URI uri = new URI(autFile);
 
       final GraphProxy graph = constructGraph(path.resolve(uri));
       if (graph != null) {
         final IdentifierProxy identifier =
-            mFactory.createSimpleIdentifierProxy(formatIdentifier(autName));
+            mFactory.createSimpleIdentifierProxy(autName);
+        mIdentifiers.add(autName);
+        mAutIdentifiers.add(autName);
 
         mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
             graph));
@@ -494,11 +499,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       URISyntaxException
   {
     final URI uri = new URI(desLocation);
-
+    final String newName = formatIdentifier(desName);
     final GraphProxy graph = constructGraph(path.resolve(uri));
     if (graph != null) {
       final IdentifierProxy identifier =
-          mFactory.createSimpleIdentifierProxy(formatIdentifier(desName));
+          mFactory.createSimpleIdentifierProxy(newName);
+      mIdentifiers.add(newName);
+      mAutIdentifiers.add(newName);
 
       mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
           graph, HISCAttributes.ATTRIBUTES_INTERFACE));
@@ -1033,10 +1040,16 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       new TreeMap<String,EventDeclProxy>();
 
   /*
-   * A map of the identifiers created.
+   * A HashSet of the identifiers created, this is for identifiers that apply to
+   * each subsystem.
    */
-  private final HashSet<String> mIdentifiers = new HashSet<String>();
+  private HashSet<String> mIdentifiers = new HashSet<String>();
 
+  /**
+   * A HashSet that is NOT cleared after each subsystem is processed, it stores
+   * the name of all automaton in a module.
+   */
+  private final HashSet<String> mAutIdentifiers = new HashSet<String>();
   /**
    * Maps the name of a module to its ModuleProxy.
    */
