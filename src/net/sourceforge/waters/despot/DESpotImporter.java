@@ -225,10 +225,10 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         }
         clearGraphStructures();
       }
-      if (mEvents.size() > 0) {
-        // adds the accepting proposition to the events list
-        addAcceptingProp();
-      }
+
+      // adds the accepting proposition to the events list
+      addAcceptingProp();
+
       module = constructModule(subsystem);
       if (module != null) {
         // stores the module
@@ -874,7 +874,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     if (state.getTagName().equals("St")) {
       // checks if the state is marked (i.e. accepting)
       if (state.getAttribute("mk").equals(marked)) {
-        return markState(state, false, nodePos, labelPos);
+        return markState(stateName, false, nodePos, labelPos);
       } else {
         return mFactory.createSimpleNodeProxy(stateName, null, false, nodePos,
             null, labelPos);
@@ -884,7 +884,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     else {
       // checks if the state is marked (i.e. accepting)
       if (state.getAttribute("mk").equals(marked)) {
-        return markState(state, true, nodePos, labelPos);
+        return markState(stateName, true, nodePos, labelPos);
       }
       return mFactory.createSimpleNodeProxy(stateName, null, true, nodePos,
           null, labelPos);
@@ -900,10 +900,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param initial
    *          States whether this is the initial state.
    */
-  private SimpleNodeProxy markState(final Element state, final Boolean initial,
+  private SimpleNodeProxy markState(final String stateName , final Boolean initial,
       final PointGeometryProxy nodePos, final LabelGeometryProxy labelPos)
   {
-    final String stateName = state.getAttribute("nm");
     // holds the :accepting constant
     final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
 
