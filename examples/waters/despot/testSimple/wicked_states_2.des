@@ -3,10 +3,10 @@
     <Definition desDefVer="1.0">
         <Header name="wicked_states_2" type="subsystem"/>
         <States count="4" marked-count="1">
-            <InitSt id="1" nm="st__2" al="st__2" mk="1" rch="0"/>
+            <InitSt id="1" nm="st__2" al="st__2" mk="0" rch="1"/>
             <St id="2" nm="st-_2" al="st-_2" mk="0" rch="0"/>
-            <St id="3" nm="st_-2" al="st_-2" mk="0" rch="0"/>
-            <St id="4" nm="st--2" al="st--2" mk="0" rch="1"/>
+            <St id="3" nm="st_-2" al="st_-2" mk="1" rch="0"/>
+            <St id="4" nm="st--2" al="st--2" mk="0" rch="0"/>
         </States>
         <Events count="0" ctrl-count="0" unctrl-count="0" def-count="0" ans-count="0" req-count="0"/>
         <Trans-Function count="0">

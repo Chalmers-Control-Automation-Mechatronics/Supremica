@@ -11,7 +11,7 @@
         <Events count="4" ctrl-count="4" unctrl-count="0" def-count="4" ans-count="0" req-count="0">
             <Ev id="1" nm="e_-x" al="e_-x" ctrl="1" type="d"/>
             <Ev id="2" nm="e__x" al="e__x" ctrl="1" type="d"/>
-            <Ev id="3" nm="e--x" al="e--x" ctrl="1" type="d"/>
+            <Ev id="3" nm="e--x" al="e--x" ctrl="0" type="d"/>
             <Ev id="4" nm="e-_x" al="e-_x" ctrl="1" type="d"/>
         </Events>
         <Trans-Function count="0">

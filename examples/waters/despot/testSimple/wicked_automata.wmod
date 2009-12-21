@@ -4,7 +4,7 @@
 <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
-<SimpleComponent Kind="PLANT" Name="wicked_states_1">
+<SimpleComponent Kind="SPEC" Name="wicked_states_1">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="st">

@@ -2,8 +2,10 @@
 <Project projVer="1.0.0">
     <Header name="wicked_automata" type="flat"/>
     <Subsystem name="wicked_automata">
-        <Plant>
+          <Supervisor>
             <Des name="wicked-states-1" location="wicked-states-1.des"/>
+          </Supervisor>
+          <Plant>
             <Des name="wicked_states_1" location="wicked_states_1.des"/>
             <Des name="wicked_states-1" location="wicked_states-1.des"/>
         </Plant>

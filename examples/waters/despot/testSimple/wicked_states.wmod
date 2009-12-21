@@ -21,13 +21,13 @@
 <SimpleComponent Kind="PLANT" Name="wicked_states_2">
 <Graph>
 <NodeList>
-<SimpleNode Initial="true" Name="st__2">
+<SimpleNode Initial="true" Name="st__2"/>
+<SimpleNode Name="st__2_1"/>
+<SimpleNode Name="st__2_2">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 </SimpleNode>
-<SimpleNode Name="st__2_1"/>
-<SimpleNode Name="st__2_2"/>
 <SimpleNode Name="st__2_3"/>
 </NodeList>
 </Graph>

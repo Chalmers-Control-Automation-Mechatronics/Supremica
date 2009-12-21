@@ -4,7 +4,7 @@
 <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
 <EventDecl Kind="CONTROLLABLE" Name="e_1"/>
 <EventDecl Kind="CONTROLLABLE" Name="e_1_1"/>
-<EventDecl Kind="CONTROLLABLE" Name="e__x"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="e__x"/>
 <EventDecl Kind="CONTROLLABLE" Name="e__x_1"/>
 <EventDecl Kind="CONTROLLABLE" Name="e__x_2"/>
 <EventDecl Kind="CONTROLLABLE" Name="e__x_3"/>
