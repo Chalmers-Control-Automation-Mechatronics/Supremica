@@ -599,7 +599,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
     // gets the blocked events for this automata
     final NodeList transLoopList = transitions.getElementsByTagName("*");
-    final LabelBlockProxy blockedEvents = findBlockedEvents(transLoopList);
+    final LabelBlockProxy blockedEvents =
+        findBlockedEvents(transLoopList, stElmntLst);
 
     return mFactory.createGraphProxy(true, blockedEvents, mNodes, mEdges);
 
@@ -612,11 +613,28 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param transLoopList
    *          The list of Transitions and self-loops from the DOM.
    */
-  private LabelBlockProxy findBlockedEvents(final NodeList transitions)
+  private LabelBlockProxy findBlockedEvents(final NodeList transitions,
+      final NodeList states)
   {
     boolean found = false;
     final List<SimpleIdentifierProxy> blockedEventList =
         new ArrayList<SimpleIdentifierProxy>();
+
+    // checks if the default marking proposition is used
+    for (int i = 0; i < states.getLength(); i++) {
+      final Element state = (Element) states.item(i);
+      if (state.getAttribute("mk").equals("1")) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      blockedEventList.add(mFactory
+          .createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME));
+    }
+
+    // checks if each event is used in this automaton
+    found = false;
     for (final int eventID : mEventIDs.keySet()) {
       found = false;
       for (int j = 0; j < transitions.getLength(); j++) {
@@ -633,6 +651,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
             .get(eventID)));
       }
     }
+
     if (blockedEventList.size() == 0) {
       return null;
     } else {
@@ -900,8 +919,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param initial
    *          States whether this is the initial state.
    */
-  private SimpleNodeProxy markState(final String stateName , final Boolean initial,
-      final PointGeometryProxy nodePos, final LabelGeometryProxy labelPos)
+  private SimpleNodeProxy markState(final String stateName,
+      final Boolean initial, final PointGeometryProxy nodePos,
+      final LabelGeometryProxy labelPos)
   {
     // holds the :accepting constant
     final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
