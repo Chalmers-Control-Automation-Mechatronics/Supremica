@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="never_marked" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="never_marked">
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name=":accepting"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="st"/>
+</NodeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

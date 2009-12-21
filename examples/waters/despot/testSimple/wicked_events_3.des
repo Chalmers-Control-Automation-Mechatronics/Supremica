@@ -2,8 +2,8 @@
 <DES desVer="1.0">
     <Definition desDefVer="1.0">
         <Header name="wicked_events_3" type="subsystem"/>
-        <States count="4" marked-count="0">
-            <InitSt id="1" nm="s1" al="s1" mk="0" rch="1"/>
+        <States count="4" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="1"/>
             <St id="2" nm="s2" al="s2" mk="0" rch="0"/>
             <St id="3" nm="s3" al="s3" mk="0" rch="0"/>
             <St id="4" nm="s4" al="s4" mk="0" rch="0"/>

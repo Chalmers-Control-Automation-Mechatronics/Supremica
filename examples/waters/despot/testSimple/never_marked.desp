@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="never_marked" type="flat"/>
+    <Subsystem name="never_marked">
+        <Plant>
+            <Des name="never_marked" location="never_marked.des"/>
+        </Plant>
+    </Subsystem>
+</Project>

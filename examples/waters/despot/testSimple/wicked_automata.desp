@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="wicked_automata" type="flat"/>
+    <Subsystem name="wicked_automata">
+        <Plant>
+            <Des name="wicked-states-1" location="wicked-states-1.des"/>
+            <Des name="wicked_states_1" location="wicked_states_1.des"/>
+            <Des name="wicked_states-1" location="wicked_states-1.des"/>
+        </Plant>
+    </Subsystem>
+</Project>

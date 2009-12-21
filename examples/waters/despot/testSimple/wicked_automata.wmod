@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="wicked_states" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="wicked_automata" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
 <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
@@ -7,18 +7,15 @@
 <SimpleComponent Kind="PLANT" Name="wicked_states_1">
 <Graph>
 <NodeList>
-<SimpleNode Initial="true" Name="st__2">
+<SimpleNode Initial="true" Name="st">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 </SimpleNode>
-<SimpleNode Name="st__2_1"/>
-<SimpleNode Name="st__2_2"/>
-<SimpleNode Name="st__2_3"/>
 </NodeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT" Name="wicked_states_2">
+<SimpleComponent Kind="PLANT" Name="wicked_states_1_1">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="st__2">
@@ -32,15 +29,14 @@
 </NodeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT" Name="wicked_states_3">
+<SimpleComponent Kind="PLANT" Name="wicked_states_1_2">
 <Graph>
 <NodeList>
-<SimpleNode Initial="true" Name="st__2">
+<SimpleNode Initial="true" Name="st">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 </SimpleNode>
-<SimpleNode Name="st__2_1"/>
 </NodeList>
 </Graph>
 </SimpleComponent>
