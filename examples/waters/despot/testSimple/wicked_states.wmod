@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="wicked_states" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-<ns2:Comment></ns2:Comment>
 <ComponentList>
-<SimpleComponent Kind="SPEC" Name="wicked_states_1">
+<SimpleComponent Kind="PLANT" Name="wicked_states_1">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="st__2"/>
@@ -12,7 +11,7 @@
 </NodeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC" Name="wicked_states_2">
+<SimpleComponent Kind="PLANT" Name="wicked_states_2">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="st__2"/>
@@ -22,7 +21,7 @@
 </NodeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="SPEC" Name="wicked_states_3">
+<SimpleComponent Kind="PLANT" Name="wicked_states_3">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="st__2"/>

@@ -19,22 +19,22 @@
 <SimpleNode Name="s4"/>
 </NodeList>
 <EdgeList>
-<Edge Target="s1" Source="s2">
+<Edge Target="s2" Source="s1">
 <LabelBlock>
 <SimpleIdentifier Name="e__x"/>
 </LabelBlock>
 </Edge>
-<Edge Target="s2" Source="s3">
+<Edge Target="s3" Source="s2">
 <LabelBlock>
 <SimpleIdentifier Name="e__x_1"/>
 </LabelBlock>
 </Edge>
-<Edge Target="s3" Source="s4">
+<Edge Target="s4" Source="s3">
 <LabelBlock>
 <SimpleIdentifier Name="e__x_2"/>
 </LabelBlock>
 </Edge>
-<Edge Target="s4" Source="s1">
+<Edge Target="s1" Source="s4">
 <LabelBlock>
 <SimpleIdentifier Name="e__x_3"/>
 </LabelBlock>
@@ -51,22 +51,22 @@
 <SimpleNode Name="s4"/>
 </NodeList>
 <EdgeList>
-<Edge Target="s1" Source="s2">
+<Edge Target="s2" Source="s1">
 <LabelBlock>
 <SimpleIdentifier Name="e__x_3"/>
 </LabelBlock>
 </Edge>
-<Edge Target="s2" Source="s3">
+<Edge Target="s3" Source="s2">
 <LabelBlock>
 <SimpleIdentifier Name="e__x_2"/>
 </LabelBlock>
 </Edge>
-<Edge Target="s3" Source="s4">
+<Edge Target="s4" Source="s3">
 <LabelBlock>
 <SimpleIdentifier Name="e_1_1"/>
 </LabelBlock>
 </Edge>
-<Edge Target="s4" Source="s1">
+<Edge Target="s1" Source="s4">
 <LabelBlock>
 <SimpleIdentifier Name="e_1"/>
 </LabelBlock>
@@ -88,22 +88,22 @@
 <SimpleIdentifier Name="e__x"/>
 </LabelBlock>
 </Edge>
-<Edge Target="s1" Source="s2">
+<Edge Target="s2" Source="s1">
 <LabelBlock>
 <SimpleIdentifier Name="e__x_3"/>
 </LabelBlock>
 </Edge>
-<Edge Target="s2" Source="s3">
+<Edge Target="s3" Source="s2">
 <LabelBlock>
 <SimpleIdentifier Name="e__x_2"/>
 </LabelBlock>
 </Edge>
-<Edge Target="s3" Source="s4">
+<Edge Target="s4" Source="s3">
 <LabelBlock>
 <SimpleIdentifier Name="e__x_1"/>
 </LabelBlock>
 </Edge>
-<Edge Target="s4" Source="s1">
+<Edge Target="s1" Source="s4">
 <LabelBlock>
 <SimpleIdentifier Name="e__x"/>
 </LabelBlock>
