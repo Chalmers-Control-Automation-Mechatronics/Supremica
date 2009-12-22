@@ -58,16 +58,18 @@ import org.supremica.automata.State;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
-import org.supremica.automata.ForbiddenEvent;
 import org.supremica.automata.Project;
+import org.supremica.automata.LabeledEvent;
 
 /**
  * For forbidding of undesirable sub-states
  * Adds self-loops to the Automata given in class ModularForbidderInput
  * No clone is performed, events are added to given automata
+ * ZPMS - Zero plant multiple specification
  * MPZS - Multiple plant zero specification
  * MPSS - Multiple plant single specification
  * MPMS - Multiple plant multiple specification
+ * Multiple := Nbr of automaton in a sub-state >= 1
  * @author patrik
  * @since December 10, 2009
  */
@@ -82,7 +84,7 @@ public class ModularForbidder
     private Automata createdAutomata; //Automata that are created
 
     private ArrayList<ModularForbidderInput.SubState> ss;
-    private ArrayList<ForbiddenEvent> alphaEvent;
+    private ArrayList<LabeledEvent> events;
     private ModularForbidderInput.SubState subState;
 
     private final String extensionPrefix = "@_"; //Prefix used in names/labels for new events and automata
@@ -104,7 +106,7 @@ public class ModularForbidder
         givenAutomata = input.getTotalAutomata();
         createdAutomata = new Automata();
         ss = input.getSubStates(); //ArrayList<SubState>
-        alphaEvent = new ArrayList<ForbiddenEvent>();
+        events = new ArrayList<LabeledEvent>();
     }
 
     /**
@@ -147,11 +149,11 @@ public class ModularForbidder
             final ArrayList<ModularForbidderInput.LocalState> ls = subState.getLocalStates();
 
             // Create single project-global unique forbidden event
-            final ForbiddenEvent x_event = new ForbiddenEvent(project.getUniqueEventLabel(extensionPrefix));
-            x_event.setControllable(false);
-            x_event.setPrioritized(false); //If we need synk between sub-specificatinos later
-            alphaEvent.add(x_event);
-            logger.debug(x_event.getLabel());
+            final LabeledEvent event = new LabeledEvent(project.getUniqueEventLabel(extensionPrefix));
+            event.setControllable(false);
+            event.setPrioritized(false);
+            events.add(event);
+            logger.debug(event.getLabel());
 
             //Go through all local-states for current sub-state
             final Iterator<ModularForbidderInput.LocalState> lsit = ls.iterator();
@@ -160,20 +162,26 @@ public class ModularForbidder
                 final ModularForbidderInput.LocalState localState = lsit.next();
 
                 //Add self-loop with right event to current local-state
-                extendAutomaton(localState.getAutomaton(),localState.getState(), x_event);
+                extendAutomaton(localState.getAutomaton(),localState.getState(), event);
             }
 
             //MPZS
-            if(subState.getAutomataInSubState().getSpecificationAutomata().nbrOfAutomata() == 0)
+            if(subState.getAutomataInSubState().hasNoSpecificationsAndSupervisors())
             {
                 //create a new specification if this sub-state only has sub-plants
-                createSpecification(x_event);
+                createSpecification(event);
+            }
+            //ZPMS
+            if(subState.getAutomataInSubState().hasNoPlants())
+            {
+                //create a new plant if this sub-state only has sub-specifications
+                createPlant(event);
             }
 
-            //set Priority of x_event for MPZS and MPSS for later synchronization
+            //set Priority of event for MPZS and MPSS for later synchronization
             if(subState.getAutomataInSubState().getSpecificationAutomata().nbrOfAutomata() <= 1)
             {
-                x_event.setPrioritized(true);
+                event.setPrioritized(true);
             }
         }
     }
@@ -182,20 +190,20 @@ public class ModularForbidder
      * Handle difference between how plant and specification automaton should be extended with self-loops
      * @param automaton
      * @param state
-     * @param x_event
+     * @param event
      */
-    private void extendAutomaton(final Automaton automaton, final State state, final ForbiddenEvent x_event)
+    private void extendAutomaton(final Automaton automaton, final State state, final LabeledEvent event)
     {
         // Add the event - beware, adding an existig event throws exception
-        if(automaton.getAlphabet().contains(x_event) == false)
+        if(automaton.getAlphabet().contains(event) == false)
         {
-            automaton.getAlphabet().addEvent(x_event);
+            automaton.getAlphabet().addEvent(event);
         }
 
         //Add to state if plant, add to all other states if specification
         if(automaton.getType() == AutomatonType.PLANT)
         {
-            addSelfLoop(automaton,state,x_event);
+            addSelfLoop(automaton,state,event);
             logger.info(automaton.getName()+" is extended");
         }
         else
@@ -206,14 +214,14 @@ public class ModularForbidder
                 final State currentState = it.next();
                 if(!currentState.equalState(state))
                 {
-                    addSelfLoop(automaton,currentState,x_event);
+                    addSelfLoop(automaton,currentState,event);
                 }
             }
             logger.info(automaton.getName()+" is extended");
         }
     }
 
-    private void addSelfLoop(final Automaton automaton, final State state, final ForbiddenEvent event)
+    private void addSelfLoop(final Automaton automaton, final State state, final LabeledEvent event)
     {
         automaton.addArc(new Arc(state, state, event));
     }
@@ -221,19 +229,45 @@ public class ModularForbidder
     /**
      * Creates a new specification with one state and one event in alphabet
      * The event is blocked from occurring
-     * @param x_event
-     */
-    private void createSpecification(final ForbiddenEvent x_event)
+     * @param event
+     */    
+    private void createSpecification(final LabeledEvent event)
     {
-        final Automaton spec = new Automaton(x_event.getLabel()); // same name as the event-label
-        spec.setType(AutomatonType.SPECIFICATION);
-        spec.getAlphabet().addEvent(x_event);
-        final State init_state = new State("q0");
+        final Automaton spec = createSingleStateAutomatonWithOneEvent(AutomatonType.SPECIFICATION,"q0",event);
+        createdAutomata.addAutomaton(spec);
+    }
+
+    /**
+     * Creates a new plant with one state and one event in alphabet
+     * The event is added to a self-loop in the one state
+     * @param event
+     */
+    private void createPlant(final LabeledEvent event)
+    {
+        final Automaton plant = createSingleStateAutomatonWithOneEvent(AutomatonType.PLANT,"p0",event);
+        addSelfLoop(plant, plant.getStateWithIndex(0), event);
+        createdAutomata.addAutomaton(plant);
+    }
+
+    /**
+     * To create automaton with one state and one event in alphabet
+     * The state is initial and accepting
+     * @param type
+     * @param stateName Name of the one and only state
+     * @param event The automaton will get this name
+     * @return The created automaton
+     */
+    private Automaton createSingleStateAutomatonWithOneEvent(AutomatonType type,String stateName,LabeledEvent event)
+    {
+        final Automaton a = new Automaton(event.getLabel()); // same name as the event-label
+        a.setType(type);
+        a.getAlphabet().addEvent(event);
+        final State init_state = new State(stateName);
         init_state.setInitial(true);
         init_state.setAccepting(true);
-        spec.addState(init_state);
-        logger.info(spec.getName()+" created for event "+x_event.getLabel());
-        createdAutomata.addAutomaton(spec);
+        a.addState(init_state);
+        logger.info(a.getName()+" created for event "+event.getLabel());
+        return a;
     }
 
     /**
@@ -278,7 +312,7 @@ public class ModularForbidder
     private void restorePriority()
     {
         //All x_event have Prioritized(true) from now on
-        final Iterator<ForbiddenEvent> it = alphaEvent.iterator();
+        final Iterator<LabeledEvent> it = events.iterator();
         while(it.hasNext())
         {
             it.next().setPrioritized(true);

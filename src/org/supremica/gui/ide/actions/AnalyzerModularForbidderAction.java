@@ -73,7 +73,6 @@ public class AnalyzerModularForbidderAction
                 mfi.addLocalStateIn(it.next(), 0, 0);
             }
             
-            
             ModularForbidder mf = new ModularForbidder(mfi, ide.getIDE().getActiveProject());
             ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomata(mf.execute());
         }
