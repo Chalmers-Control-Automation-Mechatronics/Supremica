@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -180,7 +179,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         if (file.exists()) {
           interfaceMap.put(name, location);
         } else {
-          throw new FileNotFoundException();
+          throw new FileNotFoundException("The interface file " + file
+              + " could not be located.");
         }
       }
     }
@@ -242,7 +242,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         }
         final File file = new File(mOutputDir, filename + ext);
         mDocumentManager.saveAs(module, file);
-        mAutIdentifiers.clear();
       }
 
     }
@@ -285,31 +284,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * which waters does not). If it is not, the identifier name is translated to
    * something accepted by waters and returned.
    */
-  private String formatIdentifier(String name)
+  private String formatIdentifier(final String name)
   {
-    int index = name.indexOf("-");
-    if (index != -1) {
-      // replaces - with _ where possible
-      final String newName = name.replaceAll("-", "_");
-      name = newName;
-    }
-    int count = 1;
-    if (mIdentifiers.contains(name)) {
-      final String newName = name + "_" + count;
-      name = newName;
-    }
-    while (mIdentifiers.contains(name)) {
-      final String newName = name.substring(0, name.length() - 1) + count;
-      name = newName;
-      count++;
-    }
-    index = name.indexOf(".");
-    if (index != -1) {
-      // replaces . with :
-      final String newName = name.replaceAll(".", ":");
-      name = newName;
-    }
-    return name;
+    final String newName = name.replaceAll("-", ":");
+
+    return newName;
   }
 
   /**
@@ -321,9 +300,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final NodeList interfaceList = uses.getElementsByTagName("*");
     for (int i = 0; i < interfaceList.getLength(); i++) {
       final Element interfaceRef = (Element) interfaceList.item(i);
-      final String moduleName = interfaceRef.getAttribute("provider");
-      // final String moduleName =
-      // formatIdentifier(interfaceRef.getAttribute("provider"));
+      // final String moduleName = interfaceRef.getAttribute("provider");
+      final String moduleName =
+          formatIdentifier(interfaceRef.getAttribute("provider"));
       // Note, an instance has two names. The *identifier* identifies the
       // instance within the calling module, while the *module name*
       // specifies the file name of the submodule to be instantiated.
@@ -377,7 +356,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * Initialises the data structures used to store the states, events and
    * transitions in the construction of a graph.
    */
-  @SuppressWarnings("unchecked")
   private void clearGraphStructures()
   {
     mStates.clear();
@@ -385,8 +363,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     mTransitions.clear();
     mNodes.clear();
     mEdges.clear();
-    mIdentifiers.clear();
-    mIdentifiers = (HashSet<String>) mAutIdentifiers.clone();
   }
 
   // #########################################################################
@@ -401,7 +377,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     if (!mEvents.containsKey(eventName)) {
       final IdentifierProxy identifier =
           mFactory.createSimpleIdentifierProxy(eventName);
-      mIdentifiers.add(eventName);
       final String eventKind = event.getAttribute("ctrl");
       final String eventType = event.getAttribute("type");
       EventDeclProxy eventDecl = null;
@@ -477,8 +452,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       if (graph != null) {
         final IdentifierProxy identifier =
             mFactory.createSimpleIdentifierProxy(autName);
-        mIdentifiers.add(autName);
-        mAutIdentifiers.add(autName);
 
         mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
             graph));
@@ -504,8 +477,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     if (graph != null) {
       final IdentifierProxy identifier =
           mFactory.createSimpleIdentifierProxy(newName);
-      mIdentifiers.add(newName);
-      mAutIdentifiers.add(newName);
 
       mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
           graph, HISCAttributes.ATTRIBUTES_INTERFACE));
@@ -535,7 +506,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final DocumentBuilder builder =
         DocumentBuilderFactory.newInstance().newDocumentBuilder();
     if (!file.exists()) {
-      throw new FileNotFoundException();
+      throw new FileNotFoundException("The DES file " + file
+          + " could not be located.");
     }
     final Document doc = builder.parse(file);
     // gets the root element
@@ -889,7 +861,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final Point2D labelPoint = new Point2D.Double(xPos, yPos);
       labelPos = mFactory.createLabelGeometryProxy(labelPoint);
     }
-    mIdentifiers.add(stateName);
     if (state.getTagName().equals("St")) {
       // checks if the state is marked (i.e. accepting)
       if (state.getAttribute("mk").equals(marked)) {
@@ -1039,17 +1010,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   private final Map<String,EventDeclProxy> mEvents =
       new TreeMap<String,EventDeclProxy>();
 
-  /*
-   * A HashSet of the identifiers created, this is for identifiers that apply to
-   * each subsystem.
-   */
-  private HashSet<String> mIdentifiers = new HashSet<String>();
-
-  /**
-   * A HashSet that is NOT cleared after each subsystem is processed, it stores
-   * the name of all automaton in a module.
-   */
-  private final HashSet<String> mAutIdentifiers = new HashSet<String>();
   /**
    * Maps the name of a module to its ModuleProxy.
    */
