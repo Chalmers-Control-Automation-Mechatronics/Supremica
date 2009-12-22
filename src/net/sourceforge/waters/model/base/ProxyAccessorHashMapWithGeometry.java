@@ -33,13 +33,13 @@ public class ProxyAccessorHashMapWithGeometry<P extends Proxy>
   }
 
   public ProxyAccessorHashMapWithGeometry(final int initialCapacity,
-                                        final float loadFactor)
+                                          final float loadFactor)
   {
     super(initialCapacity, loadFactor);
   }
 
   public ProxyAccessorHashMapWithGeometry
-    (final Map<? extends ProxyAccessor<P>, ? extends P> map)
+    (final Map<? extends ProxyAccessor<P>, P> map)
   {
     super(map);
   }
@@ -53,7 +53,7 @@ public class ProxyAccessorHashMapWithGeometry<P extends Proxy>
 
   //#########################################################################
   //# Overrides for abstract base class ProxyAccessorHashMap
-  public <PP extends Proxy> ProxyAccessor<PP> createAccessor(final PP proxy)
+  public <PP extends P> ProxyAccessor<PP> createAccessor(final PP proxy)
   {
     return new ProxyAccessorWithGeometry<PP>(proxy);
   }

@@ -39,7 +39,7 @@ public class ProxyAccessorHashMapByContents<P extends Proxy>
   }
 
   public ProxyAccessorHashMapByContents
-    (final Map<? extends ProxyAccessor<P>, ? extends P> map)
+    (final Map<? extends ProxyAccessor<P>, P> map)
   {
     super(map);
   }
@@ -53,7 +53,7 @@ public class ProxyAccessorHashMapByContents<P extends Proxy>
 
   //#########################################################################
   //# Overrides for abstract base class ProxyAccessorHashMap
-  public <PP extends Proxy> ProxyAccessor<PP> createAccessor(final PP proxy)
+  public <PP extends P> ProxyAccessor<PP> createAccessor(final PP proxy)
   {
     return new ProxyAccessorByContents<PP>(proxy);
   }

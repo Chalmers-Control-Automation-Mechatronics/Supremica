@@ -44,7 +44,7 @@ public abstract class ProxyAccessorHashMap<P extends Proxy>
   }
 
   public ProxyAccessorHashMap
-    (final Map<? extends ProxyAccessor<P>, ? extends P> map)
+    (final Map<? extends ProxyAccessor<P>, P> map)
   {
     mMap = new HashMap<ProxyAccessor<P>,P>(map);
   }
@@ -94,21 +94,16 @@ public abstract class ProxyAccessorHashMap<P extends Proxy>
     return result;
   }
 
-  public boolean containsProxy(final Object item)
+  public boolean containsProxy(final P proxy)
   {
-    if (item instanceof Proxy) {
-      final Proxy proxy = (Proxy) item;
-      final ProxyAccessor<Proxy> accessor = createAccessor(proxy);
-      return containsKey(accessor);
-    } else {
-      return false;
-    }
+    final ProxyAccessor<P> accessor = createAccessor(proxy);
+    return containsKey(accessor);
   }
 
-  public boolean containsAll(final Collection<?> collection)
+  public boolean containsAll(final Collection<? extends P> collection)
   {
-    for (final Object item : collection) {
-      if (!containsProxy(item)) {
+    for (final P proxy : collection) {
+      if (!containsProxy(proxy)) {
         return false;
       }
     }
@@ -133,34 +128,22 @@ public abstract class ProxyAccessorHashMap<P extends Proxy>
     return new AccessorIterator<P>(iter);
   }
 
-  public boolean removeProxy(final Object item)
+  public boolean removeProxy(final P proxy)
   {
-    if (item instanceof Proxy) {
-      final Proxy proxy = (Proxy) item;
-      final ProxyAccessor<Proxy> accessor = createAccessor(proxy);
-      if (remove(accessor) != null) {
-        return true;
-      }
-    }
-    return false;
+    final ProxyAccessor<P> accessor = createAccessor(proxy);
+    return remove(accessor) != null;
   }
 
-  public boolean removeAll(final Collection<?> collection)
+  public boolean removeAll(final Collection<? extends P> collection)
   {
     boolean result = false;
-    for (final Object item : collection) {
-      if (removeProxy(item)) {
+    for (final P proxy : collection) {
+      if (removeProxy(proxy)) {
         result = true;
       }
     }
     return result;
   }
-
-
-  //#########################################################################
-  //# Provided by Subclasses
-  public abstract <PP extends Proxy> ProxyAccessor<PP>
-    createAccessor(PP proxy);
 
 
   //#########################################################################

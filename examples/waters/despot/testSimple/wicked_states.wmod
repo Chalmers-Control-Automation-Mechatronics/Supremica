@@ -7,14 +7,14 @@
 <SimpleComponent Kind="PLANT" Name="wicked_states_1">
 <Graph>
 <NodeList>
-<SimpleNode Initial="true" Name="st__2">
+<SimpleNode Initial="true" Name="st::2">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 </SimpleNode>
-<SimpleNode Name="st__2_1"/>
-<SimpleNode Name="st__2_2"/>
-<SimpleNode Name="st__2_3"/>
+<SimpleNode Name="st__2"/>
+<SimpleNode Name="st_:2"/>
+<SimpleNode Name="st:_2"/>
 </NodeList>
 </Graph>
 </SimpleComponent>
@@ -22,25 +22,25 @@
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="st__2"/>
-<SimpleNode Name="st__2_1"/>
-<SimpleNode Name="st__2_2">
+<SimpleNode Name="st:_2"/>
+<SimpleNode Name="st_:2">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 </SimpleNode>
-<SimpleNode Name="st__2_3"/>
+<SimpleNode Name="st::2"/>
 </NodeList>
 </Graph>
 </SimpleComponent>
 <SimpleComponent Kind="PLANT" Name="wicked_states_3">
 <Graph>
 <NodeList>
-<SimpleNode Initial="true" Name="st__2">
+<SimpleNode Initial="true" Name="st:_2">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 </SimpleNode>
-<SimpleNode Name="st__2_1"/>
+<SimpleNode Name="st__2"/>
 </NodeList>
 </Graph>
 </SimpleComponent>

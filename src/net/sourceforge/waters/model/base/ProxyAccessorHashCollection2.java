@@ -20,39 +20,51 @@ import java.util.Set;
  * @author Robi Malik
  */
 
-public abstract class ProxyAccessorHashCollection<P extends Proxy>
+public class ProxyAccessorHashCollection2<P extends Proxy>
   extends AbstractMap<ProxyAccessor<P>,Integer>
   implements ProxyAccessorCollection<P>
 {
 
   //#########################################################################
   //# Constructors
-  public ProxyAccessorHashCollection()
+  public ProxyAccessorHashCollection2(final ProxyEqualityVisitor eq)
   {
     mMap = new HashMap<ProxyAccessor<P>,Integer>();
+    mEqualityVisitor = eq;
+    mHashCodeVisitor = eq.getHashCodeVisitor();
   }
 
-  public ProxyAccessorHashCollection(final int initialCapacity)
+  public ProxyAccessorHashCollection2(final ProxyEqualityVisitor eq,
+                                      final int initialCapacity)
   {
     mMap = new HashMap<ProxyAccessor<P>,Integer>(initialCapacity);
+    mEqualityVisitor = eq;
+    mHashCodeVisitor = eq.getHashCodeVisitor();
   }
 
-  public ProxyAccessorHashCollection(final int initialCapacity,
-                                     final float loadFactor)
+  public ProxyAccessorHashCollection2(final ProxyEqualityVisitor eq,
+                                      final int initialCapacity,
+                                      final float loadFactor)
   {
     mMap = new HashMap<ProxyAccessor<P>,Integer>(initialCapacity, loadFactor);
+    mEqualityVisitor = eq;
+    mHashCodeVisitor = eq.getHashCodeVisitor();
   }
 
-  public ProxyAccessorHashCollection
-    (final Map<ProxyAccessor<P>, Integer> map)
+  public ProxyAccessorHashCollection2
+    (final ProxyEqualityVisitor eq,
+     final Map<ProxyAccessor<P>, Integer> map)
   {
     mMap = new HashMap<ProxyAccessor<P>,Integer>(map);
+    mEqualityVisitor = eq;
+    mHashCodeVisitor = eq.getHashCodeVisitor();
   }
 
-  public ProxyAccessorHashCollection
-    (final Collection<? extends P> collection)
+  public ProxyAccessorHashCollection2
+    (final ProxyEqualityVisitor eq,
+     final Collection<? extends P> collection)
   {
-    this(collection.size());
+    this(eq, collection.size());
     addAll(collection);
   }
 
@@ -100,13 +112,8 @@ public abstract class ProxyAccessorHashCollection<P extends Proxy>
 
   public boolean containsAll(final Collection<? extends P> collection)
   {
-    final ProxyAccessorHashCollection<P> outer = this;
     final ProxyAccessorCollection<P> hcoll =
-      new ProxyAccessorHashCollection<P>(collection) {
-        public <PP extends P> ProxyAccessor<PP> createAccessor(final PP proxy) {
-          return outer.createAccessor(proxy);
-        }
-      };
+      new ProxyAccessorHashCollection2<P>(mEqualityVisitor, collection);
     final Set<Map.Entry<ProxyAccessor<P>,Integer>> entries = hcoll.entrySet();
     for (final Map.Entry<ProxyAccessor<P>,Integer> entry : entries) {
       final ProxyAccessor<P> key = entry.getKey();
@@ -116,6 +123,11 @@ public abstract class ProxyAccessorHashCollection<P extends Proxy>
       }
     }
     return true;
+  }
+
+  public <PP extends P> ProxyAccessor<PP> createAccessor(final PP proxy)
+  {
+    return new Accessor<PP>(proxy);
   }
 
   public int getCount(final P proxy)
@@ -161,6 +173,49 @@ public abstract class ProxyAccessorHashCollection<P extends Proxy>
       }
     }
     return result;
+  }
+
+
+  //#########################################################################
+  //# Inner Class Accessor
+  private class Accessor<PP extends P> implements ProxyAccessor<PP>
+  {
+
+    //#######################################################################
+    //# Constructors
+    private Accessor(final PP proxy)
+    {
+      mProxy = proxy;
+    }
+
+    //#######################################################################
+    //# Equality and HashCode
+    public boolean equals(final Object partner)
+    {
+      if (partner instanceof ProxyAccessorHashCollection2<?>.Accessor<?>) {
+        final Accessor<?> accessor = (Accessor<?>) partner;
+        return mEqualityVisitor.equals(mProxy, accessor.mProxy);
+      } else {
+        return false;
+      }
+    }
+
+    public int hashCode()
+    {
+      return mHashCodeVisitor.hashCode(mProxy);
+    }
+
+    //#########################################################################
+    //# Interface net.sourceforge.waters.base.ProxyAccessor<P>
+    public PP getProxy()
+    {
+      return mProxy;
+    }
+
+    //#########################################################################
+    //# Data Members
+    private final PP mProxy;
+
   }
 
 
@@ -232,5 +287,7 @@ public abstract class ProxyAccessorHashCollection<P extends Proxy>
   //#########################################################################
   //# Data Members
   private final Map<ProxyAccessor<P>,Integer> mMap;
+  private final ProxyEqualityVisitor mEqualityVisitor;
+  private final ProxyHashCodeVisitor mHashCodeVisitor;
 
 }

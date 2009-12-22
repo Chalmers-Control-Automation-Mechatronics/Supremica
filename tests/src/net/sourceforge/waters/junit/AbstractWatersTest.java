@@ -14,8 +14,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-import net.sourceforge.waters.model.base.Proxy;
-
 import junit.framework.TestCase;
 
 import org.apache.log4j.Appender;
@@ -118,32 +116,6 @@ public abstract class AbstractWatersTest
   {
     final File dirname = outfile.getParentFile();
     ensureDirectoryExists(dirname);
-  }
-
-
-  //#########################################################################
-  //# Class Names
-  public static String getShortProxyInterfaceName(final Proxy proxy)
-  {
-    final Class<? extends Proxy> iface = proxy.getProxyInterface();
-    return getShortClassName(iface);
-  }
-
-  public static String getShortClassName(final Object item)
-  {
-    final Class<?> clazz = item.getClass();
-    return getShortClassName(clazz);
-  }
-
-  public static String getShortClassName(final Class<?> clazz)
-  {
-    final String name = clazz.getName();
-    final int dotpos = name.lastIndexOf('.');
-    if (dotpos < 0) {
-      return name;
-    } else {
-      return name.substring(dotpos + 1);
-    }
   }
 
 

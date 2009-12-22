@@ -40,9 +40,9 @@ public interface ProxyAccessorCollection<P extends Proxy>
 
   public boolean containsAll(Collection<? extends P> collection);
 
-  public boolean equalsByAccessorEquality(ProxyAccessorCollection<P> partner);
+  public <PP extends P> ProxyAccessor<PP> createAccessor(PP proxy);
 
-  public int hashCodeByAccessorEquality();
+  public int getCount(P proxy);
 
   public Iterator<P> iterator();
 

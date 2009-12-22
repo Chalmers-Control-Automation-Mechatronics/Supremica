@@ -53,9 +53,9 @@ public class ProxyAccessorHashCollectionWithGeometry<P extends Proxy>
 
   //#########################################################################
   //# Overrides for abstract base class ProxyAccessorHashCollection
-  public ProxyAccessor<P> createAccessor(final P proxy)
+  public <PP extends P> ProxyAccessor<PP> createAccessor(final PP proxy)
   {
-    return new ProxyAccessorWithGeometry<P>(proxy);
+    return new ProxyAccessorWithGeometry<PP>(proxy);
   }
 
 }

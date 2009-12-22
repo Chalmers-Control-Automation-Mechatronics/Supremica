@@ -2,12 +2,12 @@
 <Module Name="wicked_events" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
 <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="e:1"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="e::x"/>
+<EventDecl Kind="CONTROLLABLE" Name="e:_x"/>
 <EventDecl Kind="CONTROLLABLE" Name="e_1"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_1_1"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="e__x"/>
-<EventDecl Kind="CONTROLLABLE" Name="e__x_1"/>
-<EventDecl Kind="CONTROLLABLE" Name="e__x_2"/>
-<EventDecl Kind="CONTROLLABLE" Name="e__x_3"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_:x"/>
+<EventDecl Kind="CONTROLLABLE" Name="e__x"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT" Name="wicked_events_1">
@@ -25,22 +25,22 @@
 <EdgeList>
 <Edge Target="s2" Source="s1">
 <LabelBlock>
-<SimpleIdentifier Name="e__x"/>
+<SimpleIdentifier Name="e::x"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s3" Source="s2">
 <LabelBlock>
-<SimpleIdentifier Name="e__x_1"/>
+<SimpleIdentifier Name="e:_x"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s4" Source="s3">
 <LabelBlock>
-<SimpleIdentifier Name="e__x_2"/>
+<SimpleIdentifier Name="e_:x"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s1" Source="s4">
 <LabelBlock>
-<SimpleIdentifier Name="e__x_3"/>
+<SimpleIdentifier Name="e__x"/>
 </LabelBlock>
 </Edge>
 </EdgeList>
@@ -61,28 +61,28 @@
 <EdgeList>
 <Edge Target="s2" Source="s1">
 <LabelBlock>
-<SimpleIdentifier Name="e__x_3"/>
+<SimpleIdentifier Name="e__x"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s3" Source="s2">
 <LabelBlock>
-<SimpleIdentifier Name="e__x_2"/>
+<SimpleIdentifier Name="e_:x"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s4" Source="s3">
 <LabelBlock>
-<SimpleIdentifier Name="e_1_1"/>
+<SimpleIdentifier Name="e_1"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s1" Source="s4">
 <LabelBlock>
-<SimpleIdentifier Name="e_1"/>
+<SimpleIdentifier Name="e:1"/>
 </LabelBlock>
 </Edge>
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT" Name="wicked_events_3">
+<SimpleComponent Kind="PLANT" Name="wicked_events">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="s1">
@@ -97,27 +97,27 @@
 <EdgeList>
 <Edge Target="s1" Source="s1">
 <LabelBlock>
-<SimpleIdentifier Name="e__x"/>
+<SimpleIdentifier Name="e::x"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s2" Source="s1">
 <LabelBlock>
-<SimpleIdentifier Name="e__x_3"/>
+<SimpleIdentifier Name="e__x"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s3" Source="s2">
 <LabelBlock>
-<SimpleIdentifier Name="e__x_2"/>
+<SimpleIdentifier Name="e_:x"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s4" Source="s3">
 <LabelBlock>
-<SimpleIdentifier Name="e__x_1"/>
+<SimpleIdentifier Name="e:_x"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s1" Source="s4">
 <LabelBlock>
-<SimpleIdentifier Name="e__x"/>
+<SimpleIdentifier Name="e::x"/>
 </LabelBlock>
 </Edge>
 </EdgeList>

@@ -22,6 +22,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -259,7 +260,7 @@ public class DESpotImporterTest extends AbstractWatersTest
 
   //#########################################################################
   //# Exception Throwing Test Cases
-  public void testException_Nonexist()
+  public void testException_nonexist()
     throws Exception
   {
     testException("testSimple", "nonexist",
@@ -277,15 +278,15 @@ public class DESpotImporterTest extends AbstractWatersTest
   {
     try {
       testImport(subdir, name);
-      fail("Expected " + getShortClassName(exclass) + " not caught!");
+      fail("Expected " + ProxyTools.getShortClassName(exclass) + " not caught!");
     } catch (final Exception exception) {
       if (exclass.isAssignableFrom(exception.getClass())) {
         final String msg = exception.getMessage();
         if (msg == null) {
-          fail(getShortClassName(exclass) +
+          fail(ProxyTools.getShortClassName(exclass) +
                " caught as expected, but message is null!");
         } else if (msg.indexOf(culprit) < 0) {
-          fail(getShortClassName(exclass) +
+          fail(ProxyTools.getShortClassName(exclass) +
                " caught as expected, but message '" + msg +
                "' does not mention culprit '" + culprit + "'!");
         }

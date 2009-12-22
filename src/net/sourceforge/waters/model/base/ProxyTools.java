@@ -23,7 +23,7 @@ import net.sourceforge.waters.model.unchecked.Casting;
  * equalsByContents()} and {@link Proxy#equalsWithGeometry(Proxy)
  * equalsWithGeometry()} provided by the {@link Proxy} interface, as well
  * as the corresponding methods for hash code computation.
- * 
+ *
  * @author Robi Malik
  */
 
@@ -69,7 +69,7 @@ public class ProxyTools
    * Checks whether two proxy objects are equal, handling <CODE>null</CODE>
    * references properly. The equality method {@link
    * Proxy#equalsByContents(Proxy) equalsByContents()} provided by the
-   * {@link Proxy} interface is used for comparison.   
+   * {@link Proxy} interface is used for comparison.
    * @return <CODE>true</CODE> if the two arguments are equal,
    *         or if both are <CODE>null</CODE>.
    */
@@ -98,7 +98,7 @@ public class ProxyTools
       new ProxyAccessorHashCollectionByContents<Proxy>(coll1);
     final ProxyAccessorCollection<Proxy> map2 =
       new ProxyAccessorHashCollectionByContents<Proxy>(coll2);
-    return map1.equalsByAccessorEquality(map2);
+    return map1.equals(map2);
   }
 
   /**
@@ -159,7 +159,7 @@ public class ProxyTools
    * Checks whether two proxy objects are equal, handling <CODE>null</CODE>
    * references properly. The equality method {@link
    * Proxy#equalsWithGeometry(Proxy) equalsWithGeometry()} provided by the
-   * {@link Proxy} interface is used for comparison.   
+   * {@link Proxy} interface is used for comparison.
    * @return <CODE>true</CODE> if the two arguments are equal,
    *         or if both are <CODE>null</CODE>.
    */
@@ -189,7 +189,7 @@ public class ProxyTools
       new ProxyAccessorHashCollectionWithGeometry<Proxy>(coll1);
     final ProxyAccessorCollection<Proxy> map2 =
       new ProxyAccessorHashCollectionWithGeometry<Proxy>(coll2);
-    return map1.equalsByAccessorEquality(map2);
+    return map1.equals(map2);
   }
 
   /**
@@ -396,6 +396,32 @@ public class ProxyTools
     } else {
       final Class<P> clazz = Casting.toClass(proxy.getClass());
       return clazz.cast(proxy.clone());
+    }
+  }
+
+
+  //#########################################################################
+  //# Class Names
+  public static String getShortProxyInterfaceName(final Proxy proxy)
+  {
+    final Class<? extends Proxy> iface = proxy.getProxyInterface();
+    return getShortClassName(iface);
+  }
+
+  public static String getShortClassName(final Object item)
+  {
+    final Class<?> clazz = item.getClass();
+    return getShortClassName(clazz);
+  }
+
+  public static String getShortClassName(final Class<?> clazz)
+  {
+    final String name = clazz.getName();
+    final int dotpos = name.lastIndexOf('.');
+    if (dotpos < 0) {
+      return name;
+    } else {
+      return name.substring(dotpos + 1);
     }
   }
 
