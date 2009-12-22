@@ -10,6 +10,7 @@
 package net.sourceforge.waters.despot;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -48,7 +49,7 @@ public class DESpotImporterTest extends AbstractWatersTest
 {
 
   //#########################################################################
-  //# Test Cases
+  //# Successful Test Cases
   public void testImport_test2()
     throws IOException, WatersMarshalException, WatersUnmarshalException,
            EvalException
@@ -257,7 +258,43 @@ public class DESpotImporterTest extends AbstractWatersTest
 
 
   //#########################################################################
+  //# Exception Throwing Test Cases
+  public void testException_Nonexist()
+    throws Exception
+  {
+    testException("testSimple", "nonexist",
+                  FileNotFoundException.class, "nonexist.des");
+  }
+
+
+  //#########################################################################
   //# Utilities
+  void testException(final String subdir,
+                     final String name,
+                     final Class<? extends Exception> exclass,
+                     final String culprit)
+    throws Exception
+  {
+    try {
+      testImport(subdir, name);
+      fail("Expected " + getShortClassName(exclass) + " not caught!");
+    } catch (final Exception exception) {
+      if (exclass.isAssignableFrom(exception.getClass())) {
+        final String msg = exception.getMessage();
+        if (msg == null) {
+          fail(getShortClassName(exclass) +
+               " caught as expected, but message is null!");
+        } else if (msg.indexOf(culprit) < 0) {
+          fail(getShortClassName(exclass) +
+               " caught as expected, but message '" + msg +
+               "' does not mention culprit '" + culprit + "'!");
+        }
+      } else {
+        throw exception;
+      }
+    }
+  }
+
   void testImport(final String subdir, final String name)
     throws IOException, WatersMarshalException, WatersUnmarshalException,
            EvalException
