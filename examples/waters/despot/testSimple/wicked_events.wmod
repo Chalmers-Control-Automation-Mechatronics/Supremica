@@ -82,7 +82,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT" Name="wicked_events">
+<SimpleComponent Kind="PLANT" Name="wicked_events_3">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="s1">
