@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="low1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="hisc0_low1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
 <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
-<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="a2">
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a2">
 <ns2:AttributeMap>
-<ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+<ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="lev1"/>
 <EventDecl Kind="CONTROLLABLE" Name="lev2"/>
-<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="r2">
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r2">
 <ns2:AttributeMap>
-<ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+<ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="r3">
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r3">
 <ns2:AttributeMap>
-<ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+<ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
 </EventDeclList>
@@ -32,19 +32,19 @@
 <SimpleNode Name="iY2"/>
 </NodeList>
 <EdgeList>
-<Edge Source="iY2" Target="iY1">
+<Edge Target="iY2" Source="iY1">
 <LabelBlock>
-<SimpleIdentifier Name="a2"/>
+<SimpleIdentifier Name="r2"/>
 </LabelBlock>
 </Edge>
-<Edge Source="iY1" Target="iY1">
+<Edge Target="iY1" Source="iY1">
 <LabelBlock>
 <SimpleIdentifier Name="r3"/>
 </LabelBlock>
 </Edge>
-<Edge Source="iY1" Target="iY2">
+<Edge Target="iY1" Source="iY2">
 <LabelBlock>
-<SimpleIdentifier Name="r2"/>
+<SimpleIdentifier Name="a2"/>
 </LabelBlock>
 </Edge>
 </EdgeList>
@@ -70,39 +70,39 @@
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Source="hX3" Target="hX1">
+<Edge Target="hX2" Source="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX4" Source="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX2" Source="hX4">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX1" Source="hX4">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX1" Source="hX3">
 <LabelBlock>
 <SimpleIdentifier Name="a2"/>
 </LabelBlock>
 </Edge>
-<Edge Source="hX3" Target="hX3">
+<Edge Target="hX3" Source="hX3">
 <LabelBlock>
 <SimpleIdentifier Name="lev2"/>
 </LabelBlock>
 </Edge>
-<Edge Source="hX2" Target="hX3">
+<Edge Target="hX3" Source="hX2">
 <LabelBlock>
 <SimpleIdentifier Name="lev1"/>
-</LabelBlock>
-</Edge>
-<Edge Source="hX4" Target="hX1">
-<LabelBlock>
-<SimpleIdentifier Name="r3"/>
-</LabelBlock>
-</Edge>
-<Edge Source="hX4" Target="hX2">
-<LabelBlock>
-<SimpleIdentifier Name="r2"/>
-</LabelBlock>
-</Edge>
-<Edge Source="hX1" Target="hX4">
-<LabelBlock>
-<SimpleIdentifier Name="r3"/>
-</LabelBlock>
-</Edge>
-<Edge Source="hX1" Target="hX2">
-<LabelBlock>
-<SimpleIdentifier Name="r2"/>
 </LabelBlock>
 </Edge>
 </EdgeList>
@@ -125,39 +125,39 @@
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Source="hX3" Target="hX1">
+<Edge Target="hX2" Source="hX1">
 <LabelBlock>
-<SimpleIdentifier Name="a2"/>
+<SimpleIdentifier Name="r2"/>
 </LabelBlock>
 </Edge>
-<Edge Source="hX3" Target="hX3">
+<Edge Target="hX4" Source="hX1">
 <LabelBlock>
-<SimpleIdentifier Name="lev2"/>
+<SimpleIdentifier Name="r3"/>
 </LabelBlock>
 </Edge>
-<Edge Source="hX2" Target="hX3">
+<Edge Target="hX3" Source="hX2">
 <LabelBlock>
 <SimpleIdentifier Name="lev1"/>
 </LabelBlock>
 </Edge>
-<Edge Source="hX4" Target="hX1">
-<LabelBlock>
-<SimpleIdentifier Name="r3"/>
-</LabelBlock>
-</Edge>
-<Edge Source="hX4" Target="hX2">
+<Edge Target="hX2" Source="hX4">
 <LabelBlock>
 <SimpleIdentifier Name="r2"/>
 </LabelBlock>
 </Edge>
-<Edge Source="hX1" Target="hX4">
+<Edge Target="hX1" Source="hX4">
 <LabelBlock>
 <SimpleIdentifier Name="r3"/>
 </LabelBlock>
 </Edge>
-<Edge Source="hX1" Target="hX2">
+<Edge Target="hX1" Source="hX3">
 <LabelBlock>
-<SimpleIdentifier Name="r2"/>
+<SimpleIdentifier Name="a2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX3" Source="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="lev2"/>
 </LabelBlock>
 </Edge>
 </EdgeList>

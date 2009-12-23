@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="wicked-low" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a1">
+<ns2:AttributeMap>
+<ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r1">
+<ns2:AttributeMap>
+<ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+</ns2:AttributeMap>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="wicked_iface_1">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="i1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="i2"/>
+</NodeList>
+<EdgeList>
+<Edge Target="i2" Source="i1">
+<LabelBlock>
+<SimpleIdentifier Name="r1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="i1" Source="i2">
+<LabelBlock>
+<SimpleIdentifier Name="a1"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+<ns2:AttributeMap>
+<ns2:Attribute Name="HISC:Interface"/>
+</ns2:AttributeMap>
+</SimpleComponent>
+</ComponentList>
+</Module>

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="low2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="hisc0_low2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
 <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
-<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="a1">
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a1">
 <ns2:AttributeMap>
-<ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+<ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="r1">
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r1">
 <ns2:AttributeMap>
-<ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+<ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
 </EventDeclList>
@@ -25,12 +25,12 @@
 <SimpleNode Name="iX2"/>
 </NodeList>
 <EdgeList>
-<Edge Source="iX1" Target="iX2">
+<Edge Target="iX2" Source="iX1">
 <LabelBlock>
 <SimpleIdentifier Name="r1"/>
 </LabelBlock>
 </Edge>
-<Edge Source="iX2" Target="iX1">
+<Edge Target="iX1" Source="iX2">
 <LabelBlock>
 <SimpleIdentifier Name="a1"/>
 </LabelBlock>
@@ -52,12 +52,12 @@
 <SimpleNode Name="lX2"/>
 </NodeList>
 <EdgeList>
-<Edge Source="lX1" Target="lX2">
+<Edge Target="lX2" Source="lX1">
 <LabelBlock>
 <SimpleIdentifier Name="r1"/>
 </LabelBlock>
 </Edge>
-<Edge Source="lX2" Target="lX1">
+<Edge Target="lX1" Source="lX2">
 <LabelBlock>
 <SimpleIdentifier Name="a1"/>
 </LabelBlock>
@@ -76,12 +76,12 @@
 <SimpleNode Name="lX2"/>
 </NodeList>
 <EdgeList>
-<Edge Source="lX1" Target="lX2">
+<Edge Target="lX2" Source="lX1">
 <LabelBlock>
 <SimpleIdentifier Name="r1"/>
 </LabelBlock>
 </Edge>
-<Edge Source="lX2" Target="lX1">
+<Edge Target="lX1" Source="lX2">
 <LabelBlock>
 <SimpleIdentifier Name="a1"/>
 </LabelBlock>

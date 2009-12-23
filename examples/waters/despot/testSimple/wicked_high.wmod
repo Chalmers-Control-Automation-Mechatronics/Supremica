@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="wicked_high" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a1">
+<ns2:AttributeMap>
+<ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a2">
+<ns2:AttributeMap>
+<ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r1">
+<ns2:AttributeMap>
+<ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r2">
+<ns2:AttributeMap>
+<ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+</ns2:AttributeMap>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<Instance ModuleName="wicked-low">
+<SimpleIdentifier Name="wicked:low"/>
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+<ParameterBinding Name="a1">
+<SimpleIdentifier Name="a1"/>
+</ParameterBinding>
+<ParameterBinding Name="r1">
+<SimpleIdentifier Name="r1"/>
+</ParameterBinding>
+</Instance>
+<Instance ModuleName="wicked_low">
+<SimpleIdentifier Name="wicked_low"/>
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+<ParameterBinding Name="a2">
+<SimpleIdentifier Name="a2"/>
+</ParameterBinding>
+<ParameterBinding Name="r2">
+<SimpleIdentifier Name="r2"/>
+</ParameterBinding>
+</Instance>
+</ComponentList>
+</Module>

@@ -121,6 +121,13 @@ public class DESpotImporterTest extends AbstractWatersTest
     testImport("testSimple", "wicked_events");
   }
 
+  public void testImport_wicked_instances()
+    throws IOException, WatersMarshalException, WatersUnmarshalException,
+           EvalException
+  {
+    testImport("testSimple", "wicked_instances");
+  }
+
   public void testImport_wicked_states()
     throws IOException, WatersMarshalException, WatersUnmarshalException,
            EvalException
@@ -369,18 +376,16 @@ public class DESpotImporterTest extends AbstractWatersTest
             final URI outuri = outfile.toURI();
             final ModuleProxy outmodule = mModuleMarshaller.unmarshal(outuri);
             mIdentifierChecker.check(outmodule);
-            File expectfile = new File(indirname, extname);
-            if (!expectfile.exists()) {
-              final String altextname = testname + "-" + extname;
-              expectfile = new File(indirname, altextname);
-            }
+            final File expectfile = new File(indirname, extname);
             if (expectfile.exists()) {
               final URI expecturi = expectfile.toURI();
               final ModuleProxy expectmodule =
                 mModuleMarshaller.unmarshal(expecturi);
-              assertTrue("Unexpected module contents after parse back!",
+              assertTrue("Unexpected module contents for subsystem '" +
+                         sysname + "' after parse back!",
                          outmodule.equalsByContents(expectmodule));
-              assertTrue("Unexpected module geometry after parse back!",
+              assertTrue("Unexpected module geometry for subsystem '" +
+                         sysname + "' after parse back!",
                          outmodule.equalsWithGeometry(expectmodule));
             }
           }

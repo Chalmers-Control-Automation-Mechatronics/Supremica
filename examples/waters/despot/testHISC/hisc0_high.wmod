@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="High-Level Subsystem" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="hisc0_high" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
 <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
 <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="a1">
@@ -148,7 +148,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<Instance ModuleName="low2" Name="low2">
+<Instance ModuleName="hisc0_low2" Name="hisc0_low2">
 <ParameterBinding Name=":accepting">
 <SimpleIdentifier Name=":accepting"/>
 </ParameterBinding>
@@ -159,7 +159,7 @@
 <SimpleIdentifier Name="r1"/>
 </ParameterBinding>
 </Instance>
-<Instance ModuleName="low1" Name="low1">
+<Instance ModuleName="hisc0_low1" Name="hisc0_low1">
 <ParameterBinding Name=":accepting">
 <SimpleIdentifier Name=":accepting"/>
 </ParameterBinding>
