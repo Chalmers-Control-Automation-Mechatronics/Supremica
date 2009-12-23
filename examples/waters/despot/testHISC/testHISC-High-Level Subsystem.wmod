@@ -92,7 +92,7 @@
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT" Name="hplnt1">
+<SimpleComponent Kind="PLANT" Name="hplnt2">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="hX1">

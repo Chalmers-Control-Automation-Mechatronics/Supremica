@@ -21,7 +21,7 @@
 </EventDecl>
 </EventDeclList>
 <ComponentList>
-<SimpleComponent Kind="SPEC" Name="intf1">
+<SimpleComponent Kind="SPEC" Name="ides2">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="iY1">
