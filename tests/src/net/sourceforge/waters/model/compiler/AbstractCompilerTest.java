@@ -701,7 +701,7 @@ public abstract class AbstractCompilerTest
     final URI uri2 = filename2.toURI();
     final DocumentProxy proxy1 = mProductDESMarshaller.unmarshal(uri1);
     final DocumentProxy proxy2 = mProductDESMarshaller.unmarshal(uri2);
-    assertTrue("Unexpected result!", proxy2.equalsByContents(proxy1));
+    assertProductDESProxyEquals(proxy1, proxy2);
   }
 
   private ParameterBindingProxy createBinding(final String name,

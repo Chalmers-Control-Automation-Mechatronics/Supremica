@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.base
-//# CLASS:   ProxyAccessorHashCollection
+//# CLASS:   ProxyAccessorHashMap
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -16,53 +16,53 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 
+
 /**
  * @author Robi Malik
  */
 
-public class ProxyAccessorHashCollection2<P extends Proxy>
-  extends AbstractMap<ProxyAccessor<P>,Integer>
-  implements ProxyAccessorCollection<P>
+public class ProxyAccessorHashMap2<P extends Proxy>
+  extends AbstractMap<ProxyAccessor<P>,P>
+  implements ProxyAccessorMap<P>
 {
 
   //#########################################################################
   //# Constructors
-  public ProxyAccessorHashCollection2(final AbstractEqualityVisitor eq)
+  public ProxyAccessorHashMap2(final AbstractEqualityVisitor eq)
   {
-    mMap = new HashMap<ProxyAccessor<P>,Integer>();
+    mMap = new HashMap<ProxyAccessor<P>,P>();
     mEqualityVisitor = eq;
     mHashCodeVisitor = eq.getHashCodeVisitor();
   }
 
-  public ProxyAccessorHashCollection2(final AbstractEqualityVisitor eq,
-                                      final int initialCapacity)
+  public ProxyAccessorHashMap2(final AbstractEqualityVisitor eq,
+                               final int initialCapacity)
   {
-    mMap = new HashMap<ProxyAccessor<P>,Integer>(initialCapacity);
+    mMap = new HashMap<ProxyAccessor<P>,P>(initialCapacity);
     mEqualityVisitor = eq;
     mHashCodeVisitor = eq.getHashCodeVisitor();
   }
 
-  public ProxyAccessorHashCollection2(final AbstractEqualityVisitor eq,
-                                      final int initialCapacity,
-                                      final float loadFactor)
+  public ProxyAccessorHashMap2(final AbstractEqualityVisitor eq,
+                               final int initialCapacity,
+                               final float loadFactor)
   {
-    mMap = new HashMap<ProxyAccessor<P>,Integer>(initialCapacity, loadFactor);
+    mMap = new HashMap<ProxyAccessor<P>,P>(initialCapacity, loadFactor);
     mEqualityVisitor = eq;
     mHashCodeVisitor = eq.getHashCodeVisitor();
   }
 
-  public ProxyAccessorHashCollection2
+  public ProxyAccessorHashMap2
     (final AbstractEqualityVisitor eq,
-     final Map<ProxyAccessor<P>, Integer> map)
+     final Map<ProxyAccessor<P>,P> map)
   {
-    mMap = new HashMap<ProxyAccessor<P>,Integer>(map);
+    mMap = new HashMap<ProxyAccessor<P>,P>(map);
     mEqualityVisitor = eq;
     mHashCodeVisitor = eq.getHashCodeVisitor();
   }
 
-  public ProxyAccessorHashCollection2
-    (final AbstractEqualityVisitor eq,
-     final Collection<? extends P> collection)
+  public ProxyAccessorHashMap2(final AbstractEqualityVisitor eq,
+                               final Collection<? extends P> collection)
   {
     this(eq, collection.size());
     addAll(collection);
@@ -71,37 +71,39 @@ public class ProxyAccessorHashCollection2<P extends Proxy>
 
   //#########################################################################
   //# Interface java.util.Map
-  public Set<Map.Entry<ProxyAccessor<P>,Integer>> entrySet()
+  public Set<Map.Entry<ProxyAccessor<P>,P>> entrySet()
   {
     return mMap.entrySet();
   }
 
-  public Integer put(final ProxyAccessor<P> key, final Integer value)
+  public P put(final ProxyAccessor<P> key, final P value)
   {
     return mMap.put(key, value);
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.base.ProxyAccessorCollection
+  //# Interface net.sourceforge.waters.model.base.ProxyAccessorMap
   public boolean addProxy(final P proxy)
   {
     final ProxyAccessor<P> accessor = createAccessor(proxy);
-    final Integer value = get(accessor);
-    if (value == null) {
-      put(accessor, 1);
+    if (containsKey(accessor)) {
+      return false;
     } else {
-      put(accessor, value + 1);
+      put(accessor, proxy);
+      return true;
     }
-    return true;
   }
 
   public boolean addAll(final Collection<? extends P> collection)
   {
+    boolean result = false;
     for (final P proxy : collection) {
-      addProxy(proxy);
+      if (addProxy(proxy)) {
+        result = true;
+      }
     }
-    return true;
+    return result;
   }
 
   public boolean containsProxy(final P proxy)
@@ -112,13 +114,8 @@ public class ProxyAccessorHashCollection2<P extends Proxy>
 
   public boolean containsAll(final Collection<? extends P> collection)
   {
-    final ProxyAccessorCollection<P> hcoll =
-      new ProxyAccessorHashCollection2<P>(mEqualityVisitor, collection);
-    final Set<Map.Entry<ProxyAccessor<P>,Integer>> entries = hcoll.entrySet();
-    for (final Map.Entry<ProxyAccessor<P>,Integer> entry : entries) {
-      final ProxyAccessor<P> key = entry.getKey();
-      final Integer myvalue = get(key);
-      if (myvalue == null || myvalue < entry.getValue()) {
+    for (final P proxy : collection) {
+      if (!containsProxy(proxy)) {
         return false;
       }
     }
@@ -130,38 +127,28 @@ public class ProxyAccessorHashCollection2<P extends Proxy>
     return new Accessor<PP>(proxy);
   }
 
-  public int getCount(final P proxy)
+  public boolean equalsByAccessorEquality(final ProxyAccessorMap<P> partner)
   {
-    final ProxyAccessor<P> accessor = createAccessor(proxy);
-    final Integer count = mMap.get(accessor);
-    if (count == null) {
-      return 0;
-    } else {
-      return count.intValue();
-    }
+    final Set<ProxyAccessor<P>> set1 = keySet();
+    final Set<ProxyAccessor<P>> set2 = partner.keySet();
+    return set1.equals(set2);
+  }
+
+  public int hashCodeByAccessorEquality()
+  {
+    return keySet().hashCode();
   }
 
   public Iterator<P> iterator()
   {
-    final Set<Map.Entry<ProxyAccessor<P>,Integer>> entries = entrySet();
-    final Iterator<Map.Entry<ProxyAccessor<P>,Integer>> iter =
-      entries.iterator();
+    final Iterator<ProxyAccessor<P>> iter = keySet().iterator();
     return new AccessorIterator<P>(iter);
   }
 
   public boolean removeProxy(final P proxy)
   {
     final ProxyAccessor<P> accessor = createAccessor(proxy);
-    final Integer value = get(accessor);
-    if (value == null) {
-      return false;
-    } else if (value == 1) {
-      remove(accessor);
-      return true;
-    } else {
-      put(accessor, value - 1);
-      return true;
-    }
+    return remove(accessor) != null;
   }
 
   public boolean removeAll(final Collection<? extends P> collection)
@@ -192,7 +179,7 @@ public class ProxyAccessorHashCollection2<P extends Proxy>
     //# Equality and HashCode
     public boolean equals(final Object partner)
     {
-      if (partner instanceof ProxyAccessorHashCollection2<?>.Accessor<?>) {
+      if (partner instanceof ProxyAccessorHashMap2<?>.Accessor<?>) {
         final Accessor<?> accessor = (Accessor<?>) partner;
         return mEqualityVisitor.equals(mProxy, accessor.mProxy);
       } else {
@@ -227,66 +214,38 @@ public class ProxyAccessorHashCollection2<P extends Proxy>
 
     //#######################################################################
     //# Constructor
-    private AccessorIterator
-      (final Iterator<Map.Entry<ProxyAccessor<P>,Integer>> iter)
+    private AccessorIterator(final Iterator<ProxyAccessor<P>> iter)
     {
       mIterator = iter;
-      mCount = 0;
-      mCurrentProxy = null;
-      mCurrentEntry = null;
     }
 
     //#######################################################################
     //# Interface java.util.Iterator
     public boolean hasNext()
     {
-      return mCount > 0 || mIterator.hasNext();
+      return mIterator.hasNext();
     }
 
     public P next()
     {
-      if (mCount > 0) {
-        mCurrentEntry = mIterator.next();
-        final P key = mCurrentEntry.getKey().getProxy();
-        final int value = mCurrentEntry.getValue();
-        if (value > 1) {
-          mCurrentProxy = key;
-          mCount = value - 1;
-        }
-        return key;
-      } else {
-        mCount--;
-        return mCurrentProxy;
-      }
+      return mIterator.next().getProxy();
     }
 
     public void remove()
     {
-      if (mCurrentEntry == null) {
-        mIterator.remove();
-      } else {
-        int value = mCurrentEntry.getValue();
-        if (value-- == 0) {
-          mIterator.remove();
-        } else {
-          mCurrentEntry.setValue(value);
-        }
-      }
+      mIterator.remove();
     }
 
     //#######################################################################
     //# Data Members
-    private final Iterator<Map.Entry<ProxyAccessor<P>,Integer>> mIterator;
-    private int mCount;
-    private P mCurrentProxy;
-    private Entry<ProxyAccessor<P>,Integer> mCurrentEntry;
+    private final Iterator<ProxyAccessor<P>> mIterator;
 
   }
 
 
   //#########################################################################
   //# Data Members
-  private final Map<ProxyAccessor<P>,Integer> mMap;
+  private final Map<ProxyAccessor<P>,P> mMap;
   private final AbstractEqualityVisitor mEqualityVisitor;
   private final AbstractHashCodeVisitor mHashCodeVisitor;
 

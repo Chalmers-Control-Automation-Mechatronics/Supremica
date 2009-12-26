@@ -9,14 +9,38 @@
 
 package net.sourceforge.waters.model.base;
 
+import java.util.Collection;
+import java.util.List;
+
 
 /**
  * @author Robi Malik
  */
 
-public abstract class ProxyHashCodeVisitor
+public abstract class AbstractHashCodeVisitor
   implements ProxyVisitor
 {
+
+  //#########################################################################
+  //# Invocation
+  public AbstractHashCodeVisitor()
+  {
+    this(false);
+  }
+
+  public AbstractHashCodeVisitor(final boolean geo)
+  {
+    mIsRespectingGeometry = geo;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public boolean isRespectingGeometry()
+  {
+    return mIsRespectingGeometry;
+  }
+
 
   //#########################################################################
   //# Invocation
@@ -82,6 +106,32 @@ public abstract class ProxyHashCodeVisitor
       return (Integer) proxy.acceptVisitor(this);
     }
   }
+
+  protected int getSetHashCode(final Collection<? extends Proxy> set)
+    throws VisitorException
+  {
+    int result = 0;
+    for (final Proxy proxy : set) {
+      result += (Integer) proxy.acceptVisitor(this);
+    }
+    return result;
+  }
+
+  protected int getListHashCode(final List<? extends Proxy> list)
+    throws VisitorException
+  {
+    int result = 0;
+    for (final Proxy proxy : list) {
+      result *= 5;
+      result += (Integer) proxy.acceptVisitor(this);
+    }
+    return result;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final boolean mIsRespectingGeometry;
 
 
   //#########################################################################

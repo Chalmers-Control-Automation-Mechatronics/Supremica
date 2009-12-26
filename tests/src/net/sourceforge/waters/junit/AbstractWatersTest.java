@@ -14,6 +14,9 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
+
 import junit.framework.TestCase;
 
 import org.apache.log4j.Appender;
@@ -116,6 +119,28 @@ public abstract class AbstractWatersTest
   {
     final File dirname = outfile.getParentFile();
     ensureDirectoryExists(dirname);
+  }
+
+
+  //#########################################################################
+  //# Proxy Equality Assertions
+  protected void assertProductDESProxyEquals(final Proxy proxy,
+                                             final Proxy expected)
+  {
+    assertProductDESProxyEquals(null, proxy, expected);
+  }
+
+  protected void assertProductDESProxyEquals(final String msg,
+                                             final Proxy proxy,
+                                             final Proxy expected)
+  {
+    final ProductDESEqualityVisitor eq = new ProductDESEqualityVisitor(true);
+    if (!eq.equals(proxy, expected)) {
+      final String diagnostics = eq.getDiagnostics(msg);
+      final Logger logger = getLogger();
+      logger.debug(diagnostics);
+      fail(diagnostics);
+    }
   }
 
 
