@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.printer
-//# CLASS:   ProductDESProxyPrinter
+//# PACKAGE: net.sourceforge.waters.model.des
+//# CLASS:   ProductDESHashCodeVisitor
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -65,7 +65,7 @@ public class ProductDESHashCodeVisitor
     result += kind.hashCode();
     final Set<EventProxy> events = aut.getEvents();
     result *= 5;
-    result += getSetHashCode(events); // TODO
+    result += getRefCollectionHashCode(events);
     final Set<StateProxy> states = aut.getStates();
     result *= 5;
     result += getSetHashCode(states);
@@ -134,7 +134,7 @@ public class ProductDESHashCodeVisitor
     }
     final Collection<EventProxy> props = state.getPropositions();
     result *= 5;
-    result += getSetHashCode(props); // TODO
+    result += getRefSetHashCode(props);
     return result;
   }
 
@@ -147,7 +147,7 @@ public class ProductDESHashCodeVisitor
     result += des.hashCode();
     final Set<AutomatonProxy> automata = trace.getAutomata();
     result *= 5;
-    result += automata.hashCode();
+    result += getRefCollectionHashCode(automata);
     final List<TraceStepProxy> steps = trace.getTraceSteps();
     result *= 5;
     result *= getListHashCode(steps);
@@ -163,7 +163,7 @@ public class ProductDESHashCodeVisitor
     result += getOptionalHashCode(event);
     final Map<AutomatonProxy,StateProxy> statemap = step.getStateMap();
     result *= 5;
-    result += statemap.hashCode();
+    result += getRefMapHashCode(statemap);
     return result;
   }
 

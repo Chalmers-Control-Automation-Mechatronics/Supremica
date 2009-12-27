@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.printer
-//# CLASS:   ProductDESProxyPrinter
+//# PACKAGE: net.sourceforge.waters.model.des
+//# CLASS:   ProductDESEqualityVisitor
 //###########################################################################
 //# $Id$
 //###########################################################################

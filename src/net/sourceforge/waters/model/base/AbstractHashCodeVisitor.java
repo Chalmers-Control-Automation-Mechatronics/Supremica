@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
 //# PACKAGE: net.sourceforge.waters.model.base
-//# CLASS:   EqualityDiagnoser
+//# CLASS:   AbstractHashCodeVisitor
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -10,7 +10,10 @@
 package net.sourceforge.waters.model.base;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -124,6 +127,50 @@ public abstract class AbstractHashCodeVisitor
     for (final Proxy proxy : list) {
       result *= 5;
       result += (Integer) proxy.acceptVisitor(this);
+    }
+    return result;
+  }
+
+  protected int getRefCollectionHashCode
+      (final Collection<? extends NamedProxy> coll)
+    throws VisitorException
+  {
+    int result = 0;
+    for (final NamedProxy proxy : coll) {
+      result += proxy.refHashCode();
+    }
+    return result;
+  }
+
+  protected int getRefSetHashCode(final Collection<? extends NamedProxy> coll)
+    throws VisitorException
+  {
+    if (coll instanceof Set<?>) {
+      return getRefCollectionHashCode(coll);
+    } else {
+      final int size = coll.size();
+      final Set<String> names = new HashSet<String>(size);
+      int result = 0;
+      for (final NamedProxy proxy : coll) {
+        final String name = proxy.getName();
+        if (names.add(name)) {
+          result += proxy.refHashCode();
+        }
+      }
+      return result;
+    }
+  }
+
+  protected int getRefMapHashCode
+      (final Map<? extends NamedProxy,? extends NamedProxy> map)
+    throws VisitorException
+  {
+    int result = 0;
+    for (final Map.Entry<? extends NamedProxy,? extends NamedProxy> entry :
+         map.entrySet()) {
+      final NamedProxy key = entry.getKey();
+      final NamedProxy value = entry.getValue();
+      result += key.refHashCode() + 5 * value.refHashCode();
     }
     return result;
   }
