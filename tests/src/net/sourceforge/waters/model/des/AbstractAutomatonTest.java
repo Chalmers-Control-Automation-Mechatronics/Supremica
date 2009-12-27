@@ -41,10 +41,8 @@ public abstract class AbstractAutomatonTest
   //#########################################################################
   //# Test Cases
   /**
-   * Tests whether an automoton is equal to itself. The two automata that
-   * are compared in the equalsByContents() method are the same instance
-   * (have same reference). Uses assertTrue() since we expect
-   * AutomationProxy.equalsByContents() to return true in this case.
+   * Tests whether an automaton is equal to itself. The two automata that
+   * are compared are the same instance (the same reference).
    */
   public void testEqualSelf()
   {
@@ -55,7 +53,7 @@ public abstract class AbstractAutomatonTest
   }
 
   /**
-   * Tests whether an automoton is equal to its clone. This method creates
+   * Tests whether an automaton is equal to its clone. This method creates
    * clones of all sample automata and compares them to the original.
    */
   public void testEqualClones()
@@ -69,31 +67,31 @@ public abstract class AbstractAutomatonTest
 
   /**
    * Tests whether two identical automata are equal (different instances).
-   * Uses assertTrue() since we expect AutomationProxy.equalsByContents()
-   * to return true in this case.
    */
   public void testEqualHandcraftedClone()
   {
     checkEqual("Clone expected equality!",
-	       mAutomata.get(7), mAutomata.get(8));
+               mAutomata.get(7), mAutomata.get(8));
   }
 
   /**
-   * Tests whether two identical automata with different are not equal.
+   * Tests whether two identical automata with different names are not equal.
    */
   public void testEqualCloneRenamed()
   {
     checkNotEqual("Renamed clone expected equality!",
-		  mAutomata.get(12), mAutomata.get(11));
+                  mAutomata.get(12), mAutomata.get(11));
   }
 
   /**
-   * Tests whether passing <CODE>null</CODE> will return true for equility.
+   * Tests whether passing <CODE>null</CODE> will return <CODE>false</CODE>
+   * for equality.
    */
   public void testEqualNull()
   {
     for (final AutomatonProxy aut : mAutomata) {
-      assertFalse("NULL did NOT expect equality!", aut.equalsByContents(null));
+      checkNotEqual("An automaton should NOT be equal to NULL!", aut, null);
+      checkNotEqual("NULL should not be equal to an automaton!", null, aut);
     }
   }
 

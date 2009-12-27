@@ -188,6 +188,8 @@ public abstract class AbstractEqualityVisitor
   {
     if (proxy == null) {
       return expected == null;
+    } else if (expected == null) {
+      return false;
     } else if (mIsProvidingDiagnostics && isDiagnosticNode(proxy)) {
       mDiagnosticPath.addLast(proxy);
       mSecondProxy = expected;
