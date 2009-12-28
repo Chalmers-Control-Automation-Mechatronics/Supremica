@@ -26,6 +26,19 @@ import net.sourceforge.waters.model.printer.ProxyPrinter;
 
 
 /**
+ * <P>A visitor to compare {@link Proxy} objects for content-based
+ * equality.</P>
+ *
+ * <P>All {@link Proxy} objects implement default object equality.
+ * The AbstractEqualityVisitor provides for content-based equality.
+ * It can be configured to respect or not to respect geometry information
+ * found in some {@link Proxy} objects.</P>
+ *
+ * <P>In addition, the AbstractEqualityVisitor can optionally produce
+ * detailed diagnostic information when two items are found to be not
+ * equal. This is useful for testing and debugging, but it does have
+ * an impact on performance.</P>
+ *
  * @author Robi Malik
  */
 
@@ -35,16 +48,20 @@ public abstract class AbstractEqualityVisitor
 
   //#########################################################################
   //# Constructors
-  public AbstractEqualityVisitor()
-  {
-    this(false);
-  }
-
-  public AbstractEqualityVisitor(final boolean diag)
-  {
-    this(diag, false);
-  }
-
+  /**
+   * Creates a new equality checker.
+   * @param  diag      A flag, indicating whether the equality checker should
+   *                   provide diagnostic information if items compared are
+   *                   found not to be equal. Diagnostic information can be
+   *                   retrieved using {@link #getDiagnostics()}.
+   *                   This is useful for testing and debugging, but it does
+   *                   have an impact on performance.
+   * @param  geo       A flag, indicating whether the equality checker should
+   *                   consider geometry information. If <CODE>true</CODE>
+   *                   objects will be considered equal if their contents and
+   *                   geometry are equal, otherwise any geometry information
+   *                   will be ignored when checking for equality.
+   */
   public AbstractEqualityVisitor(final boolean diag, final boolean geo)
   {
     mIsProvidingDiagnostics = diag;
@@ -55,11 +72,17 @@ public abstract class AbstractEqualityVisitor
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Returns whether this equality checker respects geometry information.
+   */
   public boolean isRespectingGeometry()
   {
     return mIsRespectingGeometry;
   }
 
+  /**
+   * Returns whether provides diagnostic information.
+   */
   public boolean isProvidingDiagnostics()
   {
     return mIsProvidingDiagnostics;
@@ -75,6 +98,16 @@ public abstract class AbstractEqualityVisitor
 
   //#########################################################################
   //# Invocation
+  /**
+   * Compares two objects for equality.
+   * @param  proxy     The first object to be compared.
+   * @param  expected  The second object to be compared. For the purpose
+   *                   of diagnostic information, the second argument will
+   *                   be referred to as the 'expected' value.
+   * @return <CODE>true</CODE> if the two objects were found equal according
+   *         to the parameterisation of this equality checker,
+   *         <CODE>false</CODE> otherwise.
+   */
   public boolean equals(final Proxy proxy, final Proxy expected)
   {
     mDiagnostics = null;
@@ -86,11 +119,28 @@ public abstract class AbstractEqualityVisitor
     }
   }
 
+  /**
+   * Gets diagnostics information.
+   * @return A string explaining why the last equality test performed by
+   *         this equality checker produced a <CODE>false</CODE> result.
+   * @throws IllegalStateException to indicate that the last comparison gave
+   *                   a <CODE>true</CODE> result, or the equality checker is
+   *                   not configured to provide diagnostic information.
+   */
   public String getDiagnostics()
   {
     return getDiagnostics(null);
   }
 
+  /**
+   * Gets diagnostics information.
+   * @param  prefix    A string to be prepended to the diagnostic message.
+   * @return A string explaining why the last equality test performed by
+   *         this equality checker produced a <CODE>false</CODE> result.
+   * @throws IllegalStateException to indicate that the last comparison gave
+   *                   a <CODE>true</CODE> result, or the equality checker is
+   *                   not configured to provide diagnostic information.
+   */
   public String getDiagnostics(final String prefix)
   {
     try {
@@ -106,14 +156,31 @@ public abstract class AbstractEqualityVisitor
     }
   }
 
+  /**
+   * Writes diagnostics information.
+   * This method writes a string explaining why the last equality test
+   * performed by this equality checker produced a <CODE>false</CODE> result.
+   * The message should explain in detail which attributes of the two items
+   * differ and how they differ.
+   * @param  writer    A stream for writing output to.
+   * @throws IOException to indicate a failure when writing to the output
+   *                   stream.
+   * @throws IllegalStateException to indicate that the last comparison gave
+   *                   a <CODE>true</CODE> result, or the equality checker is
+   *                   not configured to provide diagnostic information.
+   */
   public void writeDiagnostics(final Writer writer)
     throws IOException
   {
     if (mDiagnostics != null) {
       writeDiagnosticPath(writer);
       mDiagnostics.write(writer);
+    } else if (mIsProvidingDiagnostics) {
+      throw new IllegalStateException
+          ("No previous false comparison found, diagnostics not available!");
     } else {
-      throw new IllegalStateException("Diagnostics not available!");
+      throw new IllegalStateException
+          ("Not configured to produce diagnostics!");
     }
   }
 
@@ -174,6 +241,11 @@ public abstract class AbstractEqualityVisitor
     return mSecondProxy;
   }
 
+  protected void setSecondProxy(final Proxy expected)
+  {
+    mSecondProxy = expected;
+  }
+
   protected boolean compareObjects(final Object object, final Object expected)
   {
     if (object == null) {
@@ -201,6 +273,16 @@ public abstract class AbstractEqualityVisitor
     } else {
       mSecondProxy = expected;
       return (Boolean) proxy.acceptVisitor(this);
+    }
+  }
+
+  protected boolean compareReferences(final NamedProxy proxy,
+                                      final NamedProxy expected)
+  {
+    if (proxy == null) {
+      return expected == null;
+    } else {
+      return proxy.refequals(expected);
     }
   }
 
@@ -684,9 +766,9 @@ public abstract class AbstractEqualityVisitor
     void write(final Writer writer)
       throws IOException
     {
-      writer.write("the attribute ");
+      writer.write("the attribute '");
       writer.write(mAttrib);
-      writer.write(" has value ");
+      writer.write("' has value ");
       writeValue(writer, mValue);
       writer.write(", but should be ");
       writeValue(writer, mExpected);

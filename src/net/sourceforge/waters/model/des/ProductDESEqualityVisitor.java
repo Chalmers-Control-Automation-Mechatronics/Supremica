@@ -44,7 +44,7 @@ public class ProductDESEqualityVisitor
   //# Constructors
   public ProductDESEqualityVisitor(final boolean diag)
   {
-    super(diag);
+    super(diag, false);
   }
 
   private ProductDESEqualityVisitor()
@@ -231,6 +231,7 @@ public class ProductDESEqualityVisitor
       if (!compareLists(steps1, steps2)) {
         return false;
       }
+      setSecondProxy(expected);
       return true;
     } else {
       return false;

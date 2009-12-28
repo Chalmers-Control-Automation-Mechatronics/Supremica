@@ -68,10 +68,10 @@ public class ProductDESHashCodeVisitor
     result += getRefCollectionHashCode(events);
     final Set<StateProxy> states = aut.getStates();
     result *= 5;
-    result += getSetHashCode(states);
+    result += getCollectionHashCode(states);
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     result *= 5;
-    result += getSetHashCode(transitions);
+    result += getCollectionHashCode(transitions);
     final Map<String,String> attribs = aut.getAttributes();
     result *= 5;
     result += attribs.hashCode();
@@ -111,10 +111,10 @@ public class ProductDESHashCodeVisitor
     int result = visitDocumentProxy(des);
     final Set<EventProxy> events = des.getEvents();
     result *= 5;
-    result += getSetHashCode(events);
+    result += getCollectionHashCode(events);
     final Set<AutomatonProxy> automata = des.getAutomata();
     result *= 5;
-    result += getSetHashCode(automata);
+    result += getCollectionHashCode(automata);
     return result;
   }
 

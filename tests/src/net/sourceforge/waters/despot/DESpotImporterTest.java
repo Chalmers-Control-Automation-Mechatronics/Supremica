@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -308,6 +307,7 @@ public class DESpotImporterTest extends AbstractWatersTest
            EvalException
   {
     final String inextname = name + mImporter.getDefaultExtension();
+    getLogger().info("Converting " + inextname + " ...");
     final File indirname = new File(mInputDirectory, subdir);
     final File infilename = new File(indirname, inextname);
     final URI despotURI = infilename.toURI();
@@ -381,12 +381,10 @@ public class DESpotImporterTest extends AbstractWatersTest
               final URI expecturi = expectfile.toURI();
               final ModuleProxy expectmodule =
                 mModuleMarshaller.unmarshal(expecturi);
-              assertTrue("Unexpected module contents for subsystem '" +
-                         sysname + "' after parse back!",
-                         outmodule.equalsByContents(expectmodule));
-              assertTrue("Unexpected module geometry for subsystem '" +
-                         sysname + "' after parse back!",
-                         outmodule.equalsWithGeometry(expectmodule));
+              assertModuleProxyEquals
+                ("Unexpected module contents for subsystem '" +
+                 sysname + "' after parse back!",
+                 outmodule, expectmodule);
             }
           }
         }
@@ -402,8 +400,9 @@ public class DESpotImporterTest extends AbstractWatersTest
   //#########################################################################
   //# Overrides for junit.framework.TestCase
   protected void setUp()
-    throws JAXBException, SAXException
+    throws Exception
   {
+    super.setUp();
     mInputDirectory = new File(getWatersInputRoot(), "despot");
     mOutputDirectory = getOutputDirectory();
     final ModuleProxyFactory moduleFactory =
@@ -422,6 +421,7 @@ public class DESpotImporterTest extends AbstractWatersTest
   }
 
   protected void tearDown()
+    throws Exception
   {
     mInputDirectory = null;
     mOutputDirectory = null;
@@ -431,6 +431,7 @@ public class DESpotImporterTest extends AbstractWatersTest
     mDocumentManager = null;
     mImporter = null;
     mIdentifierChecker = null;
+    super.tearDown();
   }
 
 

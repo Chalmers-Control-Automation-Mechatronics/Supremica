@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 
 import junit.framework.TestCase;
 
@@ -138,7 +139,26 @@ public abstract class AbstractWatersTest
     if (!eq.equals(proxy, expected)) {
       final String diagnostics = eq.getDiagnostics(msg);
       final Logger logger = getLogger();
-      logger.debug(diagnostics);
+      logger.info(diagnostics);
+      fail(diagnostics);
+    }
+  }
+
+  protected void assertModuleProxyEquals(final Proxy proxy,
+                                         final Proxy expected)
+  {
+    assertModuleProxyEquals(null, proxy, expected);
+  }
+
+  protected void assertModuleProxyEquals(final String msg,
+                                         final Proxy proxy,
+                                         final Proxy expected)
+  {
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true, true);
+    if (!eq.equals(proxy, expected)) {
+      final String diagnostics = eq.getDiagnostics(msg);
+      final Logger logger = getLogger();
+      logger.info(diagnostics);
       fail(diagnostics);
     }
   }

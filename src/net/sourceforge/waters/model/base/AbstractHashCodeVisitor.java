@@ -17,6 +17,11 @@ import java.util.Set;
 
 
 /**
+ * A visitor to compute hash code for {@link Proxy} objects based on their
+ * contents. It can be parameterised to respect or not to respect the geometry
+ * information for in some {@link Proxy} objects.
+ *
+ * @see AbstractEqualityVisitor
  * @author Robi Malik
  */
 
@@ -73,8 +78,8 @@ public abstract class AbstractHashCodeVisitor
   public Integer visitNamedProxy(final NamedProxy proxy)
   {
     int result = visitProxy(proxy);
-    result *= 5;
     final String name = proxy.getName();
+    result *= 5;
     result += name.hashCode();
     return result;
   }
@@ -82,8 +87,8 @@ public abstract class AbstractHashCodeVisitor
   public Integer visitDocumentProxy(final DocumentProxy proxy)
   {
     int result = visitNamedProxy(proxy);
-    result *= 5;
     final String comment = proxy.getComment();
+    result *= 5;
     result += getOptionalHashCode(comment);
     return result;
   }
@@ -110,7 +115,17 @@ public abstract class AbstractHashCodeVisitor
     }
   }
 
-  protected int getSetHashCode(final Collection<? extends Proxy> set)
+  protected int getRefHashCode(final NamedProxy proxy)
+    throws VisitorException
+  {
+    if (proxy == null) {
+      return HASH_NULL;
+    } else {
+      return proxy.refHashCode();
+    }
+  }
+
+  protected int getCollectionHashCode(final Collection<? extends Proxy> set)
     throws VisitorException
   {
     int result = 0;
@@ -159,6 +174,17 @@ public abstract class AbstractHashCodeVisitor
       }
       return result;
     }
+  }
+
+  protected int getRefListHashCode(final List<? extends NamedProxy> list)
+    throws VisitorException
+  {
+    int result = 0;
+    for (final NamedProxy proxy : list) {
+      result *= 5;
+      result += proxy.refHashCode();
+    }
+    return result;
   }
 
   protected int getRefMapHashCode

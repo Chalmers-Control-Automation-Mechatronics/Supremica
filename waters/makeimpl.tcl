@@ -62,6 +62,12 @@ proc Java_ProcessPackage {impls subpack prefix} {
   set destname [file join $indir "${prefix}ProxyCloner.java"]
   Java_GenerateCloningVisitor $subpack $prefix $destname $classes \
       implClassMap importMap
+  set destname [file join $indir "${prefix}HashCodeVisitor.java"]
+  Java_GenerateHashCodeVisitor $subpack $prefix $destname $classes \
+      implClassMap importMap
+  set destname [file join $indir "${prefix}EqualityVisitor.java"]
+  Java_GenerateEqualityVisitor $subpack $prefix $destname $classes \
+      implClassMap importMap
 }
 
 proc Java_ExtractFileInfo {srcname importMapName} {
@@ -1934,6 +1940,577 @@ proc Java_GenerateCloningVisitor {subpack prefix destname classnames
 
 
 ##############################################################################
+# Generate HashCode Visitor
+##############################################################################
+
+proc Java_GenerateHashCodeVisitor {subpack prefix destname classnames
+                                   classMapName importMapName} {
+  global gSpaces
+  upvar $classMapName classMap
+  upvar $importMapName importMap
+  set keyword "class"
+  set suffix "HashCodeVisitor"
+  set visitorname "${prefix}${suffix}"
+  set packname "net.sourceforge.waters.model.$subpack"
+  set impl ""
+
+  ############################################################################
+  # Prepare and Write Output
+  foreach write {0 1} {
+    if {$write} {
+      set tmpname "$destname.tmp"
+      set stream [open $tmpname w]
+      set umap ""
+      Java_GenerateHeaderComment $stream $packname $visitorname
+      Java_WritePackageAndImports $stream $packname useMap importMap
+    } else {
+      set stream ""
+      set umap useMap
+    }
+
+  ############################################################################
+  # Write Headers
+    Java_WriteLn $stream $umap "/**"
+    Java_WriteLn $stream $umap \
+        " * A visitor to compute hash code for ${prefix} objects based on"
+    Java_WriteLn $stream $umap \
+        " * their contents. The $visitorname can be parameterised to respect"
+    Java_WriteLn $stream $umap \
+        " * or not to respect geometry information."
+    Java_WriteLn $stream $umap " *"
+    Java_WriteLn $stream $umap " * @author Robi Malik"
+    Java_WriteLn $stream $umap " */"
+    Java_WriteLn $stream $umap ""
+    Java_WriteLn $stream $umap "public $keyword $visitorname"
+    Java_WriteLn $stream $umap "  extends Abstract${suffix}"
+    Java_WriteLn $stream $umap "  implements ${prefix}ProxyVisitor"
+    Java_WriteLn $stream $umap "\{"
+
+  ############################################################################
+  # Write Singleton Pattern
+    Java_GenerateSeparatorComment $stream $umap "Singleton Pattern"
+    Java_WriteLn $stream $umap \
+        "  public static $visitorname getInstance(final boolean geo)"
+    Java_WriteLn $stream $umap "  \{"
+    Java_WriteLn $stream $umap "    if (geo) \{"
+    Java_WriteLn $stream $umap \
+        "      return SingletonHolderWithGeometry.INSTANCE;";
+    Java_WriteLn $stream $umap "    \} else \{"
+    Java_WriteLn $stream $umap \
+        "      return SingletonHolderWithoutGeometry.INSTANCE;"
+    Java_WriteLn $stream $umap "    \}"
+    Java_WriteLn $stream $umap "  \}"
+    Java_WriteLn $stream $umap ""
+    Java_WriteLn $stream $umap "  private ${visitorname}(final boolean geo)"
+    Java_WriteLn $stream $umap "  \{"
+    Java_WriteLn $stream $umap "    super (geo);"
+    Java_WriteLn $stream $umap "  \}"
+    Java_WriteLn $stream $umap ""
+    for {set geo 0} {$geo <= 1} {incr geo} {
+      if {$geo} { 
+        set gbool "true"
+        set gname "With"
+      } else {
+        set gbool "false"
+        set gname "Without"
+      }
+      Java_WriteLn $stream $umap \
+          "  private static class SingletonHolder${gname}Geometry \{"
+      Java_WriteLn $stream $umap \
+          "    private static final $visitorname INSTANCE ="
+      Java_WriteLn $stream $umap "      new ${visitorname}(${gbool});"
+      Java_WriteLn $stream $umap "  \}"
+      Java_WriteLn $stream $umap ""
+    }
+    
+  ############################################################################
+  # Write Visitor Methods
+    Java_GenerateSeparatorComment $stream $umap \
+        "Interface $packname.${prefix}ProxyVisitor"
+    set classnames [lsort $classnames]
+    foreach classname $classnames {
+      set classinfo $classMap($classname)
+      Java_WriteLn $stream $umap "  public Integer visit${classname}"
+      Java_WriteLn $stream $umap "    (final $classname proxy)"
+      Java_WriteLn $stream $umap "    throws VisitorException"
+      Java_WriteLn $stream $umap "  \{"
+      if {[string compare $classname "IdentifiedProxy"] == 0} {
+        set supername "Proxy"
+      } else {
+        set supername [Java_ClassGetParent $classinfo]
+      }
+      set attribs [Java_ClassGetAttributes $classinfo]
+      set geo [Java_ClassGetGeometryStatus $classinfo]
+      set numattribs 0
+      set nongeoattribs ""
+      set geoattribs ""
+      foreach attrib $attribs {
+        set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
+        if {[string compare $eqstatus "ignored"] == 0} {
+          continue
+        } elseif {$geo != 3 &&
+                  [string compare $eqstatus "geometry"] == 0} {
+          incr numattribs
+          lappend geoattribs $attrib
+        } else {
+          incr numattribs
+          lappend nongeoattribs $attrib
+        }
+      }
+      if {$numattribs == 0} {
+	Java_WriteLn $stream $umap "    return visit${supername}(proxy);"
+      } else {
+	Java_WriteLn $stream $umap "    int result = visit${supername}(proxy);"
+        for {set geo 0} {$geo <= 1} {incr geo} {
+          if {$geo} {
+            if {[llength $geoattribs] == 0} {
+              break
+            }
+            set attribs $geoattribs
+            Java_WriteLn $stream $umap "    if (isRespectingGeometry()) \{"
+            set indent 6
+          } else {
+            set attribs $nongeoattribs
+            set indent 4
+          }              
+          set indent [string range $gSpaces 1 $indent]
+          foreach attrib $attribs {
+            set varname [Java_AttribGetParameterName $attrib $impl]
+            set type [Java_AttribGetDeclaredType $attrib $impl]
+            set getter [Java_AttribGetGetterName $attrib $impl]
+            set refstatus [Java_AttribGetRefStatus $attrib $impl]
+            Java_WriteLn $stream $umap \
+                "${indent}final $type $varname = proxy.${getter}();"
+            Java_WriteLn $stream $umap "${indent}result *= 5;"
+            if {[regexp {^boolean$} $type all]} {
+              Java_WriteLn $stream $umap "${indent}if ($varname) \{"
+              Java_WriteLn $stream $umap "${indent}  result++;"
+              Java_WriteLn $stream $umap "${indent}\}"
+            } elseif {[regexp {^[a-z]} $type all]} {
+              Java_WriteLn $stream $umap "${indent}result += $varname;"
+            } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all] ||
+                      [regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
+              # TODO: collection or set?
+              if {[string compare $refstatus "ref"] == 0} {
+                Java_WriteLn $stream $umap \
+                    "${indent}result += getRefCollectionHashCode($varname);"
+              } else {
+                Java_WriteLn $stream $umap \
+                    "${indent}result += getCollectionHashCode($varname);"
+              }
+            } elseif {[regexp {^List<[a-zA-Z]*Proxy>} $type all]} {
+              # TODO: ref or not ref ?
+              Java_WriteLn $stream $umap \
+                  "${indent}result += getListHashCode($varname);"
+            } elseif {[string compare $refstatus "ref"] == 0} {
+              Java_WriteLn $stream $umap \
+                  "${indent}result += getRefHashCode($varname);"
+            } elseif {[info exists classMap($type)]} {
+              Java_WriteLn $stream $umap \
+                  "${indent}result += getProxyHashCode($varname);"
+            } else {
+              Java_WriteLn $stream $umap \
+                  "${indent}result += getOptionalHashCode($varname);"
+            }
+          }
+          if {$geo} {
+            Java_WriteLn $stream $umap "    \}"
+          }
+        }
+        Java_WriteLn $stream $umap "    return result;"
+      }
+      Java_WriteLn $stream $umap "  \}"
+      Java_WriteLn $stream $umap ""
+    }
+
+    if {$write} {
+      Java_WriteLn $stream $umap "\}"
+      close $stream
+      Java_ReplaceFile $tmpname $destname
+    }
+  }
+}
+
+
+
+##############################################################################
+# Generate Equality Visitor
+##############################################################################
+
+proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
+                                   classMapName importMapName} {
+  global gSpaces
+  upvar $classMapName classMap
+  upvar $importMapName importMap
+  set keyword "class"
+  set suffix "EqualityVisitor"
+  set visitorname "${prefix}${suffix}"
+  set nonreporter "mNonReporting${suffix}"
+  set packname "net.sourceforge.waters.model.$subpack"
+  set impl ""
+
+  ############################################################################
+  # Prepare and Write Output
+  foreach write {0 1} {
+    if {$write} {
+      set tmpname "$destname.tmp"
+      set stream [open $tmpname w]
+      set umap ""
+      Java_GenerateHeaderComment $stream $packname $visitorname
+      Java_WritePackageAndImports $stream $packname useMap importMap
+    } else {
+      set stream ""
+      set umap useMap
+    }
+
+  ############################################################################
+  # Write Headers
+    Java_WriteLn $stream $umap "/**"
+    Java_WriteLn $stream $umap \
+        " * A visitor to compare module objects based on their contents."
+    Java_WriteLn $stream $umap \
+        " * The $visitorname can be configured to respect or not to"
+    Java_WriteLn $stream $umap \
+        " * respect geometry information found in some \{@link Proxy\}"
+    Java_WriteLn $stream $umap \
+        " * objects, and to produce detailed diagnostic information when two"
+    Java_WriteLn $stream $umap \
+        " * items are found to be not equal."
+    Java_WriteLn $stream $umap " *"
+    Java_WriteLn $stream $umap " * @see Abstract${suffix}"
+    Java_WriteLn $stream $umap " * @author Robi Malik"
+    Java_WriteLn $stream $umap " */"
+    Java_WriteLn $stream $umap ""
+    Java_WriteLn $stream $umap "public $keyword $visitorname"
+    Java_WriteLn $stream $umap "  extends Abstract${suffix}"
+    Java_WriteLn $stream $umap "  implements ${prefix}ProxyVisitor"
+    Java_WriteLn $stream $umap "\{"
+
+  ############################################################################
+  # Write Singleton Pattern
+    Java_GenerateSeparatorComment $stream $umap "Singleton Pattern"
+    Java_WriteLn $stream $umap "  /**"
+    Java_WriteLn $stream $umap \
+        "   * Returns an instance of an equality checker that does not provide"
+    Java_WriteLn $stream $umap \
+        "   * diagnostic information. This method uses the singleton pattern"
+    Java_WriteLn $stream $umap \
+        "   * to provide more efficient access to a pre-built visitor object."
+    Java_WriteLn $stream $umap \
+        "   * @param  geo  A flag, indicating whether the equality checker"
+    Java_WriteLn $stream $umap \
+        "   *              should consider geometry information."
+    Java_WriteLn $stream $umap \
+        "   *              If <CODE>true</CODE> objects will be considered"
+    Java_WriteLn $stream $umap \
+        "   *              equal if their contents and geometry are equal,"
+    Java_WriteLn $stream $umap \
+        "   *              otherwise any geometry information will be ignored"
+    Java_WriteLn $stream $umap \
+        "   *              when checking for equality."
+    Java_WriteLn $stream $umap "   */"
+    Java_WriteLn $stream $umap \
+        "  public static $visitorname getInstance(final boolean geo)"
+    Java_WriteLn $stream $umap "  \{"
+    Java_WriteLn $stream $umap "    if (geo) \{"
+    Java_WriteLn $stream $umap \
+        "      return SingletonHolderWithGeometry.INSTANCE;";
+    Java_WriteLn $stream $umap "    \} else \{"
+    Java_WriteLn $stream $umap \
+        "      return SingletonHolderWithoutGeometry.INSTANCE;"
+    Java_WriteLn $stream $umap "    \}"
+    Java_WriteLn $stream $umap "  \}"
+    Java_WriteLn $stream $umap ""
+    for {set geo 0} {$geo <= 1} {incr geo} {
+      if {$geo} { 
+        set gbool "true"
+        set gname "With"
+      } else {
+        set gbool "false"
+        set gname "Without"
+      }
+      Java_WriteLn $stream $umap \
+          "  private static class SingletonHolder${gname}Geometry \{"
+      Java_WriteLn $stream $umap \
+          "    private static final $visitorname INSTANCE ="
+      Java_WriteLn $stream $umap "      new ${visitorname}(false, ${gbool});"
+      Java_WriteLn $stream $umap "  \}"
+      Java_WriteLn $stream $umap ""
+    }
+
+  ############################################################################
+  # Write Constructor
+    Java_GenerateSeparatorComment $stream $umap "Constructor"
+    Java_WriteLn $stream $umap "  /**"
+    Java_WriteLn $stream $umap \
+        "   * Creates a new equality checker."
+    Java_WriteLn $stream $umap \
+        "   * @param  diag A flag, indicating whether the equality checker"
+    Java_WriteLn $stream $umap \
+        "   *              should provide diagnostic information if items"
+    Java_WriteLn $stream $umap \
+        "   *              compared are found not to be equal. Diagnostic"
+    Java_WriteLn $stream $umap \
+        "   *              information can be retrieved using \{@link"
+    Java_WriteLn $stream $umap \
+        "   *              Abstract${suffix}#getDiagnostics()\}."
+    Java_WriteLn $stream $umap \
+        "   *              This is useful for testing and debugging, but it"
+    Java_WriteLn $stream $umap \
+        "   *              does have an impact on performance."
+    Java_WriteLn $stream $umap \
+        "   * @param  geo  A flag, indicating whether the equality checker"
+    Java_WriteLn $stream $umap \
+        "   *              should consider geometry information."
+    Java_WriteLn $stream $umap \
+        "   *              If <CODE>true</CODE>, objects will be considered"
+    Java_WriteLn $stream $umap \
+        "   *              equal if their contents and geometry are equal,"
+    Java_WriteLn $stream $umap \
+        "   *              otherwise any geometry information will be ignored"
+    Java_WriteLn $stream $umap \
+        "   *              when checking for equality."
+    Java_WriteLn $stream $umap "*/"
+    Java_WriteLn $stream $umap \
+        "  public ${visitorname}(final boolean diag, final boolean geo)"
+    Java_WriteLn $stream $umap "  \{"
+    Java_WriteLn $stream $umap "    super (diag, geo);"
+    Java_WriteLn $stream $umap \
+        "    mHashCodeVisitor = ${prefix}HashCodeVisitor.getInstance(geo);"
+    Java_WriteLn $stream $umap \
+        "    $nonreporter = diag ? getInstance(geo) : this;"
+    Java_WriteLn $stream $umap "  \}"
+    Java_WriteLn $stream $umap ""
+   
+  ############################################################################
+  # Write Overrides
+    Java_GenerateSeparatorComment $stream $umap \
+        "Overrides for net.sourceforge.waters.model.base.Abstract${suffix}"
+    Java_WriteLn $stream $umap \
+        "  public ${prefix}HashCodeVisitor getHashCodeVisitor()"
+    Java_WriteLn $stream $umap "  \{"
+    Java_WriteLn $stream $umap "    return mHashCodeVisitor;"
+    Java_WriteLn $stream $umap "  \}"
+    Java_WriteLn $stream $umap \
+        "  public $visitorname getNonReporting${suffix}()"
+    Java_WriteLn $stream $umap "  \{"
+    Java_WriteLn $stream $umap "    return $nonreporter;"
+    Java_WriteLn $stream $umap "  \}"
+    Java_WriteLn $stream $umap ""
+
+  ############################################################################
+  # Write Visitor Methods
+    Java_GenerateSeparatorComment $stream $umap \
+        "Interface $packname.${prefix}ProxyVisitor"
+    set classnames [lsort $classnames]
+    foreach classname $classnames {
+      set classinfo $classMap($classname)
+      Java_WriteLn $stream $umap "  public Boolean visit${classname}"
+      Java_WriteLn $stream $umap "    (final $classname proxy)"
+      Java_WriteLn $stream $umap "    throws VisitorException"
+      Java_WriteLn $stream $umap "  \{"
+      if {[string compare $classname "IdentifiedProxy"] == 0} {
+        set supername "Proxy"
+      } else {
+        set supername [Java_ClassGetParent $classinfo]
+      }
+      set attribs [Java_ClassGetAttributes $classinfo]
+      set geo [Java_ClassGetGeometryStatus $classinfo]
+      set numattribs 0
+      set nongeoattribs ""
+      set geoattribs ""
+      foreach attrib $attribs {
+        set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
+        if {[string compare $eqstatus "ignored"] == 0} {
+          continue
+        } elseif {$geo != 3 &&
+                  [string compare $eqstatus "geometry"] == 0} {
+          incr numattribs
+          lappend geoattribs $attrib
+        } else {
+          incr numattribs
+          lappend nongeoattribs $attrib
+        }
+      }
+      if {$numattribs == 0} {
+	Java_WriteLn $stream $umap "    return visit${supername}(proxy);"
+      } else {
+	Java_WriteLn $stream $umap "    if (visit${supername}(proxy)) \{"
+	Java_WriteLn $stream $umap \
+            "      final $classname expected = ($classname) getSecondProxy();"
+        set needreset 0
+        for {set geo 0} {$geo <= 1} {incr geo} {
+          if {$geo} {
+            if {[llength $geoattribs] == 0} {
+              break
+            }
+            set attribs $geoattribs
+            Java_WriteLn $stream $umap "      if (isRespectingGeometry()) \{"
+            set indent 8
+          } else {
+            set attribs $nongeoattribs
+            set indent 6
+          }              
+          set indent [string range $gSpaces 1 $indent]
+          foreach attrib $attribs {
+            set varname [Java_AttribGetParameterName $attrib $impl]
+            set name [Java_AttribGetEnglishDescription $attrib $impl]
+            set type [Java_AttribGetDeclaredType $attrib $impl]
+            set getter [Java_AttribGetGetterName $attrib $impl]
+            set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
+            set refstatus [Java_AttribGetRefStatus $attrib $impl]
+            Java_WriteLn $stream $umap \
+                "${indent}final $type ${varname}1 = proxy.${getter}();"
+            Java_WriteLn $stream $umap \
+                "${indent}final $type ${varname}2 = expected.${getter}();"
+            if {[regexp {^[a-z]} $type all]} {
+              Java_WriteLn $stream $umap \
+                  "${indent}if (${varname}1 != ${varname}2) \{"
+              Java_Write $stream $umap \
+                  "${indent}  return reportAttributeMismatch"
+              Java_WriteLn $stream $umap \
+                  "(\"$name\", ${varname}1, ${varname}2);"
+              Java_WriteLn $stream $umap "${indent}\}"
+            } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all] ||
+                      [regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
+              # TODO: collection or set ?
+              if {[string compare $refstatus "ref"] == 0} {
+                set method "compareRefCollections"
+              } else {
+                set method "compareCollections"
+                set needreset 1
+              }
+              Java_WriteLn $stream $umap \
+                  "${indent}if (!${method}(${varname}1, ${varname}2)) \{"
+              Java_WriteLn $stream $umap "${indent}  return false;"
+              Java_WriteLn $stream $umap "${indent}\}"
+            } elseif {[regexp {^List<([a-zA-Z]*Proxy)>} $type all elemtype]} {
+              # TODO: ref or not ref ?
+              if {[Java_IsSimpleExpressionProxy $elemtype classMap] ||
+                  [string compare $varname "eventList"] == 0} {
+                set method "compareExpressionLists"
+              } else {
+                set method "compareLists"
+              }
+              set needreset 1
+              Java_WriteLn $stream $umap \
+                  "${indent}if (!${method}(${varname}1, ${varname}2)) \{"
+              Java_WriteLn $stream $umap "${indent}  return false;"
+              Java_WriteLn $stream $umap "${indent}\}"
+            } elseif {[regexp {^Map} $type all]} {
+              # TODO: other maps ?
+              set method "compareAttributeMaps"
+              Java_WriteLn $stream $umap \
+                  "${indent}if (!${method}(${varname}1, ${varname}2)) \{"
+              Java_WriteLn $stream $umap "${indent}  return false;"
+              Java_WriteLn $stream $umap "${indent}\}"
+            } elseif {![info exists classMap($type)]} {
+              Java_WriteLn $stream $umap \
+                  "${indent}if (!compareObjects(${varname}1, ${varname}2)) \{"
+              Java_Write $stream $umap \
+                  "${indent}  return reportAttributeMismatch"
+              Java_WriteLn $stream $umap \
+                  "(\"$name\", ${varname}1, ${varname}2);"
+              Java_WriteLn $stream $umap "${indent}\}"
+            } elseif {[string compare $refstatus "ref"] == 0} {
+              set method "compareReferences"
+              Java_WriteLn $stream $umap \
+                  "${indent}if (!${method}(${varname}1, ${varname}2)) \{"
+              Java_WriteLn $stream $umap \
+                  "${indent}  return reportAttributeMismatch"
+              Java_Write $stream $umap \
+                  "${indent}      (\"$name\", "
+              Java_WriteLn $stream $umap \
+                  "${varname}1.getName(), ${varname}2.getName());"
+              Java_WriteLn $stream $umap "${indent}\}"
+            } elseif {[Java_IsSimpleExpressionProxy $type classMap] ||
+                      [string compare $eqstatus "geometry"] == 0} {
+              set method "$nonreporter.equals"
+              Java_WriteLn $stream $umap \
+                  "${indent}if (!${method}(${varname}1, ${varname}2)) \{"
+              Java_Write $stream $umap \
+                  "${indent}  return reportAttributeMismatch"
+              Java_WriteLn $stream $umap \
+                  "(\"$name\", ${varname}1, ${varname}2);"
+              Java_WriteLn $stream $umap "${indent}\}"
+            } else {
+              Java_WriteLn $stream $umap \
+                  "${indent}if (!compareProxies(${varname}1, ${varname}2)) \{"
+              Java_WriteLn $stream $umap "${indent}  return false;"
+              Java_WriteLn $stream $umap "${indent}\}"
+              set needreset 1
+            }
+          }
+          if {$geo} {
+            Java_WriteLn $stream $umap "      \}"
+          }
+        }
+        if {$needreset && [Java_ClassIsAbstract $classinfo]} {
+          Java_WriteLn $stream $umap "      setSecondProxy(expected);"
+        }
+        Java_WriteLn $stream $umap "      return true;"
+        Java_WriteLn $stream $umap "    \} else \{"
+        Java_WriteLn $stream $umap "      return false;"
+        Java_WriteLn $stream $umap "    \}"
+      }
+      Java_WriteLn $stream $umap "  \}"
+      Java_WriteLn $stream $umap ""
+    }
+
+  ############################################################################
+  # Write Auxiliary Methods
+    Java_GenerateSeparatorComment $stream $umap "Auxiliary Methods"
+    set etype "Proxy"
+    Java_WriteLn $stream $umap "  private boolean compareExpressionLists"
+    Java_WriteLn $stream $umap "    (final List<? extends $etype> list,"
+    Java_WriteLn $stream $umap "     final List<? extends $etype> expected)"
+    Java_WriteLn $stream $umap "  \{"
+    Java_WriteLn $stream $umap \
+        "    final Iterator<? extends $etype> iter1 = list.iterator();"
+    Java_WriteLn $stream $umap \
+        "    final Iterator<? extends $etype> iter2 = expected.iterator();"
+    Java_WriteLn $stream $umap \
+        "    while (iter1.hasNext() && iter2.hasNext()) \{"
+    Java_WriteLn $stream $umap "      final $etype expr1 = iter1.next();"
+    Java_WriteLn $stream $umap "      final $etype expr2 = iter2.next();"
+    Java_WriteLn $stream $umap \
+        "      if (!$nonreporter.equals(expr1, expr2)) \{"
+    Java_WriteLn $stream $umap \
+        "        return reportItemMismatch(expr1, expr2);"
+    Java_WriteLn $stream $umap "      \}"
+    Java_WriteLn $stream $umap "    \}"
+    Java_WriteLn $stream $umap "    if (iter1.hasNext()) \{"
+    Java_WriteLn $stream $umap \
+        "      return reportSuperfluousItem(iter1.next());"
+    Java_WriteLn $stream $umap "    \} else if (iter2.hasNext()) \{"
+    Java_WriteLn $stream $umap \
+        "      return reportMissingItem(iter2.next());"
+    Java_WriteLn $stream $umap "    \} else \{"
+    Java_WriteLn $stream $umap "      return true;"
+    Java_WriteLn $stream $umap "    \}"
+    Java_WriteLn $stream $umap "  \}"
+    Java_WriteLn $stream $umap ""
+
+  ############################################################################
+  # Write Data Members
+    Java_GenerateSeparatorComment $stream $umap "Data Members"
+    Java_WriteLn $stream $umap \
+        "  private final ${prefix}HashCodeVisitor mHashCodeVisitor;"
+    Java_WriteLn $stream $umap \
+        "  private final $visitorname $nonreporter;"
+ 
+    if {$write} {
+      Java_WriteLn $stream $umap ""
+      Java_WriteLn $stream $umap "\}"
+      close $stream
+      Java_ReplaceFile $tmpname $destname
+    }
+  }
+}
+
+
+
+##############################################################################
 # Collecting Imports
 ##############################################################################
 
@@ -1949,6 +2526,7 @@ proc Java_CollectGlobalImports {importMapName} {
   set importMap(Collections) "java.util"
   set importMap(HashMap) "java.util"
   set importMap(HashSet) "java.util"
+  set importMap(Iterator) "java.util"
   set importMap(LinkedList) "java.util"
   set importMap(List) "java.util"
   set importMap(Map) "java.util"
@@ -2501,17 +3079,27 @@ proc Java_GetSuperClassInfo {supername implobjname classMapName} {
   return [list $supername $superclassname]
 }
 
-proc Java_IsNamedProxy {type classMapName} {
+proc Java_IsProxySubtypeOf {type iface classMapName} {
   if {[string compare $type ""] == 0} {
     return 0
-  } elseif {[string compare $type "NamedProxy"] == 0} {
+  } elseif {[string compare $type $iface] == 0} {
     return 1
   } else {
     upvar $classMapName classMap
     set classinfo $classMap($type)
     set type [Java_ClassGetParent $classinfo]
-    return [Java_IsNamedProxy $type classMap]
+    return [Java_IsProxySubtypeOf $type $iface classMap]
   }
+}
+
+proc Java_IsNamedProxy {type classMapName} {
+  upvar $classMapName classMap
+  return [Java_IsProxySubtypeOf $type "NamedProxy" classMap]
+}
+
+proc Java_IsSimpleExpressionProxy {type classMapName} {
+  upvar $classMapName classMap
+  return [Java_IsProxySubtypeOf $type "SimpleExpressionProxy" classMap]
 }
 
 proc Java_ToEnglish {javaname} {
