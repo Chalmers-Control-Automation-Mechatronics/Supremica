@@ -20,8 +20,9 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 public class Composing {
@@ -780,8 +781,10 @@ public class Composing {
 	  }
 	  //Transitions:
 	  final Collection<TransitionProxy> oldtrans = aut.getTransitions();
-	  final ProxyAccessorMap<TransitionProxy> newtrans =
-	  	new ProxyAccessorHashMapByContents<TransitionProxy>(oldtrans.size());
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      final ProxyAccessorSet<TransitionProxy> newtrans =
+        new ProxyAccessorHashSet<TransitionProxy>(eq, oldtrans.size());
 	  final List<TransitionProxy> newtranlist =
 	  	new ArrayList<TransitionProxy>(oldtrans.size());
 	  for (final TransitionProxy oldtran : oldtrans) {

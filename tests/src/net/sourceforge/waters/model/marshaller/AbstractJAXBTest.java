@@ -145,14 +145,8 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     manager.saveAs(proxy1, outfilename);
     final URI outuri = outfilename.toURI();
     final DocumentProxy proxy2 = manager.load(outuri);
-    assertTrue("Structure changed after marshalling!",
-               proxy1.equalsByContents(proxy2));
-    assertTrue("Structure changed after marshalling!",
-               proxy2.equalsByContents(proxy1));
-    assertTrue("Geometry information changed after marshalling!",
-               proxy1.equalsWithGeometry(proxy2));
-    assertTrue("Geometry information changed after marshalling!",
-               proxy2.equalsWithGeometry(proxy1));
+    assertProxyEquals("Structure changed after marshalling!", proxy1, proxy2);
+    assertProxyEquals("Structure changed after marshalling!", proxy2, proxy1);
     final Class<D> clazz = Casting.toClass(proxy1.getClass());
     return clazz.cast(proxy1);
   }
@@ -193,14 +187,8 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     final DocumentProxy proxy1 = manager.load(url);
     final File truefile = new File(getWatersInputRoot(), infile.toString());
     final DocumentProxy proxy2 = manager.load(truefile);
-    assertTrue("Structure in JAR differs from file!",
-               proxy1.equalsByContents(proxy2));
-    assertTrue("Structure in JAR differs from file!",
-               proxy2.equalsByContents(proxy1));
-    assertTrue("Geometry information in JAR differs from file!",
-               proxy1.equalsWithGeometry(proxy2));
-    assertTrue("Geometry information in JAR differs from file!",
-               proxy2.equalsWithGeometry(proxy1));
+    assertProxyEquals("Structure in JAR differs from file!", proxy1, proxy2);
+    assertProxyEquals("Structure in JAR differs from file!", proxy2, proxy1);
     final Class<D> clazz = Casting.toClass(proxy1.getClass());
     return clazz.cast(proxy1);
   }
@@ -237,23 +225,15 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     final URI outuri = outfilename.toURI();
     marshaller.marshal(handcrafted, outfilename);
     final D parsed1 = unmarshaller.unmarshal(outuri);
-    assertTrue("Constructed structure differs from parsed-back!",
-               handcrafted.equalsByContents(parsed1));
-    assertTrue("Constructed structure differs from parsed-back!",
-               parsed1.equalsByContents(handcrafted));
-    assertTrue("Constructed geometry info differs from parsed-back!",
-               handcrafted.equalsWithGeometry(parsed1));
-    assertTrue("Constructed geometry info differs from parsed-back!",
-               parsed1.equalsWithGeometry(handcrafted));
+    assertProxyEquals("Constructed structure differs from parsed-back!",
+                      handcrafted, parsed1);
+    assertProxyEquals("Constructed structure differs from parsed-back!",
+                      parsed1, handcrafted);
     final D parsed2 = unmarshaller.unmarshal(inuri);
-    assertTrue("Constructed structure differs from expected in file!",
-               handcrafted.equalsByContents(parsed2));
-    assertTrue("Constructed structure differs from expected in file!",
-               parsed2.equalsByContents(handcrafted));
-    assertTrue("Constructed geometry info differs from expected in file!",
-               handcrafted.equalsWithGeometry(parsed2));
-    assertTrue("Constructed geometry info differs from expected in file!",
-               parsed2.equalsWithGeometry(handcrafted));
+    assertProxyEquals("Constructed structure differs from expected in file!",
+                      handcrafted, parsed2);
+    assertProxyEquals("Constructed structure differs from expected in file!",
+                      parsed2, handcrafted);
   }
 
   protected D testClone(final String name)
@@ -298,8 +278,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     final Class<D> clazz = unmarshaller.getDocumentClass();
     final D cloned = clazz.cast(cloneddoc);
     checkIntegrity(cloned);
-    assertTrue("Clone differs from original!",
-               proxy.equalsWithGeometry(cloned));
+    assertProxyEquals("Clone differs from original!", proxy, cloned);
     return cloned;
   }
 
@@ -353,14 +332,8 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
       final ObjectInputStream in = new ObjectInputStream(fis);
       final DocumentProxy doc2 = (DocumentProxy) in.readObject();
       in.close();
-      assertTrue("Structure changed after serializing!",
-                 doc1.equalsByContents(doc2));
-      assertTrue("Structure changed after serializing!",
-                 doc2.equalsByContents(doc1));
-      assertTrue("Geometry information changed after serializing!",
-                 doc1.equalsWithGeometry(doc2));
-      assertTrue("Geometry information changed after serializing!",
-                 doc2.equalsWithGeometry(doc1));
+      assertProxyEquals("Structure changed after serialising!", doc1, doc2);
+      assertProxyEquals("Structure changed after serialising!", doc2, doc1);
     }
     final Class<D> clazz = Casting.toClass(doc1.getClass());
     return clazz.cast(doc1);
@@ -396,7 +369,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
       mDocumentManager.registerUnmarshaller(unmarshaller);
     }
     return mDocumentManager;
-  }     
+  }
 
 
   //#########################################################################

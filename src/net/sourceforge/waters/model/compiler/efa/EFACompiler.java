@@ -22,7 +22,8 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -45,6 +46,7 @@ import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -333,7 +335,7 @@ public class EFACompiler
     throws DuplicateIdentifierException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
+      mEFAEventDeclMap.createAccessor(ident);
     if (mEFAEventDeclMap.containsKey(accessor)) {
       throw new DuplicateIdentifierException(ident, "event");
     } else {
@@ -343,9 +345,7 @@ public class EFACompiler
 
   private EFAEventDecl getEventDecl(final IdentifierProxy ident)
   {
-    final ProxyAccessor<IdentifierProxy> accessor =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
-    return mEFAEventDeclMap.get(accessor);
+    return mEFAEventDeclMap.getByProxy(ident);
   }
 
   private EFAEventDecl findEventDecl(final IdentifierProxy ident)
@@ -570,10 +570,12 @@ public class EFACompiler
     public Object visitModuleProxy(final ModuleProxy module)
       throws VisitorException
     {
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
       final List<EventDeclProxy> events = module.getEventDeclList();
       final int size = events.size();
       mEFAEventDeclMap =
-        new HashMap<ProxyAccessor<IdentifierProxy>,EFAEventDecl>(size);
+        new ProxyAccessorHashMap<IdentifierProxy,EFAEventDecl>(eq, size);
       visitCollection(events);
       final List<Proxy> components = module.getComponentList();
       visitCollection(components);
@@ -980,7 +982,8 @@ public class EFACompiler
    * EventDeclProxy} the information about its event variable set and
    * associated guards.
    */
-  private Map<ProxyAccessor<IdentifierProxy>,EFAEventDecl> mEFAEventDeclMap;
+  private ProxyAccessorMap<IdentifierProxy,EFAEventDecl> mEFAEventDeclMap;
+
   // Pass 3
   /**
    * A map that assigns to each identifier of an event label on an edge the

@@ -16,7 +16,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -27,8 +26,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * A JUnit tester class for the {@link AutomatonProxy} interface's {@link
- * Proxy#equalsByContents(Proxy) equalsByContents()} method.
+ * A JUnit test for the {@link ProductDESEqualityVisitor} class when applied
+ * to {@link AutomatonProxy} objects.
  *
  * @author Brook Novak
  * @author Robi Malik

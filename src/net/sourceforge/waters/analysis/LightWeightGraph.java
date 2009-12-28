@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -323,34 +322,6 @@ public class LightWeightGraph
     public Class<StateProxy> getProxyInterface()
     {
       return StateProxy.class;
-    }
-
-    public boolean equalsByContents(final Proxy partner)
-    {
-      if (partner != null &&
-          partner.getProxyInterface() == getProxyInterface()) {
-        final StateProxy state = (StateProxy) partner;
-        return (getName().equals(state.getName())) &&
-               (isInitial() == state.isInitial()) &&
-               state.getPropositions().isEmpty();
-      } else {
-        return false;
-      }
-    }
-
-    public boolean equalsWithGeometry(final Proxy o)
-    {
-      return equalsByContents(o);
-    }
-
-    public int hashCodeByContents()
-    {
-      return refHashCode();
-    }
-
-    public int hashCodeWithGeometry()
-    {
-      return refHashCode();
     }
 
     public int compareTo(final NamedProxy n)

@@ -12,7 +12,6 @@
 
 package net.sourceforge.waters.subject.module;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -111,56 +110,10 @@ public final class QualifiedIdentifierSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<QualifiedIdentifierProxy> getProxyInterface()
   {
     return QualifiedIdentifierProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final QualifiedIdentifierProxy downcast =
-        (QualifiedIdentifierProxy) partner;
-      return
-        mBaseIdentifier.equalsByContents(downcast.getBaseIdentifier()) &&
-        mComponentIdentifier.equalsByContents(downcast.getComponentIdentifier());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final QualifiedIdentifierProxy downcast =
-        (QualifiedIdentifierProxy) partner;
-      return
-        mBaseIdentifier.equalsWithGeometry(downcast.getBaseIdentifier()) &&
-        mComponentIdentifier.equalsWithGeometry(downcast.getComponentIdentifier());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mBaseIdentifier.hashCodeByContents();
-    result *= 5;
-    result += mComponentIdentifier.hashCodeByContents();
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeWithGeometry();
-    result *= 5;
-    result += mBaseIdentifier.hashCodeWithGeometry();
-    result *= 5;
-    result += mComponentIdentifier.hashCodeWithGeometry();
-    return result;
   }
 
 

@@ -10,12 +10,10 @@
 package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -24,6 +22,7 @@ import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
@@ -37,10 +36,11 @@ class EFAGuardCompiler
   EFAGuardCompiler(final ModuleProxyFactory factory,
                    final CompilerOperatorTable optable)
   {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     mFactory = factory;
     mOperatorTable = optable;
     mCache =
-      new HashMap<ProxyAccessor<GuardActionBlockProxy>,ConstraintList>();
+      new ProxyAccessorHashMap<GuardActionBlockProxy,ConstraintList>(eq);
   }
 
 
@@ -50,7 +50,7 @@ class EFAGuardCompiler
     throws EvalException
   {
     final ProxyAccessor<GuardActionBlockProxy> accessor =
-      new ProxyAccessorByContents<GuardActionBlockProxy>(block);
+      mCache.createAccessor(block);
     final ConstraintList cached = mCache.get(accessor);
     if (cached != null) {
       return cached;
@@ -118,7 +118,6 @@ class EFAGuardCompiler
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
 
-  private final Map<ProxyAccessor<GuardActionBlockProxy>,ConstraintList>
-    mCache;
+  private final ProxyAccessorMap<GuardActionBlockProxy,ConstraintList> mCache;
 
 }

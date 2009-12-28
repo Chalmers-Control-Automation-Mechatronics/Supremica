@@ -54,7 +54,6 @@ import java.io.Serializable;
 import org.supremica.util.Args;
 import org.supremica.log.*;
 import java.util.Comparator;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
@@ -65,84 +64,84 @@ public class Arc
 {
     private static Logger logger = LoggerFactory.createLogger(Arc.class);
     private LabeledEvent event;
-    private State fromState;
+    private final State fromState;
     private State toState;
 
     // TEMP-solution (use EFA instead)
     public static final double DEFAULT_PROBABILITY = 1;
-    private double probability = DEFAULT_PROBABILITY;  
-    
-    public Arc(State from, State to, LabeledEvent event)
+    private double probability = DEFAULT_PROBABILITY;
+
+    public Arc(final State from, final State to, final LabeledEvent event)
     {
         Args.checkForNull(from);
         Args.checkForNull(to);
         Args.checkForNull(event);
-        
+
         this.fromState = from;
         this.toState = to;
         this.event = event;
     }
-    
-    public Arc(Arc other)
+
+    public Arc(final Arc other)
     {
         this.event = other.event;
         this.fromState = other.fromState;
         this.toState = other.toState;
     }
-    
+
     public TransitionProxy clone()
-    {   
+    {
         try
         {
-            return (Arc)super.clone();        
+            return (Arc)super.clone();
         }
-        catch (CloneNotSupportedException ex)
+        catch (final CloneNotSupportedException ex)
         {
             logger.error(ex);
             return null;
         }
     }
-    
+
     public LabeledEvent getEvent()
     {
         return event;
     }
-    
-    public void setEvent(LabeledEvent event)
+
+    public void setEvent(final LabeledEvent event)
     {
         this.event = event;
     }
-    
+
     public State getToState()
     {
         return toState;
     }
- 
-    public void setToState(State toState)
+
+    public void setToState(final State toState)
     {
         this.toState = toState;
     }
-    
+
     public State getTarget()
     {
         return getToState();
     }
-    
+
     public State getFromState()
     {
         return fromState;
     }
-    
+
     public State getSource()
     {
         return getFromState();
     }
-    
+
     public String getLabel()
     {
         return event.getLabel();
     }
-    
+
     /**
      * True if the from- and the to-state are the same, otherwise false.
      */
@@ -150,43 +149,43 @@ public class Arc
     {
         return fromState == toState;
     }
-    
+
     public void clear()
     {
         if (fromState != null)
         {
             fromState.removeOutgoingArc(this);
         }
-        
+
         if (toState != null)
         {
             toState.removeIncomingArc(this);
-        }    
+        }
     }
-    
-    public boolean equals(Object object)
+
+    public boolean equals(final Object object)
     {
         if (object instanceof Arc)
         {
-            Arc arc = (Arc) object;
+            final Arc arc = (Arc) object;
             return (toState.equals(arc.getToState()) && fromState.equals(arc.getFromState()) && event.equals(arc.getEvent()));
         }
         return false;
     }
-    
+
     public int hashCode()
     {
         return toState.hashCode() + fromState.hashCode() + event.hashCode();
     }
-    
+
     /**
      * Returns a string representation of the arc as an ordered triple,
      * with from-state, to-state and event.
      */
     public String toString()
     {
-        StringBuffer sbuf = new StringBuffer();
-        
+        final StringBuffer sbuf = new StringBuffer();
+
         sbuf.append("<");
         sbuf.append(getFromState());
         sbuf.append(", ");
@@ -194,15 +193,15 @@ public class Arc
         sbuf.append(", ");
         sbuf.append(getToState());
         sbuf.append(">");
-        
+
         return sbuf.toString();
     }
-    
+
     /**
      * Compares this arc to another arc. The event is compared first,
      * then the toState and last the fromState.
      */
-    public int compareTo(TransitionProxy trans)
+    public int compareTo(final TransitionProxy trans)
     {
         final int compsource = getSource().compareTo(trans.getSource());
         if (compsource != 0)
@@ -216,7 +215,7 @@ public class Arc
         }
         return getTarget().compareTo(trans.getTarget());
     }
-    
+
     /**
      * Comparator for comparing two arcs based on their events alone.
      */
@@ -225,49 +224,18 @@ public class Arc
     {
 		private static final long serialVersionUID = 1L;
 
-		public int compare(Arc one, Arc two)
+		public int compare(final Arc one, final Arc two)
         {
             return one.getEvent().compareTo(two.getEvent());
         }
     }
-    
+
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.Proxy
     public Class<TransitionProxy> getProxyInterface()
     {
         return TransitionProxy.class;
-    }
-
-    public boolean equalsByContents(final Proxy partner)
-    {
-        if (partner.getProxyInterface() == getProxyInterface()) {
-            final TransitionProxy partnerArc = (TransitionProxy) partner;
-            return
-                getSource().refequals(partnerArc.getSource()) &&
-                getTarget().refequals(partnerArc.getTarget()) &&
-                getEvent().refequals(partnerArc.getEvent());
-        } else {
-            return false;
-        }
-    }
-
-    public boolean equalsWithGeometry(final Proxy partner)
-    {
-        return equalsByContents(partner);
-    }
-
-    public int hashCodeByContents()
-    {
-        return
-            getSource().refHashCode() +
-            5 * getEvent().refHashCode() +
-            25 * getTarget().refHashCode();
-    }
-
-    public int hashCodeWithGeometry()
-    {
-        return hashCodeByContents();
     }
 
     public Object acceptVisitor(final ProxyVisitor visitor)
@@ -281,16 +249,17 @@ public class Arc
 
     //#######################################################################
     //# TEMP-solution (use EFA instead)
-    public Arc(State from, State to, LabeledEvent event, double probability)
+    public Arc(final State from, final State to, final LabeledEvent event, final double probability)
         throws IllegalArgumentException
     {
         this(from, to, event);
         setProbability(probability);
     }
 
-    public void setProbability(double probability)
+    public void setProbability(final double probability)
     {
         @SuppressWarnings("unused")
+        final
 		String label = getEvent().getName();
         this.probability = probability;
     }

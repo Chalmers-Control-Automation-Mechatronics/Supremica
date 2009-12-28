@@ -17,6 +17,7 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
@@ -71,7 +72,9 @@ public class OccursChecker extends AbstractModuleProxyVisitor
   private boolean occurs(final SimpleExpressionProxy expr)
     throws VisitorException
   {
-    if (expr.equalsByContents(mVarName)) {
+    final ModuleEqualityVisitor eq =
+      ModuleEqualityVisitor.getInstance(false);
+    if (eq.equals(expr, mVarName)) {
       return true;
     } else {
       return (Boolean) expr.acceptVisitor(this);

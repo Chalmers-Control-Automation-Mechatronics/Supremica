@@ -12,7 +12,6 @@
 
 package net.sourceforge.waters.subject.module;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -74,47 +73,6 @@ public abstract class AliasSubject
     } else {
       return false;
     }
-  }
-
-
-  //#########################################################################
-  //# Equality and Hashcode
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final AliasProxy downcast = (AliasProxy) partner;
-      return
-        mExpression.equalsByContents(downcast.getExpression());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final AliasProxy downcast = (AliasProxy) partner;
-      return
-        mExpression.equalsWithGeometry(downcast.getExpression());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mExpression.hashCodeByContents();
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeWithGeometry();
-    result *= 5;
-    result += mExpression.hashCodeWithGeometry();
-    return result;
   }
 
 

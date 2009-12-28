@@ -12,7 +12,6 @@
 
 package net.sourceforge.waters.plain.module;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
@@ -66,48 +65,10 @@ public final class SimpleIdentifierElement
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<SimpleIdentifierProxy> getProxyInterface()
   {
     return SimpleIdentifierProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final SimpleIdentifierProxy downcast = (SimpleIdentifierProxy) partner;
-      return
-        mName.equals(downcast.getName());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final SimpleIdentifierProxy downcast = (SimpleIdentifierProxy) partner;
-      return
-        mName.equals(downcast.getName());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mName.hashCode();
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeWithGeometry();
-    result *= 5;
-    result += mName.hashCode();
-    return result;
   }
 
 

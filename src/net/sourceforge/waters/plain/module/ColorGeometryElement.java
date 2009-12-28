@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
@@ -75,29 +74,10 @@ public final class ColorGeometryElement
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<ColorGeometryProxy> getProxyInterface()
   {
     return ColorGeometryProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final ColorGeometryProxy downcast = (ColorGeometryProxy) partner;
-      return
-        mColorSet.equals(downcast.getColorSet());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mColorSet.hashCode();
-    return result;
   }
 
 

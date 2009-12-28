@@ -55,7 +55,16 @@ public abstract class AbstractHashCodeVisitor
   public int hashCode(final Proxy proxy)
   {
     try {
-      return getProxyHashCode(proxy);
+      return computeProxyHashCode(proxy);
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
+    }
+  }
+
+  public int getListHashCode(final List<? extends Proxy> list)
+  {
+    try {
+      return computeListHashCode(list);
     } catch (final VisitorException exception) {
       throw exception.getRuntimeException();
     }
@@ -89,14 +98,14 @@ public abstract class AbstractHashCodeVisitor
     int result = visitNamedProxy(proxy);
     final String comment = proxy.getComment();
     result *= 5;
-    result += getOptionalHashCode(comment);
+    result += computeOptionalHashCode(comment);
     return result;
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  protected int getOptionalHashCode(final Object item)
+  protected int computeOptionalHashCode(final Object item)
   {
     if (item == null) {
       return HASH_NULL;
@@ -105,7 +114,7 @@ public abstract class AbstractHashCodeVisitor
     }
   }
 
-  protected int getProxyHashCode(final Proxy proxy)
+  protected int computeProxyHashCode(final Proxy proxy)
     throws VisitorException
   {
     if (proxy == null) {
@@ -115,7 +124,7 @@ public abstract class AbstractHashCodeVisitor
     }
   }
 
-  protected int getRefHashCode(final NamedProxy proxy)
+  protected int computeRefHashCode(final NamedProxy proxy)
     throws VisitorException
   {
     if (proxy == null) {
@@ -125,7 +134,7 @@ public abstract class AbstractHashCodeVisitor
     }
   }
 
-  protected int getCollectionHashCode(final Collection<? extends Proxy> set)
+  protected int computeCollectionHashCode(final Collection<? extends Proxy> set)
     throws VisitorException
   {
     int result = 0;
@@ -135,7 +144,7 @@ public abstract class AbstractHashCodeVisitor
     return result;
   }
 
-  protected int getListHashCode(final List<? extends Proxy> list)
+  protected int computeListHashCode(final List<? extends Proxy> list)
     throws VisitorException
   {
     int result = 0;
@@ -146,7 +155,7 @@ public abstract class AbstractHashCodeVisitor
     return result;
   }
 
-  protected int getRefCollectionHashCode
+  protected int computeRefCollectionHashCode
       (final Collection<? extends NamedProxy> coll)
     throws VisitorException
   {
@@ -157,11 +166,12 @@ public abstract class AbstractHashCodeVisitor
     return result;
   }
 
-  protected int getRefSetHashCode(final Collection<? extends NamedProxy> coll)
+  protected int computeRefSetHashCode
+    (final Collection<? extends NamedProxy> coll)
     throws VisitorException
   {
     if (coll instanceof Set<?>) {
-      return getRefCollectionHashCode(coll);
+      return computeRefCollectionHashCode(coll);
     } else {
       final int size = coll.size();
       final Set<String> names = new HashSet<String>(size);
@@ -176,7 +186,7 @@ public abstract class AbstractHashCodeVisitor
     }
   }
 
-  protected int getRefListHashCode(final List<? extends NamedProxy> list)
+  protected int computeRefListHashCode(final List<? extends NamedProxy> list)
     throws VisitorException
   {
     int result = 0;
@@ -187,7 +197,7 @@ public abstract class AbstractHashCodeVisitor
     return result;
   }
 
-  protected int getRefMapHashCode
+  protected int computeRefMapHashCode
       (final Map<? extends NamedProxy,? extends NamedProxy> map)
     throws VisitorException
   {

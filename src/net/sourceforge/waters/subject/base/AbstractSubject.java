@@ -65,58 +65,6 @@ public abstract class AbstractSubject
 
 
   //#########################################################################
-  //# Equals and Hashcode
-  /**
-   * Checks whether two subjects are equal. This method implements
-   * content-based equality, i.e., two subjects will be equal if their
-   * contents are the same. Since subjects have no contents by themselves,
-   * this default implementation considers two subjects as equal if they
-   * have the same proxy interface.
-   */
-  public boolean equalsByContents(final Proxy partner)
-  {
-    return
-      partner != null && getProxyInterface() == partner.getProxyInterface();
-  }
-
-  /**
-   * Checks whether two subjects are equal and have the same geometry
-   * information. This method implements content-based equality, i.e., two
-   * subjects will be equal if their contents and geometry information are
-   * the same. The default implementation simply calls {@link
-   * #equalsByContents(Proxy) equalsByContents()}.
-   */
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    return equalsByContents(partner);
-  }
-
-  /**
-   * Computes a hash code based on this object's contents. This method is
-   * used to compute a hash code to match the equality defined by the
-   * {@link #equalsByContents(Proxy) equalsByContents()} method. The
-   * default implementation for subjects computes the hash code based only
-   * on the object's proxy interface.
-   */
-  public int hashCodeByContents()
-  {
-    return getProxyInterface().hashCode();
-  }
-
-  /**
-   * Computes a hash code based on this object's contents and geometry
-   * information. This method is used to compute a hash code to match the
-   * equality defined by the {@link #equalsWithGeometry(Proxy)
-   * equalsWithGeometry()} method. The default implementation for subjects
-   * simply calls {@link #hashCodeByContents()}.
-   */
-  public int hashCodeWithGeometry()
-  {
-    return hashCodeByContents();
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
   public Subject getParent()
   {

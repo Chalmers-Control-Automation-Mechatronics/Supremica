@@ -14,7 +14,6 @@ package net.sourceforge.waters.subject.module;
 
 import java.awt.geom.Point2D;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
@@ -97,32 +96,10 @@ public final class LabelGeometrySubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<LabelGeometryProxy> getProxyInterface()
   {
     return LabelGeometryProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final LabelGeometryProxy downcast = (LabelGeometryProxy) partner;
-      return
-        mOffset.equals(downcast.getOffset()) &&
-        mAnchor.equals(downcast.getAnchor());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mOffset.hashCode();
-    result *= 5;
-    result += mAnchor.hashCode();
-    return result;
   }
 
 

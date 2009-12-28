@@ -15,7 +15,6 @@ import java.net.URI;
 import java.net.URL;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.model.base.Proxy;
 
 
 /**
@@ -123,34 +122,9 @@ public abstract class DocumentSubject
     }
   }
 
-  public void setLocation(URI location)
+  public void setLocation(final URI location)
   {
     mLocation = location;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.base.Proxy
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final DocumentProxy doc = (DocumentProxy) partner;
-      return
-	mComment == null ?
-	doc.getComment() == null :
-	mComment.equals(doc.getComment());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    if (mComment != null) { 
-      result += 5 * mComment.hashCode();
-    }
-    return result;
   }
 
 

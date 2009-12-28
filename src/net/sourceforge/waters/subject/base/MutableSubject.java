@@ -23,7 +23,7 @@ import net.sourceforge.waters.model.base.Proxy;
  * <P>This is the abstract base class of all mutable Waters elements
  * in the <I>subject</I> implementation. It provides the basic functionality
  * of a mutable object.</P>
- * 
+ *
  * @author Robi Malik
  */
 
@@ -62,8 +62,7 @@ public abstract class MutableSubject
   /**
    * Assigns the contents of another subject to this subject.
    * This method ensures that the contents of this subject are equal to the
-   * contents of the given subject according to the {@link
-   * Proxy#equalsWithGeometry(Proxy) equalsWithGeometry()} method. Members
+   * contents of the given subject according to contents. Members
    * that differ are cloned or recursively assigned from the other
    * subject. The method produces as few state change notifications as
    * possible.

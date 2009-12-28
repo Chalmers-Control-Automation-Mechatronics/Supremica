@@ -17,8 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -95,61 +93,10 @@ public final class GuardActionBlockElement
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<GuardActionBlockProxy> getProxyInterface()
   {
     return GuardActionBlockProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final GuardActionBlockProxy downcast = (GuardActionBlockProxy) partner;
-      return
-        ProxyTools.isEqualListByContents
-          (mGuards, downcast.getGuards()) &&
-        ProxyTools.isEqualListByContents
-          (mActions, downcast.getActions());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final GuardActionBlockProxy downcast = (GuardActionBlockProxy) partner;
-      return
-        ProxyTools.isEqualListWithGeometry
-          (mGuards, downcast.getGuards()) &&
-        ProxyTools.isEqualListWithGeometry
-          (mActions, downcast.getActions()) &&
-        ProxyTools.equalsWithGeometry(mGeometry, downcast.getGeometry());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.getListHashCodeByContents(mGuards);
-    result *= 5;
-    result += ProxyTools.getListHashCodeByContents(mActions);
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.getListHashCodeWithGeometry(mGuards);
-    result *= 5;
-    result += ProxyTools.getListHashCodeWithGeometry(mActions);
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mGeometry);
-    return result;
   }
 
 

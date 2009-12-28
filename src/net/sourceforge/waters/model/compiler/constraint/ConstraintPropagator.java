@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +20,8 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
@@ -36,6 +36,7 @@ import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
@@ -399,8 +400,11 @@ public class ConstraintPropagator
     {
       mRootContext = context.mRootContext;
       final int size = mRootContext.getVariableNames().size();
-      mBindings = new HashMap<ProxyAccessor<SimpleExpressionProxy>,
-                              AbstractBinding>(size);
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      mBindings =
+        new ProxyAccessorHashMap<SimpleExpressionProxy,AbstractBinding>
+          (eq, size);
       for (final Map.Entry<ProxyAccessor<SimpleExpressionProxy>,
                            AbstractBinding> entry :
              context.mBindings.entrySet()) {
@@ -423,10 +427,13 @@ public class ConstraintPropagator
 
     ConstraintContext(final VariableContext root)
     {
-      final int size = root.getVariableNames().size();
       mRootContext = root;
-      mBindings = new HashMap<ProxyAccessor<SimpleExpressionProxy>,
-                              AbstractBinding>(size);
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      final int size = root.getVariableNames().size();
+      mBindings =
+        new ProxyAccessorHashMap<SimpleExpressionProxy,AbstractBinding>
+          (eq, size);
     }
 
     //#######################################################################
@@ -434,9 +441,7 @@ public class ConstraintPropagator
     public SimpleExpressionProxy getBoundExpression
       (final SimpleExpressionProxy ident)
     {
-      final ProxyAccessor<SimpleExpressionProxy> accessor =
-        new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
-      final AbstractBinding binding = mBindings.get(accessor);
+      final AbstractBinding binding = mBindings.getByProxy(ident);
       if (binding != null) {
         final SimpleExpressionProxy expr = binding.getBoundExpression();
         if (expr != null) {
@@ -460,19 +465,11 @@ public class ConstraintPropagator
     //# Interface net.sourceforge.waters.model.compiler.context.VariableContext
     public CompiledRange getVariableRange(final SimpleExpressionProxy varname)
     {
-      final ProxyAccessor<SimpleExpressionProxy> accessor =
-        new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
-      return getVariableRange(accessor);
-    }
-
-    public CompiledRange getVariableRange
-      (final ProxyAccessor<SimpleExpressionProxy> accessor)
-    {
-      final AbstractBinding binding = mBindings.get(accessor);
+      final AbstractBinding binding = mBindings.getByProxy(varname);
       if (binding != null) {
         return binding.getContrainedRange();
       } else {
-        return mRootContext.getVariableRange(accessor);
+        return mRootContext.getVariableRange(varname);
       }
     }
 
@@ -500,10 +497,10 @@ public class ConstraintPropagator
       throws EvalException
     {
       final ProxyAccessor<SimpleExpressionProxy> accessor =
-        new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
+        mBindings.createAccessor(varname);
       AbstractBinding binding = mBindings.get(accessor);
       if (binding == null) {
-        final CompiledRange current = mRootContext.getVariableRange(accessor);
+        final CompiledRange current = mRootContext.getVariableRange(varname);
         final CompiledRange estimate = estimateRange(expr);
         final CompiledRange intersection = current.intersection(estimate);
         if (intersection.isEmpty()) {
@@ -534,10 +531,10 @@ public class ConstraintPropagator
       throws EvalException
     {
       final ProxyAccessor<SimpleExpressionProxy> accessor =
-        new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
+        mBindings.createAccessor(varname);
       AbstractBinding binding = mBindings.get(accessor);
       if (binding == null) {
-        final CompiledRange current = mRootContext.getVariableRange(accessor);
+        final CompiledRange current = mRootContext.getVariableRange(varname);
         assert current != null :
         "Attempting to restrict undefined range for " + varname + "!";
         final CompiledRange intersection = current.intersection(restriction);
@@ -588,9 +585,7 @@ public class ConstraintPropagator
 
     BinaryExpressionProxy recallBinding(final SimpleExpressionProxy varname)
     {
-      final ProxyAccessor<SimpleExpressionProxy> accessor =
-        new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
-      AbstractBinding binding = mBindings.get(accessor);
+      final AbstractBinding binding = mBindings.getByProxy(varname);
       if (binding == null) {
         return null;
       } else {
@@ -612,7 +607,7 @@ public class ConstraintPropagator
     //#######################################################################
     //# Data Members
     private final VariableContext mRootContext;
-    private final Map<ProxyAccessor<SimpleExpressionProxy>,AbstractBinding>
+    private final ProxyAccessorMap<SimpleExpressionProxy,AbstractBinding>
       mBindings;
 
   }
@@ -729,7 +724,9 @@ public class ConstraintPropagator
     boolean restrictRange(final SimpleExpressionProxy expr)
       throws EvalException
     {
-      if (expr.equalsByContents(mBoundExpression)) {
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      if (eq.equals(expr, mBoundExpression)) {
         return false;
       } else {
         mBoundExpression = expr;
@@ -969,7 +966,7 @@ public class ConstraintPropagator
         final BinaryOperator neqop = mOperatorTable.getNotEqualsOperator();
         for (final SimpleExpressionProxy value : enumorig.getValues()) {
           if (!enumrange.contains(value)) {
-            SimpleExpressionProxy constraint =
+            final SimpleExpressionProxy constraint =
               mFactory.createBinaryExpressionProxy(neqop, varname, value);
             result.add(constraint);
           }
@@ -993,8 +990,8 @@ public class ConstraintPropagator
   private final SimplificationRule[] mNormalizationRules;
   private final SimplificationRule[] mRewriteRules;
 
-  private List<SimpleExpressionProxy> mUnprocessedConstraints;
-  private Collection<SimpleExpressionProxy> mNormalizedConstraints;
+  private final List<SimpleExpressionProxy> mUnprocessedConstraints;
+  private final Collection<SimpleExpressionProxy> mNormalizedConstraints;
   private boolean mIsUnsatisfiable;
 
 }

@@ -245,9 +245,8 @@ public class ProductDESEqualityVisitor
       final TraceStepProxy expected = (TraceStepProxy) getSecondProxy();
       final EventProxy event1 = step.getEvent();
       final EventProxy event2 = expected.getEvent();
-      if (!event1.refequals(event2)) {
-        return reportAttributeMismatch
-            ("event", event1.getName(), event2.getName());
+      if (!compareReferences(event1, event2)) {
+        return reportAttributeMismatch("event", event1, event2);
       }
       final Map<AutomatonProxy,StateProxy> statemap1 = step.getStateMap();
       final Map<AutomatonProxy,StateProxy> statemap2 = expected.getStateMap();

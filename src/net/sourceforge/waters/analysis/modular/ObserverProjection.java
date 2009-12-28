@@ -16,7 +16,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -34,12 +33,13 @@ import gnu.trove.TIntArrayList;
 
 public class ObserverProjection
 {
-  public ObserverProjection(ProductDESProxy model, ProductDESProxyFactory factory,
-                            Set<EventProxy> hide, Set<EventProxy> forbidden, EventProxy marked)
+  public ObserverProjection(final ProductDESProxy model, final ProductDESProxyFactory factory,
+                            final Set<EventProxy> hide, final Set<EventProxy> forbidden, final EventProxy marked)
   {
     @SuppressWarnings("unused")
+    final
 	Set<EventProxy[]> set = new HashSet<EventProxy[]>();
-    
+
     mMarked = marked;
     mModel = model;
     mFactory = factory;
@@ -54,11 +54,11 @@ public class ObserverProjection
     //System.out.println("forbidden;" + forbidden);
   }
 
-  public void setNodeLimit(int stateLimit)
+  public void setNodeLimit(final int stateLimit)
   {
     mNodeLimit = stateLimit;
   }
-  
+
   public AutomatonProxy project()
     throws AnalysisException
   {
@@ -66,7 +66,7 @@ public class ObserverProjection
     states = new IntMap(mNodeLimit);
     trans = new ArrayList<TransitionProxy>();
     events = mModel.getEvents().toArray(new EventProxy[mModel.getEvents().size()]);
-    int numAutomata = mModel.getAutomata().size();
+    final int numAutomata = mModel.getAutomata().size();
     AutomatonProxy[] aut = mModel.getAutomata().toArray(new AutomatonProxy[numAutomata]);
     for (int i = 0; i < aut.length; i++) {
       System.out.println("Automata" + i + " " + aut[i].getName());
@@ -79,7 +79,7 @@ public class ObserverProjection
     Map<EventProxy, Integer> eventToIndex = new HashMap<EventProxy, Integer>(events.length);
     for (int i = 0; i < events.length; i++) {
       if (mHide.contains(events[i])) {
-        EventProxy temp = events[i];
+        final EventProxy temp = events[i];
         events[i] = events[l];
         events[l] = temp;
         l++;
@@ -90,7 +90,7 @@ public class ObserverProjection
     //put all the forbidden events directly after the Hidden ones
     for (int i = l; i < events.length; i++) {
       if (mForbidden.contains(events[i])) {
-        EventProxy temp = events[i];
+        final EventProxy temp = events[i];
         events[i] = events[l];
         events[l] = temp;
         l++;
@@ -105,7 +105,7 @@ public class ObserverProjection
     for (int i = 0; i < events.length; i++) {
       for (int j = 0; j < aut.length; j++) {
         if (aut[j].getEvents().contains(events[i])) {
-          int[] states1 = new int[aut[j].getStates().size()];
+          final int[] states1 = new int[aut[j].getStates().size()];
           Arrays.fill(states1, -1);
           transitions[j][i] = states1;
         } else {
@@ -116,12 +116,12 @@ public class ObserverProjection
     int[] currentState = new int[numAutomata];
     mMarkedStates = new boolean[numAutomata][];
     for (int i = 0; i < aut.length; i++) {
-      Map<StateProxy, Integer> stateMap = new HashMap<StateProxy, Integer>(aut[i].getStates().size());
+      final Map<StateProxy, Integer> stateMap = new HashMap<StateProxy, Integer>(aut[i].getStates().size());
       mMarkedStates[i] = new boolean[aut[i].getStates().size()];
       l = 0;
-      Set<StateProxy> states = aut[i].getStates();
-      boolean containsmarked = aut[i].getEvents().contains(mMarked);
-      for (StateProxy s : states) {
+      final Set<StateProxy> states = aut[i].getStates();
+      final boolean containsmarked = aut[i].getEvents().contains(mMarked);
+      for (final StateProxy s : states) {
         if (s.isInitial()) {
           currentState[i] = l;
         }
@@ -132,8 +132,8 @@ public class ObserverProjection
         l++;
       }
       assert(l == aut[i].getStates().size());
-      Collection<TransitionProxy> trns = aut[i].getTransitions();
-      for (TransitionProxy t : trns) {
+      final Collection<TransitionProxy> trns = aut[i].getTransitions();
+      for (final TransitionProxy t : trns) {
         //System.out.println(transitions[i][eventToIndex.get(t.getEvent()));
         transitions[i][eventToIndex.get(t.getEvent())]
                    [stateMap.get(t.getSource())] = stateMap.get(t.getTarget());
@@ -143,7 +143,7 @@ public class ObserverProjection
       //System.out.println("Marked:" + i + " " + Arrays.toString(mMarkedStates[i]));
     //}
     for (int i = 0; i < events.length; i++) {
-      IntDouble[] list = new IntDouble[numAutomata];
+      final IntDouble[] list = new IntDouble[numAutomata];
       for (int j = 0; j < aut.length; j++) {
         list[j] = new IntDouble(j, 0);
         if (transitions[j][i] != null) {
@@ -165,7 +165,7 @@ public class ObserverProjection
     // don't need these anymore
     aut = null;
     eventToIndex = null;
-    
+
     // Time to start building the automaton
     numStates = 1;
     currentState = encode(currentState);
@@ -189,11 +189,11 @@ public class ObserverProjection
     transitions = new int[1][events.length][numStates];
     mBackTransitions = new TIntArrayList[events.length][numStates];
     for (int i = 0; i < transitions[0].length; i++) {
-      for (int j = 0; j < transitions[0][i].length; j++) {         
+      for (int j = 0; j < transitions[0][i].length; j++) {
         transitions[0][i][j] = -1;
       }
     }
-    for (int[] tran : newtrans) {
+    for (final int[] tran : newtrans) {
       if (tran[1] < mHide.size() && tran[0] == tran[2]) {
         //System.out.println("removed selfloop");
         //continue;
@@ -207,18 +207,18 @@ public class ObserverProjection
     //System.out.println("mark");
     markStates();
     mBackTransitions = null;
-    List<EventProxy> removed = new ArrayList<EventProxy>();
+    final List<EventProxy> removed = new ArrayList<EventProxy>();
     mNextMarked = new TIntHashSet();
     projloop:
     for (int k = 0; k < mHide.size(); k++) {
       newtrans.clear();
       //System.out.println("newmarked:" + Arrays.toString(mNewMarked.toArray()));
       System.out.println("attemptevent: " + (k+1) + " of " + mHide.size() + " numStates:" + numStates);
-      int prevStates = numStates;
+      final int prevStates = numStates;
       numStates = 1;
       currentState = new int[] {0};
       currentState = actualState(currentState, k);
-      int ism = isMarked(currentState, k);
+      final int ism = isMarked(currentState, k);
       if (ism == 1) {
         mNextMarked.add(0);
       } else if (ism == -1) {
@@ -240,11 +240,11 @@ public class ObserverProjection
       removed.add(events[k]);
       transitions = new int[1][events.length][numStates];
       for (int i = 0; i < transitions[0].length; i++) {
-        for (int j = 0; j < transitions[0][i].length; j++) {         
+        for (int j = 0; j < transitions[0][i].length; j++) {
           transitions[0][i][j] = -1;
         }
       }
-      for (int[] tran : newtrans) {
+      for (final int[] tran : newtrans) {
         if (tran[1] < mHide.size() && tran[0] == tran[2]) {
           //System.out.println("removed selfloop");
           //continue;
@@ -257,34 +257,34 @@ public class ObserverProjection
       mDumpState = mNewDumpState;
     }
     System.out.println("endmarked:" + Arrays.toString(mNewMarked.toArray()));
-    Collection<EventProxy> ev = new ArrayList<EventProxy>(mModel.getEvents());
+    final Collection<EventProxy> ev = new ArrayList<EventProxy>(mModel.getEvents());
     newStates = null;
     MemStateProxy[] ns = new MemStateProxy[numStates];
     for (int i = 0; i < ns.length; i++) {
-      ns[i] = mNewMarked.contains(i) ? new MemStateProxy(i, mMarked) 
+      ns[i] = mNewMarked.contains(i) ? new MemStateProxy(i, mMarked)
                                      : new MemStateProxy(i);
     }
     trans.clear();
     for (int i = 0; i < transitions[0].length; i++) {
       for (int j = 0; j < transitions[0][i].length; j++) {
-        int target = transitions[0][i][j];
+        final int target = transitions[0][i][j];
         if (target != -1) {
           trans.add(mFactory.createTransitionProxy(ns[j], events[i], ns[target]));
         }
       }
     }
     ev.removeAll(removed);
-    StringBuffer name = new StringBuffer();
-    for (AutomatonProxy a : mModel.getAutomata()) {
+    final StringBuffer name = new StringBuffer();
+    for (final AutomatonProxy a : mModel.getAutomata()) {
       name.append(a.getName());
     }
-    Collection<StateProxy> states = new ArrayList<StateProxy>(ns.length);
+    final Collection<StateProxy> states = new ArrayList<StateProxy>(ns.length);
     for (int i = 0; i < ns.length; i++) {
       states.add(ns[i]);
     }
-    String nam = name.toString();
-    ComponentKind ck = ComponentKind.PLANT;
-    AutomatonProxy result = mFactory.createAutomatonProxy(nam, ck,
+    final String nam = name.toString();
+    final ComponentKind ck = ComponentKind.PLANT;
+    final AutomatonProxy result = mFactory.createAutomatonProxy(nam, ck,
                                                           ev, states,
                                                           trans);
     newStates = null;
@@ -292,7 +292,7 @@ public class ObserverProjection
     ns = null;
     System.out.println("Project:" + result.getStates().size() + " Composition:" + mCompositionSize);
       //System.out.println("orig:\n" + result);
-    
+
     /*try {
       Minimizer min = new Minimizer(result, mFactory);
       result = min.run();
@@ -308,26 +308,26 @@ public class ObserverProjection
     System.out.println("disabled:" + mDisabled);
     return result;
   }
-  
+
   private void markStates()
   {
-    boolean[] reachable = new boolean[mBackTransitions[0].length];
-    IntBag curstates = new IntBag(100);
+    final boolean[] reachable = new boolean[mBackTransitions[0].length];
+    final IntBag curstates = new IntBag(100);
     //System.out.println("marked:" + Arrays.toString(mNewMarked.toArray()));
-    int[] markedstates = mNewMarked.toArray();
+    final int[] markedstates = mNewMarked.toArray();
     for (int i = 0; i < markedstates.length; i++) {
       reachable[markedstates[i]] = true;
       curstates.offer(markedstates[i]);
     }
     while (!curstates.isEmpty()) {
-      int cs = curstates.take();
+      final int cs = curstates.take();
       for (int i = 0; i < mBackTransitions.length; i++) {
         if (mBackTransitions[i][cs] == null) {
           continue;
         }
-        int[] sucs = mBackTransitions[i][cs].toNativeArray();
+        final int[] sucs = mBackTransitions[i][cs].toNativeArray();
         for (int j = 0; j < sucs.length; j++) {
-          int suc = sucs[j];
+          final int suc = sucs[j];
           if (!reachable[suc]) {
             reachable[suc] = true;
             curstates.offer(suc);
@@ -345,9 +345,9 @@ public class ObserverProjection
             if (mBackTransitions[i][k] == null) {
               continue;
             }
-            int[] sucs = mBackTransitions[i][k].toNativeArray();
+            final int[] sucs = mBackTransitions[i][k].toNativeArray();
             for (int j = 0; j < sucs.length; j++) {
-              int suc = sucs[j];
+              final int suc = sucs[j];
               // that which use to point to this state now points to the dump state
               transitions[0][i][suc] = mDumpState;
             }
@@ -359,7 +359,7 @@ public class ObserverProjection
       }
     }
   }
-  
+
   /*
   private boolean isBlocked(int state, int event)
   {
@@ -383,13 +383,13 @@ public class ObserverProjection
     return true;
   }
   */
-  
-  public boolean explore(int[] state, boolean forbidden)
+
+  public boolean explore(int[] state, final boolean forbidden)
     throws AnalysisException
   {
     boolean result = false;
-    int numAutomata = transitions.length;
-    int source = states.get(state);
+    final int numAutomata = transitions.length;
+    final int source = states.get(state);
     state = decode(state);
     int min, max;
     if (forbidden) {
@@ -406,9 +406,9 @@ public class ObserverProjection
           continue;
         }
       }
-      int[] suc = new int[numAutomata];
+      final int[] suc = new int[numAutomata];
       for (int l = 0; l < numAutomata; l++) {
-        int automaton = eventAutomaton[i][l];
+        final int automaton = eventAutomaton[i][l];
         if (transitions[automaton][i] != null) {
           suc[automaton] = transitions[automaton][i][state[automaton]];
         } else {
@@ -416,7 +416,7 @@ public class ObserverProjection
         }
         if (suc[automaton] == -1) {
           if (l > 0) {
-            int t = eventAutomaton[i][l];
+            final int t = eventAutomaton[i][l];
             eventAutomaton[i][l] = eventAutomaton[i][l - 1];
             eventAutomaton[i][l - 1] = t;
           }
@@ -443,8 +443,8 @@ public class ObserverProjection
     }
     return result;
   }
-  
-  private boolean determineMarked(int[] suc)
+
+  private boolean determineMarked(final int[] suc)
   {
     //System.out.println("state:" + Arrays.toString(suc));
     for (int i = 0; i < suc.length; i++) {
@@ -454,16 +454,16 @@ public class ObserverProjection
     }
     return true;
   }
-  
-  public boolean explore2(int[] state, int hideevent)
+
+  public boolean explore2(final int[] state, final int hideevent)
     throws AnalysisException
   {
     int min, max;
     min = 0;
     max = events.length;
-    TIntHashSet blocked = new TIntHashSet();
+    final TIntHashSet blocked = new TIntHashSet();
     //System.out.println("state:" + Arrays.toString(state));
-    MemStateProxy source = newStates.get(state);
+    final MemStateProxy source = newStates.get(state);
     if (source == null) {
       System.out.println("thing");
       System.out.println(newStates);
@@ -472,12 +472,12 @@ public class ObserverProjection
       if (i == hideevent) {
         continue;
       }
-      List<Integer> successor = new ArrayList<Integer>(state.length);
+      final List<Integer> successor = new ArrayList<Integer>(state.length);
       boolean isblocked = false;
       for (int j = 0; j < state.length; j++) {
-        int s = transitions[0][i][state[j]];
+        final int s = transitions[0][i][state[j]];
         if (s == -1) {
-          int targ = transitions[0][hideevent][state[j]];
+          final int targ = transitions[0][hideevent][state[j]];
           if (targ == -1 || blocked.contains(targ)) {
             isblocked = true;
           }
@@ -519,7 +519,7 @@ public class ObserverProjection
       MemStateProxy target = newStates.get(succ);
       if (target == null) {
         target = new MemStateProxy(numStates);
-        int ism = isMarked(succ, hideevent);
+        final int ism = isMarked(succ, hideevent);
         if (ism == 1) {
           mNextMarked.add(numStates);
         } else if (ism == -1) {
@@ -546,17 +546,17 @@ public class ObserverProjection
     }
     return true;
   }
-  
-  public int isMarked(int[] state, int hideevent)
+
+  public int isMarked(final int[] state, final int hideevent)
   {
-    TIntHashSet notMarkedStates = new TIntHashSet();
+    final TIntHashSet notMarkedStates = new TIntHashSet();
     boolean marked = false;
     boolean notmarked = false;
     for (int i = 0; i < state.length; i++) {
       if (mNewMarked.contains(state[i])) {
         marked = true;
       } else {
-        int targ = transitions[0][hideevent][state[i]];
+        final int targ = transitions[0][hideevent][state[i]];
         if (targ == -1 || notMarkedStates.contains(targ)) {
           notmarked = true;
         }
@@ -568,11 +568,11 @@ public class ObserverProjection
     }
     return marked ? 1 : 0;
   }
-  
-  public int[] actualState(int[] state, int hideEvent)
+
+  public int[] actualState(final int[] state, final int hideEvent)
   {
-    SortedSet<Integer> setofstates = new TreeSet<Integer>();
-    IntBag nextstate = new IntBag(100);
+    final SortedSet<Integer> setofstates = new TreeSet<Integer>();
+    final IntBag nextstate = new IntBag(100);
     for (int i = 0; i < state.length; i++) {
       if (setofstates.add(state[i])) {
         nextstate.offer(state[i]);
@@ -580,9 +580,9 @@ public class ObserverProjection
     }
     // find out what states can be reached from state with hidden events
     while (!nextstate.isEmpty()) {
-      int s = nextstate.take();
-      int i = hideEvent;
-      int newstate = transitions[0][i][s];
+      final int s = nextstate.take();
+      final int i = hideEvent;
+      final int newstate = transitions[0][i][s];
       if (newstate == -1) {
         continue;
       }
@@ -590,33 +590,33 @@ public class ObserverProjection
         nextstate.offer(newstate);
       }
     }
-    int[] result = new int[setofstates.size()];
+    final int[] result = new int[setofstates.size()];
     int l = 0;
-    for (Integer a : setofstates) {
+    for (final Integer a : setofstates) {
       result[l] = a;
       l++;
     }
     assert(result.length == l);
     return result;
   }
-  
+
   private static class MemStateProxy
     implements StateProxy
   {
     private final int mName;
     private final EventProxy mEvent;
-    
-    public MemStateProxy(int name, EventProxy event)
+
+    public MemStateProxy(final int name, final EventProxy event)
     {
       mName = name;
       mEvent = event;
     }
-    
-    public MemStateProxy(int name)
+
+    public MemStateProxy(final int name)
     {
       this(name, null);
     }
-    
+
     public Collection<EventProxy> getPropositions()
     {
       if (mEvent == null) {
@@ -625,37 +625,37 @@ public class ObserverProjection
         return Collections.singleton(mEvent);
       }
     }
-    
+
     public boolean isInitial()
     {
       return mName == 0;
     }
-    
+
     public int getNum()
     {
       return mName;
     }
-    
+
     public MemStateProxy clone()
     {
       return new MemStateProxy(mName, mEvent);
     }
-    
+
     public String getName()
     {
       return Integer.toString(mName);
     }
-    
+
     @SuppressWarnings("unused")
-	public boolean refequals(Object o)
+	public boolean refequals(final Object o)
     {
       if (o instanceof NamedProxy) {
         return refequals((NamedProxy) o);
       }
       return false;
     }
-    
-    public boolean refequals(NamedProxy o)
+
+    public boolean refequals(final NamedProxy o)
     {
       if (o instanceof MemStateProxy) {
         final MemStateProxy s = (MemStateProxy) o;
@@ -664,12 +664,12 @@ public class ObserverProjection
         return false;
       }
     }
-    
+
     public int refHashCode()
     {
       return mName;
     }
-    
+
     public Object acceptVisitor(final ProxyVisitor visitor)
       throws VisitorException
     {
@@ -682,79 +682,51 @@ public class ObserverProjection
       return StateProxy.class;
     }
 
-    public boolean equalsByContents(final Proxy partner)
-    {
-      if (partner != null &&
-          partner.getProxyInterface() == getProxyInterface()) {
-        final StateProxy state = (StateProxy) partner;
-        return (getName().equals(state.getName())) &&
-               (isInitial() == state.isInitial()) &&
-               state.getPropositions().isEmpty();
-      } else {
-        return false;
-      }
-    }
-    
-    public boolean equalsWithGeometry(Proxy o)
-    {
-      return equalsByContents(o);
-    }
-    
-    public int hashCodeByContents()
-    {
-      return refHashCode();
-    }
-    
-    public int hashCodeWithGeometry()
-    {
-      return refHashCode();
-    }
-    
-    public int compareTo(NamedProxy n)
+    public int compareTo(final NamedProxy n)
     {
       return n.getName().compareTo(getName());
     }
-    
+
     public String toString()
     {
       return "S:" + mName;
     }
   }
-  
+
   private static interface Bag
   {
     /** is the bag empty*/
     public boolean isEmpty();
-    
+
     /** add a new item to the bag */
     public void offer(int[] a);
-    
+
     /** remove an arbitrary item from the bag */
     public int[] take();
   }
-  
+
   private static class IntBag
   {
     private int mLength;
     private final int mInitialSize;
     private int[] mValues;
-    
-    public IntBag(int initialSize)
+
+    public IntBag(final int initialSize)
     {
       mLength = 0;
       mInitialSize = initialSize;
       mValues = new int[mInitialSize];
     }
-    
+
     public boolean isEmpty()
     {
       return mLength == 0;
     }
-    
-    public void offer(int a)
+
+    public void offer(final int a)
     {
       if (mLength == mValues.length) {
-        int[] newArray = new int[mValues.length*2];
+        final int[] newArray = new int[mValues.length*2];
         // from memory this is actually faster than using the Arrays method for it
         for (int i = 0; i < mValues.length; i++) {
           newArray[i] = mValues[i];
@@ -764,13 +736,13 @@ public class ObserverProjection
       mValues[mLength] = a;
       mLength++;
     }
-    
+
     public int take()
     {
       mLength--;
-      int a = mValues[mLength];
+      final int a = mValues[mLength];
       if (mValues.length > mInitialSize && (mLength <= (mValues.length / 4))) {
-        int[] newArray = new int[mValues.length / 2];
+        final int[] newArray = new int[mValues.length / 2];
         for (int i = 0; i < mLength; i++) {
           newArray[i] = mValues[i];
         }
@@ -779,30 +751,30 @@ public class ObserverProjection
       return a;
     }
   }
-  
+
   private static class ArrayBag
     implements Bag
   {
     private int mLength;
     private final int mInitialSize;
     private int[][] mValues;
-    
-    public ArrayBag(int initialSize)
+
+    public ArrayBag(final int initialSize)
     {
       mLength = 0;
       mInitialSize = initialSize;
       mValues = new int[mInitialSize][];
     }
-    
+
     public boolean isEmpty()
     {
       return mLength == 0;
     }
-    
-    public void offer(int[] a)
+
+    public void offer(final int[] a)
     {
       if (mLength == mValues.length) {
-        int[][] newArray = new int[mValues.length*2][];
+        final int[][] newArray = new int[mValues.length*2][];
         // from memory this is actually faster than using the Arrays method for it
         for (int i = 0; i < mValues.length; i++) {
           newArray[i] = mValues[i];
@@ -812,15 +784,15 @@ public class ObserverProjection
       mValues[mLength] = a;
       mLength++;
     }
-    
+
     public int[] take()
     {
       mLength--;
-      int[] a = mValues[mLength];
+      final int[] a = mValues[mLength];
       // this shouldn't actually save any memory as the Map will still reference the array but oh well
       mValues[mLength] = null;
       if (mValues.length > mInitialSize && (mLength <= (mValues.length / 4))) {
-        int[][] newArray = new int[mValues.length / 2][];
+        final int[][] newArray = new int[mValues.length / 2][];
         for (int i = 0; i < mLength; i++) {
           newArray[i] = mValues[i];
         }
@@ -829,7 +801,7 @@ public class ObserverProjection
       return a;
     }
   }
-  
+
   /**
    *  I'll make this encode it properly later on
    *
@@ -838,122 +810,122 @@ public class ObserverProjection
   {
     return sState;
   }
-  
+
   private int[] decode(final int[] sState)
   {
     return sState;
   }
-  
+
   private static class StateMap
     extends AbstractMap<int[], MemStateProxy>
   {
     final Map<IntArray, MemStateProxy> mMap;
-    
-    public StateMap(int num)
+
+    public StateMap(final int num)
     {
       mMap = new HashMap<IntArray, MemStateProxy>(num);
     }
-    
+
     public Set<Map.Entry<int[],MemStateProxy>> entrySet()
     {
       return null; // I don't think i'll be using this method so meh
     }
-    
-    public MemStateProxy get(Object o)
+
+    public MemStateProxy get(final Object o)
     {
-      int[] a = (int[]) o;
+      final int[] a = (int[]) o;
       return mMap.get(new IntArray(a));
     }
-    
+
     @SuppressWarnings("unused")
-	public MemStateProxy get(int[] a)
+	public MemStateProxy get(final int[] a)
     {
       return mMap.get(new IntArray(a));
     }
-    
+
     @SuppressWarnings("unused")
-	public MemStateProxy put(Object o, MemStateProxy s)
+	public MemStateProxy put(final Object o, final MemStateProxy s)
     {
       return mMap.put(new IntArray((int[])o), s);
     }
-    
-    public MemStateProxy put(int[] a, MemStateProxy s)
+
+    public MemStateProxy put(final int[] a, final MemStateProxy s)
     {
       return mMap.put(new IntArray(a), s);
     }
-    
+
     public Collection<MemStateProxy> values()
     {
       return mMap.values();
     }
-    
+
     public String toString()
     {
       return mMap.toString();
     }
   }
-  
+
   private static class IntMap
     extends AbstractMap<int[], Integer>
   {
     final Map<IntArray, Integer> mMap;
-    
-    public IntMap(int num)
+
+    public IntMap(final int num)
     {
       mMap = new HashMap<IntArray, Integer>(num);
     }
-    
+
     public Set<Map.Entry<int[],Integer>> entrySet()
     {
       return null; // I don't think i'll be using this method so meh
     }
-    
-    public Integer get(Object o)
+
+    public Integer get(final Object o)
     {
-      int[] a = (int[]) o;
+      final int[] a = (int[]) o;
       return mMap.get(new IntArray(a));
     }
-    
+
     @SuppressWarnings("unused")
-	public Integer get(int[] a)
+	public Integer get(final int[] a)
     {
       return mMap.get(new IntArray(a));
     }
-    
+
     @SuppressWarnings("unused")
-	public Integer put(Object o, Integer s)
+	public Integer put(final Object o, final Integer s)
     {
       return mMap.put(new IntArray((int[])o), s);
     }
-    
-    public Integer put(int[] a, Integer s)
+
+    public Integer put(final int[] a, final Integer s)
     {
       return mMap.put(new IntArray(a), s);
     }
-    
+
     public Collection<Integer> values()
     {
       return mMap.values();
     }
   }
-  
+
   private static class IntArray
   {
     public final int[] mArray;
-    
-    public IntArray(int[] array)
+
+    public IntArray(final int[] array)
     {
       mArray = array;
     }
-    
+
     public int hashCode()
     {
       return Arrays.hashCode(mArray);
     }
-    
-    public boolean equals(Object o)
+
+    public boolean equals(final Object o)
     {
-      IntArray oth = (IntArray)o;
+      final IntArray oth = (IntArray)o;
       if (oth.mArray.length != mArray.length) {
         return false;
       }
@@ -964,26 +936,26 @@ public class ObserverProjection
       }
       return true;
     }
-    
+
     public String toString()
     {
       return Arrays.toString(mArray);
     }
   }
-  
+
   private static class IntDouble
     implements Comparable<IntDouble>
   {
     final public int mInt;
     public double mDouble;
-    
-    public IntDouble(int i, double d)
+
+    public IntDouble(final int i, final double d)
     {
       mInt = i;
       mDouble = d;
     }
-    
-    public int compareTo(IntDouble id)
+
+    public int compareTo(final IntDouble id)
     {
       if (mDouble < id.mDouble) {
         return -1;
@@ -993,19 +965,19 @@ public class ObserverProjection
       return 0;
     }
   }
-  
+
   public int getDumpState()
   {
     return mDumpState;
   }
-  
+
   private int mCompositionSize = 0;
   private int mNodeLimit;
-  private ProductDESProxy mModel;
-  private ProductDESProxyFactory mFactory;
-  private Set<EventProxy> mHide;
-  private Set<EventProxy> mForbidden;
-  private Set<EventProxy> mDisabled;
+  private final ProductDESProxy mModel;
+  private final ProductDESProxyFactory mFactory;
+  private final Set<EventProxy> mHide;
+  private final Set<EventProxy> mForbidden;
+  private final Set<EventProxy> mDisabled;
   private Map<int[], Integer> states;
   private Collection<TransitionProxy> trans;
   private EventProxy[] events;
@@ -1014,7 +986,7 @@ public class ObserverProjection
   private boolean[][] mMarkedStates;
   private TIntHashSet mNewMarked;
   private TIntHashSet mNextMarked;
-  private List<int[]> newtrans = new ArrayList<int[]>();
+  private final List<int[]> newtrans = new ArrayList<int[]>();
   private Map<int[], MemStateProxy> newStates;
   private int numStates;
   private Bag unvisited;

@@ -564,8 +564,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final ModuleProxy module = unmarshaller.unmarshal(uri);
     final ModuleProxy cloned = (ModuleProxy) cloner.getClone(module);
     checkIntegrity(cloned);
-    assertTrue("Clone differs from original!",
-               cloned.equalsWithGeometry(module));
+    assertModuleProxyEquals("Clone differs from original!", cloned, module);
     return cloned;
   }
 

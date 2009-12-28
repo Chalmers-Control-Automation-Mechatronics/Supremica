@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.
@@ -28,6 +29,7 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
@@ -48,12 +50,13 @@ class CompiledNameSpace
   CompiledNameSpace(final IdentifierProxy ident,
 		    final CompiledNameSpace parent)
   {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     mIdentifier = ident;
     mParent = parent;
     mNameSpaceMap =
-      new HashMap<ProxyAccessor<IdentifierProxy>,CompiledNameSpace>();
+      new ProxyAccessorHashMap<IdentifierProxy,CompiledNameSpace>(eq);
     mComponentMap =
-      new HashMap<ProxyAccessor<IdentifierProxy>,IdentifiedProxy>();
+      new ProxyAccessorHashMap<IdentifierProxy,IdentifiedProxy>(eq);
     mEventMap =
       new HashMap<String,CompiledEvent>();
   }
@@ -158,7 +161,7 @@ class CompiledNameSpace
     throws UndefinedIdentifierException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
+      mComponentMap.createAccessor(ident);
     final IdentifiedProxy comp = mComponentMap.get(accessor);
     if (throwing && comp == null) {
       final String prefixed = getPrefixedName(ident);
@@ -173,7 +176,7 @@ class CompiledNameSpace
     throws UndefinedIdentifierException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
+      mNameSpaceMap.createAccessor(ident);
     final CompiledNameSpace namespace = mNameSpaceMap.get(accessor);
     if (throwing && namespace == null) {
       final String prefixed = getPrefixedName(ident);
@@ -200,7 +203,7 @@ class CompiledNameSpace
     throws DuplicateIdentifierException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
+      mComponentMap.createAccessor(ident);
     final IdentifiedProxy old = mComponentMap.get(accessor);
     if (old == null) {
       return mComponentMap.put(accessor, comp);
@@ -215,7 +218,7 @@ class CompiledNameSpace
     throws DuplicateIdentifierException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
+      mNameSpaceMap.createAccessor(ident);
     final CompiledNameSpace old = mNameSpaceMap.get(accessor);
     if (old == null) {
       return mNameSpaceMap.put(accessor, subspace);
@@ -723,9 +726,9 @@ class CompiledNameSpace
   private final CompiledNameSpace mParent;
   private final Map<String,CompiledEvent>
     mEventMap;
-  private final Map<ProxyAccessor<IdentifierProxy>,IdentifiedProxy>
+  private final ProxyAccessorMap<IdentifierProxy,IdentifiedProxy>
     mComponentMap;
-  private final Map<ProxyAccessor<IdentifierProxy>,CompiledNameSpace>
+  private final ProxyAccessorMap<IdentifierProxy,CompiledNameSpace>
     mNameSpaceMap;
 
 

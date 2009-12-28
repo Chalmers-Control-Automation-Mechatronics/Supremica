@@ -22,6 +22,7 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -530,7 +531,10 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
           (INSTANCE.mUnaryMinusOperator, simpRHS);
       } else if (intRHS == 0) {
         return simpLHS;
-      } else if (simpLHS.equalsByContents(simpRHS)) {
+      }
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      if (eq.equals(simpLHS, simpRHS)) {
         return simplifier.createIntConstantProxy(0);
       } else {
         return createExpression(simplifier, simpLHS, simpRHS);
@@ -825,15 +829,17 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
        final AbstractSimpleExpressionSimplifier simplifier)
       throws EvalException
     {
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
       final boolean eresult = getEqualsResult();
       final SimpleExpressionProxy origLHS = expr.getLeft();
       final SimpleExpressionProxy origRHS = expr.getRight();
-      if (origLHS.equalsByContents(origRHS)) {
+      if (eq.equals(origLHS, origRHS)) {
         return simplifier.createBooleanConstantProxy(eresult);
       }
       final SimpleExpressionProxy simpLHS = simplifier.simplify(origLHS);
       final SimpleExpressionProxy simpRHS = simplifier.simplify(origRHS);
-      if (simpLHS.equalsByContents(simpRHS)) {
+      if (eq.equals(simpLHS, simpRHS)) {
         return simplifier.createBooleanConstantProxy(eresult);
       } else if (simplifier.isAtomicValue(simpLHS) &&
                  simplifier.isAtomicValue(simpRHS)) {
@@ -958,7 +964,10 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       if (atomLHS && atomRHS) {
         final boolean result = eval(intLHS, intRHS);
         return simplifier.createBooleanConstantProxy(result);
-      } else if (simpLHS.equalsByContents(simpRHS)) {
+      }
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      if (eq.equals(simpLHS, simpRHS)) {
         final boolean result = includesEquality();
         return simplifier.createBooleanConstantProxy(result);
       } else {

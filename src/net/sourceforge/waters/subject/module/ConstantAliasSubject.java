@@ -12,7 +12,6 @@
 
 package net.sourceforge.waters.subject.module;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
@@ -96,48 +95,10 @@ public final class ConstantAliasSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<ConstantAliasProxy> getProxyInterface()
   {
     return ConstantAliasProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final ConstantAliasProxy downcast = (ConstantAliasProxy) partner;
-      return
-        mScope.equals(downcast.getScope());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final ConstantAliasProxy downcast = (ConstantAliasProxy) partner;
-      return
-        mScope.equals(downcast.getScope());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mScope.hashCode();
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeWithGeometry();
-    result *= 5;
-    result += mScope.hashCode();
-    return result;
   }
 
 

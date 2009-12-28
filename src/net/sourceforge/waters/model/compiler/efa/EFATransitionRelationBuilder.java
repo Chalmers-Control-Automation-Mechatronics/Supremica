@@ -31,6 +31,7 @@ import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -60,6 +61,7 @@ class EFATransitionRelationBuilder
     mContext = context;
     mSimpleExpressionCompiler = compiler;
     mCollector = new EFAVariableCollector(optable, context);
+    mEquality = ModuleEqualityVisitor.getInstance(false);
 
     mUniqueTransitionRelations =
       new HashMap<EFAVariableTransitionRelation,
@@ -147,14 +149,14 @@ class EFATransitionRelationBuilder
     throws EvalException
   {
     try {
-      int numLiterals = constraints.size();
+      final int numLiterals = constraints.size();
       mVariableRecords = new HashMap<EFAVariable,VariableRecord>(numLiterals);
       final Collection<SimpleExpressionProxy> literals =
         constraints.getConstraints();
       for (final SimpleExpressionProxy literal : literals) {
         collectRecord(edecl, literal);
       }
-      int numRecords = mVariableRecords.size();
+      final int numRecords = mVariableRecords.size();
       final EFAVariableTransitionRelation result =
         new EFAVariableTransitionRelation(numRecords);
       result.provideFormula(constraints);
@@ -419,34 +421,36 @@ class EFATransitionRelationBuilder
           final SimpleExpressionProxy rhs = binary.getRight();
           if (mPrimed != null) {
             final SimpleExpressionProxy primed = mPrimed.getVariableName();
-            if (primed.equalsByContents(lhs) && !checker.occurs(lhs, rhs)) {
+            if (mEquality.equals(primed, lhs) &&
+                !checker.occurs(lhs, rhs)) {
               mEquation = binary;
               return;
-            } else if (primed.equalsByContents(rhs) &&
+            } else if (mEquality.equals(primed, rhs) &&
                        !checker.occurs(rhs, lhs)) {
               mEquation = mFactory.createBinaryExpressionProxy(op, rhs, lhs);
               return;
             }
           }
           final SimpleExpressionProxy unprimed = mUnprimed.getVariableName();
-          if (unprimed.equalsByContents(lhs) && !checker.occurs(lhs, rhs)) {
+          if (mEquality.equals(unprimed, lhs) &&
+              !checker.occurs(lhs, rhs)) {
             mEquation = binary;
             return;
-          } else if (unprimed.equalsByContents(rhs) &&
+          } else if (mEquality.equals(unprimed, rhs) &&
                      !checker.occurs(rhs, lhs)) {
             mEquation = mFactory.createBinaryExpressionProxy(op, rhs, lhs);
             return;
           }
         }
-      }        
+      }
       mOtherLiterals.add(literal);
     }
-    
+
     CompiledRange getRange()
     {
       return mUnprimed.getRange();
     }
-    
+
     boolean evalOtherLiterals(final BindingContext context)
       throws EvalException
     {
@@ -467,10 +471,10 @@ class EFATransitionRelationBuilder
 
     //#######################################################################
     //# Data Members
-    private EFAVariable mUnprimed;
-    private EFAVariable mPrimed;
+    private final EFAVariable mUnprimed;
+    private final EFAVariable mPrimed;
     private BinaryExpressionProxy mEquation;
-    private Collection<SimpleExpressionProxy> mOtherLiterals;
+    private final Collection<SimpleExpressionProxy> mOtherLiterals;
 
   }
 
@@ -510,7 +514,7 @@ class EFATransitionRelationBuilder
       final int size = values.size();
       final EFAVariableTransitionRelationPart result =
         new EFAVariableTransitionRelationPart(size);
-      for (SimpleExpressionProxy value : values) {
+      for (final SimpleExpressionProxy value : values) {
         final BindingContext context =
           new SingleBindingContext(varname, value, mContext);
         if (evalOtherLiterals(context)) {
@@ -565,7 +569,7 @@ class EFATransitionRelationBuilder
         }
       } else {
         final SimpleExpressionProxy innervar = eqn.getLeft();
-        final boolean forward = innervar.equalsByContents(primed);
+        final boolean forward = mEquality.equals(innervar, primed);
         final SimpleExpressionProxy outervar = forward ? unprimed : primed;
         final SimpleExpressionProxy expr = eqn.getRight();
         for (final SimpleExpressionProxy outervalue : values) {
@@ -640,6 +644,7 @@ class EFATransitionRelationBuilder
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final EFAModuleContext mContext;
   private final EFAVariableCollector mCollector;
+  private final ModuleEqualityVisitor mEquality;
 
   private final
     Map<EFAVariableTransitionRelation,EFAVariableTransitionRelation>

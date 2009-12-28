@@ -17,16 +17,16 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
-import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.NameNotFoundException;
-import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.DocumentSubject;
@@ -75,32 +75,6 @@ class NodeSetSubject
 
 
   //#########################################################################
-  //# Equals and Hashcode
-  public boolean equalsWithGeometry(final Object partner)
-  {
-    if (!(partner instanceof Set<?>)) {
-      return false;
-    }
-    final Set<?> set = (Set<?>) partner;
-    if (size() != set.size()) {
-      return false;
-    }
-    for (final Object item2 : set) {
-      if (!(item2 instanceof NodeSubject)) {
-        return false;
-      }
-      final NodeSubject node2 = (NodeSubject) item2;
-      final String name = node2.getName();
-      final NodeSubject node1 = get(name);
-      if (node1 == null || !node1.equalsWithGeometry(node2)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-
-  //#########################################################################
   //# Interface java.util.Set
   public boolean add(final NodeSubject node)
   {
@@ -144,7 +118,7 @@ class NodeSetSubject
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.base.IndexedCollectionProxy 
+  //# Interface net.sourceforge.waters.model.base.IndexedCollectionProxy
   public void checkAllUnique
     (final Collection<? extends NodeSubject> collection)
   {
@@ -304,13 +278,14 @@ class NodeSetSubject
   //# Interface net.sourceforge.waters.subject.base.SetSubject
   public void assignFrom(final Set<? extends NodeSubject> set)
   {
-    if (!ProxyTools.isEqualSetWithGeometry(this, set)) {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
+    if (!eq.isEqualSet(this, set)) {
       throw new UnsupportedOperationException
         ("Node set assignment not yet implemented!");
     }
   }
 
-  
+
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
   public Subject getParent()
@@ -629,7 +604,7 @@ class NodeSetSubject
       mGotNode = false;
     }
 
- 
+
     //#######################################################################
     //# Interface java.util.Iterator
     public boolean hasNext()
@@ -727,7 +702,7 @@ class NodeSetSubject
   /**
    * The simple nodes contained in this set.
    */
-  private Collection<SimpleNodeSubject> mSimpleNodes;
+  private final Collection<SimpleNodeSubject> mSimpleNodes;
   /**
    * The group nodes contained in this set.
    */
@@ -735,6 +710,6 @@ class NodeSetSubject
   /**
    * All nodes in this set, indexed by their names.
    */
-  private Map<String,NodeSubject> mNameMap;
+  private final Map<String,NodeSubject> mNameMap;
 
 }

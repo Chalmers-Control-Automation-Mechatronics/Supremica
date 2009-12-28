@@ -16,8 +16,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -127,53 +125,10 @@ public final class GroupNodeSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<GroupNodeProxy> getProxyInterface()
   {
     return GroupNodeProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final GroupNodeProxy downcast = (GroupNodeProxy) partner;
-      return
-        ProxyTools.isEqualSetByContents
-          (mImmediateChildNodes, downcast.getImmediateChildNodes());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final GroupNodeProxy downcast = (GroupNodeProxy) partner;
-      return
-        ProxyTools.isEqualSetWithGeometry
-          (mImmediateChildNodes, downcast.getImmediateChildNodes()) &&
-        ProxyTools.equalsWithGeometry(mGeometry, downcast.getGeometry());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.getSetHashCodeByContents(mImmediateChildNodes);
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.getSetHashCodeWithGeometry(mImmediateChildNodes);
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mGeometry);
-    return result;
   }
 
 

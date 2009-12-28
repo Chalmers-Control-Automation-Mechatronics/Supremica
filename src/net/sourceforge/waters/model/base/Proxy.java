@@ -10,8 +10,32 @@
 package net.sourceforge.waters.model.base;
 
 /**
- * <P>The common interface for all Waters elements.</P>
+ * <P>
+ * The common interface for all Waters elements.
+ * </P>
  *
+ * <P>
+ * This mainly is a marker interface to make it possible to treat all Waters
+ * objects in a uniform way. Its main functionality is to provide a common entry
+ * point for <I>visitors</I> ({@link ProxyVisitor}), which implement all kinds
+ * of content-dependent functionality.
+ * </P>
+ *
+ * <P>
+ * Proxies do <I>not</I> override Java's {@link Object#equals(Object) equals()}
+ * and {@link Object#hashCode() hashCode()} methods, so they are compared in the
+ * standard way by object identity. Content-based equality is provided by
+ * special visitors ({@link AbstractEqualityVisitor}).
+ * </P>
+ *
+ * <P>
+ * Some subtypes (most prominently {@link NamedProxy}) may implement the
+ * {@link Comparable} interface to provide a more convenient ordering. These
+ * implementations are not compatible with the standard equality.
+ * </P>
+ *
+ * @see ProxyVisitor
+ * @see AbstractEqualityVisitor
  * @author Robi Malik
  */
 
@@ -31,58 +55,14 @@ public interface Proxy {
   //#########################################################################
   //# Comparing
   /**
-   * Returns the most specific proxy interface implemented by this object.
-   * This method must return one of the leaf interfaces of the proxy
-   * hierarchy, e.g. {@link net.sourceforge.waters.model.des.EventProxy
-   * EventProxy}, not any specific implementation class. This is used by
-   * the different equality methods to ensure that objects from different
-   * implementations can be considered equal.
+   * Returns the most specific proxy interface implemented by this object. This
+   * method must return one of the leaf interfaces of the proxy hierarchy, e.g.
+   * {@link net.sourceforge.waters.model.des.EventProxy EventProxy}, not any
+   * specific implementation class. This can be used by equality visitors to
+   * ensure that objects from different implementations are considered as
+   * equal.
    */
   public Class<? extends Proxy> getProxyInterface();
-
-  /**
-   * Checks whether two elements are equal. This method implements
-   * content-based equality, i.e., two elements will be equal if their
-   * contents are the same. It considers all structural contents of the
-   * object, except for geometry information.
-   * @see #equalsWithGeometry(Proxy) equalsWithGeometry()
-   * @see #hashCodeByContents()
-   */
-  public boolean equalsByContents(Proxy partner);
-
-  /**
-   * Checks whether two elements are equal and have the same geometry
-   * information. This method implements content-based equality, i.e., two
-   * elements will be equal if their contents are the same.  In contrast to
-   * the {@link #equalsByContents(Proxy) equalsByContents()} method, this
-   * method also takes the layout information of graphical objects such as
-   * nodes and edges into account.
-   * @see #equalsByContents(Proxy) equalsByContents()
-   * @see #hashCodeWithGeometry()
-   */
-  public boolean equalsWithGeometry(Proxy partner);
-
-  /**
-   * Computes a hash code based on this object's contents. This method is
-   * used to compute a hash code to match the equality defined by the
-   * {@link #equalsByContents(Proxy) equalsByContents()} method. All
-   * structural contents of the object, except for geometry information,
-   * are taken into account.
-   * @see #equalsByContents(Proxy) equalsByContents()
-   * @see #hashCodeWithGeometry()
-   */
-  public int hashCodeByContents();
-
-  /**
-   * Computes a hash code based on this object's contents and geometry
-   * information. This method is used to compute a hash code to match the
-   * equality defined by the {@link #equalsWithGeometry(Proxy)
-   * equalsWithGeometry()} method. All structural contents of the object
-   * including geometry information, are taken into account.
-   * @see #equalsWithGeometry(Proxy) equalsWithGeometry()
-   * @see #hashCodeWithGeometry()
-   */
-  public int hashCodeWithGeometry();
 
 
   //#########################################################################

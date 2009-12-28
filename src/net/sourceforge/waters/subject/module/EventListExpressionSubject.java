@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.unchecked.Casting;
@@ -88,30 +87,6 @@ public abstract class EventListExpressionSubject
     } else {
       return false;
     }
-  }
-
-
-  //#########################################################################
-  //# Equality and Hashcode
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final EventListExpressionProxy downcast =
-        (EventListExpressionProxy) partner;
-      return
-        ProxyTools.isEqualListByContents
-          (mEventList, downcast.getEventList());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.getListHashCodeByContents(mEventList);
-    return result;
   }
 
 

@@ -137,8 +137,9 @@ public abstract class AbstractProductDESImporterTest
     final String desext = mProductDESMarshaller.getDefaultExtension();
     final File outdesfile = new File(outdir, name + desext);
     mProductDESMarshaller.marshal(compileddes, outdesfile);
-    assertTrue("Compilation of imported module does not yield original DES!",
-               des.equalsByContents(compileddes));
+    assertProductDESProxyEquals
+      ("Compilation of imported module does not yield original DES!",
+       compileddes, des);
     return module;
   }
 

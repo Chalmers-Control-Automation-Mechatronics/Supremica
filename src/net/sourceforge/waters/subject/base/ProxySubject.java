@@ -36,15 +36,13 @@ public interface ProxySubject
   public ProxySubject clone();
 
   /**
-   * Assigns the contents of another subject to this subject.  This method
-   * ensures that the contents of this subject are equal to the contents of
-   * the given subject according to the {@link
-   * net.sourceforge.waters.model.base.Proxy#equalsWithGeometry(Proxy)
-   * equalsWithGeometry()} method. Items already contained in this subject
-   * are reused if possible, and may be changed in position as
-   * needed. Items not contained are cloned from the given subject. The
-   * method tries to produce as few model change notifications as possible.
-   * @param  partner  The subject to be copied from.
+   * Assigns the contents of another subject to this subject. This method
+   * ensures that the contents of this subject are equal to the contents of the
+   * given subject according to the contents. Items already contained in this
+   * subject are reused if possible, and may be changed in position as needed.
+   * Items not contained are cloned from the given subject. The method tries to
+   * produce as few model change notifications as possible.
+   * @param partner  The subject to be copied from.
    */
   public boolean assignFrom(ProxySubject partner);
 

@@ -19,10 +19,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
@@ -46,16 +47,16 @@ class EFAVariableTransitionRelationPart
   //# Constructors
   EFAVariableTransitionRelationPart()
   {
-    mSourceValues =
-      new ProxyAccessorHashMapByContents<SimpleExpressionProxy>();
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    mSourceValues = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
     mTransitions = new TreeSet<EFAVariableTransition>();
     mIsAllSelfloops = true;
   }
 
   EFAVariableTransitionRelationPart(final int size)
   {
-    mSourceValues =
-      new ProxyAccessorHashMapByContents<SimpleExpressionProxy>(size);
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    mSourceValues = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq, size);
     mTransitions = new TreeSet<EFAVariableTransition>();
     mIsAllSelfloops = true;
   }
@@ -177,8 +178,8 @@ class EFAVariableTransitionRelationPart
   //# Subsumption Testing
   boolean isDisjoint(final EFAVariableTransitionRelationPart part)
   {
-    final ProxyAccessorMap<SimpleExpressionProxy> sources1 = mSourceValues;
-    final ProxyAccessorMap<SimpleExpressionProxy> sources2 =
+    final ProxyAccessorSet<SimpleExpressionProxy> sources1 = mSourceValues;
+    final ProxyAccessorSet<SimpleExpressionProxy> sources2 =
       part.mSourceValues;
     if (sources1.size() < sources2.size()) {
       for (final ProxyAccessor<SimpleExpressionProxy> accessor :
@@ -258,10 +259,11 @@ class EFAVariableTransitionRelationPart
 
   EFAVariableTransitionRelationPart complement(final CompiledRange range)
   {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     final List<? extends SimpleExpressionProxy> allvalues = range.getValues();
     final int allsize = allvalues.size();
-    final ProxyAccessorMap<SimpleExpressionProxy> selfloops =
-      new ProxyAccessorHashMapByContents<SimpleExpressionProxy>(allsize);
+    final ProxyAccessorSet<SimpleExpressionProxy> selfloops =
+      new ProxyAccessorHashSet<SimpleExpressionProxy>(eq, allsize);
     for (final EFAVariableTransition trans : mTransitions) {
       if (trans.isSelfloop()) {
         final SimpleExpressionProxy source = trans.getSource();
@@ -276,7 +278,7 @@ class EFAVariableTransitionRelationPart
         result.addTransition(value, value);
       }
     }
-    return result;      
+    return result;
   }
 
   EFAVariableTransitionRelationPart stripSelfloops()
@@ -288,7 +290,7 @@ class EFAVariableTransitionRelationPart
         result.addTransition(trans);
       }
     }
-    return result;      
+    return result;
   }
 
 
@@ -313,7 +315,7 @@ class EFAVariableTransitionRelationPart
 
   //#########################################################################
   //# Data Members
-  private final ProxyAccessorMap<SimpleExpressionProxy> mSourceValues;
+  private final ProxyAccessorSet<SimpleExpressionProxy> mSourceValues;
   private final Set<EFAVariableTransition> mTransitions;
   private boolean mIsAllSelfloops;
 

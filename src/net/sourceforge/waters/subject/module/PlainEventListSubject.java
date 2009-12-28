@@ -75,7 +75,7 @@ public final class PlainEventListSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<PlainEventListProxy> getProxyInterface()
   {
     return PlainEventListProxy.class;

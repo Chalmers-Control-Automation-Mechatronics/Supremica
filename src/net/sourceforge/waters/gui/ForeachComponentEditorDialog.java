@@ -29,9 +29,9 @@ import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.ForeachComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
@@ -115,14 +115,14 @@ public class ForeachComponentEditorDialog
       new SimpleExpressionCell(oldrange, Operator.TYPE_RANGE, parser);
     mRangeInput.addActionListener(commithandler);
     mRangeInput.setToolTipText
-      ("Enter the index range, e.g., 1..10 or {a,b,c}"); 
+      ("Enter the index range, e.g., 1..10 or {a,b,c}");
     mGuardLabel = new JLabel("Guard:");
     final SimpleExpressionProxy oldguard = template.getGuard();
     mGuardInput =
       new SimpleExpressionCell(oldguard, Operator.TYPE_BOOLEAN, parser);
     mGuardInput.setAllowNull(true);
     mGuardInput.addActionListener(commithandler);
-    mGuardInput.setToolTipText("Optionally enter a Boolean expression"); 
+    mGuardInput.setToolTipText("Optionally enter a Boolean expression");
 
     // Error panel ...
     mErrorPanel = new RaisedDialogPanel();
@@ -269,11 +269,11 @@ public class ForeachComponentEditorDialog
         final String oldname = mForeach.getName();
         final boolean namechange = !name.equals(oldname);
         final SimpleExpressionSubject oldrange = mForeach.getRange();
-        final boolean rangechange =
-          !ProxyTools.equalsWithGeometry(range, oldrange);
+        final ModuleEqualityVisitor eq =
+          ModuleEqualityVisitor.getInstance(true);
+        final boolean rangechange = !eq.equals(range, oldrange);
         final SimpleExpressionSubject oldguard = mForeach.getGuard();
-        final boolean guardchange =
-          !ProxyTools.equalsWithGeometry(guard, oldguard);
+        final boolean guardchange = !eq.equals(guard, oldguard);
         if (namechange || rangechange || guardchange) {
           final ForeachComponentSubject template = mForeach.clone();
           if (namechange) {

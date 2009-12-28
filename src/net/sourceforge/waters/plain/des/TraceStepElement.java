@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -112,26 +111,6 @@ public final class TraceStepElement
   public Class<TraceStepProxy> getProxyInterface()
   {
     return TraceStepProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final TraceStepProxy step = (TraceStepProxy) partner;
-      return
-        (mEvent == step.getEvent()) &&
-        mStateMap.equals(step.getStateMap());
-    } else {
-      return false;
-    }    
-  }
-
-  public int hashCodeByContents()
-  {
-    return
-      super.hashCodeByContents() +
-      5 * mEvent.hashCode() +
-      5 * mStateMap.hashCode();
   }
 
 

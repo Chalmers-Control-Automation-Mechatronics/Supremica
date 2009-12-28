@@ -892,257 +892,15 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 
 
   ############################################################################
-  # Equality
-    if {$numattribs > 0 || !$abstract} {
-      Java_GenerateSeparatorComment $stream $umap "Equality and Hashcode"
-    }
+  # Comparing
     if {!$abstract} {
+      Java_GenerateSeparatorComment $stream $umap "Comparing"
       Java_WriteLn $stream $umap \
           "  public Class<$interfacename> getProxyInterface()"
       Java_WriteLn $stream $umap "  \{"
       Java_WriteLn $stream $umap "    return $interfacename.class;"
       Java_WriteLn $stream $umap "  \}"
       Java_WriteLn $stream $umap ""
-    }
-    if {$numattribs > 0} {
-      set numgeoattribs 0
-      foreach attrib $attribs {
-	set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-	if {[string compare $eqstatus "geometry"] == 0} {
-	  incr numgeoattribs
-	}
-      }
-      if {$numattribs > $numgeoattribs} {
-	Java_WriteLn $stream $umap \
-	    "  public boolean equalsByContents(final Proxy partner)"
-	Java_WriteLn $stream $umap "  \{"
-	Java_WriteLn $stream $umap \
-            "    if (super.equalsByContents(partner)) \{"
-	Java_WriteLn $stream $umap \
-	    "      final $interfacename downcast = ($interfacename) partner;"
-	Java_WriteLn $stream $umap "      return"
-	set i [expr $numgeoattribs + 1]
-	foreach attrib $attribs {
-	  set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-	  if {[string compare $eqstatus "geometry"] == 0 ||
-	      [string compare $eqstatus "ignored"] == 0} {
-	    continue
-	  }
-	  set type [Java_AttribGetDeclaredType $attrib $impl]
-	  set membername [Java_AttribGetMemberName $attrib $impl]
-	  set gettername [Java_AttribGetGetterName $attrib $impl]
-          if {[info exists classMap($type)]} {
-            set equals "equalsByContents"
-          } else {
-            set equals "equals"
-          }
-	  if {[regexp {^[a-z]} $type all]} {
-	    Java_Write $stream $umap \
-		"        ($membername == downcast.${gettername}())"
-	  } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
-	    Java_WriteLn $stream $umap \
-		"        ProxyTools.isEqualCollectionByContents"
-	    Java_Write $stream $umap \
-                "          ($membername, downcast.${gettername}())"
-	  } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
-	    Java_WriteLn $stream $umap \
-		"        ProxyTools.isEqualSetByContents"
-	    Java_Write $stream $umap \
-                "          ($membername, downcast.${gettername}())"
-	  } elseif {[regexp {^List<[a-zA-Z]*Proxy>} $type all]} {
-	    Java_WriteLn  $stream $umap \
-		"        ProxyTools.isEqualListByContents"
-	    Java_Write $stream $umap \
-                "          ($membername, downcast.${gettername}())"
-	  } elseif {[string compare $eqstatus "required"] == 0} {
-	    Java_Write $stream $umap \
-		"        $membername.${equals}(downcast.${gettername}())"
-	  } else {
-	    Java_Write $stream $umap \
-              "        ProxyTools.${equals}($membername, downcast.${gettername}())"
-	  }
-	  if {$i < $numattribs} {
-	    Java_WriteLn $stream $umap " &&"
-	    incr i
-	  }
-	}
-	Java_WriteLn $stream $umap ";"
-	Java_WriteLn $stream $umap "    \} else \{"
-	Java_WriteLn $stream $umap "      return false;"
-	Java_WriteLn $stream $umap "    \}"
-	Java_WriteLn $stream $umap "  \}"
-	Java_WriteLn $stream $umap ""
-      }
-      if {$geo == 1 || $geo == 2} {
-        Java_WriteLn $stream $umap \
-            "  public boolean equalsWithGeometry(final Proxy partner)"
-        Java_WriteLn $stream $umap "  \{"
-        set supergeo [Java_ClassGetGeometryStatus $superinfo]
-        if {$supergeo == 0} {
-          set supermethod "equalsByContents"
-        } else {
-          set supermethod "equalsWithGeometry"
-        }
-        Java_WriteLn $stream $umap "    if (super.${supermethod}(partner)) \{"
-        Java_WriteLn $stream $umap \
-            "      final $interfacename downcast = ($interfacename) partner;"
-        Java_WriteLn $stream $umap "      return"
-        set i 1
-        foreach attrib $attribs {
-          set type [Java_AttribGetDeclaredType $attrib $impl]
-          set membername [Java_AttribGetMemberName $attrib $impl]
-	  set gettername [Java_AttribGetGetterName $attrib $impl]
-          set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-          if {[string compare $eqstatus "ignored"] == 0} {
-            continue
-          }
-          if {[info exists classMap($type)]} {
-            set typeinfo $classMap($type)
-            set typegeo [Java_ClassGetGeometryStatus $typeinfo]
-            set equals "equalsWithGeometry"
-          } else {
-            set equals "equals"
-          }
-          if {[regexp {^[a-z]} $type all]} {
-            Java_Write $stream $umap \
-                "        ($membername == downcast.${gettername}())"
-          } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
-            Java_WriteLn $stream $umap \
-                "        ProxyTools.isEqualCollectionWithGeometry"
-            Java_Write $stream $umap \
-                "          ($membername, downcast.${gettername}())"
-          } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
-            Java_WriteLn $stream $umap \
-                "        ProxyTools.isEqualSetWithGeometry"
-            Java_Write $stream $umap \
-                "          ($membername, downcast.${gettername}())"
-          } elseif {[regexp {^List<[a-zA-Z]*Proxy>} $type all]} {
-            Java_WriteLn  $stream $umap \
-                "        ProxyTools.isEqualListWithGeometry"
-            Java_Write $stream $umap \
-                "          ($membername, downcast.${gettername}())"
-          } elseif {[string compare $eqstatus "required"] == 0} {
-            Java_Write $stream $umap \
-                "        $membername.${equals}(downcast.${gettername}())"
-          } else {
-            Java_Write $stream $umap \
-              "        ProxyTools.${equals}($membername, downcast.${gettername}())"
-          }
-          if {$i < $numattribs} {
-            Java_WriteLn $stream $umap " &&"
-            incr i
-          }
-        }
-        Java_WriteLn $stream $umap ";"
-        Java_WriteLn $stream $umap "    \} else \{"
-        Java_WriteLn $stream $umap "      return false;"
-        Java_WriteLn $stream $umap "    \}"
-        Java_WriteLn $stream $umap "  \}"
-        Java_WriteLn $stream $umap ""
-      }
-
-      if {$numattribs > $numgeoattribs} {
-        Java_WriteLn $stream $umap "  public int hashCodeByContents()"
-        Java_WriteLn $stream $umap "  \{"
-        Java_WriteLn $stream $umap \
-            "    int result = super.hashCodeByContents();"
-        foreach attrib $attribs {
-          set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-          if {[string compare $eqstatus "geometry"] == 0 ||
-              [string compare $eqstatus "ignored"] == 0} {
-            continue
-          }
-          Java_WriteLn $stream $umap "    result *= 5;"
-          set type [Java_AttribGetDeclaredType $attrib $impl]
-          set membername [Java_AttribGetMemberName $attrib $impl]
-          if {[regexp {^boolean$} $type all]} {
-            Java_WriteLn $stream $umap "    if ($membername) \{"
-            Java_WriteLn $stream $umap "      result++;"
-            Java_WriteLn $stream $umap "    \}"
-          } elseif {[regexp {^[a-z]} $type all]} {
-            Java_WriteLn $stream $umap "    result += $membername;"
-          } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
-            Java_Write $stream $umap "    result += "
-            Java_WriteLn $stream $umap \
-                "ProxyTools.getCollectionHashCodeByContents($membername);"
-          } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
-            Java_Write $stream $umap "    result += "
-            Java_WriteLn $stream $umap \
-                "ProxyTools.getSetHashCodeByContents($membername);"
-          } elseif {[regexp {^List<[a-zA-Z]*Proxy>} $type all]} {
-            Java_Write $stream $umap "    result += "
-            Java_WriteLn $stream $umap \
-                "ProxyTools.getListHashCodeByContents($membername);"
-          } elseif {![info exists classMap($type)]} {
-            Java_WriteLn $stream $umap "    result += $membername.hashCode();"
-          } elseif {[string compare $eqstatus "required"] == 0} {
-            Java_WriteLn $stream $umap \
-                "    result += $membername.hashCodeByContents();"
-          } else {
-            Java_WriteLn $stream $umap \
-                "    result += ProxyTools.hashCodeByContents($membername);"
-          }
-        }
-        Java_WriteLn $stream $umap "    return result;"
-        Java_WriteLn $stream $umap "  \}"
-        Java_WriteLn $stream $umap ""
-      }
-      if {$geo == 1 || $geo == 2} {
-        Java_WriteLn $stream $umap "  public int hashCodeWithGeometry()"
-        Java_WriteLn $stream $umap "  \{"
-        set supergeo [Java_ClassGetGeometryStatus $superinfo]
-        if {$supergeo == 0} {
-          set supermethod "hashCodeByContents"
-        } else {
-          set supermethod "hashCodeWithGeometry"
-        }
-        Java_WriteLn $stream $umap "    int result = super.${supermethod}();"
-        set i 1
-        foreach attrib $attribs {
-          set type [Java_AttribGetDeclaredType $attrib $impl]
-          set membername [Java_AttribGetMemberName $attrib $impl]
-          set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-          if {[string compare $eqstatus "ignored"] == 0} {
-            continue
-          }
-          Java_WriteLn $stream $umap "    result *= 5;"
-          if {[info exists classMap($type)]} {
-            set typeinfo $classMap($type)
-            set typegeo [Java_ClassGetGeometryStatus $typeinfo]
-            set hashmethod "hashCodeWithGeometry"
-          } else {
-            set hashmethod "hashCode"
-          }
-          if {[regexp {^boolean$} $type all]} {
-            Java_WriteLn $stream $umap "    if ($membername) \{"
-            Java_WriteLn $stream $umap "      result++;"
-            Java_WriteLn $stream $umap "    \}"
-          } elseif {[regexp {^[a-z]} $type all]} {
-            Java_WriteLn $stream $umap "    result += $membername;"
-          } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
-            Java_Write $stream $umap "    result += "
-            Java_WriteLn $stream $umap \
-              "ProxyTools.getCollectionHashCodeWithGeometry($membername);"
-          } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
-            Java_Write $stream $umap "    result += "
-            Java_WriteLn $stream $umap \
-                "ProxyTools.getSetHashCodeWithGeometry($membername);"
-          } elseif {[regexp {^List<[a-zA-Z]*Proxy>} $type all]} {
-            Java_Write $stream $umap "    result += "
-            Java_WriteLn $stream $umap \
-                "ProxyTools.getListHashCodeWithGeometry($membername);"
-          } elseif {[string compare $eqstatus "required"] == 0} {
-            Java_WriteLn $stream $umap \
-                "    result += $membername.${hashmethod}();"
-          } else {
-            Java_WriteLn $stream $umap \
-                "    result += ProxyTools.${hashmethod}($membername);"
-          }
-        }
-        Java_WriteLn $stream $umap "    return result;"
-        Java_WriteLn $stream $umap "  \}"
-        Java_WriteLn $stream $umap ""
-      }
     }
 
   ############################################################################
@@ -2092,25 +1850,26 @@ proc Java_GenerateHashCodeVisitor {subpack prefix destname classnames
                       [regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
               # TODO: collection or set?
               if {[string compare $refstatus "ref"] == 0} {
+                set method "computeRefCollectionHashCode"
                 Java_WriteLn $stream $umap \
-                    "${indent}result += getRefCollectionHashCode($varname);"
+                    "${indent}result += ${method}($varname);"
               } else {
                 Java_WriteLn $stream $umap \
-                    "${indent}result += getCollectionHashCode($varname);"
+                    "${indent}result += computeCollectionHashCode($varname);"
               }
             } elseif {[regexp {^List<[a-zA-Z]*Proxy>} $type all]} {
               # TODO: ref or not ref ?
               Java_WriteLn $stream $umap \
-                  "${indent}result += getListHashCode($varname);"
+                  "${indent}result += computeListHashCode($varname);"
             } elseif {[string compare $refstatus "ref"] == 0} {
               Java_WriteLn $stream $umap \
-                  "${indent}result += getRefHashCode($varname);"
+                  "${indent}result += computeRefHashCode($varname);"
             } elseif {[info exists classMap($type)]} {
               Java_WriteLn $stream $umap \
-                  "${indent}result += getProxyHashCode($varname);"
+                  "${indent}result += computeProxyHashCode($varname);"
             } else {
               Java_WriteLn $stream $umap \
-                  "${indent}result += getOptionalHashCode($varname);"
+                  "${indent}result += computeOptionalHashCode($varname);"
             }
           }
           if {$geo} {
@@ -2433,6 +2192,7 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
               Java_WriteLn $stream $umap \
                   "(\"$name\", ${varname}1, ${varname}2);"
               Java_WriteLn $stream $umap "${indent}\}"
+              set needreset 1
             } else {
               Java_WriteLn $stream $umap \
                   "${indent}if (!compareProxies(${varname}1, ${varname}2)) \{"

@@ -59,8 +59,6 @@ public class SICPropertyVBuilder
 
   /**
    * Gets all the answer events that belong to the model.
-   *
-   * @return
    */
   public Collection<EventProxy> getAnswerEvents()
   {
@@ -79,7 +77,6 @@ public class SICPropertyVBuilder
    *
    * @param answer
    *          The name of the answer event.
-   * @return
    */
   public ProductDESProxy createModelForAnswer(final EventProxy answer)
   {
@@ -115,7 +112,6 @@ public class SICPropertyVBuilder
    * event occurs after a request event.
    *
    * @param answer
-   * @return
    */
   private AutomatonProxy createTestForAnswer(final EventProxy answer)
   {

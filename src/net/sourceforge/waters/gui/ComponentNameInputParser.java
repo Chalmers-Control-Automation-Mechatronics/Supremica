@@ -15,6 +15,7 @@ import javax.swing.text.DocumentFilter;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 
 
 class ComponentNameInputParser
@@ -30,6 +31,7 @@ class ComponentNameInputParser
     mOldIdentifier = oldname;
     mOldName = oldname.toString();
     mModuleContext = context;
+    mEquality = ModuleEqualityVisitor.getInstance(true);
     mExpressionParser = parser;
     mDocumentFilter = new SimpleExpressionDocumentFilter(parser);
   }
@@ -42,9 +44,9 @@ class ComponentNameInputParser
   {
     if (text.equals(mOldName)) {
       return mOldIdentifier;
-    } 
+    }
     final IdentifierProxy ident = mExpressionParser.parseIdentifier(text);
-    if (mOldIdentifier.equalsWithGeometry(ident)) {
+    if (mEquality.equals(mOldIdentifier, ident)) {
       return mOldIdentifier;
     }
     mModuleContext.checkNewComponentName(ident);
@@ -62,6 +64,7 @@ class ComponentNameInputParser
   private final IdentifierProxy mOldIdentifier;
   private final String mOldName;
   private final ModuleContext mModuleContext;
+  private final ModuleEqualityVisitor mEquality;
   private final ExpressionParser mExpressionParser;
   private final DocumentFilter mDocumentFilter;
 

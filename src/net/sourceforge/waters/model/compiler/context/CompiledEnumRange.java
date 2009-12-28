@@ -14,6 +14,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 
@@ -43,11 +45,13 @@ public class CompiledEnumRange implements CompiledRange
         }
         final IdentifierProxy atom1 = iter1.next();
         final IdentifierProxy atom2 = iter2.next();
-        if (!atom1.equalsByContents(atom2)) {
+        final ModuleEqualityVisitor eq =
+          ModuleEqualityVisitor.getInstance(false);
+        if (!eq.equals(atom1, atom2)) {
           return false;
         }
       }
-      return !iter2.hasNext();      
+      return !iter2.hasNext();
     } else {
       return false;
     }
@@ -55,10 +59,12 @@ public class CompiledEnumRange implements CompiledRange
 
   public int hashCode()
   {
+    final ModuleHashCodeVisitor hash =
+      ModuleHashCodeVisitor.getInstance(false);
     int result = getClass().hashCode();
     for (final IdentifierProxy atom : mAtoms) {
       result *= 5;
-      result += atom.hashCodeByContents();
+      result += hash.hashCode(atom);
     }
     return result;
   }
@@ -72,7 +78,7 @@ public class CompiledEnumRange implements CompiledRange
       result.append(atom.toString());
       if (iter.hasNext()) {
         result.append(", ");
-      } 
+      }
     }
     result.append('}');
     return result.toString();
@@ -167,9 +173,11 @@ public class CompiledEnumRange implements CompiledRange
 
   public int indexOf(final IdentifierProxy value)
   {
+    final ModuleEqualityVisitor eq =
+      ModuleEqualityVisitor.getInstance(false);
     int i = 0;
     for (final IdentifierProxy atom : mAtoms) {
-      if (atom.equalsByContents(value)) {
+      if (eq.equals(atom, value)) {
         return i;
       }
       i++;
@@ -204,11 +212,13 @@ public class CompiledEnumRange implements CompiledRange
   public CompiledEnumRange remove(final IdentifierProxy value)
   {
     if (contains(value)) {
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
       final int newsize = size() - 1;
       final List<IdentifierProxy> newlist =
         new ArrayList<IdentifierProxy>(newsize);
       for (final IdentifierProxy atom : mAtoms) {
-        if (!atom.equalsByContents(value)) {
+        if (!eq.equals(atom, value)) {
           newlist.add(atom);
         }
       }

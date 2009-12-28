@@ -11,12 +11,11 @@
 package net.sourceforge.waters.model.compiler.context;
 
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -49,8 +48,8 @@ public class ModuleBindingContext implements BindingContext
                               final IdentifierProxy prefix,
                               final SourceInfo info)
   {
-    mMap = new HashMap<ProxyAccessor<SimpleExpressionProxy>,
-                       SimpleExpressionProxy>();
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    mMap = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
     mModule = module;
     mPrefix = prefix;
     mInstanceSource = info;
@@ -63,15 +62,17 @@ public class ModuleBindingContext implements BindingContext
     (final SimpleExpressionProxy ident)
   {
     final ProxyAccessor<SimpleExpressionProxy> key =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
+      mMap.createAccessor(ident);
     return mMap.get(key);
   }
 
   public boolean isEnumAtom(final IdentifierProxy ident)
   {
     if (ident instanceof SimpleIdentifierProxy) {
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
       final SimpleExpressionProxy bound = getBoundExpression(ident);
-      return ident.equalsByContents(bound);
+      return eq.equals(ident, bound);
     } else {
       return false;
     }
@@ -124,7 +125,7 @@ public class ModuleBindingContext implements BindingContext
                          final SimpleExpressionProxy value)
   {
     final ProxyAccessor<SimpleExpressionProxy> key =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
+      mMap.createAccessor(ident);
     mMap.put(key, value);
   }
 
@@ -133,7 +134,7 @@ public class ModuleBindingContext implements BindingContext
     throws DuplicateIdentifierException
   {
     final ProxyAccessor<SimpleExpressionProxy> key =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(ident);
+      mMap.createAccessor(ident);
     if (mMap.containsKey(key)) {
       final String name = ident.toString();
       throw new DuplicateIdentifierException(name);
@@ -145,8 +146,7 @@ public class ModuleBindingContext implements BindingContext
 
   //#########################################################################
   //# Data Members
-  private final Map<ProxyAccessor<SimpleExpressionProxy>,SimpleExpressionProxy>
-    mMap;
+  private final ProxyAccessorSet<SimpleExpressionProxy> mMap;
   private final ModuleProxy mModule;
   private final IdentifierProxy mPrefix;
   private final SourceInfo mInstanceSource;

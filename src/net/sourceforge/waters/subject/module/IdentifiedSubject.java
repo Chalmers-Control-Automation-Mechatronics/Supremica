@@ -12,7 +12,6 @@
 
 package net.sourceforge.waters.subject.module;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
@@ -71,47 +70,6 @@ public abstract class IdentifiedSubject
     } else {
       return false;
     }
-  }
-
-
-  //#########################################################################
-  //# Equality and Hashcode
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final IdentifiedProxy downcast = (IdentifiedProxy) partner;
-      return
-        mIdentifier.equalsByContents(downcast.getIdentifier());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final IdentifiedProxy downcast = (IdentifiedProxy) partner;
-      return
-        mIdentifier.equalsWithGeometry(downcast.getIdentifier());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mIdentifier.hashCodeByContents();
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeWithGeometry();
-    result *= 5;
-    result += mIdentifier.hashCodeWithGeometry();
-    return result;
   }
 
 

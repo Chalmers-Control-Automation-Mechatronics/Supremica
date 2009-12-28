@@ -15,6 +15,8 @@ import java.util.Comparator;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
@@ -37,7 +39,8 @@ class EFAVariableTransition implements Comparable<EFAVariableTransition>
   EFAVariableTransition(final SimpleExpressionProxy source,
                         final SimpleExpressionProxy target)
   {
-    if (source.equalsByContents(target)) {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    if (eq.equals(source, target)) {
       mSource = mTarget = source;
     } else {
       mSource = source;
@@ -82,10 +85,10 @@ class EFAVariableTransition implements Comparable<EFAVariableTransition>
   public boolean equals(final Object other)
   {
     if (other != null && getClass() == other.getClass()) {
+      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
       final EFAVariableTransition trans = (EFAVariableTransition) other;
       return
-        mSource.equalsByContents(trans.mSource) &&
-        mTarget.equalsByContents(trans.mTarget);
+        eq.equals(mSource, trans.mSource) && eq.equals(mTarget, trans.mTarget);
     } else {
       return false;
     }
@@ -93,7 +96,9 @@ class EFAVariableTransition implements Comparable<EFAVariableTransition>
 
   public int hashCode()
   {
-    return 5 * mSource.hashCodeByContents() + mTarget.hashCodeByContents();
+    final ModuleHashCodeVisitor hash =
+      ModuleHashCodeVisitor.getInstance(false);
+    return 5 * hash.hashCode(mSource) + hash.hashCode(mTarget);
   }
 
 

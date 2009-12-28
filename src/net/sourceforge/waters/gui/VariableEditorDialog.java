@@ -69,6 +69,7 @@ import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
@@ -653,12 +654,14 @@ public class VariableEditorDialog
       final VariableComponentSubject template =
         new VariableComponentSubject(iclone, type, deterministic,
                                      initial, markings);
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(true);
       if (mVariable == null) {
         final SelectionOwner panel = mRoot.getComponentsPanel();
         final Command command = new InsertCommand(template, panel);
         mVariable = template;
         mRoot.getUndoInterface().executeCommand(command);
-      } else if (!mVariable.equalsWithGeometry(template)) {
+      } else if (!eq.equals(mVariable, template)) {
         final SelectionOwner panel = mRoot.getComponentsPanel();
         final Command command = new EditCommand(mVariable, template, panel);
         mRoot.getUndoInterface().executeCommand(command);
@@ -701,12 +704,14 @@ public class VariableEditorDialog
       if (binpred.getOperator() != optable.getEqualsOperator()) {
         return null;
       }
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
       final IdentifierSubject ident = var.getIdentifier();
       final SimpleExpressionSubject lhs = binpred.getLeft();
       final SimpleExpressionSubject rhs = binpred.getRight();
-      if (lhs.equalsByContents(ident)) {
+      if (eq.equals(lhs, ident)) {
         return rhs;
-      } else if (rhs.equalsByContents(ident)) {
+      } else if (eq.equals(rhs, ident)) {
         return lhs;
       } else if (lhs instanceof SimpleIdentifierSubject) {
         return rhs;
@@ -789,13 +794,15 @@ public class VariableEditorDialog
           if (binpred.getOperator() != eqop) {
             return;
           }
+          final ModuleEqualityVisitor eq =
+            ModuleEqualityVisitor.getInstance(false);
           final IdentifierSubject ident =
             (IdentifierSubject) mNameInput.getValue();
           final SimpleExpressionSubject lhs = binpred.getLeft();
           final SimpleExpressionSubject rhs = binpred.getRight();
-          if (lhs.equalsByContents(ident)) {
+          if (eq.equals(lhs, ident)) {
             setValue(rhs);
-          } else if (rhs.equalsByContents(ident)) {
+          } else if (eq.equals(rhs, ident)) {
             setValue(lhs);
           } else if (lhs instanceof SimpleIdentifierSubject) {
             setValue(rhs);

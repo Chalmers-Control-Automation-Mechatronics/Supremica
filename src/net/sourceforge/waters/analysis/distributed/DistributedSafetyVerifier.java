@@ -20,6 +20,7 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.SerializableKindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
@@ -27,7 +28,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 /**
  * XXX
- * 
+ *
  * @author Sam Douglas
  */
 public class DistributedSafetyVerifier
@@ -61,17 +62,17 @@ public class DistributedSafetyVerifier
 
     try
       {
-	Server server = connectToServer(getHostname(), getPort());
+	final Server server = connectToServer(getHostname(), getPort());
 
-	SafetyVerificationJob job = new SafetyVerificationJob();
+	final SafetyVerificationJob job = new SafetyVerificationJob();
 	job.setName("safety-" + UUID.randomUUID().toString());
 	job.setController(controller);
 	job.setNodeCount(getNodeCount());
 	job.setModel(model);
 	job.setProcessingThreadCount(getProcessingThreadCount());
 
-	//The controller shouldn't care if there isn't a 
-	//walltime limit. 
+	//The controller shouldn't care if there isn't a
+	//walltime limit.
 	if (getWalltimeLimit() >= 0)
 	  {
 	    job.setWalltimeLimit(getWalltimeLimit());
@@ -79,14 +80,14 @@ public class DistributedSafetyVerifier
 
 	//Set the kind translator for the job by serialising
 	//the current translator, regardless of the type.
-	SerializableKindTranslator kx = new SerializableKindTranslator(translator, model);
+	final SerializableKindTranslator kx = new SerializableKindTranslator(translator, model);
 	job.setKindTranslator(kx);
 
 	job.setStateDistribution(getStateDistribution());
-	
+
 	//Submit the job to the server and wait for it to run.
 	//Interpret the results as a verification job result.
-	VerificationJobResult result = new VerificationJobResult(server.submitJob(job));
+	final VerificationJobResult result = new VerificationJobResult(server.submitJob(job));
 
 	if (getShutdownAfter())
 	  {
@@ -96,7 +97,7 @@ public class DistributedSafetyVerifier
 	      {
 		server.ping();
 	      }
-	    catch (RemoteException e)
+	    catch (final RemoteException e)
 	      {
 		System.err.println("Ping to server failed. Chances of shutting down cleanly are slim");
 	      }
@@ -105,7 +106,7 @@ public class DistributedSafetyVerifier
 	      {
 		server.shutdown();
 	      }
-	    catch (RemoteException e)
+	    catch (final RemoteException e)
 	      {
 		//Ignore. Shutdown calls generally appear to fail because
 		//the remote shutdown methods do a System.exit
@@ -113,12 +114,12 @@ public class DistributedSafetyVerifier
 	      }
 	  }
 
-	
+
 	try
 	  {
 	    dumpJobResult(result);
 	  }
-	catch (IOException e)
+	catch (final IOException e)
 	  {
 	    //Chain an analysis exception...
 	    throw new AnalysisException(e.getMessage(), e);
@@ -129,7 +130,7 @@ public class DistributedSafetyVerifier
 	  throw new AnalysisException(result.getException());
 
 
-	Boolean b = result.getResult();
+	final Boolean b = result.getResult();
 	if (b == null)
 	  {
 	    throw new AnalysisException("Verification result was undefined!");
@@ -147,32 +148,32 @@ public class DistributedSafetyVerifier
 	    if (result.getTrace() != null)
 	      {
 		trace = result.getTrace();
-		
+
 		//'Sanitise' the trace. This ensures the EventProxy
 		//objects that are in the trace are the same objects
 		//as the ones in the original model, as is expected
 		//for Waters verifiers.
-		List<EventProxy> tracelist = sanitiseTrace(trace);
-		
+		final List<EventProxy> tracelist = sanitiseTrace(trace);
+
 		counterexample = factory.createSafetyTraceProxy(model, tracelist);
 	      }
 	    return setFailedResult(counterexample);
 	  }
-	
-	
+
+
       }
-    catch (Exception e)
+    catch (final Exception e)
       {
 	throw new AnalysisException(e);
       }
   }
 
 
-  private List<EventProxy> sanitiseTrace(EventProxy[] trace) throws AnalysisException
+  private List<EventProxy> sanitiseTrace(final EventProxy[] trace) throws AnalysisException
   {
-    List<EventProxy> nt = new ArrayList<EventProxy>();
-    
-    for (EventProxy ev : trace)
+    final List<EventProxy> nt = new ArrayList<EventProxy>();
+
+    for (final EventProxy ev : trace)
       {
 	nt.add(sanitiseEvent(ev));
       }
@@ -188,33 +189,34 @@ public class DistributedSafetyVerifier
    * @return event considered equal from the model
    * @throws AnalysisException if no events were equal
    */
-  private EventProxy sanitiseEvent(EventProxy event) throws AnalysisException
+  private EventProxy sanitiseEvent(final EventProxy event) throws AnalysisException
   {
-    for (EventProxy ev : getModel().getEvents())
-      {
-	if (ev.equalsByContents(event))
-	  return ev;
+    final ProductDESEqualityVisitor eq =
+      ProductDESEqualityVisitor.getInstance();
+    for (final EventProxy ev : getModel().getEvents()) {
+      if (eq.equals(ev, event)) {
+        return ev;
       }
-
-    throw new AnalysisException("EventProxy could not be sanitised: not in model?"); 
+    }
+    throw new AnalysisException("EventProxy could not be sanitised: not in model?");
   }
 
-  private Server connectToServer(String host, int port) throws Exception
+  private Server connectToServer(final String host, final int port) throws Exception
   {
     //This should probably be replaced with a common constants
     //class or something. For now this will do
-    String service = net.sourceforge.waters.analysis.distributed.application.DistributedServer.DEFAULT_SERVICE_NAME;
+    final String service = net.sourceforge.waters.analysis.distributed.application.DistributedServer.DEFAULT_SERVICE_NAME;
 
-    Registry registry = LocateRegistry.getRegistry(host, port);
-    Server server = (Server) registry.lookup(service);
-    
+    final Registry registry = LocateRegistry.getRegistry(host, port);
+    final Server server = (Server) registry.lookup(service);
+
     return server;
   }
 
-  
-  private void dumpJobResult(JobResult result) throws IOException
+
+  private void dumpJobResult(final JobResult result) throws IOException
   {
-    File dumpfile = getResultsDumpFile();
+    final File dumpfile = getResultsDumpFile();
     if (dumpfile != null)
       {
 	ObjectOutputStream oos = null;
@@ -227,11 +229,11 @@ public class DistributedSafetyVerifier
 	    oos.close();
 	    fos.close();
 	  }
-	catch (IOException e)
+	catch (final IOException e)
 	  {
 	    if (oos != null)
 	      oos.close();
-	    
+
 	    if (fos != null)
 	      fos.close();
 
@@ -243,7 +245,7 @@ public class DistributedSafetyVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
-  public void setKindTranslator(KindTranslator translator)
+  public void setKindTranslator(final KindTranslator translator)
   {
     mKindTranslator = translator;
     clearAnalysisResult();
@@ -262,12 +264,12 @@ public class DistributedSafetyVerifier
 
   //########################################################################
   //# Option methods
-  public void setHostname(String hostname)
+  public void setHostname(final String hostname)
   {
     mHostname = hostname;
   }
 
-  public void setPort(int port)
+  public void setPort(final int port)
   {
     mPort = port;
   }
@@ -282,7 +284,7 @@ public class DistributedSafetyVerifier
     return mPort;
   }
 
-  public void setResultsDumpFile(File dumpFile)
+  public void setResultsDumpFile(final File dumpFile)
   {
     mDumpFile = dumpFile;
   }
@@ -292,7 +294,7 @@ public class DistributedSafetyVerifier
     return mDumpFile;
   }
 
-  public void setNodeCount(int count)
+  public void setNodeCount(final int count)
   {
     mNodeCount = count;
   }
@@ -302,7 +304,7 @@ public class DistributedSafetyVerifier
     return mNodeCount;
   }
 
-  public void setShutdownAfter(boolean value)
+  public void setShutdownAfter(final boolean value)
   {
     mShutdownAfter = value;
   }
@@ -312,7 +314,7 @@ public class DistributedSafetyVerifier
     return mShutdownAfter;
   }
 
-  public void setWalltimeLimit(int seconds)
+  public void setWalltimeLimit(final int seconds)
   {
     mWalltimeLimit = seconds;
   }
@@ -322,7 +324,7 @@ public class DistributedSafetyVerifier
     return mWalltimeLimit;
   }
 
-  public void setProcessingThreadCount(int threads)
+  public void setProcessingThreadCount(final int threads)
   {
     mProcessingThreads = threads;
   }
@@ -332,7 +334,7 @@ public class DistributedSafetyVerifier
     return mProcessingThreads;
   }
 
-  public void setStateDistribution(String dist)
+  public void setStateDistribution(final String dist)
   {
     mStateDistribution = dist;
   }
@@ -341,7 +343,7 @@ public class DistributedSafetyVerifier
   {
     return mStateDistribution;
   }
-  
+
   private String mHostname = null;
   private int mPort = 23232;
   private int mNodeCount = 10;

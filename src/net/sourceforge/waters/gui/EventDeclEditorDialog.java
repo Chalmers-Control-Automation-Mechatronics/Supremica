@@ -70,6 +70,7 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.module.ColorGeometrySubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
@@ -977,6 +978,7 @@ public class EventDeclEditorDialog
         final Set<Color> set = Collections.singleton(mChosenColor);
         geo = new ColorGeometrySubject(set);
       }
+      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
       final SelectionOwner panel = mRoot.getEventsPanel();
       final EventDeclSubject template =
         new EventDeclSubject(ident, kind, observable,
@@ -985,7 +987,7 @@ public class EventDeclEditorDialog
         final Command command = new InsertCommand(template, panel);
         mEventDecl = template;
         mRoot.getUndoInterface().executeCommand(command);
-      } else if (!mEventDecl.equalsWithGeometry(template)) {
+      } else if (!eq.equals(mEventDecl, template)) {
         final Command command = new EditCommand(mEventDecl, template, panel);
         mRoot.getUndoInterface().executeCommand(command);
       }

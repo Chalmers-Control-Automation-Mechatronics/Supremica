@@ -261,7 +261,7 @@ public class AlgorithmsTest extends AbstractWatersTest
     final File outfilename = new File(mOutputDirectory, outextname);
     ensureParentDirectoryExists(outfilename);
     mProductDESMarshaller.marshal(des, outfilename);
-  }                     
+  }
 
   @SuppressWarnings("unused")
   private Collection<EventProxy> getEvents(final ProductDESProxy des,
@@ -309,7 +309,7 @@ public class AlgorithmsTest extends AbstractWatersTest
   {
     final String name = aut.getName();
     final AutomatonProxy expectedaut = findAutomaton(expected, name);
-    assertTrue("Unexpected result!", aut.equalsByContents(expectedaut));
+    assertProductDESProxyEquals("Unexpected result!", aut, expectedaut);
   }
 
   private String eliminateStrangeCharacters(final String name)

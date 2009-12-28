@@ -73,8 +73,8 @@ import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -87,6 +87,7 @@ import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -273,7 +274,7 @@ public class GraphEventPanel
     }
   }
 
-  public void replaceSelection(List<? extends Proxy> items)
+  public void replaceSelection(final List<? extends Proxy> items)
   {
     boolean propagate = false;
     for (final Proxy proxy : items) {
@@ -287,7 +288,7 @@ public class GraphEventPanel
     addToSelection(items);
   }
 
-  public void addToSelection(List<? extends Proxy> items)
+  public void addToSelection(final List<? extends Proxy> items)
   {
     final List<Proxy> others = new LinkedList<Proxy>();
     int row0 = -1;
@@ -311,10 +312,10 @@ public class GraphEventPanel
       addRowSelectionInterval(row0, row1);
     }
     final GraphEditorPanel surface = mRoot.getGraphEditorPanel();
-    surface.addToSelection(others);  
+    surface.addToSelection(others);
   }
 
-  public void removeFromSelection(List<? extends Proxy> items)
+  public void removeFromSelection(final List<? extends Proxy> items)
   {
     final List<Proxy> others = new LinkedList<Proxy>();
     int row0 = -1;
@@ -338,7 +339,7 @@ public class GraphEventPanel
       removeRowSelectionInterval(row0, row1);
     }
     final GraphEditorPanel surface = mRoot.getGraphEditorPanel();
-    surface.removeFromSelection(others);  
+    surface.removeFromSelection(others);
   }
 
   public Object getInsertPosition(final Proxy item)
@@ -353,12 +354,12 @@ public class GraphEventPanel
     model.addIdentifier(ident);
   }
 
-  public boolean canCopy(List<? extends Proxy> items)
+  public boolean canCopy(final List<? extends Proxy> items)
   {
     return hasNonEmptySelection();
   }
 
-  public Transferable createTransferable(List<? extends Proxy> items)
+  public Transferable createTransferable(final List<? extends Proxy> items)
   {
     return new IdentifierTransferable(items);
   }
@@ -378,7 +379,7 @@ public class GraphEventPanel
         }
         return false;
       } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-        final String data = 
+        final String data =
           (String) transferable.getTransferData(DataFlavor.stringFlavor);
         final ModuleWindowInterface modroot = mRoot.getModuleWindowInterface();
         final ExpressionParser parser = modroot.getExpressionParser();
@@ -416,7 +417,7 @@ public class GraphEventPanel
         }
       }
     } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-      final String data = 
+      final String data =
         (String) transferable.getTransferData(DataFlavor.stringFlavor);
       final ModuleWindowInterface modroot = mRoot.getModuleWindowInterface();
       final ExpressionParser parser = modroot.getExpressionParser();
@@ -561,7 +562,7 @@ public class GraphEventPanel
       mObservers = null;
     }
   }
-  
+
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     if (mObservers != null) {
@@ -652,7 +653,7 @@ public class GraphEventPanel
     final Transferable trans = new IdentifierTransferable(idents);
     try {
       event.startDrag(DragSource.DefaultCopyDrop, trans);
-    } catch (InvalidDnDOperationException exception) {
+    } catch (final InvalidDnDOperationException exception) {
       throw new IllegalArgumentException(exception);
     }
   }
@@ -1139,7 +1140,9 @@ public class GraphEventPanel
                                     final List<InsertInfo> inserts)
     {
       try {
-        mItems = new ProxyAccessorHashMapByContents<Proxy>(items);
+        final ModuleEqualityVisitor eq =
+          ModuleEqualityVisitor.getInstance(false);
+        mItems = new ProxyAccessorHashSet<Proxy>(eq, items);
         mInserts = inserts;
         final SimpleComponentProxy comp = mRoot.getComponent();
         final GraphProxy graph = comp.getGraph();
@@ -1231,7 +1234,7 @@ public class GraphEventPanel
 
     //#######################################################################
     //# Data Members
-    private ProxyAccessorMap<Proxy> mItems;
+    private ProxyAccessorSet<Proxy> mItems;
     private List<InsertInfo> mInserts;
 
   }
@@ -1328,10 +1331,12 @@ public class GraphEventPanel
     private void processList(final ListSubject<? extends ProxySubject> list)
       throws VisitorException
     {
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
       int pos = 0;
       for (final Proxy proxy : list) {
         if (proxy instanceof IdentifierProxy) {
-          if (proxy.equalsByContents(mOldProxy)) {
+          if (eq.equals(proxy, mOldProxy)) {
             final ModuleProxyCloner cloner =
               ModuleSubjectFactory.getCloningInstance();
             final Proxy cloned = cloner.getClone(mNewProxy);

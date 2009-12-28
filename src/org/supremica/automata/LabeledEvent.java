@@ -50,10 +50,10 @@
  */
 package org.supremica.automata;
 
+import java.util.Collections;
 import java.util.Map;
 
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -310,42 +310,6 @@ public class LabeledEvent
         return EventProxy.class;
     }
 
-    public boolean equalsByContents(final Proxy partner)
-    {
-        if (getProxyInterface() == partner.getProxyInterface()) {
-            final EventProxy partnerEvent = (LabeledEvent) partner;
-            return
-                getName().equals(partnerEvent.getName()) &&
-                getKind() == partnerEvent.getKind() &&
-                isObservable() == partnerEvent.isObservable();
-        } else {
-            return false;
-        }
-    }
-
-    public boolean equalsWithGeometry(final Proxy partner)
-    {
-        return equalsByContents(partner);
-    }
-
-    public int hashCodeByContents()
-    {
-        int result = refHashCode();
-        result *= 5;
-        result += getKind().hashCode();
-        result *= 5;
-        if (isObservable())
-        {
-            result++;
-        }
-        return result;
-    }
-
-    public int hashCodeWithGeometry()
-    {
-        return hashCodeByContents();
-    }
-
     public boolean refequals(final NamedProxy partner)
     {
         return getName().equals(partner.getName());
@@ -391,7 +355,7 @@ public class LabeledEvent
 
     public Map<String,String> getAttributes()
     {
-      return null;
+      return Collections.emptyMap();
     }
 
 }

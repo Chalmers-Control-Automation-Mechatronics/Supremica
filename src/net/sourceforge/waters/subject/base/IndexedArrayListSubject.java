@@ -26,6 +26,7 @@ import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.unchecked.Casting;
 
 
@@ -203,7 +204,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     return mProxyList.size();
   }
 
-           
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.IndexedListProxy
   public void checkAllUnique(final Collection<? extends P> collection)
@@ -237,7 +238,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
       return proxy;
     } else {
       throw createNameNotFound(name);
-    }      
+    }
   }
 
   public P get(final String name)
@@ -381,6 +382,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
   //# Interface net.sourceforge.waters.subject.base.ListSubject
   public void assignFrom(final List<? extends P> list)
   {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
     final int oldsize = size();
     final int newsize = list.size();
     final boolean[] used = new boolean[oldsize];
@@ -406,7 +408,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
       names.add(name);
       if (iter.hasNext()) {
         final P oldproxy = iter.next();
-        if (newproxy.equalsWithGeometry(oldproxy)) {
+        if (eq.equals(newproxy, oldproxy)) {
           newlist.set(i, oldproxy);
           used[i] = true;
         }
@@ -422,7 +424,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
         if (containsName(name)) {
           int j = 0;
           for (final P oldproxy : this) {
-            if (!used[j] && newproxy.equalsWithGeometry(oldproxy)) {
+            if (!used[j] && eq.equals(newproxy, oldproxy)) {
               newlist.set(i, oldproxy);
               used[j] = true;
               moved.add(oldproxy);
@@ -436,7 +438,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
           final P proxy = ProxyTools.clone(newproxy);
           newlist.set(i, proxy);
           added.add(proxy);
-          beforeAdd(proxy);          
+          beforeAdd(proxy);
           mProxyMap.put(name, proxy);
         }
       }
@@ -462,7 +464,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     }
   }
 
-  
+
   //#########################################################################
   //# Additional Methods
   public P insert(final int index, final P proxy)

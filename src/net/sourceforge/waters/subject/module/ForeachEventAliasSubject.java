@@ -89,7 +89,7 @@ public final class ForeachEventAliasSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<ForeachEventAliasProxy> getProxyInterface()
   {
     return ForeachEventAliasProxy.class;

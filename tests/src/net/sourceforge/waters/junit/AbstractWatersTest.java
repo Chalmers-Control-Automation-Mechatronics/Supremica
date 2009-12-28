@@ -125,6 +125,28 @@ public abstract class AbstractWatersTest
 
   //#########################################################################
   //# Proxy Equality Assertions
+  protected void assertProxyEquals(final Proxy proxy, final Proxy expected)
+  {
+    assertProxyEquals(null, proxy, expected);
+  }
+
+  protected void assertProxyEquals(final String msg,
+                                   final Proxy proxy,
+                                   final Proxy expected)
+  {
+    final Class<?> clazz = proxy.getClass();
+    final Package pack = clazz.getPackage();
+    final String packname = pack.getName();
+    final int dotpos = packname.lastIndexOf('.');
+    final String lastpart = packname.substring(dotpos + 1);
+    if (lastpart.equals("des")) {
+      assertProductDESProxyEquals(msg, proxy, expected);
+    } else if (lastpart.equals("module")) {
+      assertModuleProxyEquals(msg, proxy, expected);
+    } else {
+      fail("Unsupported Proxy class " + clazz.getName() + "!");
+    }
+  }
   protected void assertProductDESProxyEquals(final Proxy proxy,
                                              final Proxy expected)
   {

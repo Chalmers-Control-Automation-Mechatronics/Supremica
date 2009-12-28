@@ -14,7 +14,6 @@ package net.sourceforge.waters.plain.module;
 
 import java.awt.geom.Point2D;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
@@ -54,29 +53,10 @@ public final class PointGeometryElement
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<PointGeometryProxy> getProxyInterface()
   {
     return PointGeometryProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final PointGeometryProxy downcast = (PointGeometryProxy) partner;
-      return
-        mPoint.equals(downcast.getPoint());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mPoint.hashCode();
-    return result;
   }
 
 

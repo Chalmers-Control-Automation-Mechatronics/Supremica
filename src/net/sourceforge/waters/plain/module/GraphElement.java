@@ -17,8 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -100,74 +98,10 @@ public final class GraphElement
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<GraphProxy> getProxyInterface()
   {
     return GraphProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final GraphProxy downcast = (GraphProxy) partner;
-      return
-        (mIsDeterministic == downcast.isDeterministic()) &&
-        ProxyTools.equalsByContents(mBlockedEvents, downcast.getBlockedEvents()) &&
-        ProxyTools.isEqualSetByContents
-          (mNodes, downcast.getNodes()) &&
-        ProxyTools.isEqualCollectionByContents
-          (mEdges, downcast.getEdges());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final GraphProxy downcast = (GraphProxy) partner;
-      return
-        (mIsDeterministic == downcast.isDeterministic()) &&
-        ProxyTools.equalsWithGeometry(mBlockedEvents, downcast.getBlockedEvents()) &&
-        ProxyTools.isEqualSetWithGeometry
-          (mNodes, downcast.getNodes()) &&
-        ProxyTools.isEqualCollectionWithGeometry
-          (mEdges, downcast.getEdges());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    if (mIsDeterministic) {
-      result++;
-    }
-    result *= 5;
-    result += ProxyTools.hashCodeByContents(mBlockedEvents);
-    result *= 5;
-    result += ProxyTools.getSetHashCodeByContents(mNodes);
-    result *= 5;
-    result += ProxyTools.getCollectionHashCodeByContents(mEdges);
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    if (mIsDeterministic) {
-      result++;
-    }
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mBlockedEvents);
-    result *= 5;
-    result += ProxyTools.getSetHashCodeWithGeometry(mNodes);
-    result *= 5;
-    result += ProxyTools.getCollectionHashCodeWithGeometry(mEdges);
-    return result;
   }
 
 

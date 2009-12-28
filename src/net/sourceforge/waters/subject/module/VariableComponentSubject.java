@@ -16,8 +16,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -147,74 +145,10 @@ public final class VariableComponentSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<VariableComponentProxy> getProxyInterface()
   {
     return VariableComponentProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final VariableComponentProxy downcast =
-        (VariableComponentProxy) partner;
-      return
-        mType.equalsByContents(downcast.getType()) &&
-        (mIsDeterministic == downcast.isDeterministic()) &&
-        mInitialStatePredicate.equalsByContents(downcast.getInitialStatePredicate()) &&
-        ProxyTools.isEqualListByContents
-          (mVariableMarkings, downcast.getVariableMarkings());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final VariableComponentProxy downcast =
-        (VariableComponentProxy) partner;
-      return
-        mType.equalsWithGeometry(downcast.getType()) &&
-        (mIsDeterministic == downcast.isDeterministic()) &&
-        mInitialStatePredicate.equalsWithGeometry(downcast.getInitialStatePredicate()) &&
-        ProxyTools.isEqualListWithGeometry
-          (mVariableMarkings, downcast.getVariableMarkings());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mType.hashCodeByContents();
-    result *= 5;
-    if (mIsDeterministic) {
-      result++;
-    }
-    result *= 5;
-    result += mInitialStatePredicate.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.getListHashCodeByContents(mVariableMarkings);
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeWithGeometry();
-    result *= 5;
-    result += mType.hashCodeWithGeometry();
-    result *= 5;
-    if (mIsDeterministic) {
-      result++;
-    }
-    result *= 5;
-    result += mInitialStatePredicate.hashCodeWithGeometry();
-    result *= 5;
-    result += ProxyTools.getListHashCodeWithGeometry(mVariableMarkings);
-    return result;
   }
 
 

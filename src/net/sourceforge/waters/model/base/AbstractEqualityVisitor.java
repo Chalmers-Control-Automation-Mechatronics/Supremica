@@ -99,7 +99,7 @@ public abstract class AbstractEqualityVisitor
   //#########################################################################
   //# Invocation
   /**
-   * Compares two objects for equality.
+   * Compares two proxy objects for equality.
    * @param  proxy     The first object to be compared.
    * @param  expected  The second object to be compared. For the purpose
    *                   of diagnostic information, the second argument will
@@ -114,6 +114,69 @@ public abstract class AbstractEqualityVisitor
     mDiagnosticPath.clear();
     try {
       return compareProxies(proxy, expected);
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
+    }
+  }
+
+  /**
+   * Checks whether two collections have the same contents. This method
+   * compares two collections of proxies, and checks whether they have elements
+   * considered as equal by this visitor, occurring the same number of times.
+   * @param  coll      The first collection to be compared.
+   * @param  expected  The second collection to be compared. For the purpose
+   *                   of diagnostic information, the second argument will
+   *                   be referred to as the 'expected' value.
+   * @return <CODE>true</CODE> if the proxies in the two collection were found
+   *         equal according to the parameterisation of this equality checker,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean isEqualCollection(final Collection<? extends Proxy> coll,
+                                   final Collection<? extends Proxy> expected)
+  {
+    mDiagnostics = null;
+    mDiagnosticPath.clear();
+    return compareCollections(coll, expected);
+  }
+
+  /**
+   * Checks whether two sets have the same contents. This method compares
+   * two sets of proxies, and checks whether they have elements considered
+   * as equal by this visitor. This method can compare sets or collections,
+   * duplicates are not considered significant in either case.
+   * @param  set       The first set to be compared.
+   * @param  expected  The second set to be compared. For the purpose
+   *                   of diagnostic information, the second argument will
+   *                   be referred to as the 'expected' value.
+   * @return <CODE>true</CODE> if the proxies in the two sets were found
+   *         equal according to the parameterisation of this equality checker,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean isEqualSet(final Collection<? extends Proxy> set,
+                            final Collection<? extends Proxy> expected)
+  {
+    mDiagnostics = null;
+    mDiagnosticPath.clear();
+    return compareSets(set, expected);
+  }
+
+  /**
+   * Compares two lists of proxies for equality.
+   * @param  list      The first list to be compared.
+   * @param  expected  The second list to be compared. For the purpose
+   *                   of diagnostic information, the second argument will
+   *                   be referred to as the 'expected' value.
+   * @return <CODE>true</CODE> if the proxies in the two lists were found
+   *         equal according to the parameterisation of this equality checker,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean isEqualList(final List<? extends Proxy> list,
+                             final List<? extends Proxy> expected)
+  {
+    mDiagnostics = null;
+    mDiagnosticPath.clear();
+    try {
+      return compareLists(list, expected);
     } catch (final VisitorException exception) {
       throw exception.getRuntimeException();
     }
@@ -308,9 +371,9 @@ public abstract class AbstractEqualityVisitor
   {
     final AbstractEqualityVisitor eq = getNonReportingEqualityVisitor();
     final ProxyAccessorCollection<Proxy> map =
-      new ProxyAccessorHashCollection2<Proxy>(eq, coll);
+      new ProxyAccessorHashCollection<Proxy>(eq, coll);
     final ProxyAccessorCollection<Proxy> emap =
-      new ProxyAccessorHashCollection2<Proxy>(eq, expected);
+      new ProxyAccessorHashCollection<Proxy>(eq, expected);
     for (final Map.Entry<ProxyAccessor<Proxy>,Integer> entry :
       map.entrySet()) {
       final ProxyAccessor<Proxy> accessor = entry.getKey();
@@ -346,10 +409,10 @@ public abstract class AbstractEqualityVisitor
      final Collection<? extends Proxy> expected)
   {
     final AbstractEqualityVisitor eq = getNonReportingEqualityVisitor();
-    final ProxyAccessorMap<Proxy> map =
-      new ProxyAccessorHashMap2<Proxy>(eq, set);
-    final ProxyAccessorMap<Proxy> emap =
-      new ProxyAccessorHashMap2<Proxy>(eq, expected);
+    final ProxyAccessorSet<Proxy> map =
+      new ProxyAccessorHashSet<Proxy>(eq, set);
+    final ProxyAccessorSet<Proxy> emap =
+      new ProxyAccessorHashSet<Proxy>(eq, expected);
     for (final ProxyAccessor<Proxy> eaccessor : emap.keySet()) {
       if (!map.containsKey(eaccessor)) {
         final Proxy proxy = eaccessor.getProxy();

@@ -54,7 +54,7 @@ public final class EventAliasElement
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<EventAliasProxy> getProxyInterface()
   {
     return EventAliasProxy.class;

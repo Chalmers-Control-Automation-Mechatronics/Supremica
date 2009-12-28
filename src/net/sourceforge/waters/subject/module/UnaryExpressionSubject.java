@@ -12,7 +12,6 @@
 
 package net.sourceforge.waters.subject.module;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
@@ -106,54 +105,10 @@ public final class UnaryExpressionSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<UnaryExpressionProxy> getProxyInterface()
   {
     return UnaryExpressionProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final UnaryExpressionProxy downcast = (UnaryExpressionProxy) partner;
-      return
-        mOperator.equals(downcast.getOperator()) &&
-        mSubTerm.equalsByContents(downcast.getSubTerm());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final UnaryExpressionProxy downcast = (UnaryExpressionProxy) partner;
-      return
-        mOperator.equals(downcast.getOperator()) &&
-        mSubTerm.equalsWithGeometry(downcast.getSubTerm());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mOperator.hashCode();
-    result *= 5;
-    result += mSubTerm.hashCodeByContents();
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeWithGeometry();
-    result *= 5;
-    result += mOperator.hashCode();
-    result *= 5;
-    result += mSubTerm.hashCodeWithGeometry();
-    return result;
   }
 
 

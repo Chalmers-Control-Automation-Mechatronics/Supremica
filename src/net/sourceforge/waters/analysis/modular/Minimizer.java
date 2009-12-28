@@ -24,7 +24,6 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -37,7 +36,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 
 public class Minimizer
 {
-  
+
   //#########################################################################
   //# Constructor
   @SuppressWarnings("unchecked")
@@ -51,7 +50,7 @@ public class Minimizer
     mStateToPart = new int[mStates.length];
     mEvents = new EventProxy[automaton.getEvents().size()];
     mEventMap = new HashMap<EventProxy, Integer>(mEvents.length);
-    Map<StateProxy, Integer> stateMap =
+    final Map<StateProxy, Integer> stateMap =
       new HashMap<StateProxy, Integer>(mStates.length);
     mTransitionsSucc = new int[mStates.length][mEvents.length];
     mTransitionsPred = new HashSet[mStates.length][mEvents.length];
@@ -64,7 +63,7 @@ public class Minimizer
       }
     }
     mPartitions = new ArrayList<Set<Integer>>(mStates.length);
-    Set<Integer> firstpartition = new HashSet<Integer>(mStates.length);
+    final Set<Integer> firstpartition = new HashSet<Integer>(mStates.length);
     for (int i = 0; i < mEvents.length; i++) {
       mEventMap.put(mEvents[i], i);
     }
@@ -73,7 +72,7 @@ public class Minimizer
       stateMap.put(mStates[i], i);
     }
     mPartitions.add(firstpartition);
-    for (TransitionProxy t : automaton.getTransitions()) {
+    for (final TransitionProxy t : automaton.getTransitions()) {
       assert(mTransitionsSucc[stateMap.get(t.getSource())][mEventMap.get(t.getEvent())] == -1);
       mTransitionsSucc[stateMap.get(t.getSource())][mEventMap.get(t.getEvent())]
         = stateMap.get(t.getTarget());
@@ -84,7 +83,7 @@ public class Minimizer
       }
     }
   }
-  
+
   public AutomatonProxy run()
   {
     int size = (int)(mPartitions.size() * 2);
@@ -95,7 +94,7 @@ public class Minimizer
       }
       size = (int)(mPartitions.size() * 2);
     }
-    LinkedList<int[]> L = new LinkedList<int[]>();
+    final LinkedList<int[]> L = new LinkedList<int[]>();
     for (int i = 0; i < mPartitions.size(); i++) {
       for (int j = 0; j < mEvents.length; j++) {
         L.offer(new int[] {i, j});
@@ -103,23 +102,23 @@ public class Minimizer
     }
     while (!L.isEmpty()) {
       int[] tup = L.poll();
-      int part = tup[0];
-      int event = tup[1];
-      Set<Integer> parts = new HashSet<Integer>(mPartitions.size());
-      for (Integer state : mPartitions.get(part)) {
-        Set<Integer> predecesorstates = mTransitionsPred[state][event];
-        for (Object predstate : predecesorstates) {
+      final int part = tup[0];
+      final int event = tup[1];
+      final Set<Integer> parts = new HashSet<Integer>(mPartitions.size());
+      for (final Integer state : mPartitions.get(part)) {
+        final Set<Integer> predecesorstates = mTransitionsPred[state][event];
+        for (final Object predstate : predecesorstates) {
           parts.add(mStateToPart[(Integer)predstate]);
         }
       }
-      Map<Integer, Integer> split = new HashMap<Integer, Integer>(parts.size());
-      for (Integer partition : parts) {
-        Set<Integer> newPart = new HashSet<Integer>();
-        Iterator<Integer> it = mPartitions.get(partition).iterator();
+      final Map<Integer, Integer> split = new HashMap<Integer, Integer>(parts.size());
+      for (final Integer partition : parts) {
+        final Set<Integer> newPart = new HashSet<Integer>();
+        final Iterator<Integer> it = mPartitions.get(partition).iterator();
         while (it.hasNext()) {
-          int state = it.next();
-          int successorstate = mTransitionsSucc[state][event];
-          int successorstatepart = successorstate == -1 ? -1 :
+          final int state = it.next();
+          final int successorstate = mTransitionsSucc[state][event];
+          final int successorstatepart = successorstate == -1 ? -1 :
                                                 mStateToPart[successorstate];
           if (successorstatepart != part) {
             newPart.add(state);
@@ -132,44 +131,44 @@ public class Minimizer
         }
       }
       if (!split.isEmpty()) {
-        Map<Integer, Set<Integer>> events = new HashMap<Integer, Set<Integer>>(split.size());
-        for (Integer partition : split.keySet()) {
+        final Map<Integer, Set<Integer>> events = new HashMap<Integer, Set<Integer>>(split.size());
+        for (final Integer partition : split.keySet()) {
           events.put(partition, allTo(mEvents.length));
         }
-        for (Integer partition : split.values()) {
-          for (Integer state : mPartitions.get(partition)) {
+        for (final Integer partition : split.values()) {
+          for (final Integer state : mPartitions.get(partition)) {
             mStateToPart[state] = partition;
           }
         }
-        ListIterator<int[]> it = L.listIterator();
+        final ListIterator<int[]> it = L.listIterator();
         while (it.hasNext()) {
           tup = it.next();
           if (split.containsKey(tup[0])) {
-            int newpart = split.get(tup[0]);
-            int[] newtup = new int[] {newpart, tup[1]};
+            final int newpart = split.get(tup[0]);
+            final int[] newtup = new int[] {newpart, tup[1]};
             events.get(tup[0]).remove(tup[1]);
             it.add(newtup);
           }
         }
-        for (Map.Entry<Integer, Set<Integer>> entry : events.entrySet()) {
+        for (final Map.Entry<Integer, Set<Integer>> entry : events.entrySet()) {
           int partitionnumber = entry.getKey();
-          int oldsize = mPartitions.get(partitionnumber).size();
-          int newsize = mPartitions.get(split.get(partitionnumber)).size();
+          final int oldsize = mPartitions.get(partitionnumber).size();
+          final int newsize = mPartitions.get(split.get(partitionnumber)).size();
           if (newsize < oldsize) {
             partitionnumber = split.get(partitionnumber);
           }
-          for (Integer eventi : entry.getValue()) {
+          for (final Integer eventi : entry.getValue()) {
             L.offer(new int[] {partitionnumber, eventi});
           }
         }
       }
     }
-    for (Set<Integer> p : mPartitions) {
+    for (final Set<Integer> p : mPartitions) {
       check(p);
     }
-    if (mStates.length > mPartitions.size()) { 
-      List<StateProxy> states = new ArrayList<StateProxy>(mPartitions.size());
-      Collection<TransitionProxy> transitions = new ArrayList<TransitionProxy>();
+    if (mStates.length > mPartitions.size()) {
+      final List<StateProxy> states = new ArrayList<StateProxy>(mPartitions.size());
+      final Collection<TransitionProxy> transitions = new ArrayList<TransitionProxy>();
       int initial = -1;
       for(int i = 0; i < mStates.length; i++) {
         if (mStates[i].isInitial()) {
@@ -187,13 +186,13 @@ public class Minimizer
         }
       }
       for (int i = 0; i < mPartitions.size(); i++) {
-        int sourcestate = mPartitions.get(i).iterator().next();
+        final int sourcestate = mPartitions.get(i).iterator().next();
         for(int event = 0; event < mTransitionsSucc[sourcestate].length; event++) {
-          int targetstate = mTransitionsSucc[sourcestate][event];
+          final int targetstate = mTransitionsSucc[sourcestate][event];
           if (targetstate != -1) {
-            int sourcepartition = i;
-            int targetpartition = mStateToPart[targetstate];
-            TransitionProxy trans = mFactory.createTransitionProxy(
+            final int sourcepartition = i;
+            final int targetpartition = mStateToPart[targetstate];
+            final TransitionProxy trans = mFactory.createTransitionProxy(
                                                states.get(sourcepartition),
                                                mEvents[event],
                                                states.get(targetpartition));
@@ -209,19 +208,19 @@ public class Minimizer
       return mAutomaton;
     }
   }
-  
+
   private void partition()
   {
-    int start = mPartitions.size();
+    final int start = mPartitions.size();
     int current = start;
     for (int i = 0; i < mPartitions.size(); i++) {
       if (mPartitions.get(i).size() > 1) {
-        Map<Long, Integer> map = new HashMap<Long, Integer>();
-        Iterator<Integer> it = mPartitions.get(i).iterator();
+        final Map<Long, Integer> map = new HashMap<Long, Integer>();
+        final Iterator<Integer> it = mPartitions.get(i).iterator();
         map.put(stateHashCode(it.next()), i);
         while (it.hasNext()) {
-          int state = it.next();
-          long hash = stateHashCode(state);
+          final int state = it.next();
+          final long hash = stateHashCode(state);
           int partition;
           if (map.containsKey(hash)) {
             partition = map.get(hash);
@@ -239,48 +238,48 @@ public class Minimizer
       }
     }
     for (int i = start; i < mPartitions.size(); i++) {
-      for (Integer j : mPartitions.get(i)) {
+      for (final Integer j : mPartitions.get(i)) {
         mStateToPart[j] = i;
       }
     }
   }
-  
-  private long stateHashCode(int state)
+
+  private long stateHashCode(final int state)
   {
     long hashCode = 1;
     for(int i = 0; i < mTransitionsSucc[state].length; i++) {
-      int successor = mTransitionsSucc[state][i];
+      final int successor = mTransitionsSucc[state][i];
       int successorPartition = successor == -1 ? -1 : mStateToPart[successor];
       successorPartition++;
       hashCode = 3179 * hashCode + successorPartition * i;
     }
     return hashCode;
   }
-  
-  private static Set<Integer> allTo(int to)
+
+  private static Set<Integer> allTo(final int to)
   {
-    Set<Integer> all = new HashSet<Integer>(to);
+    final Set<Integer> all = new HashSet<Integer>(to);
     for(int i = 0; i < to; i++)
     {
       all.add(i);
     }
     return all;
   }
-  
-  private void check(Set<Integer> partition) {
-    Integer st = partition.iterator().next();
-    int[] successors = new int[mEvents.length];
+
+  private void check(final Set<Integer> partition) {
+    final Integer st = partition.iterator().next();
+    final int[] successors = new int[mEvents.length];
     for(int i = 0; i < mEvents.length; i++) {
-      int succ = mTransitionsSucc[st][i];
-      int succpart = succ == -1 ? -1 : mStateToPart[succ];
+      final int succ = mTransitionsSucc[st][i];
+      final int succpart = succ == -1 ? -1 : mStateToPart[succ];
       successors[i] = succpart;
     }
     boolean broken = false;
-    for (Integer state : partition) {
-      int[] successors2 = new int[mEvents.length];
+    for (final Integer state : partition) {
+      final int[] successors2 = new int[mEvents.length];
       for(int i = 0; i < mEvents.length; i++) {
-        int succ = mTransitionsSucc[state][i];
-        int succpart = succ == -1 ? -1 : mStateToPart[succ];
+        final int succ = mTransitionsSucc[state][i];
+        final int succpart = succ == -1 ? -1 : mStateToPart[succ];
         successors2[i] = succpart;
       }
       if (!Arrays.equals(successors, successors2)) {
@@ -295,14 +294,14 @@ public class Minimizer
       for(int i = 0; i < mTransitionsSucc.length; i++) {
         System.out.print(Integer.toString(i, Character.MAX_RADIX) + " ");
         for(int j = 0; j < mTransitionsSucc[i].length; j++) {
-          int succ = mTransitionsSucc[i][j];
+          final int succ = mTransitionsSucc[i][j];
           System.out.print(Integer.toString(succ, Character.MAX_RADIX) + " ");
         }
         System.out.println();
       }
       int i = 0;
       System.out.println();
-      for (Set<Integer> part : mPartitions) {
+      for (final Set<Integer> part : mPartitions) {
         System.out.println("part " + i + ":" + part);
         i++;
       }
@@ -312,47 +311,47 @@ public class Minimizer
       System.exit(4);
     }
   }
-  
+
   private static class MemStateProxy
     implements StateProxy
   {
     private final int mName;
-    
-    public MemStateProxy(int name)
+
+    public MemStateProxy(final int name)
     {
       mName = name;
     }
-    
+
     public Collection<EventProxy> getPropositions()
     {
       return Collections.emptySet();
     }
-    
+
     public boolean isInitial()
     {
       return mName == 0;
     }
-    
+
     public MemStateProxy clone()
     {
       return new MemStateProxy(mName);
     }
-    
+
     public String getName()
     {
       return Integer.toString(mName);
     }
-    
+
     @SuppressWarnings("unused")
-	public boolean refequals(Object o)
+	public boolean refequals(final Object o)
     {
       if (o instanceof NamedProxy) {
         return refequals((NamedProxy) o);
       }
       return false;
     }
-    
-    public boolean refequals(NamedProxy o)
+
+    public boolean refequals(final NamedProxy o)
     {
       if (o instanceof MemStateProxy) {
         final MemStateProxy s = (MemStateProxy) o;
@@ -361,12 +360,12 @@ public class Minimizer
         return false;
       }
     }
-    
+
     public int refHashCode()
     {
       return mName;
     }
-    
+
     public Object acceptVisitor(final ProxyVisitor visitor)
       throws VisitorException
     {
@@ -380,35 +379,7 @@ public class Minimizer
       return StateProxy.class;
     }
 
-    public boolean equalsByContents(final Proxy partner)
-    {
-      if (partner != null &&
-          partner.getProxyInterface() == getProxyInterface()) {
-        final StateProxy state = (StateProxy) partner;
-        return (getName().equals(state.getName())) &&
-               (isInitial() == state.isInitial()) &&
-               state.getPropositions().isEmpty();
-      } else {
-        return false;
-      }
-    }
-    
-    public boolean equalsWithGeometry(Proxy o)
-    {
-      return equalsByContents(o);
-    }
-    
-    public int hashCodeByContents()
-    {
-      return refHashCode();
-    }
-    
-    public int hashCodeWithGeometry()
-    {
-      return refHashCode();
-    }
-    
-    public int compareTo(NamedProxy n)
+    public int compareTo(final NamedProxy n)
     {
       return getName().compareTo(n.getName());
     }
@@ -417,14 +388,14 @@ public class Minimizer
 
   //#########################################################################
   //# Data Members
-  private ProductDESProxyFactory mFactory;
-  private AutomatonProxy mAutomaton;
-  private StateProxy[] mStates;
-  private int[] mStateToPart;
-  private List<Set<Integer>> mPartitions;
-  private int[][] mTransitionsSucc;
-  private Set<Integer>[][] mTransitionsPred;
-  private EventProxy[] mEvents;
-  private Map<EventProxy,Integer> mEventMap;
+  private final ProductDESProxyFactory mFactory;
+  private final AutomatonProxy mAutomaton;
+  private final StateProxy[] mStates;
+  private final int[] mStateToPart;
+  private final List<Set<Integer>> mPartitions;
+  private final int[][] mTransitionsSucc;
+  private final Set<Integer>[][] mTransitionsPred;
+  private final EventProxy[] mEvents;
+  private final Map<EventProxy,Integer> mEventMap;
 
 }

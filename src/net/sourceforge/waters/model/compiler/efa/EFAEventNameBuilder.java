@@ -29,6 +29,8 @@ import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
@@ -57,6 +59,8 @@ class EFAEventNameBuilder {
                       final VariableContext context)
   {
     mComparator = new ExpressionComparator(optable);
+    mEquality = ModuleEqualityVisitor.getInstance(false);
+    mHashCodeVisitor = ModuleHashCodeVisitor.getInstance(false);
     mCollector = new VariableCollectVisitor(optable, context);
     mAllLiterals = null;
     mAllGuards = null;
@@ -145,7 +149,7 @@ class EFAEventNameBuilder {
       return test;
     } else {
       return found;
-    }    
+    }
   }
 
   private CountedLiteral getCountedLiteral(final SimpleExpressionProxy literal)
@@ -208,7 +212,7 @@ class EFAEventNameBuilder {
     {
       if (other != null && getClass() == other.getClass()) {
         final CountedLiteral counted = (CountedLiteral) other;
-        return mLiteral.equalsByContents(counted.mLiteral);
+        return mEquality.equals(mLiteral, counted.mLiteral);
       } else {
         return false;
       }
@@ -216,7 +220,7 @@ class EFAEventNameBuilder {
 
     public int hashCode()
     {
-      return mLiteral.hashCodeByContents();
+      return mHashCodeVisitor.hashCode(mLiteral);
     }
 
     //#######################################################################
@@ -376,7 +380,7 @@ class EFAEventNameBuilder {
         if (mIdentifier == null) {
           mIdentifier = ident;
           mOccurrenceKind = OccurrenceKind.CURRENT;
-        } else if (mIdentifier.equalsByContents(ident)) {
+        } else if (mEquality.equals(mIdentifier, ident)) {
           if (mOccurrenceKind == OccurrenceKind.NEXT) {
             mOccurrenceKind = OccurrenceKind.BOTH;
           }
@@ -417,7 +421,7 @@ class EFAEventNameBuilder {
         if (mIdentifier == null) {
           mIdentifier = ident;
           mOccurrenceKind = OccurrenceKind.NEXT;
-        } else if (mIdentifier.equalsByContents(ident)) {
+        } else if (mEquality.equals(mIdentifier, ident)) {
           if (mOccurrenceKind == OccurrenceKind.CURRENT) {
             mOccurrenceKind = OccurrenceKind.BOTH;
           }
@@ -454,6 +458,8 @@ class EFAEventNameBuilder {
   //# Data Members
   private final VariableCollectVisitor mCollector;
   private final Comparator<SimpleExpressionProxy> mComparator;
+  private final ModuleEqualityVisitor mEquality;
+  private final ModuleHashCodeVisitor mHashCodeVisitor;
 
   private Map<CountedLiteral,CountedLiteral> mAllLiterals;
   private Collection<List<CountedLiteral>> mAllGuards;

@@ -54,8 +54,6 @@ import java.util.*;
 
 import org.supremica.util.Args;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -89,7 +87,7 @@ public class State
     private boolean selected = false;
     private double cost = UNDEF_COST;
     private State assocState = null;
-    private StateSet stateSet = null;    
+    private StateSet stateSet = null;
 
     private Listeners listeners = null;
 
@@ -104,7 +102,7 @@ public class State
     /** List of outgoing transitions. */
     private ArcSet outgoingArcs = new ArcSet();
     /** List of outgoing edges (multiple transitions on each edge). */
-    private MultiArcSet outgoingMultiArcs = new MultiArcSet();
+    private final MultiArcSet outgoingMultiArcs = new MultiArcSet();
 
     /**
      * Stores the cost accumulated from the initial state until this one.
@@ -115,7 +113,7 @@ public class State
     /**
      * Creates a new state with a specified name.
      */
-    public State(String name)
+    public State(final String name)
     {
         Args.checkForContent(name);
         this.name = name;
@@ -127,7 +125,7 @@ public class State
      *
      *@param  otherState Description of the Parameter
      */
-    public State(State otherState)
+    public State(final State otherState)
     {
         this(otherState.name, otherState);
     }
@@ -140,7 +138,7 @@ public class State
      * @param name the name of the new state
      * @param  otherState Description of the Parameter
      */
-    public State(String name, State otherState)
+    public State(final String name, final State otherState)
     {
         this(name);
 
@@ -154,14 +152,14 @@ public class State
         stateSet = otherState.stateSet;
         visited = otherState.visited;
     }
-    
-    public State(State state, String name)
+
+    public State(final State state, final String name)
     {
         this(name);
 
         incomingArcs = state.incomingArcs;
         outgoingArcs = state.outgoingArcs;
-        
+
         index = state.index;
         initial = state.initial;
         accepting = state.accepting;
@@ -184,7 +182,7 @@ public class State
      * needs special initialisation that is not automatically done.
      * This method is not recommended for general use.
      */
-    public void setIndex(int index)
+    public void setIndex(final int index)
     {
         this.index = index;
     }
@@ -210,7 +208,7 @@ public class State
         return first;
     }
 
-    public void setFirst(boolean first)
+    public void setFirst(final boolean first)
     {
         this.first = first;
     }
@@ -220,7 +218,7 @@ public class State
         return last;
     }
 
-    public void setLast(boolean last)
+    public void setLast(final boolean last)
     {
         this.last = last;
     }
@@ -238,7 +236,7 @@ public class State
         return name;
     }
 
-    public void setName(String name)
+    public void setName(final String name)
     {
         Args.checkForContent(name);
         this.name = name;
@@ -249,7 +247,7 @@ public class State
         return "'" + getName() + "'";
     }
 
-    public void setInitial(boolean initial)
+    public void setInitial(final boolean initial)
     {
         this.initial = initial;
     }
@@ -259,7 +257,7 @@ public class State
         return initial;
     }
 
-    public void setAccepting(boolean accepting)
+    public void setAccepting(final boolean accepting)
     {
         this.accepting = accepting;
     }
@@ -278,7 +276,7 @@ public class State
      * @param considerEpsilonClosure If true, the method returns true also if any state
      * in the epsilon closure is accepting.
      */
-    public boolean isAccepting(boolean considerEpsilonClosure)
+    public boolean isAccepting(final boolean considerEpsilonClosure)
     {
         if (!considerEpsilonClosure)
         {
@@ -295,7 +293,7 @@ public class State
         return forbidden;
     }
 
-    public void setForbidden(boolean forbidden)
+    public void setForbidden(final boolean forbidden)
     {
         this.forbidden = forbidden;
 
@@ -320,12 +318,12 @@ public class State
      * This is used when computing the shortest
      * trace to a state.
      */
-    public void setAssociatedState(State assocState)
+    public void setAssociatedState(final State assocState)
     {
         this.assocState = assocState;
     }
 
-    public void setSelected(boolean selected)
+    public void setSelected(final boolean selected)
     {
         this.selected = selected;
     }
@@ -335,7 +333,7 @@ public class State
         return selected;
     }
 
-    public boolean equals(Object other)
+    public boolean equals(final Object other)
     {
         if (other instanceof State)
         {
@@ -349,12 +347,12 @@ public class State
      * * accepting
      * * forbidden
      */
-    public boolean hasEqualMarking(State otherState)
+    public boolean hasEqualMarking(final State otherState)
     {
         return ((accepting == otherState.accepting) && (forbidden == otherState.forbidden));
     }
 
-    public boolean equalState(State otherState)
+    public boolean equalState(final State otherState)
     {
         if (!getName().equals(otherState.getName()))
         {
@@ -407,7 +405,7 @@ public class State
     /**
      * Don't do this in public -- only for use by Automaton
      */
-    void addIncomingArc(Arc theArc)
+    void addIncomingArc(final Arc theArc)
     {
         incomingArcs.add(theArc);
     }
@@ -415,7 +413,7 @@ public class State
     /**
      * Don't do this in public -- only for use by Automaton
      */
-    void addOutgoingArc(Arc theArc)
+    void addOutgoingArc(final Arc theArc)
     {
         outgoingArcs.add(theArc);
 
@@ -433,7 +431,7 @@ public class State
     /**
      * Don't do this in public -- only for use by Automaton
      */
-    void removeIncomingArc(Arc theArc)
+    void removeIncomingArc(final Arc theArc)
     {
         incomingArcs.remove(theArc);
     }
@@ -441,12 +439,12 @@ public class State
     /**
      * Don't do this in public -- only for use by Automaton
      */
-    void removeOutgoingArc(Arc theArc)
+    void removeOutgoingArc(final Arc theArc)
     {
         outgoingArcs.remove(theArc);
 
         // Also remove the arc from the arcset
-        MultiArc theArcSet = getArcSet(theArc);
+        final MultiArc theArcSet = getArcSet(theArc);
         theArcSet.remove(theArc);
 
         // Remove it if it is empty!
@@ -459,13 +457,13 @@ public class State
     /**
      * Don't do this in public -- only for use by Automaton.
      */
-    MultiArc getArcSet(Arc theArc)
+    MultiArc getArcSet(final Arc theArc)
     {
-        State toState = theArc.getToState();
+        final State toState = theArc.getToState();
 
-        for (Iterator<MultiArc> arcSetIt = outgoingMultiArcIterator(); arcSetIt.hasNext(); )
+        for (final Iterator<MultiArc> arcSetIt = outgoingMultiArcIterator(); arcSetIt.hasNext(); )
         {
-            MultiArc currArcSet = arcSetIt.next();
+            final MultiArc currArcSet = arcSetIt.next();
 
             if (currArcSet.getToState() == toState)
             {
@@ -492,8 +490,8 @@ public class State
      */
     public Set<Arc> getOutgoingArcs()
     {
-        Set<Arc> arcSet = new HashSet<Arc>();
-        Iterator<Arc> iterator = outgoingArcsIterator();
+        final Set<Arc> arcSet = new HashSet<Arc>();
+        final Iterator<Arc> iterator = outgoingArcsIterator();
         while(iterator.hasNext())
         {
             arcSet.add(iterator.next());
@@ -528,10 +526,10 @@ public class State
      * Returns true if there is an outgoing arc from this state that is equal to the
      * supplied arc.
      */
-    public boolean containsOutgoingArc(Arc arc)
+    public boolean containsOutgoingArc(final Arc arc)
     {
         // Had to do this ugly iteration since the equals()-method won't work properly
-        for (Iterator<Arc> arcIt = outgoingArcsIterator(); arcIt.hasNext(); )
+        for (final Iterator<Arc> arcIt = outgoingArcsIterator(); arcIt.hasNext(); )
         {
             if (arc.equals(arcIt.next()))
             {
@@ -546,10 +544,10 @@ public class State
      * Returns true if there is an incoming arc from this state that is equal to the
      * supplied arc.
      */
-    public boolean containsIncomingArc(Arc arc)
+    public boolean containsIncomingArc(final Arc arc)
     {
         // Had to do this ugly iteration since the equals()-method won't work properly
-        for (Iterator<Arc> arcIt = incomingArcsIterator(); arcIt.hasNext(); )
+        for (final Iterator<Arc> arcIt = incomingArcsIterator(); arcIt.hasNext(); )
         {
             if (arc.equals(arcIt.next()))
             {
@@ -567,8 +565,8 @@ public class State
 
     public Iterator<State> nextStateIterator()
     {
-        StateSet nextStates = new StateSet();
-        Iterator<Arc> arcIt = outgoingArcsIterator();
+        final StateSet nextStates = new StateSet();
+        final Iterator<Arc> arcIt = outgoingArcsIterator();
 
         while (arcIt.hasNext())
         {
@@ -580,8 +578,8 @@ public class State
 
     public Iterator<State> previousStateIterator()
     {
-        StateSet previousStates = new StateSet();
-        Iterator<Arc> arcIt = incomingArcsIterator();
+        final StateSet previousStates = new StateSet();
+        final Iterator<Arc> arcIt = incomingArcsIterator();
 
         while (arcIt.hasNext())
         {
@@ -596,13 +594,13 @@ public class State
      * along the event labeled eventLabel.
      */
     //public Iterator<State> previousStateIterator(LabeledEvent event)
-    public Iterator<State> previousStateIterator(String eventLabel)
+    public Iterator<State> previousStateIterator(final String eventLabel)
     {
-        StateSet previousStates = new StateSet();
-        Iterator<Arc> arcIt = incomingArcsIterator();
+        final StateSet previousStates = new StateSet();
+        final Iterator<Arc> arcIt = incomingArcsIterator();
         while (arcIt.hasNext())
         {
-            Arc arc = arcIt.next();
+            final Arc arc = arcIt.next();
             if (arc.getEvent().equals(eventLabel))
             {
                 previousStates.add(arc.getFromState());
@@ -621,7 +619,7 @@ public class State
     {
         int count = 0;
 
-        for (Iterator<Arc> it = incomingArcsIterator(); it.hasNext(); )
+        for (final Iterator<Arc> it = incomingArcsIterator(); it.hasNext(); )
         {
             if (!it.next().getEvent().isObservable())
             {
@@ -647,7 +645,7 @@ public class State
         return outgoingArcs.size() == 0;
     }
 
-    public void setCost(double cost)
+    public void setCost(final double cost)
     {
         this.cost = cost;
     }
@@ -661,7 +659,7 @@ public class State
      * Method used by e.g. AutomatonMinimizer for faster lookup of which equivalence class
      * a state belongs to.
      */
-    public void setStateSet(StateSet stateSet)    // setEquivalenceClass(Object equivClass)
+    public void setStateSet(final StateSet stateSet)    // setEquivalenceClass(Object equivClass)
     {
         // this.equivClass = equivClass;
         this.stateSet = stateSet;
@@ -676,7 +674,7 @@ public class State
         return stateSet;    // equivClass;
     }
 
-    public void setVisited(boolean visited)
+    public void setVisited(final boolean visited)
     {
         this.visited = visited;
     }
@@ -698,10 +696,10 @@ public class State
      */
     public int removeOutgoingArcs()
     {
-        int count = outgoingArcs.size();
-        Object[] arcs = outgoingArcs.toArray();
+        final int count = outgoingArcs.size();
+        final Object[] arcs = outgoingArcs.toArray();
         outgoingArcs.clear();
-        for (Object arc : arcs)
+        for (final Object arc : arcs)
         {
             ((Arc) arc).clear();
         }
@@ -714,10 +712,10 @@ public class State
      */
     public int removeIncomingArcs()
     {
-        int count = incomingArcs.size();
-        Object[] arcs = incomingArcs.toArray();
+        final int count = incomingArcs.size();
+        final Object[] arcs = incomingArcs.toArray();
         incomingArcs.clear();
-        for (Object arc : arcs)
+        for (final Object arc : arcs)
         {
             ((Arc) arc).clear();
         }
@@ -731,13 +729,13 @@ public class State
      *@param  label Description of the Parameter
      *@return  Description of the Return Value
      */
-    public State nextState(String label)
+    public State nextState(final String label)
     {
-        Iterator<Arc> outgoingArcsIt = outgoingArcsIterator();
+        final Iterator<Arc> outgoingArcsIt = outgoingArcsIterator();
 
         while (outgoingArcsIt.hasNext())
         {
-            Arc currArc = outgoingArcsIt.next();
+            final Arc currArc = outgoingArcsIt.next();
 
             if (currArc.getEvent().getLabel().equals(label))
             {
@@ -754,7 +752,7 @@ public class State
      *
      *@param theEvent The event.
      */
-    public State nextState(LabeledEvent theEvent)
+    public State nextState(final LabeledEvent theEvent)
     {
         return nextState(theEvent.getLabel());
 
@@ -763,7 +761,7 @@ public class State
     /**
      * Follow the event "theEvent" and return the set of states that may be reached.
      */
-    public StateSet nextStates(LabeledEvent theEvent)
+    public StateSet nextStates(final LabeledEvent theEvent)
     {
         return nextStates(theEvent, false);
     }
@@ -784,9 +782,9 @@ public class State
      * @param considerEpsilonClosure if true, an arbitrary number of epsilon events may be
      * executed before and after theEvent, otherwise, only theEvent is executed.
      */
-    public StateSet nextStates(LabeledEvent theEvent, boolean considerEpsilonClosure)
+    public StateSet nextStates(final LabeledEvent theEvent, final boolean considerEpsilonClosure)
     {
-        StateSet states = new StateSet();
+        final StateSet states = new StateSet();
 
                 /* Sometimes we want this!
                 assert (!theEvent.isEpsilon());    // See above!
@@ -805,7 +803,7 @@ public class State
 
         while (outgoingArcsIt.hasNext())
         {
-            Arc currArc = outgoingArcsIt.next();
+            final Arc currArc = outgoingArcsIt.next();
 
             if (currArc.getEvent().equals(theEvent))
             {
@@ -832,7 +830,7 @@ public class State
      * State itself may not be in the returned set (if there is no loop).
      * @return the states that can be reached by executing at least one epsilon transition.
      */
-    public StateSet epsilonClosure(boolean includeSelf)
+    public StateSet epsilonClosure(final boolean includeSelf)
     {
         return epsilonClosure(includeSelf, true, true);
     }
@@ -844,9 +842,9 @@ public class State
      * @param includeControllable if true, silent controllable transitions count for the closure.
      * @param includeUncontrollable if true, silent uncontrollable transitions count for the closure.
      */
-    public StateSet epsilonClosure(boolean includeSelf, boolean includeControllable, boolean includeUncontrollable)
+    public StateSet epsilonClosure(final boolean includeSelf, final boolean includeControllable, final boolean includeUncontrollable)
     {
-        StateSet result = new StateSet();
+        final StateSet result = new StateSet();
 
         // Include self?
         if (includeSelf)
@@ -855,16 +853,16 @@ public class State
         }
 
         // Examine states
-        LinkedList<State> statesToExamine = new LinkedList<State>();
+        final LinkedList<State> statesToExamine = new LinkedList<State>();
         statesToExamine.add(this);
         while (statesToExamine.size() != 0)
         {
-            State currState = statesToExamine.removeFirst();
+            final State currState = statesToExamine.removeFirst();
 
-            for (Iterator<Arc> arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+            for (final Iterator<Arc> arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
             {
-                Arc currArc = arcIt.next();
-                State state = currArc.getToState();
+                final Arc currArc = arcIt.next();
+                final State state = currArc.getToState();
 
                 // Is this an epsilon event that we care about?
                 if (!currArc.getEvent().isObservable() && !currArc.isSelfLoop() && !result.contains(state) &&
@@ -887,22 +885,22 @@ public class State
      */
     public StateSet backwardsEpsilonClosure()
     {
-        StateSet result = new StateSet();
+        final StateSet result = new StateSet();
 
         result.add(this);
 
-        LinkedList<State> statesToExamine = new LinkedList<State>();
+        final LinkedList<State> statesToExamine = new LinkedList<State>();
 
         statesToExamine.add(this);
 
         while (statesToExamine.size() != 0)
         {
-            State currState = statesToExamine.removeFirst();
+            final State currState = statesToExamine.removeFirst();
 
-            for (Iterator<Arc> arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
+            for (final Iterator<Arc> arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
             {
-                Arc currArc = arcIt.next();
-                State state = currArc.getFromState();
+                final Arc currArc = arcIt.next();
+                final State state = currArc.getFromState();
 
                 if (!currArc.getEvent().isObservable() &&!currArc.isSelfLoop() &&!result.contains(state))
                 {
@@ -919,7 +917,7 @@ public class State
     /**
      * Returns true if this state has an outgoing arc for this event .
      */
-    public boolean doesDefine(LabeledEvent event)
+    public boolean doesDefine(final LabeledEvent event)
     {
         return doesDefine(event, false);
     }
@@ -929,7 +927,7 @@ public class State
      * If considerEpsilonClosure is true, it can be anywhere in the epsilon closure
      * of this state instead of just in this state.
      */
-    private boolean doesDefine(LabeledEvent event, boolean considerEpsilonClosure)
+    private boolean doesDefine(final LabeledEvent event, final boolean considerEpsilonClosure)
     {
         Iterator<Arc> arc_it;
 
@@ -944,7 +942,7 @@ public class State
 
         while (arc_it.hasNext())
         {
-            Arc curr_arc = arc_it.next();
+            final Arc curr_arc = arc_it.next();
 
             if (curr_arc.getEvent().equals(event))
             {
@@ -958,9 +956,9 @@ public class State
     /**
      * Returns the alphabet of active events. Epsilon events are left out.
      */
-    public Alphabet activeEvents(boolean considerEpsilonClosure)
+    public Alphabet activeEvents(final boolean considerEpsilonClosure)
     {
-        Alphabet enabled = new Alphabet();
+        final Alphabet enabled = new Alphabet();
         Iterator<Arc> arcIt;
 
         if (considerEpsilonClosure)
@@ -974,7 +972,7 @@ public class State
 
         while (arcIt.hasNext())
         {
-            LabeledEvent event = arcIt.next().getEvent();
+            final LabeledEvent event = arcIt.next().getEvent();
 
             if (!enabled.contains(event) && event.isObservable())
             {
@@ -1020,7 +1018,7 @@ public class State
     /**
      * Updates the accumulated cost. This method is overloaded in CompositeState.
      */
-    public void updateCosts(State prevState)
+    public void updateCosts(final State prevState)
     {
         updateCosts(prevState, prevState.getAccumulatedCost());
     }
@@ -1029,7 +1027,7 @@ public class State
      * This method updates explicitly the accumulatedCost. Normally, this version
      * of updateCosts() is only used from within Node.class.
      */
-    public void updateCosts(State prevState, double accumulatedCost)
+    public void updateCosts(final State prevState, final double accumulatedCost)
     {
         this.accumulatedCost = accumulatedCost + prevState.getCost();
     }
@@ -1042,15 +1040,15 @@ public class State
      * Implementation of the Comparable interface. Compares the id of the states.
      */
 
-    public int compareTo(NamedProxy partner)
+    public int compareTo(final NamedProxy partner)
     {
         return name.compareTo(((State) partner).name);
     }
-    
+
 //    //////////////////
 //    // Kripke stuff //
 //    //////////////////
-//    
+//
 //    /**
 //     * The set of labels in this state.
 //     */
@@ -1086,52 +1084,6 @@ public class State
         return StateProxy.class;
     }
 
-    public boolean equalsByContents(final Proxy partner)
-    {
-        if (getProxyInterface() == partner.getProxyInterface()) {
-            final StateProxy partnerState = (StateProxy) partner;
-            return
-                getName().equals(partnerState.getName()) &&
-                isInitial() == partnerState.isInitial() &&
-                ProxyTools.isEqualCollectionByContents
-                    (getPropositions(), partnerState.getPropositions());
-        } else {
-            return false;
-        }
-    }
-
-    public boolean equalsWithGeometry(final Proxy partner)
-    {
-        return equalsByContents(partner);
-    }
-
-    public int hashCodeByContents()
-    {
-        int result = refHashCode();
-        result *= 5;
-        if (isInitial())
-        {
-            result *= 5;
-            result += "initial".hashCode();
-        }
-        if (isAccepting())
-        {
-            result *= 5;
-            result += "accepting".hashCode();
-        }
-        if (isForbidden())
-        {
-            result *= 5;
-            result += "forbidden".hashCode();
-        }
-        return result;
-    }
-
-    public int hashCodeWithGeometry()
-    {
-        return hashCodeByContents();
-    }
-
     public Object acceptVisitor(final ProxyVisitor visitor)
         throws VisitorException
     {
@@ -1154,7 +1106,7 @@ public class State
     //# Interface net.sourceforge.waters.model.module.AutomatonProxy
     public Collection<EventProxy> getPropositions()
     {
-        LinkedList<EventProxy> currPropositions = new LinkedList<EventProxy>();
+        final LinkedList<EventProxy> currPropositions = new LinkedList<EventProxy>();
         if (isAccepting() && !isForbidden())
         {
             currPropositions.add(acceptingProposition);

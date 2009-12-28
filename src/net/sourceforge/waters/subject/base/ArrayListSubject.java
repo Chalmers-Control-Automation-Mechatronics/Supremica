@@ -19,6 +19,7 @@ import java.util.List;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.unchecked.Casting;
 
 
@@ -113,69 +114,6 @@ public class ArrayListSubject<P extends ProxySubject>
 
 
   //#########################################################################
-  //# Equals and Hashcode
-  /**
-   * Checks whether this list has the same contents as another list.
-   * To be considered equal, the two lists must have the same size,
-   * and contain proxies that are considered as equal by their
-   * {@link Proxy#equalsByContents(Proxy) equalsByContents()} methods,
-   * in the proper order.
-   */
-  public boolean equalsByContents(final List<? extends Proxy> partner)
-  {
-    if (size() != partner.size()) {
-      return false;
-    }
-    final Iterator<P> iter1 = iterator();
-    final Iterator<? extends Proxy> iter2 = partner.iterator();
-    while (iter1.hasNext()) {
-      final P item1 = iter1.next();
-      final Proxy item2 = iter2.next();
-      if (item1 == null) {
-        if (item2 != null) {
-          return false;
-        } 
-      } else {
-        if (!item1.equalsByContents(item2)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Checks whether this list has the same contents and geometry
-   * information as another list. To be considered equal, the two lists
-   * must have the same size, and contain proxies that are considered as
-   * equal by their {@link Proxy#equalsWithGeometry(Proxy)
-   * equalsWithGeometry()} methods, in the proper order.
-   */
-  public boolean equalsWithGeometry(final List<? extends Proxy> partner)
-  {
-    if (size() != partner.size()) {
-      return false;
-    }
-    final Iterator<P> iter1 = iterator();
-    final Iterator<? extends Proxy> iter2 = partner.iterator();
-    while (iter1.hasNext()) {
-      final P item1 = iter1.next();
-      final Proxy item2 = iter2.next();
-      if (item1 == null) {
-        if (item2 != null) {
-          return false;
-        }
-      } else {
-        if (!item1.equalsWithGeometry(item2)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-
-  //#########################################################################
   //# Interface java.util.List
   public void add(final int index, final P proxy)
   {
@@ -213,11 +151,12 @@ public class ArrayListSubject<P extends ProxySubject>
     return mProxyList.size();
   }
 
-           
+
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ListSubject
   public void assignFrom(final List<? extends P> list)
   {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
     final int oldsize = size();
     final int newsize = list.size();
     final boolean[] used = new boolean[oldsize];
@@ -237,7 +176,7 @@ public class ArrayListSubject<P extends ProxySubject>
     for (final P newproxy : list) {
       if (iter.hasNext()) {
         final P oldproxy = iter.next();
-        if (newproxy.equalsWithGeometry(oldproxy)) {
+        if (eq.equals(newproxy, oldproxy)) {
           newlist.set(i, oldproxy);
           used[i] = true;
         }
@@ -251,7 +190,7 @@ public class ArrayListSubject<P extends ProxySubject>
       if (newlist.get(i) == null) {
         int j = 0;
         for (final P oldproxy : this) {
-          if (!used[j] && newproxy.equalsWithGeometry(oldproxy)) {
+          if (!used[j] && eq.equals(newproxy, oldproxy)) {
             newlist.set(i, oldproxy);
             used[j] = true;
             moved.add(oldproxy);
@@ -264,7 +203,7 @@ public class ArrayListSubject<P extends ProxySubject>
           final P proxy = ProxyTools.clone(newproxy);
           newlist.set(i, proxy);
           added.add(proxy);
-          beforeAdd(proxy);          
+          beforeAdd(proxy);
         }
       }
       i++;
@@ -287,7 +226,7 @@ public class ArrayListSubject<P extends ProxySubject>
     }
   }
 
-  
+
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
   public Subject getParent()

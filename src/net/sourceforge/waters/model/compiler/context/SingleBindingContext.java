@@ -11,6 +11,7 @@
 package net.sourceforge.waters.model.compiler.context;
 
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -59,7 +60,9 @@ public class SingleBindingContext implements BindingContext
   public SimpleExpressionProxy getBoundExpression
     (final SimpleExpressionProxy ident)
   {
-    if (mBoundVariableName.equalsByContents(ident)) {
+    final ModuleEqualityVisitor eq =
+      ModuleEqualityVisitor.getInstance(false);
+    if (eq.equals(mBoundVariableName, ident)) {
       return mBoundValue;
     } else {
       return mParent.getBoundExpression(ident);
@@ -69,7 +72,8 @@ public class SingleBindingContext implements BindingContext
   public boolean isEnumAtom(final IdentifierProxy ident)
   {
     if (ident instanceof SimpleIdentifierProxy &&
-        mBoundVariableName.equalsByContents(ident)) {
+        ModuleEqualityVisitor.getInstance(false).
+          equals(mBoundVariableName, ident)) {
       return false;
     } else {
       return mParent.isEnumAtom(ident);

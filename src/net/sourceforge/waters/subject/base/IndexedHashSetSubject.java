@@ -25,6 +25,7 @@ import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.unchecked.Casting;
 
 
@@ -128,32 +129,6 @@ public class IndexedHashSetSubject<P extends NamedSubject>
 
 
   //#########################################################################
-  //# Equals and Hashcode
-  public boolean equalsWithGeometry(final Object partner)
-  {
-    if (!(partner instanceof Set<?>)) {
-      return false;
-    }
-    final Set<?> set = (Set<?>) partner;
-    if (size() != set.size()) {
-      return false;
-    }
-    for (final Object item2 : set) {
-      if (!(item2 instanceof NamedSubject)) {
-        return false;
-      }
-      final NamedSubject elem2 = (NamedSubject) item2;
-      final String name = elem2.getName();
-      final NamedSubject elem1 = get(name);
-      if (elem1 == null || !elem1.equalsWithGeometry(elem2)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-
-  //#########################################################################
   //# Interface java.util.Set
   public boolean add(final P proxy)
   {
@@ -198,7 +173,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
     return mProxyMap.size();
   }
 
-           
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.IndexedSetProxy
   public void checkAllUnique(final Collection<? extends P> collection)
@@ -232,7 +207,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
       return proxy;
     } else {
       throw createNameNotFound(name);
-    }      
+    }
   }
 
   public P get(final String name)
@@ -312,6 +287,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
   //# Interface net.sourceforge.waters.subject.base.SetSubject
   public void assignFrom(final Set<? extends P> set)
   {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
     final int oldsize = size();
     final int newsize = set.size();
     final Collection<P> added = new ArrayList<P>(newsize);
@@ -324,7 +300,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
       }
       names.add(name);
       final P present = mProxyMap.get(name);
-      if (present == null || !present.equalsWithGeometry(newproxy)) {
+      if (present == null || !eq.equals(present, newproxy)) {
         final P copy = ProxyTools.clone(newproxy);
         added.add(copy);
       } else {
@@ -338,7 +314,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
     }
   }
 
-  
+
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
   public Subject getParent()

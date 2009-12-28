@@ -20,9 +20,8 @@ import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
-import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -32,6 +31,8 @@ import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -148,9 +149,11 @@ public class EventTableModel
       case 0:
         return;
       case 1:
-        final Proxy proxy = (Proxy) value;
         final ModuleProxyCloner cloner =
           ModuleSubjectFactory.getCloningInstance();
+        final ModuleEqualityVisitor eq =
+          ModuleEqualityVisitor.getInstance(true);
+        final Proxy proxy = (Proxy) value;
         final IdentifierSubject neo =
           (IdentifierSubject) cloner.getClone(proxy);
         final IdentifierSubject old = getIdentifier(row);
@@ -161,7 +164,7 @@ public class EventTableModel
           }
         } else if (neo == null) {
           mEventHandler.removeEvent(old);
-        } else if (!old.equalsWithGeometry(neo)) {
+        } else if (!eq.equals(old, neo)) {
           mEventHandler.replaceEvent(old, neo);
         }
         return;
@@ -200,8 +203,10 @@ public class EventTableModel
     if (index < 0) {
       return false;
     } else {
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
       final IdentifierSubject found = getIdentifier(index);
-      return found.equalsByContents(ident);
+      return eq.equals(found, ident);
     }
   }
 
@@ -298,8 +303,9 @@ public class EventTableModel
   //# Auxiliary Methods
   private List<EventEntry> collectEvents()
   {
-    final ProxyAccessorMap<IdentifierSubject> collected =
-      new ProxyAccessorHashMapByContents<IdentifierSubject>();
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ProxyAccessorSet<IdentifierSubject> collected =
+      new ProxyAccessorHashSet<IdentifierSubject>(eq);
     final EventListExpressionProxy blocked = mGraph.getBlockedEvents();
     collectEvents(collected, blocked);
     final Collection<NodeProxy> nodes = mGraph.getNodes();
@@ -324,7 +330,7 @@ public class EventTableModel
     return result;
   }
 
-  private void collectEvents(final ProxyAccessorMap<IdentifierSubject> dest,
+  private void collectEvents(final ProxyAccessorSet<IdentifierSubject> dest,
                              final EventListExpressionProxy source)
   {
     if (source != null) {
@@ -332,7 +338,7 @@ public class EventTableModel
     }
   }
 
-  private void collectEvents(final ProxyAccessorMap<IdentifierSubject> dest,
+  private void collectEvents(final ProxyAccessorSet<IdentifierSubject> dest,
                              final List<? extends Proxy> source)
   {
     for (final Proxy proxy : source) {
@@ -438,7 +444,7 @@ public class EventTableModel
         }
         break;
       default:
-        subject = (AbstractSubject) event.getSource(); 
+        subject = (AbstractSubject) event.getSource();
         break;
       }
       final EventDeclSubject decl =
@@ -454,7 +460,7 @@ public class EventTableModel
       case ModelChangeEvent.GEOMETRY_CHANGED:
         row0 = row1 = getFirstRow(decl);
         while (row1 < rowcount && guessEventDecl(row1) == decl) {
-          row1++;          
+          row1++;
         }
         if (row0 < row1) {
           fireTableRowsUpdated(row0, row1 - 1);
@@ -475,7 +481,7 @@ public class EventTableModel
               fireTableRowsUpdated(row0, row1 - 1);
               row0 = row1;
               deleting = true;
-            }              
+            }
           } else {
             if (row0 < 0) {
               row0 = row1;
@@ -484,7 +490,7 @@ public class EventTableModel
               removeIdentifierRange(row0, row1 - 1);
               row1 = row0;
               deleting = false;
-            }              
+            }
           }
         }
         if (row0 >= 0) {
@@ -549,8 +555,10 @@ public class EventTableModel
     public boolean equals(final Object partner)
     {
       if (partner != null && partner.getClass() == getClass()) {
+        final ModuleEqualityVisitor eq =
+          ModuleEqualityVisitor.getInstance(false);
         final EventEntry entry = (EventEntry) partner;
-        return ProxyTools.equalsByContents(mName, entry.mName);
+        return eq.equals(mName, entry.mName);
       } else {
         return false;
       }
@@ -558,7 +566,9 @@ public class EventTableModel
 
     public int hashCode()
     {
-      return mName == null ? 0 : mName.hashCodeByContents();
+      final ModuleHashCodeVisitor hash =
+        ModuleHashCodeVisitor.getInstance(false);
+      return hash.hashCode(mName);
     }
 
 
@@ -746,7 +756,9 @@ public class EventTableModel
 
     public Boolean visitIdentifierProxy(final IdentifierProxy ident)
     {
-      return mIdentifier.equalsByContents(ident);
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      return eq.equals(mIdentifier, ident);
     }
 
     public Boolean visitEventListExpressionProxy

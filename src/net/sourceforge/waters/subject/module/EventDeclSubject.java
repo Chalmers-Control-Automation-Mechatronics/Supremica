@@ -17,8 +17,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
@@ -173,81 +171,10 @@ public final class EventDeclSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<EventDeclProxy> getProxyInterface()
   {
     return EventDeclProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final EventDeclProxy downcast = (EventDeclProxy) partner;
-      return
-        mKind.equals(downcast.getKind()) &&
-        (mIsObservable == downcast.isObservable()) &&
-        mScope.equals(downcast.getScope()) &&
-        ProxyTools.isEqualListByContents
-          (mRanges, downcast.getRanges()) &&
-        mAttributes.equals(downcast.getAttributes());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final EventDeclProxy downcast = (EventDeclProxy) partner;
-      return
-        mKind.equals(downcast.getKind()) &&
-        (mIsObservable == downcast.isObservable()) &&
-        mScope.equals(downcast.getScope()) &&
-        ProxyTools.isEqualListWithGeometry
-          (mRanges, downcast.getRanges()) &&
-        ProxyTools.equalsWithGeometry(mColorGeometry, downcast.getColorGeometry()) &&
-        mAttributes.equals(downcast.getAttributes());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mKind.hashCode();
-    result *= 5;
-    if (mIsObservable) {
-      result++;
-    }
-    result *= 5;
-    result += mScope.hashCode();
-    result *= 5;
-    result += ProxyTools.getListHashCodeByContents(mRanges);
-    result *= 5;
-    result += mAttributes.hashCode();
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeWithGeometry();
-    result *= 5;
-    result += mKind.hashCode();
-    result *= 5;
-    if (mIsObservable) {
-      result++;
-    }
-    result *= 5;
-    result += mScope.hashCode();
-    result *= 5;
-    result += ProxyTools.getListHashCodeWithGeometry(mRanges);
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mColorGeometry);
-    result *= 5;
-    result += mAttributes.hashCode();
-    return result;
   }
 
 

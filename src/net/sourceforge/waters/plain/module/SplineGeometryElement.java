@@ -16,7 +16,6 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
@@ -74,32 +73,10 @@ public final class SplineGeometryElement
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<SplineGeometryProxy> getProxyInterface()
   {
     return SplineGeometryProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final SplineGeometryProxy downcast = (SplineGeometryProxy) partner;
-      return
-        mPoints.equals(downcast.getPoints()) &&
-        mKind.equals(downcast.getKind());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mPoints.hashCode();
-    result *= 5;
-    result += mKind.hashCode();
-    return result;
   }
 
 

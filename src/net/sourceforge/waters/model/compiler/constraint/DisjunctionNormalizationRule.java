@@ -15,8 +15,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -24,6 +24,7 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -153,7 +154,9 @@ class DisjunctionNormalizationRule extends SimplificationRule
     //# Constructor
     private DisjunctionCollector()
     {
-      mLiterals = new ProxyAccessorHashMapByContents<SimpleExpressionProxy>();
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      mLiterals = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
     }
 
     //#######################################################################
@@ -259,7 +262,7 @@ class DisjunctionNormalizationRule extends SimplificationRule
 
     //#######################################################################
     //# Data Members
-    private final ProxyAccessorMap<SimpleExpressionProxy> mLiterals;
+    private final ProxyAccessorSet<SimpleExpressionProxy> mLiterals;
 
     private ConstraintPropagator mPropagator;
     private boolean mHasModifications;

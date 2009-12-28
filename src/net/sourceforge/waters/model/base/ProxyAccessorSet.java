@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.base
-//# CLASS:   ProxyAccessorCollection
+//# CLASS:   ProxyAccessorMap
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -14,24 +14,22 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * An alternative collection interface that allows {@link Proxy} objects to
+ * An alternative set interface that allows {@link Proxy} objects to
  * be treated using alternative equalities.
- * This interface supports actual collections, where more than a single
- * instance of a set of equal items may be contained, and where the order
- * is immaterial.  A proxy accessor map essentially is a map that maps
- * {@link ProxyAccessor} objects to the number of times they are contained
- * in the collection. This interface provides set-like access to this set.
+ * A proxy accessor map essentially is a map that maps {@link ProxyAccessor}
+ * objects to the actual {@link Proxy} objects. This interface provides
+ * set-like access to this set.
  *
- * @see ProxyAccessorSet
+ * @see ProxyAccessorCollection
  * @author Robi Malik
  */
 
-public interface ProxyAccessorCollection<P extends Proxy>
-  extends Map<ProxyAccessor<P>,Integer>
+public interface ProxyAccessorSet<P extends Proxy>
+  extends Map<ProxyAccessor<P>,P>
 {
 
   //#########################################################################
-  //# Access as Proxy Collection
+  //# Access as Proxy Set
   public boolean addProxy(P proxy);
 
   public boolean addAll(Collection<? extends P> collection);
@@ -42,7 +40,9 @@ public interface ProxyAccessorCollection<P extends Proxy>
 
   public <PP extends P> ProxyAccessor<PP> createAccessor(PP proxy);
 
-  public int getCount(P proxy);
+  public boolean equalsByAccessorEquality(ProxyAccessorSet<P> partner);
+
+  public int hashCodeByAccessorEquality();
 
   public Iterator<P> iterator();
 

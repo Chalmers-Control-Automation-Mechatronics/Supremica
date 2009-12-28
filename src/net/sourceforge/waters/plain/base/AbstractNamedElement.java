@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.plain.base;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 
 
@@ -23,9 +22,8 @@ import net.sourceforge.waters.model.base.NamedProxy;
  * without affecting any hash tables or ordered lists. While not actually
  * providing the name member, this abstract base class uses the {@link
  * #getName()} method to provide implementations for the {@link
- * #refequals(NamedProxy) refequals()}, {@link #equalsByContents(Proxy)
- * equals()}, {@link #hashCodeByContents()}, and {@link
- * #compareTo(NamedProxy) compareTo()} methods.</P>
+ * #refequals(NamedProxy) refequals()} and {@link #compareTo(NamedProxy)
+ * compareTo()} methods.</P>
  *
  * @author Robi Malik
  */
@@ -72,34 +70,9 @@ public abstract class AbstractNamedElement
 
   //#########################################################################
   //# Equals and Hashcode
-  /**
-   * Checks whether two elements are equal. This method implements
-   * content-based equality, i.e., two elements will be equal if their
-   * contents are the same. In addition to calling the superclass
-   * method, this method compares the names of the two elements.
-   */
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final NamedProxy named = (NamedProxy) partner;
-      return getName().equals(named.getName());
-    } else {
-      return false;
-    }
-  }
-
   public int refHashCode()
   {
     return getName().hashCode();
-  }
-
-  /**
-   * Computes a hash code based on this object's contents.
-   * This method uses the element's name to calculate the hash code.
-   */
-  public int hashCodeByContents()
-  {
-    return super.hashCodeByContents() + 5 * getName().hashCode();
   }
 
 

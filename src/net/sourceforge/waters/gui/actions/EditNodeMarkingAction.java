@@ -25,6 +25,7 @@ import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
@@ -81,11 +82,12 @@ public class EditNodeMarkingAction
     final NodeSubject cloned = (NodeSubject) cloner.getClone(mNode);
     final List<AbstractSubject> props =
       cloned.getPropositions().getEventListModifiable();
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     final Iterator<AbstractSubject> iter = props.iterator();
     boolean removed = false;
     while (iter.hasNext()) {
       final AbstractSubject prop = iter.next();
-      if (mIdentifier.equalsByContents(prop)) {
+      if (eq.equals(mIdentifier, prop)) {
         iter.remove();
         removed = true;
         break;

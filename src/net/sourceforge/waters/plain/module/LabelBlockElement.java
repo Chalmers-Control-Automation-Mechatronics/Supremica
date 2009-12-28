@@ -15,7 +15,6 @@ package net.sourceforge.waters.plain.module;
 import java.util.Collection;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -70,29 +69,10 @@ public final class LabelBlockElement
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<LabelBlockProxy> getProxyInterface()
   {
     return LabelBlockProxy.class;
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final LabelBlockProxy downcast = (LabelBlockProxy) partner;
-      return
-        ProxyTools.equalsWithGeometry(mGeometry, downcast.getGeometry());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mGeometry);
-    return result;
   }
 
 

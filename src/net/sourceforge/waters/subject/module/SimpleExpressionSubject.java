@@ -12,8 +12,6 @@
 
 package net.sourceforge.waters.subject.module;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -76,28 +74,6 @@ public abstract class SimpleExpressionSubject
     } else {
       return false;
     }
-  }
-
-
-  //#########################################################################
-  //# Equality and Hashcode
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final SimpleExpressionProxy downcast = (SimpleExpressionProxy) partner;
-      return
-        ProxyTools.equals(mPlainText, downcast.getPlainText());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.hashCode(mPlainText);
-    return result;
   }
 
 

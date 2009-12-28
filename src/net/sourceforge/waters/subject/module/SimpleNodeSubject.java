@@ -15,8 +15,6 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collections;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
@@ -166,61 +164,10 @@ public final class SimpleNodeSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<SimpleNodeProxy> getProxyInterface()
   {
     return SimpleNodeProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final SimpleNodeProxy downcast = (SimpleNodeProxy) partner;
-      return
-        (mIsInitial == downcast.isInitial());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final SimpleNodeProxy downcast = (SimpleNodeProxy) partner;
-      return
-        (mIsInitial == downcast.isInitial()) &&
-        ProxyTools.equalsWithGeometry(mPointGeometry, downcast.getPointGeometry()) &&
-        ProxyTools.equalsWithGeometry(mInitialArrowGeometry, downcast.getInitialArrowGeometry()) &&
-        ProxyTools.equalsWithGeometry(mLabelGeometry, downcast.getLabelGeometry());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    if (mIsInitial) {
-      result++;
-    }
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    if (mIsInitial) {
-      result++;
-    }
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mPointGeometry);
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mInitialArrowGeometry);
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mLabelGeometry);
-    return result;
   }
 
 

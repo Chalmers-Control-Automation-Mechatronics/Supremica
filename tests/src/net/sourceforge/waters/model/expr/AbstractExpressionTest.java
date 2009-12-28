@@ -16,6 +16,7 @@ import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -363,7 +364,7 @@ public abstract class AbstractExpressionTest extends TestCase
       final SimpleExpressionProxy parsed = mParser.parse(text, mask);
       assertTrue("Unexpected result! - expected: <" + expr +
                  ">, but got <" + parsed + ">!",
-                 parsed.equalsByContents(expr));
+                 mEquality.equals(parsed, expr));
       assertEquals("Wrong plain text!", text, parsed.toString());
     } catch (final ParseException exception) {
       final int pos = exception.getErrorOffset();
@@ -417,6 +418,7 @@ public abstract class AbstractExpressionTest extends TestCase
     final ModuleProxyFactory factory = getFactory();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mParser = new ExpressionParser(factory, optable);
+    mEquality = ModuleEqualityVisitor.getInstance(false);
 
     final BinaryOperator plus = optable.getBinaryOperator("+");
     final BinaryOperator minus = optable.getBinaryOperator("-");
@@ -561,6 +563,7 @@ public abstract class AbstractExpressionTest extends TestCase
   //#########################################################################
   //# Data Members
   private ExpressionParser mParser;
+  private ModuleEqualityVisitor mEquality;
 
   private SimpleExpressionProxy mExpr_1;
   private SimpleExpressionProxy mExpr_2;

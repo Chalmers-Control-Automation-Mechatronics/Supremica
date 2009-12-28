@@ -18,6 +18,7 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -42,7 +43,7 @@ class MatchVisitor extends AbstractModuleProxyVisitor
   {
   }
 
-    
+
   //#########################################################################
   //# Invocation
   boolean match(final SimpleExpressionProxy expr,
@@ -78,7 +79,7 @@ class MatchVisitor extends AbstractModuleProxyVisitor
     mCurrentExpression = expr;
     return (Boolean) template.acceptVisitor(this);
   }
-    
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
@@ -152,7 +153,9 @@ class MatchVisitor extends AbstractModuleProxyVisitor
   public Boolean visitSimpleExpressionProxy
     (final SimpleExpressionProxy template)
   {
-    return template.equalsByContents(mCurrentExpression);
+    final ModuleEqualityVisitor eq =
+      ModuleEqualityVisitor.getInstance(false);
+    return eq.equals(template, mCurrentExpression);
   }
 
   public Boolean visitSimpleIdentifierProxy

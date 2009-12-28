@@ -10,13 +10,14 @@
 package net.sourceforge.waters.model.compiler.constraint;
 
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 
 class PlaceHolder {
-  
+
   //#########################################################################
   //# Constructors
   PlaceHolder(final ModuleProxyFactory factory, final String name)
@@ -58,7 +59,9 @@ class PlaceHolder {
       mBoundExpression = expr;
       return true;
     } else {
-      return expr.equalsByContents(mBoundExpression);
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      return eq.equals(expr, mBoundExpression);
     }
   }
 

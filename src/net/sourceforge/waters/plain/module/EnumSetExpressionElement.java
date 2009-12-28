@@ -17,8 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
@@ -80,52 +78,10 @@ public final class EnumSetExpressionElement
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<EnumSetExpressionProxy> getProxyInterface()
   {
     return EnumSetExpressionProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final EnumSetExpressionProxy downcast =
-        (EnumSetExpressionProxy) partner;
-      return
-        ProxyTools.isEqualListByContents
-          (mItems, downcast.getItems());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final EnumSetExpressionProxy downcast =
-        (EnumSetExpressionProxy) partner;
-      return
-        ProxyTools.isEqualListWithGeometry
-          (mItems, downcast.getItems());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.getListHashCodeByContents(mItems);
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeWithGeometry();
-    result *= 5;
-    result += ProxyTools.getListHashCodeWithGeometry(mItems);
-    return result;
   }
 
 

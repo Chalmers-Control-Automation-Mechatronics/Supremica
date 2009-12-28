@@ -13,10 +13,11 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
 
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
@@ -29,15 +30,17 @@ public class CompiledClause implements Cloneable
   //# Constructors
   public CompiledClause(final BinaryOperator op)
   {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     mOperator = op;
-    mLiterals = new ProxyAccessorHashMapByContents<SimpleExpressionProxy>();
+    mLiterals = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
   }
 
   public CompiledClause(final BinaryOperator op, final int size)
   {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     mOperator = op;
     mLiterals =
-      new ProxyAccessorHashMapByContents<SimpleExpressionProxy>(size);
+      new ProxyAccessorHashSet<SimpleExpressionProxy>(eq, size);
   }
 
   public CompiledClause(final BinaryOperator op,
@@ -159,6 +162,6 @@ public class CompiledClause implements Cloneable
   //#########################################################################
   //# Data Members
   private final BinaryOperator mOperator;
-  private final ProxyAccessorMap<SimpleExpressionProxy> mLiterals;
+  private final ProxyAccessorSet<SimpleExpressionProxy> mLiterals;
 
 }

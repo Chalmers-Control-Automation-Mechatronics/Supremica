@@ -12,18 +12,18 @@ package net.sourceforge.waters.model.compiler.constraint;
 
 import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -34,9 +34,10 @@ class DummyContext implements VariableContext
   //# Constructor
   DummyContext()
   {
-    mAtoms = new ProxyAccessorHashMapByContents<IdentifierProxy>();
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    mAtoms = new ProxyAccessorHashSet<IdentifierProxy>(eq);
     mRangeMap =
-      new HashMap<ProxyAccessor<SimpleExpressionProxy>,CompiledRange>();
+      new ProxyAccessorHashMap<SimpleExpressionProxy,CompiledRange>(eq);
   }
 
 
@@ -63,15 +64,7 @@ class DummyContext implements VariableContext
   //# Interface net.sourceforge.waters.model.compiler.context.VariableContext
   public CompiledRange getVariableRange(final SimpleExpressionProxy varname)
   {
-    final ProxyAccessor<SimpleExpressionProxy> accessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
-    return getVariableRange(accessor);
-  }
-
-  public CompiledRange getVariableRange
-    (final ProxyAccessor<SimpleExpressionProxy> accessor)
-  {
-    return mRangeMap.get(accessor);
+   return mRangeMap.getByProxy(varname);
   }
 
   public Collection<SimpleExpressionProxy> getVariableNames()
@@ -90,9 +83,7 @@ class DummyContext implements VariableContext
   void addVariable(final SimpleExpressionProxy varname,
                    final CompiledRange range)
   {
-    final ProxyAccessor<SimpleExpressionProxy> accessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
-    mRangeMap.put(accessor, range);
+    mRangeMap.putByProxy(varname, range);
   }
 
 
@@ -105,7 +96,7 @@ class DummyContext implements VariableContext
     //#######################################################################
     //# Constructor
     VariableNameSet
-      (final Map<ProxyAccessor<SimpleExpressionProxy>,CompiledRange> map)
+      (final ProxyAccessorMap<SimpleExpressionProxy,CompiledRange> map)
     {
       mMap = map;
     }
@@ -124,7 +115,7 @@ class DummyContext implements VariableContext
 
     //#######################################################################
     //# Data Members
-    private final Map<ProxyAccessor<SimpleExpressionProxy>,CompiledRange> mMap;
+    private final ProxyAccessorMap<SimpleExpressionProxy,CompiledRange> mMap;
 
   }
 
@@ -171,8 +162,8 @@ class DummyContext implements VariableContext
 
   //#########################################################################
   //# Data Members
-  private final ProxyAccessorMap<IdentifierProxy> mAtoms;
-  private final Map<ProxyAccessor<SimpleExpressionProxy>,CompiledRange>
+  private final ProxyAccessorSet<IdentifierProxy> mAtoms;
+  private final ProxyAccessorMap<SimpleExpressionProxy,CompiledRange>
     mRangeMap;
 
 }

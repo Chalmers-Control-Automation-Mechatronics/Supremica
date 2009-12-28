@@ -10,13 +10,12 @@
 package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.AbstractSet;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
@@ -24,6 +23,7 @@ import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -31,7 +31,7 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 /**
  * The binding context used by the EFA compiler.
- * 
+ *
  * In addition to bindings of enumeration atom, the EFA context includes a
  * symbol table contains with all variables mantained by the EFA compiler
  * and their range. These are the variables that occur in guards and
@@ -59,8 +59,10 @@ class EFAModuleContext
   EFAModuleContext(final ModuleProxy module)
   {
     super(module);
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     final int size = 2 * module.getComponentList().size();
-    mMap = new HashMap<ProxyAccessor<SimpleExpressionProxy>,EFAVariable>(size);
+    mMap =
+      new ProxyAccessorHashMap<SimpleExpressionProxy,EFAVariable>(eq, size);
     mVariableNameSet = new VariableNameSet();
   }
 
@@ -70,17 +72,6 @@ class EFAModuleContext
   public CompiledRange getVariableRange(final SimpleExpressionProxy varname)
   {
     final EFAVariable var = getVariable(varname);
-    if (var == null) {
-      return null;
-    } else {
-      return var.getRange();
-    }
-  }
-
-  public CompiledRange getVariableRange
-    (final ProxyAccessor<SimpleExpressionProxy> accessor)
-  {
-    final EFAVariable var = getVariable(accessor);
     if (var == null) {
       return null;
     } else {
@@ -98,14 +89,7 @@ class EFAModuleContext
   //# Simple Access
   EFAVariable getVariable(final SimpleExpressionProxy varname)
   {
-    final ProxyAccessor<SimpleExpressionProxy> accessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(varname);
-    return getVariable(accessor);
-  }
-
-  EFAVariable getVariable(final ProxyAccessor<SimpleExpressionProxy> accessor)
-  {
-    return mMap.get(accessor);
+    return mMap.getByProxy(varname);
   }
 
   EFAVariable findVariable(final SimpleExpressionProxy varname)
@@ -127,15 +111,11 @@ class EFAModuleContext
     final EFAVariable curvar =
       new EFAVariable(false, comp, range, factory, optable);
     final SimpleExpressionProxy curvarname = curvar.getVariableName();
-    final ProxyAccessor<SimpleExpressionProxy> curaccessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(curvarname);
-    mMap.put(curaccessor, curvar);
+    mMap.putByProxy(curvarname, curvar);
     final EFAVariable nextvar =
       new EFAVariable(true, comp, range, factory, optable);
     final SimpleExpressionProxy nextvarname = nextvar.getVariableName();
-    final ProxyAccessor<SimpleExpressionProxy> nextaccessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(nextvarname);
-    mMap.put(nextaccessor, nextvar);
+    mMap.putByProxy(nextvarname, nextvar);
   }
 
 
@@ -195,13 +175,13 @@ class EFAModuleContext
     //#######################################################################
     //# Data Members
     private final Iterator<ProxyAccessor<SimpleExpressionProxy>> mMaster;
-    
+
   }
 
 
   //#########################################################################
   //# Data Members
-  private final Map<ProxyAccessor<SimpleExpressionProxy>,EFAVariable> mMap;
+  private final ProxyAccessorMap<SimpleExpressionProxy,EFAVariable> mMap;
   private final VariableNameSet mVariableNameSet;
 
 }

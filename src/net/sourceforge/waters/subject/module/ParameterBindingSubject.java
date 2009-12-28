@@ -12,7 +12,6 @@
 
 package net.sourceforge.waters.subject.module;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ExpressionProxy;
@@ -83,29 +82,10 @@ public final class ParameterBindingSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<ParameterBindingProxy> getProxyInterface()
   {
     return ParameterBindingProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final ParameterBindingProxy downcast = (ParameterBindingProxy) partner;
-      return
-        mExpression.equalsByContents(downcast.getExpression());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mExpression.hashCodeByContents();
-    return result;
   }
 
 

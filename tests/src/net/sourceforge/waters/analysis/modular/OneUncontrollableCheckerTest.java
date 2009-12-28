@@ -28,7 +28,7 @@ public class OneUncontrollableCheckerTest
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    TestSuite testSuite =
+    final TestSuite testSuite =
       new TestSuite(OneUncontrollableCheckerTest.class);
     return testSuite;
   }
@@ -64,6 +64,15 @@ public class OneUncontrollableCheckerTest
   {
     try {
       super.testHISCRhoneSubsystem1Patch2();
+    } catch (final OverflowException exception) {
+      // Can't do this one-uncontrollable-at-a-time --- too bad :-(
+    }
+  }
+
+  public void testTransferline__5() throws Exception
+  {
+    try {
+      super.testTransferline__5();
     } catch (final OverflowException exception) {
       // Can't do this one-uncontrollable-at-a-time --- too bad :-(
     }

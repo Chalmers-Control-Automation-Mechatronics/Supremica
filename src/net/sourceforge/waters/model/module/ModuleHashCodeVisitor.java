@@ -82,7 +82,7 @@ public class ModuleHashCodeVisitor
     int result = visitIdentifiedProxy(proxy);
     final ExpressionProxy expression = proxy.getExpression();
     result *= 5;
-    result += getProxyHashCode(expression);
+    result += computeProxyHashCode(expression);
     return result;
   }
 
@@ -93,13 +93,13 @@ public class ModuleHashCodeVisitor
     int result = visitSimpleExpressionProxy(proxy);
     final BinaryOperator operator = proxy.getOperator();
     result *= 5;
-    result += getOptionalHashCode(operator);
+    result += computeOptionalHashCode(operator);
     final SimpleExpressionProxy left = proxy.getLeft();
     result *= 5;
-    result += getProxyHashCode(left);
+    result += computeProxyHashCode(left);
     final SimpleExpressionProxy right = proxy.getRight();
     result *= 5;
-    result += getProxyHashCode(right);
+    result += computeProxyHashCode(right);
     return result;
   }
 
@@ -110,7 +110,7 @@ public class ModuleHashCodeVisitor
     int result = visitGeometryProxy(proxy);
     final Rectangle2D rectangle = proxy.getRectangle();
     result *= 5;
-    result += getOptionalHashCode(rectangle);
+    result += computeOptionalHashCode(rectangle);
     return result;
   }
 
@@ -121,7 +121,7 @@ public class ModuleHashCodeVisitor
     int result = visitGeometryProxy(proxy);
     final Set<Color> colorSet = proxy.getColorSet();
     result *= 5;
-    result += getOptionalHashCode(colorSet);
+    result += computeOptionalHashCode(colorSet);
     return result;
   }
 
@@ -139,7 +139,7 @@ public class ModuleHashCodeVisitor
     int result = visitAliasProxy(proxy);
     final ScopeKind scope = proxy.getScope();
     result *= 5;
-    result += getOptionalHashCode(scope);
+    result += computeOptionalHashCode(scope);
     return result;
   }
 
@@ -150,27 +150,27 @@ public class ModuleHashCodeVisitor
     int result = visitProxy(proxy);
     final NodeProxy source = proxy.getSource();
     result *= 5;
-    result += getRefHashCode(source);
+    result += computeRefHashCode(source);
     final NodeProxy target = proxy.getTarget();
     result *= 5;
-    result += getRefHashCode(target);
+    result += computeRefHashCode(target);
     final LabelBlockProxy labelBlock = proxy.getLabelBlock();
     result *= 5;
-    result += getProxyHashCode(labelBlock);
+    result += computeProxyHashCode(labelBlock);
     final GuardActionBlockProxy guardActionBlock =
       proxy.getGuardActionBlock();
     result *= 5;
-    result += getProxyHashCode(guardActionBlock);
+    result += computeProxyHashCode(guardActionBlock);
     if (isRespectingGeometry()) {
       final SplineGeometryProxy geometry = proxy.getGeometry();
       result *= 5;
-      result += getProxyHashCode(geometry);
+      result += computeProxyHashCode(geometry);
       final PointGeometryProxy startPoint = proxy.getStartPoint();
       result *= 5;
-      result += getProxyHashCode(startPoint);
+      result += computeProxyHashCode(startPoint);
       final PointGeometryProxy endPoint = proxy.getEndPoint();
       result *= 5;
-      result += getProxyHashCode(endPoint);
+      result += computeProxyHashCode(endPoint);
     }
     return result;
   }
@@ -182,7 +182,7 @@ public class ModuleHashCodeVisitor
     int result = visitSimpleExpressionProxy(proxy);
     final List<SimpleIdentifierProxy> items = proxy.getItems();
     result *= 5;
-    result += getListHashCode(items);
+    result += computeListHashCode(items);
     return result;
   }
 
@@ -200,7 +200,7 @@ public class ModuleHashCodeVisitor
     int result = visitIdentifiedProxy(proxy);
     final EventKind kind = proxy.getKind();
     result *= 5;
-    result += getOptionalHashCode(kind);
+    result += computeOptionalHashCode(kind);
     final boolean observable = proxy.isObservable();
     result *= 5;
     if (observable) {
@@ -208,17 +208,17 @@ public class ModuleHashCodeVisitor
     }
     final ScopeKind scope = proxy.getScope();
     result *= 5;
-    result += getOptionalHashCode(scope);
+    result += computeOptionalHashCode(scope);
     final List<SimpleExpressionProxy> ranges = proxy.getRanges();
     result *= 5;
-    result += getListHashCode(ranges);
+    result += computeListHashCode(ranges);
     final Map<String,String> attributes = proxy.getAttributes();
     result *= 5;
-    result += getOptionalHashCode(attributes);
+    result += computeOptionalHashCode(attributes);
     if (isRespectingGeometry()) {
       final ColorGeometryProxy colorGeometry = proxy.getColorGeometry();
       result *= 5;
-      result += getProxyHashCode(colorGeometry);
+      result += computeProxyHashCode(colorGeometry);
     }
     return result;
   }
@@ -230,7 +230,7 @@ public class ModuleHashCodeVisitor
     int result = visitExpressionProxy(proxy);
     final List<Proxy> eventList = proxy.getEventList();
     result *= 5;
-    result += getListHashCode(eventList);
+    result += computeListHashCode(eventList);
     return result;
   }
 
@@ -269,13 +269,13 @@ public class ModuleHashCodeVisitor
     int result = visitNamedProxy(proxy);
     final SimpleExpressionProxy range = proxy.getRange();
     result *= 5;
-    result += getProxyHashCode(range);
+    result += computeProxyHashCode(range);
     final SimpleExpressionProxy guard = proxy.getGuard();
     result *= 5;
-    result += getProxyHashCode(guard);
+    result += computeProxyHashCode(guard);
     final List<Proxy> body = proxy.getBody();
     result *= 5;
-    result += getListHashCode(body);
+    result += computeListHashCode(body);
     return result;
   }
 
@@ -291,13 +291,13 @@ public class ModuleHashCodeVisitor
     }
     final LabelBlockProxy blockedEvents = proxy.getBlockedEvents();
     result *= 5;
-    result += getProxyHashCode(blockedEvents);
+    result += computeProxyHashCode(blockedEvents);
     final Set<NodeProxy> nodes = proxy.getNodes();
     result *= 5;
-    result += getCollectionHashCode(nodes);
+    result += computeCollectionHashCode(nodes);
     final Collection<EdgeProxy> edges = proxy.getEdges();
     result *= 5;
-    result += getCollectionHashCode(edges);
+    result += computeCollectionHashCode(edges);
     return result;
   }
 
@@ -308,11 +308,11 @@ public class ModuleHashCodeVisitor
     int result = visitNodeProxy(proxy);
     final Set<NodeProxy> immediateChildNodes = proxy.getImmediateChildNodes();
     result *= 5;
-    result += getRefCollectionHashCode(immediateChildNodes);
+    result += computeRefCollectionHashCode(immediateChildNodes);
     if (isRespectingGeometry()) {
       final BoxGeometryProxy geometry = proxy.getGeometry();
       result *= 5;
-      result += getProxyHashCode(geometry);
+      result += computeProxyHashCode(geometry);
     }
     return result;
   }
@@ -324,14 +324,14 @@ public class ModuleHashCodeVisitor
     int result = visitProxy(proxy);
     final List<SimpleExpressionProxy> guards = proxy.getGuards();
     result *= 5;
-    result += getListHashCode(guards);
+    result += computeListHashCode(guards);
     final List<BinaryExpressionProxy> actions = proxy.getActions();
     result *= 5;
-    result += getListHashCode(actions);
+    result += computeListHashCode(actions);
     if (isRespectingGeometry()) {
       final LabelGeometryProxy geometry = proxy.getGeometry();
       result *= 5;
-      result += getProxyHashCode(geometry);
+      result += computeProxyHashCode(geometry);
     }
     return result;
   }
@@ -343,7 +343,7 @@ public class ModuleHashCodeVisitor
     int result = visitProxy(proxy);
     final IdentifierProxy identifier = proxy.getIdentifier();
     result *= 5;
-    result += getProxyHashCode(identifier);
+    result += computeProxyHashCode(identifier);
     return result;
   }
 
@@ -361,10 +361,10 @@ public class ModuleHashCodeVisitor
     int result = visitIdentifierProxy(proxy);
     final String name = proxy.getName();
     result *= 5;
-    result += getOptionalHashCode(name);
+    result += computeOptionalHashCode(name);
     final List<SimpleExpressionProxy> indexes = proxy.getIndexes();
     result *= 5;
-    result += getListHashCode(indexes);
+    result += computeListHashCode(indexes);
     return result;
   }
 
@@ -375,10 +375,10 @@ public class ModuleHashCodeVisitor
     int result = visitComponentProxy(proxy);
     final String moduleName = proxy.getModuleName();
     result *= 5;
-    result += getOptionalHashCode(moduleName);
+    result += computeOptionalHashCode(moduleName);
     final List<ParameterBindingProxy> bindingList = proxy.getBindingList();
     result *= 5;
-    result += getListHashCode(bindingList);
+    result += computeListHashCode(bindingList);
     return result;
   }
 
@@ -401,7 +401,7 @@ public class ModuleHashCodeVisitor
     if (isRespectingGeometry()) {
       final LabelGeometryProxy geometry = proxy.getGeometry();
       result *= 5;
-      result += getProxyHashCode(geometry);
+      result += computeProxyHashCode(geometry);
     }
     return result;
   }
@@ -413,10 +413,10 @@ public class ModuleHashCodeVisitor
     int result = visitGeometryProxy(proxy);
     final Point2D offset = proxy.getOffset();
     result *= 5;
-    result += getOptionalHashCode(offset);
+    result += computeOptionalHashCode(offset);
     final AnchorPosition anchor = proxy.getAnchor();
     result *= 5;
-    result += getOptionalHashCode(anchor);
+    result += computeOptionalHashCode(anchor);
     return result;
   }
 
@@ -428,16 +428,16 @@ public class ModuleHashCodeVisitor
     final List<ConstantAliasProxy> constantAliasList =
       proxy.getConstantAliasList();
     result *= 5;
-    result += getListHashCode(constantAliasList);
+    result += computeListHashCode(constantAliasList);
     final List<EventDeclProxy> eventDeclList = proxy.getEventDeclList();
     result *= 5;
-    result += getListHashCode(eventDeclList);
+    result += computeListHashCode(eventDeclList);
     final List<Proxy> eventAliasList = proxy.getEventAliasList();
     result *= 5;
-    result += getListHashCode(eventAliasList);
+    result += computeListHashCode(eventAliasList);
     final List<Proxy> componentList = proxy.getComponentList();
     result *= 5;
-    result += getListHashCode(componentList);
+    result += computeListHashCode(componentList);
     return result;
   }
 
@@ -448,7 +448,7 @@ public class ModuleHashCodeVisitor
     int result = visitDocumentProxy(proxy);
     final List<ModuleProxy> modules = proxy.getModules();
     result *= 5;
-    result += getListHashCode(modules);
+    result += computeListHashCode(modules);
     return result;
   }
 
@@ -459,7 +459,7 @@ public class ModuleHashCodeVisitor
     int result = visitNamedProxy(proxy);
     final PlainEventListProxy propositions = proxy.getPropositions();
     result *= 5;
-    result += getProxyHashCode(propositions);
+    result += computeProxyHashCode(propositions);
     return result;
   }
 
@@ -470,7 +470,7 @@ public class ModuleHashCodeVisitor
     int result = visitNamedProxy(proxy);
     final ExpressionProxy expression = proxy.getExpression();
     result *= 5;
-    result += getProxyHashCode(expression);
+    result += computeProxyHashCode(expression);
     return result;
   }
 
@@ -488,7 +488,7 @@ public class ModuleHashCodeVisitor
     int result = visitGeometryProxy(proxy);
     final Point2D point = proxy.getPoint();
     result *= 5;
-    result += getOptionalHashCode(point);
+    result += computeOptionalHashCode(point);
     return result;
   }
 
@@ -499,11 +499,11 @@ public class ModuleHashCodeVisitor
     int result = visitIdentifierProxy(proxy);
     final IdentifierProxy baseIdentifier = proxy.getBaseIdentifier();
     result *= 5;
-    result += getProxyHashCode(baseIdentifier);
+    result += computeProxyHashCode(baseIdentifier);
     final IdentifierProxy componentIdentifier =
       proxy.getComponentIdentifier();
     result *= 5;
-    result += getProxyHashCode(componentIdentifier);
+    result += computeProxyHashCode(componentIdentifier);
     return result;
   }
 
@@ -514,13 +514,13 @@ public class ModuleHashCodeVisitor
     int result = visitComponentProxy(proxy);
     final ComponentKind kind = proxy.getKind();
     result *= 5;
-    result += getOptionalHashCode(kind);
+    result += computeOptionalHashCode(kind);
     final GraphProxy graph = proxy.getGraph();
     result *= 5;
-    result += getProxyHashCode(graph);
+    result += computeProxyHashCode(graph);
     final Map<String,String> attributes = proxy.getAttributes();
     result *= 5;
-    result += getOptionalHashCode(attributes);
+    result += computeOptionalHashCode(attributes);
     return result;
   }
 
@@ -532,7 +532,7 @@ public class ModuleHashCodeVisitor
     if (isRespectingGeometry()) {
       final String plainText = proxy.getPlainText();
       result *= 5;
-      result += getOptionalHashCode(plainText);
+      result += computeOptionalHashCode(plainText);
     }
     return result;
   }
@@ -544,7 +544,7 @@ public class ModuleHashCodeVisitor
     int result = visitIdentifierProxy(proxy);
     final String name = proxy.getName();
     result *= 5;
-    result += getOptionalHashCode(name);
+    result += computeOptionalHashCode(name);
     return result;
   }
 
@@ -561,14 +561,14 @@ public class ModuleHashCodeVisitor
     if (isRespectingGeometry()) {
       final PointGeometryProxy pointGeometry = proxy.getPointGeometry();
       result *= 5;
-      result += getProxyHashCode(pointGeometry);
+      result += computeProxyHashCode(pointGeometry);
       final PointGeometryProxy initialArrowGeometry =
         proxy.getInitialArrowGeometry();
       result *= 5;
-      result += getProxyHashCode(initialArrowGeometry);
+      result += computeProxyHashCode(initialArrowGeometry);
       final LabelGeometryProxy labelGeometry = proxy.getLabelGeometry();
       result *= 5;
-      result += getProxyHashCode(labelGeometry);
+      result += computeProxyHashCode(labelGeometry);
     }
     return result;
   }
@@ -580,10 +580,10 @@ public class ModuleHashCodeVisitor
     int result = visitGeometryProxy(proxy);
     final List<Point2D> points = proxy.getPoints();
     result *= 5;
-    result += getOptionalHashCode(points);
+    result += computeOptionalHashCode(points);
     final SplineKind kind = proxy.getKind();
     result *= 5;
-    result += getOptionalHashCode(kind);
+    result += computeOptionalHashCode(kind);
     return result;
   }
 
@@ -594,10 +594,10 @@ public class ModuleHashCodeVisitor
     int result = visitSimpleExpressionProxy(proxy);
     final UnaryOperator operator = proxy.getOperator();
     result *= 5;
-    result += getOptionalHashCode(operator);
+    result += computeOptionalHashCode(operator);
     final SimpleExpressionProxy subTerm = proxy.getSubTerm();
     result *= 5;
-    result += getProxyHashCode(subTerm);
+    result += computeProxyHashCode(subTerm);
     return result;
   }
 
@@ -608,7 +608,7 @@ public class ModuleHashCodeVisitor
     int result = visitComponentProxy(proxy);
     final SimpleExpressionProxy type = proxy.getType();
     result *= 5;
-    result += getProxyHashCode(type);
+    result += computeProxyHashCode(type);
     final boolean deterministic = proxy.isDeterministic();
     result *= 5;
     if (deterministic) {
@@ -617,11 +617,11 @@ public class ModuleHashCodeVisitor
     final SimpleExpressionProxy initialStatePredicate =
       proxy.getInitialStatePredicate();
     result *= 5;
-    result += getProxyHashCode(initialStatePredicate);
+    result += computeProxyHashCode(initialStatePredicate);
     final List<VariableMarkingProxy> variableMarkings =
       proxy.getVariableMarkings();
     result *= 5;
-    result += getListHashCode(variableMarkings);
+    result += computeListHashCode(variableMarkings);
     return result;
   }
 
@@ -632,10 +632,10 @@ public class ModuleHashCodeVisitor
     int result = visitProxy(proxy);
     final IdentifierProxy proposition = proxy.getProposition();
     result *= 5;
-    result += getProxyHashCode(proposition);
+    result += computeProxyHashCode(proposition);
     final SimpleExpressionProxy predicate = proxy.getPredicate();
     result *= 5;
-    result += getProxyHashCode(predicate);
+    result += computeProxyHashCode(predicate);
     return result;
   }
 

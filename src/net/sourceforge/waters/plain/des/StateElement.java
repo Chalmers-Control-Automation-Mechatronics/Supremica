@@ -14,8 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -114,31 +112,6 @@ public final class StateElement
   public Class<StateProxy> getProxyInterface()
   {
     return StateProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final StateProxy state = (StateProxy) partner;
-      return
-        (isInitial() == state.isInitial()) &&
-        ProxyTools.isEqualCollectionByContents
-          (mPropositions, state.getPropositions());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    if (isInitial()) {
-      result++;
-    }
-    result *= 5;
-    result += ProxyTools.getCollectionHashCodeByContents(mPropositions);
-    return result;
   }
 
 

@@ -21,7 +21,8 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
@@ -44,6 +45,7 @@ import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -198,12 +200,13 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     throws VisitorException
   {
     try {
+      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
       final String name = mInputModule.getName();
       final String comment = mInputModule.getComment();
       final List<EventDeclProxy> decls = mInputModule.getEventDeclList();
       final int numevents = decls.size();
       mGlobalEventsMap =
-        new HashMap<ProxyAccessor<IdentifierProxy>,EventProxy>(numevents);
+        new ProxyAccessorHashMap<IdentifierProxy,EventProxy>(eq, numevents);
       mGlobalEventsList = new ArrayList<EventProxy>(numevents);
       if (mIsOptimizationEnabled) {
         mGloballyUsedEvents = new HashSet<EventProxy>(numevents);
@@ -212,7 +215,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       final List<Proxy> components = mInputModule.getComponentList();
       final int numaut = components.size();
       mAutomataMap =
-        new HashMap<ProxyAccessor<IdentifierProxy>,AutomatonProxy>(numaut);
+        new ProxyAccessorHashMap<IdentifierProxy,AutomatonProxy>(eq, numaut);
       mAutomataList = new ArrayList<AutomatonProxy>(numaut);
       visitCollection(components);
       if (mIsOptimizationEnabled) {
@@ -360,7 +363,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     throws VisitorException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
+      mGlobalEventsMap.createAccessor(ident);
     if (mGlobalEventsMap.containsKey(accessor)) {
       final DuplicateIdentifierException exception =
         new DuplicateIdentifierException(ident, "event");
@@ -375,7 +378,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     throws VisitorException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
+      mGlobalEventsMap.createAccessor(ident);
     final EventProxy event = mGlobalEventsMap.get(accessor);
     if (event != null) {
       return event;
@@ -391,7 +394,7 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
     throws VisitorException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
-      new ProxyAccessorByContents<IdentifierProxy>(ident);
+      mAutomataMap.createAccessor(ident);
     if (mAutomataMap.containsKey(accessor)) {
       final DuplicateIdentifierException exception =
         new DuplicateIdentifierException(ident, "automaton");
@@ -857,10 +860,10 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
 
   private boolean mIsOptimizationEnabled = true;
 
-  private Map<ProxyAccessor<IdentifierProxy>,EventProxy> mGlobalEventsMap;
+  private ProxyAccessorMap<IdentifierProxy,EventProxy> mGlobalEventsMap;
   private List<EventProxy> mGlobalEventsList;
   private Set<EventProxy> mGloballyUsedEvents;
-  private Map<ProxyAccessor<IdentifierProxy>,AutomatonProxy> mAutomataMap;
+  private ProxyAccessorMap<IdentifierProxy,AutomatonProxy> mAutomataMap;
   private List<AutomatonProxy> mAutomataList;
 
   private SimpleComponentProxy mCurrentComponent;

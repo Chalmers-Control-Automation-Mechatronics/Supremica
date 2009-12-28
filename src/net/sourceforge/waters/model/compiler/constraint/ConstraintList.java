@@ -15,10 +15,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -63,9 +64,10 @@ public class ConstraintList
   public boolean equals(final Object other)
   {
     if (other != null && other.getClass() == getClass()) {
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
       final ConstraintList clist = (ConstraintList) other;
-      return ProxyTools.isEqualListByContents
-        (mConstraints, clist.mConstraints);
+      return eq.isEqualList(mConstraints, clist.mConstraints);
     } else {
       return false;
     }
@@ -73,7 +75,9 @@ public class ConstraintList
 
   public int hashCode()
   {
-    return ProxyTools.getListHashCodeByContents(mConstraints);
+    final ModuleHashCodeVisitor hash =
+      ModuleHashCodeVisitor.getInstance(false);
+    return hash.getListHashCode(mConstraints);
   }
 
 
@@ -105,14 +109,13 @@ public class ConstraintList
 
   /**
    * Checks whether this constraints list contains an elementary constraint
-   * equal to the given formula (using {@link
-   * net.sourceforge.waters.model.base.Proxy#equalsByContents(Proxy)
-   * equalsByContents()}).
+   * equal to the given formula (using content-based equality).
    */
   public boolean contains(final SimpleExpressionProxy constraint)
   {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     for (final SimpleExpressionProxy current : mConstraints) {
-      if (current.equalsByContents(constraint)) {
+      if (eq.equals(current, constraint)) {
         return true;
       }
     }

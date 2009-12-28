@@ -261,10 +261,7 @@ public class ValidTest extends AbstractWatersTest
   {
     final DocumentProxy doc2 = mDocumentManager.load(filename);
     assertTrue("Identical documents from different sources!", doc != doc2);
-    assertTrue("Unexpected " + kindname + " contents!",
-               doc.equalsByContents(doc2));
-    assertTrue("Unexpected " + kindname + " geometry!",
-               doc.equalsWithGeometry(doc2));
+    assertProxyEquals("Unexpected " + kindname + " contents!", doc, doc2);
   }
 
 

@@ -15,11 +15,9 @@ import java.util.Collections;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.IndexedHashSet;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -180,28 +178,6 @@ public class ProductDESElement
     return ProductDESProxy.class;
   }
 
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final ProductDESElement des = (ProductDESElement) partner;
-      return
-        ProxyTools.isEqualSetByContents(mEvents, des.mEvents) &&
-        ProxyTools.isEqualSetByContents(mAutomata, des.mAutomata);
-    } else {
-      return false;
-    }    
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.getSetHashCodeByContents(mEvents);
-    result *= 5;
-    result += ProxyTools.getSetHashCodeByContents(mAutomata);
-    return result;
-  }
-
 
   //#########################################################################
   //# Local Class EventSet
@@ -281,7 +257,7 @@ public class ProductDESElement
         ("Product DES '" + getName() +
          "' already contains an automaton named '" + name + "'!");
     }
-  
+
     //#########################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;

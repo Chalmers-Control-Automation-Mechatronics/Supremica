@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -93,60 +92,10 @@ public final class SimpleComponentElement
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<SimpleComponentProxy> getProxyInterface()
   {
     return SimpleComponentProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final SimpleComponentProxy downcast = (SimpleComponentProxy) partner;
-      return
-        mKind.equals(downcast.getKind()) &&
-        mGraph.equalsByContents(downcast.getGraph()) &&
-        mAttributes.equals(downcast.getAttributes());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final SimpleComponentProxy downcast = (SimpleComponentProxy) partner;
-      return
-        mKind.equals(downcast.getKind()) &&
-        mGraph.equalsWithGeometry(downcast.getGraph()) &&
-        mAttributes.equals(downcast.getAttributes());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mKind.hashCode();
-    result *= 5;
-    result += mGraph.hashCodeByContents();
-    result *= 5;
-    result += mAttributes.hashCode();
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeWithGeometry();
-    result *= 5;
-    result += mKind.hashCode();
-    result *= 5;
-    result += mGraph.hashCodeWithGeometry();
-    result *= 5;
-    result += mAttributes.hashCode();
-    return result;
   }
 
 

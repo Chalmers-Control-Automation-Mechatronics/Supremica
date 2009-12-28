@@ -18,11 +18,9 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.IndexedHashSet;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -216,37 +214,6 @@ public final class AutomatonElement
   public Class<AutomatonProxy> getProxyInterface()
   {
     return AutomatonProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final AutomatonProxy aut = (AutomatonProxy) partner;
-      return
-        mKind.equals(aut.getKind()) &&
-        ProxyTools.isEqualSetByContents(mEvents, aut.getEvents()) &&
-        ProxyTools.isEqualSetByContents(mStates, aut.getStates()) &&
-        ProxyTools.isEqualSetByContents(mTransitions, aut.getTransitions()) &&
-        mAttributes.equals(aut.getAttributes());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mKind.hashCode();
-    result *= 5;
-    result += ProxyTools.getSetHashCodeByContents(mEvents);
-    result *= 5;
-    result += ProxyTools.getSetHashCodeByContents(mStates);
-    result *= 5;
-    result += ProxyTools.getSetHashCodeByContents(mTransitions);
-    result *= 5;
-    result += mAttributes.hashCode();
-    return result;
   }
 
 

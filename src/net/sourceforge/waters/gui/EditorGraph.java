@@ -31,7 +31,6 @@ import net.sourceforge.waters.gui.command.UpdateCommand;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
@@ -42,6 +41,7 @@ import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -1171,15 +1171,15 @@ class EditorGraph
 
     AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
+      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
       final SimpleNodeSubject original = getOriginal();
       final PointGeometrySubject oldgeo = original.getPointGeometry();
       final PointGeometrySubject oldinit = original.getInitialArrowGeometry();
       final SimpleNodeSubject fake = getFake();
       final PointGeometrySubject newgeo = fake.getPointGeometry();
       final PointGeometrySubject newinit = fake.getInitialArrowGeometry();
-      final boolean equalgeo = ProxyTools.equalsWithGeometry(oldgeo, newgeo);
-      final boolean equalinit =
-        ProxyTools.equalsWithGeometry(oldinit, newinit);
+      final boolean equalgeo = eq.equals(oldgeo, newgeo);
+      final boolean equalinit = eq.equals(oldinit, newinit);
       if (equalinit) {
         if (equalgeo) {
           return null;
@@ -1389,12 +1389,11 @@ class EditorGraph
       if (hasnull) {
         return createEditCommand(surface, name);
       } else {
-        final boolean equalgeo =
-          ProxyTools.equalsWithGeometry(oldgeo, newgeo);
-        final boolean equalstart =
-          ProxyTools.equalsWithGeometry(oldstart, newstart);
-        final boolean equalend =
-          ProxyTools.equalsWithGeometry(oldend, newend);
+        final ModuleEqualityVisitor eq =
+          ModuleEqualityVisitor.getInstance(true);
+        final boolean equalgeo = eq.equals(oldgeo, newgeo);
+        final boolean equalstart = eq.equals(oldstart, newstart);
+        final boolean equalend = eq.equals(oldend, newend);
         if (!equalgeo && equalstart && equalend) {
           return new MoveCommand(oldgeo, newgeo, surface, name);
         } else if (equalgeo && !equalstart && equalend) {

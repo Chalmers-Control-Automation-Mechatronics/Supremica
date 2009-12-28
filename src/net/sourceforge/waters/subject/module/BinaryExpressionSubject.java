@@ -12,7 +12,6 @@
 
 package net.sourceforge.waters.subject.module;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -122,60 +121,10 @@ public final class BinaryExpressionSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<BinaryExpressionProxy> getProxyInterface()
   {
     return BinaryExpressionProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final BinaryExpressionProxy downcast = (BinaryExpressionProxy) partner;
-      return
-        mOperator.equals(downcast.getOperator()) &&
-        mLeft.equalsByContents(downcast.getLeft()) &&
-        mRight.equalsByContents(downcast.getRight());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final BinaryExpressionProxy downcast = (BinaryExpressionProxy) partner;
-      return
-        mOperator.equals(downcast.getOperator()) &&
-        mLeft.equalsWithGeometry(downcast.getLeft()) &&
-        mRight.equalsWithGeometry(downcast.getRight());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mOperator.hashCode();
-    result *= 5;
-    result += mLeft.hashCodeByContents();
-    result *= 5;
-    result += mRight.hashCodeByContents();
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeWithGeometry();
-    result *= 5;
-    result += mOperator.hashCode();
-    result *= 5;
-    result += mLeft.hashCodeWithGeometry();
-    result *= 5;
-    result += mRight.hashCodeWithGeometry();
-    return result;
   }
 
 

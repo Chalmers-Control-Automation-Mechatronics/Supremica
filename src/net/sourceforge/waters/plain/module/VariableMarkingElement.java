@@ -12,7 +12,6 @@
 
 package net.sourceforge.waters.plain.module;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -57,54 +56,10 @@ public final class VariableMarkingElement
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<VariableMarkingProxy> getProxyInterface()
   {
     return VariableMarkingProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final VariableMarkingProxy downcast = (VariableMarkingProxy) partner;
-      return
-        mProposition.equalsByContents(downcast.getProposition()) &&
-        mPredicate.equalsByContents(downcast.getPredicate());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final VariableMarkingProxy downcast = (VariableMarkingProxy) partner;
-      return
-        mProposition.equalsWithGeometry(downcast.getProposition()) &&
-        mPredicate.equalsWithGeometry(downcast.getPredicate());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mProposition.hashCodeByContents();
-    result *= 5;
-    result += mPredicate.hashCodeByContents();
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mProposition.hashCodeWithGeometry();
-    result *= 5;
-    result += mPredicate.hashCodeWithGeometry();
-    return result;
   }
 
 

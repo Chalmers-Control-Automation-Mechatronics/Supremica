@@ -10,44 +10,36 @@
 package net.sourceforge.waters.model.base;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
- * An alternative set interface that allows {@link Proxy} objects to
+ * An alternative map interface that allows {@link Proxy} keys to
  * be treated using alternative equalities.
  * A proxy accessor map essentially is a map that maps {@link ProxyAccessor}
- * objects to the actual {@link Proxy} objects. This interface provides
- * set-like access to this set.
+ * objects to their associated values. This interface provides some more
+ * convenient access to the keys as proxies.
  *
- * @see ProxyAccessorCollection
  * @author Robi Malik
  */
 
-public interface ProxyAccessorMap<P extends Proxy>
-  extends Map<ProxyAccessor<P>,P>
+public interface ProxyAccessorMap<P extends Proxy,V>
+  extends Map<ProxyAccessor<P>,V>
 {
 
   //#########################################################################
   //# Access as Proxy Set
-  public boolean addProxy(P proxy);
-
-  public boolean addAll(Collection<? extends P> collection);
-
-  public boolean containsProxy(P proxy);
-
-  public boolean containsAll(Collection<? extends P> collection);
+  public boolean containsProxyKey(P proxy);
 
   public <PP extends P> ProxyAccessor<PP> createAccessor(PP proxy);
 
-  public boolean equalsByAccessorEquality(ProxyAccessorMap<P> partner);
+  public V getByProxy(P proxy);
 
-  public int hashCodeByAccessorEquality();
+  public V putByProxy(P proxy, V value);
 
-  public Iterator<P> iterator();
+  public void putAllByProxies(Map<? extends P, ? extends V> map);
 
   public boolean removeProxy(P proxy);
 
-  public boolean removeAll(Collection<? extends P> collection);
+  public boolean removeAllProxies(Collection<? extends P> collection);
 
 }

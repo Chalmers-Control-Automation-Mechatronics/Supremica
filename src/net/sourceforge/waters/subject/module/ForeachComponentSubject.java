@@ -89,7 +89,7 @@ public final class ForeachComponentSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<ForeachComponentProxy> getProxyInterface()
   {
     return ForeachComponentProxy.class;

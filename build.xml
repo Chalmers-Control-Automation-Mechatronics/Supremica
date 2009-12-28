@@ -102,8 +102,10 @@
 *       You should also run it every time one of the jar files below
 *       has been updated.
     -->
-    <target name="initialize" depends="clean,initialize_jars,build,jar_supremica_lib,cpp_waters"
-            description="Rebuilds the project from scratch."/>
+    <target
+        name="initialize"
+        depends="clean,jar_supremica_lib,build,-jar_supremica_tests,cpp_waters"
+        description="Rebuilds the project from scratch."/>
 
     <!--
 <target name="eclipse_initialize">

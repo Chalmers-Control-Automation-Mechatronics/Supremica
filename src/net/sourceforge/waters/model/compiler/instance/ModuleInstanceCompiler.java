@@ -23,8 +23,8 @@ import java.util.TreeSet;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
@@ -58,6 +58,7 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -114,6 +115,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     mFactory = factory;
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
+    mEquality = ModuleEqualityVisitor.getInstance(false);
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
     mPrimeSearcher = new PrimeSearcher();
@@ -438,7 +440,9 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       mCurrentNodes = new ArrayList<NodeProxy>(numnodes);
       mNodeMap = new HashMap<NodeProxy,NodeProxy>(numnodes);
       visitCollection(nodes);
-      mCurrentAlphabet = new ProxyAccessorHashMapByContents<IdentifierProxy>();
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      mCurrentAlphabet = new ProxyAccessorHashSet<IdentifierProxy>(eq);
       final Collection<EdgeProxy> edges = graph.getEdges();
       final int numedges = edges.size();
       mCurrentEdges = new ArrayList<EdgeProxy>(numedges);
@@ -1041,7 +1045,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
           final SimpleExpressionProxy value =
             mSimpleExpressionCompiler.eval(index, mContext);
           values.add(value);
-          cloning |= !index.equalsByContents(value);
+          cloning |= !mEquality.equals(index, value);
         }
         if (cloning) {
           return mFactory.createIndexedIdentifierProxy(name, values);
@@ -1065,8 +1069,8 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
       final IdentifierProxy comp1 =
         (IdentifierProxy) comp0.acceptVisitor(this);
       if (mIsCloning ||
-          !base0.equalsByContents(base1) ||
-          !comp0.equalsByContents(comp1)) {
+          !mEquality.equals(base0, base1) ||
+          !mEquality.equals(comp0, comp1)) {
         return mFactory.createQualifiedIdentifierProxy(base1, comp1);
       } else {
         return ident;
@@ -1204,7 +1208,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
     public SimpleExpressionProxy getBoundExpression
       (final SimpleExpressionProxy expr)
     {
-      if (expr.equalsByContents(mSuffix)) {
+      if (mEquality.equals(expr, mSuffix)) {
         return mNameSpace.getPrefixedIdentifier(mSuffix, mFactory);
       } else {
         return mContext.getBoundExpression(expr);
@@ -1213,7 +1217,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
 
     public boolean isEnumAtom(final IdentifierProxy ident)
     {
-      if (ident.equalsByContents(mSuffix)) {
+      if (mEquality.equals(ident, mSuffix)) {
         return false;
       } else {
         return mContext.isEnumAtom(ident);
@@ -1237,6 +1241,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
+  private final ModuleEqualityVisitor mEquality;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final PrimeSearcher mPrimeSearcher;
   private final NameCompiler mNameCompiler;
@@ -1257,7 +1262,7 @@ public class ModuleInstanceCompiler extends AbstractModuleProxyVisitor
   private Map<String,CompiledParameterBinding> mParameterMap;
 
   private SimpleComponentProxy mCurrentComponent;
-  private ProxyAccessorMap<IdentifierProxy> mCurrentAlphabet;
+  private ProxyAccessorSet<IdentifierProxy> mCurrentAlphabet;
   private CompiledEventList mCurrentBlockedEvents;
   private List<NodeProxy> mCurrentNodes;
   private List<EdgeProxy> mCurrentEdges;

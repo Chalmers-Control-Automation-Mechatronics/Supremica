@@ -409,8 +409,8 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     final URI outmoduleuri = outmodulefile.toURI();
     final ModuleProxy read =
       (ModuleProxy) mModuleMarshaller.unmarshal(outmoduleuri);
-    assertTrue("Module changed after reading back in!",
-               module.equalsWithGeometry(read));
+    assertModuleProxyEquals("Module changed after reading back in!",
+                            read, module);
 
     final ModuleCompiler compiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
@@ -418,7 +418,8 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     final File outdesfile = des.getFileLocation();
     mProductDESMarshaller.marshal(des, outdesfile);
 
-    VerificationResult result = checkLanguageInclusion(des, mProductDESFactory);
+    final VerificationResult result =
+      checkLanguageInclusion(des, mProductDESFactory);
     final boolean controllable = result.isSatisfied();
     SafetyTraceProxy counterexample = null;
     if (!controllable) {

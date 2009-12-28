@@ -21,47 +21,47 @@ import java.util.Set;
  * @author Robi Malik
  */
 
-public class ProxyAccessorHashMap2<P extends Proxy>
+public class ProxyAccessorHashSet<P extends Proxy>
   extends AbstractMap<ProxyAccessor<P>,P>
-  implements ProxyAccessorMap<P>
+  implements ProxyAccessorSet<P>
 {
 
   //#########################################################################
   //# Constructors
-  public ProxyAccessorHashMap2(final AbstractEqualityVisitor eq)
+  public ProxyAccessorHashSet(final AbstractEqualityVisitor eq)
   {
     mMap = new HashMap<ProxyAccessor<P>,P>();
-    mEqualityVisitor = eq;
+    mEquality = eq;
     mHashCodeVisitor = eq.getHashCodeVisitor();
   }
 
-  public ProxyAccessorHashMap2(final AbstractEqualityVisitor eq,
+  public ProxyAccessorHashSet(final AbstractEqualityVisitor eq,
                                final int initialCapacity)
   {
     mMap = new HashMap<ProxyAccessor<P>,P>(initialCapacity);
-    mEqualityVisitor = eq;
+    mEquality = eq;
     mHashCodeVisitor = eq.getHashCodeVisitor();
   }
 
-  public ProxyAccessorHashMap2(final AbstractEqualityVisitor eq,
+  public ProxyAccessorHashSet(final AbstractEqualityVisitor eq,
                                final int initialCapacity,
                                final float loadFactor)
   {
     mMap = new HashMap<ProxyAccessor<P>,P>(initialCapacity, loadFactor);
-    mEqualityVisitor = eq;
+    mEquality = eq;
     mHashCodeVisitor = eq.getHashCodeVisitor();
   }
 
-  public ProxyAccessorHashMap2
+  public ProxyAccessorHashSet
     (final AbstractEqualityVisitor eq,
      final Map<ProxyAccessor<P>,P> map)
   {
     mMap = new HashMap<ProxyAccessor<P>,P>(map);
-    mEqualityVisitor = eq;
+    mEquality = eq;
     mHashCodeVisitor = eq.getHashCodeVisitor();
   }
 
-  public ProxyAccessorHashMap2(final AbstractEqualityVisitor eq,
+  public ProxyAccessorHashSet(final AbstractEqualityVisitor eq,
                                final Collection<? extends P> collection)
   {
     this(eq, collection.size());
@@ -127,7 +127,7 @@ public class ProxyAccessorHashMap2<P extends Proxy>
     return new Accessor<PP>(proxy);
   }
 
-  public boolean equalsByAccessorEquality(final ProxyAccessorMap<P> partner)
+  public boolean equalsByAccessorEquality(final ProxyAccessorSet<P> partner)
   {
     final Set<ProxyAccessor<P>> set1 = keySet();
     final Set<ProxyAccessor<P>> set2 = partner.keySet();
@@ -179,9 +179,9 @@ public class ProxyAccessorHashMap2<P extends Proxy>
     //# Equality and HashCode
     public boolean equals(final Object partner)
     {
-      if (partner instanceof ProxyAccessorHashMap2<?>.Accessor<?>) {
+      if (partner instanceof ProxyAccessorHashSet<?>.Accessor<?>) {
         final Accessor<?> accessor = (Accessor<?>) partner;
-        return mEqualityVisitor.equals(mProxy, accessor.mProxy);
+        return mEquality.equals(mProxy, accessor.mProxy);
       } else {
         return false;
       }
@@ -246,7 +246,7 @@ public class ProxyAccessorHashMap2<P extends Proxy>
   //#########################################################################
   //# Data Members
   private final Map<ProxyAccessor<P>,P> mMap;
-  private final AbstractEqualityVisitor mEqualityVisitor;
+  private final AbstractEqualityVisitor mEquality;
   private final AbstractHashCodeVisitor mHashCodeVisitor;
 
 }

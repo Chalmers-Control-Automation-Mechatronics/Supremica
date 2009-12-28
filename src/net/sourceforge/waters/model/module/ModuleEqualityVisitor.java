@@ -525,6 +525,7 @@ public class ModuleEqualityVisitor
       if (!mNonReportingEqualityVisitor.equals(identifier1, identifier2)) {
         return reportAttributeMismatch("identifier defining the name", identifier1, identifier2);
       }
+      setSecondProxy(expected);
       return true;
     } else {
       return false;

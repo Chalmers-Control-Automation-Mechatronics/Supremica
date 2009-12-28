@@ -14,7 +14,6 @@ package net.sourceforge.waters.subject.module;
 
 import java.awt.geom.Rectangle2D;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -75,29 +74,10 @@ public final class BoxGeometrySubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<BoxGeometryProxy> getProxyInterface()
   {
     return BoxGeometryProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final BoxGeometryProxy downcast = (BoxGeometryProxy) partner;
-      return
-        mRectangle.equals(downcast.getRectangle());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mRectangle.hashCode();
-    return result;
   }
 
 

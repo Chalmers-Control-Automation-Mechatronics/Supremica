@@ -12,8 +12,6 @@
 
 package net.sourceforge.waters.subject.module;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -200,75 +198,10 @@ public final class EdgeSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<EdgeProxy> getProxyInterface()
   {
     return EdgeProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final EdgeProxy downcast = (EdgeProxy) partner;
-      return
-        ProxyTools.equalsByContents(mSource, downcast.getSource()) &&
-        ProxyTools.equalsByContents(mTarget, downcast.getTarget()) &&
-        mLabelBlock.equalsByContents(downcast.getLabelBlock()) &&
-        ProxyTools.equalsByContents(mGuardActionBlock, downcast.getGuardActionBlock());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final EdgeProxy downcast = (EdgeProxy) partner;
-      return
-        ProxyTools.equalsWithGeometry(mSource, downcast.getSource()) &&
-        ProxyTools.equalsWithGeometry(mTarget, downcast.getTarget()) &&
-        mLabelBlock.equalsWithGeometry(downcast.getLabelBlock()) &&
-        ProxyTools.equalsWithGeometry(mGuardActionBlock, downcast.getGuardActionBlock()) &&
-        ProxyTools.equalsWithGeometry(mGeometry, downcast.getGeometry()) &&
-        ProxyTools.equalsWithGeometry(mStartPoint, downcast.getStartPoint()) &&
-        ProxyTools.equalsWithGeometry(mEndPoint, downcast.getEndPoint());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.hashCodeByContents(mSource);
-    result *= 5;
-    result += ProxyTools.hashCodeByContents(mTarget);
-    result *= 5;
-    result += mLabelBlock.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.hashCodeByContents(mGuardActionBlock);
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mSource);
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mTarget);
-    result *= 5;
-    result += mLabelBlock.hashCodeWithGeometry();
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mGuardActionBlock);
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mGeometry);
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mStartPoint);
-    result *= 5;
-    result += ProxyTools.hashCodeWithGeometry(mEndPoint);
-    return result;
   }
 
 

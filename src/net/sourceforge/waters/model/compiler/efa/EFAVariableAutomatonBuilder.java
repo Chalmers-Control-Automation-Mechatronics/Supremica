@@ -10,7 +10,6 @@
 package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,8 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
@@ -29,6 +28,8 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -61,6 +62,8 @@ class EFAVariableAutomatonBuilder
   {
     mFactory = factory;
     mSimpleExpressionCompiler = compiler;
+    mEquality = ModuleEqualityVisitor.getInstance(false);
+    mHashCodeVisitor = ModuleHashCodeVisitor.getInstance(false);
     mRootContext = context;
   }
 
@@ -124,36 +127,34 @@ class EFAVariableAutomatonBuilder
     final CompiledRange range = mVariable.getRange();
     final int rangesize = range.size();
     mNodeList = new ArrayList<SimpleNodeProxy>(rangesize);
-    mNodeMap =
-      new HashMap<ProxyAccessor<SimpleExpressionProxy>,SimpleNodeProxy>
-      (rangesize);
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    mNodeMap = new ProxyAccessorHashMap<SimpleExpressionProxy,SimpleNodeProxy>
+      (eq, rangesize);
     mEdgeMap = new TreeMap<EFAVariableEdge,EFAVariableEdge>();
     for (final SimpleExpressionProxy value : range.getValues()) {
       final String name = value.toString();
       final BindingContext context =
-	new SingleBindingContext(varname, value, mRootContext);
+        new SingleBindingContext(varname, value, mRootContext);
       final SimpleExpressionProxy initval =
-	mSimpleExpressionCompiler.eval(initpred, context);
+        mSimpleExpressionCompiler.eval(initpred, context);
       final boolean initial =
-	mSimpleExpressionCompiler.getBooleanValue(initval);
+        mSimpleExpressionCompiler.getBooleanValue(initval);
       for (final VariableMarkingProxy marking : markings) {
-	final SimpleExpressionProxy pred = marking.getPredicate();
-	final SimpleExpressionProxy predval =
-	  mSimpleExpressionCompiler.eval(pred, context);
-	if (mSimpleExpressionCompiler.getBooleanValue(predval)) {
-	  final IdentifierProxy prop = marking.getProposition();
-	  props.add(prop);
-	  blocked.remove(prop);
-	}
+        final SimpleExpressionProxy pred = marking.getPredicate();
+        final SimpleExpressionProxy predval =
+          mSimpleExpressionCompiler.eval(pred, context);
+        if (mSimpleExpressionCompiler.getBooleanValue(predval)) {
+          final IdentifierProxy prop = marking.getProposition();
+          props.add(prop);
+          blocked.remove(prop);
+        }
       }
       final PlainEventListProxy elist =
-	props.isEmpty() ? null : mFactory.createPlainEventListProxy(props);
+        props.isEmpty() ? null : mFactory.createPlainEventListProxy(props);
       final SimpleNodeProxy node = mFactory.createSimpleNodeProxy
-	(name, elist, initial, null, null, null);
+        (name, elist, initial, null, null, null);
       mNodeList.add(node);
-      final ProxyAccessor<SimpleExpressionProxy> accessor =
-	new ProxyAccessorByContents<SimpleExpressionProxy>(value);
-      mNodeMap.put(accessor, node);
+      mNodeMap.putByProxy(value, node);
       props.clear();
     }
     if (!blocked.isEmpty()) {
@@ -201,9 +202,7 @@ class EFAVariableAutomatonBuilder
   //# Auxiliary Methods
   private SimpleNodeProxy getNode(final SimpleExpressionProxy value)
   {
-    final ProxyAccessor<SimpleExpressionProxy> accessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(value);
-    return mNodeMap.get(accessor);
+    return mNodeMap.getByProxy(value);
   }
 
   private void createTransition(final SimpleExpressionProxy source,
@@ -256,20 +255,20 @@ class EFAVariableAutomatonBuilder
     public boolean equals(final Object other)
     {
       if (other.getClass() == getClass()) {
-	final EFAVariableEdge edge = (EFAVariableEdge) other;
-	return
-	  mSourceValue.equalsByContents(edge.mSourceValue) &&
-	  mTargetValue.equalsByContents(edge.mTargetValue);
+        final EFAVariableEdge edge = (EFAVariableEdge) other;
+        return
+          mEquality.equals(mSourceValue, edge.mSourceValue) &&
+          mEquality.equals(mTargetValue, edge.mTargetValue);
       } else {
-	return false;
+        return false;
       }
     }
 
     public int hashCode()
     {
       return
-	mSourceValue.hashCodeByContents() +
-	5 * mTargetValue.hashCodeByContents();
+        mHashCodeVisitor.hashCode(mSourceValue) +
+        5 * mHashCodeVisitor.hashCode(mTargetValue);
     }
 
     //#######################################################################
@@ -305,13 +304,15 @@ class EFAVariableAutomatonBuilder
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
+  private final ModuleEqualityVisitor mEquality;
+  private final ModuleHashCodeVisitor mHashCodeVisitor;
   private final BindingContext mRootContext;
 
   private EFAVariable mVariable;
   private List<IdentifierProxy> mBlockedEvents;
   private List<SimpleNodeProxy> mNodeList;
   private List<EdgeProxy> mEdgeList;
-  private Map<ProxyAccessor<SimpleExpressionProxy>,SimpleNodeProxy> mNodeMap;
+  private ProxyAccessorMap<SimpleExpressionProxy,SimpleNodeProxy> mNodeMap;
   private Map<EFAVariableEdge,EFAVariableEdge> mEdgeMap;
 
 }

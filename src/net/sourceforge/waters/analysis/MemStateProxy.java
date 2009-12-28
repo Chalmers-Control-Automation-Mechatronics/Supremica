@@ -8,25 +8,24 @@ import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.model.base.Proxy;
 
 public class MemStateProxy
   implements StateProxy
 {
   private final int mName;
   private final EventProxy mEvent;
-  
-  public MemStateProxy(int name, EventProxy event)
+
+  public MemStateProxy(final int name, final EventProxy event)
   {
     mName = name;
     mEvent = event;
   }
-  
-  public MemStateProxy(int name)
+
+  public MemStateProxy(final int name)
   {
     this(name, null);
   }
-  
+
   public Collection<EventProxy> getPropositions()
   {
     if (mEvent == null) {
@@ -35,36 +34,36 @@ public class MemStateProxy
       return Collections.singleton(mEvent);
     }
   }
-  
+
   public boolean isInitial()
   {
     return mName == 0;
   }
-  
+
   public int getNum()
   {
     return mName;
   }
-  
+
   public MemStateProxy clone()
   {
     return new MemStateProxy(mName, mEvent);
   }
-  
+
   public String getName()
   {
     return Integer.toString(mName);
   }
-  
-  public boolean refequals(Object o)
+
+  public boolean refequals(final Object o)
   {
     if (o instanceof NamedProxy) {
       return refequals((NamedProxy) o);
     }
     return false;
   }
-  
-  public boolean refequals(NamedProxy o)
+
+  public boolean refequals(final NamedProxy o)
   {
     if (o instanceof MemStateProxy) {
       final MemStateProxy s = (MemStateProxy) o;
@@ -73,12 +72,12 @@ public class MemStateProxy
       return false;
     }
   }
-  
+
   public int refHashCode()
   {
     return mName;
   }
-  
+
   public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
   {
@@ -91,39 +90,11 @@ public class MemStateProxy
     return StateProxy.class;
   }
 
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (partner != null &&
-        partner.getProxyInterface() == getProxyInterface()) {
-      final StateProxy state = (StateProxy) partner;
-      return (getName().equals(state.getName())) &&
-             (isInitial() == state.isInitial()) &&
-             state.getPropositions().isEmpty();
-    } else {
-      return false;
-    }
-  }
-  
-  public boolean equalsWithGeometry(Proxy o)
-  {
-    return equalsByContents(o);
-  }
-  
-  public int hashCodeByContents()
-  {
-    return refHashCode();
-  }
-  
-  public int hashCodeWithGeometry()
-  {
-    return refHashCode();
-  }
-  
-  public int compareTo(NamedProxy n)
+  public int compareTo(final NamedProxy n)
   {
     return n.getName().compareTo(getName());
   }
-  
+
   public String toString()
   {
     return "S:" + mName;

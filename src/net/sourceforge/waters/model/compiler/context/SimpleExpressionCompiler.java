@@ -28,6 +28,7 @@ import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
@@ -107,6 +108,7 @@ public class SimpleExpressionCompiler
     mSimplificationVisitor = new SimplificationVisitor();
     mAtomicVisitor = new AtomicVisitor();
     mRangeVisitor = new RangeVisitor();
+    mEquality = ModuleEqualityVisitor.getInstance(false);
   }
 
 
@@ -263,7 +265,7 @@ public class SimpleExpressionCompiler
       return getClone(expr, alreadyCloned);
     }
     final SimpleExpressionProxy bound = getBoundExpression(expr);
-    if (expr.equalsByContents(bound)) {
+    if (mEquality.equals(expr, bound)) {
       return getClone(expr, alreadyCloned);
     } else if (bound != null) {
       return simplify(bound);
@@ -385,7 +387,7 @@ public class SimpleExpressionCompiler
               mContext.getModuleBindingContext();
             modulecontext.addBinding(item, item);
           }
-        } else if (found.equalsByContents(item)) {
+        } else if (mEquality.equals(found, item)) {
           // nothing ...
         } else {
           final String name = item.getName();
@@ -670,7 +672,7 @@ public class SimpleExpressionCompiler
     {
       final SimpleExpressionProxy origLHS = expr.getLeft();
       final SimpleExpressionProxy origRHS = expr.getRight();
-      if (includesEquality() && origLHS.equalsByContents(origRHS)) {
+      if (includesEquality() && mEquality.equals(origLHS, origRHS)) {
         return createBooleanConstantProxy(true);
       }
       final SimpleExpressionProxy simpLHS = simplify(origLHS);
@@ -682,7 +684,8 @@ public class SimpleExpressionCompiler
       if (atomLHS && atomRHS) {
         final boolean result = eval(intLHS, intRHS);
         return createBooleanConstantProxy(result);
-      } else if (includesEquality() && simpLHS.equalsByContents(simpRHS)) {
+      } else if (includesEquality() &&
+                 mEquality.equals(simpLHS, simpRHS)) {
         return createBooleanConstantProxy(true);
       } else if (mVariableContext != null) {
         final CompiledIntRange rangeLHS =
@@ -726,12 +729,12 @@ public class SimpleExpressionCompiler
       final boolean eresult = getEqualsResult();
       final SimpleExpressionProxy origLHS = expr.getLeft();
       final SimpleExpressionProxy origRHS = expr.getRight();
-      if (origLHS.equalsByContents(origRHS)) {
+      if (mEquality.equals(origLHS, origRHS)) {
         return createBooleanConstantProxy(eresult);
       }
       final SimpleExpressionProxy simpLHS = simplify(origLHS);
       final SimpleExpressionProxy simpRHS = simplify(origRHS);
-      if (simpLHS.equalsByContents(simpRHS)) {
+      if (mEquality.equals(simpLHS, simpRHS)) {
         return createBooleanConstantProxy(eresult);
       } else if (isAtomicValue(simpLHS) && isAtomicValue(simpRHS)) {
         return createBooleanConstantProxy(!eresult);
@@ -1013,7 +1016,7 @@ public class SimpleExpressionCompiler
         return mFactory.createUnaryExpressionProxy(op, simpRHS);
       } else if (intRHS == 0) {
         return simpLHS;
-      } else if (simpLHS.equalsByContents(simpRHS)) {
+      } else if (mEquality.equals(simpLHS, simpRHS)) {
         return createIntConstantProxy(0);
       } else {
         return createExpression(expr, simpLHS, simpRHS);
@@ -1303,6 +1306,7 @@ public class SimpleExpressionCompiler
   private final SimplificationVisitor mSimplificationVisitor;
   private final AtomicVisitor mAtomicVisitor;
   private final RangeVisitor mRangeVisitor;
+  private final ModuleEqualityVisitor mEquality;
 
   private boolean mIsEvaluating;
   private int mNumPrimes;

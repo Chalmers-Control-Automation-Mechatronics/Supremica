@@ -12,7 +12,6 @@
 
 package net.sourceforge.waters.subject.module;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -83,28 +82,6 @@ public abstract class NodeSubject
     } else {
       return false;
     }
-  }
-
-
-  //#########################################################################
-  //# Equality and Hashcode
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final NodeProxy downcast = (NodeProxy) partner;
-      return
-        mPropositions.equalsByContents(downcast.getPropositions());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mPropositions.hashCodeByContents();
-    return result;
   }
 
 

@@ -16,8 +16,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -112,56 +110,10 @@ public final class InstanceSubject
 
 
   //#########################################################################
-  //# Equality and Hashcode
+  //# Comparing
   public Class<InstanceProxy> getProxyInterface()
   {
     return InstanceProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final InstanceProxy downcast = (InstanceProxy) partner;
-      return
-        mModuleName.equals(downcast.getModuleName()) &&
-        ProxyTools.isEqualListByContents
-          (mBindingList, downcast.getBindingList());
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Proxy partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final InstanceProxy downcast = (InstanceProxy) partner;
-      return
-        mModuleName.equals(downcast.getModuleName()) &&
-        ProxyTools.isEqualListWithGeometry
-          (mBindingList, downcast.getBindingList());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mModuleName.hashCode();
-    result *= 5;
-    result += ProxyTools.getListHashCodeByContents(mBindingList);
-    return result;
-  }
-
-  public int hashCodeWithGeometry()
-  {
-    int result = super.hashCodeWithGeometry();
-    result *= 5;
-    result += mModuleName.hashCode();
-    result *= 5;
-    result += ProxyTools.getListHashCodeWithGeometry(mBindingList);
-    return result;
   }
 
 

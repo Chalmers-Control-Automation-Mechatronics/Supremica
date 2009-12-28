@@ -16,8 +16,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-
 import net.sourceforge.waters.model.unchecked.Casting;
 
 
@@ -88,39 +86,13 @@ public class IndexedHashSet<P extends NamedProxy>
 
 
   //#########################################################################
-  //# Equals and Hashcode
-  public boolean equalsWithGeometry(final Object partner)
-  {
-    if (!(partner instanceof Set<?>)) {
-      return false;
-    }
-    final Set<?> set = (Set<?>) partner;
-    if (size() != set.size()) {
-      return false;
-    }
-    for (final Object item2 : set) {
-      if (!(item2 instanceof NamedProxy)) {
-        return false;
-      }
-      final NamedProxy elem2 = (NamedProxy) item2;
-      final String name = elem2.getName();
-      final NamedProxy elem1 = get(name);
-      if (elem1 == null || !elem1.equalsWithGeometry(elem2)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-
-  //#########################################################################
   //# Interface java.util.Set
   public boolean add(final P proxy)
   {
     return insert(proxy) == proxy;
   }
 
-  public void clear() 
+  public void clear()
   {
     mProxyMap.clear();
   }
@@ -141,7 +113,7 @@ public class IndexedHashSet<P extends NamedProxy>
   {
     return mProxyMap.values().iterator();
   }
-           
+
   public boolean remove(final Object victim)
   {
     if (contains(victim)) {
@@ -159,7 +131,7 @@ public class IndexedHashSet<P extends NamedProxy>
     return mProxyMap.size();
   }
 
-           
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.SetProxy
   public void checkAllUnique(final Collection<? extends P> collection)
@@ -190,7 +162,7 @@ public class IndexedHashSet<P extends NamedProxy>
       return proxy;
     } else {
       throw createNameNotFound(name);
-    }      
+    }
   }
 
   public P get(final String name)

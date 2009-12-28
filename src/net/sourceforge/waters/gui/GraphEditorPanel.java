@@ -90,8 +90,8 @@ import net.sourceforge.waters.gui.transfer.ProxyTransferable;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -106,6 +106,7 @@ import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -4262,8 +4263,10 @@ public class GraphEditorPanel
     private ProxyTransferable<? extends Proxy> createTransferable
       (final List<? extends Proxy> list)
     {
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
       final int size = list.size();
-      mTransferredItems = new ProxyAccessorHashMapByContents<Proxy>(size);
+      mTransferredItems = new ProxyAccessorHashSet<Proxy>(eq, size);
       for (final Proxy proxy : list) {
         try {
           proxy.acceptVisitor(this);
@@ -4313,7 +4316,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Data Members
-    private ProxyAccessorMap<Proxy> mTransferredItems;
+    private ProxyAccessorSet<Proxy> mTransferredItems;
   }
 
 
@@ -4459,9 +4462,10 @@ public class GraphEditorPanel
     @SuppressWarnings("unchecked")
 	private boolean isContainingAll(final EventListExpressionProxy elist)
     {
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
       final List<? extends Proxy> list = elist.getEventList();
-      final ProxyAccessorMap<Proxy> map =
-        new ProxyAccessorHashMapByContents(list);
+      final ProxyAccessorSet<Proxy> map = new ProxyAccessorHashSet(eq, list);
       return map.containsAll(mTransferData);
     }
 

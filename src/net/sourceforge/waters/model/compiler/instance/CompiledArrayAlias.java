@@ -11,13 +11,11 @@ package net.sourceforge.waters.model.compiler.instance;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
 import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorByContents;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.
@@ -25,6 +23,7 @@ import net.sourceforge.waters.model.compiler.context.
 import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.plain.module.IndexedIdentifierElement;
 import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
@@ -37,15 +36,17 @@ class CompiledArrayAlias implements CompiledEvent
   //# Constructor
   CompiledArrayAlias(final String name)
   {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     mParentInfo = new RootParentInfo(name);
-    mMap = new HashMap<ProxyAccessor<SimpleExpressionProxy>,CompiledEvent>();
+    mMap = new ProxyAccessorHashMap<SimpleExpressionProxy,CompiledEvent>(eq);
   }
 
   CompiledArrayAlias(final CompiledArrayAlias parent,
                      final SimpleExpressionProxy index)
   {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     mParentInfo = new IndexedParentInfo(parent, index);
-    mMap = new HashMap<ProxyAccessor<SimpleExpressionProxy>,CompiledEvent>();
+    mMap = new ProxyAccessorHashMap<SimpleExpressionProxy,CompiledEvent>(eq);
   }
 
 
@@ -82,7 +83,7 @@ class CompiledArrayAlias implements CompiledEvent
     return Collections.emptyList();
   }
 
-  public CompiledEvent find(SimpleExpressionProxy index)
+  public CompiledEvent find(final SimpleExpressionProxy index)
     throws UndefinedIdentifierException
   {
     final CompiledEvent result = get(index);
@@ -115,7 +116,7 @@ class CompiledArrayAlias implements CompiledEvent
   CompiledEvent get(final SimpleExpressionProxy index)
   {
     final ProxyAccessor<SimpleExpressionProxy> accessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(index);
+      mMap.createAccessor(index);
     return mMap.get(accessor);
   }
 
@@ -123,7 +124,7 @@ class CompiledArrayAlias implements CompiledEvent
     throws DuplicateIdentifierException
   {
     final ProxyAccessor<SimpleExpressionProxy> accessor =
-      new ProxyAccessorByContents<SimpleExpressionProxy>(index);
+      mMap.createAccessor(index);
     if (!mMap.containsKey(accessor)) {
       mMap.put(accessor, value);
     } else {
@@ -165,7 +166,7 @@ class CompiledArrayAlias implements CompiledEvent
       set(index, alias);
     } else {
       set(index, value);
-    }      
+    }
   }
 
 
@@ -261,6 +262,6 @@ class CompiledArrayAlias implements CompiledEvent
   //#########################################################################
   //# Data Members
   private final ParentInfo mParentInfo;
-  private final Map<ProxyAccessor<SimpleExpressionProxy>,CompiledEvent> mMap;
+  private final ProxyAccessorMap<SimpleExpressionProxy,CompiledEvent> mMap;
 
 }

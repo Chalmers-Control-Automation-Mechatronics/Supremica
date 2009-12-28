@@ -18,11 +18,9 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.IndexedHashSet;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -163,32 +161,6 @@ public abstract class TraceElement
       mTraceEvents = new TraceEventList(mTraceSteps);
     }
     return mTraceEvents;
-  }
-
-
-  //#########################################################################
-  //# Equals and Hashcode
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final TraceProxy trace = (TraceProxy) partner;
-      return
-        mProductDES == trace.getProductDES() &&
-        mAutomata.equals(trace.getAutomata()) &&
-        ProxyTools.isEqualListByContents(mTraceSteps, trace.getTraceSteps());
-    } else {
-      return false;
-    }    
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mAutomata.hashCode();
-    result *= 5;
-    result += ProxyTools.getListHashCodeByContents(mTraceSteps);
-    return result;
   }
 
 

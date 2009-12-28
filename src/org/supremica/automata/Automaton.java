@@ -56,11 +56,9 @@ import org.supremica.log.*;
 import org.supremica.util.Args;
 import org.supremica.properties.Config;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -2432,51 +2430,6 @@ public class Automaton
         return AutomatonProxy.class;
     }
 
-    public boolean equalsByContents(final Proxy partner)
-    {
-        if (getProxyInterface() == partner.getProxyInterface())
-        {
-            final AutomatonProxy partnerAutomaton = (AutomatonProxy) partner;
-            return
-                getName().equals(partnerAutomaton.getName()) &&
-                getKind() == partnerAutomaton.getKind() &&
-                ProxyTools.isEqualSetByContents
-                (getEvents(), partnerAutomaton.getEvents()) &&
-                ProxyTools.isEqualSetByContents
-                (getStates(), partnerAutomaton.getStates()) &&
-                ProxyTools.isEqualSetByContents
-                (getTransitions(), partnerAutomaton.getTransitions());
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    public boolean equalsWithGeometry(final Proxy partner)
-    {
-        return equalsByContents(partner);
-    }
-
-    public int hashCodeByContents()
-    {
-        int result = refHashCode();
-        result *= 5;
-        result += getKind().hashCode();
-        result *= 5;
-        result += ProxyTools.getSetHashCodeByContents(getEvents());
-        result *= 5;
-        result += ProxyTools.getSetHashCodeByContents(getStates());
-        result *= 5;
-        result += ProxyTools.getSetHashCodeByContents(getTransitions());
-        return result;
-    }
-
-    public int hashCodeWithGeometry()
-    {
-        return hashCodeByContents();
-    }
-
     public boolean refequals(final NamedProxy partner)
     {
         return getName().equals(partner.getName());
@@ -2538,7 +2491,7 @@ public class Automaton
 
     public Map<String,String> getAttributes()
     {
-      return null;
+      return Collections.emptyMap();
     }
 
     // Events are (supposed to be) immutable, you cannot change the label once constructed

@@ -65,13 +65,13 @@ public class ProductDESHashCodeVisitor
     result += kind.hashCode();
     final Set<EventProxy> events = aut.getEvents();
     result *= 5;
-    result += getRefCollectionHashCode(events);
+    result += computeRefCollectionHashCode(events);
     final Set<StateProxy> states = aut.getStates();
     result *= 5;
-    result += getCollectionHashCode(states);
+    result += computeCollectionHashCode(states);
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     result *= 5;
-    result += getCollectionHashCode(transitions);
+    result += computeCollectionHashCode(transitions);
     final Map<String,String> attribs = aut.getAttributes();
     result *= 5;
     result += attribs.hashCode();
@@ -111,10 +111,10 @@ public class ProductDESHashCodeVisitor
     int result = visitDocumentProxy(des);
     final Set<EventProxy> events = des.getEvents();
     result *= 5;
-    result += getCollectionHashCode(events);
+    result += computeCollectionHashCode(events);
     final Set<AutomatonProxy> automata = des.getAutomata();
     result *= 5;
-    result += getCollectionHashCode(automata);
+    result += computeCollectionHashCode(automata);
     return result;
   }
 
@@ -134,7 +134,7 @@ public class ProductDESHashCodeVisitor
     }
     final Collection<EventProxy> props = state.getPropositions();
     result *= 5;
-    result += getRefSetHashCode(props);
+    result += computeRefSetHashCode(props);
     return result;
   }
 
@@ -147,10 +147,10 @@ public class ProductDESHashCodeVisitor
     result += des.hashCode();
     final Set<AutomatonProxy> automata = trace.getAutomata();
     result *= 5;
-    result += getRefCollectionHashCode(automata);
+    result += computeRefCollectionHashCode(automata);
     final List<TraceStepProxy> steps = trace.getTraceSteps();
     result *= 5;
-    result *= getListHashCode(steps);
+    result *= computeListHashCode(steps);
     return result;
   }
 
@@ -160,10 +160,10 @@ public class ProductDESHashCodeVisitor
     int result = visitProxy(step);
     final EventProxy event = step.getEvent();
     result *= 5;
-    result += getOptionalHashCode(event);
+    result += computeOptionalHashCode(event);
     final Map<AutomatonProxy,StateProxy> statemap = step.getStateMap();
     result *= 5;
-    result += getRefMapHashCode(statemap);
+    result += computeRefMapHashCode(statemap);
     return result;
   }
 

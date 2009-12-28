@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -130,33 +129,6 @@ public final class EventElement
   public Class<EventProxy> getProxyInterface()
   {
     return EventProxy.class;
-  }
-
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final EventProxy event = (EventProxy) partner;
-      return
-        mKind.equals(event.getKind()) &&
-        (mIsObservable == event.isObservable()) &&
-        mAttributes.equals(event.getAttributes());
-    } else {
-      return false;
-    }
-  }
-
-  public int hashCodeByContents()
-  {
-    int result = super.hashCodeByContents();
-    result *= 5;
-    result += mKind.hashCode();
-    result *= 5;
-    if (mIsObservable) {
-      result++;
-    }
-    result *= 5;
-    result += mAttributes.hashCode();
-    return result;
   }
 
 

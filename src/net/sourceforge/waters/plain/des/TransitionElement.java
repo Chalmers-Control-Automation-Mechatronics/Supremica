@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.plain.des;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -97,32 +96,6 @@ public final class TransitionElement
     return TransitionProxy.class;
   }
 
-  /**
-   * Checks whether this transition is equal to another.
-   * Two transitions are considered as equal if their source and target
-   * states, and their events all have the same names.
-   */
-  public boolean equalsByContents(final Proxy partner)
-  {
-    if (super.equalsByContents(partner)) {
-      final TransitionProxy trans = (TransitionProxy) partner;
-      return
-        getSource().refequals(trans.getSource()) &&
-        getTarget().refequals(trans.getTarget()) &&
-        getEvent().refequals(trans.getEvent());
-    } else {
-      return false;
-    }    
-  }
-
-  public int hashCodeByContents()
-  {
-    return
-      getSource().refHashCode() +
-      5 * getEvent().refHashCode() +
-      25 * getTarget().refHashCode();
-  }
-
 
   //#########################################################################
   //# Interface java.lang.Comparable
@@ -139,7 +112,7 @@ public final class TransitionElement
     return getTarget().compareTo(trans.getTarget());
   }
 
- 
+
   //#########################################################################
   //# Data Members
   private final StateProxy mSource;

@@ -38,6 +38,7 @@ import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
@@ -318,11 +319,13 @@ public class SimpleComponentEditorDialog
           throw new WatersRuntimeException(exception);
         }
       } else {
+        final ModuleEqualityVisitor eq =
+          ModuleEqualityVisitor.getInstance(true);
         final GraphSubject graph = mComponent.getGraph().clone();
         graph.setDeterministic(deterministic);
         final SimpleComponentSubject template =
           new SimpleComponentSubject(ident, kind, graph, attribs);
-        if (!mComponent.equalsWithGeometry(template)) {
+        if (!eq.equals(mComponent, template)) {
           final SelectionOwner panel = mRoot.getComponentsPanel();
           final Command command = new EditCommand(mComponent, template, panel);
           mRoot.getUndoInterface().executeCommand(command);

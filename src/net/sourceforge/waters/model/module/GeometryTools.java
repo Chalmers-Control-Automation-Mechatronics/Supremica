@@ -565,7 +565,7 @@ public final class GeometryTools
    * @param  pt1             One end of the curve.
    * @param  c1              The first B&eacute;zier control point of the
    *                         curve.
-   * @param  c1              The second B&eacute;zier control point of the
+   * @param  c2              The second B&eacute;zier control point of the
    *                         curve.
    * @param  pt2             The other end of the curve.
    * @return A tight bounding box of the curve.
