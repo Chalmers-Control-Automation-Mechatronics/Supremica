@@ -188,7 +188,7 @@ public abstract class AbstractWatersTest
         // Funny thing, when run from ANT, the text after the first newline
         // in the argument passed to fail() gets printed on the console.
         // So we suppress the output and refer the programmer to the log file.
-        diagnostics = msg + " (see " + mLogFile + " for details.)";
+        diagnostics = msg + " (See " + mLogFile + " for details.)";
       }
       fail(diagnostics);
     }
