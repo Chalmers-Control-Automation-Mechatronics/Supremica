@@ -15,7 +15,6 @@ import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.marshaller.DocumentIntegrityChecker;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.AbstractJAXBTest;
@@ -104,9 +103,9 @@ public abstract class AbstractTraceTest extends AbstractJAXBTest<TraceProxy>
     return mPrinter;
   }
 
-  protected DocumentIntegrityChecker getIntegrityChecker()
+  protected TraceIntegrityChecker getIntegrityChecker()
   {
-    return DocumentIntegrityChecker.getInstance();
+    return TraceIntegrityChecker.getInstance();
   }
 
 
@@ -114,7 +113,7 @@ public abstract class AbstractTraceTest extends AbstractJAXBTest<TraceProxy>
   //# Overrides for junit.framework.TestCase
   protected void setUp()
     throws Exception
-  { 
+  {
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mTraceMarshaller = new JAXBTraceMarshaller(factory);

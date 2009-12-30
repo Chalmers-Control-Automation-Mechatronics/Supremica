@@ -16,7 +16,6 @@ import java.io.PrintWriter;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.marshaller.AbstractJAXBTest;
-import net.sourceforge.waters.model.marshaller.DocumentIntegrityChecker;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
@@ -86,9 +85,9 @@ public abstract class AbstractProductDESTest
     return mPrinter;
   }
 
-  protected DocumentIntegrityChecker getIntegrityChecker()
+  protected ProductDESIntegrityChecker getIntegrityChecker()
   {
-    return DocumentIntegrityChecker.getInstance();
+    return ProductDESIntegrityChecker.getInstance();
   }
 
 
@@ -96,7 +95,7 @@ public abstract class AbstractProductDESTest
   //# Overrides for junit.framework.TestCase
   protected void setUp()
     throws Exception
-  { 
+  {
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mMarshaller = new JAXBProductDESMarshaller(factory);

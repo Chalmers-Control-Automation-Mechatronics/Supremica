@@ -37,7 +37,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
 {
 
   //#########################################################################
-  //# Marshalling Test Cases
+  //# Marshaling Test Cases
   public void testMarshal_buffer_sf1()
     throws Exception
   {
@@ -48,6 +48,12 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     throws Exception
   {
     testMarshal("handwritten", "colours");
+  }
+
+  public void testMarshal_dosingtankEFA()
+    throws Exception
+  {
+    testMarshal("handwritten", "dosingtankEFA");
   }
 
   public void testMarshal_machine()
@@ -601,7 +607,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
 
   protected ModuleIntegrityChecker getIntegrityChecker()
   {
-    return ModuleIntegrityChecker.getInstance();
+    return ModuleIntegrityChecker.getModuleIntegrityCheckerInstance();
   }
 
 

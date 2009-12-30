@@ -10,8 +10,8 @@
 
 package net.sourceforge.waters.subject.module;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.module.ModuleIntegrityChecker;
+import net.sourceforge.waters.model.module.ModuleProxy;
 
 
 public class ModuleSubjectIntegrityChecker
@@ -20,14 +20,20 @@ public class ModuleSubjectIntegrityChecker
 
   //#########################################################################
   //# Constructors
-  public static ModuleSubjectIntegrityChecker getInstance()
+  public static ModuleSubjectIntegrityChecker
+    getModuleSubjectIntegrityCheckerInstance()
   {
-    if (theInstance == null) {
-      theInstance = new ModuleSubjectIntegrityChecker();
-    }
-    return theInstance;
+    return SingletonHolder.INSTANCE;
   }
 
+  private static class SingletonHolder {
+    static final ModuleSubjectIntegrityChecker INSTANCE =
+      new ModuleSubjectIntegrityChecker();
+  }
+
+
+  //#########################################################################
+  //# Constructor
   protected ModuleSubjectIntegrityChecker()
   {
     mHierarchyChecker = ModuleHierarchyChecker.getInstance();
@@ -36,11 +42,11 @@ public class ModuleSubjectIntegrityChecker
 
   //#########################################################################
   //# Invocation
-  public void check(final DocumentProxy doc)
+  public void check(final ModuleProxy module)
     throws Exception
   {
-    final ModuleSubject module = (ModuleSubject) doc;
-    check(module);
+    final ModuleSubject subject = (ModuleSubject) module;
+    check(subject);
   }
 
   public void check(final ModuleSubject module)
@@ -54,10 +60,5 @@ public class ModuleSubjectIntegrityChecker
   //#########################################################################
   //# Data Members
   private final ModuleHierarchyChecker mHierarchyChecker;
-
-
-  //#########################################################################
-  //# Class Variables
-  private static ModuleSubjectIntegrityChecker theInstance = null;
 
 }

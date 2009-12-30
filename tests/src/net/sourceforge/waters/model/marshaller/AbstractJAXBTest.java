@@ -145,8 +145,8 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     manager.saveAs(proxy1, outfilename);
     final URI outuri = outfilename.toURI();
     final DocumentProxy proxy2 = manager.load(outuri);
-    assertProxyEquals("Structure changed after marshalling!", proxy1, proxy2);
-    assertProxyEquals("Structure changed after marshalling!", proxy2, proxy1);
+    assertProxyEquals("Structure changed after marshaling!", proxy1, proxy2);
+    assertProxyEquals("Structure changed after marshaling!", proxy2, proxy1);
     final Class<D> clazz = Casting.toClass(proxy1.getClass());
     return clazz.cast(proxy1);
   }
@@ -342,7 +342,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
   protected void checkIntegrity(final D document)
     throws Exception
   {
-    final DocumentIntegrityChecker checker = getIntegrityChecker();
+    final DocumentIntegrityChecker<D> checker = getIntegrityChecker();
     checker.check(document);
   }
 
@@ -377,7 +377,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
   protected abstract ProxyMarshaller<D> getProxyMarshaller();
   protected abstract ProxyUnmarshaller<D> getProxyUnmarshaller();
   protected abstract ProxyPrinter getPrinter();
-  protected abstract DocumentIntegrityChecker getIntegrityChecker();
+  protected abstract DocumentIntegrityChecker<D> getIntegrityChecker();
 
 
   //#########################################################################

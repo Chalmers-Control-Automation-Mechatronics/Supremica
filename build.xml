@@ -747,6 +747,7 @@ Class-Path: ${manifest.pathlist}</echo>
             </classpath>
             <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+            <sysproperty key="waters.test.ant" value="true"/>
             <sysproperty key="java.library.path" value="${dist}"/>
         </junit>
     </target>
@@ -777,6 +778,7 @@ Class-Path: ${manifest.pathlist}</echo>
             </classpath>
             <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+            <sysproperty key="waters.test.ant" value="true"/>
             <sysproperty key="java.library.path" value="${dist}"/>
             <jvmarg value="-enableassertions"/>
         </junit>
@@ -803,6 +805,7 @@ Class-Path: ${manifest.pathlist}</echo>
             </classpath>
             <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+            <sysproperty key="waters.test.ant" value="true"/>
             <sysproperty key="java.library.path" value="${dist}"/>
             <jvmarg value="-enableassertions"/>
         </junit>
@@ -818,6 +821,7 @@ Class-Path: ${manifest.pathlist}</echo>
             </classpath>
             <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+            <sysproperty key="waters.test.ant" value="true"/>
             <sysproperty key="java.library.path" value="${dist}"/>
         </java>
     </target>
@@ -832,6 +836,7 @@ Class-Path: ${manifest.pathlist}</echo>
             </classpath>
             <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+            <sysproperty key="waters.test.ant" value="true"/>
             <sysproperty key="java.library.path" value="${dist}"/>
         </java>
     </target>
@@ -846,6 +851,7 @@ Class-Path: ${manifest.pathlist}</echo>
             </classpath>
             <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+            <sysproperty key="waters.test.ant" value="true"/>
             <sysproperty key="java.library.path" value="${dist}"/>
         </java>
     </target>
@@ -876,6 +882,7 @@ Class-Path: ${manifest.pathlist}</echo>
             </classpath>
             <sysproperty key="waters.test.inputdir" value="${examples}"/>
             <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+            <sysproperty key="waters.test.ant" value="true"/>
             <sysproperty key="java.library.path" value="${dist}"/>
         </junit>
     </target>

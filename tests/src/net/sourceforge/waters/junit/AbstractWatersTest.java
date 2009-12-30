@@ -14,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
+import net.sourceforge.waters.model.base.AbstractEqualityVisitor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -158,12 +159,7 @@ public abstract class AbstractWatersTest
                                              final Proxy expected)
   {
     final ProductDESEqualityVisitor eq = new ProductDESEqualityVisitor(true);
-    if (!eq.equals(proxy, expected)) {
-      final String diagnostics = eq.getDiagnostics(msg);
-      final Logger logger = getLogger();
-      logger.info(diagnostics);
-      fail(diagnostics);
-    }
+    assertProxyEquals(eq, msg, proxy, expected);
   }
 
   protected void assertModuleProxyEquals(final Proxy proxy,
@@ -177,10 +173,23 @@ public abstract class AbstractWatersTest
                                          final Proxy expected)
   {
     final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true, true);
+    assertProxyEquals(eq, msg, proxy, expected);
+  }
+
+  protected void assertProxyEquals(final AbstractEqualityVisitor eq,
+                                   final String msg,
+                                   final Proxy proxy,
+                                   final Proxy expected)
+  {
     if (!eq.equals(proxy, expected)) {
-      final String diagnostics = eq.getDiagnostics(msg);
-      final Logger logger = getLogger();
-      logger.info(diagnostics);
+      String diagnostics = eq.getDiagnostics(msg);
+      getLogger().error(diagnostics);
+      if (System.getProperty("waters.test.ant") != null) {
+        // Funny thing, when run from ANT, the text after the first newline
+        // in the argument passed to fail() gets printed on the console.
+        // So we suppress the output and refer the programmer to the log file.
+        diagnostics = msg + " (see " + mLogFile + " for details.)";
+      }
       fail(diagnostics);
     }
   }

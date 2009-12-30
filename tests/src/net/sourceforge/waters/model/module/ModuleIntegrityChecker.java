@@ -16,25 +16,29 @@ import java.util.List;
 import java.util.Set;
 import junit.framework.Assert;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.marshaller.DocumentIntegrityChecker;
 
 
 public class ModuleIntegrityChecker
-  extends DocumentIntegrityChecker
+  extends DocumentIntegrityChecker<ModuleProxy>
 {
 
   //#########################################################################
-  //# Constructors
-  public static ModuleIntegrityChecker getInstance()
+  //# Singleton Pattern
+  public static ModuleIntegrityChecker getModuleIntegrityCheckerInstance()
   {
-    if (theInstance == null) {
-      theInstance = new ModuleIntegrityChecker();
-    }
-    return theInstance;
+    return SingletonHolder.INSTANCE;
   }
 
+  private static class SingletonHolder {
+    private static final ModuleIntegrityChecker INSTANCE =
+      new ModuleIntegrityChecker();
+  }
+
+
+  //#########################################################################
+  //# Constructor
   protected ModuleIntegrityChecker()
   {
   }
@@ -42,13 +46,6 @@ public class ModuleIntegrityChecker
 
   //#########################################################################
   //# Invocation
-  public void check(final DocumentProxy doc)
-    throws Exception
-  {
-    final ModuleProxy module = (ModuleProxy) doc;
-    check(module);
-  }
-
   public void check(final ModuleProxy module)
     throws Exception
   {
@@ -81,7 +78,7 @@ public class ModuleIntegrityChecker
         checkComponentListIntegrity(body);
       } else {
         Assert.fail("Bad component type " + proxy.getClass().getName());
-      } 
+      }
     }
   }
 
@@ -120,10 +117,5 @@ public class ModuleIntegrityChecker
                         collected.contains(target));
     }
   }
-
-
-  //#########################################################################
-  //# Class Variables
-  private static ModuleIntegrityChecker theInstance = null;
 
 }

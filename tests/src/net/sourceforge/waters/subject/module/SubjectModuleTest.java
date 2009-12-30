@@ -27,7 +27,7 @@ public class SubjectModuleTest extends AbstractModuleTest
     return new TestSuite(SubjectModuleTest.class);
   }
 
-  public static void main(String args[]) {
+  public static void main(final String args[]) {
     junit.textui.TestRunner.run(suite());
   }
 
@@ -51,7 +51,8 @@ public class SubjectModuleTest extends AbstractModuleTest
   //# net.sourceforge.waters.model.marshaller.AbstractJAXBTest
   protected ModuleSubjectIntegrityChecker getIntegrityChecker()
   {
-    return ModuleSubjectIntegrityChecker.getInstance();
+    return
+      ModuleSubjectIntegrityChecker.getModuleSubjectIntegrityCheckerInstance();
   }
 
 }
