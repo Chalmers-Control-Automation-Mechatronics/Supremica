@@ -2,22 +2,22 @@
 <Module Name="wicked_high" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
 <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
-<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a1">
+<EventDecl Kind="CONTROLLABLE" Name="a1">
 <ns2:AttributeMap>
 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a2">
+<EventDecl Kind="CONTROLLABLE" Name="a2">
 <ns2:AttributeMap>
 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r1">
+<EventDecl Kind="CONTROLLABLE" Name="r1">
 <ns2:AttributeMap>
 <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r2">
+<EventDecl Kind="CONTROLLABLE" Name="r2">
 <ns2:AttributeMap>
 <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
 </ns2:AttributeMap>

@@ -2,34 +2,34 @@
 <Module Name="hisc0_high" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
 <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
-<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="a1">
+<EventDecl Kind="CONTROLLABLE" Name="a1">
 <ns2:AttributeMap>
 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="a2">
+<EventDecl Kind="CONTROLLABLE" Name="a2">
 <ns2:AttributeMap>
 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
 </ns2:AttributeMap>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="ev1"/>
 <EventDecl Kind="CONTROLLABLE" Name="ev2"/>
-<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="ld1">
+<EventDecl Kind="CONTROLLABLE" Name="ld1">
 <ns2:AttributeMap>
 <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="r1">
+<EventDecl Kind="CONTROLLABLE" Name="r1">
 <ns2:AttributeMap>
 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="r2">
+<EventDecl Kind="CONTROLLABLE" Name="r2">
 <ns2:AttributeMap>
 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="r3">
+<EventDecl Kind="CONTROLLABLE" Name="r3">
 <ns2:AttributeMap>
 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
 </ns2:AttributeMap>
