@@ -471,7 +471,7 @@ public abstract class AbstractEqualityVisitor
       final String attrib = entry.getKey();
       final String value2 = entry.getValue();
       final String value1 = attribs.get(attrib);
-      if (!value1.equals(value2)) {
+      if (!compareObjects(value1, value2)) {
         return reportAttributeMismatch(attrib, value1, value2);
       }
     }
