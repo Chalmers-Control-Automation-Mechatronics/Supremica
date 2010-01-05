@@ -1,14 +1,14 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.IDEDimensions;
 import org.supremica.gui.ide.MainPanel;
@@ -84,29 +84,27 @@ public class SimulatorPanel
     mEventsTree = new EventJTree(mSimulation, mDesktop, mModuleContainer);
     final JScrollPane scroll = new JScrollPane(mEventsTree);
     mEventsTree.addPane(scroll);
-    mEventsPanel.setLayout(new BorderLayout());
-    mEventsPanel.add(scroll, BorderLayout.CENTER);
-    final JTableHeader header = new JTableHeader();
-    final JTable fakeTable = new JTable();
-    fakeTable.setTableHeader(header);
-    header.getColumnModel().addColumn(new TableColumn());
-    header.getColumnModel().addColumn(new TableColumn());
-    header.getColumnModel().addColumn(new TableColumn());
-    final int width = 245; // DEBUG: Arbitrary value: Any value will work, but this is close to the 'normal' value
-    header.getColumnModel().getColumn(0).setPreferredWidth((int)(width * 0.2));
-    header.getColumnModel().getColumn(0).setMaxWidth((int)(width * 0.2));
-    header.getColumnModel().getColumn(0).setHeaderValue("Type");
-    header.getColumnModel().getColumn(1).setPreferredWidth((int)(width * 0.6));
-    header.getColumnModel().getColumn(1).setHeaderValue("Name");
-    header.getColumnModel().getColumn(2).setPreferredWidth((int)(width * 0.2));
-    header.getColumnModel().getColumn(2).setMaxWidth((int)(width * 0.2));
-    header.getColumnModel().getColumn(2).setHeaderValue("Ebd");
+    final GridBagLayout layout = new GridBagLayout();
+    final GridBagConstraints constraints = new GridBagConstraints();
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.weightx = 1;
+    mEventsPanel.setLayout(layout);
+    final JTableHeader header = new EventJTreeHeader(mEventsPanel);
+    //final JTable fakeTable = new JTable();
+    //fakeTable.setTableHeader(header);
     header.addMouseListener(new TreePseudoTable(mEventsTree, header));
-    header.setReorderingAllowed(false);
-    header.setVisible(true);
     //final JScrollPane topPane = new JScrollPane(psuedoTable);
     //mEventsPanel.add(topPane, BorderLayout.NORTH);
-    mEventsPanel.add(header, BorderLayout.NORTH);
+    constraints.gridx = 0;
+    constraints.gridy = 0;
+    constraints.weighty = 0;
+    layout.setConstraints(header, constraints);
+    mEventsPanel.add(header);
+    constraints.fill = GridBagConstraints.BOTH;
+    constraints.gridy = 1;
+    constraints.weighty = 1;
+    layout.setConstraints(scroll, constraints);
+    mEventsPanel.add(scroll);
     mTabbedPane.addTab("Events", mEventsPanel);
   }
 

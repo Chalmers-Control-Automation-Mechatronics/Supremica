@@ -131,7 +131,6 @@ public class EventTreeModel
   // # Interface SimulationObserver
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    // Do nothing... yet.
   }
 
   // #####################################################################

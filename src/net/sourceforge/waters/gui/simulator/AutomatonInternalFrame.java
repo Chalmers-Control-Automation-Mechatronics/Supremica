@@ -12,6 +12,7 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
@@ -45,6 +46,7 @@ public class AutomatonInternalFrame extends JInternalFrame
         storeReferenceFrame();
       }
     });
+    this.setFrameIcon(ModuleContext.getComponentKindIcon(aut.getKind()));
   }
 
 
