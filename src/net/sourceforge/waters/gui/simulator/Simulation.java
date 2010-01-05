@@ -53,6 +53,7 @@ public class Simulation implements ModelObserver, Observer
     mPreviousAutomatonStates = new ArrayList<HashMap<AutomatonProxy, StateProxy>>();
     mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
     mPreviousTransitionHistory = new ArrayList<HashMap<AutomatonProxy, TransitionProxy>>();
+    mBlockingEvents = new ArrayList<Pair<EventProxy, AutomatonProxy>>();
     currentTime = -1;
     mContainer = container;
     final ModuleSubject module = container.getModule();
@@ -60,6 +61,7 @@ public class Simulation implements ModelObserver, Observer
     container.attach(this);
     final ProductDESProxy des = container.getCompiledDES();
     setCompiledDES(des);
+    updateControllability();
   }
 
 
@@ -143,27 +145,12 @@ public class Simulation implements ModelObserver, Observer
    */
   public boolean isBlocking(final EventProxy event)
   {
-    if (event.getKind() == EventKind.UNCONTROLLABLE)
+    if (mBlockingEvents == null)
+      return false;
+    for (final Pair<EventProxy, AutomatonProxy> blocker : mBlockingEvents)
     {
-      boolean blockingPlant = false;
-      boolean blockingSpec = false;
-      if (mInvalidEvents.get(event) == null)
-        return false;
-      for (final AutomatonProxy automata : mInvalidEvents.get(event))
-      {
-        if (automata.getKind() == ComponentKind.SPEC)
-        {
-          blockingSpec = true;
-        }
-        else if (automata.getKind() == ComponentKind.PLANT)
-        {
-          blockingPlant = true;
-        }
-      }
-      if (!blockingPlant && blockingSpec)
+      if (blocker.getFirst() == event)
         return true;
-      else
-        return false;
     }
     return false;
   }
@@ -325,6 +312,7 @@ public class Simulation implements ModelObserver, Observer
     mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
     mPreviousTransitionHistory = new ArrayList<HashMap<AutomatonProxy, TransitionProxy>>();
     currentTime = -1;
+    updateControllability();
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
@@ -391,6 +379,7 @@ public class Simulation implements ModelObserver, Observer
       currentTime++;
     }
     findEventClassification();
+    updateControllability();
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
@@ -452,7 +441,7 @@ public class Simulation implements ModelObserver, Observer
 
   //#########################################################################
   //# Auxiliary Functions
-  private ArrayList<Pair<EventProxy, AutomatonProxy>> testForControlability()
+  private void updateControllability()
   {
     final ArrayList<Pair<EventProxy, AutomatonProxy>> output = new ArrayList<Pair<EventProxy, AutomatonProxy>>();
     for (final EventProxy event : mInvalidEvents.keySet())
@@ -477,9 +466,14 @@ public class Simulation implements ModelObserver, Observer
       }
     }
     if (output.size() == 0)
-      return null;
+      mBlockingEvents = null;
     else
-      return output;
+      mBlockingEvents = output;
+  }
+
+  private ArrayList<Pair<EventProxy, AutomatonProxy>> testForControlability()
+  {
+    return mBlockingEvents;
   }
 
   private boolean isInValidEvent (final EventProxy event)
@@ -646,6 +640,7 @@ public class Simulation implements ModelObserver, Observer
       mEnabledLastStep = (ArrayList<AutomatonProxy>)mPreviousEnabledLastStep.get(currentTime).clone();
       findEventClassification();
     }
+    updateControllability();
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
@@ -676,6 +671,7 @@ public class Simulation implements ModelObserver, Observer
   private ArrayList<HashMap<AutomatonProxy, StateProxy>> mPreviousAutomatonStates;
   private ArrayList<ArrayList<AutomatonProxy>> mPreviousEnabledLastStep;
   private ArrayList<HashMap<AutomatonProxy, TransitionProxy>> mPreviousTransitionHistory;
+  private ArrayList<Pair<EventProxy, AutomatonProxy>> mBlockingEvents;
   private final ModuleContainer mModuleContainer;
   private ArrayList<AutomatonProxy> mEnabledLastStep;
   private final ArrayList<SimulationObserver> mSimulationObservers;

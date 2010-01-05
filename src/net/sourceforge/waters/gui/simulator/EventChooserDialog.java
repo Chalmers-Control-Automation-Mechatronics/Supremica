@@ -3,7 +3,6 @@ package net.sourceforge.waters.gui.simulator;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -55,10 +54,6 @@ public class EventChooserDialog extends JDialog
           output.setBackground(EditorColor.BACKGROUND_FOCUSSED);
         else
           output.setBackground(EditorColor.BACKGROUNDCOLOR);
-        if (cellHasFocus)
-          output.setFont(output.getFont().deriveFont(Font.BOLD));
-        else
-          output.setFont(output.getFont().deriveFont(Font.PLAIN));
         return output;
       }
     });
@@ -143,6 +138,17 @@ public class EventChooserDialog extends JDialog
 
     });
     this.pack();
+    final int screenHeight = 768; // TODO: Calculate the real height of the screen
+    if (this.getSize().getHeight() > screenHeight)
+    {
+      this.setLocation(DEFAULT_STARTING_LOCATION.x, 0);
+      this.setSize((int)this.getSize().getWidth(), screenHeight);
+      this.pack();
+    }
+    else if (this.getSize().getHeight() + DEFAULT_STARTING_LOCATION.y > screenHeight)
+    {
+      this.setLocation(DEFAULT_STARTING_LOCATION.x, (int)(screenHeight - this.getSize().getHeight()));
+    }
   }
 
   // ####################################################################
