@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreeCellRenderer;
@@ -178,11 +177,8 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
 
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    //forceRecalculation();
-    for (final EventProxy selectedEvent : event.getSource().getAllEvents())
-    {
-      this.fireValueChanged(new TreeSelectionEvent(this, new TreePath(new Object[]{event.getSource(), selectedEvent}), false, null, null));
-    }
+    if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED)
+      forceRecalculation();
   }
 
   // #################################################################
