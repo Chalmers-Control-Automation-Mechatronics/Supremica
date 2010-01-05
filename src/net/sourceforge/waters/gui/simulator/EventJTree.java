@@ -259,12 +259,10 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
           left.setIcon(IconLoader.ICON_CONTROLLABLE);
         else
           left.setIcon(IconLoader.ICON_UNCONTROLLABLE);
+        left.setFont(left.getFont().deriveFont(Font.PLAIN));
         right = new JLabel();
-        if (mSim.getValidTransitions().contains(event))
-          right.setIcon(IconLoader.ICON_TICK);
-        else
-          right.setIcon(IconLoader.ICON_CROSS);
-        final int width = mPane.getWidth();
+        right.setIcon(mSim.getEventActivityIcon(event));
+        final int width = mPane.getViewport().getWidth();
         final int rightWidth = (width * eventColumnWidth[1] - noduleWidth * eventColumnWidth[1]) / (sum(eventColumnWidth));
         final int leftWidth = (width * eventColumnWidth[0] - noduleWidth * eventColumnWidth[0]) / (sum(eventColumnWidth));
         left.setPreferredSize(new Dimension(leftWidth, rowHeight));
@@ -284,9 +282,10 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
         else
           left.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
         center = new JLabel();
-        //if (mSim.getBlocking(((EventBranchNode)autoNode.getParent()).getEvent()).contains(autoProxy))
-        //  center.setIcon(IconLoader.ICON_CROSS);
-        //else
+        final EventProxy parentEvent = getParentEvent(row);
+        if (mSim.getBlocking(parentEvent).contains(autoProxy))
+          center.setIcon(IconLoader.ICON_CROSS);
+        else
         center.setIcon(IconLoader.ICON_TICK); // TODO: Determine what event is this automatons parent
         StateProxy currentState;
         currentState = mSim.getCurrentStates().get(autoProxy);
@@ -327,6 +326,14 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
       for (int i = 0; i < a.length; i++)
         o+=a[i];
       return o;
+    }
+
+    private EventProxy getParentEvent(final int row)
+    {
+      if (EventJTree.this.getPathForRow(row).getPathCount() == 2)
+        return (EventProxy)EventJTree.this.getPathForRow(row).getLastPathComponent();
+      else
+        return getParentEvent(row-1);
     }
 
     // ###########################################################################

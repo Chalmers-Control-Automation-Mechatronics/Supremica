@@ -216,6 +216,7 @@ public class EventTreeModel
   }
 
   /**
+   * Returns a POSITIVE NUMBER if a is before b in the default setting. The default order is ENABLED, DISABLED, BLOCKING
    * Returns a POSITIVE NUMBER if a is enabled and b isn't, NEGATIVE if b is enabled and a isn't, and ZERO if they are the same
    * @param a
    * @param b
@@ -223,6 +224,8 @@ public class EventTreeModel
    */
   public int sortByEnabled(final EventProxy a, final EventProxy b)
   {
+    if (b == null)
+      throw new IllegalArgumentException("DEBUG: NULL EVENT");
     if (mSim.getValidTransitions().contains(a))
     {
       if (mSim.getValidTransitions().contains(b))
@@ -230,10 +233,19 @@ public class EventTreeModel
       else
         return 1;
     }
+    else if (mSim.isBlocking(a))
+    {
+      if (mSim.isBlocking(b))
+        return 0;
+      else
+        return -1;
+    }
     else
     {
       if (mSim.getValidTransitions().contains(b))
         return -1;
+      else if (mSim.isBlocking(b))
+        return 1;
       else
         return 0;
     }

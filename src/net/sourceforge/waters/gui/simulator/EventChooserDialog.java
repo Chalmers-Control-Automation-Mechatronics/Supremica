@@ -1,7 +1,6 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -24,6 +23,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.BevelBorder;
 
+import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.model.des.EventProxy;
 
@@ -50,8 +50,11 @@ public class EventChooserDialog extends JDialog
           final int index, final boolean isSelected, final boolean cellHasFocus)
       {
         final JLabel output = (JLabel) value;
+        output.setOpaque(true);
         if (isSelected)
-          output.setBackground(Color.blue);
+          output.setBackground(EditorColor.BACKGROUND_FOCUSSED);
+        else
+          output.setBackground(EditorColor.BACKGROUNDCOLOR);
         if (cellHasFocus)
           output.setFont(output.getFont().deriveFont(Font.BOLD));
         else
@@ -72,10 +75,12 @@ public class EventChooserDialog extends JDialog
     selectButton.setPreferredSize(new Dimension((int)maximumWidth, (int)selectButton.getPreferredSize().getHeight()));
     cancelButton.setPreferredSize(new Dimension((int)maximumWidth, (int)cancelButton.getPreferredSize().getHeight()));
     final GridBagLayout layout = new GridBagLayout();
-    layout.columnWidths = new int[]{(int)((DEFAULT_LIST_WIDTH - maximumWidth * 2) / 2),
+    final int[] a = new int[]{(int)((DEFAULT_LIST_WIDTH - maximumWidth * 2) / 2),
       (int)maximumWidth,
       (int)maximumWidth,
       (int)((DEFAULT_LIST_WIDTH - maximumWidth * 2) / 2)};
+    layout.columnWidths = a;
+    scrollPane.setPreferredSize(new Dimension(a[0] + a[1] + a[2] + a[3] + 20, DEFAULT_ROW_HEIGHT * correspondingEvent.length + 20));
     buttonPanel.setLayout(layout);
     buttonPanel.add(new JLabel()); // To keep the empty tile empty
     buttonPanel.add(selectButton);
@@ -85,7 +90,6 @@ public class EventChooserDialog extends JDialog
     topLabel.setIcon(IconLoader.ICON_EVENT);
     panel.add(topLabel, BorderLayout.NORTH);
     this.add(panel);
-    this.pack();
     this.setLocation(DEFAULT_STARTING_LOCATION);
     selectButton.addMouseListener(new MouseAdapter()
     {
@@ -138,6 +142,7 @@ public class EventChooserDialog extends JDialog
       }
 
     });
+    this.pack();
   }
 
   // ####################################################################

@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.table.JTableHeader;
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.IDEDimensions;
@@ -18,7 +19,6 @@ import org.supremica.gui.ide.ModuleContainer;
 public class SimulatorPanel
   extends MainPanel
 {
-
   // #########################################################################
   // # Constructor
 
@@ -83,6 +83,8 @@ public class SimulatorPanel
   {
     mEventsTree = new EventJTree(mSimulation, mDesktop, mModuleContainer);
     final JScrollPane scroll = new JScrollPane(mEventsTree);
+    if (EVENT_VERTICAL_SCROLLBAR_ALWAYS)
+      scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     mEventsTree.addPane(scroll);
     final GridBagLayout layout = new GridBagLayout();
     final GridBagConstraints constraints = new GridBagConstraints();
@@ -90,8 +92,8 @@ public class SimulatorPanel
     constraints.weightx = 1;
     mEventsPanel.setLayout(layout);
     final JTableHeader header = new EventJTreeHeader(mEventsPanel);
-    //final JTable fakeTable = new JTable();
-    //fakeTable.setTableHeader(header);
+    final JTable fakeTable = new JTable();
+    fakeTable.setTableHeader(header);
     header.addMouseListener(new TreePseudoTable(mEventsTree, header));
     //final JScrollPane topPane = new JScrollPane(psuedoTable);
     //mEventsPanel.add(topPane, BorderLayout.NORTH);
@@ -126,5 +128,5 @@ public class SimulatorPanel
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-
+  private static final boolean EVENT_VERTICAL_SCROLLBAR_ALWAYS = true;
 }

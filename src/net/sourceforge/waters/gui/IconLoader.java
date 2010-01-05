@@ -49,6 +49,7 @@ public class IconLoader
   private static final String NAME_VARIABLE = "waters/variable";
   private static final String NAME_CROSS = "waters/cross16";
   private static final String NAME_TICK = "waters/tick16";
+  private static final String NAME_WARNING = "RedFlag";
 
 
   //#########################################################################
@@ -80,6 +81,6 @@ public class IconLoader
   public static final ImageIcon ICON_VARIABLE = getIcon(NAME_VARIABLE);
   public static final ImageIcon ICON_CROSS = getIcon(NAME_CROSS);
   public static final ImageIcon ICON_TICK = getIcon(NAME_TICK);
-
+  public static final ImageIcon ICON_WARNING = getIcon(NAME_WARNING);
 
 }

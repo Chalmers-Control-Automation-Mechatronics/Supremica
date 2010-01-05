@@ -11,7 +11,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
+
 import net.sourceforge.waters.gui.EditorColor;
+import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -111,6 +114,65 @@ public class Simulation implements ModelObserver, Observer
     return output;
   }
 
+  public ImageIcon getEventActivityIcon(final EventProxy event)
+  {
+    if (mEnabledEvents.contains(event))
+      return IconLoader.ICON_TICK;
+    else if (mInvalidEvents.containsKey(event))
+    {
+      if (testForControlability() != null)
+      {
+        for (final Pair<EventProxy, AutomatonProxy> blockingEvent : testForControlability())
+        {
+          if (blockingEvent.getFirst() == event)
+            return IconLoader.ICON_WARNING;
+        }
+      }
+      return IconLoader.ICON_CROSS;
+    }
+    else
+    {
+      throw new UnsupportedOperationException("ERROR: Unknown event status");
+    }
+  }
+
+  /**
+   * A check to see if the event is a blocking event (All automaton which are blocked by this event are specifications)
+   * @param event The event to test
+   * @return TRUE if the event is a blocking event, false otherwise
+   */
+  public boolean isBlocking(final EventProxy event)
+  {
+    if (event.getKind() == EventKind.UNCONTROLLABLE)
+    {
+      boolean blockingPlant = false;
+      boolean blockingSpec = false;
+      if (mInvalidEvents.get(event) == null)
+        return false;
+      for (final AutomatonProxy automata : mInvalidEvents.get(event))
+      {
+        if (automata.getKind() == ComponentKind.SPEC)
+        {
+          blockingSpec = true;
+        }
+        else if (automata.getKind() == ComponentKind.PLANT)
+        {
+          blockingPlant = true;
+        }
+      }
+      if (!blockingPlant && blockingSpec)
+        return true;
+      else
+        return false;
+    }
+    return false;
+  }
+
+  /**
+   * Returns the automaton which are blocked by this event
+   * @param event
+   * @return All automaton which are blocked by this event, or an empty arraylist, if the event is valid.
+   */
   public ArrayList<AutomatonProxy> getBlocking(final EventProxy event)
   {
     if (mInvalidEvents.containsKey(event))
@@ -171,6 +233,13 @@ public class Simulation implements ModelObserver, Observer
   public boolean changedLastStep(final AutomatonProxy automaton)
   {
     return mEnabledLastStep.contains(automaton);
+  }
+  public boolean changedSecondLastStep(final AutomatonProxy automaton)
+  {
+    if (mPreviousEnabledLastStep.size() < 2)
+      return false;
+    else
+      return mPreviousEnabledLastStep.get(mPreviousEnabledLastStep.size() - 2).contains(automaton);
   }
 
   public ModuleContainer getContainer()
@@ -264,16 +333,20 @@ public class Simulation implements ModelObserver, Observer
   @SuppressWarnings("unchecked")
   public void step(final EventProxy event) throws UncontrollableException
   {
+    final long time = System.currentTimeMillis();
     if (event == null)
     {
       return;
     }
     if (testForControlability() != null)
     {
-      final Pair<EventProxy, AutomatonProxy> invalidEvent = testForControlability();
-      throw new UncontrollableException("ERROR: The event " + invalidEvent.getFirst().getName()
-          + " is not controllable, inside the automaton " + invalidEvent.getSecond().getName()
-          + " Current state is: " + mAllAutomatons.get(invalidEvent.getSecond()).getName());
+      final ArrayList<Pair<EventProxy, AutomatonProxy>> invalidEvent = testForControlability();
+      for (final Pair<EventProxy, AutomatonProxy> invalidPair : invalidEvent)
+      {
+        System.out.println("ERROR: The event " + invalidPair.getFirst().getName()
+            + " is not controllable, inside the automaton " + invalidPair.getSecond().getName()
+            + " Current state is: " + mAllAutomatons.get(invalidPair.getSecond()).getName());
+      }
     }
     if (isInInvalidEvent(event))
     {
@@ -321,7 +394,7 @@ public class Simulation implements ModelObserver, Observer
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
-    System.out.println("Event successfully completed:" + event);
+    System.out.println("Event successfully completed:" + event + " time taken: " + (System.currentTimeMillis() - time));
   }
 
   public void stepBack()
@@ -379,8 +452,9 @@ public class Simulation implements ModelObserver, Observer
 
   //#########################################################################
   //# Auxiliary Functions
-  private Pair<EventProxy, AutomatonProxy> testForControlability()
+  private ArrayList<Pair<EventProxy, AutomatonProxy>> testForControlability()
   {
+    final ArrayList<Pair<EventProxy, AutomatonProxy>> output = new ArrayList<Pair<EventProxy, AutomatonProxy>>();
     for (final EventProxy event : mInvalidEvents.keySet())
     {
       if (event.getKind() == EventKind.UNCONTROLLABLE)
@@ -399,10 +473,13 @@ public class Simulation implements ModelObserver, Observer
           }
         }
         if (!blockingPlant && blockingSpec != null)
-          return blockingSpec;
+          output.add(blockingSpec);
       }
     }
-    return null;
+    if (output.size() == 0)
+      return null;
+    else
+      return output;
   }
 
   private boolean isInValidEvent (final EventProxy event)
