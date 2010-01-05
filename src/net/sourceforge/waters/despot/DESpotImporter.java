@@ -192,6 +192,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     Collections.sort(subsystems, new LevelComparator());
 
     for (int j = 0; j < subsystems.size(); j++) {
+      // adds the accepting proposition to the events list
+      addAcceptingProp();
       final Element subsystem = subsystems.get(j);
 
       final NodeList automaton = subsystem.getElementsByTagName("*");
@@ -222,9 +224,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         }
         clearGraphStructures();
       }
-
-      // adds the accepting proposition to the events list
-      addAcceptingProp();
 
       module = constructModule(subsystem);
       if (module != null) {
@@ -334,8 +333,10 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           // referencing it, add it to the list of events for the module
           // referencing it
           if (!mEvents.containsKey(eventName)) {
-            final EventDeclProxy eventCopy = (EventDeclProxy) event.clone();
-            mEvents.put(eventName, eventCopy);
+            final EventDeclProxy newEvent =
+                mFactory.createEventDeclProxy(event.getIdentifier(), event
+                    .getKind(), true, ScopeKind.LOCAL, null, null, null);
+            mEvents.put(eventName, newEvent);
           }
           bindings.add(mFactory.createParameterBindingProxy(eventName,
                                                             identifier));
@@ -370,7 +371,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * Checks if an event already exists. If the event hasn't been used already an
    * EventDeclProxy is created and stored.
    */
-  private void constructEventDecl(final Element event)
+  private void constructEventDecl(final Element event,
+                                  final boolean implementation)
   {
     final String eventName = formatIdentifier(event.getAttribute("nm"));
     if (!mEvents.containsKey(eventName)) {
@@ -381,7 +383,12 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       EventDeclProxy eventDecl = null;
       // the event is controllable
       if (eventKind.equals("1")) {
-        if (eventType.equals("r")) {
+        if (!implementation || eventType.equals("d")) {
+          eventDecl =
+              mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,
+                                            true, ScopeKind.LOCAL, null, null,
+                                            null);
+        } else if (eventType.equals("r")) {
           eventDecl =
               mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,
                                             true, ScopeKind.REQUIRED_PARAMETER,
@@ -393,11 +400,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
                                             true, ScopeKind.REQUIRED_PARAMETER,
                                             null, null,
                                             HISCAttributes.ATTRIBUTES_ANSWER);
-        } else if (eventType.equals("d")) {
-          eventDecl =
-              mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,
-                                            true, ScopeKind.LOCAL, null, null,
-                                            null);
         } else if (eventType.equals("ld")) {
           eventDecl =
               mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,
@@ -408,7 +410,12 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       }
       // the event is uncontrollable
       else if (eventKind.equals("0")) {
-        if (eventType.equals("r")) {
+        if (!implementation || eventType.equals("d")) {
+          eventDecl =
+              mFactory.createEventDeclProxy(identifier,
+                                            EventKind.UNCONTROLLABLE, true,
+                                            ScopeKind.LOCAL, null, null, null);
+        } else if (eventType.equals("r")) {
           eventDecl =
               mFactory.createEventDeclProxy(identifier,
                                             EventKind.UNCONTROLLABLE, true,
@@ -422,11 +429,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
                                             ScopeKind.REQUIRED_PARAMETER, null,
                                             null,
                                             HISCAttributes.ATTRIBUTES_ANSWER);
-        } else if (eventType.equals("d")) {
-          eventDecl =
-              mFactory.createEventDeclProxy(identifier,
-                                            EventKind.UNCONTROLLABLE, true,
-                                            ScopeKind.LOCAL, null, null, null);
+
         } else if (eventType.equals("ld")) {
           eventDecl =
               mFactory.createEventDeclProxy(identifier,
@@ -463,7 +466,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final NodeList allHeaders = definition.getElementsByTagName("Header");
       final Element header = (Element) allHeaders.item(0);
       final String autName = formatIdentifier(header.getAttribute("name"));
-      final GraphProxy graph = constructGraph(root);
+      final GraphProxy graph = constructGraph(root, false);
       if (graph != null) {
         final IdentifierProxy identifier =
             mFactory.createSimpleIdentifierProxy(autName);
@@ -488,14 +491,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       URISyntaxException
   {
     final URI uri = new URI(desLocation);
-    // final String newName = formatIdentifier(desName);
     final Element root = openDESFile(path.resolve(uri));
     final Element definition =
         (Element) root.getElementsByTagName("Definition").item(0);
     final NodeList allHeaders = definition.getElementsByTagName("Header");
     final Element header = (Element) allHeaders.item(0);
     final String newName = formatIdentifier(header.getAttribute("name"));
-    final GraphProxy graph = constructGraph(root);
+    final GraphProxy graph = constructGraph(root, true);
     if (graph != null) {
       final IdentifierProxy identifier =
           mFactory.createSimpleIdentifierProxy(newName);
@@ -537,7 +539,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param des
    *          The root element of the .des file that contains the automaton.
    */
-  private GraphProxy constructGraph(final Element des)
+  private GraphProxy constructGraph(final Element des,
+                                    final boolean implementation)
       throws ParserConfigurationException, SAXException, IOException
   {
 
@@ -560,7 +563,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final NodeList allEvents = definition.getElementsByTagName("Events");
     final Element events = (Element) allEvents.item(0);
     final NodeList evElmntLst = events.getElementsByTagName("*");
-    storeEvents(evElmntLst);
+    storeEvents(evElmntLst, implementation);
 
     // converts each transition in the despot file into edges for waters
     final NodeList transitionList =
@@ -667,14 +670,14 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param events
    *          The list of event elements from the DOM.
    */
-  private void storeEvents(final NodeList events)
+  private void storeEvents(final NodeList events, final boolean implementation)
   {
     for (int i = 0; i < events.getLength(); i++) {
       final Element event = (Element) events.item(i);
       final int eventID = Integer.parseInt(event.getAttribute("id"));
       final String eventName = formatIdentifier(event.getAttribute("nm"));
       mEventIDs.put(eventID, eventName);
-      constructEventDecl(event);
+      constructEventDecl(event, implementation);
     }
   }
 

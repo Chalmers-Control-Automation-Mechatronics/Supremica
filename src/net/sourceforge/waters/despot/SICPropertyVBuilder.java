@@ -1,33 +1,21 @@
 package net.sourceforge.waters.despot;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.valid.ValidUnmarshaller;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.analysis.comp552.ConflictMain;
 import net.sourceforge.waters.despot.HISCAttributes;
 
 
@@ -41,7 +29,7 @@ public class SICPropertyVBuilder
   }
 
   public SICPropertyVBuilder(final ProductDESProxy model,
-      final ProductDESProxyFactory factory)
+                             final ProductDESProxyFactory factory)
   {
     mModel = model;
     mFactory = factory;
@@ -103,7 +91,8 @@ public class SICPropertyVBuilder
 
     final ProductDESProxy newModel =
         mFactory.createProductDESProxy(mModel.getName(), mModel.getComment(),
-            mModel.getLocation(), mModel.getEvents(), newAutomaton);
+                                       mModel.getLocation(),
+                                       mModel.getEvents(), newAutomaton);
     return newModel;
   }
 
@@ -118,7 +107,7 @@ public class SICPropertyVBuilder
     // create the default marking proposition
     final EventProxy defaultMark =
         mFactory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME,
-            EventKind.PROPOSITION, true);
+                                  EventKind.PROPOSITION, true);
     // create the precondition marking :alpha
     final EventProxy alpha =
         mFactory.createEventProxy(mAlpha, EventKind.PROPOSITION, true);
@@ -151,7 +140,7 @@ public class SICPropertyVBuilder
       transitions.add(transition);
 
       // the transition which accepts any request event
-      if (event.getAttributes().equals(HISCAttributes.ATTRIBUTES_REQUEST)) {
+      if (event.getAttributes() == HISCAttributes.ATTRIBUTES_REQUEST) {
         final TransitionProxy requestTransition =
             mFactory.createTransitionProxy(initialState, event, alphaState);
         transitions.add(requestTransition);
@@ -159,7 +148,7 @@ public class SICPropertyVBuilder
 
       // the transition which accepts any local event (i.e. non request, non
       // answer events)
-      else if (!event.getAttributes().equals(HISCAttributes.ATTRIBUTES_ANSWER)) {
+      else if (event.getAttributes() != HISCAttributes.ATTRIBUTES_ANSWER) {
         final TransitionProxy localTransition =
             mFactory.createTransitionProxy(alphaState, event, t3State);
         transitions.add(localTransition);
@@ -185,174 +174,123 @@ public class SICPropertyVBuilder
   }
 
   private AutomatonProxy createModifiedInterfaceAutomaton(
-      final AutomatonProxy aut, final EventProxy answer)
+                                                          final AutomatonProxy aut,
+                                                          final EventProxy answer)
   {
     // removes the default marking proposition from the event alphabet (all
     // states are required to be marked with it, so by removing the marking all
     // states are implicitly marked)
     final List<EventProxy> newEvents = new ArrayList<EventProxy>();
     for (final EventProxy event : aut.getEvents()) {
-      if (event.getKind().equals(EventKind.PROPOSITION)) {
-        if (!event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+      if (event.getKind() == EventKind.PROPOSITION) {
+        if (event.getName() != EventDeclProxy.DEFAULT_MARKING_NAME) {
           newEvents.add(event);
         }
       }
     }
-    // removes the default marking proposition from any states it is currently
-    // applied to
-    List<StateProxy> newStates = new ArrayList<StateProxy>();
-    for (final StateProxy state : aut.getStates()) {
-      final List<EventProxy> propositions = new ArrayList<EventProxy>();
-      for (final EventProxy proposition : state.getPropositions()) {
-        if (!proposition.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
-          propositions.add(proposition);
-        }
-      }
-      newStates.add(mFactory.createStateProxy(state.getName(), state
-          .isInitial(), propositions));
-    }
-    AutomatonProxy modifiedInterface =
-        mFactory.createAutomatonProxy(aut.getName(), aut.getKind(), newEvents,
-            newStates, aut.getTransitions(), aut.getAttributes());
 
-    // mark states that have the specified answer event enabled with the
-    // precondition marking proposition :alpha
-    newStates = new ArrayList<StateProxy>();
     // collects all the transitions that use the specified answer event
     final List<TransitionProxy> answerTransitions =
         new ArrayList<TransitionProxy>();
-    for (final TransitionProxy transition : modifiedInterface.getTransitions()) {
+    for (final TransitionProxy transition : aut.getTransitions()) {
       if (transition.getEvent().equals(answer)) {
         answerTransitions.add(transition);
       }
     }
+
+    final List<StateProxy> newStates = new ArrayList<StateProxy>();
     final EventProxy alpha =
         mFactory.createEventProxy(mAlpha, EventKind.PROPOSITION, true);
-    for (final StateProxy state : modifiedInterface.getStates()) {
-      for (final TransitionProxy transition : answerTransitions) {
-        if (transition.getSource().equals(state)) {
-          final List<EventProxy> propositions =
-              (List<EventProxy>) state.getPropositions();
 
-          if (!propositions.contains(alpha)) {
-            propositions.add(alpha);
-          }
-          newStates.add(mFactory.createStateProxy(state.getName(), state
-              .isInitial(), propositions));
+    for (final StateProxy state : aut.getStates()) {
+      // removes the default marking proposition from any states it is currently
+      // applied to
+      final List<EventProxy> newPropositions = new ArrayList<EventProxy>();
+      for (final EventProxy proposition : state.getPropositions()) {
+        if (proposition.getName() != EventDeclProxy.DEFAULT_MARKING_NAME) {
+          newPropositions.add(proposition);
         }
       }
-    }
-    modifiedInterface =
-        mFactory.createAutomatonProxy(aut.getName(), aut.getKind(), newEvents,
-            newStates, aut.getTransitions(), aut.getAttributes());
 
-    return modifiedInterface;
+      // mark states that have the specified answer event enabled with the
+      // precondition marking proposition :alpha
+      for (final TransitionProxy transition : answerTransitions) {
+        if (transition.getSource() == state) {
+          if (!newPropositions.contains(alpha)) {
+            newPropositions.add(alpha);
+          }
+        }
+      }
+      final StateProxy newState =
+          mFactory.createStateProxy(state.getName(), state.isInitial(),
+                                    newPropositions);
+      newStates.add(newState);
+      mStates.put(state, newState);
+    }
+    final List<TransitionProxy> newTransitions = replaceTransitionStates(aut);
+    mStates.clear();
+    return mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
+                                         newEvents, newStates, newTransitions,
+                                         aut.getAttributes());
   }
 
   private AutomatonProxy createModifiedLowLevelAutomaton(
-      final AutomatonProxy aut)
+                                                         final AutomatonProxy aut)
   {
     // removes markings from automaton event alphabet
     final List<EventProxy> newEvents = new ArrayList<EventProxy>();
     for (final EventProxy event : aut.getEvents()) {
-      if (event.getKind().equals(EventKind.PROPOSITION)) {
-        if (!event.getName().equals(mAlpha)
-            && !event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
-          newEvents.add(event);
-        }
+      if (event.getKind() != EventKind.PROPOSITION) {
+        newEvents.add(event);
       }
     }
     // removes markings from the states
     final List<StateProxy> newStates = new ArrayList<StateProxy>();
     for (final StateProxy state : aut.getStates()) {
       final List<EventProxy> propositions = new ArrayList<EventProxy>();
-      for (final EventProxy proposition : state.getPropositions()) {
-        if (!proposition.getName().equals(mAlpha)
-            && !proposition.getName().equals(
-                EventDeclProxy.DEFAULT_MARKING_NAME)) {
-          propositions.add(proposition);
-        }
-      }
-      newStates.add(mFactory.createStateProxy(state.getName(), state
-          .isInitial(), propositions));
+      /*
+       * for (final EventProxy proposition : state.getPropositions()) { if
+       * (!proposition.getName().equals(mAlpha) && !proposition.getName()
+       * .equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+       * propositions.add(proposition); } }
+       */
+      final StateProxy newState =
+          mFactory.createStateProxy(state.getName(), state.isInitial(),
+                                    propositions);
+      newStates.add(newState);
+      mStates.put(state, newState);
     }
+    final List<TransitionProxy> newTransitions = replaceTransitionStates(aut);
+
     final AutomatonProxy modifiedLowLevelAutomaton =
         mFactory.createAutomatonProxy(aut.getName(), aut.getKind(), newEvents,
-            newStates, aut.getTransitions(), aut.getAttributes());
+                                      newStates, newTransitions, aut
+                                          .getAttributes());
     mLowLevelAutomata.add(modifiedLowLevelAutomaton);
+    mStates.clear();
     return modifiedLowLevelAutomaton;
   }
 
-  // #########################################################################
-  // # Main Method for Testing
   /**
-   * Main method. This is a main method to check a set of files for conflicts.
-   * Please refer to the class documentation ({@link ConflictMain}) for more
-   * detailed information.
+   * Replaces the source and target states of a transition with the new version
+   * of the states.
    *
-   * @param args
-   *          Array of file names from the command line.
+   * @return
    */
-  public static void main(final String[] args)
+  private List<TransitionProxy> replaceTransitionStates(final AutomatonProxy aut)
   {
-    try {
-      final ModuleProxyFactory moduleFactory =
-          ModuleElementFactory.getInstance();
-      final ProductDESProxyFactory desFactory =
-          ProductDESElementFactory.getInstance();
-      final OperatorTable optable = CompilerOperatorTable.getInstance();
-      final ValidUnmarshaller importer =
-          new ValidUnmarshaller(moduleFactory, optable);
-      final JAXBModuleMarshaller moduleMarshaller =
-          new JAXBModuleMarshaller(moduleFactory, optable, false);
-      final JAXBProductDESMarshaller desMarshaller =
-          new JAXBProductDESMarshaller(desFactory);
-      final DocumentManager docManager = new DocumentManager();
-      docManager.registerUnmarshaller(desMarshaller);
-      docManager.registerUnmarshaller(moduleMarshaller);
-      docManager.registerUnmarshaller(importer);
-
-      for (int i = 0; i < args.length; i++) {
-        final String name = args[i];
-        final File filename = new File(name);
-        final DocumentProxy doc = docManager.load(filename);
-        final ProductDESProxy des;
-        if (doc instanceof ProductDESProxy) {
-          des = (ProductDESProxy) doc;
-        } else {
-          final ModuleProxy module = (ModuleProxy) doc;
-          final ModuleCompiler compiler =
-              new ModuleCompiler(docManager, desFactory, module);
-          des = compiler.compile();
-        }
-        final SICPropertyVBuilder builder =
-            new SICPropertyVBuilder(des, desFactory);
-        System.out.print(des.getName() + " ... ");
-        System.out.flush();
-
-        final List<EventProxy> answerEvents =
-            (List<EventProxy>) builder.getAnswerEvents();
-        for (final EventProxy answer : answerEvents) {
-          final ProductDESProxy modifiedDES =
-              builder.createModelForAnswer(answer);
-          System.out.print(modifiedDES);
-        }
-        System.out.print("run");
-        /*
-         * if (result) { System.out.println("nonconflicting"); } else {
-         * System.out.println("CONFLICTING");
-         * System.out.println("Counterexample:"); final ConflictTraceProxy
-         * counterex = builder.getCounterExample();
-         * System.out.println(counterex.toString()); }
-         */
-      }
-
-    } catch (final Throwable exception) {
-      System.err.println("FATAL ERROR !!!");
-      System.err.println(exception.getClass().getName() + " caught in main()!");
-      exception.printStackTrace(System.err);
+    final List<TransitionProxy> newTransitions =
+        new ArrayList<TransitionProxy>();
+    for (final TransitionProxy transition : aut.getTransitions()) {
+      final StateProxy source = mStates.get(transition.getSource());
+      final StateProxy target = mStates.get(transition.getTarget());
+      final TransitionProxy newTransition =
+          mFactory.createTransitionProxy(source, transition.getEvent(), target);
+      newTransitions.add(newTransition);
     }
+    return newTransitions;
   }
+
 
   // #########################################################################
   // # Data Members
@@ -370,5 +308,13 @@ public class SICPropertyVBuilder
    * rules.
    */
   private List<AutomatonProxy> mLowLevelAutomata;
+
+  /**
+   * A map of the original states to the new version of the state (which is
+   * either a copy or has a proposition added/removed).
+   *
+   */
+  private final Map<StateProxy,StateProxy> mStates =
+      new HashMap<StateProxy,StateProxy>();
 
 }
