@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="nonexist_subsystem" type="HISC" degree="2"/>
+    <Subsystem name="nonexist_high" level="0" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Uses>
+            <InterfaceRef name="intf1" provider="exist_low"/>
+            <InterfaceRef name="intf2" provider="nonexist_low"/>
+        </Uses>
+    </Subsystem>
+    <Interface name="intf1">
+        <Des name="wicked_iface_1" location="wicked_iface_1.des"/>
+    </Interface>
+    <Interface name="intf2">
+        <Des name="wicked_iface_2" location="wicked_iface_2.des"/>
+    </Interface>
+    <Subsystem name="exist_low" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="intf1"/>
+        </Implements>
+    </Subsystem>
+</Project>

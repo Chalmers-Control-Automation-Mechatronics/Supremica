@@ -228,11 +228,25 @@ public class DESpotImporterTest extends AbstractWatersTest
 
   //#########################################################################
   //# Exception Throwing Test Cases
-  public void testException_nonexist()
+  public void testException_nonexist_des()
     throws Exception
   {
-    testException("testSimple", "nonexist",
+    testException("testSimple", "nonexist_des",
                   FileNotFoundException.class, "nonexist.des");
+  }
+
+  public void testException_nonexist_interface()
+    throws Exception
+  {
+    testException("testSimple", "nonexist_interface",
+                  WatersUnmarshalException.class, "nonexist_iface");
+  }
+
+  public void testException_nonexist_subsystem()
+    throws Exception
+  {
+    testException("testSimple", "nonexist_subsystem",
+                  WatersUnmarshalException.class, "nonexist_low");
   }
 
 

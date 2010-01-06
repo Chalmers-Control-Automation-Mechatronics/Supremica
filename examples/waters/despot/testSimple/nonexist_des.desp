@@ -1,8 +1,8 @@
 <Project projVer="1.0.0">
-    <Header name="nonexist" type="flat">
+    <Header name="nonexist_des" type="flat">
         <Integrity status="yes" dateStamp=""/>
     </Header>
-    <Subsystem name="nonexist">
+    <Subsystem name="nonexist_des">
         <Supervisor>
             <Des name="sup1" location="sup1.des"/>
         </Supervisor>

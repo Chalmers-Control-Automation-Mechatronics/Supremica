@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="nonexist_interface" type="HISC" degree="2"/>
+    <Subsystem name="nonexist_high" level="0" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Uses>
+            <InterfaceRef name="exist_iface" provider="low1"/>
+            <InterfaceRef name="nonexist_iface" provider="low2"/>
+        </Uses>
+    </Subsystem>
+    <Interface name="exist_iface">
+        <Des name="wicked_iface_1" location="wicked_iface_1.des"/>
+    </Interface>
+    <Subsystem name="low1" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="exist_iface"/>
+        </Implements>
+    </Subsystem>
+    <Subsystem name="low2" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="nonexist_iface"/>
+        </Implements>
+    </Subsystem>
+</Project>
