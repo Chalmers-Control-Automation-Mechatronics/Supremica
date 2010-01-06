@@ -2,6 +2,7 @@ package net.sourceforge.waters.gui.simulator;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.event.ComponentEvent;
@@ -236,6 +237,14 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
     //# Constructor
     private EventTreeCellRenderer()
     {
+      mEventPanel = new JPanel();
+      final FlowLayout layout = new FlowLayout(FlowLayout.LEADING, 0, 0);
+      mEventPanel.setLayout(layout);
+      mEventNameLabel = new JLabel();
+      mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
+      mEventPanel.add(mEventNameLabel);
+      mEventStatusLabel = new JLabel();
+      mEventPanel.add(mEventStatusLabel);
     }
 
     //#######################################################################
@@ -245,38 +254,36 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
        final boolean expanded, final boolean leaf,
        final int row, final boolean hasFocus)
     {
-      panel  = new JPanel();
-      if (sel)
-        panel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
-      else
-        panel.setBackground(EditorColor.BACKGROUNDCOLOR);
-      if (EventProxy.class.isInstance(value))
+       if (EventProxy.class.isInstance(value))
       {
-        final GridBagLayout layout = new GridBagLayout();
-        panel.setLayout(layout);
+         if (sel)
+           mEventPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
+         else
+           mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
         final EventProxy event = (EventProxy)value;
-        left = new JLabel(event.getName());
         if (event.getKind() == EventKind.CONTROLLABLE)
-          left.setIcon(IconLoader.ICON_CONTROLLABLE);
+          mEventNameLabel.setIcon(IconLoader.ICON_CONTROLLABLE);
         else
-          left.setIcon(IconLoader.ICON_UNCONTROLLABLE);
-        left.setFont(left.getFont().deriveFont(Font.PLAIN));
-        right = new JLabel();
-        right.setIcon(mSim.getEventActivityIcon(event));
+          mEventNameLabel.setIcon(IconLoader.ICON_UNCONTROLLABLE);
+        mEventNameLabel.setText(event.getName());
+        mEventStatusLabel.setIcon(mSim.getEventActivityIcon(event));
         final int width = mPane.getViewport().getWidth();
         final int rightWidth = (width * eventColumnWidth[1] - noduleWidth * eventColumnWidth[1]) / (sum(eventColumnWidth));
         final int leftWidth = (width * eventColumnWidth[0] - noduleWidth * eventColumnWidth[0]) / (sum(eventColumnWidth));
-        left.setPreferredSize(new Dimension(leftWidth, rowHeight));
-        right.setPreferredSize(new Dimension(rightWidth, rowHeight));
-        panel.add(left);
-        panel.add(right);
-        return panel;
+        mEventNameLabel.setPreferredSize(new Dimension(leftWidth, rowHeight));
+        mEventStatusLabel.setPreferredSize(new Dimension(rightWidth, rowHeight));
+        return mEventPanel;
       }
       else if (AutomatonProxy.class.isInstance(value))
       {
+        if (sel)
+          mPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
+        else
+          mPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
+       mPanel = new JPanel();
         final AutomatonProxy autoProxy = (AutomatonProxy)value;
         final GridBagLayout layout = new GridBagLayout();
-        panel.setLayout(layout);
+        mPanel.setLayout(layout);
         left = new JLabel(autoProxy.getName());
         if (mContainer.getSourceInfoMap().get(autoProxy).getSourceObject().getClass() == VariableComponentSubject.class)
           left.setIcon(IconLoader.ICON_VARIABLE);
@@ -310,10 +317,10 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
           left.setFont(left.getFont().deriveFont(Font.PLAIN));
           right.setFont(right.getFont().deriveFont(Font.PLAIN));
         }
-        panel.add(left);
-        panel.add(center);
-        panel.add(right);
-        return panel;
+        mPanel.add(left);
+        mPanel.add(center);
+        mPanel.add(right);
+        return mPanel;
       }
       else
       {
@@ -339,8 +346,10 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
 
     // ###########################################################################
     // # Data Members
-
-    private JPanel panel;
+    private final JPanel mEventPanel;
+    private final JLabel mEventNameLabel;
+    private final JLabel mEventStatusLabel;
+    private JPanel mPanel;
     private JLabel left;
     private JLabel right;
     private JLabel center;

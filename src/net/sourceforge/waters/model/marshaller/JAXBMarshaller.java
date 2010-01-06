@@ -80,6 +80,19 @@ public abstract class JAXBMarshaller
 
 
   //#########################################################################
+  //# Simple Access
+  JAXBDocumentExporter<D,T> getExporter()
+  {
+    return mExporter;
+  }
+
+  JAXBDocumentImporter<D,T> getImporter()
+  {
+    return mImporter;
+  }
+
+
+  //#########################################################################
   //# Configuration
   /**
    * Returns whether geometry information is provided when unmarshalling.
@@ -188,7 +201,7 @@ public abstract class JAXBMarshaller
     return mImporter.getDocumentManager();
   }
 
-  public void setDocumentManager(DocumentManager manager)
+  public void setDocumentManager(final DocumentManager manager)
   {
     mImporter.setDocumentManager(manager);
   }

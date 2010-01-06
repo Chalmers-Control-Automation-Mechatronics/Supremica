@@ -57,6 +57,14 @@ class JAXBTraceImporter
 
 
   //#########################################################################
+  //# Configuration
+  public void setProductDES(final ProductDESProxy des)
+  {
+    mProductDES = des;
+  }
+
+
+  //#########################################################################
   //# Overrides for Abstract Base Class JAXBImporter
   Proxy importElement(final ElementType element)
   {
@@ -139,9 +147,19 @@ class JAXBTraceImporter
     try {
       final DocumentManager manager = getDocumentManager();
       final String name = element.getProductDES();
-      final ProductDESProxy des =
-        manager.load(uri, name, ProductDESProxy.class);
-      return des;
+      if (mProductDES == null) {
+        final ProductDESProxy des =
+          manager.load(uri, name, ProductDESProxy.class);
+        return des;
+      } else if (mProductDES.getName().equals(name)) {
+        return mProductDES;
+      } else {
+        final String msg =
+          "Product DES name '" + name +
+          "' in trace does not match name of provided product DES '" +
+          mProductDES.getName() + "'!";
+        throw new WatersUnmarshalException(msg);
+      }
     } catch (final IOException exception) {
       throw new WatersUnmarshalException(exception);
     }
@@ -247,7 +265,7 @@ class JAXBTraceImporter
       cache = new CheckedExportSet<StateProxy>(aut.getStates(), aut, "state");
       mStateCaches.put(aut, cache);
     }
-    return cache;      
+    return cache;
   }
 
   private void clearStateCaches()
@@ -287,7 +305,7 @@ class JAXBTraceImporter
     //#######################################################################
     //# Data Members
     private final IndexedSet<AutomatonProxy> mAlphabet;
-    
+
   }
 
 
@@ -322,7 +340,7 @@ class JAXBTraceImporter
     //#######################################################################
     //# Data Members
     private final IndexedSet<EventProxy> mAlphabet;
-    
+
   }
 
 
@@ -332,6 +350,7 @@ class JAXBTraceImporter
   private final TraceAutomatonRefListHandler
     mTraceAutomatonRefListHandler = new TraceAutomatonRefListHandler();
 
+  private ProductDESProxy mProductDES;
   private Map<AutomatonProxy,IndexedSet<StateProxy>> mStateCaches;
 
 }
