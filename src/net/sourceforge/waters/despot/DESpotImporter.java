@@ -153,7 +153,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   // # Algorithm
   private ModuleProxy convertDESpotHierarchy(final URI uri)
       throws ParserConfigurationException, SAXException, IOException,
-      URISyntaxException, WatersMarshalException
+      URISyntaxException, WatersMarshalException, WatersUnmarshalException
   {
     final URL url = uri.toURL();
     final InputStream stream = url.openStream();
@@ -216,6 +216,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
             if (interfaceLocation != null) {
               constructSimpleComponent(interfaceNm, interfaceLocation,
                                        ComponentKind.SPEC, uri);
+            } else {
+              throw new WatersUnmarshalException("The interface " + interfaceNm
+                  + " does not exist.");
             }
           }
 
@@ -294,8 +297,12 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   /**
    * This method creates an instance of a module. One call to this method
    * creates all the required instance for the current module.
+   *
+   * @throws FileNotFoundException
+   * @throws WatersUnmarshalException
    */
   private void constructModuleInstance(final Element uses)
+      throws FileNotFoundException, WatersUnmarshalException
   {
     final NodeList interfaceList = uses.getElementsByTagName("*");
     for (int i = 0; i < interfaceList.getLength(); i++) {
@@ -311,7 +318,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       // gets the module to create an instance of
       final ModuleProxy module = mModules.get(moduleName);
       if (module == null) {
-        return;
+        throw new WatersUnmarshalException("The subsystem " + moduleName
+            + " could not be found.");
       }
 
       final List<ParameterBindingProxy> bindings =
