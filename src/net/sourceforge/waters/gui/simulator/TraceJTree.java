@@ -2,8 +2,8 @@ package net.sourceforge.waters.gui.simulator;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
@@ -46,7 +46,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
     desktop.attach(this);
     automatonAreOpen = new ArrayList<String>();
     mContainer = container;
-    expandedNodes = new ArrayList<String>();
+    expandedNodes = new ArrayList<Integer>();
     final TraceMutableTreeNode root = new TraceMutableTreeNode(sim, this);
     this.setModel(new DefaultTreeModel(root, false));
     this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -111,14 +111,14 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
       {
         if (event.getPath().getLastPathComponent().getClass() == EventBranchNode.class)
         {
-          for (final String name : expandedNodes)
+          final int expansionIndex = ((EventBranchNode)event.getPath().getLastPathComponent()).getTime();
+          for (final Integer index : expandedNodes)
           {
-            if (((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName().compareTo(name) == 0)
+            if (index == expansionIndex)
               return;
           }
-          expandedNodes.add(((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName());
-          ((EventBranchNode)event.getPath().getLastPathComponent()).addAutomata(mSim,
-              mSim.getAutomatonHistory().get((((EventBranchNode)event.getPath().getLastPathComponent()).getTime())));
+          expandedNodes.add(expansionIndex);
+          ((EventBranchNode)event.getPath().getLastPathComponent()).addAutomata(mSim, mSim.getAutomatonHistory().get(expansionIndex));
         }
       }
     });
@@ -139,10 +139,10 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
     this.setModel(new DefaultTreeModel(node, false));
     for (int looper = 0; looper < expandedNodes.size(); looper++)
     {
-      final String name = expandedNodes.get(looper);
+      final int expandedIndex = expandedNodes.get(looper);
       for (int nodeIndex = 0; nodeIndex < node.getChildCount(); nodeIndex++)
       {
-        if (((EventBranchNode)node.getChildAt(nodeIndex)).getEvent().getName().compareTo(name) == 0)
+        if (((EventBranchNode)node.getChildAt(nodeIndex)).getTime() == expandedIndex)
         {
           ((EventBranchNode)node.getChildAt(nodeIndex)).addAutomata(mSim,
               mSim.getAutomatonHistory().get(((EventBranchNode)node.getChildAt(nodeIndex)).getTime()));
@@ -206,6 +206,20 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
     //# Constructor
     private TraceTreeCellRenderer()
     {
+      mEventPanel = new JPanel();
+      final FlowLayout layout = new FlowLayout(FlowLayout.LEADING, 0, 0);
+      mEventPanel.setLayout(layout);
+      mEventNameLabel = new JLabel();
+      mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
+      mEventPanel.add(mEventNameLabel);
+      mAutomataPanel = new JPanel();
+      mAutomataPanel.setLayout(layout);
+      mAutomataNameLabel = new JLabel();
+      mAutomataIconLabel = new JLabel();
+      mAutomataStatusLabel = new JLabel();
+      mAutomataPanel.add(mAutomataNameLabel);
+      mAutomataPanel.add(mAutomataIconLabel);
+      mAutomataPanel.add(mAutomataStatusLabel);
     }
 
     //#######################################################################
@@ -215,86 +229,68 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
         final boolean expanded, final boolean leaf,
         final int row, final boolean hasFocus)
      {
-      panel = new JPanel();
-      if (sel)
-        panel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
-      else
-        panel.setBackground(EditorColor.BACKGROUNDCOLOR);
        if (value.getClass() == EventBranchNode.class)
        {
-         final GridBagLayout layout = new GridBagLayout();
-         panel.setLayout(layout);
-         final EventBranchNode eventNode = (EventBranchNode)value;
-         left = new JLabel(String.valueOf(eventNode.getTime() + 1));
-         final EventProxy event = eventNode.getEvent();
-         right = new JLabel(event.getName());
-         if (event.getKind() == EventKind.CONTROLLABLE)
-           right.setIcon(IconLoader.ICON_CONTROLLABLE);
+         if (sel)
+           mEventPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
          else
-           right.setIcon(IconLoader.ICON_UNCONTROLLABLE);
+           mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
+         final EventBranchNode eventNode = (EventBranchNode)value;
+         final EventProxy event = eventNode.getEvent();
+         mEventNameLabel.setText(String.valueOf(eventNode.getTime() + 1) + ". " + event.getName());
+         if (event.getKind() == EventKind.CONTROLLABLE)
+           mEventNameLabel.setIcon(IconLoader.ICON_CONTROLLABLE);
+         else
+           mEventNameLabel.setIcon(IconLoader.ICON_UNCONTROLLABLE);
          if (eventNode.getTime() == TraceJTree.this.mSim.getCurrentTime())
          {
-           right.setFont(right.getFont().deriveFont(Font.BOLD));
-           left.setFont(left.getFont().deriveFont(Font.BOLD));
+           mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.BOLD));
          }
          else
          {
-           right.setFont(right.getFont().deriveFont(Font.PLAIN));
-           left.setFont(left.getFont().deriveFont(Font.PLAIN));
+           mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
          }
-         final int width = mPane.getWidth();
-         final int rightWidth = (width * eventColumnWidth[1] - noduleWidth * eventColumnWidth[1]) / (sum(eventColumnWidth));
-         final int leftWidth = (width * eventColumnWidth[0] - noduleWidth * eventColumnWidth[0]) / (sum(eventColumnWidth));
-         left.setPreferredSize(new Dimension(leftWidth, rowHeight));
-         right.setPreferredSize(new Dimension(rightWidth, rowHeight));
-         layout.columnWidths = new int[]{leftWidth, rightWidth};
-         layout.rowHeights = new int[]{rowHeight};
-         panel.add(left);
-         panel.add(right);
-         return panel;
+         return mEventPanel;
        }
        else if (value.getClass() == AutomatonLeafNode.class)
        {
+         if (sel)
+           mAutomataPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
+         else
+           mAutomataPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
          final AutomatonLeafNode autoNode = (AutomatonLeafNode) value;
          final AutomatonProxy autoProxy = autoNode.getAutomata();
-         final GridBagLayout layout = new GridBagLayout();
-         panel.setLayout(layout);
-         left = new JLabel(autoProxy.getName());
+         mAutomataNameLabel.setText(autoProxy.getName());
          if (mContainer.getSourceInfoMap().get(autoProxy).getSourceObject().getClass() == VariableComponentSubject.class)
-           left.setIcon(IconLoader.ICON_VARIABLE);
+           mAutomataNameLabel.setIcon(IconLoader.ICON_VARIABLE);
          else
-           left.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
-         center = new JLabel();
+           mAutomataNameLabel.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
          if (mSim.getBlocking(((EventBranchNode)autoNode.getParent()).getEvent()).contains(autoProxy))
-           center.setIcon(IconLoader.ICON_CROSS);
+           mAutomataIconLabel.setIcon(IconLoader.ICON_CROSS);
          else
-           center.setIcon(IconLoader.ICON_TICK);
+           mAutomataIconLabel.setIcon(IconLoader.ICON_TICK);
          StateProxy currentState;
          currentState = autoNode.getOverloadedState();
-         right = new JLabel(currentState.getName());
-         right.setIcon(mSim.getMarkingIcon(currentState, autoProxy));
+         mAutomataStatusLabel.setText(currentState.getName());
+         mAutomataStatusLabel.setIcon(mSim.getMarkingIcon(currentState, autoProxy));
          final int width = mPane.getWidth();
          final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));
          final int centerWidth = (width * automataColumnWidth[1] - 2 * noduleWidth * automataColumnWidth[1]) / (sum(automataColumnWidth));
          final int leftWidth = (width * automataColumnWidth[0] - 2 * noduleWidth * automataColumnWidth[0]) / (sum(automataColumnWidth));
-         left.setPreferredSize(new Dimension(leftWidth, rowHeight));
-         center.setPreferredSize(new Dimension(centerWidth, rowHeight));
-         right.setPreferredSize(new Dimension(rightWidth, rowHeight));
-         layout.columnWidths = new int[]{leftWidth, centerWidth, rightWidth};
+         mAutomataNameLabel.setPreferredSize(new Dimension(leftWidth, rowHeight));
+         mAutomataIconLabel.setPreferredSize(new Dimension(centerWidth, rowHeight));
+         mAutomataStatusLabel.setPreferredSize(new Dimension(rightWidth, rowHeight));
          if (automatonAreOpen.contains(autoProxy.getName()))
          {
-           left.setFont(left.getFont().deriveFont(Font.BOLD));
-           right.setFont(right.getFont().deriveFont(Font.BOLD));
+           mAutomataNameLabel.setFont(mAutomataNameLabel.getFont().deriveFont(Font.BOLD));
+           mAutomataStatusLabel.setFont(mAutomataStatusLabel.getFont().deriveFont(Font.BOLD));
          }
          else
          {
-           left.setFont(left.getFont().deriveFont(Font.PLAIN));
-           right.setFont(right.getFont().deriveFont(Font.PLAIN));
+           mAutomataNameLabel.setFont(mAutomataNameLabel.getFont().deriveFont(Font.PLAIN));
+           mAutomataStatusLabel.setFont(mAutomataStatusLabel.getFont().deriveFont(Font.PLAIN));
          }
-         panel.add(left);
-         panel.add(center);
-         panel.add(right);
-         return panel;
+         return mAutomataPanel;
        }
        else
        {
@@ -312,10 +308,12 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
 
     // ###########################################################################
     // # Data Members
-    private JLabel left;
-    private JLabel right;
-    private JLabel center;
-    private JPanel panel;
+    private final JPanel mEventPanel;
+    private final JLabel mEventNameLabel;
+    private final JPanel mAutomataPanel;
+    private final JLabel mAutomataNameLabel;
+    private final JLabel mAutomataIconLabel;
+    private final JLabel mAutomataStatusLabel;
 
     // ###########################################################################
     // # Class Constants
@@ -327,7 +325,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
   private final ModuleContainer mContainer;
   private final ArrayList<String> automatonAreOpen;
   private JScrollPane mPane;
-  private final ArrayList<String> expandedNodes;
+  private final ArrayList<Integer> expandedNodes;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};

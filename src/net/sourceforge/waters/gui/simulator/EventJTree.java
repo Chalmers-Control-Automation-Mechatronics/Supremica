@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
@@ -233,6 +232,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
   private class EventTreeCellRenderer
   implements TreeCellRenderer
   {
+
     //#######################################################################
     //# Constructor
     private EventTreeCellRenderer()
@@ -244,6 +244,14 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
       mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
       mEventPanel.add(mEventNameLabel);
       mEventStatusLabel = new JLabel();
+      mAutomataPanel = new JPanel();
+      mAutomataPanel.setLayout(layout);
+      mAutomataNameLabel = new JLabel();
+      mAutomataIconLabel = new JLabel();
+      mAutomataStatusLabel = new JLabel();
+      mAutomataPanel.add(mAutomataNameLabel);
+      mAutomataPanel.add(mAutomataIconLabel);
+      mAutomataPanel.add(mAutomataStatusLabel);
       mEventPanel.add(mEventStatusLabel);
     }
 
@@ -277,50 +285,42 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
       else if (AutomatonProxy.class.isInstance(value))
       {
         if (sel)
-          mPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
+          mAutomataPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
         else
-          mPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
-       mPanel = new JPanel();
+          mAutomataPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
         final AutomatonProxy autoProxy = (AutomatonProxy)value;
-        final GridBagLayout layout = new GridBagLayout();
-        mPanel.setLayout(layout);
-        left = new JLabel(autoProxy.getName());
+        mAutomataNameLabel.setText(autoProxy.getName());
         if (mContainer.getSourceInfoMap().get(autoProxy).getSourceObject().getClass() == VariableComponentSubject.class)
-          left.setIcon(IconLoader.ICON_VARIABLE);
+          mAutomataNameLabel.setIcon(IconLoader.ICON_VARIABLE);
         else
-          left.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
-        center = new JLabel();
+          mAutomataNameLabel.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
         final EventProxy parentEvent = getParentEvent(row);
         if (mSim.getBlocking(parentEvent).contains(autoProxy))
-          center.setIcon(IconLoader.ICON_CROSS);
+          mAutomataIconLabel.setIcon(IconLoader.ICON_CROSS);
         else
-        center.setIcon(IconLoader.ICON_TICK); // TODO: Determine what event is this automatons parent
+          mAutomataIconLabel.setIcon(IconLoader.ICON_TICK);
         StateProxy currentState;
         currentState = mSim.getCurrentStates().get(autoProxy);
-        right = new JLabel(currentState.getName());
-        right.setIcon(mSim.getMarkingIcon(currentState, autoProxy));
+        mAutomataStatusLabel.setText(currentState.getName());
+        mAutomataStatusLabel.setIcon(mSim.getMarkingIcon(currentState, autoProxy));
         final int width = mPane.getWidth();
         final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));
         final int centerWidth = (width * automataColumnWidth[1] - 2 * noduleWidth * automataColumnWidth[1]) / (sum(automataColumnWidth));
         final int leftWidth = (width * automataColumnWidth[0] - 2 * noduleWidth * automataColumnWidth[0]) / (sum(automataColumnWidth));
-        left.setPreferredSize(new Dimension(leftWidth, rowHeight));
-        center.setPreferredSize(new Dimension(centerWidth, rowHeight));
-        right.setPreferredSize(new Dimension(rightWidth, rowHeight));
-        layout.columnWidths = new int[]{leftWidth, centerWidth, rightWidth};
+        mAutomataNameLabel.setPreferredSize(new Dimension(leftWidth, rowHeight));
+        mAutomataIconLabel.setPreferredSize(new Dimension(centerWidth, rowHeight));
+        mAutomataStatusLabel.setPreferredSize(new Dimension(rightWidth, rowHeight));
         if (automatonAreOpen.contains(autoProxy.getName()))
         {
-          left.setFont(left.getFont().deriveFont(Font.BOLD));
-          right.setFont(right.getFont().deriveFont(Font.BOLD));
+          mAutomataNameLabel.setFont(mAutomataNameLabel.getFont().deriveFont(Font.BOLD));
+          mAutomataStatusLabel.setFont(mAutomataStatusLabel.getFont().deriveFont(Font.BOLD));
         }
         else
         {
-          left.setFont(left.getFont().deriveFont(Font.PLAIN));
-          right.setFont(right.getFont().deriveFont(Font.PLAIN));
+          mAutomataNameLabel.setFont(mAutomataNameLabel.getFont().deriveFont(Font.PLAIN));
+          mAutomataStatusLabel.setFont(mAutomataStatusLabel.getFont().deriveFont(Font.PLAIN));
         }
-        mPanel.add(left);
-        mPanel.add(center);
-        mPanel.add(right);
-        return mPanel;
+        return mAutomataPanel;
       }
       else
       {
@@ -349,10 +349,10 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
     private final JPanel mEventPanel;
     private final JLabel mEventNameLabel;
     private final JLabel mEventStatusLabel;
-    private JPanel mPanel;
-    private JLabel left;
-    private JLabel right;
-    private JLabel center;
+    private final JPanel mAutomataPanel;
+    private final JLabel mAutomataNameLabel;
+    private final JLabel mAutomataIconLabel;
+    private final JLabel mAutomataStatusLabel;
 
     // ###########################################################################
     // # Class Constants

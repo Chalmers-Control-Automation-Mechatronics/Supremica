@@ -123,7 +123,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  *   ALT-w:
  *   ALT-x: Examples menu
  *   ALT-y:
- *   ALT-z: Analyze menu
+ *   ALT-z: Analyze menu (in the Analyse menu) / New Analyze menu (in the Editor menu)
  *
  * CTRL-Hotkeys:
  *   CTRL-a: Edit/Select all
@@ -157,6 +157,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 public class IDEMenuBar
   extends JMenuBar
 {
+
 
   // #########################################################################
   // # Constructor
@@ -268,6 +269,13 @@ public class IDEMenuBar
         mCreateMenu.add(insevent);
         // menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());
         // menu.add(ide.getActions().editorAddBindingAction.getMenuItem());
+      }
+
+      // The new analyze menu
+      if (mNewAnalyzeMenu == null && panel instanceof EditorPanel)
+      {
+        mNewAnalyzeMenu = new JMenu("Analyze");
+        mNewAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
       }
 
       // Simulate
@@ -396,6 +404,7 @@ public class IDEMenuBar
     if (panel != null) {
       if (panel instanceof EditorPanel) {
         add(mCreateMenu);
+        add(mNewAnalyzeMenu);
       } else if (panel instanceof SimulatorPanel) {
         add(mSimulateMenu);
       } else if (panel instanceof AnalyzerPanel) {
@@ -578,6 +587,7 @@ public class IDEMenuBar
   private JMenu mFileMenu = null;
   private JMenu mEditMenu = null;
   private JMenu mCreateMenu = null;
+  private JMenu mNewAnalyzeMenu = null;
   private JMenu mSimulateMenu = null;
   private JMenu mAnalyzeMenu = null;
   private JMenu mToolsMenu = null;
