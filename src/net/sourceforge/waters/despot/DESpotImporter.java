@@ -335,7 +335,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           if (!mEvents.containsKey(eventName)) {
             final EventDeclProxy newEvent =
                 mFactory.createEventDeclProxy(event.getIdentifier(), event
-                    .getKind(), true, ScopeKind.LOCAL, null, null, null);
+                    .getKind(), true, ScopeKind.LOCAL, null, null, event
+                    .getAttributes());
             mEvents.put(eventName, newEvent);
           }
           bindings.add(mFactory.createParameterBindingProxy(eventName,
@@ -381,64 +382,33 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final String eventKind = event.getAttribute("ctrl");
       final String eventType = event.getAttribute("type");
       EventDeclProxy eventDecl = null;
-      // the event is controllable
-      if (eventKind.equals("1")) {
-        if (!implementation || eventType.equals("d")) {
-          eventDecl =
-              mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,
-                                            true, ScopeKind.LOCAL, null, null,
-                                            null);
-        } else if (eventType.equals("r")) {
-          eventDecl =
-              mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,
-                                            true, ScopeKind.REQUIRED_PARAMETER,
-                                            null, null,
-                                            HISCAttributes.ATTRIBUTES_REQUEST);
-        } else if (eventType.equals("a")) {
-          eventDecl =
-              mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,
-                                            true, ScopeKind.REQUIRED_PARAMETER,
-                                            null, null,
-                                            HISCAttributes.ATTRIBUTES_ANSWER);
-        } else if (eventType.equals("ld")) {
-          eventDecl =
-              mFactory.createEventDeclProxy(identifier, EventKind.CONTROLLABLE,
-                                            true, ScopeKind.REQUIRED_PARAMETER,
-                                            null, null,
-                                            HISCAttributes.ATTRIBUTES_LOWDATA);
-        }
-      }
-      // the event is uncontrollable
-      else if (eventKind.equals("0")) {
-        if (!implementation || eventType.equals("d")) {
-          eventDecl =
-              mFactory.createEventDeclProxy(identifier,
-                                            EventKind.UNCONTROLLABLE, true,
-                                            ScopeKind.LOCAL, null, null, null);
-        } else if (eventType.equals("r")) {
-          eventDecl =
-              mFactory.createEventDeclProxy(identifier,
-                                            EventKind.UNCONTROLLABLE, true,
-                                            ScopeKind.REQUIRED_PARAMETER, null,
-                                            null,
-                                            HISCAttributes.ATTRIBUTES_REQUEST);
-        } else if (eventType.equals("a")) {
-          eventDecl =
-              mFactory.createEventDeclProxy(identifier,
-                                            EventKind.UNCONTROLLABLE, true,
-                                            ScopeKind.REQUIRED_PARAMETER, null,
-                                            null,
-                                            HISCAttributes.ATTRIBUTES_ANSWER);
 
-        } else if (eventType.equals("ld")) {
-          eventDecl =
-              mFactory.createEventDeclProxy(identifier,
-                                            EventKind.UNCONTROLLABLE, true,
-                                            ScopeKind.REQUIRED_PARAMETER, null,
-                                            null,
-                                            HISCAttributes.ATTRIBUTES_LOWDATA);
-        }
+      ScopeKind scope;
+      if (implementation) {
+        scope = ScopeKind.REQUIRED_PARAMETER;
+      } else {
+        scope = ScopeKind.LOCAL;
       }
+
+      EventKind controllability;
+      if (eventKind.equals("1")) {
+        controllability = EventKind.CONTROLLABLE;
+      } else {
+        controllability = EventKind.UNCONTROLLABLE;
+      }
+
+      Map<String,String> attributes = null;
+      if (eventType.equals("a")) {
+        attributes = HISCAttributes.ATTRIBUTES_ANSWER;
+      } else if (eventType.equals("r")) {
+        attributes = HISCAttributes.ATTRIBUTES_REQUEST;
+      } else if (eventType.equals("ld")) {
+        attributes = HISCAttributes.ATTRIBUTES_LOWDATA;
+      }
+      eventDecl =
+          mFactory.createEventDeclProxy(identifier, controllability, true,
+                                        scope, null, null, attributes);
+
       mEvents.put(eventName, eventDecl);
     }
   }
