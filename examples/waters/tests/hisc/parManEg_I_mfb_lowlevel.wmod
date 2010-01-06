@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+when<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="parManEg_I_mfb_lowlevel" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <ns2:Comment>Low level of Parallel Manufacturing Example of Ryan Leduc's PhD thesis.
 Should pass all HISC property checks for the low level.

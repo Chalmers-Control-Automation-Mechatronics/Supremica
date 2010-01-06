@@ -18,6 +18,7 @@ import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -35,18 +36,26 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
 {
 
   // #########################################################################
-  // # Successful Test Cases
-  public void testImport_test2() throws Exception
+  // # tests integrity of the model built
+  public void testIntegrity() throws Exception
   {
-    testBuild("testSimple", "test2");
+    final List<EventProxy> answerEvents =
+        (List<EventProxy>) mBuilder.getAnswerEvents();
+    for (final EventProxy answer : answerEvents) {
+      final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
+      System.out.print(modifiedDES);
+      ProductDESIntegrityChecker.getInstance().check(modifiedDES);
+    }
   }
 
   // #########################################################################
   // # Exception Throwing Test Cases
   public void testException_nonexist() throws Exception
   {
-  /*  testException("testSimple", "nonexist", FileNotFoundException.class,
-                  "nonexist.des");*/
+    /*
+     * testException("testSimple", "nonexist", FileNotFoundException.class,
+     * "nonexist.des");
+     */
   }
 
   // #########################################################################
@@ -105,19 +114,10 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
             new ModuleCompiler(docManager, desFactory, module);
         des = compiler.compile();
       }
-      final SICPropertyVBuilder builder =
-          new SICPropertyVBuilder(des, desFactory);
+      mBuilder = new SICPropertyVBuilder(des, desFactory);
       System.out.print(des.getName() + " ... ");
       System.out.flush();
 
-      final List<EventProxy> answerEvents =
-          (List<EventProxy>) builder.getAnswerEvents();
-      for (final EventProxy answer : answerEvents) {
-        final ProductDESProxy modifiedDES =
-            builder.createModelForAnswer(answer);
-        System.out.print(modifiedDES);
-      }
-      System.out.print("run");
       /*
        * if (result) { System.out.println("nonconflicting"); } else {
        * System.out.println("CONFLICTING");
@@ -166,5 +166,6 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   private JAXBModuleMarshaller mModuleMarshaller;
   private JAXBProductDESMarshaller mProductDESMarshaller;
   private DocumentManager mDocumentManager;
+  private SICPropertyVBuilder mBuilder;
 
 }
