@@ -312,7 +312,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
 
     // #######################################################################
     // # Constructor
-    private SyncProduct() throws OverflowException
+    private SyncProduct() throws AnalysisException
     {
       final ProductDESProxy model = getModel();
       final EventProxy marking = getUsedMarkingProposition();

@@ -156,6 +156,7 @@ public abstract class AbstractModelVerifierFactory
   }
 
   public void postConfigure(final ModelVerifier checker)
+    throws EventNotFoundException
   {
     if (checker instanceof ConflictChecker) {
       final ConflictChecker cchecker = (ConflictChecker) checker;

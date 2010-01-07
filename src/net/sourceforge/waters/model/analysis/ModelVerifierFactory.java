@@ -71,7 +71,7 @@ public interface ModelVerifierFactory
    * running the model verifier to provide a second pass of configuration.
    * When it is called, the model verifier's input model is available.
    */
-  public void postConfigure(ModelVerifier verifier);
+  public void postConfigure(ModelVerifier verifier) throws AnalysisException;
 
   /**
    * Configures the given compiler according to any command line

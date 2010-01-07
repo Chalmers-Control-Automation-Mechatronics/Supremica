@@ -12,6 +12,7 @@ package net.sourceforge.waters.cpp.analysis;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -135,7 +136,7 @@ public class NativeConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
-  public void setMarkingProposition(EventProxy marking)
+  public void setMarkingProposition(final EventProxy marking)
   {
     mMarking = marking;
     mUsedMarking = null;
@@ -167,6 +168,7 @@ public class NativeConflictChecker
   //#########################################################################
   //# Auxiliary Methods
   public EventProxy getUsedMarkingProposition()
+    throws EventNotFoundException
   {
     if (mUsedMarking == null) {
       if (mMarking == null) {
@@ -184,7 +186,7 @@ public class NativeConflictChecker
     return ConflictKindTranslator.getInstance();
   }
 
-  
+
   //#########################################################################
   //# Native Methods
   native VerificationResult runNativeAlgorithm();
@@ -194,7 +196,7 @@ public class NativeConflictChecker
     return getModel().getName() + ":conflicting";
   }
 
-    
+
   //#########################################################################
   //# Data Members
   private EventProxy mMarking;
