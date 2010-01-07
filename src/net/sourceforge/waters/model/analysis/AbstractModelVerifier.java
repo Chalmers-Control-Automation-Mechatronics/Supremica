@@ -105,9 +105,9 @@ public abstract class AbstractModelVerifier
   /**
    * Stores any available statistics on this verifier's last run in the
    * given verification result. This default implementation does nothing,
-   * it needs to be overriden by subclasses.
+   * it needs to be overridden by subclasses.
    */
-  protected void addStatistics(VerificationResult result)
+  protected void addStatistics(final VerificationResult result)
   {
   }
 

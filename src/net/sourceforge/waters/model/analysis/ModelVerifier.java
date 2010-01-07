@@ -31,12 +31,18 @@ import net.sourceforge.waters.model.des.TraceProxy;
  *
  * <P>
  * <CODE>{@link net.sourceforge.waters.model.des.ProductDESProxyFactory}
- *   factory =
+ *   desfactory =
  *   {@link net.sourceforge.waters.plain.des.ProductDESElementFactory}.{@link
  *   net.sourceforge.waters.plain.des.ProductDESElementFactory#getInstance()
  *   getInstance}();</CODE><BR>
- * <CODE>ModelVerifier verifier = new ControllabilityChecker(des, factory);
- * //</CODE> <I>e.g.</I><BR>
+ * <CODE>{@link ModelVerifierFactory} vfactory =
+ *   {@link net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory}.{@link
+ *   net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory#getInstance()
+ *   getInstance}(); //</CODE> <I>e.g.</I></CODE><BR>
+ * <CODE>ModelVerifier verifier = vfactory.{@link
+ *   ModelVerifierFactory#createControllabilityChecker(ProductDESProxyFactory)
+ *   createControllabilityChecker}(desfactory); //</CODE> <I>e.g.</I><BR>
+ * <CODE>verifier.{@link #setModel(ProductDESProxy) setModel}(des);</CODE><BR>
  * <CODE>verifier.{@link #run() run()};</CODE><BR>
  * <CODE>boolean result = verifier.{@link #isSatisfied()};</CODE><BR>
  * <CODE>if (result) {</CODE><BR>

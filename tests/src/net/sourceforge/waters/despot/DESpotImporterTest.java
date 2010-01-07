@@ -122,10 +122,6 @@ public class DESpotImporterTest extends AbstractWatersTest
   public void testImport_testHISC()
     throws Exception
   {
-    // TODO
-    // To support multi-level hierarchies, interface events should only be
-    // declared REQUIRED_PARAMETER if they occur in at least one interface
-    // implemented by the subsystem.
     testImport("testHISC", "testHISC");
   }
 

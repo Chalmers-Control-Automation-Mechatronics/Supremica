@@ -41,9 +41,9 @@ public interface ModelAnalyser
    *         unsuccessful result,
    * @throws NullPointerException to indicate that no model has been
    *         specified.
-   * @throws AnalysisException to indicate that analysis could not be
-   *         completed due to errors in the model or due to resource
-   *         limitations.
+   * @throws AnalysisException to indicate that analysis was aborted or
+   *         could not be completed due to errors in the model or due to
+   *         resource limitations.
    */
   public boolean run() throws AnalysisException;
 
@@ -136,5 +136,23 @@ public interface ModelAnalyser
    * valid.
    */
   public void clearAnalysisResult();
+
+
+  //#########################################################################
+  //# Aborting
+  /**
+   * Requests that a running model analyser aborts.
+   * This does not necessarily cause an abort, it merely sets a flag to
+   * request abort at a later time. It may take some time for the model
+   * analyser to check this flag and react, or the request may not be
+   * obeyed at all. If a model analyser aborts, it will throw an
+   * {@link AbortException} from its {@link #run()} method.
+   */
+  public void requestAbort();
+
+  /**
+   * Returns whether the model analyser has been requested to abort.
+   */
+  public boolean isAborting();
 
 }

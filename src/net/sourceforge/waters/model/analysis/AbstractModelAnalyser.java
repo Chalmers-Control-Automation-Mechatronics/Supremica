@@ -37,12 +37,13 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   }
 
   public AbstractModelAnalyser(final ProductDESProxy model,
-			       final ProductDESProxyFactory factory)
+                               final ProductDESProxyFactory factory)
   {
     mFactory = factory;
     mModel = model;
     mNodeLimit = Integer.MAX_VALUE;
     mTransitionLimit = Integer.MAX_VALUE;
+    mIsAborting = false;
   }
 
 
@@ -66,7 +67,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
 
   public void setModel(final AutomatonProxy aut)
   {
-    ProductDESProxy des = createProductDESProxy(aut, mFactory);
+    final ProductDESProxy des = createProductDESProxy(aut, mFactory);
     setModel(des);
   }
 
@@ -90,6 +91,56 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     return mTransitionLimit;
   }
 
+  public void requestAbort()
+  {
+    mIsAborting = true;
+  }
+
+  public boolean isAborting()
+  {
+    return mIsAborting;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  /**
+   * Initialises the model analyser for a new run.
+   * This method should be called by all subclasses at the beginning of
+   * each {@link ModelAnalyser#run() run()}. If overridden, the overriding
+   * method should call the superclass methods first.
+   */
+  protected void setUp()
+  {
+    mIsAborting = false;
+  }
+
+  /**
+   * Resets the model analyser at the end of a run.
+   * This method should be called by all subclasses upon completion of
+   * each {@link ModelAnalyser#run() run()}, even if an exception is
+   * thrown. If overridden, the overriding method should call the superclass
+   * methods last.
+   */
+  protected void tearDown()
+  {
+    mIsAborting = false;
+  }
+
+  /**
+   * Checks whether the model analyser has been requested to abort,
+   * and if so, performs the abort by throwing an {@link AbortException}.
+   * This method should be called periodically by any model analyser that
+   * supports being aborted by user request.
+   */
+  protected void checkAbort()
+    throws AbortException
+  {
+    if (mIsAborting) {
+      throw new AbortException();
+    }
+  }
+
 
   //#########################################################################
   //# Auxiliary Static Methods
@@ -109,5 +160,6 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   private ProductDESProxy mModel;
   private int mNodeLimit;
   private int mTransitionLimit;
+  private boolean mIsAborting;
 
 }

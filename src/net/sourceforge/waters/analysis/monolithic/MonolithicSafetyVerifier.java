@@ -19,7 +19,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.Arrays;
 
+import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
@@ -81,147 +83,152 @@ public class MonolithicSafetyVerifier
   //#########################################################################
   //# Invocation
   public boolean run()
-    throws OverflowException
+    throws AnalysisException
   {
-    final ProductDESProxy model = getModel();
+    try {
+      setUp();
+      final ProductDESProxy model = getModel();
 
-    Set<StateProxy> stateSet;
-    int i, j, k = 0;
-    int ck = 0;
-    int bl = 0;
-    int mask = 0;
-    int codeLength = 0;
-    int cp = 0;
+      Set<StateProxy> stateSet;
+      int i, j, k = 0;
+      int ck = 0;
+      int bl = 0;
+      int mask = 0;
+      int codeLength = 0;
+      int cp = 0;
 
-    mNumAutomata = 0;
-    mNumEvents = 0;
-    mNumPlants = 0;
-    mStateTupleSize = 0;
+      mNumAutomata = 0;
+      mNumEvents = 0;
+      mNumPlants = 0;
+      mStateTupleSize = 0;
 
-    final Collection<AutomatonProxy> automata =
-      new LinkedList<AutomatonProxy>();
-    for (final AutomatonProxy aut : model.getAutomata()) {
-      final ComponentKind kind = mKindTranslator.getComponentKind(aut);
-      switch (kind) {
-      case PLANT:
-        mNumPlants++;
-        automata.add(aut);
-        break;
-      case SPEC:
-        automata.add(aut);
-        break;
-      default:
-        break;
-      }
-    }
-
-    mPlantTransitionMap = new ArrayList<int[][]>();
-    mSpecTransitionMap = new ArrayList<int[][]>();
-    mIndexList = new ArrayList<Integer>();
-    mStateSpace = new BlockedArrayList<StateTuple>(StateTuple.class);
-    mEventCodingList = new ArrayList<EventProxy>(model.getEvents());
-    mPlantEventList = new ArrayList<byte[]>();
-    mSpecEventList = new ArrayList<byte[]>();
-
-    mNumEvents = mEventCodingList.size();
-    mNumAutomata = automata.size();
-
-    // Empty case
-    if (mNumAutomata == 0) {
-      return setSatisfiedResult();
-    }
-
-    mBitLengthList = new int[mNumAutomata];
-    mMaskList = new int[mNumAutomata];
-    mCodePosition = new int[mNumAutomata];
-    mSystemState = new int[mNumAutomata];
-
-    // Separate the automatons by kind
-    for (AutomatonProxy ap : automata) {
-      // Get all states
-      stateSet = ap.getStates();
-      // Encoding states to binary values
-      final List<StateProxy> codes = new ArrayList<StateProxy>(stateSet);
-      // Encoding events to binary values
-      final byte[] aneventCodingList = new byte[mNumEvents];
-      for (EventProxy evp : ap.getEvents()) {
-        aneventCodingList[mEventCodingList.indexOf(evp)] = 1;
-      }
-      // Encoding transitions to binary values
-      int stateSize = codes.size();
-      int[][] atransition = new int[stateSize][mNumEvents];
-      for (i = 0; i < stateSize; i++) {
-        for (j = 0; j < mNumEvents; j++) {
-          atransition[i][j] = -1;
-        }
-      }
-      for (TransitionProxy tp : ap.getTransitions()) {
-        atransition
-          [codes.indexOf(tp.getSource())]
-          [mEventCodingList.indexOf(tp.getEvent())]
-          = codes.indexOf(tp.getTarget());
-      }
-      // Compute bit length and mask
-      bl = BigInteger.valueOf(stateSize).bitLength();
-      mask = (1 << bl) - 1;
-
-      // Find initial state
-      StateProxy initialState = null;
-      for (final StateProxy sp : stateSet) {
-        if (sp.isInitial()) {
-          initialState = sp;
+      final Collection<AutomatonProxy> automata =
+        new LinkedList<AutomatonProxy>();
+      for (final AutomatonProxy aut : model.getAutomata()) {
+        final ComponentKind kind = mKindTranslator.getComponentKind(aut);
+        switch (kind) {
+        case PLANT:
+          mNumPlants++;
+          automata.add(aut);
+          break;
+        case SPEC:
+          automata.add(aut);
+          break;
+        default:
           break;
         }
       }
-      // Store all the information by automaton type
-      final ComponentKind kind = mKindTranslator.getComponentKind(ap);
-      switch (kind) {
-      case PLANT:
-        mSystemState[ck] = codes.indexOf(initialState);
-        mPlantEventList.add(aneventCodingList);
-        mPlantTransitionMap.add(atransition);
-        mBitLengthList[ck] = bl;
-        mMaskList[ck] = mask;
-        ck++;
-        break;
-      case SPEC:
-        mSystemState[k + mNumPlants] = codes.indexOf(initialState);
-        mSpecEventList.add(aneventCodingList);
-        mSpecTransitionMap.add(atransition);
-        mBitLengthList[k + mNumPlants] = bl;
-        mMaskList[k + mNumPlants] = mask;
-        k++;
-        break;
-      default:
-        break;
-      }
-    }
 
-    // Set the mCodePosition list
-    for (i = 0; i < mNumAutomata; i++) {
-      codeLength += mBitLengthList[i];
-      if (codeLength <= 32){
-        mCodePosition[i] = cp;
+      mPlantTransitionMap = new ArrayList<int[][]>();
+      mSpecTransitionMap = new ArrayList<int[][]>();
+      mIndexList = new ArrayList<Integer>();
+      mStateSpace = new BlockedArrayList<StateTuple>(StateTuple.class);
+      mEventCodingList = new ArrayList<EventProxy>(model.getEvents());
+      mPlantEventList = new ArrayList<byte[]>();
+      mSpecEventList = new ArrayList<byte[]>();
+
+      mNumEvents = mEventCodingList.size();
+      mNumAutomata = automata.size();
+
+      // Empty case
+      if (mNumAutomata == 0) {
+        return setSatisfiedResult();
+      }
+
+      mBitLengthList = new int[mNumAutomata];
+      mMaskList = new int[mNumAutomata];
+      mCodePosition = new int[mNumAutomata];
+      mSystemState = new int[mNumAutomata];
+
+      // Separate the automatons by kind
+      for (final AutomatonProxy ap : automata) {
+        // Get all states
+        stateSet = ap.getStates();
+        // Encoding states to binary values
+        final List<StateProxy> codes = new ArrayList<StateProxy>(stateSet);
+        // Encoding events to binary values
+        final byte[] aneventCodingList = new byte[mNumEvents];
+        for (final EventProxy evp : ap.getEvents()) {
+          aneventCodingList[mEventCodingList.indexOf(evp)] = 1;
+        }
+        // Encoding transitions to binary values
+        final int stateSize = codes.size();
+        final int[][] atransition = new int[stateSize][mNumEvents];
+        for (i = 0; i < stateSize; i++) {
+          for (j = 0; j < mNumEvents; j++) {
+            atransition[i][j] = -1;
+          }
+        }
+        for (final TransitionProxy tp : ap.getTransitions()) {
+          atransition
+          [codes.indexOf(tp.getSource())]
+           [mEventCodingList.indexOf(tp.getEvent())]
+            = codes.indexOf(tp.getTarget());
+        }
+        // Compute bit length and mask
+        bl = BigInteger.valueOf(stateSize).bitLength();
+        mask = (1 << bl) - 1;
+
+        // Find initial state
+        StateProxy initialState = null;
+        for (final StateProxy sp : stateSet) {
+          if (sp.isInitial()) {
+            initialState = sp;
+            break;
+          }
+        }
+        // Store all the information by automaton type
+        final ComponentKind kind = mKindTranslator.getComponentKind(ap);
+        switch (kind) {
+        case PLANT:
+          mSystemState[ck] = codes.indexOf(initialState);
+          mPlantEventList.add(aneventCodingList);
+          mPlantTransitionMap.add(atransition);
+          mBitLengthList[ck] = bl;
+          mMaskList[ck] = mask;
+          ck++;
+          break;
+        case SPEC:
+          mSystemState[k + mNumPlants] = codes.indexOf(initialState);
+          mSpecEventList.add(aneventCodingList);
+          mSpecTransitionMap.add(atransition);
+          mBitLengthList[k + mNumPlants] = bl;
+          mMaskList[k + mNumPlants] = mask;
+          k++;
+          break;
+        default:
+          break;
+        }
+      }
+
+      // Set the mCodePosition list
+      for (i = 0; i < mNumAutomata; i++) {
+        codeLength += mBitLengthList[i];
+        if (codeLength <= 32){
+          mCodePosition[i] = cp;
+        } else {
+          codeLength = mBitLengthList[i];
+          cp++;
+          mCodePosition[i] = cp;
+        }
+      }
+      mStateTupleSize = cp + 1;
+
+      if (isControllable(mSystemState)) {
+        return setSatisfiedResult();
       } else {
-        codeLength = mBitLengthList[i];
-        cp++;
-        mCodePosition[i] = cp;
+        final SafetyTraceProxy counterexample = computeCounterExample();
+        return setFailedResult(counterexample);
       }
-    }
-    mStateTupleSize = cp + 1;
-
-    if (isControllable(mSystemState)) {
-      return setSatisfiedResult();
-    } else {
-      final SafetyTraceProxy counterexample = computeCounterExample();
-      return setFailedResult(counterexample);
+    } finally {
+      tearDown();
     }
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
-  public void setKindTranslator(KindTranslator translator)
+  public void setKindTranslator(final KindTranslator translator)
   {
     mKindTranslator = translator;
     clearAnalysisResult();
@@ -258,10 +265,10 @@ public class MonolithicSafetyVerifier
    * @return <CODE>true</CODE> if the model is controllable, or
    *         <CODE>false</CODE> if it is not.
    */
-  private boolean isControllable(int[] sState)
-    throws OverflowException
+  private boolean isControllable(final int[] sState)
+    throws AnalysisException
   {
-    THashSet<StateTuple> systemSet = new THashSet<StateTuple>();
+    final THashSet<StateTuple> systemSet = new THashSet<StateTuple>();
     boolean enabled = true;
 
     // Add the initial synchronous product in systemSet and mStateSpace
@@ -273,10 +280,10 @@ public class MonolithicSafetyVerifier
     mIndexList.add(mStateSpace.size()-1);
 
     int indexSize = 0;
-    int mNumEvents = mEventCodingList.size();
+    final int mNumEvents = mEventCodingList.size();
     int i,j,k,temp;
 
-    while(true){
+    while (true) {
       // For each current state in the current level, check its controllability
       indexSize = mIndexList.size();
       for (j = (indexSize == 1) ? 0 : (mIndexList.get(indexSize - 2) + 1);
@@ -351,6 +358,8 @@ public class MonolithicSafetyVerifier
             mStateSpace.add(mStateTuple);
             if (mStateSpace.size() > getNodeLimit()) {
               throw new OverflowException(getNodeLimit());
+            } else {
+              checkAbort();
             }
           }
         }
@@ -402,7 +411,7 @@ public class MonolithicSafetyVerifier
    * @param sTuple The StateTuple to be decoded
    * @param state  The decoded state
    */
-  private void decode(StateTuple sTuple, int[] state)
+  private void decode(final StateTuple sTuple, final int[] state)
   {
     int i;
     int result;
@@ -443,6 +452,7 @@ public class MonolithicSafetyVerifier
    *         property is satisfied and there is no counterexample.
    */
   private SafetyTraceProxy computeCounterExample()
+    throws AbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
@@ -454,7 +464,7 @@ public class MonolithicSafetyVerifier
     boolean found = false;
     int i, j, k, temp;
     int indexSize = mIndexList.size();
-    int[] errorState = new int[mNumAutomata];
+    final int[] errorState = new int[mNumAutomata];
 
     tracelist.add(0, mEventCodingList.get(mErrorEvent));
 
@@ -517,6 +527,7 @@ public class MonolithicSafetyVerifier
           found = false;
           break;
         }
+        checkAbort();
       }
     }
     final SafetyTraceProxy trace =

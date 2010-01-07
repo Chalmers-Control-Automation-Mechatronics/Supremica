@@ -17,7 +17,9 @@ import java.util.Set;
 
 import gnu.trove.*;
 
+import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -115,9 +117,11 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
 
   // #########################################################################
   // # Invocation
-  public boolean run() throws OverflowException
+  public boolean run()
+    throws AnalysisException
   {
     try {
+      setUp();
       // First get the model
       final ProductDESProxy model = getModel();
       mEventMap = new EventMap();
@@ -186,6 +190,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
               break;
             }
           }
+          checkAbort();
         }
       } else {
         //all states must be coreachable if there is only one marking type
@@ -195,6 +200,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
             nonblocking = false;
             break;
           }
+          checkAbort();
         }
       }
       if (nonblocking) {
@@ -232,6 +238,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       // So the garbage collector can clean up ...
       mEventMap = null;
       mSyncProduct = null;
+      tearDown();
     }
   }
 
@@ -261,10 +268,13 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
    * @return <CODE>true</CODE> if exploration was successful within the given
    *         depth, <CODE>false</CODE> otherwise.
    */
-  private boolean exploreBackwards(final int stateid, final BitSet coreachable,
-      int maxdepth)
+  private boolean exploreBackwards(final int stateid,
+                                   final BitSet coreachable,
+                                   int maxdepth)
+    throws AbortException
   {
     if (maxdepth-- > 0) {
+      checkAbort();
       coreachable.set(stateid);
       boolean result = true;
       final TIntArrayList preds = mSyncProduct.getPredecessors(stateid);
@@ -351,7 +361,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
      * in the state mapping it will be given the existing id, otherwise a new
      * mapping will be assigned and the id returned.
      */
-    private int addNewState(long state, int pred)
+    private int addNewState(final long state, final int pred)
       throws OverflowException
     {
       if (mStateMap.containsKey(state)) {
@@ -383,27 +393,29 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     /**
      * Look up the state id the state list to get its 64 bit encoded version.
      */
-    private long getStateFromId(int id)
+    private long getStateFromId(final int id)
     {
       return statelist.get(id);
     }
 
-    private void build() throws OverflowException
+    private void build()
+      throws AnalysisException
     {
       // Compose the initial state.
-      AutomatonSchema[] automata = mStateSchema.getOrdering();
-      StateProxy[] state = new StateProxy[automata.length];
+      final AutomatonSchema[] automata = mStateSchema.getOrdering();
+      final StateProxy[] state = new StateProxy[automata.length];
       for (int i = 0; i < automata.length; i++) {
         state[i] = automata[i].getInitialState();
         assert state[i] != null : "Every automaton must have an initial state";
       }
-      long init = mStateSchema.encodeState(state);
+      final long init = mStateSchema.encodeState(state);
       addNewState(init, -1);
       // Expand all the states in the fringe, until no more
       // are added. This implies we have explored the entire
       // synchronous product.
       while (fringeSize() > 0) {
         expand();
+        checkAbort();
       }
     }
 
@@ -507,7 +519,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     EventMap()
     {
       final ProductDESProxy model = getModel();
-      Set<EventProxy> eventset = model.getEvents();
+      final Set<EventProxy> eventset = model.getEvents();
       // Create an array of the events (arbitrarily)
       events = eventset.toArray(new EventProxy[] {});
       eventmap = new TObjectIntHashMap<EventProxy>();
@@ -523,13 +535,13 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       return events.length;
     }
 
-    EventProxy getEvent(int id)
+    EventProxy getEvent(final int id)
     {
       assert (id >= 0 && id < events.length);
       return events[id];
     }
 
-    int getId(EventProxy e)
+    int getId(final EventProxy e)
     {
       assert eventmap.containsKey(e);
       return eventmap.get(e);
@@ -592,7 +604,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       int shamt = 0;
       for (int i = 0; i < mAutomata.length; i++) {
         // The number of bits that will be required
-        int bits = clog2(mAutomata[i].stateSize());
+        final int bits = clog2(mAutomata[i].stateSize());
         mEncondings[i] = new StateEncodingData(bits, shamt);
         // Add the number of bits we encoded to the shift amount
         shamt += bits;
@@ -620,10 +632,10 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
      * A convenience method that encodes the state from an array of state proxy
      * objects by looking up the state indexes in the automata schema.
      */
-    long encodeState(StateProxy[] states)
+    long encodeState(final StateProxy[] states)
     {
       assert states.length == mAutomata.length : "Wrong number of states given";
-      int[] istates = new int[states.length];
+      final int[] istates = new int[states.length];
       for (int i = 0; i < states.length; i++) {
         istates[i] = mAutomata[i].getStateNumber(states[i]);
       }
@@ -635,7 +647,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
      * ordering of the states should match the ordering of automata given by the
      * getOrdering method.
      */
-    long encodeState(int[] states)
+    long encodeState(final int[] states)
     {
       assert states.length == mAutomata.length : "Wrong number of states given";
       // The to-be-encoded state in the synchronous product.
@@ -773,7 +785,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       }
     }
 
-    boolean isMarked(int state)
+    boolean isMarked(final int state)
     {
       if (mMarkedStates == null) {
         return true;
@@ -782,7 +794,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       }
     }
 
-    boolean isPreconditionMarked(int state)
+    boolean isPreconditionMarked(final int state)
     {
       if (mPreconditionMarkedStates == null) {
         return true;
@@ -830,7 +842,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
 
     //#######################################################################
     //# Constructor
-    StateEncodingData(int bits, int shift)
+    StateEncodingData(final int bits, final int shift)
     {
       // Construct a mask for the state values.
       long tmask = 0;
