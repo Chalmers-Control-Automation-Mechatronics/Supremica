@@ -175,9 +175,12 @@ public class IDEMenuBar
     Config.INCLUDE_INSTANTION.addPropertyChangeListener(createListener);
     final SupremicaPropertyChangeListener toolsListener =
       new ToolsPropertyListener();
+    final SupremicaPropertyChangeListener analyzeListener =
+      new AnalyzePropertyListener();
     Config.INCLUDE_EXTERNALTOOLS.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_SOCEDITOR.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_ANIMATOR.addPropertyChangeListener(toolsListener);
+    Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener(analyzeListener);
   }
 
 
@@ -273,7 +276,8 @@ public class IDEMenuBar
       }
 
       // The new analyze menu
-      if (mNewAnalyzeMenu == null && (panel instanceof EditorPanel || panel instanceof SimulatorPanel))
+      if (mNewAnalyzeMenu == null && Config.INCLUDE_WATERS_SIMULATOR.isTrue()
+          && (panel instanceof EditorPanel || panel instanceof SimulatorPanel))
       {
         mNewAnalyzeMenu = new JMenu("Analyze");
         mNewAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
@@ -407,10 +411,12 @@ public class IDEMenuBar
     if (panel != null) {
       if (panel instanceof EditorPanel) {
         add(mCreateMenu);
-        add(mNewAnalyzeMenu);
+        if (mNewAnalyzeMenu != null)
+          add(mNewAnalyzeMenu);
       } else if (panel instanceof SimulatorPanel) {
         add(mSimulateMenu);
-        add(mNewAnalyzeMenu);
+        if (mNewAnalyzeMenu != null)
+          add(mNewAnalyzeMenu);
       } else if (panel instanceof AnalyzerPanel) {
         add(mAnalyzeMenu);
       }
@@ -546,6 +552,18 @@ public class IDEMenuBar
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       mToolsMenu = null;
+      rebuildMenus();
+    }
+  }
+
+  private class AnalyzePropertyListener
+    implements SupremicaPropertyChangeListener
+  {
+    // #######################################################################
+    // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    public void propertyChanged(final SupremicaPropertyChangeEvent event)
+    {
+      mNewAnalyzeMenu = null;
       rebuildMenus();
     }
   }
