@@ -23,6 +23,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
+import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
+import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
 import net.sourceforge.waters.gui.actions.IDECopyAction;
@@ -281,8 +283,12 @@ public class IDEMenuBar
       {
         mNewAnalyzeMenu = new JMenu("Analyze");
         mNewAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
-        final Action analyze = actions.getAction(AnalyzeConflictCheckAction.class);
-        mNewAnalyzeMenu.add(analyze);
+        final Action conflict = actions.getAction(AnalyzeConflictCheckAction.class);
+        mNewAnalyzeMenu.add(conflict);
+        final Action controllability = actions.getAction(AnalyzeControllabilityAction.class);
+        mNewAnalyzeMenu.add(controllability);
+        final Action controlLoop = actions.getAction(AnalyzeControlLoopAction.class);
+        mNewAnalyzeMenu.add(controlLoop);
       }
 
       // Simulate

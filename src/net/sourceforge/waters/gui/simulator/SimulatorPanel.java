@@ -10,6 +10,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.JTableHeader;
+
+import net.sourceforge.waters.model.des.TraceProxy;
+
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.IDEDimensions;
 import org.supremica.gui.ide.MainPanel;
@@ -44,6 +47,13 @@ public class SimulatorPanel
   public Simulation getSimulation()
   {
     return mSimulation;
+  }
+
+  public void switchToTraceMode(final TraceProxy trace)
+  {
+    mSimulation.run(trace);
+    System.out.println("DEBUG: Simulation trace completed");
+    mTabbedPane.setSelectedIndex(2);
   }
 
 

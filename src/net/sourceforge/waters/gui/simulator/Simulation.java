@@ -24,6 +24,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -316,6 +317,21 @@ public class Simulation implements ModelObserver, Observer
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
+  }
+
+
+  public void run(final TraceProxy trace)
+  {
+    reset();
+    for (int looper = 0; looper < trace.getEvents().size() - 1; looper ++)
+    {
+      final EventProxy event = trace.getEvents().get(looper);
+      try {
+        step(event);
+      } catch (final UncontrollableException exception) {
+        // Do nothing
+      }
+    }
   }
 
   @SuppressWarnings("unchecked")

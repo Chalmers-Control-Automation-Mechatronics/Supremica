@@ -24,7 +24,6 @@ public class EventJTreeHeader extends JTableHeader implements ComponentListener
     if (oldWidth == 0)
       oldWidth = 245;
     final double width = oldWidth;
-    System.out.println("DEBUG: Old width: " + oldWidth);
     this.getColumnModel().getColumn(0).setWidth((int)(width * 0.2));
     this.getColumnModel().getColumn(0).setMaxWidth((int)(width * 0.2));
     this.getColumnModel().getColumn(0).setHeaderValue("Type");
@@ -61,9 +60,6 @@ public class EventJTreeHeader extends JTableHeader implements ComponentListener
     final double newWidth = width - firstColumn.getWidth() - thirdColumn.getWidth();
     secondColumn.setWidth((int)newWidth);
      oldWidth = parent.getWidth();
-    for (int looper = 0 ; looper < 3; looper++)
-      System.out.println("DEBUG: Column " + looper + " has width " + this.getColumnModel().getColumn(looper).getWidth());
-    System.out.println("DEBUG: The entire width is: " + this.getWidth());
   }
 
   public void componentShown(final ComponentEvent e)

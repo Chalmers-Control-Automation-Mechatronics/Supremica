@@ -237,6 +237,11 @@ public class ModuleContainer
       return mSimulatorPanel;
     }
 
+    public JTabbedPane getTabPane()
+    {
+      return mTabPanel;
+    }
+
     public ModuleSubject getModule()
     {
         return (ModuleSubject) getDocument();
@@ -541,5 +546,8 @@ public class ModuleContainer
     //#######################################################################
     //# Class Constants
     static final String TYPE_STRING = "Waters module";
+
+
+
 
 }

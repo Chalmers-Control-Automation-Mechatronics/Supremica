@@ -6,6 +6,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -29,16 +30,15 @@ import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
-public class AnalyzeConflictCheckAction
-extends WatersAnalyzeAction
+public class AnalyzeControllabilityAction extends WatersAnalyzeAction
 {
-  protected AnalyzeConflictCheckAction(final IDE ide)
+  protected AnalyzeControllabilityAction(final IDE ide)
   {
     super(ide);
     des = null;
     this.ide = ide;
-    putValue(Action.NAME, "Conflict");
-    putValue(Action.SHORT_DESCRIPTION, "Check for Conflict issues");
+    putValue(Action.NAME, "Controllability");
+    putValue(Action.SHORT_DESCRIPTION, "Check for Controllability issues");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_T);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK)); // Get better Accelerator Key
@@ -54,7 +54,7 @@ extends WatersAnalyzeAction
 
   public void actionPerformed(final ActionEvent e)
   {
-    final ConflictJDialog dialog = new ConflictJDialog(ide);
+    final ControllabilityJDialog dialog = new ControllabilityJDialog(ide);
     dialog.setVisible(true);
   }
 
@@ -84,21 +84,21 @@ extends WatersAnalyzeAction
   // #####################################################################
   // # Inner classes
 
-  private class ConflictJDialog extends JDialog
+  private class ControllabilityJDialog extends JDialog
   {
     // #######################################################################
     // # Constructor
 
-    public ConflictJDialog(final IDE ide)
+    public ControllabilityJDialog(final IDE ide)
     {
       final JPanel panel = new JPanel();
-      final JButton cancelButton = new JButton("Abort");
+      final JButton cancelButton = new JButton("Cancel");
       run();
       cancelButton.addActionListener(new ActionListener(){
         public void actionPerformed(final ActionEvent e)
         {
           runner.abort();
-          ConflictJDialog.this.dispose();
+          ControllabilityJDialog.this.dispose();
         }
       });
       panel.add(cancelButton, BorderLayout.CENTER);
@@ -109,77 +109,82 @@ extends WatersAnalyzeAction
 
     private void run()
     {
-      runner = new ConflictThread();
+      runner = new ControllabilityThread();
       runner.setPriority(Thread.MIN_PRIORITY);
       runner.start();
-    } // ######################################################################
+    }
+
+    // ######################################################################
     // # Inner Classes
 
-    private class ConflictThread extends Thread
+    private class ControllabilityThread extends Thread
     {
-      public ConflictThread()
+      public ControllabilityThread()
       {
         final ProductDESProxyFactory  desfactory = ProductDESElementFactory.getInstance();
         final ModelVerifierFactory vfactory = MonolithicModelVerifierFactory.getInstance();
-        verifier = vfactory.createControlLoopChecker(desfactory);
+        verifier = vfactory.createControllabilityChecker(desfactory);
       }
 
-      public void run()
-      {
-        super.run();
-        boolean fatalError = false;
-        final String modeName = "control loop problem";
-        verifier.setModel(des);
-        try {
-          verifier.run();
-        }
-        catch (final AbortException exception)
+        public void run()
         {
-          // Do nothing: Aborted
-          fatalError = true;
-        } catch (final AnalysisException exception) {
-          JOptionPane.showMessageDialog(ide, "Analysis Failed:\r\n" + exception.getMessage(), "Failure!", JOptionPane.ERROR_MESSAGE);
-          fatalError = true;
-        }
-        if (!fatalError)
-        {
-          final boolean result = verifier.isSatisfied();
-          if (result) {
-            JOptionPane.showMessageDialog(ide, "No " + modeName + "s could be detected", "Success!", JOptionPane.INFORMATION_MESSAGE);
-          } else {
-            final TraceProxy counterexample = verifier.getCounterExample();
-            // This code will soon load the trade, and switch the screen to the trace menu, once that feature is implemented
-            if (JOptionPane.showConfirmDialog(ide,
-              "ERROR: " + modeName.toUpperCase() + " detected. Do you wish to view the trace?",
-              "Failure", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-            {
-              ((ModuleContainer)ide.getActiveDocumentContainer()).getTabPane().setSelectedIndex(1);
-              ((ModuleContainer)ide.getActiveDocumentContainer()).getSimulatorPanel().switchToTraceMode(counterexample);
+          super.run();
+          boolean fatalError = false;
+          final String modeName = "controllability problem";
+          verifier.setModel(des);
+          try {
+            verifier.run();
+          }
+          catch (final AbortException exception)
+          {
+            // Do nothing: Aborted
+            fatalError = true;
+          } catch (final AnalysisException exception) {
+            JOptionPane.showMessageDialog(ide, "Analysis Failed:\r\n" + exception.getMessage(), "Failure!", JOptionPane.ERROR_MESSAGE);
+            fatalError = true;
+          }
+          if (!fatalError)
+          {
+            final boolean result = verifier.isSatisfied();
+            if (result) {
+              JOptionPane.showMessageDialog(ide, "No " + modeName + "s could be detected", "Success!", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+              final TraceProxy counterexample = verifier.getCounterExample();
+              // This code will soon load the trade, and switch the screen to the trace menu, once that feature is implemented
+              if (ide == null)
+                System.out.println("DEBUG: IDE is NULL");
+              if (JOptionPane.showConfirmDialog(ide,
+                 "ERROR: " + modeName.toUpperCase() + " detected. Do you wish to view the trace?",
+                 "Failure", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+              {
+                ((ModuleContainer)ide.getActiveDocumentContainer()).getTabPane().setSelectedIndex(1);
+                ((ModuleContainer)ide.getActiveDocumentContainer()).getSimulatorPanel().switchToTraceMode(counterexample);
+              }
             }
           }
+          SwingUtilities.invokeLater(new Runnable(){public void run(){ControllabilityJDialog.this.dispose();}});
         }
-        SwingUtilities.invokeLater(new Runnable(){public void run(){ConflictJDialog.this.dispose();}});
-      }
 
-      public boolean abort()
-      {
-        if (verifier != null)
+        public boolean abort()
         {
-          verifier.requestAbort();
-          return true;
+          if (verifier != null)
+          {
+            verifier.requestAbort();
+            return true;
+          }
+          else
+          {
+            return false;
+          }
         }
-        else
-        {
-          return false;
-        }
-      }
-      ModelVerifier verifier;
-  }
+
+        ModelVerifier verifier;
+    }
 
     // ######################################################################
     // # Data Members
 
-    ConflictThread runner;
+    ControllabilityThread runner;
 
     // #####################################################################
     // # Class Constants
@@ -199,5 +204,4 @@ extends WatersAnalyzeAction
   // # Class Constants
 
   private static final long serialVersionUID = -4339676103986484641L;
-
 }
