@@ -182,6 +182,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           throw new FileNotFoundException("The interface file " + file
               + " could not be located.");
         }
+      } else {
+        interfaceMap.put(name, "");
       }
     }
     final NodeList subsystemList = project.getElementsByTagName("Subsystem");
@@ -213,10 +215,10 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           if (interfaceRef != null) {
             final String interfaceNm = interfaceRef.getAttribute("name");
             final String interfaceLocation = interfaceMap.get(interfaceNm);
-            if (interfaceLocation != null) {
+            if (interfaceLocation != null && interfaceLocation != "") {
               constructSimpleComponent(interfaceNm, interfaceLocation,
                                        ComponentKind.SPEC, uri);
-            } else {
+            } else if (interfaceLocation != "") {
               throw new WatersUnmarshalException("The interface " + interfaceNm
                   + " does not exist.");
             }
