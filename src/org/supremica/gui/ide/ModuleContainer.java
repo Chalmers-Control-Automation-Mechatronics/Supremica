@@ -455,15 +455,19 @@ public class ModuleContainer
 
 
     //#######################################################################
-    //# Auxiliary Methods
-    private void recompile()
+    //# Compilation
+    public ProductDESProxy recompile()
       throws EvalException
     {
       if (mCompiledDES == null) {
         mCompiledDES = mCompiler.compile();
       }
+      return mCompiledDES;
     }
 
+
+    //#######################################################################
+    //# Auxiliary Methods
     private void fireUndoRedoEvent()
     {
         final EditorChangedEvent event = new UndoRedoEvent(this);
