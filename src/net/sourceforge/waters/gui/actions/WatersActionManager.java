@@ -35,6 +35,7 @@ public abstract class WatersActionManager
     final int SIZE = 32;
     mActionMap = new HashMap<Class<? extends IDEAction>, IDEAction>(SIZE);
     mKeyboardActionMap = new HashMap<Class<? extends IDEAction>, Action>(SIZE);
+    addAction(new AnalyzeConflictCheckAction(ide));
     addAction(new EditEventLabelAction(ide));
     addAction(new GraphLayoutAction(ide));
     addAction(new GraphSaveEPSAction(ide));

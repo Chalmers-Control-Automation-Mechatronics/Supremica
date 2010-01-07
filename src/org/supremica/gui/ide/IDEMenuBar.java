@@ -22,6 +22,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
 import net.sourceforge.waters.gui.actions.IDECopyAction;
@@ -272,10 +273,12 @@ public class IDEMenuBar
       }
 
       // The new analyze menu
-      if (mNewAnalyzeMenu == null && panel instanceof EditorPanel)
+      if (mNewAnalyzeMenu == null && (panel instanceof EditorPanel || panel instanceof SimulatorPanel))
       {
         mNewAnalyzeMenu = new JMenu("Analyze");
         mNewAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
+        final Action analyze = actions.getAction(AnalyzeConflictCheckAction.class);
+        mNewAnalyzeMenu.add(analyze);
       }
 
       // Simulate
@@ -407,6 +410,7 @@ public class IDEMenuBar
         add(mNewAnalyzeMenu);
       } else if (panel instanceof SimulatorPanel) {
         add(mSimulateMenu);
+        add(mNewAnalyzeMenu);
       } else if (panel instanceof AnalyzerPanel) {
         add(mAnalyzeMenu);
       }
