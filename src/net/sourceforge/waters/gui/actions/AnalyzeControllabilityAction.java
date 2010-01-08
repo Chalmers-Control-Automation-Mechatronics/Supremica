@@ -151,8 +151,6 @@ public class AnalyzeControllabilityAction extends WatersAnalyzeAction
             } else {
               final TraceProxy counterexample = verifier.getCounterExample();
               // This code will soon load the trade, and switch the screen to the trace menu, once that feature is implemented
-              if (ide == null)
-                System.out.println("DEBUG: IDE is NULL");
               if (JOptionPane.showConfirmDialog(ide,
                  "ERROR: " + modeName.toUpperCase() + " detected. Do you wish to view the trace?",
                  "Failure", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)

@@ -52,7 +52,6 @@ public class SimulatorPanel
   public void switchToTraceMode(final TraceProxy trace)
   {
     mSimulation.run(trace);
-    System.out.println("DEBUG: Simulation trace completed");
     mTabbedPane.setSelectedIndex(2);
   }
 
