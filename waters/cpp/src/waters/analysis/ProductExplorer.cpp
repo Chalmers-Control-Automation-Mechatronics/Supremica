@@ -24,6 +24,7 @@
 #include "jni/glue/ConflictTraceGlue.h"
 #include "jni/glue/EventGlue.h"
 #include "jni/glue/ExplorerModeGlue.h"
+#include "jni/glue/Glue.h"
 #include "jni/glue/HashMapGlue.h"
 #include "jni/glue/LinkedListGlue.h"
 #include "jni/glue/NativeConflictCheckerGlue.h"
@@ -72,6 +73,7 @@ ProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mMarking(marking),
     mStateLimit(UNDEF_UINT32),
     mTransitionLimit(UNDEF_UINT32),
+    mIsAbortRequested(false),
     mEncoding(0),
     mStateSpace(0),
     mDepthMap(0),
@@ -229,6 +231,7 @@ addStatistics(const jni::VerificationResultGlue& vresult)
 void ProductExplorer::
 setup()
 {
+  mIsAbortRequested = false;
   // Establish automaton encoding ...
   const int numtags = mMode == EXPLORER_MODE_SAFETY ? 0 : 1;
   mEncoding =
@@ -300,6 +303,7 @@ teardown()
     uint32* currenttuple = new uint32[mNumAutomata];            \
     try {                                                       \
       while (current < mNumStates) {                            \
+        checkAbort();                                           \
         uint32* currentpacked = mStateSpace->get(current);      \
         mEncoding->decode(currentpacked, currenttuple);         \
         if (!EXPAND(current, currenttuple, currentpacked)) {    \
@@ -356,6 +360,7 @@ doNonblockingCoreachabilitySearch()
   }
   try {
     for (uint32 current = 0; current < mNumStates; current++) {
+      checkAbort();
       uint32* currentpacked = mStateSpace->get(current);
       if (mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
         continue;
@@ -384,6 +389,7 @@ doNonblockingCoreachabilitySearch()
     overflow = false;
     try {
       for (uint32 current = mNumStates; current-- > 0;) {
+        checkAbort();
         uint32* currentpacked = mStateSpace->get(current);
         if (mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
           if (currenttuple == 0) {
@@ -403,6 +409,7 @@ doNonblockingCoreachabilitySearch()
   }
   delete [] currenttuple;
   for (uint32 current = 0; current < mNumStates; current++) {
+    checkAbort();
     uint32* currentpacked = mStateSpace->get(current);
     if (!mEncoding->hasTag(currentpacked, TAG_COREACHABLE) &&
         mEncoding->isPreMarkedStateTuplePacked(currentpacked)) {
@@ -427,6 +434,7 @@ computeCounterExample(const jni::ListGlue& list, uint32 level)
     uint32* targetpacked = mStateSpace->get(mTraceState);
     mEncoding->decode(targetpacked, targettuple);
     while (level > 0) {
+      checkAbort();
       mTraceLimit = mDepthMap->get(level);
       expandTraceState(targettuple, targetpacked);
       uint32* sourcepacked = mStateSpace->get(mTraceState);
@@ -490,6 +498,7 @@ storeInitialStates(bool initzero, bool donondet)
         }
       }
       do {
+        checkAbort();
         initpacked = mStateSpace->prepare(mNumStates++);
         for (ndindex = 0; ndindex < ndcount; ndindex++) {
           if (!iters[ndindex].advanceInit(initpacked)) {
@@ -621,6 +630,12 @@ getDepth(uint32 state)
   return l;
 }
 
+void ProductExplorer::
+doAbort()
+  const
+{
+  throw jni::PreJavaException(jni::CLASS_AbortException);
+}
 
 
 //############################################################################
@@ -631,21 +646,29 @@ class ProductExplorerFinalizer {
 public:
   //##########################################################################
   //# Constructor & Destructor
-  ProductExplorerFinalizer() : mProductExplorer(0) {}
-  ~ProductExplorerFinalizer() {delete mProductExplorer;}
+  ProductExplorerFinalizer(const jni::NativeModelVerifierGlue& gchecker) :
+    mNativeModelVerifier(gchecker), mProductExplorer(0)
+  {
+  }
+
+  ~ProductExplorerFinalizer()
+  {
+    mNativeModelVerifier.setNativeModelAnalyser(0);
+    delete mProductExplorer;
+  }
 
   //##########################################################################
   //# Initialisation
   ProductExplorer* createProductExplorer
-    (const jni::NativeModelVerifierGlue& gchecker,
-     const jni::KindTranslatorGlue& translator,
+    (const jni::KindTranslatorGlue& translator,
      const jni::EventGlue& premarking,
      const jni::EventGlue& marking,
      jni::ClassCache& cache)
   {
-    jni::ProductDESProxyFactoryGlue factory = gchecker.getFactoryGlue(&cache);
-    jni::ProductDESGlue des = gchecker.getModelGlue(&cache);
-    jni::ExplorerMode mode = gchecker.getExplorerModeGlue(&cache);
+    jni::ProductDESProxyFactoryGlue factory =
+      mNativeModelVerifier.getFactoryGlue(&cache);
+    jni::ProductDESGlue des = mNativeModelVerifier.getModelGlue(&cache);
+    jni::ExplorerMode mode = mNativeModelVerifier.getExplorerModeGlue(&cache);
     if (mode == jni::ExplorerMode_NARROW) {
       mProductExplorer = new NarrowProductExplorer
         (factory, des, translator, premarking, marking, &cache);
@@ -653,20 +676,25 @@ public:
       mProductExplorer = new BroadProductExplorer
         (factory, des, translator, premarking, marking, &cache);
     }
-    const int limit = gchecker.getNodeLimit();
+    const int limit = mNativeModelVerifier.getNodeLimit();
     if (limit != UNDEF_INT32) {
       mProductExplorer->setStateLimit(limit);
     }
-    const int tlimit = gchecker.getTransitionLimit();
+    const int tlimit = mNativeModelVerifier.getTransitionLimit();
     if (tlimit != UNDEF_INT32) {
       mProductExplorer->setTransitionLimit(tlimit);
     }
+    JNIEnv* env = cache.getEnvironment();
+    jobject bbuffer =
+      env->NewDirectByteBuffer(mProductExplorer, sizeof(*mProductExplorer));
+    mNativeModelVerifier.setNativeModelAnalyser(bbuffer);
     return mProductExplorer;
   }
 
 private:
   //##########################################################################
   //# Data Members
+  jni::NativeModelVerifierGlue mNativeModelVerifier;
   ProductExplorer* mProductExplorer;
 
 };
@@ -689,10 +717,10 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
       jni::KindTranslatorGlue translator =
         gchecker.getKindTranslatorGlue(&cache);
       jni::EventGlue nomarking(0, &cache);
-      waters::ProductExplorerFinalizer finalizer;
+      waters::ProductExplorerFinalizer finalizer(gchecker);
       waters::ProductExplorer* checker =
-        finalizer.createProductExplorer(gchecker, translator,
-                                        nomarking, nomarking, cache);
+        finalizer.createProductExplorer(translator, nomarking,
+                                        nomarking, cache);
       bool result = checker->runSafetyCheck();
       if (result) {
         jni::VerificationResultGlue vresult(result, 0, &cache);
@@ -728,10 +756,10 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
       jni::EventGlue marking = gchecker.getUsedMarkingPropositionGlue(&cache);
       jni::EventGlue premarking =
         gchecker.getGeneralisedPreconditionGlue(&cache);
-      waters::ProductExplorerFinalizer finalizer;
+      waters::ProductExplorerFinalizer finalizer(gchecker);
       waters::ProductExplorer* checker =
-        finalizer.createProductExplorer(gchecker, translator,
-                                        premarking, marking, cache);
+        finalizer.createProductExplorer(translator, premarking,
+                                        marking, cache);
       bool result = checker->runNonblockingCheck();
       if (result) {
         jni::VerificationResultGlue vresult(result, 0, &cache);
@@ -752,4 +780,17 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
   } catch (jthrowable exception) {
     return 0;
   }
+}
+
+
+JNIEXPORT void JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyser_requestAbort
+  (JNIEnv *env, jobject jchecker)
+{
+  jni::ClassCache cache(env);
+  jni::NativeModelAnalyserGlue gchecker(jchecker, &cache);
+  jobject bbuffer = gchecker.getNativeModelAnalyser();
+  waters::ProductExplorer* explorer =
+    (waters::ProductExplorer*) env->GetDirectBufferAddress(bbuffer);
+  explorer->requestAbort();
 }

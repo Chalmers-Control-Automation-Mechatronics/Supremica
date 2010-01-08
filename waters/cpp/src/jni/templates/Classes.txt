@@ -29,6 +29,13 @@ ref class URI {}
 
 
 //###########################################################################
+package java.nio;
+//###########################################################################
+
+ref class ByteBuffer {}
+
+
+//###########################################################################
 package java.util;
 //###########################################################################
 
@@ -203,6 +210,10 @@ glue class KindTranslator {
   glue EventKind getEventKind(glue EventProxy event);
 }
 
+glue class AbortException extends Exception {
+  AbortException();
+}
+
 glue class NondeterministicDESException extends Exception {
   NondeterministicDESException(glue AutomatonProxy aut, glue StateProxy state);
   NondeterministicDESException(glue AutomatonProxy aut,
@@ -227,6 +238,8 @@ glue class NativeModelAnalyser {
   glue ProductDESProxy getModel();
   int getNodeLimit();
   int getTransitionLimit();
+  ByteBuffer getNativeModelAnalyser();
+  void setNativeModelAnalyser(ByteBuffer buffer);
 }
 
 glue class NativeModelVerifier extends NativeModelAnalyser {

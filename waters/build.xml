@@ -200,6 +200,7 @@
     <mkdir dir="${javah.dir}"/>
     <javah outputFile="${javah.file}" classpath="${waters.classes}">
       <class name="net.sourceforge.waters.cpp.analysis.NativeConflictChecker"/>
+      <class name="net.sourceforge.waters.cpp.analysis.NativeModelAnalyser"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeHashSet"/>
     </javah>

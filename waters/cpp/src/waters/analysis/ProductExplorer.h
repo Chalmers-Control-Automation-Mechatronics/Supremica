@@ -114,6 +114,10 @@ public:
   inline const EventRecord* getTraceEvent() const {return mTraceEvent;}
   inline void setTraceEvent(const EventRecord* event) {mTraceEvent = event;}
 
+  //##########################################################################
+  //# Aborting
+  inline void requestAbort() {mIsAbortRequested = true;}
+
 protected:
   //##########################################################################
   //# Auxiliary Methods
@@ -143,6 +147,9 @@ protected:
   void checkCoreachabilityState();
   void checkTraceState();
   uint32 getDepth(uint32 state) const;
+
+  inline void checkAbort() const {if (mIsAbortRequested) doAbort();}
+  void doAbort() const;
 
   //##########################################################################
   //# Simple Access
@@ -181,6 +188,7 @@ private:
   uint32 mStateLimit;
   uint32 mTransitionLimit;
   ExplorerMode mMode;
+  bool mIsAbortRequested;
   AutomatonEncoding* mEncoding;
   StateSpace* mStateSpace;
   ArrayList<uint32>* mDepthMap;
