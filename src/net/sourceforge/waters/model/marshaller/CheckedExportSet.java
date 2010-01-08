@@ -15,6 +15,7 @@ import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.IndexedTreeSet;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.unchecked.Casting;
 
 
@@ -56,8 +57,8 @@ class CheckedExportSet<P extends NamedProxy>
   //# Error Messages
   protected void appendContainerName(final StringBuffer buffer)
   {
-    final Class<?> clazz = mContainer.getClass();
-    final String clazzname = getShortClassName(clazz);
+    final Class<? extends Proxy> clazz = mContainer.getProxyInterface();
+    final String clazzname = ProxyTools.getShortClassName(clazz);
     buffer.append(clazzname);
     if (mContainer instanceof NamedProxy) {
       final NamedProxy named = (NamedProxy) mContainer;

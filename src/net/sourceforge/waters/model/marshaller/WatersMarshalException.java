@@ -54,7 +54,7 @@ public class WatersMarshalException extends WatersException {
   /**
    * Constructs a new exception with the specified detail message and cause.
    */
-  public WatersMarshalException(final String message, final Throwable cause) 
+  public WatersMarshalException(final String message, final Throwable cause)
   {
     super(message, cause);
   }
@@ -74,11 +74,10 @@ public class WatersMarshalException extends WatersException {
    */
   public WatersMarshalException(final File filename, final Throwable cause)
   {
-    super("Failed to write file '" + filename + "'" +
-          (cause == null ? "!" : cause));
+    super("Failed to write file '" + filename + "'!", cause);
   }
-  
-  
+
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
