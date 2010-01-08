@@ -182,10 +182,8 @@ public class SICPropertyVBuilder
     // states are implicitly marked)
     final List<EventProxy> newEvents = new ArrayList<EventProxy>();
     for (final EventProxy event : aut.getEvents()) {
-      if (event.getKind() == EventKind.PROPOSITION) {
-        if (event.getName() != EventDeclProxy.DEFAULT_MARKING_NAME) {
-          newEvents.add(event);
-        }
+      if (event.getKind() != EventKind.PROPOSITION) {
+        newEvents.add(event);
       }
     }
 
@@ -290,7 +288,6 @@ public class SICPropertyVBuilder
     }
     return newTransitions;
   }
-
 
   // #########################################################################
   // # Data Members

@@ -122,8 +122,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
       final File infilename = new File(indirname, name);
       final URI unmodifiedDESURI = infilename.toURI();
 
-      final File outdirname = new File(mOutputDirectory, subdir);
-      createEmptyDirectory(outdirname);
+      createEmptyDirectory(mOutputDirectory);
 
       final DocumentProxy doc = docManager.load(unmodifiedDESURI);
       final ProductDESProxy des;
@@ -143,17 +142,17 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
         final ProductDESProxy modifiedDES =
             mBuilder.createModelForAnswer(answer);
 
-        final File wmodfilename =
+       /* final File wmodfilename =
             new File(outdirname, answer.getName() + "_" + name);
         assertEquals("Unexpected location of output file!", wmodfilename,
-                     modifiedDES.getFileLocation());
+                     modifiedDES.getFileLocation());*/
 
         // parseGeneratedModules(name, answer.getName(), unmodifiedDESURI,
         // indirname, outdirname);
 
         final File outfilename =
-            new File(outdirname, answer.getName() + "_" + name);
-        mProductDESMarshaller.marshal(des, outfilename);
+            new File(mOutputDirectory, answer.getName() + "_" + name);
+        mProductDESMarshaller.marshal(modifiedDES, outfilename);
 
       }
 
