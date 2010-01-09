@@ -4,7 +4,7 @@
         <Integrity status="yes" dateStamp="Thu May 15 21:22:21 2008"/>
         <Properties controllable="yes" ctrl-date-stamp="Thu May 15 15:35:43 2008" non-blocking="yes" non-block-stamp="Thu May 15 15:39:37 2008"/>
     </Header>
-    <Subsystem name="High-Level Subsystem" level="0" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+    <Subsystem name="hisc7_high" level="0" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
         <Implements/>
         <Supervisor>
             <Des name="hsup1" location="hsup1.des"/>
@@ -15,8 +15,8 @@
             <Des name="hplnt2" location="hplnt1.des"/>
         </Plant>
         <Uses>
-            <InterfaceRef name="intf1" provider="low1"/>
-            <InterfaceRef name="intf2" provider="low2"/>
+            <InterfaceRef name="intf1" provider="hisc1_low1"/>
+            <InterfaceRef name="intf2" provider="hisc7_low2"/>
         </Uses>
     </Subsystem>
     <Interface name="intf1">
@@ -25,7 +25,7 @@
     <Interface name="intf2">
         <Des name="ides1" location="ides1.des"/>
     </Interface>
-    <Subsystem name="low1" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+    <Subsystem name="hisc1_low1" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
         <Implements>
             <InterfaceRef name="intf1"/>
         </Implements>
@@ -37,7 +37,7 @@
         </Plant>
         <Uses/>
     </Subsystem>
-    <Subsystem name="low2" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+    <Subsystem name="hisc7_low2" level="1" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
         <Implements>
             <InterfaceRef name="intf2"/>
         </Implements>

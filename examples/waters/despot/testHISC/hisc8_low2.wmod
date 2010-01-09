@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="hisc8_low2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a1">
+<ns2:AttributeMap>
+<ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a2:2">
+<ns2:AttributeMap>
+<ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r1">
+<ns2:AttributeMap>
+<ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+</ns2:AttributeMap>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="ides4">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="iX1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="iX2"/>
+</NodeList>
+<EdgeList>
+<Edge Target="iX2" Source="iX1">
+<LabelBlock>
+<SimpleIdentifier Name="r1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="iX1" Source="iX2">
+<LabelBlock>
+<SimpleIdentifier Name="a2:2"/>
+<SimpleIdentifier Name="a1"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+<ns2:AttributeMap>
+<ns2:Attribute Name="HISC:Interface"/>
+</ns2:AttributeMap>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="lsup7">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="lX1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="lX2"/>
+</NodeList>
+<EdgeList>
+<Edge Target="lX1" Source="lX2">
+<LabelBlock>
+<SimpleIdentifier Name="a2:2"/>
+<SimpleIdentifier Name="a1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="lX2" Source="lX1">
+<LabelBlock>
+<SimpleIdentifier Name="r1"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="lplnt7">
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="a2:2"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="lX1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="lX2"/>
+</NodeList>
+<EdgeList>
+<Edge Target="lX1" Source="lX2">
+<LabelBlock>
+<SimpleIdentifier Name="a1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="lX2" Source="lX1">
+<LabelBlock>
+<SimpleIdentifier Name="r1"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
