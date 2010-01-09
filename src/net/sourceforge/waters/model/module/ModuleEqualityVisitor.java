@@ -257,7 +257,8 @@ public class ModuleEqualityVisitor
       final GuardActionBlockProxy guardActionBlock2 =
         expected.getGuardActionBlock();
       if (!compareProxies(guardActionBlock1, guardActionBlock2)) {
-        return false;
+        return reportAttributeMismatch
+            ("guard action block", guardActionBlock1, guardActionBlock2);
       }
       if (isRespectingGeometry()) {
         final SplineGeometryProxy geometry1 = proxy.getGeometry();
@@ -440,7 +441,8 @@ public class ModuleEqualityVisitor
       final LabelBlockProxy blockedEvents1 = proxy.getBlockedEvents();
       final LabelBlockProxy blockedEvents2 = expected.getBlockedEvents();
       if (!compareProxies(blockedEvents1, blockedEvents2)) {
-        return false;
+        return reportAttributeMismatch
+            ("list of blocked events", blockedEvents1, blockedEvents2);
       }
       final Set<NodeProxy> nodes1 = proxy.getNodes();
       final Set<NodeProxy> nodes2 = expected.getNodes();

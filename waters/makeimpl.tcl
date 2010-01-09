@@ -2196,7 +2196,14 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
             } else {
               Java_WriteLn $stream $umap \
                   "${indent}if (!compareProxies(${varname}1, ${varname}2)) \{"
-              Java_WriteLn $stream $umap "${indent}  return false;"
+              if {[string compare $eqstatus "optional"] == 0} {
+                Java_WriteLn $stream $umap \
+                    "${indent}  return reportAttributeMismatch"
+                Java_WriteLn $stream $umap \
+                    "${indent}      (\"$name\", ${varname}1, ${varname}2);"
+              } else {
+                Java_WriteLn $stream $umap "${indent}  return false;"
+              }
               Java_WriteLn $stream $umap "${indent}\}"
               set needreset 1
             }
