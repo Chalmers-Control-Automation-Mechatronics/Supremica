@@ -101,74 +101,65 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
 
   void testBuild(final String subdir, final String name) throws Exception
   {
-    try {
-      final ModuleProxyFactory moduleFactory =
-          ModuleElementFactory.getInstance();
-      final ProductDESProxyFactory desFactory =
-          ProductDESElementFactory.getInstance();
-      final OperatorTable optable = CompilerOperatorTable.getInstance();
-      final ValidUnmarshaller importer =
-          new ValidUnmarshaller(moduleFactory, optable);
-      final JAXBModuleMarshaller moduleMarshaller =
-          new JAXBModuleMarshaller(moduleFactory, optable, false);
-      final JAXBProductDESMarshaller desMarshaller =
-          new JAXBProductDESMarshaller(desFactory);
-      final DocumentManager docManager = new DocumentManager();
-      docManager.registerUnmarshaller(desMarshaller);
-      docManager.registerUnmarshaller(moduleMarshaller);
-      docManager.registerUnmarshaller(importer);
+    final ModuleProxyFactory moduleFactory = ModuleElementFactory.getInstance();
+    final ProductDESProxyFactory desFactory =
+        ProductDESElementFactory.getInstance();
+    final OperatorTable optable = CompilerOperatorTable.getInstance();
+    final ValidUnmarshaller importer =
+        new ValidUnmarshaller(moduleFactory, optable);
+    final JAXBModuleMarshaller moduleMarshaller =
+        new JAXBModuleMarshaller(moduleFactory, optable, false);
+    final JAXBProductDESMarshaller desMarshaller =
+        new JAXBProductDESMarshaller(desFactory);
+    final DocumentManager docManager = new DocumentManager();
+    docManager.registerUnmarshaller(desMarshaller);
+    docManager.registerUnmarshaller(moduleMarshaller);
+    docManager.registerUnmarshaller(importer);
 
-      final File indirname = new File(mInputDirectory, subdir);
-      final File infilename = new File(indirname, name);
-      final URI unmodifiedDESURI = infilename.toURI();
+    final File indirname = new File(mInputDirectory, subdir);
+    final File infilename = new File(indirname, name);
+    final URI unmodifiedDESURI = infilename.toURI();
 
-      createEmptyDirectory(mOutputDirectory);
+    createEmptyDirectory(mOutputDirectory);
 
-      final DocumentProxy doc = docManager.load(unmodifiedDESURI);
-      final ProductDESProxy des;
-      if (doc instanceof ProductDESProxy) {
-        des = (ProductDESProxy) doc;
-      } else {
-        final ModuleProxy module = (ModuleProxy) doc;
-        final ModuleCompiler compiler =
-            new ModuleCompiler(docManager, desFactory, module);
-        des = compiler.compile();
-      }
-      mBuilder = new SICPropertyVBuilder(des, desFactory);
+    final DocumentProxy doc = docManager.load(unmodifiedDESURI);
+    final ProductDESProxy des;
+    if (doc instanceof ProductDESProxy) {
+      des = (ProductDESProxy) doc;
+    } else {
+      final ModuleProxy module = (ModuleProxy) doc;
+      final ModuleCompiler compiler =
+          new ModuleCompiler(docManager, desFactory, module);
+      des = compiler.compile();
+    }
+    mBuilder = new SICPropertyVBuilder(des, desFactory);
 
-      final List<EventProxy> answerEvents =
-          (List<EventProxy>) mBuilder.getAnswerEvents();
-      for (final EventProxy answer : answerEvents) {
-        final ProductDESProxy modifiedDES =
-            mBuilder.createModelForAnswer(answer);
-
-       /* final File wmodfilename =
-            new File(outdirname, answer.getName() + "_" + name);
-        assertEquals("Unexpected location of output file!", wmodfilename,
-                     modifiedDES.getFileLocation());*/
-
-        // parseGeneratedModules(name, answer.getName(), unmodifiedDESURI,
-        // indirname, outdirname);
-
-        final File outfilename =
-            new File(mOutputDirectory, answer.getName() + "_" + name);
-        mProductDESMarshaller.marshal(modifiedDES, outfilename);
-
-      }
+    final List<EventProxy> answerEvents =
+        (List<EventProxy>) mBuilder.getAnswerEvents();
+    for (final EventProxy answer : answerEvents) {
+      final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
 
       /*
-       * if (result) { System.out.println("nonconflicting"); } else {
-       * System.out.println("CONFLICTING");
-       * System.out.println("Counterexample:"); final ConflictTraceProxy
-       * counterex = builder.getCounterExample();
-       * System.out.println(counterex.toString()); }
+       * final File wmodfilename = new File(outdirname, answer.getName() + "_" +
+       * name); assertEquals("Unexpected location of output file!",
+       * wmodfilename, modifiedDES.getFileLocation());
        */
 
-    } catch (final Throwable exception) {
-      System.err.println("FATAL ERROR !!!");
-      System.err.println(exception.getClass().getName() + " caught in main()!");
-      exception.printStackTrace(System.err);
+      // parseGeneratedModules(name, answer.getName(), unmodifiedDESURI,
+      // indirname, outdirname);
+
+      final File outfilename =
+          new File(mOutputDirectory, answer.getName() + "_" + name);
+      mProductDESMarshaller.marshal(modifiedDES, outfilename);
+
     }
+
+    /*
+     * if (result) { System.out.println("nonconflicting"); } else {
+     * System.out.println("CONFLICTING"); System.out.println("Counterexample:");
+     * final ConflictTraceProxy counterex = builder.getCounterExample();
+     * System.out.println(counterex.toString()); }
+     */
   }
 
   /**

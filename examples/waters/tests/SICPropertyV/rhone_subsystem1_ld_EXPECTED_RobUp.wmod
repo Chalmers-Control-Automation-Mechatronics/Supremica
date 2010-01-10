@@ -8596,7 +8596,7 @@
             </ComponentList>
         </ForeachComponent>
         <SimpleComponent Kind="SPEC" Name="Test_aut">
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <EventList>
