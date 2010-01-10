@@ -94,6 +94,8 @@ public class SimulatorPanel
     final JScrollPane scroll = new JScrollPane(mEventsTree);
     if (EVENT_VERTICAL_SCROLLBAR_ALWAYS)
       scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    if (EVENT_HORIZONTAL_SCROLLBAR_NEVER)
+      scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     mEventsTree.addPane(scroll);
     final GridBagLayout layout = new GridBagLayout();
     final GridBagConstraints constraints = new GridBagConstraints();
@@ -137,5 +139,6 @@ public class SimulatorPanel
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-  private static final boolean EVENT_VERTICAL_SCROLLBAR_ALWAYS = true;
+  private static final boolean EVENT_VERTICAL_SCROLLBAR_ALWAYS = false;
+  private static final boolean EVENT_HORIZONTAL_SCROLLBAR_NEVER = true;
 }

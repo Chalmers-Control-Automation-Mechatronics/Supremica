@@ -1,5 +1,9 @@
 package net.sourceforge.waters.gui.actions;
 
+import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
 import org.supremica.gui.ide.IDE;
 
 public class AnalyzeControllabilityAction extends WatersAnalyzeAction
@@ -10,14 +14,25 @@ public class AnalyzeControllabilityAction extends WatersAnalyzeAction
     super(ide);
   }
 
-  protected String[] getAnalyzeMethod()
+  protected String getCheckName()
   {
-    return new String[]{"Controllability", "controllability error", WatersAnalyzeAction.ANALYZE_CONTROLLABLE};
+    return "Controllability";
   }
 
-  protected void updateEnabledStatus()
+  protected String getFailureDescription()
   {
-    // Do nothing
+    return "is not controllable";
+  }
+
+  protected ModelVerifier getModelVerifier(final ModelVerifierFactory factory,
+                                           final ProductDESProxyFactory desFactory)
+  {
+    return factory.createControllabilityChecker(desFactory);
+  }
+
+  protected String getSuccessDescription()
+  {
+    return "is controllable";
   }
 
   private static final long serialVersionUID = -1008097797553564719L;

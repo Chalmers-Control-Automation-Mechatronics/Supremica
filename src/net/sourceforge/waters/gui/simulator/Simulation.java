@@ -33,6 +33,7 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.des.LoopTrace;
 
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -282,6 +283,15 @@ public class Simulation implements ModelObserver, Observer
     return null;
   }
 
+  public void setTrace(final TraceProxy trace)
+  {
+    mTrace = trace;
+  }
+  public TraceProxy getTrace()
+  {
+    return mTrace;
+  }
+
   public void setState(final AutomatonProxy automaton, final StateProxy state)
   {
     if (!automaton.getStates().contains(state))
@@ -296,32 +306,40 @@ public class Simulation implements ModelObserver, Observer
 
   public void reset()
   {
-    mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
-    mEnabledEvents = new ArrayList<EventProxy>();
-    mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
-    if (mCompiledDES != null)
+    if (mTrace != null)
     {
-      for (final AutomatonProxy automaton : mCompiledDES.getAutomata())
-        for (final StateProxy state : automaton.getStates())
-          if (state.isInitial())
-            mAllAutomatons.put(automaton, state);
-      findEventClassification();
+      run(mTrace);
     }
-    mPreviousEvents = new ArrayList<EventProxy>();
-    mEnabledLastStep = new ArrayList<AutomatonProxy>();
-    mPreviousAutomatonStates = new ArrayList<HashMap<AutomatonProxy, StateProxy>>();
-    mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
-    mPreviousTransitionHistory = new ArrayList<HashMap<AutomatonProxy, TransitionProxy>>();
-    currentTime = -1;
-    updateControllability();
-    final SimulationChangeEvent simEvent = new SimulationChangeEvent
-      (this, SimulationChangeEvent.STATE_CHANGED);
-    fireSimulationChangeEvent(simEvent);
+    else
+    {
+      mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
+      mEnabledEvents = new ArrayList<EventProxy>();
+      mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
+      if (mCompiledDES != null)
+      {
+        for (final AutomatonProxy automaton : mCompiledDES.getAutomata())
+          for (final StateProxy state : automaton.getStates())
+            if (state.isInitial())
+              mAllAutomatons.put(automaton, state);
+        findEventClassification();
+      }
+      mPreviousEvents = new ArrayList<EventProxy>();
+      mEnabledLastStep = new ArrayList<AutomatonProxy>();
+      mPreviousAutomatonStates = new ArrayList<HashMap<AutomatonProxy, StateProxy>>();
+      mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
+      mPreviousTransitionHistory = new ArrayList<HashMap<AutomatonProxy, TransitionProxy>>();
+      currentTime = -1;
+      updateControllability();
+      final SimulationChangeEvent simEvent = new SimulationChangeEvent
+        (this, SimulationChangeEvent.STATE_CHANGED);
+      fireSimulationChangeEvent(simEvent);
+    }
   }
 
 
   public void run(final TraceProxy trace)
   {
+    mTrace = null;
     reset();
     for (int looper = 0; looper < trace.getEvents().size() - 1; looper ++)
     {
@@ -332,6 +350,7 @@ public class Simulation implements ModelObserver, Observer
         // Do nothing
       }
     }
+    mTrace = trace;
   }
 
   @SuppressWarnings("unchecked")
@@ -408,6 +427,17 @@ public class Simulation implements ModelObserver, Observer
   }
   public void replayStep()
   {
+    if (mTrace != null)
+    {
+      if (mTrace instanceof LoopTrace)
+      {
+        if (currentTime == mPreviousEvents.size() - 1)
+        {
+          while (currentTime != ((LoopTrace)mTrace).getLoopIndex())
+            stepBack();
+        }
+      }
+    }
     moveSafely(true);
   }
 
@@ -693,6 +723,7 @@ public class Simulation implements ModelObserver, Observer
   private final ArrayList<SimulationObserver> mSimulationObservers;
   private ProductDESProxy mCompiledDES;
   private final ModuleContainer mContainer;
+  private TraceProxy mTrace;
 
 
 }

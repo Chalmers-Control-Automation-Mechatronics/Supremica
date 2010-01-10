@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -38,8 +39,8 @@ public abstract class WatersAnalyzeAction
     super(ide);
     ide.attach(this);
     this.setEnabled(true);
-    putValue(Action.NAME, getAnalyzeMethod()[0] + " check");
-    putValue(Action.SHORT_DESCRIPTION, "Check for " + getAnalyzeMethod()[0] + " issues");
+    putValue(Action.NAME, getCheckName() + " check");
+    putValue(Action.SHORT_DESCRIPTION, "Check for " + getCheckName() + " issues");
   }
 
   // ###################################################################
@@ -68,18 +69,28 @@ public abstract class WatersAnalyzeAction
   // ##############################################################################
   // # Abstract Methods
 
-  protected abstract void updateEnabledStatus();
-  /**
-   * @return Returns 3 Strings, a capitalised description, a lower-case description, and either
-   * ANALYZE_CONFLICT, ANALYZE_CONTROLLABLE, or ANALYZE_CONTROL_LOOP
-   */
-  protected abstract String[] getAnalyzeMethod();
+  protected void updateEnabledStatus()
+  {
+    setEnabled(true);
+  }
+
+  protected abstract String getCheckName();
+  protected abstract String getFailureDescription();
+  protected abstract String getSuccessDescription();
+  protected abstract ModelVerifier getModelVerifier(ModelVerifierFactory factory, ProductDESProxyFactory desFactory);
 
   public void actionPerformed(final ActionEvent e)
   {
     updateProductDES();
-    final AnalyzerDialog dialog = new AnalyzerDialog(getAnalyzeMethod());
-    dialog.setVisible(true);
+    if (des != null)
+    {
+      final AnalyzerDialog dialog = new AnalyzerDialog();
+      dialog.setVisible(true);
+    }
+    else
+    {
+      getIDE().error("ERROR: DES was not able to be successfully compiled");
+    }
   }
 
   // ##############################################################################
@@ -90,13 +101,15 @@ public abstract class WatersAnalyzeAction
     // #######################################################################
     // # Constructor
 
-    public AnalyzerDialog(final String[] dialogInfo)
+    public AnalyzerDialog()
     {
-      this.setTitle(dialogInfo[0] + " Check");
-      info = dialogInfo;
-      final JPanel panel = new JPanel();
-      final JButton cancelButton = new JButton("Abort");
-      run();
+      this.setTitle(getCheckName() + " Check");
+      majorPanel = new JPanel();
+      topPanel = new JPanel();
+      bottomPanel = new JPanel();
+      informationLabel = new JLabel();
+      informationLabel.setText(getCheckName() + " Check is running...");
+      cancelButton = new JButton("Abort");
       cancelButton.addActionListener(new ActionListener(){
         public void actionPerformed(final ActionEvent e)
         {
@@ -104,10 +117,53 @@ public abstract class WatersAnalyzeAction
           AnalyzerDialog.this.dispose();
         }
       });
-      panel.add(cancelButton, BorderLayout.CENTER);
-      this.add(panel);
+      bottomPanel.add(cancelButton, BorderLayout.WEST);
+      topPanel.add(informationLabel, BorderLayout.CENTER);
+      majorPanel.add(topPanel, BorderLayout.CENTER);
+      majorPanel.add(bottomPanel, BorderLayout.SOUTH);
+      this.add(majorPanel);
       this.setSize(DEFAULT_DIALOG_SIZE);
       this.setLocation(DEFAULT_DIALOG_LOCATION);
+      run();
+    }
+
+    public void succeed()
+    {
+      informationLabel.setText("Model " + " " + getSuccessDescription());
+      cancelButton.setText("OK");
+      cancelButton.removeActionListener(cancelButton.getActionListeners()[0]);
+      cancelButton.addActionListener(new ActionListener(){
+        public void actionPerformed(final ActionEvent e)
+        {
+          AnalyzerDialog.this.dispose();
+        }
+      });
+      this.validate();
+    }
+
+    public void fail()
+    {
+      informationLabel.setText("Model " + " " + getFailureDescription());
+      cancelButton.setText("OK");
+      cancelButton.removeActionListener(cancelButton.getActionListeners()[0]);
+      traceButton = new JButton("Show Trace");
+      cancelButton.addActionListener(new ActionListener(){
+        public void actionPerformed(final ActionEvent e)
+        {
+          AnalyzerDialog.this.dispose();
+        }
+      });
+      traceButton.addActionListener(new ActionListener(){
+        public void actionPerformed(final ActionEvent e)
+        {
+          final TraceProxy counterexample = verifier.getCounterExample();
+          ((ModuleContainer)getIDE().getActiveDocumentContainer()).getTabPane().setSelectedIndex(1);
+          ((ModuleContainer)getIDE().getActiveDocumentContainer()).getSimulatorPanel().switchToTraceMode(counterexample);
+          AnalyzerDialog.this.dispose();
+        }
+      });
+      bottomPanel.add(traceButton, BorderLayout.EAST);
+      this.validate();
     }
 
     private void run()
@@ -126,12 +182,7 @@ public abstract class WatersAnalyzeAction
       {
         final ProductDESProxyFactory  desfactory = ProductDESElementFactory.getInstance();
         final ModelVerifierFactory vfactory = MonolithicModelVerifierFactory.getInstance();
-        if (info[2] == WatersAnalyzeAction.ANALYZE_CONFLICT)
-          verifier = vfactory.createConflictChecker(desfactory);
-        if (info[2] == WatersAnalyzeAction.ANALYZE_CONTROL_LOOP)
-          verifier = vfactory.createControlLoopChecker(desfactory);
-        if (info[2] == WatersAnalyzeAction.ANALYZE_CONTROLLABLE)
-          verifier = vfactory.createControllabilityChecker(desfactory);
+        verifier = getModelVerifier(vfactory, desfactory);
       }
 
         public void run()
@@ -154,20 +205,11 @@ public abstract class WatersAnalyzeAction
           {
             final boolean result = verifier.isSatisfied();
             if (result) {
-              JOptionPane.showMessageDialog(getIDE(), "No " + info[1] + "s could be detected", "Success!", JOptionPane.INFORMATION_MESSAGE);
+              SwingUtilities.invokeLater(new Runnable(){public void run(){succeed();}});
             } else {
-              final TraceProxy counterexample = verifier.getCounterExample();
-              // This code will soon load the trade, and switch the screen to the trace menu, once that feature is implemented
-              if (JOptionPane.showConfirmDialog(getIDE(),
-                 "ERROR: " + info[0] + " detected. Do you wish to view the trace?",
-                 "Failure", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-              {
-                ((ModuleContainer)getIDE().getActiveDocumentContainer()).getTabPane().setSelectedIndex(1);
-                ((ModuleContainer)getIDE().getActiveDocumentContainer()).getSimulatorPanel().switchToTraceMode(counterexample);
-              }
+              SwingUtilities.invokeLater(new Runnable(){public void run(){fail();}});
             }
           }
-          SwingUtilities.invokeLater(new Runnable(){public void run(){AnalyzerDialog.this.dispose();}});
         }
 
         public boolean abort()
@@ -183,14 +225,19 @@ public abstract class WatersAnalyzeAction
           }
         }
 
-        ModelVerifier verifier;
     }
 
     // ######################################################################
     // # Data Members
 
     AnalyzerThread runner;
-    private final String[] info;
+    ModelVerifier verifier;
+    JPanel topPanel;
+    JPanel bottomPanel;
+    JPanel majorPanel;
+    JButton cancelButton;
+    JButton traceButton;
+    JLabel informationLabel;
 
     // #####################################################################
     // # Class Constants

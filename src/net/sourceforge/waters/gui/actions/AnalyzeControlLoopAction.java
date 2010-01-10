@@ -1,6 +1,10 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.gui.actions.WatersAnalyzeAction;
+import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
 import org.supremica.gui.ide.IDE;
 
 
@@ -11,14 +15,25 @@ public class AnalyzeControlLoopAction extends WatersAnalyzeAction
     super(ide);
   }
 
-  protected String[] getAnalyzeMethod()
+  protected String getCheckName()
   {
-    return new String[]{"Control Loop", "control loop error", WatersAnalyzeAction.ANALYZE_CONTROL_LOOP};
+    return "Control Loop";
   }
 
-  protected void updateEnabledStatus()
+  protected String getFailureDescription()
   {
-    // Do nothing
+    return "has a control loop";
+  }
+
+  protected ModelVerifier getModelVerifier(final ModelVerifierFactory factory,
+                                           final ProductDESProxyFactory desFactory)
+  {
+    return factory.createControlLoopChecker(desFactory);
+  }
+
+  protected String getSuccessDescription()
+  {
+    return "is control loop free";
   }
 
   private static final long serialVersionUID = 2167516363996006935L;
