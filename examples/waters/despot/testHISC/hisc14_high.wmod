@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="hisc14_high" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="a1">
+<ns2:AttributeMap>
+<ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="a2">
+<ns2:AttributeMap>
+<ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="a2:10">
+<ns2:AttributeMap>
+<ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="a3:9">
+<ns2:AttributeMap>
+<ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="ev1"/>
+<EventDecl Kind="CONTROLLABLE" Name="ev2"/>
+<EventDecl Kind="CONTROLLABLE" Name="ld1">
+<ns2:AttributeMap>
+<ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="ld2:9">
+<ns2:AttributeMap>
+<ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="r1">
+<ns2:AttributeMap>
+<ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="r2">
+<ns2:AttributeMap>
+<ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="r3">
+<ns2:AttributeMap>
+<ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+</ns2:AttributeMap>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="hsup1">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="hX1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="hX2"/>
+<SimpleNode Name="hX3"/>
+<SimpleNode Name="hX4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="hX1" Target="hX4">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX1" Target="hX2">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX2" Target="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="ld1"/>
+<SimpleIdentifier Name="a2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX4" Target="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX4" Target="hX2">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX3" Target="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="ev1"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX3" Target="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="ev2"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="hsup2">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="hX1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="hX2"/>
+<SimpleNode Name="hX3"/>
+<SimpleNode Name="hX4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="hX2" Target="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="ld1"/>
+<SimpleIdentifier Name="a2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX1" Target="hX2">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX1" Target="hX4">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX3" Target="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="ev2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX3" Target="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="ev1"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX4" Target="hX2">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX4" Target="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="hplnt1">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="hX1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="hX2"/>
+<SimpleNode Name="hX3"/>
+<SimpleNode Name="hX4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="hX1" Target="hX4">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX1" Target="hX2">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX2" Target="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="ld1"/>
+<SimpleIdentifier Name="a2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX4" Target="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX4" Target="hX2">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX3" Target="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="ev1"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX3" Target="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="ev2"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="hplnt2">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="hX1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="hX2"/>
+<SimpleNode Name="hX3"/>
+<SimpleNode Name="hX4">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="hX1" Target="hX4">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX1" Target="hX2">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX2" Target="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="ld1"/>
+<SimpleIdentifier Name="a2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX4" Target="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX4" Target="hX2">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX3" Target="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="ev1"/>
+</LabelBlock>
+</Edge>
+<Edge Source="hX3" Target="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="ev2"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<Instance ModuleName="hisc14_low2" Name="hisc14_low2">
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+<ParameterBinding Name="a1">
+<SimpleIdentifier Name="a1"/>
+</ParameterBinding>
+<ParameterBinding Name="a2:10">
+<SimpleIdentifier Name="a2:10"/>
+</ParameterBinding>
+<ParameterBinding Name="r1">
+<SimpleIdentifier Name="r1"/>
+</ParameterBinding>
+</Instance>
+<Instance ModuleName="hisc14_low1" Name="hisc14_low1">
+<ParameterBinding Name=":accepting">
+<SimpleIdentifier Name=":accepting"/>
+</ParameterBinding>
+<ParameterBinding Name="a2">
+<SimpleIdentifier Name="a2"/>
+</ParameterBinding>
+<ParameterBinding Name="a3:9">
+<SimpleIdentifier Name="a3:9"/>
+</ParameterBinding>
+<ParameterBinding Name="ld1">
+<SimpleIdentifier Name="ld1"/>
+</ParameterBinding>
+<ParameterBinding Name="ld2:9">
+<SimpleIdentifier Name="ld2:9"/>
+</ParameterBinding>
+<ParameterBinding Name="r2">
+<SimpleIdentifier Name="r2"/>
+</ParameterBinding>
+<ParameterBinding Name="r3">
+<SimpleIdentifier Name="r3"/>
+</ParameterBinding>
+</Instance>
+</ComponentList>
+</Module>
