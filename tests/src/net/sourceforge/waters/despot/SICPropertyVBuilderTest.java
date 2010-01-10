@@ -59,7 +59,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   // # tests the model built compared to a manually created model
   public void testBuild_parManEg_I_mfb_lowlevel() throws Exception
   {
-    testBuild("SICPropertyV", "parManEg_I_mfb_lowlevel.wmod");
+    testBuild("SICPropertyV", "parManEg_I_mfb_lowlevel");
 
   }
 
@@ -117,7 +117,8 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     docManager.registerUnmarshaller(importer);
 
     final File indirname = new File(mInputDirectory, subdir);
-    final File infilename = new File(indirname, name);
+    final String wmodext = ".wmod";
+    final File infilename = new File(indirname, name + wmodext);
     final URI unmodifiedDESURI = infilename.toURI();
 
     createEmptyDirectory(mOutputDirectory);
@@ -149,7 +150,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
       // indirname, outdirname);
 
       final File outfilename =
-          new File(mOutputDirectory, answer.getName() + "_" + name);
+          new File(mOutputDirectory, name + "_" + answer.getName() + wmodext);
       mProductDESMarshaller.marshal(modifiedDES, outfilename);
 
     }
