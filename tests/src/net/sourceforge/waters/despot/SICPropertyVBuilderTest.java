@@ -13,11 +13,13 @@ import java.io.File;
 import java.net.URI;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -31,6 +33,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class SICPropertyVBuilderTest extends AbstractWatersTest
@@ -161,14 +164,38 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
 
       parseGeneratedProductDES(name, answer.getName(), outfilename, des);
       ProductDESIntegrityChecker.getInstance().check(modifiedDES);
+
+      EventProxy defaultMark = null;
+      EventProxy preconditionMark = null;
+      for (final EventProxy event : modifiedDES.getEvents()) {
+        if (event.getKind().equals(EventKind.PROPOSITION)) {
+          if (event.getName().equals(":alpha")) {
+            preconditionMark = event;
+          } else if (event.getName().equals(":accepting")) {
+            defaultMark = event;
+          }
+        }
+        if (defaultMark != null && preconditionMark != null) {
+          break;
+        }
+      }
+      final MonolithicConflictChecker conflictChecker =
+          new MonolithicConflictChecker(modifiedDES, defaultMark,
+              preconditionMark, desFactory);
+      final boolean result = conflictChecker.run();
+
+      if (result) {
+        System.out.println("nonconflicting");
+      } else {
+        System.out.println("CONFLICTING");
+        System.out.println("Counterexample:");
+        final ConflictTraceProxy counterex =
+            conflictChecker.getCounterExample();
+        System.out.println(counterex.toString());
+      }
+
     }
 
-    /*
-     * if (result) { System.out.println("nonconflicting"); } else {
-     * System.out.println("CONFLICTING"); System.out.println("Counterexample:");
-     * final ConflictTraceProxy counterex = builder.getCounterExample();
-     * System.out.println(counterex.toString()); }
-     */
   }
 
   /**

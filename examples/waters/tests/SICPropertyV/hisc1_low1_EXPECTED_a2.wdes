@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="hisc1_low1" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <ns2:EventList>
+        <ns2:Event Kind="PROPOSITION" Name=":accepting"/>
+        <ns2:Event Kind="PROPOSITION" Name=":alpha"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="a2">
+            <AttributeMap>
+                <Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </AttributeMap>
+        </ns2:Event>
+        <ns2:Event Kind="CONTROLLABLE" Name="ld1">
+            <AttributeMap>
+                <Attribute Value="LOWDATA" Name="HISC:EventType"/>
+            </AttributeMap>
+        </ns2:Event>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="lev1"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="lev2"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="r2">
+            <AttributeMap>
+                <Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </AttributeMap>
+        </ns2:Event>
+        <ns2:Event Kind="CONTROLLABLE" Name="r3">
+            <AttributeMap>
+                <Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </AttributeMap>
+        </ns2:Event>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PROPERTY" Name="TestAut">
+            <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
+                <ns2:EventRef Name=":alpha"/>
+                <ns2:EventRef Name="a2"/>
+                <ns2:EventRef Name="ld1"/>
+                <ns2:EventRef Name="lev1"/>
+                <ns2:EventRef Name="lev2"/>
+                <ns2:EventRef Name="r2"/>
+                <ns2:EventRef Name="r3"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="T1">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="T2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":alpha"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="T3"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Target="T1" Source="T1" Event="a2"/>
+                <ns2:Transition Target="T1" Source="T1" Event="ld1"/>
+                <ns2:Transition Target="T1" Source="T1" Event="lev1"/>
+                <ns2:Transition Target="T1" Source="T1" Event="lev2"/>
+                <ns2:Transition Target="T1" Source="T1" Event="r2"/>
+                <ns2:Transition Target="T2" Source="T1" Event="r2"/>
+                <ns2:Transition Target="T1" Source="T1" Event="r3"/>
+                <ns2:Transition Target="T2" Source="T1" Event="r3"/>
+                <ns2:Transition Target="T1" Source="T2" Event="a2"/>
+                <ns2:Transition Target="T3" Source="T2" Event="ld1"/>
+                <ns2:Transition Target="T3" Source="T2" Event="lev1"/>
+                <ns2:Transition Target="T3" Source="T2" Event="lev2"/>
+                <ns2:Transition Target="T1" Source="T3" Event="a2"/>
+                <ns2:Transition Target="T3" Source="T3" Event="ld1"/>
+                <ns2:Transition Target="T3" Source="T3" Event="lev1"/>
+                <ns2:Transition Target="T3" Source="T3" Event="lev2"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="SPEC" Name="ides3">
+            <ns2:EventRefList>
+                <ns2:EventRef Name=":alpha"/>
+                <ns2:EventRef Name="a2"/>
+                <ns2:EventRef Name="ld1"/>
+                <ns2:EventRef Name="r2"/>
+                <ns2:EventRef Name="r3"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="iY1"/>
+                <ns2:State Name="iY2">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":alpha"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Target="iY2" Source="iY1" Event="r2"/>
+                <ns2:Transition Target="iY1" Source="iY1" Event="r3"/>
+                <ns2:Transition Target="iY1" Source="iY2" Event="a2"/>
+                <ns2:Transition Target="iY1" Source="iY2" Event="ld1"/>
+            </ns2:TransitionList>
+            <AttributeMap>
+                <Attribute Name="HISC:Interface"/>
+            </AttributeMap>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="lplnt5">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a2"/>
+                <ns2:EventRef Name="ld1"/>
+                <ns2:EventRef Name="lev1"/>
+                <ns2:EventRef Name="lev2"/>
+                <ns2:EventRef Name="r2"/>
+                <ns2:EventRef Name="r3"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="hX1"/>
+                <ns2:State Name="hX2"/>
+                <ns2:State Name="hX3"/>
+                <ns2:State Name="hX4"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Target="hX2" Source="hX1" Event="r2"/>
+                <ns2:Transition Target="hX4" Source="hX1" Event="r3"/>
+                <ns2:Transition Target="hX3" Source="hX2" Event="lev1"/>
+                <ns2:Transition Target="hX1" Source="hX3" Event="a2"/>
+                <ns2:Transition Target="hX1" Source="hX3" Event="ld1"/>
+                <ns2:Transition Target="hX3" Source="hX3" Event="lev2"/>
+                <ns2:Transition Target="hX2" Source="hX4" Event="r2"/>
+                <ns2:Transition Target="hX1" Source="hX4" Event="r3"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="SPEC" Name="lsup4">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a2"/>
+                <ns2:EventRef Name="ld1"/>
+                <ns2:EventRef Name="lev1"/>
+                <ns2:EventRef Name="lev2"/>
+                <ns2:EventRef Name="r2"/>
+                <ns2:EventRef Name="r3"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="hX1"/>
+                <ns2:State Name="hX2"/>
+                <ns2:State Name="hX3"/>
+                <ns2:State Name="hX4"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Target="hX2" Source="hX1" Event="r2"/>
+                <ns2:Transition Target="hX4" Source="hX1" Event="r3"/>
+                <ns2:Transition Target="hX3" Source="hX2" Event="lev1"/>
+                <ns2:Transition Target="hX1" Source="hX3" Event="a2"/>
+                <ns2:Transition Target="hX1" Source="hX3" Event="ld1"/>
+                <ns2:Transition Target="hX3" Source="hX3" Event="lev2"/>
+                <ns2:Transition Target="hX2" Source="hX4" Event="r2"/>
+                <ns2:Transition Target="hX1" Source="hX4" Event="r3"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>
