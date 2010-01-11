@@ -165,7 +165,7 @@ class AutomataTableModel
         else
           row.add(ModuleContext.getComponentKindIcon(aut.getKind()));
         row.add(aut.getName());
-        row.add(ModuleContext.getBooleanIcon(getSimulation().changedLastStep(aut)));
+        row.add(getSimulation().getAutomatonActivityIcon(aut));
         final StateProxy currentState = getSimulation().getCurrentStates().get(aut);
         row.add(getSimulation().getMarkingIcon(currentState, aut));
         row.add(getSimulation().getCurrentStates().get(aut).getName());
@@ -190,7 +190,7 @@ class AutomataTableModel
         else
           row.add(ModuleContext.getComponentKindIcon(aut.getKind()));
         row.add(aut.getName());
-        row.add(ModuleContext.getBooleanIcon(getSimulation().changedLastStep(aut)));
+        row.add(getSimulation().getAutomatonActivityIcon(aut));
         final StateProxy currentState = getSimulation().getCurrentStates().get(aut);
         row.add(getSimulation().getMarkingIcon(currentState, aut));
         row.add(getSimulation().getCurrentStates().get(aut).getName());

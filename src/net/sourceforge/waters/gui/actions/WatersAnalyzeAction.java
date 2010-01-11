@@ -1,8 +1,6 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -17,6 +15,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory;
@@ -118,10 +117,9 @@ public abstract class WatersAnalyzeAction
       topPanel = new JPanel();
       bottomPanel = new JPanel();
       informationLabel = new WrapperLabel(this);
-      informationLabel.setBackground(Color.WHITE);
-      informationLabel.setOpaque(true);
-      informationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+      //informationLabel = new JLabel();
       informationLabel.setText(getCheckName() + " Check is running...");
+      informationLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cancelButton = new JButton("Abort");
       cancelButton.addActionListener(new ActionListener(){
         public void actionPerformed(final ActionEvent e)
@@ -192,7 +190,8 @@ public abstract class WatersAnalyzeAction
 
     private String HTMLinize(final String raw)
     {
-      return "<html><P STYLE=\"word-wrap:break-word;width:100%;left:0\">" + raw + "</p></html>";
+      return "<html><P STYLE=\"text-align:center;word-wrap:break-word;width:100%;left:0\">" + raw + "</p></html>";
+      //return raw;
     }
 
     // ######################################################################
@@ -319,6 +318,7 @@ public abstract class WatersAnalyzeAction
     JButton cancelButton;
     JButton traceButton;
     WrapperLabel informationLabel;
+    //JLabel informationLabel;
 
     // #####################################################################
     // # Class Constants

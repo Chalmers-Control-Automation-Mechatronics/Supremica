@@ -123,9 +123,10 @@ public class Simulation implements ModelObserver, Observer
       return IconLoader.ICON_TICK;
     else if (mInvalidEvents.containsKey(event))
     {
-      if (testForControlability() != null)
+      updateControllability();
+      if (mBlockingEvents != null)
       {
-        for (final Pair<EventProxy, AutomatonProxy> blockingEvent : testForControlability())
+        for (final Pair<EventProxy, AutomatonProxy> blockingEvent : mBlockingEvents)
         {
           if (blockingEvent.getFirst() == event)
             return IconLoader.ICON_WARNING;
@@ -137,6 +138,23 @@ public class Simulation implements ModelObserver, Observer
     {
       throw new UnsupportedOperationException("ERROR: Unknown event status");
     }
+  }
+
+  public ImageIcon getAutomatonActivityIcon(final AutomatonProxy aut)
+  {
+    updateControllability();
+    if (mBlockingEvents != null && aut.getKind() == ComponentKind.SPEC)
+    {
+      for (final Pair<EventProxy, AutomatonProxy> blockingEvent : mBlockingEvents)
+      {
+        if (blockingEvent.getSecond() == aut)
+            return IconLoader.ICON_WARNING;
+      }
+    }
+    if (mEnabledLastStep.contains(aut))
+      return IconLoader.ICON_TICK;
+    else
+      return IconLoader.ICON_CROSS;
   }
 
   /**
@@ -360,16 +378,6 @@ public class Simulation implements ModelObserver, Observer
     {
       return;
     }
-    if (testForControlability() != null)
-    {
-      final ArrayList<Pair<EventProxy, AutomatonProxy>> invalidEvent = testForControlability();
-      for (final Pair<EventProxy, AutomatonProxy> invalidPair : invalidEvent)
-      {
-        mModuleContainer.getIDE().error(": The event " + invalidPair.getFirst().getName()
-            + " is not controllable, inside the automaton " + invalidPair.getSecond().getName()
-            + " Current state is: " + mAllAutomatons.get(invalidPair.getSecond()).getName());
-      }
-    }
     if (isInInvalidEvent(event))
     {
       String errorMessage = "ERROR: The event " + event.getName() +
@@ -577,9 +585,32 @@ public class Simulation implements ModelObserver, Observer
         }
       }
     }
+    updateControllability();
+    if (mBlockingEvents != null)
+    {
+      final ArrayList<Pair<EventProxy, AutomatonProxy>> invalidEvent = testForControlability();
+      for (final Pair<EventProxy, AutomatonProxy> invalidPair : invalidEvent)
+      {
+        mModuleContainer.getIDE().error(": The event " + invalidPair.getFirst().getName()
+            + " is not controllable, inside the automaton " + invalidPair.getSecond().getName()
+            + " Current state is: " + mAllAutomatons.get(invalidPair.getSecond()).getName());
+      }
+    }
     if (mEnabledEvents.size() == 0)
     {
-      mContainer.getIDE().error(": Deadlock has occured");
+      for (final StateProxy state : mAllAutomatons.values())
+      {
+        for (final EventProxy proposition : state.getPropositions())
+        {
+          if (proposition.getName().compareTo(":accepting") != 0)
+          {
+            mContainer.getIDE().error(": Deadlock has occured");
+            return;
+          }
+          else
+            System.out.println("DEBUG: Proposition name is : " + proposition.getName());
+        }
+      }
     }
   }
 
