@@ -52,6 +52,11 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testBuild("SICPropertyV", "hisc0_low2");
   }
 
+  public void testBuild_hisc1_low1() throws Exception
+  {
+    testBuild("SICPropertyV", "hisc1_low1");
+  }
+
   /*
    * public void testBuild_parManEg_I_mfb_lowlevel() throws Exception {
    * testBuild("SICPropertyV", "parManEg_I_mfb_lowlevel"); }
@@ -149,8 +154,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
             new ModuleCompiler(docManager, desFactory, module);
         des = compiler.compile();
       }
-      // final ProductDESProxy expectedDES
-      // =mProductDESMarshaller.unmarshal(expectfilename.toURI());
+
       final File expectDESfilename =
           new File(indirname, name + "_EXPECTED_" + answer.getName() + wdesext);
       mProductDESMarshaller.marshal(des, expectDESfilename);
@@ -222,9 +226,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   // #########################################################################
   // # Data Members
 
-  // location of the tests
   private File mInputDirectory;
-
   private File mOutputDirectory;
   private ProductDESProxyFactory mProductDESFactory;
   private JAXBModuleMarshaller mModuleMarshaller;
