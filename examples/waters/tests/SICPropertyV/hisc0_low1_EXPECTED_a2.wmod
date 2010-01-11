@@ -149,8 +149,8 @@
 </Graph>
 </SimpleComponent>
 
-<SimpleComponent Kind="SPEC" Name="TestAut">
-<Graph>
+<SimpleComponent Kind="PROPERTY" Name="TestAut">
+<Graph Deterministic="false">
 <NodeList>
 <SimpleNode Initial="true" Name="T1">
 <EventList>

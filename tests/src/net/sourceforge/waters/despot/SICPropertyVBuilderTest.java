@@ -25,7 +25,6 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
-import net.sourceforge.waters.model.module.ModuleIdentifierChecker;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -65,10 +64,10 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testBuild("SICPropertyV", "hisc0_low2");
   }
 
-  public void testBuild_parManEg_I_mfb_lowlevel() throws Exception
-  {
-    testBuild("SICPropertyV", "parManEg_I_mfb_lowlevel");
-  }
+  /*
+   * public void testBuild_parManEg_I_mfb_lowlevel() throws Exception {
+   * testBuild("SICPropertyV", "parManEg_I_mfb_lowlevel"); }
+   */
 
   // #########################################################################
   // # Exception Throwing Test Cases
@@ -125,13 +124,12 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
 
     final File indirname = new File(mInputDirectory, subdir);
     final String wmodext = ".wmod";
+    final String wdesext = ".wdes";
     final File infilename = new File(indirname, name + wmodext);
     final URI unmodifiedDESURI = infilename.toURI();
 
-    createEmptyDirectory(mOutputDirectory);
-
-    final DocumentProxy doc = docManager.load(unmodifiedDESURI);
-    final ProductDESProxy des;
+    DocumentProxy doc = docManager.load(unmodifiedDESURI);
+    ProductDESProxy des;
     if (doc instanceof ProductDESProxy) {
       des = (ProductDESProxy) doc;
     } else {
@@ -147,18 +145,28 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     for (final EventProxy answer : answerEvents) {
       final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
 
-      /*
-       * final File wmodfilename = new File(outdirname, answer.getName() + "_" +
-       * name); assertEquals("Unexpected location of output file!",
-       * wmodfilename, modifiedDES.getFileLocation());
-       */
-
       final File outfilename =
-          new File(mOutputDirectory, name + "_" + answer.getName() + wmodext);
+          new File(mOutputDirectory, name + "_" + answer.getName() + wdesext);
       mProductDESMarshaller.marshal(modifiedDES, outfilename);
+
       final File expectfilename =
           new File(indirname, name + "_EXPECTED_" + answer.getName() + wmodext);
-      parseGeneratedModules(name, answer.getName(), expectfilename, outfilename);
+      final URI expecteddesURI = expectfilename.toURI();
+      doc = docManager.load(expecteddesURI);
+      if (doc instanceof ProductDESProxy) {
+        des = (ProductDESProxy) doc;
+      } else {
+        final ModuleProxy module = (ModuleProxy) doc;
+        final ModuleCompiler compiler =
+            new ModuleCompiler(docManager, desFactory, module);
+        des = compiler.compile();
+      }
+      // final ProductDESProxy expectedDES
+      // =mProductDESMarshaller.unmarshal(expectfilename.toURI());
+      final File expectDESfilename =
+          new File(indirname, name + "_EXPECTED_" + answer.getName() + wdesext);
+      mProductDESMarshaller.marshal(des, expectDESfilename);
+      parseGeneratedProductDES(name, answer.getName(), outfilename, des);
     }
 
     /*
@@ -172,59 +180,18 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   /**
    * Checks whether the built module matches the expected output.
    */
-  private void parseGeneratedModules(final String testname,
-                                     final String answername,
-                                     final File expectfile,
-                                     final File outfilename) throws Exception
+  private void parseGeneratedProductDES(final String testname,
+                                        final String answername,
+                                        final File outfilename,
+                                        final ProductDESProxy expectedProductDES)
+      throws Exception
   {
-    /*
-     * final URL url = unmodifiedDESURI.toURL(); /* final InputStream stream =
-     * url.openStream();
-     *
-     * final Document doc; try { final DocumentBuilder builder =
-     * DocumentBuilderFactory.newInstance().newDocumentBuilder(); doc =
-     * builder.parse(stream); } finally { stream.close(); } /* final Element
-     * root = doc.getDocumentElement(); final String ext =
-     * mModuleMarshaller.getDefaultExtension();
-     *
-     * for (Node node = root.getFirstChild(); node != null; node =
-     * node.getNextSibling()) { if (node instanceof Element) { final Element
-     * element = (Element) node; if (element.getTagName().equals("Subsystem")) {
-     * final String sysname = element.getAttribute("name"); final String extname
-     * = sysname + ext;
-     */
     final URI outuri = outfilename.toURI();
-    final ModuleProxy outmodule = mModuleMarshaller.unmarshal(outuri);
-    mIdentifierChecker.check(outmodule);
-    if (expectfile.exists()) {
-      final URI expecturi = expectfile.toURI();
-      final ModuleProxy expectmodule = mModuleMarshaller.unmarshal(expecturi);
-      assertModuleProxyEquals("Unexpected module contents for module '"
-          + testname + "' with answer '" + answername + "' after parse back!",
-                              outmodule, expectmodule);
-    }
-    /*
-     * } } }
-     *
-     * } catch (final ParserConfigurationException exception) { throw new
-     * WatersUnmarshalException(exception); } catch (final SAXException
-     * exception) { throw new WatersUnmarshalException(exception); }
-     */
-  }
+    final ProductDESProxy outDES = mProductDESMarshaller.unmarshal(outuri);
 
-  private void createEmptyDirectory(final File outdirname)
-  {
-    if (outdirname.exists()) {
-      final File[] children = outdirname.listFiles();
-      if (children == null) {
-        outdirname.delete();
-      } else {
-        for (final File child : children) {
-          child.delete();
-        }
-      }
-    }
-    ensureParentDirectoryExists(outdirname);
+    assertProductDESProxyEquals("Unexpected contents for module '" + testname
+        + "' with answer '" + answername + "' after parse back!", outDES,
+                                expectedProductDES);
   }
 
   // #########################################################################
@@ -245,8 +212,8 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mBuilder = new SICPropertyVBuilder(mProductDESFactory);
-    mIdentifierChecker =
-        ModuleIdentifierChecker.getModuleIdentifierCheckerInstance();
+    // mIdentifierChecker =
+    // ModuleIdentifierChecker.getModuleIdentifierCheckerInstance();
   }
 
   protected void tearDown() throws Exception
@@ -258,7 +225,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     mProductDESMarshaller = null;
     mDocumentManager = null;
     mBuilder = null;
-    mIdentifierChecker = null;
+    // mIdentifierChecker = null;
     super.tearDown();
   }
 
@@ -274,6 +241,6 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   private JAXBProductDESMarshaller mProductDESMarshaller;
   private DocumentManager mDocumentManager;
   private SICPropertyVBuilder mBuilder;
-  private ModuleIdentifierChecker mIdentifierChecker;
+  // private ModuleIdentifierChecker mIdentifierChecker;
 
 }

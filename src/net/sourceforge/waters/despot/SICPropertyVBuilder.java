@@ -140,8 +140,9 @@ public class SICPropertyVBuilder
     final List<EventProxy> newEvents =
         removeAlphabetMarkings(mModel.getEvents());
 
-    // creates the 3 states needed
-    final List<StateProxy> states = new ArrayList<StateProxy>(3);
+    // creates the 3 states needed (the 3rd is optional, not needed if only
+    // request and answer events exist)
+    final List<StateProxy> states = new ArrayList<StateProxy>(2);
     List<EventProxy> propositions = new ArrayList<EventProxy>(1);
     // initial state has the default marking proposition
     propositions.add(mDefaultMark);
@@ -154,10 +155,7 @@ public class SICPropertyVBuilder
     final StateProxy alphaState =
         mFactory.createStateProxy("T2", false, propositions);
     states.add(alphaState);
-    // third state has no propositions
-    propositions = null;
-    final StateProxy t3State = mFactory.createStateProxy("T3", false, null);
-    states.add(t3State);
+    StateProxy t3State = null;
 
     // creates the transitions needed
     final List<TransitionProxy> transitions = new ArrayList<TransitionProxy>();
@@ -174,9 +172,15 @@ public class SICPropertyVBuilder
         transitions.add(requestTransition);
       }
 
-      // the transition which accepts any local event (i.e. non request, non
+      // the transitions which accepts any local event (i.e. non request, non
       // answer events)
       else if (event.getAttributes() != HISCAttributes.ATTRIBUTES_ANSWER) {
+        if (states.size() < 3) {
+          // third state has no propositions
+          propositions = null;
+          t3State = mFactory.createStateProxy("T3", false, null);
+          states.add(t3State);
+        }
         final TransitionProxy localTransition =
             mFactory.createTransitionProxy(alphaState, event, t3State);
         transitions.add(localTransition);
