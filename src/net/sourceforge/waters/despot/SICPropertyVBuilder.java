@@ -195,9 +195,11 @@ public class SICPropertyVBuilder
     final TransitionProxy immediateAnswer =
         mFactory.createTransitionProxy(alphaState, answer, initialState);
     transitions.add(immediateAnswer);
-    final TransitionProxy finallyAnswer =
-        mFactory.createTransitionProxy(t3State, answer, initialState);
-    transitions.add(finallyAnswer);
+    if (t3State != null) {
+      final TransitionProxy finallyAnswer =
+          mFactory.createTransitionProxy(t3State, answer, initialState);
+      transitions.add(finallyAnswer);
+    }
 
     // adds the two marking propositions to the automaton alphabet
     newEvents.add(mDefaultMark);
