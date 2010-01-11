@@ -13,8 +13,6 @@ import java.io.File;
 import java.net.URI;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -27,15 +25,12 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
-import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleIdentifierChecker;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
-
-import org.xml.sax.SAXException;
 
 
 public class SICPropertyVBuilderTest extends AbstractWatersTest
@@ -146,13 +141,12 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
        * wmodfilename, modifiedDES.getFileLocation());
        */
 
-      // parseGeneratedModules(name, answer.getName(), unmodifiedDESURI,
-      // indirname, outdirname);
-
       final File outfilename =
           new File(mOutputDirectory, name + "_" + answer.getName() + wmodext);
       mProductDESMarshaller.marshal(modifiedDES, outfilename);
-
+      final File expectfilename =
+          new File(indirname, name + "_EXPECTED_" + answer.getName() + wmodext);
+      parseGeneratedModules(name, answer.getName(), expectfilename, outfilename);
     }
 
     /*
@@ -165,59 +159,45 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
 
   /**
    * Checks whether the built module matches the expected output.
-   *
-   * @param testname
-   * @param unmodifiedDESURI
-   * @param indirname
-   * @param outdirname
-   * @throws Exception
    */
-  @SuppressWarnings("unused")
   private void parseGeneratedModules(final String testname,
-                                     final String answerName,
-                                     final URI unmodifiedDESURI,
-                                     final File indirname, final File outdirname)
-      throws Exception
+                                     final String answername,
+                                     final File expectfile,
+                                     final File outfilename) throws Exception
   {
-    try {
-      /*
-       * final URL url = unmodifiedDESURI.toURL(); /* final InputStream stream =
-       * url.openStream();
-       *
-       * final Document doc; try { final DocumentBuilder builder =
-       * DocumentBuilderFactory.newInstance().newDocumentBuilder(); doc =
-       * builder.parse(stream); } finally { stream.close(); } /* final Element
-       * root = doc.getDocumentElement(); final String ext =
-       * mModuleMarshaller.getDefaultExtension();
-       *
-       * for (Node node = root.getFirstChild(); node != null; node =
-       * node.getNextSibling()) { if (node instanceof Element) { final Element
-       * element = (Element) node; if (element.getTagName().equals("Subsystem"))
-       * { final String sysname = element.getAttribute("name"); final String
-       * extname = sysname + ext;
-       */
-      final File outfile = new File(outdirname, testname);
-      final URI outuri = outfile.toURI();
-      final ModuleProxy outmodule = mModuleMarshaller.unmarshal(outuri);
-      mIdentifierChecker.check(outmodule);
-      final File expectfile = new File(indirname, testname);
-      if (expectfile.exists()) {
-        final URI expecturi = expectfile.toURI();
-        final ModuleProxy expectmodule = mModuleMarshaller.unmarshal(expecturi);
-        assertModuleProxyEquals(
-                                "Unexpected module contents for module '"
-                                    + testname + "' with answer '" + answerName
-                                    + "' after parse back!", outmodule,
-                                expectmodule);
-      }
-      /*
-       * } } }
-       */
-    } catch (final ParserConfigurationException exception) {
-      throw new WatersUnmarshalException(exception);
-    } catch (final SAXException exception) {
-      throw new WatersUnmarshalException(exception);
+    /*
+     * final URL url = unmodifiedDESURI.toURL(); /* final InputStream stream =
+     * url.openStream();
+     *
+     * final Document doc; try { final DocumentBuilder builder =
+     * DocumentBuilderFactory.newInstance().newDocumentBuilder(); doc =
+     * builder.parse(stream); } finally { stream.close(); } /* final Element
+     * root = doc.getDocumentElement(); final String ext =
+     * mModuleMarshaller.getDefaultExtension();
+     *
+     * for (Node node = root.getFirstChild(); node != null; node =
+     * node.getNextSibling()) { if (node instanceof Element) { final Element
+     * element = (Element) node; if (element.getTagName().equals("Subsystem")) {
+     * final String sysname = element.getAttribute("name"); final String extname
+     * = sysname + ext;
+     */
+    final URI outuri = outfilename.toURI();
+    final ModuleProxy outmodule = mModuleMarshaller.unmarshal(outuri);
+    mIdentifierChecker.check(outmodule);
+    if (expectfile.exists()) {
+      final URI expecturi = expectfile.toURI();
+      final ModuleProxy expectmodule = mModuleMarshaller.unmarshal(expecturi);
+      assertModuleProxyEquals("Unexpected module contents for module '"
+          + testname + "' with answer '" + answername + "' after parse back!",
+                              outmodule, expectmodule);
     }
+    /*
+     * } } }
+     *
+     * } catch (final ParserConfigurationException exception) { throw new
+     * WatersUnmarshalException(exception); } catch (final SAXException
+     * exception) { throw new WatersUnmarshalException(exception); }
+     */
   }
 
   private void createEmptyDirectory(final File outdirname)
@@ -242,16 +222,15 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     super.setUp();
     mInputDirectory = new File(getWatersInputRoot(), "tests");
     mOutputDirectory = getOutputDirectory();
-    // final ModuleProxyFactory moduleFactory =
-    // ModuleElementFactory.getInstance();
+    final ModuleProxyFactory moduleFactory = ModuleElementFactory.getInstance();
     mProductDESFactory = ProductDESElementFactory.getInstance();
-    // final OperatorTable optable = CompilerOperatorTable.getInstance();
-    // mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
+    final OperatorTable optable = CompilerOperatorTable.getInstance();
+    mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
     mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
     mDocumentManager = new DocumentManager();
-    // mDocumentManager.registerMarshaller(mModuleMarshaller);
+    mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
-    // mDocumentManager.registerUnmarshaller(mModuleMarshaller);
+    mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mBuilder = new SICPropertyVBuilder(mProductDESFactory);
     mIdentifierChecker =
