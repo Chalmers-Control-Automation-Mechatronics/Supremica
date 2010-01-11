@@ -52,10 +52,22 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
 
   // #########################################################################
   // # tests the model built compared to a manually created model
+
+  public void testBuild_hisc0_low1() throws Exception
+  {
+    testBuild("SICPropertyV", "hisc0_low1");
+  }
+
+  // this model only has request and answer events so does not require the 3rd
+  // state of the "test" automaton which must be created
+  public void testBuild_hisc0_low2() throws Exception
+  {
+    testBuild("SICPropertyV", "hisc0_low2");
+  }
+
   public void testBuild_parManEg_I_mfb_lowlevel() throws Exception
   {
     testBuild("SICPropertyV", "parManEg_I_mfb_lowlevel");
-
   }
 
   // #########################################################################

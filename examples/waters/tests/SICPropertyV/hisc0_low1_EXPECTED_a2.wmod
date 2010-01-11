@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="hisc0_low1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":alpha"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a2">
+<ns2:AttributeMap>
+<ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="lev1"/>
+<EventDecl Kind="CONTROLLABLE" Name="lev2"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r2">
+<ns2:AttributeMap>
+<ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+</ns2:AttributeMap>
+</EventDecl>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r3">
+<ns2:AttributeMap>
+<ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+</ns2:AttributeMap>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC" Name="ides2">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="iY1"/>
+<SimpleNode Name="iY2">
+<EventList>
+<SimpleIdentifier Name=":alpha"/>
+</EventList>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="iY2" Source="iY1">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="iY1" Source="iY1">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="iY1" Source="iY2">
+<LabelBlock>
+<SimpleIdentifier Name="a2"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+<ns2:AttributeMap>
+<ns2:Attribute Name="HISC:Interface"/>
+</ns2:AttributeMap>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="lsup1">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="hX1"/>
+<SimpleNode Name="hX2"/>
+<SimpleNode Name="hX3"/>
+<SimpleNode Name="hX4"/>
+</NodeList>
+<EdgeList>
+<Edge Target="hX2" Source="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX4" Source="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX2" Source="hX4">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX1" Source="hX4">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX1" Source="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="a2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX3" Source="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="lev2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX3" Source="hX2">
+<LabelBlock>
+<SimpleIdentifier Name="lev1"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="lplnt1">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="hX1"/>
+<SimpleNode Name="hX2"/>
+<SimpleNode Name="hX3"/>
+<SimpleNode Name="hX4"/>
+</NodeList>
+<EdgeList>
+<Edge Target="hX2" Source="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX4" Source="hX1">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX3" Source="hX2">
+<LabelBlock>
+<SimpleIdentifier Name="lev1"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX2" Source="hX4">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX1" Source="hX4">
+<LabelBlock>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX1" Source="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="a2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="hX3" Source="hX3">
+<LabelBlock>
+<SimpleIdentifier Name="lev2"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+
+<SimpleComponent Kind="SPEC" Name="TestAut">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="T1">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="T2">
+<EventList>
+<SimpleIdentifier Name=":alpha"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="T3"/>
+</NodeList>
+<EdgeList>
+<Edge Target="T1" Source="T2">
+<LabelBlock>
+<SimpleIdentifier Name="a2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="T1" Source="T3">
+<LabelBlock>
+<SimpleIdentifier Name="a2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="T1" Source="T1">
+<LabelBlock>
+<SimpleIdentifier Name="a2"/>
+<SimpleIdentifier Name="lev1"/>
+<SimpleIdentifier Name="lev2"/>
+<SimpleIdentifier Name="r2"/>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="T2" Source="T1">
+<LabelBlock>
+<SimpleIdentifier Name="r2"/>
+<SimpleIdentifier Name="r3"/>
+</LabelBlock>
+</Edge>
+<Edge Target="T3" Source="T2">
+<LabelBlock>
+<SimpleIdentifier Name="lev1"/>
+<SimpleIdentifier Name="lev2"/>
+</LabelBlock>
+</Edge>
+<Edge Target="T3" Source="T3">
+<LabelBlock>
+<SimpleIdentifier Name="lev1"/>
+<SimpleIdentifier Name="lev2"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
