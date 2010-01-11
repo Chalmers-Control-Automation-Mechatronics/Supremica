@@ -166,7 +166,7 @@ public class SICPropertyVBuilder
       transitions.add(transition);
 
       // the transition which accepts any request event
-      if (event.getAttributes() == HISCAttributes.ATTRIBUTES_REQUEST) {
+      if (event.getAttributes().equals(HISCAttributes.ATTRIBUTES_REQUEST)) {
         final TransitionProxy requestTransition =
             mFactory.createTransitionProxy(initialState, event, alphaState);
         transitions.add(requestTransition);
@@ -174,7 +174,8 @@ public class SICPropertyVBuilder
 
       // the transitions which accepts any local event (i.e. non request, non
       // answer events)
-      else if (event.getAttributes() != HISCAttributes.ATTRIBUTES_ANSWER) {
+      else if (!event.getAttributes().equals(HISCAttributes.ATTRIBUTES_ANSWER)
+          && !event.getAttributes().equals(HISCAttributes.ATTRIBUTES_REQUEST)) {
         if (states.size() < 3) {
           // third state has no propositions
           propositions = null;
