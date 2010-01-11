@@ -19,6 +19,7 @@ import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -36,21 +37,8 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
 {
 
   // #########################################################################
-  // # tests integrity of the model built
-  /*
-   * public void testIntegrity() throws Exception {
-   *
-   * final List<EventProxy> answerEvents = (List<EventProxy>)
-   * mBuilder.getAnswerEvents(); for (final EventProxy answer : answerEvents) {
-   * final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
-   * System.out.print(modifiedDES);
-   * ProductDESIntegrityChecker.getInstance().check(modifiedDES); }
-   *
-   * }
-   */
-
-  // #########################################################################
-  // # tests the model built compared to a manually created model
+  // # tests the model built compared to a manually created model as well as
+  // testing the integrity
 
   public void testBuild_hisc0_low1() throws Exception
   {
@@ -166,7 +154,9 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
       final File expectDESfilename =
           new File(indirname, name + "_EXPECTED_" + answer.getName() + wdesext);
       mProductDESMarshaller.marshal(des, expectDESfilename);
+
       parseGeneratedProductDES(name, answer.getName(), outfilename, des);
+      ProductDESIntegrityChecker.getInstance().check(modifiedDES);
     }
 
     /*
