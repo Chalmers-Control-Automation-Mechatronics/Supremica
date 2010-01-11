@@ -1,26 +1,24 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+
 import javax.swing.Action;
+
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.simulator.Simulation;
-import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 
 import org.supremica.gui.ide.IDE;
 
-public class SimulationStepBackAction
-  extends WatersSimulationAction
-  implements SimulationObserver
+public class SimulationBackToStartAction extends WatersSimulationAction
 {
-
   //#########################################################################
   //# Constructor
-  SimulationStepBackAction(final IDE ide)
+  SimulationBackToStartAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "Step Back");
-    putValue(Action.SHORT_DESCRIPTION, "Travel back through the trace");
+    putValue(Action.NAME, "Jump To Start");
+    putValue(Action.SHORT_DESCRIPTION, "Return the simulation to the initial state");
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_BACK);
   }
 
@@ -32,7 +30,8 @@ public class SimulationStepBackAction
     final SimulatorPanel panel = getActiveSimulatorPanel();
     if (panel != null) {
       final Simulation sim = getObservedSimulation();
-      sim.stepBack();
+      while (sim.getCurrentTime() != -1)
+        sim.stepBack();
     }
   }
 
@@ -48,7 +47,6 @@ public class SimulationStepBackAction
       setEnabled(sim.getCurrentTime() != -1);
     }
   }
-
 
   //#########################################################################
   //# Class Constants

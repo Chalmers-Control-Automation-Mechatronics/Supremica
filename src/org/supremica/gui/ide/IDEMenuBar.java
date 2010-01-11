@@ -40,6 +40,8 @@ import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.ShowGraphAction;
 import net.sourceforge.waters.gui.actions.ShowModuleCommentAction;
+import net.sourceforge.waters.gui.actions.SimulationBackToStartAction;
+import net.sourceforge.waters.gui.actions.SimulationJumpToEndAction;
 import net.sourceforge.waters.gui.actions.SimulationReplayStepAction;
 import net.sourceforge.waters.gui.actions.SimulationResetAction;
 import net.sourceforge.waters.gui.actions.SimulationStepAction;
@@ -299,12 +301,18 @@ public class IDEMenuBar
         mSimulateMenu.add(reset);
         final Action step = actions.getAction(SimulationStepAction.class);
         mSimulateMenu.add(step);
+        final Action endTrace =
+          actions.getAction(SimulationJumpToEndAction.class);
+        mSimulateMenu.add(endTrace);
         final Action replayStep =
           actions.getAction(SimulationReplayStepAction.class);
         mSimulateMenu.add(replayStep);
         final Action stepBack =
           actions.getAction(SimulationStepBackAction.class);
         mSimulateMenu.add(stepBack);
+        final Action stepBeginning =
+          actions.getAction(SimulationBackToStartAction.class);
+        mSimulateMenu.add(stepBeginning);
       }
 
       // Analyze

@@ -22,6 +22,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -33,8 +34,6 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.des.LoopTrace;
-
 import org.supremica.gui.ide.ModuleContainer;
 
 
@@ -341,6 +340,7 @@ public class Simulation implements ModelObserver, Observer
   {
     mTrace = null;
     reset();
+    mTrace = trace;
     for (int looper = 0; looper < trace.getEvents().size() - 1; looper ++)
     {
       final EventProxy event = trace.getEvents().get(looper);
@@ -350,7 +350,6 @@ public class Simulation implements ModelObserver, Observer
         // Do nothing
       }
     }
-    mTrace = trace;
   }
 
   @SuppressWarnings("unchecked")
@@ -366,7 +365,7 @@ public class Simulation implements ModelObserver, Observer
       final ArrayList<Pair<EventProxy, AutomatonProxy>> invalidEvent = testForControlability();
       for (final Pair<EventProxy, AutomatonProxy> invalidPair : invalidEvent)
       {
-        System.out.println("ERROR: The event " + invalidPair.getFirst().getName()
+        mModuleContainer.getIDE().error(": The event " + invalidPair.getFirst().getName()
             + " is not controllable, inside the automaton " + invalidPair.getSecond().getName()
             + " Current state is: " + mAllAutomatons.get(invalidPair.getSecond()).getName());
       }
@@ -429,16 +428,23 @@ public class Simulation implements ModelObserver, Observer
   {
     if (mTrace != null)
     {
-      if (mTrace instanceof LoopTrace)
+      if (mTrace instanceof LoopTraceProxy)
       {
         if (currentTime == mPreviousEvents.size() - 1)
         {
-          while (currentTime != ((LoopTrace)mTrace).getLoopIndex())
+          while (currentTime != ((LoopTraceProxy)mTrace).getLoopIndex() - 1)
+          {
             stepBack();
+          }
         }
+        else
+          moveSafely(true);
       }
+      else
+        moveSafely(true);
     }
-    moveSafely(true);
+    else
+      moveSafely(true);
   }
 
   //#########################################################################
@@ -570,6 +576,10 @@ public class Simulation implements ModelObserver, Observer
           addNewInvalidEvent(event, automaton);
         }
       }
+    }
+    if (mEnabledEvents.size() == 0)
+    {
+      mContainer.getIDE().error(": Deadlock has occured");
     }
   }
 

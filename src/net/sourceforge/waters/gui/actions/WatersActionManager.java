@@ -57,6 +57,8 @@ public abstract class WatersActionManager
     addAction(new ShowModuleCommentAction(ide));
     addAction(new SimulationStepAction(ide));
     addAction(new SimulationResetAction(ide));
+    addAction(new SimulationBackToStartAction(ide));
+    addAction(new SimulationJumpToEndAction(ide));
     addAction(new SimulationStepBackAction(ide));
     addAction(new SimulationReplayStepAction(ide));
     addAction(new ToolEdgeAction(ide));

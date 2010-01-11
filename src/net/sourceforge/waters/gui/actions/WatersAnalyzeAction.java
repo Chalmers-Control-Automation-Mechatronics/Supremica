@@ -1,10 +1,15 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -15,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
@@ -73,6 +79,10 @@ public abstract class WatersAnalyzeAction
   {
     setEnabled(true);
   }
+  public void update(final EditorChangedEvent event)
+  {
+    setEnabled(true);
+  }
 
   protected abstract String getCheckName();
   protected abstract String getFailureDescription();
@@ -107,7 +117,10 @@ public abstract class WatersAnalyzeAction
       majorPanel = new JPanel();
       topPanel = new JPanel();
       bottomPanel = new JPanel();
-      informationLabel = new JLabel();
+      informationLabel = new WrapperLabel(this);
+      informationLabel.setBackground(Color.WHITE);
+      informationLabel.setOpaque(true);
+      informationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
       informationLabel.setText(getCheckName() + " Check is running...");
       cancelButton = new JButton("Abort");
       cancelButton.addActionListener(new ActionListener(){
@@ -118,9 +131,10 @@ public abstract class WatersAnalyzeAction
         }
       });
       bottomPanel.add(cancelButton, BorderLayout.WEST);
-      topPanel.add(informationLabel, BorderLayout.CENTER);
-      majorPanel.add(topPanel, BorderLayout.CENTER);
-      majorPanel.add(bottomPanel, BorderLayout.SOUTH);
+      topPanel.add(informationLabel, BorderLayout.NORTH);
+      majorPanel.setLayout(new GridLayout(2, 1));
+      majorPanel.add(topPanel);
+      majorPanel.add(bottomPanel);
       this.add(majorPanel);
       this.setSize(DEFAULT_DIALOG_SIZE);
       this.setLocation(DEFAULT_DIALOG_LOCATION);
@@ -174,7 +188,74 @@ public abstract class WatersAnalyzeAction
     }
 
     // ######################################################################
+    // # Auxillary Methods
+
+    private String HTMLinize(final String raw)
+    {
+      return "<html><P STYLE=\"word-wrap:break-word;width:100%;left:0\">" + raw + "</p></html>";
+    }
+
+    // ######################################################################
     // # Inner Classes
+
+    private class WrapperLabel extends JLabel implements ComponentListener
+    {
+      // ######################################################################
+      // # Constructor
+
+      public WrapperLabel(final AnalyzerDialog parent)
+      {
+        super();
+        this.parent = parent;
+        parent.addComponentListener(this);
+      }
+      @SuppressWarnings("unused")
+      public WrapperLabel(final String e, final AnalyzerDialog parent)
+      {
+        super(HTMLinize(e));
+        this.parent = parent;
+        parent.addComponentListener(this);
+      }
+
+      public void setText(final String e)
+      {
+        super.setText(HTMLinize(e));
+      }
+
+      // ######################################################################
+      // # Interface ComponentListener
+
+      public void componentHidden(final ComponentEvent e)
+      {
+        // Do Nothing
+      }
+
+      public void componentMoved(final ComponentEvent e)
+      {
+        // Do nothing
+      }
+
+      public void componentResized(final ComponentEvent e)
+      {
+        this.setPreferredSize(new Dimension(((int)parent.getSize().getWidth()), ((int)parent.getSize().getHeight() / 2)));
+        System.out.println("DEBUG: New size is:" + this.getSize());
+      }
+
+      public void componentShown(final ComponentEvent e)
+      {
+        // Do nothing
+      }
+
+      // #####################################################################
+      // # Data Members
+
+      private final AnalyzerDialog parent;
+
+      // #####################################################################
+      // # Class Constants
+      private static final long serialVersionUID = -6693747793242415495L;
+    }
+
 
     private class AnalyzerThread extends Thread
     {
@@ -237,7 +318,7 @@ public abstract class WatersAnalyzeAction
     JPanel majorPanel;
     JButton cancelButton;
     JButton traceButton;
-    JLabel informationLabel;
+    WrapperLabel informationLabel;
 
     // #####################################################################
     // # Class Constants

@@ -27,6 +27,8 @@ import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
 import net.sourceforge.waters.gui.actions.IDEPasteAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
+import net.sourceforge.waters.gui.actions.SimulationBackToStartAction;
+import net.sourceforge.waters.gui.actions.SimulationJumpToEndAction;
 import net.sourceforge.waters.gui.actions.SimulationReplayStepAction;
 import net.sourceforge.waters.gui.actions.SimulationResetAction;
 import net.sourceforge.waters.gui.actions.SimulationStepAction;
@@ -214,9 +216,11 @@ public class IDEToolBar
       } else if (panel instanceof SimulatorPanel) {
         addSeparator();
         addAction(actions.getAction(SimulationResetAction.class));
+        addAction(actions.getAction(SimulationBackToStartAction.class));
         addAction(actions.getAction(SimulationStepBackAction.class));
         addAction(actions.getAction(SimulationStepAction.class));
         addAction(actions.getAction(SimulationReplayStepAction.class));
+        addAction(actions.getAction(SimulationJumpToEndAction.class));
       }
     }
   }
