@@ -43,6 +43,7 @@ public class SICPropertyVBuilder
   public void setInputModel(final ProductDESProxy model)
   {
     mModel = model;
+    mLowLevelAutomata = null;
   }
 
   public void setMarkingProposition(final EventProxy marking)
@@ -94,8 +95,9 @@ public class SICPropertyVBuilder
                                     EventKind.PROPOSITION, true);
     }
     if (mPreconditionMarking == null) {
+      final String alphaNm = ":alpha";
       mPreconditionMarking =
-          mFactory.createEventProxy(mAlphaNm, EventKind.PROPOSITION, true);
+          mFactory.createEventProxy(alphaNm, EventKind.PROPOSITION, true);
     }
     List<AutomatonProxy> newAutomaton = new ArrayList<AutomatonProxy>();
     // the low level automaton of a model only need modifying once because they
@@ -105,10 +107,11 @@ public class SICPropertyVBuilder
       for (final AutomatonProxy aut : mModel.getAutomata()) {
         if (!HISCAttributes.isInterface(aut.getAttributes())) {
           newAutomaton.add(createModifiedLowLevelAutomaton(aut));
+
         }
       }
     } else {
-      newAutomaton = mLowLevelAutomata;
+      newAutomaton = new ArrayList<AutomatonProxy>(mLowLevelAutomata);
     }
     // modifies the models interfaces dependent on the answer event specified
     for (final AutomatonProxy aut : mModel.getAutomata()) {
@@ -338,8 +341,6 @@ public class SICPropertyVBuilder
 
   private final ProductDESProxyFactory mFactory;
 
-  private final String mAlphaNm = ":alpha";
-
   /**
    * A list of the low level automaton that are created with the new marking
    * rules.
@@ -349,7 +350,6 @@ public class SICPropertyVBuilder
   /**
    * A map of the original states to the new version of the state (which is
    * either a copy or has a proposition added/removed).
-   *
    */
   private final Map<StateProxy,StateProxy> mStates =
       new HashMap<StateProxy,StateProxy>();
