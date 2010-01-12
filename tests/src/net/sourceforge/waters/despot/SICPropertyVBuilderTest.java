@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.junit.AbstractWatersTest;
@@ -82,8 +81,8 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
       throws Exception
   {
     final String wdesext = mProductDESMarshaller.getDefaultExtension();
-    final List<EventProxy> answerEvents =
-        (List<EventProxy>) getModelAnswerEvents(group, subdir, name);
+    final Collection<EventProxy> answerEvents =
+        getModelAnswerEvents(group, subdir, name);
     for (final EventProxy answer : answerEvents) {
       final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
       final File outfilename =
@@ -96,8 +95,8 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   void testConflictChecker(final String group, final String subdir,
                            final String name) throws Exception
   {
-    final List<EventProxy> answerEvents =
-        (List<EventProxy>) getModelAnswerEvents(group, subdir, name);
+    final Collection<EventProxy> answerEvents =
+        getModelAnswerEvents(group, subdir, name);
     for (final EventProxy answer : answerEvents) {
       final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
       final EventProxy defaultMark = mBuilder.getMarkingProposition();
@@ -126,8 +125,8 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     final File indirname = new File(groupname, subdir);
     final String wmodext = mModuleMarshaller.getDefaultExtension();
     final String wdesext = mProductDESMarshaller.getDefaultExtension();
-    final List<EventProxy> answerEvents =
-        (List<EventProxy>) getModelAnswerEvents(group, subdir, name);
+    final Collection<EventProxy> answerEvents =
+        getModelAnswerEvents(group, subdir, name);
 
     for (final EventProxy answer : answerEvents) {
       final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
@@ -182,7 +181,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     final ProductDESProxy originalDES = loadProductDES(unmodifiedDESURI);
     mBuilder.setInputModel(originalDES);
 
-    return (List<EventProxy>) mBuilder.getAnswerEvents();
+    return mBuilder.getAnswerEvents();
   }
 
   // #########################################################################
