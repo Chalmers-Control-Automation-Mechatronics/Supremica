@@ -144,26 +144,28 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
       final File outfilename =
           new File(mOutputDirectory, name + "_" + answer.getName() + wdesext);
       mProductDESMarshaller.marshal(modifiedDES, outfilename);
+      ProductDESIntegrityChecker.getInstance().check(modifiedDES);
 
       final File expectfilename =
           new File(indirname, name + "_EXPECTED_" + answer.getName() + wmodext);
       final URI expecteddesURI = expectfilename.toURI();
       doc = docManager.load(expecteddesURI);
+      ProductDESProxy expectedDES;
       if (doc instanceof ProductDESProxy) {
-        des = (ProductDESProxy) doc;
+        expectedDES = (ProductDESProxy) doc;
       } else {
         final ModuleProxy module = (ModuleProxy) doc;
         final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
-        des = compiler.compile();
+        expectedDES = compiler.compile();
       }
 
       final File expectDESfilename =
           new File(indirname, name + "_EXPECTED_" + answer.getName() + wdesext);
-      mProductDESMarshaller.marshal(des, expectDESfilename);
-
-      parseGeneratedProductDES(name, answer.getName(), outfilename, des);
-      ProductDESIntegrityChecker.getInstance().check(modifiedDES);
+      mProductDESMarshaller.marshal(expectedDES, expectDESfilename);
+      assertProductDESProxyEquals("Unexpected contents for product DES '" + name
+                                  + "' with answer '" + answer.getName() + "'!",
+                                  modifiedDES, expectedDES);
 
       EventProxy defaultMark = null;
       EventProxy preconditionMark = null;
@@ -196,23 +198,6 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
 
     }
 
-  }
-
-  /**
-   * Checks whether the built module matches the expected output.
-   */
-  private void parseGeneratedProductDES(final String testname,
-                                        final String answername,
-                                        final File outfilename,
-                                        final ProductDESProxy expectedProductDES)
-      throws Exception
-  {
-    final URI outuri = outfilename.toURI();
-    final ProductDESProxy outDES = mProductDESMarshaller.unmarshal(outuri);
-
-    assertProductDESProxyEquals("Unexpected contents for module '" + testname
-        + "' with answer '" + answername + "' after parse back!", outDES,
-                                expectedProductDES);
   }
 
   // #########################################################################

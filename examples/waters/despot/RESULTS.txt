@@ -1,0 +1,37 @@
+These are the expected results for SIC property V of some of the DESpot
+models in this directory according to Ryan Leduc. 
+
+Simple Manufacturing Example/
+Small 'serial' example from Ryan's thesis.
+Should pass all tests.
+
+output-aip_leducversion-old/
+AIP example from Ryan's thesis.
+Connected version, imported from DESign and edited.
+Should pass all tests, but not verified.
+
+testHISC.desp
+testHISC1.desp
+testHISC12.desp
+Simple tests that should pass all tests.
+
+testHISC2.desp
+testHISC3.desp
+testHISC4.desp
+testHISC5.desp
+testHISC6.desp
+testHISC10.desp
+testHISC11.desp
+Simple tests that fail some properties other than SIC5/6;
+SIC5/6 may or may not pass.
+
+testHISC7.desp
+Simple test with LD events that fails SIC6.
+
+testHISC8.desp
+testHISC9.desp
+Is this a SIC5 failure?
+
+testHISC13.desp
+testHISC14.desp
+Malformed interface. SIC5/6 result undefined.
