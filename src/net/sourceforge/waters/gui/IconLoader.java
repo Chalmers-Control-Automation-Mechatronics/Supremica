@@ -43,6 +43,10 @@ public class IconLoader
   private static final String NAME_SIMULATOR_REPLAY = "waters/simulator_replay";
   private static final String NAME_SIMULATOR_RESET = "waters/simulator_reset";
   private static final String NAME_SIMULATOR_STEP = "waters/simulator_step";
+  private static final String NAME_SIMULATOR_TO_END =
+    "waters/simulator_to_end";
+  private static final String NAME_SIMULATOR_TO_START =
+    "waters/simulator_to_start";
   private static final String NAME_SPEC = "waters/spec";
   private static final String NAME_SUPERVISOR = "waters/supervisor";
   private static final String NAME_UNCONTROLLABLE = "waters/uncontrollable";
@@ -74,6 +78,10 @@ public class IconLoader
     getIcon(NAME_SIMULATOR_RESET);
   public static final ImageIcon ICON_SIMULATOR_STEP =
     getIcon(NAME_SIMULATOR_STEP);
+  public static final ImageIcon ICON_SIMULATOR_TO_END =
+    getIcon(NAME_SIMULATOR_TO_END);
+  public static final ImageIcon ICON_SIMULATOR_TO_START =
+    getIcon(NAME_SIMULATOR_TO_START);
   public static final ImageIcon ICON_SPEC = getIcon(NAME_SPEC);
   public static final ImageIcon ICON_SUPERVISOR = getIcon(NAME_SUPERVISOR);
   public static final ImageIcon ICON_UNCONTROLLABLE =
