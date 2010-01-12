@@ -230,8 +230,8 @@ public class SICPropertyVBuilder
     newEvents.add(mPreconditionMarking);
 
     final AutomatonProxy newTestAut =
-        mFactory.createAutomatonProxy("TestAut", ComponentKind.SPEC, newEvents,
-                                      states, transitions);
+        mFactory.createAutomatonProxy("Test:Aut", ComponentKind.SPEC,
+                                      newEvents, states, transitions);
 
     return newTestAut;
   }
