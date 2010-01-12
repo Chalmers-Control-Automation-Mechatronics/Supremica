@@ -7,7 +7,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
-public class Step
+public class Step implements Comparable<Step>
 {
 
   public Step(final EventProxy event, final HashMap<AutomatonProxy, StateProxy> source, final HashMap<AutomatonProxy, StateProxy> dest)
@@ -16,6 +16,28 @@ public class Step
     mSource = source;
     mDest = dest;
     determineDeterminism();
+  }
+  public Step(final EventProxy event)
+  {
+    mEvent = event;
+    mSource = new HashMap<AutomatonProxy, StateProxy>();
+    mDest = new HashMap<AutomatonProxy, StateProxy>();
+    determineDeterminism();
+  }
+
+  @SuppressWarnings("unchecked")
+  public Step addNewTransition(final AutomatonProxy auto, final TransitionProxy trans)
+  {
+    final HashMap<AutomatonProxy, StateProxy> newSource = (HashMap<AutomatonProxy, StateProxy>) mSource.clone();
+    final HashMap<AutomatonProxy, StateProxy> newDest = (HashMap<AutomatonProxy, StateProxy>) mDest.clone();
+    if (mSource.keySet().contains(auto))
+    {
+      newSource.remove(auto);
+      newDest.remove(auto);
+    }
+    newSource.put(auto, trans.getSource());
+    newDest.put(auto, trans.getTarget());
+    return new Step(mEvent, newSource, newDest);
   }
 
   public EventProxy getEvent()
@@ -44,7 +66,11 @@ public class Step
     }
     else
     {
-      return null;
+      for (final TransitionProxy trans : aut.getTransitions())
+      {
+        if (trans.getEvent() == mEvent)
+          return trans;
+      }
     }
     throw new IllegalArgumentException("ERROR: Somehow, the transition could not be found.");
   }
@@ -71,6 +97,12 @@ public class Step
   public boolean isDeterministic()
   {
     return deterministic;
+  }
+
+
+  public int compareTo(final Step o)
+  {
+    return this.getEvent().compareTo(o.getEvent());
   }
 
   public String toString()

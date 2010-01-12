@@ -24,7 +24,6 @@ import javax.swing.border.BevelBorder;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.IconLoader;
-import net.sourceforge.waters.model.des.EventProxy;
 
 
 public class EventChooserDialog extends JDialog
@@ -34,7 +33,7 @@ public class EventChooserDialog extends JDialog
   // #######################################################################
   // # Constructor
 
-  public EventChooserDialog(final JFrame owner, final JLabel[] labels, final EventProxy[] correspondingEvent)
+  public EventChooserDialog(final JFrame owner, final JLabel[] labels, final Step[] correspondingEvent)
   {
     super(owner, "Multiple Options available", true);
     cancelled = true;
@@ -90,7 +89,7 @@ public class EventChooserDialog extends JDialog
     {
       public void mouseClicked(final MouseEvent evt)
       {
-        if (EventChooserDialog.this.getSelectedEvent() != null)
+        if (EventChooserDialog.this.getSelectedStep() != null)
         {
           cancelled = false;
           EventChooserDialog.this.dispose();
@@ -108,7 +107,7 @@ public class EventChooserDialog extends JDialog
     {
       public void mouseClicked(final MouseEvent evt)
       {
-        if (evt.getClickCount() == 2 && EventChooserDialog.this.getSelectedEvent() != null)
+        if (evt.getClickCount() == 2 && EventChooserDialog.this.getSelectedStep() != null)
         {
           cancelled = false;
           EventChooserDialog.this.dispose();
@@ -154,9 +153,9 @@ public class EventChooserDialog extends JDialog
   // ####################################################################
   // # Simple Access
 
-  public EventProxy getSelectedEvent()
+  public Step getSelectedStep()
   {
-    return (EventProxy)eventList[mList.getSelectedIndex()];
+    return (Step)eventList[mList.getSelectedIndex()];
   }
   public boolean wasCancelled()
   {
@@ -168,7 +167,7 @@ public class EventChooserDialog extends JDialog
 
   private final JList mList;
   private boolean cancelled;
-  private final EventProxy[] eventList;
+  private final Step[] eventList;
 
   // ####################################################################
   // # Class Constants

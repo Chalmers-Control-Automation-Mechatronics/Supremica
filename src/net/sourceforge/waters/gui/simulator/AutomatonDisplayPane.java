@@ -50,7 +50,6 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -278,9 +277,9 @@ public class AutomatonDisplayPane
   {
     final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
     final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
-    for (final EventProxy event : mSim.getValidTransitions()) {
+    for (final Step step : mSim.getValidTransitions()) {
       for (final TransitionProxy trans : mAutomaton.getTransitions()) {
-        if (trans.getEvent() == event && trans.getSource() == currentState) {
+        if (trans.getEvent() == step.getEvent() && trans.getSource() == currentState) {
           final Proxy source = infomap.get(trans).getSourceObject();
           if (clicked instanceof IdentifierProxy) {
             if (source == clicked) {
@@ -298,7 +297,7 @@ public class AutomatonDisplayPane
     return false;
   }
 
-  private EventProxy findOptions(final List<EventProxy> possibleEvents)
+  private Step findOptions(final List<Step> possibleEvents)
   {
     if (possibleEvents.size() == 0)
       return null;
@@ -306,13 +305,13 @@ public class AutomatonDisplayPane
       return possibleEvents.get(0);
     else {
       final JLabel[] possibilities = new JLabel[possibleEvents.size()];
-      final EventProxy[] events = new EventProxy[possibleEvents.size()];
+      final Step[] events = new Step[possibleEvents.size()];
       for (int looper = 0; looper < possibleEvents.size(); looper++) {
-        final EventProxy event = possibleEvents.get(looper);
-        final JLabel toAdd = new JLabel(event.getName());
-        if (event.getKind() == EventKind.CONTROLLABLE)
+        final Step event = possibleEvents.get(looper);
+        final JLabel toAdd = new JLabel(event.toString());
+        if (event.getEvent().getKind() == EventKind.CONTROLLABLE)
           toAdd.setIcon(IconLoader.ICON_CONTROLLABLE);
-        else if (event.getKind() == EventKind.UNCONTROLLABLE)
+        else if (event.getEvent().getKind() == EventKind.UNCONTROLLABLE)
           toAdd.setIcon(IconLoader.ICON_UNCONTROLLABLE);
         else
           toAdd.setIcon(IconLoader.ICON_PROPOSITION);
@@ -322,9 +321,9 @@ public class AutomatonDisplayPane
       final EventChooserDialog dialog =
           new EventChooserDialog(mContainer.getIDE(), possibilities, events);
       dialog.setVisible(true);
-      final EventProxy event = dialog.getSelectedEvent();
+      final Step event = dialog.getSelectedStep();
       if ((event != null && !dialog.wasCancelled())) {
-        for (final EventProxy findEvent : possibleEvents) {
+        for (final Step findEvent : possibleEvents) {
           if (findEvent == event)
             return event;
         }
@@ -346,13 +345,13 @@ public class AutomatonDisplayPane
       if (event.getClickCount() == 2 &&
           mFocusedItem != null && isEnabled(mFocusedItem)) {
         final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-        final List<EventProxy> possibleEvents = new ArrayList<EventProxy>();
+        final List<Step> possibleSteps = new ArrayList<Step>();
         if (mFocusedItem instanceof IdentifierProxy) {
           for (final TransitionProxy trans : mAutomaton.getTransitions()) {
             final Proxy source = infomap.get(trans).getSourceObject();
             if (source == mFocusedItem &&
                 mSim.getValidTransitions().contains(trans.getEvent())) {
-              possibleEvents.add(trans.getEvent());
+              possibleSteps.add(getStep(trans));
             }
           }
         } else if (mFocusedItem instanceof EdgeProxy) {
@@ -361,20 +360,34 @@ public class AutomatonDisplayPane
             final AbstractSubject subject = (AbstractSubject) source;
             if (subject.getAncestor(EdgeSubject.class) == mFocusedItem
                 && mSim.getValidTransitions().contains(trans.getEvent())) {
-              possibleEvents.add(trans.getEvent());
+              possibleSteps.add(getStep(trans));
             }
           }
         }
-        final EventProxy firedEvent = findOptions(possibleEvents);
+        final Step firedEvent = findOptions(possibleSteps);
         if (firedEvent != null) {
           try {
             mSim.step(firedEvent);
-          } catch (final UncontrollableException exception) {
+          } catch (final NonDeterministicException exception) {
             System.out.println("ERROR: " + exception.getMessage()
                 + ". Event will not be fired");
           }
         }
       }
+    }
+
+    private Step getStep(final TransitionProxy trans)
+    {
+      for (final Step step: mSim.getValidTransitions())
+      {
+        if (step.getEvent() == trans.getEvent()
+            && step.getSource().get(mAutomaton) == null || step.getSource().get(mAutomaton) == trans.getSource()
+            && step.getDest().get(mAutomaton) == null || step.getDest().get(mAutomaton) == trans.getTarget())
+        {
+           return step;
+        }
+      }
+      return null;
     }
 
     public void mouseEntered(final MouseEvent event)

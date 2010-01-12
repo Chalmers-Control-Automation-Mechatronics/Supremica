@@ -9,6 +9,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -68,10 +69,10 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
           {
             try {
               if (sim.getValidTransitions().contains((EventProxy)node))
-                sim.step((EventProxy)node);
+                fireEvent((EventProxy)node);
               else
                 System.out.println("ERROR: That event is blocked");
-            } catch (final UncontrollableException exception) {
+            } catch (final NonDeterministicException exception) {
               System.out.println("ERROR: Uncontrollable Event detected: " + exception.getMessage() + ". No event has been fired.");
             } catch (final IllegalArgumentException exception) {
               System.out.println(exception.getMessage() + ". No event has been fired");
@@ -82,6 +83,34 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
             final AutomatonProxy toAdd = (AutomatonProxy)node;
             mDesktop.addAutomaton(toAdd.getName(), mSim.getContainer(), mSim, 2);
           }
+        }
+      }
+
+      private void fireEvent(final EventProxy node) throws NonDeterministicException
+      {
+
+        final JLabel[] labels = new JLabel[mSim.getValidTransitions().size()];
+        final Step[] steps = new Step[mSim.getValidTransitions().size()];
+        final int index = 0;
+        for (final Step step: mSim.getValidTransitions())
+        {
+          if (step.getEvent() == node)
+          {
+            final JLabel toAdd = new JLabel(step.toString());
+            if (node.getKind() == EventKind.CONTROLLABLE)
+              toAdd.setIcon(IconLoader.ICON_CONTROLLABLE);
+            else if (node.getKind() == EventKind.UNCONTROLLABLE)
+              toAdd.setIcon(IconLoader.ICON_UNCONTROLLABLE);
+            else
+              toAdd.setIcon(IconLoader.ICON_PROPOSITION);
+            labels[index] = toAdd;
+            steps[index] = step;
+          }
+        }
+        final EventChooserDialog dialog = new EventChooserDialog(mContainer.getIDE(), labels, steps);
+        if (!dialog.wasCancelled())
+        {
+          mSim.step(dialog.getSelectedStep());
         }
       }
     });

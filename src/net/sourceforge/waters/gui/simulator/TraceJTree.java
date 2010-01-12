@@ -102,7 +102,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
       {
         if (event.getPath().getLastPathComponent().getClass() == EventBranchNode.class)
         {
-          expandedNodes.remove(((EventBranchNode)event.getPath().getLastPathComponent()).getEvent().getName());
+          expandedNodes.remove(((EventBranchNode)event.getPath().getLastPathComponent()).getTime());
         }
       }
 

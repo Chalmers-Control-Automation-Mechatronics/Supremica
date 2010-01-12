@@ -1,7 +1,6 @@
 package net.sourceforge.waters.gui.simulator;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import net.sourceforge.waters.model.des.EventProxy;
 
 public class TraceMutableTreeNode extends DefaultMutableTreeNode implements SimulationObserver
 {
@@ -65,8 +64,8 @@ public class TraceMutableTreeNode extends DefaultMutableTreeNode implements Simu
     this.removeAllChildren();
     for (int looper = 0; looper < sim.getEventHistory().size(); looper++)
     {
-      final EventProxy event = sim.getEventHistory().get(looper);
-      final DefaultMutableTreeNode eventToAdd= new EventBranchNode(event, looper);
+      final Step step = sim.getEventHistory().get(looper);
+      final DefaultMutableTreeNode eventToAdd= new EventBranchNode(step.getEvent(), looper);
       this.add(eventToAdd);
       eventToAdd.add(new DefaultMutableTreeNode("Placeholder. You shouldn't ever see this"));
     }

@@ -46,14 +46,13 @@ public class Simulation implements ModelObserver, Observer
   {
     mSimulationObservers = new ArrayList<SimulationObserver>();
     mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
-    mEnabledEvents = new ArrayList<EventProxy>();
+    mEnabledEvents = new ArrayList<Step>();
     mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
     mModuleContainer = container;
-    mPreviousEvents = new ArrayList<EventProxy>();
+    mPreviousEvents = new ArrayList<Step>();
     mEnabledLastStep = new ArrayList<AutomatonProxy>();
     mPreviousAutomatonStates = new ArrayList<HashMap<AutomatonProxy, StateProxy>>();
     mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
-    mPreviousTransitionHistory = new ArrayList<HashMap<AutomatonProxy, TransitionProxy>>();
     mBlockingEvents = new ArrayList<Pair<EventProxy, AutomatonProxy>>();
     currentTime = -1;
     mContainer = container;
@@ -69,9 +68,9 @@ public class Simulation implements ModelObserver, Observer
   //#########################################################################
   //# Simple Access
   @SuppressWarnings("unchecked")
-  public ArrayList<EventProxy> getValidTransitions()
+  public ArrayList<Step> getValidTransitions()
   {
-    return (ArrayList<EventProxy>)mEnabledEvents.clone();
+    return (ArrayList<Step>)mEnabledEvents.clone();
   }
 
   @SuppressWarnings("unchecked")
@@ -119,9 +118,12 @@ public class Simulation implements ModelObserver, Observer
 
   public ImageIcon getEventActivityIcon(final EventProxy event)
   {
-    if (mEnabledEvents.contains(event))
-      return IconLoader.ICON_TICK;
-    else if (mInvalidEvents.containsKey(event))
+    for (final Step validStep : mEnabledEvents)
+    {
+      if (validStep.getEvent() == event)
+        return IconLoader.ICON_TICK;
+    }
+    if (mInvalidEvents.containsKey(event))
     {
       updateControllability();
       if (mBlockingEvents != null)
@@ -253,7 +255,7 @@ public class Simulation implements ModelObserver, Observer
     return mContainer;
   }
 
-  public List<EventProxy> getEventHistory()
+  public List<Step> getEventHistory()
   {
     return Collections.unmodifiableList(mPreviousEvents);
   }
@@ -287,7 +289,7 @@ public class Simulation implements ModelObserver, Observer
     if (currentTime == -1)
       return null;
     else
-      return mPreviousTransitionHistory.get(currentTime).get(automaton);
+      return mPreviousEvents.get(currentTime).getTransition(automaton);
   }
 
   public AutomatonProxy getAutomatonFromName(final String automatonFind)
@@ -330,7 +332,7 @@ public class Simulation implements ModelObserver, Observer
     else
     {
       mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
-      mEnabledEvents = new ArrayList<EventProxy>();
+      mEnabledEvents = new ArrayList<Step>();
       mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
       if (mCompiledDES != null)
       {
@@ -340,11 +342,10 @@ public class Simulation implements ModelObserver, Observer
               mAllAutomatons.put(automaton, state);
         findEventClassification();
       }
-      mPreviousEvents = new ArrayList<EventProxy>();
+      mPreviousEvents = new ArrayList<Step>();
       mEnabledLastStep = new ArrayList<AutomatonProxy>();
       mPreviousAutomatonStates = new ArrayList<HashMap<AutomatonProxy, StateProxy>>();
       mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
-      mPreviousTransitionHistory = new ArrayList<HashMap<AutomatonProxy, TransitionProxy>>();
       currentTime = -1;
       updateControllability();
       final SimulationChangeEvent simEvent = new SimulationChangeEvent
@@ -359,65 +360,105 @@ public class Simulation implements ModelObserver, Observer
     mTrace = null;
     reset();
     mTrace = trace;
+    Step locatedStep = null;
     for (int looper = 0; looper < trace.getEvents().size() - 1; looper ++)
     {
-      final EventProxy event = trace.getEvents().get(looper);
+      for (final Step step : mEnabledEvents)
+      {
+        boolean isTheRightStep = true;
+        if (step.getEvent() == trace.getEvents().get(looper))
+        {
+          for (final AutomatonProxy auto : this.mAllAutomatons.keySet())
+          {
+            if (step.getSource().get(auto) != null)
+            {
+              if (step.getSource().get(auto) == trace.getTraceSteps().get(looper - 1).getStateMap().get(auto))
+              {
+                if (step.getDest().get(auto) == trace.getTraceSteps().get(looper).getStateMap().get(auto))
+                {
+                  // Do nothing
+                }
+                else
+                  isTheRightStep = false;
+              }
+              else
+                isTheRightStep = false;
+            }
+            else
+              isTheRightStep = false;
+          }
+        }
+        if (isTheRightStep)
+          locatedStep = step;
+      }
       try {
-        step(event);
-      } catch (final UncontrollableException exception) {
+        step(locatedStep);
+      } catch (final NonDeterministicException exception) {
         // Do nothing
       }
     }
   }
 
   @SuppressWarnings("unchecked")
-  public void step(final EventProxy event) throws UncontrollableException
+  public void step(final Step step) throws NonDeterministicException
   {
     final long time = System.currentTimeMillis();
-    if (event == null)
+    if (step == null)
     {
       return;
     }
-    if (isInInvalidEvent(event))
+    if (isInInvalidEvent(step.getEvent()))
     {
-      String errorMessage = "ERROR: The event " + event.getName() +
+      String errorMessage = "ERROR: The event " + step.toString() +
         " cannot be compiled as the following automata are blocking it:";
-      for (final AutomatonProxy automata : mInvalidEvents.get(event))
+      for (final AutomatonProxy automata : mInvalidEvents.get(step.getEvent()))
         errorMessage += "\r\n" + automata.getName();
       throw new IllegalArgumentException(errorMessage);
     }
-    else if (!isInValidEvent(event))
+    else if (!isInValidEvent(step))
     {
-      final String errorMessage = "ERROR: The event " + event.getName() +
+      final String errorMessage = "ERROR: The event " + step.toString() +
         " cannot be completed as it is not inside any automata";
       throw new IllegalArgumentException(errorMessage);
     }
     else
     {
       removeFutureEvents();
-      mPreviousEvents.add(event);
+      mPreviousEvents.add(step);
       mEnabledLastStep = new ArrayList<AutomatonProxy>();
       final HashMap<AutomatonProxy, TransitionProxy> thisStateTransitionFire = new HashMap<AutomatonProxy, TransitionProxy>();
       for (final AutomatonProxy automata : mAllAutomatons.keySet())
       {
         boolean moved = false;
-        for (final TransitionProxy trans : automata.getTransitions())
+        final StateProxy oldLocation = mAllAutomatons.get(automata);
+        if (step.getDest().get(automata) != null)
         {
-          if (trans.getEvent() == event)
+          mAllAutomatons.put(automata, step.getDest().get(automata));
+        }
+        else
+        {
+          for (final TransitionProxy trans : automata.getTransitions())
           {
-            if (trans.getSource() == mAllAutomatons.get(automata) && !moved)
+            if (trans.getEvent() == step.getEvent())
             {
-              mAllAutomatons.put(automata, trans.getTarget());
-              thisStateTransitionFire.put(automata, trans);
-              moved = true;
+              if (trans.getSource() == mAllAutomatons.get(automata) && !moved)
+              {
+                mAllAutomatons.put(automata, trans.getTarget());
+                thisStateTransitionFire.put(automata, trans);
+                moved = true;
+                mEnabledLastStep.add(automata);
+              }
+              else if (trans.getSource() == oldLocation && moved)
+              {
+                throw new NonDeterministicException("The automaton " + automata.getName() +
+                                                    " has two options. The event fired was " + step.toString());
+              }
             }
-            mEnabledLastStep.add(automata);
           }
         }
       }
       mPreviousAutomatonStates.add((HashMap<AutomatonProxy,StateProxy>) mAllAutomatons.clone());
       mPreviousEnabledLastStep.add(mEnabledLastStep);
-      mPreviousTransitionHistory.add(thisStateTransitionFire);
       currentTime++;
     }
     findEventClassification();
@@ -425,7 +466,7 @@ public class Simulation implements ModelObserver, Observer
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
-    System.out.println("Event successfully completed:" + event + " time taken: " + (System.currentTimeMillis() - time));
+    System.out.println("Event successfully completed:" + step + " time taken: " + (System.currentTimeMillis() - time));
   }
 
   public void stepBack()
@@ -536,11 +577,11 @@ public class Simulation implements ModelObserver, Observer
     return mBlockingEvents;
   }
 
-  private boolean isInValidEvent (final EventProxy event)
+  private boolean isInValidEvent (final Step step)
   {
-    for (final EventProxy validEvent : mEnabledEvents)
+    for (final Step validStep : mEnabledEvents)
     {
-      if (event == validEvent)
+      if (step == validStep)
         return true;
     }
     return false;
@@ -556,32 +597,68 @@ public class Simulation implements ModelObserver, Observer
     return false;
   }
 
+  @SuppressWarnings("unchecked")
   private void findEventClassification()
   {
-    mEnabledEvents = new ArrayList<EventProxy>();
+    mEnabledEvents = new ArrayList<Step>();
     mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
-    for (final AutomatonProxy automaton : mAllAutomatons.keySet())
+    for (final AutomatonProxy aut : mAllAutomatons.keySet())
     {
-      for (final EventProxy event : automaton.getEvents())
+      final ArrayList<TransitionProxy> eventsFirable = new ArrayList<TransitionProxy>();
+      for (final TransitionProxy trans : aut.getTransitions())
       {
-        boolean eventIsValidForAutomata = false;
-        for (final TransitionProxy transition : automaton.getTransitions())
+        if (trans.getSource() == mAllAutomatons.get(aut))
         {
-          if (transition.getSource() == mAllAutomatons.get(automaton) && transition.getEvent() == event)
+          boolean isInEnabled = false;
+          boolean isInInvalid = false;
+          for (final Step step: mEnabledEvents)
           {
-            eventIsValidForAutomata = true;
-            if (!isInInvalidEvent(event))
+            if (step.getEvent() == trans.getEvent())
+              isInEnabled = true;
+          }
+          for (final EventProxy invalidEvent : mInvalidEvents.keySet())
+          {
+            if (invalidEvent == trans.getEvent())
+              isInInvalid = true;
+          }
+          if (isInEnabled)
+          {
+            TransitionProxy old = null;
+            for (final TransitionProxy eventFired : eventsFirable)
             {
-              if (!isInValidEvent(event))
-              {
-                mEnabledEvents.add(event);
-              }
+              if (eventFired.getEvent() == trans.getEvent())
+                old = eventFired;
+            }
+            if (old != null)
+            {
+              splitEvent(aut, old, trans);
             }
           }
+          else if (!isInEnabled && !isInInvalid)
+          {
+            mEnabledEvents.add(new Step(trans.getEvent()));
+          }
+          eventsFirable.add(trans);
         }
-        if (!eventIsValidForAutomata)
+      }
+      for (final EventProxy event : aut.getEvents())
+      {
+        boolean fired = false;
+        for (final TransitionProxy trans : eventsFirable)
         {
-          addNewInvalidEvent(event, automaton);
+          if (trans.getEvent() == event)
+            fired = true;
+        }
+        if (!fired)
+        {
+          for (final Step toBeRemoved : (ArrayList<Step>)mEnabledEvents.clone())
+          {
+            if (toBeRemoved.getEvent() == event)
+            {
+              mEnabledEvents.remove(toBeRemoved);
+            }
+          }
+          addNewInvalidEvent(event, aut);
         }
       }
     }
@@ -614,17 +691,50 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
+  private void splitEvent(final AutomatonProxy auto, final TransitionProxy old, final TransitionProxy trans)
+  {
+    if (old.getEvent() != trans.getEvent())
+      throw new IllegalArgumentException();
+    for (final Step step : mEnabledEvents)
+    {
+      if (step.getEvent() == old.getEvent())
+      {
+        if (step.getSource().size() == 0)
+        {
+          mEnabledEvents.remove(step);
+          mEnabledEvents.add(step.addNewTransition(auto, old));
+          mEnabledEvents.add(step.addNewTransition(auto, trans));
+        }
+        else
+        {
+          mEnabledEvents.add(step.addNewTransition(auto, trans));
+        }
+      }
+    }
+  }
+
+
   private void addNewInvalidEvent(final EventProxy event, final AutomatonProxy automaton)
   {
+    boolean isInValidEvent = false;
+    for (final Step step : mEnabledEvents)
+    {
+      if (step.getEvent() == event)
+        isInValidEvent = true;
+    }
     if (isInInvalidEvent(event))
     {
       final ArrayList<AutomatonProxy> got = mInvalidEvents.get(event);
       got.add(automaton);
       mInvalidEvents.put(event, got);
     }
-    else if (isInValidEvent(event))
+    else if (isInValidEvent)
     {
-      mEnabledEvents.remove(event);
+      for (final Step step : mEnabledEvents)
+      {
+        if (step.getEvent() == event)
+          mEnabledEvents.remove(step);
+      }
       final ArrayList<AutomatonProxy> failAutomaton = new ArrayList<AutomatonProxy>();
       failAutomaton.add(automaton);
       mInvalidEvents.put(event, failAutomaton);
@@ -709,7 +819,7 @@ public class Simulation implements ModelObserver, Observer
     if (currentTime == -1)
     {
       mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
-      mEnabledEvents = new ArrayList<EventProxy>();
+      mEnabledEvents = new ArrayList<Step>();
       mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
       if (mCompiledDES != null)
       {
@@ -744,20 +854,18 @@ public class Simulation implements ModelObserver, Observer
       mPreviousEvents.remove(currentTime + 1);
       mPreviousAutomatonStates.remove(currentTime + 1);
       mPreviousEnabledLastStep.remove(currentTime + 1);
-      mPreviousTransitionHistory.remove(currentTime + 1);
     }
   }
 
   //#########################################################################
   //# Data Members
   private HashMap<AutomatonProxy,StateProxy> mAllAutomatons; // The Map object is the current state of the key
-  private ArrayList<EventProxy> mEnabledEvents;
-  private HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the key
-  private ArrayList<EventProxy> mPreviousEvents;
+  private ArrayList<Step> mEnabledEvents;
+  private HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the event
+  private ArrayList<Step> mPreviousEvents;
   private int currentTime; // The index representing the current index for the current version history.
   private ArrayList<HashMap<AutomatonProxy, StateProxy>> mPreviousAutomatonStates;
   private ArrayList<ArrayList<AutomatonProxy>> mPreviousEnabledLastStep;
-  private ArrayList<HashMap<AutomatonProxy, TransitionProxy>> mPreviousTransitionHistory;
   private ArrayList<Pair<EventProxy, AutomatonProxy>> mBlockingEvents;
   private final ModuleContainer mModuleContainer;
   private ArrayList<AutomatonProxy> mEnabledLastStep;

@@ -14,7 +14,7 @@ public class EventBranchNode extends DefaultMutableTreeNode
 {
   public EventBranchNode(final EventProxy event, final int currentTime)
   {
-    super(event.getName(), true);
+    super(event.toString(), true);
     mEvent = event;
     mTime = currentTime;
 

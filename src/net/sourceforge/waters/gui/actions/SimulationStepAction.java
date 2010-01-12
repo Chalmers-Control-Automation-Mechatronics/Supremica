@@ -18,11 +18,11 @@ import javax.swing.Action;
 import javax.swing.JLabel;
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.simulator.EventChooserDialog;
+import net.sourceforge.waters.gui.simulator.NonDeterministicException;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.simulator.UncontrollableException;
-import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.gui.simulator.Step;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.IDE;
@@ -51,19 +51,19 @@ public class SimulationStepAction
     final SimulatorPanel panel = getActiveSimulatorPanel();
     if (panel != null) {
       final Simulation sim = getObservedSimulation();
-      final ArrayList<EventProxy> possibleEvents = sim.getValidTransitions();
+      final ArrayList<Step> possibleEvents = sim.getValidTransitions();
       Collections.sort(possibleEvents);
       if (possibleEvents.size() == 1) {
         try {
           sim.step(possibleEvents.get(0));
-        } catch (final UncontrollableException exception) {
+        } catch (final NonDeterministicException exception) {
           // TODO Auto-generated catch block
           System.err.println(exception.toString());
         }
       } else {
         try {
           sim.step(findOptions(possibleEvents));
-        } catch (final UncontrollableException exception) {
+        } catch (final NonDeterministicException exception) {
           // TODO Auto-generated catch block
           System.err.println(exception.toString());
         }
@@ -84,30 +84,30 @@ public class SimulationStepAction
     }
   }
 
-  private EventProxy findOptions(final ArrayList<EventProxy> possibleEvents)
+  private Step findOptions(final ArrayList<Step> possibleEvents)
   {
     final JLabel[] possibilities = new JLabel[possibleEvents.size()];
-    final EventProxy[] events = new EventProxy[possibleEvents.size()];
+    final Step[] events = new Step[possibleEvents.size()];
     for (int looper = 0; looper < possibleEvents.size(); looper++)
     {
-      final EventProxy event = possibleEvents.get(looper);
-      final JLabel toAdd = new JLabel(event.getName());
-      if (event.getKind() == EventKind.CONTROLLABLE)
+      final Step step = possibleEvents.get(looper);
+      final JLabel toAdd = new JLabel(step.toString());
+      if (step.getEvent().getKind() == EventKind.CONTROLLABLE)
         toAdd.setIcon(IconLoader.ICON_CONTROLLABLE);
-      else if (event.getKind() == EventKind.UNCONTROLLABLE)
+      else if (step.getEvent().getKind() == EventKind.UNCONTROLLABLE)
         toAdd.setIcon(IconLoader.ICON_UNCONTROLLABLE);
       else
         toAdd.setIcon(IconLoader.ICON_PROPOSITION);
       possibilities[looper] = toAdd;
-      events[looper] = event;
+      events[looper] = step;
     }
     final EventChooserDialog dialog = new EventChooserDialog(this.getIDE().getFrame(), possibilities, events);
     dialog.setVisible(true);
-    final EventProxy event = dialog.getSelectedEvent();
-    if ((event != null && !dialog.wasCancelled())) {
-      for (final EventProxy findEvent : possibleEvents) {
-        if (findEvent == event)
-          return event;
+    final Step step = dialog.getSelectedStep();
+    if ((step != null && !dialog.wasCancelled())) {
+      for (final Step findEvent : possibleEvents) {
+        if (findEvent == step)
+          return step;
       }
     }
     return null;
