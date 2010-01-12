@@ -149,7 +149,7 @@
 </Graph>
 </SimpleComponent>
 
-<SimpleComponent Kind="PROPERTY" Name="TestAut">
+<SimpleComponent Kind="SPEC" Name="TestAut">
 <Graph Deterministic="false">
 <NodeList>
 <SimpleNode Initial="true" Name="T1">
