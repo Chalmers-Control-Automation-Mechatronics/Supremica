@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -300,7 +301,10 @@ public class AutomatonDisplayPane
   private Step findOptions(final List<Step> possibleEvents)
   {
     if (possibleEvents.size() == 0)
+    {
+      mContainer.getIDE().info("DEBUG: possibleEvents is zero-sized)");
       return null;
+    }
     else if (possibleEvents.size() == 1)
       return possibleEvents.get(0);
     else {
@@ -332,7 +336,6 @@ public class AutomatonDisplayPane
     }
   }
 
-
   //##########################################################################
   //# Inner Class MouseHandler
   private class MouseHandler implements MouseListener, MouseMotionListener
@@ -350,7 +353,7 @@ public class AutomatonDisplayPane
           for (final TransitionProxy trans : mAutomaton.getTransitions()) {
             final Proxy source = infomap.get(trans).getSourceObject();
             if (source == mFocusedItem &&
-                mSim.getValidTransitions().contains(trans.getEvent())) {
+                eventCanBeFired(mSim, trans.getEvent())) {
               possibleSteps.add(getStep(trans));
             }
           }
@@ -359,7 +362,7 @@ public class AutomatonDisplayPane
             final Proxy source = infomap.get(trans).getSourceObject();
             final AbstractSubject subject = (AbstractSubject) source;
             if (subject.getAncestor(EdgeSubject.class) == mFocusedItem
-                && mSim.getValidTransitions().contains(trans.getEvent())) {
+                && eventCanBeFired(mSim, trans.getEvent())) {
               possibleSteps.add(getStep(trans));
             }
           }
@@ -374,6 +377,16 @@ public class AutomatonDisplayPane
           }
         }
       }
+    }
+
+    private boolean eventCanBeFired(final Simulation sim, final EventProxy event)
+    {
+      for (final Step possibleStep : sim.getValidTransitions())
+      {
+        if (possibleStep.getEvent() == event)
+          return true;
+      }
+      return false;
     }
 
     private Step getStep(final TransitionProxy trans)
@@ -588,5 +601,7 @@ public class AutomatonDisplayPane
   //##########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
+
+
 
 }

@@ -156,7 +156,7 @@ public class Simulation implements ModelObserver, Observer
     if (mEnabledLastStep.contains(aut))
       return IconLoader.ICON_TICK;
     else
-      return IconLoader.ICON_CROSS;
+      return new ImageIcon();
   }
 
   /**
@@ -402,7 +402,6 @@ public class Simulation implements ModelObserver, Observer
   @SuppressWarnings("unchecked")
   public void step(final Step step) throws NonDeterministicException
   {
-    final long time = System.currentTimeMillis();
     if (step == null)
     {
       return;
@@ -466,7 +465,6 @@ public class Simulation implements ModelObserver, Observer
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
-    System.out.println("Event successfully completed:" + step + " time taken: " + (System.currentTimeMillis() - time));
   }
 
   public void stepBack()
@@ -481,6 +479,7 @@ public class Simulation implements ModelObserver, Observer
       {
         if (currentTime == mPreviousEvents.size() - 1)
         {
+          mContainer.getIDE().info(": Looping to start of control loop");
           while (currentTime != ((LoopTraceProxy)mTrace).getLoopIndex() - 1)
           {
             stepBack();
@@ -691,11 +690,12 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void splitEvent(final AutomatonProxy auto, final TransitionProxy old, final TransitionProxy trans)
   {
     if (old.getEvent() != trans.getEvent())
       throw new IllegalArgumentException();
-    for (final Step step : mEnabledEvents)
+    for (final Step step : (ArrayList<Step>)mEnabledEvents.clone())
     {
       if (step.getEvent() == old.getEvent())
       {
@@ -841,10 +841,6 @@ public class Simulation implements ModelObserver, Observer
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
-    if (currentTime != -1)
-      System.out.println("Event successfully completed:" + mPreviousEvents.get(currentTime));
-    else
-      System.out.println("Stepped back to beginning");
   }
 
   private void removeFutureEvents()

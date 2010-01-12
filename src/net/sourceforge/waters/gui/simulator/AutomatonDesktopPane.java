@@ -237,11 +237,10 @@ public class AutomatonDesktopPane
   //#########################################################################
   //# Interface ModelObserver
 
-
   public void update(final EditorChangedEvent event)
   {
     if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH)
-    onReOpen(mContainer, mSim);
+      onReOpen(mContainer, mSim);
   }
 
   //#########################################################################

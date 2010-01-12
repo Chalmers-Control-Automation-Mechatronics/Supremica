@@ -13,7 +13,6 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -178,6 +177,19 @@ public abstract class WatersAnalyzeAction
       this.validate();
     }
 
+    public void error(final AnalysisException exception)
+    {
+      informationLabel.setText("ERROR: " + exception.getMessage());
+      cancelButton.setText("OK");
+      cancelButton.removeActionListener(cancelButton.getActionListeners()[0]);
+      cancelButton.addActionListener(new ActionListener(){
+        public void actionPerformed(final ActionEvent e)
+        {
+          AnalyzerDialog.this.dispose();
+        }
+      });
+    }
+
     private void run()
     {
       runner = new AnalyzerThread();
@@ -237,7 +249,6 @@ public abstract class WatersAnalyzeAction
       public void componentResized(final ComponentEvent e)
       {
         this.setPreferredSize(new Dimension(((int)parent.getSize().getWidth()), ((int)parent.getSize().getHeight() / 2)));
-        System.out.println("DEBUG: New size is:" + this.getSize());
       }
 
       public void componentShown(final ComponentEvent e)
@@ -278,7 +289,7 @@ public abstract class WatersAnalyzeAction
             // Do nothing: Aborted
             fatalError = true;
           } catch (final AnalysisException exception) {
-            JOptionPane.showMessageDialog(getIDE(), "Analysis Failed:\r\n" + exception.getMessage(), "Failure!", JOptionPane.ERROR_MESSAGE);
+            SwingUtilities.invokeLater(new Runnable(){public void run(){error(exception);}});
             fatalError = true;
           }
           if (!fatalError)

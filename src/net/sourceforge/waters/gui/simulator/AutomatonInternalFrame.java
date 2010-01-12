@@ -15,12 +15,14 @@ import javax.swing.SwingUtilities;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.GraphSubject;
 
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class AutomatonInternalFrame extends JInternalFrame
+public class AutomatonInternalFrame extends JInternalFrame implements ModelObserver
 {
 
   //##########################################################################
@@ -47,6 +49,7 @@ public class AutomatonInternalFrame extends JInternalFrame
       }
     });
     this.setFrameIcon(ModuleContext.getComponentKindIcon(aut.getKind()));
+    container.getModule().addModelObserver(this);
   }
 
 
@@ -128,6 +131,17 @@ public class AutomatonInternalFrame extends JInternalFrame
     }
   }
 
+  // ###########################################################################
+  // # Interface ModelObserver
+
+  public void modelChanged(final ModelChangeEvent event)
+  {
+    if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED)
+    {
+      this.adjustSize(false);
+      this.repaint();
+    }
+  }
 
   //##########################################################################
   //# Inner class InternalFrameMouseAdapter

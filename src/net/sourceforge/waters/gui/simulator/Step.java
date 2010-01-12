@@ -63,6 +63,7 @@ public class Step implements Comparable<Step>
         if (trans.getSource() == mSource.get(aut) && trans.getTarget() == mDest.get(aut) && trans.getEvent() == mEvent)
           return trans;
       }
+      return null;
     }
     else
     {
@@ -71,8 +72,8 @@ public class Step implements Comparable<Step>
         if (trans.getEvent() == mEvent)
           return trans;
       }
+      return null;
     }
-    throw new IllegalArgumentException("ERROR: Somehow, the transition could not be found.");
   }
 
   private void determineDeterminism()

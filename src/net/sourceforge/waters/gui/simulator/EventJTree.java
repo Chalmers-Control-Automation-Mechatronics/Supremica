@@ -54,7 +54,6 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
-    // Expand all foreach-component entries.
 
     this.addMouseListener(new MouseAdapter(){
       public void mouseClicked(final MouseEvent e)
@@ -68,7 +67,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
           if (EventProxy.class.isInstance(node))
           {
             try {
-              if (sim.getValidTransitions().contains((EventProxy)node))
+              if (eventCanBeFired(mSim, (EventProxy)node))
                 fireEvent((EventProxy)node);
               else
                 System.out.println("ERROR: That event is blocked");
@@ -86,12 +85,21 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
         }
       }
 
+      private boolean eventCanBeFired(final Simulation sim, final EventProxy event)
+      {
+        for (final Step possibleStep : sim.getValidTransitions())
+        {
+          if (possibleStep.getEvent() == event)
+            return true;
+        }
+        return false;
+      }
+
       private void fireEvent(final EventProxy node) throws NonDeterministicException
       {
 
-        final JLabel[] labels = new JLabel[mSim.getValidTransitions().size()];
-        final Step[] steps = new Step[mSim.getValidTransitions().size()];
-        final int index = 0;
+        final ArrayList<JLabel> labels = new ArrayList<JLabel>();
+        final ArrayList<Step> steps = new ArrayList<Step>();
         for (final Step step: mSim.getValidTransitions())
         {
           if (step.getEvent() == node)
@@ -103,14 +111,29 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
               toAdd.setIcon(IconLoader.ICON_UNCONTROLLABLE);
             else
               toAdd.setIcon(IconLoader.ICON_PROPOSITION);
-            labels[index] = toAdd;
-            steps[index] = step;
+            labels.add(toAdd);
+            steps.add(step);
           }
         }
-        final EventChooserDialog dialog = new EventChooserDialog(mContainer.getIDE(), labels, steps);
-        if (!dialog.wasCancelled())
+        if (labels.size() == 0)
+          mContainer.getIDE().error(": That event cannot be fired");
+        else if (labels.size() == 1)
+          mSim.step(steps.get(0));
+        else
         {
-          mSim.step(dialog.getSelectedStep());
+          final JLabel[] arrayLabels = new JLabel[labels.size()];
+          final Step[] arraySteps = new Step[steps.size()];
+          for (int looper = 0; looper < labels.size(); looper++)
+          {
+            arrayLabels[looper] = labels.get(looper);
+            arraySteps[looper] = steps.get(looper);
+          }
+          final EventChooserDialog dialog = new EventChooserDialog(mContainer.getIDE(), arrayLabels, arraySteps);
+          dialog.setVisible(true);
+          if (!dialog.wasCancelled())
+          {
+            mSim.step(dialog.getSelectedStep());
+          }
         }
       }
     });
@@ -305,8 +328,8 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
         mEventNameLabel.setText(event.getName());
         mEventStatusLabel.setIcon(mSim.getEventActivityIcon(event));
         final int width = mPane.getViewport().getWidth();
-        final int rightWidth = (width * eventColumnWidth[1] - noduleWidth * eventColumnWidth[1]) / (sum(eventColumnWidth));
-        final int leftWidth = (width * eventColumnWidth[0] - noduleWidth * eventColumnWidth[0]) / (sum(eventColumnWidth));
+        final int rightWidth = eventColumnWidth[1];
+        final int leftWidth = width - rightWidth - noduleWidth;
         mEventNameLabel.setPreferredSize(new Dimension(leftWidth, rowHeight));
         mEventStatusLabel.setPreferredSize(new Dimension(rightWidth, rowHeight));
         return mEventPanel;
@@ -367,6 +390,8 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
 
     private EventProxy getParentEvent(final int row)
     {
+      if (EventJTree.this.getPathForRow(row) == null)
+        return null; // The row is not visible, so it doesn't matter what event has it's parent
       if (EventJTree.this.getPathForRow(row).getPathCount() == 2)
         return (EventProxy)EventJTree.this.getPathForRow(row).getLastPathComponent();
       else
@@ -398,7 +423,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
-  private static final int[] eventColumnWidth = {180, 20};
+  private static final int[] eventColumnWidth = {200, 20};
   private static final int noduleWidth = 30;
   public static final int rowHeight = 20;
 
