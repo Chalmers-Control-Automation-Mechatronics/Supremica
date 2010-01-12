@@ -12,6 +12,7 @@ package net.sourceforge.waters.despot;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
@@ -82,7 +83,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   {
     final String wdesext = mProductDESMarshaller.getDefaultExtension();
     final List<EventProxy> answerEvents =
-        getModelAnswerEvents(group, subdir, name);
+        (List<EventProxy>) getModelAnswerEvents(group, subdir, name);
     for (final EventProxy answer : answerEvents) {
       final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
       final File outfilename =
@@ -96,7 +97,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
                            final String name) throws Exception
   {
     final List<EventProxy> answerEvents =
-        getModelAnswerEvents(group, subdir, name);
+        (List<EventProxy>) getModelAnswerEvents(group, subdir, name);
     for (final EventProxy answer : answerEvents) {
       final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
       final EventProxy defaultMark = mBuilder.getMarkingProposition();
@@ -121,11 +122,12 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   void testBuild(final String group, final String subdir, final String name)
       throws Exception
   {
-    final File indirname = new File(mInputDirectory, group + "//" + subdir);
+    final File groupname = new File(mInputDirectory, group);
+    final File indirname = new File(groupname, subdir);
     final String wmodext = mModuleMarshaller.getDefaultExtension();
     final String wdesext = mProductDESMarshaller.getDefaultExtension();
     final List<EventProxy> answerEvents =
-        getModelAnswerEvents(group, subdir, name);
+        (List<EventProxy>) getModelAnswerEvents(group, subdir, name);
 
     for (final EventProxy answer : answerEvents) {
       final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
@@ -166,12 +168,13 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     return des;
   }
 
-  private List<EventProxy> getModelAnswerEvents(final String group,
-                                                final String subdir,
-                                                final String name)
+  private Collection<EventProxy> getModelAnswerEvents(final String group,
+                                                      final String subdir,
+                                                      final String name)
       throws Exception
   {
-    final File indirname = new File(mInputDirectory, group + "//" + subdir);
+    final File groupname = new File(mInputDirectory, group);
+    final File indirname = new File(groupname, subdir);
     final String wmodext = mModuleMarshaller.getDefaultExtension();
     final File infilename = new File(indirname, name + wmodext);
     final URI unmodifiedDESURI = infilename.toURI();
