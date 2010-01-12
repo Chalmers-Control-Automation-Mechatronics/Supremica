@@ -26,10 +26,6 @@ public class SICPropertyVBuilder
   {
     mFactory = factory;
     mModel = null;
-    mDefaultMark =
-        mFactory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME,
-                                  EventKind.PROPOSITION, true);
-    mAlpha = mFactory.createEventProxy(mAlphaNm, EventKind.PROPOSITION, true);
   }
 
   public SICPropertyVBuilder(final ProductDESProxy model,
@@ -37,10 +33,6 @@ public class SICPropertyVBuilder
   {
     mModel = model;
     mFactory = factory;
-    mDefaultMark =
-        mFactory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME,
-                                  EventKind.PROPOSITION, true);
-    mAlpha = mFactory.createEventProxy(mAlphaNm, EventKind.PROPOSITION, true);
   }
 
   /**
@@ -51,6 +43,26 @@ public class SICPropertyVBuilder
   public void setInputModel(final ProductDESProxy model)
   {
     mModel = model;
+  }
+
+  public void setMarkingProposition(final EventProxy marking)
+  {
+    mMarking = marking;
+  }
+
+  public EventProxy getMarkingProposition()
+  {
+    return mMarking;
+  }
+
+  public void setGeneralisedPrecondition(final EventProxy marking)
+  {
+    mPreconditionMarking = marking;
+  }
+
+  public EventProxy getGeneralisedPrecondition()
+  {
+    return mPreconditionMarking;
   }
 
   /**
@@ -76,6 +88,15 @@ public class SICPropertyVBuilder
    */
   public ProductDESProxy createModelForAnswer(final EventProxy answer)
   {
+    if (mMarking == null) {
+      mMarking =
+          mFactory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME,
+                                    EventKind.PROPOSITION, true);
+    }
+    if (mPreconditionMarking == null) {
+      mPreconditionMarking =
+          mFactory.createEventProxy(mAlphaNm, EventKind.PROPOSITION, true);
+    }
     List<AutomatonProxy> newAutomaton = new ArrayList<AutomatonProxy>();
     // the low level automaton of a model only need modifying once because they
     // don't depend on the answer event
@@ -100,8 +121,8 @@ public class SICPropertyVBuilder
     // removes markings from automaton event alphabet
     final List<EventProxy> newEvents =
         removeAlphabetMarkings(mModel.getEvents());
-    newEvents.add(mDefaultMark);
-    newEvents.add(mAlpha);
+    newEvents.add(mMarking);
+    newEvents.add(mPreconditionMarking);
 
     final ProductDESProxy newModel =
         mFactory.createProductDESProxy(mModel.getName(), mModel.getComment(),
@@ -145,13 +166,13 @@ public class SICPropertyVBuilder
     final List<StateProxy> states = new ArrayList<StateProxy>(2);
     List<EventProxy> propositions = new ArrayList<EventProxy>(1);
     // initial state has the default marking proposition
-    propositions.add(mDefaultMark);
+    propositions.add(mMarking);
     final StateProxy initialState =
         mFactory.createStateProxy("T1", true, propositions);
     states.add(initialState);
     // next state has the precondition marking
     propositions = new ArrayList<EventProxy>(1);
-    propositions.add(mAlpha);
+    propositions.add(mPreconditionMarking);
     final StateProxy alphaState =
         mFactory.createStateProxy("T2", false, propositions);
     states.add(alphaState);
@@ -202,8 +223,8 @@ public class SICPropertyVBuilder
     }
 
     // adds the two marking propositions to the automaton alphabet
-    newEvents.add(mDefaultMark);
-    newEvents.add(mAlpha);
+    newEvents.add(mMarking);
+    newEvents.add(mPreconditionMarking);
 
     final AutomatonProxy newTestAut =
         mFactory.createAutomatonProxy("TestAut", ComponentKind.PROPERTY,
@@ -221,7 +242,7 @@ public class SICPropertyVBuilder
     // so
     // by removing the marking all states are implicitly marked)
     final List<EventProxy> newEvents = removeAlphabetMarkings(aut.getEvents());
-    newEvents.add(mAlpha);
+    newEvents.add(mPreconditionMarking);
 
     // collects all the transitions that use the specified answer event
     final List<TransitionProxy> answerTransitions =
@@ -243,8 +264,8 @@ public class SICPropertyVBuilder
       // precondition marking proposition :alpha
       for (final TransitionProxy transition : answerTransitions) {
         if (transition.getSource() == state) {
-          if (!newPropositions.contains(mAlpha)) {
-            newPropositions.add(mAlpha);
+          if (!newPropositions.contains(mPreconditionMarking)) {
+            newPropositions.add(mPreconditionMarking);
           }
           break;
         }
@@ -334,8 +355,8 @@ public class SICPropertyVBuilder
       new HashMap<StateProxy,StateProxy>();
 
   // the default marking proposition
-  private final EventProxy mDefaultMark;
-  // the precondition marking :alpha
-  private final EventProxy mAlpha;
+  private EventProxy mMarking;
+  // the precondition marking
+  private EventProxy mPreconditionMarking;
 
 }
