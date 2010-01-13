@@ -379,22 +379,40 @@ public class Simulation implements ModelObserver, Observer
           {
             if (step.getSource().get(auto) != null)
             {
-              if (step.getSource().get(auto) == trace.getTraceSteps().get(looper - 1).getStateMap().get(auto))
+              if (looper != 0)
               {
-                if (step.getDest().get(auto) == trace.getTraceSteps().get(looper).getStateMap().get(auto))
+                if (step.getSource().get(auto) == trace.getTraceSteps().get(looper - 1).getStateMap().get(auto)
+                    || trace.getTraceSteps().get(looper - 1).getStateMap().get(auto) == null)
                 {
-                  // Do nothing
+                  if (step.getDest().get(auto) == trace.getTraceSteps().get(looper).getStateMap().get(auto)
+                      || trace.getTraceSteps().get(looper).getStateMap().get(auto) == null)
+                  {
+                    // Do nothing
+                  }
+                  else
+                    isTheRightStep = false;
                 }
                 else
                   isTheRightStep = false;
               }
               else
-                isTheRightStep = false;
+              {
+                if (step.getSource().get(auto) == mAllAutomatons.get(auto));
+                {
+                  if (step.getDest().get(auto) == trace.getTraceSteps().get(looper).getStateMap().get(auto)
+                      || trace.getTraceSteps().get(looper).getStateMap().get(auto) == null)
+                  {
+                    // Do nothing
+                  }
+                  else
+                    isTheRightStep = false;
+                }
+              }
             }
-            else
-              isTheRightStep = false;
           }
         }
+        else
+          isTheRightStep = false;
         if (isTheRightStep)
           locatedStep = step;
       }

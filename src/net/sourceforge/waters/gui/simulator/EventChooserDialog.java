@@ -54,6 +54,7 @@ public class EventChooserDialog extends JDialog
         return output;
       }
     });
+    validate();
     mList.setPreferredSize(new Dimension((int)labels[0].getPreferredSize().getWidth() + LIST_BORDER_SIZE, labels.length * DEFAULT_ROW_HEIGHT));
       // This code correctly assigns the width, but not the height
     mList.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
