@@ -75,6 +75,103 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testIntegrity("tests", "hisc", "rhone_subsystem1_ld");
   }
 
+  public void testConflictChecker_High_Level_Subsystem() throws Exception
+  {
+    testConflictChecker("despot", "simpleManufacturingExample",
+                        "High-Level Subsystem", true);
+  }
+
+  public void testConflictChecker_Manuf_Cells() throws Exception
+  {
+    testConflictChecker("despot", "simpleManufacturingExample", "Manuf-Cells",
+                        true);
+  }
+
+  public void testConflictChecker_hisc0_low1() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc0_low1", true);
+  }
+
+  public void testConflictChecker_hisc0_low2() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc0_low2", true);
+  }
+
+  public void testConflictChecker_hisc1_low1() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc1_low1", true);
+  }
+
+  public void testConflictChecker_hisc1_low2() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc1_low2", true);
+  }
+
+  public void testConflictChecker_hisc10_low1() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc10_low1", true);
+  }
+
+  public void testConflictChecker_hisc12_low1() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc12_low1", true);
+  }
+
+  public void testConflictChecker_hisc12_low2() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc12_low2", true);
+  }
+
+  public void testConflictChecker_hisc13_low1() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc13_low1", true);
+  }
+
+  public void testConflictChecker_hisc13_low2() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc13_low2", true);
+  }
+
+  public void testConflictChecker_hisc14_low1() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc14_low1", true);
+  }
+
+  public void testConflictChecker_hisc14_low2() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc14_low2", true);
+  }
+
+  public void testConflictChecker_hisc2_low1() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc2_low1", true);
+  }
+
+  public void testConflictChecker_hisc2_low2() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc2_low2", true);
+  }
+
+  public void testConflictChecker_hisc3_low2() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc3_low2", true);
+  }
+
+  public void testConflictChecker_hisc7_low2() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc7_low2", true);
+  }
+
+  public void testConflictChecker_hisc8_low2() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc8_low2", true);
+  }
+
+  public void testConflictChecker_hisc9_low2() throws Exception
+  {
+    testConflictChecker("despot", "testHISC", "hisc9_low2", true);
+  }
+
   // #########################################################################
 
   void testIntegrity(final String group, final String subdir, final String name)
@@ -93,7 +190,8 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   }
 
   void testConflictChecker(final String group, final String subdir,
-                           final String name) throws Exception
+                           final String name, final boolean expectedResult)
+      throws Exception
   {
     final Collection<EventProxy> answerEvents =
         getModelAnswerEvents(group, subdir, name);
