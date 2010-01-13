@@ -179,9 +179,15 @@ class AutomataTableModel
 
   private void updateRawData()
   {
+    if (mRawData.size() == 0)
+    {
+      getRawData();
+      return;
+    }
     for (final AutomatonProxy aut : getSimulation().getAutomata())
     {
-      if (getSimulation().changedLastStep(aut) || getSimulation().changedSecondLastStep(aut))
+      if (getSimulation().changedLastStep(aut) || getSimulation().changedSecondLastStep(aut)
+          || getSimulation().changedNextStep(aut) || getSimulation().getEventHistory().size() == 0)
       {
         final int indexToChange = getIndex(aut);
         final List<Object> row = new ArrayList<Object>();

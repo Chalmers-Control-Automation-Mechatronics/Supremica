@@ -140,7 +140,7 @@ public abstract class WatersAnalyzeAction
 
     public void succeed()
     {
-      informationLabel.setText("Model " + " " + getSuccessDescription());
+      informationLabel.setText("Model " + des.getName() + " " + getSuccessDescription());
       cancelButton.setText("OK");
       cancelButton.removeActionListener(cancelButton.getActionListeners()[0]);
       cancelButton.addActionListener(new ActionListener(){
@@ -154,7 +154,7 @@ public abstract class WatersAnalyzeAction
 
     public void fail()
     {
-      informationLabel.setText("Model " + " " + getFailureDescription());
+      informationLabel.setText("Model " + des.getName() + " " + getFailureDescription());
       cancelButton.setText("OK");
       cancelButton.removeActionListener(cancelButton.getActionListeners()[0]);
       traceButton = new JButton("Show Trace");

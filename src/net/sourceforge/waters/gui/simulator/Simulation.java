@@ -244,10 +244,17 @@ public class Simulation implements ModelObserver, Observer
   }
   public boolean changedSecondLastStep(final AutomatonProxy automaton)
   {
-    if (mPreviousEnabledLastStep.size() < 2)
+    if (currentTime < 1)
       return false;
     else
-      return mPreviousEnabledLastStep.get(mPreviousEnabledLastStep.size() - 2).contains(automaton);
+      return mPreviousEnabledLastStep.get(currentTime - 1).contains(automaton);
+  }
+  public boolean changedNextStep(final AutomatonProxy aut)
+  {
+    if (currentTime == mPreviousEnabledLastStep.size() - 1)
+      return false;
+    else
+      return mPreviousEnabledLastStep.get(currentTime + 1).contains(aut);
   }
 
   public ModuleContainer getContainer()
@@ -289,7 +296,7 @@ public class Simulation implements ModelObserver, Observer
     if (currentTime == -1)
       return null;
     else
-      return mPreviousEvents.get(currentTime).getTransition(automaton);
+      return mPreviousEvents.get(currentTime).getTransition(automaton, mPreviousAutomatonStates.get(currentTime).get(automaton));
   }
 
   public AutomatonProxy getAutomatonFromName(final String automatonFind)

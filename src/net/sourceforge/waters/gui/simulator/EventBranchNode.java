@@ -3,7 +3,6 @@ package net.sourceforge.waters.gui.simulator;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -17,7 +16,6 @@ public class EventBranchNode extends DefaultMutableTreeNode
     super(event.toString(), true);
     mEvent = event;
     mTime = currentTime;
-
   }
 
   public void addAutomata(final Simulation sim, final HashMap<AutomatonProxy, StateProxy> currentStates)
@@ -75,11 +73,6 @@ public class EventBranchNode extends DefaultMutableTreeNode
 
   private final EventProxy mEvent;
   private final int mTime;
-
-  static ImageIcon enabledEventControllableIcon;
-  static ImageIcon disabledEventControllableIcon;
-  static ImageIcon enabledEventUncontrollableIcon;
-  static ImageIcon disabledEventUncontrollableIcon;
 
   private static final long serialVersionUID = 1581075011997555080L;
 

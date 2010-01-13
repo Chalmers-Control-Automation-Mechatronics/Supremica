@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -92,6 +93,15 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
             final AutomatonProxy toAdd = ((AutomatonLeafNode)node).getAutomata();
             mDesktop.addAutomaton(toAdd.getName(), mSim.getContainer(), mSim, 2);
           }
+          else if (InitialState.class.isInstance(node))
+          {
+            int currentTime = sim.getCurrentTime();
+            while (currentTime != -1)
+            {
+              sim.stepBack();
+              currentTime--;
+            }
+          }
         }
       }
     });
@@ -102,7 +112,11 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
       {
         if (event.getPath().getLastPathComponent().getClass() == EventBranchNode.class)
         {
-          expandedNodes.remove(((EventBranchNode)event.getPath().getLastPathComponent()).getTime());
+          expandedNodes.remove((Integer)(((EventBranchNode)event.getPath().getLastPathComponent()).getTime()));
+        }
+        else if (InitialState.class.isInstance(event.getPath().getLastPathComponent()))
+        {
+          expandedNodes.remove(Integer.decode("-1"));
         }
       }
 
@@ -119,6 +133,11 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
           }
           expandedNodes.add(expansionIndex);
           ((EventBranchNode)event.getPath().getLastPathComponent()).addAutomata(mSim, mSim.getAutomatonHistory().get(expansionIndex));
+        }
+        else if (InitialState.class.isInstance(event.getPath().getLastPathComponent()))
+        {
+          ((InitialState)event.getPath().getLastPathComponent()).expand();
+          expandedNodes.add(-1);
         }
       }
     });
@@ -142,11 +161,22 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
       final int expandedIndex = expandedNodes.get(looper);
       for (int nodeIndex = 0; nodeIndex < node.getChildCount(); nodeIndex++)
       {
-        if (((EventBranchNode)node.getChildAt(nodeIndex)).getTime() == expandedIndex)
+        if (EventBranchNode.class.isInstance(node.getChildAt(nodeIndex)))
         {
-          ((EventBranchNode)node.getChildAt(nodeIndex)).addAutomata(mSim,
-              mSim.getAutomatonHistory().get(((EventBranchNode)node.getChildAt(nodeIndex)).getTime()));
-          this.expandPath(new TreePath(((EventBranchNode)node.getChildAt(nodeIndex)).getPath()));
+          if (((EventBranchNode)node.getChildAt(nodeIndex)).getTime() == expandedIndex)
+          {
+            ((EventBranchNode)node.getChildAt(nodeIndex)).addAutomata(mSim,
+                mSim.getAutomatonHistory().get(((EventBranchNode)node.getChildAt(nodeIndex)).getTime()));
+            this.expandPath(new TreePath(((EventBranchNode)node.getChildAt(nodeIndex)).getPath()));
+          }
+        }
+        else if (InitialState.class.isInstance(node.getChildAt(nodeIndex)))
+        {
+          if (expandedIndex == -1)
+          {
+            ((InitialState)node.getChildAt(nodeIndex)).expand();
+            this.expandPath(new TreePath(((InitialState)node.getChildAt(nodeIndex)).getPath()));
+          }
         }
       }
     }
@@ -265,10 +295,17 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
            mAutomataNameLabel.setIcon(IconLoader.ICON_VARIABLE);
          else
            mAutomataNameLabel.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
-         if (mSim.getBlocking(((EventBranchNode)autoNode.getParent()).getEvent()).contains(autoProxy))
-           mAutomataIconLabel.setIcon(IconLoader.ICON_CROSS);
+         if (EventBranchNode.class.isInstance(autoNode.getParent()))
+         {
+           if (mSim.getBlocking(((EventBranchNode)autoNode.getParent()).getEvent()).contains(autoProxy))
+             mAutomataIconLabel.setIcon(IconLoader.ICON_CROSS);
+           else
+             mAutomataIconLabel.setIcon(IconLoader.ICON_TICK);
+         }
          else
-           mAutomataIconLabel.setIcon(IconLoader.ICON_TICK);
+         {
+           mAutomataIconLabel.setIcon(new ImageIcon());
+         }
          StateProxy currentState;
          currentState = autoNode.getOverloadedState();
          mAutomataStatusLabel.setText(currentState.getName());
@@ -291,6 +328,24 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
            mAutomataStatusLabel.setFont(mAutomataStatusLabel.getFont().deriveFont(Font.PLAIN));
          }
          return mAutomataPanel;
+       }
+       else if (InitialState.class.isInstance(value))
+       {
+         if (sel)
+           mEventPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
+         else
+           mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
+         mEventNameLabel.setText("Initial State");
+         if (TraceJTree.this.mSim.getCurrentTime() == -1)
+         {
+           mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.BOLD));
+         }
+         else
+         {
+           mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
+         }
+         mEventNameLabel.setIcon(new ImageIcon());
+         return mEventPanel;
        }
        else
        {

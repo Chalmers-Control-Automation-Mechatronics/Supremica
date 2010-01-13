@@ -28,8 +28,6 @@ import net.sourceforge.waters.gui.IconLoader;
 
 public class EventChooserDialog extends JDialog
 {
-
-
   // #######################################################################
   // # Constructor
 
@@ -56,7 +54,7 @@ public class EventChooserDialog extends JDialog
         return output;
       }
     });
-    mList.setPreferredSize(new Dimension(DEFAULT_LIST_WIDTH, labels.length * DEFAULT_ROW_HEIGHT));
+    mList.setPreferredSize(new Dimension((int)labels[0].getPreferredSize().getWidth() + LIST_BORDER_SIZE, labels.length * DEFAULT_ROW_HEIGHT));
       // This code correctly assigns the width, but not the height
     mList.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
     eventList = correspondingEvent;
@@ -175,5 +173,6 @@ public class EventChooserDialog extends JDialog
   private static final int DEFAULT_LIST_WIDTH = 250;
   private static final int DEFAULT_ROW_HEIGHT = 20;
   private static final Point DEFAULT_STARTING_LOCATION = new Point(100, 100);
+  private static final int LIST_BORDER_SIZE = 5;
 
 }
