@@ -75,18 +75,14 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testIntegrity("tests", "hisc", "rhone_subsystem1_ld");
   }
 
-  public void testConflictChecker_High_Level_Subsystem() throws Exception
-  {
-    testConflictChecker("despot", "simpleManufacturingExample",
-                        "High-Level Subsystem", true);
-  }
-
+  // SimpleManufacturingExample
   public void testConflictChecker_Manuf_Cells() throws Exception
   {
     testConflictChecker("despot", "simpleManufacturingExample", "Manuf-Cells",
                         true);
   }
 
+  // testHISC
   public void testConflictChecker_hisc0_low1() throws Exception
   {
     testConflictChecker("despot", "testHISC", "hisc0_low1", true);
@@ -97,6 +93,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testConflictChecker("despot", "testHISC", "hisc0_low2", true);
   }
 
+  //testHISC1
   public void testConflictChecker_hisc1_low1() throws Exception
   {
     testConflictChecker("despot", "testHISC", "hisc1_low1", true);
@@ -107,6 +104,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testConflictChecker("despot", "testHISC", "hisc1_low2", true);
   }
 
+  //testHISC10
   public void testConflictChecker_hisc10_low1() throws Exception
   {
     testConflictChecker("despot", "testHISC", "hisc10_low1", true);
