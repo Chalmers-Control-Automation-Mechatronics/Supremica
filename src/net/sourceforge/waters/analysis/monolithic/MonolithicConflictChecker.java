@@ -444,6 +444,12 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           } else if (targets.length == 1) {
             mTargetBuffer[autid] = targets[0];
           } else {
+            // ~~~ Not correct. Either expandNondeterministic()
+            // replaces expand() completely, or do something smarter:
+            // Record the autid's with more than once successor state
+            // in another array, then after this loop call a modified
+            // version of expandNondeterministic() that only expands the
+            // listed automata.
             expandNondeterministic(mSourceBuffer, mTargetBuffer, eventid, 0);
           }
 
@@ -458,28 +464,29 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
                                         final int eventID, final int i)
         throws OverflowException
     {
+      // ~~~ As we have got mSourceBuffer and mTargetBuffer, we can use these
+      // and do not need the parameters.
       final int stateid = fringeGet();// should maybe pass stateid to this
-      // method,
-      // because we arent getting a new state,
+      // method, because we aren't getting a new state,
       // but using one expand() tried to expand
-
+      // ~~~ Indeed, and probably also call the variable sourceID, as it
+      // is the code of the source state of the transitions. It is used
+      // to store predecessor states.
       final AutomatonSchema[] automata = mStateSchema.getOrdering();
       if (i < automata.length) {
         final AutomatonSchema schema = automata[i];
         final int[][][] table = schema.mTransitionTable;
-        if (table[eventID] == null) {
+        final int[][] eventsSources = table[eventID];
+        if (eventsSources == null) {
           target[i] = source[i];
           expandNondeterministic(source, target, eventID, i + 1);
         } else {
           // there are (maybe) target states, process them ...
-          final int[][] eventsSources = table[eventID];
-          if (eventsSources != null) {
-            final int[] targets = eventsSources[source[i]];
-            if (targets != null) {
-              for (final int foundTarget : targets) {
-                target[i] = foundTarget;
-                expandNondeterministic(source, target, eventID, i + 1);
-              }
+          final int[] targets = eventsSources[source[i]];
+          if (targets != null) {
+            for (final int foundTarget : targets) {
+              target[i] = foundTarget;
+              expandNondeterministic(source, target, eventID, i + 1);
             }
           }
         }
