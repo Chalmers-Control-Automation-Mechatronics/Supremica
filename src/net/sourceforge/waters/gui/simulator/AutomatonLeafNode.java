@@ -1,6 +1,5 @@
 package net.sourceforge.waters.gui.simulator;
 
-import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -9,12 +8,12 @@ import net.sourceforge.waters.model.des.StateProxy;
 public class AutomatonLeafNode extends DefaultMutableTreeNode
 {
 
-  public AutomatonLeafNode(final AutomatonProxy automata, final StateProxy overloadedState)
+  public AutomatonLeafNode(final AutomatonProxy automata, final StateProxy overloadedState, final boolean blocking)
   {
     super(automata.getName(), false);
     mAutomata = automata;
     mState = overloadedState;
-
+    mBlocking = blocking;
   }
 
   public AutomatonProxy getAutomata()
@@ -50,16 +49,14 @@ public class AutomatonLeafNode extends DefaultMutableTreeNode
       output += "-";
     return output;
   }
+  public boolean getBlocking()
+  {
+    return mBlocking;
+  }
 
   private final AutomatonProxy mAutomata;
   private final StateProxy mState;
-
-  static ImageIcon unblockingPlantIcon;
-  static ImageIcon blockingPlantIcon;
-  static ImageIcon unblockingSpecIcon;
-  static ImageIcon blockingSpecIcon;
-  static ImageIcon unblockingVarIcon;
-  static ImageIcon blockingVarIcon;
+  private final boolean mBlocking;
 
   private static final long serialVersionUID = 4785226183311677790L;
 

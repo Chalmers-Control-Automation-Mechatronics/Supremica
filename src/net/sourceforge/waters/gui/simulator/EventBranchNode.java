@@ -27,12 +27,14 @@ public class EventBranchNode extends DefaultMutableTreeNode
       for (final AutomatonProxy automaton : sim.getAutomata())
         if (automaton.getEvents().contains(mEvent))
           automatonInEvent.add(automaton);
+      automatonInEvent.addAll(sim.isNonControllableAtTime(mTime));
+      final ArrayList<AutomatonProxy> allInvalid = sim.isNonControllableAtTime(mTime);
       for (final AutomatonProxy automaton : automatonInEvent)
       {
         if (currentStates == null)
-          this.add(new AutomatonLeafNode(automaton, null));
+          this.add(new AutomatonLeafNode(automaton, null, allInvalid.contains(automaton)));
         else
-          this.add(new AutomatonLeafNode(automaton, currentStates.get(automaton)));
+          this.add(new AutomatonLeafNode(automaton, currentStates.get(automaton), allInvalid.contains(automaton)));
       }
     }
   }

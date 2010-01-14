@@ -159,6 +159,70 @@ public class Simulation implements ModelObserver, Observer
       return new ImageIcon();
   }
 
+  public ArrayList<AutomatonProxy> isNonControllableAtTime(final int time)
+  {
+    final HashMap<AutomatonProxy, StateProxy> pastStates;
+    if (time == -1)
+    {
+      pastStates = new HashMap<AutomatonProxy, StateProxy>();
+      for (final AutomatonProxy auto : mCompiledDES.getAutomata())
+        for (final StateProxy state : auto.getStates())
+          if (state.isInitial())
+            pastStates.put(auto, state);
+    }
+    else
+     pastStates = mPreviousAutomatonStates.get(time);
+    final ArrayList<AutomatonProxy> output = new ArrayList<AutomatonProxy>();
+    for (final EventProxy event: getAllEvents())
+    {
+      if (event.getKind() == EventKind.UNCONTROLLABLE)
+      {
+        final ArrayList<AutomatonProxy> blocked = new ArrayList<AutomatonProxy>();
+        for (final AutomatonProxy auto : pastStates.keySet())
+        {
+          if (cantBeFired(event, pastStates).contains(auto) && !blocked.contains(auto) && auto.getEvents().contains(event))
+          {
+            blocked.add(auto);
+          }
+        }
+        boolean plant = false;
+        boolean spec = false;
+        for (final AutomatonProxy auto : blocked)
+        {
+          if (auto.getKind() == ComponentKind.PLANT)
+            plant = true;
+          else if (auto.getKind() == ComponentKind.SPEC)
+            spec = true;
+        }
+        if (!plant && spec)
+        {
+          for (final AutomatonProxy auto : blocked)
+          {
+            if (auto.getKind() == ComponentKind.SPEC && !output.contains(auto))
+              output.add(auto);
+          }
+        }
+      }
+    }
+    return output;
+  }
+  private ArrayList<AutomatonProxy> cantBeFired(final EventProxy event, final HashMap<AutomatonProxy, StateProxy> state)
+  {
+    final ArrayList<AutomatonProxy> output = new ArrayList<AutomatonProxy>();
+    for (final AutomatonProxy auto : state.keySet())
+    {
+      boolean passed = false;
+      for (final TransitionProxy trans: auto.getTransitions())
+      {
+        if (trans.getEvent() == event && state.get(auto) == trans.getSource())
+          passed = true;
+      }
+      if (!passed)
+        output.add(auto);
+    }
+    return output;
+  }
+
   /**
    * A check to see if the event is a blocking event (All automaton which are blocked by this event are specifications)
    * @param event The event to test

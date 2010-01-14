@@ -136,7 +136,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
         }
         else if (InitialState.class.isInstance(event.getPath().getLastPathComponent()))
         {
-          ((InitialState)event.getPath().getLastPathComponent()).expand();
+          ((InitialState)event.getPath().getLastPathComponent()).expand(mSim);
           expandedNodes.add(-1);
         }
       }
@@ -174,7 +174,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
         {
           if (expandedIndex == -1)
           {
-            ((InitialState)node.getChildAt(nodeIndex)).expand();
+            ((InitialState)node.getChildAt(nodeIndex)).expand(mSim);
             this.expandPath(new TreePath(((InitialState)node.getChildAt(nodeIndex)).getPath()));
           }
         }
@@ -295,14 +295,10 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
            mAutomataNameLabel.setIcon(IconLoader.ICON_VARIABLE);
          else
            mAutomataNameLabel.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
-         if (EventBranchNode.class.isInstance(autoNode.getParent()))
-         {
-           mAutomataIconLabel.setIcon(new ImageIcon());
-         }
+         if (autoNode.getBlocking())
+           mAutomataIconLabel.setIcon(IconLoader.ICON_WARNING);
          else
-         {
            mAutomataIconLabel.setIcon(new ImageIcon());
-         }
          StateProxy currentState;
          currentState = autoNode.getOverloadedState();
          mAutomataStatusLabel.setText(currentState.getName());
