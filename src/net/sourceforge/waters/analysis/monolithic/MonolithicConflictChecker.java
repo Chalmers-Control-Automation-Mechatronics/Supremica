@@ -438,11 +438,11 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         for (int autid = 0; autid < automata.length; autid++) {
           final AutomatonSchema schema = automata[autid];
           final int src = mSourceBuffer[autid];
-          final int target = schema.getSuccessorState(src, eventid).get(0);
-          if (target<0) {
+          final int[] targets = schema.getSuccessorState(src, eventid);
+          if (targets == null) {
             continue nextevent;
           }
-          mTargetBuffer[autid] = target;
+          mTargetBuffer[autid] = targets[0];
 
         }
         // Hopefully we have a new state! Encode away ...
@@ -464,9 +464,11 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         for (int autid = 0; autid < numaut; autid++) {
           final AutomatonSchema schema = automata[autid];
           final int source = mSourceBuffer[autid];
-          final List<Integer> targets =
-              schema.getSuccessorState(source, eventid);
-          final int target = targets.get(0);
+          final int[] targets = schema.getSuccessorState(source, eventid);
+          int target = -1;
+          if (targets != null) {
+            target = targets[0];
+          }
           if (target != mTargetBuffer[autid]) {
             continue nextevent;
           }
@@ -733,27 +735,47 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       mInitialState = initial;
 
       final int numevents = eventmap.size();
-      mTransitionTable = new HashMap[numevents];
+      mTransitionTable = new int[numevents][][];
+      final Map<Integer,List<Integer>>[] tempTransitionTable =
+          new HashMap[numevents];
       for (final EventProxy event : automaton.getEvents()) {
         final int eventid = eventmap.getId(event);
-        mTransitionTable[eventid] =
+        mTransitionTable[eventid] = new int[numstates][];
+        tempTransitionTable[eventid] =
             new HashMap<Integer,List<Integer>>(numstates);
         for (int srcid = 0; srcid < numstates; srcid++) {
-          final List<Integer> targetlist = new ArrayList<Integer>(1);
-          targetlist.add(-1);
-          mTransitionTable[eventid].put(srcid, targetlist);
+          // final List<Integer> targetlist = new ArrayList<Integer>(1);
+          // targetlist.add(-1);
+          tempTransitionTable[eventid].put(srcid, null);
+          mTransitionTable[eventid][srcid] = null;
         }
       }
       for (final TransitionProxy trans : automaton.getTransitions()) {
         final int srcid = getStateNumber(trans.getSource());
         final int destid = getStateNumber(trans.getTarget());
         final int eventid = eventmap.getId(trans.getEvent());
-        List<Integer> existingTargets = mTransitionTable[eventid].get(srcid);
-        if (existingTargets.contains(-1)) {
+        List<Integer> existingTargets = tempTransitionTable[eventid].get(srcid);
+        if (existingTargets == null) {
           existingTargets = new ArrayList<Integer>();
-          mTransitionTable[eventid].put(srcid, existingTargets);
+          tempTransitionTable[eventid].put(srcid, existingTargets);
         }
         existingTargets.add(destid);
+      }
+      // copies target contents from tempTransitionTable into an array for
+      // easier processing later
+      for (int j = 0; j < numevents; j++) {
+        for (int k = 0; k < numstates; k++) {
+          if (tempTransitionTable[j] != null) {
+            if (tempTransitionTable[j].get(k) != null) {
+              final int numtargets = tempTransitionTable[j].get(k).size();
+              final int[] targets = new int[numtargets];
+              for (int m = 0; m < numtargets; m++) {
+                targets[m] = tempTransitionTable[j].get(k).get(m);
+              }
+              mTransitionTable[j][k] = targets;
+            }
+          }
+        }
       }
     }
 
@@ -782,15 +804,14 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
      * Returns the successor state for the given source state and event, or -1
      * if the event is not enabled.
      */
-    List<Integer> getSuccessorState(final int src, final int event)
+    int[] getSuccessorState(final int src, final int event)
     {
-      final Map<Integer,List<Integer>> alltargets = mTransitionTable[event];
+      final int[][] alltargets = mTransitionTable[event];
       if (alltargets == null) {
-        final List<Integer> test = new ArrayList<Integer>();
-        test.add(src);
+        final int[] test = new int[] {src};
         return test;
       } else {
-        final List<Integer> targets = mTransitionTable[event].get(src);
+        final int[] targets = mTransitionTable[event][src];
         return targets;
       }
     }
@@ -827,7 +848,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         new TObjectIntHashMap<StateProxy>();
     private final TIntHashSet mMarkedStates;
     private final TIntHashSet mPreconditionMarkedStates;
-    private final Map<Integer,List<Integer>>[] mTransitionTable;
+    private final int[][][] mTransitionTable;
     /**
      * The initial state of the automaton.
      */
