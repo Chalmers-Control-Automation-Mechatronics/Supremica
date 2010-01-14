@@ -11,7 +11,6 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -453,33 +452,19 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     }
 
     @SuppressWarnings("unused")
-    private void expandReverse(final int[] target, final int[] source,
-                               final EventProxy event, final int i)
+    private void expandNondeterministic(final int[] source, final int[] target,
+                                        final int eventID, final int i)
     {
       final AutomatonSchema[] automata = mStateSchema.getOrdering();
-      if (i < mStateSchema.getNumberOfAutomata()) {
-        boolean eventFound = false;
-        for (final EventProxy ev : automata[i].getAutomatonEvents()) {
-          if (ev == event) {
-            eventFound = true;
-            break;
-          }
-        }
-        if (eventFound) {
-          for (final TransitionProxy transition : automata[i]
-              .getAutomatonTransitions()) {
-            if (transition.getEvent() == event
-            /* && transition.getTarget() == target[i] */) {
-              source[i] = automata[i].getStateNumber(transition.getSource());
-              expandReverse(target, source, event, i + 1);
-            }
-          }
-        } else {
-          source[i] = target[i];
-          expandReverse(target, source, event, i + 1);
-        }
+      final AutomatonSchema schema = automata[i];
+      final int[][][] table = schema.mTransitionTable;
+      if (table[eventID] == null) {
+        // always selflooped
+        target[i] = source[i];
+        expandNondeterministic(source, target, eventID, i + 1);
       } else {
-        // source contains a predecessor state, use it
+        // there are (maybe) target states, process them ...
+
       }
 
     }
@@ -733,7 +718,6 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     {
       // Enumerate the state set for this automata.
       // This gives an ordering to the states.
-      mAutomaton = automaton;
       final Set<StateProxy> states = automaton.getStates();
       final int numstates = states.size();
       mStates = new StateProxy[numstates];
@@ -798,13 +782,15 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       // copies target contents from tempTransitionTable into an array for
       // easier processing later
       for (int j = 0; j < numevents; j++) {
+        final Map<Integer,List<Integer>> sources = tempTransitionTable[j];
         for (int k = 0; k < numstates; k++) {
-          if (tempTransitionTable[j] != null) {
-            if (tempTransitionTable[j].get(k) != null) {
-              final int numtargets = tempTransitionTable[j].get(k).size();
+          if (sources != null) {
+            final List<Integer> targetList = sources.get(k);
+            if (targetList != null) {
+              final int numtargets = targetList.size();
               final int[] targets = new int[numtargets];
               for (int m = 0; m < numtargets; m++) {
-                targets[m] = tempTransitionTable[j].get(k).get(m);
+                targets[m] = targetList.get(m);
               }
               mTransitionTable[j][k] = targets;
             }
@@ -832,16 +818,6 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     StateProxy getInitialState()
     {
       return mInitialState;
-    }
-
-    Set<EventProxy> getAutomatonEvents()
-    {
-      return mAutomaton.getEvents();
-    }
-
-    Collection<TransitionProxy> getAutomatonTransitions()
-    {
-      return mAutomaton.getTransitions();
     }
 
     /**
@@ -897,10 +873,6 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
      * The initial state of the automaton.
      */
     private final StateProxy mInitialState;
-    /**
-     * The automaton this schema uses.
-     */
-    private final AutomatonProxy mAutomaton;
 
   }
 
