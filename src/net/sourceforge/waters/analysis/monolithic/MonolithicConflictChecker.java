@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -451,6 +452,38 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       }
     }
 
+    @SuppressWarnings("unused")
+    private void expandReverse(final int[] target, final int[] source,
+                               final EventProxy event, final int i)
+    {
+      final AutomatonSchema[] automata = mStateSchema.getOrdering();
+      if (i < mStateSchema.getNumberOfAutomata()) {
+        boolean eventFound = false;
+        for (final EventProxy ev : automata[i].getAutomatonEvents()) {
+          if (ev == event) {
+            eventFound = true;
+            break;
+          }
+        }
+        if (eventFound) {
+          for (final TransitionProxy transition : automata[i]
+              .getAutomatonTransitions()) {
+            if (transition.getEvent() == event
+            /* && transition.getTarget() == target[i] */) {
+              source[i] = automata[i].getStateNumber(transition.getSource());
+              expandReverse(target, source, event, i + 1);
+            }
+          }
+        } else {
+          source[i] = target[i];
+          expandReverse(target, source, event, i + 1);
+        }
+      } else {
+        // source contains a predecessor state, use it
+      }
+
+    }
+
     private EventProxy findEvent(final int sourceid, final int targetid)
     {
       final AutomatonSchema[] automata = mStateSchema.getOrdering();
@@ -700,6 +733,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     {
       // Enumerate the state set for this automata.
       // This gives an ordering to the states.
+      mAutomaton = automaton;
       final Set<StateProxy> states = automaton.getStates();
       final int numstates = states.size();
       mStates = new StateProxy[numstates];
@@ -800,6 +834,16 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       return mInitialState;
     }
 
+    Set<EventProxy> getAutomatonEvents()
+    {
+      return mAutomaton.getEvents();
+    }
+
+    Collection<TransitionProxy> getAutomatonTransitions()
+    {
+      return mAutomaton.getTransitions();
+    }
+
     /**
      * Returns the successor state for the given source state and event, or -1
      * if the event is not enabled.
@@ -853,6 +897,10 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
      * The initial state of the automaton.
      */
     private final StateProxy mInitialState;
+    /**
+     * The automaton this schema uses.
+     */
+    private final AutomatonProxy mAutomaton;
 
   }
 
