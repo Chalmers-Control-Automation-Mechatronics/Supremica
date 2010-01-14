@@ -65,6 +65,10 @@ public class SimulatorPanel
     mDesktop.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
     setRightComponent(mDesktop);
   }
+  public AutomatonDesktopPane getDesktop()
+  {
+    return mDesktop;
+  }
 
   private void setupAutomata()
   {

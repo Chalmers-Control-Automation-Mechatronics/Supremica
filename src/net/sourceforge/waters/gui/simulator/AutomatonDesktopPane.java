@@ -1,8 +1,10 @@
 package net.sourceforge.waters.gui.simulator;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyVetoException;
@@ -176,6 +178,21 @@ public class AutomatonDesktopPane
     } catch (final PropertyVetoException exception) {
       // Can't select frame---too bad ...
     }
+  }
+
+  // #########################################################################
+  // # Remote Actions
+
+  public void closeWindow(final ActionEvent e, final Point point)
+  {
+    final Component locatedComponent = this.getComponentAt(point);
+    if (AutomatonInternalFrame.class.isInstance(locatedComponent))
+    {
+      final AutomatonInternalFrame targetFrame = (AutomatonInternalFrame)locatedComponent; // Use e to find out what window needs to be closed here
+      removeAutomaton(targetFrame.getTitle());
+    }
+    else
+      mContainer.getIDE().info("DEBUG: Component is: " + locatedComponent.getClass());
   }
 
   //#########################################################################

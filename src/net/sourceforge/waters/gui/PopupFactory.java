@@ -24,13 +24,13 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import org.supremica.util.VPopupMenu;
 
 
-abstract class PopupFactory
+public abstract class PopupFactory
   extends AbstractModuleProxyVisitor
 {
 
   //#########################################################################
   //# Constructor
-  PopupFactory(final WatersPopupActionManager master)
+  protected PopupFactory(final WatersPopupActionManager master)
   {
     mMaster = master;
     mPopupMenu = null;
@@ -113,17 +113,17 @@ abstract class PopupFactory
 
   //#########################################################################
   //# Simple Access
-  WatersPopupActionManager getMaster()
+  protected WatersPopupActionManager getMaster()
   {
     return mMaster;
   }
 
-  JPopupMenu getPopup()
+  protected JPopupMenu getPopup()
   {
     return mPopupMenu;
   }
 
-  MouseEvent getEvent()
+  protected MouseEvent getEvent()
   {
     return mEvent;
   }

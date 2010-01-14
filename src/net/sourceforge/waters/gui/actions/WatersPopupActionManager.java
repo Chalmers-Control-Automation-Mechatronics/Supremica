@@ -197,6 +197,11 @@ public class WatersPopupActionManager
     return master.getAction(ShowModuleCommentAction.class);
   }
 
+  public IDEAction getDesktopCloseWindowAction(final Point point)
+  {
+    return new DesktopCloseWindowAction(mIDE, point);
+  }
+
 
   //#######################################################################
   //# Data Members
