@@ -441,8 +441,11 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           final int[] targets = schema.getSuccessorState(src, eventid);
           if (targets == null) {
             continue nextevent;
+          } else if (targets.length == 1) {
+            mTargetBuffer[autid] = targets[0];
+          } else {
+            expandNondeterministic(mSourceBuffer, mTargetBuffer, eventid, 0);
           }
-          mTargetBuffer[autid] = targets[0];
 
         }
         // Hopefully we have a new state! Encode away ...
@@ -451,20 +454,38 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       }
     }
 
-    @SuppressWarnings("unused")
     private void expandNondeterministic(final int[] source, final int[] target,
                                         final int eventID, final int i)
+        throws OverflowException
     {
-      final AutomatonSchema[] automata = mStateSchema.getOrdering();
-      final AutomatonSchema schema = automata[i];
-      final int[][][] table = schema.mTransitionTable;
-      if (table[eventID] == null) {
-        // always selflooped
-        target[i] = source[i];
-        expandNondeterministic(source, target, eventID, i + 1);
-      } else {
-        // there are (maybe) target states, process them ...
+      final int stateid = fringeGet();// should maybe pass stateid to this
+      // method,
+      // because we arent getting a new state,
+      // but using one expand() tried to expand
 
+      final AutomatonSchema[] automata = mStateSchema.getOrdering();
+      if (i < automata.length) {
+        final AutomatonSchema schema = automata[i];
+        final int[][][] table = schema.mTransitionTable;
+        if (table[eventID] == null) {
+          target[i] = source[i];
+          expandNondeterministic(source, target, eventID, i + 1);
+        } else {
+          // there are (maybe) target states, process them ...
+          final int[][] eventsSources = table[eventID];
+          if (eventsSources != null) {
+            final int[] targets = eventsSources[source[i]];
+            if (targets != null) {
+              for (final int foundTarget : targets) {
+                target[i] = foundTarget;
+                expandNondeterministic(source, target, eventID, i + 1);
+              }
+            }
+          }
+        }
+      } else {
+        final long newstate = mStateSchema.encodeState(target);
+        addNewState(newstate, stateid);
       }
 
     }
