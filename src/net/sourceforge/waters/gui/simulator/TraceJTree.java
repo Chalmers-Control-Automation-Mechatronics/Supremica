@@ -297,10 +297,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
            mAutomataNameLabel.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
          if (EventBranchNode.class.isInstance(autoNode.getParent()))
          {
-           if (mSim.getBlocking(((EventBranchNode)autoNode.getParent()).getEvent()).contains(autoProxy))
-             mAutomataIconLabel.setIcon(IconLoader.ICON_CROSS);
-           else
-             mAutomataIconLabel.setIcon(IconLoader.ICON_TICK);
+           mAutomataIconLabel.setIcon(new ImageIcon());
          }
          else
          {

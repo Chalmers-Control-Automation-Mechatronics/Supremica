@@ -40,6 +40,11 @@ public class Step implements Comparable<Step>
     return new Step(mEvent, newSource, newDest);
   }
 
+  public boolean isSensitive(final AutomatonProxy auto)
+  {
+    return mSource.containsKey(auto);
+  }
+
   public EventProxy getEvent()
   {
     return mEvent;
@@ -114,12 +119,12 @@ public class Step implements Comparable<Step>
     }
     else
     {
-      String output = mEvent.getName() + "(";
+      String output = mEvent.getName() + "{";
       for (final AutomatonProxy endingAut : mDest.keySet())
       {
-        output += endingAut.getName() + " goes to " + mDest.get(endingAut) + ",";
+        output += endingAut.getName() + "=" + mDest.get(endingAut) + ",";
       }
-      return output + ")";
+      return output.substring(0, output.length() - 1) + "}";
     }
   }
 

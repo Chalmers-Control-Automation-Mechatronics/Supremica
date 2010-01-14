@@ -162,18 +162,19 @@ public class Simulation implements ModelObserver, Observer
   /**
    * A check to see if the event is a blocking event (All automaton which are blocked by this event are specifications)
    * @param event The event to test
-   * @return TRUE if the event is a blocking event, false otherwise
+   * @return null if the event is a blocking event, all specifications which are blocking it otherwise
    */
-  public boolean isBlocking(final EventProxy event)
+  public ArrayList<AutomatonProxy> getNonControllable(final EventProxy event)
   {
     if (mBlockingEvents == null)
-      return false;
+      return null;
+    final ArrayList<AutomatonProxy> output = new ArrayList<AutomatonProxy>();
     for (final Pair<EventProxy, AutomatonProxy> blocker : mBlockingEvents)
     {
       if (blocker.getFirst() == event)
-        return true;
+        output.add(blocker.getSecond());
     }
-    return false;
+    return output;
   }
 
   /**
@@ -694,13 +695,18 @@ public class Simulation implements ModelObserver, Observer
       {
         mModuleContainer.getIDE().error(": The event " + invalidPair.getFirst().getName()
             + " is not controllable, inside the automaton " + invalidPair.getSecond().getName()
-            + " Current state is: " + mAllAutomatons.get(invalidPair.getSecond()).getName());
+            + ". Current state is: " + mAllAutomatons.get(invalidPair.getSecond()).getName());
       }
     }
     if (mEnabledEvents.size() == 0)
     {
       for (final StateProxy state : mAllAutomatons.values())
       {
+        if (state.getPropositions().size() == 0)
+        {
+          mContainer.getIDE().error(": Deadlock has occured");
+          return;
+        }
         for (final EventProxy proposition : state.getPropositions())
         {
           if (proposition.getName().compareTo(":accepting") != 0)
@@ -724,7 +730,7 @@ public class Simulation implements ModelObserver, Observer
     {
       if (step.getEvent() == old.getEvent())
       {
-        if (step.getSource().size() == 0)
+        if (!step.isSensitive(auto))
         {
           mEnabledEvents.remove(step);
           mEnabledEvents.add(step.addNewTransition(auto, old));

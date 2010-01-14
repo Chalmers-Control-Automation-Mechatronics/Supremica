@@ -19,7 +19,7 @@ public class SimulationJumpToEndAction extends WatersSimulationAction
     super(ide);
     putValue(Action.NAME, "Jump To End");
     putValue(Action.SHORT_DESCRIPTION, "Set the simulation to the final state");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_REPLAY);
+    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_TO_END);
   }
 
 

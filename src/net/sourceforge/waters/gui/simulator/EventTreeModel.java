@@ -240,9 +240,9 @@ public class EventTreeModel
       else
         return 1;
     }
-    else if (mSim.isBlocking(a))
+    else if (mSim.getNonControllable(a) == null)
     {
-      if (mSim.isBlocking(b))
+      if (mSim.getNonControllable(b) == null)
         return 0;
       else
         return -1;
@@ -251,7 +251,7 @@ public class EventTreeModel
     {
       if (mSim.getValidTransitions().contains(b))
         return -1;
-      else if (mSim.isBlocking(b))
+      else if (mSim.getNonControllable(b) == null)
         return 1;
       else
         return 0;

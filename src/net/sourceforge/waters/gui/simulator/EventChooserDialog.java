@@ -54,8 +54,6 @@ public class EventChooserDialog extends JDialog
         return output;
       }
     });
-    validate();
-    mList.setPreferredSize(new Dimension((int)labels[0].getPreferredSize().getWidth() + LIST_BORDER_SIZE, labels.length * DEFAULT_ROW_HEIGHT));
       // This code correctly assigns the width, but not the height
     mList.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
     eventList = correspondingEvent;
@@ -73,7 +71,8 @@ public class EventChooserDialog extends JDialog
       (int)maximumWidth,
       (int)((DEFAULT_LIST_WIDTH - maximumWidth * 2) / 2)};
     layout.columnWidths = a;
-    scrollPane.setPreferredSize(new Dimension(a[0] + a[1] + a[2] + a[3] + 20, DEFAULT_ROW_HEIGHT * correspondingEvent.length + 20));
+    System.out.println("DEBUG: Label size: " + labels[0].getPreferredSize().getWidth() + LIST_BORDER_SIZE);
+    scrollPane.setPreferredSize(new Dimension((int)labels[0].getPreferredSize().getWidth() + 2 * LIST_BORDER_SIZE, DEFAULT_ROW_HEIGHT * correspondingEvent.length + 20));
     buttonPanel.setLayout(layout);
     buttonPanel.add(new JLabel()); // To keep the empty tile empty
     buttonPanel.add(selectButton);

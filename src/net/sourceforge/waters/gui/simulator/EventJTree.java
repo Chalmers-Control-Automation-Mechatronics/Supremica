@@ -347,10 +347,27 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
         else
           mAutomataNameLabel.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
         final EventProxy parentEvent = getParentEvent(row);
-        if (mSim.getBlocking(parentEvent).contains(autoProxy))
-          mAutomataIconLabel.setIcon(IconLoader.ICON_CROSS);
+        if (mSim.getNonControllable(parentEvent) != null)
+        {
+          if (mSim.getNonControllable(parentEvent).contains(autoProxy))
+          {
+            mAutomataIconLabel.setIcon(IconLoader.ICON_WARNING);
+          }
+          else
+          {
+            if (mSim.getBlocking(parentEvent).contains(autoProxy))
+              mAutomataIconLabel.setIcon(IconLoader.ICON_CROSS);
+            else
+              mAutomataIconLabel.setIcon(IconLoader.ICON_TICK);
+          }
+        }
         else
-          mAutomataIconLabel.setIcon(IconLoader.ICON_TICK);
+        {
+          if (mSim.getBlocking(parentEvent).contains(autoProxy))
+            mAutomataIconLabel.setIcon(IconLoader.ICON_CROSS);
+          else
+            mAutomataIconLabel.setIcon(IconLoader.ICON_TICK);
+        }
         StateProxy currentState;
         currentState = mSim.getCurrentStates().get(autoProxy);
         mAutomataStatusLabel.setText(currentState.getName());

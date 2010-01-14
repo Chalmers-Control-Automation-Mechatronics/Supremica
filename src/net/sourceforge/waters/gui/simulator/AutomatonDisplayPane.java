@@ -354,7 +354,7 @@ public class AutomatonDisplayPane
             final Proxy source = infomap.get(trans).getSourceObject();
             if (source == mFocusedItem &&
                 eventCanBeFired(mSim, trans.getEvent())) {
-              possibleSteps.add(getStep(trans));
+              possibleSteps.addAll(getSteps(trans));
             }
           }
         } else if (mFocusedItem instanceof EdgeProxy) {
@@ -363,7 +363,7 @@ public class AutomatonDisplayPane
             final AbstractSubject subject = (AbstractSubject) source;
             if (subject.getAncestor(EdgeSubject.class) == mFocusedItem
                 && eventCanBeFired(mSim, trans.getEvent())) {
-              possibleSteps.add(getStep(trans));
+              possibleSteps.addAll(getSteps(trans));
             }
           }
         }
@@ -389,18 +389,19 @@ public class AutomatonDisplayPane
       return false;
     }
 
-    private Step getStep(final TransitionProxy trans)
+    private ArrayList<Step> getSteps(final TransitionProxy trans)
     {
+      final ArrayList<Step> output = new ArrayList<Step>();
       for (final Step step: mSim.getValidTransitions())
       {
         if (step.getEvent() == trans.getEvent()
-            && step.getSource().get(mAutomaton) == null || step.getSource().get(mAutomaton) == trans.getSource()
-            && step.getDest().get(mAutomaton) == null || step.getDest().get(mAutomaton) == trans.getTarget())
+            && (step.getSource().get(mAutomaton) == null || step.getSource().get(mAutomaton) == trans.getSource())
+            && (step.getDest().get(mAutomaton) == null || step.getDest().get(mAutomaton) == trans.getTarget()))
         {
-           return step;
+           output.add(step);
         }
       }
-      return null;
+      return output;
     }
 
     public void mouseEntered(final MouseEvent event)
@@ -448,7 +449,6 @@ public class AutomatonDisplayPane
     {
       mTransform = mInverseTransform = null;
     }
-
   }
 
 

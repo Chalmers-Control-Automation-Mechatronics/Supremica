@@ -19,7 +19,7 @@ public class SimulationBackToStartAction extends WatersSimulationAction
     super(ide);
     putValue(Action.NAME, "Jump To Start");
     putValue(Action.SHORT_DESCRIPTION, "Return the simulation to the initial state");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_BACK);
+    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_TO_START);
   }
 
 
