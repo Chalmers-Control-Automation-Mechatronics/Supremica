@@ -47,7 +47,7 @@ public abstract class PopupFactory
    * @param  proxy   The object under the mouse cursor when the popup is
    *                 invoked, or <CODE>null</CODE>.
    */
-  void maybeShowPopup(final Component invoker,
+  public void maybeShowPopup(final Component invoker,
                       final MouseEvent event,
                       final Proxy proxy)
   {
@@ -78,7 +78,7 @@ public abstract class PopupFactory
    * @param  proxy   The object under the mouse cursor when the popup is
    *                 invoked, or <CODE>null</CODE>.
    */
-  void showPopup(final Component invoker,
+  public void showPopup(final Component invoker,
                  final MouseEvent event,
                  final Proxy proxy)
   {
@@ -91,7 +91,7 @@ public abstract class PopupFactory
    * @param  proxy   The object under the mouse cursor when the popup is
    *                 invoked, or <CODE>null</CODE>.
    */
-  JPopupMenu createPopup(final Proxy proxy, final MouseEvent event)
+  public JPopupMenu createPopup(final Proxy proxy, final MouseEvent event)
   {
     final JPopupMenu popup = mPopupMenu = new VPopupMenu();
     mEvent = event;
@@ -137,7 +137,7 @@ public abstract class PopupFactory
    * the cursor. Its items are inserted at the beginning of the menu,
    * instead of any-specific actions.
    */
-  void addDefaultMenuItems()
+  protected void addDefaultMenuItems()
   {
     final IDEAction delete = mMaster.getDeleteAction();
     mPopupMenu.add(delete);
@@ -150,7 +150,7 @@ public abstract class PopupFactory
    * always available in the panel. The default creates the generic
    * 'cut', 'copy', 'paste', 'select all', and 'deselect all' menu buttons.
    */
-  void addCommonMenuItems()
+  protected void addCommonMenuItems()
   {
     final IDEAction cut = mMaster.getCutAction();
     mPopupMenu.add(cut);

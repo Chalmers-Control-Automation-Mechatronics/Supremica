@@ -19,6 +19,7 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -197,9 +198,9 @@ public class WatersPopupActionManager
     return master.getAction(ShowModuleCommentAction.class);
   }
 
-  public IDEAction getDesktopCloseWindowAction(final Point point)
+  public IDEAction getDesktopCloseWindowAction(final AutomatonProxy auto)
   {
-    return new DesktopCloseWindowAction(mIDE, point);
+    return new DesktopCloseWindowAction(mIDE, auto);
   }
 
 

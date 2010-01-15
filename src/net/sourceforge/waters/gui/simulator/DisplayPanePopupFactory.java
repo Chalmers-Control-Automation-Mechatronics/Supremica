@@ -1,7 +1,5 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.awt.Point;
-import java.awt.event.MouseEvent;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
@@ -23,9 +21,6 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 public class DisplayPanePopupFactory extends PopupFactory
 {
-
-
-
   DisplayPanePopupFactory(final WatersPopupActionManager master, final AutomatonDisplayPane displayPane)
   {
     super(master);
@@ -39,9 +34,7 @@ public class DisplayPanePopupFactory extends PopupFactory
   {
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
-    final MouseEvent event = getEvent();
-    final Point point = event.getPoint();
-    final IDEAction newblocked = master.getDesktopCloseWindowAction(point);
+    final IDEAction newblocked = master.getDesktopCloseWindowAction(mDisplayPane.getAutomaton());
     popup.add(newblocked);
   }
 

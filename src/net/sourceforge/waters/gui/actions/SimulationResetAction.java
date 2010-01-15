@@ -43,8 +43,20 @@ public class SimulationResetAction
     final Simulation sim = getObservedSimulation();
     if (sim == null) {
       setEnabled(false);
+      putValue(Action.NAME, "Reset");
+      putValue(Action.SHORT_DESCRIPTION, "Reset the Simulation");
     } else {
       setEnabled(sim.getEventHistory().size() != 0);
+      if (sim.getTrace() != null)
+      {
+        putValue(Action.NAME, "Restore Trace");
+        putValue(Action.SHORT_DESCRIPTION, "Restore the Trace to it's original state");
+      }
+      else
+      {
+        putValue(Action.NAME, "Reset");
+        putValue(Action.SHORT_DESCRIPTION, "Reset the Simulation");
+      }
     }
   }
 

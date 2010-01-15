@@ -57,7 +57,7 @@ class GraphPopupFactory
 
   //#########################################################################
   //# Shared Menu Items
-  void addDefaultMenuItems()
+  protected void addDefaultMenuItems()
   {
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
@@ -69,7 +69,7 @@ class GraphPopupFactory
     super.addDefaultMenuItems();
   }
 
-  void addCommonMenuItems()
+  protected void addCommonMenuItems()
   {
     super.addCommonMenuItems();
     final WatersPopupActionManager master = getMaster();

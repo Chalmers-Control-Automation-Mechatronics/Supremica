@@ -31,7 +31,7 @@ class EventDeclListPopupFactory
 
   //#########################################################################
   //# Shared Menu Items
-  void addCommonMenuItems()
+  protected void addCommonMenuItems()
   {
     super.addCommonMenuItems();
     final WatersPopupActionManager master = getMaster();

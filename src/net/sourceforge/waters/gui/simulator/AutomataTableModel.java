@@ -187,7 +187,10 @@ class AutomataTableModel
     for (final AutomatonProxy aut : getSimulation().getAutomata())
     {
       if (getSimulation().changedLastStep(aut) || getSimulation().changedSecondLastStep(aut)
-          || getSimulation().changedNextStep(aut) || getSimulation().getEventHistory().size() == 0)
+          || getSimulation().changedNextStep(aut) || getSimulation().getEventHistory().size() == 0
+          || getSimulation().isNonControllableAtTime(getSimulation().getCurrentTime()).contains(aut)
+          || getSimulation().isNonControllableAtTime(getSimulation().getCurrentTime() - 1).contains(aut)
+          || getSimulation().isNonControllableAtTime(getSimulation().getCurrentTime() + 1).contains(aut))
       {
         final int indexToChange = getIndex(aut);
         final List<Object> row = new ArrayList<Object>();

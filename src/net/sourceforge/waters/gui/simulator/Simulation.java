@@ -162,6 +162,8 @@ public class Simulation implements ModelObserver, Observer
   public ArrayList<AutomatonProxy> isNonControllableAtTime(final int time)
   {
     final HashMap<AutomatonProxy, StateProxy> pastStates;
+    if (time < -1 || time >= mPreviousAutomatonStates.size())
+      return new ArrayList<AutomatonProxy>();
     if (time == -1)
     {
       pastStates = new HashMap<AutomatonProxy, StateProxy>();
@@ -360,8 +362,23 @@ public class Simulation implements ModelObserver, Observer
   {
     if (currentTime == -1)
       return null;
+    else if (currentTime == 0)
+    {
+      for (final StateProxy startState : automaton.getStates())
+      {
+        if (startState.isInitial())
+          return mPreviousEvents.get(currentTime).getTransition(automaton,
+                                                                startState,
+                                                                mPreviousAutomatonStates.get(currentTime).get(automaton));
+      }
+    }
     else
-      return mPreviousEvents.get(currentTime).getTransition(automaton, mPreviousAutomatonStates.get(currentTime).get(automaton));
+    {
+      return mPreviousEvents.get(currentTime).getTransition(automaton,
+                     mPreviousAutomatonStates.get(currentTime - 1).get(automaton),
+                     mPreviousAutomatonStates.get(currentTime).get(automaton));
+    }
+    return null;
   }
 
   public AutomatonProxy getAutomatonFromName(final String automatonFind)
@@ -764,23 +781,26 @@ public class Simulation implements ModelObserver, Observer
     }
     if (mEnabledEvents.size() == 0)
     {
+      boolean hasPropositions = false;
       for (final StateProxy state : mAllAutomatons.values())
       {
-        if (state.getPropositions().size() == 0)
+        if (state.getPropositions().size() != 0)
         {
-          mContainer.getIDE().error(": Deadlock has occured");
-          return;
-        }
-        for (final EventProxy proposition : state.getPropositions())
-        {
-          if (proposition.getName().compareTo(":accepting") != 0)
+          hasPropositions = true;
+          for (final EventProxy proposition : state.getPropositions())
           {
-            mContainer.getIDE().error(": Deadlock has occured");
-            return;
+            if (proposition.getName().compareTo(":accepting") != 0)
+            {
+              mContainer.getIDE().error(": Deadlock has occured");
+              return;
+            }
           }
-          else
-            System.out.println("DEBUG: Proposition name is : " + proposition.getName());
         }
+      }
+      if (!hasPropositions)
+      {
+        mContainer.getIDE().error(": Deadlock has occured");
+        return;
       }
     }
   }

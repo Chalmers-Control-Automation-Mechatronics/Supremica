@@ -74,6 +74,9 @@ public class AutomatonDisplayPane
 {
 
 
+
+
+
   //##########################################################################
   //# Constructors
   public AutomatonDisplayPane(final AutomatonProxy aut,
@@ -94,6 +97,7 @@ public class AutomatonDisplayPane
     final RenderingContext context = new SimulatorRenderingContext();
     final ProxyShapeProducer producer =
       new SubjectShapeProducer(graph, module, context);
+    factory = new DisplayPanePopupFactory(container.getIDE().getPopupActionManager(), this);
     setShapeProducer(producer);
     final int width;
     final int height;
@@ -121,6 +125,11 @@ public class AutomatonDisplayPane
   public Rectangle2D getMinimumBoundingRectangle()
   {
     return getShapeProducer().getMinimumBoundingRectangle();
+  }
+
+  public AutomatonProxy getAutomaton()
+  {
+    return mAutomaton;
   }
 
 
@@ -416,7 +425,7 @@ public class AutomatonDisplayPane
 
     public void mousePressed(final MouseEvent event)
     {
-      // Do nothing
+      factory.maybeShowPopup(AutomatonDisplayPane.this, event, mFocusedItem);
     }
 
     public void mouseReleased(final MouseEvent event)
@@ -592,7 +601,7 @@ public class AutomatonDisplayPane
   private final AutomatonProxy mAutomaton;
   private final ModuleContainer mContainer;
   private final AutomatonInternalFrame mParent;
-
+  private final DisplayPanePopupFactory factory;
   private AffineTransform mTransform;
   private AffineTransform mInverseTransform;
   private Proxy mFocusedItem;
