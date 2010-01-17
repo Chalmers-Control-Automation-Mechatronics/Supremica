@@ -116,7 +116,7 @@ public class ModuleProxyPrinter
     if (text != null) {
       print(text);
     } else {
-      final int savedPriority = mPriority; 
+      final int savedPriority = mPriority;
       final boolean savedAssocBraces = mAssocBraces;
       try {
         final BinaryOperator operator = proxy.getOperator();
@@ -378,7 +378,7 @@ public class ModuleProxyPrinter
     if (text != null) {
       print(text);
     } else {
-      final int savedPriority = mPriority; 
+      final int savedPriority = mPriority;
       final boolean savedAssocBraces = mAssocBraces;
       try {
         print(proxy.getName());
@@ -392,7 +392,7 @@ public class ModuleProxyPrinter
         }
         return null;
       } finally {
-        mPriority = savedPriority; 
+        mPriority = savedPriority;
         mAssocBraces = savedAssocBraces;
       }
     }
@@ -468,6 +468,7 @@ public class ModuleProxyPrinter
     print("MODULE ");
     print(proxy.getName());
     println(" {");
+    printComment(proxy);
     printCollection("CONSTANTS", proxy.getConstantAliasList());
     printCollection("EVENTS", proxy.getEventDeclList());
     printCollection("ALIASES", proxy.getEventAliasList());
@@ -617,7 +618,7 @@ public class ModuleProxyPrinter
     if (text != null) {
       print(text);
     } else {
-      final int savedPriority = mPriority; 
+      final int savedPriority = mPriority;
       final boolean savedAssocBraces = mAssocBraces;
       try {
         final UnaryOperator operator = expr.getOperator();
@@ -740,7 +741,7 @@ public class ModuleProxyPrinter
     print(')');
   }
 
-  
+
   //#########################################################################
   //# Data Members
   private int mPriority = OperatorTable.PRIORITY_OUTER;

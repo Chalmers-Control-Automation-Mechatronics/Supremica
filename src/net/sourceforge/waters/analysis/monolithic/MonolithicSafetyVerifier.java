@@ -32,6 +32,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -129,6 +130,7 @@ public class MonolithicSafetyVerifier
 
       mNumEvents = mEventCodingList.size();
       mNumAutomata = automata.size();
+      mAutomata = new AutomatonProxy[mNumAutomata];
 
       // Empty case
       if (mNumAutomata == 0) {
@@ -181,6 +183,7 @@ public class MonolithicSafetyVerifier
         final ComponentKind kind = mKindTranslator.getComponentKind(ap);
         switch (kind) {
         case PLANT:
+          mAutomata[ck] = ap;
           mSystemState[ck] = codes.indexOf(initialState);
           mPlantEventList.add(aneventCodingList);
           mPlantTransitionMap.add(atransition);
@@ -189,11 +192,13 @@ public class MonolithicSafetyVerifier
           ck++;
           break;
         case SPEC:
-          mSystemState[k + mNumPlants] = codes.indexOf(initialState);
+          final int pk = k + mNumPlants;
+          mAutomata[pk] = ap;
+          mSystemState[pk] = codes.indexOf(initialState);
           mSpecEventList.add(aneventCodingList);
           mSpecTransitionMap.add(atransition);
-          mBitLengthList[k + mNumPlants] = bl;
-          mMaskList[k + mNumPlants] = mask;
+          mBitLengthList[pk] = bl;
+          mMaskList[pk] = mask;
           k++;
           break;
         default:
@@ -316,19 +321,21 @@ public class MonolithicSafetyVerifier
           final EventKind kind = mKindTranslator.getEventKind(event);
           if (kind == EventKind.UNCONTROLLABLE) {
             for (i = 0; i < mNumAutomata - mNumPlants; i++) {
+              final int si = i + mNumPlants;
               if (mSpecEventList.get(i)[e] == 1) {
                 temp =
-                  mSpecTransitionMap.get(i)[mSystemState[i + mNumPlants]][e];
+                  mSpecTransitionMap.get(i)[mSystemState[si]][e];
                 if (temp == -1) {
                   mErrorEvent = e;
+                  mErrorAutomaton = si;
                   return false;
                 }
                 if (temp > -1) {
-                  mSuccessor[i + mNumPlants] = temp;
+                  mSuccessor[si] = temp;
                   continue;
                 }
               }
-              mSuccessor[i + mNumPlants] = mSystemState[i + mNumPlants];
+              mSuccessor[si] = mSystemState[si];
             }
           } else {
             for (k = 0; k < mNumAutomata - mNumPlants; k++){
@@ -458,15 +465,22 @@ public class MonolithicSafetyVerifier
     final ProductDESProxy des = getModel();
     final String desname = des.getName();
     final String tracename = desname + ":uncontrollable";
-    final List<EventProxy> tracelist = new LinkedList<EventProxy>();
+    final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
 
     boolean enabled;
     boolean found = false;
     int i, j, k, temp;
     int indexSize = mIndexList.size();
     final int[] errorState = new int[mNumAutomata];
+    final EventProxy event0 = mEventCodingList.get(mErrorEvent);
+    final AutomatonProxy aut = mAutomata[mErrorAutomaton];
+    final List<StateProxy> codes0 = new ArrayList<StateProxy>(aut.getStates());
+    final int code0 = mSystemState[mErrorAutomaton];
+    final StateProxy state0 = codes0.get(code0);
+    final String comment = createTraceComment(des, event0, aut, state0);
 
-    tracelist.add(0, mEventCodingList.get(mErrorEvent));
+    final TraceStepProxy step0 = factory.createTraceStepProxy(event0);
+    steps.add(0, step0);
 
     while(true){
       for (i = 0; i < mNumAutomata; i++) {
@@ -498,7 +512,6 @@ public class MonolithicSafetyVerifier
           if (!enabled) {
             continue;
           }
-
           for (k = 0; k < mNumAutomata - mNumPlants; k++) {
             if (mSpecEventList.get(k)[e] == 1) {
               temp = mSpecTransitionMap.get(k)[mSystemState[k+mNumPlants]][e];
@@ -516,10 +529,11 @@ public class MonolithicSafetyVerifier
           if (!enabled) {
             continue;
           }
-
           if (Arrays.equals(mSuccessor, errorState)) {
             found = true;
-            tracelist.add(0, mEventCodingList.get(e));
+            final EventProxy event = mEventCodingList.get(e);
+            final TraceStepProxy step = factory.createTraceStepProxy(event);
+            steps.add(0, step);
             break;
           }
         }
@@ -530,9 +544,22 @@ public class MonolithicSafetyVerifier
         checkAbort();
       }
     }
-    final SafetyTraceProxy trace =
-      factory.createSafetyTraceProxy(tracename, des, tracelist);
+    final TraceStepProxy init = factory.createTraceStepProxy(null);
+    steps.add(0, init);
+    final SafetyTraceProxy trace = factory.createSafetyTraceProxy
+      (tracename, comment, null, des, null, steps);
     return trace;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  String createTraceComment(final ProductDESProxy des,
+                            final EventProxy event,
+                            final AutomatonProxy aut,
+                            final StateProxy state)
+  {
+    return null;
   }
 
 
@@ -549,6 +576,7 @@ public class MonolithicSafetyVerifier
   private List<StateTuple> mStateSpace;
 
   // For encoding/decoding
+  private AutomatonProxy[] mAutomata;
   private List<EventProxy> mEventCodingList;
   private List<byte[]> mPlantEventList;
   private List<byte[]> mSpecEventList;
@@ -567,5 +595,6 @@ public class MonolithicSafetyVerifier
   private int[] mSystemState;
   private int[] mSuccessor;
   private int mErrorEvent;
+  private int mErrorAutomaton;
 
 }

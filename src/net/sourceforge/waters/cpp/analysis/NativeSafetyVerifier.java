@@ -12,9 +12,12 @@ package net.sourceforge.waters.cpp.analysis;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.StateProxy;
 
 
 /**
@@ -45,7 +48,7 @@ public abstract class NativeSafetyVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
-  public void setKindTranslator(KindTranslator translator)
+  public void setKindTranslator(final KindTranslator translator)
   {
     mKindTranslator = translator;
     clearAnalysisResult();
@@ -65,6 +68,13 @@ public abstract class NativeSafetyVerifier
   //#########################################################################
   //# Native Methods
   native VerificationResult runNativeAlgorithm();
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  public abstract String getTraceComment(final EventProxy event,
+                                         final AutomatonProxy aut,
+                                         final StateProxy state);
 
 
   //#########################################################################

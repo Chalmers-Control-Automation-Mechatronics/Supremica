@@ -31,6 +31,7 @@
 #include "jni/glue/NativeSafetyVerifierGlue.h"
 #include "jni/glue/SafetyTraceGlue.h"
 #include "jni/glue/SetGlue.h"
+#include "jni/glue/StateGlue.h"
 #include "jni/glue/TraceStepGlue.h"
 #include "jni/glue/VerificationResultGlue.h"
 
@@ -85,8 +86,12 @@ ProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mDFSStackSize(0),
     mTraceList(0),
     mTraceEvent(0),
+    mTraceAutomaton(0),
     mTraceState(UNDEF_UINT32),
     mTraceLimit(UNDEF_UINT32),
+    mJavaTraceEvent(0, cache),
+    mJavaTraceAutomaton(0, cache),
+    mJavaTraceState(0, cache),
     mConflictKind(jni::ConflictKind_CONFLICT)
 {
 }
@@ -124,10 +129,17 @@ runSafetyCheck()
       result = doSafetySearch();
       if (!result) {
         mTraceStartTime = clock();
+        mJavaTraceEvent = mTraceEvent->getJavaEvent();
+        if (mTraceAutomaton) {
+          mJavaTraceAutomaton = mTraceAutomaton->getJavaAutomaton();
+          const uint32* packed = mStateSpace->get(mTraceState);
+          const uint32 autindex = mTraceAutomaton->getAutomatonIndex();
+          const uint32 statecode = mEncoding->get(packed, autindex);
+          mJavaTraceState = mTraceAutomaton->getJavaState(statecode);
+        }
         mTraceList = new jni::LinkedListGlue(mCache);
-        const jni::EventGlue& event = mTraceEvent->getJavaEvent();
         jni::TraceStepGlue step =
-          mFactory.createTraceStepProxyGlue(&event, mCache);
+          mFactory.createTraceStepProxyGlue(&mJavaTraceEvent, mCache);
         mTraceList->add(0, &step);
         const uint32 level = mDepthMap->size() - 2;
         computeCounterExample(*mTraceList, level);
@@ -181,19 +193,28 @@ runNonblockingCheck()
 }
 
 jni::SafetyTraceGlue ProductExplorer::
-getSafetyCounterExample(jstring name)
+getSafetyCounterExample(const jni::NativeSafetyVerifierGlue& gchecker)
   const
 {
+  jstring name = gchecker.getTraceName();
+  jstring comment;
+  if (mJavaTraceAutomaton.isNull()) {
+    comment = 0;
+  } else {
+    comment = gchecker.getTraceComment
+      (&mJavaTraceEvent, &mJavaTraceAutomaton, &mJavaTraceState);
+  }
   const jni::SetGlue automata = mModel.getAutomataGlue(mCache);
   return mFactory.createSafetyTraceProxyGlue
-    (name, 0, 0, &mModel, &automata, mTraceList, mCache);
+    (name, comment, 0, &mModel, &automata, mTraceList, mCache);
 }
 
 
 jni::ConflictTraceGlue ProductExplorer::
-getConflictCounterExample(jstring name)
+getConflictCounterExample(const jni::NativeConflictCheckerGlue& gchecker)
   const
 {
+  jstring name = gchecker.getTraceName();
   const jni::SetGlue automata = mModel.getAutomataGlue(mCache);
   const jni::ConflictKindGlue kind(mConflictKind, mCache);
   return mFactory.createConflictTraceProxyGlue
@@ -241,6 +262,7 @@ setup()
   mNumAutomata = mEncoding->getNumberOfRecords();
   mNumStates = 0;
   mTraceEvent = 0;
+  mTraceAutomaton = 0;
   mTraceState = UNDEF_UINT32;
   mConflictKind = jni::ConflictKind_CONFLICT;
   switch (mMode) {
@@ -293,6 +315,7 @@ teardown()
   mDFSStack = 0;
   mDFSStackSize = 0;
   mTraceEvent = 0;
+  mTraceAutomaton = 0;
 }
 
 
@@ -727,8 +750,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
         checker->addStatistics(vresult);
         return vresult.returnJavaObject();
       } else {
-        jstring name = gchecker.getTraceName();
-        jni::SafetyTraceGlue trace = checker->getSafetyCounterExample(name);
+        jni::SafetyTraceGlue trace =
+          checker->getSafetyCounterExample(gchecker);
         jni::VerificationResultGlue vresult(result, &trace, &cache);
         checker->addStatistics(vresult);
         return vresult.returnJavaObject();
@@ -766,9 +789,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
         checker->addStatistics(vresult);
         return vresult.returnJavaObject();
       } else {
-        jstring name = gchecker.getTraceName();
         jni::ConflictTraceGlue trace =
-          checker->getConflictCounterExample(name);
+          checker->getConflictCounterExample(gchecker);
         jni::VerificationResultGlue vresult(result, &trace, &cache);
         checker->addStatistics(vresult);
         return vresult.returnJavaObject();

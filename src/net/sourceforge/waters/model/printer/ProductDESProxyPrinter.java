@@ -74,16 +74,6 @@ public class ProductDESProxyPrinter
     return null;
   }
 
-  public Object visitProductDESProxy(final ProductDESProxy des)
-    throws VisitorException
-  {
-    print("DES ");
-    println(des.getName());
-    printSortedCollection("EVENTS", des.getEvents());
-    printSortedCollection("AUTOMATA", des.getAutomata());
-    return null;
-  }
-
   public Object visitAutomatonProxy(final AutomatonProxy aut)
     throws VisitorException
   {
@@ -125,6 +115,17 @@ public class ProductDESProxyPrinter
     print(trace.getName());
     final int loop = trace.getLoopIndex();
     visitTraceProxy(trace, loop);
+    return null;
+  }
+
+  public Object visitProductDESProxy(final ProductDESProxy des)
+    throws VisitorException
+  {
+    print("DES ");
+    println(des.getName());
+    printComment(des);
+    printSortedCollection("EVENTS", des.getEvents());
+    printSortedCollection("AUTOMATA", des.getAutomata());
     return null;
   }
 
@@ -208,6 +209,7 @@ public class ProductDESProxyPrinter
   {
     println(" {");
     indentIn();
+    printComment(trace);
     final ProductDESProxy des = trace.getProductDES();
     final List<ProductDESProxy> list = Collections.singletonList(des);
     printSortedRefCollection("DES", list);

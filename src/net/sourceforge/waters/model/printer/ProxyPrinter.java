@@ -20,6 +20,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.AbstractProxyVisitor;
 import net.sourceforge.waters.model.base.ComparableProxy;
+import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -143,7 +144,7 @@ public class ProxyPrinter
         return buffer.toString();
       } catch (final IOException exception) {
         throw new WatersRuntimeException(exception);
-      }      
+      }
     } else {
       throw new IllegalStateException
         ("ProxyPrinter must be initialised with a StringWriter " +
@@ -158,6 +159,17 @@ public class ProxyPrinter
     throws VisitorException
   {
     proxy.acceptVisitor(this);
+  }
+
+  public void printComment(final DocumentProxy doc)
+    throws VisitorException
+  {
+    final String comment = doc.getComment();
+    if (comment != null) {
+      print('"');
+      print(comment);
+      println('"');
+    }
   }
 
   public void printEmptyCollection
@@ -366,7 +378,7 @@ public class ProxyPrinter
 
   //#########################################################################
   //# Indentation
-  int setIndent(int indent)
+  int setIndent(final int indent)
   {
     final int oldindent = mIndent;
     mIndent = indent;

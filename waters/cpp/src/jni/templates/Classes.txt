@@ -249,6 +249,9 @@ glue class NativeModelVerifier extends NativeModelAnalyser {
 
 glue class NativeSafetyVerifier extends NativeModelVerifier {
   glue KindTranslator getKindTranslator();
+  String getTraceComment(glue EventProxy event,
+			 glue AutomatonProxy aut,
+			 glue StateProxy state);
 }
 
 glue class NativeConflictChecker extends NativeModelVerifier {

@@ -37,6 +37,8 @@ namespace jni {
   class ClassCache;
   class ConflictTraceGlue;
   class ListGlue;
+  class NativeConflictCheckerGlue;
+  class NativeSafetyVerifierGlue;
   class ProductDESGlue;
   class SafetyTraceGlue;
   class VerificationResultGlue;
@@ -97,8 +99,10 @@ public:
   //# Invocation
   virtual bool runSafetyCheck();
   virtual bool runNonblockingCheck();
-  virtual jni::SafetyTraceGlue getSafetyCounterExample(jstring name) const;
-  virtual jni::ConflictTraceGlue getConflictCounterExample(jstring name) const;
+  virtual jni::SafetyTraceGlue getSafetyCounterExample
+    (const jni::NativeSafetyVerifierGlue& gchecker) const;
+  virtual jni::ConflictTraceGlue getConflictCounterExample
+    (const jni::NativeConflictCheckerGlue& gchecker) const;
   virtual void addStatistics(const jni::VerificationResultGlue& vresult) const;
 
   //##########################################################################
@@ -112,7 +116,9 @@ public:
   //# Simple Access
   inline ExplorerMode getMode() const {return mMode;}
   inline const EventRecord* getTraceEvent() const {return mTraceEvent;}
-  inline void setTraceEvent(const EventRecord* event) {mTraceEvent = event;}
+  void setTraceEvent(const EventRecord* event) {mTraceEvent = event;}
+  void setTraceEvent(const EventRecord* event, const AutomatonRecord* aut)
+    {mTraceEvent = event; mTraceAutomaton = aut;}
 
   //##########################################################################
   //# Aborting
@@ -203,8 +209,12 @@ private:
   uint32 mDFSStackPos;
   jni::ListGlue* mTraceList;
   const EventRecord* mTraceEvent;
+  const AutomatonRecord* mTraceAutomaton;
   uint32 mTraceState;
   uint32 mTraceLimit;
+  jni::EventGlue mJavaTraceEvent;
+  jni::AutomatonGlue mJavaTraceAutomaton;
+  jni::StateGlue mJavaTraceState;
   jni::ConflictKind mConflictKind;
   clock_t mStartTime;
   clock_t mTraceStartTime;

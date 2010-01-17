@@ -244,7 +244,7 @@ expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
       EXPAND_ENABLED_TRANSITIONS
         (numwords, SOURCE, sourcetuple, sourcepacked, event);
     } else if (!dis->isPlant() && !event->isControllable()) {
-      setTraceEvent(event);
+      setTraceEvent(event, dis);
       return false;
     }
   }
