@@ -93,7 +93,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testConflictChecker("despot", "testHISC", "hisc0_low2", true);
   }
 
-  //testHISC1
+  // testHISC1
   public void testConflictChecker_hisc1_low1() throws Exception
   {
     testConflictChecker("despot", "testHISC", "hisc1_low1", true);
@@ -104,7 +104,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testConflictChecker("despot", "testHISC", "hisc1_low2", true);
   }
 
-  //testHISC10
+  // testHISC10
   public void testConflictChecker_hisc10_low1() throws Exception
   {
     testConflictChecker("despot", "testHISC", "hisc10_low1", true);
@@ -168,6 +168,100 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   public void testConflictChecker_hisc9_low2() throws Exception
   {
     testConflictChecker("despot", "testHISC", "hisc9_low2", true);
+  }
+
+  // SimpleManufacturingExample
+  public void testIntegrity_Manuf_Cells() throws Exception
+  {
+    testIntegrity("despot", "simpleManufacturingExample", "Manuf-Cells");
+  }
+
+  // testHISC
+  public void testIntegrity_hisc0_low1() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc0_low1");
+  }
+
+  public void testIntegrity_hisc0_low2() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc0_low2");
+  }
+
+  // testHISC1
+  public void testIntegrity_hisc1_low1() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc1_low1");
+  }
+
+  public void testIntegrity_hisc1_low2() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc1_low2");
+  }
+
+  // testHISC10
+  public void testIntegrity_hisc10_low1() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc10_low1");
+  }
+
+  public void testIntegrity_hisc12_low1() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc12_low1");
+  }
+
+  public void testIntegrity_hisc12_low2() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc12_low2");
+  }
+
+  public void testIntegrity_hisc13_low1() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc13_low1");
+  }
+
+  public void testIntegrity_hisc13_low2() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc13_low2");
+  }
+
+  public void testIntegrity_hisc14_low1() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc14_low1");
+  }
+
+  public void testIntegrity_hisc14_low2() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc14_low2");
+  }
+
+  public void testIntegrity_hisc2_low1() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc2_low1");
+  }
+
+  public void testIntegrity_hisc2_low2() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc2_low2");
+  }
+
+  public void testIntegrity_hisc3_low2() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc3_low2");
+  }
+
+  public void testIntegrity_hisc7_low2() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc7_low2");
+  }
+
+  public void testIntegrity_hisc8_low2() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc8_low2");
+  }
+
+  public void testIntegrity_hisc9_low2() throws Exception
+  {
+    testIntegrity("despot", "testHISC", "hisc9_low2");
   }
 
   // #########################################################################
