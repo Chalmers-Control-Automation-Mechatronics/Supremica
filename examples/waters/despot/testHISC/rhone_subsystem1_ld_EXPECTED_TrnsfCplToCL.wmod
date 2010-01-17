@@ -841,7 +841,11 @@
             </RangeList>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="PROPOSITION" Name=":alpha"/>
+        <EventDecl Kind="PROPOSITION" Name=":alpha">
+            <ColorGeometry>
+                <Color Red="204" Green="0" Blue="0"/>
+            </ColorGeometry>
+        </EventDecl>
     </EventDeclList>
     <ComponentList>
         <ForeachComponent Name="r">

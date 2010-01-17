@@ -43,7 +43,11 @@ Should pass all HISC property checks for the low level.
         <EventDecl Kind="UNCONTROLLABLE" Name="recog_A"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="recog_B"/>
         <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":alpha"/>
+        <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":alpha">
+            <ColorGeometry>
+                <Color Red="204" Green="0" Blue="0"/>
+            </ColorGeometry>
+        </EventDecl>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="interface_I">
