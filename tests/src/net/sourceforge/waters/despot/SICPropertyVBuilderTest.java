@@ -275,7 +275,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     for (final EventProxy answer : answerEvents) {
       final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
       final File outfilename =
-          new File(mOutputDirectory, name + "_" + answer.getName() + wdesext);
+          new File(mOutputDirectory, name.replace(':', '_') + "_" + answer.getName().replace(':', '_') + wdesext);
       mProductDESMarshaller.marshal(modifiedDES, outfilename);
       ProductDESIntegrityChecker.getInstance().check(modifiedDES);
     }
