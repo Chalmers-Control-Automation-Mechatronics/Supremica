@@ -264,10 +264,39 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testIntegrity("tests", "hisc", "rhone_subsystem1_ld");
   }
 
-  public void testIntegrity_output_aip_leducversion_old() throws Exception
+  public void testIntegrity_as1() throws Exception
   {
-    testIntegrity("despot", "output-aip_leducversion-old",
-                  "output-aip_leducversion-old");
+    testIntegrity("despot", "output-aip_leducversion-old", "as1");
+  }
+
+  public void testIntegrity_as2() throws Exception
+  {
+    testIntegrity("despot", "output-aip_leducversion-old", "as2");
+  }
+
+  public void testIntegrity_as3() throws Exception
+  {
+    testIntegrity("despot", "output-aip_leducversion-old", "as3");
+  }
+
+  public void testIntegrity_tu1() throws Exception
+  {
+    testIntegrity("despot", "output-aip_leducversion-old", "tu1");
+  }
+
+  public void testIntegrity_tu2() throws Exception
+  {
+    testIntegrity("despot", "output-aip_leducversion-old", "tu2");
+  }
+
+  public void testIntegrity_tu3() throws Exception
+  {
+    testIntegrity("despot", "output-aip_leducversion-old", "tu3");
+  }
+
+  public void testIntegrity_tu4() throws Exception
+  {
+    testIntegrity("despot", "output-aip_leducversion-old", "tu4");
   }
 
   // #########################################################################
