@@ -432,6 +432,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       // Decode the state.
       mStateSchema.decodeState(state, mSourceBuffer);
       final AutomatonSchema[] automata = mStateSchema.getOrdering();
+      final List<Integer> nondeterministicAutomata = new ArrayList<Integer>(0);
 
       // Explore transitions ...
       nextevent: for (int eventid = 0; eventid < mEventMap.size(); eventid++) {
@@ -450,51 +451,61 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
             // in another array, then after this loop call a modified
             // version of expandNondeterministic() that only expands the
             // listed automata.
-            expandNondeterministic(mSourceBuffer, mTargetBuffer, eventid, 0);
+            nondeterministicAutomata.add(autid);
           }
-
         }
         // Hopefully we have a new state! Encode away ...
         final long newstate = mStateSchema.encodeState(mTargetBuffer);
         addNewState(newstate, stateid);
+        if (nondeterministicAutomata.size() > 0) {
+          expandNondeterministic(automata, nondeterministicAutomata, eventid,
+                                 stateid, nondeterministicAutomata.get(0));
+        }
       }
     }
 
-    private void expandNondeterministic(final int[] source, final int[] target,
-                                        final int eventID, final int i)
-        throws OverflowException
+    private void expandNondeterministic(
+                                        final AutomatonSchema[] automata,
+                                        final List<Integer> nondeterministicAutomata,
+                                        final int eventID, final int sourceID,
+                                        final int i) throws OverflowException
     {
-      // ~~~ As we have got mSourceBuffer and mTargetBuffer, we can use these
-      // and do not need the parameters.
-      final int stateid = fringeGet();// should maybe pass stateid to this
+      // final int stateid = fringeGet();// should maybe pass stateid to this
       // method, because we aren't getting a new state,
       // but using one expand() tried to expand
       // ~~~ Indeed, and probably also call the variable sourceID, as it
       // is the code of the source state of the transitions. It is used
       // to store predecessor states.
-      final AutomatonSchema[] automata = mStateSchema.getOrdering();
-      if (i < automata.length) {
+      if (i !=-1) {
         final AutomatonSchema schema = automata[i];
         final int[][][] table = schema.mTransitionTable;
         final int[][] eventsSources = table[eventID];
+        nondeterministicAutomata.remove(0);
+        int nextAutID = -1;
+        if (nondeterministicAutomata.size() > 0) {
+          nextAutID = nondeterministicAutomata.get(0);
+        }
         if (eventsSources == null) {
-          target[i] = source[i];
-          expandNondeterministic(source, target, eventID, i + 1);
+          mTargetBuffer[i] = mSourceBuffer[i];
+
+          expandNondeterministic(automata, nondeterministicAutomata, eventID,
+                                 sourceID, nextAutID);
         } else {
           // there are (maybe) target states, process them ...
-          final int[] targets = eventsSources[source[i]];
+          final int[] targets = eventsSources[mSourceBuffer[i]];
           if (targets != null) {
             for (final int foundTarget : targets) {
-              target[i] = foundTarget;
-              expandNondeterministic(source, target, eventID, i + 1);
+              mTargetBuffer[i] = foundTarget;
+
+              expandNondeterministic(automata, nondeterministicAutomata,
+                                     eventID, sourceID, nextAutID);
             }
           }
         }
       } else {
-        final long newstate = mStateSchema.encodeState(target);
-        addNewState(newstate, stateid);
+        final long newstate = mStateSchema.encodeState(mTargetBuffer);
+        addNewState(newstate, sourceID);
       }
-
     }
 
     private EventProxy findEvent(final int sourceid, final int targetid)

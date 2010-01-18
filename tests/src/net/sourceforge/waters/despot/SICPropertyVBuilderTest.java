@@ -275,7 +275,8 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     for (final EventProxy answer : answerEvents) {
       final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
       final File outfilename =
-          new File(mOutputDirectory, name.replace(':', '_') + "_" + answer.getName().replace(':', '_') + wdesext);
+          new File(mOutputDirectory, name.replace(':', '_') + "_"
+              + answer.getName().replace(':', '_') + wdesext);
       mProductDESMarshaller.marshal(modifiedDES, outfilename);
       ProductDESIntegrityChecker.getInstance().check(modifiedDES);
     }
@@ -295,6 +296,10 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
           new MonolithicConflictChecker(modifiedDES, defaultMark,
               preconditionMark, mProductDESFactory);
       final boolean result = conflictChecker.run();
+
+      assertEquals("Wrong result from model checker: got " + result
+          + " but should have been " + expectedResult + "!", expectedResult,
+                   result);
 
       if (result) {
         System.out.println("nonconflicting");
