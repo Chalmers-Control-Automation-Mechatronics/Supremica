@@ -323,6 +323,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       final int numaut = getNumberOfAutomata();
       mSourceBuffer = new int[numaut];
       mTargetBuffer = new int[numaut];
+      mNondeterministicAutomata = new int[numaut];
     }
 
     // #######################################################################
@@ -432,7 +433,6 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       // Decode the state.
       mStateSchema.decodeState(state, mSourceBuffer);
       final AutomatonSchema[] automata = mStateSchema.getOrdering();
-      final List<Integer> nondeterministicAutomata = new ArrayList<Integer>(0);
 
       // Explore transitions ...
       nextevent: for (int eventid = 0; eventid < mEventMap.size(); eventid++) {
@@ -451,22 +451,18 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
             // in another array, then after this loop call a modified
             // version of expandNondeterministic() that only expands the
             // listed automata.
-            nondeterministicAutomata.add(autid);
+            mNondeterministicAutomata[autid] = 1;
           }
         }
         // Hopefully we have a new state! Encode away ...
         final long newstate = mStateSchema.encodeState(mTargetBuffer);
         addNewState(newstate, stateid);
-        if (nondeterministicAutomata.size() > 0) {
-          expandNondeterministic(automata, nondeterministicAutomata, eventid,
-                                 stateid, nondeterministicAutomata.get(0));
-        }
+        expandNondeterministic(automata, eventid, stateid, 0);
+
       }
     }
 
-    private void expandNondeterministic(
-                                        final AutomatonSchema[] automata,
-                                        final List<Integer> nondeterministicAutomata,
+    private void expandNondeterministic(final AutomatonSchema[] automata,
                                         final int eventID, final int sourceID,
                                         final int i) throws OverflowException
     {
@@ -476,29 +472,25 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       // ~~~ Indeed, and probably also call the variable sourceID, as it
       // is the code of the source state of the transitions. It is used
       // to store predecessor states.
-      if (i !=-1) {
-        final AutomatonSchema schema = automata[i];
-        final int[][][] table = schema.mTransitionTable;
-        final int[][] eventsSources = table[eventID];
-        nondeterministicAutomata.remove(0);
-        int nextAutID = -1;
-        if (nondeterministicAutomata.size() > 0) {
-          nextAutID = nondeterministicAutomata.get(0);
-        }
-        if (eventsSources == null) {
-          mTargetBuffer[i] = mSourceBuffer[i];
-
-          expandNondeterministic(automata, nondeterministicAutomata, eventID,
-                                 sourceID, nextAutID);
+      if (i < mNondeterministicAutomata.length) {
+        if (mNondeterministicAutomata[i] != 1) {
+          expandNondeterministic(automata, eventID, sourceID, i + 1);
         } else {
-          // there are (maybe) target states, process them ...
-          final int[] targets = eventsSources[mSourceBuffer[i]];
-          if (targets != null) {
-            for (final int foundTarget : targets) {
-              mTargetBuffer[i] = foundTarget;
-
-              expandNondeterministic(automata, nondeterministicAutomata,
-                                     eventID, sourceID, nextAutID);
+          final AutomatonSchema schema = automata[i];
+          final int[][][] table = schema.mTransitionTable;
+          final int[][] eventsSources = table[eventID];
+          mNondeterministicAutomata[i] = -1;
+          if (eventsSources == null) {
+            mTargetBuffer[i] = mSourceBuffer[i];
+            expandNondeterministic(automata, eventID, sourceID, i + 1);
+          } else {
+            // there are (maybe) target states, process them ...
+            final int[] targets = eventsSources[mSourceBuffer[i]];
+            if (targets != null) {
+              for (final int foundTarget : targets) {
+                mTargetBuffer[i] = foundTarget;
+                expandNondeterministic(automata, eventID, sourceID, i + 1);
+              }
             }
           }
         }
@@ -560,6 +552,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
 
     private final int[] mSourceBuffer;
     private final int[] mTargetBuffer;
+
+    final int[] mNondeterministicAutomata;
 
   }
 
