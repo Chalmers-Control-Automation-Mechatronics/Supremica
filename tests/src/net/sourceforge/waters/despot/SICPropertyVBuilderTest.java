@@ -297,19 +297,17 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
               preconditionMark, mProductDESFactory);
       final boolean result = conflictChecker.run();
 
-      assertEquals("Wrong result from model checker: got " + result
-          + " but should have been " + expectedResult + "!", expectedResult,
-                   result);
-
-      if (result) {
-        System.out.println("nonconflicting");
-      } else {
+      if (!result) {
         System.out.println("CONFLICTING");
         System.out.println("Counterexample:");
         final ConflictTraceProxy counterex =
             conflictChecker.getCounterExample();
         System.out.println(counterex.toString());
       }
+      assertEquals("Wrong result from model checker: got " + result
+          + " but should have been " + expectedResult + "!", expectedResult,
+                   result);
+
     }
   }
 
