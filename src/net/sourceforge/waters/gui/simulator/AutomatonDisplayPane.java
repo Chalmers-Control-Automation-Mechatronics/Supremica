@@ -345,6 +345,75 @@ public class AutomatonDisplayPane
     }
   }
 
+  private boolean eventCanBeFired(final Simulation sim, final EventProxy event)
+  {
+    for (final Step possibleStep : sim.getValidTransitions())
+    {
+      if (possibleStep.getEvent() == event)
+        return true;
+    }
+    return false;
+  }
+
+  private ArrayList<Step> getSteps(final TransitionProxy trans)
+  {
+    final ArrayList<Step> output = new ArrayList<Step>();
+    for (final Step step: mSim.getValidTransitions())
+    {
+      if (step.getEvent() == trans.getEvent()
+          && (step.getSource().get(mAutomaton) == null || step.getSource().get(mAutomaton) == trans.getSource())
+          && (step.getDest().get(mAutomaton) == null || step.getDest().get(mAutomaton) == trans.getTarget()))
+      {
+         output.add(step);
+      }
+    }
+    return output;
+  }
+
+  // #########################################################################
+  // # Event Handling Access methods
+
+  public boolean canExecute()
+  {
+    return mFocusedItem != null;
+  }
+
+  public void execute()
+  {
+    if (mFocusedItem != null && isEnabled(mFocusedItem)) {
+      final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+      final List<Step> possibleSteps = new ArrayList<Step>();
+      if (mFocusedItem instanceof IdentifierProxy) {
+        for (final TransitionProxy trans : mAutomaton.getTransitions()) {
+          final Proxy source = infomap.get(trans).getSourceObject();
+          if (source == mFocusedItem &&
+              eventCanBeFired(mSim, trans.getEvent())) {
+            possibleSteps.addAll(getSteps(trans));
+          }
+        }
+      } else if (mFocusedItem instanceof EdgeProxy) {
+        for (final TransitionProxy trans : mAutomaton.getTransitions()) {
+          final Proxy source = infomap.get(trans).getSourceObject();
+          final AbstractSubject subject = (AbstractSubject) source;
+          if (subject.getAncestor(EdgeSubject.class) == mFocusedItem
+              && eventCanBeFired(mSim, trans.getEvent())) {
+            possibleSteps.addAll(getSteps(trans));
+          }
+        }
+      }
+      final Step firedEvent = findOptions(possibleSteps);
+      if (firedEvent != null) {
+        try {
+          mSim.step(firedEvent);
+        } catch (final NonDeterministicException exception) {
+          System.out.println("ERROR: " + exception.getMessage()
+              + ". Event will not be fired");
+        }
+      }
+    }
+  }
+
+
   //##########################################################################
   //# Inner Class MouseHandler
   private class MouseHandler implements MouseListener, MouseMotionListener
@@ -354,63 +423,8 @@ public class AutomatonDisplayPane
     //# Interface java.awt.event.MouseListener
     public void mouseClicked(final MouseEvent event)
     {
-      if (event.getClickCount() == 2 &&
-          mFocusedItem != null && isEnabled(mFocusedItem)) {
-        final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-        final List<Step> possibleSteps = new ArrayList<Step>();
-        if (mFocusedItem instanceof IdentifierProxy) {
-          for (final TransitionProxy trans : mAutomaton.getTransitions()) {
-            final Proxy source = infomap.get(trans).getSourceObject();
-            if (source == mFocusedItem &&
-                eventCanBeFired(mSim, trans.getEvent())) {
-              possibleSteps.addAll(getSteps(trans));
-            }
-          }
-        } else if (mFocusedItem instanceof EdgeProxy) {
-          for (final TransitionProxy trans : mAutomaton.getTransitions()) {
-            final Proxy source = infomap.get(trans).getSourceObject();
-            final AbstractSubject subject = (AbstractSubject) source;
-            if (subject.getAncestor(EdgeSubject.class) == mFocusedItem
-                && eventCanBeFired(mSim, trans.getEvent())) {
-              possibleSteps.addAll(getSteps(trans));
-            }
-          }
-        }
-        final Step firedEvent = findOptions(possibleSteps);
-        if (firedEvent != null) {
-          try {
-            mSim.step(firedEvent);
-          } catch (final NonDeterministicException exception) {
-            System.out.println("ERROR: " + exception.getMessage()
-                + ". Event will not be fired");
-          }
-        }
-      }
-    }
-
-    private boolean eventCanBeFired(final Simulation sim, final EventProxy event)
-    {
-      for (final Step possibleStep : sim.getValidTransitions())
-      {
-        if (possibleStep.getEvent() == event)
-          return true;
-      }
-      return false;
-    }
-
-    private ArrayList<Step> getSteps(final TransitionProxy trans)
-    {
-      final ArrayList<Step> output = new ArrayList<Step>();
-      for (final Step step: mSim.getValidTransitions())
-      {
-        if (step.getEvent() == trans.getEvent()
-            && (step.getSource().get(mAutomaton) == null || step.getSource().get(mAutomaton) == trans.getSource())
-            && (step.getDest().get(mAutomaton) == null || step.getDest().get(mAutomaton) == trans.getTarget()))
-        {
-           output.add(step);
-        }
-      }
-      return output;
+      if (event.getClickCount() == 2)
+        execute();
     }
 
     public void mouseEntered(final MouseEvent event)

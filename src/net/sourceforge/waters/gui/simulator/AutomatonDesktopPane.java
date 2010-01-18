@@ -73,7 +73,10 @@ public class AutomatonDesktopPane
           try {
             final AutomatonInternalFrame newFrame = new AutomatonInternalFrame
               (realAuto, graph, this, container, sim);
-            newFrame.setLocation(findCoords(newFrame.getSize(), aut));
+            final ArrayList<Rectangle> otherScreens = new ArrayList<Rectangle>();
+            for (final AutomatonInternalFrame automaton : openAutomaton.values())
+              otherScreens.add(automaton.getBounds());
+            newFrame.setLocation(findLocation(otherScreens, newFrame.getSize()));
             add(newFrame);
             newFrame.moveToFront();
             openAutomaton.put(aut, newFrame);
@@ -89,60 +92,6 @@ public class AutomatonDesktopPane
     } else {
       selectAutomaton(clicks, aut);
     }
-  }
-
-  private Point findCoords(final Dimension size, final String name)
-  {
-    final ArrayList<Rectangle> bannedRegions = new ArrayList<Rectangle>();
-    final ArrayList<Rectangle> otherScreens = new ArrayList<Rectangle>();
-    for (final AutomatonInternalFrame automaton : openAutomaton.values())
-      otherScreens.add(automaton.getBounds());
-    for (int y = 0; y < this.getHeight() - size.getHeight(); y++)
-    {
-      for (int x = 0; x < this.getWidth() - size.getWidth(); x++)
-      {
-        boolean failed = false;
-        final Rectangle2D thisFrame = new Rectangle(x, y, (int)size.getWidth(), (int)size.getHeight());
-        final Area thisArea = new Area(thisFrame);
-        for (final Rectangle screen : otherScreens)
-        {
-          if (thisArea.intersects(screen))
-          {
-            final Rectangle newBanned = new Rectangle
-            (x, y, (int) (screen.getWidth() + (screen.getX() - thisArea.getBounds().getX()))
-                , (int) (screen.getHeight() + (screen.getY() - thisArea.getBounds().getY())));
-            bannedRegions.add(newBanned);
-          }
-        }
-        for (final Rectangle banned : bannedRegions)
-        {
-          if (thisArea.intersects(banned))
-          {
-            x = (int) (banned.getX() + banned.getWidth());
-            failed = true;
-          }
-        }
-        if (!failed)
-          return new Point(x, y);
-      }
-    }
-    for (int coords = 0; coords < Math.min(this.getHeight(), this.getWidth()); coords += 30)
-    {
-      boolean fail = false;
-      for (final Rectangle rect : otherScreens)
-      {
-        if (Math.abs(rect.getX() - coords) < SCREENS_TOO_CLOSE && Math.abs(rect.getY() - coords) < SCREENS_TOO_CLOSE)
-          fail = true;
-      }
-      if (!fail)
-        return new Point(coords, coords);
-    }
-    return new Point(0,0);
-  }
-
-  public void closeAutomaton(final String aut)
-  {
-    openAutomaton.get(aut).dispose();
   }
 
   public void removeAutomaton(final String aut)
@@ -180,6 +129,114 @@ public class AutomatonDesktopPane
       }
     } catch (final PropertyVetoException exception) {
       // Can't select frame---too bad ...
+    }
+  }
+
+  private Set<String> copySet(final Set<String> toCopy)
+  {
+    final Set<String> output = new HashSet<String>();
+    for (final String copy : toCopy)
+    {
+      output.add(copy);
+    }
+    return output;
+  }
+
+  private Point findLocation(final ArrayList<Rectangle> bannedLocations, final Dimension newSize)
+  {
+    final ArrayList<Rectangle> bannedRegions = new ArrayList<Rectangle>();
+    final ArrayList<Rectangle> otherScreens = bannedLocations;
+    for (int y = 0; y < this.getHeight() - newSize.getHeight(); y++)
+    {
+      for (int x = 0; x < this.getWidth() - newSize.getWidth(); x++)
+      {
+        boolean failed = false;
+        final Rectangle2D thisFrame = new Rectangle(x, y, (int)newSize.getWidth(), (int)newSize.getHeight());
+        final Area thisArea = new Area(thisFrame);
+        for (final Rectangle screen : otherScreens)
+        {
+          if (thisArea.intersects(screen))
+          {
+            final Rectangle newBanned = new Rectangle
+            (x, y, (int) (screen.getWidth() + (screen.getX() - thisArea.getBounds().getX()))
+                , (int) (screen.getHeight() + (screen.getY() - thisArea.getBounds().getY())));
+            bannedRegions.add(newBanned);
+          }
+        }
+        for (final Rectangle banned : bannedRegions)
+        {
+          if (thisArea.intersects(banned))
+          {
+            x = (int) (banned.getX() + banned.getWidth());
+            failed = true;
+          }
+        }
+        if (!failed)
+          return new Point(x, y);
+      }
+    }
+    for (int coords = 0; coords < Math.min(this.getHeight(), this.getWidth()); coords += 30)
+    {
+      boolean fail = false;
+      for (final Rectangle rect : otherScreens)
+      {
+        if (Math.abs(rect.getX() - coords) < SCREENS_TOO_CLOSE && Math.abs(rect.getY() - coords) < SCREENS_TOO_CLOSE)
+          fail = true;
+      }
+      if (!fail)
+        return new Point(coords, coords);
+    }
+    return new Point(0,0);
+  }
+
+  //#########################################################################
+  //# Event Access Methods
+
+  public void closeAutomaton(final String aut)
+  {
+    openAutomaton.get(aut).dispose();
+  }
+
+  public void closeAllAutomaton()
+  {
+    final Set<String> copySet = copySet(openAutomaton.keySet());
+    for (final String string : copySet)
+      openAutomaton.get(string).dispose();
+  }
+
+  public void closeOtherAutomaton(final String aut)
+  {
+    final Set<String> copySet = copySet(openAutomaton.keySet());
+    for (final String string : copySet)
+      if (string.compareTo(aut) != 0)
+        openAutomaton.get(string).dispose();
+  }
+
+  public void showAllAutomata()
+  {
+    for (final AutomatonProxy automata : mSim.getAutomata())
+    {
+      addAutomaton(automata.getName(), mContainer, mSim, 2);
+    }
+  }
+
+  public void cascade()
+  {
+    final ArrayList<Rectangle> previousLocations = new ArrayList<Rectangle>();
+    for (final AutomatonInternalFrame frame : openAutomaton.values())
+    {
+      final Point newPoint = findLocation(previousLocations, frame.getSize());
+      final Rectangle newRect = new Rectangle(newPoint.x, newPoint.y, (int)frame.getSize().getWidth(), (int)frame.getSize().getHeight());
+      frame.setLocation(newPoint);
+      previousLocations.add(newRect);
+    }
+  }
+
+  public void execute (final String aut)
+  {
+    if (openAutomaton.get(aut) != null)
+    {
+      openAutomaton.get(aut).execute();
     }
   }
 

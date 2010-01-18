@@ -94,8 +94,8 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
       finalWidth = Math.min(panelWidth, scaledWidth);
       finalHeight = Math.min(panelHeight, scaledHeight);
     }
-    // Do not resize if the width and height are unchanged.
-    if (finalWidth != panelWidth || finalHeight != panelHeight) {
+    // Do not resize if the width and height are unchanged, or if the old bounds haven't yet been loaded
+    if ((finalWidth != panelWidth || finalHeight != panelHeight) && mOldBounds != null) {
       // Before resizing, check whether we need to adjust the position.
       // This is necessary when dragging the window to the left or up,
       // otherwise the window may be moved due to rounding errors.
@@ -129,6 +129,14 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
     } else {
       mOldBounds.setBounds(bounds);
     }
+  }
+
+  // ###########################################################################
+  // # Access methods for event handling
+
+  public void execute()
+  {
+    mDisplayPane.execute();
   }
 
   // ###########################################################################

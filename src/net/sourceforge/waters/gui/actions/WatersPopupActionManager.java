@@ -203,10 +203,32 @@ public class WatersPopupActionManager
     return new DesktopCloseWindowAction(mIDE, auto);
   }
 
+  public IDEAction getDesktopExecuteAction(final AutomatonProxy automaton)
+  {
+    return new DesktopExecuteAction(mIDE, automaton);
+  }
+
+  public IDEAction getDesktopCloseAllAction()
+  {
+    return new DesktopCloseAllAction(mIDE);
+  }
+
+  public IDEAction getDesktopCloseOtherAction(final AutomatonProxy automaton)
+  {
+    return new DesktopCloseOtherAction(mIDE, automaton);
+  }
+
+  public IDEAction getDesktopShowAllAction()
+  {
+    return new DesktopShowAllAction(mIDE);
+  }
+
+  public IDEAction getDesktopCascadeAction()
+  {
+    return new DesktopCascadeAction(mIDE);
+  }
 
   //#######################################################################
   //# Data Members
   private final IDE mIDE;
-
-
 }
