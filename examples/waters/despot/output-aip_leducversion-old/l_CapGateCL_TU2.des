@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_CapGateCL_TU2" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="3" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="3" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="4" ctrl-count="3" unctrl-count="1" def-count="1" ans-count="1" req-count="2">
+            <Ev id="1" nm="TrnsfToELTU2" al="TrnsfToELTU2" ctrl="1" type="r"/>
+            <Ev id="2" nm="LibPalletTU2" al="LibPalletTU2" ctrl="1" type="r"/>
+            <Ev id="3" nm="NoTrnsfELTU2" al="NoTrnsfELTU2" ctrl="1" type="a"/>
+            <Ev id="4" nm="PalletLvGCLTU2" al="PalletLvGCLTU2" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="8">
+            <Transitions count="8">
+                <Tr fID="1" eID="2" tID="3"/>
+                <Tr fID="1" eID="1" tID="3"/>
+                <Tr fID="2" eID="4" tID="3"/>
+                <Tr fID="2" eID="3" tID="3"/>
+                <Tr fID="3" eID="4" tID="1"/>
+                <Tr fID="3" eID="2" tID="2"/>
+                <Tr fID="3" eID="1" tID="2"/>
+                <Tr fID="3" eID="3" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_RobotNewEvents_AS3" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="1" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+        </States>
+        <Events count="5" ctrl-count="5" unctrl-count="0" def-count="5" ans-count="0" req-count="0">
+            <Ev id="1" nm="ProcTyp1AsR1AS3" al="ProcTyp1AsR1AS3" ctrl="1" type="d"/>
+            <Ev id="2" nm="ProcTyp2AsR1AS3" al="ProcTyp2AsR1AS3" ctrl="1" type="d"/>
+            <Ev id="3" nm="RTasksCplAS3" al="RTasksCplAS3" ctrl="1" type="d"/>
+            <Ev id="4" nm="ProcTyp1AsR2AS3" al="ProcTyp1AsR2AS3" ctrl="1" type="d"/>
+            <Ev id="5" nm="ProcTyp2AsR2AS3" al="ProcTyp2AsR2AS3" ctrl="1" type="d"/>
+        </Events>
+        <Trans-Function count="5">
+            <Transitions count="5">
+                <Tr fID="1" eID="1" tID="1"/>
+                <Tr fID="1" eID="2" tID="1"/>
+                <Tr fID="1" eID="5" tID="1"/>
+                <Tr fID="1" eID="3" tID="1"/>
+                <Tr fID="1" eID="4" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

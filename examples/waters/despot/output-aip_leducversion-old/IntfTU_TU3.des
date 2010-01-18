@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="IntfTU_TU3" type="interface">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="4" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s3" al="s3" mk="0" rch="1"/>
+            <St id="3" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="4" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="10" ctrl-count="10" unctrl-count="0" ans-count="4" req-count="6" ld-count="0">
+            <Ev id="1" nm="TrnsfToEL3_Up" al="TrnsfToEL3_Up" ctrl="1" type="r"/>
+            <Ev id="2" nm="TrnsfToEL3_1D" al="TrnsfToEL3_1D" ctrl="1" type="r"/>
+            <Ev id="3" nm="TrnsfToEL3_2D" al="TrnsfToEL3_2D" ctrl="1" type="r"/>
+            <Ev id="4" nm="TrnsfToEL3_BD" al="TrnsfToEL3_BD" ctrl="1" type="r"/>
+            <Ev id="5" nm="NoTrnsfELTU3" al="NoTrnsfELTU3" ctrl="1" type="a"/>
+            <Ev id="6" nm="TrnsfCplToELTU3" al="TrnsfCplToELTU3" ctrl="1" type="a"/>
+            <Ev id="7" nm="TrnsfELToCLTU3" al="TrnsfELToCLTU3" ctrl="1" type="r"/>
+            <Ev id="8" nm="TrnsfCplToCLTU3" al="TrnsfCplToCLTU3" ctrl="1" type="a"/>
+            <Ev id="9" nm="LibPalletTU3" al="LibPalletTU3" ctrl="1" type="r"/>
+            <Ev id="10" nm="PalletRlsdTU3" al="PalletRlsdTU3" ctrl="1" type="a"/>
+        </Events>
+        <Trans-Function count="10">
+            <Transitions count="10">
+                <Tr fID="3" eID="8" tID="1"/>
+                <Tr fID="4" eID="6" tID="1"/>
+                <Tr fID="4" eID="5" tID="1"/>
+                <Tr fID="1" eID="9" tID="2"/>
+                <Tr fID="1" eID="4" tID="4"/>
+                <Tr fID="1" eID="3" tID="4"/>
+                <Tr fID="1" eID="7" tID="3"/>
+                <Tr fID="1" eID="1" tID="4"/>
+                <Tr fID="1" eID="2" tID="4"/>
+                <Tr fID="2" eID="10" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

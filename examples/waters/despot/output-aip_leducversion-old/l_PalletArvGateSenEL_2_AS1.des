@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_PalletArvGateSenEL_2_AS1" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="2" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="2" ctrl-count="1" unctrl-count="1" def-count="1" ans-count="0" req-count="1">
+            <Ev id="1" nm="ProcPalletAS1" al="ProcPalletAS1" ctrl="1" type="r"/>
+            <Ev id="2" nm="PalletArvGEL_2AS1" al="PalletArvGEL_2AS1" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="2">
+            <Transitions count="2">
+                <Tr fID="2" eID="2" tID="1"/>
+                <Tr fID="1" eID="1" tID="2"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

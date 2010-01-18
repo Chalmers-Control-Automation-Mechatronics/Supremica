@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_HndlPallet_AS1" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="17" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s9" al="s9" mk="0" rch="1"/>
+            <St id="3" nm="s8" al="s8" mk="0" rch="1"/>
+            <St id="4" nm="s7" al="s7" mk="0" rch="1"/>
+            <St id="5" nm="s6" al="s6" mk="0" rch="1"/>
+            <St id="6" nm="s5" al="s5" mk="0" rch="1"/>
+            <St id="7" nm="s4" al="s4" mk="0" rch="1"/>
+            <St id="8" nm="s3" al="s3" mk="0" rch="1"/>
+            <St id="9" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="10" nm="s1" al="s1" mk="0" rch="1"/>
+            <St id="11" nm="s16" al="s16" mk="0" rch="1"/>
+            <St id="12" nm="s15" al="s15" mk="0" rch="1"/>
+            <St id="13" nm="s14" al="s14" mk="0" rch="1"/>
+            <St id="14" nm="s13" al="s13" mk="0" rch="1"/>
+            <St id="15" nm="s12" al="s12" mk="0" rch="1"/>
+            <St id="16" nm="s11" al="s11" mk="0" rch="1"/>
+            <St id="17" nm="s10" al="s10" mk="0" rch="1"/>
+        </States>
+        <Events count="24" ctrl-count="17" unctrl-count="7" def-count="21" ans-count="3" req-count="0">
+            <Ev id="1" nm="ReadLabelAS1" al="ReadLabelAS1" ctrl="1" type="d"/>
+            <Ev id="2" nm="MvExtrToPlatfAS1" al="MvExtrToPlatfAS1" ctrl="1" type="d"/>
+            <Ev id="3" nm="QTypeAS1" al="QTypeAS1" ctrl="1" type="d"/>
+            <Ev id="4" nm="ProcTyp1AS1" al="ProcTyp1AS1" ctrl="1" type="d"/>
+            <Ev id="5" nm="ProcTyp2AS1" al="ProcTyp2AS1" ctrl="1" type="d"/>
+            <Ev id="6" nm="RobDwnAS1" al="RobDwnAS1" ctrl="1" type="d"/>
+            <Ev id="7" nm="RTasksCplAS1" al="RTasksCplAS1" ctrl="1" type="d"/>
+            <Ev id="8" nm="AssmbErrAAS1" al="AssmbErrAAS1" ctrl="1" type="d"/>
+            <Ev id="9" nm="AssmbErrBAS1" al="AssmbErrBAS1" ctrl="1" type="d"/>
+            <Ev id="10" nm="MvExtrToConvAS1" al="MvExtrToConvAS1" ctrl="1" type="d"/>
+            <Ev id="11" nm="RelPalletAS1" al="RelPalletAS1" ctrl="1" type="d"/>
+            <Ev id="12" nm="ASDwnAS1" al="ASDwnAS1" ctrl="1" type="a"/>
+            <Ev id="13" nm="ProcErrAS1" al="ProcErrAS1" ctrl="1" type="a"/>
+            <Ev id="14" nm="ProcCplAS1" al="ProcCplAS1" ctrl="1" type="a"/>
+            <Ev id="15" nm="WrtCplT1A_1BAS1" al="WrtCplT1A_1BAS1" ctrl="1" type="d"/>
+            <Ev id="16" nm="WrtErr1AAS1" al="WrtErr1AAS1" ctrl="1" type="d"/>
+            <Ev id="17" nm="WrtErr1BAS1" al="WrtErr1BAS1" ctrl="1" type="d"/>
+            <Ev id="18" nm="PArvAtExtractorAS1" al="PArvAtExtractorAS1" ctrl="0" type="d"/>
+            <Ev id="19" nm="DoneReadAS1" al="DoneReadAS1" ctrl="0" type="d"/>
+            <Ev id="20" nm="ExtrArvPlatfAS1" al="ExtrArvPlatfAS1" ctrl="0" type="d"/>
+            <Ev id="21" nm="IsType1AS1" al="IsType1AS1" ctrl="0" type="d"/>
+            <Ev id="22" nm="IsType2AS1" al="IsType2AS1" ctrl="0" type="d"/>
+            <Ev id="23" nm="ExtrArvConvAS1" al="ExtrArvConvAS1" ctrl="0" type="d"/>
+            <Ev id="24" nm="DoneWriteAS1" al="DoneWriteAS1" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="34">
+            <Transitions count="34">
+                <Tr fID="1" eID="18" tID="10"/>
+                <Tr fID="14" eID="24" tID="13"/>
+                <Tr fID="14" eID="16" tID="14"/>
+                <Tr fID="15" eID="10" tID="15"/>
+                <Tr fID="15" eID="23" tID="14"/>
+                <Tr fID="6" eID="5" tID="5"/>
+                <Tr fID="7" eID="4" tID="5"/>
+                <Tr fID="2" eID="10" tID="2"/>
+                <Tr fID="2" eID="23" tID="17"/>
+                <Tr fID="8" eID="3" tID="8"/>
+                <Tr fID="8" eID="21" tID="7"/>
+                <Tr fID="8" eID="22" tID="6"/>
+                <Tr fID="9" eID="2" tID="9"/>
+                <Tr fID="9" eID="20" tID="8"/>
+                <Tr fID="13" eID="11" tID="13"/>
+                <Tr fID="13" eID="13" tID="1"/>
+                <Tr fID="16" eID="11" tID="16"/>
+                <Tr fID="16" eID="14" tID="1"/>
+                <Tr fID="3" eID="12" tID="1"/>
+                <Tr fID="3" eID="11" tID="3"/>
+                <Tr fID="4" eID="10" tID="4"/>
+                <Tr fID="4" eID="23" tID="3"/>
+                <Tr fID="5" eID="7" tID="2"/>
+                <Tr fID="5" eID="9" tID="12"/>
+                <Tr fID="5" eID="8" tID="15"/>
+                <Tr fID="5" eID="6" tID="4"/>
+                <Tr fID="17" eID="15" tID="17"/>
+                <Tr fID="17" eID="24" tID="16"/>
+                <Tr fID="10" eID="19" tID="9"/>
+                <Tr fID="10" eID="1" tID="10"/>
+                <Tr fID="11" eID="17" tID="11"/>
+                <Tr fID="11" eID="24" tID="13"/>
+                <Tr fID="12" eID="10" tID="12"/>
+                <Tr fID="12" eID="23" tID="11"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_IntfRobot_AS1" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="4" marked-count="2">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s3" al="s3" mk="1" rch="1"/>
+            <St id="3" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="4" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="8" ctrl-count="8" unctrl-count="0" def-count="6" ans-count="1" req-count="1">
+            <Ev id="1" nm="DoRprAS1" al="DoRprAS1" ctrl="1" type="r"/>
+            <Ev id="2" nm="RobUpAS1" al="RobUpAS1" ctrl="1" type="a"/>
+            <Ev id="3" nm="ProcTyp1AS1" al="ProcTyp1AS1" ctrl="1" type="d"/>
+            <Ev id="4" nm="ProcTyp2AS1" al="ProcTyp2AS1" ctrl="1" type="d"/>
+            <Ev id="5" nm="RTasksCplAS1" al="RTasksCplAS1" ctrl="1" type="d"/>
+            <Ev id="6" nm="RobDwnAS1" al="RobDwnAS1" ctrl="1" type="d"/>
+            <Ev id="7" nm="AssmbErrAAS1" al="AssmbErrAAS1" ctrl="1" type="d"/>
+            <Ev id="8" nm="AssmbErrBAS1" al="AssmbErrBAS1" ctrl="1" type="d"/>
+        </Events>
+        <Trans-Function count="8">
+            <Transitions count="8">
+                <Tr fID="1" eID="3" tID="4"/>
+                <Tr fID="1" eID="4" tID="4"/>
+                <Tr fID="2" eID="1" tID="3"/>
+                <Tr fID="4" eID="6" tID="2"/>
+                <Tr fID="4" eID="7" tID="1"/>
+                <Tr fID="4" eID="8" tID="1"/>
+                <Tr fID="4" eID="5" tID="1"/>
+                <Tr fID="3" eID="2" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

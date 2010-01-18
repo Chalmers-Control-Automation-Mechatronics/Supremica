@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_DetNProc_AS3" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="10" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s9" al="s9" mk="0" rch="1"/>
+            <St id="3" nm="s8" al="s8" mk="0" rch="1"/>
+            <St id="4" nm="s7" al="s7" mk="0" rch="1"/>
+            <St id="5" nm="s6" al="s6" mk="0" rch="1"/>
+            <St id="6" nm="s5" al="s5" mk="0" rch="1"/>
+            <St id="7" nm="s4" al="s4" mk="0" rch="1"/>
+            <St id="8" nm="s3" al="s3" mk="0" rch="1"/>
+            <St id="9" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="10" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="19" ctrl-count="11" unctrl-count="8" def-count="19" ans-count="0" req-count="0">
+            <Ev id="1" nm="DetNProcPalletAS3" al="DetNProcPalletAS3" ctrl="1" type="d"/>
+            <Ev id="2" nm="QTypeAS3" al="QTypeAS3" ctrl="1" type="d"/>
+            <Ev id="3" nm="QCplT1A_1BAS3" al="QCplT1A_1BAS3" ctrl="1" type="d"/>
+            <Ev id="4" nm="QCplT2A_2BAS3" al="QCplT2A_2BAS3" ctrl="1" type="d"/>
+            <Ev id="5" nm="RTasksCplAS3" al="RTasksCplAS3" ctrl="1" type="d"/>
+            <Ev id="6" nm="ProcTyp1AsR1AS3" al="ProcTyp1AsR1AS3" ctrl="1" type="d"/>
+            <Ev id="7" nm="ProcTyp2AsR1AS3" al="ProcTyp2AsR1AS3" ctrl="1" type="d"/>
+            <Ev id="8" nm="ProcTyp1AsR2AS3" al="ProcTyp1AsR2AS3" ctrl="1" type="d"/>
+            <Ev id="9" nm="ProcTyp2AsR2AS3" al="ProcTyp2AsR2AS3" ctrl="1" type="d"/>
+            <Ev id="10" nm="CplT1A_1BAS3" al="CplT1A_1BAS3" ctrl="1" type="d"/>
+            <Ev id="11" nm="CplT2A_2BAS3" al="CplT2A_2BAS3" ctrl="1" type="d"/>
+            <Ev id="12" nm="IsType1AS3" al="IsType1AS3" ctrl="0" type="d"/>
+            <Ev id="13" nm="IsType2AS3" al="IsType2AS3" ctrl="0" type="d"/>
+            <Ev id="14" nm="IsCplAS3" al="IsCplAS3" ctrl="0" type="d"/>
+            <Ev id="15" nm="NotCplAS3" al="NotCplAS3" ctrl="0" type="d"/>
+            <Ev id="16" nm="AssmbErr1AAS3" al="AssmbErr1AAS3" ctrl="0" type="d"/>
+            <Ev id="17" nm="AssmbErr1BAS3" al="AssmbErr1BAS3" ctrl="0" type="d"/>
+            <Ev id="18" nm="AssmbErr2AAS3" al="AssmbErr2AAS3" ctrl="0" type="d"/>
+            <Ev id="19" nm="AssmbErr2BAS3" al="AssmbErr2BAS3" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="28">
+            <Transitions count="28">
+                <Tr fID="2" eID="19" tID="1"/>
+                <Tr fID="2" eID="5" tID="3"/>
+                <Tr fID="2" eID="18" tID="1"/>
+                <Tr fID="2" eID="9" tID="2"/>
+                <Tr fID="7" eID="10" tID="1"/>
+                <Tr fID="8" eID="6" tID="8"/>
+                <Tr fID="8" eID="5" tID="7"/>
+                <Tr fID="8" eID="17" tID="1"/>
+                <Tr fID="8" eID="16" tID="1"/>
+                <Tr fID="9" eID="15" tID="8"/>
+                <Tr fID="9" eID="14" tID="4"/>
+                <Tr fID="9" eID="3" tID="9"/>
+                <Tr fID="10" eID="13" tID="6"/>
+                <Tr fID="10" eID="12" tID="9"/>
+                <Tr fID="10" eID="2" tID="10"/>
+                <Tr fID="3" eID="11" tID="1"/>
+                <Tr fID="4" eID="19" tID="1"/>
+                <Tr fID="4" eID="5" tID="3"/>
+                <Tr fID="4" eID="18" tID="1"/>
+                <Tr fID="4" eID="8" tID="4"/>
+                <Tr fID="5" eID="5" tID="7"/>
+                <Tr fID="5" eID="7" tID="5"/>
+                <Tr fID="5" eID="17" tID="1"/>
+                <Tr fID="5" eID="16" tID="1"/>
+                <Tr fID="6" eID="4" tID="6"/>
+                <Tr fID="6" eID="15" tID="2"/>
+                <Tr fID="6" eID="14" tID="5"/>
+                <Tr fID="1" eID="1" tID="10"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

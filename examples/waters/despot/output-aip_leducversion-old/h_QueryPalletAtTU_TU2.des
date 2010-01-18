@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="h_QueryPalletAtTU_TU2" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="3" marked-count="1">
+            <InitSt id="1" nm="s2" al="s2" mk="1" rch="1"/>
+            <St id="2" nm="s3" al="s3" mk="0" rch="1"/>
+            <St id="3" nm="s0" al="s0" mk="0" rch="1"/>
+        </States>
+        <Events count="6" ctrl-count="3" unctrl-count="3" def-count="6" ans-count="0" req-count="0">
+            <Ev id="1" nm="QPalletAtELTU2" al="QPalletAtELTU2" ctrl="1" type="d"/>
+            <Ev id="2" nm="IsPalletELTU2" al="IsPalletELTU2" ctrl="1" type="d"/>
+            <Ev id="3" nm="QPalletAtCLTU2" al="QPalletAtCLTU2" ctrl="1" type="d"/>
+            <Ev id="4" nm="NoPalletELTU2" al="NoPalletELTU2" ctrl="0" type="d"/>
+            <Ev id="5" nm="IsPalletCLTU2" al="IsPalletCLTU2" ctrl="0" type="d"/>
+            <Ev id="6" nm="NoPalletCLTU2" al="NoPalletCLTU2" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="6">
+            <Transitions count="6">
+                <Tr fID="3" eID="6" tID="1"/>
+                <Tr fID="3" eID="5" tID="1"/>
+                <Tr fID="1" eID="3" tID="3"/>
+                <Tr fID="1" eID="1" tID="2"/>
+                <Tr fID="2" eID="4" tID="1"/>
+                <Tr fID="2" eID="2" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

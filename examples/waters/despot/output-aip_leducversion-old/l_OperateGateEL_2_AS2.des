@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_OperateGateEL_2_AS2" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="3" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="3" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="8" ctrl-count="6" unctrl-count="2" def-count="4" ans-count="3" req-count="1">
+            <Ev id="1" nm="GOpensEL_2AS2" al="GOpensEL_2AS2" ctrl="1" type="d"/>
+            <Ev id="2" nm="GClosesEL_2AS2" al="GClosesEL_2AS2" ctrl="1" type="d"/>
+            <Ev id="3" nm="ProcPalletAS2" al="ProcPalletAS2" ctrl="1" type="r"/>
+            <Ev id="4" nm="ProcCplAS2" al="ProcCplAS2" ctrl="1" type="a"/>
+            <Ev id="5" nm="ProcErrAS2" al="ProcErrAS2" ctrl="1" type="a"/>
+            <Ev id="6" nm="ASDwnAS2" al="ASDwnAS2" ctrl="1" type="a"/>
+            <Ev id="7" nm="PalletArvGEL_2AS2" al="PalletArvGEL_2AS2" ctrl="0" type="d"/>
+            <Ev id="8" nm="PalletLvGEL_2AS2" al="PalletLvGEL_2AS2" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="8">
+            <Transitions count="8">
+                <Tr fID="1" eID="4" tID="1"/>
+                <Tr fID="1" eID="7" tID="3"/>
+                <Tr fID="1" eID="3" tID="1"/>
+                <Tr fID="1" eID="5" tID="1"/>
+                <Tr fID="1" eID="6" tID="1"/>
+                <Tr fID="2" eID="2" tID="1"/>
+                <Tr fID="3" eID="1" tID="3"/>
+                <Tr fID="3" eID="8" tID="2"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

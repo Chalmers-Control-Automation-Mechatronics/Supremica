@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_DetIfOpNeeded_TU1" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="6" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s5" al="s5" mk="0" rch="1"/>
+            <St id="3" nm="s4" al="s4" mk="0" rch="1"/>
+            <St id="4" nm="s3" al="s3" mk="0" rch="1"/>
+            <St id="5" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="6" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="10" ctrl-count="6" unctrl-count="4" def-count="10" ans-count="0" req-count="0">
+            <Ev id="1" nm="QOpNeededTU1" al="QOpNeededTU1" ctrl="1" type="d"/>
+            <Ev id="2" nm="OpNeededTU1" al="OpNeededTU1" ctrl="1" type="d"/>
+            <Ev id="3" nm="NotOpNeededTU1" al="NotOpNeededTU1" ctrl="1" type="d"/>
+            <Ev id="4" nm="QCplT1A_1BTU1" al="QCplT1A_1BTU1" ctrl="1" type="d"/>
+            <Ev id="5" nm="QCplT2A_2BTU1" al="QCplT2A_2BTU1" ctrl="1" type="d"/>
+            <Ev id="6" nm="QTypeTU1" al="QTypeTU1" ctrl="1" type="d"/>
+            <Ev id="7" nm="IsCplTU1" al="IsCplTU1" ctrl="0" type="d"/>
+            <Ev id="8" nm="NotCplTU1" al="NotCplTU1" ctrl="0" type="d"/>
+            <Ev id="9" nm="IsType1TU1" al="IsType1TU1" ctrl="0" type="d"/>
+            <Ev id="10" nm="IsType2TU1" al="IsType2TU1" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="12">
+            <Transitions count="12">
+                <Tr fID="1" eID="1" tID="5"/>
+                <Tr fID="2" eID="2" tID="1"/>
+                <Tr fID="3" eID="5" tID="3"/>
+                <Tr fID="3" eID="7" tID="2"/>
+                <Tr fID="3" eID="8" tID="6"/>
+                <Tr fID="4" eID="9" tID="2"/>
+                <Tr fID="4" eID="6" tID="4"/>
+                <Tr fID="4" eID="10" tID="3"/>
+                <Tr fID="5" eID="4" tID="5"/>
+                <Tr fID="5" eID="7" tID="6"/>
+                <Tr fID="5" eID="8" tID="4"/>
+                <Tr fID="6" eID="3" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

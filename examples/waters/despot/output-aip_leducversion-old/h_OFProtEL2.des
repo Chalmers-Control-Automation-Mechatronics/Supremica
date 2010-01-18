@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="h_OFProtEL2" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="5" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s4" al="s4" mk="0" rch="1"/>
+            <St id="3" nm="s3" al="s3" mk="0" rch="1"/>
+            <St id="4" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="5" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="14" ctrl-count="11" unctrl-count="3" def-count="4" ans-count="6" req-count="4">
+            <Ev id="1" nm="TrnsfToELTU2" al="TrnsfToELTU2" ctrl="1" type="r"/>
+            <Ev id="2" nm="TrnsfCplToELTU2" al="TrnsfCplToELTU2" ctrl="1" type="a"/>
+            <Ev id="3" nm="NoTrnsfELTU2" al="NoTrnsfELTU2" ctrl="1" type="a"/>
+            <Ev id="4" nm="TrnsfCplToCLTU2" al="TrnsfCplToCLTU2" ctrl="1" type="a"/>
+            <Ev id="5" nm="LibPalletTU2" al="LibPalletTU2" ctrl="1" type="r"/>
+            <Ev id="6" nm="ProcPalletAS2" al="ProcPalletAS2" ctrl="1" type="r"/>
+            <Ev id="7" nm="ProcCplAS2" al="ProcCplAS2" ctrl="1" type="a"/>
+            <Ev id="8" nm="ASDwnAS2" al="ASDwnAS2" ctrl="1" type="a"/>
+            <Ev id="9" nm="TrnsfELToCLTU2" al="TrnsfELToCLTU2" ctrl="1" type="r"/>
+            <Ev id="10" nm="IsPalletELTU2" al="IsPalletELTU2" ctrl="1" type="d"/>
+            <Ev id="11" nm="ProcErrAS2" al="ProcErrAS2" ctrl="1" type="a"/>
+            <Ev id="12" nm="IsPalletCLTU2" al="IsPalletCLTU2" ctrl="0" type="d"/>
+            <Ev id="13" nm="StnUpAS2" al="StnUpAS2" ctrl="0" type="d"/>
+            <Ev id="14" nm="StnDwnAS2" al="StnDwnAS2" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="26">
+            <Transitions count="26">
+                <Tr fID="2" eID="13" tID="2"/>
+                <Tr fID="2" eID="5" tID="2"/>
+                <Tr fID="2" eID="9" tID="2"/>
+                <Tr fID="2" eID="14" tID="2"/>
+                <Tr fID="2" eID="12" tID="2"/>
+                <Tr fID="2" eID="10" tID="2"/>
+                <Tr fID="2" eID="4" tID="1"/>
+                <Tr fID="4" eID="13" tID="4"/>
+                <Tr fID="4" eID="5" tID="1"/>
+                <Tr fID="4" eID="14" tID="4"/>
+                <Tr fID="3" eID="13" tID="1"/>
+                <Tr fID="3" eID="14" tID="4"/>
+                <Tr fID="5" eID="13" tID="5"/>
+                <Tr fID="5" eID="5" tID="5"/>
+                <Tr fID="5" eID="7" tID="2"/>
+                <Tr fID="5" eID="8" tID="2"/>
+                <Tr fID="5" eID="14" tID="5"/>
+                <Tr fID="5" eID="12" tID="5"/>
+                <Tr fID="5" eID="11" tID="2"/>
+                <Tr fID="5" eID="6" tID="5"/>
+                <Tr fID="1" eID="2" tID="5"/>
+                <Tr fID="1" eID="13" tID="1"/>
+                <Tr fID="1" eID="3" tID="4"/>
+                <Tr fID="1" eID="14" tID="1"/>
+                <Tr fID="1" eID="12" tID="3"/>
+                <Tr fID="1" eID="1" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

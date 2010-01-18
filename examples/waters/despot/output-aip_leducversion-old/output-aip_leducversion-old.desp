@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0" >
+	<Header name="aip" type="HISC" degree="1" >
+		<Integrity status="not-verified" date-stamp="" />
+		<Properties controllable="" ctrl-date-stamp="" non-blocking="" non-block-stamp="" />
+	</Header>
+	<Subsystem name="high" level="0" lw-ctrl="" lw-non-blocking="" i-consist="" >
+		<Implements />
+		<Supervisor>
+			<Des name="h_ManageTU1" location="h_ManageTU1.des" />
+			<Des name="h_ManageTU2" location="h_ManageTU2.des" />
+			<Des name="h_ManageTU3" location="h_ManageTU3.des" />
+			<Des name="h_ManageTU4" location="h_ManageTU4.des" />
+			<Des name="h_OFProtEL1" location="h_OFProtEL1.des" />
+			<Des name="h_OFProtEL2" location="h_OFProtEL2.des" />
+			<Des name="h_DetWhichStnUp" location="h_DetWhichStnUp.des" />
+			<Des name="h_HndlComEventsAS" location="h_HndlComEventsAS.des" />
+		</Supervisor>
+		<Plant>
+			<Des name="h_ASStoreUpState_AS1" location="h_ASStoreUpState_AS1.des" />
+			<Des name="h_ASStoreUpState_AS2" location="h_ASStoreUpState_AS2.des" />
+			<Des name="h_PalletArvGateSenEL3_2" location="h_PalletArvGateSenEL3_2.des" />
+			<Des name="h_QueryPalletAtTU_TU1" location="h_QueryPalletAtTU_TU1.des" />
+			<Des name="h_QueryPalletAtTU_TU2" location="h_QueryPalletAtTU_TU2.des" />
+			<Des name="h_QueryPalletAtTU_TU3" location="h_QueryPalletAtTU_TU3.des" />
+			<Des name="h_QueryPalletAtTU_TU4" location="h_QueryPalletAtTU_TU4.des" />
+		</Plant>
+		<Uses>
+			<InterfaceRef name="as1-interface" provider="as1" />
+			<InterfaceRef name="as2-interface" provider="as2" />
+			<InterfaceRef name="as3-interface" provider="as3" />
+			<InterfaceRef name="tu1-interface" provider="tu1" />
+			<InterfaceRef name="tu2-interface" provider="tu2" />
+			<InterfaceRef name="tu3-interface" provider="tu3" />
+			<InterfaceRef name="tu4-interface" provider="tu4" />
+		</Uses>
+	</Subsystem>
+	<Interface name="as1-interface" >
+		<Des name="IntfAssmbStn_AS1" location="IntfAssmbStn_AS1.des" />
+	</Interface>
+	<Interface name="as2-interface" >
+		<Des name="IntfAssmbStn_AS2" location="IntfAssmbStn_AS2.des" />
+	</Interface>
+	<Interface name="as3-interface" >
+		<Des name="IntfAssmbStn_AS3" location="IntfAssmbStn_AS3.des" />
+	</Interface>
+	<Interface name="tu1-interface" >
+		<Des name="IntfTU_TU1" location="IntfTU_TU1.des" />
+	</Interface>
+	<Interface name="tu2-interface" >
+		<Des name="IntfTU_TU2" location="IntfTU_TU2.des" />
+	</Interface>
+	<Interface name="tu3-interface" >
+		<Des name="IntfTU_TU3" location="IntfTU_TU3.des" />
+	</Interface>
+	<Interface name="tu4-interface" >
+		<Des name="IntfTU_TU4" location="IntfTU_TU4.des" />
+	</Interface>
+	<Subsystem name="as1" level="1" lw-ctrl="" lw-non-blocking="" i-consist="" >
+		<Implements>
+			<InterfaceRef name="as1-interface" />
+		</Implements>
+		<Supervisor>
+			<Des name="l_HndlPallet_AS1" location="l_HndlPallet_AS1.des" />
+			<Des name="l_HndlPalletLvAS_AS1" location="l_HndlPalletLvAS_AS1.des" />
+			<Des name="l_OperateGateEL_2_AS1" location="l_OperateGateEL_2_AS1.des" />
+			<Des name="l_IntfRobot_AS1" location="l_IntfRobot_AS1.des" />
+			<Des name="l_DoRobotTasks_AS1" location="l_DoRobotTasks_AS1.des" />
+		</Supervisor>
+		<Plant>
+			<Des name="l_ASNewEvents_AS1" location="l_ASNewEvents_AS1.des" />
+			<Des name="l_CapGateEL_2_AS1" location="l_CapGateEL_2_AS1.des" />
+			<Des name="l_DepGateNExtrSen_AS1" location="l_DepGateNExtrSen_AS1.des" />
+			<Des name="l_Extractor_AS1" location="l_Extractor_AS1.des" />
+			<Des name="l_PalletArvGateSenEL_2_AS1" location="l_PalletArvGateSenEL_2_AS1.des" />
+			<Des name="l_PalletGateEL_2_AS1" location="l_PalletGateEL_2_AS1.des" />
+			<Des name="l_PalletStopEL_2_AS1" location="l_PalletStopEL_2_AS1.des" />
+			<Des name="l_PSenAtExtractor_AS1" location="l_PSenAtExtractor_AS1.des" />
+			<Des name="l_QueryPalletTyp_AS1" location="l_QueryPalletTyp_AS1.des" />
+			<Des name="l_RWDevice_AS1" location="l_RWDevice_AS1.des" />
+			<Des name="l_Robot_AS1" location="l_Robot_AS1.des" />
+			<Des name="l_RobotNewEvents_AS1" location="l_RobotNewEvents_AS1.des" />
+		</Plant>
+		<Uses />
+	</Subsystem>
+	<Subsystem name="as2" level="1" lw-ctrl="" lw-non-blocking="" i-consist="" >
+		<Implements>
+			<InterfaceRef name="as2-interface" />
+		</Implements>
+		<Supervisor>
+			<Des name="l_HndlPallet_AS2" location="l_HndlPallet_AS2.des" />
+			<Des name="l_HndlPalletLvAS_AS2" location="l_HndlPalletLvAS_AS2.des" />
+			<Des name="l_OperateGateEL_2_AS2" location="l_OperateGateEL_2_AS2.des" />
+			<Des name="l_IntfRobot_AS2" location="l_IntfRobot_AS2.des" />
+			<Des name="l_DoRobotTasks_AS2" location="l_DoRobotTasks_AS2.des" />
+		</Supervisor>
+		<Plant>
+			<Des name="l_ASNewEvents_AS2" location="l_ASNewEvents_AS2.des" />
+			<Des name="l_CapGateEL_2_AS2" location="l_CapGateEL_2_AS2.des" />
+			<Des name="l_DepGateNExtrSen_AS2" location="l_DepGateNExtrSen_AS2.des" />
+			<Des name="l_Extractor_AS2" location="l_Extractor_AS2.des" />
+			<Des name="l_PalletArvGateSenEL_2_AS2" location="l_PalletArvGateSenEL_2_AS2.des" />
+			<Des name="l_PalletGateEL_2_AS2" location="l_PalletGateEL_2_AS2.des" />
+			<Des name="l_PalletStopEL_2_AS2" location="l_PalletStopEL_2_AS2.des" />
+			<Des name="l_PSenAtExtractor_AS2" location="l_PSenAtExtractor_AS2.des" />
+			<Des name="l_QueryPalletTyp_AS2" location="l_QueryPalletTyp_AS2.des" />
+			<Des name="l_RWDevice_AS2" location="l_RWDevice_AS2.des" />
+			<Des name="l_Robot_AS2" location="l_Robot_AS2.des" />
+			<Des name="l_RobotNewEvents_AS2" location="l_RobotNewEvents_AS2.des" />
+		</Plant>
+		<Uses />
+	</Subsystem>
+	<Subsystem name="as3" level="1" lw-ctrl="" lw-non-blocking="" i-consist="" >
+		<Implements>
+			<InterfaceRef name="as3-interface" />
+		</Implements>
+		<Supervisor>
+			<Des name="l_HndlPalletLvAS_AS3" location="l_HndlPalletLvAS_AS3.des" />
+			<Des name="l_HndlPallet_AS3" location="l_HndlPallet_AS3.des" />
+			<Des name="l_OperateGateEL_2_AS3" location="l_OperateGateEL_2_AS3.des" />
+			<Des name="l_IntfRepairPallet_AS3" location="l_IntfRepairPallet_AS3.des" />
+			<Des name="l_IntfDetOpNProc_AS3" location="l_IntfDetOpNProc_AS3.des" />
+			<Des name="l_DoMaintenance_AS3" location="l_DoMaintenance_AS3.des" />
+			<Des name="l_DetNProc_AS3" location="l_DetNProc_AS3.des" />
+			<Des name="l_IntfQueryErrors_AS3" location="l_IntfQueryErrors_AS3.des" />
+			<Des name="l_IntfRobot_AS3" location="l_IntfRobot_AS3.des" />
+			<Des name="l_DoChkErr_AS3" location="l_DoChkErr_AS3.des" />
+			<Des name="l_DoRobotTasks_AS3" location="l_DoRobotTasks_AS3.des" />
+		</Supervisor>
+		<Plant>
+			<Des name="l_ASNewEvents_AS3" location="l_ASNewEvents_AS3.des" />
+			<Des name="l_CapGateEL_2_AS3" location="l_CapGateEL_2_AS3.des" />
+			<Des name="l_DepGateNExtrSen_AS3" location="l_DepGateNExtrSen_AS3.des" />
+			<Des name="l_Extractor_AS3" location="l_Extractor_AS3.des" />
+			<Des name="l_PalletGateEL_2_AS3" location="l_PalletGateEL_2_AS3.des" />
+			<Des name="l_PalletStopEL_2_AS3" location="l_PalletStopEL_2_AS3.des" />
+			<Des name="l_PSenAtExtractor_AS3" location="l_PSenAtExtractor_AS3.des" />
+			<Des name="l_RWDevice_AS3" location="l_RWDevice_AS3.des" />
+			<Des name="l_PalletMaint_AS3" location="l_PalletMaint_AS3.des" />
+			<Des name="l_RepPalletNewEvents_AS3" location="l_RepPalletNewEvents_AS3.des" />
+			<Des name="l_DetOpNProcNewEvents_AS3" location="l_DetOpNProcNewEvents_AS3.des" />
+			<Des name="l_QueryTypNCpl_AS3" location="l_QueryTypNCpl_AS3.des" />
+			<Des name="l_ChkErr_AS3" location="l_ChkErr_AS3.des" />
+			<Des name="l_QueryErrNewEvents_AS3" location="l_QueryErrNewEvents_AS3.des" />
+			<Des name="l_Robot_AS3" location="l_Robot_AS3.des" />
+			<Des name="l_RobotNewEvents_AS3" location="l_RobotNewEvents_AS3.des" />
+		</Plant>
+		<Uses />
+	</Subsystem>
+	<Subsystem name="tu1" level="1" lw-ctrl="" lw-non-blocking="" i-consist="" >
+		<Implements>
+			<InterfaceRef name="tu1-interface" />
+		</Implements>
+		<Supervisor>
+			<Des name="l_HndlTrnsfToEL_TU1" location="l_HndlTrnsfToEL_TU1.des" />
+			<Des name="l_DoChkErr_TU1" location="l_DoChkErr_TU1.des" />
+			<Des name="l_IntfCheckOpNeeded_TU1" location="l_IntfCheckOpNeeded_TU1.des" />
+			<Des name="l_DetIfOpNeeded_TU1" location="l_DetIfOpNeeded_TU1.des" />
+			<Des name="l_HndlComEvents_TU1" location="l_HndlComEvents_TU1.des" />
+			<Des name="l_HndlTrnsfELToCL_TU1" location="l_HndlTrnsfELToCL_TU1.des" />
+			<Des name="l_IntfQueryErrors_TU1" location="l_IntfQueryErrors_TU1.des" />
+			<Des name="l_HndlLibPallet_TU1" location="l_HndlLibPallet_TU1.des" />
+		</Supervisor>
+		<Plant>
+			<Des name="l_CapGateCL_TU1" location="l_CapGateCL_TU1.des" />
+			<Des name="l_CapGateEL_1_TU1" location="l_CapGateEL_1_TU1.des" />
+			<Des name="l_CapTUDrwToExit_TU1" location="l_CapTUDrwToExit_TU1.des" />
+			<Des name="l_CapTUDrwToGateCL_TU1" location="l_CapTUDrwToGateCL_TU1.des" />
+			<Des name="l_CapTUDrwToGateEL_1_TU1" location="l_CapTUDrwToGateEL_1_TU1.des" />
+			<Des name="l_PalletGateCL_TU1" location="l_PalletGateCL_TU1.des" />
+			<Des name="l_PalletGateEL_1_TU1" location="l_PalletGateEL_1_TU1.des" />
+			<Des name="l_PalletStopCL_TU1" location="l_PalletStopCL_TU1.des" />
+			<Des name="l_PalletStopEL_1_TU1" location="l_PalletStopEL_1_TU1.des" />
+			<Des name="l_QueryDrwLoc_TU1" location="l_QueryDrwLoc_TU1.des" />
+			<Des name="l_RWDevice_TU1" location="l_RWDevice_TU1.des" />
+			<Des name="l_TUDrawer_TU1" location="l_TUDrawer_TU1.des" />
+			<Des name="l_TUNewEvents_TU1" location="l_TUNewEvents_TU1.des" />
+			<Des name="l_ChkErr_TU1" location="l_ChkErr_TU1.des" />
+			<Des name="l_QueryErrNewEvents_TU1" location="l_QueryErrNewEvents_TU1.des" />
+			<Des name="l_CheckOpNeededNewEvts_TU1" location="l_CheckOpNeededNewEvts_TU1.des" />
+			<Des name="l_QueryTypNCpl_TU1" location="l_QueryTypNCpl_TU1.des" />
+		</Plant>
+		<Uses />
+	</Subsystem>
+	<Subsystem name="tu2" level="1" lw-ctrl="" lw-non-blocking="" i-consist="" >
+		<Implements>
+			<InterfaceRef name="tu2-interface" />
+		</Implements>
+		<Supervisor>
+			<Des name="l_HndlTrnsfToEL_TU2" location="l_HndlTrnsfToEL_TU2.des" />
+			<Des name="l_DoChkErr_TU2" location="l_DoChkErr_TU2.des" />
+			<Des name="l_IntfCheckOpNeeded_TU2" location="l_IntfCheckOpNeeded_TU2.des" />
+			<Des name="l_DetIfOpNeeded_TU2" location="l_DetIfOpNeeded_TU2.des" />
+			<Des name="l_HndlComEvents_TU2" location="l_HndlComEvents_TU2.des" />
+			<Des name="l_HndlTrnsfELToCL_TU2" location="l_HndlTrnsfELToCL_TU2.des" />
+			<Des name="l_IntfQueryErrors_TU2" location="l_IntfQueryErrors_TU2.des" />
+			<Des name="l_HndlLibPallet_TU2" location="l_HndlLibPallet_TU2.des" />
+		</Supervisor>
+		<Plant>
+			<Des name="l_CapGateCL_TU2" location="l_CapGateCL_TU2.des" />
+			<Des name="l_CapGateEL_1_TU2" location="l_CapGateEL_1_TU2.des" />
+			<Des name="l_CapTUDrwToExit_TU2" location="l_CapTUDrwToExit_TU2.des" />
+			<Des name="l_CapTUDrwToGateCL_TU2" location="l_CapTUDrwToGateCL_TU2.des" />
+			<Des name="l_CapTUDrwToGateEL_1_TU2" location="l_CapTUDrwToGateEL_1_TU2.des" />
+			<Des name="l_PalletGateCL_TU2" location="l_PalletGateCL_TU2.des" />
+			<Des name="l_PalletGateEL_1_TU2" location="l_PalletGateEL_1_TU2.des" />
+			<Des name="l_PalletStopCL_TU2" location="l_PalletStopCL_TU2.des" />
+			<Des name="l_PalletStopEL_1_TU2" location="l_PalletStopEL_1_TU2.des" />
+			<Des name="l_QueryDrwLoc_TU2" location="l_QueryDrwLoc_TU2.des" />
+			<Des name="l_RWDevice_TU2" location="l_RWDevice_TU2.des" />
+			<Des name="l_TUDrawer_TU2" location="l_TUDrawer_TU2.des" />
+			<Des name="l_TUNewEvents_TU2" location="l_TUNewEvents_TU2.des" />
+			<Des name="l_ChkErr_TU2" location="l_ChkErr_TU2.des" />
+			<Des name="l_QueryErrNewEvents_TU2" location="l_QueryErrNewEvents_TU2.des" />
+			<Des name="l_CheckOpNeededNewEvts_TU2" location="l_CheckOpNeededNewEvts_TU2.des" />
+			<Des name="l_QueryTypNCpl_TU2" location="l_QueryTypNCpl_TU2.des" />
+		</Plant>
+		<Uses />
+	</Subsystem>
+	<Subsystem name="tu3" level="1" lw-ctrl="" lw-non-blocking="" i-consist="" >
+		<Implements>
+			<InterfaceRef name="tu3-interface" />
+		</Implements>
+		<Supervisor>
+			<Des name="l_DoChkErr_TU3" location="l_DoChkErr_TU3.des" />
+			<Des name="l_HndlBothStnDwn_TU3" location="l_HndlBothStnDwn_TU3.des" />
+			<Des name="l_HndlComEvents_TU3" location="l_HndlComEvents_TU3.des" />
+			<Des name="l_HndlComEvents_ChkDwn_TU3" location="l_HndlComEvents_ChkDwn_TU3.des" />
+			<Des name="l_HndlLibPallet_TU3" location="l_HndlLibPallet_TU3.des" />
+			<Des name="l_HndlSelCheck_TU3" location="l_HndlSelCheck_TU3.des" />
+			<Des name="l_HndlStn1Dwn_TU3" location="l_HndlStn1Dwn_TU3.des" />
+			<Des name="l_HndlStn2Dwn_TU3" location="l_HndlStn2Dwn_TU3.des" />
+			<Des name="l_HndlTrnsfELToCL_TU3" location="l_HndlTrnsfELToCL_TU3.des" />
+			<Des name="l_HndlTrnsfToEL_TU3" location="l_HndlTrnsfToEL_TU3.des" />
+			<Des name="l_IntfCheckDwnOpNeeded_TU3" location="l_IntfCheckDwnOpNeeded_TU3.des" />
+			<Des name="l_IntfQueryErrors_TU3" location="l_IntfQueryErrors_TU3.des" />
+		</Supervisor>
+		<Plant>
+			<Des name="l_CapGateCL_TU3" location="l_CapGateCL_TU3.des" />
+			<Des name="l_CapGateEL_1_TU3" location="l_CapGateEL_1_TU3.des" />
+			<Des name="l_CapTUDrwToExit_TU3" location="l_CapTUDrwToExit_TU3.des" />
+			<Des name="l_CapTUDrwToGateCL_TU3" location="l_CapTUDrwToGateCL_TU3.des" />
+			<Des name="l_CapTUDrwToGateEL_1_TU3" location="l_CapTUDrwToGateEL_1_TU3.des" />
+			<Des name="l_CheckDwnOpNeededNewEvts_TU3" location="l_CheckDwnOpNeededNewEvts_TU3.des" />
+			<Des name="l_ChkErr_TU3" location="l_ChkErr_TU3.des" />
+			<Des name="l_PalletGateCL_TU3" location="l_PalletGateCL_TU3.des" />
+			<Des name="l_PalletGateEL_1_TU3" location="l_PalletGateEL_1_TU3.des" />
+			<Des name="l_PalletStopCL_TU3" location="l_PalletStopCL_TU3.des" />
+			<Des name="l_PalletStopEL_1_TU3" location="l_PalletStopEL_1_TU3.des" />
+			<Des name="l_QueryDrwLoc_TU3" location="l_QueryDrwLoc_TU3.des" />
+			<Des name="l_QueryErrNewEvents_TU3" location="l_QueryErrNewEvents_TU3.des" />
+			<Des name="l_QueryTypNCpl_TU3" location="l_QueryTypNCpl_TU3.des" />
+			<Des name="l_RWDevice_TU3" location="l_RWDevice_TU3.des" />
+			<Des name="l_TUDrawer_TU3" location="l_TUDrawer_TU3.des" />
+			<Des name="l_TUNewEvents3_TU3" location="l_TUNewEvents3_TU3.des" />
+		</Plant>
+		<Uses />
+	</Subsystem>
+	<Subsystem name="tu4" level="1" lw-ctrl="" lw-non-blocking="" i-consist="" >
+		<Implements>
+			<InterfaceRef name="tu4-interface" />
+		</Implements>
+		<Supervisor>
+			<Des name="l_HndlComEvents_TU4" location="l_HndlComEvents_TU4.des" />
+			<Des name="l_HndlLibPallet_TU4" location="l_HndlLibPallet_TU4.des" />
+			<Des name="l_HndlTrnsfELToCL_TU4" location="l_HndlTrnsfELToCL_TU4.des" />
+			<Des name="l_HndlTrnsfToEL_TU4" location="l_HndlTrnsfToEL_TU4.des" />
+		</Supervisor>
+		<Plant>
+			<Des name="l_CapGateCL_TU4" location="l_CapGateCL_TU4.des" />
+			<Des name="l_CapGateEL_1_TU4" location="l_CapGateEL_1_TU4.des" />
+			<Des name="l_CapTUDrwToExit_TU4" location="l_CapTUDrwToExit_TU4.des" />
+			<Des name="l_CapTUDrwToGateCL_TU4" location="l_CapTUDrwToGateCL_TU4.des" />
+			<Des name="l_CapTUDrwToGateEL_1_TU4" location="l_CapTUDrwToGateEL_1_TU4.des" />
+			<Des name="l_PalletGateCL_TU4" location="l_PalletGateCL_TU4.des" />
+			<Des name="l_PalletGateEL_1_TU4" location="l_PalletGateEL_1_TU4.des" />
+			<Des name="l_PalletStopCL_TU4" location="l_PalletStopCL_TU4.des" />
+			<Des name="l_PalletStopEL_1_TU4" location="l_PalletStopEL_1_TU4.des" />
+			<Des name="l_QCorrectType_TU4" location="l_QCorrectType_TU4.des" />
+			<Des name="l_QTasksCpl_TU4" location="l_QTasksCpl_TU4.des" />
+			<Des name="l_QueryDrwLoc_TU4" location="l_QueryDrwLoc_TU4.des" />
+			<Des name="l_RWDevice_TU4" location="l_RWDevice_TU4.des" />
+			<Des name="l_TUDrawer_TU4" location="l_TUDrawer_TU4.des" />
+			<Des name="l_TUNewEvents_TU4" location="l_TUNewEvents_TU4.des" />
+		</Plant>
+		<Uses />
+	</Subsystem>
+</Project>

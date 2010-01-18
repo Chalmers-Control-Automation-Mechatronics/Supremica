@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_HndlComEvents_TU4" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="2" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="28" ctrl-count="18" unctrl-count="10" def-count="21" ans-count="4" req-count="3">
+            <Ev id="1" nm="LibPalletTU4" al="LibPalletTU4" ctrl="1" type="r"/>
+            <Ev id="2" nm="TrnsfToELTU4" al="TrnsfToELTU4" ctrl="1" type="r"/>
+            <Ev id="3" nm="TrnsfELToCLTU4" al="TrnsfELToCLTU4" ctrl="1" type="r"/>
+            <Ev id="4" nm="NoTrnsfELTU4" al="NoTrnsfELTU4" ctrl="1" type="a"/>
+            <Ev id="5" nm="TrnsfCplToELTU4" al="TrnsfCplToELTU4" ctrl="1" type="a"/>
+            <Ev id="6" nm="TrnsfCplToCLTU4" al="TrnsfCplToCLTU4" ctrl="1" type="a"/>
+            <Ev id="7" nm="PalletRlsdTU4" al="PalletRlsdTU4" ctrl="1" type="a"/>
+            <Ev id="8" nm="GOpensCLTU4" al="GOpensCLTU4" ctrl="1" type="d"/>
+            <Ev id="9" nm="GOpensEL_1TU4" al="GOpensEL_1TU4" ctrl="1" type="d"/>
+            <Ev id="10" nm="GClosesEL_1TU4" al="GClosesEL_1TU4" ctrl="1" type="d"/>
+            <Ev id="11" nm="GClosesCLTU4" al="GClosesCLTU4" ctrl="1" type="d"/>
+            <Ev id="12" nm="PStopOpensEL_1TU4" al="PStopOpensEL_1TU4" ctrl="1" type="d"/>
+            <Ev id="13" nm="PStopClosesEL_1TU4" al="PStopClosesEL_1TU4" ctrl="1" type="d"/>
+            <Ev id="14" nm="PStopOpensCLTU4" al="PStopOpensCLTU4" ctrl="1" type="d"/>
+            <Ev id="15" nm="PStopClosesCLTU4" al="PStopClosesCLTU4" ctrl="1" type="d"/>
+            <Ev id="16" nm="QDrwLocTU4" al="QDrwLocTU4" ctrl="1" type="d"/>
+            <Ev id="17" nm="MvDrwToELTU4" al="MvDrwToELTU4" ctrl="1" type="d"/>
+            <Ev id="18" nm="MvDrwToCLTU4" al="MvDrwToCLTU4" ctrl="1" type="d"/>
+            <Ev id="19" nm="PalletLvGCLTU4" al="PalletLvGCLTU4" ctrl="0" type="d"/>
+            <Ev id="20" nm="PalletLvGEL_1TU4" al="PalletLvGEL_1TU4" ctrl="0" type="d"/>
+            <Ev id="21" nm="PalletArvDrwCLTU4" al="PalletArvDrwCLTU4" ctrl="0" type="d"/>
+            <Ev id="22" nm="PalletArvDrwELTU4" al="PalletArvDrwELTU4" ctrl="0" type="d"/>
+            <Ev id="23" nm="PalletLvTUAtCLTU4" al="PalletLvTUAtCLTU4" ctrl="0" type="d"/>
+            <Ev id="24" nm="PalletLvTUAtEL_1TU4" al="PalletLvTUAtEL_1TU4" ctrl="0" type="d"/>
+            <Ev id="25" nm="DrwAtELTU4" al="DrwAtELTU4" ctrl="0" type="d"/>
+            <Ev id="26" nm="DrwAtCLTU4" al="DrwAtCLTU4" ctrl="0" type="d"/>
+            <Ev id="27" nm="DrwArvELTU4" al="DrwArvELTU4" ctrl="0" type="d"/>
+            <Ev id="28" nm="DrwArvCLTU4" al="DrwArvCLTU4" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="28">
+            <Transitions count="28">
+                <Tr fID="1" eID="2" tID="2"/>
+                <Tr fID="1" eID="1" tID="2"/>
+                <Tr fID="1" eID="3" tID="2"/>
+                <Tr fID="2" eID="24" tID="2"/>
+                <Tr fID="2" eID="25" tID="2"/>
+                <Tr fID="2" eID="23" tID="2"/>
+                <Tr fID="2" eID="4" tID="1"/>
+                <Tr fID="2" eID="5" tID="1"/>
+                <Tr fID="2" eID="6" tID="1"/>
+                <Tr fID="2" eID="7" tID="1"/>
+                <Tr fID="2" eID="12" tID="2"/>
+                <Tr fID="2" eID="28" tID="2"/>
+                <Tr fID="2" eID="13" tID="2"/>
+                <Tr fID="2" eID="22" tID="2"/>
+                <Tr fID="2" eID="14" tID="2"/>
+                <Tr fID="2" eID="26" tID="2"/>
+                <Tr fID="2" eID="15" tID="2"/>
+                <Tr fID="2" eID="16" tID="2"/>
+                <Tr fID="2" eID="27" tID="2"/>
+                <Tr fID="2" eID="17" tID="2"/>
+                <Tr fID="2" eID="18" tID="2"/>
+                <Tr fID="2" eID="19" tID="2"/>
+                <Tr fID="2" eID="20" tID="2"/>
+                <Tr fID="2" eID="21" tID="2"/>
+                <Tr fID="2" eID="9" tID="2"/>
+                <Tr fID="2" eID="10" tID="2"/>
+                <Tr fID="2" eID="8" tID="2"/>
+                <Tr fID="2" eID="11" tID="2"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_CheckDwnOpNeededNewEvts_TU3" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="1" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+        </States>
+        <Events count="5" ctrl-count="5" unctrl-count="0" def-count="5" ans-count="0" req-count="0">
+            <Ev id="1" nm="QDwnOpNeeded_1DTU3" al="QDwnOpNeeded_1DTU3" ctrl="1" type="d"/>
+            <Ev id="2" nm="QDwnOpNeeded_2DTU3" al="QDwnOpNeeded_2DTU3" ctrl="1" type="d"/>
+            <Ev id="3" nm="QDwnOpNeeded_BDTU3" al="QDwnOpNeeded_BDTU3" ctrl="1" type="d"/>
+            <Ev id="4" nm="DwnOpNeededTU3" al="DwnOpNeededTU3" ctrl="1" type="d"/>
+            <Ev id="5" nm="NotDwnOpNeededTU3" al="NotDwnOpNeededTU3" ctrl="1" type="d"/>
+        </Events>
+        <Trans-Function count="5">
+            <Transitions count="5">
+                <Tr fID="1" eID="1" tID="1"/>
+                <Tr fID="1" eID="2" tID="1"/>
+                <Tr fID="1" eID="3" tID="1"/>
+                <Tr fID="1" eID="4" tID="1"/>
+                <Tr fID="1" eID="5" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

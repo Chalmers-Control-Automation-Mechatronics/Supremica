@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="h_ASStoreUpState_AS1" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="4" marked-count="1">
+            <InitSt id="1" nm="s2" al="s2" mk="1" rch="1"/>
+            <St id="2" nm="s3" al="s3" mk="0" rch="1"/>
+            <St id="3" nm="s1" al="s1" mk="0" rch="1"/>
+            <St id="4" nm="s0" al="s0" mk="0" rch="1"/>
+        </States>
+        <Events count="7" ctrl-count="5" unctrl-count="2" def-count="3" ans-count="2" req-count="2">
+            <Ev id="1" nm="ASDwnAS1" al="ASDwnAS1" ctrl="1" type="a"/>
+            <Ev id="2" nm="RobUpAS1" al="RobUpAS1" ctrl="1" type="a"/>
+            <Ev id="3" nm="QStnUpAS1" al="QStnUpAS1" ctrl="1" type="d"/>
+            <Ev id="4" nm="ProcPalletAS1" al="ProcPalletAS1" ctrl="1" type="r"/>
+            <Ev id="5" nm="DoRprAS1" al="DoRprAS1" ctrl="1" type="r"/>
+            <Ev id="6" nm="StnUpAS1" al="StnUpAS1" ctrl="0" type="d"/>
+            <Ev id="7" nm="StnDwnAS1" al="StnDwnAS1" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="12">
+            <Transitions count="12">
+                <Tr fID="3" eID="2" tID="1"/>
+                <Tr fID="3" eID="3" tID="4"/>
+                <Tr fID="3" eID="5" tID="3"/>
+                <Tr fID="1" eID="4" tID="1"/>
+                <Tr fID="1" eID="3" tID="2"/>
+                <Tr fID="1" eID="1" tID="3"/>
+                <Tr fID="2" eID="4" tID="2"/>
+                <Tr fID="2" eID="6" tID="1"/>
+                <Tr fID="2" eID="1" tID="4"/>
+                <Tr fID="4" eID="2" tID="2"/>
+                <Tr fID="4" eID="7" tID="3"/>
+                <Tr fID="4" eID="5" tID="4"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

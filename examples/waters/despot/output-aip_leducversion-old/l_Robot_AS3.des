@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_Robot_AS3" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="5" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s4" al="s4" mk="0" rch="1"/>
+            <St id="3" nm="s3" al="s3" mk="0" rch="1"/>
+            <St id="4" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="5" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="12" ctrl-count="4" unctrl-count="8" def-count="12" ans-count="0" req-count="0">
+            <Ev id="1" nm="StrRtask1AAS3" al="StrRtask1AAS3" ctrl="1" type="d"/>
+            <Ev id="2" nm="StrRtask1BAS3" al="StrRtask1BAS3" ctrl="1" type="d"/>
+            <Ev id="3" nm="StrRtask2AAS3" al="StrRtask2AAS3" ctrl="1" type="d"/>
+            <Ev id="4" nm="StrRtask2BAS3" al="StrRtask2BAS3" ctrl="1" type="d"/>
+            <Ev id="5" nm="RtaskCpl1AAS3" al="RtaskCpl1AAS3" ctrl="0" type="d"/>
+            <Ev id="6" nm="RtaskCpl1BAS3" al="RtaskCpl1BAS3" ctrl="0" type="d"/>
+            <Ev id="7" nm="AssmbErr1AAS3" al="AssmbErr1AAS3" ctrl="0" type="d"/>
+            <Ev id="8" nm="AssmbErr1BAS3" al="AssmbErr1BAS3" ctrl="0" type="d"/>
+            <Ev id="9" nm="AssmbErr2AAS3" al="AssmbErr2AAS3" ctrl="0" type="d"/>
+            <Ev id="10" nm="AssmbErr2BAS3" al="AssmbErr2BAS3" ctrl="0" type="d"/>
+            <Ev id="11" nm="RtaskCpl2AAS3" al="RtaskCpl2AAS3" ctrl="0" type="d"/>
+            <Ev id="12" nm="RtaskCpl2BAS3" al="RtaskCpl2BAS3" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="12">
+            <Transitions count="12">
+                <Tr fID="1" eID="3" tID="2"/>
+                <Tr fID="1" eID="4" tID="3"/>
+                <Tr fID="1" eID="1" tID="4"/>
+                <Tr fID="1" eID="2" tID="5"/>
+                <Tr fID="2" eID="11" tID="1"/>
+                <Tr fID="2" eID="9" tID="1"/>
+                <Tr fID="3" eID="10" tID="1"/>
+                <Tr fID="3" eID="12" tID="1"/>
+                <Tr fID="4" eID="7" tID="1"/>
+                <Tr fID="4" eID="5" tID="1"/>
+                <Tr fID="5" eID="8" tID="1"/>
+                <Tr fID="5" eID="6" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

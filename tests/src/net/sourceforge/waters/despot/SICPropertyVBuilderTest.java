@@ -60,21 +60,6 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testBuild("despot", "testHISC", "hisc1_low1");
   }
 
-  public void testIntegrity_parManEg_I_mfb_lowlevel() throws Exception
-  {
-    testIntegrity("tests", "hisc", "parManEg_I_mfb_lowlevel");
-  }
-
-  public void testIntegrity_rhone_subsystem1_ld_failsic5() throws Exception
-  {
-    testIntegrity("tests", "hisc", "rhone_subsystem1_ld_failsic5");
-  }
-
-  public void testIntegrity_rhone_subsystem1_ld() throws Exception
-  {
-    testIntegrity("tests", "hisc", "rhone_subsystem1_ld");
-  }
-
   // SimpleManufacturingExample
   public void testConflictChecker_Manuf_Cells() throws Exception
   {
@@ -262,6 +247,27 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   public void testIntegrity_hisc9_low2() throws Exception
   {
     testIntegrity("despot", "testHISC", "hisc9_low2");
+  }
+
+  public void testIntegrity_parManEg_I_mfb_lowlevel() throws Exception
+  {
+    testIntegrity("tests", "hisc", "parManEg_I_mfb_lowlevel");
+  }
+
+  public void testIntegrity_rhone_subsystem1_ld_failsic5() throws Exception
+  {
+    testIntegrity("tests", "hisc", "rhone_subsystem1_ld_failsic5");
+  }
+
+  public void testIntegrity_rhone_subsystem1_ld() throws Exception
+  {
+    testIntegrity("tests", "hisc", "rhone_subsystem1_ld");
+  }
+
+  public void testIntegrity_output_aip_leducversion_old() throws Exception
+  {
+    testIntegrity("despot", "output-aip_leducversion-old",
+                  "output-aip_leducversion-old");
   }
 
   // #########################################################################

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="h_HndlComEventsAS" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="6" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s5" al="s5" mk="0" rch="1"/>
+            <St id="3" nm="s4" al="s4" mk="0" rch="1"/>
+            <St id="4" nm="s3" al="s3" mk="0" rch="1"/>
+            <St id="5" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="6" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="13" ctrl-count="5" unctrl-count="8" def-count="13" ans-count="0" req-count="0">
+            <Ev id="1" nm="QPalletAtCLTU1" al="QPalletAtCLTU1" ctrl="1" type="d"/>
+            <Ev id="2" nm="QStnUpAS1" al="QStnUpAS1" ctrl="1" type="d"/>
+            <Ev id="3" nm="QPalletAtCLTU2" al="QPalletAtCLTU2" ctrl="1" type="d"/>
+            <Ev id="4" nm="DetStnsUp" al="DetStnsUp" ctrl="1" type="d"/>
+            <Ev id="5" nm="QStnUpAS2" al="QStnUpAS2" ctrl="1" type="d"/>
+            <Ev id="6" nm="IsPalletCLTU1" al="IsPalletCLTU1" ctrl="0" type="d"/>
+            <Ev id="7" nm="NoPalletCLTU1" al="NoPalletCLTU1" ctrl="0" type="d"/>
+            <Ev id="8" nm="StnUpAS1" al="StnUpAS1" ctrl="0" type="d"/>
+            <Ev id="9" nm="StnDwnAS1" al="StnDwnAS1" ctrl="0" type="d"/>
+            <Ev id="10" nm="IsPalletCLTU2" al="IsPalletCLTU2" ctrl="0" type="d"/>
+            <Ev id="11" nm="NoPalletCLTU2" al="NoPalletCLTU2" ctrl="0" type="d"/>
+            <Ev id="12" nm="StnUpAS2" al="StnUpAS2" ctrl="0" type="d"/>
+            <Ev id="13" nm="StnDwnAS2" al="StnDwnAS2" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="19">
+            <Transitions count="19">
+                <Tr fID="1" eID="3" tID="5"/>
+                <Tr fID="1" eID="1" tID="6"/>
+                <Tr fID="1" eID="4" tID="4"/>
+                <Tr fID="2" eID="13" tID="1"/>
+                <Tr fID="2" eID="12" tID="1"/>
+                <Tr fID="2" eID="5" tID="2"/>
+                <Tr fID="4" eID="13" tID="1"/>
+                <Tr fID="4" eID="12" tID="1"/>
+                <Tr fID="4" eID="2" tID="4"/>
+                <Tr fID="4" eID="8" tID="4"/>
+                <Tr fID="4" eID="9" tID="4"/>
+                <Tr fID="4" eID="5" tID="4"/>
+                <Tr fID="5" eID="10" tID="2"/>
+                <Tr fID="5" eID="11" tID="1"/>
+                <Tr fID="3" eID="2" tID="3"/>
+                <Tr fID="3" eID="8" tID="1"/>
+                <Tr fID="3" eID="9" tID="1"/>
+                <Tr fID="6" eID="7" tID="1"/>
+                <Tr fID="6" eID="6" tID="3"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

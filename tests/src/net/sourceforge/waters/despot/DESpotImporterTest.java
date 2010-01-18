@@ -45,214 +45,184 @@ import org.xml.sax.SAXException;
 public class DESpotImporterTest extends AbstractWatersTest
 {
 
-  //#########################################################################
-  //# Successful Test Cases
-  public void testImport_test2()
-    throws Exception
+  // #########################################################################
+  // # Successful Test Cases
+
+  public void testImport_output_aip_leducversion_old() throws Exception
+  {
+    testImport("output-aip_leducversion-old", "output-aip_leducversion-old");
+  }
+
+  public void testImport_test2() throws Exception
   {
     testImport("testSimple", "test2");
   }
 
-  public void testImport_testCont1()
-    throws Exception
+  public void testImport_testCont1() throws Exception
   {
     testImport("testSimple", "testCont1");
   }
 
-  public void testImport_testInt()
-    throws Exception
+  public void testImport_testInt() throws Exception
   {
     testImport("testSimple", "testInt");
   }
 
-  public void testImport_testNB()
-    throws Exception
+  public void testImport_testNB() throws Exception
   {
     testImport("testSimple", "testNB");
   }
 
-  public void testImport_testNB2()
-    throws Exception
+  public void testImport_testNB2() throws Exception
   {
     testImport("testSimple", "testNB2");
   }
 
-  public void testImport_testSync()
-    throws Exception
+  public void testImport_testSync() throws Exception
   {
     testImport("testSimple", "testSync");
   }
 
-  public void testImport_never_marked_1()
-    throws Exception
+  public void testImport_never_marked_1() throws Exception
   {
     testImport("testSimple", "never_marked_1");
   }
 
-  public void testImport_never_marked_2()
-    throws Exception
+  public void testImport_never_marked_2() throws Exception
   {
     testImport("testSimple", "never_marked_2");
   }
 
-  public void testImport_wicked_automata()
-    throws Exception
+  public void testImport_wicked_automata() throws Exception
   {
     testImport("testSimple", "wicked_automata");
   }
 
-  public void testImport_wicked_events()
-    throws Exception
+  public void testImport_wicked_events() throws Exception
   {
     testImport("testSimple", "wicked_events");
   }
 
-  public void testImport_wicked_instances()
-    throws Exception
+  public void testImport_wicked_instances() throws Exception
   {
     testImport("testSimple", "wicked_instances");
   }
 
-  public void testImport_wicked_states()
-    throws Exception
+  public void testImport_wicked_states() throws Exception
   {
     testImport("testSimple", "wicked_states");
   }
 
-  public void testImport_testHISC()
-    throws Exception
+  public void testImport_testHISC() throws Exception
   {
     testImport("testHISC", "testHISC");
   }
 
-  public void testImport_testHISC1()
-    throws Exception
+  public void testImport_testHISC1() throws Exception
   {
     testImport("testHISC", "testHISC1");
   }
 
-  public void testImport_testHISC2()
-    throws Exception
+  public void testImport_testHISC2() throws Exception
   {
     testImport("testHISC", "testHISC2");
   }
 
-  public void testImport_testHISC3A()
-    throws Exception
+  public void testImport_testHISC3A() throws Exception
   {
     testImport("testHISC", "testHISC3A");
   }
 
-  public void testImport_testHISC4()
-    throws Exception
+  public void testImport_testHISC4() throws Exception
   {
     testImport("testHISC", "testHISC4");
   }
 
-  public void testImport_testHISC5()
-    throws Exception
+  public void testImport_testHISC5() throws Exception
   {
     testImport("testHISC", "testHISC5");
   }
 
-  public void testImport_testHISC6()
-    throws Exception
+  public void testImport_testHISC6() throws Exception
   {
     testImport("testHISC", "testHISC6");
   }
 
-  public void testImport_testHISC7()
-    throws Exception
+  public void testImport_testHISC7() throws Exception
   {
     testImport("testHISC", "testHISC7");
   }
 
-  public void testImport_testHISC8()
-    throws Exception
+  public void testImport_testHISC8() throws Exception
   {
     testImport("testHISC", "testHISC8");
   }
 
-  public void testImport_testHISC9()
-    throws Exception
+  public void testImport_testHISC9() throws Exception
   {
     testImport("testHISC", "testHISC9");
   }
 
-  public void testImport_testHISC10()
-    throws Exception
+  public void testImport_testHISC10() throws Exception
   {
     testImport("testHISC", "testHISC10");
   }
 
-  public void testImport_testHISC11()
-    throws Exception
+  public void testImport_testHISC11() throws Exception
   {
     testImport("testHISC", "testHISC11");
   }
 
-  public void testImport_testHISC12()
-    throws Exception
+  public void testImport_testHISC12() throws Exception
   {
     testImport("testHISC", "testHISC12");
   }
 
-  public void testImport_testHISC13()
-    throws Exception
+  public void testImport_testHISC13() throws Exception
   {
     testImport("testHISC", "testHISC13");
   }
 
-  public void testImport_testHISC14()
-    throws Exception
+  public void testImport_testHISC14() throws Exception
   {
     testImport("testHISC", "testHISC14");
   }
 
-  public void testImport_testHISCld()
-    throws Exception
+  public void testImport_testHISCld() throws Exception
   {
     testImport("testHISC", "testHISCld");
   }
 
-  public void testImport_ManufacturingExampleSimple()
-    throws Exception
+  public void testImport_ManufacturingExampleSimple() throws Exception
   {
     testImport("simpleManufacturingExample", "Manufacturing-Example-Simple");
   }
 
-
-  //#########################################################################
-  //# Exception Throwing Test Cases
-  public void testException_nonexist_des()
-    throws Exception
+  // #########################################################################
+  // # Exception Throwing Test Cases
+  public void testException_nonexist_des() throws Exception
   {
-    testException("testSimple", "nonexist_des",
-                  FileNotFoundException.class, "nonexist.des");
+    testException("testSimple", "nonexist_des", FileNotFoundException.class,
+                  "nonexist.des");
   }
 
-  public void testException_nonexist_interface()
-    throws Exception
+  public void testException_nonexist_interface() throws Exception
   {
     testException("testSimple", "nonexist_interface",
                   WatersUnmarshalException.class, "nonexist_iface");
   }
 
-  public void testException_nonexist_subsystem()
-    throws Exception
+  public void testException_nonexist_subsystem() throws Exception
   {
     testException("testSimple", "nonexist_subsystem",
                   WatersUnmarshalException.class, "nonexist_low");
   }
 
-
-  //#########################################################################
-  //# Utilities
-  void testException(final String subdir,
-                     final String name,
+  // #########################################################################
+  // # Utilities
+  void testException(final String subdir, final String name,
                      final Class<? extends Exception> exclass,
-                     final String culprit)
-    throws Exception
+                     final String culprit) throws Exception
   {
     try {
       testImport(subdir, name);
@@ -261,12 +231,12 @@ public class DESpotImporterTest extends AbstractWatersTest
       if (exclass.isAssignableFrom(exception.getClass())) {
         final String msg = exception.getMessage();
         if (msg == null) {
-          fail(ProxyTools.getShortClassName(exclass) +
-               " caught as expected, but message is null!");
+          fail(ProxyTools.getShortClassName(exclass)
+              + " caught as expected, but message is null!");
         } else if (msg.indexOf(culprit) < 0) {
-          fail(ProxyTools.getShortClassName(exclass) +
-               " caught as expected, but message '" + msg +
-               "' does not mention culprit '" + culprit + "'!");
+          fail(ProxyTools.getShortClassName(exclass)
+              + " caught as expected, but message '" + msg
+              + "' does not mention culprit '" + culprit + "'!");
         }
       } else {
         throw exception;
@@ -274,8 +244,7 @@ public class DESpotImporterTest extends AbstractWatersTest
     }
   }
 
-  void testImport(final String subdir, final String name)
-    throws Exception
+  void testImport(final String subdir, final String name) throws Exception
   {
     final String inextname = name + mImporter.getDefaultExtension();
     getLogger().info("Converting " + inextname + " ...");
@@ -287,16 +256,16 @@ public class DESpotImporterTest extends AbstractWatersTest
     mImporter.setOutputDirectory(outdirname);
     final ModuleProxy module = mImporter.unmarshalCopying(despotURI);
     final String wmodextname =
-      module.getName() + mModuleMarshaller.getDefaultExtension();
+        module.getName() + mModuleMarshaller.getDefaultExtension();
     final File wmodfilename = new File(outdirname, wmodextname);
-    assertEquals("Unexpected location of output file!",
-                 wmodfilename, module.getFileLocation());
+    assertEquals("Unexpected location of output file!", wmodfilename, module
+        .getFileLocation());
     parseGeneratedModules(name, despotURI, indirname, outdirname);
     final ModuleCompiler compiler =
-      new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
+        new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     final ProductDESProxy des = compiler.compile();
     final String desextname =
-      name + mProductDESMarshaller.getDefaultExtension();
+        name + mProductDESMarshaller.getDefaultExtension();
     final File outfilename = new File(outdirname, desextname);
     mProductDESMarshaller.marshal(des, outfilename);
   }
@@ -317,10 +286,8 @@ public class DESpotImporterTest extends AbstractWatersTest
   }
 
   private void parseGeneratedModules(final String testname,
-                                     final URI despotURI,
-                                     final File indirname,
-                                     final File outdirname)
-    throws Exception
+                                     final URI despotURI, final File indirname,
+                                     final File outdirname) throws Exception
   {
     try {
       final URL url = despotURI.toURL();
@@ -328,16 +295,15 @@ public class DESpotImporterTest extends AbstractWatersTest
       final Document doc;
       try {
         final DocumentBuilder builder =
-          DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilderFactory.newInstance().newDocumentBuilder();
         doc = builder.parse(stream);
       } finally {
         stream.close();
       }
       final Element root = doc.getDocumentElement();
       final String ext = mModuleMarshaller.getDefaultExtension();
-      for (Node node = root.getFirstChild();
-           node != null;
-           node = node.getNextSibling()) {
+      for (Node node = root.getFirstChild(); node != null; node =
+          node.getNextSibling()) {
         if (node instanceof Element) {
           final Element element = (Element) node;
           if (element.getTagName().equals("Subsystem")) {
@@ -351,11 +317,11 @@ public class DESpotImporterTest extends AbstractWatersTest
             if (expectfile.exists()) {
               final URI expecturi = expectfile.toURI();
               final ModuleProxy expectmodule =
-                mModuleMarshaller.unmarshal(expecturi);
-              assertModuleProxyEquals
-                ("Unexpected module contents for subsystem '" +
-                 sysname + "' after parse back!",
-                 outmodule, expectmodule);
+                  mModuleMarshaller.unmarshal(expecturi);
+              assertModuleProxyEquals(
+                                      "Unexpected module contents for subsystem '"
+                                          + sysname + "' after parse back!",
+                                      outmodule, expectmodule);
             }
           }
         }
@@ -367,17 +333,14 @@ public class DESpotImporterTest extends AbstractWatersTest
     }
   }
 
-
-  //#########################################################################
-  //# Overrides for junit.framework.TestCase
-  protected void setUp()
-    throws Exception
+  // #########################################################################
+  // # Overrides for junit.framework.TestCase
+  protected void setUp() throws Exception
   {
     super.setUp();
     mInputDirectory = new File(getWatersInputRoot(), "despot");
     mOutputDirectory = getOutputDirectory();
-    final ModuleProxyFactory moduleFactory =
-      ModuleElementFactory.getInstance();
+    final ModuleProxyFactory moduleFactory = ModuleElementFactory.getInstance();
     mProductDESFactory = ProductDESElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
@@ -389,11 +352,10 @@ public class DESpotImporterTest extends AbstractWatersTest
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mImporter = new DESpotImporter(moduleFactory, mDocumentManager);
     mIdentifierChecker =
-      ModuleIdentifierChecker.getModuleIdentifierCheckerInstance();
+        ModuleIdentifierChecker.getModuleIdentifierCheckerInstance();
   }
 
-  protected void tearDown()
-    throws Exception
+  protected void tearDown() throws Exception
   {
     mInputDirectory = null;
     mOutputDirectory = null;
@@ -406,9 +368,8 @@ public class DESpotImporterTest extends AbstractWatersTest
     super.tearDown();
   }
 
-
-  //#########################################################################
-  //# Data Members
+  // #########################################################################
+  // # Data Members
   private File mInputDirectory;
   private File mOutputDirectory;
   private ProductDESProxyFactory mProductDESFactory;

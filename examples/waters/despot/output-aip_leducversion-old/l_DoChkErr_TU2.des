@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_DoChkErr_TU2" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="6" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s5" al="s5" mk="0" rch="1"/>
+            <St id="3" nm="s4" al="s4" mk="0" rch="1"/>
+            <St id="4" nm="s3" al="s3" mk="0" rch="1"/>
+            <St id="5" nm="s2" al="s2" mk="0" rch="1"/>
+            <St id="6" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="11" ctrl-count="6" unctrl-count="5" def-count="11" ans-count="0" req-count="0">
+            <Ev id="1" nm="QErrorTU2" al="QErrorTU2" ctrl="1" type="d"/>
+            <Ev id="2" nm="NoErrorTU2" al="NoErrorTU2" ctrl="1" type="d"/>
+            <Ev id="3" nm="QErr1ATU2" al="QErr1ATU2" ctrl="1" type="d"/>
+            <Ev id="4" nm="QErr1BTU2" al="QErr1BTU2" ctrl="1" type="d"/>
+            <Ev id="5" nm="QErr2ATU2" al="QErr2ATU2" ctrl="1" type="d"/>
+            <Ev id="6" nm="QErr2BTU2" al="QErr2BTU2" ctrl="1" type="d"/>
+            <Ev id="7" nm="IsErr1ATU2" al="IsErr1ATU2" ctrl="0" type="d"/>
+            <Ev id="8" nm="IsErr1BTU2" al="IsErr1BTU2" ctrl="0" type="d"/>
+            <Ev id="9" nm="IsErr2ATU2" al="IsErr2ATU2" ctrl="0" type="d"/>
+            <Ev id="10" nm="IsErr2BTU2" al="IsErr2BTU2" ctrl="0" type="d"/>
+            <Ev id="11" nm="NoErrTU2" al="NoErrTU2" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="14">
+            <Transitions count="14">
+                <Tr fID="1" eID="1" tID="6"/>
+                <Tr fID="2" eID="2" tID="1"/>
+                <Tr fID="3" eID="6" tID="3"/>
+                <Tr fID="3" eID="10" tID="1"/>
+                <Tr fID="3" eID="11" tID="2"/>
+                <Tr fID="4" eID="9" tID="1"/>
+                <Tr fID="4" eID="5" tID="4"/>
+                <Tr fID="4" eID="11" tID="3"/>
+                <Tr fID="5" eID="8" tID="1"/>
+                <Tr fID="5" eID="4" tID="5"/>
+                <Tr fID="5" eID="11" tID="4"/>
+                <Tr fID="6" eID="7" tID="1"/>
+                <Tr fID="6" eID="3" tID="6"/>
+                <Tr fID="6" eID="11" tID="5"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

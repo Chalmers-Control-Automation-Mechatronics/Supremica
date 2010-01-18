@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_QueryDrwLoc_TU3" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="4" marked-count="2">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s3" al="s3" mk="0" rch="1"/>
+            <St id="3" nm="s2" al="s2" mk="1" rch="1"/>
+            <St id="4" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="5" ctrl-count="1" unctrl-count="4" def-count="5" ans-count="0" req-count="0">
+            <Ev id="1" nm="QDrwLocTU3" al="QDrwLocTU3" ctrl="1" type="d"/>
+            <Ev id="2" nm="DrwArvELTU3" al="DrwArvELTU3" ctrl="0" type="d"/>
+            <Ev id="3" nm="DrwArvCLTU3" al="DrwArvCLTU3" ctrl="0" type="d"/>
+            <Ev id="4" nm="DrwAtELTU3" al="DrwAtELTU3" ctrl="0" type="d"/>
+            <Ev id="5" nm="DrwAtCLTU3" al="DrwAtCLTU3" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="8">
+            <Transitions count="8">
+                <Tr fID="1" eID="1" tID="4"/>
+                <Tr fID="1" eID="2" tID="3"/>
+                <Tr fID="3" eID="1" tID="2"/>
+                <Tr fID="3" eID="3" tID="1"/>
+                <Tr fID="2" eID="3" tID="4"/>
+                <Tr fID="2" eID="4" tID="3"/>
+                <Tr fID="4" eID="2" tID="2"/>
+                <Tr fID="4" eID="5" tID="1"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

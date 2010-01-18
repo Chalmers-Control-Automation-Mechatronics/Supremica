@@ -1,0 +1,1425 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="tu1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="DoneReadTU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="DrwArvCLTU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="DrwArvELTU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="DrwAtCLTU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="DrwAtELTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="GClosesCLTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="GClosesEL_1TU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="GOpensCLTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="GOpensEL_1TU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsCplTU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsErr1ATU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsErr1BTU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsErr2ATU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsErr2BTU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsType1TU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsType2TU1"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="LibPalletTU1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="MvDrwToCLTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="MvDrwToELTU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoErrTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="NoErrorTU1"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="NoTrnsfELTU1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NotCplTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="NotOpNeededTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="OpNeededTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PStopClosesCLTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PStopClosesEL_1TU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PStopOpensCLTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PStopOpensEL_1TU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletArvDrwCLTU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletArvDrwELTU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvGCLTU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvGEL_1TU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvTUAtCLTU1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvTUAtEL_1TU1"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="PalletRlsdTU1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="QCplT1A_1BTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QCplT2A_2BTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QDrwLocTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QErr1ATU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QErr1BTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QErr2ATU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QErr2BTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QErrorTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QOpNeededTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QTypeTU1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ReadLabelTU1"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="TrnsfCplToCLTU1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="TrnsfCplToELTU1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="TrnsfELToCLTU1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="TrnsfToELTU1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="IntfTU_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsdTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1"/>
+                            <SimpleIdentifier Name="NoTrnsfELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_HndlTrnsfToEL_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s9"/>
+                    <SimpleNode Name="s8"/>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s14"/>
+                    <SimpleNode Name="s13"/>
+                    <SimpleNode Name="s12"/>
+                    <SimpleNode Name="s11"/>
+                    <SimpleNode Name="s10"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s5" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvDrwToELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwArvELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvDrwCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GOpensCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwArvCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvDrwToCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QDrwLocTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwAtCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwAtELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s14" Source="s13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NotOpNeededTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s13" Source="s13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QOpNeededTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="OpNeededTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s9" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopClosesEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopOpensEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvTUAtEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopOpensEL_1TU1"/>
+                            <SimpleIdentifier Name="DrwArvCLTU1"/>
+                            <SimpleIdentifier Name="PStopClosesEL_1TU1"/>
+                            <SimpleIdentifier Name="QDrwLocTU1"/>
+                            <SimpleIdentifier Name="MvDrwToCLTU1"/>
+                            <SimpleIdentifier Name="PalletArvDrwCLTU1"/>
+                            <SimpleIdentifier Name="MvDrwToELTU1"/>
+                            <SimpleIdentifier Name="PalletLvGCLTU1"/>
+                            <SimpleIdentifier Name="PalletLvGEL_1TU1"/>
+                            <SimpleIdentifier Name="DrwAtCLTU1"/>
+                            <SimpleIdentifier Name="GOpensCLTU1"/>
+                            <SimpleIdentifier Name="GOpensEL_1TU1"/>
+                            <SimpleIdentifier Name="GClosesEL_1TU1"/>
+                            <SimpleIdentifier Name="GClosesCLTU1"/>
+                            <SimpleIdentifier Name="DrwArvELTU1"/>
+                            <SimpleIdentifier Name="PalletArvDrwELTU1"/>
+                            <SimpleIdentifier Name="PalletLvTUAtCLTU1"/>
+                            <SimpleIdentifier Name="PalletLvTUAtEL_1TU1"/>
+                            <SimpleIdentifier Name="PStopOpensCLTU1"/>
+                            <SimpleIdentifier Name="PStopClosesCLTU1"/>
+                            <SimpleIdentifier Name="DrwAtELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s14" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsErr1BTU1"/>
+                            <SimpleIdentifier Name="IsErr1ATU1"/>
+                            <SimpleIdentifier Name="IsErr2ATU1"/>
+                            <SimpleIdentifier Name="IsErr2BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QErrorTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s13" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoErrorTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneReadTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ReadLabelTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvDrwCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_DoChkErr_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoErrorTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QErr2BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoErrTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsErr2BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QErr2ATU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoErrTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsErr2ATU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QErr1BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoErrTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsErr1BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsErr1ATU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QErr1ATU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoErrTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QErrorTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_IntfCheckOpNeeded_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QOpNeededTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NotOpNeededTU1"/>
+                            <SimpleIdentifier Name="OpNeededTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_DetIfOpNeeded_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QOpNeededTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="OpNeededTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QCplT2A_2BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsCplTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NotCplTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsType1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QTypeTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsType2TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QCplT1A_1BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsCplTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NotCplTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NotOpNeededTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_HndlComEvents_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU1"/>
+                            <SimpleIdentifier Name="TrnsfToELTU1"/>
+                            <SimpleIdentifier Name="LibPalletTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QDrwLocTU1"/>
+                            <SimpleIdentifier Name="MvDrwToELTU1"/>
+                            <SimpleIdentifier Name="MvDrwToCLTU1"/>
+                            <SimpleIdentifier Name="PalletLvTUAtCLTU1"/>
+                            <SimpleIdentifier Name="GOpensEL_1TU1"/>
+                            <SimpleIdentifier Name="GClosesEL_1TU1"/>
+                            <SimpleIdentifier Name="DrwAtCLTU1"/>
+                            <SimpleIdentifier Name="DrwArvELTU1"/>
+                            <SimpleIdentifier Name="DrwArvCLTU1"/>
+                            <SimpleIdentifier Name="PalletLvTUAtEL_1TU1"/>
+                            <SimpleIdentifier Name="GOpensCLTU1"/>
+                            <SimpleIdentifier Name="PalletLvGCLTU1"/>
+                            <SimpleIdentifier Name="PalletLvGEL_1TU1"/>
+                            <SimpleIdentifier Name="PalletArvDrwCLTU1"/>
+                            <SimpleIdentifier Name="PalletArvDrwELTU1"/>
+                            <SimpleIdentifier Name="PStopOpensCLTU1"/>
+                            <SimpleIdentifier Name="PStopClosesCLTU1"/>
+                            <SimpleIdentifier Name="GClosesCLTU1"/>
+                            <SimpleIdentifier Name="DrwAtELTU1"/>
+                            <SimpleIdentifier Name="PStopOpensEL_1TU1"/>
+                            <SimpleIdentifier Name="PStopClosesEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU1"/>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1"/>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_HndlTrnsfELToCL_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s9"/>
+                    <SimpleNode Name="s8"/>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s10"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s9" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopClosesCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopOpensCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvTUAtCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwArvCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvDrwToCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesEL_1TU1"/>
+                            <SimpleIdentifier Name="PStopOpensEL_1TU1"/>
+                            <SimpleIdentifier Name="DrwArvCLTU1"/>
+                            <SimpleIdentifier Name="DrwArvELTU1"/>
+                            <SimpleIdentifier Name="MvDrwToCLTU1"/>
+                            <SimpleIdentifier Name="MvDrwToELTU1"/>
+                            <SimpleIdentifier Name="PStopOpensCLTU1"/>
+                            <SimpleIdentifier Name="DrwAtELTU1"/>
+                            <SimpleIdentifier Name="GClosesCLTU1"/>
+                            <SimpleIdentifier Name="PalletLvGEL_1TU1"/>
+                            <SimpleIdentifier Name="DrwAtCLTU1"/>
+                            <SimpleIdentifier Name="GOpensCLTU1"/>
+                            <SimpleIdentifier Name="PalletArvDrwELTU1"/>
+                            <SimpleIdentifier Name="QDrwLocTU1"/>
+                            <SimpleIdentifier Name="PStopClosesEL_1TU1"/>
+                            <SimpleIdentifier Name="PalletArvDrwCLTU1"/>
+                            <SimpleIdentifier Name="GOpensEL_1TU1"/>
+                            <SimpleIdentifier Name="PalletLvTUAtCLTU1"/>
+                            <SimpleIdentifier Name="PalletLvTUAtEL_1TU1"/>
+                            <SimpleIdentifier Name="PalletLvGCLTU1"/>
+                            <SimpleIdentifier Name="PStopClosesCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvDrwELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GOpensEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwArvELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvDrwToELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwAtELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwAtCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QDrwLocTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvDrwELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_IntfQueryErrors_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsErr2ATU1"/>
+                            <SimpleIdentifier Name="NoErrorTU1"/>
+                            <SimpleIdentifier Name="IsErr1ATU1"/>
+                            <SimpleIdentifier Name="IsErr1BTU1"/>
+                            <SimpleIdentifier Name="IsErr2BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QErrorTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_HndlLibPallet_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s9"/>
+                    <SimpleNode Name="s8"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s10"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGCLTU1"/>
+                            <SimpleIdentifier Name="PalletLvGEL_1TU1"/>
+                            <SimpleIdentifier Name="PalletLvTUAtEL_1TU1"/>
+                            <SimpleIdentifier Name="MvDrwToELTU1"/>
+                            <SimpleIdentifier Name="DrwAtELTU1"/>
+                            <SimpleIdentifier Name="DrwAtCLTU1"/>
+                            <SimpleIdentifier Name="PStopClosesEL_1TU1"/>
+                            <SimpleIdentifier Name="QDrwLocTU1"/>
+                            <SimpleIdentifier Name="PStopOpensCLTU1"/>
+                            <SimpleIdentifier Name="GClosesCLTU1"/>
+                            <SimpleIdentifier Name="GClosesEL_1TU1"/>
+                            <SimpleIdentifier Name="DrwArvCLTU1"/>
+                            <SimpleIdentifier Name="DrwArvELTU1"/>
+                            <SimpleIdentifier Name="PalletArvDrwCLTU1"/>
+                            <SimpleIdentifier Name="PalletArvDrwELTU1"/>
+                            <SimpleIdentifier Name="PStopOpensEL_1TU1"/>
+                            <SimpleIdentifier Name="GOpensEL_1TU1"/>
+                            <SimpleIdentifier Name="PStopClosesCLTU1"/>
+                            <SimpleIdentifier Name="PalletLvTUAtCLTU1"/>
+                            <SimpleIdentifier Name="MvDrwToCLTU1"/>
+                            <SimpleIdentifier Name="GOpensCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsdTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s9" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopClosesCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopOpensCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvTUAtCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvDrwCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GOpensCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvDrwCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_CapGateCL_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU1"/>
+                            <SimpleIdentifier Name="PalletLvGCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU1"/>
+                            <SimpleIdentifier Name="PalletLvGCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToELTU1"/>
+                            <SimpleIdentifier Name="LibPalletTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToELTU1"/>
+                            <SimpleIdentifier Name="LibPalletTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_CapGateEL_1_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_CapTUDrwToExit_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvDrwELTU1"/>
+                            <SimpleIdentifier Name="PalletArvDrwCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvDrwELTU1"/>
+                            <SimpleIdentifier Name="PalletArvDrwCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvTUAtCLTU1"/>
+                            <SimpleIdentifier Name="PalletLvTUAtEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvTUAtCLTU1"/>
+                            <SimpleIdentifier Name="PalletLvTUAtEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_CapTUDrwToGateCL_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvDrwCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvDrwCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_CapTUDrwToGateEL_1_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvDrwELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvDrwELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_PalletGateCL_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GOpensCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_PalletGateEL_1_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GOpensEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_PalletStopCL_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopClosesCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvTUAtCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopOpensCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_PalletStopEL_1_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopOpensEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopClosesEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvTUAtEL_1TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_QueryDrwLoc_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwArvELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwAtCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwArvCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwAtELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QDrwLocTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwArvELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QDrwLocTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwArvCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_RWDevice_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneReadTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ReadLabelTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_TUDrawer_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwArvCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvDrwToCLTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvDrwToELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DrwArvELTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_TUNewEvents_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToELTU1"/>
+                            <SimpleIdentifier Name="NoTrnsfELTU1"/>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1"/>
+                            <SimpleIdentifier Name="TrnsfELToCLTU1"/>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1"/>
+                            <SimpleIdentifier Name="LibPalletTU1"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_ChkErr_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QErr1ATU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QErr1BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QErr2ATU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QErr2BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoErrTU1"/>
+                            <SimpleIdentifier Name="IsErr2BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsErr2ATU1"/>
+                            <SimpleIdentifier Name="NoErrTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoErrTU1"/>
+                            <SimpleIdentifier Name="IsErr1BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoErrTU1"/>
+                            <SimpleIdentifier Name="IsErr1ATU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_QueryErrNewEvents_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QErrorTU1"/>
+                            <SimpleIdentifier Name="NoErrorTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_CheckOpNeededNewEvts_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QOpNeededTU1"/>
+                            <SimpleIdentifier Name="OpNeededTU1"/>
+                            <SimpleIdentifier Name="NotOpNeededTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_QueryTypNCpl_TU1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QTypeTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QCplT1A_1BTU1"/>
+                            <SimpleIdentifier Name="QCplT2A_2BTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsType1TU1"/>
+                            <SimpleIdentifier Name="IsType2TU1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsCplTU1"/>
+                            <SimpleIdentifier Name="NotCplTU1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

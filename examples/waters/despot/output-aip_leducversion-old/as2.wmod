@@ -1,0 +1,1043 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="as2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="AError2AAS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="AError2BAS2"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="ASDwnAS2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="AssmbErrAAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="AssmbErrBAS2"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="DoRprAS2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="DoneReadAS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="DoneWriteAS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ExtrArvConvAS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ExtrArvPlatfAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="GClosesEL_2AS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="GOpensEL_2AS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsType1AS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsType2AS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="MvExtrToConvAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="MvExtrToPlatfAS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PArvAtExtractorAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PStopClosesEL_2AS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PStopOpensEL_2AS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletArvGEL_2AS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvASAS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvGEL_2AS2"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="ProcCplAS2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="ProcErrAS2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="ProcPalletAS2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcTyp1AS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcTyp2AS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QTypeAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="RTasksCplAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ReadLabelAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="RelPalletAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="RobDwnAS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="RobRprCplAS2"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="RobUpAS2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="RtaskCpl2AAS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="RtaskCpl2BAS2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="RtimeoutAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="StrRobRepairAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="StrRtask2AAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="StrRtask2BAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="StrRtimerAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="WrtCplT2A_2BAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="WrtErr2AAS2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="WrtErr2BAS2"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="IntfAssmbStn_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2"/>
+                            <SimpleIdentifier Name="ProcErrAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwnAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_HndlPallet_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s9"/>
+                    <SimpleNode Name="s8"/>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s16"/>
+                    <SimpleNode Name="s15"/>
+                    <SimpleNode Name="s14"/>
+                    <SimpleNode Name="s13"/>
+                    <SimpleNode Name="s12"/>
+                    <SimpleNode Name="s11"/>
+                    <SimpleNode Name="s10"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s11" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneWriteAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="WrtCplT2A_2BAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s14" Source="s14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RelPalletAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcErrAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s13" Source="s13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="WrtErr2AAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s14" Source="s13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneWriteAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToConvAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s13" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvConvAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PArvAtExtractorAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsType1AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QTypeAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsType2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToPlatfAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvPlatfAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ReadLabelAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneReadAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s9" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToConvAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvConvAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s16" Source="s16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="WrtErr2BAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s14" Source="s16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneWriteAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s15" Source="s15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToConvAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s16" Source="s15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvConvAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RelPalletAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwnAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RelPalletAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToConvAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvConvAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s9" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RTasksCplAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s15" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrBAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobDwnAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrAAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcTyp2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcTyp1AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_HndlPalletLvAS_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvASAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopOpensEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RelPalletAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcErrAS2"/>
+                            <SimpleIdentifier Name="ProcCplAS2"/>
+                            <SimpleIdentifier Name="ASDwnAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopClosesEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_OperateGateEL_2_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2"/>
+                            <SimpleIdentifier Name="ProcPalletAS2"/>
+                            <SimpleIdentifier Name="ProcErrAS2"/>
+                            <SimpleIdentifier Name="ASDwnAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvGEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GOpensEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_IntfRobot_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobDwnAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrAAS2"/>
+                            <SimpleIdentifier Name="RTasksCplAS2"/>
+                            <SimpleIdentifier Name="AssmbErrBAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcTyp2AS2"/>
+                            <SimpleIdentifier Name="ProcTyp1AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_DoRobotTasks_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s9"/>
+                    <SimpleNode Name="s8"/>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s19"/>
+                    <SimpleNode Name="s18"/>
+                    <SimpleNode Name="s17"/>
+                    <SimpleNode Name="s16"/>
+                    <SimpleNode Name="s13"/>
+                    <SimpleNode Name="s12"/>
+                    <SimpleNode Name="s11">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s10"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s11" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobDwnAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtimerAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RTasksCplAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtaskCpl2BAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtask2BAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s18" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AError2BAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtimeoutAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtimerAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s9" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtimerAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtaskCpl2BAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtask2BAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s16" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AError2BAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtimeoutAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtask2AAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s17" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AError2AAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtimeoutAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtaskCpl2AAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtimerAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s19">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrAAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s18">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrBAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s13" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobRprCplAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRobRepairAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcTyp1AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcTyp2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s9" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtask2AAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s19" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AError2AAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtimeoutAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtaskCpl2AAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s17">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrAAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrBAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_ASNewEvents_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RelPalletAS2"/>
+                            <SimpleIdentifier Name="ProcErrAS2"/>
+                            <SimpleIdentifier Name="ProcCplAS2"/>
+                            <SimpleIdentifier Name="ProcPalletAS2"/>
+                            <SimpleIdentifier Name="ASDwnAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_CapGateEL_2_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvGEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvGEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_DepGateNExtrSen_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PArvAtExtractorAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PArvAtExtractorAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_Extractor_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToPlatfAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvPlatfAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvConvAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToConvAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_PalletArvGateSenEL_2_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvGEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_PalletGateEL_2_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GOpensEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_PalletStopEL_2_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopClosesEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvASAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopOpensEL_2AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_PSenAtExtractor_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PArvAtExtractorAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvASAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_QueryPalletTyp_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QTypeAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsType2AS2"/>
+                            <SimpleIdentifier Name="IsType1AS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_RWDevice_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneReadAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneWriteAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ReadLabelAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="WrtErr2AAS2"/>
+                            <SimpleIdentifier Name="WrtErr2BAS2"/>
+                            <SimpleIdentifier Name="WrtCplT2A_2BAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_Robot_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtask2BAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtask2AAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRobRepairAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AError2AAS2"/>
+                            <SimpleIdentifier Name="RtaskCpl2AAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtimeoutAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtimeoutAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtaskCpl2BAS2"/>
+                            <SimpleIdentifier Name="AError2BAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtimerAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobRprCplAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_RobotNewEvents_AS2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS2"/>
+                            <SimpleIdentifier Name="AssmbErrBAS2"/>
+                            <SimpleIdentifier Name="ProcTyp1AS2"/>
+                            <SimpleIdentifier Name="AssmbErrAAS2"/>
+                            <SimpleIdentifier Name="RobUpAS2"/>
+                            <SimpleIdentifier Name="RTasksCplAS2"/>
+                            <SimpleIdentifier Name="ProcTyp2AS2"/>
+                            <SimpleIdentifier Name="RobDwnAS2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

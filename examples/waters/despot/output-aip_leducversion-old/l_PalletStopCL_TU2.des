@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="l_PalletStopCL_TU2" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="2" marked-count="1">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1"/>
+            <St id="2" nm="s1" al="s1" mk="0" rch="1"/>
+        </States>
+        <Events count="3" ctrl-count="2" unctrl-count="1" def-count="3" ans-count="0" req-count="0">
+            <Ev id="1" nm="PStopOpensCLTU2" al="PStopOpensCLTU2" ctrl="1" type="d"/>
+            <Ev id="2" nm="PStopClosesCLTU2" al="PStopClosesCLTU2" ctrl="1" type="d"/>
+            <Ev id="3" nm="PalletLvTUAtCLTU2" al="PalletLvTUAtCLTU2" ctrl="0" type="d"/>
+        </Events>
+        <Trans-Function count="3">
+            <Transitions count="3">
+                <Tr fID="1" eID="1" tID="2"/>
+                <Tr fID="2" eID="2" tID="1"/>
+                <Tr fID="2" eID="3" tID="2"/>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>
