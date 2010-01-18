@@ -1,7 +1,11 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
+import javax.swing.KeyStroke;
+
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
@@ -21,6 +25,7 @@ public class SimulationReplayStepAction
     putValue(Action.NAME, "Replay Step");
     putValue(Action.SHORT_DESCRIPTION, "Replay the next event");
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_REPLAY);
+    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK));
   }
 
 

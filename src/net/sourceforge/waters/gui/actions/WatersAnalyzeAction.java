@@ -154,7 +154,6 @@ public abstract class WatersAnalyzeAction
 
     public void fail()
     {
-      informationLabel.setText("Model " + des.getName() + " " + getFailureDescription());
       cancelButton.setText("OK");
       cancelButton.removeActionListener(cancelButton.getActionListeners()[0]);
       traceButton = new JButton("Show Trace");
@@ -173,6 +172,12 @@ public abstract class WatersAnalyzeAction
           AnalyzerDialog.this.dispose();
         }
       });
+      if (verifier.getCounterExample().getComment() == null)
+        informationLabel.setText("Model " + des.getName() + " " + getFailureDescription());
+      else if (verifier.getCounterExample().getComment().compareTo("") == 0)
+        informationLabel.setText("Model " + des.getName() + " " + getFailureDescription());
+      else
+        informationLabel.setText(verifier.getCounterExample().getComment());
       bottomPanel.add(traceButton, BorderLayout.EAST);
       this.validate();
     }

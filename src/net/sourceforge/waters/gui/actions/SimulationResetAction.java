@@ -1,7 +1,11 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
+import javax.swing.KeyStroke;
+
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
@@ -21,6 +25,7 @@ public class SimulationResetAction
     putValue(Action.NAME, "Reset");
     putValue(Action.SHORT_DESCRIPTION, "Reset the Simulation");
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_RESET);
+    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
   }
 
 

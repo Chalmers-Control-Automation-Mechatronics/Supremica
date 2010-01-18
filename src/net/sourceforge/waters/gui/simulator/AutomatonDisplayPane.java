@@ -375,7 +375,7 @@ public class AutomatonDisplayPane
 
   public boolean canExecute()
   {
-    return mFocusedItem != null;
+    return mFocusedItem != null && isEnabled(mFocusedItem);
   }
 
   public void execute()

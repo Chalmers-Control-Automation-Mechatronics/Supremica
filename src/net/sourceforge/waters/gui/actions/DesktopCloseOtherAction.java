@@ -15,8 +15,8 @@ public class DesktopCloseOtherAction extends WatersDesktopAction
   {
     super(ide);
     mAutomaton = autoToClose;
-    putValue(Action.NAME, "Close Others");
-    putValue(Action.SHORT_DESCRIPTION, "Close all other windows");
+    putValue(Action.NAME, "Close Other Automata");
+    putValue(Action.SHORT_DESCRIPTION, "Close all other automata windows");
     setEnabled(true);
   }
 

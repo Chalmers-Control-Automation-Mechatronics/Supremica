@@ -120,7 +120,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  *   ALT-o: Configure menu
  *   ALT-p: Simulator/Step
  *   ALT-q: Simulator/Replay Step
- *   ALT-r:
+ *   ALT-r: Simulator/Reset
  *   ALT-s: Simulator menu
  *   ALT-t: Tools menu
  *   ALT-u:

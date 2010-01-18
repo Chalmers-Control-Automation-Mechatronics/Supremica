@@ -15,8 +15,8 @@ public class DesktopCloseWindowAction extends WatersDesktopAction
   {
     super(ide);
     mAutomaton = autoToClose;
-    putValue(Action.NAME, "Close");
-    putValue(Action.SHORT_DESCRIPTION, "Close the window");
+    putValue(Action.NAME, "Close Automaton");
+    putValue(Action.SHORT_DESCRIPTION, "Close this Automaton window");
     setEnabled(true);
   }
 

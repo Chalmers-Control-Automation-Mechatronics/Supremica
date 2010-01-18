@@ -57,6 +57,7 @@ public class Simulation implements ModelObserver, Observer
     mUncontrollableAutomata = new ArrayList<ArrayList<AutomatonProxy>>();
     currentTime = -1;
     mContainer = container;
+    invalidated = false;
     final ModuleSubject module = container.getModule();
     module.addModelObserver(this);
     container.attach(this);
@@ -337,10 +338,14 @@ public class Simulation implements ModelObserver, Observer
   public void setTrace(final TraceProxy trace)
   {
     mTrace = trace;
+    invalidated = false;
   }
   public TraceProxy getTrace()
   {
-    return mTrace;
+    if (invalidated)
+      return null;
+    else
+      return mTrace;
   }
 
   public void setState(final AutomatonProxy automaton, final StateProxy state)
@@ -386,7 +391,6 @@ public class Simulation implements ModelObserver, Observer
       fireSimulationChangeEvent(simEvent);
     }
   }
-
 
   public void run(final TraceProxy trace)
   {
@@ -448,6 +452,10 @@ public class Simulation implements ModelObserver, Observer
         // Do nothing
       }
     }
+    invalidated = false;
+    final SimulationChangeEvent simEvent = new SimulationChangeEvent
+      (this, SimulationChangeEvent.STATE_CHANGED);
+    fireSimulationChangeEvent(simEvent);
   }
 
   @SuppressWarnings("unchecked")
@@ -474,6 +482,7 @@ public class Simulation implements ModelObserver, Observer
     }
     else
     {
+      invalidated = true;
       removeFutureEvents();
       mPreviousEvents.add(step);
       mEnabledLastStep = new ArrayList<AutomatonProxy>();
@@ -527,7 +536,7 @@ public class Simulation implements ModelObserver, Observer
   {
     if (mTrace != null)
     {
-      if (mTrace instanceof LoopTraceProxy)
+      if (mTrace instanceof LoopTraceProxy && !invalidated)
       {
         if (currentTime == mPreviousEvents.size() - 1)
         {
@@ -937,6 +946,7 @@ public class Simulation implements ModelObserver, Observer
   private ProductDESProxy mCompiledDES;
   private final ModuleContainer mContainer;
   private TraceProxy mTrace;
+  private boolean invalidated;
 
   long time = 0;
 

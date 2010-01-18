@@ -9,6 +9,7 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 public class DisplayPanePopupFactory extends PopupFactory
@@ -24,6 +25,11 @@ public class DisplayPanePopupFactory extends PopupFactory
   //# Shared Menu Items
   protected void addDefaultMenuItems()
   {
+    // Do nothing
+  }
+
+  protected void addCommonMenuItems()
+  {
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
     final IDEAction closeAll = master.getDesktopCloseAllAction();
@@ -32,12 +38,6 @@ public class DisplayPanePopupFactory extends PopupFactory
     popup.add(showAll);
     final IDEAction cascade = master.getDesktopCascadeAction();
     popup.add(cascade);
-  }
-
-  protected void addCommonMenuItems()
-  {
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
     if (mDisplayPane != null)
     {
       final IDEAction closeOther = master.getDesktopCloseOtherAction(mDisplayPane.getAutomaton());
@@ -57,8 +57,11 @@ public class DisplayPanePopupFactory extends PopupFactory
     final JPopupMenu popup = getPopup();
     if (mDisplayPane != null)
     {
-      final IDEAction execute = master.getDesktopExecuteAction(mDisplayPane.getAutomaton());
-      popup.add(execute);
+      if (mDisplayPane.canExecute())
+      {
+        final IDEAction execute = master.getDesktopExecuteAction(mDisplayPane.getAutomaton());
+        popup.add(execute);
+      }
     }
     return null;
   }
@@ -86,6 +89,20 @@ public class DisplayPanePopupFactory extends PopupFactory
   {
    // visitProxy(node);
     // Node
+    return null;
+  }
+  public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy proxy)
+  {
+    final WatersPopupActionManager master = getMaster();
+    final JPopupMenu popup = getPopup();
+    if (mDisplayPane != null)
+    {
+      if (mDisplayPane.canExecute())
+      {
+        final IDEAction execute = master.getDesktopExecuteAction(mDisplayPane.getAutomaton());
+        popup.add(execute);
+      }
+    }
     return null;
   }
 

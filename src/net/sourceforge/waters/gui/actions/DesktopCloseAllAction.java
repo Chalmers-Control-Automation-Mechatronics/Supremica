@@ -12,8 +12,8 @@ public class DesktopCloseAllAction extends WatersDesktopAction
   protected DesktopCloseAllAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "Close All");
-    putValue(Action.SHORT_DESCRIPTION, "Close all windows");
+    putValue(Action.NAME, "Close All Automata");
+    putValue(Action.SHORT_DESCRIPTION, "Close all automata windows");
     setEnabled(true);
   }
 

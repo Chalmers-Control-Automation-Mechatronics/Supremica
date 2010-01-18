@@ -11,11 +11,14 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.Action;
 import javax.swing.JLabel;
+import javax.swing.KeyStroke;
+
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.simulator.EventChooserDialog;
 import net.sourceforge.waters.gui.simulator.NonDeterministicException;
@@ -41,6 +44,7 @@ public class SimulationStepAction
     putValue(Action.NAME, "Step");
     putValue(Action.SHORT_DESCRIPTION, "Execute an event");
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_STEP);
+    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.ALT_MASK));
   }
 
 

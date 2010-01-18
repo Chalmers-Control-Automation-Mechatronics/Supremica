@@ -159,6 +159,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
     for (int looper = 0; looper < expandedNodes.size(); looper++)
     {
       final int expandedIndex = expandedNodes.get(looper);
+      boolean located = false;
       for (int nodeIndex = 0; nodeIndex < node.getChildCount(); nodeIndex++)
       {
         if (EventBranchNode.class.isInstance(node.getChildAt(nodeIndex)))
@@ -168,6 +169,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
             ((EventBranchNode)node.getChildAt(nodeIndex)).addAutomata(mSim,
                 mSim.getAutomatonHistory().get(((EventBranchNode)node.getChildAt(nodeIndex)).getTime()));
             this.expandPath(new TreePath(((EventBranchNode)node.getChildAt(nodeIndex)).getPath()));
+            located = true;
           }
         }
         else if (InitialState.class.isInstance(node.getChildAt(nodeIndex)))
@@ -176,8 +178,14 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
           {
             ((InitialState)node.getChildAt(nodeIndex)).expand(mSim);
             this.expandPath(new TreePath(((InitialState)node.getChildAt(nodeIndex)).getPath()));
+            located = true;
           }
         }
+      }
+      if (!located)
+      {
+        expandedNodes.remove(looper);
+        looper--;
       }
     }
   }

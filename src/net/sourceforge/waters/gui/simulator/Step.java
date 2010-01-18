@@ -126,7 +126,7 @@ public class Step implements Comparable<Step>
       String output = mEvent.getName() + "{";
       for (final AutomatonProxy endingAut : mDest.keySet())
       {
-        output += endingAut.getName() + "=" + mDest.get(endingAut) + ",";
+        output += endingAut.getName() + "=" + mDest.get(endingAut).getName() + ",";
       }
       return output.substring(0, output.length() - 1) + "}";
     }
