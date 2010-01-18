@@ -30,6 +30,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
@@ -213,7 +214,9 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         // strategy is used, and all states are reachable, following the
         // transition to a state with the lowest id will give a
         // counterexample.
-        final List<EventProxy> countertrace = new LinkedList<EventProxy>();
+        final List<TraceStepProxy> countertrace =
+            new LinkedList<TraceStepProxy>();
+        final ProductDESProxyFactory desFactory = getFactory();
         // Find the unchecked state with the lowest
         // id, as this should give the shortest counterexample.
         // or if a second marking condition is simultaneously used, look
@@ -224,14 +227,23 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           final TIntArrayList preds = mSyncProduct.getPredecessors(trace_start);
           final int pred = preds.get(0);
           final EventProxy event = mSyncProduct.findEvent(pred, trace_start);
-          countertrace.add(0, event);
+          final Map<AutomatonProxy,StateProxy> statemap =
+              new HashMap<AutomatonProxy,StateProxy>();
+          for (@SuppressWarnings("unused")
+          final AutomatonProxy aut : model.getAutomata()) {
+            // statemap.put(aut, value);
+          }
+          final TraceStepProxy traceStep =
+              desFactory.createTraceStepProxy(event, statemap);
+          countertrace.add(0, traceStep);
           trace_start = pred;
         }
-        final ProductDESProxyFactory desFactory = getFactory();
         final String modelname = model.getName();
         final String tracename = modelname + ":conflicting";
         final ConflictTraceProxy trace =
-            desFactory.createConflictTraceProxy(tracename, model, countertrace,
+            desFactory.createConflictTraceProxy(tracename, null, null, model,
+                                                model.getAutomata(),
+                                                countertrace,
                                                 ConflictKind.CONFLICT);
         return setFailedResult(trace);
       }

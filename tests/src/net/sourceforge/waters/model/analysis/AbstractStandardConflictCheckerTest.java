@@ -89,11 +89,19 @@ public abstract class AbstractStandardConflictCheckerTest extends
     runModelVerifier(group, name, true);
   }
 
-  /*
-   * public void testMultiNondeterministic() throws Exception { final String
-   * group = "tests/nondeterministic"; final String name =
-   * "multiNondeterministic.wmod"; runModelVerifier(group, name, false); }
-   */
+  public void testMultiNondeterministicConflicting() throws Exception
+  {
+    final String group = "tests/nondeterministic";
+    final String name = "multiNondeterministicConflicting.wmod";
+    runModelVerifier(group, name, false);
+  }
+
+  public void testMultiNondeterministicNonconflicting() throws Exception
+  {
+    final String group = "tests/nondeterministic";
+    final String name = "multiNondeterministicNonconflicting.wmod";
+    runModelVerifier(group, name, true);
+  }
 
   // #########################################################################
   // # Test Cases --- handwritten
