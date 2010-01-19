@@ -12,8 +12,8 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JLabel;
@@ -55,7 +55,7 @@ public class SimulationStepAction
     final SimulatorPanel panel = getActiveSimulatorPanel();
     if (panel != null) {
       final Simulation sim = getObservedSimulation();
-      final ArrayList<Step> possibleEvents = sim.getValidTransitions();
+      final List<Step> possibleEvents = sim.getValidTransitions();
       Collections.sort(possibleEvents);
       if (possibleEvents.size() == 1) {
         try {
@@ -88,7 +88,7 @@ public class SimulationStepAction
     }
   }
 
-  private Step findOptions(final ArrayList<Step> possibleEvents)
+  private Step findOptions(final List<Step> possibleEvents)
   {
     final JLabel[] possibilities = new JLabel[possibleEvents.size()];
     final Step[] events = new Step[possibleEvents.size()];

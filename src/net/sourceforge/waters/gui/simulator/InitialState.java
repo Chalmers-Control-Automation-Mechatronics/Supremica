@@ -1,7 +1,7 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -10,7 +10,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 public class InitialState extends DefaultMutableTreeNode
 {
 
-  public InitialState(final HashMap<AutomatonProxy,StateProxy> hashMap)
+  public InitialState(final Map<AutomatonProxy,StateProxy> hashMap)
   {
     super("Initial State", true);
     toExpand = hashMap;
@@ -30,7 +30,7 @@ public class InitialState extends DefaultMutableTreeNode
     }
   }
 
-  private final HashMap<AutomatonProxy,StateProxy> toExpand;
+  private final Map<AutomatonProxy,StateProxy> toExpand;
 
   private static final long serialVersionUID = -8469400574115123118L;
 }

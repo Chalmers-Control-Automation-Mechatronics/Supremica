@@ -26,6 +26,7 @@ import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -51,7 +52,7 @@ public class Simulation implements ModelObserver, Observer
     mModuleContainer = container;
     mPreviousEvents = new ArrayList<Step>();
     mEnabledLastStep = new ArrayList<AutomatonProxy>();
-    mPreviousAutomatonStates = new ArrayList<HashMap<AutomatonProxy, StateProxy>>();
+    mPreviousAutomatonStates = new ArrayList<Map<AutomatonProxy, StateProxy>>();
     mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
     mBlockingEvents = new ArrayList<Pair<EventProxy, AutomatonProxy>>();
     mUncontrollableAutomata = new ArrayList<ArrayList<AutomatonProxy>>();
@@ -69,22 +70,19 @@ public class Simulation implements ModelObserver, Observer
 
   //#########################################################################
   //# Simple Access
-  @SuppressWarnings("unchecked")
-  public ArrayList<Step> getValidTransitions()
+  public List<Step> getValidTransitions()
   {
-    return (ArrayList<Step>)mEnabledEvents.clone();
+    return Collections.unmodifiableList(mEnabledEvents);
   }
 
-  @SuppressWarnings("unchecked")
-  public HashMap<EventProxy, ArrayList<AutomatonProxy>> getInvalidEvents()
+  public Map<EventProxy,ArrayList<AutomatonProxy>> getInvalidEvents()
   {
-    return (HashMap<EventProxy,ArrayList<AutomatonProxy>>) mInvalidEvents.clone();
+    return Collections.unmodifiableMap(mInvalidEvents);
   }
 
-  @SuppressWarnings("unchecked")
-  public HashMap<AutomatonProxy, StateProxy> getCurrentStates()
+  public Map<AutomatonProxy, StateProxy> getCurrentStates()
   {
-    return (HashMap<AutomatonProxy,StateProxy>) mAllAutomatons.clone();
+    return Collections.unmodifiableMap(mAllAutomatons);
   }
 
   public List<EventProxy> getAllEvents()
@@ -278,7 +276,7 @@ public class Simulation implements ModelObserver, Observer
     return Collections.unmodifiableList(mPreviousEvents);
   }
 
-  public List<HashMap<AutomatonProxy, StateProxy>> getAutomatonHistory()
+  public List<Map<AutomatonProxy, StateProxy>> getAutomatonHistory()
   {
    return Collections.unmodifiableList(mPreviousAutomatonStates);
   }
@@ -381,7 +379,7 @@ public class Simulation implements ModelObserver, Observer
       }
       mPreviousEvents = new ArrayList<Step>();
       mEnabledLastStep = new ArrayList<AutomatonProxy>();
-      mPreviousAutomatonStates = new ArrayList<HashMap<AutomatonProxy, StateProxy>>();
+      mPreviousAutomatonStates = new ArrayList<Map<AutomatonProxy, StateProxy>>();
       mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
       mUncontrollableAutomata = new ArrayList<ArrayList<AutomatonProxy>>();
       currentTime = -1;
@@ -398,46 +396,25 @@ public class Simulation implements ModelObserver, Observer
     reset();
     mTrace = trace;
     Step locatedStep = null;
-    for (int looper = 0; looper < trace.getEvents().size() - 1; looper ++) // Travel through each trace step
+    for (final TraceStepProxy tStep : trace.getTraceSteps()) // Travel through each trace step
     {
       for (final Step step : mEnabledEvents) // Look for all possible Steps in the simulation
       {
         boolean isTheRightStep = true;
-        if (step.getEvent() == trace.getEvents().get(looper)) // Check if the event name is right. If not, this is not the correct Step
+        if (step.getEvent() == tStep.getEvent()) // Check if the event name is right. If not, this is not the correct Step
         {
           for (final AutomatonProxy auto : this.mAllAutomatons.keySet())
           {
             if (step.getSource().get(auto) != null) // Check to see if the step is non-deterministic. If it is, then it is the correct Step
             {
-              if (looper != 0) // If this isn't the first step in the trace...
-              {
-                if (step.getSource().get(auto) == trace.getTraceSteps().get(looper - 1).getStateMap().get(auto)
-                    || trace.getTraceSteps().get(looper - 1).getStateMap().get(auto) == null) // Check to see if the sources match
+              if (tStep.getStateMap().get(auto) == null) // If there is no non-deterministic information, fail always
+                throw new IllegalArgumentException("No non-deterministic information available");
+              else if (step.getDest().get(auto) == tStep.getStateMap().get(auto)) // If the destinations match, then it is the right step
                 {
-                  if (step.getDest().get(auto) == trace.getTraceSteps().get(looper).getStateMap().get(auto)
-                      || trace.getTraceSteps().get(looper).getStateMap().get(auto) == null) // And if the destinations match
-                  {
-                    isTheRightStep = true;
-                  }
-                  else
-                    isTheRightStep = false;
+                  isTheRightStep = true;
                 }
                 else
                   isTheRightStep = false;
-              }
-              else // If this IS the first step in the traace
-              {
-                if (step.getSource().get(auto) == mAllAutomatons.get(auto)); // Check to see if the source is the initial state of the automaton
-                {
-                  if (step.getDest().get(auto) == trace.getTraceSteps().get(looper).getStateMap().get(auto)
-                      || trace.getTraceSteps().get(looper).getStateMap().get(auto) == null) // Check to see if the destinations match
-                  {
-                    isTheRightStep = true;
-                  }
-                  else
-                    isTheRightStep = false;
-                }
-              }
             }
             else
               isTheRightStep = true;
@@ -448,11 +425,16 @@ public class Simulation implements ModelObserver, Observer
         if (isTheRightStep)
           locatedStep = step; // We have found the next instruction for the trace
       }
-      try {
-        step(locatedStep); // So fire it, and continue to the next one.
-      } catch (final NonDeterministicException exception) {
-        // Do nothing
+      if (locatedStep != null)
+      {
+        try {
+          step(locatedStep); // So fire it, and continue to the next one.
+        } catch (final NonDeterministicException exception) {
+          // Do nothing
+        }
       }
+      else
+        throw new IllegalArgumentException("No valid step could be found");
     }
     invalidated = false;
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
@@ -460,7 +442,6 @@ public class Simulation implements ModelObserver, Observer
     fireSimulationChangeEvent(simEvent);
   }
 
-  @SuppressWarnings("unchecked")
   public void step(final Step step) throws NonDeterministicException
   {
     time = System.currentTimeMillis();
@@ -519,7 +500,7 @@ public class Simulation implements ModelObserver, Observer
           }
         }
       }
-      mPreviousAutomatonStates.add((HashMap<AutomatonProxy,StateProxy>) mAllAutomatons.clone());
+      mPreviousAutomatonStates.add(Collections.unmodifiableMap(mAllAutomatons));
       mPreviousEnabledLastStep.add(mEnabledLastStep);
       currentTime++;
     }
@@ -915,7 +896,7 @@ public class Simulation implements ModelObserver, Observer
     }
     else
     {
-      mAllAutomatons = (HashMap<AutomatonProxy, StateProxy>)mPreviousAutomatonStates.get(currentTime).clone();
+      mAllAutomatons = Collections.unmodifiableMap(mPreviousAutomatonStates.get(currentTime));
       mEnabledLastStep = (ArrayList<AutomatonProxy>)mPreviousEnabledLastStep.get(currentTime).clone();
       findEventClassification();
     }
@@ -938,12 +919,12 @@ public class Simulation implements ModelObserver, Observer
 
   //#########################################################################
   //# Data Members
-  private HashMap<AutomatonProxy,StateProxy> mAllAutomatons; // The Map object is the current state of the key
+  private Map<AutomatonProxy,StateProxy> mAllAutomatons; // The Map object is the current state of the key
   private ArrayList<Step> mEnabledEvents;
   private HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the event
   private ArrayList<Step> mPreviousEvents;
   private int currentTime; // The index representing the current index for the current version history.
-  private ArrayList<HashMap<AutomatonProxy, StateProxy>> mPreviousAutomatonStates;
+  private ArrayList<Map<AutomatonProxy, StateProxy>> mPreviousAutomatonStates;
   private ArrayList<ArrayList<AutomatonProxy>> mPreviousEnabledLastStep;
   private ArrayList<Pair<EventProxy, AutomatonProxy>> mBlockingEvents;
   private ArrayList<ArrayList<AutomatonProxy>> mUncontrollableAutomata;

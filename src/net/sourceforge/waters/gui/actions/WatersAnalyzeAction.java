@@ -256,7 +256,7 @@ public abstract class WatersAnalyzeAction
 
       public void componentResized(final ComponentEvent e)
       {
-        this.setPreferredSize(new Dimension(((int)parent.getSize().getWidth()), ((int)parent.getSize().getHeight() / 2)));
+        this.setPreferredSize(new Dimension(((int)parent.getSize().getWidth() - 20), (((int)parent.getSize().getHeight() * 2 / 3) - 20)));
       }
 
       public void componentShown(final ComponentEvent e)

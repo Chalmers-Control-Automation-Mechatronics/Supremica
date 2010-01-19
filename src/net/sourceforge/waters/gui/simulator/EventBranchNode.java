@@ -1,7 +1,7 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -18,7 +18,7 @@ public class EventBranchNode extends DefaultMutableTreeNode
     mTime = currentTime;
   }
 
-  public void addAutomata(final Simulation sim, final HashMap<AutomatonProxy, StateProxy> currentStates)
+  public void addAutomata(final Simulation sim, final Map<AutomatonProxy, StateProxy> currentStates)
   {
     if (this.getChildAt(0).getClass() != AutomatonLeafNode.class)
     {
