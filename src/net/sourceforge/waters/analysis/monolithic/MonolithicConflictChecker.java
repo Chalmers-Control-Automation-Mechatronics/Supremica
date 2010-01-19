@@ -448,7 +448,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       // Decode the state.
       mStateSchema.decodeState(state, mSourceBuffer);
       final AutomatonSchema[] automata = mStateSchema.getOrdering();
-      int i = 0;
+      int i = -1;
 
       // Explore transitions ...
       nextevent: for (int eventid = 0; eventid < mEventMap.size(); eventid++) {
@@ -461,8 +461,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           } else if (targets.length == 1) {
             mTargetBuffer[autid] = targets[0];
           } else {
-            mNondeterministicAutomata[i] = autid;
             i++;
+            mNondeterministicAutomata[i] = autid;
           }
         }
         // Hopefully we have a new state! Encode away ...
@@ -475,8 +475,9 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
                                         final int eventID, final int sourceID,
                                         final int i) throws OverflowException
     {
-      if (i > 0) {
-        final AutomatonSchema schema = automata[i];
+      if (i >= 0) {
+        final int autID = mNondeterministicAutomata[i];
+        final AutomatonSchema schema = automata[autID];
         final int[][][] table = schema.mTransitionTable;
         final int[][] eventsSources = table[eventID];
         /*
@@ -484,10 +485,10 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
          * expandNondeterministic(automata, eventID, sourceID, i - 1); } else {
          */
         // there are (maybe) target states, process them ...
-        final int[] targets = eventsSources[mSourceBuffer[i]];
+        final int[] targets = eventsSources[mSourceBuffer[autID]];
         if (targets != null) {
           for (final int foundTarget : targets) {
-            mTargetBuffer[i] = foundTarget;
+            mTargetBuffer[autID] = foundTarget;
             expandNondeterministic(automata, eventID, sourceID, i - 1);
           }
         }
