@@ -228,9 +228,21 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           final EventProxy event = mSyncProduct.findEvent(pred, trace_start);
           final Map<AutomatonProxy,StateProxy> statemap =
               new HashMap<AutomatonProxy,StateProxy>();
-          for (@SuppressWarnings("unused")
-          final AutomatonProxy aut : model.getAutomata()) {
-            // statemap.put(aut, value);
+
+          final int[] decodedstate = new int[numaut];
+          final long state = mSyncProduct.getStateFromId(pred);
+          // Decode the state.
+          stateSchema.decodeState(state, decodedstate);
+          for (int i = 0; i < automata.length; i++) {
+            final int eventID = mEventMap.getId(event);
+            final int[] targets =
+                automata[i].getSuccessorStates(decodedstate[i], eventID);
+            if (targets != null) {
+              for (final int target : targets) {
+                statemap.put(automata[i].getAutomatonProxy(), automata[i]
+                    .getStateProxyFromID(target));
+              }
+            }
           }
           final TraceStepProxy traceStep =
               desFactory.createTraceStepProxy(event, statemap);
@@ -455,7 +467,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         for (int autid = 0; autid < automata.length; autid++) {
           final AutomatonSchema schema = automata[autid];
           final int src = mSourceBuffer[autid];
-          final int[] targets = schema.getSuccessorState(src, eventid);
+          final int[] targets = schema.getSuccessorStates(src, eventid);
           if (targets == null) {
             continue nextevent;
           } else if (targets.length == 1) {
@@ -512,7 +524,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         for (int autid = 0; autid < numaut; autid++) {
           final AutomatonSchema schema = automata[autid];
           final int source = mSourceBuffer[autid];
-          final int[] targets = schema.getSuccessorState(source, eventid);
+          final int[] targets = schema.getSuccessorStates(source, eventid);
           if (targets == null) {
             continue nextevent;
           } else {
@@ -755,6 +767,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     AutomatonSchema(final AutomatonProxy automaton, final EventMap eventmap,
                     final EventProxy marking, final EventProxy preMarking)
     {
+      mAutomaton = automaton;
       // Enumerate the state set for this automata.
       // This gives an ordering to the states.
       final Set<StateProxy> states = automaton.getStates();
@@ -846,10 +859,14 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       return mStateMap.get(state);
     }
 
-    @SuppressWarnings("unused")
-    StateProxy getStateProxyFromID(final int index)
+    StateProxy getStateProxyFromID(final int id)
     {
-      return mStates[index];
+      return mStates[id];
+    }
+
+    AutomatonProxy getAutomatonProxy()
+    {
+      return mAutomaton;
     }
 
     /**
@@ -866,10 +883,10 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     }
 
     /**
-     * Returns the successor state for the given source state and event, or -1
-     * if the event is not enabled.
+     * Returns the successor states for the given source state and event, or
+     * null if the event is not enabled.
      */
-    int[] getSuccessorState(final int src, final int event)
+    int[] getSuccessorStates(final int src, final int event)
     {
       final int[][] alltargets = mTransitionTable[event];
       if (alltargets == null) {
@@ -918,6 +935,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
      * The initial state of the automaton.
      */
     private final StateProxy mInitialState;
+
+    private final AutomatonProxy mAutomaton;
 
   }
 

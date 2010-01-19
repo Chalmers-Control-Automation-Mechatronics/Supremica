@@ -121,15 +121,13 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testConflictChecker("despot", "testHISC", "hisc12_low2", true);
   }
 
-  public void testConflictChecker_hisc13_low1() throws Exception
-  {
-    testConflictChecker("despot", "testHISC", "hisc13_low1", true);
-  }
-
-  public void testConflictChecker_hisc13_low2() throws Exception
-  {
-    testConflictChecker("despot", "testHISC", "hisc13_low2", true);
-  }
+  /*
+   * public void testConflictChecker_hisc13_low1() throws Exception {
+   * testConflictChecker("despot", "testHISC", "hisc13_low1", false); }
+   *
+   * public void testConflictChecker_hisc13_low2() throws Exception {
+   * testConflictChecker("despot", "testHISC", "hisc13_low2", true); }
+   */
 
   public void testConflictChecker_hisc14_low1() throws Exception
   {

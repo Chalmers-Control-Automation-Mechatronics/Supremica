@@ -103,6 +103,15 @@ public abstract class AbstractStandardConflictCheckerTest extends
     runModelVerifier(group, name, true);
   }
 
+  public void testMultiNondeterministicSepPlacesConflicting() throws Exception
+  {
+    // the two deterministic automata don't have non determinism at the same
+    // time
+    final String group = "tests/nondeterministic";
+    final String name = "multiNondeterministicSepPlacesConflicting.wmod";
+    runModelVerifier(group, name, false);
+  }
+
   // #########################################################################
   // # Test Cases --- handwritten
   public void testDosingTankWithJellyEFA1() throws Exception
