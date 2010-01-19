@@ -60,6 +60,22 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testBuild("despot", "testHISC", "hisc1_low1");
   }
 
+  public void testConflictChecker_parManEg_I_mfb_lowlevel() throws Exception
+  {
+    testConflictChecker("tests", "hisc", "parManEg_I_mfb_lowlevel", true);
+  }
+
+  public void testConflictChecker_rhone_subsystem1_ld_failsic5()
+      throws Exception
+  {
+    testConflictChecker("tests", "hisc", "rhone_subsystem1_ld_failsic5", false);
+  }
+
+  public void testConflictChecker_rhone_subsystem1_ld() throws Exception
+  {
+    testConflictChecker("tests", "hisc", "rhone_subsystem1_ld", true);
+  }
+
   // SimpleManufacturingExample
   public void testConflictChecker_Manuf_Cells() throws Exception
   {

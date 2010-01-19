@@ -25,6 +25,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
                             <Point Y="64" X="208"/>
                         </PointGeometry>
@@ -81,6 +84,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
                             <Point Y="80" X="224"/>
                         </PointGeometry>
@@ -135,6 +141,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
                             <Point Y="96" X="128"/>
                         </PointGeometry>
@@ -159,9 +168,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S4">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="112" X="304"/>
                         </PointGeometry>
@@ -195,6 +201,9 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="178" X="293"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Target="S1" Source="S1">
                         <LabelBlock>
@@ -210,6 +219,14 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="e2"/>
                         </LabelBlock>
+                    </Edge>
+                    <Edge Target="S3" Source="S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="146" X="282"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

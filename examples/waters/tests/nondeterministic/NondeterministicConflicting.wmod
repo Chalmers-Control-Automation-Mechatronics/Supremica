@@ -60,14 +60,6 @@
                             <SimpleIdentifier Name="a1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S1" Source="S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="a2"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="147" X="186"/>
-                        </SplineGeometry>
-                    </Edge>
                     <Edge Target="S1" Source="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a1"/>

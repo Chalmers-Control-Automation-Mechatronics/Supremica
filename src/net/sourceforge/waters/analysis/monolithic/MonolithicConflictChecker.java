@@ -167,7 +167,6 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           }
         }
       }
-
       // if all precondition marked states are coreachable then the model
       // is nonblocking
       boolean nonblocking = true;
@@ -238,8 +237,12 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           countertrace.add(0, traceStep);
           trace_start = pred;
         }
+        final TraceStepProxy startPoint =
+            desFactory.createTraceStepProxy(null, null);
+        countertrace.add(0, startPoint);
         final String modelname = model.getName();
         final String tracename = modelname + ":conflicting";
+        // final String comment =
         final ConflictTraceProxy trace =
             desFactory.createConflictTraceProxy(tracename, null, null, model,
                                                 model.getAutomata(),
@@ -509,12 +512,19 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           final AutomatonSchema schema = automata[autid];
           final int source = mSourceBuffer[autid];
           final int[] targets = schema.getSuccessorState(source, eventid);
-          int target = -1;
-          if (targets != null) {
-            target = targets[0];
-          }
-          if (target != mTargetBuffer[autid]) {
+          if (targets == null) {
             continue nextevent;
+          } else {
+            boolean eventFound = false;
+            for (final int target : targets) {
+              if (target == mTargetBuffer[autid]) {
+                eventFound = true;
+                break;
+              }
+            }
+            if (!eventFound) {
+              continue nextevent;
+            }
           }
         }
         return mEventMap.getEvent(eventid);
@@ -833,6 +843,12 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     int getStateNumber(final StateProxy state)
     {
       return mStateMap.get(state);
+    }
+
+    @SuppressWarnings("unused")
+    StateProxy getStateProxyFromID(final int index)
+    {
+      return mStates[index];
     }
 
     /**
