@@ -63,7 +63,6 @@ import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -170,6 +169,7 @@ public class AutomatonDisplayPane
     mTransform = mInverseTransform = null;
   }
 
+  /*
   public String setToolTipText()
   {
     return getToolTipText();
@@ -184,8 +184,18 @@ public class AutomatonDisplayPane
     else
       return null;
   }
+  */
 
   public String getToolTipText()
+  {
+    return "tooltip0";
+  }
+
+  public String getToolTipText(final MouseEvent e)
+  {
+    return "tooltip1";
+  }
+  /*
   {
     final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
     for (final StateProxy possibleState : mAutomaton.getStates())
@@ -249,6 +259,7 @@ public class AutomatonDisplayPane
     //System.out.println("DEBUG: " + toolTipText);
     return toolTipText;
   }
+  */
 
 
   //##########################################################################

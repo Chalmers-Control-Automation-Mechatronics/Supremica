@@ -48,11 +48,11 @@ public abstract class PopupFactory
    *                 invoked, or <CODE>null</CODE>.
    */
   public void maybeShowPopup(final Component invoker,
-                      final MouseEvent event,
-                      final Proxy proxy)
+                             final MouseEvent event,
+                             final Proxy proxy)
   {
     if (event.isPopupTrigger()) {
-      // Paranioa. These popups require the invoking component to own the
+      // Paranoia. These popups require the invoking component to own the
       // keyboard focus. If we do not have it, request it first. However,
       // the focus is not granted immediately, and maybe not at all ...
       if (invoker.isFocusOwner()) {
@@ -79,8 +79,8 @@ public abstract class PopupFactory
    *                 invoked, or <CODE>null</CODE>.
    */
   public void showPopup(final Component invoker,
-                 final MouseEvent event,
-                 final Proxy proxy)
+                        final MouseEvent event,
+                        final Proxy proxy)
   {
     final JPopupMenu popup = createPopup(proxy, event);
     popup.show(invoker, event.getX(), event.getY());
@@ -99,9 +99,9 @@ public abstract class PopupFactory
       addDefaultMenuItems();
     } else {
       try {
-	proxy.acceptVisitor(this);
+        proxy.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	throw exception.getRuntimeException();
+        throw exception.getRuntimeException();
       }
       mPopupMenu.addSeparator();
     }

@@ -2,7 +2,6 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,12 +9,14 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -112,7 +113,6 @@ public abstract class WatersAnalyzeAction
     public AnalyzerDialog()
     {
       this.setTitle(getCheckName() + " Check");
-      majorPanel = new JPanel();
       topPanel = new JPanel();
       bottomPanel = new JPanel();
       informationLabel = new WrapperLabel(this);
@@ -127,12 +127,15 @@ public abstract class WatersAnalyzeAction
           AnalyzerDialog.this.dispose();
         }
       });
+      final Border border = BorderFactory.createRaisedBevelBorder();
+      topPanel.setBorder(border);
       bottomPanel.add(cancelButton, BorderLayout.WEST);
       topPanel.add(informationLabel, BorderLayout.NORTH);
-      majorPanel.setLayout(new GridLayout(2, 1));
-      majorPanel.add(topPanel);
-      majorPanel.add(bottomPanel);
-      this.add(majorPanel);
+      //majorPanel.setLayout(new GridLayout(2, 1));
+      //majorPanel.add(topPanel);
+      //majorPanel.add(bottomPanel);
+      this.getContentPane().add(topPanel, BorderLayout.CENTER);
+      this.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
       this.setSize(DEFAULT_DIALOG_SIZE);
       this.setLocation(DEFAULT_DIALOG_LOCATION);
       run();
@@ -330,7 +333,6 @@ public abstract class WatersAnalyzeAction
     ModelVerifier verifier;
     JPanel topPanel;
     JPanel bottomPanel;
-    JPanel majorPanel;
     JButton cancelButton;
     JButton traceButton;
     WrapperLabel informationLabel;
