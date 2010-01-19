@@ -445,6 +445,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       // Decode the state.
       mStateSchema.decodeState(state, mSourceBuffer);
       final AutomatonSchema[] automata = mStateSchema.getOrdering();
+      int i = 0;
 
       // Explore transitions ...
       nextevent: for (int eventid = 0; eventid < mEventMap.size(); eventid++) {
@@ -457,19 +458,12 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           } else if (targets.length == 1) {
             mTargetBuffer[autid] = targets[0];
           } else {
-            // ~~~ Not correct. Either expandNondeterministic()
-            // replaces expand() completely, or do something smarter:
-            // Record the autid's with more than once successor state
-            // in another array, then after this loop call a modified
-            // version of expandNondeterministic() that only expands the
-            // listed automata.
-            mNondeterministicAutomata[autid] = 1;
+            mNondeterministicAutomata[i] = autid;
+            i++;
           }
         }
         // Hopefully we have a new state! Encode away ...
-        final long newstate = mStateSchema.encodeState(mTargetBuffer);
-        addNewState(newstate, stateid);
-        expandNondeterministic(automata, eventid, stateid, 0);
+        expandNondeterministic(automata, eventid, stateid, i);
 
       }
     }
@@ -478,34 +472,23 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
                                         final int eventID, final int sourceID,
                                         final int i) throws OverflowException
     {
-      // final int stateid = fringeGet();// should maybe pass stateid to this
-      // method, because we aren't getting a new state,
-      // but using one expand() tried to expand
-      // ~~~ Indeed, and probably also call the variable sourceID, as it
-      // is the code of the source state of the transitions. It is used
-      // to store predecessor states.
-      if (i < mNondeterministicAutomata.length) {
-        if (mNondeterministicAutomata[i] != 1) {
-          expandNondeterministic(automata, eventID, sourceID, i + 1);
-        } else {
-          final AutomatonSchema schema = automata[i];
-          final int[][][] table = schema.mTransitionTable;
-          final int[][] eventsSources = table[eventID];
-          mNondeterministicAutomata[i] = -1;
-          if (eventsSources == null) {
-            mTargetBuffer[i] = mSourceBuffer[i];
-            expandNondeterministic(automata, eventID, sourceID, i + 1);
-          } else {
-            // there are (maybe) target states, process them ...
-            final int[] targets = eventsSources[mSourceBuffer[i]];
-            if (targets != null) {
-              for (final int foundTarget : targets) {
-                mTargetBuffer[i] = foundTarget;
-                expandNondeterministic(automata, eventID, sourceID, i + 1);
-              }
-            }
+      if (i > 0) {
+        final AutomatonSchema schema = automata[i];
+        final int[][][] table = schema.mTransitionTable;
+        final int[][] eventsSources = table[eventID];
+        /*
+         * if (eventsSources == null) { mTargetBuffer[i] = mSourceBuffer[i];
+         * expandNondeterministic(automata, eventID, sourceID, i - 1); } else {
+         */
+        // there are (maybe) target states, process them ...
+        final int[] targets = eventsSources[mSourceBuffer[i]];
+        if (targets != null) {
+          for (final int foundTarget : targets) {
+            mTargetBuffer[i] = foundTarget;
+            expandNondeterministic(automata, eventID, sourceID, i - 1);
           }
         }
+        // }
       } else {
         final long newstate = mStateSchema.encodeState(mTargetBuffer);
         addNewState(newstate, sourceID);
