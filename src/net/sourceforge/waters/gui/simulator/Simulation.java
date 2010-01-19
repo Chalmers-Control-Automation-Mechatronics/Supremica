@@ -398,26 +398,26 @@ public class Simulation implements ModelObserver, Observer
     reset();
     mTrace = trace;
     Step locatedStep = null;
-    for (int looper = 0; looper < trace.getEvents().size() - 1; looper ++)
+    for (int looper = 0; looper < trace.getEvents().size() - 1; looper ++) // Travel through each trace step
     {
-      for (final Step step : mEnabledEvents)
+      for (final Step step : mEnabledEvents) // Look for all possible Steps in the simulation
       {
         boolean isTheRightStep = true;
-        if (step.getEvent() == trace.getEvents().get(looper))
+        if (step.getEvent() == trace.getEvents().get(looper)) // Check if the event name is right. If not, this is not the correct Step
         {
           for (final AutomatonProxy auto : this.mAllAutomatons.keySet())
           {
-            if (step.getSource().get(auto) != null)
+            if (step.getSource().get(auto) != null) // Check to see if the step is non-deterministic. If it is, then it is the correct Step
             {
-              if (looper != 0)
+              if (looper != 0) // If this isn't the first step in the trace...
               {
                 if (step.getSource().get(auto) == trace.getTraceSteps().get(looper - 1).getStateMap().get(auto)
-                    || trace.getTraceSteps().get(looper - 1).getStateMap().get(auto) == null)
+                    || trace.getTraceSteps().get(looper - 1).getStateMap().get(auto) == null) // Check to see if the sources match
                 {
                   if (step.getDest().get(auto) == trace.getTraceSteps().get(looper).getStateMap().get(auto)
-                      || trace.getTraceSteps().get(looper).getStateMap().get(auto) == null)
+                      || trace.getTraceSteps().get(looper).getStateMap().get(auto) == null) // And if the destinations match
                   {
-                    // Do nothing
+                    isTheRightStep = true;
                   }
                   else
                     isTheRightStep = false;
@@ -425,29 +425,31 @@ public class Simulation implements ModelObserver, Observer
                 else
                   isTheRightStep = false;
               }
-              else
+              else // If this IS the first step in the traace
               {
-                if (step.getSource().get(auto) == mAllAutomatons.get(auto));
+                if (step.getSource().get(auto) == mAllAutomatons.get(auto)); // Check to see if the source is the initial state of the automaton
                 {
                   if (step.getDest().get(auto) == trace.getTraceSteps().get(looper).getStateMap().get(auto)
-                      || trace.getTraceSteps().get(looper).getStateMap().get(auto) == null)
+                      || trace.getTraceSteps().get(looper).getStateMap().get(auto) == null) // Check to see if the destinations match
                   {
-                    // Do nothing
+                    isTheRightStep = true;
                   }
                   else
                     isTheRightStep = false;
                 }
               }
             }
+            else
+              isTheRightStep = true;
           }
         }
         else
           isTheRightStep = false;
         if (isTheRightStep)
-          locatedStep = step;
+          locatedStep = step; // We have found the next instruction for the trace
       }
       try {
-        step(locatedStep);
+        step(locatedStep); // So fire it, and continue to the next one.
       } catch (final NonDeterministicException exception) {
         // Do nothing
       }
@@ -741,26 +743,31 @@ public class Simulation implements ModelObserver, Observer
     }
     if (mEnabledEvents.size() == 0)
     {
-      boolean hasPropositions = false;
-      for (final StateProxy state : mAllAutomatons.values())
+      for (final AutomatonProxy auto : mAllAutomatons.keySet())
       {
-        if (state.getPropositions().size() != 0)
+        if (mAllAutomatons.get(auto).getPropositions().size() == 0)
         {
-          hasPropositions = true;
-          for (final EventProxy proposition : state.getPropositions())
+          for (final StateProxy state : auto.getStates())
           {
-            if (proposition.getName().compareTo(":accepting") != 0)
+            if (state.getPropositions().size() != 0)
             {
-              mContainer.getIDE().error(": Deadlock has occured");
-              return;
+              mModuleContainer.getIDE().error(": The automaton " + auto.getName() + " is blocking");
             }
           }
         }
-      }
-      if (!hasPropositions)
-      {
-        mContainer.getIDE().error(": Deadlock has occured");
-        return;
+        else
+        {
+          boolean isAccepting = false;
+          for (final EventProxy prop : mAllAutomatons.get(auto).getPropositions())
+          {
+            if (prop.getName().compareTo(":accepting") == 0)
+              isAccepting = true;
+          }
+          if (!isAccepting)
+          {
+            mModuleContainer.getIDE().error(": The automaton " + auto.getName() + " is blocking");
+          }
+        }
       }
     }
   }

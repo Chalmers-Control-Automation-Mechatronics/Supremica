@@ -294,8 +294,9 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
       mEventPanel.setLayout(layout);
       mEventNameLabel = new JLabel();
       mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
-      mEventPanel.add(mEventNameLabel);
       mEventStatusLabel = new JLabel();
+      mEventPanel.add(mEventNameLabel);
+      mEventPanel.add(mEventStatusLabel);
       mAutomataPanel = new JPanel();
       mAutomataPanel.setLayout(layout);
       mAutomataNameLabel = new JLabel();
@@ -304,7 +305,6 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
       mAutomataPanel.add(mAutomataNameLabel);
       mAutomataPanel.add(mAutomataIconLabel);
       mAutomataPanel.add(mAutomataStatusLabel);
-      mEventPanel.add(mEventStatusLabel);
     }
 
     //#######################################################################
@@ -315,7 +315,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
        final int row, final boolean hasFocus)
     {
        if (EventProxy.class.isInstance(value))
-      {
+       {
          if (sel)
            mEventPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
          else
@@ -330,6 +330,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
         final int width = mPane.getViewport().getWidth();
         final int rightWidth = eventColumnWidth[1];
         final int leftWidth = width - rightWidth - noduleWidth;
+        mEventPanel.setPreferredSize(new Dimension(width, rowHeight));
         mEventNameLabel.setPreferredSize(new Dimension(leftWidth, rowHeight));
         mEventStatusLabel.setPreferredSize(new Dimension(rightWidth, rowHeight));
         return mEventPanel;
