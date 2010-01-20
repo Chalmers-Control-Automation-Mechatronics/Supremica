@@ -8,14 +8,17 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.des.ConflictKind;
 import net.sourceforge.waters.despot.HISCAttributes;
 
 
@@ -330,6 +333,39 @@ public class SICPropertyVBuilder
       newTransitions.add(newTransition);
     }
     return newTransitions;
+  }
+
+  public ConflictTraceProxy convertTraceToOriginalModel(
+                                                        final ConflictTraceProxy conflictTrace)
+  {
+    final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+    final List<TraceStepProxy> convertedSteps = new ArrayList<TraceStepProxy>();
+    for (final TraceStepProxy step : traceSteps) {
+      final Map<AutomatonProxy,StateProxy> stepsAutStateMap =
+          step.getStateMap();
+      final Map<AutomatonProxy,StateProxy> convertedMap =
+          new HashMap<AutomatonProxy,StateProxy>();
+      for (final Map.Entry<AutomatonProxy,StateProxy> e : stepsAutStateMap
+          .entrySet()) {
+        final AutomatonProxy aut = e.getKey();
+        @SuppressWarnings("unused")
+        final StateProxy state = e.getValue();
+        if (mModel.getAutomata().contains(aut)) {
+          final StateProxy convertedState = null;// need to get key from mStates
+          convertedMap.put(aut, convertedState);
+        }
+      }
+      final TraceStepProxy convertedStep =
+          mFactory.createTraceStepProxy(step.getEvent(), convertedMap);
+      convertedSteps.add(convertedStep);
+    }
+    final ConflictTraceProxy convertedTrace =
+        mFactory.createConflictTraceProxy(conflictTrace.getName(),
+                                          conflictTrace.getComment(),
+                                          conflictTrace.getLocation(), mModel,
+                                          mModel.getAutomata(), convertedSteps,
+                                          ConflictKind.CONFLICT);
+    return convertedTrace;
   }
 
   // #########################################################################
