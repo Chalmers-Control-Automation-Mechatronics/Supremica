@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0" >
+	<Definition desDefVer="1.0" >
+		<Header name="targetID_nonexist" type="subsystem" >
+			<Integrity status="not-verified" date-stamp="" />
+			<Reachable status="not-verified" date-stamp="" />
+			<Nonblocking status="not-verified" date-stamp="" />
+		</Header>
+		<States count="0" marked-count="1" >
+			<InitSt id="1" nm="s0" al="s0" mk="1" rch="?" />
+		</States>
+		<Events count="7" ctrl-count="4" unctrl-count="3" ans-count="3" req-count="3" >
+			<Ev id="1" nm="startpallets-1" al="startpallets-1" ctrl="1" type="r" />
+			<Ev id="2" nm="startpallets-2" al="startpallets-2" ctrl="1" type="r" />
+			<Ev id="3" nm="startpallets-3" al="startpallets-3" ctrl="1" type="r" />
+			<Ev id="4" nm="finishpallets-1" al="finishpallets-1" ctrl="0" type="a" />
+			<Ev id="5" nm="finishpallets-2" al="finishpallets-2" ctrl="0" type="a" />
+			<Ev id="6" nm="finishpallets-3" al="finishpallets-3" ctrl="0" type="a" />
+			<Ev id="7" nm="pallets_f_outbuf" al="pallets_f_outbuf" ctrl="1" type="d" />
+		</Events>
+		<Trans-Function count="22" >
+			<Transitions count="22" >
+				<Tr fID="1" eID="1" tID="1" />
+				<Tr fID="1" eID="2" tID="1" />
+				<Tr fID="1" eID="3" tID="1" />
+				<Tr fID="1" eID="4" tID="0" />
+
+			</Transitions>
+			<Self-Loops count="0" />
+		</Trans-Function>
+	</Definition>
+</DES>

@@ -52,7 +52,7 @@ public class DESpotImporterTest extends AbstractWatersTest
    * public void testImport_maip3_syn() throws Exception {
    * testImport("song_aip/maip3_syn", "maip3_syn"); }
    *
-   * public void testImport_maip3_veri() throws Exception {
+   * /* public void testImport_maip3_veri() throws Exception {
    * testImport("song_aip/maip3_veri", "maip3_veri"); }
    *
    * public void testImport_maip5_syn() throws Exception {
@@ -230,6 +230,20 @@ public class DESpotImporterTest extends AbstractWatersTest
   {
     testException("testSimple", "nonexist_subsystem",
                   WatersUnmarshalException.class, "nonexist_low");
+  }
+
+  public void testException_nonexist_transitionTargetID_nonexist()
+      throws Exception
+  {
+    testException("exception", "targetID_nonexist",
+                  WatersUnmarshalException.class, "targetID_nonexist");
+  }
+
+  public void testException_nonexist_transitionSourceID_nonexist()
+      throws Exception
+  {
+    testException("exception", "sourceID_nonexist",
+                  WatersUnmarshalException.class, "srcID_nonexist");
   }
 
   // #########################################################################

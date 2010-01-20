@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0" >
+	<Header name="maip3" type="HISC" degree="1" >
+		<Integrity status="not-verified" date-stamp="" />
+		<Nonblocking status="not-verified" date-stamp="" />
+		<Controllable status="not-verified" date-stamp="" />
+		<I-Consistent status="not-verified" date-stamp="" />
+		<LW-Nonblocking status="not-verified" date-stamp="" />
+		<LW-Controllable status="not-verified" date-stamp="" />
+	</Header>
+	<Subsystem name="high" level="0" valid="" lw-ctrl="" lw-non-blocking="" i-consist="" >
+		<Implements />
+		<Supervisor>
+			<Des name="srcID_nonexist" location="srcID_nonexist.des" />
+		</Supervisor>
+	</Subsystem>
+</Project>

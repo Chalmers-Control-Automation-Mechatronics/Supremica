@@ -426,11 +426,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   /**
    * Constructs the SimpleComponent section for the module of a
    * <CODE>.wmod</CODE> file.
+   *
+   * @throws WatersUnmarshalException
    */
   private void constructSimpleComponent(final Element automaton,
                                         final ComponentKind kind, final URI path)
       throws ParserConfigurationException, SAXException, IOException,
-      URISyntaxException
+      URISyntaxException, WatersUnmarshalException
   {
     final NodeList desList = automaton.getElementsByTagName("*");
     for (int i = 0; i < desList.getLength(); i++) {
@@ -446,7 +448,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final NodeList allHeaders = definition.getElementsByTagName("Header");
       final Element header = (Element) allHeaders.item(0);
       final String autName = formatIdentifier(header.getAttribute("name"));
-      final GraphProxy graph = constructGraph(root, false);
+      final GraphProxy graph = constructGraph(autFile, root, false);
       if (graph != null) {
         final IdentifierProxy identifier =
             mFactory.createSimpleIdentifierProxy(autName);
@@ -463,12 +465,14 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   /**
    * Constructs the SimpleComponent section for the module of a
    * <CODE>.wmod</CODE> file.
+   *
+   * @throws WatersUnmarshalException
    */
   private void constructSimpleComponent(final String desName,
                                         final String desLocation,
                                         final ComponentKind kind, final URI path)
       throws ParserConfigurationException, SAXException, IOException,
-      URISyntaxException
+      URISyntaxException, WatersUnmarshalException
   {
     final URI uri = new URI(desLocation);
     final Element root = openDESFile(path.resolve(uri));
@@ -477,7 +481,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final NodeList allHeaders = definition.getElementsByTagName("Header");
     final Element header = (Element) allHeaders.item(0);
     final String newName = formatIdentifier(header.getAttribute("name"));
-    final GraphProxy graph = constructGraph(root, true);
+    final GraphProxy graph = constructGraph(desLocation, root, true);
     if (graph != null) {
       final IdentifierProxy identifier =
           mFactory.createSimpleIdentifierProxy(newName);
@@ -518,10 +522,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    *
    * @param des
    *          The root element of the .des file that contains the automaton.
+   * @throws WatersUnmarshalException
    */
-  private GraphProxy constructGraph(final Element des,
+  private GraphProxy constructGraph(final String autfilename,
+                                    final Element des,
                                     final boolean implementation)
-      throws ParserConfigurationException, SAXException, IOException
+      throws ParserConfigurationException, SAXException, IOException,
+      WatersUnmarshalException
   {
 
     final Element definition =
@@ -566,7 +573,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       if (mTransitions.containsKey(srcTargIds)) {
         exists = true;
       }
-      final EdgeProxy edge = convertTransition(trElmnt, exists);
+      final EdgeProxy edge = convertTransition(autfilename, trElmnt, exists);
       if (!exists) {
         mEdges.add(edge);
         final int index = mEdges.indexOf(edge);
@@ -693,22 +700,36 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    *
    * @param tr
    *          The transition to be converted.
+   * @throws WatersUnmarshalException
    */
-  private EdgeProxy convertTransition(final Element tr, final boolean exists)
+  private EdgeProxy convertTransition(final String autfilename,
+                                      final Element tr, final boolean exists)
+      throws WatersUnmarshalException
   {
     // gets the source and target states ID numbers
     final int srcID = Integer.parseInt(tr.getAttribute("fID"));
     final int targetID = Integer.parseInt(tr.getAttribute("tID"));
-
-    // gets the index number of the source and target states in the list
-    final int srcIndex = mStates.get(srcID);
-    final int targetIndex = mStates.get(targetID);
 
     // assigns the correct name to the edge
     final String eventID = tr.getAttribute("eID");
     final String eventName = mEventIDs.get(Integer.parseInt(eventID));
     final List<SimpleIdentifierProxy> eventList =
         new ArrayList<SimpleIdentifierProxy>();
+
+    // gets the index number of the source and target states in the list
+    final Integer srcIndex = mStates.get(srcID);
+    if (srcIndex == null) {
+      throw new WatersUnmarshalException("The source state ID " + srcID
+          + " does not exist on the transition with target state ID "
+          + targetID + " and event ID " + eventID + " in the file "
+          + autfilename + ".");
+    }
+    final Integer targetIndex = mStates.get(targetID);
+    if (targetIndex == null) {
+      throw new WatersUnmarshalException("The target state ID " + targetID
+          + " does not exist on the transition with source state ID " + srcID
+          + " and event ID " + eventID + " in the file " + autfilename + ".");
+    }
 
     if (exists) {
       // there is already an existing edge in this direction between these two
