@@ -228,6 +228,7 @@ public class AutomatonDesktopPane
       final Point newPoint = findLocation(previousLocations, frame.getSize());
       final Rectangle newRect = new Rectangle(newPoint.x, newPoint.y, (int)frame.getSize().getWidth(), (int)frame.getSize().getHeight());
       frame.setLocation(newPoint);
+      frame.toFront();
       previousLocations.add(newRect);
     }
   }

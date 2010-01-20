@@ -159,18 +159,18 @@ public class Simulation implements ModelObserver, Observer
       return new ImageIcon();
   }
 
-  public ArrayList<AutomatonProxy> isNonControllableAtTime(final int time)
+  public List<AutomatonProxy> isNonControllableAtTime(final int time)
   {
     if (time < -1 || time > mUncontrollableAutomata.size() - 2)
-      return new ArrayList<AutomatonProxy>();
+      return Collections.emptyList();
     else
-      return mUncontrollableAutomata.get(time + 1);
+      return Collections.unmodifiableList(mUncontrollableAutomata.get(time + 1));
   }
 
   /**
    * A check to see if the event is a blocking event (All automaton which are blocked by this event are specifications)
    * @param event The event to test
-   * @return null if the event is a blocking event, all specifications which are blocking it otherwise
+   * @return null if the event is a non-blocking event, all specifications which are blocking it otherwise
    */
   public ArrayList<AutomatonProxy> getNonControllable(final EventProxy event)
   {
@@ -190,15 +190,15 @@ public class Simulation implements ModelObserver, Observer
    * @param event
    * @return All automaton which are blocked by this event, or an empty arraylist, if the event is valid.
    */
-  public ArrayList<AutomatonProxy> getBlocking(final EventProxy event)
+  public List<AutomatonProxy> getBlocking(final EventProxy event)
   {
     if (mInvalidEvents.containsKey(event))
     {
-      return mInvalidEvents.get(event);
+      return Collections.unmodifiableList(mInvalidEvents.get(event));
     }
     else
     {
-      return new ArrayList<AutomatonProxy>();
+      return Collections.emptyList();
     }
   }
 
@@ -403,6 +403,7 @@ public class Simulation implements ModelObserver, Observer
         boolean isTheRightStep = true;
         if (step.getEvent() == tStep.getEvent()) // Check if the event name is right. If not, this is not the correct Step
         {
+          System.out.println("DEBUG: Event matched");
           for (final AutomatonProxy auto : this.mAllAutomatons.keySet())
           {
             if (step.getSource().get(auto) != null) // Check to see if the step is non-deterministic. If it is, then it is the correct Step
@@ -421,7 +422,10 @@ public class Simulation implements ModelObserver, Observer
           }
         }
         else
+        {
           isTheRightStep = false;
+          System.out.println("Difference between " + step.getEvent() + " and " + tStep.getEvent());
+        }
         if (isTheRightStep)
           locatedStep = step; // We have found the next instruction for the trace
       }

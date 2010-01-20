@@ -56,6 +56,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -63,6 +64,7 @@ import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -186,15 +188,6 @@ public class AutomatonDisplayPane
   }
   */
 
-  public String getToolTipText()
-  {
-    return "tooltip0";
-  }
-
-  public String getToolTipText(final MouseEvent e)
-  {
-    return "tooltip1";
-  }
   /*
   {
     final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
@@ -348,6 +341,13 @@ public class AutomatonDisplayPane
         return edge;
       }
     }
+    for (final NodeProxy node : graph.getNodes()) {
+      final ProxyShape shape = producer.getShape(node);
+      if (shape.isClicked(x, y))
+      {
+        return node;
+      }
+    }
     return null;
   }
 
@@ -363,7 +363,85 @@ public class AutomatonDisplayPane
     final Proxy clicked = getClickedItem(event);
     if (clicked != mFocusedItem) {
       mFocusedItem = clicked;
+      updateToolTip();
       repaint();
+    }
+  }
+
+  private void updateToolTip()
+  {
+    if (mFocusedItem == null)
+    {
+      String toolTipText = "";
+      if (mAutomaton.getKind() == ComponentKind.SPEC)
+        toolTipText += "Specification ";
+      else
+        toolTipText += "Plant ";
+      toolTipText += mAutomaton.getName();
+      if (mSim.changedLastStep(mAutomaton))
+        toolTipText += " contains a transition that has been executed";
+      if (mSim.isNonControllableAtTime(mSim.getCurrentTime()).contains(mAutomaton) && mSim.changedLastStep(mAutomaton))
+        toolTipText += " and";
+      if (mSim.isNonControllableAtTime(mSim.getCurrentTime()).contains(mAutomaton))
+        toolTipText += " has controllability problem in state " + mSim.getCurrentStates().get(mAutomaton).getName();
+      this.setToolTipText(toolTipText);
+    }
+    else
+    {
+      final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+      for (final StateProxy possibleState : mAutomaton.getStates())
+      {
+        if (mFocusedItem == infomap.get(possibleState).getSourceObject())
+        {
+          String toolTipText = "";
+          if (possibleState.isInitial())
+          {
+            toolTipText += "Initial state ";
+          }
+          toolTipText += possibleState.getName() + " ";
+          if (possibleState.getPropositions().size() != 0)
+          {
+            toolTipText += "marked as ";
+            for (final EventProxy proposition : possibleState.getPropositions())
+            {
+              toolTipText += proposition.getName() + ", ";
+            }
+            toolTipText = toolTipText.substring(0, toolTipText.length() - 2);
+          }
+          if (mSim.getCurrentStates().get(mAutomaton) == possibleState)
+          {
+            toolTipText += ", current state";
+          }
+          toolTipText += ".";
+          this.setToolTipText(toolTipText);
+        }
+      }
+      for (final TransitionProxy trans : mAutomaton.getTransitions())
+      {
+        final Proxy source = infomap.get(trans).getSourceObject();
+        if (source == mFocusedItem) {
+          String toolTipText = "";
+          if (trans.getEvent().getKind() == EventKind.CONTROLLABLE)
+            toolTipText += "Controllable event ";
+          else
+            toolTipText += "Uncontrollable event ";
+          toolTipText += trans.getEvent().getName() + " ";
+          boolean enabled = false;
+          for (final Step possibleSteps : mSim.getValidTransitions())
+          {
+            if (trans.getEvent() == possibleSteps.getEvent()
+                && (trans.getSource() == possibleSteps.getSource().get(mAutomaton) || possibleSteps.getSource().get(mAutomaton) == null)
+                && (trans.getTarget() == possibleSteps.getDest().get(mAutomaton) || possibleSteps.getDest().get(mAutomaton) == null)
+                && mSim.getCurrentStates().get(mAutomaton) == trans.getSource())
+              enabled = true;
+          }
+          if (enabled)
+            toolTipText += "currently enabled.";
+          else
+            toolTipText += "currently disabled.";
+          this.setToolTipText(toolTipText);
+        }
+      }
     }
   }
 
@@ -623,6 +701,15 @@ public class AutomatonDisplayPane
         if (infomap.get(currentState).getSourceObject() == orig) {
           proxyIsActive = true;
         }
+        if (isEnabled(orig)) {
+          proxyIsEnabled = true;
+        }
+        if (mFocusedItem != null)
+        {
+          if (orig == mFocusedItem) {
+            proxyIsSelected = true;
+          }
+        }
       } else if (orig instanceof IdentifierProxy ||
                  orig instanceof EdgeProxy) {
         final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
@@ -648,7 +735,6 @@ public class AutomatonDisplayPane
         {
           if (orig == mFocusedItem) {
             proxyIsSelected = true;
-            System.out.println("DEBUG: " + orig.toString());
           } else if (orig instanceof IdentifierSubject) {
             final AbstractSubject subject = (AbstractSubject) orig;
             if (subject.getAncestor(EdgeSubject.class) == mFocusedItem) {
@@ -657,7 +743,6 @@ public class AutomatonDisplayPane
           }
         }
       }
-      setToolTipText(getToolTipText());
       return getRawRenderingInformation
         (orig, proxyIsActive, proxyIsEnabled, proxyIsSelected);
     }

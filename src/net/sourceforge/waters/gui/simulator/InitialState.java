@@ -1,6 +1,6 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -21,7 +21,7 @@ public class InitialState extends DefaultMutableTreeNode
   {
     if (this.getChildAt(0).getClass() != AutomatonLeafNode.class)
     {
-      final ArrayList<AutomatonProxy> isBlocking = sim.isNonControllableAtTime(-1);
+      final List<AutomatonProxy> isBlocking = sim.isNonControllableAtTime(-1);
       this.removeAllChildren();
       for (final AutomatonProxy automaton : toExpand.keySet())
       {
