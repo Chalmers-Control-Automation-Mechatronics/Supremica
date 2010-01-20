@@ -238,7 +238,11 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
             final int[] targets =
                 automata[i].getSuccessorStates(decodedstate[i], eventID);
             if (targets != null) {
+              // If targets == null, we have a serious problem ...
               for (final int target : targets) {
+                // *** BUG *** This tries to store all nondeterministic
+                // successors in the map; it should only store the right
+                // one, and only if there is a nondeterministic choice.
                 statemap.put(automata[i].getAutomatonProxy(), automata[i]
                     .getStateProxyFromID(target));
               }
@@ -477,9 +481,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
             mNondeterministicAutomata[i] = autid;
           }
         }
-        // Hopefully we have a new state! Encode away ...
         expandNondeterministic(automata, eventid, stateid, i);
-
       }
     }
 
@@ -492,19 +494,11 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         final AutomatonSchema schema = automata[autID];
         final int[][][] table = schema.mTransitionTable;
         final int[][] eventsSources = table[eventID];
-        /*
-         * if (eventsSources == null) { mTargetBuffer[i] = mSourceBuffer[i];
-         * expandNondeterministic(automata, eventID, sourceID, i - 1); } else {
-         */
-        // there are (maybe) target states, process them ...
         final int[] targets = eventsSources[mSourceBuffer[autID]];
-        if (targets != null) {
-          for (final int foundTarget : targets) {
-            mTargetBuffer[autID] = foundTarget;
-            expandNondeterministic(automata, eventID, sourceID, i - 1);
-          }
+        for (final int foundTarget : targets) {
+          mTargetBuffer[autID] = foundTarget;
+          expandNondeterministic(automata, eventID, sourceID, i - 1);
         }
-        // }
       } else {
         final long newstate = mStateSchema.encodeState(mTargetBuffer);
         addNewState(newstate, sourceID);
