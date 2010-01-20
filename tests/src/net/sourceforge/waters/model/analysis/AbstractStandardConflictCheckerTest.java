@@ -75,6 +75,14 @@ public abstract class AbstractStandardConflictCheckerTest extends
 
   // #########################################################################
   // # Test Cases --- nondeterministic
+
+  public void testNondeterministicCombiniations() throws Exception
+  {
+    final String group = "tests/nondeterministic";
+    final String name = "NondeterministicCombinations.wmod";
+    runModelVerifier(group, name, true);
+  }
+
   public void testNondeterministicConflicting() throws Exception
   {
     final String group = "tests/nondeterministic";
