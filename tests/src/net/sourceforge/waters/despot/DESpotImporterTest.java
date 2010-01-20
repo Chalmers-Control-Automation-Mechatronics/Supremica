@@ -48,6 +48,20 @@ public class DESpotImporterTest extends AbstractWatersTest
   // #########################################################################
   // # Successful Test Cases
 
+  /*
+   * public void testImport_maip3_syn() throws Exception {
+   * testImport("song_aip/maip3_syn", "maip3_syn"); }
+   *
+   * public void testImport_maip3_veri() throws Exception {
+   * testImport("song_aip/maip3_veri", "maip3_veri"); }
+   *
+   * public void testImport_maip5_syn() throws Exception {
+   * testImport("song_aip/maip5_syn", "maip5_syn"); }
+   *
+   * public void testImport_maip5_veri() throws Exception {
+   * testImport("song_aip/maip5_veri", "maip5_veri"); }
+   */
+
   public void testImport_output_aip_leducversion_old() throws Exception
   {
     testImport("output-aip_leducversion-old", "output-aip_leducversion-old");

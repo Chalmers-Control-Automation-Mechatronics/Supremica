@@ -169,6 +169,166 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testConflictChecker("despot", "testHISC", "hisc9_low2", true);
   }
 
+  public void testConflictChecker_aip3_syn_as1() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_syn", "as1", true);
+  }
+
+  public void testConflictChecker_aip3_syn_as2() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_syn", "as2", true);
+  }
+
+  public void testConflictChecker_aip3_syn_as3() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_syn", "as3", true);
+  }
+
+  public void testConflictChecker_aip3_syn_io() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_syn", "io", true);
+  }
+
+  public void testConflictChecker_aip3_syn_tu1() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_syn", "tu1", true);
+  }
+
+  public void testConflictChecker_aip3_syn_tu2() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_syn", "tu2", true);
+  }
+
+  public void testConflictChecker_aip3_syn_tu3() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_syn", "tu3", true);
+  }
+
+  public void testConflictChecker_aip3_syn_tu4() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_syn", "tu4", true);
+  }
+
+  public void testConflictChecker_aip3_veri_as1() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_veri", "as1", true);
+  }
+
+  public void testConflictChecker_aip3_veri_as2() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_veri", "as2", true);
+  }
+
+  public void testConflictChecker_aip3_veri_as3() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_veri", "as3", true);
+  }
+
+  public void testConflictChecker_aip3_veri_io() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_veri", "io", true);
+  }
+
+  public void testConflictChecker_aip3_veri_tu1() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_veri", "tu1", true);
+  }
+
+  public void testConflictChecker_aip3_veri_tu2() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_veri", "tu2", true);
+  }
+
+  public void testConflictChecker_aip3_veri_tu3() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_veri", "tu3", true);
+  }
+
+  public void testConflictChecker_aip3_veri_tu4() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_syn", "tu4", true);
+  }
+
+  public void testConflictChecker_aip5_syn_as1() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_syn", "as1", true);
+  }
+
+  public void testConflictChecker_aip5_syn_as2() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_syn", "as2", true);
+  }
+
+  public void testConflictChecker_aip5_syn_as3() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_syn", "as3", true);
+  }
+
+  public void testConflictChecker_aip5_syn_io() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_syn", "io", true);
+  }
+
+  public void testConflictChecker_aip5_syn_tu1() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_syn", "tu1", true);
+  }
+
+  public void testConflictChecker_aip5_syn_tu2() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_syn", "tu2", true);
+  }
+
+  public void testConflictChecker_aip5_syn_tu3() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_syn", "tu3", true);
+  }
+
+  public void testConflictChecker_aip5_syn_tu4() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip3_syn", "tu4", true);
+  }
+
+  public void testConflictChecker_aip5_veri_as1() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_veri", "as1", true);
+  }
+
+  public void testConflictChecker_aip5_veri_as2() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_veri", "as2", true);
+  }
+
+  public void testConflictChecker_aip5_veri_as3() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_veri", "as3", true);
+  }
+
+  public void testConflictChecker_aip5_veri_io() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_veri", "io", true);
+  }
+
+  public void testConflictChecker_aip5_veri_tu1() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_veri", "tu1", true);
+  }
+
+  public void testConflictChecker_aip5_veri_tu2() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_veri", "tu2", true);
+  }
+
+  public void testConflictChecker_aip5_veri_tu3() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_veri", "tu3", true);
+  }
+
+  public void testConflictChecker_aip5_veri_tu4() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/aip5_veri", "tu4", true);
+  }
+
   // SimpleManufacturingExample
   public void testIntegrity_Manuf_Cells() throws Exception
   {
@@ -311,6 +471,166 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   public void testIntegrity_tu4() throws Exception
   {
     testIntegrity("despot", "output-aip_leducversion-old", "tu4");
+  }
+
+  public void testIntegrity_aip3_syn_as1() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_syn", "as1");
+  }
+
+  public void testIntegrity_aip3_syn_as2() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_syn", "as2");
+  }
+
+  public void testIntegrity_aip3_syn_as3() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_syn", "as3");
+  }
+
+  public void testIntegrity_aip3_syn_io() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_syn", "io");
+  }
+
+  public void testIntegrity_aip3_syn_tu1() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_syn", "tu1");
+  }
+
+  public void testIntegrity_aip3_syn_tu2() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_syn", "tu2");
+  }
+
+  public void testIntegrity_aip3_syn_tu3() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_syn", "tu3");
+  }
+
+  public void testIntegrity_aip3_syn_tu4() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_syn", "tu4");
+  }
+
+  public void testIntegrity_aip3_veri_as1() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_veri", "as1");
+  }
+
+  public void testIntegrity_aip3_veri_as2() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_veri", "as2");
+  }
+
+  public void testIntegrity_aip3_veri_as3() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_veri", "as3");
+  }
+
+  public void testIntegrity_aip3_veri_io() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_veri", "io");
+  }
+
+  public void testIntegrity_aip3_veri_tu1() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_veri", "tu1");
+  }
+
+  public void testIntegrity_aip3_veri_tu2() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_veri", "tu2");
+  }
+
+  public void testIntegrity_aip3_veri_tu3() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_veri", "tu3");
+  }
+
+  public void testIntegrity_aip3_veri_tu4() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_syn", "tu4");
+  }
+
+  public void testIntegrity_aip5_syn_as1() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_syn", "as1");
+  }
+
+  public void testIntegrity_aip5_syn_as2() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_syn", "as2");
+  }
+
+  public void testIntegrity_aip5_syn_as3() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_syn", "as3");
+  }
+
+  public void testIntegrity_aip5_syn_io() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_syn", "io");
+  }
+
+  public void testIntegrity_aip5_syn_tu1() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_syn", "tu1");
+  }
+
+  public void testIntegrity_aip5_syn_tu2() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_syn", "tu2");
+  }
+
+  public void testIntegrity_aip5_syn_tu3() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_syn", "tu3");
+  }
+
+  public void testIntegrity_aip5_syn_tu4() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip3_syn", "tu4");
+  }
+
+  public void testIntegrity_aip5_veri_as1() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_veri", "as1");
+  }
+
+  public void testIntegrity_aip5_veri_as2() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_veri", "as2");
+  }
+
+  public void testIntegrity_aip5_veri_as3() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_veri", "as3");
+  }
+
+  public void testIntegrity_aip5_veri_io() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_veri", "io");
+  }
+
+  public void testIntegrity_aip5_veri_tu1() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_veri", "tu1");
+  }
+
+  public void testIntegrity_aip5_veri_tu2() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_veri", "tu2");
+  }
+
+  public void testIntegrity_aip5_veri_tu3() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_veri", "tu3");
+  }
+
+  public void testIntegrity_aip5_veri_tu4() throws Exception
+  {
+    testIntegrity("despot", "song_aip/aip5_veri", "tu4");
   }
 
   // #########################################################################
