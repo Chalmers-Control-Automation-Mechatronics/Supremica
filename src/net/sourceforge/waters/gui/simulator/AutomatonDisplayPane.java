@@ -396,7 +396,7 @@ public class AutomatonDisplayPane
           }
           if (possibleState.getPropositions().size() != 0)
           {
-            toolTipText += " marked as ";
+            toolTipText += ", marked as ";
             for (final EventProxy proposition : possibleState.getPropositions())
             {
               toolTipText += proposition.getName() + ", ";
@@ -431,9 +431,9 @@ public class AutomatonDisplayPane
               enabled = true;
           }
           if (enabled)
-            toolTipText += "currently enabled";
+            toolTipText += ", currently enabled";
           else
-            toolTipText += "currently disabled";
+            toolTipText += ", currently disabled";
           this.setToolTipText(toolTipText);
         }
       }

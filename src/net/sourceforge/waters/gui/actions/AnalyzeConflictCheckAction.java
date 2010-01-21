@@ -35,6 +35,6 @@ extends WatersAnalyzeAction
 
   protected String getSuccessDescription()
   {
-    return "is non-blocking";
+    return "is nonblocking";
   }
 }

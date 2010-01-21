@@ -33,7 +33,7 @@ public class AnalyzeControlLoopAction extends WatersAnalyzeAction
 
   protected String getSuccessDescription()
   {
-    return "is control loop free";
+    return "is control-loop free";
   }
 
   private static final long serialVersionUID = 2167516363996006935L;

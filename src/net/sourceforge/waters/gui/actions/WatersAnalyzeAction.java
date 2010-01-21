@@ -143,7 +143,7 @@ public abstract class WatersAnalyzeAction
 
     public void succeed()
     {
-      informationLabel.setText("Model " + des.getName() + " " + getSuccessDescription());
+      informationLabel.setText("Model " + des.getName() + " " + getSuccessDescription() + ".");
       cancelButton.setText("OK");
       cancelButton.removeActionListener(cancelButton.getActionListeners()[0]);
       cancelButton.addActionListener(new ActionListener(){
