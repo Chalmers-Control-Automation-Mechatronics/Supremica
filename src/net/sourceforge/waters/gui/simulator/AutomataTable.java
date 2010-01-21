@@ -13,6 +13,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -25,6 +26,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 class AutomataTable extends JTable
@@ -60,6 +62,30 @@ class AutomataTable extends JTable
     listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     getTableHeader().addMouseListener(new TableHeaderMouseListener());
     setShowGrid(!DISABLE_AUTOMATON_GRIDLINES);
+    this.addMouseMotionListener(new MouseMotionListener(){
+      public void mouseDragged(final MouseEvent e)
+      {
+        // Do nothing
+      }
+
+      public void mouseMoved(final MouseEvent e)
+      {
+        final int row = AutomataTable.this.rowAtPoint(e.getPoint());
+        final AutomatonProxy auto = AutomataTable.this.getModel().getAutomaton(row);
+        String toolTipText = "";
+        if (auto.getKind() == ComponentKind.PLANT){
+          toolTipText += "Plant " + auto.getName();
+        }
+        else
+        {
+          toolTipText += "Specification " + auto.getName();
+        }
+        if (mSimulation.changedLastStep(auto))
+          toolTipText += " has an event which was fired last step";
+        setToolTipText(toolTipText);
+      }
+
+    });
   }
 
 

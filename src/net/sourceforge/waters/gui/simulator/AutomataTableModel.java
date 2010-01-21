@@ -167,7 +167,7 @@ class AutomataTableModel
         row.add(aut.getName());
         row.add(getSimulation().getAutomatonActivityIcon(aut));
         final StateProxy currentState = getSimulation().getCurrentStates().get(aut);
-        row.add(getSimulation().getMarkingIcon(currentState, aut));
+        row.add(getSimulation().getMarkingIcon(currentState, aut, false));
         row.add(getSimulation().getCurrentStates().get(aut).getName());
         output.add(row);
       }
@@ -201,7 +201,7 @@ class AutomataTableModel
         row.add(aut.getName());
         row.add(getSimulation().getAutomatonActivityIcon(aut));
         final StateProxy currentState = getSimulation().getCurrentStates().get(aut);
-        row.add(getSimulation().getMarkingIcon(currentState, aut));
+        row.add(getSimulation().getMarkingIcon(currentState, aut, false));
         row.add(getSimulation().getCurrentStates().get(aut).getName());
         mRawData.set(indexToChange, row);
         this.fireTableRowsUpdated(indexToChange, indexToChange);

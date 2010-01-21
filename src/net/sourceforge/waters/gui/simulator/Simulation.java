@@ -203,21 +203,30 @@ public class Simulation implements ModelObserver, Observer
   }
 
   public Icon getMarkingIcon(final StateProxy state,
-                             final AutomatonProxy automaton)
+                             final AutomatonProxy automaton,
+                             final boolean drawAsEditor)
   {
-    final PropositionIcon.ColorInfo info = getMarkingColorInfo(state, automaton);
+    final PropositionIcon.ColorInfo info = getMarkingColorInfo(state, automaton, drawAsEditor);
     return info.getIcon();
   }
 
   public PropositionIcon.ColorInfo getMarkingColorInfo
-    (final StateProxy state, final AutomatonProxy automaton)
+    (final StateProxy state, final AutomatonProxy automaton, final boolean drawAsEditor)
   {
-    if (!hasPropositions(automaton)) {
+    if (!hasPropositions(automaton) && drawAsEditor) {
+      return PropositionIcon.getUnmarkedColors();
+    }
+    else if (!hasPropositions(automaton) && !drawAsEditor)
+    {
       return PropositionIcon.getDefaultMarkedColors();
     }
     final Collection<EventProxy> props = state.getPropositions();
-    if (props.isEmpty()) {
+    if (props.isEmpty() && drawAsEditor) {
       return PropositionIcon.getUnmarkedColors();
+    }
+    else if (props.isEmpty() && !drawAsEditor)
+    {
+      return PropositionIcon.getDefaultMarkedColors();
     } else {
       final Map<Proxy,SourceInfo> infomap = mModuleContainer.getSourceInfoMap();
       final int size = props.size();
@@ -397,16 +406,17 @@ public class Simulation implements ModelObserver, Observer
     mTrace = trace;
     Step locatedStep = null;
     boolean firstStep = true;
+    final TraceStepProxy lastStep = trace.getTraceSteps().get(trace.getTraceSteps().size() - 1);
     for (final TraceStepProxy tStep : trace.getTraceSteps()) // Travel through each trace step
     {
-      if (!firstStep)
+      locatedStep = null;
+      if (!firstStep && tStep != lastStep)
       {
         for (final Step step : mEnabledEvents) // Look for all possible Steps in the simulation
         {
           boolean isTheRightStep = true;
           if (step.getEvent() == tStep.getEvent()) // Check if the event name is right. If not, this is not the correct Step
           {
-            System.out.println("DEBUG: Event matched");
             for (final AutomatonProxy auto : this.mAllAutomatons.keySet())
             {
               if (step.getSource().get(auto) != null) // Check to see if the step is non-deterministic. If it is, then it is the correct Step
@@ -427,7 +437,6 @@ public class Simulation implements ModelObserver, Observer
           else
           {
             isTheRightStep = false;
-            System.out.println("Difference between " + step.getEvent() + " and " + tStep.getEvent());
           }
           if (isTheRightStep)
             locatedStep = step; // We have found the next instruction for the trace

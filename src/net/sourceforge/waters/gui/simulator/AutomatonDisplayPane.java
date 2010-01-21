@@ -670,7 +670,7 @@ public class AutomatonDisplayPane
       final Proxy orig = getOriginal(node);
       final StateProxy state = mStateMap.get(orig);
       if (state != null) {
-        return mSim.getMarkingColorInfo(state, mAutomaton);
+        return mSim.getMarkingColorInfo(state, mAutomaton, true);
       } else {
         // This state was a victim of compiler optimisation ..,
         return PropositionIcon.getUnmarkedColors();

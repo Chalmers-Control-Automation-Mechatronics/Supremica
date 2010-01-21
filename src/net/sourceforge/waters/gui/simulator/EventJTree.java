@@ -8,6 +8,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
@@ -28,6 +29,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -54,7 +56,6 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
-
     this.addMouseListener(new MouseAdapter(){
       public void mouseClicked(final MouseEvent e)
       {
@@ -135,6 +136,50 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
             mSim.step(dialog.getSelectedStep());
           }
         }
+      }
+    });
+    this.addMouseMotionListener(new MouseMotionListener(){
+      public void mouseMoved(final MouseEvent e)
+      {
+        final TreePath path = EventJTree.this.getClosestPathForLocation(e.getX(), e.getY());
+        final Object comp = path.getLastPathComponent();
+        if (EventProxy.class.isInstance(comp))
+        {
+          String toolTipText = "";
+          final EventProxy event = (EventProxy)comp;
+          if (event.getKind() == EventKind.CONTROLLABLE)
+          {
+            toolTipText += "Controllable";
+          }
+          else
+            toolTipText += "Uncontrollable";
+          toolTipText += " Event " + event.getName();
+          if (mSim.getBlocking(event).size() == 0)
+            toolTipText += " is enabled";
+          else
+            toolTipText += " is disabled";
+          setToolTipText(toolTipText);
+        }
+        else if (AutomatonProxy.class.isInstance(comp))
+        {
+          String toolTipText = "";
+          final AutomatonProxy auto = (AutomatonProxy)comp;
+          if (auto.getKind() == ComponentKind.PLANT){
+            toolTipText += "Plant " + auto.getName();
+          }
+          else
+          {
+            toolTipText += "Specification " + auto.getName();
+          }
+          if (mSim.changedLastStep(auto))
+            toolTipText += " has an event which was fired last step";
+          setToolTipText(toolTipText);
+        }
+      }
+
+      public void mouseDragged(final MouseEvent e)
+      {
+        // Do nothing
       }
     });
     this.addTreeWillExpandListener(new TreeWillExpandListener(){
@@ -372,7 +417,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
         StateProxy currentState;
         currentState = mSim.getCurrentStates().get(autoProxy);
         mAutomataStatusLabel.setText(currentState.getName());
-        mAutomataStatusLabel.setIcon(mSim.getMarkingIcon(currentState, autoProxy));
+        mAutomataStatusLabel.setIcon(mSim.getMarkingIcon(currentState, autoProxy, false));
         final int width = mPane.getWidth();
         final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));
         final int centerWidth = (width * automataColumnWidth[1] - 2 * noduleWidth * automataColumnWidth[1]) / (sum(automataColumnWidth));

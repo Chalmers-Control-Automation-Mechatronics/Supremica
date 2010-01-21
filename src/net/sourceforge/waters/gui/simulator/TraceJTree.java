@@ -8,6 +8,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -31,6 +32,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -138,6 +140,60 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
         {
           ((InitialState)event.getPath().getLastPathComponent()).expand(mSim);
           expandedNodes.add(-1);
+        }
+      }
+    });
+    this.addMouseMotionListener(new MouseMotionListener(){
+
+      public void mouseDragged(final MouseEvent e)
+      {
+        // Do nothing
+
+      }
+
+      public void mouseMoved(final MouseEvent e)
+      {
+        final TreePath path = TraceJTree.this.getClosestPathForLocation(e.getX(), e.getY());
+        final Object comp = path.getLastPathComponent();
+        if (EventBranchNode.class.isInstance(comp))
+        {
+          String toolTipText = "";
+          final EventProxy event = ((EventBranchNode)comp).getEvent();
+          if (event.getKind() == EventKind.CONTROLLABLE)
+          {
+            toolTipText += "Controllable";
+          }
+          else
+            toolTipText += "Uncontrollable";
+          toolTipText += " Event " + event.getName() + " was fired at time " + (((EventBranchNode)comp).getTime() + 1);
+          setToolTipText(toolTipText);
+        }
+        else if (AutomatonLeafNode.class.isInstance(comp))
+        {
+          String toolTipText = "";
+          final AutomatonProxy auto = ((AutomatonLeafNode)comp).getAutomata();
+          if (auto.getKind() == ComponentKind.PLANT){
+            toolTipText += "Plant " + auto.getName();
+          }
+          else
+          {
+            toolTipText += "Specification " + auto.getName();
+          }
+          if (InitialState.class.isInstance(path.getPathComponent(1)))
+          {
+            if (mSim.isNonControllableAtTime(-1).contains(auto))
+              toolTipText += " was causing a controllability problem";
+          }
+          else
+          {
+            if (mSim.isNonControllableAtTime(((EventBranchNode)path.getPathComponent(1)).getTime()).contains(auto))
+              toolTipText += " was causing a controllability problem";
+          }
+          setToolTipText(toolTipText);
+        }
+        else if (InitialState.class.isInstance(comp))
+        {
+          setToolTipText("The Initial State of the Simulation");
         }
       }
     });
@@ -310,7 +366,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
          StateProxy currentState;
          currentState = autoNode.getOverloadedState();
          mAutomataStatusLabel.setText(currentState.getName());
-         mAutomataStatusLabel.setIcon(mSim.getMarkingIcon(currentState, autoProxy));
+         mAutomataStatusLabel.setIcon(mSim.getMarkingIcon(currentState, autoProxy, false));
          final int width = mPane.getWidth();
          final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));
          final int centerWidth = (width * automataColumnWidth[1] - 2 * noduleWidth * automataColumnWidth[1]) / (sum(automataColumnWidth));
