@@ -226,25 +226,28 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           final TIntArrayList preds = mSyncProduct.getPredecessors(trace_start);
           final int pred = preds.get(0);
           final EventProxy event = mSyncProduct.findEvent(pred, trace_start);
-          final Map<AutomatonProxy,StateProxy> statemap =
-              new HashMap<AutomatonProxy,StateProxy>();
+          Map<AutomatonProxy,StateProxy> statemap = null;
 
-          final int[] decodedstate = new int[numaut];
-          final long state = mSyncProduct.getStateFromId(pred);
-          // Decode the state.
-          stateSchema.decodeState(state, decodedstate);
+          final int[] decodedSource = new int[numaut];
+          final int[] decodedTarget = new int[numaut];
+          final long srcstate = mSyncProduct.getStateFromId(pred);
+          final long targetstate = mSyncProduct.getStateFromId(trace_start);
+          stateSchema.decodeState(srcstate, decodedSource);
+          stateSchema.decodeState(targetstate, decodedTarget);
           for (int i = 0; i < automata.length; i++) {
             final int eventID = mEventMap.getId(event);
             final int[] targets =
-                automata[i].getSuccessorStates(decodedstate[i], eventID);
+                automata[i].getSuccessorStates(decodedSource[i], eventID);
             if (targets != null) {
               // If targets == null, we have a serious problem ...
-              for (final int target : targets) {
-                // *** BUG *** This tries to store all nondeterministic
-                // successors in the map; it should only store the right
-                // one, and only if there is a nondeterministic choice.
-                statemap.put(automata[i].getAutomatonProxy(), automata[i]
-                    .getStateProxyFromID(target));
+              if (targets.length > 1) {
+                for (final int target : targets) {
+                  if (target == decodedTarget[i]) {
+                    statemap = new HashMap<AutomatonProxy,StateProxy>();
+                    statemap.put(automata[i].getAutomatonProxy(), automata[i]
+                        .getStateProxyFromID(target));
+                  }
+                }
               }
             }
           }
@@ -264,6 +267,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
                                                 model.getAutomata(),
                                                 countertrace,
                                                 ConflictKind.CONFLICT);
+        System.out.println(trace);
         return setFailedResult(trace);
       }
 
