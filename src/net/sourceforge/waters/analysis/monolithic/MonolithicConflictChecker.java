@@ -226,7 +226,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           final TIntArrayList preds = mSyncProduct.getPredecessors(trace_start);
           final int pred = preds.get(0);
           final EventProxy event = mSyncProduct.findEvent(pred, trace_start);
-          Map<AutomatonProxy,StateProxy> statemap = null;
+          final Map<AutomatonProxy,StateProxy> statemap =
+              new HashMap<AutomatonProxy,StateProxy>();
 
           final int[] decodedSource = new int[numaut];
           final int[] decodedTarget = new int[numaut];
@@ -235,6 +236,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           stateSchema.decodeState(srcstate, decodedSource);
           stateSchema.decodeState(targetstate, decodedTarget);
           for (int i = 0; i < automata.length; i++) {
+
             final int eventID = mEventMap.getId(event);
             final int[] targets =
                 automata[i].getSuccessorStates(decodedSource[i], eventID);
@@ -243,7 +245,6 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
               if (targets.length > 1) {
                 for (final int target : targets) {
                   if (target == decodedTarget[i]) {
-                    statemap = new HashMap<AutomatonProxy,StateProxy>();
                     statemap.put(automata[i].getAutomatonProxy(), automata[i]
                         .getStateProxyFromID(target));
                   }
@@ -267,7 +268,6 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
                                                 model.getAutomata(),
                                                 countertrace,
                                                 ConflictKind.CONFLICT);
-        System.out.println(trace);
         return setFailedResult(trace);
       }
 
