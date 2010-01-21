@@ -12,7 +12,7 @@ public class DesktopCascadeAction extends WatersDesktopAction
   {
     super(ide);
 
-    putValue(Action.NAME, "Cascade Automata");
+    putValue(Action.NAME, "Layout Automata");
     putValue(Action.SHORT_DESCRIPTION, "Tile all the open windows, so that all are visible");
     setEnabled(true);
   }

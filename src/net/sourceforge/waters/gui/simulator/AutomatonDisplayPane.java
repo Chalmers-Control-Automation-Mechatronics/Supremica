@@ -61,10 +61,10 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.ForeachEventSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -372,23 +372,12 @@ public class AutomatonDisplayPane
   {
     if (mFocusedItem == null)
     {
-      String toolTipText = "";
-      if (mAutomaton.getKind() == ComponentKind.SPEC)
-        toolTipText += "Specification ";
-      else
-        toolTipText += "Plant ";
-      toolTipText += mAutomaton.getName();
-      if (mSim.changedLastStep(mAutomaton))
-        toolTipText += " contains a transition that has been executed";
-      if (mSim.isNonControllableAtTime(mSim.getCurrentTime()).contains(mAutomaton) && mSim.changedLastStep(mAutomaton))
-        toolTipText += " and";
-      if (mSim.isNonControllableAtTime(mSim.getCurrentTime()).contains(mAutomaton))
-        toolTipText += " has controllability problem in state " + mSim.getCurrentStates().get(mAutomaton).getName();
-      this.setToolTipText(toolTipText);
+      setToolTipText(null);
     }
     else
     {
       final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+      boolean foundState = false;
       for (final StateProxy possibleState : mAutomaton.getStates())
       {
         if (mFocusedItem == infomap.get(possibleState).getSourceObject())
@@ -396,25 +385,31 @@ public class AutomatonDisplayPane
           String toolTipText = "";
           if (possibleState.isInitial())
           {
-            toolTipText += "Initial state ";
+            toolTipText += "Initial state";
           }
-          toolTipText += possibleState.getName() + " ";
+          else
+            toolTipText += "State";
+          toolTipText += " " + possibleState.getName();
+          if (mSim.getCurrentStates().get(mAutomaton) == possibleState)
+          {
+            toolTipText += ", current state";
+          }
           if (possibleState.getPropositions().size() != 0)
           {
-            toolTipText += "marked as ";
+            toolTipText += " marked as ";
             for (final EventProxy proposition : possibleState.getPropositions())
             {
               toolTipText += proposition.getName() + ", ";
             }
             toolTipText = toolTipText.substring(0, toolTipText.length() - 2);
           }
-          if (mSim.getCurrentStates().get(mAutomaton) == possibleState)
-          {
-            toolTipText += ", current state";
-          }
-          toolTipText += ".";
           this.setToolTipText(toolTipText);
+          foundState = true;
         }
+      }
+      if (NodeProxy.class.isInstance(mFocusedItem) && !foundState)
+      {
+        setToolTipText("State " + ((NodeProxy)mFocusedItem).getName() + " has been removed due to optimisation");
       }
       for (final TransitionProxy trans : mAutomaton.getTransitions())
       {
@@ -436,9 +431,9 @@ public class AutomatonDisplayPane
               enabled = true;
           }
           if (enabled)
-            toolTipText += "currently enabled.";
+            toolTipText += "currently enabled";
           else
-            toolTipText += "currently disabled.";
+            toolTipText += "currently disabled";
           this.setToolTipText(toolTipText);
         }
       }
@@ -740,6 +735,19 @@ public class AutomatonDisplayPane
             if (subject.getAncestor(EdgeSubject.class) == mFocusedItem) {
               proxyIsSelected = true;
             }
+          }
+        }
+      }
+      else if (orig instanceof ForeachEventSubject)
+      {
+        if (orig == mFocusedItem) {
+          proxyIsSelected = true;
+        }
+        else
+        {
+          final AbstractSubject subject = (AbstractSubject) orig;
+          if (subject.getAncestor(EdgeSubject.class) == mFocusedItem) {
+            proxyIsSelected = true;
           }
         }
       }

@@ -12,7 +12,7 @@ public class DesktopShowAllAction extends WatersDesktopAction
   protected DesktopShowAllAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "Show All");
+    putValue(Action.NAME, "Show All Automata");
     putValue(Action.SHORT_DESCRIPTION, "Open all automata windows");
     setEnabled(true);
   }

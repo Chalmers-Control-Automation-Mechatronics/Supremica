@@ -396,49 +396,55 @@ public class Simulation implements ModelObserver, Observer
     reset();
     mTrace = trace;
     Step locatedStep = null;
+    boolean firstStep = true;
     for (final TraceStepProxy tStep : trace.getTraceSteps()) // Travel through each trace step
     {
-      for (final Step step : mEnabledEvents) // Look for all possible Steps in the simulation
+      if (!firstStep)
       {
-        boolean isTheRightStep = true;
-        if (step.getEvent() == tStep.getEvent()) // Check if the event name is right. If not, this is not the correct Step
+        for (final Step step : mEnabledEvents) // Look for all possible Steps in the simulation
         {
-          System.out.println("DEBUG: Event matched");
-          for (final AutomatonProxy auto : this.mAllAutomatons.keySet())
+          boolean isTheRightStep = true;
+          if (step.getEvent() == tStep.getEvent()) // Check if the event name is right. If not, this is not the correct Step
           {
-            if (step.getSource().get(auto) != null) // Check to see if the step is non-deterministic. If it is, then it is the correct Step
+            System.out.println("DEBUG: Event matched");
+            for (final AutomatonProxy auto : this.mAllAutomatons.keySet())
             {
-              if (tStep.getStateMap().get(auto) == null) // If there is no non-deterministic information, fail always
-                throw new IllegalArgumentException("No non-deterministic information available");
-              else if (step.getDest().get(auto) == tStep.getStateMap().get(auto)) // If the destinations match, then it is the right step
-                {
-                  isTheRightStep = true;
-                }
-                else
-                  isTheRightStep = false;
+              if (step.getSource().get(auto) != null) // Check to see if the step is non-deterministic. If it is, then it is the correct Step
+              {
+                if (tStep.getStateMap().get(auto) == null) // If there is no non-deterministic information, fail always
+                  throw new IllegalArgumentException("No non-deterministic information available");
+                else if (step.getDest().get(auto) == tStep.getStateMap().get(auto)) // If the destinations match, then it is the right step
+                  {
+                    isTheRightStep = true;
+                  }
+                  else
+                    isTheRightStep = false;
+              }
+              else
+                isTheRightStep = true;
             }
-            else
-              isTheRightStep = true;
+          }
+          else
+          {
+            isTheRightStep = false;
+            System.out.println("Difference between " + step.getEvent() + " and " + tStep.getEvent());
+          }
+          if (isTheRightStep)
+            locatedStep = step; // We have found the next instruction for the trace
+        }
+        if (locatedStep != null)
+        {
+          try {
+            step(locatedStep); // So fire it, and continue to the next one.
+          } catch (final NonDeterministicException exception) {
+            // Do nothing
           }
         }
         else
-        {
-          isTheRightStep = false;
-          System.out.println("Difference between " + step.getEvent() + " and " + tStep.getEvent());
-        }
-        if (isTheRightStep)
-          locatedStep = step; // We have found the next instruction for the trace
-      }
-      if (locatedStep != null)
-      {
-        try {
-          step(locatedStep); // So fire it, and continue to the next one.
-        } catch (final NonDeterministicException exception) {
-          // Do nothing
-        }
+          throw new IllegalArgumentException("No valid step could be found");
       }
       else
-        throw new IllegalArgumentException("No valid step could be found");
+        firstStep = false;
     }
     invalidated = false;
     final SimulationChangeEvent simEvent = new SimulationChangeEvent

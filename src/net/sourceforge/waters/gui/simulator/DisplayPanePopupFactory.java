@@ -6,6 +6,7 @@ import net.sourceforge.waters.gui.PopupFactory;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
@@ -103,6 +104,11 @@ public class DisplayPanePopupFactory extends PopupFactory
         popup.add(execute);
       }
     }
+    return null;
+  }
+
+  public Object visitForeachEventProxy(final ForeachEventProxy proxy)
+  {
     return null;
   }
 
