@@ -262,7 +262,6 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         countertrace.add(0, startPoint);
         final String modelname = model.getName();
         final String tracename = modelname + ":conflicting";
-        // final String comment =
         final ConflictTraceProxy trace =
             desFactory.createConflictTraceProxy(tracename, null, null, model,
                                                 model.getAutomata(),
