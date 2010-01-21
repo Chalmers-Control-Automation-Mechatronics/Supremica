@@ -236,14 +236,14 @@ public class DESpotImporterTest extends AbstractWatersTest
       throws Exception
   {
     testException("exception", "targetID_nonexist",
-                  WatersUnmarshalException.class, "targetID_nonexist");
+                  WatersUnmarshalException.class, "targetID_nonexist.des");
   }
 
   public void testException_nonexist_transitionSourceID_nonexist()
       throws Exception
   {
     testException("exception", "sourceID_nonexist",
-                  WatersUnmarshalException.class, "srcID_nonexist");
+                  WatersUnmarshalException.class, "srcID_nonexist.des");
   }
 
   // #########################################################################
