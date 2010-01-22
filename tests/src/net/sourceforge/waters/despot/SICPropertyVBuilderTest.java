@@ -329,6 +329,36 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testConflictChecker("despot", "song_aip/aip5_veri", "tu4", true);
   }
 
+  public void testConflictChecker_maip3_syn_as1() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/maip3_syn", "aip1", true);
+  }
+
+  public void testConflictChecker_maip3_syn_as2() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/maip3_syn", "aip2", true);
+  }
+
+  public void testConflictChecker_maip3_syn_as3() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/maip3_syn", "aip3", true);
+  }
+
+  public void testConflictChecker_maip3_veri_as1() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/maip3_veri", "aip1", true);
+  }
+
+  public void testConflictChecker_maip3_veri_as2() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/maip3_veri", "aip2", true);
+  }
+
+  public void testConflictChecker_maip3_veri_as3() throws Exception
+  {
+    testConflictChecker("despot", "song_aip/maip3_veri", "aip3", true);
+  }
+
   // SimpleManufacturingExample
   public void testIntegrity_Manuf_Cells() throws Exception
   {

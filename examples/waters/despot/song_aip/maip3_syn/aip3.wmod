@@ -1,0 +1,4012 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="aip3" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ASDwnAS1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ASDwnAS2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="CplMvInPalletIO:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="CplMvOutPalletIO:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="DetStnsUp:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="DoRprAS1:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="DoRprAS2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletCLTU1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletCLTU2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletCLTU3:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletCLTU4:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletELTU1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletELTU2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletELTU3:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletELTU4:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletOutIO:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletType1InIO:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletType2InIO:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="LibPalletTU1:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="LibPalletTU2:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="LibPalletTU3:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="LibPalletTU4:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="MvInPalletType1IO:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="MvInPalletType2IO:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="MvOutPalletIO:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletCLTU1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletCLTU2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletCLTU3:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletCLTU4:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletELTU1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletELTU2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletELTU3:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletELTU4:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletOutIO:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletType1InIO:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletType2InIO:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoTrnsfELTU1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoTrnsfELTU2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoTrnsfELTU3:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoTrnsfELTU4:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletRepdAS3:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletRlsdTU1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletRlsdTU2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletRlsdTU3:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletRlsdTU4:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ProcCplAS1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ProcCplAS2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ProcCplAS3:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ProcErrAS1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ProcErrAS2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ProcErrAS3:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcPalletAS1:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcPalletAS2:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcPalletAS3:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QPalletAtCLTU1:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QPalletAtCLTU2:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QPalletAtCLTU3:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QPalletAtCLTU4:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QPalletAtELTU1:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QPalletAtELTU2:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QPalletAtELTU3:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QPalletAtELTU4:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QPalletOutIO:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QPalletType1InIO:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QPalletType2InIO:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QStnUpAS1:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QStnUpAS2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="RobUpAS1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="RobUpAS2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="StnDwnAS1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="StnDwnAS2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="StnUpAS1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="StnUpAS2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TrnsfCplToCLTU1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TrnsfCplToCLTU2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TrnsfCplToCLTU3:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TrnsfCplToCLTU4:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TrnsfCplToELTU1:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TrnsfCplToELTU2:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TrnsfCplToELTU3:3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="TrnsfCplToELTU4:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfELToCLTU1:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfELToCLTU2:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfELToCLTU3:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfELToCLTU4:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfToEL3_1D:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfToEL3_2D:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfToEL3_BD:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfToEL3_Up:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfToELTU1:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfToELTU2:3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfToELTU4:3"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="finishpallets:3">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="startpallets:3">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="IntfAIP:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finishpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_ManageIO:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletOutIO:3"/>
+                            <SimpleIdentifier Name="NoPalletOutIO:3"/>
+                            <SimpleIdentifier Name="QPalletType1InIO:3"/>
+                            <SimpleIdentifier Name="QPalletType2InIO:3"/>
+                            <SimpleIdentifier Name="NoPalletType1InIO:3"/>
+                            <SimpleIdentifier Name="NoPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletOutIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvInPalletType1IO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvInPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvInPalletType2IO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvInPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_AltMvInTypes:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletType1InIO:3"/>
+                            <SimpleIdentifier Name="NoPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletType2InIO:3"/>
+                            <SimpleIdentifier Name="NoPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_ManageTU2:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtCLTU2:3"/>
+                            <SimpleIdentifier Name="QPalletAtELTU2:3"/>
+                            <SimpleIdentifier Name="NoPalletELTU2:3"/>
+                            <SimpleIdentifier Name="NoPalletCLTU2:3"/>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU2:3"/>
+                            <SimpleIdentifier Name="TrnsfToELTU2:3"/>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU2:3"/>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU2:3"/>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_OFProtEL22:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_OFProtEL21:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s01"/>
+                    <SimpleNode Name="s02"/>
+                    <SimpleNode Name="s11"/>
+                    <SimpleNode Name="s12"/>
+                    <SimpleNode Name="s21"/>
+                    <SimpleNode Name="s22"/>
+                    <SimpleNode Name="s31"/>
+                    <SimpleNode Name="s32"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                            <SimpleIdentifier Name="TrnsfToELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s01" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s02" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                            <SimpleIdentifier Name="TrnsfToELTU2:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                            <SimpleIdentifier Name="TrnsfToELTU2:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s21" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s22" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                            <SimpleIdentifier Name="LibPalletTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s32" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s01" Source="s01">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s01">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s02">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s01" Source="s02">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s01" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s02" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s21" Source="s21">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s21">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s21">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s22">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s21" Source="s22">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s22" Source="s22">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s22">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s31" Source="s31">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s31">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s21" Source="s31">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s31" Source="s32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s32" Source="s32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s22" Source="s32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_OFProtC2:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU1:3"/>
+                            <SimpleIdentifier Name="QPalletAtCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU1:3"/>
+                            <SimpleIdentifier Name="QPalletAtCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_ManageTU1:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtCLTU1:3"/>
+                            <SimpleIdentifier Name="QPalletAtELTU1:3"/>
+                            <SimpleIdentifier Name="NoPalletELTU1:3"/>
+                            <SimpleIdentifier Name="NoPalletCLTU1:3"/>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU1:3"/>
+                            <SimpleIdentifier Name="TrnsfToELTU1:3"/>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU1:3"/>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU1:3"/>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_OFProtEL12:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_OFProtEL11:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s01"/>
+                    <SimpleNode Name="s02"/>
+                    <SimpleNode Name="s11"/>
+                    <SimpleNode Name="s12"/>
+                    <SimpleNode Name="s21"/>
+                    <SimpleNode Name="s22"/>
+                    <SimpleNode Name="s31"/>
+                    <SimpleNode Name="s32"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                            <SimpleIdentifier Name="TrnsfToELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s01" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s02" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                            <SimpleIdentifier Name="TrnsfToELTU1:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                            <SimpleIdentifier Name="TrnsfToELTU1:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s21" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s22" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                            <SimpleIdentifier Name="LibPalletTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s32" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s01" Source="s01">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s01">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s02">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s01" Source="s02">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s01" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s02" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s21" Source="s21">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s21">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s21">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s22">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s21" Source="s22">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s22" Source="s22">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s22">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s31" Source="s31">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s31">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s21" Source="s31">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s31" Source="s32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s32" Source="s32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s22" Source="s32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_OFProtC1:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU4:3"/>
+                            <SimpleIdentifier Name="QPalletAtCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU4:3"/>
+                            <SimpleIdentifier Name="QPalletAtCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_DetWhichStnUp:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU3:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_2D:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU3:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_BD:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU3:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_1D:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU3:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_Up:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                            <SimpleIdentifier Name="QStnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                            <SimpleIdentifier Name="LibPalletTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DetStnsUp:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_HndlComEventsAS:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DetStnsUp:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoPalletCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoPalletCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                            <SimpleIdentifier Name="QStnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_ManageTU3:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtCLTU3:3"/>
+                            <SimpleIdentifier Name="QPalletAtELTU3:3"/>
+                            <SimpleIdentifier Name="NoPalletELTU3:3"/>
+                            <SimpleIdentifier Name="NoPalletCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DetStnsUp:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToEL3_Up:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_1D:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_2D:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_BD:3"/>
+                            <SimpleIdentifier Name="LibPalletTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_OFProtEL32:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_OFProtEL31:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s10"/>
+                    <SimpleNode Name="s11"/>
+                    <SimpleNode Name="s12"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s10" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToEL3_Up:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_1D:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_2D:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_BD:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToEL3_Up:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_1D:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_2D:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_BD:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToEL3_Up:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_1D:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_2D:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_BD:3"/>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                            <SimpleIdentifier Name="LibPalletTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_OFProtC3:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU2:3"/>
+                            <SimpleIdentifier Name="QPalletAtCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU2:3"/>
+                            <SimpleIdentifier Name="QPalletAtCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_ManageTU4:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU4:3"/>
+                            <SimpleIdentifier Name="NoPalletELTU4:3"/>
+                            <SimpleIdentifier Name="QPalletAtCLTU4:3"/>
+                            <SimpleIdentifier Name="NoPalletCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToELTU4:3"/>
+                            <SimpleIdentifier Name="LibPalletTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_OFProtEL42:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvInPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletType1InIO:3"/>
+                            <SimpleIdentifier Name="QPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvInPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletType1InIO:3"/>
+                            <SimpleIdentifier Name="QPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvInPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletType1InIO:3"/>
+                            <SimpleIdentifier Name="QPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_OFProtEL41:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s10"/>
+                    <SimpleNode Name="s11"/>
+                    <SimpleNode Name="s12"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s10" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="h_OFProtC4:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU3:3"/>
+                            <SimpleIdentifier Name="QPalletAtCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU3:3"/>
+                            <SimpleIdentifier Name="QPalletAtCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_ASStoreUpState_AS2:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_QueryPalletAtTU_TU2:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoPalletELTU2:3"/>
+                            <SimpleIdentifier Name="IsPalletELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU2:3"/>
+                            <SimpleIdentifier Name="NoPalletCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_CapEL22:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_CapEL21:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_CapC2:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_ASStoreUpState_AS1:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_QueryPalletAtTU_TU1:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoPalletELTU1:3"/>
+                            <SimpleIdentifier Name="IsPalletELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU1:3"/>
+                            <SimpleIdentifier Name="NoPalletCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_CapEL12:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_CapEL11:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_CapC1:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_QueryPalletAtTU_TU3:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoPalletELTU3:3"/>
+                            <SimpleIdentifier Name="IsPalletELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU3:3"/>
+                            <SimpleIdentifier Name="NoPalletCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_CapEL32:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_CapEL31:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_CapC3:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_QueryPalletAtTU_TU4:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletAtCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoPalletELTU4:3"/>
+                            <SimpleIdentifier Name="IsPalletELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU4:3"/>
+                            <SimpleIdentifier Name="NoPalletCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_CapEL42:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvInPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvInPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvInPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvInPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_CapEL41:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletOutIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletOutIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletOutIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletOutIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_CapC4:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_QueryPalletAtIO:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletOutIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletOutIO:3"/>
+                            <SimpleIdentifier Name="NoPalletOutIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                            <SimpleIdentifier Name="NoPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                            <SimpleIdentifier Name="NoPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_PalletType1In_syn:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s8"/>
+                    <SimpleNode Name="s9"/>
+                    <SimpleNode Name="s10"/>
+                    <SimpleNode Name="s11"/>
+                    <SimpleNode Name="s12"/>
+                    <SimpleNode Name="s13"/>
+                    <SimpleNode Name="s14"/>
+                    <SimpleNode Name="s15"/>
+                    <SimpleNode Name="s16"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s9" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s13" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s14" Source="s13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s15" Source="s14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s16" Source="s15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType1InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_PalletType2In_syn:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s8"/>
+                    <SimpleNode Name="s9"/>
+                    <SimpleNode Name="s10"/>
+                    <SimpleNode Name="s11"/>
+                    <SimpleNode Name="s12"/>
+                    <SimpleNode Name="s13"/>
+                    <SimpleNode Name="s14"/>
+                    <SimpleNode Name="s15"/>
+                    <SimpleNode Name="s16"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s9" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s13" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s14" Source="s13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s15" Source="s14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s16" Source="s15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletType2InIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_PalletOut_syn:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s8"/>
+                    <SimpleNode Name="s9"/>
+                    <SimpleNode Name="s10"/>
+                    <SimpleNode Name="s11"/>
+                    <SimpleNode Name="s12"/>
+                    <SimpleNode Name="s13"/>
+                    <SimpleNode Name="s14"/>
+                    <SimpleNode Name="s15"/>
+                    <SimpleNode Name="s16"/>
+                    <SimpleNode Name="s17"/>
+                    <SimpleNode Name="s18"/>
+                    <SimpleNode Name="s19"/>
+                    <SimpleNode Name="s20"/>
+                    <SimpleNode Name="s21"/>
+                    <SimpleNode Name="s22"/>
+                    <SimpleNode Name="s23"/>
+                    <SimpleNode Name="s24"/>
+                    <SimpleNode Name="s25"/>
+                    <SimpleNode Name="s26"/>
+                    <SimpleNode Name="s27"/>
+                    <SimpleNode Name="s28"/>
+                    <SimpleNode Name="s29"/>
+                    <SimpleNode Name="s30"/>
+                    <SimpleNode Name="s31"/>
+                    <SimpleNode Name="s32"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s9" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s12" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s13" Source="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s14" Source="s13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s15" Source="s14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s16" Source="s15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s17" Source="s16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s18" Source="s17">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s19" Source="s18">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s20" Source="s19">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s21" Source="s20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s22" Source="s21">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s23" Source="s22">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s24" Source="s23">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s25" Source="s24">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s26" Source="s25">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s27" Source="s26">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s28" Source="s27">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s29" Source="s28">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s30" Source="s29">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s31" Source="s30">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s32" Source="s31">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finishpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_IntfAssmbStn_AS2:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:3"/>
+                            <SimpleIdentifier Name="ProcErrAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwnAS2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_IntfAssmbStn_AS1:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:3"/>
+                            <SimpleIdentifier Name="ProcErrAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwnAS1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_IntfAssmbStn_AS3:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:3"/>
+                            <SimpleIdentifier Name="ProcErrAS3:3"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_IntfTU_TU2:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsdTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU2:3"/>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_IntfTU_TU1:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsdTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU1:3"/>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_IntfTU_TU3:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToEL3_Up:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_1D:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_2D:3"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_BD:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU3:3"/>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsdTU3:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_IntfTU_TU4:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsdTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCLTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU4:3"/>
+                            <SimpleIdentifier Name="TrnsfCplToELTU4:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="h_IntfIO:3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvInPalletType1IO:3"/>
+                            <SimpleIdentifier Name="MvInPalletType2IO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvInPalletIO:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

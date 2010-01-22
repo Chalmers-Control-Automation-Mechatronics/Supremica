@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="high" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="allow_exit"/>
+        <EventDecl Kind="CONTROLLABLE" Name="deposit_pallets"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finishpallets:1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finishpallets:2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finishpallets:3">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="label_written"/>
+        <EventDecl Kind="CONTROLLABLE" Name="new_pallets"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="package"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pallets_f_outbuf"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="pallets_fail"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pallets_pass"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ret_inbuf"/>
+        <EventDecl Kind="CONTROLLABLE" Name="startpallets:1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="startpallets:2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="startpallets:3">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="take_pallets"/>
+        <EventDecl Kind="CONTROLLABLE" Name="write_label"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="hh_inbuf">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_inbuf"/>
+                            <SimpleIdentifier Name="new_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_inbuf"/>
+                            <SimpleIdentifier Name="new_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startpallets:1"/>
+                            <SimpleIdentifier Name="startpallets:2"/>
+                            <SimpleIdentifier Name="startpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_inbuf"/>
+                            <SimpleIdentifier Name="new_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startpallets:1"/>
+                            <SimpleIdentifier Name="startpallets:2"/>
+                            <SimpleIdentifier Name="startpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_inbuf"/>
+                            <SimpleIdentifier Name="new_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startpallets:1"/>
+                            <SimpleIdentifier Name="startpallets:2"/>
+                            <SimpleIdentifier Name="startpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startpallets:1"/>
+                            <SimpleIdentifier Name="startpallets:2"/>
+                            <SimpleIdentifier Name="startpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="hh_outbuf">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startpallets:1"/>
+                            <SimpleIdentifier Name="startpallets:2"/>
+                            <SimpleIdentifier Name="startpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finishpallets:1"/>
+                            <SimpleIdentifier Name="finishpallets:2"/>
+                            <SimpleIdentifier Name="finishpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="startpallets:1"/>
+                            <SimpleIdentifier Name="startpallets:2"/>
+                            <SimpleIdentifier Name="startpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finishpallets:1"/>
+                            <SimpleIdentifier Name="finishpallets:2"/>
+                            <SimpleIdentifier Name="finishpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pallets_f_outbuf"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finishpallets:1"/>
+                            <SimpleIdentifier Name="finishpallets:2"/>
+                            <SimpleIdentifier Name="finishpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pallets_f_outbuf"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finishpallets:1"/>
+                            <SimpleIdentifier Name="finishpallets:2"/>
+                            <SimpleIdentifier Name="finishpallets:3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pallets_f_outbuf"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pallets_f_outbuf"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="hh_packbuf">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="deposit_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="deposit_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="deposit_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="deposit_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="hh_noblock">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pallets_pass"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pallets_pass"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pallets_pass"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pallets_pass"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="hh_packsys">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="allow_exit"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="hh_source">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="hh_sink">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="allow_exit"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="hh_testunit">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s5"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pallets_f_outbuf"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pallets_pass"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pallets_fail"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="deposit_pallets"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="write_label"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="label_written"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_inbuf"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <Instance ModuleName="aip1" Name="aip1">
+            <ParameterBinding Name=":accepting">
+                <SimpleIdentifier Name=":accepting"/>
+            </ParameterBinding>
+            <ParameterBinding Name="finishpallets:1">
+                <SimpleIdentifier Name="finishpallets:1"/>
+            </ParameterBinding>
+            <ParameterBinding Name="startpallets:1">
+                <SimpleIdentifier Name="startpallets:1"/>
+            </ParameterBinding>
+        </Instance>
+        <Instance ModuleName="aip2" Name="aip2">
+            <ParameterBinding Name=":accepting">
+                <SimpleIdentifier Name=":accepting"/>
+            </ParameterBinding>
+            <ParameterBinding Name="finishpallets:2">
+                <SimpleIdentifier Name="finishpallets:2"/>
+            </ParameterBinding>
+            <ParameterBinding Name="startpallets:2">
+                <SimpleIdentifier Name="startpallets:2"/>
+            </ParameterBinding>
+        </Instance>
+        <Instance ModuleName="aip3" Name="aip3">
+            <ParameterBinding Name=":accepting">
+                <SimpleIdentifier Name=":accepting"/>
+            </ParameterBinding>
+            <ParameterBinding Name="finishpallets:3">
+                <SimpleIdentifier Name="finishpallets:3"/>
+            </ParameterBinding>
+            <ParameterBinding Name="startpallets:3">
+                <SimpleIdentifier Name="startpallets:3"/>
+            </ParameterBinding>
+        </Instance>
+    </ComponentList>
+</Module>
