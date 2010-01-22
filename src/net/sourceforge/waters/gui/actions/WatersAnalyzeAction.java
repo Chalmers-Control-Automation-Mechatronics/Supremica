@@ -127,7 +127,9 @@ public abstract class WatersAnalyzeAction
           AnalyzerDialog.this.dispose();
         }
       });
-      final Border border = BorderFactory.createRaisedBevelBorder();
+      final Border outer = BorderFactory.createRaisedBevelBorder();
+      final Border inner = BorderFactory.createEmptyBorder(4, 4, 4, 4);
+      final Border border = BorderFactory.createCompoundBorder(outer, inner);
       topPanel.setBorder(border);
       bottomPanel.add(cancelButton, BorderLayout.WEST);
       topPanel.add(informationLabel, BorderLayout.NORTH);
@@ -256,7 +258,7 @@ public abstract class WatersAnalyzeAction
 
       public void componentResized(final ComponentEvent e)
       {
-        this.setPreferredSize(new Dimension(((int)parent.getSize().getWidth() - 20), (((int)parent.getSize().getHeight() * 2 / 3) - 20)));
+        this.setPreferredSize(new Dimension(((int)parent.getSize().getWidth()), (((int)parent.getSize().getHeight() * 2 / 3))));
       }
 
       public void componentShown(final ComponentEvent e)

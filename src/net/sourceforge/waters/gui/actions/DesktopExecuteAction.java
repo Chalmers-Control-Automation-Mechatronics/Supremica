@@ -15,8 +15,8 @@ public class DesktopExecuteAction extends WatersDesktopAction
   {
     super(ide);
     mAutomaton = autoToClose;
-    putValue(Action.NAME, "Execute");
-    putValue(Action.SHORT_DESCRIPTION, "Execute this instruction");
+    putValue(Action.NAME, "Execute Transition");
+    putValue(Action.SHORT_DESCRIPTION, "Execute this transition");
     setEnabled(true);
   }
 

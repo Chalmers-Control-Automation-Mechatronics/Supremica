@@ -5,13 +5,10 @@ import javax.swing.JPopupMenu;
 import net.sourceforge.waters.gui.PopupFactory;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.ForeachEventProxy;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 public class DisplayPanePopupFactory extends PopupFactory
 {
@@ -67,17 +64,6 @@ public class DisplayPanePopupFactory extends PopupFactory
     return null;
   }
 
-  public Object visitGuardActionBlockProxy(final GuardActionBlockProxy block)
-  {
-    // Never does anything... these are those conditional things on the side of edges
-    return null;
-  }
-
-  public Object visitLabelBlockProxy(final LabelBlockProxy block)
-  {
-    return null;
-  }
-
   public Object visitLabelGeometryProxy(final LabelGeometryProxy geo)
   {
     /*final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
@@ -86,12 +72,6 @@ public class DisplayPanePopupFactory extends PopupFactory
     return null;
   }
 
-  public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
-  {
-   // visitProxy(node);
-    // Node
-    return null;
-  }
   public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy proxy)
   {
     final WatersPopupActionManager master = getMaster();
@@ -107,7 +87,7 @@ public class DisplayPanePopupFactory extends PopupFactory
     return null;
   }
 
-  public Object visitForeachEventProxy(final ForeachEventProxy proxy)
+  public Object visitProxy(final Proxy proxy)
   {
     return null;
   }

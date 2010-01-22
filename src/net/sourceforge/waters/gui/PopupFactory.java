@@ -103,7 +103,6 @@ public abstract class PopupFactory
       } catch (final VisitorException exception) {
         throw exception.getRuntimeException();
       }
-      mPopupMenu.addSeparator();
     }
     addCommonMenuItems();
     mPopupMenu = null;
@@ -152,6 +151,9 @@ public abstract class PopupFactory
    */
   protected void addCommonMenuItems()
   {
+    if (mPopupMenu.getComponentCount() > 0) {
+      mPopupMenu.addSeparator();
+    }
     final IDEAction cut = mMaster.getCutAction();
     mPopupMenu.add(cut);
     final IDEAction copy = mMaster.getCopyAction();

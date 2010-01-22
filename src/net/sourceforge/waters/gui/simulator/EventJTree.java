@@ -6,8 +6,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
@@ -56,7 +56,8 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
-    this.addMouseListener(new MouseAdapter(){
+    factory = new EventTreePopupFactory(container.getIDE().getPopupActionManager());
+    this.addMouseListener(new MouseListener(){
       public void mouseClicked(final MouseEvent e)
       {
         if (e.getClickCount() == 2)
@@ -136,6 +137,26 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
             mSim.step(dialog.getSelectedStep());
           }
         }
+      }
+
+      public void mousePressed(final MouseEvent e)
+      {
+        factory.maybeShowPopup(EventJTree.this, e, (EventProxy)EventJTree.this.getPathForLocation(e.getX(), e.getY()).getLastPathComponent());
+      }
+
+      public void mouseEntered(final MouseEvent e)
+      {
+        // Do nothing
+      }
+
+      public void mouseExited(final MouseEvent e)
+      {
+        // Do nothing
+      }
+
+      public void mouseReleased(final MouseEvent e)
+      {
+        // Do nothing
       }
     });
     this.addMouseMotionListener(new MouseMotionListener(){
@@ -483,7 +504,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
   private final ArrayList<Pair<Boolean, Integer>> mSortingMethods;
   private final ArrayList<String> expandedNodes;
   private JScrollPane mPane;
-
+  private final EventTreePopupFactory factory;
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
   private static final int[] eventColumnWidth = {200, 20};

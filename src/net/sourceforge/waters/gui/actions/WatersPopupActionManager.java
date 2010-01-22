@@ -20,6 +20,7 @@ import javax.swing.JComponent;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -226,6 +227,11 @@ public class WatersPopupActionManager
   public IDEAction getDesktopCascadeAction()
   {
     return new DesktopCascadeAction(mIDE);
+  }
+
+  public IDEAction getEventExecuteAction(final EventProxy event)
+  {
+    return new EventExecuteAction(mIDE, event);
   }
 
   //#######################################################################
