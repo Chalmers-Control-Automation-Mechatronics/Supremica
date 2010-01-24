@@ -358,6 +358,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       mSourceBuffer = new int[numaut];
       mTargetBuffer = new int[numaut];
       mNondeterministicAutomata = new int[numaut];
+      System.out.println(model);
     }
 
     // #######################################################################
@@ -467,10 +468,10 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       // Decode the state.
       mStateSchema.decodeState(state, mSourceBuffer);
       final AutomatonSchema[] automata = mStateSchema.getOrdering();
-      int i = -1;
 
       // Explore transitions ...
       nextevent: for (int eventid = 0; eventid < mEventMap.size(); eventid++) {
+        int i = -1;
         for (int autid = 0; autid < automata.length; autid++) {
           final AutomatonSchema schema = automata[autid];
           final int src = mSourceBuffer[autid];
