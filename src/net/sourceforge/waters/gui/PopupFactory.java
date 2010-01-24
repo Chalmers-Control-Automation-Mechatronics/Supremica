@@ -18,14 +18,10 @@ import javax.swing.SwingUtilities;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-
 import org.supremica.util.VPopupMenu;
 
 
 public abstract class PopupFactory
-  extends AbstractModuleProxyVisitor
 {
 
   //#########################################################################
@@ -98,11 +94,7 @@ public abstract class PopupFactory
     if (proxy == null) {
       addDefaultMenuItems();
     } else {
-      try {
-        proxy.acceptVisitor(this);
-      } catch (final VisitorException exception) {
-        throw exception.getRuntimeException();
-      }
+      addItemSpecificMenuItems(proxy);
     }
     addCommonMenuItems();
     mPopupMenu = null;
@@ -133,13 +125,45 @@ public abstract class PopupFactory
   /**
    * Adds default menu items to the menu.
    * This method is called when creating a popup without any item under
-   * the cursor. Its items are inserted at the beginning of the menu,
-   * instead of any-specific actions.
+   * the cursor. Menu items are inserted at the beginning of the menu,
+   * instead of any item-specific actions, before the common menu items.
    */
   protected void addDefaultMenuItems()
   {
     final IDEAction delete = mMaster.getDeleteAction();
     mPopupMenu.add(delete);
+  }
+
+  /**
+   * Adds menu items for a specific object to the menu.
+   * This method is called when creating a popup without with the given
+   * <CODE>proxy</CODE> under the cursor. Menu items are inserted at the
+   * beginning of the menu, before the common menu items.
+   * This method can be overridden by subclasses to provided context-specific
+   * popup menus. The default implementation merely calls {@link
+   * #addPropertiesAndDeleteMenuItems(Proxy) addPropertiesAndDeleteMenuItems()}.
+   */
+  protected void addItemSpecificMenuItems(final Proxy proxy)
+  {
+    addPropertiesAndDeleteMenuItems(proxy);
+  }
+
+  /**
+   * Adds menu Properties and Delete menu items for the given
+   * <CODE>proxy</CODE>, provided that these actions are enabled.
+   * This is method is called by the default implementation of
+   * {@link #addItemSpecificMenuItems(Proxy) addItemSpecificMenuItems()}.
+   */
+  protected void addPropertiesAndDeleteMenuItems(final Proxy proxy)
+  {
+    final IDEAction props = mMaster.getPropertiesAction(proxy);
+    if (props.isEnabled()) {
+      mPopupMenu.add(props);
+    }
+    final IDEAction delete = mMaster.getDeleteAction(proxy);
+    if (delete.isEnabled()) {
+      mPopupMenu.add(delete);
+    }
   }
 
   /**
@@ -165,22 +189,6 @@ public abstract class PopupFactory
     mPopupMenu.add(select);
     final IDEAction deselect = mMaster.getDeselectAllAction();
     mPopupMenu.add(deselect);
-  }
-
-
-  //#######################################################################
-  //# Interface net.sourceforge.waters.model.base.ProxyVisitor
-  public Object visitProxy(final Proxy proxy)
-  {
-    final IDEAction props = mMaster.getPropertiesAction(proxy);
-    if (props.isEnabled()) {
-      mPopupMenu.add(props);
-    }
-    final IDEAction delete = mMaster.getDeleteAction(proxy);
-    if (delete.isEnabled()) {
-      mPopupMenu.add(delete);
-    }
-    return null;
   }
 
 

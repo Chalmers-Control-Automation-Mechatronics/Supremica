@@ -14,7 +14,6 @@ import javax.swing.JPopupMenu;
 
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 
 
 class EventDeclListPopupFactory
@@ -39,14 +38,6 @@ class EventDeclListPopupFactory
     popup.addSeparator();
     final IDEAction newevent = master.getInsertEventDeclAction();
     popup.add(newevent);
-  }
-
-
-  //#######################################################################
-  //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
-  public Object visitEventDeclProxy(final EventDeclProxy decl)
-  {
-    return visitProxy(decl);
   }
 
 }

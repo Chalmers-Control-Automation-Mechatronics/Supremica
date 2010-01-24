@@ -41,7 +41,6 @@ public abstract class WatersSimulationAction
   //# Interface net.sourceforge.waters.gui.observer.Observer
   public void update(final EditorChangedEvent event)
   {
-    System.out.println("DEBUG: Updated");
     switch (event.getKind()) {
     case CONTAINER_SWITCH:
     case MAINPANEL_SWITCH:

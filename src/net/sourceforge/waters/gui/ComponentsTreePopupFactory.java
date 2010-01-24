@@ -14,6 +14,9 @@ import javax.swing.JPopupMenu;
 
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -29,12 +32,22 @@ class ComponentsTreePopupFactory
                              final ModuleContext context)
   {
     super(master);
+    mVisitor = new ComponentsTreePopupVisitor();
     mContext = context;
   }
 
 
   //#########################################################################
   //# Shared Menu Items
+  protected void addItemSpecificMenuItems(final Proxy proxy)
+  {
+    try {
+      proxy.acceptVisitor(mVisitor);
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
+    }
+  }
+
   protected void addCommonMenuItems()
   {
     super.addCommonMenuItems();
@@ -50,33 +63,50 @@ class ComponentsTreePopupFactory
   }
 
 
-  //#######################################################################
-  //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
-  public Object visitInstanceProxy(final InstanceProxy inst)
+  //#########################################################################
+  //# Inner Class GraphPopupVisitor
+  private class ComponentsTreePopupVisitor
+    extends AbstractModuleProxyVisitor
   {
-    visitProxy(inst);
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
-    final String name = inst.getModuleName();
-    final ModuleProxy module = mContext.getModule();
-    final IDEAction gotomod = master.getGotoModuleAction(module, name);
-    popup.add(gotomod);
-    return null;
-  }
 
-  public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
-  {
-    visitProxy(comp);
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
-    final IDEAction editgraph = master.getShowGraphAction(comp);
-    popup.add(editgraph);
-    return null;
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    public Object visitProxy(final Proxy proxy)
+    {
+      addPropertiesAndDeleteMenuItems(proxy);
+      return null;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    public Object visitInstanceProxy(final InstanceProxy inst)
+    {
+      visitProxy(inst);
+      final WatersPopupActionManager master = getMaster();
+      final JPopupMenu popup = getPopup();
+      final String name = inst.getModuleName();
+      final ModuleProxy module = mContext.getModule();
+      final IDEAction gotomod = master.getGotoModuleAction(module, name);
+      popup.add(gotomod);
+      return null;
+    }
+
+    public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
+    {
+      visitProxy(comp);
+      final WatersPopupActionManager master = getMaster();
+      final JPopupMenu popup = getPopup();
+      final IDEAction editgraph = master.getShowGraphAction(comp);
+      popup.add(editgraph);
+      return null;
+    }
+
   }
 
 
   //#######################################################################
   //# Data Members
+  private final ComponentsTreePopupVisitor mVisitor;
   private final ModuleContext mContext;
 
 }

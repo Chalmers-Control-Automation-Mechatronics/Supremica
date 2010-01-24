@@ -30,22 +30,8 @@ class GraphEventPanelPopupFactory
 
 
   //#########################################################################
-  //# Shared Menu Items
-  protected void addDefaultMenuItems()
-  {
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
-    final IDEAction insert = master.getInsertEventLabelAction();
-    popup.add(insert);
-    final IDEAction delete = master.getDeleteAction();
-    popup.add(delete);
-    popup.addSeparator();
-  }
-
-
-  //#######################################################################
-  //# Interface net.sourceforge.waters.model.base.ProxyVisitor
-  public Object visitProxy(final Proxy proxy)
+  //# Menu Items
+  protected void addItemSpecificMenuItems(final Proxy proxy)
   {
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
@@ -55,7 +41,17 @@ class GraphEventPanelPopupFactory
     popup.add(insert);
     final IDEAction delete = master.getDeleteAction(proxy);
     popup.add(delete);
-    return null;
+  }
+
+  protected void addDefaultMenuItems()
+  {
+    final WatersPopupActionManager master = getMaster();
+    final JPopupMenu popup = getPopup();
+    final IDEAction insert = master.getInsertEventLabelAction();
+    popup.add(insert);
+    final IDEAction delete = master.getDeleteAction();
+    popup.add(delete);
+    popup.addSeparator();
   }
 
 }
