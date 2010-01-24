@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="MultiNondeterministicNonconflicting" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment></ns2:Comment>
+    <ns2:Comment>A test to check whether conflict checkers can handle models with multiple nondeterministic automata.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="e1"/>
@@ -74,7 +74,7 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="80" X="64"/>
+                            <Point Y="112" X="48"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
                             <Point Y="-5" X="-5"/>
@@ -101,7 +101,7 @@
                             <SimpleIdentifier Name="e1"/>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="51" X="139"/>
+                            <Point Y="65" X="125"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="S0" Source="S1">
@@ -109,7 +109,7 @@
                             <SimpleIdentifier Name="e2"/>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="106" X="142"/>
+                            <Point Y="125" X="139"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="S1" Source="S1">
@@ -122,6 +122,9 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="e2"/>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="35" X="58"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

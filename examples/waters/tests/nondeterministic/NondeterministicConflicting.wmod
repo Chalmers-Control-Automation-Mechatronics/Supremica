@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="NondeterministicConflicting" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment></ns2:Comment>
+    <ns2:Comment>A test to check whether conflict checkers can handle models with only one nondeterministic automaton.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="a1"/>
@@ -147,7 +147,7 @@
                     </SimpleNode>
                     <SimpleNode Name="S2">
                         <PointGeometry>
-                            <Point Y="176" X="208"/>
+                            <Point Y="160" X="208"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="10" X="0"/>
@@ -183,7 +183,7 @@
                             <SimpleIdentifier Name="a1"/>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="149" X="110"/>
+                            <Point Y="141" X="114"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="S0" Source="S3">

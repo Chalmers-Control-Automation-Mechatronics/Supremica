@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="MultiNondeterministicSepPlacesConflicting" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment></ns2:Comment>
+    <ns2:Comment>A test to check whether conflict checkers can handle models that are nondeterministic in separate states when the synchronous product is built.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="e1"/>
@@ -183,7 +183,7 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="96" X="224"/>
+                            <Point Y="112" X="224"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="10" X="0"/>
@@ -245,6 +245,9 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="34" X="255"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
