@@ -32,6 +32,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 class AutomataTable extends JTable
 {
 
+
   //#########################################################################
   //# Constructor
   AutomataTable(final Simulation sim, final AutomatonDesktopPane desktop)
@@ -62,6 +63,7 @@ class AutomataTable extends JTable
     listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     getTableHeader().addMouseListener(new TableHeaderMouseListener());
     setShowGrid(!DISABLE_AUTOMATON_GRIDLINES);
+    factory = new AutomatonTablePopupFactory(sim.getContainer().getIDE().getPopupActionManager(), mDesktop);
     this.addMouseMotionListener(new MouseMotionListener(){
       public void mouseDragged(final MouseEvent e)
       {
@@ -84,7 +86,6 @@ class AutomataTable extends JTable
           toolTipText += " has an event which was fired last step";
         setToolTipText(toolTipText);
       }
-
     });
   }
 
@@ -171,6 +172,18 @@ class AutomataTable extends JTable
       }
     }
 
+    public void mousePressed(final MouseEvent event)
+    {
+      AutomatonProxy triggerAuto = null;
+      final int row = rowAtPoint(event.getPoint());
+      if (row >= 0) {
+        final AutomataTableModel model = getModel();
+        triggerAuto = model.getAutomaton(row);
+      }
+      if (triggerAuto != null)
+        factory.maybeShowPopup(AutomataTable.this, event, triggerAuto);
+    }
+
   }
 
 
@@ -198,6 +211,7 @@ class AutomataTable extends JTable
   //# Data Members
   private final Simulation mSimulation;
   private final AutomatonDesktopPane mDesktop;
+  private final AutomatonTablePopupFactory factory;
 
 
   //#########################################################################

@@ -58,6 +58,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
     setAutoscrolls(true);
     setToggleClickCount(0);
     totalEventWidth = 0;
+    factory = new TraceTreePopupFactory(container.getIDE().getPopupActionManager(), desktop);
     for (final Integer intVal : eventColumnWidth)
     {
       totalEventWidth += intVal;
@@ -104,6 +105,26 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
               currentTime--;
             }
           }
+        }
+      }
+
+      public void mousePressed(final MouseEvent e)
+      {
+        final TreePath path = TraceJTree.this.getClosestPathForLocation((int)e.getPoint().getX(), (int)e.getPoint().getY());
+        final MutableTreeNode node = (MutableTreeNode)path.getLastPathComponent();
+        if (node == null)
+          return; // Nothing is selected
+        if (node instanceof EventBranchNode)
+        {
+          factory.maybeShowPopup(TraceJTree.this, e, null, ((EventBranchNode)node).getTime());
+        }
+        else if (node instanceof InitialState)
+        {
+          factory.maybeShowPopup(TraceJTree.this, e, null, -1);
+        }
+        else if (node instanceof AutomatonLeafNode)
+        {
+          factory.maybeShowPopup(TraceJTree.this, e, ((AutomatonLeafNode)node).getAutomata());
         }
       }
     });
@@ -438,6 +459,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
   private final ArrayList<String> automatonAreOpen;
   private JScrollPane mPane;
   private final ArrayList<Integer> expandedNodes;
+  private final TraceTreePopupFactory factory;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};

@@ -15,8 +15,9 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.ModuleContainer;
 
-public class EventExecuteAction extends WatersSimulationAction
+public class EventExecuteAction extends WatersAction
 {
 
   protected EventExecuteAction(final IDE ide, final EventProxy event)
@@ -26,6 +27,7 @@ public class EventExecuteAction extends WatersSimulationAction
     putValue(Action.NAME, "Execute Event");
     putValue(Action.SHORT_DESCRIPTION, "Execute an event");
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_STEP);
+    updateEnabledStatus();
   }
 
   public void actionPerformed(final ActionEvent e)
@@ -38,6 +40,11 @@ public class EventExecuteAction extends WatersSimulationAction
       }
     else
       System.out.println("ERROR: That event is blocked");
+  }
+
+  private Simulation getObservedSimulation()
+  {
+    return ((ModuleContainer)getIDE().getActiveDocumentContainer()).getSimulatorPanel().getSimulation();
   }
 
   private boolean eventCanBeFired(final Simulation sim, final EventProxy event)

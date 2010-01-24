@@ -12,7 +12,6 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Action;
@@ -56,7 +55,6 @@ public class SimulationStepAction
     if (panel != null) {
       final Simulation sim = getObservedSimulation();
       final List<Step> possibleEvents = sim.getValidTransitions();
-      Collections.sort(possibleEvents);
       if (possibleEvents.size() == 1) {
         try {
           sim.step(possibleEvents.get(0));

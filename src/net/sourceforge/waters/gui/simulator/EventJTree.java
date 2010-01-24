@@ -25,6 +25,7 @@ import javax.swing.tree.TreeSelectionModel;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -56,7 +57,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
-    factory = new EventTreePopupFactory(container.getIDE().getPopupActionManager());
+    factory = new EventTreePopupFactory(container.getIDE().getPopupActionManager(), mDesktop);
     this.addMouseListener(new MouseListener(){
       public void mouseClicked(final MouseEvent e)
       {
@@ -141,7 +142,10 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
 
       public void mousePressed(final MouseEvent e)
       {
-        factory.maybeShowPopup(EventJTree.this, e, (EventProxy)EventJTree.this.getPathForLocation(e.getX(), e.getY()).getLastPathComponent());
+        if (EventJTree.this.getPathForLocation(e.getX(), e.getY()) != null)
+        {
+          factory.maybeShowPopup(EventJTree.this, e, (Proxy)EventJTree.this.getPathForLocation(e.getX(), e.getY()).getLastPathComponent());
+        }
       }
 
       public void mouseEntered(final MouseEvent e)

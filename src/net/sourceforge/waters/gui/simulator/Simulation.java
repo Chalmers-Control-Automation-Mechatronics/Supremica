@@ -730,6 +730,7 @@ public class Simulation implements ModelObserver, Observer
         }
       }
     }
+    Collections.sort(mEnabledEvents);
     updateControllability(false);
     if (mBlockingEvents != null)
     {

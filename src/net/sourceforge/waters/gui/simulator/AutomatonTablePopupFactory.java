@@ -10,20 +10,18 @@ import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 
-class EventTreePopupFactory extends PopupFactory
+public class AutomatonTablePopupFactory extends PopupFactory
 {
 
   //#########################################################################
   //# Constructor
-  EventTreePopupFactory(final WatersPopupActionManager master, final AutomatonDesktopPane desktop)
+  AutomatonTablePopupFactory(final WatersPopupActionManager master, final AutomatonDesktopPane desktop)
   {
     super(master);
-    mSelectedEvent = null;
+    mSelectedAutomaton = null;
     mDesktop = desktop;
   }
-
 
   //#########################################################################
   //# Menu Items
@@ -31,12 +29,8 @@ class EventTreePopupFactory extends PopupFactory
                              final MouseEvent event,
                              final Proxy proxy)
   {
-    if (proxy instanceof EventProxy) {
-      mSelectedEvent = (EventProxy) proxy;
-      super.maybeShowPopup(invoker, event, proxy);
-    }
-    else if (proxy instanceof AutomatonProxy) {
-      mSelectedAutomata = (AutomatonProxy)proxy;
+    if (proxy instanceof AutomatonProxy) {
+      mSelectedAutomaton = (AutomatonProxy)proxy;
       super.maybeShowPopup(invoker, event, proxy);
     }
   }
@@ -55,12 +49,7 @@ class EventTreePopupFactory extends PopupFactory
   {
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
-    if (mSelectedEvent != null)
-    {
-      final IDEAction fireEvent = master.getEventExecuteAction(mSelectedEvent);
-      popup.add(fireEvent);
-    }
-    else if (mSelectedAutomata != null)
+    if (mSelectedAutomaton != null)
     {
 
       final IDEAction closeAll = master.getDesktopCloseAllAction();
@@ -69,18 +58,18 @@ class EventTreePopupFactory extends PopupFactory
       popup.add(showAll);
       final IDEAction cascade = master.getDesktopCascadeAction();
       popup.add(cascade);
-      if (mDesktop.automatonIsOpen(mSelectedAutomata))
+      if (mDesktop.automatonIsOpen(mSelectedAutomaton))
       {
-        final IDEAction closeOther = master.getDesktopCloseOtherAction(mSelectedAutomata);
+        final IDEAction closeOther = master.getDesktopCloseOtherAction(mSelectedAutomaton);
         popup.add(closeOther);
-        final IDEAction close = master.getDesktopCloseWindowAction(mSelectedAutomata);
+        final IDEAction close = master.getDesktopCloseWindowAction(mSelectedAutomaton);
         popup.add(close);
       }
       else
       {
-        final IDEAction openOther = master.getDesktopOpenOtherAction(mSelectedAutomata);
+        final IDEAction openOther = master.getDesktopOpenOtherAction(mSelectedAutomaton);
         popup.add(openOther);
-        final IDEAction open = master.getDesktopOpenWindowAction(mSelectedAutomata);
+        final IDEAction open = master.getDesktopOpenWindowAction(mSelectedAutomaton);
         popup.add(open);
       }
     }
@@ -89,8 +78,7 @@ class EventTreePopupFactory extends PopupFactory
 
   //#########################################################################
   //# Data Members
-  private EventProxy mSelectedEvent;
-  private AutomatonProxy mSelectedAutomata;
-  private final AutomatonDesktopPane mDesktop;
 
+  private AutomatonProxy mSelectedAutomaton;
+  private final AutomatonDesktopPane mDesktop;
 }

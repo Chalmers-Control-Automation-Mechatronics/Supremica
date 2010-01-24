@@ -10,18 +10,17 @@ import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 
-class EventTreePopupFactory extends PopupFactory
+public class TraceTreePopupFactory extends PopupFactory
 {
 
   //#########################################################################
   //# Constructor
-  EventTreePopupFactory(final WatersPopupActionManager master, final AutomatonDesktopPane desktop)
+  TraceTreePopupFactory(final WatersPopupActionManager master, final AutomatonDesktopPane desktop)
   {
     super(master);
-    mSelectedEvent = null;
     mDesktop = desktop;
+    mTime = -2;
   }
 
 
@@ -29,16 +28,25 @@ class EventTreePopupFactory extends PopupFactory
   //# Menu Items
   public void maybeShowPopup(final Component invoker,
                              final MouseEvent event,
+                             final Proxy proxy,
+                             final int time)
+  {
+    mTime = time;
+    maybeShowPopup(invoker, event, proxy);
+  }
+
+  public void maybeShowPopup(final Component invoker,
+                             final MouseEvent event,
                              final Proxy proxy)
   {
-    if (proxy instanceof EventProxy) {
-      mSelectedEvent = (EventProxy) proxy;
-      super.maybeShowPopup(invoker, event, proxy);
-    }
-    else if (proxy instanceof AutomatonProxy) {
+    if (mTime == -2 && !(proxy instanceof AutomatonProxy))
+      throw new UnsupportedOperationException("Do not call maybeShowPopup(Component, MouseEvent, EventProxy) directly, instead, call maybeShowPopup(Component, MouseEvent, EventProxy, int)");
+    if (proxy instanceof AutomatonProxy) {
       mSelectedAutomata = (AutomatonProxy)proxy;
       super.maybeShowPopup(invoker, event, proxy);
     }
+    else
+      super.maybeShowPopup(invoker, event, proxy);
   }
 
   protected void addDefaultMenuItems()
@@ -55,9 +63,9 @@ class EventTreePopupFactory extends PopupFactory
   {
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
-    if (mSelectedEvent != null)
+    if (mTime != -2)
     {
-      final IDEAction fireEvent = master.getEventExecuteAction(mSelectedEvent);
+      final IDEAction fireEvent = master.getTraceTravelAction(mTime);
       popup.add(fireEvent);
     }
     else if (mSelectedAutomata != null)
@@ -84,13 +92,15 @@ class EventTreePopupFactory extends PopupFactory
         popup.add(open);
       }
     }
+    mTime = -2;
+    mSelectedAutomata = null;
   }
 
 
   //#########################################################################
   //# Data Members
-  private EventProxy mSelectedEvent;
   private AutomatonProxy mSelectedAutomata;
   private final AutomatonDesktopPane mDesktop;
+  private int mTime;
 
 }

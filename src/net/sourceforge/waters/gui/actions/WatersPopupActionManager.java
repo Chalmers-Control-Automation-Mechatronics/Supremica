@@ -204,6 +204,11 @@ public class WatersPopupActionManager
     return new DesktopCloseWindowAction(mIDE, auto);
   }
 
+  public IDEAction getDesktopOpenWindowAction(final AutomatonProxy auto)
+  {
+    return new DesktopOpenWindowAction(mIDE, auto);
+  }
+
   public IDEAction getDesktopExecuteAction(final AutomatonProxy automaton)
   {
     return new DesktopExecuteAction(mIDE, automaton);
@@ -217,6 +222,11 @@ public class WatersPopupActionManager
   public IDEAction getDesktopCloseOtherAction(final AutomatonProxy automaton)
   {
     return new DesktopCloseOtherAction(mIDE, automaton);
+  }
+
+  public IDEAction getDesktopOpenOtherAction(final AutomatonProxy automaton)
+  {
+    return new DesktopOpenOtherAction(mIDE, automaton);
   }
 
   public IDEAction getDesktopShowAllAction()
@@ -234,7 +244,15 @@ public class WatersPopupActionManager
     return new EventExecuteAction(mIDE, event);
   }
 
+  public IDEAction getTraceTravelAction(final int time)
+  {
+    return new TraceTravelAction(mIDE, time);
+  }
+
   //#######################################################################
   //# Data Members
   private final IDE mIDE;
+
+
+
 }

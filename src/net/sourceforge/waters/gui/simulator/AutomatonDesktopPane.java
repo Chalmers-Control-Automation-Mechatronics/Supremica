@@ -3,6 +3,8 @@ package net.sourceforge.waters.gui.simulator;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyVetoException;
@@ -42,9 +44,38 @@ public class AutomatonDesktopPane
     mSim = sim;
     mContainer = container;
     observers = new HashSet<InternalFrameObserver>();
+    factory = new DesktopPanePopupFactory(container.getIDE().getPopupActionManager());
     setBackground(EditorColor.BACKGROUNDCOLOR);
     sim.attach(this);
     container.attach(this);
+    this.addMouseListener(new MouseListener(){
+
+      public void mouseClicked(final MouseEvent e)
+      {
+        // Do nothing
+      }
+
+      public void mouseEntered(final MouseEvent e)
+      {
+        // Do nothing
+      }
+
+      public void mouseExited(final MouseEvent e)
+      {
+        // Do nothing
+      }
+
+      public void mousePressed(final MouseEvent e)
+      {
+        factory.maybeShowPopup(AutomatonDesktopPane.this, e, null);
+      }
+
+      public void mouseReleased(final MouseEvent e)
+      {
+        // Do nothing
+      }
+
+    });
   }
 
 
@@ -212,6 +243,14 @@ public class AutomatonDesktopPane
         openAutomaton.get(string).dispose();
   }
 
+  public void openOtherAutomaton(final String name)
+  {
+    final List<AutomatonProxy> otherAutomata = mSim.getAutomata();
+    for (final AutomatonProxy auto : otherAutomata)
+      if (name.compareTo(auto.getName()) != 0)
+        addAutomaton(auto.getName(), mContainer, mSim, 2);
+  }
+
   public void showAllAutomata()
   {
     for (final AutomatonProxy automata : mSim.getAutomata())
@@ -316,15 +355,11 @@ public class AutomatonDesktopPane
   private final Simulation mSim;
   private final ModuleContainer mContainer;
   private final Set<InternalFrameObserver> observers;
+  private final DesktopPanePopupFactory factory;
 
   //#########################################################################
   //# Class Constants
 
   private static final double SCREENS_TOO_CLOSE = 3;
   private static final long serialVersionUID = -5528014241244952875L;
-
-
-
-
-
 }
