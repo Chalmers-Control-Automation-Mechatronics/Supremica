@@ -240,17 +240,17 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
             final int eventID = mEventMap.getId(event);
             final int[] targets =
                 automata[i].getSuccessorStates(decodedSource[i], eventID);
-            if (targets != null) {
-              // If targets == null, we have a serious problem ...
-              if (targets.length > 1) {
-                for (final int target : targets) {
-                  if (target == decodedTarget[i]) {
-                    statemap.put(automata[i].getAutomatonProxy(), automata[i]
-                        .getStateProxyFromID(target));
-                  }
+            assert targets != null : "Every state of a counterexample trace must have atleast one successor state";
+            // If targets == null, we have a serious problem ...
+            if (targets.length > 1) {
+              for (final int target : targets) {
+                if (target == decodedTarget[i]) {
+                  statemap.put(automata[i].getAutomatonProxy(), automata[i]
+                      .getStateProxyFromID(target));
                 }
               }
             }
+
           }
           final TraceStepProxy traceStep =
               desFactory.createTraceStepProxy(event, statemap);
@@ -358,7 +358,6 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       mSourceBuffer = new int[numaut];
       mTargetBuffer = new int[numaut];
       mNondeterministicAutomata = new int[numaut];
-      System.out.println(model);
     }
 
     // #######################################################################
