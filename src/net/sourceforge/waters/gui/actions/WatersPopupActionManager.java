@@ -239,6 +239,21 @@ public class WatersPopupActionManager
     return new DesktopCascadeAction(mIDE);
   }
 
+  public IDEAction getResizeAllAction()
+  {
+    return new DesktopResizeAllAction(mIDE);
+  }
+
+  public IDEAction getResizeAction(final AutomatonProxy automaton)
+  {
+    return new DesktopOriginalSizeAction(mIDE, automaton);
+  }
+
+  public IDEAction getResizeOtherAction(final AutomatonProxy automaton)
+  {
+    return new DesktopOriginalSizeOtherAction(mIDE, automaton);
+  }
+
   public IDEAction getEventExecuteAction(final EventProxy event)
   {
     return new EventExecuteAction(mIDE, event);
@@ -252,7 +267,4 @@ public class WatersPopupActionManager
   //#######################################################################
   //# Data Members
   private final IDE mIDE;
-
-
-
 }

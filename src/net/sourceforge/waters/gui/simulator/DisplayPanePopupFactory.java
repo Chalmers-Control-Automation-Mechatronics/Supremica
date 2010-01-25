@@ -22,11 +22,13 @@ class DisplayPanePopupFactory
   //#########################################################################
   //# Constructor
   DisplayPanePopupFactory(final WatersPopupActionManager master,
-                          final AutomatonDisplayPane displayPane)
+                          final AutomatonDisplayPane displayPane,
+                          final AutomatonDesktopPane desktopPane)
   {
     super(master);
     mVisitor = new DisplayPanePopupVisitor();
     mDisplayPane = displayPane;
+    mDesktopPane = desktopPane;
   }
 
 
@@ -56,12 +58,27 @@ class DisplayPanePopupFactory
     popup.add(showAll);
     final IDEAction cascade = master.getDesktopCascadeAction();
     popup.add(cascade);
+    if (mDesktopPane.canResizeAll())
+    {
+      final IDEAction resizeAll = master.getResizeAllAction();
+      popup.add(resizeAll);
+    }
     if (mDisplayPane != null) {
       final AutomatonProxy aut = mDisplayPane.getAutomaton();
       final IDEAction closeOther = master.getDesktopCloseOtherAction(aut);
       popup.add(closeOther);
       final IDEAction close = master.getDesktopCloseWindowAction(aut);
       popup.add(close);
+      if (mDesktopPane.canResize(aut.getName()))
+      {
+        final IDEAction resize = master.getResizeAction(aut);
+        popup.add(resize);
+      }
+      if (mDesktopPane.canResizeOther(aut.getName()))
+      {
+        final IDEAction resizeOther = master.getResizeOtherAction(aut);
+        popup.add(resizeOther);
+      }
     }
   }
 
@@ -127,5 +144,6 @@ class DisplayPanePopupFactory
   //# Data Members
   private final ModuleProxyVisitor mVisitor;
   private final AutomatonDisplayPane mDisplayPane;
+  private final AutomatonDesktopPane mDesktopPane;
 
 }

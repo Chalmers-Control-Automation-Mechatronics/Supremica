@@ -280,6 +280,76 @@ public class AutomatonDesktopPane
     }
   }
 
+  public void resizeAutomaton(final String name)
+  {
+    final AutomatonInternalFrame thisAutomaton = openAutomaton.get(name);
+    if (thisAutomaton != null && canResize(name))
+    {
+      thisAutomaton.resize();
+    }
+  }
+
+  public void resizeOther(final String name)
+  {
+    if (canResizeOther(name))
+    {
+      for (final AutomatonInternalFrame frame : openAutomaton.values())
+      {
+        if (frame.getTitle() != name && canResize(frame.getTitle()))
+        {
+          frame.resize();
+        }
+      }
+    }
+  }
+
+  public void resizeAllAutomaton()
+  {
+    if (canResizeAll())
+    {
+      for (final AutomatonInternalFrame frame : openAutomaton.values())
+      {
+        if (canResize(frame.getTitle()))
+        {
+          frame.resize();
+        }
+      }
+    }
+  }
+
+  public boolean canResize(final String name)
+  {
+    final AutomatonInternalFrame thisAutomaton = openAutomaton.get(name);
+    if (thisAutomaton != null)
+      return thisAutomaton.canResize();
+    else
+      return false;
+  }
+
+  public boolean canResizeAll()
+  {
+    for (final AutomatonInternalFrame frame : openAutomaton.values())
+    {
+      if (canResize(frame.getTitle()))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean canResizeOther(final String name)
+  {
+    for (final AutomatonInternalFrame frame : openAutomaton.values())
+    {
+      if (frame.getTitle() != name && canResize(frame.getTitle()))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   //#########################################################################
   //# Dealing with attached InternalFrameObservers
 

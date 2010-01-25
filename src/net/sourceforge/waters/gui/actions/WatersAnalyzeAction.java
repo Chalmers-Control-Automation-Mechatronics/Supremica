@@ -115,7 +115,7 @@ public abstract class WatersAnalyzeAction
       this.setTitle(getCheckName() + " Check");
       topPanel = new JPanel();
       bottomPanel = new JPanel();
-      informationLabel = new WrapperLabel(this);
+      informationLabel = new WrapperLabel(topPanel);
       //informationLabel = new JLabel();
       informationLabel.setText(getCheckName() + " Check is running...");
       informationLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -221,17 +221,19 @@ public abstract class WatersAnalyzeAction
 
     private class WrapperLabel extends JLabel implements ComponentListener
     {
+
       // ######################################################################
       // # Constructor
 
-      public WrapperLabel(final AnalyzerDialog parent)
+      public WrapperLabel(final JPanel parent)
       {
         super();
         this.parent = parent;
         parent.addComponentListener(this);
+        this.componentResized(null);
       }
       @SuppressWarnings("unused")
-      public WrapperLabel(final String e, final AnalyzerDialog parent)
+      public WrapperLabel(final String e, final JPanel parent)
       {
         super(HTMLinize(e));
         this.parent = parent;
@@ -258,7 +260,8 @@ public abstract class WatersAnalyzeAction
 
       public void componentResized(final ComponentEvent e)
       {
-        this.setPreferredSize(new Dimension(((int)parent.getSize().getWidth()), (((int)parent.getSize().getHeight() * 2 / 3))));
+        System.out.println("DEBUG: Difference in height between panel and dialog box is " + (AnalyzerDialog.this.getSize().getHeight() - parent.getSize().getHeight()));
+        this.setPreferredSize(new Dimension(((int)parent.getSize().getWidth()), (((int)parent.getSize().getHeight() - TITLEBAR_HEIGHT))));
       }
 
       public void componentShown(final ComponentEvent e)
@@ -269,10 +272,12 @@ public abstract class WatersAnalyzeAction
       // #####################################################################
       // # Data Members
 
-      private final AnalyzerDialog parent;
+      private final JPanel parent;
 
       // #####################################################################
       // # Class Constants
+
+      private static final int TITLEBAR_HEIGHT = 30;
       private static final long serialVersionUID = -6693747793242415495L;
     }
 

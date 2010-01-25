@@ -519,7 +519,7 @@ public class Simulation implements ModelObserver, Observer
           }
         }
       }
-      mPreviousAutomatonStates.add(Collections.unmodifiableMap(mAllAutomatons));
+      mPreviousAutomatonStates.add(hardCopy(mAllAutomatons));
       mPreviousEnabledLastStep.add(mEnabledLastStep);
       currentTime++;
     }
@@ -529,6 +529,17 @@ public class Simulation implements ModelObserver, Observer
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
   }
+
+  private Map<AutomatonProxy,StateProxy> hardCopy(final Map<AutomatonProxy,StateProxy> copy)
+  {
+    final HashMap<AutomatonProxy,StateProxy> output = new HashMap<AutomatonProxy, StateProxy>();
+    for (final AutomatonProxy auto : copy.keySet())
+    {
+      output.put(auto, copy.get(auto));
+    }
+    return output;
+  }
+
 
   public void stepBack()
   {
@@ -916,7 +927,7 @@ public class Simulation implements ModelObserver, Observer
     }
     else
     {
-      mAllAutomatons = Collections.unmodifiableMap(mPreviousAutomatonStates.get(currentTime));
+      mAllAutomatons = hardCopy(mPreviousAutomatonStates.get(currentTime));
       mEnabledLastStep = (ArrayList<AutomatonProxy>)mPreviousEnabledLastStep.get(currentTime).clone();
       findEventClassification();
     }

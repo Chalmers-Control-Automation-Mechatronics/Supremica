@@ -1,6 +1,7 @@
 package net.sourceforge.waters.gui.simulator;
 
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
@@ -9,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 
+import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 
@@ -114,6 +116,11 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
     }
   }
 
+  public JDesktopPane getDesktopPane()
+  {
+    return mParent;
+  }
+
   /**
    * Stores the current position of the window as a reference frame for
    * aspect-preserving resizing. Also calculates the size of the window
@@ -137,6 +144,24 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
   public void execute()
   {
     mDisplayPane.execute();
+  }
+
+  public void resize()
+  {
+    if (canResize())
+    {
+      final Rectangle2D size = mDisplayPane.getMinimumBoundingRectangle();
+      mDisplayPane.setSize(new Dimension((int)size.getX(), (int)size.getY()));
+    }
+    this.pack();
+    this.repaint();
+  }
+
+  public boolean canResize()
+  {
+    System.out.println("DEBUG: Difference is : " + (mDisplayPane.getSize().getHeight() - mDisplayPane.getMinimumBoundingRectangle().getHeight()));
+    return (Math.abs(mDisplayPane.getSize().getHeight() - mDisplayPane.getMinimumBoundingRectangle().getHeight()) > 3
+            && Math.abs(mDisplayPane.getSize().getWidth() - mDisplayPane.getMinimumBoundingRectangle().getWidth()) > 3);
   }
 
   // ###########################################################################
