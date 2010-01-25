@@ -214,6 +214,11 @@ public class WatersPopupActionManager
     return new DesktopExecuteAction(mIDE, automaton);
   }
 
+  public IDEAction getDesktopEditAction(final AutomatonProxy aut)
+  {
+    return new DesktopEditAction(mIDE, aut);
+  }
+
   public IDEAction getDesktopCloseAllAction()
   {
     return new DesktopCloseAllAction(mIDE);
@@ -267,4 +272,5 @@ public class WatersPopupActionManager
   //#######################################################################
   //# Data Members
   private final IDE mIDE;
+
 }

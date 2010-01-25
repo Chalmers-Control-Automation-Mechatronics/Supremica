@@ -7,7 +7,6 @@ import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
@@ -52,34 +51,7 @@ class DisplayPanePopupFactory
   {
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
-    final IDEAction closeAll = master.getDesktopCloseAllAction();
-    popup.add(closeAll);
-    final IDEAction showAll = master.getDesktopShowAllAction();
-    popup.add(showAll);
-    final IDEAction cascade = master.getDesktopCascadeAction();
-    popup.add(cascade);
-    if (mDesktopPane.canResizeAll())
-    {
-      final IDEAction resizeAll = master.getResizeAllAction();
-      popup.add(resizeAll);
-    }
-    if (mDisplayPane != null) {
-      final AutomatonProxy aut = mDisplayPane.getAutomaton();
-      final IDEAction closeOther = master.getDesktopCloseOtherAction(aut);
-      popup.add(closeOther);
-      final IDEAction close = master.getDesktopCloseWindowAction(aut);
-      popup.add(close);
-      if (mDesktopPane.canResize(aut.getName()))
-      {
-        final IDEAction resize = master.getResizeAction(aut);
-        popup.add(resize);
-      }
-      if (mDesktopPane.canResizeOther(aut.getName()))
-      {
-        final IDEAction resizeOther = master.getResizeOtherAction(aut);
-        popup.add(resizeOther);
-      }
-    }
+    AutomatonPopupFactory.setPopup(popup, master, mDesktopPane, mDisplayPane.getAutomaton());
   }
 
 
@@ -109,6 +81,7 @@ class DisplayPanePopupFactory
           final IDEAction execute =
             master.getDesktopExecuteAction(mDisplayPane.getAutomaton());
           popup.add(execute);
+          popup.addSeparator();
         }
       }
       return null;
@@ -132,6 +105,7 @@ class DisplayPanePopupFactory
           final IDEAction execute =
             master.getDesktopExecuteAction(mDisplayPane.getAutomaton());
           popup.add(execute);
+          popup.addSeparator();
         }
       }
       return null;

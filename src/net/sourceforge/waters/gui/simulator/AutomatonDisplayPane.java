@@ -55,6 +55,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -65,7 +66,9 @@ import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.ForeachEventSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -261,9 +264,16 @@ public class AutomatonDisplayPane
         return edge;
       }
     }
-    //for (final NodeProxy node : graph.getNodes())
+    for (final NodeProxy node : graph.getNodes())
     {
-      // Find LabelGeometryProxies and add tooltips / hover-over graphics
+      if (node instanceof SimpleNodeProxy)
+      {
+        final SimpleNodeProxy sNode = (SimpleNodeProxy)node;
+        final LabelGeometryProxy label = sNode.getLabelGeometry();
+        final ProxyShape shape = producer.getShape(label);
+        if (shape.isClicked(x, y))
+          return node;
+      }
     }
     return null;
   }
@@ -297,7 +307,7 @@ public class AutomatonDisplayPane
       boolean foundState = false;
       for (final StateProxy possibleState : mAutomaton.getStates())
       {
-        if (!(mFocusedItem instanceof SimpleNodeProxy))
+        if (mFocusedItem instanceof GroupNodeProxy)
           return;
         if (mFocusedItem == infomap.get(possibleState).getSourceObject())
         {
@@ -326,7 +336,7 @@ public class AutomatonDisplayPane
           foundState = true;
         }
       }
-      if (NodeProxy.class.isInstance(mFocusedItem) && !foundState)
+      if (mFocusedItem instanceof StateProxy && !foundState)
       {
         setToolTipText("State " + ((NodeProxy)mFocusedItem).getName() + " has been removed due to optimisation");
       }
@@ -615,9 +625,6 @@ public class AutomatonDisplayPane
         if (infomap.get(currentState).getSourceObject() == orig) {
           proxyIsActive = true;
         }
-        if (isEnabled(orig)) {
-          proxyIsEnabled = true;
-        }
         if (mFocusedItem != null)
         {
           if (orig == mFocusedItem) {
@@ -672,9 +679,21 @@ public class AutomatonDisplayPane
       }
       else if (orig instanceof LabelGeometryProxy)
       {
-        if (orig == mFocusedItem)
+        if (mFocusedItem instanceof SimpleNodeProxy)
         {
-          proxyIsSelected = true;
+          final LabelGeometryProxy label = ((SimpleNodeProxy)mFocusedItem).getLabelGeometry();
+          if (orig == label)
+          {
+            proxyIsSelected = true;
+          }
+        }
+        if (orig instanceof LabelGeometrySubject)
+        {
+          final SimpleNodeSubject parent = (SimpleNodeSubject)(((LabelGeometrySubject)orig).getParent());
+          final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+          final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
+          if (infomap.get(currentState).getSourceObject() == parent)
+            proxyIsActive = true;
         }
       }
       return getRawRenderingInformation

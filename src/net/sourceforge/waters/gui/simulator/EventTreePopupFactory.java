@@ -62,27 +62,7 @@ class EventTreePopupFactory extends PopupFactory
     }
     else if (mSelectedAutomata != null)
     {
-
-      final IDEAction closeAll = master.getDesktopCloseAllAction();
-      popup.add(closeAll);
-      final IDEAction showAll = master.getDesktopShowAllAction();
-      popup.add(showAll);
-      final IDEAction cascade = master.getDesktopCascadeAction();
-      popup.add(cascade);
-      if (mDesktop.automatonIsOpen(mSelectedAutomata))
-      {
-        final IDEAction closeOther = master.getDesktopCloseOtherAction(mSelectedAutomata);
-        popup.add(closeOther);
-        final IDEAction close = master.getDesktopCloseWindowAction(mSelectedAutomata);
-        popup.add(close);
-      }
-      else
-      {
-        final IDEAction openOther = master.getDesktopOpenOtherAction(mSelectedAutomata);
-        popup.add(openOther);
-        final IDEAction open = master.getDesktopOpenWindowAction(mSelectedAutomata);
-        popup.add(open);
-      }
+      AutomatonPopupFactory.setPopup(popup, master, mDesktop, mSelectedAutomata);
     }
   }
 
