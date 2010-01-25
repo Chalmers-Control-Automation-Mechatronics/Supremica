@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicLanguageInclusionChecker;
@@ -26,6 +27,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -72,13 +74,15 @@ public abstract class AbstractConflictCheckerTest extends
    * counterexample has to be a {@link ConflictTraceProxy}, its event sequence
    * has to be accepted by all automata in the given model, and it must take the
    * model to a blocking state. The latter condition is checked by means of a
-   * language inclusion check.
+   * language inclusion check. Furthermore, when a state has a nondeterministic
+   * choice it is verified whether the counter example includes correct state
+   * information.
    *
    * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
    * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
    */
   protected void checkCounterExample(final ProductDESProxy des,
-      final TraceProxy trace) throws Exception
+                                     final TraceProxy trace) throws Exception
   {
     super.checkCounterExample(des, trace);
     final ConflictTraceProxy counterexample = (ConflictTraceProxy) trace;
@@ -132,7 +136,8 @@ public abstract class AbstractConflictCheckerTest extends
    * @return A language inclusion checker to verify the given model.
    */
   protected LanguageInclusionChecker createLanguageInclusionChecker(
-      final ProductDESProxy des, final ProductDESProxyFactory factory)
+                                                                    final ProductDESProxy des,
+                                                                    final ProductDESProxyFactory factory)
   {
     if (mLanguageInclusionChecker == null) {
       try {
@@ -153,12 +158,13 @@ public abstract class AbstractConflictCheckerTest extends
   // #########################################################################
   // # Auxiliary Methods
   protected StateProxy checkCounterExample(final AutomatonProxy aut,
-      final ConflictTraceProxy trace)
+                                           final ConflictTraceProxy trace)
   {
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     StateProxy current = null;
+    final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
     for (final StateProxy state : states) {
       if (state.isInitial()) {
         current = state;
@@ -168,20 +174,35 @@ public abstract class AbstractConflictCheckerTest extends
     if (current == null) {
       return null;
     }
+    int step = 0;
     for (final EventProxy event : trace.getEvents()) {
       if (events.contains(event)) {
-        boolean found = false;
+        int targetCount = 0;
+        TransitionProxy transFound = null;
         for (final TransitionProxy trans : transitions) {
           if (trans.getSource() == current && trans.getEvent() == event) {
-            current = trans.getTarget();
-            found = true;
-            break;
+            transFound = trans;
+            targetCount++;
           }
         }
-        if (!found) {
+        step++;
+        if (targetCount > 1) {
+          final TraceStepProxy traceStep = traceSteps.get(step);
+          final Map<AutomatonProxy,StateProxy> stepMap =
+              traceStep.getStateMap();
+          final StateProxy target = stepMap.get(aut);
+          assert target != null : "The counter example trace does not contain a successor state in automaton "
+              + aut.getName()
+              + " from source state "
+              + transFound.getSource()
+              + " with event " + event;
+
+        } else if (targetCount == 0) {
           return null;
         }
+        current = transFound.getTarget();
       }
+
     }
     // returns the end state of the counterexample trace
     return current;
@@ -190,7 +211,8 @@ public abstract class AbstractConflictCheckerTest extends
   // #########################################################################
   // # Coreachability Model
   private ProductDESProxy createLanguageInclusionModel(
-      final ProductDESProxy des, final Map<AutomatonProxy,StateProxy> inittuple)
+                                                       final ProductDESProxy des,
+                                                       final Map<AutomatonProxy,StateProxy> inittuple)
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final Collection<EventProxy> oldevents = des.getEvents();
@@ -233,8 +255,10 @@ public abstract class AbstractConflictCheckerTest extends
   }
 
   private AutomatonProxy createLanguageInclusionAutomaton(
-      final AutomatonProxy aut, final StateProxy newinit,
-      final EventProxy oldmarking, final EventProxy newmarking)
+                                                          final AutomatonProxy aut,
+                                                          final StateProxy newinit,
+                                                          final EventProxy oldmarking,
+                                                          final EventProxy newmarking)
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final Collection<EventProxy> oldevents = aut.getEvents();
@@ -283,7 +307,7 @@ public abstract class AbstractConflictCheckerTest extends
     final String autname = aut.getName();
     final ComponentKind kind = aut.getKind();
     return factory.createAutomatonProxy(autname, kind, newevents, newstates,
-        newtransitions);
+                                        newtransitions);
   }
 
   private AutomatonProxy createPropertyAutomaton(final EventProxy newmarking)
@@ -294,7 +318,7 @@ public abstract class AbstractConflictCheckerTest extends
     final StateProxy state = factory.createStateProxy("s0", true, null);
     final Collection<StateProxy> states = Collections.singletonList(state);
     return factory.createAutomatonProxy(name, ComponentKind.PROPERTY, events,
-        states, null);
+                                        states, null);
   }
 
   // #########################################################################

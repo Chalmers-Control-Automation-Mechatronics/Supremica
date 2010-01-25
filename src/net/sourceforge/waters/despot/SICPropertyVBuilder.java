@@ -336,7 +336,8 @@ public class SICPropertyVBuilder
   }
 
   public ConflictTraceProxy convertTraceToOriginalModel(
-                                                        final ConflictTraceProxy conflictTrace)
+                                                        final ConflictTraceProxy conflictTrace,
+                                                        final EventProxy answer)
   {
     final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
     final List<TraceStepProxy> convertedSteps = new ArrayList<TraceStepProxy>();
@@ -361,12 +362,11 @@ public class SICPropertyVBuilder
     }
     final String modelname = mModel.getName();
     final String tracename = modelname + " does not satisfy SIC Property V.";
-    // final String comment =
+    final String comment =
+        "The answer event " + answer.getName() + " caused the failure.";
     final ConflictTraceProxy convertedTrace =
-        mFactory.createConflictTraceProxy(tracename,
-                                          conflictTrace.getComment(),
-                                          conflictTrace.getLocation(), mModel,
-                                          mModel.getAutomata(), convertedSteps,
+        mFactory.createConflictTraceProxy(tracename, comment, conflictTrace
+            .getLocation(), mModel, mModel.getAutomata(), convertedSteps,
                                           ConflictKind.CONFLICT);
     return convertedTrace;
   }

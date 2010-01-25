@@ -166,7 +166,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
 
   public void testConflictChecker_hisc9_low2() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc9_low2", true);
+    testConflictChecker("despot", "testHISC", "hisc9_low2", false);
   }
 
   public void testConflictChecker_aip3_syn_as1() throws Exception
