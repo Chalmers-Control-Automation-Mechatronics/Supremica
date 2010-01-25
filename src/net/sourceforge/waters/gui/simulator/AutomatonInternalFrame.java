@@ -154,14 +154,15 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
       mDisplayPane.setSize(new Dimension((int)size.getX(), (int)size.getY()));
     }
     this.pack();
-    this.repaint();
+    SwingUtilities.invokeLater(new Thread(){public void run(){AutomatonInternalFrame.this.repaint();}});
+    storeReferenceFrame();
   }
 
   public boolean canResize()
   {
     System.out.println("DEBUG: Difference is : " + (mDisplayPane.getSize().getHeight() - mDisplayPane.getMinimumBoundingRectangle().getHeight()));
-    return (Math.abs(mDisplayPane.getSize().getHeight() - mDisplayPane.getMinimumBoundingRectangle().getHeight()) > 3
-            && Math.abs(mDisplayPane.getSize().getWidth() - mDisplayPane.getMinimumBoundingRectangle().getWidth()) > 3);
+    return (Math.abs(mDisplayPane.getSize().getHeight() - mDisplayPane.getMinimumBoundingRectangle().getHeight()) > 10
+            && Math.abs(mDisplayPane.getSize().getWidth() - mDisplayPane.getMinimumBoundingRectangle().getWidth()) > 10);
   }
 
   // ###########################################################################
