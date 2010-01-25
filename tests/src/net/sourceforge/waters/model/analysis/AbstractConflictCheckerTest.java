@@ -182,10 +182,15 @@ public abstract class AbstractConflictCheckerTest extends
         for (final TransitionProxy trans : transitions) {
           if (trans.getSource() == current && trans.getEvent() == event) {
             transFound = trans;
+            if (targetCount == 0) {
+              current = trans.getTarget();
+            }
             targetCount++;
           }
         }
-        step++;
+        if (targetCount > 0) {
+          step++;
+        }
         if (targetCount > 1) {
           final TraceStepProxy traceStep = traceSteps.get(step);
           final Map<AutomatonProxy,StateProxy> stepMap =
@@ -200,7 +205,7 @@ public abstract class AbstractConflictCheckerTest extends
         } else if (targetCount == 0) {
           return null;
         }
-        current = transFound.getTarget();
+
       }
 
     }

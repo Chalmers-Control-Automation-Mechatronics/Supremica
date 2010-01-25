@@ -25,8 +25,8 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 {
 
-  //#########################################################################
-  //# Overrides for base class junit.framework.TestCase
+  // #########################################################################
+  // # Overrides for base class junit.framework.TestCase
   public AbstractModelVerifierTest()
   {
   }
@@ -45,106 +45,87 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     setNodeLimit();
   }
 
-
-  //#########################################################################
-  //# Instantiating and Checking Modules
-  protected void runModelVerifier(final String group,
-                                  final String name,
+  // #########################################################################
+  // # Instantiating and Checking Modules
+  protected void runModelVerifier(final String group, final String name,
                                   final List<ParameterBindingProxy> bindings,
-                                  final boolean expect)
-    throws Exception
+                                  final boolean expect) throws Exception
   {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelVerifier(groupdir, name, bindings, expect);
   }
 
-  protected void runModelVerifier(final String group,
-                                  final String subdir,
+  protected void runModelVerifier(final String group, final String subdir,
                                   final String name,
                                   final List<ParameterBindingProxy> bindings,
-                                  final boolean expect)
-    throws Exception
+                                  final boolean expect) throws Exception
   {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelVerifier(groupdir, subdir, name, bindings, expect);
   }
 
-  protected void runModelVerifier(final File groupdir,
-                                  final String subdir,
+  protected void runModelVerifier(final File groupdir, final String subdir,
                                   final String name,
                                   final List<ParameterBindingProxy> bindings,
-                                  final boolean expect)
-    throws Exception
+                                  final boolean expect) throws Exception
   {
     final File dir = new File(groupdir, subdir);
     runModelVerifier(dir, name, bindings, expect);
   }
 
-  protected void runModelVerifier(final File dir,
-                                  final String name,
+  protected void runModelVerifier(final File dir, final String name,
                                   final List<ParameterBindingProxy> bindings,
-                                  final boolean expect)
-    throws Exception
+                                  final boolean expect) throws Exception
   {
     final File filename = new File(dir, name);
     runModelVerifier(filename, bindings, expect);
   }
 
-
-  //#########################################################################
-  //# Checking Instantiated Product DES problems
-  protected void runModelVerifier(final String group,
-                                  final String name,
-                                  final boolean expect)
-    throws Exception
+  // #########################################################################
+  // # Checking Instantiated Product DES problems
+  protected void runModelVerifier(final String group, final String name,
+                                  final boolean expect) throws Exception
   {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelVerifier(groupdir, name, expect);
   }
 
-  protected void runModelVerifier(final String group,
-                                  final String subdir,
-                                  final String name,
-                                  final boolean expect)
-    throws Exception
+  protected void runModelVerifier(final String group, final String subdir,
+                                  final String name, final boolean expect)
+      throws Exception
   {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelVerifier(groupdir, subdir, name, expect);
   }
 
-  protected void runModelVerifier(final File groupdir,
-                                  final String subdir,
-                                  final String name,
-                                  final boolean expect)
-    throws Exception
+  protected void runModelVerifier(final File groupdir, final String subdir,
+                                  final String name, final boolean expect)
+      throws Exception
   {
     final File dir = new File(groupdir, subdir);
     runModelVerifier(dir, name, expect);
   }
 
-  protected void runModelVerifier(final File dir,
-                                  final String name,
-                                  final boolean expect)
-    throws Exception
+  protected void runModelVerifier(final File dir, final String name,
+                                  final boolean expect) throws Exception
   {
     final File filename = new File(dir, name);
     runModelVerifier(filename, expect);
   }
 
   protected void runModelVerifier(final File filename, final boolean expect)
-    throws Exception
+      throws Exception
   {
     runModelVerifier(filename, (List<ParameterBindingProxy>) null, expect);
   }
 
   protected void runModelVerifier(final File filename,
                                   final List<ParameterBindingProxy> bindings,
-                                  final boolean expect)
-    throws Exception
+                                  final boolean expect) throws Exception
   {
     mBindings = bindings;
     final ProductDESProxy des = getCompiledDES(filename, bindings);
@@ -152,16 +133,14 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
   }
 
   protected void runModelVerifier(final ProductDESProxy des,
-                                  final boolean expect)
-    throws Exception
+                                  final boolean expect) throws Exception
   {
     runModelVerifier(des, null, expect);
   }
 
   protected void runModelVerifier(final ProductDESProxy des,
                                   final List<ParameterBindingProxy> bindings,
-                                  final boolean expect)
-    throws Exception
+                                  final boolean expect) throws Exception
   {
     mBindings = bindings;
     runModelVerifierWithBindings(des, expect);
@@ -172,10 +151,9 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     return mModelVerifier;
   }
 
-
-  //#########################################################################
-  //# To be Overridden/Used by Subclasses
-  /**
+  // #########################################################################
+  // # To be Overridden/Used by Subclasses
+/**
    * Performs preliminary checks on the counterexample.
    * This method performs some simple checks on the counterexample to make
    * sure that it can be saved. The more advanced semantic checks are
@@ -189,56 +167,54 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
   {
     assertNotNull("Counterexample is NULL!", trace);
     assertNotNull("NULL product DES in trace!", trace.getProductDES());
-    assertFalse("NULL automaton in trace!",
-                trace.getAutomata().contains(null));
-    assertFalse("NULL event in trace!",
-                trace.getEvents().contains(null));
+    assertFalse("NULL automaton in trace!", trace.getAutomata().contains(null));
+    assertFalse("NULL event in trace!", trace.getEvents().contains(null));
   }
 
   /**
-   * Checks whether the given counterexample is indeed a counterexample
-   * for the property considered in this test. This method should perform
-   * a detailed semantic check to confirm that the given counterexample
-   * is indeed correct. The default implementation merely checks whether
-   * the automata and events contained in the counterexample can be found
-   * in the model. All subclasses should override this method to implement
-   * specific tests.
-   * @param des     The model to be verified.
-   * @param trace   The counterexample obtained by from the model
-   *                checker under test.
-   * @throws junit.framework.AssertionFailedError to indicate that the
-   *                counterexample is not a correct counterexample for
-   *                the property.
+   * Checks whether the given counterexample is indeed a counterexample for the
+   * property considered in this test. This method should perform a detailed
+   * semantic check to confirm that the given counterexample is indeed correct.
+   * The default implementation merely checks whether the automata and events
+   * contained in the counterexample can be found in the model. All subclasses
+   * should override this method to implement specific tests.
+   *
+   * @param des
+   *          The model to be verified.
+   * @param trace
+   *          The counterexample obtained by from the model checker under test.
+   * @throws junit.framework.AssertionFailedError
+   *           to indicate that the counterexample is not a correct
+   *           counterexample for the property.
    */
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace)
-    throws Exception
+                                     final TraceProxy trace) throws Exception
   {
-    assertSame("Product DES in trace is not the original model!",
-               des, trace.getProductDES());
+    assertSame("Product DES in trace is not the original model!", des, trace
+        .getProductDES());
     final Collection<AutomatonProxy> automata = des.getAutomata();
     for (final AutomatonProxy aut : trace.getAutomata()) {
       if (!automata.contains(aut)) {
-        fail("Trace automaton '" + aut.getName() +
-             "' does not match any in product DES!");
+        fail("Trace automaton '" + aut.getName()
+            + "' does not match any in product DES!");
       }
     }
     final Collection<EventProxy> events = des.getEvents();
     for (final EventProxy event : trace.getEvents()) {
       if (!events.contains(event)) {
-        fail("Trace event '" + event.getName() +
-             "' does not match any in product DES!");
+        fail("Trace event '" + event.getName()
+            + "' does not match any in product DES!");
       }
     }
   }
 
   protected File saveCounterExample(final TraceProxy counterexample)
-    throws Exception
+      throws Exception
   {
     assertNotNull(counterexample);
     final String name = counterexample.getName();
     final String ext = mTraceMarshaller.getDefaultExtension();
-    final StringBuffer buffer = new StringBuffer(name);
+    final StringBuffer buffer = new StringBuffer(name.replaceAll(":", "-"));
     if (mBindings != null) {
       for (final ParameterBindingProxy binding : mBindings) {
         buffer.append('-');
@@ -254,38 +230,39 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     return filename;
   }
 
-
-  //#########################################################################
-  //# To be Provided by Subclasses
+  // #########################################################################
+  // # To be Provided by Subclasses
   /**
-   * Creates an instance of the model verifier under test.
-   * This method instantiates the class of the model verifier tested by
-   * the particular subclass of this test, and configures it as needed.
-   * @param  factory   The factory used by the model verifier for trace
-   *                   construction.
+   * Creates an instance of the model verifier under test. This method
+   * instantiates the class of the model verifier tested by the particular
+   * subclass of this test, and configures it as needed.
+   *
+   * @param factory
+   *          The factory used by the model verifier for trace construction.
    * @return An instance of the model verifier
    */
-  protected abstract ModelVerifier
-    createModelVerifier(ProductDESProxyFactory factory);
+  protected abstract ModelVerifier createModelVerifier(
+                                                       ProductDESProxyFactory factory);
 
   /**
-   * Configures the model verifier under test for a given product DES.
-   * This method is called just before the model verifier is started
-   * for each model to be tested. Subclasses that override this method
-   * should call the superclass method first.
-   * @param  des       The model to be verified for the current test case.
+   * Configures the model verifier under test for a given product DES. This
+   * method is called just before the model verifier is started for each model
+   * to be tested. Subclasses that override this method should call the
+   * superclass method first.
+   *
+   * @param des
+   *          The model to be verified for the current test case.
    */
   protected void configureModelVerifier(final ProductDESProxy des)
   {
     mModelVerifier.setModel(des);
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
+  // #########################################################################
+  // # Auxiliary Methods
   protected void runModelVerifierWithBindings(final ProductDESProxy des,
                                               final boolean expect)
-    throws Exception
+      throws Exception
   {
     getLogger().info("Checking " + des.getName() + " ...");
     configureModelVerifier(des);
@@ -296,9 +273,8 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
       precheckCounterExample(counterexample);
       saveCounterExample(counterexample);
     }
-    assertEquals("Wrong result from model checker: got " +
-                 result + " but should have been " + expect + "!",
-                 expect, result);
+    assertEquals("Wrong result from model checker: got " + result
+        + " but should have been " + expect + "!", expect, result);
     if (!expect) {
       checkCounterExample(des, counterexample);
     }
@@ -314,9 +290,8 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     }
   }
 
-
-  //#########################################################################
-  //# Data Members
+  // #########################################################################
+  // # Data Members
   private JAXBTraceMarshaller mTraceMarshaller;
   private ModelVerifier mModelVerifier;
   private List<ParameterBindingProxy> mBindings;
