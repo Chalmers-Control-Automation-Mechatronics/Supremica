@@ -224,10 +224,7 @@ public class Simulation implements ModelObserver, Observer
     if (props.isEmpty() && drawAsEditor) {
       return PropositionIcon.getUnmarkedColors();
     }
-    else if (props.isEmpty() && !drawAsEditor)
-    {
-      return PropositionIcon.getDefaultMarkedColors();
-    } else {
+    else {
       final Map<Proxy,SourceInfo> infomap = mModuleContainer.getSourceInfoMap();
       final int size = props.size();
       final Set<Color> colorset = new HashSet<Color>(size);

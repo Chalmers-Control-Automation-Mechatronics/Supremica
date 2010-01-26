@@ -29,7 +29,17 @@ public class LabelShape extends AbstractProxyShape
   public LabelShape(final Proxy proxy, final int x, final int y,
                     final Font font, final String aux /* unused? */)
   {
-    this(proxy, x, y, font);
+    super(proxy);
+    mFont = font;
+    mPoint = new Point(x + 2, y + (font.getSize()));
+    mName = aux;
+    final TextLayout layout =
+        new TextLayout(mName, mFont, new FontRenderContext(null, true, true));
+    final Rectangle2D rect = layout.getBounds();
+    rect.setRect(x, y, rect.getWidth() + 4, rect.getHeight() + 4);
+    mBounds =
+        new RoundRectangle2D.Double(rect.getX(), rect.getY(), rect.getWidth(),
+                                    rect.getHeight(), ARC_RADIUS, ARC_RADIUS);
   }
 
   public LabelShape(final Proxy proxy,

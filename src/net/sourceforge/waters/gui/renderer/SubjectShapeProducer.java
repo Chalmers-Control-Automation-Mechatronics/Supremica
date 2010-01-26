@@ -11,6 +11,7 @@ package net.sourceforge.waters.gui.renderer;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -44,17 +45,19 @@ public class SubjectShapeProducer
   //# Constructors
   public SubjectShapeProducer(final GraphSubject graph,
                               final ModuleSubject module,
-                              final RenderingContext context)
+                              final RenderingContext context,
+                              final BindingContext bindings)
   {
-    this(graph, graph, module, context);
+    this(graph, graph, module, context, bindings);
   }
 
   public SubjectShapeProducer(final GraphProxy graph,
                               final Subject subject,
                               final ModuleSubject module,
-                              final RenderingContext context)
+                              final RenderingContext context,
+                              final BindingContext bindings)
   {
-    super(graph, context);
+    super(graph, context, bindings);
     mSubject = subject;
     subject.addModelObserver(this);
     mModule = module;

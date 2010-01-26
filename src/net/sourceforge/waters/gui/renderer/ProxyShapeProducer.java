@@ -27,6 +27,10 @@ import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -41,22 +45,30 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 public class ProxyShapeProducer
   extends AbstractModuleProxyVisitor
 {
 
+
+
+
   //#########################################################################
   //# Constructors
   public ProxyShapeProducer(final GraphProxy graph,
-                            final RenderingContext context)
+                            final RenderingContext context,
+                            final BindingContext binding)
   {
     mGraph = graph;
     mRenderingContext = context;
+    mBindings = binding;
     final int size = graph.getNodes().size() + graph.getEdges().size();
     final Map<Proxy,ProxyShape> map = new HashMap<Proxy,ProxyShape>(4 * size);
     mMap = Collections.synchronizedMap(map);
+    mCompiler = new SimpleExpressionCompiler(ModuleSubjectFactory.getInstance(),
+                                             CompilerOperatorTable.getInstance());
   }
 
 
@@ -305,12 +317,29 @@ public class ProxyShapeProducer
       for (final Proxy proxy : block.getEventList()) {
         // Use different font for different event kinds.
         Font font = EditorColor.DEFAULT_FONT;
+        String name = proxy.toString();
         if (proxy instanceof IdentifierProxy) {
           final IdentifierProxy ident = (IdentifierProxy) proxy;
           font = mRenderingContext.getFont(ident);
         }
+        if (mBindings != null)
+        {
+          if (proxy instanceof SimpleExpressionProxy)
+          {
+            SimpleExpressionProxy sExpression;
+            try {
+              sExpression = mCompiler.simplify((SimpleExpressionProxy)proxy, mBindings);
+            } catch (final EvalException exception) {
+              sExpression = null;
+            }
+            if (sExpression != null)
+            {
+              name = sExpression.toString();
+            }
+          }
+        }
         final int ly = (int) Math.round(y + height);
-        final LabelShape lshape = new LabelShape(proxy, lx, ly, font);
+        final LabelShape lshape = new LabelShape(proxy, lx, ly, font, name);
         mMap.put(proxy, lshape);
         final RoundRectangle2D lrect = lshape.getShape();
         height += lrect.getHeight();
@@ -400,6 +429,8 @@ public class ProxyShapeProducer
   private final GraphProxy mGraph;
   private final RenderingContext mRenderingContext;
   private final Map<Proxy,ProxyShape> mMap;
+  private final BindingContext mBindings;
+  private final SimpleExpressionCompiler mCompiler;
 
 
   //#########################################################################

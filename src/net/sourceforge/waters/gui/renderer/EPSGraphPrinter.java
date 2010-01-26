@@ -51,7 +51,7 @@ public class EPSGraphPrinter extends Renderer
                          final RenderingContext context,
                          final File file)
   {
-    this(graph, new ProxyShapeProducer(graph, context), file);
+    this(graph, new ProxyShapeProducer(graph, context, null), file);
   }
 
   public EPSGraphPrinter(final GraphProxy graph,

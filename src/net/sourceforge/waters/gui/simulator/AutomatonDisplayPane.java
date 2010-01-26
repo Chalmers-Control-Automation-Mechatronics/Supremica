@@ -96,8 +96,10 @@ public class AutomatonDisplayPane
     mTransform = mInverseTransform = null;
     final ModuleSubject module = container.getModule();
     final RenderingContext context = new SimulatorRenderingContext();
+    final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+    final SourceInfo sInfo = infomap.get(aut);
     final ProxyShapeProducer producer =
-      new SubjectShapeProducer(graph, module, context);
+      new SubjectShapeProducer(graph, module, context, sInfo.getBindingContext());
     factory = new DisplayPanePopupFactory(container.getIDE().getPopupActionManager(), this, (AutomatonDesktopPane) parent.getDesktopPane());
     setShapeProducer(producer);
     final int width;
