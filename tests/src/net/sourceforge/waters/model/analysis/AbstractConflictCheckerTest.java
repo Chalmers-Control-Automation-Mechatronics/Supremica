@@ -270,7 +270,7 @@ public abstract class AbstractConflictCheckerTest extends
     }
     final AutomatonProxy prop = createPropertyAutomaton(newmarking);
     newautomata.add(prop);
-    final String name = des.getName() + ":coreachability";
+    final String name = des.getName() + "-coreachability";
     return factory.createProductDESProxy(name, newevents, newautomata);
   }
 

@@ -214,7 +214,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     assertNotNull(counterexample);
     final String name = counterexample.getName();
     final String ext = mTraceMarshaller.getDefaultExtension();
-    final StringBuffer buffer = new StringBuffer(name.replaceAll(":", "-"));
+    final StringBuffer buffer = new StringBuffer(name);
     if (mBindings != null) {
       for (final ParameterBindingProxy binding : mBindings) {
         buffer.append('-');
@@ -223,6 +223,9 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     }
     buffer.append(ext);
     final String extname = buffer.toString();
+    assertTrue("File name '" + extname + "' contains colon, " +
+               "which does not work on all platforms!",
+               extname.indexOf(':') < 0);
     final File dir = getOutputDirectory();
     final File filename = new File(dir, extname);
     ensureParentDirectoryExists(filename);

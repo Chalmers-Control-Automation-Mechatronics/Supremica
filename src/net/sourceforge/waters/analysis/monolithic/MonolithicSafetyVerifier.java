@@ -464,7 +464,7 @@ public class MonolithicSafetyVerifier
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
     final String desname = des.getName();
-    final String tracename = desname + ":uncontrollable";
+    final String tracename = desname + "-uncontrollable";
     final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
 
     boolean enabled;
