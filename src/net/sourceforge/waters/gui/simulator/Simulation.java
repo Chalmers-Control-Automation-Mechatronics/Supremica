@@ -784,10 +784,12 @@ public class Simulation implements ModelObserver, Observer
           mEnabledEvents.remove(step);
           mEnabledEvents.add(step.addNewTransition(auto, old));
           mEnabledEvents.add(step.addNewTransition(auto, trans));
+          return;
         }
         else
         {
           mEnabledEvents.add(step.addNewTransition(auto, trans));
+          return;
         }
       }
     }
