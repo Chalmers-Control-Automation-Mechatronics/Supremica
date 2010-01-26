@@ -24,6 +24,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -728,16 +729,14 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
       final boolean result = conflictChecker.run();
 
       if (!result) {
-        System.out.println("CONFLICTING");
-        System.out.println("Counterexample:");
-        final ConflictTraceProxy counterex =
+        final ConflictTraceProxy counterexample =
             conflictChecker.getCounterExample();
-        System.out.println(counterex.toString());
+        // precheckCounterExample(counterexample);
+        saveCounterExample(counterexample);
       }
       assertEquals("Wrong result from model checker: got " + result
           + " but should have been " + expectedResult + "!", expectedResult,
                    result);
-
     }
   }
 
@@ -807,6 +806,24 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     return mBuilder.getAnswerEvents();
   }
 
+  protected File saveCounterExample(final TraceProxy counterexample)
+      throws Exception
+  {
+    assertNotNull(counterexample);
+    final String name = counterexample.getName();
+    final String ext = mTraceMarshaller.getDefaultExtension();
+    final StringBuffer buffer = new StringBuffer(name);
+    buffer.append(ext);
+    final String extname = buffer.toString();
+    assertTrue("File name '" + extname + "' contains colon, "
+        + "which does not work on all platforms!", extname.indexOf(':') < 0);
+    final File dir = getOutputDirectory();
+    final File filename = new File(dir, extname);
+    ensureParentDirectoryExists(filename);
+    mTraceMarshaller.marshal(counterexample, filename);
+    return filename;
+  }
+
   // #########################################################################
   // # Overrides for junit.framework.TestCase
   protected void setUp() throws Exception
@@ -819,9 +836,11 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
     mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
+    mTraceMarshaller = new JAXBTraceMarshaller(mProductDESFactory);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
+    mDocumentManager.registerMarshaller(mTraceMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mBuilder = new SICPropertyVBuilder(mProductDESFactory);
@@ -834,6 +853,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     mProductDESFactory = null;
     mModuleMarshaller = null;
     mProductDESMarshaller = null;
+    mTraceMarshaller = null;
     mDocumentManager = null;
     mBuilder = null;
     super.tearDown();
