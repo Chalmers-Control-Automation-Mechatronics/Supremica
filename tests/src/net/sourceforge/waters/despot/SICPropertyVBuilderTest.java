@@ -29,6 +29,7 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -846,6 +847,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   private ProductDESProxyFactory mProductDESFactory;
   private JAXBModuleMarshaller mModuleMarshaller;
   private JAXBProductDESMarshaller mProductDESMarshaller;
+  private JAXBTraceMarshaller mTraceMarshaller;
   private DocumentManager mDocumentManager;
   private SICPropertyVBuilder mBuilder;
 }

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -164,7 +165,6 @@ public abstract class AbstractConflictCheckerTest extends
     final Collection<StateProxy> states = aut.getStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     StateProxy current = null;
-    final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
     for (final StateProxy state : states) {
       if (state.isInitial()) {
         current = state;
@@ -174,40 +174,55 @@ public abstract class AbstractConflictCheckerTest extends
     if (current == null) {
       return null;
     }
-    int step = 0;
-    for (final EventProxy event : trace.getEvents()) {
-      if (events.contains(event)) {
-        int targetCount = 0;
-        TransitionProxy transFound = null;
-        for (final TransitionProxy trans : transitions) {
-          if (trans.getSource() == current && trans.getEvent() == event) {
-            transFound = trans;
-            if (targetCount == 0) {
-              current = trans.getTarget();
+    final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
+    final Iterator<TraceStepProxy> iter = traceSteps.iterator();
+    iter.next();  // skip initial step
+    while (iter.hasNext()) {
+      final TraceStepProxy traceStep = iter.next();
+      final EventProxy event = traceStep.getEvent();
+      final Map<AutomatonProxy,StateProxy> stepMap =
+        traceStep.getStateMap();
+      final StateProxy target = stepMap.get(aut);
+      if (target == null) {
+        if (events.contains(event)) {
+          StateProxy next = null;
+          for (final TransitionProxy trans : transitions) {
+            if (trans.getSource() == current && trans.getEvent() == event) {
+              if (next == null) {
+                next = trans.getTarget();
+              } else {
+                fail("The counter example trace does not contain a " +
+                     "successor state for the nondeterministic transition" +
+                     " in automaton " + aut.getName() +
+                     " from source state " + current.getName() +
+                     " with event " + event.getName() + ".");
+              }
             }
-            targetCount++;
           }
+          current = next;
         }
-        if (targetCount > 0) {
-          step++;
+      } else {
+        if (events.contains(event)) {
+          boolean found = false;
+          for (final TransitionProxy trans : transitions) {
+            if (trans.getSource() == current &&
+                trans.getEvent() == event &&
+                trans.getTarget() == target) {
+              found = true;
+            }
+          }
+          assertTrue("There is no transition from state " + current.getName() +
+                     " to state " + target.getName() + " with event " +
+                     event.getName() + " in automaton" + aut.getName() +
+                     " as specified in the counterexample trace.", found);
+          current = target;
+        } else {
+          assertSame("The target state specified in the counterexample " +
+                     "for the selflooped event " + event.getName() +
+                     "is different from the current state of automaton " +
+                     aut.getName() + ".", current, target);
         }
-        if (targetCount > 1) {
-          final TraceStepProxy traceStep = traceSteps.get(step);
-          final Map<AutomatonProxy,StateProxy> stepMap =
-              traceStep.getStateMap();
-          final StateProxy target = stepMap.get(aut);
-          assert target != null : "The counter example trace does not contain a successor state in automaton "
-              + aut.getName()
-              + " from source state "
-              + transFound.getSource()
-              + " with event " + event;
-
-        } else if (targetCount == 0) {
-          return null;
-        }
-
       }
-
     }
     // returns the end state of the counterexample trace
     return current;

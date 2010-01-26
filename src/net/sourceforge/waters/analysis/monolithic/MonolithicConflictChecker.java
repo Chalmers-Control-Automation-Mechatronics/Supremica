@@ -236,21 +236,14 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           stateSchema.decodeState(srcstate, decodedSource);
           stateSchema.decodeState(targetstate, decodedTarget);
           for (int i = 0; i < automata.length; i++) {
-
             final int eventID = mEventMap.getId(event);
             final int[] targets =
                 automata[i].getSuccessorStates(decodedSource[i], eventID);
             assert targets != null : "Every state of a counterexample trace must have atleast one successor state";
-            // If targets == null, we have a serious problem ...
             if (targets.length > 1) {
-              for (final int target : targets) {
-                if (target == decodedTarget[i]) {
-                  statemap.put(automata[i].getAutomatonProxy(), automata[i]
-                      .getStateProxyFromID(target));
-                }
-              }
+              statemap.put(automata[i].getAutomatonProxy(),
+                           automata[i].getStateProxyFromID(decodedTarget[i]));
             }
-
           }
           final TraceStepProxy traceStep =
               desFactory.createTraceStepProxy(event, statemap);
