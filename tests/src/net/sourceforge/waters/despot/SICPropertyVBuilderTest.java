@@ -163,7 +163,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
 
   public void testConflictChecker_hisc8_low2() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc8_low2", true);
+    testConflictChecker("despot", "testHISC", "hisc8_low2", false);
   }
 
   public void testConflictChecker_hisc9_low2() throws Exception
@@ -719,24 +719,46 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   {
     final Collection<EventProxy> answerEvents =
         getModelAnswerEvents(group, subdir, name);
+    boolean falseFound = false;
+    MonolithicConflictChecker conflictChecker = null;
     for (final EventProxy answer : answerEvents) {
       final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
       final EventProxy defaultMark = mBuilder.getMarkingProposition();
       final EventProxy preconditionMark = mBuilder.getGeneralisedPrecondition();
-      final MonolithicConflictChecker conflictChecker =
+      conflictChecker =
           new MonolithicConflictChecker(modifiedDES, defaultMark,
               preconditionMark, mProductDESFactory);
       final boolean result = conflictChecker.run();
 
-      if (!result) {
+      if (!result && expectedResult) {
         final ConflictTraceProxy counterexample =
             conflictChecker.getCounterExample();
         // precheckCounterExample(counterexample);
         saveCounterExample(counterexample);
+        assertEquals(
+                     "Wrong result from model checker: the answer "
+                         + answer.getName()
+                         + " gives "
+                         + result
+                         + " but this model should have satisified SICPropertyV, therefore all "
+                         + "answer events should produce true as a result!",
+                     expectedResult, result);
+        break;
+      } else if (!result && !expectedResult) {
+        falseFound = true;
+        break;
       }
-      assertEquals("Wrong result from model checker: got " + result
-          + " but should have been " + expectedResult + "!", expectedResult,
-                   result);
+    }
+    if (!expectedResult && !falseFound) {
+      final ConflictTraceProxy counterexample =
+          conflictChecker.getCounterExample();
+      // precheckCounterExample(counterexample);
+      saveCounterExample(counterexample);
+      assertEquals(
+                   "Wrong result from model checker: all answers in the model give true as a result "
+                       + " but this model should not satisify SICPropertyV, therefore atleast one answer "
+                       + "event should produce a false result!",
+                   !expectedResult, !falseFound);
     }
   }
 
