@@ -109,7 +109,7 @@ public class AutomatonDisplayPane
       final int numstates = aut.getStates().size();
       width = height = 128 + 32 * numstates;
     } else {
-      final Rectangle2D imageRect = producer.getMinimumBoundingRectangle();
+      final Rectangle2D imageRect = this.getMinimumBoundingRectangle();
       width = (int) Math.ceil(imageRect.getWidth());
       height = (int) Math.ceil(imageRect.getHeight());
     }
@@ -441,11 +441,11 @@ public class AutomatonDisplayPane
     }
   }
 
-  private boolean eventCanBeFired(final Simulation sim, final EventProxy event)
+  private boolean eventCanBeFired(final Simulation sim, final TransitionProxy trans)
   {
     for (final Step possibleStep : sim.getValidTransitions())
     {
-      if (possibleStep.getEvent() == event)
+      if (possibleStep.getEvent() == trans.getEvent() && sim.getCurrentStates().get(mAutomaton) == trans.getSource())
         return true;
     }
     return false;
@@ -483,7 +483,7 @@ public class AutomatonDisplayPane
         for (final TransitionProxy trans : mAutomaton.getTransitions()) {
           final Proxy source = infomap.get(trans).getSourceObject();
           if (source == mFocusedItem &&
-              eventCanBeFired(mSim, trans.getEvent())) {
+              eventCanBeFired(mSim, trans)) {
             possibleSteps.addAll(getSteps(trans));
           }
         }
@@ -492,7 +492,7 @@ public class AutomatonDisplayPane
           final Proxy source = infomap.get(trans).getSourceObject();
           final AbstractSubject subject = (AbstractSubject) source;
           if (subject.getAncestor(EdgeSubject.class) == mFocusedItem
-              && eventCanBeFired(mSim, trans.getEvent())) {
+              && eventCanBeFired(mSim, trans)) {
             possibleSteps.addAll(getSteps(trans));
           }
         }

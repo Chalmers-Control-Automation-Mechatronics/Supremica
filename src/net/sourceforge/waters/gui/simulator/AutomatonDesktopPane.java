@@ -89,6 +89,14 @@ public class AutomatonDesktopPane
   public void addAutomaton(final String aut,
       final ModuleContainer container, final Simulation sim, final int clicks)
   {
+    /*String DEBUG = "DEBUG: AutomatonDesktopPane [92]: Automaton Current State list is {";
+    for (final AutomatonProxy auto : sim.getCurrentStates().keySet())
+    {
+      DEBUG += auto.getName() + " -> " + sim.getCurrentStates().get(auto).getName() + ",";
+    }
+    DEBUG += "}";
+    System.out.println(DEBUG);
+    */
     if (aut == null)
       return;
     if (!openAutomaton.containsKey(aut)) {
@@ -394,13 +402,26 @@ public class AutomatonDesktopPane
       final List<Map.Entry<String,AutomatonInternalFrame>> entries =
         new ArrayList<Map.Entry<String,AutomatonInternalFrame>>
           (openAutomaton.entrySet());
-      for (final Map.Entry<String,AutomatonInternalFrame> entry :
-           entries) {
-        final String name = entry.getKey();
-        final AutomatonInternalFrame frame = entry.getValue();
+      while (entries.size() != 0)
+      {
+        int highestZValue = Integer.MIN_VALUE;
+        Map.Entry<String,AutomatonInternalFrame> lowestFrame = null;
+        for (final Map.Entry<String,AutomatonInternalFrame> entry :
+             entries) {
+          final AutomatonInternalFrame frame = entry.getValue();
+          if (this.getComponentZOrder(frame) > highestZValue)
+          {
+            highestZValue = this.getComponentZOrder(frame);
+            lowestFrame = entry;
+          }
+        }
+        final String name = lowestFrame.getKey();
+        final AutomatonInternalFrame frame = lowestFrame.getValue();
         final Rectangle bounds = frame.getBounds();
+        System.out.println("DEBUG: AutomatonDesktopPane [413]: " + frame.getTitle() + " has bounds " + frame.getBounds());
         oldOpen.put(name, bounds);
         frame.dispose();
+        entries.remove(lowestFrame);
       }
       openAutomaton.clear();
     }

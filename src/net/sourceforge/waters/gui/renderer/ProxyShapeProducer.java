@@ -51,10 +51,6 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 public class ProxyShapeProducer
   extends AbstractModuleProxyVisitor
 {
-
-
-
-
   //#########################################################################
   //# Constructors
   public ProxyShapeProducer(final GraphProxy graph,
@@ -140,7 +136,12 @@ public class ProxyShapeProducer
           final ProxyShape shape = iter.next();
           rect.add(shape.getBounds2D());
         }
-        return rect;
+        final Rectangle output =
+          new Rectangle((int)(rect.getX() - BORDER),
+                        (int)(rect.getY() - BORDER),
+                        (int)(rect.getWidth() + BORDER * 2),
+                        (int)(rect.getHeight() + BORDER * 2));
+        return output;
       }
     }
   }
@@ -436,5 +437,5 @@ public class ProxyShapeProducer
   //#########################################################################
   //# Class Constants
   private static final String BLOCKED_HEADER = "BLOCKED:";
-
+  private static final double BORDER = 5;
 }

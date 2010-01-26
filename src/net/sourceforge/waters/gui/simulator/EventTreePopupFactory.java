@@ -60,10 +60,12 @@ class EventTreePopupFactory extends PopupFactory
       final IDEAction fireEvent = master.getEventExecuteAction(mSelectedEvent);
       popup.add(fireEvent);
     }
-    else if (mSelectedAutomata != null)
+    if (mSelectedAutomata != null)
     {
       AutomatonPopupFactory.setPopup(popup, master, mDesktop, mSelectedAutomata);
     }
+    mSelectedEvent = null;
+    mSelectedAutomata = null;
   }
 
 

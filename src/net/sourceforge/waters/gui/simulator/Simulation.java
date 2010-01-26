@@ -226,6 +226,8 @@ public class Simulation implements ModelObserver, Observer
     }
     else {
       final Map<Proxy,SourceInfo> infomap = mModuleContainer.getSourceInfoMap();
+      if (infomap == null)
+        return new PropositionIcon.ColorInfo(new ArrayList<Color>(), false);
       final int size = props.size();
       final Set<Color> colorset = new HashSet<Color>(size);
       final List<Color> colorlist = new ArrayList<Color>(size);
