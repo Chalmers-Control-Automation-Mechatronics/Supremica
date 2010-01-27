@@ -116,9 +116,9 @@ public class GraphTools {
    * @param  end       The end point to be used,
    *                   or <CODE>null</CODE> for simple target nodes.
    * @param labelBlock The label block for the new edge, or <CODE>null</CODE>
-   *                   to create an empty one. To be cloned.     
+   *                   to create an empty one. To be cloned.
    * @param gaBlock    The guard/action block for the new edge,
-   *                   or <CODE>null</CODE>. To be cloned.     
+   *                   or <CODE>null</CODE>. To be cloned.
    */
   public static EdgeSubject getCreatedEdge(final GraphSubject graph,
                                            final NodeSubject source,
@@ -236,19 +236,22 @@ public class GraphTools {
   //# Updating the Group Node Hierarchy
   public static boolean updateGroupNodeHierarchy(final GraphSubject graph)
   {
+    // TODO
+    // Suppress change notifications if there is no change.
     final List<GroupNodeSubject> groups = new ArrayList<GroupNodeSubject>();
     for (final NodeSubject n : graph.getNodesModifiable()) {
       if (n instanceof GroupNodeSubject) {
+        // event ...
         ((GroupNodeSubject) n).getImmediateChildNodesModifiable().clear();
         groups.add((GroupNodeSubject) n);
       }
     }
     // Sort all the node groups from smallest to largest ...
     Collections.sort(groups, new Comparator<GroupNodeSubject>() {
-      public int compare(GroupNodeSubject g1, GroupNodeSubject g2)
+      public int compare(final GroupNodeSubject g1, final GroupNodeSubject g2)
       {
-        Rectangle2D r1 = g1.getGeometry().getRectangle();
-        Rectangle2D r2 = g2.getGeometry().getRectangle();
+        final Rectangle2D r1 = g1.getGeometry().getRectangle();
+        final Rectangle2D r2 = g2.getGeometry().getRectangle();
         return (int) ((r1.getHeight() * r1.getWidth())
                       - (r2.getHeight() * r2.getWidth()));
       }
@@ -259,10 +262,10 @@ public class GraphTools {
       if (n instanceof GroupNodeSubject) {
         r1 = ((GroupNodeSubject) n).getGeometry().getRectangle();
       } else {
-        Point2D p = ((SimpleNodeSubject) n).getPointGeometry().getPoint();
+        final Point2D p = ((SimpleNodeSubject) n).getPointGeometry().getPoint();
         r1 = new Rectangle((int) p.getX(), (int) p.getY(), 1, 1);
       }
-      Collection<GroupNodeSubject> parents = new ArrayList<GroupNodeSubject>();
+      final Collection<GroupNodeSubject> parents = new ArrayList<GroupNodeSubject>();
       mainloop:
       for (final GroupNodeSubject group : groups) {
         if (n != group) {
@@ -273,7 +276,7 @@ public class GraphTools {
                 continue mainloop;
               }
             }
-            group.getImmediateChildNodesModifiable().add(n);
+            group.getImmediateChildNodesModifiable().add(n); // event
             parents.add(group);
           }
         }
