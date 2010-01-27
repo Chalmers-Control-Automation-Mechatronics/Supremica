@@ -48,6 +48,8 @@ import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent.EmbedderEventType;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -98,8 +100,10 @@ public class AutomatonDisplayPane
     final RenderingContext context = new SimulatorRenderingContext();
     final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
     final SourceInfo sInfo = infomap.get(aut);
+    final SimpleExpressionCompiler compiler = sim.getSimpleExpressionCompiler();
+    final BindingContext bindings = sInfo.getBindingContext();
     final ProxyShapeProducer producer =
-      new SubjectShapeProducer(graph, module, context, sInfo.getBindingContext());
+      new SubjectShapeProducer(graph, module, context, compiler, bindings);
     factory = new DisplayPanePopupFactory(container.getIDE().getPopupActionManager(), this, (AutomatonDesktopPane) parent.getDesktopPane());
     setShapeProducer(producer);
     final int width;

@@ -12,6 +12,7 @@ package net.sourceforge.waters.gui.renderer;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -45,19 +46,36 @@ public class SubjectShapeProducer
   //# Constructors
   public SubjectShapeProducer(final GraphSubject graph,
                               final ModuleSubject module,
+                              final RenderingContext context)
+  {
+    this(graph, graph, module, context);
+  }
+
+  public SubjectShapeProducer(final GraphProxy graph,
+                              final Subject subject,
+                              final ModuleSubject module,
+                              final RenderingContext context)
+  {
+    this(graph, subject, module, context, null, null);
+  }
+
+  public SubjectShapeProducer(final GraphSubject graph,
+                              final ModuleSubject module,
                               final RenderingContext context,
+                              final SimpleExpressionCompiler compiler,
                               final BindingContext bindings)
   {
-    this(graph, graph, module, context, bindings);
+    this(graph, graph, module, context, compiler, bindings);
   }
 
   public SubjectShapeProducer(final GraphProxy graph,
                               final Subject subject,
                               final ModuleSubject module,
                               final RenderingContext context,
+                              final SimpleExpressionCompiler compiler,
                               final BindingContext bindings)
   {
-    super(graph, context, bindings);
+    super(graph, context, compiler, bindings);
     mSubject = subject;
     subject.addModelObserver(this);
     mModule = module;
@@ -203,7 +221,7 @@ public class SubjectShapeProducer
     } else {
       final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
       final SimpleNodeSubject node = (SimpleNodeSubject) subject.getParent();
-      return createLabelProxyShape(geo, node);
+      return createNodeLabelProxyShape(geo, node);
     }
   }
 

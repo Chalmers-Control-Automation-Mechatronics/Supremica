@@ -219,7 +219,7 @@ public class BackupGraphPanel
         getShapeProducer().getRenderingContext();
       mSecondaryGraph = new EditorGraph(getGraph());
       mSecondaryShapeProducer = new SubjectShapeProducer
-        (mSecondaryGraph, mSecondaryGraph, module, context, null);
+        (mSecondaryGraph, mSecondaryGraph, module, context);
       mSecondaryGraph.addModelObserver(mGraphModelObserver);
       return true;
     } else {

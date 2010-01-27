@@ -19,6 +19,8 @@ import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -30,6 +32,8 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -45,6 +49,10 @@ public class Simulation implements ModelObserver, Observer
   //# Constructors
   public Simulation(final ModuleContainer container)
   {
+    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, optable);
+
     mSimulationObservers = new ArrayList<SimulationObserver>();
     mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
     mEnabledEvents = new ArrayList<Step>();
@@ -70,6 +78,11 @@ public class Simulation implements ModelObserver, Observer
 
   //#########################################################################
   //# Simple Access
+  SimpleExpressionCompiler getSimpleExpressionCompiler()
+  {
+    return mSimpleExpressionCompiler;
+  }
+
   public List<Step> getValidTransitions()
   {
     return Collections.unmodifiableList(mEnabledEvents);
@@ -940,6 +953,8 @@ public class Simulation implements ModelObserver, Observer
 
   //#########################################################################
   //# Data Members
+  private final SimpleExpressionCompiler mSimpleExpressionCompiler;
+
   private Map<AutomatonProxy,StateProxy> mAllAutomatons; // The Map object is the current state of the key
   private ArrayList<Step> mEnabledEvents;
   private HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the event

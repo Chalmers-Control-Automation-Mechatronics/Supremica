@@ -27,7 +27,6 @@ import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -45,7 +44,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 
 
 public class ProxyShapeProducer
@@ -54,17 +53,24 @@ public class ProxyShapeProducer
   //#########################################################################
   //# Constructors
   public ProxyShapeProducer(final GraphProxy graph,
+                            final RenderingContext context)
+  {
+    this(graph, context, null, null);
+  }
+
+  public ProxyShapeProducer(final GraphProxy graph,
                             final RenderingContext context,
+                            final SimpleExpressionCompiler compiler,
                             final BindingContext binding)
   {
     mGraph = graph;
     mRenderingContext = context;
-    mBindings = binding;
     final int size = graph.getNodes().size() + graph.getEdges().size();
     final Map<Proxy,ProxyShape> map = new HashMap<Proxy,ProxyShape>(4 * size);
     mMap = Collections.synchronizedMap(map);
-    mCompiler = new SimpleExpressionCompiler(ModuleSubjectFactory.getInstance(),
-                                             CompilerOperatorTable.getInstance());
+    mPrinter = new ModuleProxyPrinter();
+    mCompiler = compiler;
+    mBindings = binding;
   }
 
 
@@ -201,7 +207,7 @@ public class ProxyShapeProducer
   {
     final SimpleNodeProxyShape shape = createSimpleNodeProxyShape(simple);
     final LabelGeometryProxy geo = simple.getLabelGeometry();
-    createLabelProxyShape(geo, simple);
+    createNodeLabelProxyShape(geo, simple);
     return shape;
   }
 
@@ -243,8 +249,8 @@ public class ProxyShapeProducer
     return shape;
   }
 
-  LabelProxyShape createLabelProxyShape(final LabelGeometryProxy geo,
-                                        final SimpleNodeProxy simple)
+  LabelProxyShape createNodeLabelProxyShape(final LabelGeometryProxy geo,
+                                            final SimpleNodeProxy simple)
   {
     LabelProxyShape shape = (LabelProxyShape) lookup(geo);
     if (shape == null) {
@@ -318,29 +324,12 @@ public class ProxyShapeProducer
       for (final Proxy proxy : block.getEventList()) {
         // Use different font for different event kinds.
         Font font = EditorColor.DEFAULT_FONT;
-        String name = proxy.toString();
         if (proxy instanceof IdentifierProxy) {
           final IdentifierProxy ident = (IdentifierProxy) proxy;
           font = mRenderingContext.getFont(ident);
         }
-        if (mBindings != null)
-        {
-          if (proxy instanceof SimpleExpressionProxy)
-          {
-            SimpleExpressionProxy sExpression;
-            try {
-              sExpression = mCompiler.simplify((SimpleExpressionProxy)proxy, mBindings);
-            } catch (final EvalException exception) {
-              sExpression = null;
-            }
-            if (sExpression != null)
-            {
-              name = sExpression.toString();
-            }
-          }
-        }
         final int ly = (int) Math.round(y + height);
-        final LabelShape lshape = new LabelShape(proxy, lx, ly, font, name);
+        final LabelShape lshape = createEdgeLabelShape(proxy, lx, ly, font);
         mMap.put(proxy, lshape);
         final RoundRectangle2D lrect = lshape.getShape();
         height += lrect.getHeight();
@@ -391,7 +380,7 @@ public class ProxyShapeProducer
       for (final SimpleExpressionProxy guard : guards) {
         final int ly = (int) Math.round(y + height);
         final LabelShape lshape =
-          new LabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT, "guard");
+          createEdgeLabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT);
         mMap.put(guard, lshape);
         final RoundRectangle2D lrect = lshape.getShape();
         height += lrect.getHeight();
@@ -406,7 +395,7 @@ public class ProxyShapeProducer
       for (final BinaryExpressionProxy action : actions) {
         final int ly = (int) Math.round(y + height);
         final LabelShape lshape =
-          new LabelShape(action, lx, ly, EditorColor.DEFAULT_FONT, "action");
+          createEdgeLabelShape(action, lx, ly, EditorColor.DEFAULT_FONT);
         mMap.put(action, lshape);
         final RoundRectangle2D lrect = lshape.getShape();
         height += lrect.getHeight();
@@ -425,13 +414,32 @@ public class ProxyShapeProducer
   }
 
 
+  private LabelShape createEdgeLabelShape(final Proxy label,
+                                          final int x, final int y,
+                                          final Font font)
+  {
+    Proxy shown = label;
+    if (mBindings != null && label instanceof SimpleExpressionProxy) {
+      final SimpleExpressionProxy expr = (SimpleExpressionProxy) label;
+      try {
+        shown = mCompiler.simplify(expr, mBindings);
+      } catch (final EvalException exception) {
+        // OK, use the original label
+      }
+    }
+    final String text = mPrinter.toString(shown);
+    return new LabelShape(shown, x, y, font, text);
+  }
+
+
   //#########################################################################
   //# Data Members
   private final GraphProxy mGraph;
   private final RenderingContext mRenderingContext;
   private final Map<Proxy,ProxyShape> mMap;
-  private final BindingContext mBindings;
+  private final ModuleProxyPrinter mPrinter;
   private final SimpleExpressionCompiler mCompiler;
+  private final BindingContext mBindings;
 
 
   //#########################################################################

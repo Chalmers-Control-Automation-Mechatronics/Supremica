@@ -171,7 +171,7 @@ public class GraphEditorPanel
     mRoot = root;
     mRenderingContext = new EditorRenderingContext();
     final ProxyShapeProducer producer =
-      new SubjectShapeProducer(graph, module, mRenderingContext, null);
+      new SubjectShapeProducer(graph, module, mRenderingContext);
     setShapeProducer(producer);
     mToolbar = toolbar;
     mPopupFactory =
