@@ -209,7 +209,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         return setSatisfiedResult();
       } else {
         final ConflictTraceProxy counterexample =
-            getCounterExample(firstBlockingState, model, stateSchema, automata);
+            buildCounterExample(firstBlockingState, model, stateSchema,
+                                automata);
         return setFailedResult(counterexample);
       }
 
@@ -221,11 +222,11 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     }
   }
 
-  private ConflictTraceProxy getCounterExample(
-                                               final int firstBlockingState,
-                                               final ProductDESProxy model,
-                                               final SyncStateSchema stateSchema,
-                                               final AutomatonSchema[] automata)
+  private ConflictTraceProxy buildCounterExample(
+                                                 final int firstBlockingState,
+                                                 final ProductDESProxy model,
+                                                 final SyncStateSchema stateSchema,
+                                                 final AutomatonSchema[] automata)
   {
     // Generate a counter example. As each state is numbered in the
     // order it is encountered, and a breadth first exploration
