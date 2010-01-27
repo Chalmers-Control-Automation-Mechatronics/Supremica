@@ -24,6 +24,8 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
@@ -33,7 +35,7 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public class AutomatonDesktopPane
   extends JDesktopPane
-  implements SimulationObserver, Observer
+  implements ModelObserver, Observer
 {
 
   //#########################################################################
@@ -45,9 +47,10 @@ public class AutomatonDesktopPane
     mContainer = container;
     observers = new HashSet<InternalFrameObserver>();
     factory = new DesktopPanePopupFactory(container.getIDE().getPopupActionManager());
+    order = new ArrayList<String>();
     setBackground(EditorColor.BACKGROUNDCOLOR);
-    sim.attach(this);
     container.attach(this);
+    container.getModule().addModelObserver(this);
     this.addMouseListener(new MouseListener(){
 
       public void mouseClicked(final MouseEvent e)
@@ -141,14 +144,18 @@ public class AutomatonDesktopPane
 
   public void onReOpen(final ModuleContainer container, final Simulation sim)
   {
-    for (final String name : oldOpen.keySet()) {
-      addAutomaton(name, container, sim, 2);
-      if (openAutomaton.get(name) != null)
-      {
-        openAutomaton.get(name).setPreferredSize(new Dimension((int)oldOpen.get(name).getWidth(), (int)oldOpen.get(name).getHeight()));
-        openAutomaton.get(name).setLocation((int)oldOpen.get(name).getX(), (int)oldOpen.get(name).getY());
+    if (hasBeenEdited)
+    {
+      for (final String name : order) {
+        addAutomaton(name, container, sim, 2);
+        if (openAutomaton.get(name) != null)
+        {
+          openAutomaton.get(name).setPreferredSize(new Dimension((int)oldOpen.get(name).getWidth(), (int)oldOpen.get(name).getHeight()));
+          openAutomaton.get(name).setLocation((int)oldOpen.get(name).getX(), (int)oldOpen.get(name).getY());
+        }
       }
     }
+    hasBeenEdited = false;
   }
 
   private void selectAutomaton(final int clicks, final String aut)
@@ -393,37 +400,41 @@ public class AutomatonDesktopPane
 
   //#########################################################################
   //# Interface SimulationObserver
-  public void simulationChanged(final SimulationChangeEvent event)
+  public void modelChanged(final ModelChangeEvent event)
   {
-    if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED) {
-      if (openAutomaton.keySet().size() == 0)
-        return;
-      oldOpen.clear();
-      final List<Map.Entry<String,AutomatonInternalFrame>> entries =
-        new ArrayList<Map.Entry<String,AutomatonInternalFrame>>
-          (openAutomaton.entrySet());
-      while (entries.size() != 0)
-      {
-        int highestZValue = Integer.MIN_VALUE;
-        Map.Entry<String,AutomatonInternalFrame> lowestFrame = null;
-        for (final Map.Entry<String,AutomatonInternalFrame> entry :
-             entries) {
-          final AutomatonInternalFrame frame = entry.getValue();
-          if (this.getComponentZOrder(frame) > highestZValue)
-          {
-            highestZValue = this.getComponentZOrder(frame);
-            lowestFrame = entry;
+    if (!hasBeenEdited)
+    {
+      hasBeenEdited = true;
+      if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED) {
+        oldOpen.clear();
+        order.clear();
+        if (openAutomaton.keySet().size() == 0)
+          return;
+        final List<Map.Entry<String,AutomatonInternalFrame>> entries =
+          new ArrayList<Map.Entry<String,AutomatonInternalFrame>>
+            (openAutomaton.entrySet());
+        while (entries.size() != 0)
+        {
+          int highestZValue = Integer.MIN_VALUE;
+          Map.Entry<String,AutomatonInternalFrame> lowestFrame = null;
+          for (final Map.Entry<String,AutomatonInternalFrame> entry :
+               entries) {
+            final AutomatonInternalFrame frame = entry.getValue();
+            if (this.getComponentZOrder(frame) > highestZValue)
+            {
+              highestZValue = this.getComponentZOrder(frame);
+              lowestFrame = entry;
+            }
           }
+          final String name = lowestFrame.getKey();
+          final AutomatonInternalFrame frame = lowestFrame.getValue();
+          final Rectangle bounds = frame.getBounds();
+          oldOpen.put(name, bounds);
+          order.add(name);
+          frame.dispose();
+          entries.remove(lowestFrame);
         }
-        final String name = lowestFrame.getKey();
-        final AutomatonInternalFrame frame = lowestFrame.getValue();
-        final Rectangle bounds = frame.getBounds();
-        System.out.println("DEBUG: AutomatonDesktopPane [413]: " + frame.getTitle() + " has bounds " + frame.getBounds());
-        oldOpen.put(name, bounds);
-        frame.dispose();
-        entries.remove(lowestFrame);
       }
-      openAutomaton.clear();
     }
   }
 
@@ -443,10 +454,12 @@ public class AutomatonDesktopPane
     new HashMap<String,AutomatonInternalFrame>();
   private final HashMap<String, Rectangle> oldOpen =
     new HashMap<String, Rectangle>();
+  private final ArrayList<String> order;
   private final Simulation mSim;
   private final ModuleContainer mContainer;
   private final Set<InternalFrameObserver> observers;
   private final DesktopPanePopupFactory factory;
+  private boolean hasBeenEdited;
 
   //#########################################################################
   //# Class Constants
