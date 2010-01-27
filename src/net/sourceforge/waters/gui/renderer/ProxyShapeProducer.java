@@ -428,7 +428,7 @@ public class ProxyShapeProducer
       }
     }
     final String text = mPrinter.toString(shown);
-    return new LabelShape(shown, x, y, font, text);
+    return new LabelShape(label, x, y, font, text);
   }
 
 
