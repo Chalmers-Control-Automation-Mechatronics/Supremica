@@ -208,59 +208,9 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       if (nonblocking) {
         return setSatisfiedResult();
       } else {
-        // Generate a counter example. As each state is numbered in the
-        // order it is encountered, and a breadth first exploration
-        // strategy is used, and all states are reachable, following the
-        // transition to a state with the lowest id will give a
-        // counterexample.
-        final List<TraceStepProxy> countertrace =
-            new LinkedList<TraceStepProxy>();
-        final ProductDESProxyFactory desFactory = getFactory();
-        // Find the unchecked state with the lowest
-        // id, as this should give the shortest counterexample.
-        // or if a second marking condition is simultaneously used, look
-        // for the first non-coreachable precondition marked state.
-        int trace_start = firstBlockingState;
-        // Until we reach the start state...
-        while (trace_start != 0) {
-          final TIntArrayList preds = mSyncProduct.getPredecessors(trace_start);
-          final int pred = preds.get(0);
-          final EventProxy event = mSyncProduct.findEvent(pred, trace_start);
-          final Map<AutomatonProxy,StateProxy> statemap =
-              new HashMap<AutomatonProxy,StateProxy>();
-
-          final int[] decodedSource = new int[numaut];
-          final int[] decodedTarget = new int[numaut];
-          final long srcstate = mSyncProduct.getStateFromId(pred);
-          final long targetstate = mSyncProduct.getStateFromId(trace_start);
-          stateSchema.decodeState(srcstate, decodedSource);
-          stateSchema.decodeState(targetstate, decodedTarget);
-          for (int i = 0; i < automata.length; i++) {
-            final int eventID = mEventMap.getId(event);
-            final int[] targets =
-                automata[i].getSuccessorStates(decodedSource[i], eventID);
-            assert targets != null : "Every state of a counterexample trace must have atleast one successor state";
-            if (targets.length > 1) {
-              statemap.put(automata[i].getAutomatonProxy(),
-                           automata[i].getStateProxyFromID(decodedTarget[i]));
-            }
-          }
-          final TraceStepProxy traceStep =
-              desFactory.createTraceStepProxy(event, statemap);
-          countertrace.add(0, traceStep);
-          trace_start = pred;
-        }
-        final TraceStepProxy startPoint =
-            desFactory.createTraceStepProxy(null, null);
-        countertrace.add(0, startPoint);
-        final String modelname = model.getName();
-        final String tracename = modelname + "-conflicting";
-        final ConflictTraceProxy trace =
-            desFactory.createConflictTraceProxy(tracename, null, null, model,
-                                                model.getAutomata(),
-                                                countertrace,
-                                                ConflictKind.CONFLICT);
-        return setFailedResult(trace);
+        final ConflictTraceProxy counterexample =
+            getCounterExample(firstBlockingState, model, stateSchema, automata);
+        return setFailedResult(counterexample);
       }
 
     } finally {
@@ -269,6 +219,65 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       mSyncProduct = null;
       tearDown();
     }
+  }
+
+  private ConflictTraceProxy getCounterExample(
+                                               final int firstBlockingState,
+                                               final ProductDESProxy model,
+                                               final SyncStateSchema stateSchema,
+                                               final AutomatonSchema[] automata)
+  {
+    // Generate a counter example. As each state is numbered in the
+    // order it is encountered, and a breadth first exploration
+    // strategy is used, and all states are reachable, following the
+    // transition to a state with the lowest id will give a
+    // counterexample.
+    final List<TraceStepProxy> countertrace = new LinkedList<TraceStepProxy>();
+    final ProductDESProxyFactory desFactory = getFactory();
+    // Find the unchecked state with the lowest
+    // id, as this should give the shortest counterexample.
+    // or if a second marking condition is simultaneously used, look
+    // for the first non-coreachable precondition marked state.
+    int trace_start = firstBlockingState;
+    // Until we reach the start state...
+    while (trace_start != 0) {
+      final TIntArrayList preds = mSyncProduct.getPredecessors(trace_start);
+      final int pred = preds.get(0);
+      final EventProxy event = mSyncProduct.findEvent(pred, trace_start);
+      final Map<AutomatonProxy,StateProxy> statemap =
+          new HashMap<AutomatonProxy,StateProxy>();
+      final int numaut = automata.length;
+
+      final int[] decodedSource = new int[numaut];
+      final int[] decodedTarget = new int[numaut];
+      final long srcstate = mSyncProduct.getStateFromId(pred);
+      final long targetstate = mSyncProduct.getStateFromId(trace_start);
+      stateSchema.decodeState(srcstate, decodedSource);
+      stateSchema.decodeState(targetstate, decodedTarget);
+      for (int i = 0; i < automata.length; i++) {
+        final int eventID = mEventMap.getId(event);
+        final int[] targets =
+            automata[i].getSuccessorStates(decodedSource[i], eventID);
+        assert targets != null : "Every state of a counterexample trace must have atleast one successor state";
+        if (targets.length > 1) {
+          statemap.put(automata[i].getAutomatonProxy(), automata[i]
+              .getStateProxyFromID(decodedTarget[i]));
+        }
+      }
+      final TraceStepProxy traceStep =
+          desFactory.createTraceStepProxy(event, statemap);
+      countertrace.add(0, traceStep);
+      trace_start = pred;
+    }
+    final TraceStepProxy startPoint =
+        desFactory.createTraceStepProxy(null, null);
+    countertrace.add(0, startPoint);
+    final String modelname = model.getName();
+    final String tracename = modelname + "-conflicting";
+    final ConflictTraceProxy trace =
+        desFactory.createConflictTraceProxy(tracename, null, null, model, model
+            .getAutomata(), countertrace, ConflictKind.CONFLICT);
+    return trace;
   }
 
   // #########################################################################
