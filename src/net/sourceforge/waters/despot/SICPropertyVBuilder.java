@@ -335,29 +335,50 @@ public class SICPropertyVBuilder
     return newTransitions;
   }
 
+  @SuppressWarnings("unchecked")
   public ConflictTraceProxy convertTraceToOriginalModel(
                                                         final ConflictTraceProxy conflictTrace,
                                                         final EventProxy answer)
   {
+    // creates a map of the original model's automaton names to the object for
+    // that automaton and a map of the names of the states for that automaton to
+    // the state proxy objects
+    final Map<String,AutomatonProxy> autMap =
+        new HashMap<String,AutomatonProxy>();
+    final Map<String,StateProxy> innerStateMap =
+        new HashMap<String,StateProxy>();
+    final Map<String,Map<String,StateProxy>> stateMap =
+        new HashMap<String,Map<String,StateProxy>>();
+    for (final AutomatonProxy aut : mModel.getAutomata()) {
+      final String autName = aut.getName();
+      autMap.put(autName, aut);
+
+      final Set<StateProxy> states = aut.getStates();
+      for (final StateProxy state : states) {
+        final String statenm = state.getName();
+        innerStateMap.put(statenm, state);
+      }
+      stateMap.put(autName, new HashMap(innerStateMap));
+      innerStateMap.clear();
+    }
     final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
     final List<TraceStepProxy> convertedSteps = new ArrayList<TraceStepProxy>();
     for (final TraceStepProxy step : traceSteps) {
-      final Map<AutomatonProxy,StateProxy> stepsAutStateMap =
-          step.getStateMap();
-      final Map<AutomatonProxy,StateProxy> convertedMap =
+      final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
+      final Map<AutomatonProxy,StateProxy> convertedStepMap =
           new HashMap<AutomatonProxy,StateProxy>();
-      for (final Map.Entry<AutomatonProxy,StateProxy> e : stepsAutStateMap
-          .entrySet()) {
-        final AutomatonProxy aut = e.getKey();
-        @SuppressWarnings("unused")
-        final StateProxy state = e.getValue();
-        if (mModel.getAutomata().contains(aut)) {
-          final StateProxy convertedState = null;// need to get key from mStates
-          convertedMap.put(aut, convertedState);
-        }
+      for (final Map.Entry<AutomatonProxy,StateProxy> e : stepMap.entrySet()) {
+        final AutomatonProxy convertedAut = e.getKey();
+        final String autName = convertedAut.getName();
+        final AutomatonProxy originalAut = autMap.get(autName);
+        final StateProxy convertedState = e.getValue();
+        final String stateName = convertedState.getName();
+
+        final StateProxy originalState = stateMap.get(autName).get(stateName);
+        convertedStepMap.put(originalAut, originalState);
       }
       final TraceStepProxy convertedStep =
-          mFactory.createTraceStepProxy(step.getEvent(), convertedMap);
+          mFactory.createTraceStepProxy(step.getEvent(), convertedStepMap);
       convertedSteps.add(convertedStep);
     }
     final String modelname = mModel.getName();
