@@ -371,12 +371,17 @@ public class Simulation implements ModelObserver, Observer
   {
     if (!automaton.getStates().contains(state))
     {
-      throw new IllegalArgumentException("ERROR: This state does not belong to this automaton");
+      throw new IllegalArgumentException("ERROR: " + state.getName() + " does not belong to this automaton");
     }
     if (mAllAutomatons.containsKey(automaton))
       mAllAutomatons.put(automaton, state);
     else
       throw new IllegalArgumentException("ERROR: This automaton is not in this program");
+    invalidated = true;
+    findEventClassification();
+    final SimulationChangeEvent simEvent = new SimulationChangeEvent
+      (this, SimulationChangeEvent.STATE_CHANGED);
+    fireSimulationChangeEvent(simEvent);
   }
 
   public void reset()
@@ -537,9 +542,11 @@ public class Simulation implements ModelObserver, Observer
     }
     findEventClassification();
     updateControllability(true);
+    System.out.println("DEBUG: Simulation[545]: Time before events fire : " + (System.currentTimeMillis() - time));
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
+    System.out.println("DEBUG: Simulation[545]: Time after events fire : " + (System.currentTimeMillis() - time));
   }
 
   public void stepBack()

@@ -24,6 +24,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 
@@ -272,5 +273,11 @@ public class WatersPopupActionManager
   //#######################################################################
   //# Data Members
   private final IDE mIDE;
+
+  public IDEAction getDesktopSetStateAction(final AutomatonProxy automaton,
+                                            final NodeProxy node)
+  {
+    return new DesktopSwitchStateAction(mIDE, automaton, node);
+  }
 
 }

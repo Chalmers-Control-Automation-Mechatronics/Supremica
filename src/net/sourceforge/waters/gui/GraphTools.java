@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -26,6 +27,7 @@ import net.sourceforge.waters.model.module.GeometryTools;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -242,7 +244,7 @@ public class GraphTools {
     for (final NodeSubject n : graph.getNodesModifiable()) {
       if (n instanceof GroupNodeSubject) {
         // event ...
-        ((GroupNodeSubject) n).getImmediateChildNodesModifiable().clear();
+        //((GroupNodeSubject) n).getImmediateChildNodesModifiable().clear();
         groups.add((GroupNodeSubject) n);
       }
     }
@@ -257,6 +259,7 @@ public class GraphTools {
       }
     });
     // Go through all the nodes ...
+    final HashMap<GroupNodeSubject, ArrayList<NodeSubject>> newContainers = new HashMap<GroupNodeSubject, ArrayList<NodeSubject>>();
     for (final NodeSubject n : graph.getNodesModifiable()) {
       final Rectangle2D r1;
       if (n instanceof GroupNodeSubject) {
@@ -276,11 +279,37 @@ public class GraphTools {
                 continue mainloop;
               }
             }
-            group.getImmediateChildNodesModifiable().add(n); // event
+            if (!newContainers.containsKey(group))
+            {
+              newContainers.put(group, new ArrayList<NodeSubject>());
+            }
+            newContainers.get(group).add(n);
+            //group.getImmediateChildNodesModifiable().add(n); // event
             parents.add(group);
           }
         }
       }
+    }
+    for (final GroupNodeSubject group : groups)
+    {
+      final ArrayList<NodeProxy> nodesToRemove = new ArrayList<NodeProxy>();
+      final ArrayList<NodeProxy> nodesToAdd = new ArrayList<NodeProxy>();
+      for (final NodeProxy node : group.getImmediateChildNodes())
+      {
+        if (!newContainers.get(group).contains(node))
+        {
+          nodesToRemove.add(node);
+        }
+      }
+      for (final NodeProxy node : newContainers.get(group))
+      {
+        if (!group.getImmediateChildNodes().contains(node))
+          nodesToAdd.add(node);
+      }
+      for (final NodeProxy node : nodesToRemove)
+        group.getImmediateChildNodesModifiable().remove(node);
+      for (final NodeProxy node : nodesToAdd)
+        group.getImmediateChildNodesModifiable().add((NodeSubject)node);
     }
     return !groups.isEmpty();
   }

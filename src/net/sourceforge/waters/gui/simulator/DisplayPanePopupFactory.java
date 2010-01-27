@@ -11,7 +11,9 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 
 class DisplayPanePopupFactory
@@ -81,6 +83,22 @@ class DisplayPanePopupFactory
           final IDEAction execute =
             master.getDesktopExecuteAction(mDisplayPane.getAutomaton());
           popup.add(execute);
+          popup.addSeparator();
+        }
+      }
+      return null;
+    }
+
+    public Object visitNodeProxy(final NodeProxy node)
+    {
+      if (mDisplayPane != null) {
+        if (node instanceof SimpleNodeProxy)
+        {
+          final WatersPopupActionManager master = getMaster();
+          final JPopupMenu popup = getPopup();
+          final IDEAction teleport =
+            master.getDesktopSetStateAction(mDisplayPane.getAutomaton(), node);
+          popup.add(teleport);
           popup.addSeparator();
         }
       }

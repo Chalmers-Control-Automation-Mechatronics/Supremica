@@ -120,13 +120,8 @@ class AutomataTableModel
   // # Interface net.sourceforge.waters.gui.simulator.SimulationObserver
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED)
-    {
-      getRawData();
-      fireTableDataChanged();
-    }
-    else
-      updateRawData();
+    getRawData();
+    fireTableDataChanged();
   }
 
 
@@ -136,7 +131,7 @@ class AutomataTableModel
   {
     // This should identify the cells that have changed and then fire
     // a more appropriate change event.
-    updateRawData();
+    getRawData();
   }
 
 
@@ -177,9 +172,10 @@ class AutomataTableModel
       mRawData = new ArrayList<List<Object>>();
   }
 
-  private void updateRawData()
-  {
-    if (mRawData.size() == 0)
+  //private void updateRawData()
+  //{
+  // getRawData();
+  /*if (mRawData.size() == 0)
     {
       getRawData();
       return;
@@ -206,8 +202,8 @@ class AutomataTableModel
         mRawData.set(indexToChange, row);
         this.fireTableRowsUpdated(indexToChange, indexToChange);
       }
-    }
-  }
+    }*/
+  //}
 
   // #########################################################################
   // # Data Members

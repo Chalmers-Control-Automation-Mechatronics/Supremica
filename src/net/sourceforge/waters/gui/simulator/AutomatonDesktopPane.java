@@ -365,6 +365,18 @@ public class AutomatonDesktopPane
     return false;
   }
 
+  public boolean canOpenOther(final String name)
+  {
+    if (openAutomaton.size() > 1)
+      return true;
+    else if (openAutomaton.size() == 0)
+      return false;
+    else if (openAutomaton.containsKey(name))
+      return false;
+    else
+      return true;
+  }
+
   //#########################################################################
   //# Dealing with attached InternalFrameObservers
 
@@ -402,10 +414,11 @@ public class AutomatonDesktopPane
   //# Interface SimulationObserver
   public void modelChanged(final ModelChangeEvent event)
   {
-    if (!hasBeenEdited)
+    if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED)
     {
-      hasBeenEdited = true;
-      if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED) {
+      if (!hasBeenEdited)
+      {
+        hasBeenEdited = true;
         oldOpen.clear();
         order.clear();
         if (openAutomaton.keySet().size() == 0)
