@@ -6,7 +6,8 @@ import java.net.URI;
 import java.util.Collection;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
-import net.sourceforge.waters.junit.AbstractWatersTest;
+import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
+import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -28,7 +29,7 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
-public class SICPropertyVVerifierTest extends AbstractWatersTest
+public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
 {
 
   public void testConflictChecker_parManEg_I_mfb_lowlevel() throws Exception
@@ -261,7 +262,7 @@ public class SICPropertyVVerifierTest extends AbstractWatersTest
       if (!result && expectedResult) {
         final ConflictTraceProxy counterexample =
             conflictChecker.getCounterExample();
-        // precheckCounterExample(counterexample);
+        precheckCounterExample(counterexample);
         saveCounterExample(counterexample);
         assertEquals(
                      "Wrong result from model checker: the answer "
@@ -284,7 +285,7 @@ public class SICPropertyVVerifierTest extends AbstractWatersTest
     if (!expectedResult && !falseFound) {
       final ConflictTraceProxy counterexample =
           conflictChecker.getCounterExample();
-      // precheckCounterExample(counterexample);
+      precheckCounterExample(counterexample);
       saveCounterExample(counterexample);
       assertEquals(
                    "Wrong result from model checker: all answers in the model give true as a result "
@@ -352,6 +353,13 @@ public class SICPropertyVVerifierTest extends AbstractWatersTest
     return mBuilder.getAnswerEvents();
   }
 
+  protected ModelVerifier createModelVerifier(
+                                              final ProductDESProxyFactory factory)
+  {
+    mPropertyVerifier = new SICPropertyVVerifier(factory);
+    return mPropertyVerifier;
+  }
+
   // #########################################################################
   // # Overrides for junit.framework.TestCase
   protected void setUp() throws Exception
@@ -400,4 +408,5 @@ public class SICPropertyVVerifierTest extends AbstractWatersTest
   private DocumentManager mDocumentManager;
   private SICPropertyVBuilder mBuilder;
   private SICPropertyVVerifier mPropertyVerifier;
+
 }
