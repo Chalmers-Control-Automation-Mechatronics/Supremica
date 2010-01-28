@@ -378,11 +378,12 @@ public class SICPropertyVBuilder
         final AutomatonProxy convertedAut = e.getKey();
         final String autName = convertedAut.getName();
         final AutomatonProxy originalAut = autMap.get(autName);
-        final StateProxy convertedState = e.getValue();
-        final String stateName = convertedState.getName();
-
-        final StateProxy originalState = stateMap.get(autName).get(stateName);
-        convertedStepMap.put(originalAut, originalState);
+        if (originalAut != null) {
+          final StateProxy convertedState = e.getValue();
+          final String stateName = convertedState.getName();
+          final StateProxy originalState = stateMap.get(autName).get(stateName);
+          convertedStepMap.put(originalAut, originalState);
+        }
       }
       final TraceStepProxy convertedStep =
           mFactory.createTraceStepProxy(step.getEvent(), convertedStepMap);
