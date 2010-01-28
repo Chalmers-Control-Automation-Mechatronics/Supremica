@@ -4,17 +4,22 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
+import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -268,8 +273,8 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
 
         final ConflictTraceProxy convertedTrace =
             mBuilder.convertTraceToOriginalModel(counterexample, answer);
-        // tests whether the counter example trace is correctly converted
-        checkCounterExample(mBuilder.getUnchangedModel(), convertedTrace);
+        checkConvertedCounterExample(mBuilder.getUnchangedModel(),
+                                     convertedTrace);
 
         if (expectedResult) {
           assertEquals(
@@ -362,6 +367,34 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
   {
     mPropertyVerifier = new SICPropertyVVerifier(factory);
     return mPropertyVerifier;
+  }
+
+  /**
+   * Checks the correctness of a conflict counterexample which is converted back
+   * to the original model by SICPropertyVBuilder. A conflict counterexample has
+   * to be a {@link ConflictTraceProxy}, its event sequence has to be accepted
+   * by all automata in the original model. Furthermore, when a state has a
+   * nondeterministic choice it is verified whether the counter example includes
+   * correct state information.
+   *
+   * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
+   * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
+   */
+  protected void checkConvertedCounterExample(final ProductDESProxy des,
+                                              final TraceProxy trace)
+      throws Exception
+  {
+    final ConflictTraceProxy counterexample = (ConflictTraceProxy) trace;
+    final Collection<AutomatonProxy> automata = des.getAutomata();
+    final int size = automata.size();
+    final Map<AutomatonProxy,StateProxy> tuple =
+        new HashMap<AutomatonProxy,StateProxy>(size);
+    for (final AutomatonProxy aut : automata) {
+      final StateProxy state = checkCounterExample(aut, counterexample);
+      assertNotNull("Counterexample not accepted by automaton " + aut.getName()
+          + "!", state);
+      tuple.put(aut, state);
+    }
   }
 
   // #########################################################################
