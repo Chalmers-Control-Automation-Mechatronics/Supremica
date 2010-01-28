@@ -176,12 +176,11 @@ public abstract class AbstractConflictCheckerTest extends
     }
     final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
     final Iterator<TraceStepProxy> iter = traceSteps.iterator();
-    iter.next();  // skip initial step
+    iter.next(); // skip initial step
     while (iter.hasNext()) {
       final TraceStepProxy traceStep = iter.next();
       final EventProxy event = traceStep.getEvent();
-      final Map<AutomatonProxy,StateProxy> stepMap =
-        traceStep.getStateMap();
+      final Map<AutomatonProxy,StateProxy> stepMap = traceStep.getStateMap();
       final StateProxy target = stepMap.get(aut);
       if (target == null) {
         if (events.contains(event)) {
@@ -191,11 +190,11 @@ public abstract class AbstractConflictCheckerTest extends
               if (next == null) {
                 next = trans.getTarget();
               } else {
-                fail("The counter example trace does not contain a " +
-                     "successor state for the nondeterministic transition" +
-                     " in automaton " + aut.getName() +
-                     " from source state " + current.getName() +
-                     " with event " + event.getName() + ".");
+                fail("The counter example trace does not contain a "
+                    + "successor state for the nondeterministic transition"
+                    + " in automaton " + aut.getName() + " from source state "
+                    + current.getName() + " with event " + event.getName()
+                    + ".");
               }
             }
           }
@@ -205,22 +204,21 @@ public abstract class AbstractConflictCheckerTest extends
         if (events.contains(event)) {
           boolean found = false;
           for (final TransitionProxy trans : transitions) {
-            if (trans.getSource() == current &&
-                trans.getEvent() == event &&
-                trans.getTarget() == target) {
+            if (trans.getSource() == current && trans.getEvent() == event
+                && trans.getTarget() == target) {
               found = true;
             }
           }
-          assertTrue("There is no transition from state " + current.getName() +
-                     " to state " + target.getName() + " with event " +
-                     event.getName() + " in automaton" + aut.getName() +
-                     " as specified in the counterexample trace.", found);
+          assertTrue("There is no transition from state " + current.getName()
+              + " to state " + target.getName() + " with event "
+              + event.getName() + " in automaton" + aut.getName()
+              + " as specified in the counterexample trace.", found);
           current = target;
         } else {
-          assertSame("The target state specified in the counterexample " +
-                     "for the selflooped event " + event.getName() +
-                     "is different from the current state of automaton " +
-                     aut.getName() + ".", current, target);
+          assertSame("The target state specified in the counterexample "
+              + "for the selflooped event " + event.getName()
+              + "is different from the current state of automaton "
+              + aut.getName() + ".", current, target);
         }
       }
     }

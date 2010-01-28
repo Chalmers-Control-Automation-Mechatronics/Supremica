@@ -50,6 +50,11 @@ public class SICPropertyVBuilder
     mLowLevelAutomata = null;
   }
 
+  public ProductDESProxy getUnchangedModel()
+  {
+    return mModel;
+  }
+
   public void setMarkingProposition(final EventProxy marking)
   {
     mMarking = marking;
@@ -339,7 +344,8 @@ public class SICPropertyVBuilder
   @SuppressWarnings("unchecked")
   public ConflictTraceProxy convertTraceToOriginalModel(
                                                         final ConflictTraceProxy conflictTrace,
-                                                        final EventProxy answer) throws MalformedURLException
+                                                        final EventProxy answer)
+      throws MalformedURLException
   {
     // creates a map of the original model's automaton names to the object for
     // that automaton and a map of the names of the states for that automaton to

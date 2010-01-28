@@ -272,10 +272,11 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
                          + " but this model should have satisified SICPropertyV, therefore all "
                          + "answer events should produce true as a result!",
                      expectedResult, result);
-        @SuppressWarnings("unused")
+
         final ConflictTraceProxy convertedTrace =
             mBuilder.convertTraceToOriginalModel(counterexample, answer);
-
+        // tests whether the counter example trace is correctly converted
+        checkCounterExample(mBuilder.getUnchangedModel(), convertedTrace);
         break;
       } else if (!result && !expectedResult) {
         falseFound = true;
