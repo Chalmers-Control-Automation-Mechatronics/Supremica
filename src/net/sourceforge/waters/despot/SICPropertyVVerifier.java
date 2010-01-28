@@ -1,104 +1,73 @@
 package net.sourceforge.waters.despot;
 
+import java.util.List;
+
+import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
-import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
 
-public class SICPropertyVVerifier implements ModelVerifier
+
+public class SICPropertyVVerifier extends AbstractModelVerifier
 {
 
-  public VerificationResult getAnalysisResult()
+  public SICPropertyVVerifier(final ProductDESProxyFactory factory)
   {
-    // TODO Auto-generated method stub
-    return null;
+    this(null, factory);
   }
 
-  public TraceProxy getCounterExample()
+  public SICPropertyVVerifier(final ProductDESProxy model,
+                              final ProductDESProxyFactory factory)
   {
-    // TODO Auto-generated method stub
-    return null;
+    super(model, factory);
   }
 
-  public boolean isSatisfied()
+  public SICPropertyVVerifier(final ConflictChecker checker,
+                              final ProductDESProxy model,
+                              final ProductDESProxyFactory factory)
   {
-    // TODO Auto-generated method stub
-    return false;
+    super(model, factory);
+    mChecker = checker;
   }
 
-  public void clearAnalysisResult()
+  public void setConflictChecker(final ConflictChecker checker)
   {
-    // TODO Auto-generated method stub
-
-  }
-
-  public ProductDESProxyFactory getFactory()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public ProductDESProxy getModel()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public int getNodeLimit()
-  {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  public int getTransitionLimit()
-  {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  public boolean isAborting()
-  {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  public void requestAbort()
-  {
-    // TODO Auto-generated method stub
-
+    mChecker = checker;
   }
 
   public boolean run() throws AnalysisException
   {
-    // TODO Auto-generated method stub
-    return false;
+    final ProductDESProxy model = getModel();
+    final SICPropertyVBuilder builder =
+        new SICPropertyVBuilder(model, getFactory());
+    final List<EventProxy> answers =
+        (List<EventProxy>) builder.getAnswerEvents();
+    setConflictCheckerMarkings(builder);
+    ProductDESProxy convertedModel = null;
+    boolean result = true;
+    for (final EventProxy answer : answers) {
+      convertedModel = builder.createModelForAnswer(answer);
+      mChecker.setModel(convertedModel);
+      result &= mChecker.run();
+      if (!result) {
+        break;
+      }
+    }
+    return result;
   }
 
-  public void setModel(ProductDESProxy model)
+  private void setConflictCheckerMarkings(final SICPropertyVBuilder builder)
   {
-    // TODO Auto-generated method stub
-
+    final EventProxy defaultMark = builder.getMarkingProposition();
+    final EventProxy preconditionMark = builder.getGeneralisedPrecondition();
+    mChecker.setMarkingProposition(defaultMark);
+    mChecker.setGeneralisedPrecondition(preconditionMark);
   }
 
-  public void setModel(AutomatonProxy aut)
-  {
-    // TODO Auto-generated method stub
-
-  }
-
-  public void setNodeLimit(int limit)
-  {
-    // TODO Auto-generated method stub
-
-  }
-
-  public void setTransitionLimit(int limit)
-  {
-    // TODO Auto-generated method stub
-
-  }
+  // #########################################################################
+  // # Data Members
+  private ConflictChecker mChecker;
 
 }
