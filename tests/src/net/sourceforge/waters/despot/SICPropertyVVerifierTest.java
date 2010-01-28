@@ -259,29 +259,33 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
               preconditionMark, mProductDESFactory);
       final boolean result = conflictChecker.run();
 
-      if (!result && expectedResult) {
+      if (!result) {
         final ConflictTraceProxy counterexample =
             conflictChecker.getCounterExample();
         precheckCounterExample(counterexample);
-        saveCounterExample(counterexample);
-        assertEquals(
-                     "Wrong result from model checker: the answer "
-                         + answer.getName()
-                         + " gives "
-                         + result
-                         + " but this model should have satisified SICPropertyV, therefore all "
-                         + "answer events should produce true as a result!",
-                     expectedResult, result);
+        final File traceFilename = saveCounterExample(counterexample);
+        counterexample.setLocation(traceFilename.toURI());
 
         final ConflictTraceProxy convertedTrace =
             mBuilder.convertTraceToOriginalModel(counterexample, answer);
         // tests whether the counter example trace is correctly converted
         checkCounterExample(mBuilder.getUnchangedModel(), convertedTrace);
-        break;
-      } else if (!result && !expectedResult) {
-        falseFound = true;
+
+        if (expectedResult) {
+          assertEquals(
+                       "Wrong result from model checker: the answer "
+                           + answer.getName()
+                           + " gives "
+                           + result
+                           + " but this model should have satisified SICPropertyV, therefore all "
+                           + "answer events should produce true as a result!",
+                       expectedResult, result);
+        } else if (!expectedResult) {
+          falseFound = true;
+        }
         break;
       }
+
     }
     if (!expectedResult && !falseFound) {
       final ConflictTraceProxy counterexample =
