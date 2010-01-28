@@ -71,7 +71,11 @@ public class TraceMutableTreeNode extends DefaultMutableTreeNode implements Simu
     for (int looper = 0; looper < sim.getEventHistory().size(); looper++)
     {
       final Step step = sim.getEventHistory().get(looper);
-      final DefaultMutableTreeNode eventToAdd= new EventBranchNode(step.getEvent(), looper);
+      DefaultMutableTreeNode eventToAdd;
+      if (step == null)
+        eventToAdd = new TeleportEventTreeNode(looper);
+      else
+        eventToAdd= new EventBranchNode(step.getEvent(), looper);
       this.add(eventToAdd);
       eventToAdd.add(new DefaultMutableTreeNode("Placeholder. You shouldn't ever see this"));
     }

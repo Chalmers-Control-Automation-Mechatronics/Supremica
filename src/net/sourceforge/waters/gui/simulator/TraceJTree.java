@@ -91,6 +91,25 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
               }
             }
           }
+          else if (node instanceof TeleportEventTreeNode)
+          {
+            final TeleportEventTreeNode eventNode = (TeleportEventTreeNode)node;
+            final int targetTime = eventNode.getTime();
+            int currentTime = sim.getCurrentTime();
+            while (currentTime != targetTime)
+            {
+              if (targetTime < currentTime)
+              {
+                sim.stepBack();
+                currentTime--;
+              }
+              else if (targetTime > currentTime)
+              {
+                sim.replayStep();
+                currentTime++;
+              }
+            }
+          }
           else if (AutomatonLeafNode.class.isInstance(node))
           {
             final AutomatonProxy toAdd = ((AutomatonLeafNode)node).getAutomata();
@@ -118,6 +137,10 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
         {
           factory.maybeShowPopup(TraceJTree.this, e, null, ((EventBranchNode)node).getTime());
         }
+        else if (node instanceof TeleportEventTreeNode)
+        {
+          factory.maybeShowPopup(TraceJTree.this, e, null, ((TeleportEventTreeNode)node).getTime());
+        }
         else if (node instanceof InitialState)
         {
           factory.maybeShowPopup(TraceJTree.this, e, null, -1);
@@ -136,6 +159,10 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
         if (event.getPath().getLastPathComponent().getClass() == EventBranchNode.class)
         {
           expandedNodes.remove((Integer)(((EventBranchNode)event.getPath().getLastPathComponent()).getTime()));
+        }
+        else if (event.getPath().getLastPathComponent() instanceof TeleportEventTreeNode)
+        {
+          expandedNodes.remove((Integer)(((TeleportEventTreeNode)event.getPath().getLastPathComponent()).getTime()));
         }
         else if (InitialState.class.isInstance(event.getPath().getLastPathComponent()))
         {
@@ -156,6 +183,17 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
           }
           expandedNodes.add(expansionIndex);
           ((EventBranchNode)event.getPath().getLastPathComponent()).addAutomata(mSim, mSim.getAutomatonHistory().get(expansionIndex));
+        }
+        else if (event.getPath().getLastPathComponent() instanceof TeleportEventTreeNode)
+        {
+          final int expansionIndex = ((TeleportEventTreeNode)event.getPath().getLastPathComponent()).getTime();
+          for (final Integer index : expandedNodes)
+          {
+            if (index == expansionIndex)
+              return;
+          }
+          expandedNodes.add(expansionIndex);
+          ((TeleportEventTreeNode)event.getPath().getLastPathComponent()).addAutomata(mSim, mSim.getAutomatonHistory().get(expansionIndex));
         }
         else if (InitialState.class.isInstance(event.getPath().getLastPathComponent()))
         {
@@ -189,6 +227,10 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
           toolTipText += " Event " + event.getName() + " was fired at time " + (((EventBranchNode)comp).getTime() + 1);
           setToolTipText(toolTipText);
         }
+        else if (comp instanceof TeleportEventTreeNode)
+        {
+          setToolTipText("Automaton State was manually set");
+        }
         else if (AutomatonLeafNode.class.isInstance(comp))
         {
           String toolTipText = "";
@@ -203,6 +245,11 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
           if (InitialState.class.isInstance(path.getPathComponent(1)))
           {
             if (mSim.isNonControllableAtTime(-1).contains(auto))
+              toolTipText += " was causing a controllability problem";
+          }
+          else if (path.getPathComponent(1) instanceof TeleportEventTreeNode)
+          {
+            if (mSim.isNonControllableAtTime(((TeleportEventTreeNode)path.getPathComponent(1)).getTime()).contains(auto))
               toolTipText += " was causing a controllability problem";
           }
           else
@@ -246,6 +293,16 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
             ((EventBranchNode)node.getChildAt(nodeIndex)).addAutomata(mSim,
                 mSim.getAutomatonHistory().get(((EventBranchNode)node.getChildAt(nodeIndex)).getTime()));
             this.expandPath(new TreePath(((EventBranchNode)node.getChildAt(nodeIndex)).getPath()));
+            located = true;
+          }
+        }
+        else if (node.getChildAt(nodeIndex) instanceof TeleportEventTreeNode)
+        {
+          if (expandedIndex == ((TeleportEventTreeNode)node.getChildAt(nodeIndex)).getTime())
+          {
+            ((TeleportEventTreeNode)node.getChildAt(nodeIndex)).addAutomata(mSim,
+                mSim.getAutomatonHistory().get(((TeleportEventTreeNode)node.getChildAt(nodeIndex)).getTime()));
+            this.expandPath(new TreePath(((TeleportEventTreeNode)node.getChildAt(nodeIndex)).getPath()));
             located = true;
           }
         }
@@ -423,6 +480,25 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
            mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
          }
          mEventNameLabel.setIcon(new ImageIcon());
+         return mEventPanel;
+       }
+       else if (value instanceof TeleportEventTreeNode)
+       {
+         if (sel)
+           mEventPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
+         else
+           mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
+         final TeleportEventTreeNode eventNode = (TeleportEventTreeNode)value;
+         mEventNameLabel.setText("Manual State Set");
+         mEventNameLabel.setIcon(IconLoader.ICON_CROSS);
+         if (eventNode.getTime() == TraceJTree.this.mSim.getCurrentTime())
+         {
+           mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.BOLD));
+         }
+         else
+         {
+           mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
+         }
          return mEventPanel;
        }
        else

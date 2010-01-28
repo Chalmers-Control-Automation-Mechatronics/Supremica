@@ -342,10 +342,11 @@ public class AutomatonDisplayPane
           foundState = true;
         }
       }
-      if (mFocusedItem instanceof StateProxy && !foundState)
+      if (mFocusedItem instanceof NodeProxy && !foundState)
       {
         setToolTipText("State " + ((NodeProxy)mFocusedItem).getName() + " has been removed due to optimisation");
       }
+      boolean foundTrans = false;
       for (final TransitionProxy trans : mAutomaton.getTransitions())
       {
         final Proxy source = infomap.get(trans).getSourceObject();
@@ -370,8 +371,11 @@ public class AutomatonDisplayPane
           else
             toolTipText += ", currently disabled";
           this.setToolTipText(toolTipText);
+          foundTrans = true;
         }
       }
+      if (!foundTrans && mFocusedItem instanceof IdentifierProxy)
+        setToolTipText("Transition " + ((IdentifierProxy)mFocusedItem).toString() + " has been removed due to optimisation");
     }
   }
 

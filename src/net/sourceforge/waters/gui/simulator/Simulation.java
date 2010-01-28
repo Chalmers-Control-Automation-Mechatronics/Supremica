@@ -311,6 +311,11 @@ public class Simulation implements ModelObserver, Observer
     return output;
   }
 
+  public ArrayList<AutomatonProxy> getAutomatonActivityAtTime(final int time)
+  {
+    return mPreviousEnabledLastStep.get(time);
+  }
+
   ProductDESProxy getCompiledDES()
   {
     return mCompiledDES;
@@ -330,13 +335,19 @@ public class Simulation implements ModelObserver, Observer
       for (final StateProxy startState : automaton.getStates())
       {
         if (startState.isInitial())
+        {
+          if (mPreviousEvents.get(currentTime) == null)
+            return null;
           return mPreviousEvents.get(currentTime).getTransition(automaton,
                                                                 startState,
                                                                 mPreviousAutomatonStates.get(currentTime).get(automaton));
+        }
       }
     }
     else
     {
+      if (mPreviousEvents.get(currentTime) == null)
+        return null;
       return mPreviousEvents.get(currentTime).getTransition(automaton,
                      mPreviousAutomatonStates.get(currentTime - 1).get(automaton),
                      mPreviousAutomatonStates.get(currentTime).get(automaton));
@@ -379,6 +390,12 @@ public class Simulation implements ModelObserver, Observer
       throw new IllegalArgumentException("ERROR: This automaton is not in this program");
     invalidated = true;
     findEventClassification();
+    mPreviousAutomatonStates.add(new HashMap<AutomatonProxy, StateProxy>(mAllAutomatons));
+    final ArrayList<AutomatonProxy> auto = new ArrayList<AutomatonProxy>();
+    auto.add(automaton);
+    mPreviousEnabledLastStep.add(auto);
+    mPreviousEvents.add(null);
+    currentTime++;
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
@@ -542,11 +559,9 @@ public class Simulation implements ModelObserver, Observer
     }
     findEventClassification();
     updateControllability(true);
-    System.out.println("DEBUG: Simulation[545]: Time before events fire : " + (System.currentTimeMillis() - time));
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
-    System.out.println("DEBUG: Simulation[545]: Time after events fire : " + (System.currentTimeMillis() - time));
   }
 
   public void stepBack()

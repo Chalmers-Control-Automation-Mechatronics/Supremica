@@ -71,7 +71,6 @@ public class EventChooserDialog extends JDialog
       (int)maximumWidth,
       (int)((DEFAULT_LIST_WIDTH - maximumWidth * 2) / 2)};
     layout.columnWidths = a;
-    System.out.println("DEBUG: Label size: " + labels[0].getPreferredSize().getWidth() + LIST_BORDER_SIZE);
     scrollPane.setPreferredSize(new Dimension((int)labels[0].getPreferredSize().getWidth() + 2 * LIST_BORDER_SIZE, DEFAULT_ROW_HEIGHT * correspondingEvent.length + 20));
     buttonPanel.setLayout(layout);
     buttonPanel.add(new JLabel()); // To keep the empty tile empty
