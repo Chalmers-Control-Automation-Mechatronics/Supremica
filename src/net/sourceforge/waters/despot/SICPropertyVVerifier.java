@@ -60,6 +60,7 @@ public class SICPropertyVVerifier extends AbstractModelVerifier
 
   private void setConflictCheckerMarkings(final SICPropertyVBuilder builder)
   {
+    builder.setDefaultMarkings();
     final EventProxy defaultMark = builder.getMarkingProposition();
     final EventProxy preconditionMark = builder.getGeneralisedPrecondition();
     mChecker.setMarkingProposition(defaultMark);

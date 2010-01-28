@@ -249,11 +249,11 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
         getModelAnswerEvents(group, subdir, name);
     boolean falseFound = false;
     MonolithicConflictChecker conflictChecker = null;
-    final EventProxy defaultMark = mBuilder.getMarkingProposition();
-    final EventProxy preconditionMark = mBuilder.getGeneralisedPrecondition();
 
     for (final EventProxy answer : answerEvents) {
       final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
+      final EventProxy defaultMark = mBuilder.getMarkingProposition();
+      final EventProxy preconditionMark = mBuilder.getGeneralisedPrecondition();
       conflictChecker =
           new MonolithicConflictChecker(modifiedDES, defaultMark,
               preconditionMark, mProductDESFactory);
@@ -350,7 +350,6 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
     final ProductDESProxy originalDES = loadProductDES(unmodifiedDESURI);
     mBuilder.setInputModel(originalDES);
     mPropertyVerifier.setModel(originalDES);
-
     return mBuilder.getAnswerEvents();
   }
 

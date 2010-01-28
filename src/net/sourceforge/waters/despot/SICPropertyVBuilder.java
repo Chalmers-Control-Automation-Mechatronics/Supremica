@@ -402,6 +402,16 @@ public class SICPropertyVBuilder
     return convertedTrace;
   }
 
+  public void setDefaultMarkings()
+  {
+    mMarking =
+        mFactory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME,
+                                  EventKind.PROPOSITION, true);
+    final String alphaNm = ":alpha";
+    mPreconditionMarking =
+        mFactory.createEventProxy(alphaNm, EventKind.PROPOSITION, true);
+  }
+
   // #########################################################################
   // # Data Members
   /**
