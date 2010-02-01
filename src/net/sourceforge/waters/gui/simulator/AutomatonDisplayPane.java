@@ -621,6 +621,7 @@ public class AutomatonDisplayPane
       boolean proxyIsActive = false;
       boolean proxyIsEnabled = false;
       boolean proxyIsSelected = false;
+      boolean proxyIsInvalid = false;
       // The spring embedder modifies a copy of our graph. When it is running,
       // the items being displayed are not in our compiled graph ...
       final Proxy orig = getOriginal(proxy);
@@ -641,6 +642,17 @@ public class AutomatonDisplayPane
             proxyIsSelected = true;
           }
         }
+        boolean found = (proxyIsActive || proxyIsSelected);
+        if (!found)
+        {
+          for (final StateProxy state : mAutomaton.getStates())
+          {
+            if (infomap.get(state).getSourceObject() == orig)
+              found = true;
+          }
+        }
+        if (!found)
+          proxyIsInvalid = true;
       } else if (orig instanceof IdentifierProxy ||
                  orig instanceof EdgeProxy) {
         final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
@@ -673,6 +685,25 @@ public class AutomatonDisplayPane
             }
           }
         }
+        boolean found = (proxyIsActive || proxyIsSelected || proxyIsEnabled);
+        if (!found)
+        {
+          for (final TransitionProxy trans : mAutomaton.getTransitions())
+          {
+            if (orig instanceof IdentifierSubject)
+            {
+              if (infomap.get(trans).getSourceObject() == orig)
+                found = true;
+            }
+            else if (orig instanceof EdgeSubject)
+            {
+              if (((AbstractSubject)infomap.get(trans).getSourceObject()).getAncestor(EdgeSubject.class) == orig)
+                found = true;
+            }
+          }
+        }
+        if (!found)
+          proxyIsInvalid = true;
       }
       else if (orig instanceof ForeachEventSubject)
       {
@@ -704,18 +735,33 @@ public class AutomatonDisplayPane
           final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
           if (infomap.get(currentState).getSourceObject() == parent)
             proxyIsActive = true;
+          boolean found = (proxyIsActive || proxyIsSelected);
+          if (!found)
+          {
+            for (final StateProxy state : mAutomaton.getStates())
+            {
+              if (infomap.get(state).getSourceObject() == parent)
+                found = true;
+            }
+          }
+          if (!found)
+            proxyIsInvalid = true;
         }
       }
       return getRawRenderingInformation
-        (orig, proxyIsActive, proxyIsEnabled, proxyIsSelected);
+        (orig, proxyIsActive, proxyIsEnabled, proxyIsSelected, proxyIsInvalid);
     }
 
     //#######################################################################
     //# Auxiliary Methods
     private RenderingInformation getRawRenderingInformation
       (final Proxy orig, final boolean proxyIsActive,
-       final boolean proxyIsEnabled, final boolean proxyIsSelected)
+       final boolean proxyIsEnabled, final boolean proxyIsSelected,
+       final boolean proxyIsInvalid)
     {
+      if (proxyIsInvalid)
+        return new RenderingInformation(false, true, EditorColor.DEFAULTCOLOR, EditorColor.SIMULATION_INVALID,
+                                        getPriority(orig));
       if (proxyIsActive || proxyIsEnabled || proxyIsSelected) {
         final Color foreground;
         final Color shadow;

@@ -199,6 +199,11 @@ public class EditorColor
     shadow(Color.YELLOW, 144);
 
   /**
+   * The colour for transitions and states which are removed due to optimization
+   */
+  public static final Color SIMULATION_INVALID = shadow(new Color(128, 128, 128));
+
+  /**
    * The colour for disabled events that are in focus in the simulator
    */
   public static final Color SIMULATION_DISABLED_FOCUSED =
@@ -228,5 +233,6 @@ public class EditorColor
   //# Private Class Constants
   /** The alpha value of the shadow-colours. */
   private static final int SHADOWALPHA = 48;
+
 
 }

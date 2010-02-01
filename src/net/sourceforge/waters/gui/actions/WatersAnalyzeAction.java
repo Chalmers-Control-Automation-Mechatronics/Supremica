@@ -154,7 +154,6 @@ public abstract class WatersAnalyzeAction
           AnalyzerDialog.this.dispose();
         }
       });
-      this.validate();
     }
 
     public void fail()
@@ -184,7 +183,6 @@ public abstract class WatersAnalyzeAction
       else
         informationLabel.setText(verifier.getCounterExample().getComment());
       bottomPanel.add(traceButton, BorderLayout.EAST);
-      this.validate();
     }
 
     public void error(final AnalysisException exception)
@@ -260,7 +258,6 @@ public abstract class WatersAnalyzeAction
 
       public void componentResized(final ComponentEvent e)
       {
-        System.out.println("DEBUG: Difference in height between panel and dialog box is " + (AnalyzerDialog.this.getSize().getHeight() - parent.getSize().getHeight()));
         this.setPreferredSize(new Dimension(((int)parent.getSize().getWidth()), (((int)parent.getSize().getHeight() - TITLEBAR_HEIGHT))));
       }
 
