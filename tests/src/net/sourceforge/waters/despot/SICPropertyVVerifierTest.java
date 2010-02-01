@@ -3,7 +3,9 @@ package net.sourceforge.waters.despot;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +23,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -28,10 +31,13 @@ import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
@@ -274,7 +280,7 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
         final ConflictTraceProxy convertedTrace =
             mBuilder.convertTraceToOriginalModel(counterexample, answer);
         checkConvertedCounterExample(mBuilder.getUnchangedModel(),
-                                     convertedTrace);
+                                     convertedTrace, answer);
 
         if (expectedResult) {
           assertEquals(
@@ -373,15 +379,17 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
    * Checks the correctness of a conflict counterexample which is converted back
    * to the original model by SICPropertyVBuilder. A conflict counterexample has
    * to be a {@link ConflictTraceProxy}, its event sequence has to be accepted
-   * by all automata in the original model. Furthermore, when a state has a
-   * nondeterministic choice it is verified whether the counter example includes
-   * correct state information.
+   * by all automata in the original model. Also the trace must put all
+   * interfaces in a state where the answer in question is enabled. Furthermore,
+   * when a state has a nondeterministic choice it is verified whether the
+   * counter example includes correct state information.
    *
    * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
    * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
    */
   protected void checkConvertedCounterExample(final ProductDESProxy des,
-                                              final TraceProxy trace)
+                                              final TraceProxy trace,
+                                              final EventProxy answer)
       throws Exception
   {
     final ConflictTraceProxy counterexample = (ConflictTraceProxy) trace;
@@ -394,7 +402,150 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
       assertNotNull("Counterexample not accepted by automaton " + aut.getName()
           + "!", state);
       tuple.put(aut, state);
+
+      // tests that in the end state of the trace all interfaces have the answer
+      // in question enabled
+      if (HISCAttributes.isInterface(aut.getAttributes())) {
+        final Collection<TransitionProxy> transitions = aut.getTransitions();
+        for (final TransitionProxy transition : transitions) {
+          if (transition.getSource() == state) {
+            if (transition.getTarget() != answer) {
+              final File filename = saveCounterExample(trace);
+              fail("Counterexample leads to a state where the interface "
+                  + aut.getName() + " does not have the answer event "
+                  + answer.getName() + " enabled (trace written to " + filename
+                  + ")!");
+            }
+            break;
+          }
+        }
+
+      }
     }
+    /*
+     * final ProductDESProxy ldes = createLanguageInclusionModel(des, tuple);
+     * final ProductDESProxyFactory factory = getProductDESProxyFactory(); final
+     * LanguageInclusionChecker lchecker = createLanguageInclusionChecker(ldes,
+     * factory); final boolean blocking = lchecker.run(); if (!blocking) { final
+     * TraceProxy ltrace = lchecker.getCounterExample(); final File filename =
+     * saveCounterExample(ltrace);
+     * fail("Counterexample does not lead to s state where the answer event " +
+     * answer.getName() + " can never be executed (trace written to" + filename
+     * + ")!"); }
+     */
+  }
+
+  // #########################################################################
+  // # Coreachability Model
+  private ProductDESProxy createLanguageInclusionModel(
+                                                       final ProductDESProxy des,
+                                                       final Map<AutomatonProxy,StateProxy> inittuple)
+  {
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final Collection<EventProxy> oldevents = des.getEvents();
+    final int numevents = oldevents.size();
+    final Collection<EventProxy> newevents =
+        new ArrayList<EventProxy>(numevents);
+    EventProxy oldmarking = null;
+    final EventProxy newmarking = null;
+    for (final EventProxy oldevent : oldevents) {
+      if (oldevent.getKind() == EventKind.PROPOSITION) {
+        final String eventname = oldevent.getName();
+        if (eventname.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+          oldmarking = oldevent;
+          // newmarking = factory.createEventProxy(eventname,
+          // EventKind.UNCONTROLLABLE);
+          newevents.add(oldmarking);
+        }
+      } else {
+        newevents.add(oldevent);
+      }
+    }
+    if (oldmarking == null) {
+      throw new IllegalArgumentException(
+          "Default marking proposition not found in model!");
+    }
+    final Collection<AutomatonProxy> oldautomata = des.getAutomata();
+    final int numaut = oldautomata.size();
+    final Collection<AutomatonProxy> newautomata =
+        new ArrayList<AutomatonProxy>(numaut + 1);
+    for (final AutomatonProxy oldaut : oldautomata) {
+      final StateProxy init = inittuple.get(oldaut);
+      final AutomatonProxy newaut =
+          createLanguageInclusionAutomaton(oldaut, init, oldmarking, newmarking);
+      newautomata.add(newaut);
+    }
+    final AutomatonProxy prop = createPropertyAutomaton(newmarking);
+    newautomata.add(prop);
+    final String name = des.getName() + "-coreachability";
+    return factory.createProductDESProxy(name, newevents, newautomata);
+  }
+
+  private AutomatonProxy createLanguageInclusionAutomaton(
+                                                          final AutomatonProxy aut,
+                                                          final StateProxy newinit,
+                                                          final EventProxy oldmarking,
+                                                          final EventProxy newmarking)
+  {
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final Collection<EventProxy> oldevents = aut.getEvents();
+    final int numevents = oldevents.size();
+    final Collection<EventProxy> newevents =
+        new ArrayList<EventProxy>(numevents);
+    for (final EventProxy oldevent : oldevents) {
+      if (oldevent == oldmarking) {
+        newevents.add(newmarking);
+      } else if (oldevent.getKind() != EventKind.PROPOSITION) {
+        newevents.add(oldevent);
+      }
+    }
+    final Collection<StateProxy> oldstates = aut.getStates();
+    final int numstates = oldstates.size();
+    final Collection<StateProxy> newstates =
+        new ArrayList<StateProxy>(numstates);
+    final Map<StateProxy,StateProxy> statemap =
+        new HashMap<StateProxy,StateProxy>(numstates);
+    final Collection<TransitionProxy> oldtransitions = aut.getTransitions();
+    final int numtrans = oldtransitions.size();
+    final Collection<TransitionProxy> newtransitions =
+        new ArrayList<TransitionProxy>(numstates + numtrans);
+    for (final StateProxy oldstate : oldstates) {
+      final String statename = oldstate.getName();
+      final StateProxy newstate =
+          factory.createStateProxy(statename, oldstate == newinit, null);
+      newstates.add(newstate);
+      statemap.put(oldstate, newstate);
+      if (oldstate.getPropositions().contains(oldmarking)) {
+        final TransitionProxy trans =
+            factory.createTransitionProxy(newstate, newmarking, newstate);
+        newtransitions.add(trans);
+      }
+    }
+    for (final TransitionProxy oldtrans : oldtransitions) {
+      final StateProxy oldsource = oldtrans.getSource();
+      final StateProxy newsource = statemap.get(oldsource);
+      final StateProxy oldtarget = oldtrans.getTarget();
+      final StateProxy newtarget = statemap.get(oldtarget);
+      final EventProxy event = oldtrans.getEvent();
+      final TransitionProxy newtrans =
+          factory.createTransitionProxy(newsource, event, newtarget);
+      newtransitions.add(newtrans);
+    }
+    final String autname = aut.getName();
+    final ComponentKind kind = aut.getKind();
+    return factory.createAutomatonProxy(autname, kind, newevents, newstates,
+                                        newtransitions);
+  }
+
+  private AutomatonProxy createPropertyAutomaton(final EventProxy newmarking)
+  {
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final String name = ":never:" + newmarking.getName();
+    final Collection<EventProxy> events = Collections.singletonList(newmarking);
+    final StateProxy state = factory.createStateProxy("s0", true, null);
+    final Collection<StateProxy> states = Collections.singletonList(state);
+    return factory.createAutomatonProxy(name, ComponentKind.PROPERTY, events,
+                                        states, null);
   }
 
   // #########################################################################

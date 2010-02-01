@@ -389,7 +389,7 @@ public class SICPropertyVBuilder
           mFactory.createTraceStepProxy(step.getEvent(), convertedStepMap);
       convertedSteps.add(convertedStep);
     }
-    final String tracename = conflictTrace.getFileLocation().toString();
+    final String tracename = conflictTrace.getName();
     final String modelname = mModel.getName();
     final String mainComment = modelname + " does not satisfy SIC Property V. ";
     final String comment =
