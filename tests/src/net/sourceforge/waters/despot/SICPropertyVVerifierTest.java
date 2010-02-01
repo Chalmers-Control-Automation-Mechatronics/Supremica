@@ -12,6 +12,7 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
+import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -31,13 +32,11 @@ import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
@@ -422,17 +421,20 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
 
       }
     }
-    /*
-     * final ProductDESProxy ldes = createLanguageInclusionModel(des, tuple);
-     * final ProductDESProxyFactory factory = getProductDESProxyFactory(); final
-     * LanguageInclusionChecker lchecker = createLanguageInclusionChecker(ldes,
-     * factory); final boolean blocking = lchecker.run(); if (!blocking) { final
-     * TraceProxy ltrace = lchecker.getCounterExample(); final File filename =
-     * saveCounterExample(ltrace);
-     * fail("Counterexample does not lead to s state where the answer event " +
-     * answer.getName() + " can never be executed (trace written to" + filename
-     * + ")!"); }
-     */
+
+    final ProductDESProxy ldes = createLanguageInclusionModel(des, tuple);
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final LanguageInclusionChecker lchecker =
+        createLanguageInclusionChecker(ldes, factory);
+    final boolean blocking = lchecker.run();
+    if (!blocking) {
+      final TraceProxy ltrace = lchecker.getCounterExample();
+      final File filename = saveCounterExample(ltrace);
+      fail("Counterexample does not lead to s state where the answer event "
+          + answer.getName() + " can never be executed (trace written to"
+          + filename + ")!");
+    }
+
   }
 
   // #########################################################################
@@ -442,29 +444,23 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
                                                        final Map<AutomatonProxy,StateProxy> inittuple)
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    final Collection<EventProxy> oldevents = des.getEvents();
-    final int numevents = oldevents.size();
+    final Collection<EventProxy> events = des.getEvents();
+    final int numevents = events.size();
     final Collection<EventProxy> newevents =
         new ArrayList<EventProxy>(numevents);
-    EventProxy oldmarking = null;
+    final EventProxy oldmarking = null;
     final EventProxy newmarking = null;
-    for (final EventProxy oldevent : oldevents) {
-      if (oldevent.getKind() == EventKind.PROPOSITION) {
-        final String eventname = oldevent.getName();
-        if (eventname.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
-          oldmarking = oldevent;
-          // newmarking = factory.createEventProxy(eventname,
-          // EventKind.UNCONTROLLABLE);
-          newevents.add(oldmarking);
-        }
-      } else {
-        newevents.add(oldevent);
-      }
-    }
-    if (oldmarking == null) {
-      throw new IllegalArgumentException(
-          "Default marking proposition not found in model!");
-    }
+    /*
+     * for (final EventProxy oldevent : oldevents) { if (oldevent.getKind() ==
+     * EventKind.PROPOSITION) { final String eventname = oldevent.getName(); if
+     * (eventname.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) { oldmarking =
+     * oldevent; // newmarking = factory.createEventProxy(eventname, //
+     * EventKind.UNCONTROLLABLE); newevents.add(oldmarking); } } else {
+     * newevents.add(oldevent); } }
+     *
+     * if (oldmarking == null) { throw new IllegalArgumentException(
+     * "Default marking proposition not found in model!"); }
+     */
     final Collection<AutomatonProxy> oldautomata = des.getAutomata();
     final int numaut = oldautomata.size();
     final Collection<AutomatonProxy> newautomata =
@@ -490,15 +486,13 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final Collection<EventProxy> oldevents = aut.getEvents();
     final int numevents = oldevents.size();
-    final Collection<EventProxy> newevents =
-        new ArrayList<EventProxy>(numevents);
-    for (final EventProxy oldevent : oldevents) {
-      if (oldevent == oldmarking) {
-        newevents.add(newmarking);
-      } else if (oldevent.getKind() != EventKind.PROPOSITION) {
-        newevents.add(oldevent);
-      }
-    }
+    /*
+     * final Collection<EventProxy> newevents = new
+     * ArrayList<EventProxy>(numevents); for (final EventProxy oldevent :
+     * oldevents) { if (oldevent == oldmarking) { newevents.add(newmarking); }
+     * else if (oldevent.getKind() != EventKind.PROPOSITION) {
+     * newevents.add(oldevent); } }
+     */
     final Collection<StateProxy> oldstates = aut.getStates();
     final int numstates = oldstates.size();
     final Collection<StateProxy> newstates =
@@ -533,8 +527,9 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
     }
     final String autname = aut.getName();
     final ComponentKind kind = aut.getKind();
-    return factory.createAutomatonProxy(autname, kind, newevents, newstates,
-                                        newtransitions);
+    return null;
+    // factory.createAutomatonProxy(autname, kind, newevents, newstates,
+    // newtransitions);
   }
 
   private AutomatonProxy createPropertyAutomaton(final EventProxy newmarking)
