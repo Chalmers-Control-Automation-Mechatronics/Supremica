@@ -1,7 +1,6 @@
 package net.sourceforge.waters.gui.simulator;
 
 
-import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
@@ -150,20 +149,23 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
   {
     if (canResize())
     {
-      final Rectangle2D size = mDisplayPane.getMinimumBoundingRectangle();
-      mDisplayPane.setSize(new Dimension((int)size.getX(), (int)size.getY()));
+      //final Rectangle2D size = mDisplayPane.getMinimumBoundingRectangle();
+      //mDisplayPane.setSize(new Dimension((int)size.getX(), (int)size.getY()));
+      //System.out.println("DEBUG: AutomatonInternalFrame[155]: Can Resize before pack: " + canResize());
       this.pack();
-      SwingUtilities.invokeLater(new Thread(){public void run(){AutomatonInternalFrame.this.repaint();}});
+      //System.out.println("DEBUG: AutomatonInternalFrame[157]: Can Resize after pack: " + canResize());
+      SwingUtilities.invokeLater(new Thread(){public void run(){AutomatonInternalFrame.this.repaint();System.out.println("DEBUG: AutomatonInternalFrame[158]: Can Resize after repaint: " + canResize());}});
       storeReferenceFrame();
     }
   }
 
   public boolean canResize()
   {
-    System.out.println("DEBUG: Height Difference is : " + (mDisplayPane.getSize().getHeight() - mDisplayPane.getMinimumBoundingRectangle().getHeight()));
-    System.out.println("DEBUG: Width Difference is : " + (mDisplayPane.getSize().getWidth() - mDisplayPane.getMinimumBoundingRectangle().getWidth()));
-    return (Math.abs(mDisplayPane.getSize().getHeight() - mDisplayPane.getMinimumBoundingRectangle().getHeight()) > 10
-            && Math.abs(mDisplayPane.getSize().getWidth() - mDisplayPane.getMinimumBoundingRectangle().getWidth()) > 10);
+    System.out.println("DEBUG: AutomatonInternalFrame [165]: Size of desired outcome is : " + mDisplayPane.getPreferredSize());
+    System.out.println("DEBUG: Height Difference is : " + (mDisplayPane.getSize().getHeight() - mDisplayPane.getPreferredSize().getHeight()));
+    System.out.println("DEBUG: Width Difference is : " + (mDisplayPane.getSize().getWidth() - mDisplayPane.getPreferredSize().getWidth()));
+    return (Math.abs(mDisplayPane.getSize().getHeight() - mDisplayPane.getPreferredSize().getHeight()) > 10
+            && Math.abs(mDisplayPane.getSize().getWidth() - mDisplayPane.getPreferredSize().getWidth()) > 10);
   }
 
   // ###########################################################################
