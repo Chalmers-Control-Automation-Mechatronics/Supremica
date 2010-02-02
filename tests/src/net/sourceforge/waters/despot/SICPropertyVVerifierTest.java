@@ -364,7 +364,7 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
     if (!blocking) {
       final TraceProxy ltrace = lchecker.getCounterExample();
       final File filename = saveCounterExample(ltrace);
-      fail("Counterexample does not lead to s state where the answer event "
+      fail("Counterexample does not lead to a state where the answer event "
           + answer.getName() + " can never be executed (trace written to"
           + filename + ")!");
     }
