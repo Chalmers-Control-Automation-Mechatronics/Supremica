@@ -52,10 +52,16 @@ public class SICPropertyVVerifier extends AbstractModelVerifier
       mChecker.setModel(convertedModel);
       result &= mChecker.run();
       if (!result) {
+        mFailedAnswer = answer;
         break;
       }
     }
     return result;
+  }
+
+  public EventProxy getFailedAnswer()
+  {
+    return mFailedAnswer;
   }
 
   private void setConflictCheckerMarkings(final SICPropertyVBuilder builder)
@@ -70,5 +76,7 @@ public class SICPropertyVVerifier extends AbstractModelVerifier
   // #########################################################################
   // # Data Members
   private ConflictChecker mChecker;
+
+  private EventProxy mFailedAnswer;
 
 }
