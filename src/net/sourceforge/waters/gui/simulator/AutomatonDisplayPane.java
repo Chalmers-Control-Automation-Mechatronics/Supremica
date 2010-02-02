@@ -158,6 +158,9 @@ public class AutomatonDisplayPane
       mParent.adjustSize(false);
       mParent.storeReferenceFrame();
       mTransform = mInverseTransform = null;
+      final Rectangle2D newBounds = AutomatonDisplayPane.this.getMinimumBoundingRectangle();
+      this.setPreferredSize(new Dimension((int)newBounds.getWidth(), (int)newBounds.getHeight()));
+      mParent.resize();
     }
   }
 
