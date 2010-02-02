@@ -49,9 +49,9 @@ public class SimulatorPanel
     return mSimulation;
   }
 
-  public void switchToTraceMode(final TraceProxy trace)
+  public void switchToTraceMode(final TraceProxy trace, final boolean allowLastStep)
   {
-    mSimulation.run(trace);
+    mSimulation.run(trace, allowLastStep);
     mTabbedPane.setSelectedIndex(2);
   }
 

@@ -87,6 +87,7 @@ public abstract class WatersAnalyzeAction
   protected abstract String getFailureDescription();
   protected abstract String getSuccessDescription();
   protected abstract ModelVerifier getModelVerifier(ModelVerifierFactory factory, ProductDESProxyFactory desFactory);
+  protected abstract boolean getAllowLastStep();
 
   public void actionPerformed(final ActionEvent e)
   {
@@ -172,7 +173,7 @@ public abstract class WatersAnalyzeAction
         {
           final TraceProxy counterexample = verifier.getCounterExample();
           ((ModuleContainer)getIDE().getActiveDocumentContainer()).getTabPane().setSelectedIndex(1);
-          ((ModuleContainer)getIDE().getActiveDocumentContainer()).getSimulatorPanel().switchToTraceMode(counterexample);
+          ((ModuleContainer)getIDE().getActiveDocumentContainer()).getSimulatorPanel().switchToTraceMode(counterexample, getAllowLastStep());
           AnalyzerDialog.this.dispose();
         }
       });

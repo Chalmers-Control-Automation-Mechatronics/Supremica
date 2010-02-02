@@ -405,7 +405,7 @@ public class Simulation implements ModelObserver, Observer
   {
     if (mTrace != null)
     {
-      run(mTrace);
+      run(mTrace, mAllowLastStep);
     }
     else
     {
@@ -433,10 +433,12 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-  public void run(final TraceProxy trace)
+  public void run(final TraceProxy trace, final boolean allowLastStep)
   {
     mTrace = null;
+    mAllowLastStep = false;
     reset();
+    mAllowLastStep = allowLastStep;
     mTrace = trace;
     Step locatedStep = null;
     boolean firstStep = true;
@@ -444,7 +446,7 @@ public class Simulation implements ModelObserver, Observer
     for (final TraceStepProxy tStep : trace.getTraceSteps()) // Travel through each trace step
     {
       locatedStep = null;
-      if (!firstStep && tStep != lastStep)
+      if (!firstStep && (tStep != lastStep || allowLastStep))
       {
         for (final Step step : mEnabledEvents) // Look for all possible Steps in the simulation
         {
@@ -484,7 +486,7 @@ public class Simulation implements ModelObserver, Observer
           }
         }
         else
-          throw new IllegalArgumentException("No valid step could be found");
+          throw new IllegalArgumentException("No valid step could be found, trace was: " + trace.getTraceSteps());
       }
       else
         firstStep = false;
@@ -577,7 +579,7 @@ public class Simulation implements ModelObserver, Observer
         if (currentTime == mPreviousEvents.size() - 1)
         {
           mContainer.getIDE().info(": Looping to start of control loop");
-          while (currentTime != ((LoopTraceProxy)mTrace).getLoopIndex() - 1)
+          while (currentTime != ((LoopTraceProxy)mTrace).getLoopIndex())
           {
             stepBack();
           }
@@ -992,6 +994,7 @@ public class Simulation implements ModelObserver, Observer
   private ProductDESProxy mCompiledDES;
   private final ModuleContainer mContainer;
   private TraceProxy mTrace;
+  private boolean mAllowLastStep;
   private boolean invalidated;
 
   long time = 0;

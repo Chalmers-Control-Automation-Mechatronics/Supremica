@@ -25,6 +25,11 @@ public class AnalyzeControlLoopAction extends WatersAnalyzeAction
     return "has a control loop";
   }
 
+  protected boolean getAllowLastStep()
+  {
+    return true;
+  }
+
   protected ModelVerifier getModelVerifier(final ModelVerifierFactory factory,
                                            final ProductDESProxyFactory desFactory)
   {

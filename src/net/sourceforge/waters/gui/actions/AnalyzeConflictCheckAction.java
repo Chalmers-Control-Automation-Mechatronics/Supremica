@@ -27,6 +27,11 @@ extends WatersAnalyzeAction
     return "is blocking";
   }
 
+  protected boolean getAllowLastStep()
+  {
+    return true;
+  }
+
   protected ModelVerifier getModelVerifier(final ModelVerifierFactory factory,
                                            final ProductDESProxyFactory desFactory)
   {
