@@ -230,30 +230,53 @@ public class EventTreeModel
    */
   public int sortByEnabled(final EventProxy a, final EventProxy b)
   {
+    boolean aIsEnabled = false;
+    boolean bIsEnabled = false;
+    for (final Step step : mSim.getValidTransitions())
+    {
+      if (step.getEvent() == a)
+        aIsEnabled = true;
+      if (step.getEvent() == b)
+        bIsEnabled = true;
+    }
     if (b == null)
       throw new IllegalArgumentException("DEBUG: NULL EVENT");
-    if (mSim.getValidTransitions().contains(a))
+    if (aIsEnabled)
     {
-      if (mSim.getValidTransitions().contains(b))
+      if (bIsEnabled)
+      {
         return 0;
+      }
       else
+      {
         return 1;
+      }
     }
-    else if (mSim.getNonControllable(a) == null)
+    else if (mSim.getNonControllable(a) != null)
     {
-      if (mSim.getNonControllable(b) == null)
+      if (mSim.getNonControllable(b) != null)
+      {
         return 0;
+      }
       else
+      {
         return -1;
+      }
     }
     else
     {
-      if (mSim.getValidTransitions().contains(b))
+      if (bIsEnabled)
+      {
         return -1;
-      else if (mSim.getNonControllable(b) == null)
+      }
+      else if (mSim.getNonControllable(b) != null)
+      {
         return 1;
+      }
       else
+      {
         return 0;
+      }
     }
   }
 
