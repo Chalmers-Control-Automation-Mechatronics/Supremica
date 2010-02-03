@@ -132,6 +132,7 @@ class AutomataTableModel
     // This should identify the cells that have changed and then fire
     // a more appropriate change event.
     getRawData();
+    fireTableDataChanged();
   }
 
 

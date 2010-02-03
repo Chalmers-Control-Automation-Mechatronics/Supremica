@@ -161,9 +161,6 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
 
   public boolean canResize()
   {
-    System.out.println("DEBUG: AutomatonInternalFrame [165]: Size of desired outcome is : " + mDisplayPane.getPreferredSize());
-    System.out.println("DEBUG: Height Difference is : " + (mDisplayPane.getSize().getHeight() - mDisplayPane.getPreferredSize().getHeight()));
-    System.out.println("DEBUG: Width Difference is : " + (mDisplayPane.getSize().getWidth() - mDisplayPane.getPreferredSize().getWidth()));
     return (Math.abs(mDisplayPane.getSize().getHeight() - mDisplayPane.getPreferredSize().getHeight()) > 10
             && Math.abs(mDisplayPane.getSize().getWidth() - mDisplayPane.getPreferredSize().getWidth()) > 10);
   }

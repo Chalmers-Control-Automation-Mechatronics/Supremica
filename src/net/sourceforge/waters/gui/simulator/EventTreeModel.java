@@ -224,7 +224,6 @@ public class EventTreeModel
 
   /**
    * Returns a POSITIVE NUMBER if a is before b in the default setting. The default order is ENABLED, DISABLED, BLOCKING
-   * Returns a POSITIVE NUMBER if a is enabled and b isn't, NEGATIVE if b is enabled and a isn't, and ZERO if they are the same
    * @param a
    * @param b
    * @return
