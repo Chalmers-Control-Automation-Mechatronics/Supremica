@@ -201,7 +201,7 @@ public class EditorColor
   /**
    * The colour for transitions and states which are removed due to optimization
    */
-  public static final Color SIMULATION_INVALID = shadow(new Color(128, 128, 128));
+  public static final Color SIMULATION_INVALID = new Color(128, 128, 128);
 
   /**
    * The colour for disabled events that are in focus in the simulator

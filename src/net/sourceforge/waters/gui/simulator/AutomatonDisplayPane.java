@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 
 import net.sourceforge.waters.gui.BackupGraphPanel;
 import net.sourceforge.waters.gui.EditorColor;
+import net.sourceforge.waters.gui.GraphPanel;
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
@@ -161,6 +162,7 @@ public class AutomatonDisplayPane
       final Rectangle2D newBounds = AutomatonDisplayPane.this.getMinimumBoundingRectangle();
       this.setPreferredSize(new Dimension((int)newBounds.getWidth(), (int)newBounds.getHeight()));
       mParent.resize();
+      ((AutomatonDesktopPane)mParent.getDesktopPane()).cascade();
     }
   }
 
@@ -645,7 +647,7 @@ public class AutomatonDisplayPane
             proxyIsSelected = true;
           }
         }
-        boolean found = (proxyIsActive || proxyIsSelected);
+        boolean found = (proxyIsActive);
         if (!found)
         {
           for (final StateProxy state : mAutomaton.getStates())
@@ -688,7 +690,7 @@ public class AutomatonDisplayPane
             }
           }
         }
-        boolean found = (proxyIsActive || proxyIsSelected || proxyIsEnabled);
+        boolean found = (proxyIsActive || proxyIsEnabled);
         if (!found)
         {
           for (final TransitionProxy trans : mAutomaton.getTransitions())
@@ -738,7 +740,7 @@ public class AutomatonDisplayPane
           final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
           if (infomap.get(currentState).getSourceObject() == parent)
             proxyIsActive = true;
-          boolean found = (proxyIsActive || proxyIsSelected);
+          boolean found = (proxyIsActive);
           if (!found)
           {
             for (final StateProxy state : mAutomaton.getStates())
@@ -763,7 +765,8 @@ public class AutomatonDisplayPane
        final boolean proxyIsInvalid)
     {
       if (proxyIsInvalid)
-        return new RenderingInformation(false, true, EditorColor.DEFAULTCOLOR, EditorColor.SIMULATION_INVALID,
+        return new RenderingInformation(false, false, EditorColor.SIMULATION_INVALID,
+                                        EditorColor.getShadowColor(orig, GraphPanel.DragOverStatus.NOTDRAG, false, false, false),
                                         getPriority(orig));
       if (proxyIsActive || proxyIsEnabled || proxyIsSelected) {
         final Color foreground;

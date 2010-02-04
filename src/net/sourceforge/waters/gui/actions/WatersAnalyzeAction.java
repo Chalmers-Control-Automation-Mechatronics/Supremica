@@ -117,7 +117,6 @@ public abstract class WatersAnalyzeAction
       topPanel = new JPanel();
       bottomPanel = new JPanel();
       informationLabel = new WrapperLabel(topPanel);
-      //informationLabel = new JLabel();
       informationLabel.setText(getCheckName() + " Check is running...");
       informationLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cancelButton = new JButton("Abort");
@@ -141,7 +140,10 @@ public abstract class WatersAnalyzeAction
       this.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
       this.setSize(DEFAULT_DIALOG_SIZE);
       this.setLocation(DEFAULT_DIALOG_LOCATION);
-      run();
+      runner = new AnalyzerThread();
+      runner.setPriority(Thread.MIN_PRIORITY);
+      repaint();
+      runner.start();
     }
 
     public void succeed()
@@ -197,13 +199,6 @@ public abstract class WatersAnalyzeAction
           AnalyzerDialog.this.dispose();
         }
       });
-    }
-
-    private void run()
-    {
-      runner = new AnalyzerThread();
-      runner.setPriority(Thread.MIN_PRIORITY);
-      runner.start();
     }
 
     // ######################################################################

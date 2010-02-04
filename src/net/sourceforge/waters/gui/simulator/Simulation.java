@@ -389,6 +389,7 @@ public class Simulation implements ModelObserver, Observer
     else
       throw new IllegalArgumentException("ERROR: This automaton is not in this program");
     invalidated = true;
+    updateControllability(true);
     findEventClassification();
     mPreviousAutomatonStates.add(new HashMap<AutomatonProxy, StateProxy>(mAllAutomatons));
     final ArrayList<AutomatonProxy> auto = new ArrayList<AutomatonProxy>();
@@ -458,7 +459,7 @@ public class Simulation implements ModelObserver, Observer
               if (step.getSource().get(auto) != null) // Check to see if the step is non-deterministic. If it is, then it is the correct Step
               {
                 if (tStep.getStateMap().get(auto) == null) // If there is no non-deterministic information, fail always
-                  throw new IllegalArgumentException("No non-deterministic information available");
+                  throw new IllegalArgumentException("No non-deterministic information available. Trace is:" + trace.getTraceSteps());
                 else if (step.getDest().get(auto) == tStep.getStateMap().get(auto)) // If the destinations match, then it is the right step
                   {
                     isTheRightStep = true;
@@ -709,6 +710,8 @@ public class Simulation implements ModelObserver, Observer
     for (final AutomatonProxy aut : mAllAutomatons.keySet())
     {
       final ArrayList<TransitionProxy> eventsFirable = new ArrayList<TransitionProxy>();
+      final ArrayList<TransitionProxy> newEventsFirable = new ArrayList<TransitionProxy>();
+      final ArrayList<TransitionProxy> automatonsActiveEvents = new ArrayList<TransitionProxy>();
       for (final TransitionProxy trans : aut.getTransitions())
       {
         if (trans.getSource() == mAllAutomatons.get(aut))
@@ -727,28 +730,73 @@ public class Simulation implements ModelObserver, Observer
           }
           if (isInEnabled)
           {
-            TransitionProxy old = null;
-            for (final TransitionProxy eventFired : eventsFirable)
-            {
-              if (eventFired.getEvent() == trans.getEvent())
-                old = eventFired;
-            }
-            if (old != null)
-            {
-              splitEvent(aut, old, trans);
-            }
+            eventsFirable.add(trans);
+            automatonsActiveEvents.add(trans);
           }
           else if (!isInEnabled && !isInInvalid)
           {
-            mEnabledEvents.add(new Step(trans.getEvent()));
+            newEventsFirable.add(trans);
+            automatonsActiveEvents.add(trans);
           }
-          eventsFirable.add(trans);
         }
+      }
+      while (eventsFirable.size() != 0)
+      {
+        final TransitionProxy firable = eventsFirable.get(0);
+        final ArrayList<TransitionProxy> targetTrans = new ArrayList<TransitionProxy>();
+        for (final TransitionProxy trans : eventsFirable)
+        {
+          if (firable.getEvent() == trans.getEvent())
+            targetTrans.add(trans);
+        }
+        if (targetTrans.size() != 1)
+        {
+          for (final Step step : (ArrayList<Step>)mEnabledEvents.clone())
+          {
+            if (step.getEvent() == firable.getEvent())
+            {
+              mEnabledEvents.remove(step);
+              for (final TransitionProxy trans : targetTrans)
+              {
+                mEnabledEvents.add(step.addNewTransition(aut, trans));
+              }
+            }
+          }
+        }
+        for (final TransitionProxy trans : targetTrans)
+          eventsFirable.remove(trans);
+      }
+      while (newEventsFirable.size() != 0)
+      {
+        final TransitionProxy firable = newEventsFirable.get(0);
+        final ArrayList<TransitionProxy> targetTrans = new ArrayList<TransitionProxy>();
+        for (final TransitionProxy trans : newEventsFirable)
+        {
+          if (firable.getEvent() == trans.getEvent())
+            targetTrans.add(trans);
+        }
+        if (targetTrans.size() != 1)
+        {
+          for (final TransitionProxy trans : targetTrans)
+          {
+            final HashMap<AutomatonProxy, StateProxy> source = new HashMap<AutomatonProxy, StateProxy>();
+            final HashMap<AutomatonProxy, StateProxy> dest = new HashMap<AutomatonProxy, StateProxy>();
+            source.put(aut, trans.getSource());
+            dest.put(aut, trans.getTarget());
+            mEnabledEvents.add(new Step(trans.getEvent(),source, dest));
+          }
+        }
+        else
+        {
+          mEnabledEvents.add(new Step(firable.getEvent()));
+        }
+        for (final TransitionProxy trans : targetTrans)
+          newEventsFirable.remove(trans);
       }
       for (final EventProxy event : aut.getEvents())
       {
         boolean fired = false;
-        for (final TransitionProxy trans : eventsFirable)
+        for (final TransitionProxy trans : automatonsActiveEvents)
         {
           if (trans.getEvent() == event)
             fired = true;
@@ -808,32 +856,6 @@ public class Simulation implements ModelObserver, Observer
       }
     }
   }
-
-  @SuppressWarnings("unchecked")
-  private void splitEvent(final AutomatonProxy auto, final TransitionProxy old, final TransitionProxy trans)
-  {
-    if (old.getEvent() != trans.getEvent())
-      throw new IllegalArgumentException();
-    for (final Step step : (ArrayList<Step>)mEnabledEvents.clone())
-    {
-      if (step.getEvent() == old.getEvent())
-      {
-        if (!step.isSensitive(auto))
-        {
-          mEnabledEvents.remove(step);
-          mEnabledEvents.add(step.addNewTransition(auto, old));
-          mEnabledEvents.add(step.addNewTransition(auto, trans));
-          return;
-        }
-        else
-        {
-          mEnabledEvents.add(step.addNewTransition(auto, trans));
-          return;
-        }
-      }
-    }
-  }
-
 
   private void addNewInvalidEvent(final EventProxy event, final AutomatonProxy automaton)
   {
