@@ -5,6 +5,7 @@ import java.util.List;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -52,11 +53,14 @@ public class SICPropertyVVerifier extends AbstractModelVerifier
       mChecker.setModel(convertedModel);
       result &= mChecker.run();
       if (!result) {
+        final ConflictTraceProxy counterexample = mChecker.getCounterExample();
+        final ConflictTraceProxy convertedTrace =
+            builder.convertTraceToOriginalModel(counterexample, answer);
         mFailedAnswer = answer;
-        break;
+        return setFailedResult(convertedTrace);
       }
     }
-    return result;
+    return setSatisfiedResult();
   }
 
   public EventProxy getFailedAnswer()

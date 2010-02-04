@@ -1,6 +1,5 @@
 package net.sourceforge.waters.despot;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -345,7 +344,7 @@ public class SICPropertyVBuilder
   public ConflictTraceProxy convertTraceToOriginalModel(
                                                         final ConflictTraceProxy conflictTrace,
                                                         final EventProxy answer)
-      throws MalformedURLException
+
   {
     // creates a map of the original model's automaton names to the object for
     // that automaton and a map of the names of the states for that automaton to
@@ -393,8 +392,10 @@ public class SICPropertyVBuilder
     final String modelname = mModel.getName();
     final String mainComment = modelname + " does not satisfy SIC Property V. ";
     final String comment =
-        mainComment + "The answer event, " + answer.getName()
-            + ", caused the failure.";
+        mainComment
+            + "The answer event "
+            + answer.getName()
+            + " can no longer be executed, although it is required by the interface.";
     final ConflictTraceProxy convertedTrace =
         mFactory.createConflictTraceProxy(tracename, comment, conflictTrace
             .getLocation(), mModel, mModel.getAutomata(), convertedSteps,

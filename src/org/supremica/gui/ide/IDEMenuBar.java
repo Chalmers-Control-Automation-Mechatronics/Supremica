@@ -25,6 +25,7 @@ import javax.swing.JMenuItem;
 import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSICPropertyVAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
 import net.sourceforge.waters.gui.actions.IDECopyAction;
@@ -102,67 +103,24 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  */
 
 /*
- * ALT-Hotkeys:
- *   ALT-a: Create/New automaton
- *   ALT-b: Simulator/Step back
- *   ALT-c: Create menu
- *   ALT-d: Edit menu
- *   ALT-e: Create/New event
- *   ALT-f: File menu
- *   ALT-g:
- *   ALT-h: Help menu
- *   ALT-i:
- *   ALT-j:
- *   ALT-k:
- *   ALT-l:
- *   ALT-m: Modules menu
- *   ALT-n:
- *   ALT-o: Configure menu
- *   ALT-p: Simulator/Step
- *   ALT-q: Simulator/Replay Step
- *   ALT-r: Simulator/Reset
- *   ALT-s: Simulator menu
- *   ALT-t: Tools menu
- *   ALT-u:
- *   ALT-v: Create/New variable
- *   ALT-w:
- *   ALT-x: Examples menu
- *   ALT-y:
- *   ALT-z: Analyze menu (in the Analyse menu) / New Analyze menu (in the Editor menu)
+ * ALT-Hotkeys: ALT-a: Create/New automaton ALT-b: Simulator/Step back ALT-c:
+ * Create menu ALT-d: Edit menu ALT-e: Create/New event ALT-f: File menu ALT-g:
+ * ALT-h: Help menu ALT-i: ALT-j: ALT-k: ALT-l: ALT-m: Modules menu ALT-n:
+ * ALT-o: Configure menu ALT-p: Simulator/Step ALT-q: Simulator/Replay Step
+ * ALT-r: Simulator/Reset ALT-s: Simulator menu ALT-t: Tools menu ALT-u: ALT-v:
+ * Create/New variable ALT-w: ALT-x: Examples menu ALT-y: ALT-z: Analyze menu
+ * (in the Analyse menu) / New Analyze menu (in the Editor menu)
  *
- * CTRL-Hotkeys:
- *   CTRL-a: Edit/Select all
- *   CTRL-b:
- *   CTRL-c: Edit/Copy
- *   CTRL-d:
- *   CTRL-e:
- *   CTRL-f:
- *   CTRL-g:
- *   CTRL-h:
- *   CTRL-i:
- *   CTRL-j:
- *   CTRL-k:
- *   CTRL-l: Edit/Layout graph
- *   CTRL-m:
- *   CTRL-n: File/New
- *   CTRL-o: File/Open
- *   CTRL-p: File/Print
- *   CTRL-q: File/Exit
- *   CTRL-r:
- *   CTRL-s: File/Save
- *   CTRL-t: Examples/Dynamic examples
- *   CTRL-u:
- *   CTRL-v: Edit/Paste, Analyze/Verify
- *   CTRL-w: Analyze/Workbench
- *   CTRL-x: Edit/Cut
- *   CTRL-y: Edit/Redo
- *   CTRL-z: Edit/Undo
+ * CTRL-Hotkeys: CTRL-a: Edit/Select all CTRL-b: CTRL-c: Edit/Copy CTRL-d:
+ * CTRL-e: CTRL-f: CTRL-g: CTRL-h: CTRL-i: CTRL-j: CTRL-k: CTRL-l: Edit/Layout
+ * graph CTRL-m: CTRL-n: File/New CTRL-o: File/Open CTRL-p: File/Print CTRL-q:
+ * File/Exit CTRL-r: CTRL-s: File/Save CTRL-t: Examples/Dynamic examples CTRL-u:
+ * CTRL-v: Edit/Paste, Analyze/Verify CTRL-w: Analyze/Workbench CTRL-x: Edit/Cut
+ * CTRL-y: Edit/Redo CTRL-z: Edit/Undo
  */
 
-public class IDEMenuBar
-  extends JMenuBar
+public class IDEMenuBar extends JMenuBar
 {
-
 
   // #########################################################################
   // # Constructor
@@ -175,18 +133,17 @@ public class IDEMenuBar
     final IDEListener ideListener = new IDEListener();
     ide.attach(ideListener);
     final SupremicaPropertyChangeListener createListener =
-      new CreatePropertyListener();
+        new CreatePropertyListener();
     Config.INCLUDE_INSTANTION.addPropertyChangeListener(createListener);
     final SupremicaPropertyChangeListener toolsListener =
-      new ToolsPropertyListener();
+        new ToolsPropertyListener();
     final SupremicaPropertyChangeListener analyzeListener =
-      new AnalyzePropertyListener();
+        new AnalyzePropertyListener();
     Config.INCLUDE_EXTERNALTOOLS.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_SOCEDITOR.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_ANIMATOR.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener(analyzeListener);
   }
-
 
   // #########################################################################
   // # Initialisation
@@ -249,7 +206,7 @@ public class IDEMenuBar
       final Action showgraph = actions.getAction(ShowGraphAction.class);
       mEditMenu.add(showgraph);
       final Action showcomment =
-        actions.getAction(ShowModuleCommentAction.class);
+          actions.getAction(ShowModuleCommentAction.class);
       mEditMenu.add(showcomment);
       // Embedder should probably go to 'Tools' menu?
       final Action layout = actions.getAction(GraphLayoutAction.class);
@@ -264,13 +221,13 @@ public class IDEMenuBar
         mCreateMenu = new JMenu("Create");
         mCreateMenu.setMnemonic(KeyEvent.VK_C);
         final Action inscomp =
-          actions.getAction(InsertSimpleComponentAction.class);
+            actions.getAction(InsertSimpleComponentAction.class);
         mCreateMenu.add(inscomp);
         final Action insvar = actions.getAction(InsertVariableAction.class);
         mCreateMenu.add(insvar);
         if (Config.INCLUDE_INSTANTION.isTrue()) {
           final Action insforeach =
-            actions.getAction(InsertForeachComponentAction.class);
+              actions.getAction(InsertForeachComponentAction.class);
           mCreateMenu.add(insforeach);
         }
         final Action insevent = actions.getAction(InsertEventDeclAction.class);
@@ -281,16 +238,21 @@ public class IDEMenuBar
 
       // The new analyze menu
       if (mNewAnalyzeMenu == null && Config.INCLUDE_WATERS_SIMULATOR.isTrue()
-          && (panel instanceof EditorPanel || panel instanceof SimulatorPanel))
-      {
+          && (panel instanceof EditorPanel || panel instanceof SimulatorPanel)) {
         mNewAnalyzeMenu = new JMenu("Analyze");
         mNewAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
-        final Action conflict = actions.getAction(AnalyzeConflictCheckAction.class);
+        final Action conflict =
+            actions.getAction(AnalyzeConflictCheckAction.class);
         mNewAnalyzeMenu.add(conflict);
-        final Action controllability = actions.getAction(AnalyzeControllabilityAction.class);
+        final Action controllability =
+            actions.getAction(AnalyzeControllabilityAction.class);
         mNewAnalyzeMenu.add(controllability);
-        final Action controlLoop = actions.getAction(AnalyzeControlLoopAction.class);
+        final Action controlLoop =
+            actions.getAction(AnalyzeControlLoopAction.class);
         mNewAnalyzeMenu.add(controlLoop);
+        final Action sicpropertyv =
+            actions.getAction(AnalyzeSICPropertyVAction.class);
+        mNewAnalyzeMenu.add(sicpropertyv);
       }
 
       // Simulate
@@ -302,16 +264,16 @@ public class IDEMenuBar
         final Action step = actions.getAction(SimulationStepAction.class);
         mSimulateMenu.add(step);
         final Action endTrace =
-          actions.getAction(SimulationJumpToEndAction.class);
+            actions.getAction(SimulationJumpToEndAction.class);
         mSimulateMenu.add(endTrace);
         final Action replayStep =
-          actions.getAction(SimulationReplayStepAction.class);
+            actions.getAction(SimulationReplayStepAction.class);
         mSimulateMenu.add(replayStep);
         final Action stepBack =
-          actions.getAction(SimulationStepBackAction.class);
+            actions.getAction(SimulationStepBackAction.class);
         mSimulateMenu.add(stepBack);
         final Action stepBeginning =
-          actions.getAction(SimulationBackToStartAction.class);
+            actions.getAction(SimulationBackToStartAction.class);
         mSimulateMenu.add(stepBeginning);
       }
 
@@ -325,7 +287,8 @@ public class IDEMenuBar
           viewMenu.add(actions.analyzerViewAutomatonAction.getMenuItem());
           viewMenu.add(actions.analyzerViewAlphabetAction.getMenuItem());
           viewMenu.add(actions.analyzerViewStatesAction.getMenuItem());
-          viewMenu.add(actions.analyzerViewModularStructureAction.getMenuItem());
+          viewMenu
+              .add(actions.analyzerViewModularStructureAction.getMenuItem());
         }
         mAnalyzeMenu.add(viewMenu);
         mAnalyzeMenu.add(actions.analyzerSynchronizerAction.getMenuItem());
@@ -380,8 +343,8 @@ public class IDEMenuBar
       for (final TemplateGroup currGroup : exTempl) {
         final JMenu menuFileNewFromTemplateGroup = new JMenu();
         menuFileNewFromTemplateGroup.setText(currGroup.getName());
-        menuFileNewFromTemplateGroup.setToolTipText
-          (currGroup.getShortDescription());
+        menuFileNewFromTemplateGroup.setToolTipText(currGroup
+            .getShortDescription());
         mExamplesMenu.add(menuFileNewFromTemplateGroup);
         for (final TemplateItem currItem : currGroup) {
           final JMenuItem menuItem = new JMenuItem();
@@ -463,7 +426,6 @@ public class IDEMenuBar
     }
   }
 
-
   // #########################################################################
   // # Auxiliary Methods
   private void updateModulesMenu()
@@ -519,8 +481,7 @@ public class IDEMenuBar
 
   // #########################################################################
   // # Inner Class IDEListener
-  private class IDEListener
-    implements Observer
+  private class IDEListener implements Observer
   {
     // #######################################################################
     // # Interface net.sourceforge.waters.gui.observer.Observer
@@ -543,8 +504,8 @@ public class IDEMenuBar
 
   // #########################################################################
   // # Inner Class CreatePropertyListener
-  private class CreatePropertyListener
-    implements SupremicaPropertyChangeListener
+  private class CreatePropertyListener implements
+      SupremicaPropertyChangeListener
   {
     // #######################################################################
     // # Interface org.supremica.properties.SupremicaPropertyChangeListener
@@ -558,8 +519,8 @@ public class IDEMenuBar
 
   // #########################################################################
   // # Inner Class ToolsPropertyListener
-  private class ToolsPropertyListener
-    implements SupremicaPropertyChangeListener
+  private class ToolsPropertyListener implements
+      SupremicaPropertyChangeListener
   {
     // #######################################################################
     // # Interface org.supremica.properties.SupremicaPropertyChangeListener
@@ -570,8 +531,9 @@ public class IDEMenuBar
     }
   }
 
-  private class AnalyzePropertyListener
-    implements SupremicaPropertyChangeListener
+
+  private class AnalyzePropertyListener implements
+      SupremicaPropertyChangeListener
   {
     // #######################################################################
     // # Interface org.supremica.properties.SupremicaPropertyChangeListener
@@ -615,7 +577,6 @@ public class IDEMenuBar
     private final TemplateItem mItem;
   }
 
-
   // #########################################################################
   // # Data Members
   private final IDE mIDE;
@@ -631,7 +592,6 @@ public class IDEMenuBar
   private JMenu mModulesMenu = null;
   private JMenu mConfigureMenu = null;
   private JMenu mHelpMenu = null;
-
 
   // #########################################################################
   // # Class Constants

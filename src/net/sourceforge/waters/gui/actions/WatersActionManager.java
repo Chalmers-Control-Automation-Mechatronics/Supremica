@@ -7,7 +7,6 @@
 //# $Id$
 //###########################################################################
 
-
 package net.sourceforge.waters.gui.actions;
 
 import java.util.HashMap;
@@ -24,20 +23,20 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import org.supremica.gui.ide.IDE;
 
 
-public abstract class WatersActionManager
-  implements Observer
+public abstract class WatersActionManager implements Observer
 {
 
-  //#########################################################################
-  //# Constructor
+  // #########################################################################
+  // # Constructor
   public WatersActionManager(final IDE ide)
   {
     final int SIZE = 32;
-    mActionMap = new HashMap<Class<? extends IDEAction>, IDEAction>(SIZE);
-    mKeyboardActionMap = new HashMap<Class<? extends IDEAction>, Action>(SIZE);
+    mActionMap = new HashMap<Class<? extends IDEAction>,IDEAction>(SIZE);
+    mKeyboardActionMap = new HashMap<Class<? extends IDEAction>,Action>(SIZE);
     addAction(new AnalyzeConflictCheckAction(ide));
     addAction(new AnalyzeControllabilityAction(ide));
     addAction(new AnalyzeControlLoopAction(ide));
+    addAction(new AnalyzeSICPropertyVAction(ide));
     addAction(new EditEventLabelAction(ide));
     addAction(new GraphLayoutAction(ide));
     addAction(new GraphSaveEPSAction(ide));
@@ -70,16 +69,15 @@ public abstract class WatersActionManager
     ide.attach(this);
   }
 
-
-  //#########################################################################
-  //# Access to Actions
+  // #########################################################################
+  // # Access to Actions
   public IDEAction getAction(final Class<? extends IDEAction> clazz)
   {
     return mActionMap.get(clazz);
   }
 
-  //#########################################################################
-  //# Installing Keyboard Shortcuts
+  // #########################################################################
+  // # Installing Keyboard Shortcuts
   public void installCutCopyPasteActions(final JComponent comp)
   {
     installAction(comp, IDECutAction.class);
@@ -100,9 +98,8 @@ public abstract class WatersActionManager
     amap.put(name, action);
   }
 
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.gui.observer.Observer
+  // #########################################################################
+  // # Interface net.sourceforge.waters.gui.observer.Observer
   public void update(final EditorChangedEvent event)
   {
     for (final IDEAction action : mActionMap.values()) {
@@ -110,18 +107,16 @@ public abstract class WatersActionManager
     }
   }
 
-
-  //#########################################################################
-  //# Initialization
+  // #########################################################################
+  // # Initialization
   protected void addAction(final IDEAction action)
   {
     final Class<? extends IDEAction> clazz = action.getClass();
     mActionMap.put(clazz, action);
   }
 
-
-  //#######################################################################
-  //# Keyboard Actions
+  // #######################################################################
+  // # Keyboard Actions
   private Action getKeyboardAction(final Class<? extends IDEAction> clazz)
   {
     Action action = mKeyboardActionMap.get(clazz);
@@ -133,10 +128,9 @@ public abstract class WatersActionManager
     return action;
   }
 
-
-  //#######################################################################
-  //# Data Members
-  private final Map<Class<? extends IDEAction>, IDEAction> mActionMap;
-  private final Map<Class<? extends IDEAction>, Action> mKeyboardActionMap;
+  // #######################################################################
+  // # Data Members
+  private final Map<Class<? extends IDEAction>,IDEAction> mActionMap;
+  private final Map<Class<? extends IDEAction>,Action> mKeyboardActionMap;
 
 }
