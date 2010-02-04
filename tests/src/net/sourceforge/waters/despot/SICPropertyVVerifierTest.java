@@ -401,7 +401,7 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
     }
     final AutomatonProxy prop = createPropertyAutomaton(answer);
     newautomata.add(prop);
-    final String name = des.getName() + "-coreachability";
+    final String name = des.getName() + "-sic5";
     return factory.createProductDESProxy(name, newevents, newautomata);
   }
 

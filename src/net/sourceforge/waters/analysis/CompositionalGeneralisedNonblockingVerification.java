@@ -10,6 +10,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
+@SuppressWarnings("unused")
 public class CompositionalGeneralisedNonblockingVerification
 {
 
@@ -89,7 +90,6 @@ public class CompositionalGeneralisedNonblockingVerification
    * model using the two step approach. Models should be composed in order of
    * the start of the collection through to the end.
    */
-  @SuppressWarnings("unused")
   private Collection<AutomatonProxy> composeModel(final ProductDESProxy model)
   {
     return null;
@@ -102,7 +102,6 @@ public class CompositionalGeneralisedNonblockingVerification
    *
    * @return
    */
-  @SuppressWarnings("unused")
   private Collection<AutomatonProxy> orderCompositionStep1MinT()
   {
     return null;
@@ -115,7 +114,6 @@ public class CompositionalGeneralisedNonblockingVerification
    *
    * @return
    */
-  @SuppressWarnings("unused")
   private Collection<AutomatonProxy> orderCompositionStep1MaxS()
   {
     return null;
@@ -129,7 +127,6 @@ public class CompositionalGeneralisedNonblockingVerification
    *
    * @return
    */
-  @SuppressWarnings("unused")
   private Collection<AutomatonProxy> orderCompositionStep1MustL(
                                                                 final EventProxy event)
   {
@@ -143,7 +140,6 @@ public class CompositionalGeneralisedNonblockingVerification
    *
    * @return
    */
-  @SuppressWarnings("unused")
   private AutomatonProxy orderCompositionStep2MaxL()
   {
     return null;
@@ -156,7 +152,6 @@ public class CompositionalGeneralisedNonblockingVerification
    *
    * @return
    */
-  @SuppressWarnings("unused")
   private AutomatonProxy orderCompositionStep2MaxC()
   {
     return null;
@@ -170,7 +165,6 @@ public class CompositionalGeneralisedNonblockingVerification
    *
    * @return
    */
-  @SuppressWarnings("unused")
   private AutomatonProxy orderCompositionStep2MinS()
   {
     return null;
@@ -183,7 +177,6 @@ public class CompositionalGeneralisedNonblockingVerification
    *
    * @return
    */
-  @SuppressWarnings("unused")
   private ProductDESProxy abstractModel(
                                         final Collection<AutomatonProxy> orderedAut)
   {
@@ -197,7 +190,6 @@ public class CompositionalGeneralisedNonblockingVerification
    * @param aut2
    * @return
    */
-  @SuppressWarnings("unused")
   private boolean testObservationEquivalence(final AutomatonProxy aut1,
                                              final AutomatonProxy aut2)
   {
@@ -212,7 +204,6 @@ public class CompositionalGeneralisedNonblockingVerification
    * @param aut
    * @return
    */
-  @SuppressWarnings("unused")
   private AutomatonProxy removeGeneralisedMarking(final AutomatonProxy aut)
   {
     return null;
@@ -226,7 +217,6 @@ public class CompositionalGeneralisedNonblockingVerification
    * @param aut
    * @return
    */
-  @SuppressWarnings("unused")
   private AutomatonProxy removeDefaultMarking(final AutomatonProxy aut)
   {
     return null;
@@ -240,7 +230,6 @@ public class CompositionalGeneralisedNonblockingVerification
    * @param aut
    * @return
    */
-  @SuppressWarnings("unused")
   private AutomatonProxy removeNoncoreachableStates(final AutomatonProxy aut)
   {
     return null;
@@ -255,7 +244,6 @@ public class CompositionalGeneralisedNonblockingVerification
    * @param aut
    * @return
    */
-  @SuppressWarnings("unused")
   private AutomatonProxy determiniseNonPreconditionMarkedStates(
                                                                 final AutomatonProxy aut)
   {
@@ -271,7 +259,6 @@ public class CompositionalGeneralisedNonblockingVerification
    * @param aut
    * @return
    */
-  @SuppressWarnings("unused")
   private AutomatonProxy removeLeadingSilentTransitions(final AutomatonProxy aut)
   {
     return null;
@@ -286,7 +273,6 @@ public class CompositionalGeneralisedNonblockingVerification
    * @param aut
    * @return
    */
-  @SuppressWarnings("unused")
   private AutomatonProxy removeOriginatingSilentTransitions(
                                                             final AutomatonProxy aut)
   {

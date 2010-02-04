@@ -20,8 +20,7 @@ public class DesktopEditAction extends WatersDesktopAction
     super(ide);
     mAutomaton = autoToEdit;
     putValue(Action.NAME, "Edit Automaton");
-    putValue(Action.SHORT_DESCRIPTION,
-             "Open this automaton in the editor menu");
+    putValue(Action.SHORT_DESCRIPTION, "Open this automaton in the editor");
     setEnabled(true);
   }
 

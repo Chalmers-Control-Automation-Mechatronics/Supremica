@@ -52,11 +52,10 @@ public class ConflictKindTranslator
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.KindTranslator
   /**
-   * Returns the component kind of the given automaton in a controllability
+   * Returns the component kind of the given automaton in a conflict
    * check.
    * @return {@link ComponentKind#PLANT}, if the given automaton is
-   *         a plant, or {@link ComponentKind#SPEC} if the
-   *         given automaton is a spec or supervisor.
+   *         a plant, spec, or supervisor.
    */
   public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
@@ -64,6 +63,7 @@ public class ConflictKindTranslator
     switch (kind) {
     case PLANT:
     case SPEC:
+    case SUPERVISOR:
       return ComponentKind.PLANT;
     default:
       return kind;

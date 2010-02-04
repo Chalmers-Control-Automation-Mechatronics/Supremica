@@ -19,8 +19,9 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
  * <P>A kind translator used for controllability checking.
- * This translator returns all component and event types as they
- * are in the original model.</P>
+ * This translator relabels supervisors as specifications and otherwise
+ * returns all component and event types as they are in the original
+ * model.</P>
  *
  * @author Robi Malik
  */
@@ -48,17 +49,17 @@ public class ControllabilityKindTranslator
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-  /**
-   * Returns the component kind of the given automaton.
-   */
   public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
-    return aut.getKind();
+    final ComponentKind kind = aut.getKind();
+    switch (kind) {
+    case SUPERVISOR:
+      return ComponentKind.SPEC;
+    default:
+      return kind;
+    }
   }
 
-  /**
-   * Returns the event kind of the given event.
-   */
   public EventKind getEventKind(final EventProxy event)
   {
     return event.getKind();
