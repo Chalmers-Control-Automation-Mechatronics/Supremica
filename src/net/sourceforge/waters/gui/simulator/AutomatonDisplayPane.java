@@ -162,7 +162,6 @@ public class AutomatonDisplayPane
       final Rectangle2D newBounds = AutomatonDisplayPane.this.getMinimumBoundingRectangle();
       this.setPreferredSize(new Dimension((int)newBounds.getWidth(), (int)newBounds.getHeight()));
       mParent.resize();
-      ((AutomatonDesktopPane)mParent.getDesktopPane()).cascade();
     }
   }
 

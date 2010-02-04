@@ -170,7 +170,9 @@ class AutomataTableModel
       Collections.sort(output, mComparator);
       mRawData = output;
     } else
+    {
       mRawData = new ArrayList<List<Object>>();
+    }
   }
 
   //private void updateRawData()

@@ -154,7 +154,7 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
       //System.out.println("DEBUG: AutomatonInternalFrame[155]: Can Resize before pack: " + canResize());
       this.pack();
       //System.out.println("DEBUG: AutomatonInternalFrame[157]: Can Resize after pack: " + canResize());
-      SwingUtilities.invokeLater(new Thread(){public void run(){AutomatonInternalFrame.this.repaint();System.out.println("DEBUG: AutomatonInternalFrame[158]: Can Resize after repaint: " + canResize());}});
+      SwingUtilities.invokeLater(new Thread(){public void run(){AutomatonInternalFrame.this.repaint();}});
       storeReferenceFrame();
     }
   }

@@ -416,9 +416,15 @@ public class Simulation implements ModelObserver, Observer
       if (mCompiledDES != null)
       {
         for (final AutomatonProxy automaton : mCompiledDES.getAutomata())
+        {
           for (final StateProxy state : automaton.getStates())
+          {
             if (state.isInitial())
+            {
               mAllAutomatons.put(automaton, state);
+            }
+          }
+        }
         findEventClassification();
       }
       mPreviousEvents = new ArrayList<Step>();
@@ -451,30 +457,7 @@ public class Simulation implements ModelObserver, Observer
       {
         for (final Step step : mEnabledEvents) // Look for all possible Steps in the simulation
         {
-          boolean isTheRightStep = true;
-          if (step.getEvent() == tStep.getEvent()) // Check if the event name is right. If not, this is not the correct Step
-          {
-            for (final AutomatonProxy auto : this.mAllAutomatons.keySet())
-            {
-              if (step.getSource().get(auto) != null) // Check to see if the step is non-deterministic. If it is, then it is the correct Step
-              {
-                if (tStep.getStateMap().get(auto) == null) // If there is no non-deterministic information, fail always
-                  throw new IllegalArgumentException("No non-deterministic information available. Trace is:" + trace.getTraceSteps());
-                else if (step.getDest().get(auto) == tStep.getStateMap().get(auto)) // If the destinations match, then it is the right step
-                  {
-                    isTheRightStep = true;
-                  }
-                  else
-                    isTheRightStep = false;
-              }
-              else
-                isTheRightStep = true;
-            }
-          }
-          else
-          {
-            isTheRightStep = false;
-          }
+          final boolean isTheRightStep = compareTraceStep(step, tStep);
           if (isTheRightStep)
             locatedStep = step; // We have found the next instruction for the trace
         }
@@ -498,6 +481,35 @@ public class Simulation implements ModelObserver, Observer
     fireSimulationChangeEvent(simEvent);
   }
 
+  private boolean compareTraceStep(final Step step, final TraceStepProxy tStep)
+  {
+    if (step.getEvent() == tStep.getEvent()) // Check if the event name is right. If not, this is not the correct Step
+    {
+      for (final AutomatonProxy auto : this.mAllAutomatons.keySet())
+      {
+        if (step.getSource().get(auto) != null) // Check to see if the step is non-deterministic. If it isn't, then it is the correct Step
+        {
+          if (tStep.getStateMap().get(auto) == null) // If there is no non-deterministic information, fail always
+            throw new IllegalArgumentException("No non-deterministic information available. Trace is:" + mTrace.getTraceSteps());
+          else if (step.getDest().get(auto) == tStep.getStateMap().get(auto)) // If the destinations match, then it is the right step
+            {
+              return true;
+            }
+            else
+              return false;
+        }
+        else
+          return true;
+      }
+    }
+    else
+    {
+      return false;
+    }
+    return false;
+  }
+
+
   public void step(final Step step) throws NonDeterministicException
   {
     time = System.currentTimeMillis();
@@ -505,6 +517,60 @@ public class Simulation implements ModelObserver, Observer
     {
       return;
     }
+    checkInvalid(step);
+    invalidated = true;
+    removeFutureEvents();
+    mPreviousEvents.add(step);
+    mEnabledLastStep = new ArrayList<AutomatonProxy>();
+    for (final AutomatonProxy automata : mAllAutomatons.keySet())
+    {
+      final StateProxy oldLocation = mAllAutomatons.get(automata);
+      if (step.getDest().get(automata) != null)
+      {
+        mAllAutomatons.put(automata, step.getDest().get(automata));
+      }
+      else
+      {
+        moveNonDeterministicTransition(automata, step, oldLocation);
+      }
+    }
+    mPreviousAutomatonStates.add(new HashMap<AutomatonProxy, StateProxy>(mAllAutomatons));
+    mPreviousEnabledLastStep.add(mEnabledLastStep);
+    currentTime++;
+    findEventClassification();
+    updateControllability(true);
+    final SimulationChangeEvent simEvent = new SimulationChangeEvent
+      (this, SimulationChangeEvent.STATE_CHANGED);
+    fireSimulationChangeEvent(simEvent);
+  }
+
+  private void moveNonDeterministicTransition(final AutomatonProxy automata,
+                                                 final Step step,
+                                                 final StateProxy oldLocation) throws NonDeterministicException
+  {
+    boolean moved = false;
+    for (final TransitionProxy trans : automata.getTransitions())
+    {
+      if (trans.getEvent() == step.getEvent())
+      {
+        if (trans.getSource() == mAllAutomatons.get(automata) && !moved)
+        {
+          mAllAutomatons.put(automata, trans.getTarget());
+          moved = true;
+          mEnabledLastStep.add(automata);
+        }
+        else if (trans.getSource() == oldLocation && moved)
+        {
+          throw new NonDeterministicException("The automaton " + automata.getName() +
+                                              " has two options. The event fired was " + step.toString());
+        }
+      }
+    }
+  }
+
+
+  private void checkInvalid(final Step step)
+  {
     if (isInInvalidEvent(step.getEvent()))
     {
       String errorMessage = "ERROR: The event " + step.toString() +
@@ -519,53 +585,8 @@ public class Simulation implements ModelObserver, Observer
         " cannot be completed as it is not inside any automata";
       throw new IllegalArgumentException(errorMessage);
     }
-    else
-    {
-      invalidated = true;
-      removeFutureEvents();
-      mPreviousEvents.add(step);
-      mEnabledLastStep = new ArrayList<AutomatonProxy>();
-      final HashMap<AutomatonProxy, TransitionProxy> thisStateTransitionFire = new HashMap<AutomatonProxy, TransitionProxy>();
-      for (final AutomatonProxy automata : mAllAutomatons.keySet())
-      {
-        boolean moved = false;
-        final StateProxy oldLocation = mAllAutomatons.get(automata);
-        if (step.getDest().get(automata) != null)
-        {
-          mAllAutomatons.put(automata, step.getDest().get(automata));
-        }
-        else
-        {
-          for (final TransitionProxy trans : automata.getTransitions())
-          {
-            if (trans.getEvent() == step.getEvent())
-            {
-              if (trans.getSource() == mAllAutomatons.get(automata) && !moved)
-              {
-                mAllAutomatons.put(automata, trans.getTarget());
-                thisStateTransitionFire.put(automata, trans);
-                moved = true;
-                mEnabledLastStep.add(automata);
-              }
-              else if (trans.getSource() == oldLocation && moved)
-              {
-                throw new NonDeterministicException("The automaton " + automata.getName() +
-                                                    " has two options. The event fired was " + step.toString());
-              }
-            }
-          }
-        }
-      }
-      mPreviousAutomatonStates.add(new HashMap<AutomatonProxy, StateProxy>(mAllAutomatons));
-      mPreviousEnabledLastStep.add(mEnabledLastStep);
-      currentTime++;
-    }
-    findEventClassification();
-    updateControllability(true);
-    final SimulationChangeEvent simEvent = new SimulationChangeEvent
-      (this, SimulationChangeEvent.STATE_CHANGED);
-    fireSimulationChangeEvent(simEvent);
   }
+
 
   public void stepBack()
   {
@@ -702,7 +723,6 @@ public class Simulation implements ModelObserver, Observer
     return false;
   }
 
-  @SuppressWarnings("unchecked")
   private void findEventClassification()
   {
     mEnabledEvents = new ArrayList<Step>();
@@ -740,79 +760,9 @@ public class Simulation implements ModelObserver, Observer
           }
         }
       }
-      while (eventsFirable.size() != 0)
-      {
-        final TransitionProxy firable = eventsFirable.get(0);
-        final ArrayList<TransitionProxy> targetTrans = new ArrayList<TransitionProxy>();
-        for (final TransitionProxy trans : eventsFirable)
-        {
-          if (firable.getEvent() == trans.getEvent())
-            targetTrans.add(trans);
-        }
-        if (targetTrans.size() != 1)
-        {
-          for (final Step step : (ArrayList<Step>)mEnabledEvents.clone())
-          {
-            if (step.getEvent() == firable.getEvent())
-            {
-              mEnabledEvents.remove(step);
-              for (final TransitionProxy trans : targetTrans)
-              {
-                mEnabledEvents.add(step.addNewTransition(aut, trans));
-              }
-            }
-          }
-        }
-        for (final TransitionProxy trans : targetTrans)
-          eventsFirable.remove(trans);
-      }
-      while (newEventsFirable.size() != 0)
-      {
-        final TransitionProxy firable = newEventsFirable.get(0);
-        final ArrayList<TransitionProxy> targetTrans = new ArrayList<TransitionProxy>();
-        for (final TransitionProxy trans : newEventsFirable)
-        {
-          if (firable.getEvent() == trans.getEvent())
-            targetTrans.add(trans);
-        }
-        if (targetTrans.size() != 1)
-        {
-          for (final TransitionProxy trans : targetTrans)
-          {
-            final HashMap<AutomatonProxy, StateProxy> source = new HashMap<AutomatonProxy, StateProxy>();
-            final HashMap<AutomatonProxy, StateProxy> dest = new HashMap<AutomatonProxy, StateProxy>();
-            source.put(aut, trans.getSource());
-            dest.put(aut, trans.getTarget());
-            mEnabledEvents.add(new Step(trans.getEvent(),source, dest));
-          }
-        }
-        else
-        {
-          mEnabledEvents.add(new Step(firable.getEvent()));
-        }
-        for (final TransitionProxy trans : targetTrans)
-          newEventsFirable.remove(trans);
-      }
-      for (final EventProxy event : aut.getEvents())
-      {
-        boolean fired = false;
-        for (final TransitionProxy trans : automatonsActiveEvents)
-        {
-          if (trans.getEvent() == event)
-            fired = true;
-        }
-        if (!fired)
-        {
-          for (final Step toBeRemoved : (ArrayList<Step>)mEnabledEvents.clone())
-          {
-            if (toBeRemoved.getEvent() == event)
-            {
-              mEnabledEvents.remove(toBeRemoved);
-            }
-          }
-          addNewInvalidEvent(event, aut);
-        }
-      }
+      processOldEvents(eventsFirable, aut);
+      processNewEvents(newEventsFirable, aut);
+      removeIgnoredEvents(automatonsActiveEvents, aut);
     }
     Collections.sort(mEnabledEvents);
     updateControllability(false);
@@ -828,34 +778,129 @@ public class Simulation implements ModelObserver, Observer
     }
     if (mEnabledEvents.size() == 0)
     {
-      for (final AutomatonProxy auto : mAllAutomatons.keySet())
+      checkForBlockingError();
+    }
+  }
+
+  private void checkForBlockingError()
+  {
+    for (final AutomatonProxy auto : mAllAutomatons.keySet())
+    {
+      if (mAllAutomatons.get(auto).getPropositions().size() == 0)
       {
-        if (mAllAutomatons.get(auto).getPropositions().size() == 0)
+        for (final StateProxy state : auto.getStates())
         {
-          for (final StateProxy state : auto.getStates())
-          {
-            if (state.getPropositions().size() != 0)
-            {
-              mModuleContainer.getIDE().error(": The automaton " + auto.getName() + " is blocking");
-            }
-          }
-        }
-        else
-        {
-          boolean isAccepting = false;
-          for (final EventProxy prop : mAllAutomatons.get(auto).getPropositions())
-          {
-            if (prop.getName().compareTo(":accepting") == 0)
-              isAccepting = true;
-          }
-          if (!isAccepting)
+          if (state.getPropositions().size() != 0)
           {
             mModuleContainer.getIDE().error(": The automaton " + auto.getName() + " is blocking");
           }
         }
       }
+      else
+      {
+        boolean isAccepting = false;
+        for (final EventProxy prop : mAllAutomatons.get(auto).getPropositions())
+        {
+          if (prop.getName().compareTo(":accepting") == 0)
+            isAccepting = true;
+        }
+        if (!isAccepting)
+        {
+          mModuleContainer.getIDE().error(": The automaton " + auto.getName() + " is blocking");
+        }
+      }
     }
   }
+
+
+  private void removeIgnoredEvents(final ArrayList<TransitionProxy> automatonsActiveEvents, final AutomatonProxy aut)
+  {
+    for (final EventProxy event : aut.getEvents())
+    {
+      boolean fired = false;
+      for (final TransitionProxy trans : automatonsActiveEvents)
+      {
+        if (trans.getEvent() == event)
+          fired = true;
+      }
+      if (!fired)
+      {
+        for (final Step toBeRemoved : new ArrayList<Step>(mEnabledEvents))
+        {
+          if (toBeRemoved.getEvent() == event)
+          {
+            mEnabledEvents.remove(toBeRemoved);
+          }
+        }
+        addNewInvalidEvent(event, aut);
+      }
+    }
+  }
+
+
+  private void processNewEvents(final ArrayList<TransitionProxy> newEventsFirable,
+                                final AutomatonProxy aut)
+  {
+    while (newEventsFirable.size() != 0)
+    {
+      final TransitionProxy firable = newEventsFirable.get(0);
+      final ArrayList<TransitionProxy> targetTrans = new ArrayList<TransitionProxy>();
+      for (final TransitionProxy trans : newEventsFirable)
+      {
+        if (firable.getEvent() == trans.getEvent())
+          targetTrans.add(trans);
+      }
+      if (targetTrans.size() != 1)
+      {
+        for (final TransitionProxy trans : targetTrans)
+        {
+          final HashMap<AutomatonProxy, StateProxy> source = new HashMap<AutomatonProxy, StateProxy>();
+          final HashMap<AutomatonProxy, StateProxy> dest = new HashMap<AutomatonProxy, StateProxy>();
+          source.put(aut, trans.getSource());
+          dest.put(aut, trans.getTarget());
+          mEnabledEvents.add(new Step(trans.getEvent(),source, dest));
+        }
+      }
+      else
+      {
+        mEnabledEvents.add(new Step(firable.getEvent()));
+      }
+      for (final TransitionProxy trans : targetTrans)
+        newEventsFirable.remove(trans);
+    }
+  }
+
+
+  private void processOldEvents(final ArrayList<TransitionProxy> eventsFirable, final AutomatonProxy aut)
+  {
+    while (eventsFirable.size() != 0)
+    {
+      final TransitionProxy firable = eventsFirable.get(0);
+      final ArrayList<TransitionProxy> targetTrans = new ArrayList<TransitionProxy>();
+      for (final TransitionProxy trans : eventsFirable)
+      {
+        if (firable.getEvent() == trans.getEvent())
+          targetTrans.add(trans);
+      }
+      if (targetTrans.size() != 1)
+      {
+        for (final Step step : Collections.unmodifiableList(mEnabledEvents))
+        {
+          if (step.getEvent() == firable.getEvent())
+          {
+            mEnabledEvents.remove(step);
+            for (final TransitionProxy trans : targetTrans)
+            {
+              mEnabledEvents.add(step.addNewTransition(aut, trans));
+            }
+          }
+        }
+      }
+      for (final TransitionProxy trans : targetTrans)
+        eventsFirable.remove(trans);
+    }
+  }
+
 
   private void addNewInvalidEvent(final EventProxy event, final AutomatonProxy automaton)
   {
@@ -936,8 +981,37 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-  @SuppressWarnings("unchecked")
   private void moveSafely(final boolean forward)
+  {
+    moveTime(forward);
+    if (currentTime == -1)
+    {
+      mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
+      mEnabledEvents = new ArrayList<Step>();
+      mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
+      if (mCompiledDES != null)
+      {
+        for (final AutomatonProxy automaton : mCompiledDES.getAutomata())
+          for (final StateProxy state : automaton.getStates())
+            if (state.isInitial())
+              mAllAutomatons.put(automaton, state);
+        findEventClassification();
+      }
+      mEnabledLastStep = new ArrayList<AutomatonProxy>();
+    }
+    else
+    {
+      mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>(mPreviousAutomatonStates.get(currentTime));
+      mEnabledLastStep = new ArrayList<AutomatonProxy>(mPreviousEnabledLastStep.get(currentTime));
+      findEventClassification();
+    }
+    updateControllability(false);
+    final SimulationChangeEvent simEvent = new SimulationChangeEvent
+      (this, SimulationChangeEvent.STATE_CHANGED);
+    fireSimulationChangeEvent(simEvent);
+  }
+
+  private void moveTime(final boolean forward)
   {
     if (forward)
     {
@@ -959,32 +1033,8 @@ public class Simulation implements ModelObserver, Observer
       else
         currentTime--;
     }
-    if (currentTime == -1)
-    {
-      mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
-      mEnabledEvents = new ArrayList<Step>();
-      mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
-      if (mCompiledDES != null)
-      {
-        for (final AutomatonProxy automaton : mCompiledDES.getAutomata())
-          for (final StateProxy state : automaton.getStates())
-            if (state.isInitial())
-              mAllAutomatons.put(automaton, state);
-        findEventClassification();
-      }
-      mEnabledLastStep = new ArrayList<AutomatonProxy>();
-    }
-    else
-    {
-      mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>(mPreviousAutomatonStates.get(currentTime));
-      mEnabledLastStep = (ArrayList<AutomatonProxy>)mPreviousEnabledLastStep.get(currentTime).clone();
-      findEventClassification();
-    }
-    updateControllability(false);
-    final SimulationChangeEvent simEvent = new SimulationChangeEvent
-      (this, SimulationChangeEvent.STATE_CHANGED);
-    fireSimulationChangeEvent(simEvent);
   }
+
 
   private void removeFutureEvents()
   {
@@ -1018,7 +1068,5 @@ public class Simulation implements ModelObserver, Observer
   private TraceProxy mTrace;
   private boolean mAllowLastStep;
   private boolean invalidated;
-
   long time = 0;
-
 }

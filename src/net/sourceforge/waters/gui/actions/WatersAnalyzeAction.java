@@ -140,9 +140,9 @@ public abstract class WatersAnalyzeAction
       this.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
       this.setSize(DEFAULT_DIALOG_SIZE);
       this.setLocation(DEFAULT_DIALOG_LOCATION);
+      repaint();
       runner = new AnalyzerThread();
       runner.setPriority(Thread.MIN_PRIORITY);
-      repaint();
       runner.start();
     }
 
