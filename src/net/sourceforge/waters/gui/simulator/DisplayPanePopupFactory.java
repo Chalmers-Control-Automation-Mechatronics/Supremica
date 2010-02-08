@@ -1,5 +1,7 @@
 package net.sourceforge.waters.gui.simulator;
 
+import java.util.Map;
+
 import javax.swing.JPopupMenu;
 
 import net.sourceforge.waters.gui.PopupFactory;
@@ -7,6 +9,8 @@ import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
@@ -24,12 +28,14 @@ class DisplayPanePopupFactory
   //# Constructor
   DisplayPanePopupFactory(final WatersPopupActionManager master,
                           final AutomatonDisplayPane displayPane,
-                          final AutomatonDesktopPane desktopPane)
+                          final AutomatonDesktopPane desktopPane,
+                          final Map<Proxy, SourceInfo> infoMap)
   {
     super(master);
     mVisitor = new DisplayPanePopupVisitor();
     mDisplayPane = displayPane;
     mDesktopPane = desktopPane;
+    mMap = infoMap;
   }
 
 
@@ -94,12 +100,20 @@ class DisplayPanePopupFactory
       if (mDisplayPane != null) {
         if (node instanceof SimpleNodeProxy)
         {
-          final WatersPopupActionManager master = getMaster();
-          final JPopupMenu popup = getPopup();
-          final IDEAction teleport =
-            master.getDesktopSetStateAction(mDisplayPane.getAutomaton(), node);
-          popup.add(teleport);
-          popup.addSeparator();
+          for (final StateProxy state : mDisplayPane.getAutomaton().getStates())
+          {
+            if (node == mMap.get(state).getSourceObject())
+            {
+
+              final WatersPopupActionManager master = getMaster();
+              final JPopupMenu popup = getPopup();
+              final IDEAction teleport =
+                master.getDesktopSetStateAction(mDisplayPane.getAutomaton(), node);
+              popup.add(teleport);
+              popup.addSeparator();
+              return null;
+            }
+          }
         }
       }
       return null;
@@ -137,5 +151,6 @@ class DisplayPanePopupFactory
   private final ModuleProxyVisitor mVisitor;
   private final AutomatonDisplayPane mDisplayPane;
   private final AutomatonDesktopPane mDesktopPane;
+  private final Map<Proxy,SourceInfo> mMap;
 
 }

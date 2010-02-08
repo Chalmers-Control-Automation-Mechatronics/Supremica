@@ -105,7 +105,10 @@ public class AutomatonDisplayPane
     final BindingContext bindings = sInfo.getBindingContext();
     final ProxyShapeProducer producer =
       new SubjectShapeProducer(graph, module, context, compiler, bindings);
-    factory = new DisplayPanePopupFactory(container.getIDE().getPopupActionManager(), this, (AutomatonDesktopPane) parent.getDesktopPane());
+    factory = new DisplayPanePopupFactory(container.getIDE().getPopupActionManager(),
+                                          this,
+                                          (AutomatonDesktopPane) parent.getDesktopPane(),
+                                          mContainer.getSourceInfoMap());
     setShapeProducer(producer);
     final int width;
     final int height;
