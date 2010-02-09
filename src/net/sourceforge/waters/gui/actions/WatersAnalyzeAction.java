@@ -188,9 +188,12 @@ public abstract class WatersAnalyzeAction
       bottomPanel.add(traceButton, BorderLayout.EAST);
     }
 
-    public void error(final AnalysisException exception)
+    public void error(final Throwable exception)
     {
-      informationLabel.setText("ERROR: " + exception.getMessage());
+      if (exception instanceof OutOfMemoryError)
+        informationLabel.setText("ERROR: Out of Memory");
+      else
+        informationLabel.setText("ERROR: " + exception.getMessage());
       cancelButton.setText("OK");
       cancelButton.removeActionListener(cancelButton.getActionListeners()[0]);
       cancelButton.addActionListener(new ActionListener(){
@@ -298,6 +301,10 @@ public abstract class WatersAnalyzeAction
             fatalError = true;
           } catch (final AnalysisException exception) {
             SwingUtilities.invokeLater(new Runnable(){public void run(){error(exception);}});
+            fatalError = true;
+          } catch (final OutOfMemoryError error)
+          {
+            SwingUtilities.invokeLater(new Runnable(){public void run(){error(error);}});
             fatalError = true;
           }
           if (!fatalError)

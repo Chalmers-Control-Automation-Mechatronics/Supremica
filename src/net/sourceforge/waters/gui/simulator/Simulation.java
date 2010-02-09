@@ -57,6 +57,7 @@ public class Simulation implements ModelObserver, Observer
     mEnabledEvents = new ArrayList<Step>();
     mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
     mModuleContainer = container;
+    mWarningProperties = new HashMap<Step, AutomatonProxy>();
     mEnabledLastStep = new ArrayList<AutomatonProxy>();
     previousStates = new ArrayList<SimulatorState>();
     mBlockingEvents = new ArrayList<Pair<EventProxy, AutomatonProxy>>();
@@ -106,13 +107,13 @@ public class Simulation implements ModelObserver, Observer
   private void loadSimulatorState()
   {
     final SimulatorState stateToLoad = previousStates.get(currentTime);
-    mAllAutomatons = stateToLoad.mCurrentStates;
-    mEnabledEvents = stateToLoad.mEnabledEvents;
-    mInvalidEvents = stateToLoad.mInvalidEvents;
+    mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>(stateToLoad.mCurrentStates);
+    mEnabledEvents = new ArrayList<Step>(stateToLoad.mEnabledEvents);
+    mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>>(stateToLoad.mInvalidEvents);
     mCurrentEvent = stateToLoad.mCurrentEvent;
-    mBlockingEvents = stateToLoad.mBlockingEvents;
-    mEnabledLastStep = stateToLoad.mEnabledLastStep;
-    mDisabledProperties = stateToLoad.mDisabledProperties;
+    mBlockingEvents = new ArrayList<Pair<EventProxy, AutomatonProxy>>(stateToLoad.mBlockingEvents);
+    mEnabledLastStep = new ArrayList<AutomatonProxy>(stateToLoad.mEnabledLastStep);
+    mDisabledProperties = new ArrayList<AutomatonProxy>(stateToLoad.mDisabledProperties);
     updateControllability(false);
   }
 
@@ -171,6 +172,11 @@ public class Simulation implements ModelObserver, Observer
 
   public ImageIcon getEventActivityIcon(final EventProxy event)
   {
+    for (final Step blockingStep : mWarningProperties.keySet())
+    {
+      if (event == blockingStep.getEvent())
+        return IconLoader.ICON_YELLOWWARNING;
+    }
     for (final Step validStep : mEnabledEvents)
     {
       if (validStep.getEvent() == event)
@@ -201,6 +207,8 @@ public class Simulation implements ModelObserver, Observer
   {
     if (mDisabledProperties.contains(aut))
       return IconLoader.ICON_CROSS;
+    if (mWarningProperties.containsValue(aut))
+      return IconLoader.ICON_YELLOWWARNING;
     updateControllability(false);
     if (mBlockingEvents != null && aut.getKind() == ComponentKind.SPEC)
     {
@@ -627,16 +635,16 @@ public class Simulation implements ModelObserver, Observer
           throw new NonDeterministicException("The automaton " + automata.getName() +
                                               " has two options. The event fired was " + step.toString());
         }
-        if (!moved && automata.getKind() == ComponentKind.PROPERTY)
-        {
-          mContainer.getIDE().error("Property "
-                                    + automata.getName()
-                                    + " has been disabled, as the event "
-                                    + step.getEvent().getName()
-                                    + " could not be fired");
-          mDisabledProperties.add(automata);
-        }
       }
+    }
+    if (!moved && automata.getKind() == ComponentKind.PROPERTY && automata.getEvents().contains(step.getEvent()))
+    {
+      mContainer.getIDE().error("Property "
+                                + automata.getName()
+                                + " has been disabled, as the event "
+                                + step.getEvent().getName()
+                                + " could not be fired");
+      mDisabledProperties.add(automata);
     }
   }
 
@@ -673,7 +681,7 @@ public class Simulation implements ModelObserver, Observer
         if (currentTime == previousStates.size() - 1)
         {
           mContainer.getIDE().info(": Looping to start of control loop");
-          while (currentTime != ((LoopTraceProxy)mTrace).getLoopIndex())
+          while (currentTime != ((LoopTraceProxy)mTrace).getLoopIndex() + 1)
           {
             stepBack();
           }
@@ -766,6 +774,26 @@ public class Simulation implements ModelObserver, Observer
       mBlockingEvents = null;
     else
       mBlockingEvents = output;
+    for (final AutomatonProxy auto : mAllAutomatons.keySet())
+    {
+      if (auto.getKind() == ComponentKind.PROPERTY && !mDisabledProperties.contains(auto))
+      {
+        for (final Step step : mEnabledEvents)
+        {
+          if (auto.getEvents().contains(step))
+          {
+            boolean found = false;
+            for (final TransitionProxy trans : auto.getTransitions())
+            {
+              if (trans.getSource() == mAllAutomatons.get(auto) && trans.getEvent() == step.getEvent())
+                found = true;
+            }
+            if (!found)
+              mWarningProperties.put(step, auto);
+          }
+        }
+      }
+    }
   }
 
   private ArrayList<Pair<EventProxy, AutomatonProxy>> testForControlability()
@@ -799,42 +827,40 @@ public class Simulation implements ModelObserver, Observer
     mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
     for (final AutomatonProxy aut : mAllAutomatons.keySet())
     {
-      if (aut.getKind() != ComponentKind.PROPERTY)
+      final ArrayList<TransitionProxy> eventsFirable = new ArrayList<TransitionProxy>();
+      final ArrayList<TransitionProxy> newEventsFirable = new ArrayList<TransitionProxy>();
+      final ArrayList<TransitionProxy> automatonsActiveEvents = new ArrayList<TransitionProxy>();
+      for (final TransitionProxy trans : aut.getTransitions())
       {
-        final ArrayList<TransitionProxy> eventsFirable = new ArrayList<TransitionProxy>();
-        final ArrayList<TransitionProxy> newEventsFirable = new ArrayList<TransitionProxy>();
-        final ArrayList<TransitionProxy> automatonsActiveEvents = new ArrayList<TransitionProxy>();
-        for (final TransitionProxy trans : aut.getTransitions())
+        if (trans.getSource() == mAllAutomatons.get(aut))
         {
-          if (trans.getSource() == mAllAutomatons.get(aut))
+          boolean isInEnabled = false;
+          boolean isInInvalid = false;
+          automatonsActiveEvents.add(trans);
+          for (final Step step: mEnabledEvents)
           {
-            boolean isInEnabled = false;
-            boolean isInInvalid = false;
-            automatonsActiveEvents.add(trans);
-            for (final Step step: mEnabledEvents)
-            {
-              if (step.getEvent() == trans.getEvent())
-                isInEnabled = true;
-            }
-            for (final EventProxy invalidEvent : mInvalidEvents.keySet())
-            {
-              if (invalidEvent == trans.getEvent())
-                isInInvalid = true;
-            }
-            if (isInEnabled)
-            {
-              eventsFirable.add(trans);
-            }
-            else if (!isInEnabled && !isInInvalid)
-            {
-              newEventsFirable.add(trans);
-            }
+            if (step.getEvent() == trans.getEvent())
+              isInEnabled = true;
+          }
+          for (final EventProxy invalidEvent : mInvalidEvents.keySet())
+          {
+            if (invalidEvent == trans.getEvent())
+              isInInvalid = true;
+          }
+          if (isInEnabled)
+          {
+            eventsFirable.add(trans);
+          }
+          else if (!isInEnabled && !isInInvalid)
+          {
+            newEventsFirable.add(trans);
           }
         }
-        processOldEvents(eventsFirable, aut);
-        processNewEvents(newEventsFirable, aut);
-        removeIgnoredEvents(automatonsActiveEvents, aut);
       }
+      processOldEvents(eventsFirable, aut);
+      processNewEvents(newEventsFirable, aut);
+      if (aut.getKind() != ComponentKind.PROPERTY)
+        removeIgnoredEvents(automatonsActiveEvents, aut);
     }
     Collections.sort(mEnabledEvents);
     updateControllability(false);
@@ -1113,6 +1139,7 @@ public class Simulation implements ModelObserver, Observer
   private TraceProxy mTrace;
   private boolean mAllowLastStep;
   private boolean invalidated;
+  private final HashMap<Step, AutomatonProxy> mWarningProperties;
   private ArrayList<SimulatorState> previousStates;
   private ArrayList<AutomatonProxy> mDisabledProperties;
   long time = 0;
