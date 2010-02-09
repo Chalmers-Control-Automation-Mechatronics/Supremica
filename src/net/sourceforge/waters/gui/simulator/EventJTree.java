@@ -299,7 +299,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
 
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED)
+    //if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED)
       forceRecalculation();
   }
 

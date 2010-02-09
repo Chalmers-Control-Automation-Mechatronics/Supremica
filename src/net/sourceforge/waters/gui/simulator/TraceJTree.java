@@ -409,7 +409,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
            mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
          final EventBranchNode eventNode = (EventBranchNode)value;
          final EventProxy event = eventNode.getEvent();
-         mEventNameLabel.setText(String.valueOf(eventNode.getTime() + 1) + ". " + event.getName());
+         mEventNameLabel.setText(String.valueOf(eventNode.getTime()) + ". " + event.getName());
          if (event.getKind() == EventKind.CONTROLLABLE)
            mEventNameLabel.setIcon(IconLoader.ICON_CONTROLLABLE);
          else
@@ -471,7 +471,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
          else
            mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
          mEventNameLabel.setText("Initial State");
-         if (TraceJTree.this.mSim.getCurrentTime() == -1)
+         if (TraceJTree.this.mSim.getCurrentTime() == 0)
          {
            mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.BOLD));
          }

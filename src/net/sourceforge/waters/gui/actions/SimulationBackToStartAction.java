@@ -29,7 +29,7 @@ public class SimulationBackToStartAction extends WatersSimulationAction
     final SimulatorPanel panel = getActiveSimulatorPanel();
     if (panel != null) {
       final Simulation sim = getObservedSimulation();
-      while (sim.getCurrentTime() != -1)
+      while (sim.getCurrentTime() != 0)
         sim.stepBack();
     }
   }
@@ -43,7 +43,7 @@ public class SimulationBackToStartAction extends WatersSimulationAction
     if (sim == null) {
       setEnabled(false);
     } else {
-      setEnabled(sim.getCurrentTime() != -1);
+      setEnabled(sim.getCurrentTime() != 0);
     }
   }
 

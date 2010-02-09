@@ -25,6 +25,7 @@ public class EventTreeModel
   {
     sim.attach(this);
     mSim = sim;
+    mSortingEvents = sortingEvents;
     setupAllEvents(mSim, sortingEvents);
   }
 
@@ -137,6 +138,7 @@ public class EventTreeModel
       for (final TreeModelListener l : mListeners)
         for (final EventProxy selectedEvent : event.getSource().getAllEvents())
           l.treeNodesChanged(new TreeModelEvent(this, new Object[]{event.getSource(), selectedEvent}));
+      setupAllEvents(mSim, mSortingEvents);
     }
   }
 
@@ -310,5 +312,6 @@ public class EventTreeModel
   private final Simulation mSim;
   private LinkedList<TreeModelListener> mListeners;
   private ArrayList<EventProxy> sortedEvents;
+  private final ArrayList<Pair<Boolean,Integer>> mSortingEvents;
 
 }

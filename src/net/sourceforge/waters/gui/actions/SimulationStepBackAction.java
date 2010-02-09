@@ -50,7 +50,7 @@ public class SimulationStepBackAction
     if (sim == null) {
       setEnabled(false);
     } else {
-      setEnabled(sim.getCurrentTime() != -1);
+      setEnabled(sim.getCurrentTime() != 0);
     }
   }
 

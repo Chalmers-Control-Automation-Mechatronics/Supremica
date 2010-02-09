@@ -1,8 +1,8 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -24,7 +24,7 @@ public class TeleportEventTreeNode extends DefaultMutableTreeNode
       this.removeAllChildren();
       final ArrayList<AutomatonProxy> automatonInEvent = new ArrayList<AutomatonProxy>();
       automatonInEvent.add(sim.getAutomatonActivityAtTime(mTime).get(0));
-      final List<AutomatonProxy> allInvalid = sim.isNonControllableAtTime(mTime);
+      final Set<AutomatonProxy> allInvalid = sim.isNonControllableAtTime(mTime);
       for (final AutomatonProxy automaton : automatonInEvent)
       {
         if (currentStates == null)

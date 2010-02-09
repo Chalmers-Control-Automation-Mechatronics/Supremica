@@ -68,7 +68,7 @@ public class TraceMutableTreeNode extends DefaultMutableTreeNode implements Simu
     }
     else
       this.add(new InitialState(sim.getAutomatonHistory().get(0)));
-    for (int looper = 0; looper < sim.getEventHistory().size(); looper++)
+    for (int looper = 1; looper < sim.getEventHistory().size(); looper++)
     {
       final Step step = sim.getEventHistory().get(looper);
       DefaultMutableTreeNode eventToAdd;

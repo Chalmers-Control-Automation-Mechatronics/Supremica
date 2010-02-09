@@ -52,19 +52,16 @@ public class Simulation implements ModelObserver, Observer
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, optable);
-
     mSimulationObservers = new ArrayList<SimulationObserver>();
     mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
     mEnabledEvents = new ArrayList<Step>();
     mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
     mModuleContainer = container;
-    mPreviousEvents = new ArrayList<Step>();
     mEnabledLastStep = new ArrayList<AutomatonProxy>();
-    mPreviousAutomatonStates = new ArrayList<Map<AutomatonProxy, StateProxy>>();
-    mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
+    previousStates = new ArrayList<SimulatorState>();
     mBlockingEvents = new ArrayList<Pair<EventProxy, AutomatonProxy>>();
-    mUncontrollableAutomata = new ArrayList<ArrayList<AutomatonProxy>>();
-    currentTime = -1;
+    mDisabledProperties = new ArrayList<AutomatonProxy>();
+    currentTime = 0;
     mContainer = container;
     invalidated = false;
     final ModuleSubject module = container.getModule();
@@ -73,8 +70,51 @@ public class Simulation implements ModelObserver, Observer
     final ProductDESProxy des = container.getCompiledDES();
     setCompiledDES(des);
     updateControllability(true);
+    findEventClassification();
+    addNewSimulatorState();
   }
 
+  // ########################################################################
+  // # SimulationState Access Methods
+
+  public Collection<? extends Step> getEnabledEvents()
+  {
+    return mEnabledEvents;
+  }
+  public Step getCurrentEvent()
+  {
+    return mCurrentEvent;
+  }
+  public Collection<? extends Pair<EventProxy,AutomatonProxy>> getAllBlocking()
+  {
+     return mBlockingEvents;
+  }
+  public Collection<? extends AutomatonProxy> getAutomatonActivity()
+  {
+    return mEnabledLastStep;
+  }
+  public Collection<? extends AutomatonProxy> getDisabledProperties()
+  {
+    return mDisabledProperties;
+  }
+
+  private void addNewSimulatorState()
+  {
+    previousStates.add(new SimulatorState(this));
+  }
+
+  private void loadSimulatorState()
+  {
+    final SimulatorState stateToLoad = previousStates.get(currentTime);
+    mAllAutomatons = stateToLoad.mCurrentStates;
+    mEnabledEvents = stateToLoad.mEnabledEvents;
+    mInvalidEvents = stateToLoad.mInvalidEvents;
+    mCurrentEvent = stateToLoad.mCurrentEvent;
+    mBlockingEvents = stateToLoad.mBlockingEvents;
+    mEnabledLastStep = stateToLoad.mEnabledLastStep;
+    mDisabledProperties = stateToLoad.mDisabledProperties;
+    updateControllability(false);
+  }
 
   //#########################################################################
   //# Simple Access
@@ -151,12 +191,16 @@ public class Simulation implements ModelObserver, Observer
     }
     else
     {
-      throw new UnsupportedOperationException("ERROR: Unknown event status");
+      throw new UnsupportedOperationException("ERROR: Unknown event status. Event name: "
+                                              + event.getName() + " enabled/invalid size:"
+                                              + mEnabledEvents.size() + " / " + mInvalidEvents.size());
     }
   }
 
   public ImageIcon getAutomatonActivityIcon(final AutomatonProxy aut)
   {
+    if (mDisabledProperties.contains(aut))
+      return IconLoader.ICON_CROSS;
     updateControllability(false);
     if (mBlockingEvents != null && aut.getKind() == ComponentKind.SPEC)
     {
@@ -172,12 +216,19 @@ public class Simulation implements ModelObserver, Observer
       return new ImageIcon();
   }
 
-  public List<AutomatonProxy> isNonControllableAtTime(final int time)
+  public Set<AutomatonProxy> isNonControllableAtTime(final int time)
   {
-    if (time < -1 || time > mUncontrollableAutomata.size() - 2)
-      return Collections.emptyList();
+    if (time < 0 || time > previousStates.size() - 1)
+      return Collections.emptySet();
     else
-      return Collections.unmodifiableList(mUncontrollableAutomata.get(time + 1));
+    {
+      final Set<AutomatonProxy> output = new HashSet<AutomatonProxy>();
+      for (final Pair<EventProxy, AutomatonProxy> blocking: previousStates.get(time).mBlockingEvents)
+      {
+        output.add(blocking.getSecond());
+      }
+      return output;
+    }
   }
 
   /**
@@ -277,14 +328,14 @@ public class Simulation implements ModelObserver, Observer
     if (currentTime < 1)
       return false;
     else
-      return mPreviousEnabledLastStep.get(currentTime - 1).contains(automaton);
+      return previousStates.get(currentTime - 1).mEnabledLastStep.contains(automaton);
   }
   public boolean changedNextStep(final AutomatonProxy aut)
   {
-    if (currentTime == mPreviousEnabledLastStep.size() - 1)
+    if (currentTime == previousStates.size() - 1)
       return false;
     else
-      return mPreviousEnabledLastStep.get(currentTime + 1).contains(aut);
+      return previousStates.get(currentTime + 1).mEnabledLastStep.contains(aut);
   }
 
   public ModuleContainer getContainer()
@@ -294,12 +345,22 @@ public class Simulation implements ModelObserver, Observer
 
   public List<Step> getEventHistory()
   {
-    return Collections.unmodifiableList(mPreviousEvents);
+    final ArrayList<Step> output = new ArrayList<Step>();
+    for (final SimulatorState state : previousStates)
+    {
+      output.add(state.mCurrentEvent);
+    }
+    return output;
   }
 
   public List<Map<AutomatonProxy, StateProxy>> getAutomatonHistory()
   {
-   return Collections.unmodifiableList(mPreviousAutomatonStates);
+    final ArrayList<Map<AutomatonProxy, StateProxy>> output = new ArrayList<Map<AutomatonProxy, StateProxy>>();
+    for (final SimulatorState state : previousStates)
+    {
+      output.add(state.mCurrentStates);
+    }
+    return output;
   }
 
   public ArrayList<AutomatonProxy> getAutomata()
@@ -313,7 +374,7 @@ public class Simulation implements ModelObserver, Observer
 
   public ArrayList<AutomatonProxy> getAutomatonActivityAtTime(final int time)
   {
-    return mPreviousEnabledLastStep.get(time);
+    return previousStates.get(time).mEnabledLastStep;
   }
 
   ProductDESProxy getCompiledDES()
@@ -336,21 +397,21 @@ public class Simulation implements ModelObserver, Observer
       {
         if (startState.isInitial())
         {
-          if (mPreviousEvents.get(currentTime) == null)
+          if (mCurrentEvent == null)
             return null;
-          return mPreviousEvents.get(currentTime).getTransition(automaton,
-                                                                startState,
-                                                                mPreviousAutomatonStates.get(currentTime).get(automaton));
+          return mCurrentEvent.getTransition(automaton,
+                                             startState,
+                                             mAllAutomatons.get(automaton));
         }
       }
     }
     else
     {
-      if (mPreviousEvents.get(currentTime) == null)
+      if (mCurrentEvent == null)
         return null;
-      return mPreviousEvents.get(currentTime).getTransition(automaton,
-                     mPreviousAutomatonStates.get(currentTime - 1).get(automaton),
-                     mPreviousAutomatonStates.get(currentTime).get(automaton));
+      return mCurrentEvent.getTransition(automaton,
+                     previousStates.get(currentTime - 1).mCurrentStates.get(automaton),
+                     mAllAutomatons.get(automaton));
     }
     return null;
   }
@@ -389,14 +450,14 @@ public class Simulation implements ModelObserver, Observer
     else
       throw new IllegalArgumentException("ERROR: This automaton is not in this program");
     invalidated = true;
+    removeFutureEvents();
     updateControllability(true);
     findEventClassification();
-    mPreviousAutomatonStates.add(new HashMap<AutomatonProxy, StateProxy>(mAllAutomatons));
     final ArrayList<AutomatonProxy> auto = new ArrayList<AutomatonProxy>();
     auto.add(automaton);
-    mPreviousEnabledLastStep.add(auto);
-    mPreviousEvents.add(null);
+    mCurrentEvent = null;
     currentTime++;
+    addNewSimulatorState();
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
@@ -427,13 +488,13 @@ public class Simulation implements ModelObserver, Observer
         }
         findEventClassification();
       }
-      mPreviousEvents = new ArrayList<Step>();
+      previousStates = new ArrayList<SimulatorState>();
       mEnabledLastStep = new ArrayList<AutomatonProxy>();
-      mPreviousAutomatonStates = new ArrayList<Map<AutomatonProxy, StateProxy>>();
-      mPreviousEnabledLastStep = new ArrayList<ArrayList<AutomatonProxy>>();
-      mUncontrollableAutomata = new ArrayList<ArrayList<AutomatonProxy>>();
-      currentTime = -1;
+      mCurrentEvent = null;
+      mDisabledProperties = new ArrayList<AutomatonProxy>();
+      currentTime = 0;
       updateControllability(true);
+      addNewSimulatorState();
       final SimulationChangeEvent simEvent = new SimulationChangeEvent
         (this, SimulationChangeEvent.STATE_CHANGED);
       fireSimulationChangeEvent(simEvent);
@@ -520,31 +581,33 @@ public class Simulation implements ModelObserver, Observer
     checkInvalid(step);
     invalidated = true;
     removeFutureEvents();
-    mPreviousEvents.add(step);
+    mCurrentEvent = step;
     mEnabledLastStep = new ArrayList<AutomatonProxy>();
     for (final AutomatonProxy automata : mAllAutomatons.keySet())
     {
-      final StateProxy oldLocation = mAllAutomatons.get(automata);
-      if (step.getDest().get(automata) != null)
+      if (!mDisabledProperties.contains(automata))
       {
-        mAllAutomatons.put(automata, step.getDest().get(automata));
-      }
-      else
-      {
-        moveNonDeterministicTransition(automata, step, oldLocation);
+        final StateProxy oldLocation = mAllAutomatons.get(automata);
+        if (step.getDest().get(automata) != null)
+        {
+          mAllAutomatons.put(automata, step.getDest().get(automata));
+        }
+        else
+        {
+          moveDeterministicTransition(automata, step, oldLocation);
+        }
       }
     }
-    mPreviousAutomatonStates.add(new HashMap<AutomatonProxy, StateProxy>(mAllAutomatons));
-    mPreviousEnabledLastStep.add(mEnabledLastStep);
     currentTime++;
     findEventClassification();
     updateControllability(true);
+    addNewSimulatorState();
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
   }
 
-  private void moveNonDeterministicTransition(final AutomatonProxy automata,
+  private void moveDeterministicTransition(final AutomatonProxy automata,
                                                  final Step step,
                                                  final StateProxy oldLocation) throws NonDeterministicException
   {
@@ -563,6 +626,15 @@ public class Simulation implements ModelObserver, Observer
         {
           throw new NonDeterministicException("The automaton " + automata.getName() +
                                               " has two options. The event fired was " + step.toString());
+        }
+        if (!moved && automata.getKind() == ComponentKind.PROPERTY)
+        {
+          mContainer.getIDE().error("Property "
+                                    + automata.getName()
+                                    + " has been disabled, as the event "
+                                    + step.getEvent().getName()
+                                    + " could not be fired");
+          mDisabledProperties.add(automata);
         }
       }
     }
@@ -598,7 +670,7 @@ public class Simulation implements ModelObserver, Observer
     {
       if (mTrace instanceof LoopTraceProxy && !invalidated)
       {
-        if (currentTime == mPreviousEvents.size() - 1)
+        if (currentTime == previousStates.size() - 1)
         {
           mContainer.getIDE().info(": Looping to start of control loop");
           while (currentTime != ((LoopTraceProxy)mTrace).getLoopIndex())
@@ -674,7 +746,7 @@ public class Simulation implements ModelObserver, Observer
         Pair<EventProxy, AutomatonProxy> blockingSpec = null;
         for (final AutomatonProxy automata : mInvalidEvents.get(event))
         {
-          if (automata.getKind() == ComponentKind.SPEC)
+          if (automata.getKind() == ComponentKind.SPEC || automata.getKind() == ComponentKind.SUPERVISOR)
           {
             blockingSpec =  new Pair<EventProxy, AutomatonProxy> (event, automata);
           }
@@ -694,8 +766,6 @@ public class Simulation implements ModelObserver, Observer
       mBlockingEvents = null;
     else
       mBlockingEvents = output;
-    if (addNewUncontrollable)
-      mUncontrollableAutomata.add(uncontrollableAutomatonThisTime);
   }
 
   private ArrayList<Pair<EventProxy, AutomatonProxy>> testForControlability()
@@ -729,40 +799,42 @@ public class Simulation implements ModelObserver, Observer
     mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
     for (final AutomatonProxy aut : mAllAutomatons.keySet())
     {
-      final ArrayList<TransitionProxy> eventsFirable = new ArrayList<TransitionProxy>();
-      final ArrayList<TransitionProxy> newEventsFirable = new ArrayList<TransitionProxy>();
-      final ArrayList<TransitionProxy> automatonsActiveEvents = new ArrayList<TransitionProxy>();
-      for (final TransitionProxy trans : aut.getTransitions())
+      if (aut.getKind() != ComponentKind.PROPERTY)
       {
-        if (trans.getSource() == mAllAutomatons.get(aut))
+        final ArrayList<TransitionProxy> eventsFirable = new ArrayList<TransitionProxy>();
+        final ArrayList<TransitionProxy> newEventsFirable = new ArrayList<TransitionProxy>();
+        final ArrayList<TransitionProxy> automatonsActiveEvents = new ArrayList<TransitionProxy>();
+        for (final TransitionProxy trans : aut.getTransitions())
         {
-          boolean isInEnabled = false;
-          boolean isInInvalid = false;
-          for (final Step step: mEnabledEvents)
+          if (trans.getSource() == mAllAutomatons.get(aut))
           {
-            if (step.getEvent() == trans.getEvent())
-              isInEnabled = true;
-          }
-          for (final EventProxy invalidEvent : mInvalidEvents.keySet())
-          {
-            if (invalidEvent == trans.getEvent())
-              isInInvalid = true;
-          }
-          if (isInEnabled)
-          {
-            eventsFirable.add(trans);
+            boolean isInEnabled = false;
+            boolean isInInvalid = false;
             automatonsActiveEvents.add(trans);
-          }
-          else if (!isInEnabled && !isInInvalid)
-          {
-            newEventsFirable.add(trans);
-            automatonsActiveEvents.add(trans);
+            for (final Step step: mEnabledEvents)
+            {
+              if (step.getEvent() == trans.getEvent())
+                isInEnabled = true;
+            }
+            for (final EventProxy invalidEvent : mInvalidEvents.keySet())
+            {
+              if (invalidEvent == trans.getEvent())
+                isInInvalid = true;
+            }
+            if (isInEnabled)
+            {
+              eventsFirable.add(trans);
+            }
+            else if (!isInEnabled && !isInInvalid)
+            {
+              newEventsFirable.add(trans);
+            }
           }
         }
+        processOldEvents(eventsFirable, aut);
+        processNewEvents(newEventsFirable, aut);
+        removeIgnoredEvents(automatonsActiveEvents, aut);
       }
-      processOldEvents(eventsFirable, aut);
-      processNewEvents(newEventsFirable, aut);
-      removeIgnoredEvents(automatonsActiveEvents, aut);
     }
     Collections.sort(mEnabledEvents);
     updateControllability(false);
@@ -984,28 +1056,7 @@ public class Simulation implements ModelObserver, Observer
   private void moveSafely(final boolean forward)
   {
     moveTime(forward);
-    if (currentTime == -1)
-    {
-      mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
-      mEnabledEvents = new ArrayList<Step>();
-      mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
-      if (mCompiledDES != null)
-      {
-        for (final AutomatonProxy automaton : mCompiledDES.getAutomata())
-          for (final StateProxy state : automaton.getStates())
-            if (state.isInitial())
-              mAllAutomatons.put(automaton, state);
-        findEventClassification();
-      }
-      mEnabledLastStep = new ArrayList<AutomatonProxy>();
-    }
-    else
-    {
-      mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>(mPreviousAutomatonStates.get(currentTime));
-      mEnabledLastStep = new ArrayList<AutomatonProxy>(mPreviousEnabledLastStep.get(currentTime));
-      findEventClassification();
-    }
-    updateControllability(false);
+    loadSimulatorState();
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
@@ -1015,7 +1066,7 @@ public class Simulation implements ModelObserver, Observer
   {
     if (forward)
     {
-      if (currentTime == mPreviousEvents.size() - 1)
+      if (currentTime == previousStates.size() - 1)
       {
         System.out.println("No future Events");
         return;
@@ -1025,7 +1076,7 @@ public class Simulation implements ModelObserver, Observer
     }
     else
     {
-      if (currentTime == -1)
+      if (currentTime == 0)
       {
         System.out.println("No previous Event");
         return;
@@ -1038,12 +1089,9 @@ public class Simulation implements ModelObserver, Observer
 
   private void removeFutureEvents()
   {
-    while (mPreviousEvents.size() != currentTime + 1)
+    while (previousStates.size() != currentTime + 1)
     {
-      mPreviousEvents.remove(currentTime + 1);
-      mPreviousAutomatonStates.remove(currentTime + 1);
-      mPreviousEnabledLastStep.remove(currentTime + 1);
-      mUncontrollableAutomata.remove(currentTime + 1);
+      previousStates.remove(currentTime + 1);
     }
   }
 
@@ -1054,12 +1102,9 @@ public class Simulation implements ModelObserver, Observer
   private Map<AutomatonProxy,StateProxy> mAllAutomatons; // The Map object is the current state of the key
   private ArrayList<Step> mEnabledEvents;
   private HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the event
-  private ArrayList<Step> mPreviousEvents;
+  private Step mCurrentEvent;
   private int currentTime; // The index representing the current index for the current version history.
-  private ArrayList<Map<AutomatonProxy, StateProxy>> mPreviousAutomatonStates;
-  private ArrayList<ArrayList<AutomatonProxy>> mPreviousEnabledLastStep;
   private ArrayList<Pair<EventProxy, AutomatonProxy>> mBlockingEvents;
-  private ArrayList<ArrayList<AutomatonProxy>> mUncontrollableAutomata;
   private final ModuleContainer mModuleContainer;
   private ArrayList<AutomatonProxy> mEnabledLastStep;
   private final ArrayList<SimulationObserver> mSimulationObservers;
@@ -1068,5 +1113,7 @@ public class Simulation implements ModelObserver, Observer
   private TraceProxy mTrace;
   private boolean mAllowLastStep;
   private boolean invalidated;
+  private ArrayList<SimulatorState> previousStates;
+  private ArrayList<AutomatonProxy> mDisabledProperties;
   long time = 0;
 }
