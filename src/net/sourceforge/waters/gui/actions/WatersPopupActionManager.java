@@ -270,6 +270,11 @@ public class WatersPopupActionManager
     return new TraceTravelAction(mIDE, time);
   }
 
+  public IDEAction getLanguageIncusionAction(final AutomatonProxy aut)
+  {
+    return new DesktopLanguageInclusionAction(mIDE, aut);
+  }
+
   //#######################################################################
   //# Data Members
   private final IDE mIDE;
@@ -279,5 +284,7 @@ public class WatersPopupActionManager
   {
     return new DesktopSwitchStateAction(mIDE, automaton, node);
   }
+
+
 
 }

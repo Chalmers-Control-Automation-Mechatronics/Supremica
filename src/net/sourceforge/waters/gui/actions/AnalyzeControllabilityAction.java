@@ -24,11 +24,6 @@ public class AnalyzeControllabilityAction extends WatersAnalyzeAction
     return "is not controllable";
   }
 
-  protected boolean getAllowLastStep()
-  {
-    return false;
-  }
-
   protected ModelVerifier getModelVerifier(final ModelVerifierFactory factory,
                                            final ProductDESProxyFactory desFactory)
   {

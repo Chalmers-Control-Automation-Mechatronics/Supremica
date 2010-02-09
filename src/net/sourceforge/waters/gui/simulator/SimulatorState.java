@@ -23,6 +23,10 @@ public class SimulatorState
       mBlockingEvents = new ArrayList<Pair<EventProxy, AutomatonProxy>>(sim.getAllBlocking());
     mEnabledLastStep = new ArrayList<AutomatonProxy>(sim.getAutomatonActivity());
     mDisabledProperties = new ArrayList<AutomatonProxy>(sim.getDisabledProperties());
+    if (sim.getWarningProperties() != null)
+      mWarningProperties = new HashMap<Step, AutomatonProxy>(sim.getWarningProperties());
+    else
+      mWarningProperties = new HashMap<Step, AutomatonProxy>();
   }
 
   public Map<AutomatonProxy,StateProxy> mCurrentStates; // The Map object is the current state of the key
@@ -33,4 +37,5 @@ public class SimulatorState
   public ArrayList<Pair<EventProxy, AutomatonProxy>> mBlockingEvents;
   public ArrayList<AutomatonProxy> mEnabledLastStep;
   public ArrayList<AutomatonProxy> mDisabledProperties;
+  public Map<? extends Step,? extends AutomatonProxy> mWarningProperties;
 }

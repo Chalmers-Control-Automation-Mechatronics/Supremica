@@ -20,6 +20,8 @@ public class AutomatonPopupFactory
     final IDEAction cascade = master.getDesktopCascadeAction();
     popup.add(cascade);
     popup.addSeparator();
+    final IDEAction lInclusion = master.getLanguageIncusionAction(aut);
+    popup.add(lInclusion);
     if (aut != null) {
       if (open)
       {

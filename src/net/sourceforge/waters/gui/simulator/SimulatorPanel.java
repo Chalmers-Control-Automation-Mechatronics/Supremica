@@ -12,7 +12,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.JTableHeader;
 
 import net.sourceforge.waters.model.des.TraceProxy;
-
+import net.sourceforge.waters.plain.des.ConflictTraceElement;
+import net.sourceforge.waters.plain.des.LoopTraceElement;
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.IDEDimensions;
 import org.supremica.gui.ide.MainPanel;
@@ -49,9 +50,10 @@ public class SimulatorPanel
     return mSimulation;
   }
 
-  public void switchToTraceMode(final TraceProxy trace, final boolean allowLastStep)
+  public void switchToTraceMode(final TraceProxy trace)
   {
-    mSimulation.run(trace, allowLastStep);
+    mSimulation.run(trace, trace instanceof ConflictTraceElement || trace instanceof LoopTraceElement);
+    System.out.println("DEBUG: Trace type is : " + trace.getClass());
     mTabbedPane.setSelectedIndex(2);
   }
 

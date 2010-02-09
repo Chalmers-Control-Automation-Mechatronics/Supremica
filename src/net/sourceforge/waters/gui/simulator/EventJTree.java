@@ -431,6 +431,11 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
             else
               mAutomataIconLabel.setIcon(IconLoader.ICON_TICK);
           }
+          for (final Step step : mSim.getWarningProperties().keySet())
+          {
+            if (step.getEvent() == parentEvent && mSim.getWarningProperties().get(step) == autoProxy)
+              mAutomataIconLabel.setIcon(IconLoader.ICON_YELLOWWARNING);
+          }
         }
         else
         {
@@ -438,6 +443,11 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
             mAutomataIconLabel.setIcon(IconLoader.ICON_CROSS);
           else
             mAutomataIconLabel.setIcon(IconLoader.ICON_TICK);
+          for (final Step step : mSim.getWarningProperties().keySet())
+          {
+            if (step.getEvent() == parentEvent && mSim.getWarningProperties().get(step) == autoProxy)
+              mAutomataIconLabel.setIcon(IconLoader.ICON_YELLOWWARNING);
+          }
         }
         StateProxy currentState;
         currentState = mSim.getCurrentStates().get(autoProxy);

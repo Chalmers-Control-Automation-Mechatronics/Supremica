@@ -30,6 +30,8 @@ public class DesktopPanePopupFactory extends PopupFactory
     popup.add(showAll);
     final IDEAction cascade = master.getDesktopCascadeAction();
     popup.add(cascade);
+    final IDEAction lInclusion = master.getLanguageIncusionAction(null);
+    popup.add(lInclusion);
   }
 
 }

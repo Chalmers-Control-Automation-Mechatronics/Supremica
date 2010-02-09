@@ -25,6 +25,7 @@ import javax.swing.JMenuItem;
 import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
+import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSICPropertyVAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
@@ -253,6 +254,9 @@ public class IDEMenuBar extends JMenuBar
         final Action sicpropertyv =
             actions.getAction(AnalyzeSICPropertyVAction.class);
         mNewAnalyzeMenu.add(sicpropertyv);
+        final Action languageInclusion =
+            actions.getAction(AnalyzeLanguageInclusionAction.class);
+        mNewAnalyzeMenu.add(languageInclusion);
       }
 
       // Simulate

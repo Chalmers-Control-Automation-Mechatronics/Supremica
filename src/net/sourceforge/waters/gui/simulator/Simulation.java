@@ -98,6 +98,10 @@ public class Simulation implements ModelObserver, Observer
   {
     return mDisabledProperties;
   }
+  public Map<? extends Step,? extends AutomatonProxy> getWarningProperties()
+  {
+    return mWarningProperties;
+  }
 
   private void addNewSimulatorState()
   {
@@ -114,6 +118,7 @@ public class Simulation implements ModelObserver, Observer
     mBlockingEvents = new ArrayList<Pair<EventProxy, AutomatonProxy>>(stateToLoad.mBlockingEvents);
     mEnabledLastStep = new ArrayList<AutomatonProxy>(stateToLoad.mEnabledLastStep);
     mDisabledProperties = new ArrayList<AutomatonProxy>(stateToLoad.mDisabledProperties);
+    mWarningProperties = new HashMap<Step, AutomatonProxy>(stateToLoad.mWarningProperties);
     updateControllability(false);
   }
 
@@ -449,6 +454,7 @@ public class Simulation implements ModelObserver, Observer
 
   public void setState(final AutomatonProxy automaton, final StateProxy state)
   {
+    mWarningProperties = new HashMap<Step, AutomatonProxy>();
     if (!automaton.getStates().contains(state))
     {
       throw new IllegalArgumentException("ERROR: " + state.getName() + " does not belong to this automaton");
@@ -473,6 +479,7 @@ public class Simulation implements ModelObserver, Observer
 
   public void reset()
   {
+    mWarningProperties = new HashMap<Step, AutomatonProxy>();
     if (mTrace != null)
     {
       run(mTrace, mAllowLastStep);
@@ -581,6 +588,7 @@ public class Simulation implements ModelObserver, Observer
 
   public void step(final Step step) throws NonDeterministicException
   {
+    mWarningProperties = new HashMap<Step, AutomatonProxy>();
     time = System.currentTimeMillis();
     if (step == null)
     {
@@ -780,7 +788,7 @@ public class Simulation implements ModelObserver, Observer
       {
         for (final Step step : mEnabledEvents)
         {
-          if (auto.getEvents().contains(step))
+          if (auto.getEvents().contains(step.getEvent()))
           {
             boolean found = false;
             for (final TransitionProxy trans : auto.getTransitions())
@@ -1081,6 +1089,7 @@ public class Simulation implements ModelObserver, Observer
 
   private void moveSafely(final boolean forward)
   {
+    mWarningProperties = new HashMap<Step, AutomatonProxy>();
     moveTime(forward);
     loadSimulatorState();
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
@@ -1139,7 +1148,7 @@ public class Simulation implements ModelObserver, Observer
   private TraceProxy mTrace;
   private boolean mAllowLastStep;
   private boolean invalidated;
-  private final HashMap<Step, AutomatonProxy> mWarningProperties;
+  private HashMap<Step, AutomatonProxy> mWarningProperties;
   private ArrayList<SimulatorState> previousStates;
   private ArrayList<AutomatonProxy> mDisabledProperties;
   long time = 0;

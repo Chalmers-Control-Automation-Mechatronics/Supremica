@@ -27,11 +27,6 @@ public class AnalyzeSICPropertyVAction extends WatersAnalyzeAction
     return "does not satisfy SIC Property V";
   }
 
-  protected boolean getAllowLastStep()
-  {
-    return true;
-  }
-
   protected ModelVerifier getModelVerifier(
                                            final ModelVerifierFactory factory,
                                            final ProductDESProxyFactory desFactory)
