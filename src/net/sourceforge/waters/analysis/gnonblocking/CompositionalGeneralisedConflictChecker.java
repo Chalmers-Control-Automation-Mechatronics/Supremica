@@ -69,6 +69,12 @@ public class CompositionalGeneralisedConflictChecker
 
   //#########################################################################
   //# Constructors
+  public CompositionalGeneralisedConflictChecker
+    (final ProductDESProxyFactory factory)
+  {
+    this(null, factory);
+  }
+
   public CompositionalGeneralisedConflictChecker(final ProductDESProxy model,
                                       final ProductDESProxyFactory factory)
   {
@@ -704,6 +710,7 @@ public class CompositionalGeneralisedConflictChecker
           if (!mHidden.isEmpty()) {
             TransitionRelation tr = new TransitionRelation(minAutomaton,
                                                            getMarkingProposition());
+            @SuppressWarnings("unused")
             final int tau = tr.mergeEvents(mHidden, getFactory());
             /*for (EventProxy event : mOriginalAlphabet) {
               if (mAllSelfLoops.containsKey(event) && mAllSelfLoops.get(event).isEmpty()) {
