@@ -477,10 +477,10 @@ public class Simulation implements ModelObserver, Observer
     fireSimulationChangeEvent(simEvent);
   }
 
-  public void reset()
+  public void reset(final boolean destroyTrace)
   {
     mWarningProperties = new HashMap<Step, AutomatonProxy>();
-    if (mTrace != null)
+    if (mTrace != null && !destroyTrace)
     {
       run(mTrace, mAllowLastStep);
     }
@@ -520,7 +520,7 @@ public class Simulation implements ModelObserver, Observer
   {
     mTrace = null;
     mAllowLastStep = false;
-    reset();
+    reset(false);
     mAllowLastStep = allowLastStep;
     mTrace = trace;
     Step locatedStep = null;
@@ -1059,7 +1059,7 @@ public class Simulation implements ModelObserver, Observer
   {
     if (des != mCompiledDES) {
       mCompiledDES = des;
-      reset();
+      reset(true);
       final SimulationChangeEvent event = new SimulationChangeEvent
           (this, SimulationChangeEvent.MODEL_CHANGED);
       fireSimulationChangeEvent(event);

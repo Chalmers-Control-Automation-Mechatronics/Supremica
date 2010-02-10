@@ -5,6 +5,7 @@ import javax.swing.JPopupMenu;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 public class AutomatonPopupFactory
 {
@@ -20,9 +21,12 @@ public class AutomatonPopupFactory
     final IDEAction cascade = master.getDesktopCascadeAction();
     popup.add(cascade);
     popup.addSeparator();
-    final IDEAction lInclusion = master.getLanguageIncusionAction(aut);
-    popup.add(lInclusion);
     if (aut != null) {
+      if (aut.getKind() == ComponentKind.PROPERTY)
+      {
+        final IDEAction lInclusion = master.getLanguageIncusionAction(aut);
+        popup.add(lInclusion);
+      }
       if (open)
       {
         final IDEAction close = master.getDesktopCloseWindowAction(aut);

@@ -36,7 +36,7 @@ public class SimulationResetAction
     final SimulatorPanel panel = getActiveSimulatorPanel();
     if (panel != null) {
       final Simulation sim = getObservedSimulation();
-      sim.reset();
+      sim.reset(false);
     }
   }
 

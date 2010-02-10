@@ -98,6 +98,8 @@ class ComponentsTreePopupFactory
       final JPopupMenu popup = getPopup();
       final IDEAction editgraph = master.getShowGraphAction(comp);
       popup.add(editgraph);
+      final IDEAction languageInclusion = master.getLanguageIncusionAction(comp);
+      popup.add(languageInclusion);
       return null;
     }
 

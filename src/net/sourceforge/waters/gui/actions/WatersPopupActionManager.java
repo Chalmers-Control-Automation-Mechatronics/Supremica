@@ -18,6 +18,7 @@ import java.net.URI;
 import javax.swing.Action;
 import javax.swing.JComponent;
 
+import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -270,9 +271,9 @@ public class WatersPopupActionManager
     return new TraceTravelAction(mIDE, time);
   }
 
-  public IDEAction getLanguageIncusionAction(final AutomatonProxy aut)
+  public IDEAction getLanguageIncusionAction(final NamedProxy aut)
   {
-    return new DesktopLanguageInclusionAction(mIDE, aut);
+    return new AnalyzeLanguageInclusionAction(mIDE, aut);
   }
 
   //#######################################################################

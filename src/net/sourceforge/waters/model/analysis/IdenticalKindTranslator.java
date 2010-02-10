@@ -41,7 +41,7 @@ public class IdenticalKindTranslator
       new IdenticalKindTranslator();
   }
 
-  private IdenticalKindTranslator()
+  protected IdenticalKindTranslator()
   {
   }
 
