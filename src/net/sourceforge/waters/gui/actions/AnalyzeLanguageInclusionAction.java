@@ -1,10 +1,21 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui,actions
+//# CLASS:   AnalyzeLanguageInclusionAction
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.gui.actions;
 
 import java.util.Map;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.model.analysis.AbstractKindTranslator;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.model.analysis.AbstractLanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
@@ -14,7 +25,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -23,11 +34,13 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
+
 public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
                                             implements ModelObserver
 {
 
-
+  //#########################################################################
+  //# Constructors
   public AnalyzeLanguageInclusionAction(final IDE ide)
   {
     this(ide, null);
@@ -37,22 +50,25 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
   {
     super(ide);
     mNamedProxy = aut;
-    if (mNamedProxy == null)
+    if (mNamedProxy == null) {
       putValue(Action.NAME, "Check all properties");
-    else
-    {
-      if (mNamedProxy instanceof AutomatonProxy)
-        putValue(Action.NAME, "Check property " + mNamedProxy.getName());
-      else if (mNamedProxy instanceof SimpleComponentSubject)
-      {
-        if (((SimpleComponentSubject)mNamedProxy).getParent() instanceof GroupNodeProxy)
-          putValue(Action.NAME, "Check properties " + mNamedProxy.getName());
-        else
-          putValue(Action.NAME, "Check property " + mNamedProxy.getName());
+    } else {
+      String suffix = "y";
+      if (mNamedProxy instanceof SimpleComponentSubject) {
+        final SimpleComponentSubject comp =
+          (SimpleComponentSubject) mNamedProxy;
+        if (comp.getParent().getParent() instanceof ForeachComponentProxy) {
+          suffix = "ies";
+        }
       }
+      putValue(Action.NAME,
+               "Check propert" + suffix + ' ' + mNamedProxy.getName());
     }
   }
 
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
   protected String getCheckName()
   {
     return "Language Inclusion";
@@ -94,31 +110,45 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     }
     return checker;
   }
-  /*
+
+
+  //#########################################################################
+  //# Enablement
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
     case CONTAINER_SWITCH:
-    case MAINPANEL_SWITCH:
-    case SUBPANEL_SWITCH:
+      /*
+      final ModuleContainer container = getActiveModuleContainer();
+      final ModuleSubject module = container.getModule();
+      setObservedModule(module);
+      */
       updateEnabledStatus();
       break;
     default:
       break;
     }
   }
-  */
+
   public void modelChanged(final ModelChangeEvent event)
   {
-    if (event.getKind() == ModelChangeEvent.STATE_CHANGED)
-    {
-      updateEnabledStatus();
-    }
-    else if (event.getKind() == ModelChangeEvent.ITEM_ADDED || event.getKind() == ModelChangeEvent.ITEM_REMOVED)
-    {
-      updateEnabledStatus();
+    switch (event.getKind()) {
+    case ModelChangeEvent.STATE_CHANGED:
+      if (event.getSource() instanceof SimpleComponentSubject) {
+        updateEnabledStatus();
+      }
+      break;
+    case ModelChangeEvent.ITEM_ADDED:
+    case ModelChangeEvent.ITEM_REMOVED:
+      if (event.getValue() instanceof SimpleComponentSubject) {
+        updateEnabledStatus();
+      }
+      break;
+    default:
+      break;
     }
   }
+
   /*
   public void updateEnabledStatus()
   {
@@ -149,10 +179,10 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
   }*/
 
 
-
   //#######################################################################
   //# Inner Class SingleAutomatonKindTranslator
-  private class SingleAutomatonKindTranslator extends AbstractKindTranslator
+  private class SingleAutomatonKindTranslator
+    extends AbstractLanguageInclusionKindTranslator
   {
 
     //#######################################################################
@@ -171,14 +201,15 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
 
   //#######################################################################
   //# Inner Class SingleComponentKindTranslator
-  private class SingleComponentKindTranslator extends AbstractKindTranslator
+  private class SingleComponentKindTranslator
+    extends AbstractLanguageInclusionKindTranslator
   {
 
     //#######################################################################
     //# Constructor
-    private SingleComponentKindTranslator(final Map<Proxy,SourceInfo> sourceInfo)
+    private SingleComponentKindTranslator(final Map<Proxy,SourceInfo> map)
     {
-      mSourceInfo = sourceInfo;
+      mSourceInfo = map;
     }
 
     //#######################################################################
@@ -198,12 +229,12 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
   }
 
 
-  //#######################################################################
+  //#########################################################################
   //# Data Members
   private final NamedProxy mNamedProxy;
 
 
-  //#######################################################################
+  //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = -1008097797553564719L;
 

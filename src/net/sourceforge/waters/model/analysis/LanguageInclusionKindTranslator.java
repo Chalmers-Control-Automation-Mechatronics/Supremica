@@ -11,11 +11,6 @@ package net.sourceforge.waters.model.analysis;
 
 import java.io.Serializable;
 
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
-
 
 /**
  * <P>A kind translator used for language inclusion checking.
@@ -29,7 +24,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 public class LanguageInclusionKindTranslator
-  implements KindTranslator, Serializable
+  extends AbstractLanguageInclusionKindTranslator
+  implements Serializable
 {
 
   //#########################################################################
@@ -46,48 +42,6 @@ public class LanguageInclusionKindTranslator
 
   private LanguageInclusionKindTranslator()
   {
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-  /**
-   * Returns the component kind of the given automaton in a language
-   * inclusion check.
-   * @return {@link ComponentKind#PLANT}, if the given automaton is
-   *         a plant, spec, or supervisor, or {@link ComponentKind#SPEC} if
-   *         the given automaton is a property.
-   */
-  public ComponentKind getComponentKind(final AutomatonProxy aut)
-  {
-    final ComponentKind kind = aut.getKind();
-    switch (kind) {
-    case PLANT:
-    case SPEC:
-    case SUPERVISOR:
-      return ComponentKind.PLANT;
-    case PROPERTY:
-      return ComponentKind.SPEC;
-    default:
-      return kind;
-    }
-  }
-
-  /**
-   * Returns the event kind of the given event in a language
-   * inclusion check.
-   * @return {@link EventKind#UNCONTROLLABLE}.
-   */
-  public EventKind getEventKind(final EventProxy event)
-  {
-    final EventKind kind = event.getKind();
-    switch (kind) {
-    case CONTROLLABLE:
-    case UNCONTROLLABLE:
-      return EventKind.UNCONTROLLABLE;
-    default:
-      return kind;
-    }
   }
 
 
