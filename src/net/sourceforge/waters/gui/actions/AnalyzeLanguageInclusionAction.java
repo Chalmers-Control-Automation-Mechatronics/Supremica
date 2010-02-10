@@ -25,9 +25,11 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
@@ -38,6 +40,8 @@ import org.supremica.gui.ide.ModuleContainer;
 public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
                                             implements ModelObserver
 {
+
+
 
   //#########################################################################
   //# Constructors
@@ -116,17 +120,21 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
   //# Enablement
   public void update(final EditorChangedEvent event)
   {
-    switch (event.getKind()) {
-    case CONTAINER_SWITCH:
-      /*
-      final ModuleContainer container = getActiveModuleContainer();
-      final ModuleSubject module = container.getModule();
-      setObservedModule(module);
-      */
-      updateEnabledStatus();
-      break;
-    default:
-      break;
+    final ModuleContainer mContainer = ((ModuleContainer)getIDE().getActiveDocumentContainer());
+    if (mContainer != null)
+    {
+      final ModuleSubject newModuleSubject = ((ModuleContainer)getIDE().getActiveDocumentContainer()).getModule();
+      if (newModuleSubject != connected)
+      {
+        if (connected != null)
+          connected.removeModelObserver(this);
+        connected = newModuleSubject;
+        if (connected != null)
+        {
+          connected.addModelObserver(this);
+          updateEnabledStatus();
+        }
+      }
     }
   }
 
@@ -134,9 +142,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
   {
     switch (event.getKind()) {
     case ModelChangeEvent.STATE_CHANGED:
-      if (event.getSource() instanceof SimpleComponentSubject) {
-        updateEnabledStatus();
-      }
+      updateEnabledStatus();
       break;
     case ModelChangeEvent.ITEM_ADDED:
     case ModelChangeEvent.ITEM_REMOVED:
@@ -147,36 +153,30 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     default:
       break;
     }
+    updateEnabledStatus();
   }
 
-  /*
   public void updateEnabledStatus()
   {
-    final EditorWindowInterface window = getActiveModuleWindowInterface();
-    if (window == null) {
-      setObservedWindow(null);
+    boolean enabled = false;
+    try {
+      ((ModuleContainer)getIDE().getActiveDocumentContainer()).recompile();
+    } catch (final EvalException exception) {
       setEnabled(false);
-    } else {
-      final GraphSubject graph = surface.getGraph();
-      final boolean enabled = graph.getBlockedEvents() == null;
-      setObservedGraph(graph);
-      setEnabled(enabled);
+      return;
+    } catch (final Exception exception)
+    {
+      getIDE().error("WARNING: Minor exception detected:" + exception);
+      setEnabled(false);
+      return;
     }
+    for (final AutomatonProxy auto : ((ModuleContainer)getIDE().getActiveDocumentContainer()).getCompiledDES().getAutomata())
+    {
+      if (auto.getKind() == ComponentKind.PROPERTY)
+        enabled = true;
+    }
+    setEnabled(enabled);
   }
-
-
-  private void setObservedWindow(EditorWindowInterface window)
-  {
-    if (mWindow != window) {
-      if (window != null) {
-        mWindow.removeModelObserver(this);
-      }
-      mWindow = window;
-      if (mWindow != null) {
-        mWindow.addModelObserver(this);
-      }
-    }
-  }*/
 
 
   //#######################################################################
@@ -232,6 +232,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
   //#########################################################################
   //# Data Members
   private final NamedProxy mNamedProxy;
+  private ModuleSubject connected;
 
 
   //#########################################################################

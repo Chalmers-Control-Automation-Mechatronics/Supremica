@@ -20,6 +20,7 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 class ComponentsTreePopupFactory
@@ -98,8 +99,11 @@ class ComponentsTreePopupFactory
       final JPopupMenu popup = getPopup();
       final IDEAction editgraph = master.getShowGraphAction(comp);
       popup.add(editgraph);
-      final IDEAction languageInclusion = master.getLanguageIncusionAction(comp);
-      popup.add(languageInclusion);
+      if (comp.getKind() == ComponentKind.PROPERTY)
+      {
+        final IDEAction languageInclusion = master.getLanguageIncusionAction(comp);
+        popup.add(languageInclusion);
+      }
       return null;
     }
 
