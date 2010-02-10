@@ -16,6 +16,7 @@ import net.sourceforge.waters.gui.GraphEventPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.ModuleContainer;
 
 
 /**
@@ -74,8 +75,13 @@ public abstract class WatersGraphAction
    */
   EditorWindowInterface getActiveEditorWindowInterface()
   {
-    final ModuleWindowInterface iface = getActiveModuleWindowInterface();
-    return iface == null ? null : iface.getActiveEditorWindowInterface();
+    final ModuleContainer container = getActiveModuleContainer();
+    if (container == null) {
+      return null;
+    } else {
+      final ModuleWindowInterface iface = container.getEditorPanel();
+      return iface.getActiveEditorWindowInterface();
+    }
   }
 
   /**

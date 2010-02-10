@@ -11,11 +11,6 @@ package net.sourceforge.waters.model.analysis;
 
 import java.io.Serializable;
 
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
-
 
 /**
  * <P>A kind translator that does not change component and event
@@ -26,7 +21,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 public class IdenticalKindTranslator
-  implements KindTranslator, Serializable
+  extends AbstractKindTranslator
+  implements Serializable
 {
 
   //#########################################################################
@@ -41,28 +37,10 @@ public class IdenticalKindTranslator
       new IdenticalKindTranslator();
   }
 
-  protected IdenticalKindTranslator()
+  private IdenticalKindTranslator()
   {
   }
 
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-  /**
-   * Returns the component kind of the given automaton.
-   */
-  public ComponentKind getComponentKind(final AutomatonProxy aut)
-  {
-    return aut.getKind();
-  }
-
-  /**
-   * Returns the event kind of the given event.
-   */
-  public EventKind getEventKind(final EventProxy event)
-  {
-    return event.getKind();
-  }
 
   //#########################################################################
   //# Singleton Implementation

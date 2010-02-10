@@ -69,6 +69,23 @@ public abstract class WatersAction
   //#########################################################################
   //# Accessing the IDE
   /**
+   * Retrieves a references to the active module container.
+   * @return  The current module container,
+   *          or <CODE>null</CODE> if no module container is currently active.
+   */
+  ModuleContainer getActiveModuleContainer()
+  {
+    final IDE ide = getIDE();
+    final DocumentContainer container = ide.getActiveDocumentContainer();
+    if (container == null ||
+        !(container.getActivePanel() instanceof EditorPanel) ||
+        !(container instanceof ModuleContainer)) {
+      return null;
+    }
+    return (ModuleContainer) container;
+  }
+
+  /**
    * Retrieves a references to the active editor panel.
    * @return  A module window interface to access the active editor panel,
    *          or <CODE>null</CODE> if no editor panel is currently active.
@@ -94,11 +111,11 @@ public abstract class WatersAction
    */
   ModuleContext getModuleContext()
   {
-    final ModuleWindowInterface iface = getActiveModuleWindowInterface();
-    if (iface == null) {
+    final ModuleContainer container = getActiveModuleContainer();
+    if (container == null) {
       return null;
     } else {
-      return iface.getModuleContext();
+      return container.getModuleContext();
     }
   }
 
