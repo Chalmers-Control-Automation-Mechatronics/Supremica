@@ -129,6 +129,7 @@ public class Composer
   private int[] prepareForComposition()
   {
     mNewMarked = new TIntHashSet();
+    mNewPreMarked = new TIntHashSet();
     mStates = new IntMap(mNodeLimit);
     mTrans = new ArrayList<TransitionProxy>();
     mEvents =

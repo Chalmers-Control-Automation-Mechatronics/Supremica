@@ -166,6 +166,10 @@ public class CompositionalGeneralisedConflictChecker extends
             getGeneralisedPrecondition());
     @SuppressWarnings("unused")
     final AutomatonProxy syncProduct = composer.run();
+    final Map<EventProxy,Collection<AutomatonProxy>> eventAutomaton =
+        mapEventsToAutomata(getModel());
+    final Collection<EventProxy> localEvents =
+        identifyLocalEvents(eventAutomaton, candidate);
 
     // final ProjectionList list = project(getModel());
     // mMinAutMap.clear();
@@ -200,6 +204,53 @@ public class CompositionalGeneralisedConflictChecker extends
      * getFactory().createSafetyTraceProxy(getModel().getName(), getModel(),
      * e.subList(0, e.size() - 1)); setFailedResult(counter); return false; }
      */
+  }
+
+  /**
+   * Returns a collection of events that are local to a given set of automata.
+   *
+   * @param eventAutomaton
+   * @param candidate
+   * @return
+   */
+  private Collection<EventProxy> identifyLocalEvents(
+                                                     final Map<EventProxy,Collection<AutomatonProxy>> eventAutomaton,
+                                                     final Set<AutomatonProxy> candidate)
+  {
+    final Collection<EventProxy> localEvents = new ArrayList<EventProxy>();
+    for (final EventProxy event : eventAutomaton.keySet()) {
+      eventAutomaton.get(event).retainAll(candidate);
+      final Collection<AutomatonProxy> autWithEvent = eventAutomaton.get(event);
+      if (autWithEvent.size() == 1) {
+        localEvents.add(event);
+      }
+    }
+    return localEvents;
+  }
+
+  /**
+   * Maps the events in the model to a collection of the automaton that contain
+   * the event in their alphabet.
+   *
+   * @param model
+   * @return
+   */
+  private Map<EventProxy,Collection<AutomatonProxy>> mapEventsToAutomata(
+                                                                         final ProductDESProxy model)
+  {
+    final Map<EventProxy,Collection<AutomatonProxy>> eventAutomaton =
+        new HashMap<EventProxy,Collection<AutomatonProxy>>();
+    for (final EventProxy event : model.getEvents()) {
+      final Collection<AutomatonProxy> automata =
+          new ArrayList<AutomatonProxy>();
+      for (final AutomatonProxy aut : model.getAutomata()) {
+        if (aut.getEvents().contains(event)) {
+          automata.add(aut);
+        }
+        eventAutomaton.put(event, automata);
+      }
+    }
+    return eventAutomaton;
   }
 
   private Set<AutomatonProxy> evaluateCandidates(final Set<Candidate> candidates)
