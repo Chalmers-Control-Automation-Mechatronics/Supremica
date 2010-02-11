@@ -22,11 +22,14 @@ import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -142,7 +145,8 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
   {
     switch (event.getKind()) {
     case ModelChangeEvent.STATE_CHANGED:
-      updateEnabledStatus();
+      if (event.getSource() instanceof SimpleComponentSubject)
+        updateEnabledStatus();
       break;
     case ModelChangeEvent.ITEM_ADDED:
     case ModelChangeEvent.ITEM_REMOVED:
@@ -153,29 +157,18 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     default:
       break;
     }
-    updateEnabledStatus();
   }
 
   public void updateEnabledStatus()
   {
-    boolean enabled = false;
-    try {
-      ((ModuleContainer)getIDE().getActiveDocumentContainer()).recompile();
-    } catch (final EvalException exception) {
-      setEnabled(false);
-      return;
-    } catch (final Exception exception)
+    final ModuleContainer mContainer = getActiveModuleContainer();
+    if (mContainer == null)
     {
-      getIDE().error("WARNING: Minor exception detected:" + exception);
       setEnabled(false);
       return;
     }
-    for (final AutomatonProxy auto : ((ModuleContainer)getIDE().getActiveDocumentContainer()).getCompiledDES().getAutomata())
-    {
-      if (auto.getKind() == ComponentKind.PROPERTY)
-        enabled = true;
-    }
-    setEnabled(enabled);
+    final ModuleProxy module = mContainer.getModule();final PropertyFindVisitor visitor = new PropertyFindVisitor();
+    setEnabled(visitor.containsProperty(module));
   }
 
 
@@ -191,6 +184,8 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     {
       if (aut == mNamedProxy) {
         return ComponentKind.SPEC;
+      } else if (aut.getKind() == ComponentKind.PROPERTY) {
+        return ComponentKind.PROPERTY;
       } else {
         return super.getComponentKind(aut);
       }
@@ -218,6 +213,8 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     {
       if (mSourceInfo.get(aut).getSourceObject() == mNamedProxy) {
         return ComponentKind.SPEC;
+      } else if (aut.getKind() == ComponentKind.PROPERTY) {
+        return ComponentKind.PROPERTY;
       } else {
         return super.getComponentKind(aut);
       }
@@ -228,6 +225,57 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     private final Map<Proxy,SourceInfo> mSourceInfo;
   }
 
+
+  // #########################################################################
+  // # Inner Class
+
+  private class PropertyFindVisitor extends AbstractModuleProxyVisitor
+  {
+    private boolean containsProperty(final ModuleProxy proxy)
+    {
+      try {
+        return visitModuleProxy(proxy);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    private Boolean isProperty(final Proxy proxy)
+    throws VisitorException
+    {
+      return (Boolean)proxy.acceptVisitor(this);
+    }
+
+    public Boolean visitProxy(final Proxy proxy)
+    {
+      return false;
+    }
+
+    public Boolean visitForeachComponentProxy(final ForeachComponentProxy proxy)
+    throws VisitorException
+    {
+      for (final Proxy child : proxy.getBody())
+      {
+        if (isProperty(child))
+          return true;
+      }
+      return false;
+    }
+
+    public Boolean visitModuleProxy(final ModuleProxy proxy)
+    throws VisitorException
+    {
+      for (final Proxy child : proxy.getComponentList())
+        if (isProperty(child))
+          return true;
+      return false;
+    }
+
+    public Boolean visitSimpleComponentProxy(final SimpleComponentProxy proxy)
+    {
+      return proxy.getKind() == ComponentKind.PROPERTY;
+    }
+  }
 
   //#########################################################################
   //# Data Members

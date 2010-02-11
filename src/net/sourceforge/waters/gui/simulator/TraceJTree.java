@@ -32,7 +32,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -233,31 +232,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
         }
         else if (AutomatonLeafNode.class.isInstance(comp))
         {
-          String toolTipText = "";
-          final AutomatonProxy auto = ((AutomatonLeafNode)comp).getAutomata();
-          if (auto.getKind() == ComponentKind.PLANT){
-            toolTipText += "Plant " + auto.getName();
-          }
-          else
-          {
-            toolTipText += "Specification " + auto.getName();
-          }
-          if (InitialState.class.isInstance(path.getPathComponent(1)))
-          {
-            if (mSim.isNonControllableAtTime(-1).contains(auto))
-              toolTipText += " was causing a controllability problem";
-          }
-          else if (path.getPathComponent(1) instanceof TeleportEventTreeNode)
-          {
-            if (mSim.isNonControllableAtTime(((TeleportEventTreeNode)path.getPathComponent(1)).getTime()).contains(auto))
-              toolTipText += " was causing a controllability problem";
-          }
-          else
-          {
-            if (mSim.isNonControllableAtTime(((EventBranchNode)path.getPathComponent(1)).getTime()).contains(auto))
-              toolTipText += " was causing a controllability problem";
-          }
-          setToolTipText(toolTipText);
+          setToolTipText(AutomatonPopupFactory.getToolTipName(((AutomatonLeafNode)comp).getAutomata(), mSim, false));
         }
         else if (InitialState.class.isInstance(comp))
         {

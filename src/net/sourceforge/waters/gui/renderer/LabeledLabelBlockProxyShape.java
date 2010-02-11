@@ -12,7 +12,10 @@ package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -54,11 +57,22 @@ public class LabeledLabelBlockProxyShape
   {
     return true;
   }
-    
+
+  public Rectangle2D getBounds2D()
+  {
+    final Rectangle2D oldShape = getShape().getBounds2D();
+    final Rectangle2D title = mFont.getStringBounds(mName, new FontRenderContext(mFont.getTransform(), false, false));
+    final Rectangle2D output = new Rectangle((int)oldShape.getX(),
+                                             (int)(oldShape.getY() - title.getHeight()),
+                                             (int)oldShape.getWidth(),
+                                             (int)(oldShape.getHeight() + title.getHeight()));
+    return output;
+  }
+
 
   //#########################################################################
   //# Drawing
-  public void draw(Graphics2D g, RenderingInformation status)
+  public void draw(final Graphics2D g, final RenderingInformation status)
   {
     super.draw(g, status);
     final int x = (int) getShape().getBounds().getMinX();
@@ -72,12 +86,12 @@ public class LabeledLabelBlockProxyShape
     g.drawString(mName, x, y);
   }
 
-    
+
   //#########################################################################
   //# Data Members
   private final String mName;
   private final Font mFont;
-    
+
 
   //#########################################################################
   //# Class Constants

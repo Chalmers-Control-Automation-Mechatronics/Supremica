@@ -26,7 +26,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 class AutomataTable extends JTable
@@ -74,17 +73,7 @@ class AutomataTable extends JTable
       {
         final int row = AutomataTable.this.rowAtPoint(e.getPoint());
         final AutomatonProxy auto = AutomataTable.this.getModel().getAutomaton(row);
-        String toolTipText = "";
-        if (auto.getKind() == ComponentKind.PLANT){
-          toolTipText += "Plant " + auto.getName();
-        }
-        else
-        {
-          toolTipText += "Specification " + auto.getName();
-        }
-        if (mSimulation.changedLastStep(auto))
-          toolTipText += " has an event which was fired last step";
-        setToolTipText(toolTipText);
+        setToolTipText(AutomatonPopupFactory.getToolTipName(auto, sim, true));
       }
     });
   }

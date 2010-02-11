@@ -30,7 +30,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -187,18 +186,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
         }
         else if (AutomatonProxy.class.isInstance(comp))
         {
-          String toolTipText = "";
-          final AutomatonProxy auto = (AutomatonProxy)comp;
-          if (auto.getKind() == ComponentKind.PLANT){
-            toolTipText += "Plant " + auto.getName();
-          }
-          else
-          {
-            toolTipText += "Specification " + auto.getName();
-          }
-          if (mSim.changedLastStep(auto))
-            toolTipText += " has an event which was fired last step";
-          setToolTipText(toolTipText);
+          setToolTipText(AutomatonPopupFactory.getToolTipName((AutomatonProxy)comp, mSim, true));
         }
       }
 

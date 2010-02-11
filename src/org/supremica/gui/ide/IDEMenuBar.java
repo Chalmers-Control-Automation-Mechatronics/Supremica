@@ -251,12 +251,13 @@ public class IDEMenuBar extends JMenuBar
         final Action controlLoop =
             actions.getAction(AnalyzeControlLoopAction.class);
         mNewAnalyzeMenu.add(controlLoop);
-        final Action sicpropertyv =
-            actions.getAction(AnalyzeSICPropertyVAction.class);
-        mNewAnalyzeMenu.add(sicpropertyv);
         final Action languageInclusion =
             actions.getAction(AnalyzeLanguageInclusionAction.class);
         mNewAnalyzeMenu.add(languageInclusion);
+        mNewAnalyzeMenu.addSeparator();
+        final Action sicpropertyv =
+            actions.getAction(AnalyzeSICPropertyVAction.class);
+        mNewAnalyzeMenu.add(sicpropertyv);
       }
 
       // Simulate

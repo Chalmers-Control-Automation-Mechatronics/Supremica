@@ -9,6 +9,39 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 public class AutomatonPopupFactory
 {
+  static String getToolTipName(final AutomatonProxy aut, final Simulation sim , final boolean showActivity)
+  {
+    String toolTipText = "";
+    if (aut.getKind() == ComponentKind.PLANT){
+      toolTipText += "Plant " + aut.getName();
+    }
+    else if (aut.getKind() == ComponentKind.SPEC)
+    {
+      toolTipText += "Specification " + aut.getName();
+    }
+    else if (aut.getKind() == ComponentKind.PROPERTY)
+    {
+      toolTipText += "Property " + aut.getName();
+    }
+    else if (aut.getKind() == ComponentKind.SUPERVISOR)
+    {
+      toolTipText += "Supervisor " + aut.getName();
+    }
+    boolean changed = false;
+    if (sim.changedLastStep(aut) && showActivity)
+    {
+      toolTipText += " has an event which was fired last step";
+      changed = true;
+    }
+    if (sim.getDisabledProperties().contains(aut) && showActivity)
+    {
+      if (changed)
+        toolTipText += " and";
+      toolTipText += " is a disabled Property";
+    }
+    return toolTipText;
+  }
+
   static void setPopup(final JPopupMenu popup, final WatersPopupActionManager master,
                        final AutomatonDesktopPane desktopPane, final AutomatonProxy aut)
   {
