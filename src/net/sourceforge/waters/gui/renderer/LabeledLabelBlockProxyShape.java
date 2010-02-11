@@ -69,6 +69,17 @@ public class LabeledLabelBlockProxyShape
     return output;
   }
 
+  public boolean isClicked(final int x, final int y)
+  {
+    final Rectangle2D oldShape = getShape().getBounds2D();
+    final Rectangle2D titleSize = mFont.getStringBounds(mName, new FontRenderContext(mFont.getTransform(), false, false));
+    final Rectangle2D realTitle = new Rectangle((int)oldShape.getX(),
+                                             (int)(oldShape.getY() - titleSize.getHeight()),
+                                             (int)titleSize.getWidth(),
+                                             (int)titleSize.getHeight());
+    return super.isClicked(x, y) || realTitle.contains(x, y);
+  }
+
 
   //#########################################################################
   //# Drawing
