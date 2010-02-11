@@ -92,14 +92,6 @@ public class AutomatonDesktopPane
   public void addAutomaton(final String aut,
       final ModuleContainer container, final Simulation sim, final int clicks)
   {
-    /*String DEBUG = "DEBUG: AutomatonDesktopPane [92]: Automaton Current State list is {";
-    for (final AutomatonProxy auto : sim.getCurrentStates().keySet())
-    {
-      DEBUG += auto.getName() + " -> " + sim.getCurrentStates().get(auto).getName() + ",";
-    }
-    DEBUG += "}";
-    System.out.println(DEBUG);
-    */
     if (aut == null)
       return;
     if (!openAutomaton.containsKey(aut)) {

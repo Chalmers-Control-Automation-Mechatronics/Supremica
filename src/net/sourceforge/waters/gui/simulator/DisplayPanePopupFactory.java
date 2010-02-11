@@ -121,9 +121,6 @@ class DisplayPanePopupFactory
 
     public Object visitLabelGeometryProxy(final LabelGeometryProxy geo)
     {
-      /*final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
-      final SimpleNodeSubject node = (SimpleNodeSubject) subject.getParent();
-      return visitSimpleNodeProxy(node);*/
       return null;
     }
 
@@ -142,7 +139,6 @@ class DisplayPanePopupFactory
       }
       return null;
     }
-
   }
 
 
@@ -152,5 +148,4 @@ class DisplayPanePopupFactory
   private final AutomatonDisplayPane mDisplayPane;
   private final AutomatonDesktopPane mDesktopPane;
   private final Map<Proxy,SourceInfo> mMap;
-
 }

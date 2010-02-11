@@ -21,7 +21,6 @@ public class SimulationBackToStartAction extends WatersSimulationAction
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_TO_START);
   }
 
-
   //#########################################################################
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
@@ -33,7 +32,6 @@ public class SimulationBackToStartAction extends WatersSimulationAction
         sim.stepBack();
     }
   }
-
 
   //#########################################################################
   //# Auxiliary Methods

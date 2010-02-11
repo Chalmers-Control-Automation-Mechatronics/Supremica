@@ -44,7 +44,6 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public class Simulation implements ModelObserver, Observer
 {
-
   //#########################################################################
   //# Constructors
   public Simulation(final ModuleContainer container)
@@ -647,7 +646,8 @@ public class Simulation implements ModelObserver, Observer
     }
     if (!moved && automata.getKind() == ComponentKind.PROPERTY && automata.getEvents().contains(step.getEvent()))
     {
-      mContainer.getIDE().error("Property "
+      if (SHOW_DISABLED_PROPERTY_ERROR_MESSAGE)
+        mContainer.getIDE().error("Property "
                                 + automata.getName()
                                 + " has been disabled, as the event "
                                 + step.getEvent().getName()
@@ -1103,7 +1103,7 @@ public class Simulation implements ModelObserver, Observer
     {
       if (currentTime == previousStates.size() - 1)
       {
-        System.out.println("No future Events");
+        mContainer.getIDE().error("No future Events");
         return;
       }
       else
@@ -1113,7 +1113,7 @@ public class Simulation implements ModelObserver, Observer
     {
       if (currentTime == 0)
       {
-        System.out.println("No previous Event");
+        mContainer.getIDE().error("No previous Event");
         return;
       }
       else
@@ -1152,4 +1152,8 @@ public class Simulation implements ModelObserver, Observer
   private ArrayList<SimulatorState> previousStates;
   private ArrayList<AutomatonProxy> mDisabledProperties;
   long time = 0;
+
+  // #######################################################################
+  // # Class Constants
+  private static final boolean SHOW_DISABLED_PROPERTY_ERROR_MESSAGE = false;
 }

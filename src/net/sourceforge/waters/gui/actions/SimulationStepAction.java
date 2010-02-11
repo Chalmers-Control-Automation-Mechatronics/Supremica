@@ -34,7 +34,6 @@ public class SimulationStepAction
   extends WatersSimulationAction
   implements SimulationObserver
 {
-
   //#########################################################################
   //# Constructor
   SimulationStepAction(final IDE ide)
@@ -45,7 +44,6 @@ public class SimulationStepAction
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_STEP);
     putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.ALT_MASK));
   }
-
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
@@ -72,7 +70,6 @@ public class SimulationStepAction
       }
     }
   }
-
 
   //#########################################################################
   //# Auxiliary Methods
@@ -115,9 +112,7 @@ public class SimulationStepAction
     return null;
   }
 
-
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-
 }

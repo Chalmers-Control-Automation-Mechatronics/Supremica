@@ -41,7 +41,6 @@ public class EventChooserDialog extends JDialog
     mList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     mList.setSelectedIndex(0);
     mList.setCellRenderer(new ListCellRenderer(){
-
       public Component getListCellRendererComponent(final JList list, final Object value,
           final int index, final boolean isSelected, final boolean cellHasFocus)
       {
@@ -54,7 +53,6 @@ public class EventChooserDialog extends JDialog
         return output;
       }
     });
-      // This code correctly assigns the width, but not the height
     mList.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
     eventList = correspondingEvent;
     final JScrollPane scrollPane = new JScrollPane(mList);
@@ -134,17 +132,6 @@ public class EventChooserDialog extends JDialog
 
     });
     this.pack();
-    final int screenHeight = 768; // TODO: Calculate the real height of the screen
-    if (this.getSize().getHeight() > screenHeight)
-    {
-      this.setLocation(DEFAULT_STARTING_LOCATION.x, 0);
-      this.setSize((int)this.getSize().getWidth(), screenHeight);
-      this.pack();
-    }
-    else if (this.getSize().getHeight() + DEFAULT_STARTING_LOCATION.y > screenHeight)
-    {
-      this.setLocation(DEFAULT_STARTING_LOCATION.x, (int)(screenHeight - this.getSize().getHeight()));
-    }
   }
 
   // ####################################################################
@@ -173,5 +160,4 @@ public class EventChooserDialog extends JDialog
   private static final int DEFAULT_ROW_HEIGHT = 20;
   private static final Point DEFAULT_STARTING_LOCATION = new Point(100, 100);
   private static final int LIST_BORDER_SIZE = 5;
-
 }

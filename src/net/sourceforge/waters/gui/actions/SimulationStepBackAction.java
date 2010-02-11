@@ -17,7 +17,6 @@ public class SimulationStepBackAction
   extends WatersSimulationAction
   implements SimulationObserver
 {
-
   //#########################################################################
   //# Constructor
   SimulationStepBackAction(final IDE ide)
@@ -28,7 +27,6 @@ public class SimulationStepBackAction
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_BACK);
     putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.ALT_MASK));
   }
-
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
@@ -41,7 +39,6 @@ public class SimulationStepBackAction
     }
   }
 
-
   //#########################################################################
   //# Auxiliary Methods
   void updateEnabledStatus()
@@ -53,7 +50,6 @@ public class SimulationStepBackAction
       setEnabled(sim.getCurrentTime() != 0);
     }
   }
-
 
   //#########################################################################
   //# Class Constants

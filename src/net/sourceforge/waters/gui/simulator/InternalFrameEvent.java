@@ -4,8 +4,6 @@ import java.util.EventObject;
 
 public class InternalFrameEvent extends EventObject
 {
-
-
   //########################################################################
   //# Constructors
   public InternalFrameEvent(final String automatonName, final AutomatonInternalFrame frame, final boolean opening)

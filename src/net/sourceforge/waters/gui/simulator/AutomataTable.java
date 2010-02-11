@@ -209,7 +209,7 @@ class AutomataTable extends JTable
 
   private static final int AUTOMATA_TABLE_HEIGHT = 20;
 
-  // DEBUG: Arbitrary value: Any value will work,
+  // Arbitrary value: Any value will work,
   // but this is close to the 'normal' value
   private static final int DUMMY_WIDTH = 245;
   private static final int NARROW_WIDTH = DUMMY_WIDTH / 10;

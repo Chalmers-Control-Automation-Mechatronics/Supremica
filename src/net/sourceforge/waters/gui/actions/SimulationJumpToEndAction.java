@@ -22,7 +22,6 @@ public class SimulationJumpToEndAction extends WatersSimulationAction
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_TO_END);
   }
 
-
   //#########################################################################
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
@@ -34,7 +33,6 @@ public class SimulationJumpToEndAction extends WatersSimulationAction
         sim.replayStep();
     }
   }
-
 
   //#########################################################################
   //# Auxiliary Methods

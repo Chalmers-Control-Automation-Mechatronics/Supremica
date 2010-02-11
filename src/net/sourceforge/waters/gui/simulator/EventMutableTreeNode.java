@@ -27,7 +27,7 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   public void simulationChanged(final SimulationChangeEvent event)
   {
     mSim.detach(this);
-    //mParent.forceRecalculation();
+    // This mutable tree node has now become invalidated
   }
 
   // ##################################################################
@@ -36,8 +36,6 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
   private void setupAllEvents(final Simulation sim, final List<Pair<Boolean, Integer>> sortingMethods,
       final ArrayList<String> expandedNodes)
   {
-    //this.removeAllChildren();
-    //mParent.expandPath(new TreePath(this));
     final ArrayList<Integer> sortedIndexes = sortArrayList(sim.getAllEvents(), sortingMethods);
     for (final Integer index : sortedIndexes)
     {
@@ -45,9 +43,10 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
       final DefaultMutableTreeNode eventToAdd= new EventBranchNode(event, sim.getCurrentTime());
       this.add(eventToAdd);
       eventToAdd.add(new DefaultMutableTreeNode("Placeholder. You shouldn't ever see this"));
+      // To ensure that the events menu can be expanded. This is removed as soon as the menu is expanded however.
+      // It appears as a grey box on the TraceJTree however.
     }
   }
-
 
   private ArrayList<Integer> sortArrayList (final List<EventProxy> raw, final List<Pair<Boolean, Integer>> sortingMethods)
   {
@@ -61,6 +60,7 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
     }
     return output;
   }
+
   private int findIndex(final ArrayList<EventProxy> sorted, final EventProxy toAdd, final List<Pair<Boolean, Integer>> sortingMethods)
   {
     for (int looper = 0; looper < sorted.size(); looper++)

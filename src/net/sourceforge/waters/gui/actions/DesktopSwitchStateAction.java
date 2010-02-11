@@ -17,7 +17,8 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public class DesktopSwitchStateAction extends WatersAction
 {
-
+  // ##############################################################
+  // # Constructor
   protected DesktopSwitchStateAction(final IDE ide, final AutomatonProxy autoToChange, final NodeProxy node)
   {
     super(ide);
@@ -33,11 +34,15 @@ public class DesktopSwitchStateAction extends WatersAction
     setEnabled(true);
   }
 
+  // ###############################################################
+  // # Class WatersAction
   public void actionPerformed(final ActionEvent e)
   {
     getSimulation().setState(mAutomaton, mState);
   }
 
+  // ################################################################
+  // # Auxillary Methods
   public Simulation getSimulation()
   {
     final IDE ide = getIDE();
@@ -54,9 +59,13 @@ public class DesktopSwitchStateAction extends WatersAction
     }
   }
 
+  // ###################################################################
+  // # Data Members
   private final AutomatonProxy mAutomaton;
   private StateProxy mState;
 
+  // ###################################################################
+  // # Class Constants
   private static final long serialVersionUID = -1644229513613033199L;
 }
 

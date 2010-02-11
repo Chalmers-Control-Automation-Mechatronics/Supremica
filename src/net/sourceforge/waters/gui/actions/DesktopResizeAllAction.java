@@ -6,9 +6,12 @@ import javax.swing.Action;
 
 import org.supremica.gui.ide.IDE;
 
+/**
+ * This class is not used anymore, but remains here incase it is useful.
+ * @author ach17
+ */
 public class DesktopResizeAllAction extends WatersDesktopAction
 {
-
   protected DesktopResizeAllAction(final IDE ide)
   {
     super(ide);

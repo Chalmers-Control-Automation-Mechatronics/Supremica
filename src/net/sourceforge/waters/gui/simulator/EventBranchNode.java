@@ -78,6 +78,4 @@ public class EventBranchNode extends DefaultMutableTreeNode
   private final int mTime;
 
   private static final long serialVersionUID = 1581075011997555080L;
-
-
 }

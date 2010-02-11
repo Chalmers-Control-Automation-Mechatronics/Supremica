@@ -17,7 +17,7 @@ public class SimulationReplayStepAction
   extends WatersSimulationAction
   implements SimulationObserver
 {
-//#########################################################################
+  //#########################################################################
   //# Constructor
   SimulationReplayStepAction(final IDE ide)
   {
@@ -27,7 +27,6 @@ public class SimulationReplayStepAction
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_REPLAY);
     putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK));
   }
-
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
@@ -39,7 +38,6 @@ public class SimulationReplayStepAction
       sim.replayStep();
     }
   }
-
 
   //#########################################################################
   //# Auxiliary Methods
@@ -59,7 +57,6 @@ public class SimulationReplayStepAction
       }
     }
   }
-
 
   //#########################################################################
   //# Class Constants

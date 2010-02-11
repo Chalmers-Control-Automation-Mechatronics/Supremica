@@ -27,7 +27,6 @@ public abstract class WatersSimulationAction
   extends WatersAction
   implements SimulationObserver
 {
-
   //#########################################################################
   //# Constructor
   WatersSimulationAction(final IDE ide)
@@ -35,7 +34,6 @@ public abstract class WatersSimulationAction
     super(ide);
     updateEnabledStatus();
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
@@ -59,7 +57,6 @@ public abstract class WatersSimulationAction
     }
   }
 
-
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.simulation.SimulationObserver
   public void simulationChanged(final SimulationChangeEvent event)
@@ -67,8 +64,7 @@ public abstract class WatersSimulationAction
     updateEnabledStatus();
   }
 
-
-   //#########################################################################
+  //#########################################################################
   //# Auxiliary Methods
   SimulatorPanel getActiveSimulatorPanel()
   {
@@ -104,6 +100,9 @@ public abstract class WatersSimulationAction
     }
   }
 
+  // ########################################################################
+  // # Abstract Methods
+
   abstract void updateEnabledStatus();
 
 
@@ -111,9 +110,7 @@ public abstract class WatersSimulationAction
   //# Data Members
   private Simulation mObservedSimulation;
 
-
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-
 }

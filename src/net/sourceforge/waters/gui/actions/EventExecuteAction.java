@@ -39,7 +39,7 @@ public class EventExecuteAction extends WatersAction
         getIDE().error("Non-determinism detected, but not caught");
       }
     else
-      System.out.println("ERROR: That event is blocked");
+      getIDE().error("That event is blocked");
   }
 
   private Simulation getObservedSimulation()
@@ -50,7 +50,7 @@ public class EventExecuteAction extends WatersAction
   private boolean eventCanBeFired(final Simulation sim, final EventProxy event)
   {
     if (sim == null)
-      System.out.println("DEBUG: SIM IS NULL!");
+      getIDE().error("Simulation has not been set");
     for (final Step possibleStep : sim.getValidTransitions())
     {
       if (possibleStep.getEvent() == event)

@@ -9,7 +9,6 @@ abstract class SimulationTableModel
   extends AbstractTableModel
   implements SimulationObserver
 {
-
   // #########################################################################
   // # Constructors
   SimulationTableModel(final Simulation sim)
@@ -33,7 +32,6 @@ abstract class SimulationTableModel
       return mSimulation.getContainer();
     }
   }
-
 
   // #########################################################################
   // # Data Members

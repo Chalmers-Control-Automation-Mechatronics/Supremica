@@ -149,11 +149,7 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
   {
     if (canResize())
     {
-      //final Rectangle2D size = mDisplayPane.getMinimumBoundingRectangle();
-      //mDisplayPane.setSize(new Dimension((int)size.getX(), (int)size.getY()));
-      //System.out.println("DEBUG: AutomatonInternalFrame[155]: Can Resize before pack: " + canResize());
-      this.pack();
-      //System.out.println("DEBUG: AutomatonInternalFrame[157]: Can Resize after pack: " + canResize());
+      this.pack(); // This code automatically resizes the Internal Frame to the size it was when it started
       SwingUtilities.invokeLater(new Thread(){public void run(){AutomatonInternalFrame.this.repaint();}});
       storeReferenceFrame();
     }

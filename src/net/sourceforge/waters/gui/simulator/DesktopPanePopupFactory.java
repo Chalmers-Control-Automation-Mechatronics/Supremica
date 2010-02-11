@@ -33,5 +33,4 @@ public class DesktopPanePopupFactory extends PopupFactory
     final IDEAction lInclusion = master.getLanguageIncusionAction(null);
     popup.add(lInclusion);
   }
-
 }

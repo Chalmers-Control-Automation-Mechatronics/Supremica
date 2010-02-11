@@ -10,12 +10,16 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public abstract class WatersDesktopAction extends WatersAction
 {
+  // #############################################################
+  // # Constructor
   protected WatersDesktopAction(final IDE ide)
   {
     super(ide);
     updateDesktop();
   }
 
+  // #############################################################
+  // # Accessor Methods
   public AutomatonDesktopPane getDesktop()
   {
     return mDesktop;
@@ -25,6 +29,8 @@ public abstract class WatersDesktopAction extends WatersAction
     mDesktop = findDesktop();
   }
 
+  // ###############################################################
+  // # Auxillary Methods
   protected AutomatonDesktopPane findDesktop()
   {
     final IDE ide = getIDE();
@@ -40,8 +46,12 @@ public abstract class WatersDesktopAction extends WatersAction
       return null;
     }
   }
+
+  // #################################################################
+  // # Data Members
   protected AutomatonDesktopPane mDesktop;
 
+  // #################################################################
+  // # Class Constants
   private static final long serialVersionUID = -2271826996405606135L;
-
 }

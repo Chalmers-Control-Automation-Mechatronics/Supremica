@@ -8,7 +8,6 @@ import org.supremica.gui.ide.IDE;
 
 public class AnalyzeControllabilityAction extends WatersAnalyzeAction
 {
-
   protected AnalyzeControllabilityAction(final IDE ide)
   {
     super(ide);

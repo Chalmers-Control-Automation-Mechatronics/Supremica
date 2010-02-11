@@ -43,6 +43,7 @@ public class TraceTreePopupFactory extends PopupFactory
       throw new UnsupportedOperationException("Do not call maybeShowPopup(Component, MouseEvent, EventProxy) directly, instead, call maybeShowPopup(Component, MouseEvent, EventProxy, int)");
     if (proxy instanceof AutomatonProxy) {
       mSelectedAutomata = (AutomatonProxy)proxy;
+      mTime = -2;
       super.maybeShowPopup(invoker, event, proxy);
     }
     else
@@ -76,11 +77,9 @@ public class TraceTreePopupFactory extends PopupFactory
     mSelectedAutomata = null;
   }
 
-
   //#########################################################################
   //# Data Members
   private AutomatonProxy mSelectedAutomata;
   private final AutomatonDesktopPane mDesktop;
   private int mTime;
-
 }

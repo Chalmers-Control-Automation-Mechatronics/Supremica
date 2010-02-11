@@ -72,11 +72,11 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
               if (eventCanBeFired(mSim, (EventProxy)node))
                 fireEvent((EventProxy)node);
               else
-                System.out.println("ERROR: That event is blocked");
+                mContainer.getIDE().error("That event is blocked");
             } catch (final NonDeterministicException exception) {
-              System.out.println("ERROR: Uncontrollable Event detected: " + exception.getMessage() + ". No event has been fired.");
+              mContainer.getIDE().error("Uncontrollable Event detected: " + exception.getMessage() + ". No event has been fired.");
             } catch (final IllegalArgumentException exception) {
-              System.out.println(exception.getMessage() + ". No event has been fired");
+              mContainer.getIDE().error(exception.getMessage() + ". No event has been fired");
             }
           }
           else if (AutomatonProxy.class.isInstance(node))
@@ -287,8 +287,8 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
 
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    //if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED)
-      forceRecalculation();
+    // Any event can change the order, so ALWAYS redraw the entire graph
+    forceRecalculation();
   }
 
   // #################################################################
@@ -512,5 +512,4 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
   private static final int[] eventColumnWidth = {200, 20};
   private static final int noduleWidth = 30;
   public static final int rowHeight = 20;
-
 }

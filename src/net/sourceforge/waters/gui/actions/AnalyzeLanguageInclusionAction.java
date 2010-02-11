@@ -43,9 +43,6 @@ import org.supremica.gui.ide.ModuleContainer;
 public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
                                             implements ModelObserver
 {
-
-
-
   //#########################################################################
   //# Constructors
   public AnalyzeLanguageInclusionAction(final IDE ide)
@@ -72,7 +69,6 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
                "Check propert" + suffix + ' ' + mNamedProxy.getName());
     }
   }
-
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
@@ -117,7 +113,6 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     }
     return checker;
   }
-
 
   //#########################################################################
   //# Enablement
@@ -190,9 +185,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
         return super.getComponentKind(aut);
       }
     }
-
   }
-
 
   //#######################################################################
   //# Inner Class SingleComponentKindTranslator
@@ -224,8 +217,6 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     //# Data Members
     private final Map<Proxy,SourceInfo> mSourceInfo;
   }
-
-
   // #########################################################################
   // # Inner Class
 

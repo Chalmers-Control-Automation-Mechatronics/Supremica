@@ -8,9 +8,12 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 
 import org.supremica.gui.ide.IDE;
 
+/**
+ * This class is not used anymore, but remains here incase it is useful.
+ * @author ach17
+ */
 public class DesktopOriginalSizeOtherAction extends WatersDesktopAction
 {
-
   protected DesktopOriginalSizeOtherAction(final IDE ide, final AutomatonProxy autoToClose)
   {
     super(ide);

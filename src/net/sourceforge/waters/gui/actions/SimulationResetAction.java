@@ -17,7 +17,7 @@ public class SimulationResetAction
   extends WatersSimulationAction
   implements SimulationObserver
 {
-//#########################################################################
+  //#########################################################################
   //# Constructor
   SimulationResetAction(final IDE ide)
   {
@@ -27,7 +27,6 @@ public class SimulationResetAction
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_RESET);
     putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
   }
-
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
@@ -39,7 +38,6 @@ public class SimulationResetAction
       sim.reset(false);
     }
   }
-
 
   //#########################################################################
   //# Auxiliary Methods
@@ -64,9 +62,6 @@ public class SimulationResetAction
       }
     }
   }
-
-
-
 
   //#########################################################################
   //# Class Constants

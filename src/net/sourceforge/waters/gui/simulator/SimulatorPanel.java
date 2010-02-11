@@ -42,7 +42,6 @@ public class SimulatorPanel
     setLeftComponent(mTabbedPane);
   }
 
-
   // #########################################################################
   // # Simple Access
   public Simulation getSimulation()
@@ -53,7 +52,6 @@ public class SimulatorPanel
   public void switchToTraceMode(final TraceProxy trace)
   {
     mSimulation.run(trace, trace instanceof ConflictTraceElement || trace instanceof LoopTraceElement);
-    System.out.println("DEBUG: Trace type is : " + trace.getClass());
     mTabbedPane.setSelectedIndex(2);
   }
 
@@ -126,7 +124,6 @@ public class SimulatorPanel
     mEventsPanel.add(scroll);
     mTabbedPane.addTab("Events", mEventsPanel);
   }
-
 
   //#########################################################################
   //# Data Members

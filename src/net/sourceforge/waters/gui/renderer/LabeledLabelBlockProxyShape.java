@@ -27,10 +27,6 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
  * <P>In addition to the normal label block, it displayed a label in
  * bold on top of the list.</P>
  *
- * <P><STRONG>BUG.</STRONG> The label on top of the list is not
- * included in the bounds, and therefore is not sensitive to mouse
- * clicks.</P>
- *
  * @author Simon Ware
  */
 
@@ -60,24 +56,24 @@ public class LabeledLabelBlockProxyShape
 
   public Rectangle2D getBounds2D()
   {
-    final Rectangle2D oldShape = getShape().getBounds2D();
-    final Rectangle2D title = mFont.getStringBounds(mName, new FontRenderContext(mFont.getTransform(), false, false));
-    final Rectangle2D output = new Rectangle((int)oldShape.getX(),
-                                             (int)(oldShape.getY() - title.getHeight()),
-                                             (int)oldShape.getWidth(),
-                                             (int)(oldShape.getHeight() + title.getHeight()));
+    final Rectangle2D output = getTitleBounds();
     return output;
   }
 
   public boolean isClicked(final int x, final int y)
   {
+    return super.isClicked(x, y) || getTitleBounds().contains(x, y);
+  }
+
+  public Rectangle2D getTitleBounds()
+  {
     final Rectangle2D oldShape = getShape().getBounds2D();
-    final Rectangle2D titleSize = mFont.getStringBounds(mName, new FontRenderContext(mFont.getTransform(), false, false));
-    final Rectangle2D realTitle = new Rectangle((int)oldShape.getX(),
-                                             (int)(oldShape.getY() - titleSize.getHeight()),
-                                             (int)titleSize.getWidth(),
-                                             (int)titleSize.getHeight());
-    return super.isClicked(x, y) || realTitle.contains(x, y);
+    final Rectangle2D title = mFont.getStringBounds(mName, new FontRenderContext(mFont.getTransform(), false, false));
+    final Rectangle2D output = new Rectangle((int)oldShape.getX(),
+                                             (int)(oldShape.getY() - title.getHeight()),
+                                             (int)title.getWidth(),
+                                             (int)title.getHeight());
+    return output;
   }
 
 

@@ -24,7 +24,6 @@ class EventTreePopupFactory extends PopupFactory
     mDesktop = desktop;
   }
 
-
   //#########################################################################
   //# Menu Items
   public void maybeShowPopup(final Component invoker,
@@ -68,11 +67,9 @@ class EventTreePopupFactory extends PopupFactory
     mSelectedAutomata = null;
   }
 
-
   //#########################################################################
   //# Data Members
   private EventProxy mSelectedEvent;
   private AutomatonProxy mSelectedAutomata;
   private final AutomatonDesktopPane mDesktop;
-
 }

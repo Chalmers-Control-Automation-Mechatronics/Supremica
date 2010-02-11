@@ -9,7 +9,6 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 
 public class Step implements Comparable<Step>
 {
-
   public Step(final EventProxy event, final HashMap<AutomatonProxy, StateProxy> source, final HashMap<AutomatonProxy, StateProxy> dest)
   {
     mEvent = event;

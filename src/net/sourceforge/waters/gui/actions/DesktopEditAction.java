@@ -13,8 +13,6 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public class DesktopEditAction extends WatersDesktopAction
 {
-
-
   protected DesktopEditAction(final IDE ide, final AutomatonProxy autoToEdit)
   {
     super(ide);
@@ -32,14 +30,12 @@ public class DesktopEditAction extends WatersDesktopAction
     final SourceInfo sInfo = modContainer.getSourceInfoMap().get(mAutomaton);
     if (sInfo != null)
     {
-    if (sInfo.getSourceObject() instanceof SimpleComponentSubject)
-      modContainer.getEditorPanel().showEditor((SimpleComponentSubject)sInfo.getSourceObject()); // TODO: Make this work.
-    }
+      if (sInfo.getSourceObject() instanceof SimpleComponentSubject)
+        modContainer.getEditorPanel().showEditor((SimpleComponentSubject)sInfo.getSourceObject()); // TODO: Make this work.
+      }
     else
-      getIDE().error("DEBUG: sInfo is null");
+      getIDE().error("Source Information is null");
   }
-
-  //private final AutomatonProxy mAutomaton;
 
   private final AutomatonProxy mAutomaton;
   private static final long serialVersionUID = -1644229513613033199L;

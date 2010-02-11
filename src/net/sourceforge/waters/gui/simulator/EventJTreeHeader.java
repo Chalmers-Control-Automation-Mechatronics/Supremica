@@ -75,10 +75,5 @@ public class EventJTreeHeader extends JTableHeader implements ComponentListener
 
   // ###########################################################################
   // # Class Constants
-  /**
-   *
-   */
   private static final long serialVersionUID = 3210675056736810131L;
-
-
 }

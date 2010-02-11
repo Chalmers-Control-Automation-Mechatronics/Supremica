@@ -36,7 +36,6 @@ import org.supremica.gui.ide.ModuleContainer;
 public abstract class WatersAnalyzeAction
   extends WatersAction
 {
-
   // #######################################################################
   // # Constructor
   protected WatersAnalyzeAction(final IDE ide)
@@ -49,8 +48,23 @@ public abstract class WatersAnalyzeAction
   }
 
   // ###################################################################
-  // # Auxillary Methods
+  // # Class WatersAction
+  public void actionPerformed(final ActionEvent e)
+  {
+    updateProductDES();
+    if (des != null)
+    {
+      final AnalyzerDialog dialog = new AnalyzerDialog();
+      dialog.setVisible(true);
+    }
+    else
+    {
+      getIDE().error("ERROR: DES was not able to be successfully compiled");
+    }
+  }
 
+  // ###################################################################
+  // # Auxillary Methods
   public void updateProductDES()
   {
     if (getIDE() != null)
@@ -73,7 +87,6 @@ public abstract class WatersAnalyzeAction
 
   // ##############################################################################
   // # Abstract Methods
-
   protected void updateEnabledStatus()
   {
     setEnabled(true);
@@ -88,28 +101,12 @@ public abstract class WatersAnalyzeAction
   protected abstract String getSuccessDescription();
   protected abstract ModelVerifier getModelVerifier(ModelVerifierFactory factory, ProductDESProxyFactory desFactory);
 
-  public void actionPerformed(final ActionEvent e)
-  {
-    updateProductDES();
-    if (des != null)
-    {
-      final AnalyzerDialog dialog = new AnalyzerDialog();
-      dialog.setVisible(true);
-    }
-    else
-    {
-      getIDE().error("ERROR: DES was not able to be successfully compiled");
-    }
-  }
-
   // ##############################################################################
   // # Inner class
-
   private class AnalyzerDialog extends JDialog
   {
     // #######################################################################
     // # Constructor
-
     public AnalyzerDialog()
     {
       this.setTitle(getCheckName() + " Check");
@@ -132,9 +129,6 @@ public abstract class WatersAnalyzeAction
       topPanel.setBorder(border);
       bottomPanel.add(cancelButton, BorderLayout.WEST);
       topPanel.add(informationLabel, BorderLayout.NORTH);
-      //majorPanel.setLayout(new GridLayout(2, 1));
-      //majorPanel.add(topPanel);
-      //majorPanel.add(bottomPanel);
       this.getContentPane().add(topPanel, BorderLayout.CENTER);
       this.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
       this.setSize(DEFAULT_DIALOG_SIZE);
@@ -205,7 +199,6 @@ public abstract class WatersAnalyzeAction
 
     // ######################################################################
     // # Auxillary Methods
-
     private String HTMLinize(final String raw)
     {
       return "<html><P STYLE=\"text-align:center;word-wrap:break-word;width:100%;left:0\">" + raw + "</p></html>";
@@ -214,13 +207,11 @@ public abstract class WatersAnalyzeAction
 
     // ######################################################################
     // # Inner Classes
-
     private class WrapperLabel extends JLabel implements ComponentListener
     {
 
       // ######################################################################
       // # Constructor
-
       public WrapperLabel(final JPanel parent)
       {
         super();
@@ -243,7 +234,6 @@ public abstract class WatersAnalyzeAction
 
       // ######################################################################
       // # Interface ComponentListener
-
       public void componentHidden(final ComponentEvent e)
       {
         // Do Nothing
@@ -266,16 +256,13 @@ public abstract class WatersAnalyzeAction
 
       // #####################################################################
       // # Data Members
-
       private final JPanel parent;
 
       // #####################################################################
       // # Class Constants
-
       private static final int TITLEBAR_HEIGHT = 30;
       private static final long serialVersionUID = -6693747793242415495L;
     }
-
 
     private class AnalyzerThread extends Thread
     {
@@ -286,55 +273,53 @@ public abstract class WatersAnalyzeAction
         verifier = getModelVerifier(vfactory, desfactory);
       }
 
-        public void run()
+      public void run()
+      {
+        super.run();
+        boolean fatalError = false;
+        verifier.setModel(des);
+        try {
+          verifier.run();
+        }
+        catch (final AbortException exception)
         {
-          super.run();
-          boolean fatalError = false;
-          verifier.setModel(des);
-          try {
-            verifier.run();
-          }
-          catch (final AbortException exception)
-          {
-            // Do nothing: Aborted
-            fatalError = true;
-          } catch (final AnalysisException exception) {
-            SwingUtilities.invokeLater(new Runnable(){public void run(){error(exception);}});
-            fatalError = true;
-          } catch (final OutOfMemoryError error)
-          {
-            SwingUtilities.invokeLater(new Runnable(){public void run(){error(error);}});
-            fatalError = true;
-          }
-          if (!fatalError)
-          {
-            final boolean result = verifier.isSatisfied();
-            if (result) {
-              SwingUtilities.invokeLater(new Runnable(){public void run(){succeed();}});
-            } else {
-              SwingUtilities.invokeLater(new Runnable(){public void run(){fail();}});
-            }
+          // Do nothing: Aborted
+          fatalError = true;
+        } catch (final AnalysisException exception) {
+          SwingUtilities.invokeLater(new Runnable(){public void run(){error(exception);}});
+          fatalError = true;
+        } catch (final OutOfMemoryError error)
+        {
+          SwingUtilities.invokeLater(new Runnable(){public void run(){error(error);}});
+          fatalError = true;
+        }
+        if (!fatalError)
+        {
+          final boolean result = verifier.isSatisfied();
+          if (result) {
+            SwingUtilities.invokeLater(new Runnable(){public void run(){succeed();}});
+          } else {
+            SwingUtilities.invokeLater(new Runnable(){public void run(){fail();}});
           }
         }
+      }
 
-        public boolean abort()
+      public boolean abort()
+      {
+        if (verifier != null)
         {
-          if (verifier != null)
-          {
-            verifier.requestAbort();
-            return true;
-          }
-          else
-          {
-            return false;
-          }
+          verifier.requestAbort();
+          return true;
         }
-
+        else
+        {
+          return false;
+        }
+      }
     }
 
     // ######################################################################
     // # Data Members
-
     AnalyzerThread runner;
     ModelVerifier verifier;
     JPanel topPanel;
@@ -342,11 +327,9 @@ public abstract class WatersAnalyzeAction
     JButton cancelButton;
     JButton traceButton;
     WrapperLabel informationLabel;
-    //JLabel informationLabel;
 
     // #####################################################################
     // # Class Constants
-
     private final Dimension DEFAULT_DIALOG_SIZE = new Dimension(290, 190);
     private final Point DEFAULT_DIALOG_LOCATION = new Point(250, 150);
     private static final long serialVersionUID = -2478548485525996982L;
@@ -354,13 +337,9 @@ public abstract class WatersAnalyzeAction
 
   // ##############################################################################
   // # Data Members
-
   ProductDESProxy des;
 
   // ##############################################################################
   // # Class Constants
-  protected static final String ANALYZE_CONFLICT = "CONFLICT";
-  protected static final String ANALYZE_CONTROLLABLE = "CONTROLLABLE";
-  protected static final String ANALYZE_CONTROL_LOOP = "CONTROL LOOP";
   private static final long serialVersionUID = -3797986885054648213L;
 }

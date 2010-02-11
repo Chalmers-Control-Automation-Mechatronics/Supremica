@@ -10,7 +10,6 @@ import org.supremica.gui.ide.IDE;
 
 public class DesktopCloseWindowAction extends WatersDesktopAction
 {
-
   protected DesktopCloseWindowAction(final IDE ide, final AutomatonProxy autoToClose)
   {
     super(ide);

@@ -11,7 +11,6 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public class DesktopOpenWindowAction extends WatersDesktopAction
 {
-
   protected DesktopOpenWindowAction(final IDE ide, final AutomatonProxy autoToOpen)
   {
     super(ide);

@@ -8,7 +8,6 @@ import org.supremica.gui.ide.IDE;
 
 public class DesktopCloseAllAction extends WatersDesktopAction
 {
-
   protected DesktopCloseAllAction(final IDE ide)
   {
     super(ide);

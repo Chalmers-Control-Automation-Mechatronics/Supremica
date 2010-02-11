@@ -8,7 +8,6 @@ import org.supremica.gui.ide.IDE;
 
 public class DesktopShowAllAction extends WatersDesktopAction
 {
-
   protected DesktopShowAllAction(final IDE ide)
   {
     super(ide);

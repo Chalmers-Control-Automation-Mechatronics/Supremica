@@ -164,7 +164,8 @@ public class AutomatonDisplayPane
       mTransform = mInverseTransform = null;
       final Rectangle2D newBounds = AutomatonDisplayPane.this.getMinimumBoundingRectangle();
       this.setPreferredSize(new Dimension((int)newBounds.getWidth(), (int)newBounds.getHeight()));
-      mParent.resize();
+      mParent.resize(); // Set the size to the initial size, so that the 'Resize Automata' event cannot
+      // be fired immediately after the panel has been loaded.
     }
   }
 
@@ -422,7 +423,7 @@ public class AutomatonDisplayPane
   {
     if (possibleEvents.size() == 0)
     {
-      mContainer.getIDE().info("DEBUG: possibleEvents is zero-sized)");
+      mContainer.getIDE().error("There are no possible events to fire");
       return null;
     }
     else if (possibleEvents.size() == 1)
@@ -517,7 +518,7 @@ public class AutomatonDisplayPane
         try {
           mSim.step(firedEvent);
         } catch (final NonDeterministicException exception) {
-          System.out.println("ERROR: " + exception.getMessage()
+          mContainer.getIDE().error(exception.getMessage()
               + ". Event will not be fired");
         }
       }
@@ -823,7 +824,4 @@ public class AutomatonDisplayPane
   //##########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-
-
-
 }

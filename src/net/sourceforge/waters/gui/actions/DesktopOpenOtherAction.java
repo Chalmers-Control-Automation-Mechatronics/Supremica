@@ -10,7 +10,6 @@ import org.supremica.gui.ide.IDE;
 
 public class DesktopOpenOtherAction extends WatersDesktopAction
 {
-
   protected DesktopOpenOtherAction(final IDE ide, final AutomatonProxy autoToOpen)
   {
     super(ide);
@@ -26,6 +25,5 @@ public class DesktopOpenOtherAction extends WatersDesktopAction
   }
 
   private final AutomatonProxy mAutomaton;
-
   private static final long serialVersionUID = -1644229513613033199L;
 }

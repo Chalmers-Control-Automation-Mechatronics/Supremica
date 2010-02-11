@@ -37,6 +37,4 @@ public class AnalyzeControlLoopAction extends WatersAnalyzeAction
   }
 
   private static final long serialVersionUID = 2167516363996006935L;
-
-
 }

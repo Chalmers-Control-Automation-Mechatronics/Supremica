@@ -10,7 +10,6 @@ import org.supremica.gui.ide.IDE;
 
 public class DesktopExecuteAction extends WatersDesktopAction
 {
-
   protected DesktopExecuteAction(final IDE ide, final AutomatonProxy autoToClose)
   {
     super(ide);
@@ -26,6 +25,5 @@ public class DesktopExecuteAction extends WatersDesktopAction
   }
 
   private final AutomatonProxy mAutomaton;
-
   private static final long serialVersionUID = -1644229513613033199L;
 }

@@ -9,7 +9,6 @@ import org.supremica.gui.ide.IDE;
 public class AnalyzeConflictCheckAction
 extends WatersAnalyzeAction
 {
-
   protected AnalyzeConflictCheckAction(final IDE ide)
   {
     super(ide);

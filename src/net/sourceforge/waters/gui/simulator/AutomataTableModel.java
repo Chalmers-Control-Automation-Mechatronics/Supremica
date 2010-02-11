@@ -130,7 +130,8 @@ class AutomataTableModel
   public void onFrameEvent(final InternalFrameEvent event)
   {
     // This should identify the cells that have changed and then fire
-    // a more appropriate change event.
+    // a more appropriate change event. This will only increase performance
+    // by a marginal amount, however.
     getRawData();
     fireTableDataChanged();
   }
@@ -174,39 +175,6 @@ class AutomataTableModel
       mRawData = new ArrayList<List<Object>>();
     }
   }
-
-  //private void updateRawData()
-  //{
-  // getRawData();
-  /*if (mRawData.size() == 0)
-    {
-      getRawData();
-      return;
-    }
-    for (final AutomatonProxy aut : getSimulation().getAutomata())
-    {
-      if (getSimulation().changedLastStep(aut) || getSimulation().changedSecondLastStep(aut)
-          || getSimulation().changedNextStep(aut) || getSimulation().getEventHistory().size() == 0
-          || getSimulation().isNonControllableAtTime(getSimulation().getCurrentTime()).contains(aut)
-          || getSimulation().isNonControllableAtTime(getSimulation().getCurrentTime() - 1).contains(aut)
-          || getSimulation().isNonControllableAtTime(getSimulation().getCurrentTime() + 1).contains(aut))
-      {
-        final int indexToChange = getIndex(aut);
-        final List<Object> row = new ArrayList<Object>();
-        if (getModuleContainer().getSourceInfoMap().get(aut).getSourceObject().getClass() == VariableComponentSubject.class)
-          row.add(IconLoader.ICON_VARIABLE);
-        else
-          row.add(ModuleContext.getComponentKindIcon(aut.getKind()));
-        row.add(aut.getName());
-        row.add(getSimulation().getAutomatonActivityIcon(aut));
-        final StateProxy currentState = getSimulation().getCurrentStates().get(aut);
-        row.add(getSimulation().getMarkingIcon(currentState, aut, false));
-        row.add(getSimulation().getCurrentStates().get(aut).getName());
-        mRawData.set(indexToChange, row);
-        this.fireTableRowsUpdated(indexToChange, indexToChange);
-      }
-    }*/
-  //}
 
   // #########################################################################
   // # Data Members

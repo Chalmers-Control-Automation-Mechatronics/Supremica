@@ -16,8 +16,6 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public class EventTreeModel
   implements TreeModel, SimulationObserver
 {
-
-
   // ##############################################################
   // # Constructor
 
@@ -242,7 +240,7 @@ public class EventTreeModel
         bIsEnabled = true;
     }
     if (b == null)
-      throw new IllegalArgumentException("DEBUG: NULL EVENT");
+      throw new IllegalArgumentException("NULL EVENT");
     if (aIsEnabled)
     {
       if (bIsEnabled)
@@ -313,5 +311,4 @@ public class EventTreeModel
   private LinkedList<TreeModelListener> mListeners;
   private ArrayList<EventProxy> sortedEvents;
   private final ArrayList<Pair<Boolean,Integer>> mSortingEvents;
-
 }

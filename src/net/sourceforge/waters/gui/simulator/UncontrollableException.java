@@ -18,7 +18,6 @@ public class UncontrollableException extends WatersException
   {
   }
 
-
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
