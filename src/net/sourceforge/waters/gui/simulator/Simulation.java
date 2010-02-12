@@ -102,11 +102,18 @@ public class Simulation implements ModelObserver, Observer
     return mWarningProperties;
   }
 
+  /**
+   * This method is used to add a new simulation state to the END of the current list. Thus, it is only used for step methods.
+   */
   private void addNewSimulatorState()
   {
     previousStates.add(new SimulatorState(this));
   }
 
+  /**
+   * This method takes the current time of the simulation, and changes the current states of the simulation to match the correct time
+   * It is used for steping back and forward through the simulation without changing it
+   */
   private void loadSimulatorState()
   {
     final SimulatorState stateToLoad = previousStates.get(currentTime);
@@ -128,16 +135,28 @@ public class Simulation implements ModelObserver, Observer
     return mSimpleExpressionCompiler;
   }
 
+  /**
+   * Returns a list of Steps which can be fired.
+   * Any other steps outside of this list will not change the simulation state
+   * @return A list of Steps which can be fired.
+   */
   public List<Step> getValidTransitions()
   {
     return Collections.unmodifiableList(mEnabledEvents);
   }
 
+  /**
+   * @return A map. The keys are all Events which cannot be fired, and the values are all the automata
+   * which are blocking the events from being fired
+   */
   public Map<EventProxy,ArrayList<AutomatonProxy>> getInvalidEvents()
   {
     return Collections.unmodifiableMap(mInvalidEvents);
   }
 
+  /**
+   * @return A map, mapping all the automata in the simulation to thier current states
+   */
   public Map<AutomatonProxy, StateProxy> getCurrentStates()
   {
     return Collections.unmodifiableMap(mAllAutomatons);
@@ -158,22 +177,13 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-  public String getBlockingTextual()
-  {
-    String output = "";
-    output += "The automaton which are blocking the states are:\r\n";
-    for (final EventProxy event : mInvalidEvents.keySet())
-    {
-      output += event.getName() + ":[";
-      for (final AutomatonProxy proxy : mInvalidEvents.get(event))
-      {
-        output += proxy.getName() + ",";
-      }
-      output += "]\r\n";
-    }
-    return output;
-  }
-
+  /**
+   * @param event The event which is to be drawn
+   * @return An image. A tick if the event can be fired by at least one possible step,
+   * a cross if that event is blocked by some automata,
+   * a yellow flag if firing that event will disable an event, or
+   * a red flag, if that event is causing a controllability problem
+   */
   public ImageIcon getEventActivityIcon(final EventProxy event)
   {
     for (final Step blockingStep : mWarningProperties.keySet())
@@ -207,6 +217,17 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
+  /**
+   * This method is used for displaying automata in the AutomatonTable.
+   * Similar, but different code is fired in the EventJTree for it's representation of images
+   * of automata
+   * @param aut The automaton which is to be drawn
+   * @return An image. A tick if that automaton was enabled in the last step
+   * a cross if that automaton is disabled
+   * a yellow flag if that automaton is a property which can be disabled if the correct event is fired
+   * a red flag, if that automaton is causing a controllabilty problem
+   * no image, if none of the above are true.
+   */
   public ImageIcon getAutomatonActivityIcon(final AutomatonProxy aut)
   {
     if (mDisabledProperties.contains(aut))
@@ -228,6 +249,12 @@ public class Simulation implements ModelObserver, Observer
       return new ImageIcon();
   }
 
+  /**
+   * @param time The time (0 = initial, 1 = after the first event etc.) that
+   * the automata need to know if they are controllable or not
+   * @return A set of all automata which are not controllable at a specific time
+   * (IE. They are causing a controllability problem)
+   */
   public Set<AutomatonProxy> isNonControllableAtTime(final int time)
   {
     if (time < 0 || time > previousStates.size() - 1)
@@ -278,6 +305,13 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
+  /**
+   * @param state The state to be drawn
+   * @param automaton The automaton the state belongs to
+   * @param drawAsEditor <STRONG>true</STRONG> if a state inside an automaton with no accepting states should be
+   * drawn with a white inner, <STRONG>false</STRONG> if it should be drawn with a grey (IE. Accepting) inner
+   * @return The icon of a state, taking into account propositions
+   */
   public Icon getMarkingIcon(final StateProxy state,
                              final AutomatonProxy automaton,
                              final boolean drawAsEditor)
@@ -286,6 +320,13 @@ public class Simulation implements ModelObserver, Observer
     return info.getIcon();
   }
 
+  /**
+   * @param state The state to be drawn
+   * @param automaton The automaton the state belongs to
+   * @param drawAsEditor <STRONG>true</STRONG> if a state inside an automaton with no accepting states should be
+   * drawn with a white inner, <STRONG>false</STRONG> if it should be drawn with a grey (IE. Accepting) inner
+   * @return The colour of a state, taking into account propositions
+   */
   public PropositionIcon.ColorInfo getMarkingColorInfo
     (final StateProxy state, final AutomatonProxy automaton, final boolean drawAsEditor)
   {
@@ -462,13 +503,11 @@ public class Simulation implements ModelObserver, Observer
       mAllAutomatons.put(automaton, state);
     else
       throw new IllegalArgumentException("ERROR: This automaton is not in this program");
-    invalidated = true;
+    invalidated = true; // This state changes the simulation so it is different from the trace
     removeFutureEvents();
     updateControllability(true);
     findEventClassification();
-    final ArrayList<AutomatonProxy> auto = new ArrayList<AutomatonProxy>();
-    auto.add(automaton);
-    mCurrentEvent = null;
+    mCurrentEvent = null; // No event was fired. If mCurrentEvent is null, then either it is a state-change event, or the initial state
     currentTime++;
     addNewSimulatorState();
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
@@ -476,6 +515,13 @@ public class Simulation implements ModelObserver, Observer
     fireSimulationChangeEvent(simEvent);
   }
 
+  /**
+   * Resets the simulation to either it's initial state, or if it has a trace, restores the trace.
+   * Note that this method is used to initialise the simulation as well, so simply setting the current
+   * time to 0 and calling loadSimulatorState() will not work, as it will never be initilized.
+   * @param destroyTrace If this is <STRONG>true</STRONG> then it will ALWAYS return to it's initial state
+   * and it will remove the trace
+   */
   public void reset(final boolean destroyTrace)
   {
     mWarningProperties = new HashMap<Step, AutomatonProxy>();
@@ -485,6 +531,7 @@ public class Simulation implements ModelObserver, Observer
     }
     else
     {
+      mTrace = null; // If we are to destroy the trace
       mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
       mEnabledEvents = new ArrayList<Step>();
       mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
@@ -496,7 +543,7 @@ public class Simulation implements ModelObserver, Observer
           {
             if (state.isInitial())
             {
-              mAllAutomatons.put(automaton, state);
+              mAllAutomatons.put(automaton, state); // Set the state to it's current state
             }
           }
         }
@@ -515,6 +562,12 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
+  /**
+   * Resets the simulation, and then loads the trace
+   * @param trace The trace to load
+   * @param allowLastStep <STRONG>true</STRONG> if the last step in the TraceProxy is to be fired, <STRONG>false</STRONG>
+   * if the simulation is to be stopped at the second-to-last step instead.
+   */
   public void run(final TraceProxy trace, final boolean allowLastStep)
   {
     mTrace = null;
@@ -556,6 +609,13 @@ public class Simulation implements ModelObserver, Observer
     fireSimulationChangeEvent(simEvent);
   }
 
+  /**
+   * @param step The simulator instruction which is being tested for equality
+   * @param tStep The trace instruction which is being tested for equality
+   * @return <STRONG>true</STRONG> if the Step and the TraceStep represent the same instruction, <STRONG>false</STRONG> otherwise
+   * @throws IllegalArgumentException if the trace step doesn't provide non-deterministic information, while the regular step
+   * contains it (and thus, the simulation is non-deterministic)
+   */
   private boolean compareTraceStep(final Step step, final TraceStepProxy tStep)
   {
     if (step.getEvent() == tStep.getEvent()) // Check if the event name is right. If not, this is not the correct Step
@@ -584,7 +644,11 @@ public class Simulation implements ModelObserver, Observer
     return false;
   }
 
-
+  /**
+   * Moves the simulation forward one instruction, by firing a step
+   * @param step The instruction to be followed
+   * @throws NonDeterministicException If the step is deterministic, but non-deterministic information is needed
+   */
   public void step(final Step step) throws NonDeterministicException
   {
     mWarningProperties = new HashMap<Step, AutomatonProxy>();
@@ -622,6 +686,16 @@ public class Simulation implements ModelObserver, Observer
     fireSimulationChangeEvent(simEvent);
   }
 
+  /**
+   * Finds the appropiate next state for the automaton, and sets it, given that the step doesn't contain that information inside it
+   * The Step <STRONG>can</STRONG> be non-deterministic, but what is required is that the step cannot contain 'next-state' information
+   * about the automaton
+   * @param automata The automaton which is finding it's next state
+   * @param step The instruction to follow
+   * @param oldLocation The old previous current state
+   * @throws NonDeterministicException If the automata needs non-deterministic information to fire the event. However, this will still
+   * be thrown if the step contains that information, as it is assumed to NOT possess that information.
+   */
   private void moveDeterministicTransition(final AutomatonProxy automata,
                                                  final Step step,
                                                  final StateProxy oldLocation) throws NonDeterministicException
@@ -640,7 +714,7 @@ public class Simulation implements ModelObserver, Observer
         else if (trans.getSource() == oldLocation && moved)
         {
           throw new NonDeterministicException("The automaton " + automata.getName() +
-                                              " has two options. The event fired was " + step.toString());
+                                              " has two options.");
         }
       }
     }
@@ -656,7 +730,10 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-
+  /**
+   * Throws Illegal Argument Exceptions if the step is an invalid event, or if it is not inside any valid event
+   * @param step The step to check
+   */
   private void checkInvalid(final Step step)
   {
     if (isInInvalidEvent(step.getEvent()))
@@ -675,11 +752,19 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-
+  /**
+   * Moves the simulation state back one step, without changing the trace
+   */
   public void stepBack()
   {
     moveSafely(false);
   }
+  /**
+   * Moves the simulation state forward one step, without changing the trace.
+   * If the trace is a loopTrace, if that trace hasn't been invalidated by the
+   * step() and setState(...) methods, and if the current state is the final state
+   * it will move the simulation state to the beginning of the loop instead.
+   */
   public void replayStep()
   {
     if (mTrace != null)
@@ -750,6 +835,10 @@ public class Simulation implements ModelObserver, Observer
 
   //#########################################################################
   //# Auxiliary Functions
+  /**
+   * Finds the new automata and events which are now causing controllability errors.
+   * It also finds properties that could possibly fail next step
+   */
   private void updateControllability(final boolean addNewUncontrollable)
   {
     final ArrayList<Pair<EventProxy, AutomatonProxy>> output = new ArrayList<Pair<EventProxy, AutomatonProxy>>();
@@ -829,6 +918,9 @@ public class Simulation implements ModelObserver, Observer
     return false;
   }
 
+  /**
+   * Finds all the possible enabled steps, and all the disabled events
+   */
   private void findEventClassification()
   {
     mEnabledEvents = new ArrayList<Step>();
@@ -888,6 +980,10 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
+  /**
+   * Prints errors if the simulation is blocking. It does not print an error if all the current states are accepting
+   * or if those which are not accepting don't have any accepting states within thier automaton.
+   */
   private void checkForBlockingError()
   {
     for (final AutomatonProxy auto : mAllAutomatons.keySet())
@@ -918,7 +1014,12 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-
+  /**
+   * Looks for all events which are sensitive to the automaton, but are not able to be fired in this automaton
+   * It then deletes all enabled events which involve those events, and adds it to the invalid events list
+   * @param automatonsActiveEvents All the automatons possible transitions which it can fire
+   * @param aut The automaton to test
+   */
   private void removeIgnoredEvents(final ArrayList<TransitionProxy> automatonsActiveEvents, final AutomatonProxy aut)
   {
     for (final EventProxy event : aut.getEvents())
@@ -943,7 +1044,11 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-
+  /**
+   * Adds new steps to the list of enabled possible steps
+   * @param newEventsFirable The list of all the transitions in the automaton which the automaton can fire
+   * @param aut The automaton to test
+   */
   private void processNewEvents(final ArrayList<TransitionProxy> newEventsFirable,
                                 final AutomatonProxy aut)
   {
@@ -976,7 +1081,11 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-
+  /**
+   * Modifies existing steps to the list of enabled possible steps. If non-deterministic information is required, it is added here
+   * @param newEventsFirable The list of all the transitions in the automaton which the automaton can fire
+   * @param aut The automaton to test
+   */
   private void processOldEvents(final ArrayList<TransitionProxy> eventsFirable, final AutomatonProxy aut)
   {
     while (eventsFirable.size() != 0)
@@ -1007,7 +1116,12 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-
+  /**
+   * Adds a new invalid event to the invalid events list. If it is already on the list, appends the automaton
+   * to the list of automaton blocking that list
+   * @param event The invalid event
+   * @param automaton The new automaton which is blocking that event
+   */
   private void addNewInvalidEvent(final EventProxy event, final AutomatonProxy automaton)
   {
     boolean isInValidEvent = false;
@@ -1087,6 +1201,10 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
+  /**
+   * Moves the simulation state forward one step, or backward one step, without changing the trace
+   * @param forward Moves the simulation forward if <STRONG>true</STRONG>, backwards otherwise
+   */
   private void moveSafely(final boolean forward)
   {
     mWarningProperties = new HashMap<Step, AutomatonProxy>();
@@ -1097,6 +1215,11 @@ public class Simulation implements ModelObserver, Observer
     fireSimulationChangeEvent(simEvent);
   }
 
+  /**
+   * Increments or decrements the current time counter. If it is the last step and is moving forward
+   * or if it is the first step and it is moving backward, then it will print an error message instead.
+   * @param forward
+   */
   private void moveTime(final boolean forward)
   {
     if (forward)
@@ -1121,7 +1244,10 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-
+  /**
+   * Removes all future information from the simulation. This is used if the simulation is doing something that changes the trace
+   * while the current time is not the last time reached in the simulation. This invalidates all previous states.
+   */
   private void removeFutureEvents()
   {
     while (previousStates.size() != currentTime + 1)
