@@ -219,9 +219,9 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     final Collection<EventProxy> localEvents = new ArrayList<EventProxy>();
     for (final EventProxy event : eventAutomaton.keySet()) {
-      eventAutomaton.get(event).retainAll(candidate);
+      eventAutomaton.get(event).removeAll(candidate);
       final Collection<AutomatonProxy> autWithEvent = eventAutomaton.get(event);
-      if (autWithEvent.size() == 1) {
+      if (autWithEvent.size() == 0) {
         localEvents.add(event);
       }
     }
@@ -287,7 +287,7 @@ public class CompositionalGeneralisedConflictChecker extends
     maxsize = 1000;
     mChecked.clear();
     Set<AutomatonProxy> automata = new TreeSet<AutomatonProxy>();
-    // adds all automata from model if they aren't of kind property
+    // adds all automata from model if they aren't of the kind property
     final Iterator<AutomatonProxy> autit = model.getAutomata().iterator();
     while (autit.hasNext()) {
       final AutomatonProxy aut = autit.next();
@@ -756,6 +756,9 @@ public class CompositionalGeneralisedConflictChecker extends
       }
       if (mHidden.contains(getMarkingProposition())) {
         mHidden.remove(getMarkingProposition());
+      }
+      if (mHidden.contains(getGeneralisedPrecondition())) {
+        mHidden.remove(getGeneralisedPrecondition());
       }
       final AutomataHidden ah =
           new AutomataHidden(compAutomata, new HashSet<EventProxy>(mHidden));
