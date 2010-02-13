@@ -168,6 +168,7 @@ public class CompositionalGeneralisedConflictChecker extends
     final AutomatonProxy syncProduct = composer.run();
     final Map<EventProxy,Collection<AutomatonProxy>> eventAutomaton =
         mapEventsToAutomata(getModel());
+    @SuppressWarnings("unused")
     final Collection<EventProxy> localEvents =
         identifyLocalEvents(eventAutomaton, candidate);
 
@@ -207,15 +208,14 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
   /**
-   * Returns a collection of events that are local to a given set of automata.
-   *
-   * @param eventAutomaton
-   * @param candidate
-   * @return
+   * <P>Returns a collection of events that are local to a given set of
+   * automata.</P>
+   * <P><STRONG>BUG</STRONG> Deletes entries from eventAutomaton as side
+   * effect and therefore does not work when called for a second automaton.</P>
    */
-  private Collection<EventProxy> identifyLocalEvents(
-                                                     final Map<EventProxy,Collection<AutomatonProxy>> eventAutomaton,
-                                                     final Set<AutomatonProxy> candidate)
+  private Collection<EventProxy> identifyLocalEvents
+    (final Map<EventProxy,Collection<AutomatonProxy>> eventAutomaton,
+     final Set<AutomatonProxy> candidate)
   {
     final Collection<EventProxy> localEvents = new ArrayList<EventProxy>();
     for (final EventProxy event : eventAutomaton.keySet()) {
@@ -231,12 +231,9 @@ public class CompositionalGeneralisedConflictChecker extends
   /**
    * Maps the events in the model to a collection of the automaton that contain
    * the event in their alphabet.
-   *
-   * @param model
-   * @return
    */
-  private Map<EventProxy,Collection<AutomatonProxy>> mapEventsToAutomata(
-                                                                         final ProductDESProxy model)
+  private Map<EventProxy,Collection<AutomatonProxy>> mapEventsToAutomata
+    (final ProductDESProxy model)
   {
     final Map<EventProxy,Collection<AutomatonProxy>> eventAutomaton =
         new HashMap<EventProxy,Collection<AutomatonProxy>>();
@@ -272,10 +269,6 @@ public class CompositionalGeneralisedConflictChecker extends
 
   /**
    * Chooses candidates etc.
-   *
-   * @param model
-   * @return
-   * @throws AnalysisException
    */
   @SuppressWarnings("unused")
   private ProjectionList project(final ProductDESProxy model)
@@ -361,8 +354,6 @@ public class CompositionalGeneralisedConflictChecker extends
 
   /**
    * Assigns values for mAlwaysEnabled and mAllSelfLoops.
-   *
-   * @param model
    */
   private void eventscheck(final ProductDESProxy model)
   {
