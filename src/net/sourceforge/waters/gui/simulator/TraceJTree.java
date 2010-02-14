@@ -30,6 +30,7 @@ import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -223,7 +224,12 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
           }
           else
             toolTipText += "Uncontrollable";
-          toolTipText += " Event " + event.getName() + " was fired at time " + (((EventBranchNode)comp).getTime() + 1);
+          toolTipText += " Event " + event.getName() + " was fired at time " + (((EventBranchNode)comp).getTime());
+          if (mSim.getTrace() instanceof LoopTraceProxy)
+          {
+            if (((EventBranchNode)comp).getTime() == ((LoopTraceProxy)mSim.getTrace()).getLoopIndex() + 1)
+              toolTipText += ". This event is the start of the loop in the control loop problem";
+          }
           setToolTipText(toolTipText);
         }
         else if (comp instanceof TeleportEventTreeNode)
@@ -385,6 +391,11 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
          final EventBranchNode eventNode = (EventBranchNode)value;
          final EventProxy event = eventNode.getEvent();
          mEventNameLabel.setText(String.valueOf(eventNode.getTime()) + ". " + event.getName());
+         if (mSim.getTrace() instanceof LoopTraceProxy)
+         {
+           if (eventNode.getTime() == ((LoopTraceProxy)mSim.getTrace()).getLoopIndex() + 1)
+             mEventNameLabel.setText(mEventNameLabel.getText() + " <---");
+         }
          if (event.getKind() == EventKind.CONTROLLABLE)
            mEventNameLabel.setIcon(IconLoader.ICON_CONTROLLABLE);
          else
@@ -413,7 +424,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
          else
            mAutomataNameLabel.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
          if (autoNode.getBlocking())
-           mAutomataIconLabel.setIcon(IconLoader.ICON_WARNING);
+           mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_BLOCKING_AUTOMATON);
          else
            mAutomataIconLabel.setIcon(new ImageIcon());
          StateProxy currentState;
@@ -465,7 +476,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
            mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
          final TeleportEventTreeNode eventNode = (TeleportEventTreeNode)value;
          mEventNameLabel.setText("Manual State Set");
-         mEventNameLabel.setIcon(IconLoader.ICON_CROSS);
+         mEventNameLabel.setIcon(IconLoader.ICON_MANUAL_STATE_SET);
          if (eventNode.getTime() == TraceJTree.this.mSim.getCurrentTime())
          {
            mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.BOLD));

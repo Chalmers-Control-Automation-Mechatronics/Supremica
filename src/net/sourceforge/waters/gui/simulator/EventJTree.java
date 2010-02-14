@@ -182,6 +182,14 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
             toolTipText += " is enabled";
           else
             toolTipText += " is disabled";
+          Step warning = null;
+          for (final Step step : mSim.getWarningProperties().keySet())
+          {
+            if (step.getEvent() == event)
+              warning = step;
+          }
+          if (warning != null)
+            toolTipText += ", firing this event will cause the property " + mSim.getWarningProperties().get(warning).getName() + " to be disabled";
           setToolTipText(toolTipText);
         }
         else if (AutomatonProxy.class.isInstance(comp))
@@ -410,31 +418,31 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
         {
           if (mSim.getNonControllable(parentEvent).contains(autoProxy))
           {
-            mAutomataIconLabel.setIcon(IconLoader.ICON_WARNING);
+            mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_BLOCKING_EVENT);
           }
           else
           {
             if (mSim.getBlocking(parentEvent).contains(autoProxy))
-              mAutomataIconLabel.setIcon(IconLoader.ICON_CROSS);
+              mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_INVALID_EVENT);
             else
-              mAutomataIconLabel.setIcon(IconLoader.ICON_TICK);
+              mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_VALID_EVENT);
           }
           for (final Step step : mSim.getWarningProperties().keySet())
           {
             if (step.getEvent() == parentEvent && mSim.getWarningProperties().get(step) == autoProxy)
-              mAutomataIconLabel.setIcon(IconLoader.ICON_YELLOWWARNING);
+              mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_CAUSES_WARNING_EVENT);
           }
         }
         else
         {
           if (mSim.getBlocking(parentEvent).contains(autoProxy))
-            mAutomataIconLabel.setIcon(IconLoader.ICON_CROSS);
+            mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_DISABLED_AUTOMATON);
           else
-            mAutomataIconLabel.setIcon(IconLoader.ICON_TICK);
+            mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_ENABLED_AUTOMATON);
           for (final Step step : mSim.getWarningProperties().keySet())
           {
             if (step.getEvent() == parentEvent && mSim.getWarningProperties().get(step) == autoProxy)
-              mAutomataIconLabel.setIcon(IconLoader.ICON_YELLOWWARNING);
+              mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_CAUSES_WARNING_PROPERTY);
           }
         }
         StateProxy currentState;

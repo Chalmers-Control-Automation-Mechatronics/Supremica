@@ -364,7 +364,7 @@ public class AutomatonDisplayPane
             toolTipText += "Controllable event ";
           else
             toolTipText += "Uncontrollable event ";
-          toolTipText += trans.getEvent().getName() + " ";
+          toolTipText += trans.getEvent().getName();
           boolean enabled = false;
           for (final Step possibleSteps : mSim.getValidTransitions())
           {
@@ -378,6 +378,14 @@ public class AutomatonDisplayPane
             toolTipText += ", currently enabled";
           else
             toolTipText += ", currently disabled";
+          Step warning = null;
+          for (final Step step : mSim.getWarningProperties().keySet())
+          {
+            if (step.getEvent() == trans.getEvent())
+              warning = step;
+          }
+          if (warning != null)
+            toolTipText += ", firing this event will cause the property " + mSim.getWarningProperties().get(warning) + " to be disabled";
           this.setToolTipText(toolTipText);
           foundTrans = true;
         }

@@ -30,7 +30,7 @@ public class DesktopSwitchStateAction extends WatersAction
         mState = state;
     }
     putValue(Action.NAME, "Change to this State");
-    putValue(Action.SHORT_DESCRIPTION, "Change the automata state to this state");
+    putValue(Action.SHORT_DESCRIPTION, "Change the automaton state to this state");
     setEnabled(true);
   }
 

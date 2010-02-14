@@ -10,6 +10,8 @@
 package net.sourceforge.waters.gui;
 
 import java.net.URL;
+
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 
@@ -88,9 +90,23 @@ public class IconLoader
   public static final ImageIcon ICON_UNCONTROLLABLE =
     getIcon(NAME_UNCONTROLLABLE);
   public static final ImageIcon ICON_VARIABLE = getIcon(NAME_VARIABLE);
-  public static final ImageIcon ICON_CROSS = getIcon(NAME_CROSS);
+  /*public static final ImageIcon ICON_CROSS = getIcon(NAME_CROSS);
   public static final ImageIcon ICON_TICK = getIcon(NAME_TICK);
   public static final ImageIcon ICON_WARNING = getIcon(NAME_WARNING);
-  public static final ImageIcon ICON_YELLOWWARNING = getIcon(NAME_YELLOWWARNING);
+  public static final ImageIcon ICON_YELLOWWARNING = getIcon(NAME_YELLOWWARNING);*/
+  public static final ImageIcon ICON_TABLE_NORMAL_AUTOMATON = new ImageIcon();
+  public static final ImageIcon ICON_TABLE_ENABLED_AUTOMATON = getIcon(NAME_TICK);
+  public static final ImageIcon ICON_TABLE_BLOCKING_AUTOMATON = getIcon(NAME_WARNING);
+  public static final ImageIcon ICON_TABLE_WARNING_PROPERTY = getIcon(NAME_YELLOWWARNING);
+  public static final ImageIcon ICON_TABLE_DISABLED_PROPERTY = getIcon(NAME_CROSS);
+  public static final ImageIcon ICON_EVENTTREE_BLOCKING_EVENT = getIcon(NAME_WARNING);
+  public static final ImageIcon ICON_EVENTTREE_INVALID_EVENT = getIcon(NAME_CROSS);
+  public static final ImageIcon ICON_EVENTTREE_VALID_EVENT = getIcon(NAME_TICK);
+  public static final ImageIcon ICON_EVENTTREE_CAUSES_WARNING_EVENT = getIcon(NAME_YELLOWWARNING);
+  public static final ImageIcon ICON_EVENTTREE_DISABLED_AUTOMATON = getIcon(NAME_CROSS);
+  public static final ImageIcon ICON_EVENTTREE_ENABLED_AUTOMATON = getIcon(NAME_TICK);
+  public static final ImageIcon ICON_EVENTTREE_CAUSES_WARNING_PROPERTY = getIcon(NAME_YELLOWWARNING);
+  public static final Icon ICON_EVENTTREE_BLOCKING_AUTOMATON = getIcon(NAME_WARNING);
+  public static final Icon ICON_MANUAL_STATE_SET = getIcon(NAME_CROSS);
 
 }

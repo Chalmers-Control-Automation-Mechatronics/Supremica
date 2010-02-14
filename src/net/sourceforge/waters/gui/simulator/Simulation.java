@@ -189,12 +189,12 @@ public class Simulation implements ModelObserver, Observer
     for (final Step blockingStep : mWarningProperties.keySet())
     {
       if (event == blockingStep.getEvent())
-        return IconLoader.ICON_YELLOWWARNING;
+        return IconLoader.ICON_EVENTTREE_CAUSES_WARNING_EVENT;
     }
     for (final Step validStep : mEnabledEvents)
     {
       if (validStep.getEvent() == event)
-        return IconLoader.ICON_TICK;
+        return IconLoader.ICON_EVENTTREE_VALID_EVENT;
     }
     if (mInvalidEvents.containsKey(event))
     {
@@ -204,10 +204,10 @@ public class Simulation implements ModelObserver, Observer
         for (final Pair<EventProxy, AutomatonProxy> blockingEvent : mBlockingEvents)
         {
           if (blockingEvent.getFirst() == event)
-            return IconLoader.ICON_WARNING;
+            return IconLoader.ICON_EVENTTREE_BLOCKING_EVENT;
         }
       }
-      return IconLoader.ICON_CROSS;
+      return IconLoader.ICON_EVENTTREE_INVALID_EVENT;
     }
     else
     {
@@ -231,22 +231,22 @@ public class Simulation implements ModelObserver, Observer
   public ImageIcon getAutomatonActivityIcon(final AutomatonProxy aut)
   {
     if (mDisabledProperties.contains(aut))
-      return IconLoader.ICON_CROSS;
+      return IconLoader.ICON_TABLE_DISABLED_PROPERTY;
     if (mWarningProperties.containsValue(aut))
-      return IconLoader.ICON_YELLOWWARNING;
+      return IconLoader.ICON_TABLE_WARNING_PROPERTY;
     updateControllability(false);
     if (mBlockingEvents != null && aut.getKind() == ComponentKind.SPEC)
     {
       for (final Pair<EventProxy, AutomatonProxy> blockingEvent : mBlockingEvents)
       {
         if (blockingEvent.getSecond() == aut)
-            return IconLoader.ICON_WARNING;
+            return IconLoader.ICON_TABLE_BLOCKING_AUTOMATON;
       }
     }
     if (mEnabledLastStep.contains(aut))
-      return IconLoader.ICON_TICK;
+      return IconLoader.ICON_TABLE_ENABLED_AUTOMATON;
     else
-      return new ImageIcon();
+      return IconLoader.ICON_TABLE_NORMAL_AUTOMATON;
   }
 
   /**

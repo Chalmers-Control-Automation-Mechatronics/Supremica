@@ -423,13 +423,6 @@ public class ModuleContext
         ("Unknown event kind: " + event + "!");
     }
   }
-  public static Icon getBooleanIcon(final boolean bool)
-  {
-    if (bool)
-      return IconLoader.ICON_TICK;
-    else
-      return IconLoader.ICON_CROSS;
-  }
 
   public static String getComponentKindToolTip(final ComponentKind kind)
   {
