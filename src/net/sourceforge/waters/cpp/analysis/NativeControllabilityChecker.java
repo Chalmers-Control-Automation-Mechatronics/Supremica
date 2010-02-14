@@ -37,9 +37,9 @@ public class NativeControllabilityChecker
   }
 
   public NativeControllabilityChecker(final ProductDESProxy model,
-				      final ProductDESProxyFactory factory)
+                                      final ProductDESProxyFactory factory)
   {
-    super(model, ControllabilityKindTranslator.getInstance(), factory);
+    super(model, factory, ControllabilityKindTranslator.getInstance());
   }
 
 
@@ -48,7 +48,7 @@ public class NativeControllabilityChecker
   //# net.sourceforge.waters.cpp.analysis.NativeModelVerifier
   public String getTraceName()
   {
-    return getModel().getName() + ":uncontrollable";
+    return getModel().getName() + "-uncontrollable";
   }
 
 

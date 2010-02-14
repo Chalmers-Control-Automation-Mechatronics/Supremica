@@ -49,7 +49,7 @@ public final class SafetyTraceElement
    *                      generated.
    * @param  automata     The set of automata for the new trace,
    *                      or <CODE>null</CODE> if empty.
-   * @param  steps        The list of trace steps consituting the
+   * @param  steps        The list of trace steps constituting the
    *                      new trace. This list may not be empty, because
    *                      the first step must always represent the
    *                      initial state.
@@ -93,7 +93,7 @@ public final class SafetyTraceElement
    * provides a simple interface to create a controllability error trace
    * for a deterministic product DES. It creates a trace with a
    * <CODE>null</CODE> file location, with the name of the product DES
-   * catenated with <CODE>&quot:uncontrollable&quot;</CODE>, with a set of
+   * catenated with <CODE>&quot-uncontrollable&quot;</CODE>, with a set of
    * automata equal to that of the product DES, and without any state
    * information in the trace steps.
    * @param  des          The product DES for which the new trace is
@@ -106,7 +106,7 @@ public final class SafetyTraceElement
   SafetyTraceElement(final ProductDESProxy des,
                      final List<? extends EventProxy> events)
   {
-    this(des.getName() + ":uncontrollable", des, events);
+    this(des.getName() + "-uncontrollable", des, events);
   }
 
 

@@ -416,7 +416,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
     throws Exception
   {
     final ProductDESProxy des = getCompiledDES(filename, bindings, propname);
-    final String name = des.getName() + ":" + propname;
+    final String name = des.getName() + '-' + propname;
     final Collection<EventProxy> events = des.getEvents();
     final Collection<AutomatonProxy> automata =
       new LinkedList<AutomatonProxy>();
@@ -483,11 +483,11 @@ public abstract class AbstractLanguageInclusionCheckerTest
   {
     super.checkCounterExample(des, trace);
     final SafetyTraceProxy counterexample = (SafetyTraceProxy) trace;
-  	
+
     final List<EventProxy> eventlist = counterexample.getEvents();
     final int len = eventlist.size();
     assertTrue("Empty Counterexample!", len > 0);
-  	  	
+
     final Collection<AutomatonProxy> automata = des.getAutomata();
     boolean rejected = false;
     for (final AutomatonProxy aut : automata) {
@@ -541,7 +541,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
             break;
           }
         }
-        if (!found) {        	
+        if (!found) {
           return steps;
         }
       }

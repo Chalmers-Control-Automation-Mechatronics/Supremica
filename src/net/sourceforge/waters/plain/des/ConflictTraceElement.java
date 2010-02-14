@@ -51,7 +51,7 @@ public class ConflictTraceElement
    *                      generated.
    * @param  automata     The set of automata for the new trace,
    *                      or <CODE>null</CODE> if empty.
-   * @param  steps        The list of trace steps consituting the
+   * @param  steps        The list of trace steps constituting the
    *                      new trace. This list may not be empty, because
    *                      the first step must always represent the
    *                      initial state.

@@ -13,7 +13,6 @@ import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -120,7 +119,7 @@ public class NativeConflictChecker
                                final EventProxy marking,
                                final ProductDESProxyFactory factory)
   {
-    super(model, factory);
+    super(model, factory, ConflictKindTranslator.getInstance());
     mMarking = marking;
   }
 
@@ -181,11 +180,6 @@ public class NativeConflictChecker
     return mUsedMarking;
   }
 
-  public KindTranslator getKindTranslator()
-  {
-    return ConflictKindTranslator.getInstance();
-  }
-
 
   //#########################################################################
   //# Native Methods
@@ -193,7 +187,7 @@ public class NativeConflictChecker
 
   public String getTraceName()
   {
-    return getModel().getName() + ":conflicting";
+    return getModel().getName() + "-conflicting";
   }
 
 
@@ -201,6 +195,6 @@ public class NativeConflictChecker
   //# Data Members
   private EventProxy mMarking;
   private EventProxy mUsedMarking;
- private EventProxy mPreconditionMarking;
+  private EventProxy mPreconditionMarking;
 
 }

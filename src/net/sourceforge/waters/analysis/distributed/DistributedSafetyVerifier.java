@@ -36,18 +36,17 @@ public class DistributedSafetyVerifier
   implements SafetyVerifier
 {
   public DistributedSafetyVerifier(final KindTranslator translator,
-				   final ProductDESProxyFactory factory)
+                                   final ProductDESProxyFactory factory)
   {
     this(null, translator, factory);
   }
 
 
   public DistributedSafetyVerifier(final ProductDESProxy model,
-				   final KindTranslator translator,
-				   final ProductDESProxyFactory factory)
+                                   final KindTranslator translator,
+                                   final ProductDESProxyFactory factory)
   {
-    super(model, factory);
-    mKindTranslator = translator;
+    super(model, factory, translator);
   }
 
   public boolean run() throws AnalysisException
@@ -58,12 +57,9 @@ public class DistributedSafetyVerifier
     final String controller = "net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerifierController";
     final ProductDESProxy model = getModel();
     final ProductDESProxyFactory factory = getFactory();
-    final KindTranslator translator = mKindTranslator;
-
-    try
-      {
+    final KindTranslator translator = getKindTranslator();
+    try {
 	final Server server = connectToServer(getHostname(), getPort());
-
 	final SafetyVerificationJob job = new SafetyVerificationJob();
 	job.setName("safety-" + UUID.randomUUID().toString());
 	job.setController(controller);
@@ -247,13 +243,8 @@ public class DistributedSafetyVerifier
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
   public void setKindTranslator(final KindTranslator translator)
   {
-    mKindTranslator = translator;
+    super.setKindTranslator(translator);
     clearAnalysisResult();
-  }
-
-  public KindTranslator getKindTranslator()
-  {
-    return mKindTranslator;
   }
 
   public SafetyTraceProxy getCounterExample()
@@ -347,7 +338,6 @@ public class DistributedSafetyVerifier
   private String mHostname = null;
   private int mPort = 23232;
   private int mNodeCount = 10;
-  private KindTranslator mKindTranslator;
   private File mDumpFile = null;
   private boolean mShutdownAfter = false;
   private int mWalltimeLimit = -1;

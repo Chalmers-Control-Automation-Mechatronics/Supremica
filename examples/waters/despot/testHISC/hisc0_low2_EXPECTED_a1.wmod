@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="hisc0_low2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="hisc0_low2-a1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Automatically generated from 'hisc0_low2' to check SIC Property V with respect to answer event 'a1'.</ns2:Comment>
     <EventDeclList>
         <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":alpha">

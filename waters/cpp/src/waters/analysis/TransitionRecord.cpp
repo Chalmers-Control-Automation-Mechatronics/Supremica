@@ -219,7 +219,6 @@ addNondeterministicTransition(uint32 source, uint32 target)
     setupNondeterministicBuffers();
     const int shift = mAutomaton->getShift();
     const uint32 shiftedtarget = target << shift;
-    // Maybe add check for duplicates here ...
     const uint32 offset = mNumNondeterministicSuccessors[source]++;
     mNondeterministicSuccessorsShifted[source][offset] = shiftedtarget;
   }

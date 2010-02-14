@@ -97,15 +97,14 @@ public class BDDSafetyVerifier
    * @param  translator  The kind translator is used to remap component and
    *                     event kinds.
    * @param  desfactory  The factory used for trace construction.
-   * @param  bddpackage  The name of the BDD packe to be used.
+   * @param  bddpackage  The name of the BDD package to be used.
    */
   public BDDSafetyVerifier(final ProductDESProxy model,
                            final KindTranslator translator,
                            final ProductDESProxyFactory desfactory,
                            final String bddpackage)
   {
-    super(model, desfactory);
-    mKindTranslator = translator;
+    super(model, desfactory, translator);
     mBDDPackage = bddpackage;
     mIsReorderingEnabled =
       bddpackage.equals("buddy") || bddpackage.equals("cudd");
@@ -147,15 +146,10 @@ public class BDDSafetyVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
-  public void setKindTranslator(KindTranslator translator)
+  public void setKindTranslator(final KindTranslator translator)
   {
-    mKindTranslator = translator;
+    super.setKindTranslator(translator);
     clearAnalysisResult();
-  }
-
-  public KindTranslator getKindTranslator()
-  {
-    return mKindTranslator;
   }
 
   public SafetyTraceProxy getCounterExample()
@@ -208,8 +202,9 @@ public class BDDSafetyVerifier
   private void createAutomatonBDDs()
   {
     final ProductDESProxy model = getModel();
+    final KindTranslator translator = getKindTranslator();
     final VariableOrdering ordering =
-      new VariableOrdering(model, mKindTranslator);
+      new VariableOrdering(model, translator);
     if (ordering.getNumSpecs() == 0) {
       setSatisfiedResult();
       return;
@@ -225,7 +220,7 @@ public class BDDSafetyVerifier
     mAutomatonBDDs = new AutomatonBDD[mNumAutomata];
     int index = mNumAutomata;
     for (final AutomatonProxy aut : ordering) {
-      final ComponentKind kind = mKindTranslator.getComponentKind(aut);
+      final ComponentKind kind = translator.getComponentKind(aut);
       index--;
       mAutomatonBDDs[index] = new AutomatonBDD(aut, kind, index, mBDDFactory);
     }
@@ -244,11 +239,12 @@ public class BDDSafetyVerifier
   private void createEventBDDs()
   {
     final ProductDESProxy model = getModel();
+    final KindTranslator translator = getKindTranslator();
     final Collection<EventProxy> events = model.getEvents();
     int numevents = 0;
     int numuncont = 0;
     for (final EventProxy event : events) {
-      switch (mKindTranslator.getEventKind(event)) {
+      switch (translator.getEventKind(event)) {
       case UNCONTROLLABLE:
         numuncont++;
         // fall through ...
@@ -269,7 +265,7 @@ public class BDDSafetyVerifier
     int eventindex = 0;
     for (final EventProxy event : events) {
       final EventBDD eventBDD;
-      switch (mKindTranslator.getEventKind(event)) {
+      switch (translator.getEventKind(event)) {
       case UNCONTROLLABLE:
         eventBDD =
           new UncontrollableEventBDD(event, mNumAutomata, mBDDFactory);
@@ -309,9 +305,9 @@ public class BDDSafetyVerifier
       }
     }
 
-    final Partitioning<ConditionPartitionBDD> condPartitioning = 
+    final Partitioning<ConditionPartitionBDD> condPartitioning =
       new Partitioning<ConditionPartitionBDD>(ConditionPartitionBDD.class);
-    final Partitioning<TransitionPartitionBDD> transPartitioning = 
+    final Partitioning<TransitionPartitionBDD> transPartitioning =
       new Partitioning<TransitionPartitionBDD>(TransitionPartitionBDD.class);
     int condcount = 0;
     int transcount = 0;
@@ -488,9 +484,8 @@ public class BDDSafetyVerifier
 
   //#########################################################################
   //# Data Members
-  private KindTranslator mKindTranslator;
   private String mBDDPackage;
-  private boolean mIsReorderingEnabled;
+  private final boolean mIsReorderingEnabled;
 
   private int mNumAutomata;
   private BDDFactory mBDDFactory;

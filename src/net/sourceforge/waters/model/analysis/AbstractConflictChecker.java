@@ -71,9 +71,7 @@ public abstract class AbstractConflictChecker
                                  final EventProxy marking,
                                  final ProductDESProxyFactory factory)
   {
-    super(model, factory);
-    mMarking = marking;
-    mUsedMarking = null;
+    this(model, marking, null, factory);
   }
 
     /**
@@ -86,8 +84,9 @@ public abstract class AbstractConflictChecker
      *                    <CODE>marking</CODE>, i.e., their list of
      *                    propositions must contain this event (exactly the
      *                    same object).
-     * @param preMarking  The proposition event that defines which states have alpha
-     *						(precondition) markings.
+     * @param preMarking  The proposition event that defines which states have
+     *                    alpha (precondition) markings for a generalised
+     *                    nonblocking check.
      * @param  factory    Factory used for trace construction.
      */
     public AbstractConflictChecker(final ProductDESProxy model,
@@ -95,7 +94,7 @@ public abstract class AbstractConflictChecker
                                    final EventProxy preMarking,
                                    final ProductDESProxyFactory factory)
     {
-      super(model, factory);
+      super(model, factory, ConflictKindTranslator.getInstance());
       mMarking = marking;
       mPreconditionMarking = preMarking;
       mUsedMarking = null;

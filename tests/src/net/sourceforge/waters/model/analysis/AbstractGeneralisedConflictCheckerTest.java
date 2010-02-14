@@ -9,12 +9,15 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.despot.HISCAttributes;
+import net.sourceforge.waters.despot.SICPropertyVBuilder;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -23,6 +26,8 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -31,8 +36,8 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     AbstractConflictCheckerTest
 {
 
-  // #########################################################################
-  // # Entry points in junit.framework.TestCase
+  //#########################################################################
+  //# Entry points in junit.framework.TestCase
   public AbstractGeneralisedConflictCheckerTest()
   {
   }
@@ -42,22 +47,88 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     super(name);
   }
 
+
+  protected void setUp() throws Exception
+  {
+    super.setUp();
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    mBuilder = new SICPropertyVBuilder(factory);
+  }
+
+  protected void tearDown() throws Exception
+  {
+    mBuilder = null;
+    super.tearDown();
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- paper (multi-coloured automata)
+  public void testG1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "generalisedNonblocking";
+    final String name = "g1.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testG2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "generalisedNonblocking";
+    final String name = "g2.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testG3() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "generalisedNonblocking";
+    final String name = "g3.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
+  public void testG4() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "generalisedNonblocking";
+    final String name = "g4.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- SIC Property V
+  public void testSIC5__hisc8_low2__a1() throws Exception
+  {
+    testSICPropertyV("despot", "testHISC", "hisc8_low2.wmod", "a1", true);
+  }
+
+  public void testSIC5__hisc8_low2__a2_2() throws Exception
+  {
+    testSICPropertyV("despot", "testHISC", "hisc8_low2.wmod", "a2:2", false);
+  }
+
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   protected void configureModelVerifier(final ProductDESProxy des)
   {
     super.configureModelVerifier(des);
     final Set<EventProxy> events = des.getEvents();
     // checks that this des does include the precondition marking :alpha
     for (final EventProxy event : events) {
-      if (event.getName().equals(":alpha")
-          && event.getKind().equals(EventKind.PROPOSITION)) {
+      if (event.getName().equals(":alpha") &&
+          event.getKind() == EventKind.PROPOSITION) {
         mAlpha = event;
         final ConflictChecker modelVer = getModelVerifier();
         modelVer.setGeneralisedPrecondition(event);
         return;
       }
     }
-    fail("File, " + des.getName()
-        + ", does not contain a proposition named :alpha.");
+    fail("Model '" + des.getName() +
+         "' does not contain a proposition named :alpha.");
   }
 
   protected void configure(final ModuleCompiler compiler)
@@ -69,9 +140,6 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     compiler.setEnabledPropositionNames(propositions);
   }
 
-  // #########################################################################
-  // # Overrides for abstract base class
-  // # net.sourceforge.waters.analysis.AbstractModelVerifierTest
   /**
    * Checks the correctness of a conflict counterexample. A conflict
    * counterexample has to be a {@link ConflictTraceProxy}, its event sequence
@@ -110,6 +178,51 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     }
   }
 
+
+  //#########################################################################
+  //# Testing SIC Property V
+  private void testSICPropertyV(final String group,
+                                final String subdir,
+                                final String fileName,
+                                final String eventName,
+                                final boolean expect)
+    throws Exception
+  {
+    final File rootdir = getWatersInputRoot();
+    final File groupdir = new File(rootdir, group);
+    final File dir = new File(groupdir, subdir);
+    final File fullName = new File(dir, fileName);
+    final ProductDESProxy origDES = getCompiledDES(fullName);
+    mBuilder.setInputModel(origDES);
+    final EventProxy answer = findAnswerEvent(origDES, eventName);
+    final ProductDESProxy answerDES = mBuilder.createModelForAnswer(answer);
+    final DocumentManager docman = getDocumentManager();
+    final ProxyMarshaller<ProductDESProxy> marshaller =
+      docman.findProxyMarshaller(ProductDESProxy.class);
+    final String ext = marshaller.getDefaultExtension();
+    final File outdir = getOutputDirectory();
+    final String outname = answerDES.getName();
+    final File outfile = new File(outdir, outname + ext);
+    docman.saveAs(answerDES, outfile);
+    runModelVerifier(answerDES, expect);
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private EventProxy findAnswerEvent(final ProductDESProxy des,
+                                     final String eventName)
+  {
+    final EventProxy event = findEvent(des, eventName);
+    final Map<String,String> attribs = event.getAttributes();
+    if (HISCAttributes.getEventType(attribs) !=
+        HISCAttributes.EventType.ANSWER) {
+      fail("The event '" + eventName + "' in model '" + des.getName() +
+           "'is not an answer event!");
+    }
+    return event;
+  }
+
   private Map<AutomatonProxy,StateProxy> getEndState(final ProductDESProxy des,
       final TraceProxy trace)
   {
@@ -125,40 +238,10 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     return tuple;
   }
 
-  // #########################################################################
-  // #Test Cases --- paper (multi-coloured automata)
-  public void testG1() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "generalisedNonblocking";
-    final String name = "g1.wmod";
-    runModelVerifier(group, dir, name, true);
-  }
 
-  public void testG2() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "generalisedNonblocking";
-    final String name = "g2.wmod";
-    runModelVerifier(group, dir, name, true);
-  }
-
-  public void testG3() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "generalisedNonblocking";
-    final String name = "g3.wmod";
-    runModelVerifier(group, dir, name, false);
-  }
-
-  public void testG4() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "generalisedNonblocking";
-    final String name = "g4.wmod";
-    runModelVerifier(group, dir, name, false);
-  }
-
+  //#########################################################################
+  //# Data Members
+  private SICPropertyVBuilder mBuilder;
   private EventProxy mAlpha = null;
 
 }

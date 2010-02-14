@@ -10,6 +10,7 @@
 package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -28,17 +29,34 @@ public abstract class NativeModelVerifier
 
   //#########################################################################
   //# Constructors
-  public NativeModelVerifier(final ProductDESProxyFactory factory)
+  public NativeModelVerifier(final ProductDESProxyFactory factory,
+                             final KindTranslator translator)
   {
-    this(null, factory);
+    this(null, factory, translator);
   }
 
   public NativeModelVerifier(final ProductDESProxy model,
-			     final ProductDESProxyFactory factory)
+                             final ProductDESProxyFactory factory,
+                             final KindTranslator translator)
   {
     super(model, factory);
+    mKindTranslator = translator;
     mExplorerMode = ExplorerMode.BEST_GUESS;
     mResult = null;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
+  public void setKindTranslator(final KindTranslator translator)
+  {
+    mKindTranslator = translator;
+    clearAnalysisResult();
+  }
+
+  public KindTranslator getKindTranslator()
+  {
+    return mKindTranslator;
   }
 
 
@@ -142,6 +160,7 @@ public abstract class NativeModelVerifier
 
   //#########################################################################
   //# Data Members
+  private KindTranslator mKindTranslator;
   private ExplorerMode mExplorerMode;
   private VerificationResult mResult;
 

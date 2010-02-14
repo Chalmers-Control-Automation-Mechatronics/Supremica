@@ -12,7 +12,6 @@ package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
@@ -22,27 +21,26 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 
 
 /**
- * <P>A peculiar type of label block to support blocked events list.</P>
- *
- * <P>In addition to the normal label block, it displayed a label in
- * bold on top of the list.</P>
+ * <P>A peculiar type of label block to support blocked events list.
+ * In addition to the normal label block, it displays a title in
+ * a given font on top of the list.</P>
  *
  * @author Simon Ware
  */
 
-public class LabeledLabelBlockProxyShape
+public class TitledLabelBlockProxyShape
   extends LabelBlockProxyShape
 {
 
   //#########################################################################
   //# Constructor
-  public LabeledLabelBlockProxyShape(final LabelBlockProxy block,
-				     final RoundRectangle2D bounds,
-				     final String name,
-				     final Font font)
+  public TitledLabelBlockProxyShape(final LabelBlockProxy block,
+                                    final RoundRectangle2D bounds,
+                                    final String title,
+                                    final Font font)
   {
     super(block, bounds);
-    mName = name;
+    mTitle = title;
     mFont = font;
   }
 
@@ -56,24 +54,12 @@ public class LabeledLabelBlockProxyShape
 
   public Rectangle2D getBounds2D()
   {
-    final Rectangle2D output = getTitleBounds();
-    return output;
+    return getTitleBounds();
   }
 
   public boolean isClicked(final int x, final int y)
   {
     return super.isClicked(x, y) || getTitleBounds().contains(x, y);
-  }
-
-  public Rectangle2D getTitleBounds()
-  {
-    final Rectangle2D oldShape = getShape().getBounds2D();
-    final Rectangle2D title = mFont.getStringBounds(mName, new FontRenderContext(mFont.getTransform(), false, false));
-    final Rectangle2D output = new Rectangle((int)oldShape.getX(),
-                                             (int)(oldShape.getY() - title.getHeight()),
-                                             (int)title.getWidth(),
-                                             (int)title.getHeight());
-    return output;
   }
 
 
@@ -82,29 +68,39 @@ public class LabeledLabelBlockProxyShape
   public void draw(final Graphics2D g, final RenderingInformation status)
   {
     super.draw(g, status);
-    final int x = (int) getShape().getBounds().getMinX();
-    final int y = (int) getShape().getBounds().getMinY();
+    final Rectangle2D shapeBounds = getShape().getBounds();
+    final int x = (int) shapeBounds.getMinX();
+    final int y = (int) shapeBounds.getMinY();
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-		       RenderingHints.VALUE_ANTIALIAS_ON);
+                       RenderingHints.VALUE_ANTIALIAS_ON);
     g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-		       RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+                       RenderingHints.VALUE_FRACTIONALMETRICS_ON);
     g.setFont(mFont);
     g.setColor(status.getColor());
-    g.drawString(mName, x, y);
+    g.drawString(mTitle, x, y);
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private Rectangle2D getTitleBounds()
+  {
+    final Rectangle2D shapeBounds = getShape().getBounds2D();
+    final double x = shapeBounds.getX();
+    final double y = shapeBounds.getY();
+    final FontRenderContext context =
+      new FontRenderContext(mFont.getTransform(), false, false);
+    final Rectangle2D titleBounds = mFont.getStringBounds(mTitle, context);
+    final double width = titleBounds.getWidth();
+    final double height = titleBounds.getHeight();
+    titleBounds.setRect(x, y - height, width, height);
+    return titleBounds;
   }
 
 
   //#########################################################################
   //# Data Members
-  private final String mName;
+  private final String mTitle;
   private final Font mFont;
-
-
-  //#########################################################################
-  //# Class Constants
-  public static final int DEFAULTARCW = 8;
-  public static final int DEFAULTARCH = 8;
-  public static final int DEFAULTOFFSETX = 0;
-  public static final int DEFAULTOFFSETY = 10;
 
 }

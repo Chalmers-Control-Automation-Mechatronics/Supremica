@@ -22,6 +22,7 @@ import gnu.trove.*;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -38,7 +39,7 @@ import net.sourceforge.waters.xsd.des.ConflictKind;
 /**
  * <P>
  * A monolithic conflict checker implementation purely written in Java. This
- * conflict checker uses explict state enumeration with some optimisation of
+ * conflict checker uses explicit state enumeration with some optimisation of
  * data structures.
  * </P>
  *
@@ -132,12 +133,13 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       mSyncProduct.build();
 
       // Set the marked states coreachable and explore their predecessors.
+      final KindTranslator translator = getKindTranslator();
       final int numstates = mSyncProduct.getNumberOfStates();
       final BitSet coreachable = new BitSet(numstates);
       final EventProxy marking = getUsedMarkingProposition();
       final EventProxy preconditionMarking = getGeneralisedPrecondition();
-      final SyncStateSchema stateSchema =
-          new SyncStateSchema(model, mEventMap, marking, preconditionMarking);
+      final SyncStateSchema stateSchema = new SyncStateSchema
+        (model, translator, mEventMap, marking, preconditionMarking);
       final AutomatonSchema[] automata = stateSchema.getOrdering();
       final int numaut = automata.length;
       final int[] dstate = new int[numaut];
@@ -352,11 +354,12 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     private SyncProduct() throws AnalysisException
     {
       final ProductDESProxy model = getModel();
+      final KindTranslator translator = getKindTranslator();
       final EventProxy marking = getUsedMarkingProposition();
       final EventProxy preconditionMarking = getGeneralisedPrecondition();
       // Create a new state schema for the product.
-      mStateSchema =
-          new SyncStateSchema(model, mEventMap, marking, preconditionMarking);
+      mStateSchema = new SyncStateSchema(model, translator, mEventMap,
+                                         marking, preconditionMarking);
       final int numaut = getNumberOfAutomata();
       mSourceBuffer = new int[numaut];
       mTargetBuffer = new int[numaut];
@@ -644,7 +647,9 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
      * product.
      */
     private SyncStateSchema(final ProductDESProxy model,
-                            final EventMap eventmap, final EventProxy marking,
+                            final KindTranslator translator,
+                            final EventMap eventmap,
+                            final EventProxy marking,
                             final EventProxy preconditionMarking)
         throws OverflowException
     {
@@ -654,7 +659,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       final int numaut = automata.size();
       final List<AutomatonSchema> list = new ArrayList<AutomatonSchema>(numaut);
       for (final AutomatonProxy aut : automata) {
-        switch (aut.getKind()) {
+        switch (translator.getComponentKind(aut)) {
         case PLANT:
         case SPEC:
           final AutomatonSchema schema =

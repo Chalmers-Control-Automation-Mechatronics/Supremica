@@ -31,21 +31,34 @@ public abstract class AbstractModelVerifier
 
   //#########################################################################
   //# Constructors
-  public AbstractModelVerifier(final ProductDESProxyFactory factory)
+  public AbstractModelVerifier(final ProductDESProxyFactory factory,
+                               final KindTranslator translator)
   {
-    this(null, factory);
+    this(null, factory, translator);
   }
 
   public AbstractModelVerifier(final ProductDESProxy model,
-                               final ProductDESProxyFactory factory)
+                               final ProductDESProxyFactory factory,
+                               final KindTranslator translator)
   {
     super(model, factory);
+    mKindTranslator = translator;
     mResult = null;
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
+  public void setKindTranslator(final KindTranslator translator)
+  {
+    mKindTranslator = translator;
+  }
+
+  public KindTranslator getKindTranslator()
+  {
+    return mKindTranslator;
+  }
+
   public boolean isSatisfied()
   {
     if (mResult != null) {
@@ -114,6 +127,7 @@ public abstract class AbstractModelVerifier
 
   //#########################################################################
   //# Data Members
+  private KindTranslator mKindTranslator;
   private VerificationResult mResult;
 
 }

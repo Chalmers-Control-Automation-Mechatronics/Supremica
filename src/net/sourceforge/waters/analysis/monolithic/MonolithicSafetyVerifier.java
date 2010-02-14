@@ -76,8 +76,7 @@ public class MonolithicSafetyVerifier
                                   final KindTranslator translator,
                                   final ProductDESProxyFactory factory)
   {
-    super(model, factory);
-    mKindTranslator = translator;
+    super(model, factory, translator);
   }
 
 
@@ -89,6 +88,7 @@ public class MonolithicSafetyVerifier
     try {
       setUp();
       final ProductDESProxy model = getModel();
+      final KindTranslator translator = getKindTranslator();
 
       Set<StateProxy> stateSet;
       int i, j, k = 0;
@@ -106,7 +106,7 @@ public class MonolithicSafetyVerifier
       final Collection<AutomatonProxy> automata =
         new LinkedList<AutomatonProxy>();
       for (final AutomatonProxy aut : model.getAutomata()) {
-        final ComponentKind kind = mKindTranslator.getComponentKind(aut);
+        final ComponentKind kind = translator.getComponentKind(aut);
         switch (kind) {
         case PLANT:
           mNumPlants++;
@@ -180,7 +180,7 @@ public class MonolithicSafetyVerifier
           }
         }
         // Store all the information by automaton type
-        final ComponentKind kind = mKindTranslator.getComponentKind(ap);
+        final ComponentKind kind = translator.getComponentKind(ap);
         switch (kind) {
         case PLANT:
           mAutomata[ck] = ap;
@@ -235,13 +235,8 @@ public class MonolithicSafetyVerifier
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
   public void setKindTranslator(final KindTranslator translator)
   {
-    mKindTranslator = translator;
+    super.setKindTranslator(translator);
     clearAnalysisResult();
-  }
-
-  public KindTranslator getKindTranslator()
-  {
-    return mKindTranslator;
   }
 
   public SafetyTraceProxy getCounterExample()
@@ -273,6 +268,7 @@ public class MonolithicSafetyVerifier
   private boolean isControllable(final int[] sState)
     throws AnalysisException
   {
+    final KindTranslator translator = getKindTranslator();
     final THashSet<StateTuple> systemSet = new THashSet<StateTuple>();
     boolean enabled = true;
 
@@ -318,7 +314,7 @@ public class MonolithicSafetyVerifier
 
           // Check controllability of current state
           final EventProxy event = mEventCodingList.get(e);
-          final EventKind kind = mKindTranslator.getEventKind(event);
+          final EventKind kind = translator.getEventKind(event);
           if (kind == EventKind.UNCONTROLLABLE) {
             for (i = 0; i < mNumAutomata - mNumPlants; i++) {
               final int si = i + mNumPlants;
@@ -565,8 +561,6 @@ public class MonolithicSafetyVerifier
 
   //#########################################################################
   //# Data Members
-  private KindTranslator mKindTranslator;
-
   // Transition map
   private List<int[][]> mPlantTransitionMap;
   private List<int[][]> mSpecTransitionMap;

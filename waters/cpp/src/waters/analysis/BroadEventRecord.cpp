@@ -483,19 +483,33 @@ void BroadEventRecord::
 dumpTransitionRecords()
   const
 {
-  std::cerr << (const char*) (getName()) << " {";
-  bool first = true;
+  std::cerr << (const char*) (getName()) << " {" << std::endl;
   for (TransitionRecord* trans = getTransitionRecord();
        trans != 0;                                                      
        trans = trans->getNextInSearch()) {
-    if (first) {
-      first = false;
-    } else {
-      std::cerr << ", ";
-    }
     const AutomatonRecord* aut = trans->getAutomaton();
-    std::cerr << (const char*) aut->getName()
-              << " (" << aut->getAutomatonIndex() << ")";
+    std::cerr << "  " << (const char*) aut->getName()
+              << " (" << aut->getAutomatonIndex() << ") [";
+    uint32 numstates = aut->getNumberOfStates();
+    for (uint32 state = 0; state < numstates; state++) {
+      if (state > 0) {
+        std::cerr << ',';
+      }
+      uint32 shifted = trans->getDeterministicSuccessorShifted(state);
+      switch (shifted) {
+      case TransitionRecord::NO_TRANSITION:
+        std::cerr << '-';
+        break;
+      case TransitionRecord::MULTIPLE_TRANSITIONS:
+        std::cerr << '+';
+        break;
+      default:
+        int displacement = aut->getShift();
+        std::cerr << (shifted >> displacement);
+        break;
+      }
+    }
+    std::cerr << ']' << std::endl;
   }  
   std::cerr << "}" << std::endl;
 }

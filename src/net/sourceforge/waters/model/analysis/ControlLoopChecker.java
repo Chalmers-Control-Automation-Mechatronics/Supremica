@@ -27,21 +27,6 @@ public interface ControlLoopChecker extends ModelVerifier
 {
 
   //#########################################################################
-  //# Simple Access Methods
-  /**
-   * Sets a kind translator to be used by this control-loop checker.
-   */
-  public void setKindTranslator(KindTranslator translator);
-
-  /**
-   * Gets the kind translator used by this control-loop checker.
-   * Control-loops can only consist of events labelled controllable by
-   * the kind translator; the component kind is ignored.
-   */
-  public KindTranslator getKindTranslator();
-
-
-  //#########################################################################
   //# More Specific Access to the Results
   public LoopTraceProxy getCounterExample();
 

@@ -46,12 +46,12 @@ public class ModularLanguageInclusionChecker
   extends AbstractModularSafetyVerifier
   implements LanguageInclusionChecker
 {
-  
+
   //#########################################################################
   //# Constructor
-  public ModularLanguageInclusionChecker(ProductDESProxy model,
-                                         ProductDESProxyFactory factory,
-                                         ControllabilityChecker checker)
+  public ModularLanguageInclusionChecker(final ProductDESProxy model,
+                                         final ProductDESProxyFactory factory,
+                                         final ControllabilityChecker checker)
   {
     super(model, factory);
     setKindTranslator(LanguageInclusionKindTranslator.getInstance());
@@ -59,7 +59,7 @@ public class ModularLanguageInclusionChecker
     mStates = 0;
     setNodeLimit(10000000);
   }
-  
+
 
   //#########################################################################
   //# Invocation
@@ -68,7 +68,7 @@ public class ModularLanguageInclusionChecker
   {
     mStates = 0;
     final List<AutomatonProxy> properties = new ArrayList<AutomatonProxy>();
-    final Set<AutomatonProxy> automata = 
+    final Set<AutomatonProxy> automata =
       new HashSet<AutomatonProxy>(getModel().getAutomata().size());
     final KindTranslator translator = getKindTranslator();
     for (final AutomatonProxy automaton : getModel().getAutomata()) {
@@ -84,20 +84,20 @@ public class ModularLanguageInclusionChecker
       }
     }
     Collections.sort(properties, new AutomatonComparator());
-    for (AutomatonProxy p : properties) {
+    for (final AutomatonProxy p : properties) {
       automata.add(p);
-      ProductDESProxy model = 
+      final ProductDESProxy model =
         getFactory().createProductDESProxy("prop", getModel().getEvents(),
                                            automata);
       mChecker.setModel(model);
       mChecker.setKindTranslator(new KindTranslator()
       {
-        public EventKind getEventKind(EventProxy e)
+        public EventKind getEventKind(final EventProxy e)
         {
           return EventKind.UNCONTROLLABLE;
         }
-        
-        public ComponentKind getComponentKind(AutomatonProxy a)
+
+        public ComponentKind getComponentKind(final AutomatonProxy a)
         {
           return properties.contains(a) ? ComponentKind.SPEC : ComponentKind.PLANT;
         }
@@ -113,11 +113,11 @@ public class ModularLanguageInclusionChecker
     setSatisfiedResult();
     return true;
   }
-  
-  protected void addStatistics(VerificationResult result)
+
+  protected void addStatistics(final VerificationResult result)
   {
     result.setNumberOfStates(mStates);
-  } 
+  }
 
 
   //#########################################################################
@@ -129,7 +129,7 @@ public class ModularLanguageInclusionChecker
     final ProductDESProxy des = getModel();
     final String desname = des.getName();
     final String propname = property.getName();
-    final String tracename = desname + ":" + propname;
+    final String tracename = desname + '-' + propname;
     final Collection<AutomatonProxy> automata = counterexample.getAutomata();
     final List<TraceStepProxy> steps = counterexample.getTraceSteps();
     final SafetyTraceProxy wrapper =
@@ -144,7 +144,7 @@ public class ModularLanguageInclusionChecker
   private final static class AutomatonComparator
     implements Comparator<AutomatonProxy>
   {
-    public int compare(AutomatonProxy a1, AutomatonProxy a2)
+    public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       return a1.getName().compareTo(a2.getName());
     }

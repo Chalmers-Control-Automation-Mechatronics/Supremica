@@ -18,11 +18,11 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 
 /**
- * A common superclass for all modular verifiers. This class provides
- * common implmenetations for the {@link
+ * <P>A common superclass for all modular verifiers. This class provides
+ * common implementations for the {@link
  * net.sourceforge.waters.model.analysis.SafetyVerifier SafetyVerifier}
  * interface and enables uniform access to set the heuristic ({@link
- * ModularHeuristic}).
+ * ModularHeuristic}).</P>
  *
  * @author Robi Malik
  */
@@ -31,9 +31,9 @@ abstract class AbstractModularSafetyVerifier
   extends AbstractModelVerifier
   implements SafetyVerifier
 {
- 
+
   //#########################################################################
-  //# Constructor
+  //# Constructors
   public AbstractModularSafetyVerifier(final ProductDESProxy model,
                                        final ProductDESProxyFactory factory)
   {
@@ -44,8 +44,7 @@ abstract class AbstractModularSafetyVerifier
                                        final KindTranslator translator,
                                        final ProductDESProxyFactory factory)
   {
-    super(model, factory);
-    mTranslator = translator;
+    super(model, factory, translator);
     mHeuristicMethod = ModularHeuristicFactory.Method.RelMaxCommonEvents;
     mHeuristicPreference = ModularHeuristicFactory.Preference.NOPREF;
   }
@@ -53,16 +52,6 @@ abstract class AbstractModularSafetyVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
-  public KindTranslator getKindTranslator()
-  {
-    return mTranslator;
-  }
-  
-  public void setKindTranslator(final KindTranslator translator)
-  {
-    mTranslator = translator;
-  }
-
   public ModularHeuristicFactory.Method getHeuristicMethod()
   {
     return mHeuristicMethod;
@@ -96,10 +85,9 @@ abstract class AbstractModularSafetyVerifier
     return (SafetyTraceProxy) super.getCounterExample();
   }
 
-  
+
   //#########################################################################
   //# Data Members
-  private KindTranslator mTranslator;
   private ModularHeuristicFactory.Method mHeuristicMethod;
   private ModularHeuristicFactory.Preference mHeuristicPreference;
 

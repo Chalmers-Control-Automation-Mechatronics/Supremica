@@ -91,9 +91,6 @@ public class SICPropertyVBuilder
 
   /**
    * Builds a model for a given answer event.
-   *
-   * @param answer
-   *          The name of the answer event.
    */
   public ProductDESProxy createModelForAnswer(final EventProxy answer)
   {
@@ -107,51 +104,55 @@ public class SICPropertyVBuilder
       mPreconditionMarking =
           mFactory.createEventProxy(alphaNm, EventKind.PROPOSITION, true);
     }
-    List<AutomatonProxy> newAutomaton = new ArrayList<AutomatonProxy>();
-    // the low level automaton of a model only need modifying once because they
-    // don't depend on the answer event
+    final Collection<AutomatonProxy> oldAutomata = mModel.getAutomata();
+    final int numaut = oldAutomata.size();
+    final List<AutomatonProxy> newAutomata =
+      new ArrayList<AutomatonProxy>(numaut);
+    // The low level automaton of a model only need modifying once because they
+    // don't depend on the answer event.
     if (mLowLevelAutomata == null) {
-      mLowLevelAutomata = new ArrayList<AutomatonProxy>();
-      for (final AutomatonProxy aut : mModel.getAutomata()) {
+      mLowLevelAutomata = new ArrayList<AutomatonProxy>(numaut);
+      for (final AutomatonProxy aut : oldAutomata) {
         if (!HISCAttributes.isInterface(aut.getAttributes())) {
-          newAutomaton.add(createModifiedLowLevelAutomaton(aut));
-
+          newAutomata.add(createModifiedLowLevelAutomaton(aut));
         }
       }
     } else {
-      newAutomaton = new ArrayList<AutomatonProxy>(mLowLevelAutomata);
+      newAutomata.addAll(mLowLevelAutomata);
     }
-    // modifies the models interfaces dependent on the answer event specified
+    // Modifies the model's interfaces dependent on the answer event specified
     for (final AutomatonProxy aut : mModel.getAutomata()) {
       if (HISCAttributes.isInterface(aut.getAttributes())) {
-        newAutomaton.add(createModifiedInterfaceAutomaton(aut, answer));
+        newAutomata.add(createModifiedInterfaceAutomaton(aut, answer));
       }
     }
-    newAutomaton.add(createTestForAnswer(answer));
-
+    newAutomata.add(createTestForAnswer(answer));
     // removes markings from automaton event alphabet
     final List<EventProxy> newEvents =
         removeAlphabetMarkings(mModel.getEvents());
     newEvents.add(mMarking);
     newEvents.add(mPreconditionMarking);
-
+    final String desname = mModel.getName();
+    final String ansname = answer.getName();
+    final String name = desname + '-' + ansname.replace(':', '-');
+    final String comment =
+      "Automatically generated from '" + desname +
+      "' to check SIC Property V with respect to answer event '" + ansname +
+      "'.";
     final ProductDESProxy newModel =
-        mFactory.createProductDESProxy(mModel.getName(), mModel.getComment(),
-                                       mModel.getLocation(), newEvents,
-                                       newAutomaton);
+        mFactory.createProductDESProxy(name, comment, null, newEvents,
+                                       newAutomata);
     return newModel;
   }
 
   /**
    * Removes all proposition markings from a given event alphabet.
-   *
-   * @param events
-   * @return
    */
   private List<EventProxy> removeAlphabetMarkings(final Set<EventProxy> events)
   {
     // removes markings from automaton event alphabet
-    final List<EventProxy> newEvents = new ArrayList<EventProxy>();
+    final int numevents = events.size();
+    final List<EventProxy> newEvents = new ArrayList<EventProxy>(numevents);
     for (final EventProxy event : events) {
       if (event.getKind() != EventKind.PROPOSITION) {
         newEvents.add(event);

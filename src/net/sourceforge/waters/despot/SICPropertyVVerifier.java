@@ -1,3 +1,12 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.despot
+//# CLASS:   SICPropertyVVerifier
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.despot;
 
 import java.util.List;
@@ -5,6 +14,7 @@ import java.util.List;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -14,31 +24,27 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 public class SICPropertyVVerifier extends AbstractModelVerifier
 {
 
-  public SICPropertyVVerifier(final ProductDESProxyFactory factory)
-  {
-    this(null, factory);
-  }
-
-  public SICPropertyVVerifier(final ProductDESProxy model,
+  //#########################################################################
+  //# Constructors
+  public SICPropertyVVerifier(final ConflictChecker checker,
                               final ProductDESProxyFactory factory)
   {
-    super(model, factory);
+    this(checker, null, factory);
   }
 
   public SICPropertyVVerifier(final ConflictChecker checker,
                               final ProductDESProxy model,
                               final ProductDESProxyFactory factory)
   {
-    super(model, factory);
+    super(model, factory, ConflictKindTranslator.getInstance());
     mChecker = checker;
   }
 
-  public void setConflictChecker(final ConflictChecker checker)
-  {
-    mChecker = checker;
-  }
 
-  public boolean run() throws AnalysisException
+  //#########################################################################
+  //# Invocation
+  public boolean run()
+    throws AnalysisException
   {
     final ProductDESProxy model = getModel();
     final SICPropertyVBuilder builder =
@@ -68,6 +74,9 @@ public class SICPropertyVVerifier extends AbstractModelVerifier
     return mFailedAnswer;
   }
 
+
+  //#########################################################################
+  //# Auxiliary Methods
   private void setConflictCheckerMarkings(final SICPropertyVBuilder builder)
   {
     builder.setDefaultMarkings();
@@ -77,9 +86,10 @@ public class SICPropertyVVerifier extends AbstractModelVerifier
     mChecker.setGeneralisedPrecondition(preconditionMark);
   }
 
-  // #########################################################################
-  // # Data Members
-  private ConflictChecker mChecker;
+
+  //#########################################################################
+  //# Data Members
+  private final ConflictChecker mChecker;
 
   private EventProxy mFailedAnswer;
 

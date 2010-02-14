@@ -34,31 +34,19 @@ public abstract class NativeSafetyVerifier
   public NativeSafetyVerifier(final KindTranslator translator,
                               final ProductDESProxyFactory factory)
   {
-    this(null, translator, factory);
+    this(null, factory, translator);
   }
 
   public NativeSafetyVerifier(final ProductDESProxy model,
-                              final KindTranslator translator,
-                              final ProductDESProxyFactory factory)
+                              final ProductDESProxyFactory factory,
+                              final KindTranslator translator)
   {
-    super(model, factory);
-    mKindTranslator = translator;
+    super(model, factory, translator);
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
-  public void setKindTranslator(final KindTranslator translator)
-  {
-    mKindTranslator = translator;
-    clearAnalysisResult();
-  }
-
-  public KindTranslator getKindTranslator()
-  {
-    return mKindTranslator;
-  }
-
   public SafetyTraceProxy getCounterExample()
   {
     return (SafetyTraceProxy) super.getCounterExample();
@@ -75,10 +63,5 @@ public abstract class NativeSafetyVerifier
   public abstract String getTraceComment(final EventProxy event,
                                          final AutomatonProxy aut,
                                          final StateProxy state);
-
-
-  //#########################################################################
-  //# Data Members
-  private KindTranslator mKindTranslator;
 
 }

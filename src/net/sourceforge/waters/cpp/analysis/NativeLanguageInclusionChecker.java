@@ -40,7 +40,7 @@ public class NativeLanguageInclusionChecker
   public NativeLanguageInclusionChecker(final ProductDESProxy model,
                                         final ProductDESProxyFactory factory)
   {
-    super(model, LanguageInclusionKindTranslator.getInstance(), factory);
+    super(model, factory, LanguageInclusionKindTranslator.getInstance());
   }
 
 
@@ -49,7 +49,7 @@ public class NativeLanguageInclusionChecker
   //# net.sourceforge.waters.cpp.analysis.NativeModelVerifier
   public String getTraceName()
   {
-    return getModel().getName() + ":unsafe";
+    return getModel().getName() + "-unsafe";
   }
 
 

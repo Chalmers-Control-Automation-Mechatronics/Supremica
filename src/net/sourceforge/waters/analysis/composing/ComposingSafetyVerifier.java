@@ -47,7 +47,7 @@ import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
 
-public class ComposingSafetyVerifier 
+public class ComposingSafetyVerifier
   extends AbstractModelVerifier
   implements SafetyVerifier {
 
@@ -56,31 +56,24 @@ public class ComposingSafetyVerifier
   public ComposingSafetyVerifier(final KindTranslator translator,
                                  final ProductDESProxyFactory factory)
   {
-    this(null, translator, factory); 
+    this(null, translator, factory);
   }
 
   public ComposingSafetyVerifier(final ProductDESProxy model,
                                  final KindTranslator translator,
-                                 final ProductDESProxyFactory factory) {
-    super(model, factory);     
-    mTranslator = translator; 
-    setNodeLimit(10000000);    
-    setProjectionNodeLimit(3000);    
+                                 final ProductDESProxyFactory factory)
+  {
+    // TODO KindTranslator is not used?
+    super(model, factory, translator);
+    setNodeLimit(10000000);
+    setProjectionNodeLimit(3000);
   }
-  
-  
+
+
   //#########################################################################
   //# Simple Access
   public SafetyTraceProxy getCounterExample() {
     return (SafetyTraceProxy)super.getCounterExample();
-  }
-  
-  public KindTranslator getKindTranslator() {
-    return mTranslator;
-  }
-
-  public void setKindTranslator(KindTranslator trans) {
-    mTranslator = trans;
   }
 
   public int getProjectionNodeLimit()
@@ -96,11 +89,11 @@ public class ComposingSafetyVerifier
   {
     mProjectionNodeLimit = limit;
   }
-  
+
   public String getHeuristic() {
     return mHeuristic;
   }
-  
+
   public void setHeuristic(final String heuristic) {
     mHeuristic = heuristic;
   }
@@ -109,26 +102,26 @@ public class ComposingSafetyVerifier
   //#########################################################################
   //# Invocation
   public boolean run() throws AnalysisException {
-    TimeOut timer = new TimeOut(3600000); 
+    final TimeOut timer = new TimeOut(3600000);
     timer.start();
-    //System.out.println("model events size: "+getModel().getEvents().size());          
+    //System.out.println("model events size: "+getModel().getEvents().size());
     final Composing composing =
       new Composing(getConvertedModel(),
 		                getConvertedKindTranslator(),
-		                getFactory());		                
+		                getFactory());
 		composing.setHeuristic(getHeuristic());
     composing.setNodeLimit(getProjectionNodeLimit());
-    long timeTemp = System.currentTimeMillis();				   
-    ProductDESProxy des = composing.run(); 
+    final long timeTemp = System.currentTimeMillis();
+    final ProductDESProxy des = composing.run();
     System.out.println("Composing is done! Process Time: "+(System.currentTimeMillis()-timeTemp));
     //System.out.println("events size: "+des.getEvents().size());
     //System.out.println("Simplification Time: "+composing.getSimplificationTime());
     //System.out.println("Projection Time: "+composing.getProjectionTime());
-    
+
     saveIntoFile(des);
-    
-    ArrayList<Candidate> candidates = new ArrayList<Candidate>(composing.getCandidates());
-    ArrayList<Set<ASTAutomaton>> astautomata = new ArrayList<Set<ASTAutomaton>>(composing.getASTAutomata());
+
+    final ArrayList<Candidate> candidates = new ArrayList<Candidate>(composing.getCandidates());
+    final ArrayList<Set<ASTAutomaton>> astautomata = new ArrayList<Set<ASTAutomaton>>(composing.getASTAutomata());
     /*
     //Display the composing infomation
     System.out.println(candidates.size()+" candidates:");
@@ -147,7 +140,7 @@ public class ComposingSafetyVerifier
       if (!astautomata.get(i).isEmpty()){
         for (ASTAutomaton a : astautomata.get(i)) {
         System.out.println("Automaton: "+a.getAutomaton().getName());
-        Map<EventProxy,Set<EventProxy>> map = 
+        Map<EventProxy,Set<EventProxy>> map =
         	new HashMap<EventProxy,Set<EventProxy>>(a.getRevents());
         for (EventProxy e : map.keySet()) {
           System.out.println(e.getName()+" replaces:");
@@ -158,28 +151,28 @@ public class ComposingSafetyVerifier
         }
       } else {
       	System.out.println("no ASTAutomaton!!!");
-      }      
+      }
     }*/
-     
+
     final SafetyVerifier checker =
       //new ModularLanguageInclusionChecker(des,getFactory(),
           //new ModularControllabilityChecker(des,getFactory(),new NativeControllabilityChecker(getFactory()),false));
       //new ModularControllabilityChecker(des,getFactory(),new NativeControllabilityChecker(getFactory()),false);
       //new NativeSafetyVerifier(des, getConvertedKindTranslator(),getFactory());
       new BDDSafetyVerifier(des, getConvertedKindTranslator(), getFactory());
-    checker.setNodeLimit(getNodeLimit());        
-    final boolean result = checker.run(); 
+    checker.setNodeLimit(getNodeLimit());
+    final boolean result = checker.run();
     //mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
     mStates = composing.getTotalNumberOfStates();
-    mNodes = (int)checker.getAnalysisResult().getPeakNumberOfNodes();     
+    mNodes = (int)checker.getAnalysisResult().getPeakNumberOfNodes();
     timer.interrupt();
-    
-    if (result) {          
+
+    if (result) {
       return setSatisfiedResult();
     } else {
       final String tracename = getModel().getName() + ":uncontrollable";
       final SafetyTraceProxy counterexample = checker.getCounterExample();
-            
+
       List<EventProxy> composedTrace = new LinkedList<EventProxy>(counterexample.getEvents());
       /*
       System.out.println("old counter example: ");
@@ -187,50 +180,50 @@ public class ComposingSafetyVerifier
 		    System.out.print(composedTrace.get(i).getName()+" --> ");
 		  }
 		  System.out.println();*/
-    
-      if (candidates.isEmpty()) {   
+
+      if (candidates.isEmpty()) {
         return setFailedResult(counterexample);
       }
-      
+
       for (int i=candidates.size()-1;i>=0;i--) {
-        if (!astautomata.isEmpty()) {      
-	        for (ASTAutomaton astaut : astautomata.get(i+1)) {
-	          composedTrace = renovateTrace(composedTrace,astaut);          
+        if (!astautomata.isEmpty()) {
+	        for (final ASTAutomaton astaut : astautomata.get(i+1)) {
+	          composedTrace = renovateTrace(composedTrace,astaut);
 	        }
         }
-        composedTrace = extendTrace(composedTrace,candidates.get(i));        
+        composedTrace = extendTrace(composedTrace,candidates.get(i));
       }
-      
+
       if (!astautomata.isEmpty()) {
-	      for (ASTAutomaton astaut : astautomata.get(0)) {
-	        composedTrace = renovateTrace(composedTrace,astaut);          
+	      for (final ASTAutomaton astaut : astautomata.get(0)) {
+	        composedTrace = renovateTrace(composedTrace,astaut);
 	      }
       }
-      
+
       //decode the manmade event only if model is converted
       composedTrace=convertTrace(composedTrace);
-            
+
       final SafetyTraceProxy extendCounterexample =
-               getFactory().createSafetyTraceProxy(tracename, getModel(), composedTrace); 
+               getFactory().createSafetyTraceProxy(tracename, getModel(), composedTrace);
       return setFailedResult(extendCounterexample);
-    }    
+    }
   }
-  
+
   //Works only for determinstic model
-  private List<EventProxy> renovateTrace(List<EventProxy> oldlist,
-                                         ASTAutomaton astaut) {
-    Map<StateProxy, Set<EventProxy>> stateEvents = 
+  private List<EventProxy> renovateTrace(final List<EventProxy> oldlist,
+                                         final ASTAutomaton astaut) {
+    final Map<StateProxy, Set<EventProxy>> stateEvents =
       new HashMap<StateProxy, Set<EventProxy>>();
-    Map<Key, StateProxy> trans = 
+    final Map<Key, StateProxy> trans =
       new HashMap<Key, StateProxy>();
     StateProxy currstate = null;
-    for (StateProxy s : astaut.getAutomaton().getStates()) {
-      if (s.isInitial()) {          
+    for (final StateProxy s : astaut.getAutomaton().getStates()) {
+      if (s.isInitial()) {
         currstate = s;
       }
       stateEvents.put(s, new HashSet<EventProxy>());
     }
-    for (TransitionProxy t : astaut.getAutomaton().getTransitions()) {
+    for (final TransitionProxy t : astaut.getAutomaton().getTransitions()) {
       stateEvents.get(t.getSource()).add(t.getEvent());
       trans.put(new Key(t.getSource(), t.getEvent()), t.getTarget());
     }
@@ -239,15 +232,15 @@ public class ComposingSafetyVerifier
     for (int i=0; i<oldlist.size(); i++){
       System.out.print(oldlist.get(i).getName()+" --> ");
     }
-    System.out.println();*/    
-    List<EventProxy> newlist = new LinkedList<EventProxy>();
+    System.out.println();*/
+    final List<EventProxy> newlist = new LinkedList<EventProxy>();
     for (int i=0;i<oldlist.size();i++) {
       EventProxy currevent = oldlist.get(i);
       //If the current event is included in this automaton
       if (astaut.getAutomaton().getEvents().contains(currevent)){
         //If the current event is not enabled at the current state
         if (!stateEvents.get(currstate).contains(currevent)) {
-          for (EventProxy e : astaut.getRevents().get(currevent)) {
+          for (final EventProxy e : astaut.getRevents().get(currevent)) {
 		        if (stateEvents.get(currstate).contains(e)) {
 		          currevent = e;
 		        }
@@ -260,7 +253,7 @@ public class ComposingSafetyVerifier
     assert(newlist.size() == oldlist.size());
     return newlist;
   }
-  
+
   //Works for both determinstic and nondeterminstic
   /*
   private List<EventProxy> rTrace(List<EventProxy> oldlist,
@@ -273,9 +266,9 @@ public class ComposingSafetyVerifier
     if (oldlist.size() == 1) {
       //if this automaton contains the current event
       if (astaut.getAutomaton().getEvents().contains(currEvent)) {
-        if (stateEvents.get(cState).contains(currEvent)) {          
+        if (stateEvents.get(cState).contains(currEvent)) {
           return oldlist;
-        } 
+        }
         //if the current event is replaced
         else if (astaut.getRevents().keySet().contains(currEvent)) {
           List<EventProxy> newTrace = new LinkedList<EventProxy>();
@@ -291,7 +284,7 @@ public class ComposingSafetyVerifier
       //if this automaton contains the current event
       if (astaut.getAutomaton().getEvents().contains(currEvent)) {
         if (stateEvents.get(cState).contains(currEvent)) {
-            List<EventProxy> newTrace = new LinkedList<EventProxy>(oldlist);        
+            List<EventProxy> newTrace = new LinkedList<EventProxy>(oldlist);
 			      newTrace.remove(currEvent);
 			      StateProxy target = trans.get(new Key(cState,currEvent));
 			      newTrace = rTrace(newTrace,
@@ -339,8 +332,8 @@ public class ComposingSafetyVerifier
         	return new LinkedList<EventProxy>();
         }
       } else {
-        List<EventProxy> newTrace = new LinkedList<EventProxy>(oldlist);        
-        newTrace.remove(currEvent);        
+        List<EventProxy> newTrace = new LinkedList<EventProxy>(oldlist);
+        newTrace.remove(currEvent);
         newTrace = rTrace(newTrace,
                           cState,
                           stateEvents,
@@ -360,26 +353,26 @@ public class ComposingSafetyVerifier
     return oldlist;
   }*/
 
-  private List<EventProxy> extendTrace(List<EventProxy> eventlist,                                       
-                                       Candidate candidate) {
-    Set<AutomatonProxy> mCompautomata = new HashSet<AutomatonProxy>(candidate.getAllAutomata()); 
-    Set<EventProxy> mOriginalAlphabet = new HashSet<EventProxy>(candidate.getAllEvents());
-    List<Map<StateProxy, Set<EventProxy>>> events =
+  private List<EventProxy> extendTrace(final List<EventProxy> eventlist,
+                                       final Candidate candidate) {
+    final Set<AutomatonProxy> mCompautomata = new HashSet<AutomatonProxy>(candidate.getAllAutomata());
+    final Set<EventProxy> mOriginalAlphabet = new HashSet<EventProxy>(candidate.getAllEvents());
+    final List<Map<StateProxy, Set<EventProxy>>> events =
       new ArrayList<Map<StateProxy, Set<EventProxy>>>(mCompautomata.size());
-    List<Map<Key, StateProxy>> automata =
+    final List<Map<Key, StateProxy>> automata =
       new ArrayList<Map<Key, StateProxy>>(mCompautomata.size());
     List<StateProxy> currstate = new ArrayList<StateProxy>(mCompautomata.size());
-    AutomatonProxy[] aut = new AutomatonProxy[mCompautomata.size()];
+    final AutomatonProxy[] aut = new AutomatonProxy[mCompautomata.size()];
     int i = 0;
-    for (AutomatonProxy proxy : mCompautomata) {
+    for (final AutomatonProxy proxy : mCompautomata) {
       events.add(new HashMap<StateProxy, Set<EventProxy>>(proxy.getStates().size()));
       automata.add(new HashMap<Key, StateProxy>(proxy.getTransitions().size()));
-      Set<EventProxy> autevents = new HashSet<EventProxy>(mOriginalAlphabet);
+      final Set<EventProxy> autevents = new HashSet<EventProxy>(mOriginalAlphabet);
       //System.out.println(autevents);
       autevents.removeAll(proxy.getEvents());
       //System.out.println(autevents);
       int init = 0;
-      for (StateProxy s : proxy.getStates()) {
+      for (final StateProxy s : proxy.getStates()) {
         if (s.isInitial()) {
           init++;
           currstate.add(s);
@@ -387,7 +380,7 @@ public class ComposingSafetyVerifier
         events.get(i).put(s, new HashSet<EventProxy>(autevents));
       }
       assert(init == 1);
-      for (TransitionProxy t : proxy.getTransitions()) {
+      for (final TransitionProxy t : proxy.getTransitions()) {
         events.get(i).get(t.getSource()).add(t.getEvent());
         automata.get(i).put(new Key(t.getSource(), t.getEvent()), t.getTarget());
       }
@@ -397,10 +390,10 @@ public class ComposingSafetyVerifier
     Queue<Place> stateList = new PriorityQueue<Place>();
     Place place = new Place(currstate, null, 0, null);
     stateList.offer(place);
-    List<EventProxy> oldevents = new LinkedList<EventProxy>(eventlist);
+    final List<EventProxy> oldevents = new LinkedList<EventProxy>(eventlist);
     //System.out.println(oldevents);
 
-    Set<Place> visited = new HashSet<Place>();
+    final Set<Place> visited = new HashSet<Place>();
     visited.add(place);
     while (true) {
       place = stateList.poll();
@@ -409,15 +402,15 @@ public class ComposingSafetyVerifier
         break;
       }
       currstate = place.mCurrState;
-      Set<EventProxy> possevents = new HashSet<EventProxy>(candidate.getLocalEvents());
+      final Set<EventProxy> possevents = new HashSet<EventProxy>(candidate.getLocalEvents());
       //System.out.println(mHidden);
       hidden:
-      for (EventProxy pe : possevents) {
+      for (final EventProxy pe : possevents) {
         //System.out.println(pe);
-        List<StateProxy> newstate = new ArrayList<StateProxy>(currstate.size());
+        final List<StateProxy> newstate = new ArrayList<StateProxy>(currstate.size());
         for (i = 0; i < currstate.size(); i++) {
           if (aut[i].getEvents().contains(pe)) {
-            StateProxy t = automata.get(i).get(new Key(currstate.get(i), pe));
+            final StateProxy t = automata.get(i).get(new Key(currstate.get(i), pe));
             //System.out.println(t);
             if (t == null) {
               continue hidden;
@@ -428,17 +421,17 @@ public class ComposingSafetyVerifier
           }
         }
         //System.out.println(newstate);
-        Place newPlace = new Place(newstate, pe, place.mIndex, place);
+        final Place newPlace = new Place(newstate, pe, place.mIndex, place);
         if (visited.add(newPlace)) {
           stateList.offer(newPlace);
         }
       }
-      EventProxy currevent = oldevents.get(place.mIndex);
-      List<StateProxy> newstate = new ArrayList<StateProxy>(currstate.size());
+      final EventProxy currevent = oldevents.get(place.mIndex);
+      final List<StateProxy> newstate = new ArrayList<StateProxy>(currstate.size());
       boolean contains = true;
       for (i = 0; i < currstate.size(); i++) {
         if (aut[i].getEvents().contains(currevent)) {
-          StateProxy t = automata.get(i).get(new Key(currstate.get(i), currevent));
+          final StateProxy t = automata.get(i).get(new Key(currstate.get(i), currevent));
           if (t == null) {
             contains = false;
           }
@@ -447,15 +440,15 @@ public class ComposingSafetyVerifier
           newstate.add(currstate.get(i));
         }
       }
-      Place newPlace = new Place(newstate, currevent, place.mIndex + 1, place);
+      final Place newPlace = new Place(newstate, currevent, place.mIndex + 1, place);
       if (contains && visited.add(newPlace)) {
         stateList.offer(newPlace);
       }
       assert(!stateList.isEmpty());
     }
-    stateList = null;    
+    stateList = null;
     return place.getTrace();
-     
+
   }
 
   private class Place implements Comparable<Place> {
@@ -464,8 +457,8 @@ public class ComposingSafetyVerifier
     public final int mIndex;
     public final Place mParent;
 
-    public Place(List<StateProxy> currState, EventProxy event,
-                  int index, Place parent)
+    public Place(final List<StateProxy> currState, final EventProxy event,
+                  final int index, final Place parent)
     {
       mCurrState = currState;
       mEvent = event;
@@ -478,12 +471,12 @@ public class ComposingSafetyVerifier
       if (mParent == null) {
         return new LinkedList<EventProxy>();
       }
-      List<EventProxy> events = mParent.getTrace();
+      final List<EventProxy> events = mParent.getTrace();
       events.add(mEvent);
       return events;
     }
 
-    public int compareTo(Place other)
+    public int compareTo(final Place other)
     {
       return other.mIndex - mIndex;
     }
@@ -496,9 +489,9 @@ public class ComposingSafetyVerifier
       return hash;
     }
 
-    public boolean equals(Object o)
+    public boolean equals(final Object o)
     {
-      Place p = (Place) o;
+      final Place p = (Place) o;
       return p.mIndex == mIndex && p.mCurrState.equals(mCurrState);
     }
   }
@@ -508,7 +501,7 @@ public class ComposingSafetyVerifier
     private final EventProxy mEvent;
     private final int mHash;
 
-    public Key(StateProxy state, EventProxy event)
+    public Key(final StateProxy state, final EventProxy event)
     {
       int hash = 7;
       hash += state.hashCode() * 31;
@@ -534,42 +527,42 @@ public class ComposingSafetyVerifier
     }
 
   }
-  
+
   protected void addStatistics(final VerificationResult result) {
     result.setNumberOfStates(mStates);
     result.setPeakNumberOfNodes(mNodes);
-    System.out.println("( "+mNodes+" nodes )");    
+    System.out.println("( "+mNodes+" nodes )");
   }
-  
+
   public ProductDESProxy getConvertedModel() {
     return getModel();
   }
-  
+
   public KindTranslator getConvertedKindTranslator() {
     return getKindTranslator();
   }
-  
-  public List<EventProxy> convertTrace(List<EventProxy> trace) {
+
+  public List<EventProxy> convertTrace(final List<EventProxy> trace) {
     return trace;
   }
-  
+
   //################################################################
-  //Convert the Product DES structure into the Module structure and 
+  //Convert the Product DES structure into the Module structure and
   //save it into a file.
-  private void saveIntoFile(ProductDESProxy des) {    
+  private void saveIntoFile(final ProductDESProxy des) {
     try {
-	    final ModuleProxyFactory moduleFactory =  
+	    final ModuleProxyFactory moduleFactory =
 	      ModuleElementFactory.getInstance();
-	    final DocumentManager docManager = 
+	    final DocumentManager docManager =
 	      new DocumentManager();
-	    final OperatorTable optable = 
-	      CompilerOperatorTable.getInstance();	    
+	    final OperatorTable optable =
+	      CompilerOperatorTable.getInstance();
 	    final JAXBModuleMarshaller moduleMarshaller =
-	      new JAXBModuleMarshaller(moduleFactory, optable);	        
-	    docManager.registerMarshaller(moduleMarshaller);	    
-	    final ProductDESImporter pdi = 
+	      new JAXBModuleMarshaller(moduleFactory, optable);
+	    docManager.registerMarshaller(moduleMarshaller);
+	    final ProductDESImporter pdi =
 	      new ProductDESImporter(moduleFactory,docManager);
-	    final ModuleProxy module = pdi.importModule(des);	    
+	    final ModuleProxy module = pdi.importModule(des);
 	    docManager.saveAs(module,new File("composedModel.wmod"));
 	  } catch (final Throwable exception) {
         System.err.println("FATAL ERROR !!!");
@@ -579,8 +572,9 @@ public class ComposingSafetyVerifier
       }
   }
 
-  
-  private KindTranslator mTranslator;
+
+  //#########################################################################
+  //# Data Members
   private int mProjectionNodeLimit;
   private int mStates;
   private int mNodes;

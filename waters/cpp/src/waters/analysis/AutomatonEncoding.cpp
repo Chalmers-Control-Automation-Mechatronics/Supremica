@@ -117,7 +117,7 @@ AutomatonRecord(const jni::AutomatonGlue& aut,
     if (alpha.isNull() || !events.contains(&alpha)) {
       initNonMarking(cache, true);
     } else {
-      mFirstPreMarkedState = 0;
+      mFirstMarkedState = 0;
       mEndPreMarkedStates = mNumStates;
       initMarking(alpha, mFirstPreMarkedState, cache);
     }
@@ -375,10 +375,16 @@ initMarking(const jni::EventGlue& alpha,
     const uint32 code = catindex[cat]++;
     new (&mJavaStates[code]) jni::StateGlue(state);
   }
-  mFirstInitialState1 = catindex[0];
-  mEndInitialStates1 = catindex[2]; 
-  mFirstInitialState2 = catindex[4];
-  mEndInitialStates2 = catindex[6];
+  if (catindex[0] == catindex[2]) {
+    mFirstInitialState1 = catindex[4];
+    mEndInitialStates1 = mFirstInitialState2 = mEndInitialStates2 =
+      catindex[6];
+  } else {
+    mFirstInitialState1 = catindex[0];
+    mEndInitialStates1 = catindex[2]; 
+    mFirstInitialState2 = catindex[4];
+    mEndInitialStates2 = catindex[6];
+  }
   mFirstPreMarkedState = catindex[1];
   mEndPreMarkedStates = catindex[5];
   mFirstMarkedState = catindex[3];

@@ -1,77 +1,81 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis Algorithms
+//# PACKAGE: net.sourceforge.waters.analysis.modular
+//# CLASS:   ParallelModularControllabilityChecker
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.analysis.modular;
 
-import java.util.Iterator;
-import java.util.PriorityQueue;
-import net.sourceforge.waters.model.des.TraceProxy;
-import java.util.Collections;
-import java.util.Queue;
-import net.sourceforge.waters.model.analysis.VerificationResult;
-import java.util.Comparator;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import java.util.ArrayList;
 import java.util.Collection;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
+
 
 public class ParallelModularControllabilityChecker
   extends AbstractModelVerifier
   implements ControllabilityChecker
 {
-  private final ControllabilityChecker mChecker;
-  private ModularHeuristic mHeuristic;
-  private KindTranslator mTranslator;
-  private int mStates;
-  
-  public ParallelModularControllabilityChecker(ProductDESProxy model,
-                                               ProductDESProxyFactory factory,
-                                               ControllabilityChecker checker,
-                                               ModularHeuristic heuristic)
+
+  //#########################################################################
+  //# Constructor
+  public ParallelModularControllabilityChecker(final ProductDESProxy model,
+                                               final ProductDESProxyFactory factory,
+                                               final ControllabilityChecker checker,
+                                               final ModularHeuristic heuristic)
   {
-    super(model, factory);
+    super(model, factory, ControllabilityKindTranslator.getInstance());
     mChecker = checker;
     mHeuristic = heuristic;
-    mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     setNodeLimit(2000000);
   }
-  
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
   public SafetyTraceProxy getCounterExample()
   {
-    return (SafetyTraceProxy)super.getCounterExample();
+    return (SafetyTraceProxy) super.getCounterExample();
   }
-  
-  public KindTranslator getKindTranslator()
-  {
-    return mTranslator;
-  }
-  
-  public void setKindTranslator(KindTranslator trans)
-  {
-    mTranslator = trans;
-  }
-  
+
+
+  //#########################################################################
+  //# Invocation
   public boolean run()
     throws AnalysisException
   {
     mStates = 0;
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
-    final SortedSet<AutomatonProxy> specs = 
+    final SortedSet<AutomatonProxy> specs =
       new TreeSet<AutomatonProxy>(new Comparator<AutomatonProxy>() {
-      public int compare(AutomatonProxy a1, AutomatonProxy a2)
+      public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
       {
         if (a1.getStates().size() < a2.getStates().size()) {
           return -1;
@@ -91,7 +95,7 @@ public class ParallelModularControllabilityChecker
         return a1.getName().compareTo(a2.getName());
       }
     });
-    for (AutomatonProxy automaton : getModel().getAutomata()) {
+    for (final AutomatonProxy automaton : getModel().getAutomata()) {
       switch (getKindTranslator().getComponentKind(automaton)) {
         case PLANT :  plants.add(automaton);
                       break;
@@ -110,7 +114,7 @@ public class ParallelModularControllabilityChecker
       final Queue<ParallelRun> runs = new PriorityQueue<ParallelRun>(specs.size(),
                                                                      new Comparator<ParallelRun>()
       {
-        public int compare(ParallelRun p1, ParallelRun p2)
+        public int compare(final ParallelRun p1, final ParallelRun p2)
         {
           if (p1.mStates < p2.mStates) {
             return -1;
@@ -120,7 +124,7 @@ public class ParallelModularControllabilityChecker
           return 0;
         }
       });
-      for (AutomatonProxy spec : specs) {
+      for (final AutomatonProxy spec : specs) {
         runs.add(new ParallelRun(Collections.singleton(spec),
                                  new HashSet<AutomatonProxy>(),
                                  spec.getStates().size(),
@@ -132,12 +136,12 @@ public class ParallelModularControllabilityChecker
         mChecker.setModel(run.mModel);
         mChecker.setKindTranslator(new KindTranslator()
         {
-          public EventKind getEventKind(EventProxy e)
+          public EventKind getEventKind(final EventProxy e)
           {
             return getKindTranslator().getEventKind(e);
           }
-          
-          public ComponentKind getComponentKind(AutomatonProxy a)
+
+          public ComponentKind getComponentKind(final AutomatonProxy a)
           {
             return specs.contains(a) ? ComponentKind.SPEC
                                      : ComponentKind.PLANT;
@@ -145,24 +149,25 @@ public class ParallelModularControllabilityChecker
         });
         mChecker.setNodeLimit(getNodeLimit() - mStates);
         if (!mChecker.run()) {
-          Set<AutomatonProxy> cplants = 
+          final Set<AutomatonProxy> cplants =
             new HashSet<AutomatonProxy>(run.mPlants);
-          Set<AutomatonProxy> cspecs = 
+          final Set<AutomatonProxy> cspecs =
             new HashSet<AutomatonProxy>(run.mSpecs);
-          Set<EventProxy> events = new HashSet<EventProxy>(run.mModel.getEvents());
-          SortedSet<AutomatonProxy> uncomposedplants = 
-            new TreeSet<AutomatonProxy>(new AutomatonComparator());
-          SortedSet<AutomatonProxy> uncomposedspecplants = 
-            new TreeSet<AutomatonProxy>(new AutomatonComparator());
-          SortedSet<AutomatonProxy> uncomposedspecs = 
-            new TreeSet<AutomatonProxy>(new AutomatonComparator());
+          final Set<EventProxy> events =
+            new HashSet<EventProxy>(run.mModel.getEvents());
+          final SortedSet<AutomatonProxy> uncomposedplants =
+            new TreeSet<AutomatonProxy>();
+          final SortedSet<AutomatonProxy> uncomposedspecplants =
+            new TreeSet<AutomatonProxy>();
+          final SortedSet<AutomatonProxy> uncomposedspecs =
+            new TreeSet<AutomatonProxy>();
           uncomposedplants.addAll(plants);
           uncomposedplants.removeAll(cplants);
           uncomposedspecplants.addAll(specplants);
           uncomposedspecplants.removeAll(cplants);
           uncomposedspecs.addAll(specs);
           uncomposedplants.removeAll(cspecs);
-          Collection<AutomatonProxy> newComp =
+          final Collection<AutomatonProxy> newComp =
             mHeuristic.heur(run.mModel,
                             uncomposedplants,
                             uncomposedspecplants,
@@ -174,9 +179,9 @@ public class ParallelModularControllabilityChecker
             setFailedResult(mChecker.getCounterExample());
             return false;
           }
-          int eventsBefore = events.size();
+          final int eventsBefore = events.size();
           double newStates = mChecker.getAnalysisResult().getTotalNumberOfStates();
-          for (AutomatonProxy automaton : newComp) {
+          for (final AutomatonProxy automaton : newComp) {
             if (specs.contains(automaton)) {
               cspecs.add(automaton);
             } else {
@@ -186,8 +191,8 @@ public class ParallelModularControllabilityChecker
             newStates *= automaton.getStates().size();
             System.out.println(automaton.getName());
           }
-          double numevents = events.size();
-          double newEvents = events.size() - eventsBefore;
+          final double numevents = events.size();
+          final double newEvents = events.size() - eventsBefore;
           newStates -= mChecker.getAnalysisResult().getTotalNumberOfStates();
           newStates *= (newEvents / numevents);
           newStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
@@ -198,8 +203,8 @@ public class ParallelModularControllabilityChecker
             runs.offer(run);
           }
         } else {
-          Collection<AutomatonProxy> changed = new ArrayList<AutomatonProxy>();
-          for (AutomatonProxy automaton : run.mModel.getAutomata()) {
+          final Collection<AutomatonProxy> changed = new ArrayList<AutomatonProxy>();
+          for (final AutomatonProxy automaton : run.mModel.getAutomata()) {
             if (specs.contains(automaton)) {
               System.out.println(mChecker.getAnalysisResult().getTotalNumberOfStates() + " " + automaton.getName() + " size " + automaton.getStates().size());
               specs.remove(automaton);
@@ -216,21 +221,21 @@ public class ParallelModularControllabilityChecker
             }
           }
           System.out.println(thing);*/
-          Iterator<ParallelRun> it = runs.iterator();
-          Collection<ParallelRun> tobeadded = new ArrayList<ParallelRun>();
+          final Iterator<ParallelRun> it = runs.iterator();
+          final Collection<ParallelRun> tobeadded = new ArrayList<ParallelRun>();
           while (it.hasNext()) {
             ParallelRun check = it.next();
-            Collection<AutomatonProxy> changed2 = new ArrayList<AutomatonProxy>(changed);
+            final Collection<AutomatonProxy> changed2 = new ArrayList<AutomatonProxy>(changed);
             changed2.retainAll(check.mSpecs);
             if (!changed2.isEmpty()) {
               it.remove();
-              ParallelRun neo = check(check, changed2);
+              final ParallelRun neo = check(check, changed2);
               if (neo != null) {
                 changed2.retainAll(neo.mSpecs);
                 check = neo;
               }
-              Set<AutomatonProxy> cspecs = new HashSet<AutomatonProxy>(check.mSpecs);
-              Set<AutomatonProxy> cplants = new HashSet<AutomatonProxy>(check.mPlants);
+              final Set<AutomatonProxy> cspecs = new HashSet<AutomatonProxy>(check.mSpecs);
+              final Set<AutomatonProxy> cplants = new HashSet<AutomatonProxy>(check.mPlants);
               cspecs.removeAll(changed2);
               cplants.addAll(changed2);
               tobeadded.add(new ParallelRun(cspecs, cplants, check.mStates,
@@ -248,18 +253,18 @@ public class ParallelModularControllabilityChecker
     setSatisfiedResult();
     return true;
   }
-  
-  private ParallelRun check(ParallelRun run, Collection<AutomatonProxy> changed)
+
+  private ParallelRun check(final ParallelRun run, final Collection<AutomatonProxy> changed)
   {
-    Collection<AutomatonProxy> changed2 = new ArrayList<AutomatonProxy>(changed);
+    final Collection<AutomatonProxy> changed2 = new ArrayList<AutomatonProxy>(changed);
     changed2.removeAll(run.mAdded);
     if (!changed2.isEmpty()) {
       if (run.mParent == null) {
-        Set<AutomatonProxy> empty = Collections.emptySet();
-        Set<EventProxy> emptyE = Collections.emptySet();
+        final Set<AutomatonProxy> empty = Collections.emptySet();
+        final Set<EventProxy> emptyE = Collections.emptySet();
         return new ParallelRun(empty, empty, 0, empty, null, emptyE);
       }
-      ParallelRun ret = check(run.mParent, changed2);
+      final ParallelRun ret = check(run.mParent, changed2);
       if (ret != null) {
         return ret;
       }
@@ -267,66 +272,71 @@ public class ParallelModularControllabilityChecker
     if (run.mCounter == null) {
       return run;
     }
-    for (AutomatonProxy automaton : changed) {
+    for (final AutomatonProxy automaton : changed) {
       if (!AbstractModularHeuristic.acc(automaton, run.mCounter)) {
         return run;
       }
     }
     return null;
   }
-  
-  protected void addStatistics(VerificationResult result)
+
+  protected void addStatistics(final VerificationResult result)
   {
     result.setNumberOfStates(mStates);
   }
-  
+
+
+  //#########################################################################
+  //# Inner Class ParallelRun
   private final class ParallelRun
   {
-    public final ProductDESProxy mModel;
-    public final Set<AutomatonProxy> mSpecs;
-    public final Set<AutomatonProxy> mPlants;
-    public final double mStates;
-    public final Collection<AutomatonProxy> mAdded;
-    public final ParallelRun mParent;
-    public TraceProxy mCounter;
-    
-    public ParallelRun(Set<AutomatonProxy> specs, Set<AutomatonProxy> plants,
-                       double states, Collection<AutomatonProxy> added,
-                       ParallelRun parent, Set<EventProxy> events)
+    private ParallelRun(final Set<AutomatonProxy> specs,
+                       final Set<AutomatonProxy> plants,
+                       final double states,
+                       final Collection<AutomatonProxy> added,
+                       final ParallelRun parent,
+                       final Set<EventProxy> events)
     {
       mSpecs = specs;
       mPlants = plants;
       mStates = states;
       mAdded = added;
       mParent = parent;
-      Collection<AutomatonProxy> model = 
+      final Collection<AutomatonProxy> model =
         new ArrayList<AutomatonProxy>(specs.size() + plants.size());
       model.addAll(specs);
       model.addAll(plants);
       mModel = getFactory().createProductDESProxy("comp", events, model);
     }
-    
+
     public int hashCode()
     {
       return 17 + mSpecs.hashCode() * 31 + mPlants.hashCode() * 31;
     }
-    
-    public boolean equals(Object o)
+
+    public boolean equals(final Object o)
     {
       if (o instanceof ParallelRun) {
-        ParallelRun run = (ParallelRun) o;
+        final ParallelRun run = (ParallelRun) o;
         return mSpecs.equals(run.mSpecs) && mPlants.equals(run.mPlants);
       }
       return false;
     }
+
+    private final ProductDESProxy mModel;
+    private final Set<AutomatonProxy> mSpecs;
+    private final Set<AutomatonProxy> mPlants;
+    private final double mStates;
+    private final Collection<AutomatonProxy> mAdded;
+    private final ParallelRun mParent;
+    private TraceProxy mCounter;
   }
-  
-  private final static class AutomatonComparator
-    implements Comparator<AutomatonProxy>
-  {
-    public int compare(AutomatonProxy a1, AutomatonProxy a2)
-    {
-      return a1.getName().compareTo(a2.getName());
-    }
-  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final ControllabilityChecker mChecker;
+  private final ModularHeuristic mHeuristic;
+  private int mStates;
+
 }

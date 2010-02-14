@@ -26,22 +26,6 @@ public interface SafetyVerifier extends ModelVerifier
 {
 
   //#########################################################################
-  //# Simple Access Methods
-  /**
-   * Sets a kind translator to be used by this model verifier.
-   */
-  public void setKindTranslator(KindTranslator translator);
-
-  /**
-   * Gets the kind translator used by this model verifier.
-   * The kind translator is used to remap component and event kinds
-   * for the sake of a single algorithm, and thus implement different
-   * checks using the same code.
-   */
-  public KindTranslator getKindTranslator();
-
-
-  //#########################################################################
   //# More Specific Access to the Results
   public SafetyTraceProxy getCounterExample();
 

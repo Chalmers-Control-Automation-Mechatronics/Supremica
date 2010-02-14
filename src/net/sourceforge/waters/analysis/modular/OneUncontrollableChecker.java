@@ -12,7 +12,6 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
@@ -34,59 +33,53 @@ public class OneUncontrollableChecker
   extends AbstractModelVerifier
   implements ControllabilityChecker
 {
-  private final ControllabilityChecker mChecker;
-  private KindTranslator mTranslator;
-  private int mStates;
-  
-  public OneUncontrollableChecker(ProductDESProxy model,
-                                  ProductDESProxyFactory factory,
-                                  ControllabilityChecker checker)
+
+  //#########################################################################
+  //# Constructors
+  public OneUncontrollableChecker(final ProductDESProxy model,
+                                  final ProductDESProxyFactory factory,
+                                  final ControllabilityChecker checker)
   {
-    super(model, factory);
+    super(model, factory, ControllabilityKindTranslator.getInstance());
     mChecker = checker;
-    mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     setNodeLimit(5000000);
   }
-  
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
   public SafetyTraceProxy getCounterExample()
   {
     return (SafetyTraceProxy)super.getCounterExample();
   }
-  
-  public KindTranslator getKindTranslator()
-  {
-    return mTranslator;
-  }
-  
-  public void setKindTranslator(KindTranslator trans)
-  {
-    mTranslator = trans;
-  }
-  
+
+
+  //#########################################################################
+  //# Invocation
   public boolean run()
     throws AnalysisException
   {
     mStates = 0;
-    List<EventProxy> uncontrollables = new ArrayList<EventProxy>();
+    final List<EventProxy> uncontrollables = new ArrayList<EventProxy>();
     for (final EventProxy event : getModel().getEvents()) {
       if (getKindTranslator().getEventKind(event) ==
           EventKind.UNCONTROLLABLE) {
         uncontrollables.add(event);
       }
     }
-    Collections.sort(uncontrollables, new EventComparator());
+    Collections.sort(uncontrollables);
     for (final EventProxy event : uncontrollables) {
       mChecker.setModel(getModel());
       mChecker.setKindTranslator(new KindTranslator()
       {
-        public EventKind getEventKind(EventProxy e)
+        public EventKind getEventKind(final EventProxy e)
         {
           return e.equals(event) ? EventKind.UNCONTROLLABLE
                                  : EventKind.CONTROLLABLE;
         }
-        
-        public ComponentKind getComponentKind(AutomatonProxy a)
+
+        public ComponentKind getComponentKind(final AutomatonProxy a)
         {
           if (getKindTranslator().getComponentKind(a) == ComponentKind.SPEC) {
             if (!a.getEvents().contains(event)) {
@@ -111,18 +104,19 @@ public class OneUncontrollableChecker
     setSatisfiedResult();
     return true;
   }
-  
-  protected void addStatistics(VerificationResult result)
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  protected void addStatistics(final VerificationResult result)
   {
     result.setNumberOfStates(mStates);
   }
-  
-  private final static class EventComparator
-    implements Comparator<EventProxy>
-  {
-    public int compare(EventProxy a1, EventProxy a2)
-    {
-      return a1.getName().compareTo(a2.getName());
-    }
-  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final ControllabilityChecker mChecker;
+  private int mStates;
+
 }

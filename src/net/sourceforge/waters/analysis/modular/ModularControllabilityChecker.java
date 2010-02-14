@@ -46,13 +46,13 @@ public class ModularControllabilityChecker
   extends AbstractModularSafetyVerifier
   implements ControllabilityChecker
 {
- 
+
   //#########################################################################
   //# Constructor
-  public ModularControllabilityChecker(ProductDESProxy model,
-                                       ProductDESProxyFactory factory,
-                                       ControllabilityChecker checker,
-                                       boolean least)
+  public ModularControllabilityChecker(final ProductDESProxy model,
+                                       final ProductDESProxyFactory factory,
+                                       final ControllabilityChecker checker,
+                                       final boolean least)
   {
     super(model, factory);
     setKindTranslator(ControllabilityKindTranslator.getInstance());
@@ -61,8 +61,8 @@ public class ModularControllabilityChecker
     mLeast = least;
     setNodeLimit(2000000);
   }
-  
-  
+
+
   //#########################################################################
   //# Invocation
   public boolean run()
@@ -72,9 +72,9 @@ public class ModularControllabilityChecker
     mChecker.setNodeLimit(getNodeLimit());
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
-    final SortedSet<AutomatonProxy> specs = 
+    final SortedSet<AutomatonProxy> specs =
       new TreeSet<AutomatonProxy>(new Comparator<AutomatonProxy>() {
-      public int compare(AutomatonProxy a1, AutomatonProxy a2)
+      public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
       {
         if (a1.getStates().size() < a2.getStates().size()) {
           return -1;
@@ -94,7 +94,7 @@ public class ModularControllabilityChecker
         return a1.getName().compareTo(a2.getName());
       }
     });
-    for (AutomatonProxy automaton : getModel().getAutomata()) {
+    for (final AutomatonProxy automaton : getModel().getAutomata()) {
       switch (getKindTranslator().getComponentKind(automaton)) {
         case PLANT :  plants.add(automaton);
                       break;
@@ -104,15 +104,15 @@ public class ModularControllabilityChecker
       }
     }
     while (!specs.isEmpty()) {
-      Collection<AutomatonProxy> composition = new ArrayList<AutomatonProxy>();
-      Set<EventProxy> events = new HashSet<EventProxy>();
-      SortedSet<AutomatonProxy> uncomposedplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());
-      SortedSet<AutomatonProxy> uncomposedspecplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());
-      SortedSet<AutomatonProxy> uncomposedspecs = new TreeSet<AutomatonProxy>(new AutomatonComparator());
+      final Collection<AutomatonProxy> composition = new ArrayList<AutomatonProxy>();
+      final Set<EventProxy> events = new HashSet<EventProxy>();
+      final SortedSet<AutomatonProxy> uncomposedplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());
+      final SortedSet<AutomatonProxy> uncomposedspecplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());
+      final SortedSet<AutomatonProxy> uncomposedspecs = new TreeSet<AutomatonProxy>(new AutomatonComparator());
       uncomposedplants.addAll(plants);
       uncomposedspecplants.addAll(specplants);
       uncomposedspecs.addAll(specs);
-      AutomatonProxy spec = mLeast ? specs.first() : specs.last();
+      final AutomatonProxy spec = mLeast ? specs.first() : specs.last();
       composition.add(spec);
       events.addAll(spec.getEvents());
       uncomposedspecs.remove(spec);
@@ -121,12 +121,12 @@ public class ModularControllabilityChecker
       mChecker.setModel(comp);
       mChecker.setKindTranslator(new KindTranslator()
       {
-        public EventKind getEventKind(EventProxy e)
+        public EventKind getEventKind(final EventProxy e)
         {
           return getKindTranslator().getEventKind(e);
         }
-        
-        public ComponentKind getComponentKind(AutomatonProxy a)
+
+        public ComponentKind getComponentKind(final AutomatonProxy a)
         {
           return specs.contains(a) ? ComponentKind.SPEC
                                    : ComponentKind.PLANT;
@@ -135,7 +135,7 @@ public class ModularControllabilityChecker
       final ModularHeuristic heuristic = getHeuristic();
       while (!mChecker.run()) {
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-        Collection<AutomatonProxy> newComp =
+        final Collection<AutomatonProxy> newComp =
           heuristic.heur(comp,
                          uncomposedplants,
                          uncomposedspecplants,
@@ -146,7 +146,7 @@ public class ModularControllabilityChecker
           setFailedResult(mChecker.getCounterExample());
           return false;
         }
-        for (AutomatonProxy automaton : newComp) {
+        for (final AutomatonProxy automaton : newComp) {
           composition.add(automaton);
           uncomposedplants.remove(automaton);
           uncomposedspecplants.remove(automaton);
@@ -157,7 +157,7 @@ public class ModularControllabilityChecker
         mChecker.setModel(comp);
       }
       mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-      for (AutomatonProxy automaton : composition) {
+      for (final AutomatonProxy automaton : composition) {
         if (specs.contains(automaton)) {
           specs.remove(automaton);
           specplants.add(automaton);
@@ -177,7 +177,7 @@ public class ModularControllabilityChecker
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
     final String desname = des.getName();
-    final String tracename = desname + ":uncontrollable";
+    final String tracename = desname + "-uncontrollable";
     final Collection<AutomatonProxy> automata = counterexample.getAutomata();
     final List<TraceStepProxy> steps = counterexample.getTraceSteps();
     final SafetyTraceProxy wrapper =
@@ -185,25 +185,25 @@ public class ModularControllabilityChecker
                                      des, automata, steps);
     return super.setFailedResult(wrapper);
   }
-  
-  protected void addStatistics(VerificationResult result)
+
+  protected void addStatistics(final VerificationResult result)
   {
     result.setNumberOfStates(mStates);
   }
 
-  
+
   //#########################################################################
   //# Inner Class AutomatonComparator
   private final static class AutomatonComparator
     implements Comparator<AutomatonProxy>
   {
-    public int compare(AutomatonProxy a1, AutomatonProxy a2)
+    public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       return a1.getName().compareTo(a2.getName());
     }
   }
 
-  
+
   //#########################################################################
   //# Data Members
   private final ControllabilityChecker mChecker;

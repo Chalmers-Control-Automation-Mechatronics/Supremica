@@ -71,8 +71,7 @@ public class MonolithicControlLoopChecker
                                       final KindTranslator translator,
                                       final ProductDESProxyFactory factory)
   {
-    super(model, factory);
-    mKindTranslator = translator;
+    super(model, factory, translator);
   }
 
 
@@ -127,13 +126,8 @@ public class MonolithicControlLoopChecker
   //# Interface net.sourceforge.waters.model.analysis.ControlLoopChecker
   public void setKindTranslator(final KindTranslator translator)
   {
-    mKindTranslator = translator;
+    super.setKindTranslator(translator);
     clearAnalysisResult();
-  }
-
-  public KindTranslator getKindTranslator()
-  {
-    return mKindTranslator;
   }
 
   /**
@@ -173,6 +167,7 @@ public class MonolithicControlLoopChecker
   {
     super.setUp();
     final ProductDESProxy des = getModel();
+    final KindTranslator translator = getKindTranslator();
 
     mControlLoopFree = true;
     mAutomataList = new ArrayList<AutomatonProxy>();
@@ -181,7 +176,7 @@ public class MonolithicControlLoopChecker
 
     // create Automaton list
     for (final AutomatonProxy aProxy : des.getAutomata()) {
-      final ComponentKind kind = mKindTranslator.getComponentKind(aProxy);
+      final ComponentKind kind = translator.getComponentKind(aProxy);
       switch (kind) {
       case PLANT:
       case SPEC:
@@ -196,7 +191,7 @@ public class MonolithicControlLoopChecker
     // list only controllable and uncontrollable events
     mNumConEvent = 0;
     for (final EventProxy eProxy: des.getEvents()) {
-      final EventKind kind = mKindTranslator.getEventKind(eProxy);
+      final EventKind kind = translator.getEventKind(eProxy);
       switch (kind) {
       case CONTROLLABLE:
         // controllable event: put it in the beginning of the list
@@ -267,7 +262,7 @@ public class MonolithicControlLoopChecker
     mGlobalEventMap = new boolean[mNumEvent];
     for (int i = 0; i < mNumEvent; i++) {
       final EventProxy event = mEventList.get(i);
-      final EventKind kind = mKindTranslator.getEventKind(event);
+      final EventKind kind = translator.getEventKind(event);
       if (kind == EventKind.CONTROLLABLE) {
         mGlobalEventMap[i] = true;
       }
@@ -465,7 +460,7 @@ public class MonolithicControlLoopChecker
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
     final String desname = des.getName();
-    final String tracename = desname + ":has a control loop";
+    final String tracename = desname + "-loop";
     final List<EventProxy> tracelist = new LinkedList<EventProxy>();
 
     /* FIND COUNTEREXAMPLE TRACE HERE */
@@ -747,8 +742,6 @@ public class MonolithicControlLoopChecker
 
   //#########################################################################
   //# Data Members
-  private KindTranslator mKindTranslator;
-
   /** a sentinel that states if the model is control loop free. */
   private boolean mControlLoopFree;
 
@@ -770,7 +763,7 @@ public class MonolithicControlLoopChecker
   /** a list of transitions in the model */
   private ArrayList<ArrayList<TransitionProxy>> mTransitionList;
 
-  /** a map of state tuple in synchronized model */
+  /** a map of state tuple in synchronised model */
   private StateHashSet mGlobalStateSet;
 
   /** a list of unvisited state tuple. */

@@ -1,3 +1,12 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.despot
+//# CLASS:   SICPropertyVVerifierTest
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.despot;
 
 import java.io.File;
@@ -10,8 +19,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
+import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
+import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -43,6 +54,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
 {
 
+  //#########################################################################
+  //# Test Cases
   public void testConflictChecker_parManEg_I_mfb_lowlevel() throws Exception
   {
     testConflictChecker("tests", "hisc", "parManEg_I_mfb_lowlevel", true);
@@ -217,7 +230,7 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
                            + answer.getName()
                            + " gives "
                            + result
-                           + " but this model should have satisified SICPropertyV, therefore all "
+                           + " but this model should have satisfied SICPropertyV, therefore all "
                            + "answer events should produce true as a result!",
                        expectedResult, result);
         } else if (!expectedResult) {
@@ -234,16 +247,13 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
       saveCounterExample(counterexample);
       assertEquals(
                    "Wrong result from model checker: all answers in the model give true as a result "
-                       + " but this model should not satisify SICPropertyV, therefore atleast one answer "
+                       + " but this model should not satisfy SICPropertyV, therefore atleast one answer "
                        + "event should have produced a false result!",
                    !expectedResult, !falseFound);
     }
-    mPropertyVerifier.setConflictChecker(conflictChecker);
     final boolean finalResult = mPropertyVerifier.run();
-    assertEquals(
-                 "Wrong result from SIC Property V Verifier: the expected result was "
-                     + expectedResult + " but got " + finalResult + ".",
-                 finalResult, expectedResult);
+    assertEquals("Wrong result from SIC Property V Verifier.",
+                 expectedResult, finalResult);
   }
 
   protected File saveCounterExample(final TraceProxy counterexample)
@@ -255,7 +265,7 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
     final StringBuffer buffer = new StringBuffer(name);
     buffer.append(ext);
     final String extname = buffer.toString();
-    assertTrue("File name '" + extname + "' contains colon, "
+    assertTrue("File name '" + extname + "' contains a colon, "
         + "which does not work on all platforms!", extname.indexOf(':') < 0);
     final File dir = getOutputDirectory();
     final File filename = new File(dir, extname);
@@ -300,8 +310,8 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
   protected ModelVerifier createModelVerifier(
                                               final ProductDESProxyFactory factory)
   {
-    mPropertyVerifier = new SICPropertyVVerifier(factory);
-    return mPropertyVerifier;
+    final ConflictChecker checker = createConflictChecker(factory);
+    return new SICPropertyVVerifier(checker, factory);
   }
 
   /**
@@ -465,6 +475,40 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
                                         states, null);
   }
 
+
+  //#########################################################################
+  //# Auxiliary Methods
+  /**
+   * <P>
+   * Creates a low-level conflict checker for counterexample verification
+   * used for SIC property V verification.
+   * </P>
+   * <P>
+   * Depending on the size of the model, this language inclusion check may be a
+   * difficult problem on its own. This default implementation returns a
+   * {@link NativeConfloctChecker} if available, otherwise resorts to a
+   * {@link MonolithicConflictChecker.} This should be enough for the
+   * test cases contained in this class. Subclasses that involve more advanced
+   * conflict checkers with larger tests may have to override this method.
+   * </P>
+   */
+  protected ConflictChecker createConflictChecker
+    (final ProductDESProxyFactory factory)
+  {
+    if (mConflictChecker == null) {
+      try {
+        //mConflictChecker = new MonolithicConflictChecker(factory);
+        mConflictChecker = new NativeConflictChecker(factory);
+      } catch (final NoClassDefFoundError exception) {
+        mConflictChecker = new MonolithicConflictChecker(factory);
+      } catch (final UnsatisfiedLinkError exception) {
+        mConflictChecker = new MonolithicConflictChecker(factory);
+      }
+    }
+    return mConflictChecker;
+  }
+
+
   // #########################################################################
   // # Overrides for junit.framework.TestCase
   protected void setUp() throws Exception
@@ -484,7 +528,9 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mBuilder = new SICPropertyVBuilder(mProductDESFactory);
-    mPropertyVerifier = new SICPropertyVVerifier(mProductDESFactory);
+    mConflictChecker = createConflictChecker(mProductDESFactory);
+    mPropertyVerifier =
+      new SICPropertyVVerifier(mConflictChecker, mProductDESFactory);
   }
 
   protected void tearDown() throws Exception
@@ -497,12 +543,14 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
     mTraceMarshaller = null;
     mDocumentManager = null;
     mBuilder = null;
+    mConflictChecker = null;
+    mPropertyVerifier = null;
     super.tearDown();
   }
 
-  // #########################################################################
-  // # Data Members
 
+  //#########################################################################
+  //# Data Members
   private File mInputDirectory;
   // private File mOutputDirectory;
   private ProductDESProxyFactory mProductDESFactory;
@@ -511,6 +559,7 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
   private JAXBTraceMarshaller mTraceMarshaller;
   private DocumentManager mDocumentManager;
   private SICPropertyVBuilder mBuilder;
+  private ConflictChecker mConflictChecker;
   private SICPropertyVVerifier mPropertyVerifier;
 
 }

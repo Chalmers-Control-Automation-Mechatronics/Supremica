@@ -346,7 +346,7 @@ public class ProxyShapeProducer
       if (eshape != null) {
         shape = new LabelBlockProxyShape(block, bounds);
       } else {
-        shape = new LabeledLabelBlockProxyShape
+        shape = new TitledLabelBlockProxyShape
           (block, bounds, BLOCKED_HEADER, EditorColor.HEADER_FONT);
       }
       mMap.put(block, shape);

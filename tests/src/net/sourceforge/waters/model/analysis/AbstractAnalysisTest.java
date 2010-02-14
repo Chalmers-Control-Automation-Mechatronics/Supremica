@@ -60,6 +60,8 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(modmarshaller);
+    mDocumentManager.registerMarshaller(mProductDESMarshaller);
+    mDocumentManager.registerMarshaller(modmarshaller);
   }
 
 
@@ -152,6 +154,6 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
   private ProductDESProxyFactory mProductDESProxyFactory;
   private ModuleProxyFactory mModuleProxyFactory;
   private JAXBProductDESMarshaller mProductDESMarshaller;
-  private DocumentManager mDocumentManager;	
+  private DocumentManager mDocumentManager;
 
 }
