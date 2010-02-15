@@ -55,8 +55,8 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     AbstractConflictCheckerTest
 {
 
-  // #########################################################################
-  // # Test Cases
+  //#########################################################################
+  //# Test Cases
   public void testSICPropertyVVerifier_parManEg_I_mfb_lowlevel()
       throws Exception
   {
@@ -156,6 +156,8 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     runModelVerifier("despot", "testHISC", "hisc9_low2.wmod", false);
   }
 
+  /*
+   * These are too big---must go into 'large' test ...
   public void testSICPropertyVVerifier_aip3_syn_as1() throws Exception
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "as1.wmod", true);
@@ -195,7 +197,11 @@ public abstract class AbstractSICPropertyVVerifierTest extends
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "tu4.wmod", true);
   }
+   */
 
+
+  //#########################################################################
+  //# General Testing Methods
   /*
    * void testConflictChecker(final String group, final String subdir, final
    * String name, final boolean expectedResult) throws Exception { final
