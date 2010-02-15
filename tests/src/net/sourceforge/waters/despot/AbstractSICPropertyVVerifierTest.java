@@ -51,7 +51,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public class AbstractSICPropertyVVerifierTest extends
+public abstract class AbstractSICPropertyVVerifierTest extends
     AbstractConflictCheckerTest
 {
 
@@ -111,7 +111,7 @@ public class AbstractSICPropertyVVerifierTest extends
   /*
    * public void testSICPropertyVVerifier_hisc13_low1() throws Exception {
    * runModelVerifier("despot", "testHISC", "hisc13_low1.wmod", false); }
-   * 
+   *
    * public void testSICPropertyVVerifier_hisc13_low2() throws Exception {
    * runModelVerifier("despot", "testHISC", "hisc13_low2.wmod", true); }
    */
@@ -202,32 +202,32 @@ public class AbstractSICPropertyVVerifierTest extends
    * Collection<EventProxy> answerEvents = getModelAnswerEvents(group, subdir,
    * name); boolean falseFound = false; MonolithicConflictChecker
    * conflictChecker = null;
-   * 
+   *
    * for (final EventProxy answer : answerEvents) { final ProductDESProxy
    * modifiedDES = mBuilder.createModelForAnswer(answer); final EventProxy
    * defaultMark = mBuilder.getMarkingProposition(); final EventProxy
    * preconditionMark = mBuilder.getGeneralisedPrecondition(); conflictChecker =
    * new MonolithicConflictChecker(modifiedDES, defaultMark, preconditionMark,
    * mProductDESFactory); final boolean result = conflictChecker.run();
-   * 
+   *
    * if (!result) { final ConflictTraceProxy counterexample =
    * conflictChecker.getCounterExample();
    * precheckCounterExample(counterexample); final File traceFilename =
    * saveCounterExample(counterexample);
    * counterexample.setLocation(traceFilename.toURI());
-   * 
+   *
    * final ConflictTraceProxy convertedTrace =
    * mBuilder.convertTraceToOriginalModel(counterexample, answer);
    * checkConvertedCounterExample(mBuilder.getUnchangedModel(), convertedTrace,
    * answer);
-   * 
+   *
    * if (expectedResult) { assertEquals(
    * "Wrong result from model checker: the answer " + answer.getName() +
    * " gives " + result +
    * " but this model should have satisfied SICPropertyV, therefore all " +
    * "answer events should produce true as a result!", expectedResult, result);
    * } else if (!expectedResult) { falseFound = true; } break; }
-   * 
+   *
    * } if (!expectedResult && !falseFound) { final ConflictTraceProxy
    * counterexample = conflictChecker.getCounterExample();
    * precheckCounterExample(counterexample); saveCounterExample(counterexample);
@@ -369,7 +369,7 @@ public class AbstractSICPropertyVVerifierTest extends
    * interfaces in a state where the answer in question is enabled. Furthermore,
    * when a state has a nondeterministic choice it is verified whether the
    * counter example includes correct state information.
-   * 
+   *
    * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
    * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
    */
