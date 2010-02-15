@@ -51,151 +51,198 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
+public class AbstractSICPropertyVVerifierTest extends
+    AbstractConflictCheckerTest
 {
 
-  //#########################################################################
-  //# Test Cases
-  public void testConflictChecker_parManEg_I_mfb_lowlevel() throws Exception
+  // #########################################################################
+  // # Test Cases
+  public void testSICPropertyVVerifier_parManEg_I_mfb_lowlevel()
+      throws Exception
   {
-    testConflictChecker("tests", "hisc", "parManEg_I_mfb_lowlevel", true);
+    runModelVerifier("tests", "hisc", "parManEg_I_mfb_lowlevel.wmod", true);
   }
 
   // SimpleManufacturingExample
-  public void testConflictChecker_Manuf_Cells() throws Exception
+  public void testSICPropertyVVerifier_Manuf_Cells() throws Exception
   {
-    testConflictChecker("despot", "simpleManufacturingExample", "Manuf-Cells",
-                        true);
+    runModelVerifier("despot", "simpleManufacturingExample",
+                     "Manuf-Cells.wmod", true);
   }
 
   // testHISC
-  public void testConflictChecker_hisc0_low1() throws Exception
+  public void testSICPropertyVVerifier_hisc0_low1() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc0_low1", true);
+    runModelVerifier("despot", "testHISC", "hisc0_low1.wmod", true);
   }
 
-  public void testConflictChecker_hisc0_low2() throws Exception
+  public void testSICPropertyVVerifier_hisc0_low2() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc0_low2", true);
+    runModelVerifier("despot", "testHISC", "hisc0_low2.wmod", true);
   }
 
   // testHISC1
-  public void testConflictChecker_hisc1_low1() throws Exception
+  public void testSICPropertyVVerifier_hisc1_low1() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc1_low1", true);
+    runModelVerifier("despot", "testHISC", "hisc1_low1.wmod", true);
   }
 
-  public void testConflictChecker_hisc1_low2() throws Exception
+  public void testSICPropertyVVerifier_hisc1_low2() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc1_low2", true);
+    runModelVerifier("despot", "testHISC", "hisc1_low2.wmod", true);
   }
 
   // testHISC10
-  public void testConflictChecker_hisc10_low1() throws Exception
+  public void testSICPropertyVVerifier_hisc10_low1() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc10_low1", true);
+    runModelVerifier("despot", "testHISC", "hisc10_low1.wmod", true);
   }
 
-  public void testConflictChecker_hisc12_low1() throws Exception
+  public void testSICPropertyVVerifier_hisc12_low1() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc12_low1", true);
+    runModelVerifier("despot", "testHISC", "hisc12_low1.wmod", true);
   }
 
-  public void testConflictChecker_hisc12_low2() throws Exception
+  public void testSICPropertyVVerifier_hisc12_low2() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc12_low2", true);
+    runModelVerifier("despot", "testHISC", "hisc12_low2.wmod", true);
   }
 
   /*
-   * public void testConflictChecker_hisc13_low1() throws Exception {
-   * testConflictChecker("despot", "testHISC", "hisc13_low1", false); }
-   *
-   * public void testConflictChecker_hisc13_low2() throws Exception {
-   * testConflictChecker("despot", "testHISC", "hisc13_low2", true); }
+   * public void testSICPropertyVVerifier_hisc13_low1() throws Exception {
+   * runModelVerifier("despot", "testHISC", "hisc13_low1.wmod", false); }
+   * 
+   * public void testSICPropertyVVerifier_hisc13_low2() throws Exception {
+   * runModelVerifier("despot", "testHISC", "hisc13_low2.wmod", true); }
    */
 
-  public void testConflictChecker_hisc14_low1() throws Exception
+  public void testSICPropertyVVerifier_hisc14_low1() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc14_low1", true);
+    runModelVerifier("despot", "testHISC", "hisc14_low1.wmod", true);
   }
 
-  public void testConflictChecker_hisc14_low2() throws Exception
+  public void testSICPropertyVVerifier_hisc14_low2() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc14_low2", true);
+    runModelVerifier("despot", "testHISC", "hisc14_low2.wmod", true);
   }
 
-  public void testConflictChecker_hisc2_low1() throws Exception
+  public void testSICPropertyVVerifier_hisc2_low1() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc2_low1", true);
+    runModelVerifier("despot", "testHISC", "hisc2_low1.wmod", true);
   }
 
-  public void testConflictChecker_hisc2_low2() throws Exception
+  public void testSICPropertyVVerifier_hisc2_low2() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc2_low2", true);
+    runModelVerifier("despot", "testHISC", "hisc2_low2.wmod", true);
   }
 
-  public void testConflictChecker_hisc3_low2() throws Exception
+  public void testSICPropertyVVerifier_hisc3_low2() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc3_low2", true);
+    runModelVerifier("despot", "testHISC", "hisc3_low2.wmod", true);
   }
 
-  public void testConflictChecker_hisc7_low2() throws Exception
+  public void testSICPropertyVVerifier_hisc7_low2() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc7_low2", true);
+    runModelVerifier("despot", "testHISC", "hisc7_low2.wmod", true);
   }
 
-  public void testConflictChecker_hisc8_low2() throws Exception
+  public void testSICPropertyVVerifier_hisc8_low2() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc8_low2", false);
+    runModelVerifier("despot", "testHISC", "hisc8_low2.wmod", false);
   }
 
-  public void testConflictChecker_hisc9_low2() throws Exception
+  public void testSICPropertyVVerifier_hisc9_low2() throws Exception
   {
-    testConflictChecker("despot", "testHISC", "hisc9_low2", false);
+    runModelVerifier("despot", "testHISC", "hisc9_low2.wmod", false);
   }
 
-  public void testConflictChecker_aip3_syn_as1() throws Exception
+  public void testSICPropertyVVerifier_aip3_syn_as1() throws Exception
   {
-    testConflictChecker("despot", "song_aip/aip3_syn", "as1", true);
+    runModelVerifier("despot", "song_aip/aip3_syn", "as1.wmod", true);
   }
 
-  public void testConflictChecker_aip3_syn_as2() throws Exception
+  public void testSICPropertyVVerifier_aip3_syn_as2() throws Exception
   {
-    testConflictChecker("despot", "song_aip/aip3_syn", "as2", true);
+    runModelVerifier("despot", "song_aip/aip3_syn", "as2.wmod", true);
   }
 
-  public void testConflictChecker_aip3_syn_as3() throws Exception
+  public void testSICPropertyVVerifier_aip3_syn_as3() throws Exception
   {
-    testConflictChecker("despot", "song_aip/aip3_syn", "as3", true);
+    runModelVerifier("despot", "song_aip/aip3_syn", "as3.wmod", true);
   }
 
-  public void testConflictChecker_aip3_syn_io() throws Exception
+  public void testSICPropertyVVerifier_aip3_syn_io() throws Exception
   {
-    testConflictChecker("despot", "song_aip/aip3_syn", "io", true);
+    runModelVerifier("despot", "song_aip/aip3_syn", "io.wmod", true);
   }
 
-  public void testConflictChecker_aip3_syn_tu1() throws Exception
+  public void testSICPropertyVVerifier_aip3_syn_tu1() throws Exception
   {
-    testConflictChecker("despot", "song_aip/aip3_syn", "tu1", true);
+    runModelVerifier("despot", "song_aip/aip3_syn", "tu1.wmod", true);
   }
 
-  public void testConflictChecker_aip3_syn_tu2() throws Exception
+  public void testSICPropertyVVerifier_aip3_syn_tu2() throws Exception
   {
-    testConflictChecker("despot", "song_aip/aip3_syn", "tu2", true);
+    runModelVerifier("despot", "song_aip/aip3_syn", "tu2.wmod", true);
   }
 
-  public void testConflictChecker_aip3_syn_tu3() throws Exception
+  public void testSICPropertyVVerifier_aip3_syn_tu3() throws Exception
   {
-    testConflictChecker("despot", "song_aip/aip3_syn", "tu3", true);
+    runModelVerifier("despot", "song_aip/aip3_syn", "tu3.wmod", true);
   }
 
-  public void testConflictChecker_aip3_syn_tu4() throws Exception
+  public void testSICPropertyVVerifier_aip3_syn_tu4() throws Exception
   {
-    testConflictChecker("despot", "song_aip/aip3_syn", "tu4", true);
+    runModelVerifier("despot", "song_aip/aip3_syn", "tu4.wmod", true);
   }
 
-  void testConflictChecker(final String group, final String subdir,
-                           final String name, final boolean expectedResult)
+  /*
+   * void testConflictChecker(final String group, final String subdir, final
+   * String name, final boolean expectedResult) throws Exception { final
+   * Collection<EventProxy> answerEvents = getModelAnswerEvents(group, subdir,
+   * name); boolean falseFound = false; MonolithicConflictChecker
+   * conflictChecker = null;
+   * 
+   * for (final EventProxy answer : answerEvents) { final ProductDESProxy
+   * modifiedDES = mBuilder.createModelForAnswer(answer); final EventProxy
+   * defaultMark = mBuilder.getMarkingProposition(); final EventProxy
+   * preconditionMark = mBuilder.getGeneralisedPrecondition(); conflictChecker =
+   * new MonolithicConflictChecker(modifiedDES, defaultMark, preconditionMark,
+   * mProductDESFactory); final boolean result = conflictChecker.run();
+   * 
+   * if (!result) { final ConflictTraceProxy counterexample =
+   * conflictChecker.getCounterExample();
+   * precheckCounterExample(counterexample); final File traceFilename =
+   * saveCounterExample(counterexample);
+   * counterexample.setLocation(traceFilename.toURI());
+   * 
+   * final ConflictTraceProxy convertedTrace =
+   * mBuilder.convertTraceToOriginalModel(counterexample, answer);
+   * checkConvertedCounterExample(mBuilder.getUnchangedModel(), convertedTrace,
+   * answer);
+   * 
+   * if (expectedResult) { assertEquals(
+   * "Wrong result from model checker: the answer " + answer.getName() +
+   * " gives " + result +
+   * " but this model should have satisfied SICPropertyV, therefore all " +
+   * "answer events should produce true as a result!", expectedResult, result);
+   * } else if (!expectedResult) { falseFound = true; } break; }
+   * 
+   * } if (!expectedResult && !falseFound) { final ConflictTraceProxy
+   * counterexample = conflictChecker.getCounterExample();
+   * precheckCounterExample(counterexample); saveCounterExample(counterexample);
+   * assertEquals(
+   * "Wrong result from model checker: all answers in the model give true as a result "
+   * +
+   * " but this model should not satisfy SICPropertyV, therefore atleast one answer "
+   * + "event should have produced a false result!", !expectedResult,
+   * !falseFound); } final boolean finalResult = mPropertyVerifier.run();
+   * assertEquals("Wrong result from SIC Property V Verifier.", expectedResult,
+   * finalResult); }
+   */
+
+  void testSICPropertyVVerifier(final String group, final String subdir,
+                                final String name, final boolean expectedResult)
       throws Exception
   {
     final Collection<EventProxy> answerEvents =
@@ -221,8 +268,8 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
 
         final ConflictTraceProxy convertedTrace =
             mBuilder.convertTraceToOriginalModel(counterexample, answer);
-        checkConvertedCounterExample(mBuilder.getUnchangedModel(),
-                                     convertedTrace, answer);
+        checkCounterExample(mBuilder.getUnchangedModel(), convertedTrace,
+                            answer);
 
         if (expectedResult) {
           assertEquals(
@@ -252,8 +299,8 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
                    !expectedResult, !falseFound);
     }
     final boolean finalResult = mPropertyVerifier.run();
-    assertEquals("Wrong result from SIC Property V Verifier.",
-                 expectedResult, finalResult);
+    assertEquals("Wrong result from SIC Property V Verifier.", expectedResult,
+                 finalResult);
   }
 
   protected File saveCounterExample(final TraceProxy counterexample)
@@ -322,14 +369,13 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
    * interfaces in a state where the answer in question is enabled. Furthermore,
    * when a state has a nondeterministic choice it is verified whether the
    * counter example includes correct state information.
-   *
+   * 
    * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
    * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
    */
-  protected void checkConvertedCounterExample(final ProductDESProxy des,
-                                              final TraceProxy trace,
-                                              final EventProxy answer)
-      throws Exception
+  protected void checkCounterExample(final ProductDESProxy des,
+                                     final TraceProxy trace,
+                                     final EventProxy answer) throws Exception
   {
     final ConflictTraceProxy counterexample = (ConflictTraceProxy) trace;
     final Collection<AutomatonProxy> automata = des.getAutomata();
@@ -475,29 +521,28 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
                                         states, null);
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
+  // #########################################################################
+  // # Auxiliary Methods
   /**
    * <P>
-   * Creates a low-level conflict checker for counterexample verification
-   * used for SIC property V verification.
+   * Creates a low-level conflict checker for counterexample verification used
+   * for SIC property V verification.
    * </P>
    * <P>
    * Depending on the size of the model, this language inclusion check may be a
    * difficult problem on its own. This default implementation returns a
-   * {@link NativeConfloctChecker} if available, otherwise resorts to a
-   * {@link MonolithicConflictChecker.} This should be enough for the
-   * test cases contained in this class. Subclasses that involve more advanced
-   * conflict checkers with larger tests may have to override this method.
+   * {@link NativeConfloctChecker} if available, otherwise resorts to a {@link
+   * MonolithicConflictChecker.} This should be enough for the test cases
+   * contained in this class. Subclasses that involve more advanced conflict
+   * checkers with larger tests may have to override this method.
    * </P>
    */
-  protected ConflictChecker createConflictChecker
-    (final ProductDESProxyFactory factory)
+  protected ConflictChecker createConflictChecker(
+                                                  final ProductDESProxyFactory factory)
   {
     if (mConflictChecker == null) {
       try {
-        //mConflictChecker = new MonolithicConflictChecker(factory);
+        // mConflictChecker = new MonolithicConflictChecker(factory);
         mConflictChecker = new NativeConflictChecker(factory);
       } catch (final NoClassDefFoundError exception) {
         mConflictChecker = new MonolithicConflictChecker(factory);
@@ -507,7 +552,6 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
     }
     return mConflictChecker;
   }
-
 
   // #########################################################################
   // # Overrides for junit.framework.TestCase
@@ -530,7 +574,7 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
     mBuilder = new SICPropertyVBuilder(mProductDESFactory);
     mConflictChecker = createConflictChecker(mProductDESFactory);
     mPropertyVerifier =
-      new SICPropertyVVerifier(mConflictChecker, mProductDESFactory);
+        new SICPropertyVVerifier(mConflictChecker, mProductDESFactory);
   }
 
   protected void tearDown() throws Exception
@@ -548,9 +592,8 @@ public class SICPropertyVVerifierTest extends AbstractConflictCheckerTest
     super.tearDown();
   }
 
-
-  //#########################################################################
-  //# Data Members
+  // #########################################################################
+  // # Data Members
   private File mInputDirectory;
   // private File mOutputDirectory;
   private ProductDESProxyFactory mProductDESFactory;

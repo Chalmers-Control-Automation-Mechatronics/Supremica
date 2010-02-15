@@ -1,78 +1,79 @@
 package net.sourceforge.waters.despot;
 
-
-public class LargeSICPropertyVVerifierTest extends SICPropertyVVerifierTest
+public class LargeSICPropertyVVerifierTest extends
+    AbstractSICPropertyVVerifierTest
 {
 
-  public void testConflictChecker_rhone_subsystem1_ld_failsic5()
+  public void testSICPropertyVVerifier_rhone_subsystem1_ld_failsic5()
       throws Exception
   {
-    testConflictChecker("tests", "hisc", "rhone_subsystem1_ld_failsic5", false);
+    runModelVerifier("tests", "hisc", "rhone_subsystem1_ld_failsic5.wmod",
+                     false);
   }
 
-  public void testConflictChecker_rhone_subsystem1_ld() throws Exception
+  public void testSICPropertyVVerifier_rhone_subsystem1_ld() throws Exception
   {
-    testConflictChecker("tests", "hisc", "rhone_subsystem1_ld", true);
+    runModelVerifier("tests", "hisc", "rhone_subsystem1_ld.wmod", true);
   }
 
-  public void testConflictChecker_maip3_syn_as1() throws Exception
+  public void testSICPropertyVVerifier_maip3_syn_as1() throws Exception
   {
-    testConflictChecker("despot", "song_aip/maip3_syn", "aip1", true);
+    runModelVerifier("despot", "song_aip/maip3_syn", "aip1.wmod", true);
   }
 
-  public void testConflictChecker_maip3_syn_as2() throws Exception
+  public void testSICPropertyVVerifier_maip3_syn_as2() throws Exception
   {
-    testConflictChecker("despot", "song_aip/maip3_syn", "aip2", true);
+    runModelVerifier("despot", "song_aip/maip3_syn", "aip2.wmod", true);
   }
 
-  public void testConflictChecker_maip3_syn_as3() throws Exception
+  public void testSICPropertyVVerifier_maip3_syn_as3() throws Exception
   {
-    testConflictChecker("despot", "song_aip/maip3_syn", "aip3", true);
+    runModelVerifier("despot", "song_aip/maip3_syn", "aip3.wmod", true);
   }
 
-  public void testConflictChecker_maip3_veri_as1() throws Exception
+  public void testSICPropertyVVerifier_maip3_veri_as1() throws Exception
   {
-    testConflictChecker("despot", "song_aip/maip3_veri", "aip1", true);
+    runModelVerifier("despot", "song_aip/maip3_veri", "aip1.wmod", true);
   }
 
-  public void testConflictChecker_maip3_veri_as2() throws Exception
+  public void testSICPropertyVVerifier_maip3_veri_as2() throws Exception
   {
-    testConflictChecker("despot", "song_aip/maip3_veri", "aip2", true);
+    runModelVerifier("despot", "song_aip/maip3_veri", "aip2.wmod", true);
   }
 
-  public void testConflictChecker_maip3_veri_as3() throws Exception
+  public void testSICPropertyVVerifier_maip3_veri_as3() throws Exception
   {
-    testConflictChecker("despot", "song_aip/maip3_veri", "aip3", true);
+    runModelVerifier("despot", "song_aip/maip3_veri", "aip3.wmod", true);
   }
 
-  public void testConflictChecker_maip5_syn_as1() throws Exception
+  public void testSICPropertyVVerifier_maip5_syn_as1() throws Exception
   {
-    testConflictChecker("despot", "song_aip/maip5_syn", "aip1", true);
+    runModelVerifier("despot", "song_aip/maip5_syn", "aip1.wmod", true);
   }
 
-  public void testConflictChecker_maip5_syn_as2() throws Exception
+  public void testSICPropertyVVerifier_maip5_syn_as2() throws Exception
   {
-    testConflictChecker("despot", "song_aip/maip5_syn", "aip2", true);
+    runModelVerifier("despot", "song_aip/maip5_syn", "aip2.wmod", true);
   }
 
-  public void testConflictChecker_maip5_syn_as3() throws Exception
+  public void testSICPropertyVVerifier_maip5_syn_as3() throws Exception
   {
-    testConflictChecker("despot", "song_aip/maip5_syn", "aip3", true);
+    runModelVerifier("despot", "song_aip/maip5_syn", "aip3.wmod", true);
   }
 
-  public void testConflictChecker_maip5_veri_as1() throws Exception
+  public void testSICPropertyVVerifier_maip5_veri_as1() throws Exception
   {
-    testConflictChecker("despot", "song_aip/maip5_veri", "aip1", true);
+    runModelVerifier("despot", "song_aip/maip5_veri", "aip1.wmod", true);
   }
 
-  public void testConflictChecker_maip5_veri_as2() throws Exception
+  public void testSICPropertyVVerifier_maip5_veri_as2() throws Exception
   {
-    testConflictChecker("despot", "song_aip/maip5_veri", "aip2", true);
+    runModelVerifier("despot", "song_aip/maip5_veri", "aip2.wmod", true);
   }
 
-  public void testConflictChecker_maip5_veri_as3() throws Exception
+  public void testSICPropertyVVerifier_maip5_veri_as3() throws Exception
   {
-    testConflictChecker("despot", "song_aip/maip5_veri", "aip3", true);
+    runModelVerifier("despot", "song_aip/maip5_veri", "aip3.wmod", true);
   }
 
 }

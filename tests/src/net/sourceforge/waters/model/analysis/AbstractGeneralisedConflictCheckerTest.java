@@ -36,8 +36,8 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     AbstractConflictCheckerTest
 {
 
-  //#########################################################################
-  //# Entry points in junit.framework.TestCase
+  // #########################################################################
+  // # Entry points in junit.framework.TestCase
   public AbstractGeneralisedConflictCheckerTest()
   {
   }
@@ -46,7 +46,6 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
   {
     super(name);
   }
-
 
   protected void setUp() throws Exception
   {
@@ -61,9 +60,8 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     super.tearDown();
   }
 
-
-  //#########################################################################
-  //# Test Cases --- paper (multi-coloured automata)
+  // #########################################################################
+  // # Test Cases --- paper (multi-coloured automata)
   public void testG1() throws Exception
   {
     final String group = "tests";
@@ -96,9 +94,8 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     runModelVerifier(group, dir, name, false);
   }
 
-
-  //#########################################################################
-  //# Test Cases --- SIC Property V
+  // #########################################################################
+  // # Test Cases --- SIC Property V
   public void testSIC5__hisc8_low2__a1() throws Exception
   {
     testSICPropertyV("despot", "testHISC", "hisc8_low2.wmod", "a1", true);
@@ -109,26 +106,25 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     testSICPropertyV("despot", "testHISC", "hisc8_low2.wmod", "a2:2", false);
   }
 
-
-  //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  // #########################################################################
+  // # Overrides for abstract base class
+  // # net.sourceforge.waters.analysis.AbstractModelVerifierTest
   protected void configureModelVerifier(final ProductDESProxy des)
   {
     super.configureModelVerifier(des);
     final Set<EventProxy> events = des.getEvents();
     // checks that this des does include the precondition marking :alpha
     for (final EventProxy event : events) {
-      if (event.getName().equals(":alpha") &&
-          event.getKind() == EventKind.PROPOSITION) {
+      if (event.getName().equals(":alpha")
+          && event.getKind() == EventKind.PROPOSITION) {
         mAlpha = event;
         final ConflictChecker modelVer = getModelVerifier();
         modelVer.setGeneralisedPrecondition(event);
         return;
       }
     }
-    fail("Model '" + des.getName() +
-         "' does not contain a proposition named :alpha.");
+    fail("Model '" + des.getName()
+        + "' does not contain a proposition named :alpha.");
   }
 
   protected void configure(final ModuleCompiler compiler)
@@ -151,7 +147,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
    * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
    */
   protected void checkCounterExample(final ProductDESProxy des,
-      final TraceProxy trace) throws Exception
+                                     final TraceProxy trace) throws Exception
   {
     super.checkCounterExample(des, trace);
     // checks if the marking proposition :alpha is in the alphabet
@@ -167,7 +163,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
             break;
           }
         }
-        if (!marked) {
+        if (!marked && aut.getEvents().contains(mAlpha)) {
           fail("Counterexample leads to an end state where automaton "
               + aut.getName() + " is in state " + state.getName()
               + " which does not contain the proposition named :alpha");
@@ -178,15 +174,11 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     }
   }
 
-
-  //#########################################################################
-  //# Testing SIC Property V
-  private void testSICPropertyV(final String group,
-                                final String subdir,
-                                final String fileName,
-                                final String eventName,
-                                final boolean expect)
-    throws Exception
+  // #########################################################################
+  // # Testing SIC Property V
+  private void testSICPropertyV(final String group, final String subdir,
+                                final String fileName, final String eventName,
+                                final boolean expect) throws Exception
   {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
@@ -198,7 +190,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     final ProductDESProxy answerDES = mBuilder.createModelForAnswer(answer);
     final DocumentManager docman = getDocumentManager();
     final ProxyMarshaller<ProductDESProxy> marshaller =
-      docman.findProxyMarshaller(ProductDESProxy.class);
+        docman.findProxyMarshaller(ProductDESProxy.class);
     final String ext = marshaller.getDefaultExtension();
     final File outdir = getOutputDirectory();
     final String outname = answerDES.getName();
@@ -207,24 +199,22 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     runModelVerifier(answerDES, expect);
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
+  // #########################################################################
+  // # Auxiliary Methods
   private EventProxy findAnswerEvent(final ProductDESProxy des,
                                      final String eventName)
   {
     final EventProxy event = findEvent(des, eventName);
     final Map<String,String> attribs = event.getAttributes();
-    if (HISCAttributes.getEventType(attribs) !=
-        HISCAttributes.EventType.ANSWER) {
-      fail("The event '" + eventName + "' in model '" + des.getName() +
-           "'is not an answer event!");
+    if (HISCAttributes.getEventType(attribs) != HISCAttributes.EventType.ANSWER) {
+      fail("The event '" + eventName + "' in model '" + des.getName()
+          + "'is not an answer event!");
     }
     return event;
   }
 
   private Map<AutomatonProxy,StateProxy> getEndState(final ProductDESProxy des,
-      final TraceProxy trace)
+                                                     final TraceProxy trace)
   {
     final ConflictTraceProxy counterexample = (ConflictTraceProxy) trace;
     final Collection<AutomatonProxy> automata = des.getAutomata();
@@ -238,9 +228,8 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     return tuple;
   }
 
-
-  //#########################################################################
-  //# Data Members
+  // #########################################################################
+  // # Data Members
   private SICPropertyVBuilder mBuilder;
   private EventProxy mAlpha = null;
 
