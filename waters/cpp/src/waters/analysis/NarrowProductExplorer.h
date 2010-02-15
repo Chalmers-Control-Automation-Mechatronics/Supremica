@@ -91,7 +91,7 @@ private:
   uint32 mNumPlants;
   NarrowEventRecord** mEventRecords;
   NarrowTransitionTable* mTransitionTables;
-  bool mTransitionTablesReversed;
+  NarrowTransitionTable* mNonReversedTransitionTables;
   uint32* mIterator;
   uint32* mNondetIterator;
   uint32* mCurrentAutomata;

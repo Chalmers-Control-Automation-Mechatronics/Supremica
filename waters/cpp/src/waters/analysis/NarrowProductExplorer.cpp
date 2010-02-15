@@ -65,7 +65,7 @@ NarrowProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mNumPlants(0),
     mEventRecords(0),
     mTransitionTables(0),
-    mTransitionTablesReversed(false),
+    mNonReversedTransitionTables(0),
     mIterator(0),
     mNondetIterator(0),
     mCurrentAutomata(0),
@@ -82,12 +82,18 @@ NarrowProductExplorer::
     }
     delete[] mEventRecords;
   }
+  const uint32 numaut = getNumberOfAutomata();
   if (mTransitionTables != 0) {
-    const uint32 numaut = getNumberOfAutomata();
     for (uint32 a = 0; a < numaut; a++) {
       mTransitionTables[a].~NarrowTransitionTable();
     }
     delete[] (char*) mTransitionTables;
+  }
+  if (mNonReversedTransitionTables != 0) {
+    for (uint32 a = 0; a < numaut; a++) {
+      mNonReversedTransitionTables[a].~NarrowTransitionTable();
+    }
+    delete[] (char*) mNonReversedTransitionTables;
   }
   delete[] mIterator;
   delete[] mNondetIterator;
@@ -187,7 +193,7 @@ setup()
   }
 
   // Collect transitions ...
-  mTransitionTablesReversed = false;
+  mNonReversedTransitionTables = 0;
   mTransitionTables =
     (NarrowTransitionTable*) new char[numaut * sizeof(NarrowTransitionTable)];
   for (uint32 a = 0; a < numaut; a++) {
@@ -217,13 +223,20 @@ teardown()
     delete [] mEventRecords;
     mEventRecords = 0;
   }
+  const uint32 numaut = getNumberOfAutomata();
   if (mTransitionTables != 0) {
-    const uint32 numaut = getNumberOfAutomata();
     for (uint32 a = 0; a < numaut; a++) {
       mTransitionTables[a].~NarrowTransitionTable();
     }
     delete [] (char*) mTransitionTables;
     mTransitionTables = 0;
+  }
+  if (mNonReversedTransitionTables != 0) {
+    for (uint32 a = 0; a < numaut; a++) {
+      mNonReversedTransitionTables[a].~NarrowTransitionTable();
+    }
+    delete[] (char*) mNonReversedTransitionTables;
+    mNonReversedTransitionTables = 0;
   }
   mNumPlants = 0;
   delete [] mIterator;
@@ -476,14 +489,17 @@ expandNonblockingCoreachabilityState(const uint32* targettuple,
 void NarrowProductExplorer::
 setupReverseTransitionRelations()
 {
-  if (!mTransitionTablesReversed) {
+  if (mNonReversedTransitionTables == 0) {
     const uint32 numaut = getNumberOfAutomata();
+    mNonReversedTransitionTables = mTransitionTables;
+    mTransitionTables = (NarrowTransitionTable*)
+      new char[numaut * sizeof(NarrowTransitionTable)];
     for (uint32 a = 0; a < numaut; a++) {
-      //mTransitionTables[a].dump(a, mEventRecords);
-      mTransitionTables[a].reverse(mEventRecords);
-      //mTransitionTables[a].dump(a, mEventRecords);
+      // mNonReversedTransitionTables[a].dump(a, mEventRecords);
+      const NarrowTransitionTable* orig = &mNonReversedTransitionTables[a];
+      new (&mTransitionTables[a]) NarrowTransitionTable(orig, mEventRecords);
+      // mTransitionTables[a].dump(a, mEventRecords);
     }
-    mTransitionTablesReversed = true;
   }
 }
 
@@ -521,7 +537,9 @@ storeNondeterministicTargets(const uint32* sourcetuple,
   const NarrowEventRecord* event = (const NarrowEventRecord*) getTraceEvent();
   const uint32 e = event->getEventCode();
   for (uint32 a = 0; a < numaut; a++) {
-    const NarrowTransitionTable& table = mTransitionTables[a];
+    const NarrowTransitionTable& table =
+      mNonReversedTransitionTables ?
+      mNonReversedTransitionTables[a] : mTransitionTables[a];
     uint32 iter = table.iterator(sourcetuple[a]);
     uint32 current = table.getEvent(iter);
     while (current < e) {

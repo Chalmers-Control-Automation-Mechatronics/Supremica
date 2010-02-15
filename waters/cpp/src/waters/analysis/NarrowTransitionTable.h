@@ -49,6 +49,8 @@ public:
     (const NarrowPreTransitionTable* pre,
      jni::ClassCache* cache,
      const HashTable<const jni::EventGlue*, NarrowEventRecord*>& eventmap);
+  explicit NarrowTransitionTable(const NarrowTransitionTable* reverse,
+				 const NarrowEventRecord* const* events);
   ~NarrowTransitionTable();
 
   //##########################################################################
@@ -70,10 +72,6 @@ public:
     {return mBuffers[offset];}
 
   //##########################################################################
-  //# Setup
-  void reverse(const NarrowEventRecord* const* events);
-
-  //##########################################################################
   //# Debug Output
 #ifdef DEBUG
   void dump(uint32 a, const NarrowEventRecord* const* events) const;
@@ -83,7 +81,6 @@ public:
   //# Class Constants
   static const uint32 TAG_END_OF_LIST = 0x80000000;
 
-private:
   //##########################################################################
   //# Data Members
   AutomatonRecord* mAutomaton;

@@ -1150,7 +1150,7 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  /*
+  /**
    * A class that stores the events which are hidden for a set of automaton.
    */
   private static class AutomataHidden
@@ -1174,7 +1174,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
     public boolean equals(final Object o)
     {
-      if (o instanceof AutomataHidden) {
+      if (o != null && o.getClass() == getClass()) {
         final AutomataHidden a = (AutomataHidden) o;
         return mAutomata.equals(a.mAutomata) && mHidden.equals(a.mHidden);
       }
