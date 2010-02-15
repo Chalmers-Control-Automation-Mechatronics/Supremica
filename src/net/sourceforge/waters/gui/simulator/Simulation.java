@@ -48,6 +48,7 @@ public class Simulation implements ModelObserver, Observer
   //# Constructors
   public Simulation(final ModuleContainer container)
   {
+    time = System.currentTimeMillis();
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, optable);
@@ -69,9 +70,11 @@ public class Simulation implements ModelObserver, Observer
     container.attach(this);
     final ProductDESProxy des = container.getCompiledDES();
     setCompiledDES(des);
+    mTransitionsToEvents = new TransitionEventMap(des);
     updateControllability(true);
     findEventClassification();
     addNewSimulatorState();
+    System.out.println("DEBUG: Simulation [77]: Took " + (System.currentTimeMillis() - time) + " milliseconds to complete constructor");
   }
 
   // ########################################################################
@@ -652,7 +655,6 @@ public class Simulation implements ModelObserver, Observer
   public void step(final Step step) throws NonDeterministicException
   {
     mWarningProperties = new HashMap<Step, AutomatonProxy>();
-    time = System.currentTimeMillis();
     if (step == null)
     {
       return;
@@ -929,38 +931,33 @@ public class Simulation implements ModelObserver, Observer
     {
       final ArrayList<TransitionProxy> eventsFirable = new ArrayList<TransitionProxy>();
       final ArrayList<TransitionProxy> newEventsFirable = new ArrayList<TransitionProxy>();
-      final ArrayList<TransitionProxy> automatonsActiveEvents = new ArrayList<TransitionProxy>();
-      for (final TransitionProxy trans : aut.getTransitions())
+      for (final TransitionProxy trans : mTransitionsToEvents.getTransition(aut, mAllAutomatons.get(aut)))
       {
-        if (trans.getSource() == mAllAutomatons.get(aut))
+        boolean isInEnabled = false;
+        boolean isInInvalid = false;
+        for (final Step step: mEnabledEvents)
         {
-          boolean isInEnabled = false;
-          boolean isInInvalid = false;
-          automatonsActiveEvents.add(trans);
-          for (final Step step: mEnabledEvents)
-          {
-            if (step.getEvent() == trans.getEvent())
-              isInEnabled = true;
-          }
-          for (final EventProxy invalidEvent : mInvalidEvents.keySet())
-          {
-            if (invalidEvent == trans.getEvent())
-              isInInvalid = true;
-          }
-          if (isInEnabled)
-          {
-            eventsFirable.add(trans);
-          }
-          else if (!isInEnabled && !isInInvalid)
-          {
-            newEventsFirable.add(trans);
-          }
+          if (step.getEvent() == trans.getEvent())
+            isInEnabled = true;
+        }
+        for (final EventProxy invalidEvent : mInvalidEvents.keySet())
+        {
+          if (invalidEvent == trans.getEvent())
+            isInInvalid = true;
+        }
+        if (isInEnabled)
+        {
+          eventsFirable.add(trans);
+        }
+        else if (!isInEnabled && !isInInvalid)
+        {
+          newEventsFirable.add(trans);
         }
       }
       processOldEvents(eventsFirable, aut);
       processNewEvents(newEventsFirable, aut);
       if (aut.getKind() != ComponentKind.PROPERTY)
-        removeIgnoredEvents(automatonsActiveEvents, aut);
+        removeIgnoredEvents(mTransitionsToEvents.getTransition(aut, mAllAutomatons.get(aut)), aut);
     }
     Collections.sort(mEnabledEvents);
     updateControllability(false);
@@ -1020,7 +1017,7 @@ public class Simulation implements ModelObserver, Observer
    * @param automatonsActiveEvents All the automatons possible transitions which it can fire
    * @param aut The automaton to test
    */
-  private void removeIgnoredEvents(final ArrayList<TransitionProxy> automatonsActiveEvents, final AutomatonProxy aut)
+  private void removeIgnoredEvents(final List<TransitionProxy> automatonsActiveEvents, final AutomatonProxy aut)
   {
     for (final EventProxy event : aut.getEvents())
     {
@@ -1173,6 +1170,7 @@ public class Simulation implements ModelObserver, Observer
   {
     if (des != mCompiledDES) {
       mCompiledDES = des;
+      mTransitionsToEvents = new TransitionEventMap(des);
       reset(true);
       final SimulationChangeEvent event = new SimulationChangeEvent
           (this, SimulationChangeEvent.MODEL_CHANGED);
@@ -1260,6 +1258,7 @@ public class Simulation implements ModelObserver, Observer
   //# Data Members
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
 
+  private TransitionEventMap mTransitionsToEvents;
   private Map<AutomatonProxy,StateProxy> mAllAutomatons; // The Map object is the current state of the key
   private ArrayList<Step> mEnabledEvents;
   private HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the event
