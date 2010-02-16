@@ -223,9 +223,8 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     }
     buffer.append(ext);
     final String extname = buffer.toString();
-    assertTrue("File name '" + extname + "' contains colon, " +
-               "which does not work on all platforms!",
-               extname.indexOf(':') < 0);
+    assertTrue("File name '" + extname + "' contains colon, "
+        + "which does not work on all platforms!", extname.indexOf(':') < 0);
     final File dir = getOutputDirectory();
     final File filename = new File(dir, extname);
     ensureParentDirectoryExists(filename);

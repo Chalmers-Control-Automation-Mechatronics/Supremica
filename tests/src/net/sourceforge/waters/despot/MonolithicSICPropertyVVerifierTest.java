@@ -12,6 +12,7 @@ package net.sourceforge.waters.despot;
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -23,6 +24,15 @@ public class MonolithicSICPropertyVVerifierTest extends
                                               final ProductDESProxyFactory factory)
   {
     final ConflictChecker checker = new MonolithicConflictChecker(factory);
-    return new SICPropertyVVerifier(checker, factory);
+    mPropertyVerifier = new SICPropertyVVerifier(checker, factory);
+    return mPropertyVerifier;
   }
+
+  protected void configureModelVerifier(final ProductDESProxy des)
+  {
+    super.configureModelVerifier(des);
+    setPropertyVerifier(mPropertyVerifier);
+  }
+
+  SICPropertyVVerifier mPropertyVerifier;
 }
