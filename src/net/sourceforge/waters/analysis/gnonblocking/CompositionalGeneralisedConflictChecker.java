@@ -9,51 +9,23 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import net.sourceforge.waters.analysis.RemoveUnneededTransitions;
-import net.sourceforge.waters.analysis.TransitionRelation;
-import net.sourceforge.waters.analysis.modular.BiSimulator;
-import net.sourceforge.waters.analysis.modular.BlockedEvents;
-import net.sourceforge.waters.analysis.modular.NonDeterministicComposer;
+import net.sourceforge.waters.analysis.gnonblocking.NonDeterministicComposer;
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -153,47 +125,54 @@ public class CompositionalGeneralisedConflictChecker extends
     if (getMarkingProposition() == null) {
       setMarkingProposition(getUsedMarkingProposition());
     }
-    final Set<Candidate> candidates = findCandidates(getModel());
-    final Set<AutomatonProxy> candidate = evaluateCandidates(candidates);
-    final Collection<EventProxy> events = new ArrayList<EventProxy>();
-    for (final AutomatonProxy aut : candidate) {
-      events.addAll(aut.getEvents());
-    }
-    final ProductDESProxy candidateModel =
-        getFactory().createProductDESProxy("Smaller model", events, candidate);
-    final Composer composer =
-        new Composer(candidateModel, getFactory(), getMarkingProposition(),
-            getGeneralisedPrecondition());
-    @SuppressWarnings("unused")
-    final AutomatonProxy syncProduct = composer.run();
-    final Map<EventProxy,Collection<AutomatonProxy>> eventAutomaton =
-        mapEventsToAutomata(getModel());
-    @SuppressWarnings("unused")
-    final Collection<EventProxy> localEvents =
-        identifyLocalEvents(eventAutomaton, candidate);
+    final Set<AutomatonProxy> remainingAut = getModel().getAutomata();
 
-    // final ProjectionList list = project(getModel());
-    // mMinAutMap.clear();
-    // System.out.println(list);
-    /*
-     * if (list == null) { return true; }
-     */
-    // System.out.println(list.getModel());
+    // TODO: later, need to consider when an automaton is too large to be a
+    // candidate and so may not always be left with only one automaton
+    while (remainingAut.size() > 1) {
+      final Set<Candidate> candidates = findCandidates(getModel());
+      final Candidate candidate = evaluateCandidates(candidates);
+
+      // creates a model which includes only the candidate, to build the
+      // synchronous product of
+      final Set<EventProxy> candidateEvents =
+          getEventsForNewModel(candidate.getAutomata());
+      final ProductDESProxy candidateModel =
+          getFactory().createProductDESProxy("Candidate model",
+                                             candidateEvents,
+                                             candidate.getAutomata());
+      final NonDeterministicComposer composer =
+          new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
+              candidateModel.getAutomata()), getFactory(),
+              getMarkingProposition(), getGeneralisedPrecondition());
+      final AutomatonProxy syncProduct = composer.run();
+      final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton =
+          mapEventsToAutomata(getModel());
+      final Set<EventProxy> localEvents =
+          identifyLocalEvents(eventAutomaton, candidate.getAutomata());
+      candidate.setLocalEvents(localEvents);
+      // TODO: currently the candidate is changed and the original form is not
+      // stored
+      final AutomatonProxy autToAbstract =
+          hideLocalEvents(syncProduct, localEvents);
+
+      // TODO Abstraction rules here
+
+      // removes the composed automata for this candidate from the set of
+      // remaining automata and adds the newly composed candidate
+      remainingAut.removeAll(candidate.getAutomata());
+      remainingAut.add(autToAbstract);
+    }
+    // creates a new model of the composed model
+    final Set<EventProxy> composedModelAlphabet =
+        getEventsForNewModel(remainingAut);
+    final ProductDESProxy composedModel =
+        getFactory().createProductDESProxy("Final Composed Model",
+                                           composedModelAlphabet, remainingAut);
     final ConflictChecker checker =
-        new MonolithicConflictChecker(getModel(), getMarkingProposition(),
+        new MonolithicConflictChecker(composedModel, getMarkingProposition(),
             getGeneralisedPrecondition(), getFactory());
     final boolean result = checker.run();
-    // System.out.println("result: " + result);
-    // mTime += System.currentTimeMillis();
-    /*
-     * try { final BufferedWriter write = new BufferedWriter(new
-     * FileWriter("/home/darius/supremica/" + getModel().getName()));
-     * write.append(getStats()); write.append("states:" +
-     * checker.getAnalysisResult().getTotalNumberOfStates() + "\n");
-     * write.close(); } catch (final Throwable t) { t.printStackTrace(); }
-     */
-    // System.out.println("Total Switched: " + switched);
-    // clearStats();
     return result;
     /*
      * if (checker.run()) { mStates +=
@@ -208,16 +187,102 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
   /**
-   * <P>Returns a collection of events that are local to a given set of
-   * automata.</P>
-   * <P><STRONG>BUG</STRONG> Deletes entries from eventAutomaton as side
-   * effect and therefore does not work when called for a second automaton.</P>
+   * Hides the local events for a given candidate (replaces the events with a
+   * silent event "tau").
+   *
+   * @param syncProduct
    */
-  private Collection<EventProxy> identifyLocalEvents
-    (final Map<EventProxy,Collection<AutomatonProxy>> eventAutomaton,
-     final Set<AutomatonProxy> candidate)
+  private AutomatonProxy hideLocalEvents(final AutomatonProxy automaton,
+                                         final Set<EventProxy> localEvents)
   {
-    final Collection<EventProxy> localEvents = new ArrayList<EventProxy>();
+    final EventProxy tau =
+        getFactory().createEventProxy("tau", EventKind.UNCONTROLLABLE);
+
+    // replaces events on transitions with silent event and removes the local
+    // events from the automaton alphabet
+    final Collection<TransitionProxy> newTransitions =
+        new ArrayList<TransitionProxy>();
+    boolean local = false;
+    for (final TransitionProxy transition : automaton.getTransitions()) {
+      for (final EventProxy localEvent : localEvents) {
+        if (transition.getEvent() == localEvent) {
+          final TransitionProxy newTrans =
+              getFactory().createTransitionProxy(transition.getSource(), tau,
+                                                 transition.getTarget());
+          newTransitions.add(newTrans);
+          local = true;
+          break;
+        }
+      }
+      if (!local) {
+        newTransitions.add(transition);
+        local = false;
+      }
+    }
+    final Collection<EventProxy> newEvents = automaton.getEvents();
+    newEvents.removeAll(localEvents);
+    newEvents.add(tau);
+    final AutomatonProxy newAut =
+        getFactory()
+            .createAutomatonProxy(automaton.getName(), automaton.getKind(),
+                                  newEvents, automaton.getStates(),
+                                  newTransitions);
+    return newAut;
+  }
+
+  /**
+   * Returns a set of events for a new model (i.e. new ProductDESProxy) which is
+   * the alphabet from a given set of automata for the model.
+   *
+   * @param automataOfNewModel
+   * @return
+   */
+  private Set<EventProxy> getEventsForNewModel(
+                                               final Set<AutomatonProxy> automataOfNewModel)
+  {
+    final Set<EventProxy> events = new HashSet<EventProxy>();
+    for (final AutomatonProxy aut : automataOfNewModel) {
+      events.addAll(aut.getEvents());
+    }
+    return events;
+  }
+
+  /**
+   * Maps the events in the model to a collection of the automaton that contain
+   * the event in their alphabet.
+   */
+  private Map<EventProxy,Set<AutomatonProxy>> mapEventsToAutomata(
+                                                                  final ProductDESProxy model)
+  {
+    final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton =
+        new HashMap<EventProxy,Set<AutomatonProxy>>();
+    for (final AutomatonProxy aut : model.getAutomata()) {
+      for (final EventProxy event : aut.getEvents()) {
+        if (!eventAutomaton.containsKey(event)) {
+          final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
+          eventAutomaton.put(event, automata);
+        }
+        eventAutomaton.get(event).add(aut);
+      }
+    }
+    return eventAutomaton;
+  }
+
+  /**
+   * <P>
+   * Finds the set of events that are local to a candidate (i.e. a set of
+   * automata).
+   * </P>
+   * <P>
+   * <STRONG>BUG</STRONG> Deletes entries from eventAutomaton as side effect and
+   * therefore does not work when called for a second automaton.
+   * </P>
+   */
+  private Set<EventProxy> identifyLocalEvents(
+                                              final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton,
+                                              final Set<AutomatonProxy> candidate)
+  {
+    final Set<EventProxy> localEvents = new HashSet<EventProxy>();
     for (final EventProxy event : eventAutomaton.keySet()) {
       eventAutomaton.get(event).removeAll(candidate);
       final Collection<AutomatonProxy> autWithEvent = eventAutomaton.get(event);
@@ -228,34 +293,10 @@ public class CompositionalGeneralisedConflictChecker extends
     return localEvents;
   }
 
-  /**
-   * Maps the events in the model to a collection of the automaton that contain
-   * the event in their alphabet.
-   */
-  private Map<EventProxy,Collection<AutomatonProxy>> mapEventsToAutomata
-    (final ProductDESProxy model)
-  {
-    final Map<EventProxy,Collection<AutomatonProxy>> eventAutomaton =
-        new HashMap<EventProxy,Collection<AutomatonProxy>>();
-    for (final EventProxy event : model.getEvents()) {
-      final Collection<AutomatonProxy> automata =
-          new ArrayList<AutomatonProxy>();
-      for (final AutomatonProxy aut : model.getAutomata()) {
-        if (aut.getEvents().contains(event)) {
-          automata.add(aut);
-        }
-        eventAutomaton.put(event, automata);
-      }
-    }
-    return eventAutomaton;
-  }
-
-  private Set<AutomatonProxy> evaluateCandidates(final Set<Candidate> candidates)
+  private Candidate evaluateCandidates(final Set<Candidate> candidates)
   {
     // returns first candidate initially
-    final Set<AutomatonProxy> candidate =
-        candidates.toArray(new Candidate[candidates.size()])[0].mSet;
-    return candidate;
+    return candidates.toArray(new Candidate[candidates.size()])[0];
   }
 
   private Set<Candidate> findCandidates(final ProductDESProxy model)
@@ -267,931 +308,30 @@ public class CompositionalGeneralisedConflictChecker extends
     return candidates;
   }
 
-  /**
-   * Chooses candidates etc.
-   */
-  @SuppressWarnings("unused")
-  private ProjectionList project(final ProductDESProxy model)
-      throws AnalysisException
+
+  private static class Candidate implements Comparable<Candidate>
   {
-    eventscheck(model);
-    // mRIT = new RemoveImpossibleTransitions(getMarkingProposition());
-    // mME = new MergeEvents(getMarkingProposition(), model.getEvents());
-    maxsize = 1000;
-    mChecked.clear();
-    Set<AutomatonProxy> automata = new TreeSet<AutomatonProxy>();
-    // adds all automata from model if they aren't of the kind property
-    final Iterator<AutomatonProxy> autit = model.getAutomata().iterator();
-    while (autit.hasNext()) {
-      final AutomatonProxy aut = autit.next();
-      System.out.println(aut.getName() + " " + aut.getKind());
-      if (aut.getKind() != ComponentKind.PROPERTY) {
-        automata.add(aut);
-      }
-    }
-    // mRIT.addAutomata(automata);
+    private final Set<AutomatonProxy> automata;
+    public final double mSize;
+    // TODO: at this stage there is no benefit from storing the local events for
+    // a candidate
+    private Set<EventProxy> localEvents;
 
-    ProjectionList p = null;
-    while (true) {
-      // automata = mME.run(automata, getFactory());
-      // System.out.println("numautomata:" + automata.size());
-      final Set<Candidate> possibleCandidates =
-          getPossibleCandidiates(model, automata);
-      boolean stop = true;
-      int overflows = 0;
-      ProjectionList minlist = null;
-      minSize = Integer.MAX_VALUE / 4;
-      // System.out.println("possible: " + possible.size());
-      int num = 0;
-      tuples: for (final Candidate tup : possibleCandidates) {
-        if (num > 3) {
-          break;
-        }
-        try {
-          long maxsize = 1;
-          for (final AutomatonProxy a : tup.mSet) {
-            if (mDontOnOwn.contains(a) && tup.mSet.size() == 1) {
-              continue tuples;
-            }
-            maxsize *= a.getStates().size();
-            // calculates maxS
-          }
-          // System.out.println(maxsize);
-          final ProjectionList t = new ProjectionList(p, automata, tup.mSet);
-          num++;
-          if (minSize >= t.getNew().getStates().size()) {
-            minlist = t;
-            minSize = t.getNew().getStates().size();
-            break;
-          }
-        } catch (final AnalysisException exception) {
-          // exception.printStackTrace();
-          System.out.println("over");
-          overflows++;
-        }
-      }
-      if (minlist != null) {
-        p = minlist;
-        automata = new HashSet<AutomatonProxy>(p.getAutomata());
-        stop = false;
-        // System.out.println("numcomposed" + p.getComposed().size());
-      } /*
-         * else { if (maxsize < 2000000) { maxsize *= 2; stop = false; } }
-         */
-      if (stop) {
-        break;
-      }
-    }
-    final Iterator<AutomataHidden> it = mMinAutMap.keySet().iterator();
-    while (it.hasNext()) {
-      final AutomataHidden ah = it.next();
-      if (!mChecked.contains(ah)) {
-        it.remove();
-      }
-    }
-    return p;
-  }
-
-  /**
-   * Assigns values for mAlwaysEnabled and mAllSelfLoops.
-   */
-  private void eventscheck(final ProductDESProxy model)
-  {
-    final Collection<AutomatonProxy> automata = model.getAutomata();
-    mAllSelfLoops.clear();
-    mAlwaysEnabled.clear();
-    for (final EventProxy event : model.getEvents()) {
-      mAllSelfLoops.put(event, new THashSet<AutomatonProxy>());
-      mAlwaysEnabled.put(event, new THashSet<AutomatonProxy>());
-      for (final AutomatonProxy aut : automata) {
-        if (aut.getEvents().contains(event)) {
-          mAllSelfLoops.get(event).add(aut);
-          mAlwaysEnabled.get(event).add(aut);
-        }
-      }
-    }
-    for (final AutomatonProxy aut : automata) {
-      final TransitionRelation tr =
-          new TransitionRelation(aut, getMarkingProposition());
-      final Collection<EventProxy> allselflooped = tr.getAllSelfLoops();
-      for (final EventProxy event : allselflooped) {
-        mAllSelfLoops.get(event).remove(aut);
-      }
-      final Collection<EventProxy> alwaysenabled = tr.getAllwaysEnabled();
-      for (final EventProxy event : alwaysenabled) {
-        mAlwaysEnabled.get(event).remove(aut);
-      }
-    }
-  }
-
-  public ConflictTraceProxy getCounterExample()
-  {
-    return null;
-  }
-
-  @SuppressWarnings("unused")
-  private void clearStats()
-  {
-    mLargestComposition = 0;
-    /*
-     * AnnotateGraph.clearStats(); CertainConflict.clearStats();
-     * EquivalentIncoming.clearStats(); RemoveFollowOnTau.clearStats();
-     * TauLoopRemoval.clearStats(); UnAnnotateGraph.clearStats();
-     * RemoveImpossibleTransitions.clearStats(); MergeEvents.clearStats();
-     */
-    mAnnotatedBISIMulation = 0;
-    mBISIMulation = 0;
-    mCompTime = 0;
-    mAnnBITIME = 0;
-    mBITIME = 0;
-    mSmallestDiff = Integer.MAX_VALUE;
-    mLargestDiff = Integer.MIN_VALUE;
-    mAggDiff = 0;
-    mTime = 0;
-  }
-
-  public String getStats()
-  {
-    String stats = getModel().getName() + "\n";
-    /*
-     * stats = AnnotateGraph.stats() + "\n"; stats += CertainConflict.stats() +
-     * "\n"; stats += EquivalentIncoming.stats() + "\n"; stats +=
-     * RemoveFollowOnTau.stats() + "\n"; stats += TauLoopRemoval.stats() + "\n";
-     * stats += UnAnnotateGraph.stats() + "\n"; stats +=
-     * RemoveImpossibleTransitions.stats() + "\n"; stats +=
-     * RemoveSubsetTau.stats() + "\n"; stats += MergeEvents.stats() + "\n";
-     */
-    stats +=
-        "mAggDiff = " + mAggDiff + " mSmallestDiff = " + mSmallestDiff
-            + " mLargestDiff = " + mLargestDiff + "\n";
-    stats +=
-        "Largest Composition: " + mLargestComposition + " COMPTIME: "
-            + mCompTime + "\n";
-    stats +=
-        "Annotated Bisimulation: " + mAnnotatedBISIMulation + " mAnnBITIME: "
-            + mAnnBITIME + "\n";
-    stats += "Bisimulation: " + mBISIMulation + " mBITIME: " + mBITIME + "\n";
-    stats += "Time: " + mTime + "\n";
-    return stats;
-  }
-
-  // #########################################################################
-  // # Overrides for Abstract Base Class
-  // # net.sourceforge.waters.model.analysis.AbstractModelVerifier
-  public void setNodeLimit(final int limit)
-  {
-    super.setNodeLimit(limit);
-    if (limit > 500000) {
-      mMaxProjStates = 500000;
-    } else {
-      mMaxProjStates = limit;
-    }
-  }
-
-  protected void addStatistics(final VerificationResult result)
-  {
-    result.setNumberOfStates(mStates);
-  }
-
-  /*
-   * private Set<Set<AutomatonProxy>> getMaxAutomaton(Set<AutomatonProxy>
-   * automata) { Set<Set<AutomatonProxy>> pairs = new
-   * THashSet<Set<AutomatonProxy>>(); AutomatonProxy maxaut = null; for
-   * (AutomatonProxy aut : automata) { maxaut = maxaut == null ? aut : maxaut;
-   * maxaut = maxaut.getStates.size() < aut.getStates().size() ? aut : maxaut; }
-   * for (AutomatonProxy aut : automata) { if (maxaut == aut) {continue;}
-   * Set<AutomatonProxy> pair = new THashSet<AutomatonProxy>(2);
-   * pair.add(maxaut); pair.add(aut); pairs.add(pair); } return pairs; }
-   *
-   * private Set<Set<AutomatonProxy>> getMinTransitions(Set<AutomatonProxy>
-   * automata) { Set<Set<AutomatonProxy>> pairs = new
-   * THashSet<Set<AutomatonProxy>>(); AutomatonProxy minaut = null; for
-   * (AutomatonProxy aut : automata) { minaut = minaut == null ? aut : minaut;
-   * minaut = minaut.getTransitions().size() > aut.getStates().size() ? aut :
-   * minaut; } for (AutomatonProxy aut : automata) { if (minaut == aut)
-   * {continue;} Set<AutomatonProxy> pair = new THashSet<AutomatonProxy>(2);
-   * pair.add(minaut); pair.add(aut); pairs.add(pair); } return pairs; }
-   */
-
-  /*
-   * private Set<Tuple> getTuples(ProductDESProxy model, Set<AutomatonProxy>
-   * automata) { THashMap<AutomatonProxy, PriorityQueue<Tuple>> queues = new
-   * THashMap<AutomatonProxy, PriorityQueue<Tuple>>(); Set<Tuple> possible = new
-   * TreeSet<Tuple>(); for (AutomatonProxy a1 : automata) { queues.put(a1, new
-   * PriorityQueue<Tuple>()); for (AutomatonProxy a2 : automata) { if (a1 == a2)
-   * {continue;} Set<AutomatonProxy> auts = new HashSet<AutomatonProxy>(2);
-   * auts.add(a1); auts.add(a2); double size = 0; Set<EventProxy> common = new
-   * HashSet<EventProxy>(model.getEvents()); Set<EventProxy> total = new
-   * HashSet<EventProxy>(); boolean contproj = false; int taus = 0; for
-   * (AutomatonProxy a : auts) { size += Math.log(a.getStates().size());
-   * total.addAll(a.getEvents()); common.retainAll(a.getEvents()); for
-   * (EventProxy e : a.getEvents()) { if (e.getName().startsWith("tau:")) {
-   * taus++; } } } double tot = 1; double uncom = 1; for (AutomatonProxy a :
-   * auts) { int uncom1 = 0; int tot1 = 0; for (TransitionProxy t :
-   * a.getTransitions()) { if (!common.contains(t.getEvent())) { uncom1++; }
-   * tot1++; } tot *= tot1; uncom *= uncom1; } size = uncom / tot;
-   * queues.get(a1).offer(new Tuple(auts, size)); } } for (AutomatonProxy a :
-   * queues.keySet()) { PriorityQueue<Tuple> queue = queues.get(a); if
-   * (queue.isEmpty()) {continue;} if (queue.size() == 1)
-   * {possible.add(queue.poll()); continue;} Tuple tup1 = queue.poll(); Tuple
-   * tup2 = queue.poll(); possible.add(new Tuple(tup1.mSet, tup1.mSize -
-   * tup2.mSize)); } return possible; }
-   */
-
-  /*
-   * private Set<Tuple> getTuples(ProductDESProxy model, Set<AutomatonProxy>
-   * automata) { Set<Tuple> possible = new TreeSet<Tuple>(); for (AutomatonProxy
-   * a1 : automata) { for (AutomatonProxy a2 : automata) { if (a1 == a2)
-   * {continue;} Set<AutomatonProxy> auts = new HashSet<AutomatonProxy>(2);
-   * auts.add(a1); auts.add(a2); double size = 0; Set<EventProxy> common = new
-   * HashSet<EventProxy>(model.getEvents()); Set<EventProxy> total = new
-   * HashSet<EventProxy>(); boolean contproj = false; int taus = 0; for
-   * (AutomatonProxy a : auts) { size += Math.log(a.getStates().size());
-   * total.addAll(a.getEvents()); common.retainAll(a.getEvents()); for
-   * (EventProxy e : a.getEvents()) { if (e.getName().startsWith("tau:")) {
-   * taus++; } } } double tot = total.size(); double uncom = tot - common.size()
-   * - taus; size = uncom/tot; possible.add(new Tuple(auts, size)); } } return
-   * possible; }
-   */
-
-  /**
-   * Returns a set of tuples. Each tuple contains a set of automaton which share
-   * a particular event and the number of events contained in the set which not
-   * all the automaton share.
-   */
-  private Set<Candidate> getPossibleCandidiates(
-                                                final ProductDESProxy model,
-                                                final Set<AutomatonProxy> automata)
-  {
-    // this sorted map is ordered by the number of automaton in the set used as
-    // the key
-    // stores the number of times a particular set of automaton share the same
-    // event
-    final SortedMap<SortedSet<AutomatonProxy>,Integer> numoccuring =
-        new TreeMap<SortedSet<AutomatonProxy>,Integer>(new AutomataComparator());
-
-    for (final EventProxy e : model.getEvents()) {
-      if (e == getMarkingProposition()) {
-        continue;
-      }
-      final SortedSet<AutomatonProxy> possess = new TreeSet<AutomatonProxy>();
-      for (final AutomatonProxy a : automata) {
-        if (a.getEvents().contains(e)) {
-          possess.add(a);
-        }
-      }
-      if (!possess.isEmpty()) {
-        if (numoccuring.get(possess) == null) {
-          numoccuring.put(possess, 0);
-        }
-        numoccuring.put(possess, numoccuring.get(possess) + 1);
-      }
-    }
-    final Set<Candidate> possible = new TreeSet<Candidate>();
-    // System.out.println("keyset:" + numoccuring.keySet().size());
-    for (final Set<AutomatonProxy> s : numoccuring.keySet()) {
-      if (s.size() > 4 && s.size() != automata.size()) {
-        continue;
-      }
-      double size = 0;
-      // stores the events which are shared by all automaton in this set
-      final Set<EventProxy> shared = new HashSet<EventProxy>(model.getEvents());
-      // stores all the events in all the automaton in this set
-      final Set<EventProxy> total = new HashSet<EventProxy>();
-      for (final AutomatonProxy a : s) {
-        // size += Math.log(a.getStates().size());
-        total.addAll(a.getEvents());
-        shared.retainAll(a.getEvents());
-      }
-      final double tot = total.size();
-      final double nonshared = tot - shared.size();
-      size = nonshared;
-      possible.add(new Candidate(s, size));
-    }
-    return possible;
-  }
-
-
-  /**
-   * Compares two SortedSets of automaton.
-   *
-   * @author Simon Ware
-   */
-  private static class AutomataComparator implements
-      Comparator<SortedSet<AutomatonProxy>>
-  {
-    /**
-     * Returns -1 is the first argument has fewer items then the second, 1 if
-     * the second item has fewer items. If they have the same number of items,
-     * the automaton themselves are compared and the first difference determines
-     * the order.
-     */
-    public int compare(final SortedSet<AutomatonProxy> s1,
-                       final SortedSet<AutomatonProxy> s2)
+    public Candidate(final Set<AutomatonProxy> set, final double size)
     {
-      if (s1.size() < s2.size()) {
-        return -1;
-      } else if (s1.size() > s2.size()) {
-        return 1;
-      }
-      final Iterator<AutomatonProxy> i1 = s1.iterator();
-      final Iterator<AutomatonProxy> i2 = s2.iterator();
-      while (i1.hasNext()) {
-        final AutomatonProxy a1 = i1.next();
-        final AutomatonProxy a2 = i2.next();
-        final int res = a1.compareTo(a2);
-        if (res != 0) {
-          return res;
-        }
-      }
-      return 0;
-    }
-  }
-
-  /*
-   * private Set<Tuple> getTuples(ProductDESProxy model, Set<AutomatonProxy>
-   * automata) { Map<EventProxy, Set<AutomatonProxy>> haveEvent = new
-   * THashMap<EventProxy, Set<AutomatonProxy>>(); for (EventProxy e :
-   * model.getEvents()) { if (e == getMarkingProposition()) { continue; }
-   * Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>(); for
-   * (AutomatonProxy a : automata) { if (a.getEvents().contains(e)) {
-   * possess.add(a); } } haveEvent.put(e, possess); } Set<Tuple> possible = new
-   * TreeSet<Tuple>(); for (AutomatonProxy a1 : automata) { for (AutomatonProxy
-   * a2 : automata) { if (a1 == a2) {continue;} Set<AutomatonProxy> auts = new
-   * HashSet<AutomatonProxy>(2); auts.add(a1); auts.add(a2); double size = 0;
-   * Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
-   * Set<EventProxy> total = new HashSet<EventProxy>(); Set<AutomatonProxy>
-   * cover = new THashSet<AutomatonProxy>(); int taus = 0; for (AutomatonProxy a
-   * : auts) { total.addAll(a.getEvents()); common.retainAll(a.getEvents()); }
-   * for (EventProxy e : total) { Set<AutomatonProxy> have = haveEvent.get(e);
-   * if (have == null) {continue;} cover.addAll(have); } for (AutomatonProxy a :
-   * cover) { size += Math.log(a.getStates().size()); } possible.add(new
-   * Tuple(auts, size)); } } return possible; }
-   */
-
-  @SuppressWarnings("unused")
-  private boolean setFailedResult(final TraceProxy counterexample,
-                                  final Map<EventProxy,EventProxy> uncont)
-  {
-    final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy des = getModel();
-    final String desname = des.getName();
-    final String tracename = desname + ":uncontrollable";
-    final List<EventProxy> events = counterexample.getEvents();
-    final int len = events.size();
-    final List<EventProxy> modevents = new ArrayList<EventProxy>(len);
-    final Iterator<EventProxy> iter = events.iterator();
-    EventProxy event = iter.next();
-    while (iter.hasNext()) {
-      modevents.add(event);
-      event = iter.next();
-    }
-    for (final Map.Entry<EventProxy,EventProxy> entry : uncont.entrySet()) {
-      if (entry.getValue() == event) {
-        final EventProxy key = entry.getKey();
-        modevents.add(key);
-        break;
-      }
-    }
-    final SafetyTraceProxy wrapper =
-        factory.createSafetyTraceProxy(tracename, des, modevents);
-    return super.setFailedResult(wrapper);
-  }
-
-
-  // #########################################################################
-  // # Inner Class ProjectionList
-  private class ProjectionList
-  {
-    final Set<AutomatonProxy> mAutomata;
-    final ProjectionList mParent;
-    final Set<AutomatonProxy> mCompautomata;
-    final Set<EventProxy> mOriginalAlphabet;
-    final Set<EventProxy> mHidden;
-    final AutomatonProxy mNew;
-    final Set<EventProxy> mTarget;
-
-    private boolean containsAny(final Set<EventProxy> contains,
-                                final Set<EventProxy> of)
-    {
-      for (final EventProxy e : of) {
-        if (contains.contains(e)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    private void blockedEvents()
-    {
-      final Set<AutomatonProxy> mTempComp = new THashSet<AutomatonProxy>();
-      final Set<AutomatonProxy> mTempAut = new THashSet<AutomatonProxy>();
-      System.out.println("before");
-      for (final AutomatonProxy aut : mCompautomata) {
-        System.out.println(aut.getName() + " trans:"
-            + aut.getTransitions().size());
-      }
-      for (final AutomatonProxy aut : mCompautomata) {
-        AutomatonProxy aut1 = aut;
-        mTempAut.clear();
-        for (final AutomatonProxy aut2 : mAutomata) {
-          if (containsAny(aut1.getEvents(), aut2.getEvents())) {
-            List<AutomatonProxy> tocomp =
-                Arrays.asList(new AutomatonProxy[] {aut1, aut2});
-            final BlockedEvents be =
-                new BlockedEvents(tocomp, getFactory(), getMarkingProposition());
-            be.setNodeLimit(100000);
-            try {
-              tocomp = be.run();
-            } catch (final AnalysisException ae) {
-              ae.printStackTrace();
-            }
-            aut1 = tocomp.get(0);
-            mTempAut.add(tocomp.get(1));
-          } else {
-            mTempAut.add(aut2);
-          }
-        }
-        mAutomata.clear();
-        mAutomata.addAll(mTempAut);
-        mTempComp.add(aut1);
-      }
-      System.out.println("after");
-      mCompautomata.clear();
-      mCompautomata.addAll(mTempComp);
-      for (final AutomatonProxy aut : mCompautomata) {
-        System.out.println(aut.getName() + " trans:"
-            + aut.getTransitions().size());
-      }
-    }
-
-    public ProjectionList(final ProjectionList parent,
-                          final Set<AutomatonProxy> automata,
-                          final Set<AutomatonProxy> compAutomata)
-        throws AnalysisException
-    {
-      mParent = parent;
-      mCompautomata = new THashSet<AutomatonProxy>(compAutomata);
-      mAutomata = new HashSet<AutomatonProxy>(automata);
-      mAutomata.removeAll(compAutomata);
-      final Set<EventProxy> events = new HashSet<EventProxy>();
-      for (final AutomatonProxy a : compAutomata) {
-        events.addAll(a.getEvents());
-      }
-      mOriginalAlphabet = events;
-      mHidden = new HashSet<EventProxy>(events);
-      for (final AutomatonProxy a : mAutomata) {
-        if (a != mSpec) {
-          mHidden.removeAll(a.getEvents());
-        }
-      }
-      if (mHidden.contains(getMarkingProposition())) {
-        mHidden.remove(getMarkingProposition());
-      }
-      if (mHidden.contains(getGeneralisedPrecondition())) {
-        mHidden.remove(getGeneralisedPrecondition());
-      }
-      final AutomataHidden ah =
-          new AutomataHidden(compAutomata, new HashSet<EventProxy>(mHidden));
-      mChecked.add(ah);
-      AutomatonProxy minAutomaton;
-      Collection<EventProxy> allwaysenabled = null;
-      Collection<EventProxy> allselflooped = null;
-      mMinAutMap.remove(ah);
-      if (mMinAutMap.containsKey(ah)) {
-        minAutomaton = mMinAutMap.get(ah);
-        if (minAutomaton == null) {
-          throw new OverflowException();
-        }
-      } else {
-        blockedEvents();
-        System.out.println("marking: " + getMarkingProposition());
-        try {
-          // removeTransitions
-          /*
-           * compAutomata.clear(); for (AutomatonProxy aut : mCompautomata) {
-           * //System.out.println("before"); //System.out.println(aut);
-           * TransitionRelation tr = new TransitionRelation(aut,
-           * getMarkingProposition(), mOriginalAlphabet); mRIT.run(tr); aut =
-           * tr.getAutomaton(getFactory()); compAutomata.add(aut);
-           * //System.out.println("after"); //System.out.println(aut); }
-           */
-          // end remove transitions
-          final NonDeterministicComposer composer =
-              new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
-                  mCompautomata), getFactory(), getMarkingProposition());
-          final int size = maxsize;
-          System.out.println(size);
-          composer.setNodeLimit(size);
-          mCompTime -= System.currentTimeMillis();
-          minAutomaton = composer.run();
-          mCompTime += System.currentTimeMillis();
-          final int compsize = minAutomaton.getStates().size();
-          mLargestComposition =
-              mLargestComposition > minAutomaton.getStates().size() ? mLargestComposition
-                  : minAutomaton.getStates().size();
-          AutomatonProxy minAutomaton2 = minAutomaton;
-          if (!mHidden.isEmpty()) {
-            TransitionRelation tr =
-                new TransitionRelation(minAutomaton, getMarkingProposition());
-            @SuppressWarnings("unused")
-            final int tau = tr.mergeEvents(mHidden, getFactory());
-            /*
-             * for (EventProxy event : mOriginalAlphabet) { if
-             * (mAllSelfLoops.containsKey(event) &&
-             * mAllSelfLoops.get(event).isEmpty()) {
-             * System.out.println("self looped");
-             * tr.removeAllSelfLoops(tr.eventToInt(event)); } }
-             * System.out.println("CC"); CertainConflict con = new
-             * CertainConflict(tr, tau); con.run(); System.out.println("TLR");
-             * TauLoopRemoval tlr = new TauLoopRemoval(tr, tau); tlr.run();
-             * minAutomaton2 = tr.getAutomaton(getFactory());
-             * System.out.println("RFT"); RemoveFollowOnTau rft = new
-             * RemoveFollowOnTau(tr, tau); rft.run();
-             * //System.out.println("before annotation" +
-             * tr.getAutomaton(getFactory())); System.out.println("ANN");
-             * AnnotateGraph an = new AnnotateGraph(tr, tau); an.run();
-             * //RemoveSubsetTau rst = new RemoveSubsetTau(tr, tau); rst.run();
-             * //EquivalentIncoming eq = new EquivalentIncoming(tr); eq.run();
-             * for (EventProxy event : mOriginalAlphabet) { if
-             * (mAllwaysEnabled.containsKey(event)) { Set<AutomatonProxy> auts =
-             * new HashSet<AutomatonProxy>(mAllwaysEnabled.get(event));
-             * auts.removeAll(mAutomata); if (auts.isEmpty()) {
-             * System.out.println("allways enabled");
-             * tr.removeAllAnnotations(tr.eventToInt(event)); } } }
-             */
-            System.out.println("AUT");
-            minAutomaton = tr.getAutomaton(getFactory());
-            // System.out.println("after annotation:" + minAutomaton);
-            System.out.println("minautomaton size:"
-                + minAutomaton.getStates().size());
-            mAnnBITIME -= System.currentTimeMillis();
-            final BiSimulator sim =
-                new BiSimulator(minAutomaton, getMarkingProposition(),
-                    getFactory());
-            mAnnotatedBISIMulation += minAutomaton.getStates().size();
-            minAutomaton = sim.run();
-            mAnnBITIME += System.currentTimeMillis();
-            mAnnotatedBISIMulation -= minAutomaton.getStates().size();
-            tr = new TransitionRelation(minAutomaton, getMarkingProposition());
-            System.out.println("UNA");
-            /*
-             * UnAnnotateGraph ua = new UnAnnotateGraph(tr,
-             * getMarkingProposition()); minAutomaton = ua.run(getFactory());
-             * EventProxy taue = ua.getTau();
-             */
-            // System.out.println("after unannotation:" + minAutomaton);
-            /*
-             * minAutomaton = TauRemoval.unnanotateAutomaton(minAutomaton,
-             * getMarkingProposition(), getFactory());
-             */
-            /*
-             * mBITIME -= System.currentTimeMillis(); sim = new
-             * BiSimulator(minAutomaton, getMarkingProposition(), getFactory());
-             * mBISIMulation += minAutomaton.getStates().size(); minAutomaton =
-             * sim.run(); mBITIME += System.currentTimeMillis(); mBISIMulation
-             * -= minAutomaton.getStates().size();
-             */
-            tr = new TransitionRelation(minAutomaton, getMarkingProposition());
-            final int taunum = 0; // *** tr.eventToInt(taue);
-            final RemoveUnneededTransitions rut =
-                new RemoveUnneededTransitions(tr, taunum);
-            rut.run();
-            minAutomaton = tr.getAutomaton(getFactory());
-            mStates += minAutomaton.getStates().size();
-            final int diff = compsize - minAutomaton.getStates().size();
-            mAggDiff += diff;
-            mSmallestDiff = mSmallestDiff > diff ? diff : mSmallestDiff;
-            mLargestDiff = mLargestDiff < diff ? diff : mLargestDiff;
-            // if (diff < 0) {throw new AnalysisException("exception");}
-          } else {
-            mBITIME -= System.currentTimeMillis();
-            final BiSimulator sim =
-                new BiSimulator(minAutomaton2, getMarkingProposition(),
-                    getFactory());
-            // mBISIMulation += minAutomaton2.getStates().size();
-            minAutomaton2 = sim.run();
-            mBITIME += System.currentTimeMillis();
-            // mBISIMulation -= minAutomaton2.getStates().size();
-          }
-          if (minAutomaton.getStates().size() > minAutomaton2.getStates()
-              .size()) {
-            System.out.println("SWITCH");
-            System.out.println("SWITCH");
-            switched++;
-            minAutomaton = minAutomaton2;
-          }
-          final TransitionRelation tr =
-              new TransitionRelation(minAutomaton, getMarkingProposition());
-          allwaysenabled = tr.getAllwaysEnabled();
-          allselflooped = tr.getAllSelfLoops();
-          // mMinAutMap.put(ah, minAutomaton);
-        } catch (final AnalysisException exception) {
-          mCompTime += System.currentTimeMillis();
-          mStates += mMaxProjStates;
-          mMinAutMap.put(ah, null);
-          throw exception;
-        } catch (final Exception exception) {
-          minAutomaton = null;
-          exception.printStackTrace();
-          System.exit(0);
-        }
-      }
-      // RemoveTransitions
-      // mRIT.removeAutomata(mCompautomata);
-      // mRIT.addAutomata(Collections.singleton(minAutomaton));
-      // EndRemoveTransitions
-      for (final EventProxy e : minAutomaton.getEvents()) {
-        if (mAllSelfLoops.containsKey(e)) {
-          mAllSelfLoops.get(e).removeAll(mCompautomata);
-          mAlwaysEnabled.get(e).removeAll(mCompautomata);
-          mAllSelfLoops.get(e).add(minAutomaton);
-          mAlwaysEnabled.get(e).add(minAutomaton);
-        }
-      }
-      for (final EventProxy e : allselflooped) {
-        if (mAllSelfLoops.containsKey(e)) {
-          mAllSelfLoops.get(e).remove(minAutomaton);
-          /*
-           * System.out.print("Auts: "); for (AutomatonProxy a :
-           * mAllSelfLoops.get(e)) { System.out.print(a.getName() + " "); }
-           * System.out.println();
-           */
-        }
-      }
-      for (final EventProxy e : allwaysenabled) {
-        if (mAllSelfLoops.containsKey(e)) {
-          mAlwaysEnabled.get(e).remove(minAutomaton);
-          /*
-           * System.out.print("Auts: "); for (AutomatonProxy a :
-           * mAllwaysEnabled.get(e)) { System.out.print(a.getName() + " "); }
-           * System.out.println();
-           */
-        }
-      }
-      mAutomata.add(minAutomaton);
-      mDontOnOwn.add(minAutomaton);
-      mNew = minAutomaton;
-      mTarget = new HashSet<EventProxy>();
-      for (final AutomatonProxy a : mAutomata) {
-        mTarget.addAll(a.getEvents());
-      }
-    }
-
-    public ProductDESProxy getModel()
-    {
-      return getFactory().createProductDESProxy("model", mTarget, mAutomata);
-    }
-
-    @SuppressWarnings("unused")
-    public Set<AutomatonProxy> getComposed()
-    {
-      return mCompautomata;
-    }
-
-    public AutomatonProxy getNew()
-    {
-      return mNew;
+      automata = set;
+      mSize = size;
+      localEvents = null;
     }
 
     public Set<AutomatonProxy> getAutomata()
     {
-      return mAutomata;
+      return automata;
     }
 
-    @SuppressWarnings("unused")
-    public TraceProxy getTrace(TraceProxy trace, final ProductDESProxy model)
+    public void setLocalEvents(final Set<EventProxy> localevents)
     {
-      final List<Map<StateProxy,Set<EventProxy>>> events =
-          new ArrayList<Map<StateProxy,Set<EventProxy>>>(mCompautomata.size());
-      final List<Map<Key,StateProxy>> automata =
-          new ArrayList<Map<Key,StateProxy>>(mCompautomata.size());
-      List<StateProxy> currstate =
-          new ArrayList<StateProxy>(mCompautomata.size());
-      final AutomatonProxy[] aut = new AutomatonProxy[mCompautomata.size()];
-      int i = 0;
-      for (final AutomatonProxy proxy : mCompautomata) {
-        events.add(new HashMap<StateProxy,Set<EventProxy>>(proxy.getStates()
-            .size()));
-        automata
-            .add(new HashMap<Key,StateProxy>(proxy.getTransitions().size()));
-        final Set<EventProxy> autevents =
-            new HashSet<EventProxy>(mOriginalAlphabet);
-        // System.out.println(autevents);
-        autevents.removeAll(proxy.getEvents());
-        // System.out.println(autevents);
-        int init = 0;
-        final Set<StateProxy> states = proxy.getStates();
-        for (final StateProxy s : states) {
-          if (s.isInitial()) {
-            init++;
-            currstate.add(s);
-          }
-          events.get(i).put(s, new HashSet<EventProxy>(autevents));
-        }
-        assert (init == 1);
-        final Collection<TransitionProxy> trans = proxy.getTransitions();
-        for (final TransitionProxy t : trans) {
-          events.get(i).get(t.getSource()).add(t.getEvent());
-          automata.get(i).put(new Key(t.getSource(), t.getEvent()),
-                              t.getTarget());
-        }
-        aut[i] = proxy;
-        i++;
-      }
-      Queue<Place> stateList = new PriorityQueue<Place>();
-      Place place = new Place(currstate, null, 0, null);
-      stateList.offer(place);
-      final List<EventProxy> oldevents = trace.getEvents();
-      // System.out.println(oldevents);
-
-      final Set<Place> visited = new HashSet<Place>();
-      visited.add(place);
-      while (true) {
-        place = stateList.poll();
-        // System.out.println(place.getTrace());
-        if (place.mIndex >= oldevents.size()) {
-          break;
-        }
-        currstate = place.mCurrState;
-        final Set<EventProxy> possevents = new HashSet<EventProxy>(mHidden);
-        // System.out.println(mHidden);
-        hidden: for (final EventProxy pe : possevents) {
-          // System.out.println(pe);
-          final List<StateProxy> newstate =
-              new ArrayList<StateProxy>(currstate.size());
-          for (i = 0; i < currstate.size(); i++) {
-            if (aut[i].getEvents().contains(pe)) {
-              final StateProxy t =
-                  automata.get(i).get(new Key(currstate.get(i), pe));
-              // System.out.println(t);
-              if (t == null) {
-                continue hidden;
-              }
-              newstate.add(t);
-            } else {
-              newstate.add(currstate.get(i));
-            }
-          }
-          // System.out.println(newstate);
-          final Place newPlace = new Place(newstate, pe, place.mIndex, place);
-          if (visited.add(newPlace)) {
-            stateList.offer(newPlace);
-          }
-        }
-        final EventProxy currevent = oldevents.get(place.mIndex);
-        final List<StateProxy> newstate =
-            new ArrayList<StateProxy>(currstate.size());
-        boolean contains = true;
-        for (i = 0; i < currstate.size(); i++) {
-          if (aut[i].getEvents().contains(currevent)) {
-            final StateProxy t =
-                automata.get(i).get(new Key(currstate.get(i), currevent));
-            if (t == null) {
-              contains = false;
-            }
-            newstate.add(t);
-          } else {
-            newstate.add(currstate.get(i));
-          }
-        }
-        final Place newPlace =
-            new Place(newstate, currevent, place.mIndex + 1, place);
-        if (contains && visited.add(newPlace)) {
-          stateList.offer(newPlace);
-        }
-        assert (!stateList.isEmpty());
-      }
-      stateList = null;
-      final ProductDESProxy mod = mParent == null ? model : mParent.getModel();
-      trace = getFactory().createSafetyTraceProxy(mod, place.getTrace());
-      return mParent == null ? trace : mParent.getTrace(trace, model);
-    }
-
-
-    private class Place implements Comparable<Place>
-    {
-      public final List<StateProxy> mCurrState;
-      public final EventProxy mEvent;
-      public final int mIndex;
-      public final Place mParent;
-
-      public Place(final List<StateProxy> currState, final EventProxy event,
-                   final int index, final Place parent)
-      {
-        mCurrState = currState;
-        mEvent = event;
-        mIndex = index;
-        mParent = parent;
-      }
-
-      public List<EventProxy> getTrace()
-      {
-        if (mParent == null) {
-          return new LinkedList<EventProxy>();
-        }
-        final List<EventProxy> events = mParent.getTrace();
-        events.add(mEvent);
-        return events;
-      }
-
-      public int compareTo(final Place other)
-      {
-        return other.mIndex - mIndex;
-      }
-
-      public int hashCode()
-      {
-        int hash = 7;
-        hash = hash + mIndex * 31;
-        hash = hash + mCurrState.hashCode();
-        return hash;
-      }
-
-      public boolean equals(final Object o)
-      {
-        final Place p = (Place) o;
-        return p.mIndex == mIndex && p.mCurrState.equals(mCurrState);
-      }
-    }
-
-
-    private class Key
-    {
-      private final StateProxy mState;
-      private final EventProxy mEvent;
-      private final int mHash;
-
-      public Key(final StateProxy state, final EventProxy event)
-      {
-        int hash = 7;
-        hash += state.hashCode() * 31;
-        hash += event.hashCode() * 31;
-        mState = state;
-        mEvent = event;
-        mHash = hash;
-      }
-
-      public int hashCode()
-      {
-        return mHash;
-      }
-
-      public boolean equals(final Object other)
-      {
-        if (other != null && other.getClass() == getClass()) {
-          final Key key = (Key) other;
-          return mState.equals(key.mState) && mEvent.equals(key.mEvent);
-        } else {
-          return false;
-        }
-      }
-    }
-  }
-
-
-  /**
-   * A class that stores the events which are hidden for a set of automaton.
-   */
-  private static class AutomataHidden
-  {
-    public final Set<AutomatonProxy> mAutomata;
-    public final Set<EventProxy> mHidden;
-
-    public AutomataHidden(final Set<AutomatonProxy> automata,
-                          final Set<EventProxy> hidden)
-    {
-      mAutomata = automata;
-      mHidden = hidden;
-    }
-
-    public int hashCode()
-    {
-      int code = 31 + mAutomata.hashCode();
-      code = code * 31 + mHidden.hashCode();
-      return code;
-    }
-
-    public boolean equals(final Object o)
-    {
-      if (o != null && o.getClass() == getClass()) {
-        final AutomataHidden a = (AutomataHidden) o;
-        return mAutomata.equals(a.mAutomata) && mHidden.equals(a.mHidden);
-      }
-      return false;
-    }
-  }
-
-
-  private static class Candidate implements Comparable<Candidate>
-  {
-    public final Set<AutomatonProxy> mSet;
-    public final double mSize;
-
-    public Candidate(final Set<AutomatonProxy> set, final double size)
-    {
-      mSet = set;
-      mSize = size;
+      localEvents = localevents;
     }
 
     public int compareTo(final Candidate t)
@@ -1208,36 +348,8 @@ public class CompositionalGeneralisedConflictChecker extends
 
   // #########################################################################
   // # Data Members
-  private int minSize = 10000;
-  private final AutomatonProxy mSpec = null;
-  private int mStates;
-  private int mMaxProjStates;
-  private final Map<AutomataHidden,AutomatonProxy> mMinAutMap =
-      new HashMap<AutomataHidden,AutomatonProxy>();
-  private final Set<AutomataHidden> mChecked = new HashSet<AutomataHidden>();
-  private final Set<AutomatonProxy> mDontOnOwn = new HashSet<AutomatonProxy>();
-  private final Map<EventProxy,Set<AutomatonProxy>> mAllSelfLoops =
-      new THashMap<EventProxy,Set<AutomatonProxy>>();
-  private final Map<EventProxy,Set<AutomatonProxy>> mAlwaysEnabled =
-      new THashMap<EventProxy,Set<AutomatonProxy>>();
-  private int mLargestComposition = 0;
-
-  private int mAnnotatedBISIMulation = 0;
-  private int mBISIMulation = 0;
-  private int mCompTime = 0;
-  private int mAnnBITIME = 0;
-  private int mBITIME = 0;
-  private int mSmallestDiff = Integer.MAX_VALUE;
-  private int mLargestDiff = Integer.MIN_VALUE;
-  private int mAggDiff = 0;
-  private int maxsize = 1000;
-  private int switched = 0;
-  private int mTime = 0;
 
   // #########################################################################
   // # Class Constants
-  @SuppressWarnings("unused")
-  private static final Logger LOGGER =
-      LoggerFactory.createLogger(CompositionalGeneralisedConflictChecker.class);
 
 }
