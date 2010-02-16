@@ -341,34 +341,4 @@ public abstract class AbstractSICPropertyVVerifierTest extends
                                         states, null);
   }
 
-  // #########################################################################
-  // # Overrides for junit.framework.TestCase
-  /*
-   * protected void setUp() throws Exception { super.setUp(); final
-   * ModuleProxyFactory moduleFactory = ModuleElementFactory.getInstance();
-   * mProductDESFactory = ProductDESElementFactory.getInstance(); final
-   * OperatorTable optable = CompilerOperatorTable.getInstance();
-   * mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
-   * mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
-   * mTraceMarshaller = new JAXBTraceMarshaller(mProductDESFactory);
-   * mDocumentManager = new DocumentManager();
-   * mDocumentManager.registerMarshaller(mModuleMarshaller);
-   * mDocumentManager.registerMarshaller(mProductDESMarshaller);
-   * mDocumentManager.registerMarshaller(mTraceMarshaller);
-   * mDocumentManager.registerUnmarshaller(mModuleMarshaller);
-   * mDocumentManager.registerUnmarshaller(mProductDESMarshaller); }
-   *
-   * protected void tearDown() throws Exception { // mOutputDirectory = null;
-   * mProductDESFactory = null; mModuleMarshaller = null; mProductDESMarshaller
-   * = null; mTraceMarshaller = null; mDocumentManager = null; super.tearDown();
-   * }
-   */
-
-  // #########################################################################
-  // # Data Members
-  private ProductDESProxyFactory mProductDESFactory;
-  // private JAXBModuleMarshaller mModuleMarshaller;
-  // private JAXBProductDESMarshaller mProductDESMarshaller;
-  // private JAXBTraceMarshaller mTraceMarshaller;
-  // private DocumentManager mDocumentManager;
 }
