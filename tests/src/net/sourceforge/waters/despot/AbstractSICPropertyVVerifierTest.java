@@ -10,8 +10,6 @@
 package net.sourceforge.waters.despot;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,9 +23,7 @@ import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -36,14 +32,11 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
-import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
@@ -55,8 +48,8 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     AbstractConflictCheckerTest
 {
 
-  //#########################################################################
-  //# Test Cases
+  // #########################################################################
+  // # Test Cases
   public void testSICPropertyVVerifier_parManEg_I_mfb_lowlevel()
       throws Exception
   {
@@ -156,8 +149,6 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     runModelVerifier("despot", "testHISC", "hisc9_low2.wmod", false);
   }
 
-  /*
-   * These are too big---must go into 'large' test ...
   public void testSICPropertyVVerifier_aip3_syn_as1() throws Exception
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "as1.wmod", true);
@@ -197,168 +188,6 @@ public abstract class AbstractSICPropertyVVerifierTest extends
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "tu4.wmod", true);
   }
-   */
-
-
-  //#########################################################################
-  //# General Testing Methods
-  /*
-   * void testConflictChecker(final String group, final String subdir, final
-   * String name, final boolean expectedResult) throws Exception { final
-   * Collection<EventProxy> answerEvents = getModelAnswerEvents(group, subdir,
-   * name); boolean falseFound = false; MonolithicConflictChecker
-   * conflictChecker = null;
-   *
-   * for (final EventProxy answer : answerEvents) { final ProductDESProxy
-   * modifiedDES = mBuilder.createModelForAnswer(answer); final EventProxy
-   * defaultMark = mBuilder.getMarkingProposition(); final EventProxy
-   * preconditionMark = mBuilder.getGeneralisedPrecondition(); conflictChecker =
-   * new MonolithicConflictChecker(modifiedDES, defaultMark, preconditionMark,
-   * mProductDESFactory); final boolean result = conflictChecker.run();
-   *
-   * if (!result) { final ConflictTraceProxy counterexample =
-   * conflictChecker.getCounterExample();
-   * precheckCounterExample(counterexample); final File traceFilename =
-   * saveCounterExample(counterexample);
-   * counterexample.setLocation(traceFilename.toURI());
-   *
-   * final ConflictTraceProxy convertedTrace =
-   * mBuilder.convertTraceToOriginalModel(counterexample, answer);
-   * checkConvertedCounterExample(mBuilder.getUnchangedModel(), convertedTrace,
-   * answer);
-   *
-   * if (expectedResult) { assertEquals(
-   * "Wrong result from model checker: the answer " + answer.getName() +
-   * " gives " + result +
-   * " but this model should have satisfied SICPropertyV, therefore all " +
-   * "answer events should produce true as a result!", expectedResult, result);
-   * } else if (!expectedResult) { falseFound = true; } break; }
-   *
-   * } if (!expectedResult && !falseFound) { final ConflictTraceProxy
-   * counterexample = conflictChecker.getCounterExample();
-   * precheckCounterExample(counterexample); saveCounterExample(counterexample);
-   * assertEquals(
-   * "Wrong result from model checker: all answers in the model give true as a result "
-   * +
-   * " but this model should not satisfy SICPropertyV, therefore atleast one answer "
-   * + "event should have produced a false result!", !expectedResult,
-   * !falseFound); } final boolean finalResult = mPropertyVerifier.run();
-   * assertEquals("Wrong result from SIC Property V Verifier.", expectedResult,
-   * finalResult); }
-   */
-
-  void testSICPropertyVVerifier(final String group, final String subdir,
-                                final String name, final boolean expectedResult)
-      throws Exception
-  {
-    final Collection<EventProxy> answerEvents =
-        getModelAnswerEvents(group, subdir, name);
-    boolean falseFound = false;
-    MonolithicConflictChecker conflictChecker = null;
-
-    for (final EventProxy answer : answerEvents) {
-      final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
-      final EventProxy defaultMark = mBuilder.getMarkingProposition();
-      final EventProxy preconditionMark = mBuilder.getGeneralisedPrecondition();
-      conflictChecker =
-          new MonolithicConflictChecker(modifiedDES, defaultMark,
-              preconditionMark, mProductDESFactory);
-      final boolean result = conflictChecker.run();
-
-      if (!result) {
-        final ConflictTraceProxy counterexample =
-            conflictChecker.getCounterExample();
-        precheckCounterExample(counterexample);
-        final File traceFilename = saveCounterExample(counterexample);
-        counterexample.setLocation(traceFilename.toURI());
-
-        final ConflictTraceProxy convertedTrace =
-            mBuilder.convertTraceToOriginalModel(counterexample, answer);
-        checkCounterExample(mBuilder.getUnchangedModel(), convertedTrace,
-                            answer);
-
-        if (expectedResult) {
-          assertEquals(
-                       "Wrong result from model checker: the answer "
-                           + answer.getName()
-                           + " gives "
-                           + result
-                           + " but this model should have satisfied SICPropertyV, therefore all "
-                           + "answer events should produce true as a result!",
-                       expectedResult, result);
-        } else if (!expectedResult) {
-          falseFound = true;
-        }
-        break;
-      }
-
-    }
-    if (!expectedResult && !falseFound) {
-      final ConflictTraceProxy counterexample =
-          conflictChecker.getCounterExample();
-      precheckCounterExample(counterexample);
-      saveCounterExample(counterexample);
-      assertEquals(
-                   "Wrong result from model checker: all answers in the model give true as a result "
-                       + " but this model should not satisfy SICPropertyV, therefore atleast one answer "
-                       + "event should have produced a false result!",
-                   !expectedResult, !falseFound);
-    }
-    final boolean finalResult = mPropertyVerifier.run();
-    assertEquals("Wrong result from SIC Property V Verifier.", expectedResult,
-                 finalResult);
-  }
-
-  protected File saveCounterExample(final TraceProxy counterexample)
-      throws Exception
-  {
-    assertNotNull(counterexample);
-    final String name = counterexample.getName();
-    final String ext = mTraceMarshaller.getDefaultExtension();
-    final StringBuffer buffer = new StringBuffer(name);
-    buffer.append(ext);
-    final String extname = buffer.toString();
-    assertTrue("File name '" + extname + "' contains a colon, "
-        + "which does not work on all platforms!", extname.indexOf(':') < 0);
-    final File dir = getOutputDirectory();
-    final File filename = new File(dir, extname);
-    ensureParentDirectoryExists(filename);
-    mTraceMarshaller.marshal(counterexample, filename);
-    return filename;
-  }
-
-  protected ProductDESProxy loadProductDES(final URI unmodifiedDESURI)
-      throws WatersUnmarshalException, IOException, EvalException
-  {
-    final DocumentProxy doc = mDocumentManager.load(unmodifiedDESURI);
-    ProductDESProxy des;
-    if (doc instanceof ProductDESProxy) {
-      des = (ProductDESProxy) doc;
-    } else {
-      final ModuleProxy module = (ModuleProxy) doc;
-      final ModuleCompiler compiler =
-          new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
-      des = compiler.compile();
-    }
-    return des;
-  }
-
-  protected Collection<EventProxy> getModelAnswerEvents(final String group,
-                                                        final String subdir,
-                                                        final String name)
-      throws Exception
-  {
-    final File groupname = new File(mInputDirectory, group);
-    final File indirname = new File(groupname, subdir);
-    final String wmodext = mModuleMarshaller.getDefaultExtension();
-    final File infilename = new File(indirname, name + wmodext);
-    final URI unmodifiedDESURI = infilename.toURI();
-
-    final ProductDESProxy originalDES = loadProductDES(unmodifiedDESURI);
-    mBuilder.setInputModel(originalDES);
-    mPropertyVerifier.setModel(originalDES);
-    return mBuilder.getAnswerEvents();
-  }
 
   protected ModelVerifier createModelVerifier(
                                               final ProductDESProxyFactory factory)
@@ -380,14 +209,14 @@ public abstract class AbstractSICPropertyVVerifierTest extends
    * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
    */
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace,
-                                     final EventProxy answer) throws Exception
+                                     final TraceProxy trace) throws Exception
   {
     final ConflictTraceProxy counterexample = (ConflictTraceProxy) trace;
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int size = automata.size();
     final Map<AutomatonProxy,StateProxy> tuple =
         new HashMap<AutomatonProxy,StateProxy>(size);
+    final EventProxy failedAnswer = mPropertyVerifier.getFailedAnswer();
     for (final AutomatonProxy aut : automata) {
       final StateProxy state = checkCounterExample(aut, counterexample);
       assertNotNull("Counterexample not accepted by automaton " + aut.getName()
@@ -401,7 +230,7 @@ public abstract class AbstractSICPropertyVVerifierTest extends
         final Collection<TransitionProxy> transitions = aut.getTransitions();
         for (final TransitionProxy transition : transitions) {
           if (transition.getSource() == state) {
-            if (transition.getEvent() == answer) {
+            if (transition.getEvent() == failedAnswer) {
               answerEnabled = true;
               break;
             }
@@ -411,14 +240,14 @@ public abstract class AbstractSICPropertyVVerifierTest extends
           final File filename = saveCounterExample(trace);
           fail("Counterexample leads to a state where the interface "
               + aut.getName() + " does not have the answer event "
-              + answer.getName() + " enabled (trace written to " + filename
-              + ")!");
+              + failedAnswer.getName() + " enabled (trace written to "
+              + filename + ")!");
         }
       }
     }
 
     final ProductDESProxy ldes =
-        createLanguageInclusionModel(des, tuple, answer);
+        createLanguageInclusionModel(des, tuple, failedAnswer);
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final LanguageInclusionChecker lchecker =
         createLanguageInclusionChecker(ldes, factory);
@@ -427,10 +256,15 @@ public abstract class AbstractSICPropertyVVerifierTest extends
       final TraceProxy ltrace = lchecker.getCounterExample();
       final File filename = saveCounterExample(ltrace);
       fail("Counterexample does not lead to a state where the answer event "
-          + answer.getName() + " can never be executed (trace written to"
+          + failedAnswer.getName() + " can never be executed (trace written to"
           + filename + ")!");
     }
 
+  }
+
+  protected void setPropertyVerifier(final SICPropertyVVerifier propVerifier)
+  {
+    mPropertyVerifier = propVerifier;
   }
 
   // #########################################################################
@@ -564,7 +398,6 @@ public abstract class AbstractSICPropertyVVerifierTest extends
   protected void setUp() throws Exception
   {
     super.setUp();
-    mInputDirectory = getWatersInputRoot();
     final ModuleProxyFactory moduleFactory = ModuleElementFactory.getInstance();
     mProductDESFactory = ProductDESElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
@@ -577,22 +410,17 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     mDocumentManager.registerMarshaller(mTraceMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
-    mBuilder = new SICPropertyVBuilder(mProductDESFactory);
     mConflictChecker = createConflictChecker(mProductDESFactory);
-    mPropertyVerifier =
-        new SICPropertyVVerifier(mConflictChecker, mProductDESFactory);
   }
 
   protected void tearDown() throws Exception
   {
-    mInputDirectory = null;
     // mOutputDirectory = null;
     mProductDESFactory = null;
     mModuleMarshaller = null;
     mProductDESMarshaller = null;
     mTraceMarshaller = null;
     mDocumentManager = null;
-    mBuilder = null;
     mConflictChecker = null;
     mPropertyVerifier = null;
     super.tearDown();
@@ -600,14 +428,11 @@ public abstract class AbstractSICPropertyVVerifierTest extends
 
   // #########################################################################
   // # Data Members
-  private File mInputDirectory;
-  // private File mOutputDirectory;
   private ProductDESProxyFactory mProductDESFactory;
   private JAXBModuleMarshaller mModuleMarshaller;
   private JAXBProductDESMarshaller mProductDESMarshaller;
   private JAXBTraceMarshaller mTraceMarshaller;
   private DocumentManager mDocumentManager;
-  private SICPropertyVBuilder mBuilder;
   private ConflictChecker mConflictChecker;
   private SICPropertyVVerifier mPropertyVerifier;
 
