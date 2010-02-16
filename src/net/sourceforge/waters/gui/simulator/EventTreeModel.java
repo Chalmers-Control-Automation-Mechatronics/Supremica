@@ -1,6 +1,7 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,7 +12,6 @@ import javax.swing.tree.TreePath;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 public class EventTreeModel
   implements TreeModel, SimulationObserver
@@ -24,6 +24,7 @@ public class EventTreeModel
     sim.attach(this);
     mSim = sim;
     mSortingEvents = sortingEvents;
+    sortedEvents = sim.getAllEvents();
     setupAllEvents(mSim, sortingEvents);
   }
 
@@ -45,15 +46,7 @@ public class EventTreeModel
     }
     else if (EventProxy.class.isInstance(parent))
     {
-      final ArrayList<AutomatonProxy> auto = new ArrayList<AutomatonProxy>();
-      for (final AutomatonProxy search : mSim.getAutomata())
-      {
-        if (search.getEvents().contains((EventProxy)parent))
-        {
-          auto.add(search);
-        }
-      }
-      return auto.get(index);
+      return mSim.getAutomataSensitiveToEvent((EventProxy)parent).get(index);
     }
     else
       return null;
@@ -67,15 +60,8 @@ public class EventTreeModel
     }
     else if (EventProxy.class.isInstance(parent))
     {
-      final ArrayList<AutomatonProxy> auto = new ArrayList<AutomatonProxy>();
-      for (final AutomatonProxy search : mSim.getAutomata())
-      {
-        if (search.getEvents().contains((EventProxy)parent))
-        {
-          auto.add(search);
-        }
-      }
-      return auto.size();
+      System.out.println("Number of children:" + mSim.getAutomataSensitiveToEvent((EventProxy)parent).size());
+      return mSim.getAutomataSensitiveToEvent((EventProxy)parent).size();
     }
     else
       return 0;
@@ -89,15 +75,7 @@ public class EventTreeModel
     }
     else if (EventProxy.class.isInstance(parent))
     {
-      final ArrayList<AutomatonProxy> auto = new ArrayList<AutomatonProxy>();
-      for (final AutomatonProxy search : mSim.getAutomata())
-      {
-        if (search.getEvents().contains((EventProxy)parent))
-        {
-          auto.add(search);
-        }
-      }
-      return auto.indexOf(child);
+      return mSim.getAutomataSensitiveToEvent((EventProxy)parent).indexOf(child);
     }
     else
       return -1;
@@ -145,170 +123,16 @@ public class EventTreeModel
 
   private void setupAllEvents(final Simulation sim, final List<Pair<Boolean, Integer>> sortingMethods)
   {
-    final ArrayList<Integer> sortedIndexes = sortArrayList(sim.getAllEvents(), sortingMethods);
-    final ArrayList<EventProxy> output = new ArrayList<EventProxy>();
-    for (final Integer index : sortedIndexes)
-    {
-      final EventProxy event = sim.getAllEvents().get(index);
-      output.add(event);
-    }
-    sortedEvents = output;
+    //final long time = System.currentTimeMillis();
+    final EventJTreeComparitor comparitor = new EventJTreeComparitor(sim, sortingMethods);
+    Collections.sort(sortedEvents, comparitor);
   }
-
-
-  private ArrayList<Integer> sortArrayList (final List<EventProxy> raw, final List<Pair<Boolean, Integer>> sortingMethods)
-  {
-    final ArrayList<Integer> output = new ArrayList<Integer>();
-    final ArrayList<EventProxy> temp = new ArrayList<EventProxy>();
-    for (int looper = 0; looper < raw.size(); looper++)
-    {
-      final int index = findIndex(temp, raw.get(looper), sortingMethods);
-      output.add(index, looper);
-      temp.add(index, raw.get(looper));
-    }
-    return output;
-  }
-  private int findIndex(final ArrayList<EventProxy> sorted, final EventProxy toAdd, final List<Pair<Boolean, Integer>> sortingMethods)
-  {
-    for (int looper = 0; looper < sorted.size(); looper++)
-    {
-      if (!isLowerThan(toAdd, sorted.get(looper), sortingMethods))
-        return looper;
-    }
-    return sorted.size();
-  }
-
-  /**
-   * Returns TRUE if a is lower in the tree than b
-   */
-  private boolean isLowerThan(final EventProxy a, final EventProxy b, final List<Pair<Boolean, Integer>> sortingMethods)
-  {
-    if (sortingMethods.size() == 0)
-    {
-      return true;
-    }
-    final int sortingMethod = sortingMethods.get(0).getSecond();
-    final boolean isAscending = sortingMethods.get(0).getFirst();
-    int compare;
-    switch (sortingMethod)
-    {
-    case 0:
-      compare = sortByType(a, b);
-      break;
-    case 1:
-      compare = sortByName(a, b);
-      break;
-    case 2:
-      compare = sortByEnabled(a, b);
-      break;
-    default:
-      throw new UnsupportedOperationException("Unsupported Sort Method");
-    }
-    if ((compare < 0 && isAscending) || (compare > 0 && !isAscending))
-      return true;
-    if ((compare < 0 && !isAscending || compare > 0 && isAscending))
-      return false;
-    return isLowerThan(a, b, sortingMethods.subList(1, sortingMethods.size()));
-  }
-
-  /**
-   * Returns a POSITIVE NUMBER if a comes before b alphabetically, NEGATIVE number if b comes before a, and ZERO if they are equal
-   * @param a
-   * @param b
-   * @return
-   */
-  public int sortByName(final EventProxy a, final EventProxy b)
-  {
-    return -a.getName().compareTo(b.getName());
-  }
-
-  /**
-   * Returns a POSITIVE NUMBER if a is before b in the default setting. The default order is ENABLED, DISABLED, BLOCKING
-   * @param a
-   * @param b
-   * @return
-   */
-  public int sortByEnabled(final EventProxy a, final EventProxy b)
-  {
-    boolean aIsEnabled = false;
-    boolean bIsEnabled = false;
-    for (final Step step : mSim.getValidTransitions())
-    {
-      if (step.getEvent() == a)
-        aIsEnabled = true;
-      if (step.getEvent() == b)
-        bIsEnabled = true;
-    }
-    if (b == null)
-      throw new IllegalArgumentException("NULL EVENT");
-    if (aIsEnabled)
-    {
-      if (bIsEnabled)
-      {
-        return 0;
-      }
-      else
-      {
-        return 1;
-      }
-    }
-    else if (mSim.getNonControllable(a) != null)
-    {
-      if (mSim.getNonControllable(b) != null)
-      {
-        return 0;
-      }
-      else
-      {
-        return -1;
-      }
-    }
-    else
-    {
-      if (bIsEnabled)
-      {
-        return -1;
-      }
-      else if (mSim.getNonControllable(b) != null)
-      {
-        return 1;
-      }
-      else
-      {
-        return 0;
-      }
-    }
-  }
-
-  /**
-   * Returns a POSITIVE NUMBER if a is a controllable and b isn't, NEGATIVE if b is controllable and a isn't, and ZERO if they are the same
-   * @param a
-   * @param b
-   * @return
-   */
-    public int sortByType(final EventProxy a, final EventProxy b)
-   {
-     if (a.getKind() == EventKind.CONTROLLABLE)
-     {
-       if (b.getKind() == EventKind.CONTROLLABLE)
-         return 0;
-       else
-         return 1;
-     }
-     else
-     {
-       if (b.getKind() == EventKind.CONTROLLABLE)
-         return -1;
-       else
-         return 0;
-     }
-   }
 
 
   // #################################################################
   // # Data Members
   private final Simulation mSim;
   private LinkedList<TreeModelListener> mListeners;
-  private ArrayList<EventProxy> sortedEvents;
+  private final List<EventProxy> sortedEvents;
   private final ArrayList<Pair<Boolean,Integer>> mSortingEvents;
 }

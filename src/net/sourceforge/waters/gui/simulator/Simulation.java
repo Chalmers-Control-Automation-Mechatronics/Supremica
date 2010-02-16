@@ -48,7 +48,6 @@ public class Simulation implements ModelObserver, Observer
   //# Constructors
   public Simulation(final ModuleContainer container)
   {
-    time = System.currentTimeMillis();
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, optable);
@@ -71,14 +70,15 @@ public class Simulation implements ModelObserver, Observer
     final ProductDESProxy des = container.getCompiledDES();
     setCompiledDES(des);
     mTransitionsToEvents = new TransitionEventMap(des);
+    updateAutomataSensitiveToEvent();
     updateControllability(true);
     findEventClassification();
     addNewSimulatorState();
-    System.out.println("DEBUG: Simulation [77]: Took " + (System.currentTimeMillis() - time) + " milliseconds to complete constructor");
   }
 
   // ########################################################################
   // # SimulationState Access Methods
+
 
   public Collection<? extends Step> getEnabledEvents()
   {
@@ -201,7 +201,7 @@ public class Simulation implements ModelObserver, Observer
     }
     if (mInvalidEvents.containsKey(event))
     {
-      updateControllability(false);
+      //updateControllability(false);
       if (mBlockingEvents != null)
       {
         for (final Pair<EventProxy, AutomatonProxy> blockingEvent : mBlockingEvents)
@@ -494,6 +494,33 @@ public class Simulation implements ModelObserver, Observer
     else
       return mTrace;
   }
+
+  public List<AutomatonProxy> getAutomataSensitiveToEvent(final EventProxy event)
+  {
+    return mAutomataSensitiveToEvent.get(event);
+  }
+
+  private void updateAutomataSensitiveToEvent()
+  {
+    final HashMap<EventProxy, List<AutomatonProxy>> output = new HashMap<EventProxy, List<AutomatonProxy>>();
+    for (final AutomatonProxy search : mAllAutomatons.keySet())
+    {
+      for (final EventProxy event : search.getEvents())
+      {
+        List<AutomatonProxy> temp = output.get(event);
+        if (temp == null)
+        {
+          temp = new ArrayList<AutomatonProxy>();
+        }
+        temp.add(search);
+        output.put(event, temp);
+      }
+    }
+    mAutomataSensitiveToEvent = output;
+  }
+
+  //###################################################################################
+  // # Control
 
   public void setState(final AutomatonProxy automaton, final StateProxy state)
   {
@@ -882,9 +909,9 @@ public class Simulation implements ModelObserver, Observer
           if (auto.getEvents().contains(step.getEvent()))
           {
             boolean found = false;
-            for (final TransitionProxy trans : auto.getTransitions())
+            for (final TransitionProxy trans : mTransitionsToEvents.getTransition(auto, mAllAutomatons.get(auto)))
             {
-              if (trans.getSource() == mAllAutomatons.get(auto) && trans.getEvent() == step.getEvent())
+              if (trans.getEvent() == step.getEvent())
                 found = true;
             }
             if (!found)
@@ -1172,9 +1199,7 @@ public class Simulation implements ModelObserver, Observer
       mCompiledDES = des;
       mTransitionsToEvents = new TransitionEventMap(des);
       reset(true);
-      final SimulationChangeEvent event = new SimulationChangeEvent
-          (this, SimulationChangeEvent.MODEL_CHANGED);
-      fireSimulationChangeEvent(event);
+      updateAutomataSensitiveToEvent();
     }
   }
 
@@ -1259,6 +1284,7 @@ public class Simulation implements ModelObserver, Observer
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
 
   private TransitionEventMap mTransitionsToEvents;
+  private Map<EventProxy, List<AutomatonProxy>> mAutomataSensitiveToEvent;
   private Map<AutomatonProxy,StateProxy> mAllAutomatons; // The Map object is the current state of the key
   private ArrayList<Step> mEnabledEvents;
   private HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the event
@@ -1276,7 +1302,7 @@ public class Simulation implements ModelObserver, Observer
   private HashMap<Step, AutomatonProxy> mWarningProperties;
   private ArrayList<SimulatorState> previousStates;
   private ArrayList<AutomatonProxy> mDisabledProperties;
-  long time = 0;
+  //long time = 0;
 
   // #######################################################################
   // # Class Constants

@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -279,7 +280,9 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
 
   public void forceRecalculation()
   {
-    this.setModel(new EventTreeModel(mSim, mSortingMethods));
+    //final long time = System.currentTimeMillis();
+    final EventTreeModel model = new EventTreeModel(mSim, mSortingMethods);
+    this.setModel(model);
     for (int looper = 0; looper < expandedNodes.size(); looper++)
     {
       final String name = expandedNodes.get(looper);
@@ -392,7 +395,8 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
         else
           mEventNameLabel.setIcon(IconLoader.ICON_UNCONTROLLABLE);
         mEventNameLabel.setText(event.getName());
-        mEventStatusLabel.setIcon(mSim.getEventActivityIcon(event));
+        final Icon eventActivityIcon = mSim.getEventActivityIcon(event);
+        mEventStatusLabel.setIcon(eventActivityIcon);
         final int width = mPane.getViewport().getWidth();
         final int rightWidth = eventColumnWidth[1];
         final int leftWidth = width - rightWidth - noduleWidth;
