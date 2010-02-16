@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import net.sourceforge.waters.analysis.gnonblocking.NonDeterministicComposer;
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -125,6 +124,8 @@ public class CompositionalGeneralisedConflictChecker extends
     if (getMarkingProposition() == null) {
       setMarkingProposition(getUsedMarkingProposition());
     }
+    final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton =
+        mapEventsToAutomata(getModel());
     final Set<AutomatonProxy> remainingAut = getModel().getAutomata();
 
     // TODO: later, need to consider when an automaton is too large to be a
@@ -133,21 +134,8 @@ public class CompositionalGeneralisedConflictChecker extends
       final Set<Candidate> candidates = findCandidates(getModel());
       final Candidate candidate = evaluateCandidates(candidates);
 
-      // creates a model which includes only the candidate, to build the
-      // synchronous product of
-      final Set<EventProxy> candidateEvents =
-          getEventsForNewModel(candidate.getAutomata());
-      final ProductDESProxy candidateModel =
-          getFactory().createProductDESProxy("Candidate model",
-                                             candidateEvents,
-                                             candidate.getAutomata());
-      final NonDeterministicComposer composer =
-          new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
-              candidateModel.getAutomata()), getFactory(),
-              getMarkingProposition(), getGeneralisedPrecondition());
-      final AutomatonProxy syncProduct = composer.run();
-      final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton =
-          mapEventsToAutomata(getModel());
+      final AutomatonProxy syncProduct = composeSynchronousProduct(candidate);
+
       final Set<EventProxy> localEvents =
           identifyLocalEvents(eventAutomaton, candidate.getAutomata());
       candidate.setLocalEvents(localEvents);
@@ -174,16 +162,31 @@ public class CompositionalGeneralisedConflictChecker extends
             getGeneralisedPrecondition(), getFactory());
     final boolean result = checker.run();
     return result;
-    /*
-     * if (checker.run()) { mStates +=
-     * checker.getAnalysisResult().getTotalNumberOfStates();
-     * setSatisfiedResult(); return true; } else { mStates +=
-     * checker.getAnalysisResult().getTotalNumberOfStates(); TraceProxy counter
-     * = checker.getCounterExample(); counter = list.getTrace(counter, model);
-     * List<EventProxy> e = counter.getEvents(); counter =
-     * getFactory().createSafetyTraceProxy(getModel().getName(), getModel(),
-     * e.subList(0, e.size() - 1)); setFailedResult(counter); return false; }
-     */
+  }
+
+  /**
+   * Builds the synchronous product for a given candidate.
+   *
+   * @param candidate
+   * @return
+   * @throws AnalysisException
+   */
+  private AutomatonProxy composeSynchronousProduct(final Candidate candidate)
+      throws AnalysisException
+  {
+    // creates a model which includes only the candidate, to build the
+    // synchronous product of
+    final Set<EventProxy> candidateEvents =
+        getEventsForNewModel(candidate.getAutomata());
+    final ProductDESProxy candidateModel =
+        getFactory().createProductDESProxy("Candidate model", candidateEvents,
+                                           candidate.getAutomata());
+
+    final NonDeterministicComposer composer =
+        new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
+            candidateModel.getAutomata()), getFactory(),
+            getMarkingProposition(), getGeneralisedPrecondition());
+    return composer.run();
   }
 
   /**
@@ -284,9 +287,8 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     final Set<EventProxy> localEvents = new HashSet<EventProxy>();
     for (final EventProxy event : eventAutomaton.keySet()) {
-      eventAutomaton.get(event).removeAll(candidate);
-      final Collection<AutomatonProxy> autWithEvent = eventAutomaton.get(event);
-      if (autWithEvent.size() == 0) {
+      final Set<AutomatonProxy> autWithEvent = eventAutomaton.get(event);
+      if (candidate.containsAll(autWithEvent)) {
         localEvents.add(event);
       }
     }
@@ -315,6 +317,7 @@ public class CompositionalGeneralisedConflictChecker extends
     public final double mSize;
     // TODO: at this stage there is no benefit from storing the local events for
     // a candidate
+    @SuppressWarnings("unused")
     private Set<EventProxy> localEvents;
 
     public Candidate(final Set<AutomatonProxy> set, final double size)

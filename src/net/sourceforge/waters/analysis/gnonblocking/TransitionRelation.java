@@ -41,6 +41,7 @@ public class TransitionRelation
   private final EventProxy[] mEvents;
   private final TObjectIntHashMap<EventProxy> mEventToInt;
   private final EventProxy mMarkedEvent;
+  @SuppressWarnings("unused")
   private final EventProxy mPreMarking;
   private final String mName;
 
@@ -50,7 +51,6 @@ public class TransitionRelation
     this(aut, marked, preconditionMarking, aut.getEvents());
   }
 
-  @SuppressWarnings("unchecked")
   public TransitionRelation(final AutomatonProxy aut, final EventProxy marked,
                             final EventProxy preconditionMarking,
                             Set<EventProxy> eventsall)
@@ -685,6 +685,7 @@ public class TransitionRelation
     return selfs;
   }
 
+  @SuppressWarnings("unused")
   public Collection<EventProxy> getAllwaysEnabled()
   {
     final Collection<EventProxy> selfs = new ArrayList<EventProxy>();

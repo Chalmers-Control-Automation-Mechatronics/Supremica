@@ -586,6 +586,7 @@ public class NonDeterministicComposer
   private boolean[][] mMarkedStates;
   private boolean[][] mPreMarkedStates;
   private TIntArrayList mNewMarked;
+  @SuppressWarnings("unused")
   private TIntArrayList mNewPreMarked;
   private final List<int[]> newtrans = new ArrayList<int[]>();
   private int numStates;
