@@ -1,7 +1,10 @@
 package net.sourceforge.waters.despot;
 
-public class LargeSICPropertyVVerifierTest extends
-    AbstractSICPropertyVVerifierTest
+import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
+
+
+public abstract class AbstractLargeSICPropertyVVerifierTest extends
+    AbstractConflictCheckerTest
 {
 
   public void testSICPropertyVVerifier_rhone_subsystem1_ld_failsic5()

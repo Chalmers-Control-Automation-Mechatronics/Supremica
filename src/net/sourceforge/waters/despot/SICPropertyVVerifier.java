@@ -11,21 +11,20 @@ package net.sourceforge.waters.despot;
 
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class SICPropertyVVerifier extends AbstractModelVerifier
+public class SICPropertyVVerifier extends AbstractConflictChecker
 {
 
-  //#########################################################################
-  //# Constructors
+  // #########################################################################
+  // # Constructors
   public SICPropertyVVerifier(final ConflictChecker checker,
                               final ProductDESProxyFactory factory)
   {
@@ -36,15 +35,13 @@ public class SICPropertyVVerifier extends AbstractModelVerifier
                               final ProductDESProxy model,
                               final ProductDESProxyFactory factory)
   {
-    super(model, factory, ConflictKindTranslator.getInstance());
+    super(model, factory);
     mChecker = checker;
   }
 
-
-  //#########################################################################
-  //# Invocation
-  public boolean run()
-    throws AnalysisException
+  // #########################################################################
+  // # Invocation
+  public boolean run() throws AnalysisException
   {
     final ProductDESProxy model = getModel();
     final SICPropertyVBuilder builder =
@@ -74,9 +71,8 @@ public class SICPropertyVVerifier extends AbstractModelVerifier
     return mFailedAnswer;
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
+  // #########################################################################
+  // # Auxiliary Methods
   private void setConflictCheckerMarkings(final SICPropertyVBuilder builder)
   {
     builder.setDefaultMarkings();
@@ -86,9 +82,8 @@ public class SICPropertyVVerifier extends AbstractModelVerifier
     mChecker.setGeneralisedPrecondition(preconditionMark);
   }
 
-
-  //#########################################################################
-  //# Data Members
+  // #########################################################################
+  // # Data Members
   private final ConflictChecker mChecker;
 
   private EventProxy mFailedAnswer;

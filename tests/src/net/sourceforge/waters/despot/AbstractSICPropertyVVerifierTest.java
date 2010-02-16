@@ -16,14 +16,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
-import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -32,14 +27,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -189,13 +176,6 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     runModelVerifier("despot", "song_aip/aip3_syn", "tu4.wmod", true);
   }
 
-  protected ModelVerifier createModelVerifier(
-                                              final ProductDESProxyFactory factory)
-  {
-    final ConflictChecker checker = createConflictChecker(factory);
-    return new SICPropertyVVerifier(checker, factory);
-  }
-
   /**
    * Checks the correctness of a conflict counterexample which is converted back
    * to the original model by SICPropertyVBuilder. A conflict counterexample has
@@ -216,7 +196,7 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     final int size = automata.size();
     final Map<AutomatonProxy,StateProxy> tuple =
         new HashMap<AutomatonProxy,StateProxy>(size);
-    final EventProxy failedAnswer = mPropertyVerifier.getFailedAnswer();
+    final EventProxy failedAnswer = getModelVerifier().getFailedAnswer();
     for (final AutomatonProxy aut : automata) {
       final StateProxy state = checkCounterExample(aut, counterexample);
       assertNotNull("Counterexample not accepted by automaton " + aut.getName()
@@ -262,9 +242,9 @@ public abstract class AbstractSICPropertyVVerifierTest extends
 
   }
 
-  protected void setPropertyVerifier(final SICPropertyVVerifier propVerifier)
+  protected SICPropertyVVerifier getModelVerifier()
   {
-    mPropertyVerifier = propVerifier;
+    return (SICPropertyVVerifier) super.getModelVerifier();
   }
 
   // #########################################################################
@@ -362,78 +342,33 @@ public abstract class AbstractSICPropertyVVerifierTest extends
   }
 
   // #########################################################################
-  // # Auxiliary Methods
-  /**
-   * <P>
-   * Creates a low-level conflict checker for counterexample verification used
-   * for SIC property V verification.
-   * </P>
-   * <P>
-   * Depending on the size of the model, this language inclusion check may be a
-   * difficult problem on its own. This default implementation returns a
-   * {@link NativeConfloctChecker} if available, otherwise resorts to a {@link
-   * MonolithicConflictChecker.} This should be enough for the test cases
-   * contained in this class. Subclasses that involve more advanced conflict
-   * checkers with larger tests may have to override this method.
-   * </P>
-   */
-  protected ConflictChecker createConflictChecker(
-                                                  final ProductDESProxyFactory factory)
-  {
-    if (mConflictChecker == null) {
-      try {
-        // mConflictChecker = new MonolithicConflictChecker(factory);
-        mConflictChecker = new NativeConflictChecker(factory);
-      } catch (final NoClassDefFoundError exception) {
-        mConflictChecker = new MonolithicConflictChecker(factory);
-      } catch (final UnsatisfiedLinkError exception) {
-        mConflictChecker = new MonolithicConflictChecker(factory);
-      }
-    }
-    return mConflictChecker;
-  }
-
-  // #########################################################################
   // # Overrides for junit.framework.TestCase
-  protected void setUp() throws Exception
-  {
-    super.setUp();
-    final ModuleProxyFactory moduleFactory = ModuleElementFactory.getInstance();
-    mProductDESFactory = ProductDESElementFactory.getInstance();
-    final OperatorTable optable = CompilerOperatorTable.getInstance();
-    mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
-    mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
-    mTraceMarshaller = new JAXBTraceMarshaller(mProductDESFactory);
-    mDocumentManager = new DocumentManager();
-    mDocumentManager.registerMarshaller(mModuleMarshaller);
-    mDocumentManager.registerMarshaller(mProductDESMarshaller);
-    mDocumentManager.registerMarshaller(mTraceMarshaller);
-    mDocumentManager.registerUnmarshaller(mModuleMarshaller);
-    mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
-    mConflictChecker = createConflictChecker(mProductDESFactory);
-  }
-
-  protected void tearDown() throws Exception
-  {
-    // mOutputDirectory = null;
-    mProductDESFactory = null;
-    mModuleMarshaller = null;
-    mProductDESMarshaller = null;
-    mTraceMarshaller = null;
-    mDocumentManager = null;
-    mConflictChecker = null;
-    mPropertyVerifier = null;
-    super.tearDown();
-  }
+  /*
+   * protected void setUp() throws Exception { super.setUp(); final
+   * ModuleProxyFactory moduleFactory = ModuleElementFactory.getInstance();
+   * mProductDESFactory = ProductDESElementFactory.getInstance(); final
+   * OperatorTable optable = CompilerOperatorTable.getInstance();
+   * mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
+   * mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
+   * mTraceMarshaller = new JAXBTraceMarshaller(mProductDESFactory);
+   * mDocumentManager = new DocumentManager();
+   * mDocumentManager.registerMarshaller(mModuleMarshaller);
+   * mDocumentManager.registerMarshaller(mProductDESMarshaller);
+   * mDocumentManager.registerMarshaller(mTraceMarshaller);
+   * mDocumentManager.registerUnmarshaller(mModuleMarshaller);
+   * mDocumentManager.registerUnmarshaller(mProductDESMarshaller); }
+   *
+   * protected void tearDown() throws Exception { // mOutputDirectory = null;
+   * mProductDESFactory = null; mModuleMarshaller = null; mProductDESMarshaller
+   * = null; mTraceMarshaller = null; mDocumentManager = null; super.tearDown();
+   * }
+   */
 
   // #########################################################################
   // # Data Members
   private ProductDESProxyFactory mProductDESFactory;
-  private JAXBModuleMarshaller mModuleMarshaller;
-  private JAXBProductDESMarshaller mProductDESMarshaller;
-  private JAXBTraceMarshaller mTraceMarshaller;
-  private DocumentManager mDocumentManager;
-  private ConflictChecker mConflictChecker;
-  private SICPropertyVVerifier mPropertyVerifier;
-
+  // private JAXBModuleMarshaller mModuleMarshaller;
+  // private JAXBProductDESMarshaller mProductDESMarshaller;
+  // private JAXBTraceMarshaller mTraceMarshaller;
+  // private DocumentManager mDocumentManager;
 }

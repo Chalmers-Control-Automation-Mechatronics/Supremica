@@ -9,21 +9,21 @@
 
 package net.sourceforge.waters.despot;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
+import net.sourceforge.waters.analysis.gnonblocking.CompositionalGeneralisedConflictChecker;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class MonolithicSICPropertyVVerifierTest extends
-    AbstractSICPropertyVVerifierTest
+public class LargeCompositionalSICPropertyVVerifierTest extends
+    AbstractLargeSICPropertyVVerifierTest
 {
 
   protected ModelVerifier createModelVerifier(
                                               final ProductDESProxyFactory factory)
   {
-    final ConflictChecker checker = new MonolithicConflictChecker(factory);
+    final ConflictChecker checker =
+        new CompositionalGeneralisedConflictChecker(factory);
     return new SICPropertyVVerifier(checker, factory);
   }
-
 }
