@@ -196,6 +196,10 @@ public class NonDeterministicComposer
       final EventProxy marked = mNewMarked.contains(i) ? mMarked : null;
       states[i] =
           new AnnotatedMemStateProxy(i, marked, mNewInitial.contains(i));
+      final EventProxy premarked =
+          mNewPreMarked.contains(i) ? mPreMarking : null;
+      states[i] =
+          new AnnotatedMemStateProxy(i, premarked, mNewInitial.contains(i));
     }
     final ArrayList<TransitionProxy> trans = new ArrayList<TransitionProxy>();
     for (final int[] tran : newtrans) {
@@ -248,6 +252,9 @@ public class NonDeterministicComposer
       unvisited.offer(successor);
       if (determineMarked(successor)) {
         mNewMarked.add(target);
+      }
+      if (determinePreMarked(successor)) {
+        mNewPreMarked.add(target);
       }
       if (isInitial) {
         mNewInitial.add(target);
@@ -313,6 +320,17 @@ public class NonDeterministicComposer
     // System.out.println("state:" + Arrays.toString(suc));
     for (int i = 0; i < suc.length; i++) {
       if (!mMarkedStates[i][suc[i]]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean determinePreMarked(final int[] suc)
+  {
+    // System.out.println("state:" + Arrays.toString(suc));
+    for (int i = 0; i < suc.length; i++) {
+      if (!mPreMarkedStates[i][suc[i]]) {
         return false;
       }
     }
@@ -586,7 +604,6 @@ public class NonDeterministicComposer
   private boolean[][] mMarkedStates;
   private boolean[][] mPreMarkedStates;
   private TIntArrayList mNewMarked;
-  @SuppressWarnings("unused")
   private TIntArrayList mNewPreMarked;
   private final List<int[]> newtrans = new ArrayList<int[]>();
   private int numStates;

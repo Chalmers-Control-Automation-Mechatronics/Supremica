@@ -233,8 +233,8 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
   /**
-   * Returns a set of events for a new model (i.e. new ProductDESProxy) which is
-   * the alphabet from a given set of automata for the model.
+   * Returns a set of events for a new model which is the alphabet from a given
+   * set of automata.
    *
    * @param automataOfNewModel
    * @return
@@ -274,10 +274,6 @@ public class CompositionalGeneralisedConflictChecker extends
    * <P>
    * Finds the set of events that are local to a candidate (i.e. a set of
    * automata).
-   * </P>
-   * <P>
-   * <STRONG>BUG</STRONG> Deletes entries from eventAutomaton as side effect and
-   * therefore does not work when called for a second automaton.
    * </P>
    */
   private Set<EventProxy> identifyLocalEvents(
