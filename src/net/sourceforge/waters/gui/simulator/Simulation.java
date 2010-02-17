@@ -175,7 +175,6 @@ public class Simulation implements ModelObserver, Observer
       for (final EventProxy event : events)
         if (event.getKind() != EventKind.PROPOSITION)
           output.add(event);
-      Collections.sort(output);
       return output;
     }
   }
@@ -237,7 +236,6 @@ public class Simulation implements ModelObserver, Observer
       return IconLoader.ICON_TABLE_DISABLED_PROPERTY;
     if (mWarningProperties.containsValue(aut))
       return IconLoader.ICON_TABLE_WARNING_PROPERTY;
-    updateControllability(false);
     if (mBlockingEvents != null && aut.getKind() == ComponentKind.SPEC)
     {
       for (final Pair<EventProxy, AutomatonProxy> blockingEvent : mBlockingEvents)
@@ -517,6 +515,11 @@ public class Simulation implements ModelObserver, Observer
       }
     }
     mAutomataSensitiveToEvent = output;
+  }
+
+  public List<TransitionProxy> getActiveTransitions(final AutomatonProxy auto)
+  {
+    return mTransitionsToEvents.getTransition(auto, mAllAutomatons.get(auto));
   }
 
   //###################################################################################

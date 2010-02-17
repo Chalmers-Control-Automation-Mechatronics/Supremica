@@ -406,10 +406,9 @@ public class AutomatonDisplayPane
   private boolean isEnabled(final Proxy clicked)
   {
     final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-    final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
     for (final Step step : mSim.getValidTransitions()) {
-      for (final TransitionProxy trans : mAutomaton.getTransitions()) {
-        if (trans.getEvent() == step.getEvent() && trans.getSource() == currentState) {
+      for (final TransitionProxy trans : mSim.getActiveTransitions(mAutomaton)) {
+        if (trans.getEvent() == step.getEvent()) {
           final Proxy source = infomap.get(trans).getSourceObject();
           if (clicked instanceof IdentifierProxy) {
             if (source == clicked) {

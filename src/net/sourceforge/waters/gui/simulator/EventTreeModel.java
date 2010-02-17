@@ -60,7 +60,6 @@ public class EventTreeModel
     }
     else if (EventProxy.class.isInstance(parent))
     {
-      System.out.println("Number of children:" + mSim.getAutomataSensitiveToEvent((EventProxy)parent).size());
       return mSim.getAutomataSensitiveToEvent((EventProxy)parent).size();
     }
     else
