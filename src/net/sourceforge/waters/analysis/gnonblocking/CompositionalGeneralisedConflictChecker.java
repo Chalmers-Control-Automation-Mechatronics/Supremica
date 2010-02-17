@@ -124,7 +124,8 @@ public class CompositionalGeneralisedConflictChecker extends
     ProductDESProxy model = getModel();
     final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton =
         mapEventsToAutomata(model);
-    final Set<AutomatonProxy> remainingAut = model.getAutomata();
+    final Set<AutomatonProxy> remainingAut =
+        new HashSet<AutomatonProxy>(model.getAutomata());
 
     // TODO: later, need to consider when an automaton is too large to be a
     // candidate and so may not always be left with only one automaton
