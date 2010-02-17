@@ -230,7 +230,7 @@ public class CompositionalGeneralisedConflictChecker extends
         local = false;
       }
     }
-    final Collection<EventProxy> newEvents = automaton.getEvents();
+    final Set<EventProxy> newEvents = automaton.getEvents();
     newEvents.removeAll(localEvents);
     newEvents.add(tau);
     final AutomatonProxy newAut =
