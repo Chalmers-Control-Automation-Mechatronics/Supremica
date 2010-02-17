@@ -443,21 +443,9 @@ public class Simulation implements ModelObserver, Observer
 
   public TransitionProxy getPreviousTransition(final AutomatonProxy automaton)
   {
-    if (currentTime == -1)
-      return null;
-    else if (currentTime == 0)
+    if (currentTime == 0)
     {
-      for (final StateProxy startState : automaton.getStates())
-      {
-        if (startState.isInitial())
-        {
-          if (mCurrentEvent == null)
-            return null;
-          return mCurrentEvent.getTransition(automaton,
-                                             startState,
-                                             mAllAutomatons.get(automaton));
-        }
-      }
+      return null;
     }
     else
     {
@@ -465,9 +453,9 @@ public class Simulation implements ModelObserver, Observer
         return null;
       return mCurrentEvent.getTransition(automaton,
                      previousStates.get(currentTime - 1).mCurrentStates.get(automaton),
-                     mAllAutomatons.get(automaton));
+                     mAllAutomatons.get(automaton),
+                     mTransitionsToEvents);
     }
-    return null;
   }
 
   public AutomatonProxy getAutomatonFromName(final String automatonFind)

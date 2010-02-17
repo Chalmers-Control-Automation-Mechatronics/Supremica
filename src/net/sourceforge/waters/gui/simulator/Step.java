@@ -58,14 +58,16 @@ public class Step implements Comparable<Step>
     return mDest;
   }
 
-  public TransitionProxy getTransition(final AutomatonProxy aut, final StateProxy sourceState, final StateProxy destinationState)
+  public TransitionProxy getTransition(final AutomatonProxy aut,
+                                       final StateProxy sourceState,
+                                       final StateProxy destinationState,
+                                       final TransitionEventMap map)
   {
     if (mSource.get(aut) != null && mDest.get(aut) != null)
     {
-      for (final TransitionProxy trans : aut.getTransitions())
+      for (final TransitionProxy trans : map.getTransition(aut, sourceState))
       {
-        if (trans.getSource() == mSource.get(aut)
-            && trans.getTarget() == mDest.get(aut)
+        if (trans.getTarget() == mDest.get(aut)
             && trans.getEvent() == mEvent)
           return trans;
       }
@@ -73,11 +75,10 @@ public class Step implements Comparable<Step>
     }
     else
     {
-      for (final TransitionProxy trans : aut.getTransitions())
+      for (final TransitionProxy trans : map.getTransition(aut, sourceState))
       {
         if (trans.getEvent() == mEvent
-            && trans.getTarget() == destinationState
-            && trans.getSource() == sourceState)
+            && trans.getTarget() == destinationState)
           return trans;
       }
       return null;

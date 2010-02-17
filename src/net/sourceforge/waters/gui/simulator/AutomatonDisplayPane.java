@@ -28,8 +28,10 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JLabel;
 
@@ -128,6 +130,7 @@ public class AutomatonDisplayPane
     addMouseListener(handler);
     addMouseMotionListener(handler);
     addComponentListener(new ResizeHandler());
+    updateEnabledProxy();
   }
 
 
@@ -148,7 +151,29 @@ public class AutomatonDisplayPane
   //# Interface net.sourceforge.waters.gui.simulator.SimulatorObserver
   public void simulationChanged(final SimulationChangeEvent event)
   {
+    updateEnabledProxy();
     repaint();
+  }
+
+  private void updateEnabledProxy()
+  {
+    mEnabledProxy = new HashSet<Proxy>();
+    final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+    transitions:
+    for (final TransitionProxy trans : mSim.getActiveTransitions(mAutomaton)) {
+      final EventProxy event = trans.getEvent();
+      for (final Step enabledStep : mSim.getValidTransitions())
+      {
+        if (enabledStep.getEvent() == event)
+        {
+          final Proxy proxy = infomap.get(trans).getSourceObject();
+          mEnabledProxy.add(proxy);
+          mEnabledProxy.add(((IdentifierSubject)proxy).getAncestor(EdgeSubject.class));
+          continue transitions;
+        }
+      }
+    }
+    System.out.println("Size of enabled proxies are: " + mEnabledProxy.size());
   }
 
 
@@ -405,25 +430,7 @@ public class AutomatonDisplayPane
    */
   private boolean isEnabled(final Proxy clicked)
   {
-    final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-    for (final Step step : mSim.getValidTransitions()) {
-      for (final TransitionProxy trans : mSim.getActiveTransitions(mAutomaton)) {
-        if (trans.getEvent() == step.getEvent()) {
-          final Proxy source = infomap.get(trans).getSourceObject();
-          if (clicked instanceof IdentifierProxy) {
-            if (source == clicked) {
-              return true;
-            }
-          } else {
-            final AbstractSubject subject = (AbstractSubject) source;
-            if (subject.getAncestor(EdgeSubject.class) == clicked) {
-              return true;
-            }
-          }
-        }
-      }
-    }
-    return false;
+    return mEnabledProxy.contains(clicked);
   }
 
   private Step findOptions(final List<Step> possibleEvents)
@@ -575,6 +582,7 @@ public class AutomatonDisplayPane
 
     public void mouseMoved(final MouseEvent event)
     {
+      numberOfHovers++;
       updateFocusedItem(event);
     }
   }
@@ -686,8 +694,15 @@ public class AutomatonDisplayPane
             }
           }
         }
+        final long time = System.nanoTime();
         if (isEnabled(orig)) {
           proxyIsEnabled = true;
+        }
+        if (!isHovering || allowCountOfHovering)
+        {
+          final long drawTime = System.nanoTime() - time;
+          maxTime += drawTime;
+          numberOfCalls++;
         }
         if (mFocusedItem != null)
         {
@@ -815,6 +830,7 @@ public class AutomatonDisplayPane
     private final Map<SimpleNodeProxy,StateProxy> mStateMap;
 
   }
+  ;
 
   //##########################################################################
   //# Data Members
@@ -826,7 +842,16 @@ public class AutomatonDisplayPane
   private AffineTransform mTransform;
   private AffineTransform mInverseTransform;
   private Proxy mFocusedItem;
+  private Set<Proxy> mEnabledProxy;
 
+  // ##########################################################################
+  // # DEBUG: Remove at next release
+
+  private long maxTime = 0;
+  private int numberOfCalls = 0;
+  private int numberOfHovers = 0;
+  private final boolean isHovering = false;
+  private final boolean allowCountOfHovering = false;
 
   //##########################################################################
   //# Class Constants
