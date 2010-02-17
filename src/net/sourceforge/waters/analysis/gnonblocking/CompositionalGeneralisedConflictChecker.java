@@ -61,8 +61,6 @@ public class CompositionalGeneralisedConflictChecker extends
                                                  final ProductDESProxyFactory factory)
   {
     super(model, factory);
-    // mStates = 0;
-    // setNodeLimit(10000000);
   }
 
   /**
@@ -119,19 +117,18 @@ public class CompositionalGeneralisedConflictChecker extends
   // # Invocation
   public boolean run() throws AnalysisException
   {
-    // clearStats();
-    // mTime -= System.currentTimeMillis();
     if (getMarkingProposition() == null) {
       setMarkingProposition(getUsedMarkingProposition());
     }
+    ProductDESProxy model = getModel();
     final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton =
-        mapEventsToAutomata(getModel());
-    final Set<AutomatonProxy> remainingAut = getModel().getAutomata();
+        mapEventsToAutomata(model);
+    final Set<AutomatonProxy> remainingAut = model.getAutomata();
 
     // TODO: later, need to consider when an automaton is too large to be a
     // candidate and so may not always be left with only one automaton
     while (remainingAut.size() > 1) {
-      final Set<Candidate> candidates = findCandidates(getModel());
+      final Set<Candidate> candidates = findCandidates(model);
       final Candidate candidate = evaluateCandidates(candidates);
 
       final AutomatonProxy syncProduct = composeSynchronousProduct(candidate);
@@ -150,15 +147,17 @@ public class CompositionalGeneralisedConflictChecker extends
       // remaining automata and adds the newly composed candidate
       remainingAut.removeAll(candidate.getAutomata());
       remainingAut.add(autToAbstract);
+
+      // updates the current model to find candidates from
+      final Set<EventProxy> composedModelAlphabet =
+          getEventsForNewModel(remainingAut);
+      model =
+          getFactory().createProductDESProxy("Composed Model",
+                                             composedModelAlphabet,
+                                             remainingAut);
     }
-    // creates a new model of the composed model
-    final Set<EventProxy> composedModelAlphabet =
-        getEventsForNewModel(remainingAut);
-    final ProductDESProxy composedModel =
-        getFactory().createProductDESProxy("Final Composed Model",
-                                           composedModelAlphabet, remainingAut);
     final ConflictChecker checker =
-        new MonolithicConflictChecker(composedModel, getMarkingProposition(),
+        new MonolithicConflictChecker(model, getMarkingProposition(),
             getGeneralisedPrecondition(), getFactory());
     final boolean result = checker.run();
     return result;
@@ -295,12 +294,25 @@ public class CompositionalGeneralisedConflictChecker extends
     return localEvents;
   }
 
+  /**
+   * Uses a heuristic to evaluate the set of candidates to select a suitable
+   * candidate to compose next.
+   *
+   * @param candidates
+   * @return
+   */
   private Candidate evaluateCandidates(final Set<Candidate> candidates)
   {
-    // returns first candidate initially
-    return candidates.toArray(new Candidate[candidates.size()])[0];
+    // returns one random candidate initially
+    return candidates.iterator().next();
   }
 
+  /**
+   * Finds the set of candidates to compose for a given model.
+   *
+   * @param model
+   * @return
+   */
   private Set<Candidate> findCandidates(final ProductDESProxy model)
   {
     // initially all automaton are in a set as a candidate
