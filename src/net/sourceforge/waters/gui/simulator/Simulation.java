@@ -598,6 +598,7 @@ public class Simulation implements ModelObserver, Observer
    */
   public void run(final TraceProxy trace, final boolean allowLastStep)
   {
+    System.out.println("DEBUG: Simulation[601]: Trace: " + trace.getTraceSteps());
     mTrace = null;
     mAllowLastStep = false;
     reset(false);
@@ -650,26 +651,22 @@ public class Simulation implements ModelObserver, Observer
     {
       for (final AutomatonProxy auto : this.mAllAutomatons.keySet())
       {
-        if (step.getSource().get(auto) != null) // Check to see if the step is non-deterministic. If it isn't, then it is the correct Step
+        if (step.getDest().get(auto) != null)
         {
           if (tStep.getStateMap().get(auto) == null) // If there is no non-deterministic information, fail always
             throw new IllegalArgumentException("No non-deterministic information available. Trace is:" + mTrace.getTraceSteps());
-          else if (step.getDest().get(auto) == tStep.getStateMap().get(auto)) // If the destinations match, then it is the right step
-            {
-              return true;
-            }
-            else
-              return false;
+          else if (step.getDest().get(auto) != tStep.getStateMap().get(auto)) // If the destinations don't match, then this is the wrong step
+          {
+            return false;
+          }
         }
-        else
-          return true;
       }
     }
     else
     {
       return false;
     }
-    return false;
+    return true;
   }
 
   /**
