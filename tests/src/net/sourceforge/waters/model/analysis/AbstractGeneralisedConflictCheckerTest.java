@@ -106,6 +106,12 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     testSICPropertyV("despot", "testHISC", "hisc8_low2.wmod", "a2:2", false);
   }
 
+  public void testSIC5__parManEg_I_mfb_lowlevel() throws Exception
+  {
+    testSICPropertyV("tests", "hisc", "parManEg_I_mfb_lowlevel.wmod",
+                     "fin_exit", true);
+  }
+
   // #########################################################################
   // # Overrides for abstract base class
   // # net.sourceforge.waters.analysis.AbstractModelVerifierTest

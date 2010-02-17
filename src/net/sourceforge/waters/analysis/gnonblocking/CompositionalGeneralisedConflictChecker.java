@@ -213,25 +213,23 @@ public class CompositionalGeneralisedConflictChecker extends
     // events from the automaton alphabet
     final Collection<TransitionProxy> newTransitions =
         new ArrayList<TransitionProxy>();
-    boolean local = false;
     for (final TransitionProxy transition : automaton.getTransitions()) {
-      for (final EventProxy localEvent : localEvents) {
-        if (transition.getEvent() == localEvent) {
-          final TransitionProxy newTrans =
-              getFactory().createTransitionProxy(transition.getSource(), tau,
-                                                 transition.getTarget());
-          newTransitions.add(newTrans);
-          local = true;
-          break;
-        }
-      }
-      if (!local) {
+      final EventProxy event = transition.getEvent();
+      if (localEvents.contains(event)) {
+        final TransitionProxy newTrans =
+            getFactory().createTransitionProxy(transition.getSource(), tau,
+                                               transition.getTarget());
+        newTransitions.add(newTrans);
+      } else {
         newTransitions.add(transition);
-        local = false;
       }
     }
-    final Set<EventProxy> newEvents = automaton.getEvents();
-    newEvents.removeAll(localEvents);
+    final Set<EventProxy> newEvents = new HashSet<EventProxy>();
+    for (final EventProxy event : automaton.getEvents()) {
+      if (!localEvents.contains(event)) {
+        newEvents.add(event);
+      }
+    }
     newEvents.add(tau);
     final AutomatonProxy newAut =
         getFactory()
