@@ -23,6 +23,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -160,6 +161,14 @@ public class CompositionalGeneralisedConflictChecker extends
         new MonolithicConflictChecker(model, getMarkingProposition(),
             getGeneralisedPrecondition(), getFactory());
     final boolean result = checker.run();
+
+    if (result) {
+      setSatisfiedResult();
+    } else {
+      // TODO: counterexample needs to be for original model
+      final TraceProxy counterexample = checker.getCounterExample();
+      setFailedResult(counterexample);
+    }
     return result;
   }
 
