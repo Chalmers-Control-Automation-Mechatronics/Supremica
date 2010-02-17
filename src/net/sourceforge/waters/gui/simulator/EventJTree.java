@@ -90,12 +90,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
 
       private boolean eventCanBeFired(final Simulation sim, final EventProxy event)
       {
-        for (final Step possibleStep : sim.getValidTransitions())
-        {
-          if (possibleStep.getEvent() == event)
-            return true;
-        }
-        return false;
+        return sim.getActiveEvents().contains(event);
       }
 
       private void fireEvent(final EventProxy node) throws NonDeterministicException

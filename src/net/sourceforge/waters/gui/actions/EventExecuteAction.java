@@ -51,12 +51,7 @@ public class EventExecuteAction extends WatersAction
   {
     if (sim == null)
       getIDE().error("Simulation has not been set");
-    for (final Step possibleStep : sim.getValidTransitions())
-    {
-      if (possibleStep.getEvent() == event)
-        return true;
-    }
-    return false;
+    return sim.getActiveEvents().contains(event);
   }
 
   private void fireEvent(final EventProxy node) throws NonDeterministicException

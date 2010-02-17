@@ -158,22 +158,27 @@ public class AutomatonDisplayPane
   private void updateEnabledProxy()
   {
     mEnabledProxy = new HashSet<Proxy>();
+    mNonOptimizedProxy = new HashSet<Proxy>();
     final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
     transitions:
     for (final TransitionProxy trans : mSim.getActiveTransitions(mAutomaton)) {
       final EventProxy event = trans.getEvent();
-      for (final Step enabledStep : mSim.getValidTransitions())
+      if (mSim.getActiveEvents().contains(event))
       {
-        if (enabledStep.getEvent() == event)
-        {
-          final Proxy proxy = infomap.get(trans).getSourceObject();
-          mEnabledProxy.add(proxy);
-          mEnabledProxy.add(((IdentifierSubject)proxy).getAncestor(EdgeSubject.class));
-          continue transitions;
-        }
+        final Proxy proxy = infomap.get(trans).getSourceObject();
+        mEnabledProxy.add(proxy);
+        mEnabledProxy.add(((IdentifierSubject)proxy).getAncestor(EdgeSubject.class));
+        continue transitions;
       }
     }
-    System.out.println("Size of enabled proxies are: " + mEnabledProxy.size());
+    for (final TransitionProxy trans : mAutomaton.getTransitions())
+    {
+      if (infomap.get(trans) != null)
+      {
+        mNonOptimizedProxy.add(infomap.get(trans).getSourceObject());
+        mNonOptimizedProxy.add(((IdentifierSubject)infomap.get(trans).getSourceObject()).getAncestor(EdgeSubject.class));
+      }
+    }
   }
 
 
@@ -582,7 +587,6 @@ public class AutomatonDisplayPane
 
     public void mouseMoved(final MouseEvent event)
     {
-      numberOfHovers++;
       updateFocusedItem(event);
     }
   }
@@ -694,15 +698,8 @@ public class AutomatonDisplayPane
             }
           }
         }
-        final long time = System.nanoTime();
         if (isEnabled(orig)) {
           proxyIsEnabled = true;
-        }
-        if (!isHovering || allowCountOfHovering)
-        {
-          final long drawTime = System.nanoTime() - time;
-          maxTime += drawTime;
-          numberOfCalls++;
         }
         if (mFocusedItem != null)
         {
@@ -718,19 +715,7 @@ public class AutomatonDisplayPane
         boolean found = (proxyIsActive || proxyIsEnabled);
         if (!found)
         {
-          for (final TransitionProxy trans : mAutomaton.getTransitions())
-          {
-            if (orig instanceof IdentifierSubject)
-            {
-              if (infomap.get(trans).getSourceObject() == orig)
-                found = true;
-            }
-            else if (orig instanceof EdgeSubject)
-            {
-              if (((AbstractSubject)infomap.get(trans).getSourceObject()).getAncestor(EdgeSubject.class) == orig)
-                found = true;
-            }
-          }
+          found = (mNonOptimizedProxy.contains(orig));
         }
         if (!found)
           proxyIsInvalid = true;
@@ -843,15 +828,7 @@ public class AutomatonDisplayPane
   private AffineTransform mInverseTransform;
   private Proxy mFocusedItem;
   private Set<Proxy> mEnabledProxy;
-
-  // ##########################################################################
-  // # DEBUG: Remove at next release
-
-  private long maxTime = 0;
-  private int numberOfCalls = 0;
-  private int numberOfHovers = 0;
-  private final boolean isHovering = false;
-  private final boolean allowCountOfHovering = false;
+  private Set<Proxy> mNonOptimizedProxy;
 
   //##########################################################################
   //# Class Constants

@@ -13,7 +13,7 @@ public class SimulatorState
   public SimulatorState(final Simulation sim)
   {
     mCurrentStates = new HashMap<AutomatonProxy, StateProxy>(sim.getCurrentStates());
-    mEnabledEvents = new ArrayList<Step>(sim.getEnabledEvents());
+    mEnabledEvents = new ArrayList<Step>(sim.getValidTransitions());
     mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>>(sim.getInvalidEvents());
     mCurrentEvent = sim.getCurrentEvent();
     currentTime = sim.getCurrentTime();

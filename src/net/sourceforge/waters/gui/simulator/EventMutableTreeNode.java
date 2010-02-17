@@ -123,7 +123,7 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
    */
   public int sortByEnabled(final EventProxy a, final EventProxy b)
   {
-    if (mSim.getValidTransitions().contains(a))
+    if (mSim.getActiveEvents().contains(a))
     {
       if (mSim.getValidTransitions().contains(b))
         return 0;
@@ -132,7 +132,7 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
     }
     else
     {
-      if (mSim.getValidTransitions().contains(b))
+      if (mSim.getActiveEvents().contains(b))
         return -1;
       else
         return 0;
