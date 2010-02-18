@@ -11,14 +11,15 @@ import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import gnu.trove.THashSet;
 import java.util.Set;
 
-public class AnnotatedMemStateProxy
-  implements StateProxy
+
+public class AnnotatedMemStateProxy implements StateProxy
 {
   private final int mName;
   private final boolean mIsInitial;
   private final Collection<EventProxy> mProps;
 
-  public AnnotatedMemStateProxy(final int name, final Collection<EventProxy> props,
+  public AnnotatedMemStateProxy(final int name,
+                                final Collection<EventProxy> props,
                                 final boolean isInitial)
   {
     mName = name;
@@ -26,10 +27,11 @@ public class AnnotatedMemStateProxy
     mIsInitial = isInitial;
   }
 
-  public AnnotatedMemStateProxy(final int name, final EventProxy marked, final boolean isInitial)
+  public AnnotatedMemStateProxy(final int name, final EventProxy marked,
+                                final boolean isInitial)
   {
-    this(name, marked == null ? new THashSet<EventProxy>() :
-                                Collections.singleton(marked), isInitial);
+    this(name, marked == null ? new THashSet<EventProxy>() : Collections
+        .singleton(marked), isInitial);
   }
 
   public AnnotatedMemStateProxy(final int name, final EventProxy marked)
@@ -44,7 +46,8 @@ public class AnnotatedMemStateProxy
 
   private static Set<EventProxy> getRightType()
   {
-    final Set<EventProxy> empty = Collections.emptySet(); return empty;
+    final Set<EventProxy> empty = Collections.emptySet();
+    return empty;
   }
 
   public Collection<EventProxy> getPropositions()
@@ -96,7 +99,7 @@ public class AnnotatedMemStateProxy
   }
 
   public Object acceptVisitor(final ProxyVisitor visitor)
-    throws VisitorException
+      throws VisitorException
   {
     final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
     return desvisitor.visitStateProxy(this);

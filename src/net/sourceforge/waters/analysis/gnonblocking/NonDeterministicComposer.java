@@ -9,17 +9,23 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
+//import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
 import net.sourceforge.waters.analysis.modular.DisabledEvents;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -194,12 +200,18 @@ public class NonDeterministicComposer
     final StateProxy[] states = new StateProxy[numStates];
     for (int i = 0; i < states.length; i++) {
       final EventProxy marked = mNewMarked.contains(i) ? mMarked : null;
-      states[i] =
-          new AnnotatedMemStateProxy(i, marked, mNewInitial.contains(i));
       final EventProxy premarked =
           mNewPreMarked.contains(i) ? mPreMarking : null;
-      states[i] =
-          new AnnotatedMemStateProxy(i, premarked, mNewInitial.contains(i));
+      if (marked != null && premarked != null) {
+        final Set<EventProxy> props = new HashSet<EventProxy>(2);
+        props.add(marked);
+        props.add(premarked);
+        states[i] = new MemStateProxy(i, props, mNewInitial.contains(i));
+      } else if (marked != null) {
+        states[i] = new MemStateProxy(i, marked, mNewInitial.contains(i));
+      } else if (premarked != null) {
+        states[i] = new MemStateProxy(i, premarked, mNewInitial.contains(i));
+      }
     }
     final ArrayList<TransitionProxy> trans = new ArrayList<TransitionProxy>();
     for (final int[] tran : newtrans) {
@@ -466,6 +478,114 @@ public class NonDeterministicComposer
   private int[] decode(final int[] sState)
   {
     return sState;
+  }
+
+
+  /**
+   * Stores states, encoding the name as an int rather than a long string value.
+   *
+   * @author rmf18
+   */
+  private static class MemStateProxy implements StateProxy
+  {
+    private final int mName;
+    private final boolean mIsInitial;
+    private final Collection<EventProxy> mProps;
+
+    // ############################################
+    // Constructors
+    public MemStateProxy(final int name, final Collection<EventProxy> props,
+                         final boolean isInitial)
+    {
+      mName = name;
+      mProps = props;
+      mIsInitial = isInitial;
+    }
+
+    public MemStateProxy(final int name, final EventProxy event,
+                         final boolean isInitial)
+    {
+      this(name, event == null ? new THashSet<EventProxy>() : Collections
+          .singleton(event), isInitial);
+    }
+
+    @SuppressWarnings("unused")
+    public MemStateProxy(final int name, final EventProxy marked)
+    {
+      this(name, Collections.singleton(marked), false);
+    }
+
+    @SuppressWarnings("unused")
+    public MemStateProxy(final int name)
+    {
+      this(name, getRightType(), false);
+    }
+
+    // #################################################
+
+    private static Set<EventProxy> getRightType()
+    {
+      final Set<EventProxy> empty = Collections.emptySet();
+      return empty;
+    }
+
+    public Collection<EventProxy> getPropositions()
+    {
+      return mProps;
+    }
+
+    public boolean isInitial()
+    {
+      return mIsInitial;
+    }
+
+    public MemStateProxy clone()
+    {
+      return new MemStateProxy(mName, mProps, mIsInitial);
+    }
+
+    public String getName()
+    {
+      return Integer.toString(mName);
+    }
+
+    public boolean refequals(final NamedProxy o)
+    {
+      if (o instanceof MemStateProxy) {
+        final MemStateProxy s = (MemStateProxy) o;
+        return s.mName == mName;
+      } else {
+        return false;
+      }
+    }
+
+    public int refHashCode()
+    {
+      return mName;
+    }
+
+    public Object acceptVisitor(final ProxyVisitor visitor)
+        throws VisitorException
+    {
+      final ProductDESProxyVisitor desvisitor =
+          (ProductDESProxyVisitor) visitor;
+      return desvisitor.visitStateProxy(this);
+    }
+
+    public Class<StateProxy> getProxyInterface()
+    {
+      return StateProxy.class;
+    }
+
+    public int compareTo(final NamedProxy n)
+    {
+      return n.getName().compareTo(getName());
+    }
+
+    public String toString()
+    {
+      return "S:" + mName;
+    }
   }
 
 
