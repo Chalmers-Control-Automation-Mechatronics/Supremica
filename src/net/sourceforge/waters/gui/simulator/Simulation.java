@@ -281,12 +281,12 @@ public class Simulation implements ModelObserver, Observer
   /**
    * A check to see if the event is a blocking event (All automaton which are blocked by this event are specifications)
    * @param event The event to test
-   * @return null if the event is a non-blocking event, all specifications which are blocking it otherwise
+   * @return An empty list if the event is a non-blocking event, all specifications which are blocking it otherwise
    */
-  public ArrayList<AutomatonProxy> getNonControllable(final EventProxy event)
+  public List<AutomatonProxy> getNonControllable(final EventProxy event)
   {
     if (mBlockingEvents == null)
-      return null;
+      return Collections.emptyList();
     final ArrayList<AutomatonProxy> output = new ArrayList<AutomatonProxy>();
     for (final Pair<EventProxy, AutomatonProxy> blocker : mBlockingEvents)
     {
@@ -299,9 +299,9 @@ public class Simulation implements ModelObserver, Observer
   /**
    * Returns the automaton which are blocked by this event
    * @param event
-   * @return All automaton which are blocked by this event, or an empty arraylist, if the event is valid.
+   * @return All automaton which are blocked by this event, or an empty list, if the event is valid.
    */
-  public List<AutomatonProxy> getBlocking(final EventProxy event)
+  public List<AutomatonProxy> getInvalid(final EventProxy event)
   {
     if (mInvalidEvents.containsKey(event))
     {
@@ -598,7 +598,6 @@ public class Simulation implements ModelObserver, Observer
    */
   public void run(final TraceProxy trace, final boolean allowLastStep)
   {
-    System.out.println("DEBUG: Simulation[601]: Trace: " + trace.getTraceSteps());
     mTrace = null;
     mAllowLastStep = false;
     reset(false);

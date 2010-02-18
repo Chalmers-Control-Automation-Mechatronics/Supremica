@@ -151,7 +151,8 @@ public class AutomatonDisplayPane
   //# Interface net.sourceforge.waters.gui.simulator.SimulatorObserver
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    updateEnabledProxy();
+    if (event.getKind() == SimulationChangeEvent.STATE_CHANGED)
+      updateEnabledProxy();
     repaint();
   }
 
@@ -160,23 +161,26 @@ public class AutomatonDisplayPane
     mEnabledProxy = new HashSet<Proxy>();
     mNonOptimizedProxy = new HashSet<Proxy>();
     final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-    transitions:
-    for (final TransitionProxy trans : mSim.getActiveTransitions(mAutomaton)) {
-      final EventProxy event = trans.getEvent();
-      if (mSim.getActiveEvents().contains(event))
-      {
-        final Proxy proxy = infomap.get(trans).getGraphSourceObject();
-        mEnabledProxy.add(proxy);
-        mEnabledProxy.add(((IdentifierSubject)proxy).getAncestor(EdgeSubject.class));
-        continue transitions;
-      }
-    }
-    for (final TransitionProxy trans : mAutomaton.getTransitions())
+    if (infomap != null) // If the simulation model isn't currently being changed
     {
-      if (infomap.get(trans) != null)
+      transitions:
+      for (final TransitionProxy trans : mSim.getActiveTransitions(mAutomaton)) {
+        final EventProxy event = trans.getEvent();
+        if (mSim.getActiveEvents().contains(event))
+        {
+          final Proxy proxy = infomap.get(trans).getGraphSourceObject();
+          mEnabledProxy.add(proxy);
+          mEnabledProxy.add(((IdentifierSubject)proxy).getAncestor(EdgeSubject.class));
+          continue transitions;
+        }
+      }
+      for (final TransitionProxy trans : mAutomaton.getTransitions())
       {
-        mNonOptimizedProxy.add(infomap.get(trans).getGraphSourceObject());
-        mNonOptimizedProxy.add(((IdentifierSubject)infomap.get(trans).getGraphSourceObject()).getAncestor(EdgeSubject.class));
+        if (infomap.get(trans) != null)
+        {
+          mNonOptimizedProxy.add(infomap.get(trans).getGraphSourceObject());
+          mNonOptimizedProxy.add(((IdentifierSubject)infomap.get(trans).getGraphSourceObject()).getAncestor(EdgeSubject.class));
+        }
       }
     }
   }

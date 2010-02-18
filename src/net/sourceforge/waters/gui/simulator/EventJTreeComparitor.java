@@ -65,61 +65,62 @@ public class EventJTreeComparitor implements Comparator<EventProxy>
   }
 
   /**
-   * Returns a POSITIVE NUMBER if a is before b in the default setting. The default order is ENABLED, DISABLED, BLOCKING
+   * Returns a POSITIVE NUMBER if a is before b in the default setting. The default order is ENABLED, WARNING, DISABLED, BLOCKING
    * @param a
    * @param b
    * @return
    */
   private int sortByEnabled(final EventProxy a, final EventProxy b)
   {
-    boolean aIsEnabled = false;
-    boolean bIsEnabled = false;
-    for (final Step step : mSim.getValidTransitions())
+    boolean aIsWarning = false;
+    boolean bIsWarning = false;
+    for (final Step step : mSim.getWarningProperties().keySet())
     {
       if (step.getEvent() == a)
-        aIsEnabled = true;
+        aIsWarning = true;
+
       if (step.getEvent() == b)
-        bIsEnabled = true;
+        bIsWarning = true;
     }
-    if (b == null)
-      throw new IllegalArgumentException("NULL EVENT");
+    final boolean aIsEnabled = mSim.getActiveEvents().contains(a) && !aIsWarning;
+    final boolean bIsEnabled = mSim.getActiveEvents().contains(b) && !bIsWarning;
+    final boolean aIsBlocking = mSim.getNonControllable(a).size() != 0;
+    final boolean bIsBlocking = mSim.getNonControllable(b).size() != 0;
+    final boolean aIsDisabled = !aIsEnabled && !aIsBlocking && !aIsWarning;
+    final boolean bIsDisabled = !bIsEnabled && !bIsBlocking && !bIsWarning;
     if (aIsEnabled)
     {
       if (bIsEnabled)
-      {
         return 0;
-      }
-      else
-      {
+      else if (bIsWarning || bIsDisabled || bIsBlocking)
         return 1;
-      }
     }
-    else if (mSim.getNonControllable(a) != null)
-    {
-      if (mSim.getNonControllable(b) != null)
-      {
-        return 0;
-      }
-      else
-      {
-        return -1;
-      }
-    }
-    else
+    else if (aIsWarning)
     {
       if (bIsEnabled)
-      {
         return -1;
-      }
-      else if (mSim.getNonControllable(b) != null)
-      {
-        return 1;
-      }
-      else
-      {
+      else if (bIsWarning)
         return 0;
-      }
+      else if (bIsDisabled || bIsBlocking)
+        return 1;
     }
+    else if (aIsDisabled)
+    {
+      if (bIsEnabled || bIsWarning)
+        return -1;
+      else if (bIsDisabled)
+        return 0;
+      else if (bIsBlocking)
+        return 1;
+    }
+    else if (aIsBlocking)
+    {
+      if (bIsEnabled || bIsWarning || bIsDisabled)
+        return -1;
+      else if (bIsBlocking)
+        return 0;
+    }
+    throw new IllegalArgumentException("Either a or b is not blocking, warning, disabled, or enabled!");
   }
 
   /**

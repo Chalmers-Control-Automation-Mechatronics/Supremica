@@ -174,7 +174,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
           else
             toolTipText += "Uncontrollable";
           toolTipText += " Event " + event.getName();
-          if (mSim.getBlocking(event).size() == 0)
+          if (mSim.getInvalid(event).size() == 0)
             toolTipText += " is enabled";
           else
             toolTipText += " is disabled";
@@ -421,7 +421,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
           }
           else
           {
-            if (mSim.getBlocking(parentEvent).contains(autoProxy))
+            if (mSim.getInvalid(parentEvent).contains(autoProxy))
               mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_INVALID_EVENT);
             else
               mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_VALID_EVENT);
@@ -434,7 +434,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
         }
         else
         {
-          if (mSim.getBlocking(parentEvent).contains(autoProxy))
+          if (mSim.getInvalid(parentEvent).contains(autoProxy))
             mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_DISABLED_AUTOMATON);
           else
             mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_ENABLED_AUTOMATON);
