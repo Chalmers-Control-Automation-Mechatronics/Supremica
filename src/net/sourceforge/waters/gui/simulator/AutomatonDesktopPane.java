@@ -279,11 +279,11 @@ public class AutomatonDesktopPane
     }
   }
 
-  public void execute (final String aut)
+  public void execute (final String aut, final Proxy proxyToFire)
   {
     if (openAutomaton.get(aut) != null)
     {
-      openAutomaton.get(aut).execute();
+      openAutomaton.get(aut).execute(proxyToFire);
     }
   }
 

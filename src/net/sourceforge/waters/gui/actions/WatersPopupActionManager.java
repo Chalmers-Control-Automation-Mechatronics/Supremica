@@ -211,9 +211,9 @@ public class WatersPopupActionManager
     return new DesktopOpenWindowAction(mIDE, auto);
   }
 
-  public IDEAction getDesktopExecuteAction(final AutomatonProxy automaton)
+  public IDEAction getDesktopExecuteAction(final AutomatonProxy automaton, final Proxy highlighted)
   {
-    return new DesktopExecuteAction(mIDE, automaton);
+    return new DesktopExecuteAction(mIDE, automaton, highlighted);
   }
 
   public IDEAction getDesktopEditAction(final AutomatonProxy aut)

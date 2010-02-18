@@ -114,7 +114,10 @@ public class SourceInfo
   public Proxy getGraphSourceObject()
   {
     final SourceInfo info = getGraphSourceInfo();
-    return info.getGraphSourceObject();
+    if (info == this)
+      return this.getSourceObject();
+    else
+      return info.getGraphSourceObject();
   }
 
 

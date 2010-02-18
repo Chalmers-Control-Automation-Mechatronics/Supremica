@@ -87,7 +87,7 @@ class DisplayPanePopupFactory
           final WatersPopupActionManager master = getMaster();
           final JPopupMenu popup = getPopup();
           final IDEAction execute =
-            master.getDesktopExecuteAction(mDisplayPane.getAutomaton());
+            master.getDesktopExecuteAction(mDisplayPane.getAutomaton(), edge);
           popup.add(execute);
           popup.addSeparator();
         }
@@ -132,7 +132,7 @@ class DisplayPanePopupFactory
           final WatersPopupActionManager master = getMaster();
           final JPopupMenu popup = getPopup();
           final IDEAction execute =
-            master.getDesktopExecuteAction(mDisplayPane.getAutomaton());
+            master.getDesktopExecuteAction(mDisplayPane.getAutomaton(), ident);
           popup.add(execute);
           popup.addSeparator();
         }

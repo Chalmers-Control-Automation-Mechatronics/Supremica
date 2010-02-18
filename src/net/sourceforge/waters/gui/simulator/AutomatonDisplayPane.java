@@ -165,7 +165,7 @@ public class AutomatonDisplayPane
       final EventProxy event = trans.getEvent();
       if (mSim.getActiveEvents().contains(event))
       {
-        final Proxy proxy = infomap.get(trans).getSourceObject();
+        final Proxy proxy = infomap.get(trans).getGraphSourceObject();
         mEnabledProxy.add(proxy);
         mEnabledProxy.add(((IdentifierSubject)proxy).getAncestor(EdgeSubject.class));
         continue transitions;
@@ -175,8 +175,8 @@ public class AutomatonDisplayPane
     {
       if (infomap.get(trans) != null)
       {
-        mNonOptimizedProxy.add(infomap.get(trans).getSourceObject());
-        mNonOptimizedProxy.add(((IdentifierSubject)infomap.get(trans).getSourceObject()).getAncestor(EdgeSubject.class));
+        mNonOptimizedProxy.add(infomap.get(trans).getGraphSourceObject());
+        mNonOptimizedProxy.add(((IdentifierSubject)infomap.get(trans).getGraphSourceObject()).getAncestor(EdgeSubject.class));
       }
     }
   }
@@ -278,45 +278,48 @@ public class AutomatonDisplayPane
    */
   private Proxy getClickedItem(final MouseEvent event)
   {
-    final AffineTransform inverse = createInverseTransform();
-    final Point location = event.getPoint();
-    final Point2D orig = inverse.transform(location, null);
-    final int x = (int) Math.round(orig.getX());
-    final int y = (int) Math.round(orig.getY());
-    final GraphProxy graph = getGraph();
-    final ProxyShapeProducer producer = getShapeProducer();
-    // Nodes have precedence over labels
-    for (final NodeProxy node : graph.getNodes()) {
-      final ProxyShape shape = producer.getShape(node);
-      if (shape.isClicked(x, y))
-      {
-        return node;
-      }
-    }
-    // Labels have precedence over edges.
-    for (final EdgeProxy edge : graph.getEdges()) {
-      for (final Proxy proxy : edge.getLabelBlock().getEventList()) {
-        final ProxyShape shape = producer.getShape(proxy);
-        if (shape.isClicked(x, y)) {
-          return proxy;
+    if (!isEmbedderRunning())
+    {
+      final AffineTransform inverse = createInverseTransform();
+      final Point location = event.getPoint();
+      final Point2D orig = inverse.transform(location, null);
+      final int x = (int) Math.round(orig.getX());
+      final int y = (int) Math.round(orig.getY());
+      final GraphProxy graph = getGraph();
+      final ProxyShapeProducer producer = getShapeProducer();
+      // Nodes have precedence over labels
+      for (final NodeProxy node : graph.getNodes()) {
+        final ProxyShape shape = producer.getShape(node);
+        if (shape.isClicked(x, y))
+        {
+          return node;
         }
       }
-    }
-    for (final EdgeProxy edge : graph.getEdges()) {
-      final ProxyShape shape = producer.getShape(edge);
-      if (shape.isClicked(x, y)) {
-        return edge;
+      // Labels have precedence over edges.
+      for (final EdgeProxy edge : graph.getEdges()) {
+        for (final Proxy proxy : edge.getLabelBlock().getEventList()) {
+          final ProxyShape shape = producer.getShape(proxy);
+          if (shape.isClicked(x, y)) {
+            return proxy;
+          }
+        }
       }
-    }
-    for (final NodeProxy node : graph.getNodes())
-    {
-      if (node instanceof SimpleNodeProxy)
+      for (final EdgeProxy edge : graph.getEdges()) {
+        final ProxyShape shape = producer.getShape(edge);
+        if (shape.isClicked(x, y)) {
+          return edge;
+        }
+      }
+      for (final NodeProxy node : graph.getNodes())
       {
-        final SimpleNodeProxy sNode = (SimpleNodeProxy)node;
-        final LabelGeometryProxy label = sNode.getLabelGeometry();
-        final ProxyShape shape = producer.getShape(label);
-        if (shape.isClicked(x, y))
-          return node;
+        if (node instanceof SimpleNodeProxy)
+        {
+          final SimpleNodeProxy sNode = (SimpleNodeProxy)node;
+          final LabelGeometryProxy label = sNode.getLabelGeometry();
+          final ProxyShape shape = producer.getShape(label);
+          if (shape.isClicked(x, y))
+            return node;
+        }
       }
     }
     return null;
@@ -387,7 +390,7 @@ public class AutomatonDisplayPane
       boolean foundTrans = false;
       for (final TransitionProxy trans : mAutomaton.getTransitions())
       {
-        final Proxy source = infomap.get(trans).getSourceObject();
+        final Proxy source = infomap.get(trans).getGraphSourceObject();
         if (source == mFocusedItem) {
           String toolTipText = "";
           if (trans.getEvent().getKind() == EventKind.CONTROLLABLE)
@@ -509,24 +512,24 @@ public class AutomatonDisplayPane
     return mFocusedItem != null && isEnabled(mFocusedItem);
   }
 
-  public void execute()
+  public void execute(final Proxy proxyToFire)
   {
-    if (mFocusedItem != null && isEnabled(mFocusedItem)) {
+    if (proxyToFire != null && isEnabled(proxyToFire)) {
       final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
       final List<Step> possibleSteps = new ArrayList<Step>();
-      if (mFocusedItem instanceof IdentifierProxy) {
+      if (proxyToFire instanceof IdentifierProxy) {
         for (final TransitionProxy trans : mAutomaton.getTransitions()) {
-          final Proxy source = infomap.get(trans).getSourceObject();
-          if (source == mFocusedItem &&
+          final Proxy source = infomap.get(trans).getGraphSourceObject();
+          if (source == proxyToFire &&
               eventCanBeFired(mSim, trans)) {
             possibleSteps.addAll(getSteps(trans));
           }
         }
-      } else if (mFocusedItem instanceof EdgeProxy) {
+      } else if (proxyToFire instanceof EdgeProxy) {
         for (final TransitionProxy trans : mAutomaton.getTransitions()) {
-          final Proxy source = infomap.get(trans).getSourceObject();
+          final Proxy source = infomap.get(trans).getGraphSourceObject();
           final AbstractSubject subject = (AbstractSubject) source;
-          if (subject.getAncestor(EdgeSubject.class) == mFocusedItem
+          if (subject.getAncestor(EdgeSubject.class) == proxyToFire
               && eventCanBeFired(mSim, trans)) {
             possibleSteps.addAll(getSteps(trans));
           }
@@ -555,7 +558,7 @@ public class AutomatonDisplayPane
     public void mouseClicked(final MouseEvent event)
     {
       if (event.getClickCount() == 2)
-        execute();
+        execute(mFocusedItem);
     }
 
     public void mouseEntered(final MouseEvent event)
@@ -686,7 +689,7 @@ public class AutomatonDisplayPane
         final TransitionProxy currentTrans =
           mSim.getPreviousTransition(mAutomaton);
         if (currentTrans != null) {
-          final Proxy source = infomap.get(currentTrans).getSourceObject();
+          final Proxy source = infomap.get(currentTrans).getGraphSourceObject();
           if (orig instanceof IdentifierProxy) {
             if (source == orig) {
               proxyIsActive = true;

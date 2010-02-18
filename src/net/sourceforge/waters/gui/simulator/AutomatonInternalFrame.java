@@ -15,6 +15,7 @@ import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -140,9 +141,9 @@ public class AutomatonInternalFrame extends JInternalFrame implements ModelObser
   // ###########################################################################
   // # Access methods for event handling
 
-  public void execute()
+  public void execute(final Proxy proxyToFire)
   {
-    mDisplayPane.execute();
+    mDisplayPane.execute(proxyToFire);
   }
 
   public void resize()
