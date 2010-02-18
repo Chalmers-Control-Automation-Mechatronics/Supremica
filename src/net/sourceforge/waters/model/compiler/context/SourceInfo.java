@@ -64,11 +64,19 @@ public class SourceInfo
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Gets the item in the source module associated with this source
+   * information record.
+   */
   public Proxy getSourceObject()
   {
     return mSourceObject;
   }
 
+  /**
+   * Gets the binding context that indicates any variable substitutions,
+   * bindings, or aliases applied to the source object.
+   */
   public BindingContext getBindingContext()
   {
     return mBindingContext;
@@ -96,6 +104,17 @@ public class SourceInfo
     } else {
       return this;
     }
+  }
+
+  /**
+   * Gets the closed graph item linked to this source information record.
+   * This method is equivalent to calling {@link #getGraphSourceInfo()}
+   * followed by {@link #getSourceObject()}.
+   */
+  public Proxy getGraphSourceObject()
+  {
+    final SourceInfo info = getGraphSourceInfo();
+    return info.getGraphSourceObject();
   }
 
 
