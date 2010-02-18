@@ -11,15 +11,12 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.model.des.AutomatonProxy;
-
 
 /**
  * @author rmf18
  */
 public interface Heuristic
 {
-
-  public Collection<AutomatonProxy> evaulate();
+  public Collection<Candidate> evaulate();
 
 }
