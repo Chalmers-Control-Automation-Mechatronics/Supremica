@@ -211,6 +211,8 @@ public class NonDeterministicComposer
         states[i] = new MemStateProxy(i, marked, mNewInitial.contains(i));
       } else if (premarked != null) {
         states[i] = new MemStateProxy(i, premarked, mNewInitial.contains(i));
+      } else {
+        states[i] = new MemStateProxy(i);
       }
     }
     final ArrayList<TransitionProxy> trans = new ArrayList<TransitionProxy>();
@@ -515,7 +517,6 @@ public class NonDeterministicComposer
       this(name, Collections.singleton(marked), false);
     }
 
-    @SuppressWarnings("unused")
     public MemStateProxy(final int name)
     {
       this(name, getRightType(), false);
