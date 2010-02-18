@@ -190,12 +190,8 @@ public class NonDeterministicComposer
     permutations(currentState, new int[numAutomata], 0, -1, -1, true);
     while (!unvisited.isEmpty()) {
       final int[] cs = unvisited.take();
-      // System.out.println(Arrays.toString(currentState));
-      // explore(currentState, true);
       explore(cs);
     }
-    System.out.println("Composition:" + numStates);
-    System.out.println("Transitions:" + newtrans.size());
     mCompositionSize = numStates;
     final StateProxy[] states = new StateProxy[numStates];
     for (int i = 0; i < states.length; i++) {
@@ -233,10 +229,6 @@ public class NonDeterministicComposer
     final Collection<StateProxy> st = Arrays.asList(states);
     final AutomatonProxy result =
         mFactory.createAutomatonProxy(nam, ck, ev, st, trans);
-    /*
-     * System.out.println("Result"); System.out.println(result); if
-     * (result.getStates().size() > 4) { System.exit(1); }
-     */
     return result;
   }
 
@@ -255,7 +247,6 @@ public class NonDeterministicComposer
       throws AnalysisException
   {
     Integer target = states.get(successor);
-    // System.out.println("suc:" + Arrays.toString(suc) + "targ:" + target);
     if (target == null) {
       target = numStates;
       states.put(successor, target);

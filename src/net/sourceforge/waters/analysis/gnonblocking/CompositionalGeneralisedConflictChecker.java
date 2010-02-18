@@ -309,6 +309,7 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     // returns one random candidate initially
     return candidates.iterator().next();
+    // TODO: needs proper implementation
   }
 
   /**
@@ -324,6 +325,7 @@ public class CompositionalGeneralisedConflictChecker extends
     final Set<Candidate> candidates = new HashSet<Candidate>();
     candidates.add(candidate);
     return candidates;
+    // TODO: needs proper implementation
   }
 
 
