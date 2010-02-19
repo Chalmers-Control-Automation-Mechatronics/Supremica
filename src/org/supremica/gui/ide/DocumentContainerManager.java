@@ -34,10 +34,12 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
@@ -47,6 +49,7 @@ import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.unchecked.Casting;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.samples.maze.MazeCompiler;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -94,9 +97,13 @@ public class DocumentContainerManager
             new UMDESUnmarshaller(factory);
         final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller =
             new ADSUnmarshaller(factory);
-        // Add marshallers in order of importance ...
+        final ProductDESProxyFactory desfactory = ProductDESElementFactory.getInstance();
+        final JAXBTraceMarshaller traceMarshaller =
+          new JAXBTraceMarshaller(desfactory);
+       // Add marshallers in order of importance ...
         mDocumentManager.registerMarshaller(moduleMarshaller);
         mDocumentManager.registerMarshaller(supremicaMarshaller);
+        mDocumentManager.registerMarshaller(traceMarshaller);
         // Add unmarshallers in order of importance ...
         // (shows up in the file-open dialog)
         mDocumentManager.registerUnmarshaller(moduleMarshaller);

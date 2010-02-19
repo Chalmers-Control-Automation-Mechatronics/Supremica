@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -20,6 +22,7 @@ import javax.swing.border.Border;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.simulator.NonDeterministicException;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
@@ -28,6 +31,9 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
+import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
@@ -51,16 +57,8 @@ public abstract class WatersAnalyzeAction
   // # Class WatersAction
   public void actionPerformed(final ActionEvent e)
   {
-    updateProductDES();
-    if (des != null)
-    {
-      final AnalyzerDialog dialog = new AnalyzerDialog();
-      dialog.setVisible(true);
-    }
-    else
-    {
-      getIDE().error("ERROR: DES was not able to be successfully compiled");
-    }
+    @SuppressWarnings("unused")
+    final AnalyzerDialog dialog = new AnalyzerDialog();
   }
 
   // ###################################################################
@@ -78,7 +76,7 @@ public abstract class WatersAnalyzeAction
       try {
         des = mContainer.recompile();
       } catch (final EvalException exception) {
-        return;
+        des = null;
       }
     }
     else
@@ -109,11 +107,13 @@ public abstract class WatersAnalyzeAction
     // # Constructor
     public AnalyzerDialog()
     {
+      this.setSize(DEFAULT_DIALOG_SIZE);
+      this.setLocation(DEFAULT_DIALOG_LOCATION);
+      this.setVisible(true);
       this.setTitle(getCheckName() + " Check");
       topPanel = new JPanel();
       bottomPanel = new JPanel();
-      informationLabel = new WrapperLabel(topPanel);
-      informationLabel.setText(getCheckName() + " Check is running...");
+      informationLabel = new WrapperLabel(getCheckName() + " Check is running...", topPanel);
       informationLabel.setHorizontalAlignment(SwingConstants.CENTER);
       cancelButton = new JButton("Abort");
       cancelButton.addActionListener(new ActionListener(){
@@ -131,9 +131,8 @@ public abstract class WatersAnalyzeAction
       topPanel.add(informationLabel, BorderLayout.NORTH);
       this.getContentPane().add(topPanel, BorderLayout.CENTER);
       this.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
-      this.setSize(DEFAULT_DIALOG_SIZE);
-      this.setLocation(DEFAULT_DIALOG_LOCATION);
       repaint();
+      updateProductDES();
       runner = new AnalyzerThread();
       runner.setPriority(Thread.MIN_PRIORITY);
       runner.start();
@@ -150,6 +149,7 @@ public abstract class WatersAnalyzeAction
           AnalyzerDialog.this.dispose();
         }
       });
+      repaint();
     }
 
     public void fail()
@@ -168,8 +168,34 @@ public abstract class WatersAnalyzeAction
         {
           final TraceProxy counterexample = verifier.getCounterExample();
           ((ModuleContainer)getIDE().getActiveDocumentContainer()).getTabPane().setSelectedIndex(1);
-          ((ModuleContainer)getIDE().getActiveDocumentContainer()).getSimulatorPanel().switchToTraceMode(counterexample);
+          try
+          {
+            ((ModuleContainer)getIDE().getActiveDocumentContainer()).getSimulatorPanel().switchToTraceMode(counterexample);
+          }
+          catch (final NonDeterministicException exception)
+          {
+            final DocumentManager docManager = getIDE().getDocumentContainerManager().getDocumentManager();
+            final ProxyMarshaller<TraceProxy> marshaller =
+              docManager.findProxyMarshaller(TraceProxy.class);
+            final String ext = marshaller.getDefaultExtension();
+            final File outdir = getOutputDirectory();
+            final String outname = getIDE().getActiveDocumentContainer().getName();
+            final File outfile = new File(outdir, outname + ext);
+            getIDE().error(("The trace data is missing Non-Deterministic information, and thus, it cannot be compiled. The trace has been saved to " + outfile.getAbsolutePath()));
+            try {
+              docManager.saveAs(counterexample, outfile);
+            } catch (final WatersMarshalException exception1) {
+              getIDE().error("Waters Marshal Error prevented the file from being written.");
+            } catch (final IOException exception1) {
+              getIDE().error("IO Exception prevented the file from being written: " + exception1);
+            }
+            }
           AnalyzerDialog.this.dispose();
+        }
+
+        private File getOutputDirectory()
+        {
+          return getIDE().getActiveDocumentContainer().getFileLocation().getParentFile();
         }
       });
       if (verifier.getCounterExample().getComment() == null)
@@ -179,6 +205,7 @@ public abstract class WatersAnalyzeAction
       else
         informationLabel.setText(verifier.getCounterExample().getComment());
       bottomPanel.add(traceButton, BorderLayout.EAST);
+      repaint();
     }
 
     public void error(final Throwable exception)
@@ -195,6 +222,7 @@ public abstract class WatersAnalyzeAction
           AnalyzerDialog.this.dispose();
         }
       });
+      repaint();
     }
 
     // ######################################################################
@@ -212,19 +240,20 @@ public abstract class WatersAnalyzeAction
 
       // ######################################################################
       // # Constructor
+      @SuppressWarnings("unused")
       public WrapperLabel(final JPanel parent)
       {
         super();
         this.parent = parent;
         parent.addComponentListener(this);
-        this.componentResized(null);
+        this.setPreferredSize(new Dimension((int)DEFAULT_DIALOG_SIZE.getWidth(), ((int)DEFAULT_DIALOG_SIZE.getHeight() - OUTSIDE_PANEL_DIALOG_SIZE - TITLEBAR_HEIGHT)));
       }
-      @SuppressWarnings("unused")
       public WrapperLabel(final String e, final JPanel parent)
       {
         super(HTMLinize(e));
         this.parent = parent;
         parent.addComponentListener(this);
+        this.setPreferredSize(new Dimension((int)DEFAULT_DIALOG_SIZE.getWidth(), ((int)DEFAULT_DIALOG_SIZE.getHeight() - OUTSIDE_PANEL_DIALOG_SIZE - TITLEBAR_HEIGHT)));
       }
 
       public void setText(final String e)
@@ -246,7 +275,7 @@ public abstract class WatersAnalyzeAction
 
       public void componentResized(final ComponentEvent e)
       {
-        this.setPreferredSize(new Dimension(((int)parent.getSize().getWidth()), (((int)parent.getSize().getHeight() - TITLEBAR_HEIGHT))));
+        this.setPreferredSize(new Dimension(((int)parent.getSize().getWidth()), ((int)parent.getSize().getHeight() - TITLEBAR_HEIGHT)));
       }
 
       public void componentShown(final ComponentEvent e)
@@ -276,31 +305,32 @@ public abstract class WatersAnalyzeAction
       public void run()
       {
         super.run();
-        boolean fatalError = false;
         verifier.setModel(des);
+        if (des == null)
+        {
+          SwingUtilities.invokeLater(new Runnable(){public void run(){error(new IllegalArgumentException("The model was unable to be compiled"));}});
+          return;
+        }
         try {
           verifier.run();
         }
         catch (final AbortException exception)
         {
           // Do nothing: Aborted
-          fatalError = true;
+          return;
         } catch (final AnalysisException exception) {
           SwingUtilities.invokeLater(new Runnable(){public void run(){error(exception);}});
-          fatalError = true;
+          return;
         } catch (final OutOfMemoryError error)
         {
           SwingUtilities.invokeLater(new Runnable(){public void run(){error(error);}});
-          fatalError = true;
+          return;
         }
-        if (!fatalError)
-        {
-          final boolean result = verifier.isSatisfied();
-          if (result) {
-            SwingUtilities.invokeLater(new Runnable(){public void run(){succeed();}});
-          } else {
-            SwingUtilities.invokeLater(new Runnable(){public void run(){fail();}});
-          }
+        final boolean result = verifier.isSatisfied();
+        if (result) {
+          SwingUtilities.invokeLater(new Runnable(){public void run(){succeed();}});
+        } else {
+          SwingUtilities.invokeLater(new Runnable(){public void run(){fail();}});
         }
       }
 
@@ -330,7 +360,8 @@ public abstract class WatersAnalyzeAction
 
     // #####################################################################
     // # Class Constants
-    private final Dimension DEFAULT_DIALOG_SIZE = new Dimension(290, 190);
+    private final Dimension DEFAULT_DIALOG_SIZE = new Dimension(290, 160);
+    private static final int OUTSIDE_PANEL_DIALOG_SIZE = 65;
     private final Point DEFAULT_DIALOG_LOCATION = new Point(250, 150);
     private static final long serialVersionUID = -2478548485525996982L;
   }

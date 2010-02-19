@@ -49,7 +49,7 @@ public class SimulatorPanel
     return mSimulation;
   }
 
-  public void switchToTraceMode(final TraceProxy trace)
+  public void switchToTraceMode(final TraceProxy trace) throws NonDeterministicException
   {
     mSimulation.run(trace, trace instanceof ConflictTraceElement || trace instanceof LoopTraceElement);
     mTabbedPane.setSelectedIndex(2);

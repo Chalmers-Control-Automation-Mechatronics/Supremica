@@ -296,6 +296,18 @@ public class Simulation implements ModelObserver, Observer
     return output;
   }
 
+  public Set<AutomatonProxy> getNonControllable()
+  {
+    if (mBlockingEvents == null)
+      return Collections.emptySet();
+    final HashSet<AutomatonProxy> output = new HashSet<AutomatonProxy>();
+    for (final Pair<EventProxy, AutomatonProxy> blocker : mBlockingEvents)
+    {
+      output.add(blocker.getSecond());
+    }
+    return output;
+  }
+
   /**
    * Returns the automaton which are blocked by this event
    * @param event
@@ -555,7 +567,14 @@ public class Simulation implements ModelObserver, Observer
     mWarningProperties = new HashMap<Step, AutomatonProxy>();
     if (mTrace != null && !destroyTrace)
     {
-      run(mTrace, mAllowLastStep);
+      try
+      {
+        run(mTrace, mAllowLastStep);
+      }
+      catch (final NonDeterministicException exception)
+      {
+        // Do nothing
+      }
     }
     else
     {
@@ -595,8 +614,9 @@ public class Simulation implements ModelObserver, Observer
    * @param trace The trace to load
    * @param allowLastStep <STRONG>true</STRONG> if the last step in the TraceProxy is to be fired, <STRONG>false</STRONG>
    * if the simulation is to be stopped at the second-to-last step instead.
+   * @throws NonDeterministicException
    */
-  public void run(final TraceProxy trace, final boolean allowLastStep)
+  public void run(final TraceProxy trace, final boolean allowLastStep) throws NonDeterministicException
   {
     mTrace = null;
     mAllowLastStep = false;
@@ -619,11 +639,7 @@ public class Simulation implements ModelObserver, Observer
         }
         if (locatedStep != null)
         {
-          try {
-            step(locatedStep); // So fire it, and continue to the next one.
-          } catch (final NonDeterministicException exception) {
-            // Do nothing
-          }
+          step(locatedStep); // So fire it, and continue to the next one.
         }
         else
           throw new IllegalArgumentException("No valid step could be found, trace was: " + trace.getTraceSteps());
@@ -641,10 +657,11 @@ public class Simulation implements ModelObserver, Observer
    * @param step The simulator instruction which is being tested for equality
    * @param tStep The trace instruction which is being tested for equality
    * @return <STRONG>true</STRONG> if the Step and the TraceStep represent the same instruction, <STRONG>false</STRONG> otherwise
+   * @throws NonDeterministicException
    * @throws IllegalArgumentException if the trace step doesn't provide non-deterministic information, while the regular step
    * contains it (and thus, the simulation is non-deterministic)
    */
-  private boolean compareTraceStep(final Step step, final TraceStepProxy tStep)
+  private boolean compareTraceStep(final Step step, final TraceStepProxy tStep) throws NonDeterministicException
   {
     if (step.getEvent() == tStep.getEvent()) // Check if the event name is right. If not, this is not the correct Step
     {
@@ -653,7 +670,7 @@ public class Simulation implements ModelObserver, Observer
         if (step.getDest().get(auto) != null)
         {
           if (tStep.getStateMap().get(auto) == null) // If there is no non-deterministic information, fail always
-            throw new IllegalArgumentException("No non-deterministic information available. Trace is:" + mTrace.getTraceSteps());
+            throw new NonDeterministicException("No non-deterministic information available. Trace is:" + mTrace.getTraceSteps());
           else if (step.getDest().get(auto) != tStep.getStateMap().get(auto)) // If the destinations don't match, then this is the wrong step
           {
             return false;

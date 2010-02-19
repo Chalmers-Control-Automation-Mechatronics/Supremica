@@ -38,6 +38,13 @@ public class AutomatonPopupFactory
       if (changed)
         toolTipText += " and";
       toolTipText += " is a disabled Property";
+      changed = true;
+    }
+    if (sim.getNonControllable().contains(aut) && showActivity)
+    {
+      if (changed)
+        toolTipText += " and";
+      toolTipText += " is blocking";
     }
     return toolTipText;
   }
