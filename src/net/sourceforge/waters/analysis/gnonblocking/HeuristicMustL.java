@@ -22,24 +22,17 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 /**
  * @author rmf18
  */
-public class mustL implements Heuristic
+public class HeuristicMustL implements Heuristic
 {
-  final ProductDESProxy mModel;
-
-  public mustL(final ProductDESProxy model)
-  {
-    mModel = model;
-  }
-
   /**
    * There is a candidate for every event in the model, each candidate contains
    * the set of automaton which use that event.
    */
-  public Collection<Candidate> evaulate()
+  public Collection<Candidate> evaluate(final ProductDESProxy model)
   {
     final HashMap<EventProxy,Candidate> eventCandidates =
         new HashMap<EventProxy,Candidate>();
-    for (final AutomatonProxy aut : mModel.getAutomata()) {
+    for (final AutomatonProxy aut : model.getAutomata()) {
       for (final EventProxy event : aut.getEvents()) {
         if (!eventCandidates.containsKey(event)) {
           final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();

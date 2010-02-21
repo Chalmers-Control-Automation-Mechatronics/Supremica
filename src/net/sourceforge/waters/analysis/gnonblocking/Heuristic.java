@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.Collection;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
@@ -17,6 +18,6 @@ import java.util.Collection;
  */
 public interface Heuristic
 {
-  public Collection<Candidate> evaulate();
+  public Collection<Candidate> evaluate(final ProductDESProxy model);
 
 }

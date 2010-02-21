@@ -10,22 +10,15 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.Collection;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
  * @author rmf18
  */
-public class minS implements Heuristic
+public class HeuristicMinS implements Heuristic
 {
-
-  final Collection<Candidate> mCandidates;
-
-  public minS(final Collection<Candidate> candidates)
-  {
-    mCandidates = candidates;
-  }
-
-  public Collection<Candidate> evaulate()
+  public Collection<Candidate> evaluate(final ProductDESProxy model)
   {
     // TODO Auto-generated method stub
     return null;
