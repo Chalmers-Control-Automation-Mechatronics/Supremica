@@ -122,8 +122,7 @@ public class CompositionalGeneralisedConflictChecker extends
       setMarkingProposition(getUsedMarkingProposition());
     }
     ProductDESProxy model = getModel();
-    final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton =
-        mapEventsToAutomata(model);
+    mapEventsToAutomata(model);
     final Set<AutomatonProxy> remainingAut =
         new HashSet<AutomatonProxy>(model.getAutomata());
 
@@ -136,7 +135,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final AutomatonProxy syncProduct = composeSynchronousProduct(candidate);
 
       final Set<EventProxy> localEvents =
-          identifyLocalEvents(eventAutomaton, candidate.getAutomata());
+          identifyLocalEvents(mEventsToAutomata, candidate.getAutomata());
       candidate.setLocalEvents(localEvents);
       // TODO: currently the candidate is changed and the original form is not
       // stored
@@ -260,27 +259,22 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
   /**
-   * Maps the events in the model to a collection of the automaton that contain
-   * the event in their alphabet.
+   * Maps the events in the model to a set of the automaton that contain the
+   * event in their alphabet.
    */
-  private Map<EventProxy,Set<AutomatonProxy>> mapEventsToAutomata(
-                                                                  final ProductDESProxy model)
+  private void mapEventsToAutomata(final ProductDESProxy model)
   {
-    final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton =
-        new HashMap<EventProxy,Set<AutomatonProxy>>();
     for (final AutomatonProxy aut : model.getAutomata()) {
       for (final EventProxy event : aut.getEvents()) {
         if (event.getKind() != EventKind.PROPOSITION) {
-          if (!eventAutomaton.containsKey(event)) {
+          if (!mEventsToAutomata.containsKey(event)) {
             final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
-            eventAutomaton.put(event, automata);
+            mEventsToAutomata.put(event, automata);
           }
-
-          eventAutomaton.get(event).add(aut);
+          mEventsToAutomata.get(event).add(aut);
         }
       }
     }
-    return eventAutomaton;
   }
 
   /**
@@ -333,8 +327,52 @@ public class CompositionalGeneralisedConflictChecker extends
     // TODO: needs proper implementation
   }
 
+
+  private interface Heuristic
+  {
+    public Collection<Candidate> evaluate(final ProductDESProxy model);
+
+  }
+
+
+  @SuppressWarnings("unused")
+  private class HeuristicMustL implements Heuristic
+  {
+    /**
+     * There is a candidate for every event in the model, each candidate
+     * contains the set of automaton which use that event.
+     */
+    public Collection<Candidate> evaluate(final ProductDESProxy model)
+    {
+      final HashMap<EventProxy,Candidate> eventCandidates =
+          new HashMap<EventProxy,Candidate>();
+      for (final EventProxy event : mEventsToAutomata.keySet()) {
+        final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
+        final Candidate candidate = new Candidate(automata);
+        eventCandidates.put(event, candidate);
+        for (final AutomatonProxy aut : mEventsToAutomata.get(event)) {
+          eventCandidates.get(event).getAutomata().add(aut);
+        }
+      }
+      return eventCandidates.values();
+    }
+  }
+
+
+  @SuppressWarnings("unused")
+  private class HeuristicMinS implements Heuristic
+  {
+    public Collection<Candidate> evaluate(final ProductDESProxy model)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+  }
+
   // #########################################################################
   // # Data Members
+  private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata;
 
   // #########################################################################
   // # Class Constants
