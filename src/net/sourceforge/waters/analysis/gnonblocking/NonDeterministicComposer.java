@@ -194,21 +194,27 @@ public class NonDeterministicComposer
     }
     mCompositionSize = numStates;
     final StateProxy[] states = new StateProxy[numStates];
+    final Set<EventProxy> emptyset = Collections.emptySet();
+    final Set<EventProxy> markedset = Collections.singleton(mMarked);
+    final Set<EventProxy> premarkedset = Collections.singleton(mPreMarking);
+    final Set<EventProxy> twoprops = new HashSet<EventProxy>(2);
+    twoprops.add(mMarked);
+    twoprops.add(mPreMarking);
+    final Set<EventProxy> twopropsUnmodifiable =
+        Collections.unmodifiableSet(twoprops);
     for (int i = 0; i < states.length; i++) {
       final EventProxy marked = mNewMarked.contains(i) ? mMarked : null;
       final EventProxy premarked =
           mNewPreMarked.contains(i) ? mPreMarking : null;
       if (marked != null && premarked != null) {
-        final Set<EventProxy> props = new HashSet<EventProxy>(2);
-        props.add(marked);
-        props.add(premarked);
-        states[i] = new MemStateProxy(i, props, mNewInitial.contains(i));
+        states[i] =
+            new MemStateProxy(i, twopropsUnmodifiable, mNewInitial.contains(i));
       } else if (marked != null) {
-        states[i] = new MemStateProxy(i, marked, mNewInitial.contains(i));
+        states[i] = new MemStateProxy(i, markedset, mNewInitial.contains(i));
       } else if (premarked != null) {
-        states[i] = new MemStateProxy(i, premarked, mNewInitial.contains(i));
+        states[i] = new MemStateProxy(i, premarkedset, mNewInitial.contains(i));
       } else {
-        states[i] = new MemStateProxy(i);
+        states[i] = new MemStateProxy(i, emptyset, mNewInitial.contains(i));
       }
     }
     final ArrayList<TransitionProxy> trans = new ArrayList<TransitionProxy>();
@@ -495,32 +501,7 @@ public class NonDeterministicComposer
       mIsInitial = isInitial;
     }
 
-    public MemStateProxy(final int name, final EventProxy event,
-                         final boolean isInitial)
-    {
-      this(name, event == null ? new THashSet<EventProxy>() : Collections
-          .singleton(event), isInitial);
-    }
-
-    @SuppressWarnings("unused")
-    public MemStateProxy(final int name, final EventProxy marked)
-    {
-      this(name, Collections.singleton(marked), false);
-    }
-
-    public MemStateProxy(final int name)
-    {
-      this(name, getRightType(), false);
-    }
-
     // #################################################
-
-    private static Set<EventProxy> getRightType()
-    {
-      final Set<EventProxy> empty = Collections.emptySet();
-      return empty;
-    }
-
     public Collection<EventProxy> getPropositions()
     {
       return mProps;
