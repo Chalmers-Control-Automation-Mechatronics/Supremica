@@ -72,7 +72,7 @@ public class NonDeterministicComposer
   {
     mNewMarked = new TIntArrayList();
     mNewPreMarked = new TIntArrayList();
-    states = new IntMap(mNodeLimit);
+    mStates = new IntMap(mNodeLimit);
     TObjectIntHashMap<EventProxy> eventToIndex =
         new TObjectIntHashMap<EventProxy>();
     events = unionEvents();
@@ -246,10 +246,10 @@ public class NonDeterministicComposer
                         final int event, final boolean isInitial)
       throws AnalysisException
   {
-    Integer target = states.get(successor);
+    Integer target = mStates.get(successor);
     if (target == null) {
       target = numStates;
-      states.put(successor, target);
+      mStates.put(successor, target);
       numStates++;
       if (numStates > mNodeLimit) {
         throw new AnalysisException("State Limit Exceeded");
@@ -293,7 +293,7 @@ public class NonDeterministicComposer
   {
     final boolean result = false;
     final int numAutomata = transitions.length;
-    final int source = states.get(state);
+    final int source = mStates.get(state);
     events: for (int i = 0; i < events.length; i++) {
       final int[][] suc = new int[numAutomata][];
       for (int l = 0; l < numAutomata; l++) {
@@ -706,7 +706,7 @@ public class NonDeterministicComposer
   private int mNodeLimit;
   private final List<AutomatonProxy> mModel;
   private final ProductDESProxyFactory mFactory;
-  private Map<int[],Integer> states;
+  private Map<int[],Integer> mStates;
   @SuppressWarnings("unused")
   private Collection<TransitionProxy> trans;
   private EventProxy[] events;

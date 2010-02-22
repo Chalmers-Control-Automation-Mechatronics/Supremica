@@ -161,6 +161,7 @@ public class CompositionalGeneralisedConflictChecker extends
     final ConflictChecker checker =
         new MonolithicConflictChecker(model, getMarkingProposition(),
             getGeneralisedPrecondition(), getFactory());
+    System.out.println(model);
     final boolean result = checker.run();
 
     if (result) {
@@ -237,6 +238,7 @@ public class CompositionalGeneralisedConflictChecker extends
             .createAutomatonProxy(automaton.getName(), automaton.getKind(),
                                   newEvents, automaton.getStates(),
                                   newTransitions);
+    System.out.println(newAut);
     return newAut;
   }
 
@@ -268,11 +270,14 @@ public class CompositionalGeneralisedConflictChecker extends
         new HashMap<EventProxy,Set<AutomatonProxy>>();
     for (final AutomatonProxy aut : model.getAutomata()) {
       for (final EventProxy event : aut.getEvents()) {
-        if (!eventAutomaton.containsKey(event)) {
-          final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
-          eventAutomaton.put(event, automata);
+        if (event.getKind() != EventKind.PROPOSITION) {
+          if (!eventAutomaton.containsKey(event)) {
+            final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
+            eventAutomaton.put(event, automata);
+          }
+
+          eventAutomaton.get(event).add(aut);
         }
-        eventAutomaton.get(event).add(aut);
       }
     }
     return eventAutomaton;
