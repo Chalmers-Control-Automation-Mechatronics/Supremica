@@ -264,6 +264,8 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private void mapEventsToAutomata(final ProductDESProxy model)
   {
+    mEventsToAutomata =
+        new HashMap<EventProxy,Set<AutomatonProxy>>(model.getEvents().size());
     for (final AutomatonProxy aut : model.getAutomata()) {
       for (final EventProxy event : aut.getEvents()) {
         if (event.getKind() != EventKind.PROPOSITION) {
@@ -345,7 +347,7 @@ public class CompositionalGeneralisedConflictChecker extends
     public Collection<Candidate> evaluate(final ProductDESProxy model)
     {
       final HashMap<EventProxy,Candidate> eventCandidates =
-          new HashMap<EventProxy,Candidate>();
+          new HashMap<EventProxy,Candidate>(mEventsToAutomata.keySet().size());
       for (final EventProxy event : mEventsToAutomata.keySet()) {
         final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
         final Candidate candidate = new Candidate(automata);
@@ -372,7 +374,8 @@ public class CompositionalGeneralisedConflictChecker extends
 
   // #########################################################################
   // # Data Members
-  private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata;
+  private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =
+      new HashMap<EventProxy,Set<AutomatonProxy>>();
 
   // #########################################################################
   // # Class Constants
