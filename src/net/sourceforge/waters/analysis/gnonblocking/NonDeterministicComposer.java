@@ -57,6 +57,7 @@ public class NonDeterministicComposer
     mFactory = factory;
     mNodeLimit = 1000;
     numStates = 1;
+    mTraceConverter = new TraceConverter();
   }
 
   public void setNodeLimit(final int stateLimit)
@@ -79,7 +80,6 @@ public class NonDeterministicComposer
   {
     mNewMarked = new TIntArrayList();
     mNewPreMarked = new TIntArrayList();
-    mTraceConverter.mStateTuples = new ArrayList<int[][]>();
     mStates = new IntMap(mNodeLimit);
     TObjectIntHashMap<EventProxy> eventToIndex =
         new TObjectIntHashMap<EventProxy>();
@@ -380,11 +380,17 @@ public class NonDeterministicComposer
   private class TraceConverter
   {
     public List<int[][]> mStateTuples;
-    public Map<Integer,AutomatonProxy> mAutMap =
-        new HashMap<Integer,AutomatonProxy>(mModelAut.size());
-    public Map<Integer,Map<Integer,StateProxy>> mStateMap =
-        new HashMap<Integer,Map<Integer,StateProxy>>(mModelAut.size());
+    public Map<Integer,AutomatonProxy> mAutMap;
+    public Map<Integer,Map<Integer,StateProxy>> mStateMap;
     public Set<MemStateProxy> mStates = new HashSet<MemStateProxy>();
+
+    public TraceConverter()
+    {
+      mAutMap = new HashMap<Integer,AutomatonProxy>(mModelAut.size());
+      mStateMap =
+          new HashMap<Integer,Map<Integer,StateProxy>>(mModelAut.size());
+      mStateTuples = new ArrayList<int[][]>();
+    }
 
     @SuppressWarnings("unused")
     public TraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
@@ -788,7 +794,7 @@ public class NonDeterministicComposer
   private boolean[][] mPreMarkedStates;
   private TIntArrayList mNewMarked;
   private TIntArrayList mNewPreMarked;
-  final TraceConverter mTraceConverter = new TraceConverter();
+  final TraceConverter mTraceConverter;
   private final List<int[]> newtrans = new ArrayList<int[]>();
   private int numStates;
   private Bag unvisited;
