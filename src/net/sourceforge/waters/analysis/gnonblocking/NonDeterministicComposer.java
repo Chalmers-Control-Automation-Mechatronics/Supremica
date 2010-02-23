@@ -225,9 +225,12 @@ public class NonDeterministicComposer
       trans.add(mFactory.createTransitionProxy(source, event, target));
     }
     final StringBuffer name = new StringBuffer();
+    name.append("{");
     for (final AutomatonProxy a : mModel) {
-      name.append(a.getName());
+      name.append(a.getName() + ", ");
     }
+    final int namelength = name.length();
+    name.replace(namelength - 2, namelength, "}");
     final String nam = name.toString();
     final ComponentKind ck = ComponentKind.PLANT;
     final THashSet<EventProxy> ev =
@@ -235,6 +238,7 @@ public class NonDeterministicComposer
     final Collection<StateProxy> st = Arrays.asList(states);
     final AutomatonProxy result =
         mFactory.createAutomatonProxy(nam, ck, ev, st, trans);
+    System.out.println(result);
     return result;
   }
 
