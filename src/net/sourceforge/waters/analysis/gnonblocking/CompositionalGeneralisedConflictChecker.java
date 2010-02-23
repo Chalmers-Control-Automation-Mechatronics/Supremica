@@ -382,11 +382,11 @@ public class CompositionalGeneralisedConflictChecker extends
 
     private int calculateProduct(final Candidate candidate)
     {
-      int smallestProduct = 1;
+      int product = 1;
       for (final AutomatonProxy aut : candidate.getAutomata()) {
-        smallestProduct *= aut.getStates().size();
+        product *= aut.getStates().size();
       }
-      return smallestProduct;
+      return product;
     }
 
     public Collection<Candidate> evaluate(final ProductDESProxy model)
