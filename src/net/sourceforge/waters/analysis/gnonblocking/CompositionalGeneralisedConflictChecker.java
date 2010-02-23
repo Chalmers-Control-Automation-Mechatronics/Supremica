@@ -192,9 +192,9 @@ public class CompositionalGeneralisedConflictChecker extends
                                            candidate.getAutomata());
 
     final NonDeterministicComposer composer =
-        new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
-            candidateModel.getAutomata()), getFactory(),
-            getMarkingProposition(), getGeneralisedPrecondition());
+        new NonDeterministicComposer(candidateModel,
+            new ArrayList<AutomatonProxy>(candidateModel.getAutomata()),
+            getFactory(), getMarkingProposition(), getGeneralisedPrecondition());
     return composer.run();
   }
 
