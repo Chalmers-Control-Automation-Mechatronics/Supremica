@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
@@ -364,6 +365,30 @@ public class CompositionalGeneralisedConflictChecker extends
   @SuppressWarnings("unused")
   private class HeuristicMinS implements Heuristic
   {
+    public Candidate evaluate(final List<Candidate> candidates)
+    {
+      Candidate chosenCandidate = candidates.get(0);
+      int smallestProduct = calculateProduct(chosenCandidate);
+      for (int i = 1; i < candidates.size(); i++) {
+        final Candidate candidate = candidates.get(i);
+        final int newproduct = calculateProduct(candidate);
+        if (smallestProduct > newproduct) {
+          smallestProduct = newproduct;
+          chosenCandidate = candidate;
+        }
+      }
+      return chosenCandidate;
+    }
+
+    private int calculateProduct(final Candidate candidate)
+    {
+      int smallestProduct = 1;
+      for (final AutomatonProxy aut : candidate.getAutomata()) {
+        smallestProduct *= aut.getStates().size();
+      }
+      return smallestProduct;
+    }
+
     public Collection<Candidate> evaluate(final ProductDESProxy model)
     {
       // TODO Auto-generated method stub
