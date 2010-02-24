@@ -502,6 +502,36 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
+  /**
+   * Performs step 2 of the approach to select the automata to compose. The
+   * chosen candidate is the one with the highest proportion of common events.
+   */
+  @SuppressWarnings("unused")
+  private class HeuristicMaxC implements SelectingHeuristic
+  {
+    public Candidate evaluate(final List<Candidate> candidates)
+    {
+      final Iterator<Candidate> it = candidates.iterator();
+      Candidate chosenCandidate = it.next();
+      int maxCommon =
+          (chosenCandidate.getNumberOfEvents() - chosenCandidate
+              .getLocalEventCount())
+              / chosenCandidate.getNumberOfEvents();
+      while (it.hasNext()) {
+        final Candidate nextCan = it.next();
+        final int proportion =
+            (nextCan.getNumberOfEvents() - nextCan.getLocalEventCount())
+                / nextCan.getNumberOfEvents();
+        if (proportion > maxCommon) {
+          maxCommon = proportion;
+          chosenCandidate = nextCan;
+        }
+      }
+      return chosenCandidate;
+    }
+  }
+
+
   @SuppressWarnings("unused")
   private class HeuristicMinS implements SelectingHeuristic
   {
