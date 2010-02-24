@@ -94,7 +94,7 @@ public class NonDeterministicComposer
     mIntDisabled = new TIntHashSet[numAutomata][];
     for (int i = 0; i < mModelAut.size(); i++) {
       final AutomatonProxy a = mModelAut.get(i);
-      mStateMap.mAutomaton[i] = a;
+      mStateMap.addAutomaton(i, a);
       final TObjectIntHashMap<StateProxy> statetoindex =
           new TObjectIntHashMap<StateProxy>(a.getStates().size());
       mMarkedStates[i] = new boolean[a.getStates().size()];
@@ -126,7 +126,7 @@ public class NonDeterministicComposer
             mPreMarkedStates[i][snum] = false;
           }
         }
-        mStateMap.mAutToStateMap.put(i, innerStateMap);
+        mStateMap.addStatesToAutomaton(i, innerStateMap);
         if (s.isInitial()) {
           cs.add(snum);
         }
@@ -208,7 +208,7 @@ public class NonDeterministicComposer
     final Set<EventProxy> twopropsUnmodifiable =
         Collections.unmodifiableSet(twoprops);
     for (int i = 0; i < numStates; i++) {
-      final int[] stateTuple = mStateMap.mStateTuples.get(i);
+      final int[] stateTuple = mStateMap.getStateTuple(i);
       final MemStateProxy memStateProxy;
 
       final EventProxy marked = mNewMarked.contains(i) ? mMarked : null;
@@ -287,7 +287,7 @@ public class NonDeterministicComposer
       if (isInitial) {
         mNewInitial.add(target);
       }
-      mStateMap.mStateTuples.add(successor);
+      mStateMap.addStateTuple(successor);
     }
     // only add a transition if not adding in an initial state
     if (!isInitial) {

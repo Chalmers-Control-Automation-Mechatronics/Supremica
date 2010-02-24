@@ -17,10 +17,9 @@ import net.sourceforge.waters.model.des.StateProxy;
  */
 public class StateMap
 {
-  // TODO These instance variables should be private ...
-  public List<int[]> mStateTuples;
-  public AutomatonProxy[] mAutomaton;
-  public Map<Integer,StateProxy[]> mAutToStateMap;
+  private final List<int[]> mStateTuples;
+  private final AutomatonProxy[] mAutomaton;
+  private final Map<Integer,StateProxy[]> mAutToStateMap;
 
   public List<StateProxy> mStates = new ArrayList<StateProxy>();
 
@@ -29,6 +28,26 @@ public class StateMap
     mAutomaton = new AutomatonProxy[numAutomata];
     mAutToStateMap = new HashMap<Integer,StateProxy[]>(numAutomata);
     mStateTuples = new ArrayList<int[]>();
+  }
+
+  public void addStateTuple(final int[] stateTuple)
+  {
+    mStateTuples.add(stateTuple);
+  }
+
+  public int[] getStateTuple(final int index)
+  {
+    return mStateTuples.get(index);
+  }
+
+  public void addAutomaton(final int index, final AutomatonProxy aut)
+  {
+    mAutomaton[index] = aut;
+  }
+
+  public void addStatesToAutomaton(final int id, final StateProxy[] states)
+  {
+    mAutToStateMap.put(id, states);
   }
 
   public StateProxy getState(final int[] stateTuple,
