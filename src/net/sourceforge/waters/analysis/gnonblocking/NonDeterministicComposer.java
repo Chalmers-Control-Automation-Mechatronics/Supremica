@@ -23,17 +23,12 @@ import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.des.ConflictKind;
 
 
 /**
@@ -44,8 +39,7 @@ import net.sourceforge.waters.xsd.des.ConflictKind;
  */
 public class NonDeterministicComposer
 {
-  public NonDeterministicComposer(final ProductDESProxy model,
-                                  final List<AutomatonProxy> aut,
+  public NonDeterministicComposer(final List<AutomatonProxy> aut,
                                   final ProductDESProxyFactory factory,
                                   final EventProxy marked,
                                   final EventProxy preconditionMark)
@@ -53,11 +47,10 @@ public class NonDeterministicComposer
     mMarked = marked;
     mPreMarking = preconditionMark;
     mModelAut = aut;
-    mModel = model;
     mFactory = factory;
     mNodeLimit = 1000;
     numStates = 1;
-    mTraceConverter = new TraceConverter();
+    mStateMap = new StateMap(mModelAut.size());
   }
 
   public void setNodeLimit(final int stateLimit)
@@ -101,7 +94,7 @@ public class NonDeterministicComposer
     mIntDisabled = new TIntHashSet[numAutomata][];
     for (int i = 0; i < mModelAut.size(); i++) {
       final AutomatonProxy a = mModelAut.get(i);
-      mTraceConverter.mAutMap.put(i, a);
+      mStateMap.mAutomaton[i] = a;
       final TObjectIntHashMap<StateProxy> statetoindex =
           new TObjectIntHashMap<StateProxy>(a.getStates().size());
       mMarkedStates[i] = new boolean[a.getStates().size()];
@@ -112,10 +105,9 @@ public class NonDeterministicComposer
       final boolean addPreMarking = !a.getEvents().contains(mPreMarking);
       // TODO do this smarter
       int snum = 0;
-      final Map<Integer,StateProxy> innerStateMap =
-          new HashMap<Integer,StateProxy>();
+      final StateProxy[] innerStateMap = new StateProxy[a.getStates().size()];
       for (final StateProxy s : a.getStates()) {
-        innerStateMap.put(snum, s);
+        innerStateMap[snum] = s;
         if (addMarking || s.getPropositions().contains(mMarked)) {
           mMarkedStates[i][snum] = true;
         }
@@ -134,7 +126,7 @@ public class NonDeterministicComposer
             mPreMarkedStates[i][snum] = false;
           }
         }
-        mTraceConverter.mStateMap.put(i, innerStateMap);
+        mStateMap.mAutToStateMap.put(i, innerStateMap);
         if (s.isInitial()) {
           cs.add(snum);
         }
@@ -206,7 +198,7 @@ public class NonDeterministicComposer
       explore(cs);
     }
     mCompositionSize = numStates;
-    final StateProxy[] states = new StateProxy[numStates];
+    mStateMap.mStates = new ArrayList<StateProxy>(numStates);
     final Set<EventProxy> emptyset = Collections.emptySet();
     final Set<EventProxy> markedset = Collections.singleton(mMarked);
     final Set<EventProxy> premarkedset = Collections.singleton(mPreMarking);
@@ -215,8 +207,8 @@ public class NonDeterministicComposer
     twoprops.add(mPreMarking);
     final Set<EventProxy> twopropsUnmodifiable =
         Collections.unmodifiableSet(twoprops);
-    for (int i = 0; i < states.length; i++) {
-      final int[][] stateTuple = mTraceConverter.mStateTuples.get(i);
+    for (int i = 0; i < numStates; i++) {
+      final int[] stateTuple = mStateMap.mStateTuples.get(i);
       final MemStateProxy memStateProxy;
 
       final EventProxy marked = mNewMarked.contains(i) ? mMarked : null;
@@ -237,13 +229,12 @@ public class NonDeterministicComposer
         memStateProxy =
             new MemStateProxy(i, stateTuple, emptyset, mNewInitial.contains(i));
       }
-      mTraceConverter.mStates.add(memStateProxy);
-      states[i] = memStateProxy;
+      mStateMap.mStates.add(memStateProxy);
     }
     final ArrayList<TransitionProxy> trans = new ArrayList<TransitionProxy>();
     for (final int[] tran : newtrans) {
-      final StateProxy source = states[tran[0]];
-      final StateProxy target = states[tran[2]];
+      final StateProxy source = mStateMap.mStates.get(tran[0]);
+      final StateProxy target = mStateMap.mStates.get(tran[2]);
       final EventProxy event = events[tran[1]];
       trans.add(mFactory.createTransitionProxy(source, event, target));
     }
@@ -258,9 +249,8 @@ public class NonDeterministicComposer
     final ComponentKind ck = ComponentKind.PLANT;
     final THashSet<EventProxy> ev =
         new THashSet<EventProxy>(Arrays.asList(events));
-    final Collection<StateProxy> st = Arrays.asList(states);
     final AutomatonProxy result =
-        mFactory.createAutomatonProxy(nam, ck, ev, st, trans);
+        mFactory.createAutomatonProxy(nam, ck, ev, mStateMap.mStates, trans);
     System.out.println(result);
     return result;
   }
@@ -275,9 +265,9 @@ public class NonDeterministicComposer
     return new THashSet<EventProxy>();
   }
 
-  private void addState(final int[][] suc, final int[] successor,
-                        final int source, final int event,
-                        final boolean isInitial) throws AnalysisException
+  private void addState(final int[] successor, final int source,
+                        final int event, final boolean isInitial)
+      throws AnalysisException
   {
     Integer target = mStates.get(successor);
     if (target == null) {
@@ -297,7 +287,7 @@ public class NonDeterministicComposer
       if (isInitial) {
         mNewInitial.add(target);
       }
-      mTraceConverter.mStateTuples.add(suc);
+      mStateMap.mStateTuples.add(successor);
     }
     // only add a transition if not adding in an initial state
     if (!isInitial) {
@@ -314,7 +304,7 @@ public class NonDeterministicComposer
       for (int i = 0; i < perm.length; i++) {
         successor[i] = suc[i][perm[i]];
       }
-      addState(suc, successor, source, event, isInitial);
+      addState(successor, source, event, isInitial);
       return;
     }
     for (int i = 0; i < suc[depth].length; i++) {
@@ -376,63 +366,9 @@ public class NonDeterministicComposer
     return true;
   }
 
-
-  private class TraceConverter
+  public StateMap getStateMap()
   {
-    public List<int[][]> mStateTuples;
-    public Map<Integer,AutomatonProxy> mAutMap;
-    public Map<Integer,Map<Integer,StateProxy>> mStateMap;
-    public Set<MemStateProxy> mStates = new HashSet<MemStateProxy>();
-
-    public TraceConverter()
-    {
-      mAutMap = new HashMap<Integer,AutomatonProxy>(mModelAut.size());
-      mStateMap =
-          new HashMap<Integer,Map<Integer,StateProxy>>(mModelAut.size());
-      mStateTuples = new ArrayList<int[][]>();
-    }
-
-    @SuppressWarnings("unused")
-    public TraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
-    {
-      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
-      final List<TraceStepProxy> convertedSteps =
-          new ArrayList<TraceStepProxy>();
-      for (final TraceStepProxy step : traceSteps) {
-        final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
-        final Map<AutomatonProxy,StateProxy> convertedStepMap =
-            new HashMap<AutomatonProxy,StateProxy>();
-        for (final Map.Entry<AutomatonProxy,StateProxy> e : stepMap.entrySet()) {
-
-          final MemStateProxy convertedState = (MemStateProxy) e.getValue();
-          final int[][] stateTuple = convertedState.getStateTuple();
-
-          /*
-           * final AutomatonProxy originalAut = mAutMap.get(autName); if
-           * (originalAut != null) {
-           *
-           * final String stateName = convertedState.getName(); final StateProxy
-           * originalState = mStateMap.get(autName).get(stateName);
-           * convertedStepMap.put(originalAut, originalState); }
-           */
-        }
-        final TraceStepProxy convertedStep =
-            mFactory.createTraceStepProxy(step.getEvent(), convertedStepMap);
-        convertedSteps.add(convertedStep);
-      }
-      final String tracename = conflictTrace.getName();
-      final String modelname = "Model name";
-      final String mainComment =
-          modelname + " does not satisfy SIC Property V. ";
-      final String comment = mainComment + "The answer event "
-
-      + " can no longer be executed, although it is required by the interface.";
-      final ConflictTraceProxy convertedTrace =
-          mFactory.createConflictTraceProxy(tracename, comment, conflictTrace
-              .getLocation(), mModel, mModelAut, convertedSteps,
-                                            ConflictKind.CONFLICT);
-      return convertedTrace;
-    }
+    return mStateMap;
   }
 
 
@@ -575,13 +511,13 @@ public class NonDeterministicComposer
   private static class MemStateProxy implements StateProxy
   {
     private final int mName;
-    private final int[][] mStateTuple;
+    private final int[] mStateTuple;
     private final boolean mIsInitial;
     private final Collection<EventProxy> mProps;
 
     // ############################################
     // Constructors
-    public MemStateProxy(final int name, final int[][] stateTuple,
+    public MemStateProxy(final int name, final int[] stateTuple,
                          final Collection<EventProxy> props,
                          final boolean isInitial)
     {
@@ -612,7 +548,8 @@ public class NonDeterministicComposer
       return Integer.toString(mName);
     }
 
-    public int[][] getStateTuple()
+    @SuppressWarnings("unused")
+    public int[] getStateTuple()
     {
       return mStateTuple;
     }
@@ -781,7 +718,6 @@ public class NonDeterministicComposer
   private int mCompositionSize = 0;
   private int mNodeLimit;
   private final List<AutomatonProxy> mModelAut;
-  private final ProductDESProxy mModel;
   private final ProductDESProxyFactory mFactory;
   private Map<int[],Integer> mStates;
   @SuppressWarnings("unused")
@@ -794,7 +730,7 @@ public class NonDeterministicComposer
   private boolean[][] mPreMarkedStates;
   private TIntArrayList mNewMarked;
   private TIntArrayList mNewPreMarked;
-  final TraceConverter mTraceConverter;
+  private final StateMap mStateMap;
   private final List<int[]> newtrans = new ArrayList<int[]>();
   private int numStates;
   private Bag unvisited;

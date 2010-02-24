@@ -16,17 +16,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.des.ConflictKind;
 
 
 /**
@@ -140,9 +144,9 @@ public class CompositionalGeneralisedConflictChecker extends
       candidate.setLocalEvents(localEvents);
       // TODO: currently the candidate is changed and the original form is not
       // stored
-      final AutomatonProxy autToAbstract =
-          hideLocalEvents(syncProduct, localEvents);
-
+      // final AutomatonProxy autToAbstract = hideLocalEvents(syncProduct,
+      // localEvents);
+      final AutomatonProxy autToAbstract = syncProduct;
       // TODO Abstraction rules here
 
       // removes the composed automata for this candidate from the set of
@@ -168,8 +172,13 @@ public class CompositionalGeneralisedConflictChecker extends
       setSatisfiedResult();
     } else {
       // TODO: counterexample needs to be for original model
-      final TraceProxy counterexample = checker.getCounterExample();
-      setFailedResult(counterexample);
+      @SuppressWarnings("unused")
+      final ConflictTraceProxy counterexample = checker.getCounterExample();
+      /*
+       * final CompositionStep step = new CompositionStep(); final
+       * ConflictTraceProxy convertedTrace = step.convertTrace(counterexample);
+       * setFailedResult(convertedTrace);
+       */
     }
     return result;
   }
@@ -178,7 +187,9 @@ public class CompositionalGeneralisedConflictChecker extends
    * Builds the synchronous product for a given candidate.
    *
    * @param candidate
+   *
    * @return
+   *
    * @throws AnalysisException
    */
   private AutomatonProxy composeSynchronousProduct(final Candidate candidate)
@@ -193,9 +204,9 @@ public class CompositionalGeneralisedConflictChecker extends
                                            candidate.getAutomata());
 
     final NonDeterministicComposer composer =
-        new NonDeterministicComposer(candidateModel,
-            new ArrayList<AutomatonProxy>(candidateModel.getAutomata()),
-            getFactory(), getMarkingProposition(), getGeneralisedPrecondition());
+        new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
+            candidateModel.getAutomata()), getFactory(),
+            getMarkingProposition(), getGeneralisedPrecondition());
     return composer.run();
   }
 
@@ -205,6 +216,7 @@ public class CompositionalGeneralisedConflictChecker extends
    *
    * @param syncProduct
    */
+  @SuppressWarnings("unused")
   private AutomatonProxy hideLocalEvents(final AutomatonProxy automaton,
                                          final Set<EventProxy> localEvents)
   {
@@ -395,6 +407,92 @@ public class CompositionalGeneralisedConflictChecker extends
       }
       return product;
     }
+  }
+
+
+  private interface Step
+  {
+    // public AutomatonProxy mOriginalAut;
+    // public AutomatonProxy mOutputAut;
+
+    public ConflictTraceProxy convertTrace(
+                                           final ConflictTraceProxy counterexample);
+
+  }
+
+
+  @SuppressWarnings("unused")
+  private class CompositionStep implements Step
+  {
+
+    private final StateMap mStateMap;
+
+    public CompositionStep(final StateMap stateMap)
+    {
+      mStateMap = stateMap;
+    }
+
+    public ConflictTraceProxy convertTrace(
+                                           final ConflictTraceProxy conflictTrace)
+    {
+      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      final List<TraceStepProxy> convertedSteps =
+          new ArrayList<TraceStepProxy>();
+      for (final TraceStepProxy step : traceSteps) {
+        final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
+        final Map<AutomatonProxy,StateProxy> convertedStepMap =
+            new HashMap<AutomatonProxy,StateProxy>();
+        for (final Map.Entry<AutomatonProxy,StateProxy> e : stepMap.entrySet()) {
+
+          // final MemStateProxy convertedState = (MemStateProxy) e.getValue();
+          // final int[] stateTuple = convertedState.getStateTuple();
+
+          /*
+           * final AutomatonProxy originalAut = mAutMap.get(autName); if
+           * (originalAut != null) {
+           *
+           * final String stateName = convertedState.getName(); final StateProxy
+           * originalState = mStateMap.get(autName).get(stateName);
+           * convertedStepMap.put(originalAut, originalState); }
+           */
+
+        }
+        final TraceStepProxy convertedStep =
+            getFactory()
+                .createTraceStepProxy(step.getEvent(), convertedStepMap);
+        convertedSteps.add(convertedStep);
+      }
+      final String tracename = conflictTrace.getName();
+      final String modelname = "Model name";
+      final String mainComment =
+          modelname + " does not satisfy SIC Property V. ";
+      final String comment = mainComment + "The answer event "
+
+      + " can no longer be executed, although it is required by the interface.";
+      final ConflictTraceProxy convertedTrace =
+          getFactory().createConflictTraceProxy(tracename, comment,
+                                                conflictTrace.getLocation(),
+                                                getModel(),
+                                                getModel().getAutomata(),
+                                                convertedSteps,
+                                                ConflictKind.CONFLICT);
+      return convertedTrace;
+    }
+
+  }
+
+
+  @SuppressWarnings("unused")
+  private class HidingStep implements Step
+  {
+
+    public ConflictTraceProxy convertTrace(
+                                           final ConflictTraceProxy counterexample)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
   }
 
   // #########################################################################
