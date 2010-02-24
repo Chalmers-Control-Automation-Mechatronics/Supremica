@@ -331,15 +331,22 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  private interface Heuristic
+  private interface PreselectingHeuristic
   {
     public Collection<Candidate> evaluate(final ProductDESProxy model);
 
   }
 
 
+  private interface SelectingHeuristic
+  {
+    public Candidate evaluate(final List<Candidate> candidates);
+
+  }
+
+
   @SuppressWarnings("unused")
-  private class HeuristicMustL implements Heuristic
+  private class HeuristicMustL implements PreselectingHeuristic
   {
     /**
      * There is a candidate for every event in the model, each candidate
@@ -363,7 +370,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
 
   @SuppressWarnings("unused")
-  private class HeuristicMinS implements Heuristic
+  private class HeuristicMinS implements SelectingHeuristic
   {
     public Candidate evaluate(final List<Candidate> candidates)
     {
@@ -388,13 +395,6 @@ public class CompositionalGeneralisedConflictChecker extends
       }
       return product;
     }
-
-    public Collection<Candidate> evaluate(final ProductDESProxy model)
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
   }
 
   // #########################################################################
