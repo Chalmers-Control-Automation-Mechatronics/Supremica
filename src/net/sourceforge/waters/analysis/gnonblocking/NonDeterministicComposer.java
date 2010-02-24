@@ -78,10 +78,7 @@ public class NonDeterministicComposer
         new TObjectIntHashMap<EventProxy>();
     events = unionEvents();
     final int numAutomata = mModelAut.size();
-    for (final AutomatonProxy a : mModelAut) {
-      System.out.println("Automata: " + a.getName());
-      // System.out.println(a);
-    }
+
     eventAutomaton = new int[events.length][numAutomata];
     // transitions indexed first by automaton then by event then by source state
     transitions = new int[numAutomata][events.length][][];
@@ -251,7 +248,6 @@ public class NonDeterministicComposer
         new THashSet<EventProxy>(Arrays.asList(events));
     final AutomatonProxy result =
         mFactory.createAutomatonProxy(nam, ck, ev, mStateMap.mStates, trans);
-    System.out.println(result);
     return result;
   }
 

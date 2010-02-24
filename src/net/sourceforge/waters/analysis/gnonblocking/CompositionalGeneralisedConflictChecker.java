@@ -127,6 +127,7 @@ public class CompositionalGeneralisedConflictChecker extends
       setMarkingProposition(getUsedMarkingProposition());
     }
     ProductDESProxy model = getModel();
+    final List<StateMap> stateMaps = new ArrayList<StateMap>();
     mapEventsToAutomata(model);
     final Set<AutomatonProxy> remainingAut =
         new HashSet<AutomatonProxy>(model.getAutomata());
@@ -137,7 +138,10 @@ public class CompositionalGeneralisedConflictChecker extends
       final Set<Candidate> candidates = findCandidates(model);
       final Candidate candidate = evaluateCandidates(candidates);
 
-      final AutomatonProxy syncProduct = composeSynchronousProduct(candidate);
+      final NonDeterministicComposer composer =
+          composeSynchronousProduct(candidate);
+      final AutomatonProxy syncProduct = composer.run();
+      stateMaps.add(composer.getStateMap());
 
       final Set<EventProxy> localEvents =
           identifyLocalEvents(mEventsToAutomata, candidate.getAutomata());
@@ -165,20 +169,20 @@ public class CompositionalGeneralisedConflictChecker extends
     final ConflictChecker checker =
         new MonolithicConflictChecker(model, getMarkingProposition(),
             getGeneralisedPrecondition(), getFactory());
-    System.out.println(model);
     final boolean result = checker.run();
 
     if (result) {
       setSatisfiedResult();
     } else {
       // TODO: counterexample needs to be for original model
-      @SuppressWarnings("unused")
       final ConflictTraceProxy counterexample = checker.getCounterExample();
-      /*
-       * final CompositionStep step = new CompositionStep(); final
-       * ConflictTraceProxy convertedTrace = step.convertTrace(counterexample);
-       * setFailedResult(convertedTrace);
-       */
+      ConflictTraceProxy convertedTrace = counterexample;
+      for (int i = stateMaps.size() - 1; i >= 0; i--) {
+        final CompositionStep step = new CompositionStep(stateMaps.get(i));
+        convertedTrace = step.convertTrace(counterexample);
+        System.out.println(convertedTrace);
+      }
+      setFailedResult(convertedTrace);
     }
     return result;
   }
@@ -192,7 +196,8 @@ public class CompositionalGeneralisedConflictChecker extends
    *
    * @throws AnalysisException
    */
-  private AutomatonProxy composeSynchronousProduct(final Candidate candidate)
+  private NonDeterministicComposer composeSynchronousProduct(
+                                                             final Candidate candidate)
       throws AnalysisException
   {
     // creates a model which includes only the candidate, to build the
@@ -207,7 +212,7 @@ public class CompositionalGeneralisedConflictChecker extends
         new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
             candidateModel.getAutomata()), getFactory(),
             getMarkingProposition(), getGeneralisedPrecondition());
-    return composer.run();
+    return composer;
   }
 
   /**
@@ -250,7 +255,6 @@ public class CompositionalGeneralisedConflictChecker extends
             .createAutomatonProxy(automaton.getName(), automaton.getKind(),
                                   newEvents, automaton.getStates(),
                                   newTransitions);
-    System.out.println(newAut);
     return newAut;
   }
 
@@ -418,16 +422,15 @@ public class CompositionalGeneralisedConflictChecker extends
     @SuppressWarnings("unused")
     private AutomatonProxy mOutputAut;
 
-    public abstract ConflictTraceProxy
-      convertTrace(final ConflictTraceProxy counterexample);
+    public abstract ConflictTraceProxy convertTrace(
+                                                    final ConflictTraceProxy counterexample);
 
   }
 
 
-  @SuppressWarnings("unused")
   private class CompositionStep extends Step
   {
-
+    @SuppressWarnings("unused")
     private final StateMap mStateMap;
 
     public CompositionStep(final StateMap stateMap)
@@ -445,7 +448,8 @@ public class CompositionalGeneralisedConflictChecker extends
         final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
         final Map<AutomatonProxy,StateProxy> convertedStepMap =
             new HashMap<AutomatonProxy,StateProxy>();
-        for (final Map.Entry<AutomatonProxy,StateProxy> e : stepMap.entrySet()) {
+        for (@SuppressWarnings("unused")
+        final Map.Entry<AutomatonProxy,StateProxy> e : stepMap.entrySet()) {
 
           // final MemStateProxy convertedState = (MemStateProxy) e.getValue();
           // final int[] stateTuple = convertedState.getStateTuple();
