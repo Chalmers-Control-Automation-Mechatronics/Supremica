@@ -17,17 +17,43 @@ import net.sourceforge.waters.model.des.StateProxy;
  */
 public class StateMap
 {
+  private AutomatonProxy mComposedAutomaton;
   private final List<int[]> mStateTuples;
   private final AutomatonProxy[] mAutomaton;
   private final Map<Integer,StateProxy[]> mAutToStateMap;
-
-  public List<StateProxy> mStates = new ArrayList<StateProxy>();
+  private final List<StateProxy> mStates = new ArrayList<StateProxy>();
 
   public StateMap(final int numAutomata)
   {
     mAutomaton = new AutomatonProxy[numAutomata];
     mAutToStateMap = new HashMap<Integer,StateProxy[]>(numAutomata);
     mStateTuples = new ArrayList<int[]>();
+    mComposedAutomaton = null;
+  }
+
+  public void setComposedAutomaton(final AutomatonProxy aut)
+  {
+    mComposedAutomaton = aut;
+  }
+
+  public AutomatonProxy getComposedAutomaton()
+  {
+    return mComposedAutomaton;
+  }
+
+  public void addState(final StateProxy state)
+  {
+    mStates.add(state);
+  }
+
+  public StateProxy getState(final int index)
+  {
+    return mStates.get(index);
+  }
+
+  public List<StateProxy> getStates()
+  {
+    return mStates;
   }
 
   public void addStateTuple(final int[] stateTuple)
@@ -38,6 +64,11 @@ public class StateMap
   public int[] getStateTuple(final int index)
   {
     return mStateTuples.get(index);
+  }
+
+  public AutomatonProxy[] getAutomata()
+  {
+    return mAutomaton;
   }
 
   public void addAutomaton(final int index, final AutomatonProxy aut)

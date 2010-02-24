@@ -565,10 +565,9 @@ public class CompositionalGeneralisedConflictChecker extends
   private abstract class Step
   {
 
+    protected AutomatonProxy mComposedAut;
     @SuppressWarnings("unused")
-    private AutomatonProxy mOriginalAut;
-    @SuppressWarnings("unused")
-    private AutomatonProxy mOutputAut;
+    private AutomatonProxy mAutPreComposition;
 
     public abstract ConflictTraceProxy convertTrace(
                                                     final ConflictTraceProxy counterexample);
@@ -578,12 +577,12 @@ public class CompositionalGeneralisedConflictChecker extends
 
   private class CompositionStep extends Step
   {
-    @SuppressWarnings("unused")
     private final StateMap mStateMap;
 
     public CompositionStep(final StateMap stateMap)
     {
       mStateMap = stateMap;
+      mComposedAut = stateMap.getComposedAutomaton();
     }
 
     public ConflictTraceProxy convertTrace(
@@ -593,29 +592,38 @@ public class CompositionalGeneralisedConflictChecker extends
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
       for (final TraceStepProxy step : traceSteps) {
-        final Map<AutomatonProxy,StateProxy> convertedStepMap =
-            new HashMap<AutomatonProxy,StateProxy>();
         final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
-        for (@SuppressWarnings("unused")
-        final Map.Entry<AutomatonProxy,StateProxy> e : stepMap.entrySet()) {
+        if (stepMap.containsKey(mComposedAut)) {
+          final Map<AutomatonProxy,StateProxy> convertedStepMap =
+              new HashMap<AutomatonProxy,StateProxy>(stepMap);
+          stepMap.remove(mComposedAut);
+          // add original automata and states
+          final AutomatonProxy[] autOfComposition = mStateMap.getAutomata();
+          for (@SuppressWarnings("unused")
+          final AutomatonProxy aut : autOfComposition) {
 
-          // final MemStateProxy convertedState = (MemStateProxy) e.getValue();
-          // final int[] stateTuple = convertedState.getStateTuple();
-
-          /*
-           * final AutomatonProxy originalAut = mAutMap.get(autName); if
-           * (originalAut != null) {
-           *
-           * final String stateName = convertedState.getName(); final StateProxy
-           * originalState = mStateMap.get(autName).get(stateName);
-           * convertedStepMap.put(originalAut, originalState); }
-           */
-
+            // convertedStepMap.put(aut, value);
+          }
+          final TraceStepProxy convertedStep =
+              getFactory().createTraceStepProxy(step.getEvent(),
+                                                convertedStepMap);
+          convertedSteps.add(convertedStep);
         }
-        final TraceStepProxy convertedStep =
-            getFactory()
-                .createTraceStepProxy(step.getEvent(), convertedStepMap);
-        convertedSteps.add(convertedStep);
+        // for (final Map.Entry<AutomatonProxy,StateProxy> e :
+        // stepMap.entrySet()) {
+
+        // final MemStateProxy convertedState = (MemStateProxy) e.getValue();
+        // final int[] stateTuple = convertedState.getStateTuple();
+
+        /*
+         * final AutomatonProxy originalAut = mAutMap.get(autName); if
+         * (originalAut != null) {
+         *
+         * final String stateName = convertedState.getName(); final StateProxy
+         * originalState = mStateMap.get(autName).get(stateName);
+         * convertedStepMap.put(originalAut, originalState); }
+         */
+
       }
       // TODO: change comment and model name
       final ConflictTraceProxy convertedTrace =
@@ -628,7 +636,6 @@ public class CompositionalGeneralisedConflictChecker extends
                                                 ConflictKind.CONFLICT);
       return convertedTrace;
     }
-
   }
 
 

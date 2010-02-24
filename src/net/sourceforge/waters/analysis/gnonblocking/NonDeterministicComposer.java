@@ -195,7 +195,7 @@ public class NonDeterministicComposer
       explore(cs);
     }
     mCompositionSize = numStates;
-    mStateMap.mStates = new ArrayList<StateProxy>(numStates);
+    // mStateMap.mStates = new ArrayList<StateProxy>(numStates);
     final Set<EventProxy> emptyset = Collections.emptySet();
     final Set<EventProxy> markedset = Collections.singleton(mMarked);
     final Set<EventProxy> premarkedset = Collections.singleton(mPreMarking);
@@ -226,12 +226,12 @@ public class NonDeterministicComposer
         memStateProxy =
             new MemStateProxy(i, stateTuple, emptyset, mNewInitial.contains(i));
       }
-      mStateMap.mStates.add(memStateProxy);
+      mStateMap.addState(memStateProxy);
     }
     final ArrayList<TransitionProxy> trans = new ArrayList<TransitionProxy>();
     for (final int[] tran : newtrans) {
-      final StateProxy source = mStateMap.mStates.get(tran[0]);
-      final StateProxy target = mStateMap.mStates.get(tran[2]);
+      final StateProxy source = mStateMap.getState(tran[0]);
+      final StateProxy target = mStateMap.getState(tran[2]);
       final EventProxy event = events[tran[1]];
       trans.add(mFactory.createTransitionProxy(source, event, target));
     }
@@ -247,7 +247,9 @@ public class NonDeterministicComposer
     final THashSet<EventProxy> ev =
         new THashSet<EventProxy>(Arrays.asList(events));
     final AutomatonProxy result =
-        mFactory.createAutomatonProxy(nam, ck, ev, mStateMap.mStates, trans);
+        mFactory
+            .createAutomatonProxy(nam, ck, ev, mStateMap.getStates(), trans);
+    mStateMap.setComposedAutomaton(result);
     return result;
   }
 
