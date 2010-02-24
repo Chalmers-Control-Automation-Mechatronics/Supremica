@@ -17,6 +17,7 @@ import net.sourceforge.waters.model.des.StateProxy;
  */
 public class StateMap
 {
+  // TODO These instance variables should be private ...
   public List<int[]> mStateTuples;
   public AutomatonProxy[] mAutomaton;
   public Map<Integer,StateProxy[]> mAutToStateMap;

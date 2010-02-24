@@ -410,19 +410,22 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  private interface Step
+  private abstract class Step
   {
-    // public AutomatonProxy mOriginalAut;
-    // public AutomatonProxy mOutputAut;
 
-    public ConflictTraceProxy convertTrace(
-                                           final ConflictTraceProxy counterexample);
+    @SuppressWarnings("unused")
+    private AutomatonProxy mOriginalAut;
+    @SuppressWarnings("unused")
+    private AutomatonProxy mOutputAut;
+
+    public abstract ConflictTraceProxy
+      convertTrace(final ConflictTraceProxy counterexample);
 
   }
 
 
   @SuppressWarnings("unused")
-  private class CompositionStep implements Step
+  private class CompositionStep extends Step
   {
 
     private final StateMap mStateMap;
@@ -483,7 +486,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
 
   @SuppressWarnings("unused")
-  private class HidingStep implements Step
+  private class HidingStep extends Step
   {
 
     public ConflictTraceProxy convertTrace(
