@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -339,7 +340,7 @@ public class CompositionalGeneralisedConflictChecker extends
   private Set<Candidate> findCandidates(final ProductDESProxy model)
   {
     // initially all automaton are in a set as a candidate
-    final Candidate candidate = new Candidate(model.getAutomata(), 1);
+    final Candidate candidate = new Candidate(model.getAutomata());
     final Set<Candidate> candidates = new HashSet<Candidate>();
     candidates.add(candidate);
     return candidates;
@@ -354,20 +355,101 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  private interface SelectingHeuristic
+  private class HeuristicPairing
   {
-    public Candidate evaluate(final List<Candidate> candidates);
-
+    protected Collection<Candidate> pairAutomaton(
+                                                  final AutomatonProxy chosenAut,
+                                                  final Set<AutomatonProxy> automata)
+    {
+      final Set<AutomatonProxy> aut = new HashSet<AutomatonProxy>(automata);
+      aut.remove(chosenAut);
+      final Collection<Candidate> candidates =
+          new HashSet<Candidate>(aut.size());
+      for (final AutomatonProxy a : aut) {
+        final Set<AutomatonProxy> pair = new HashSet<AutomatonProxy>(2);
+        pair.add(a);
+        pair.add(chosenAut);
+        final Candidate candidate = new Candidate(pair);
+        candidates.add(candidate);
+      }
+      return candidates;
+    }
   }
 
 
   @SuppressWarnings("unused")
+  /**
+   * Performs step 1 of the approach to select the automata to compose.
+   * A candidate is produced by pairing the automaton with the fewest transitions
+   * to every other automaton in the model.
+   */
+  private class HeuristicMinT extends HeuristicPairing implements
+      PreselectingHeuristic
+  {
+    public Collection<Candidate> evaluate(final ProductDESProxy model)
+    {
+      // Find automaton with fewest transitions
+      final Set<AutomatonProxy> automata = model.getAutomata();
+      final Iterator<AutomatonProxy> it = automata.iterator();
+      AutomatonProxy chosenAut = it.next();
+      int minTrans = chosenAut.getTransitions().size();
+      while (it.hasNext()) {
+        final AutomatonProxy nextAut = it.next();
+        final int transCount = nextAut.getTransitions().size();
+        if (transCount < minTrans) {
+          minTrans = transCount;
+          chosenAut = nextAut;
+        }
+      }
+      // pairs chosen automaton with all others
+      final Collection<Candidate> candidates =
+          pairAutomaton(chosenAut, automata);
+      return candidates;
+    }
+  }
+
+
+  /**
+   * Performs step 1 of the approach to select the automata to compose. A
+   * candidate is produced by pairing the automaton with the most states to
+   * every other automaton in the model.
+   */
+  @SuppressWarnings("unused")
+  private class HeuristicMaxS extends HeuristicPairing implements
+      PreselectingHeuristic
+  {
+
+    public Collection<Candidate> evaluate(final ProductDESProxy model)
+    {
+      // Find automaton with the most states
+      final Set<AutomatonProxy> automata = model.getAutomata();
+      final Iterator<AutomatonProxy> it = automata.iterator();
+      AutomatonProxy chosenAut = it.next();
+      int maxStates = chosenAut.getStates().size();
+      while (it.hasNext()) {
+        final AutomatonProxy nextAut = it.next();
+        final int statesCount = nextAut.getStates().size();
+        if (statesCount > maxStates) {
+          maxStates = statesCount;
+          chosenAut = nextAut;
+        }
+      }
+      // pairs chosen automaton with all others
+      final Collection<Candidate> candidates =
+          pairAutomaton(chosenAut, automata);
+      return candidates;
+    }
+  }
+
+
+  @SuppressWarnings("unused")
+  /**
+   * Performs step 1 of the approach to select the automata to compose.
+   * A candidate is produced for every event in the model, each candidate
+   * contains the set of automaton which use that event.
+   */
   private class HeuristicMustL implements PreselectingHeuristic
   {
-    /**
-     * There is a candidate for every event in the model, each candidate
-     * contains the set of automaton which use that event.
-     */
     public Collection<Candidate> evaluate(final ProductDESProxy model)
     {
       final HashMap<EventProxy,Candidate> eventCandidates =
@@ -381,6 +463,41 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
       return eventCandidates.values();
+    }
+  }
+
+
+  private interface SelectingHeuristic
+  {
+    public Candidate evaluate(final List<Candidate> candidates);
+
+  }
+
+
+  /**
+   * Performs step 2 of the approach to select the automata to compose. The
+   * chosen candidate is the one with the highest proportion of local events.
+   */
+  @SuppressWarnings("unused")
+  private class HeuristicMaxL implements SelectingHeuristic
+  {
+    public Candidate evaluate(final List<Candidate> candidates)
+    {
+      final Iterator<Candidate> it = candidates.iterator();
+      Candidate chosenCandidate = it.next();
+      int maxLocal =
+          chosenCandidate.getLocalEventCount()
+              / chosenCandidate.getNumberOfEvents();
+      while (it.hasNext()) {
+        final Candidate nextCan = it.next();
+        final int proportion =
+            nextCan.getLocalEventCount() / nextCan.getNumberOfEvents();
+        if (proportion > maxLocal) {
+          maxLocal = proportion;
+          chosenCandidate = nextCan;
+        }
+      }
+      return chosenCandidate;
     }
   }
 
