@@ -175,7 +175,8 @@ public class CompositionalGeneralisedConflictChecker extends
     if (result) {
       setSatisfiedResult();
     } else {
-      // TODO: counterexample needs to be for original model
+      // TODO: counterexample needs to be for original model, this is not right
+      // yet
       final ConflictTraceProxy counterexample = checker.getCounterExample();
       ConflictTraceProxy convertedTrace = counterexample;
       for (int i = stateMaps.size() - 1; i >= 0; i--) {
@@ -588,13 +589,13 @@ public class CompositionalGeneralisedConflictChecker extends
     public ConflictTraceProxy convertTrace(
                                            final ConflictTraceProxy conflictTrace)
     {
-      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
+      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
       for (final TraceStepProxy step : traceSteps) {
-        final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
         final Map<AutomatonProxy,StateProxy> convertedStepMap =
             new HashMap<AutomatonProxy,StateProxy>();
+        final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
         for (@SuppressWarnings("unused")
         final Map.Entry<AutomatonProxy,StateProxy> e : stepMap.entrySet()) {
 
@@ -616,18 +617,13 @@ public class CompositionalGeneralisedConflictChecker extends
                 .createTraceStepProxy(step.getEvent(), convertedStepMap);
         convertedSteps.add(convertedStep);
       }
-      final String tracename = conflictTrace.getName();
-      final String modelname = "Model name";
-      final String mainComment =
-          modelname + " does not satisfy SIC Property V. ";
-      final String comment = mainComment + "The answer event "
-
-      + " can no longer be executed, although it is required by the interface.";
+      // TODO: change comment and model name
       final ConflictTraceProxy convertedTrace =
-          getFactory().createConflictTraceProxy(tracename, comment,
+          getFactory().createConflictTraceProxy(conflictTrace.getName(),
+                                                conflictTrace.getComment(),
                                                 conflictTrace.getLocation(),
-                                                getModel(),
-                                                getModel().getAutomata(),
+                                                conflictTrace.getProductDES(),
+                                                conflictTrace.getAutomata(),
                                                 convertedSteps,
                                                 ConflictKind.CONFLICT);
       return convertedTrace;
