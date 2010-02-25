@@ -562,41 +562,66 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
+  //#########################################################################
+  //# Inner Class Step
   private abstract class Step
   {
 
-    protected AutomatonProxy mComposedAut;
+    //#######################################################################
+    //# Constructor
+    Step(final AutomatonProxy aut)
+    {
+      mResultAutomaton = aut;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    AutomatonProxy getResultAutomaton()
+    {
+      return mResultAutomaton;
+    }
+
+    //#######################################################################
+    //# Trace Computation
+    abstract ConflictTraceProxy convertTrace
+      (final ConflictTraceProxy counterexample);
+
+    //#######################################################################
+    //# Data Members
+    private final AutomatonProxy mResultAutomaton;
     @SuppressWarnings("unused")
     private AutomatonProxy mAutPreComposition;
-
-    public abstract ConflictTraceProxy convertTrace(
-                                                    final ConflictTraceProxy counterexample);
 
   }
 
 
+  //#########################################################################
+  //# Inner Class CompositionStep
   private class CompositionStep extends Step
   {
-    private final StateMap mStateMap;
 
-    public CompositionStep(final StateMap stateMap)
+    //#######################################################################
+    //# Constructor
+    private CompositionStep(final StateMap stateMap)
     {
+      super(stateMap.getComposedAutomaton());
       mStateMap = stateMap;
-      mComposedAut = stateMap.getComposedAutomaton();
     }
 
-    public ConflictTraceProxy convertTrace(
-                                           final ConflictTraceProxy conflictTrace)
+    //#######################################################################
+    //# Trace Computation
+    ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
+      final AutomatonProxy composed = getResultAutomaton();
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
       for (final TraceStepProxy step : traceSteps) {
         final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
-        if (stepMap.containsKey(mComposedAut)) {
+        if (stepMap.containsKey(composed)) {
           final Map<AutomatonProxy,StateProxy> convertedStepMap =
               new HashMap<AutomatonProxy,StateProxy>(stepMap);
-          stepMap.remove(mComposedAut);
+          stepMap.remove(composed);
           // add original automata and states
           final AutomatonProxy[] autOfComposition = mStateMap.getAutomata();
           for (@SuppressWarnings("unused")
@@ -636,21 +661,37 @@ public class CompositionalGeneralisedConflictChecker extends
                                                 ConflictKind.CONFLICT);
       return convertedTrace;
     }
+
+    //#######################################################################
+    //# Data Members
+    private final StateMap mStateMap;
   }
 
 
+  //#########################################################################
+  //# Inner Class HidingStep
   @SuppressWarnings("unused")
   private class HidingStep extends Step
   {
 
-    public ConflictTraceProxy convertTrace(
-                                           final ConflictTraceProxy counterexample)
+    //#######################################################################
+    //# Constructor
+    private HidingStep(final AutomatonProxy result)
+    {
+      super(result);
+    }
+
+    //#######################################################################
+    //# Trace Computation
+    ConflictTraceProxy convertTrace
+      (final ConflictTraceProxy counterexample)
     {
       // TODO Auto-generated method stub
       return null;
     }
 
   }
+
 
   // #########################################################################
   // # Data Members
