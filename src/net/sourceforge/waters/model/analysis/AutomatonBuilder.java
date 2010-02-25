@@ -35,10 +35,7 @@ public interface AutomatonBuilder extends ModelAnalyser
   //#########################################################################
   //# More Specific Access to the Results
   /**
-   * Gets a counterexample if model checking has found that the
-   * property checked is not satisfied.
-   * @return A trace object constructed for the model that was checked.
-   *         It shares events and automata with the input model.
+   * Gets the automaton computed by this algorithm.
    * @throws IllegalStateException if this method is called before
    *         model checking has completed, i.e., before {@link
    *         ModelAnalyser#run() run()} has been called, or model checking

@@ -123,6 +123,8 @@ public class NonDeterministicComposer
             mPreMarkedStates[i][snum] = false;
           }
         }
+        // TODO The inner state map should only be set once per automaton,
+        // not once per state.
         mStateMap.addStatesToAutomaton(i, innerStateMap);
         if (s.isInitial()) {
           cs.add(snum);
