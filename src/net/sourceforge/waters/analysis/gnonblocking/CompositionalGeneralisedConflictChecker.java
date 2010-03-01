@@ -22,6 +22,7 @@ import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -128,7 +129,9 @@ public class CompositionalGeneralisedConflictChecker extends
       setMarkingProposition(getUsedMarkingProposition());
     }
     ProductDESProxy model = getModel();
-    final List<StateMap> stateMaps = new ArrayList<StateMap>();
+    final List<SynchronousProductStateMap> stateMaps =
+        new ArrayList<SynchronousProductStateMap>();
+    final List<AutomatonProxy> composedAut = new ArrayList<AutomatonProxy>();
     mapEventsToAutomata(model);
     final Set<AutomatonProxy> remainingAut =
         new HashSet<AutomatonProxy>(model.getAutomata());
@@ -143,6 +146,7 @@ public class CompositionalGeneralisedConflictChecker extends
           composeSynchronousProduct(candidate);
       final AutomatonProxy syncProduct = composer.run();
       stateMaps.add(composer.getStateMap());
+      composedAut.add(syncProduct);
 
       final Set<EventProxy> localEvents =
           identifyLocalEvents(mEventsToAutomata, candidate.getAutomata());
@@ -180,7 +184,8 @@ public class CompositionalGeneralisedConflictChecker extends
       final ConflictTraceProxy counterexample = checker.getCounterExample();
       ConflictTraceProxy convertedTrace = counterexample;
       for (int i = stateMaps.size() - 1; i >= 0; i--) {
-        final CompositionStep step = new CompositionStep(stateMaps.get(i));
+        final CompositionStep step =
+            new CompositionStep(composedAut.get(i), stateMaps.get(i));
         convertedTrace = step.convertTrace(counterexample);
         System.out.println(convertedTrace);
       }
@@ -562,32 +567,32 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  //#########################################################################
-  //# Inner Class Step
+  // #########################################################################
+  // # Inner Class Step
   private abstract class Step
   {
 
-    //#######################################################################
-    //# Constructor
+    // #######################################################################
+    // # Constructor
     Step(final AutomatonProxy aut)
     {
       mResultAutomaton = aut;
     }
 
-    //#######################################################################
-    //# Simple Access
+    // #######################################################################
+    // # Simple Access
     AutomatonProxy getResultAutomaton()
     {
       return mResultAutomaton;
     }
 
-    //#######################################################################
-    //# Trace Computation
-    abstract ConflictTraceProxy convertTrace
-      (final ConflictTraceProxy counterexample);
+    // #######################################################################
+    // # Trace Computation
+    abstract ConflictTraceProxy convertTrace(
+                                             final ConflictTraceProxy counterexample);
 
-    //#######################################################################
-    //# Data Members
+    // #######################################################################
+    // # Data Members
     private final AutomatonProxy mResultAutomaton;
     @SuppressWarnings("unused")
     private AutomatonProxy mAutPreComposition;
@@ -595,21 +600,22 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  //#########################################################################
-  //# Inner Class CompositionStep
+  // #########################################################################
+  // # Inner Class CompositionStep
   private class CompositionStep extends Step
   {
 
-    //#######################################################################
-    //# Constructor
-    private CompositionStep(final StateMap stateMap)
+    // #######################################################################
+    // # Constructor
+    private CompositionStep(final AutomatonProxy composedAut,
+                            final SynchronousProductStateMap stateMap)
     {
-      super(stateMap.getComposedAutomaton());
+      super(composedAut);
       mStateMap = stateMap;
     }
 
-    //#######################################################################
-    //# Trace Computation
+    // #######################################################################
+    // # Trace Computation
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
       final AutomatonProxy composed = getResultAutomaton();
@@ -623,32 +629,20 @@ public class CompositionalGeneralisedConflictChecker extends
               new HashMap<AutomatonProxy,StateProxy>(stepMap);
           stepMap.remove(composed);
           // add original automata and states
-          final AutomatonProxy[] autOfComposition = mStateMap.getAutomata();
-          for (@SuppressWarnings("unused")
-          final AutomatonProxy aut : autOfComposition) {
+          final Collection<AutomatonProxy> autOfComposition =
+              mStateMap.getInputAutomata();
 
-            // convertedStepMap.put(aut, value);
+          for (final AutomatonProxy aut : autOfComposition) {
+            final StateProxy convertedState = stepMap.get(aut);
+            final StateProxy originalState =
+                mStateMap.getOriginalState(convertedState, aut);
+            convertedStepMap.put(aut, originalState);
           }
           final TraceStepProxy convertedStep =
               getFactory().createTraceStepProxy(step.getEvent(),
                                                 convertedStepMap);
           convertedSteps.add(convertedStep);
         }
-        // for (final Map.Entry<AutomatonProxy,StateProxy> e :
-        // stepMap.entrySet()) {
-
-        // final MemStateProxy convertedState = (MemStateProxy) e.getValue();
-        // final int[] stateTuple = convertedState.getStateTuple();
-
-        /*
-         * final AutomatonProxy originalAut = mAutMap.get(autName); if
-         * (originalAut != null) {
-         *
-         * final String stateName = convertedState.getName(); final StateProxy
-         * originalState = mStateMap.get(autName).get(stateName);
-         * convertedStepMap.put(originalAut, originalState); }
-         */
-
       }
       // TODO: change comment and model name
       final ConflictTraceProxy convertedTrace =
@@ -662,36 +656,34 @@ public class CompositionalGeneralisedConflictChecker extends
       return convertedTrace;
     }
 
-    //#######################################################################
-    //# Data Members
-    private final StateMap mStateMap;
+    // #######################################################################
+    // # Data Members
+    private final SynchronousProductStateMap mStateMap;
   }
 
 
-  //#########################################################################
-  //# Inner Class HidingStep
+  // #########################################################################
+  // # Inner Class HidingStep
   @SuppressWarnings("unused")
   private class HidingStep extends Step
   {
 
-    //#######################################################################
-    //# Constructor
+    // #######################################################################
+    // # Constructor
     private HidingStep(final AutomatonProxy result)
     {
       super(result);
     }
 
-    //#######################################################################
-    //# Trace Computation
-    ConflictTraceProxy convertTrace
-      (final ConflictTraceProxy counterexample)
+    // #######################################################################
+    // # Trace Computation
+    ConflictTraceProxy convertTrace(final ConflictTraceProxy counterexample)
     {
       // TODO Auto-generated method stub
       return null;
     }
 
   }
-
 
   // #########################################################################
   // # Data Members

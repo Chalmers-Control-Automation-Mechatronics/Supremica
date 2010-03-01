@@ -19,6 +19,7 @@ import java.util.Set;
 //import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
 import net.sourceforge.waters.analysis.modular.DisabledEvents;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -123,15 +124,15 @@ public class NonDeterministicComposer
             mPreMarkedStates[i][snum] = false;
           }
         }
-        // TODO The inner state map should only be set once per automaton,
-        // not once per state.
-        mStateMap.addStatesToAutomaton(i, innerStateMap);
         if (s.isInitial()) {
           cs.add(snum);
         }
         statetoindex.put(s, snum);
         snum++;
       }
+      // The inner state map should only be set once per automaton,
+      // not once per state.
+      mStateMap.addStatesToAutomaton(i, innerStateMap);
       currentState[i] = cs.toNativeArray();
       // TODO do this smarter later
       final TIntArrayList[][] auttransitionslists =
@@ -366,9 +367,10 @@ public class NonDeterministicComposer
     return true;
   }
 
-  public StateMap getStateMap()
+  public SynchronousProductStateMap getStateMap()
   {
-    return mStateMap;
+    final MemStateMap stateMap = new MemStateMap(mModelAut);
+    return stateMap;
   }
 
 
@@ -503,6 +505,148 @@ public class NonDeterministicComposer
   }
 
 
+  // #########################################################################
+  // # Inner Class MemStateMap
+  private static class MemStateMap implements SynchronousProductStateMap
+  {
+
+    // #######################################################################
+    // # Constructor
+    private MemStateMap(final Collection<AutomatonProxy> automata)
+    {
+      mInputAutomata = new ArrayList<AutomatonProxy>(automata);
+      final int numaut = automata.size();
+      mStateLists = new StateProxy[numaut][];
+      // Assumes state codes are given by their ordering in the original
+      // automata. If this is not good enough, need to provide method
+      // setStateList(int a, StateProxy[] states).
+      int a = 0;
+      for (final AutomatonProxy aut : mInputAutomata) {
+        final Collection<StateProxy> states = aut.getStates();
+        mStateLists[a++] = states.toArray(null);
+      }
+    }
+
+    // #######################################################################
+    // # Interface
+    // # net.sourceforge.waters.model.analysis.SynchronousProductStateMap
+    public Collection<AutomatonProxy> getInputAutomata()
+    {
+      return mInputAutomata;
+    }
+
+    public StateProxy getOriginalState(final StateProxy state,
+                                       final AutomatonProxy aut)
+    {
+      final int a = getAutomatonIndex(aut);
+      final MemStateProxy memstate = (MemStateProxy) state;
+      final int[] tuple = memstate.getStateTuple();
+      final int code = tuple[a];
+      return mStateLists[a][code];
+    }
+
+    // #######################################################################
+    // # Auxiliary Methods
+    /**
+     * Gets the index position of the given automaton in state tuples. Presently
+     * linear complexity --- is this good enough?
+     */
+    private int getAutomatonIndex(final AutomatonProxy aut)
+    {
+      return mInputAutomata.indexOf(aut);
+    }
+
+    // #######################################################################
+    // # Data Members
+    private final List<AutomatonProxy> mInputAutomata;
+    private final StateProxy[][] mStateLists;
+
+  }
+
+
+  /**
+   * Provides a way of storing the original input automata/states and the
+   * changes resulting in the output automata.
+   *
+   * @author Rachel Francis
+   */
+  private class StateMap implements SynchronousProductStateMap
+  {
+    private AutomatonProxy mComposedAutomaton;
+    private final List<int[]> mStateTuples;
+    private final AutomatonProxy[] mAutomaton;
+    private final Map<Integer,StateProxy[]> mAutToStateMap;
+    private final List<StateProxy> mStates = new ArrayList<StateProxy>();
+
+    public StateMap(final int numAutomata)
+    {
+      mAutomaton = new AutomatonProxy[numAutomata];
+      mAutToStateMap = new HashMap<Integer,StateProxy[]>(numAutomata);
+      mStateTuples = new ArrayList<int[]>();
+      mComposedAutomaton = null;
+    }
+
+    public void setComposedAutomaton(final AutomatonProxy aut)
+    {
+      mComposedAutomaton = aut;
+    }
+
+    @SuppressWarnings("unused")
+    public AutomatonProxy getComposedAutomaton()
+    {
+      return mComposedAutomaton;
+    }
+
+    public void addState(final StateProxy state)
+    {
+      mStates.add(state);
+    }
+
+    public StateProxy getState(final int index)
+    {
+      return mStates.get(index);
+    }
+
+    public List<StateProxy> getStates()
+    {
+      return mStates;
+    }
+
+    public void addStateTuple(final int[] stateTuple)
+    {
+      mStateTuples.add(stateTuple);
+    }
+
+    public int[] getStateTuple(final int index)
+    {
+      return mStateTuples.get(index);
+    }
+
+    public void addAutomaton(final int index, final AutomatonProxy aut)
+    {
+      mAutomaton[index] = aut;
+    }
+
+    public void addStatesToAutomaton(final int id, final StateProxy[] states)
+    {
+      mAutToStateMap.put(id, states);
+    }
+
+    public Collection<AutomatonProxy> getInputAutomata()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public StateProxy getOriginalState(final StateProxy tuple,
+                                       final AutomatonProxy aut)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+  }
+
+
   /**
    * Stores states, encoding the name as an int rather than a long string value.
    *
@@ -548,7 +692,6 @@ public class NonDeterministicComposer
       return Integer.toString(mName);
     }
 
-    @SuppressWarnings("unused")
     public int[] getStateTuple()
     {
       return mStateTuple;
