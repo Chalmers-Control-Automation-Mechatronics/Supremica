@@ -631,8 +631,9 @@ public class CompositionalGeneralisedConflictChecker extends
           // add original automata and states
           final Collection<AutomatonProxy> autOfComposition =
               mStateMap.getInputAutomata();
-
           for (final AutomatonProxy aut : autOfComposition) {
+            // TODO: Should this be composed instead of aut,
+            // and done before the loop?
             final StateProxy convertedState = stepMap.get(aut);
             final StateProxy originalState =
                 mStateMap.getOriginalState(convertedState, aut);
@@ -645,6 +646,7 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
       // TODO: change comment and model name
+      // TODO: more importantly, adjust the list of automata!
       final ConflictTraceProxy convertedTrace =
           getFactory().createConflictTraceProxy(conflictTrace.getName(),
                                                 conflictTrace.getComment(),

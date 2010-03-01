@@ -523,7 +523,8 @@ public class NonDeterministicComposer
       int a = 0;
       for (final AutomatonProxy aut : mInputAutomata) {
         final Collection<StateProxy> states = aut.getStates();
-        mStateLists[a++] = states.toArray(new StateProxy[0]);
+        final int size = states.size();
+        mStateLists[a++] = states.toArray(new StateProxy[size]);
       }
     }
 
