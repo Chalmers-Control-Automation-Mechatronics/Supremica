@@ -627,7 +627,7 @@ public class CompositionalGeneralisedConflictChecker extends
         if (stepMap.containsKey(composed)) {
           final Map<AutomatonProxy,StateProxy> convertedStepMap =
               new HashMap<AutomatonProxy,StateProxy>(stepMap);
-          stepMap.remove(composed);
+          convertedStepMap.remove(composed);
           // add original automata and states
           final Collection<AutomatonProxy> autOfComposition =
               mStateMap.getInputAutomata();
