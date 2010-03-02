@@ -645,12 +645,25 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(convertedStep);
         }
       }
+      final Set<EventProxy> events = new HashSet<EventProxy>();
+      for (final AutomatonProxy aut : traceAutomata) {
+        events.addAll(aut.getEvents());
+      }
+      final ProductDESProxy originalModel =
+          getFactory().createProductDESProxy(
+                                             conflictTrace.getProductDES()
+                                                 .getName(),
+                                             conflictTrace.getProductDES()
+                                                 .getComment(),
+                                             conflictTrace.getProductDES()
+                                                 .getLocation(), events,
+                                             traceAutomata);
       final ConflictTraceProxy convertedTrace =
           getFactory().createConflictTraceProxy(conflictTrace.getName(),
                                                 conflictTrace.getComment(),
                                                 conflictTrace.getLocation(),
-                                                conflictTrace.getProductDES(),
-                                                traceAutomata, convertedSteps,
+                                                originalModel, traceAutomata,
+                                                convertedSteps,
                                                 ConflictKind.CONFLICT);
       return convertedTrace;
     }
