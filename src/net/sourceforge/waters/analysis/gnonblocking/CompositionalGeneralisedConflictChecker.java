@@ -167,7 +167,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final Set<EventProxy> composedModelAlphabet =
           getEventsForNewModel(remainingAut);
       model =
-          getFactory().createProductDESProxy("Composed Model",
+          getFactory().createProductDESProxy("Composed-Model",
                                              composedModelAlphabet,
                                              remainingAut);
     }
@@ -179,8 +179,6 @@ public class CompositionalGeneralisedConflictChecker extends
     if (result) {
       setSatisfiedResult();
     } else {
-      // TODO: counterexample needs to be for original model, this is not right
-      // yet
       final ConflictTraceProxy counterexample = checker.getCounterExample();
       ConflictTraceProxy convertedTrace = counterexample;
       for (int i = stateMaps.size() - 1; i >= 0; i--) {
@@ -619,6 +617,9 @@ public class CompositionalGeneralisedConflictChecker extends
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
       final AutomatonProxy composed = getResultAutomaton();
+      final Set<AutomatonProxy> traceAutomata =
+          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
+      traceAutomata.remove(composed);
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
@@ -628,16 +629,15 @@ public class CompositionalGeneralisedConflictChecker extends
           final Map<AutomatonProxy,StateProxy> convertedStepMap =
               new HashMap<AutomatonProxy,StateProxy>(stepMap);
           convertedStepMap.remove(composed);
+          final StateProxy convertedState = stepMap.get(composed);
           // add original automata and states
           final Collection<AutomatonProxy> autOfComposition =
               mStateMap.getInputAutomata();
           for (final AutomatonProxy aut : autOfComposition) {
-            // TODO: Should this be composed instead of aut,
-            // and done before the loop?
-            final StateProxy convertedState = stepMap.get(aut);
             final StateProxy originalState =
                 mStateMap.getOriginalState(convertedState, aut);
             convertedStepMap.put(aut, originalState);
+            traceAutomata.add(aut);
           }
           final TraceStepProxy convertedStep =
               getFactory().createTraceStepProxy(step.getEvent(),
@@ -645,15 +645,12 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(convertedStep);
         }
       }
-      // TODO: change comment and model name
-      // TODO: more importantly, adjust the list of automata!
       final ConflictTraceProxy convertedTrace =
           getFactory().createConflictTraceProxy(conflictTrace.getName(),
                                                 conflictTrace.getComment(),
                                                 conflictTrace.getLocation(),
                                                 conflictTrace.getProductDES(),
-                                                conflictTrace.getAutomata(),
-                                                convertedSteps,
+                                                traceAutomata, convertedSteps,
                                                 ConflictKind.CONFLICT);
       return convertedTrace;
     }
