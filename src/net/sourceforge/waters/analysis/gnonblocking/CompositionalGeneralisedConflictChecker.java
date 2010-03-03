@@ -700,6 +700,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
     // #######################################################################
     // # Trace Computation
+    @SuppressWarnings("unchecked")
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
       final List<TraceStepProxy> convertedSteps =
@@ -785,6 +786,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
     // #######################################################################
     // # Data Members
+    @SuppressWarnings("unused")
     private final Map<TransitionProxy,TransitionProxy> mTransitionMap;
   }
 
