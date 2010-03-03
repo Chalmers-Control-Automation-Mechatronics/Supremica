@@ -51,7 +51,8 @@ public class NonDeterministicComposer
     mFactory = factory;
     mNodeLimit = 1000;
     numStates = 1;
-    mStateMap = new StateMap(mModelAut.size());
+    mStateTuples = new ArrayList<int[]>();
+    mAutToStateMap = new HashMap<Integer,StateProxy[]>(aut.size());
   }
 
   public void setNodeLimit(final int stateLimit)
@@ -92,7 +93,6 @@ public class NonDeterministicComposer
     mIntDisabled = new TIntHashSet[numAutomata][];
     for (int i = 0; i < mModelAut.size(); i++) {
       final AutomatonProxy a = mModelAut.get(i);
-      mStateMap.addAutomaton(i, a);
       final TObjectIntHashMap<StateProxy> statetoindex =
           new TObjectIntHashMap<StateProxy>(a.getStates().size());
       mMarkedStates[i] = new boolean[a.getStates().size()];
@@ -130,9 +130,7 @@ public class NonDeterministicComposer
         statetoindex.put(s, snum);
         snum++;
       }
-      // The inner state map should only be set once per automaton,
-      // not once per state.
-      mStateMap.addStatesToAutomaton(i, innerStateMap);
+      mAutToStateMap.put(i, innerStateMap);
       currentState[i] = cs.toNativeArray();
       // TODO do this smarter later
       final TIntArrayList[][] auttransitionslists =
@@ -208,7 +206,7 @@ public class NonDeterministicComposer
     final Set<EventProxy> twopropsUnmodifiable =
         Collections.unmodifiableSet(twoprops);
     for (int i = 0; i < numStates; i++) {
-      final int[] stateTuple = mStateMap.getStateTuple(i);
+      final int[] stateTuple = mStateTuples.get(i);
       final MemStateProxy memStateProxy;
 
       final EventProxy marked = mNewMarked.contains(i) ? mMarked : null;
@@ -229,12 +227,13 @@ public class NonDeterministicComposer
         memStateProxy =
             new MemStateProxy(i, stateTuple, emptyset, mNewInitial.contains(i));
       }
-      mStateMap.addState(memStateProxy);
+      mStatesList.add(memStateProxy);
+
     }
     final ArrayList<TransitionProxy> trans = new ArrayList<TransitionProxy>();
     for (final int[] tran : newtrans) {
-      final StateProxy source = mStateMap.getState(tran[0]);
-      final StateProxy target = mStateMap.getState(tran[2]);
+      final StateProxy source = mStatesList.get(tran[0]);
+      final StateProxy target = mStatesList.get(tran[2]);
       final EventProxy event = events[tran[1]];
       trans.add(mFactory.createTransitionProxy(source, event, target));
     }
@@ -250,9 +249,8 @@ public class NonDeterministicComposer
     final THashSet<EventProxy> ev =
         new THashSet<EventProxy>(Arrays.asList(events));
     final AutomatonProxy result =
-        mFactory
-            .createAutomatonProxy(nam, ck, ev, mStateMap.getStates(), trans);
-    mStateMap.setComposedAutomaton(result);
+        mFactory.createAutomatonProxy(nam, ck, ev, mStatesList, trans);
+    // mComposedAutomaton = result;
     return result;
   }
 
@@ -288,7 +286,7 @@ public class NonDeterministicComposer
       if (isInitial) {
         mNewInitial.add(target);
       }
-      mStateMap.addStateTuple(successor);
+      mStateTuples.add(successor);
     }
     // only add a transition if not adding in an initial state
     if (!isInitial) {
@@ -566,89 +564,6 @@ public class NonDeterministicComposer
 
 
   /**
-   * Provides a way of storing the original input automata/states and the
-   * changes resulting in the output automata.
-   *
-   * @author Rachel Francis
-   */
-  private class StateMap implements SynchronousProductStateMap
-  {
-    private AutomatonProxy mComposedAutomaton;
-    private final List<int[]> mStateTuples;
-    private final AutomatonProxy[] mAutomaton;
-    private final Map<Integer,StateProxy[]> mAutToStateMap;
-    private final List<StateProxy> mStates = new ArrayList<StateProxy>();
-
-    public StateMap(final int numAutomata)
-    {
-      mAutomaton = new AutomatonProxy[numAutomata];
-      mAutToStateMap = new HashMap<Integer,StateProxy[]>(numAutomata);
-      mStateTuples = new ArrayList<int[]>();
-      mComposedAutomaton = null;
-    }
-
-    public void setComposedAutomaton(final AutomatonProxy aut)
-    {
-      mComposedAutomaton = aut;
-    }
-
-    @SuppressWarnings("unused")
-    public AutomatonProxy getComposedAutomaton()
-    {
-      return mComposedAutomaton;
-    }
-
-    public void addState(final StateProxy state)
-    {
-      mStates.add(state);
-    }
-
-    public StateProxy getState(final int index)
-    {
-      return mStates.get(index);
-    }
-
-    public List<StateProxy> getStates()
-    {
-      return mStates;
-    }
-
-    public void addStateTuple(final int[] stateTuple)
-    {
-      mStateTuples.add(stateTuple);
-    }
-
-    public int[] getStateTuple(final int index)
-    {
-      return mStateTuples.get(index);
-    }
-
-    public void addAutomaton(final int index, final AutomatonProxy aut)
-    {
-      mAutomaton[index] = aut;
-    }
-
-    public void addStatesToAutomaton(final int id, final StateProxy[] states)
-    {
-      mAutToStateMap.put(id, states);
-    }
-
-    public Collection<AutomatonProxy> getInputAutomata()
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-    public StateProxy getOriginalState(final StateProxy tuple,
-                                       final AutomatonProxy aut)
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-  }
-
-
-  /**
    * Stores states, encoding the name as an int rather than a long string value.
    *
    * @author rmf18
@@ -874,7 +789,6 @@ public class NonDeterministicComposer
   private boolean[][] mPreMarkedStates;
   private TIntArrayList mNewMarked;
   private TIntArrayList mNewPreMarked;
-  private final StateMap mStateMap;
   private final List<int[]> newtrans = new ArrayList<int[]>();
   private int numStates;
   private Bag unvisited;
@@ -886,4 +800,9 @@ public class NonDeterministicComposer
   private final int mDumpState = -1;
   private TIntHashSet[][] mIntDisabled;
   private final TIntHashSet mNewInitial = new TIntHashSet();
+
+  // private AutomatonProxy mComposedAutomaton;
+  private final List<int[]> mStateTuples;
+  private final Map<Integer,StateProxy[]> mAutToStateMap;
+  private final List<StateProxy> mStatesList = new ArrayList<StateProxy>();
 }
