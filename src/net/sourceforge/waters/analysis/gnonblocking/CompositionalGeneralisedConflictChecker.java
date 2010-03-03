@@ -189,7 +189,6 @@ public class CompositionalGeneralisedConflictChecker extends
       for (int i = mModifyingSteps.size() - 1; i >= 0; i--) {
         final Step step = mModifyingSteps.get(i);
         convertedTrace = step.convertTrace(convertedTrace);
-        System.out.println(convertedTrace);
       }
       setFailedResult(convertedTrace);
     }
@@ -266,7 +265,7 @@ public class CompositionalGeneralisedConflictChecker extends
             .createAutomatonProxy(automaton.getName(), automaton.getKind(),
                                   newEvents, automaton.getStates(),
                                   newTransitions);
-    final HidingStep step = new HidingStep(newAut, automaton, null);
+    final HidingStep step = new HidingStep(newAut, automaton, transitionMap);
     mModifyingSteps.add(step);
     return newAut;
   }
@@ -704,17 +703,39 @@ public class CompositionalGeneralisedConflictChecker extends
     // # Trace Computation
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
-      /*
-       * final AutomatonProxy result = getResultAutomaton(); final
-       * List<TraceStepProxy> convertedSteps = new ArrayList<TraceStepProxy>();
-       * final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
-       * for (final TraceStepProxy step : traceSteps) { final EventProxy
-       * stepEvent = step.getEvent(); if (stepEvent == mTau) { // TODO:
-       * implement this final TraceStepProxy convertedStep =
-       * getFactory().createTraceStepProxy(step.getEvent(), step.getStateMap());
-       * convertedSteps.add(convertedStep); } else { convertedSteps.add(step); }
-       * }
-       */
+      final List<TraceStepProxy> convertedSteps =
+          new ArrayList<TraceStepProxy>();
+      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      for (final TraceStepProxy step : traceSteps) {
+        final EventProxy stepEvent = step.getEvent();
+        if (stepEvent == mTau) {
+          final Map<AutomatonProxy,StateProxy> stepsStateMap =
+              step.getStateMap();
+          final StateProxy[] targetStates =
+              stepsStateMap.values().toArray(new StateProxy[0]);
+          final StateProxy targetState = targetStates[0];
+          for (final TransitionProxy transition : mTransitionMap.keySet()) {
+            // TODO: this is not quite right? what about states with more than 1
+            // incoming transition
+            if (transition.getTarget() == targetState) {
+              final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
+                  new HashMap<AutomatonProxy,StateProxy>(stepsStateMap.size());
+              stepsNewStateMap.put(getOriginalAutomaton(), targetState);
+              final TraceStepProxy convertedStep =
+                  getFactory().createTraceStepProxy(
+                                                    mTransitionMap
+                                                        .get(transition)
+                                                        .getEvent(),
+                                                    stepsNewStateMap);
+              convertedSteps.add(convertedStep);
+              break;
+            }
+          }
+        } else {
+          convertedSteps.add(step);
+        }
+      }
+
       final Set<AutomatonProxy> traceAutomata = new HashSet<AutomatonProxy>(1);
       traceAutomata.add(getOriginalAutomaton());
       final ConflictTraceProxy convertedTrace =
@@ -722,7 +743,7 @@ public class CompositionalGeneralisedConflictChecker extends
                                                 conflictTrace.getComment(),
                                                 conflictTrace.getLocation(),
                                                 getModel(), traceAutomata,
-                                                conflictTrace.getTraceSteps(),
+                                                convertedSteps,
                                                 ConflictKind.CONFLICT);
       return convertedTrace;
     }
