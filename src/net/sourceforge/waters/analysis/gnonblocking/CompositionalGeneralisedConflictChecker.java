@@ -155,10 +155,10 @@ public class CompositionalGeneralisedConflictChecker extends
       final Set<EventProxy> localEvents =
           identifyLocalEvents(mEventsToAutomata, candidate.getAutomata());
       candidate.setLocalEvents(localEvents);
-      // final AutomatonProxy autToAbstract = hideLocalEvents(syncProduct,
-      // localEvents);
+      final AutomatonProxy autToAbstract =
+          hideLocalEvents(syncProduct, localEvents);
 
-      final AutomatonProxy autToAbstract = syncProduct;
+      // final AutomatonProxy autToAbstract = syncProduct;
       // TODO Abstraction rules here
 
       // removes the composed automata for this candidate from the set of
@@ -188,7 +188,7 @@ public class CompositionalGeneralisedConflictChecker extends
       ConflictTraceProxy convertedTrace = counterexample;
       for (int i = mModifyingSteps.size() - 1; i >= 0; i--) {
         final Step step = mModifyingSteps.get(i);
-        convertedTrace = step.convertTrace(counterexample);
+        convertedTrace = step.convertTrace(convertedTrace);
         System.out.println(convertedTrace);
       }
       setFailedResult(convertedTrace);
@@ -357,43 +357,6 @@ public class CompositionalGeneralisedConflictChecker extends
     candidates.add(candidate);
     return candidates;
     // TODO: needs proper implementation
-  }
-
-
-  private class HidingEventsMap
-  {
-    private final AutomatonProxy aut;
-    private final AutomatonProxy originalAut;
-    private final Map<TransitionProxy,TransitionProxy> transitionMap;
-
-    public HidingEventsMap(
-                           final AutomatonProxy original,
-                           final AutomatonProxy convertedAut,
-                           final Map<TransitionProxy,TransitionProxy> transitionsMap)
-    {
-      aut = convertedAut;
-      originalAut = original;
-      transitionMap = transitionsMap;
-    }
-
-    @SuppressWarnings("unused")
-    public TransitionProxy getOriginalTransition(
-                                                 final TransitionProxy transition)
-    {
-      return transitionMap.get(transition);
-    }
-
-    @SuppressWarnings("unused")
-    public AutomatonProxy getOriginalAut()
-    {
-      return originalAut;
-    }
-
-    @SuppressWarnings("unused")
-    public AutomatonProxy getConvertedAut()
-    {
-      return aut;
-    }
   }
 
 
@@ -625,7 +588,7 @@ public class CompositionalGeneralisedConflictChecker extends
     Step(final AutomatonProxy resultAut, final AutomatonProxy originalAut)
     {
       mResultAutomaton = resultAut;
-      mOriginalAutomaton = mOriginalAutomaton;
+      mOriginalAutomaton = originalAut;
     }
 
     // #######################################################################
@@ -724,7 +687,6 @@ public class CompositionalGeneralisedConflictChecker extends
 
   // #########################################################################
   // # Inner Class HidingStep
-  @SuppressWarnings("unused")
   private class HidingStep extends Step
   {
 
