@@ -716,7 +716,8 @@ public class CompositionalGeneralisedConflictChecker extends
           for (final TransitionProxy transition : mTransitionMap.keySet()) {
             // TODO: this is not quite right? what about states with more than 1
             // incoming transition
-            if (transition.getTarget() == targetState) {
+            if (transition.getTarget() == targetState
+                && transition.getEvent() == stepEvent) {
               final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
                   new HashMap<AutomatonProxy,StateProxy>(stepsStateMap.size());
               stepsNewStateMap.put(getOriginalAutomaton(), targetState);
