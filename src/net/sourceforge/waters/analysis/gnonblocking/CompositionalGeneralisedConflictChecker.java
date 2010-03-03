@@ -158,7 +158,6 @@ public class CompositionalGeneralisedConflictChecker extends
       final AutomatonProxy autToAbstract =
           hideLocalEvents(syncProduct, localEvents);
 
-      // final AutomatonProxy autToAbstract = syncProduct;
       // TODO Abstraction rules here
 
       // removes the composed automata for this candidate from the set of
