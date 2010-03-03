@@ -55,7 +55,7 @@ public abstract class TraceElement
    *                      generated.
    * @param  automata     The set of automata for the new trace,
    *                      or <CODE>null</CODE> if empty.
-   * @param  steps        The list of trace steps consituting the
+   * @param  steps        The list of trace steps constituting the
    *                      new trace. This list may not be empty, because
    *                      the first step must always represent the
    *                      initial state.
@@ -80,6 +80,10 @@ public abstract class TraceElement
     }
     final List<TraceStepProxy> stepscopy =
       new ArrayList<TraceStepProxy>(steps);
+    if (steps.isEmpty()) {
+      throw new IllegalArgumentException
+        ("Step list for trace may not be empty!");
+    }
     mTraceSteps = Collections.unmodifiableList(stepscopy);
   }
 
