@@ -153,11 +153,11 @@ public class CompositionalGeneralisedConflictChecker extends
       candidate.setLocalEvents(localEvents);
       // TODO: currently the candidate is changed and the original form is not
       // stored
-      final HidingEventsMap hiddenEventsMap =
-          hideLocalEvents(syncProduct, localEvents);
-      final AutomatonProxy autToAbstract = hiddenEventsMap.getConvertedAut();
+      // final HidingEventsMap hiddenEventsMap = hideLocalEvents(syncProduct,
+      // localEvents);
+      // final AutomatonProxy autToAbstract = hiddenEventsMap.getConvertedAut();
 
-      // final AutomatonProxy autToAbstract = syncProduct;
+      final AutomatonProxy autToAbstract = syncProduct;
       // TODO Abstraction rules here
 
       // removes the composed automata for this candidate from the set of
