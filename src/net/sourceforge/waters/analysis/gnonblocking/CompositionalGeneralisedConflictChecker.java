@@ -129,7 +129,6 @@ public class CompositionalGeneralisedConflictChecker extends
       setMarkingProposition(getUsedMarkingProposition());
     }
     ProductDESProxy model = getModel();
-    System.out.println(model);
     final List<SynchronousProductStateMap> stateMaps =
         new ArrayList<SynchronousProductStateMap>();
     final List<AutomatonProxy> composedAut = new ArrayList<AutomatonProxy>();
@@ -190,11 +189,8 @@ public class CompositionalGeneralisedConflictChecker extends
         final CompositionStep step =
             new CompositionStep(composedAut.get(i), stateMaps.get(i));
         convertedTrace = step.convertTrace(counterexample);
-        System.out.println(convertedTrace);
       }
       setFailedResult(convertedTrace);
-      System.out.println(convertedTrace.getProductDES());
-
     }
     return result;
   }
@@ -693,6 +689,8 @@ public class CompositionalGeneralisedConflictChecker extends
               getFactory().createTraceStepProxy(step.getEvent(),
                                                 convertedStepMap);
           convertedSteps.add(convertedStep);
+        } else {
+          convertedSteps.add(step);
         }
       }
       final Set<EventProxy> events = new HashSet<EventProxy>();
