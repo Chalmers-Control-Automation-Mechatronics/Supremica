@@ -129,6 +129,7 @@ public class CompositionalGeneralisedConflictChecker extends
       setMarkingProposition(getUsedMarkingProposition());
     }
     ProductDESProxy model = getModel();
+    mModifyingSteps = new ArrayList<Step>();
     final List<SynchronousProductStateMap> stateMaps =
         new ArrayList<SynchronousProductStateMap>();
     final List<AutomatonProxy> composedAut = new ArrayList<AutomatonProxy>();
@@ -147,15 +148,15 @@ public class CompositionalGeneralisedConflictChecker extends
       final AutomatonProxy syncProduct = composer.run();
       stateMaps.add(composer.getStateMap());
       composedAut.add(syncProduct);
+      final CompositionStep step =
+          new CompositionStep(syncProduct, composer.getStateMap());
+      mModifyingSteps.add(step);
 
       final Set<EventProxy> localEvents =
           identifyLocalEvents(mEventsToAutomata, candidate.getAutomata());
       candidate.setLocalEvents(localEvents);
-      // TODO: currently the candidate is changed and the original form is not
-      // stored
-      // final HidingEventsMap hiddenEventsMap = hideLocalEvents(syncProduct,
+      // final AutomatonProxy autToAbstract = hideLocalEvents(syncProduct,
       // localEvents);
-      // final AutomatonProxy autToAbstract = hiddenEventsMap.getConvertedAut();
 
       final AutomatonProxy autToAbstract = syncProduct;
       // TODO Abstraction rules here
@@ -185,10 +186,10 @@ public class CompositionalGeneralisedConflictChecker extends
     } else {
       final ConflictTraceProxy counterexample = checker.getCounterExample();
       ConflictTraceProxy convertedTrace = counterexample;
-      for (int i = stateMaps.size() - 1; i >= 0; i--) {
-        final CompositionStep step =
-            new CompositionStep(composedAut.get(i), stateMaps.get(i));
+      for (int i = mModifyingSteps.size() - 1; i >= 0; i--) {
+        final Step step = mModifyingSteps.get(i);
         convertedTrace = step.convertTrace(counterexample);
+        System.out.println(convertedTrace);
       }
       setFailedResult(convertedTrace);
     }
@@ -229,12 +230,10 @@ public class CompositionalGeneralisedConflictChecker extends
    *
    * @param syncProduct
    */
-  @SuppressWarnings("unused")
-  private HidingEventsMap hideLocalEvents(final AutomatonProxy automaton,
-                                          final Set<EventProxy> localEvents)
+  private AutomatonProxy hideLocalEvents(final AutomatonProxy automaton,
+                                         final Set<EventProxy> localEvents)
   {
-    final EventProxy tau =
-        getFactory().createEventProxy("tau", EventKind.UNCONTROLLABLE);
+    mTau = getFactory().createEventProxy("tau", EventKind.UNCONTROLLABLE);
 
     final Map<TransitionProxy,TransitionProxy> transitionMap =
         new HashMap<TransitionProxy,TransitionProxy>(automaton.getTransitions()
@@ -247,7 +246,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final EventProxy event = transition.getEvent();
       if (localEvents.contains(event)) {
         final TransitionProxy newTrans =
-            getFactory().createTransitionProxy(transition.getSource(), tau,
+            getFactory().createTransitionProxy(transition.getSource(), mTau,
                                                transition.getTarget());
         newTransitions.add(newTrans);
         transitionMap.put(newTrans, transition);
@@ -261,15 +260,15 @@ public class CompositionalGeneralisedConflictChecker extends
         newEvents.add(event);
       }
     }
-    newEvents.add(tau);
+    newEvents.add(mTau);
     final AutomatonProxy newAut =
         getFactory()
             .createAutomatonProxy(automaton.getName(), automaton.getKind(),
                                   newEvents, automaton.getStates(),
                                   newTransitions);
-    final HidingEventsMap hidingMap =
-        new HidingEventsMap(automaton, newAut, transitionMap);
-    return hidingMap;
+    final HidingStep step = new HidingStep(newAut, automaton, null);
+    mModifyingSteps.add(step);
+    return newAut;
   }
 
   /**
@@ -623,11 +622,22 @@ public class CompositionalGeneralisedConflictChecker extends
       mResultAutomaton = aut;
     }
 
+    Step(final AutomatonProxy resultAut, final AutomatonProxy originalAut)
+    {
+      mResultAutomaton = resultAut;
+      mOriginalAutomaton = mOriginalAutomaton;
+    }
+
     // #######################################################################
     // # Simple Access
     AutomatonProxy getResultAutomaton()
     {
       return mResultAutomaton;
+    }
+
+    AutomatonProxy getOriginalAutomaton()
+    {
+      return mOriginalAutomaton;
     }
 
     // #######################################################################
@@ -638,8 +648,7 @@ public class CompositionalGeneralisedConflictChecker extends
     // #######################################################################
     // # Data Members
     private final AutomatonProxy mResultAutomaton;
-    @SuppressWarnings("unused")
-    private AutomatonProxy mAutPreComposition;
+    private AutomatonProxy mOriginalAutomaton;
 
   }
 
@@ -722,37 +731,51 @@ public class CompositionalGeneralisedConflictChecker extends
     // #######################################################################
     // # Constructor
     private HidingStep(final AutomatonProxy result,
-                       final HidingEventsMap hiddenEventsMap)
+                       final AutomatonProxy originalAut,
+                       final Map<TransitionProxy,TransitionProxy> transitionMap)
     {
-      super(result);
-      mHiddenEventsMap = hiddenEventsMap;
+      super(result, originalAut);
+      mTransitionMap = transitionMap;
     }
 
     // #######################################################################
     // # Trace Computation
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
-
       /*
-       * final ConflictTraceProxy convertedTrace =
-       * getFactory().createConflictTraceProxy( conflictTrace.getName(),
-       * conflictTrace.getComment(), conflictTrace.getLocation(),
-       * mHiddenEventsMap .getOriginalAut(), conflictTrace.getAutomata(),
-       * conflictTrace.getTraceSteps(), ConflictKind.CONFLICT);
+       * final AutomatonProxy result = getResultAutomaton(); final
+       * List<TraceStepProxy> convertedSteps = new ArrayList<TraceStepProxy>();
+       * final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+       * for (final TraceStepProxy step : traceSteps) { final EventProxy
+       * stepEvent = step.getEvent(); if (stepEvent == mTau) { // TODO:
+       * implement this final TraceStepProxy convertedStep =
+       * getFactory().createTraceStepProxy(step.getEvent(), step.getStateMap());
+       * convertedSteps.add(convertedStep); } else { convertedSteps.add(step); }
+       * }
        */
-      return null;
+      final Set<AutomatonProxy> traceAutomata = new HashSet<AutomatonProxy>(1);
+      traceAutomata.add(getOriginalAutomaton());
+      final ConflictTraceProxy convertedTrace =
+          getFactory().createConflictTraceProxy(conflictTrace.getName(),
+                                                conflictTrace.getComment(),
+                                                conflictTrace.getLocation(),
+                                                getModel(), traceAutomata,
+                                                conflictTrace.getTraceSteps(),
+                                                ConflictKind.CONFLICT);
+      return convertedTrace;
     }
 
     // #######################################################################
     // # Data Members
-    private final HidingEventsMap mHiddenEventsMap;
-
+    private final Map<TransitionProxy,TransitionProxy> mTransitionMap;
   }
 
   // #########################################################################
   // # Data Members
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =
       new HashMap<EventProxy,Set<AutomatonProxy>>();
+  private EventProxy mTau;
+  private List<Step> mModifyingSteps;
 
   // #########################################################################
   // # Class Constants
