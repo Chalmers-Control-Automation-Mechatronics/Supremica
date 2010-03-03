@@ -153,9 +153,11 @@ public class CompositionalGeneralisedConflictChecker extends
       candidate.setLocalEvents(localEvents);
       // TODO: currently the candidate is changed and the original form is not
       // stored
-      // final AutomatonProxy autToAbstract = hideLocalEvents(syncProduct,
-      // localEvents);
-      final AutomatonProxy autToAbstract = syncProduct;
+      final HidingEventsMap hiddenEventsMap =
+          hideLocalEvents(syncProduct, localEvents);
+      final AutomatonProxy autToAbstract = hiddenEventsMap.getConvertedAut();
+
+      // final AutomatonProxy autToAbstract = syncProduct;
       // TODO Abstraction rules here
 
       // removes the composed automata for this candidate from the set of
@@ -167,7 +169,9 @@ public class CompositionalGeneralisedConflictChecker extends
       final Set<EventProxy> composedModelAlphabet =
           getEventsForNewModel(remainingAut);
       model =
-          getFactory().createProductDESProxy("Composed-Model",
+          getFactory().createProductDESProxy(model.getName(),
+                                             model.getComment(),
+                                             model.getLocation(),
                                              composedModelAlphabet,
                                              remainingAut);
     }
@@ -226,13 +230,15 @@ public class CompositionalGeneralisedConflictChecker extends
    *
    * @param syncProduct
    */
-  @SuppressWarnings("unused")
-  private AutomatonProxy hideLocalEvents(final AutomatonProxy automaton,
-                                         final Set<EventProxy> localEvents)
+  private HidingEventsMap hideLocalEvents(final AutomatonProxy automaton,
+                                          final Set<EventProxy> localEvents)
   {
     final EventProxy tau =
         getFactory().createEventProxy("tau", EventKind.UNCONTROLLABLE);
 
+    final Map<TransitionProxy,TransitionProxy> transitionMap =
+        new HashMap<TransitionProxy,TransitionProxy>(automaton.getTransitions()
+            .size());
     // replaces events on transitions with silent event and removes the local
     // events from the automaton alphabet
     final Collection<TransitionProxy> newTransitions =
@@ -244,6 +250,7 @@ public class CompositionalGeneralisedConflictChecker extends
             getFactory().createTransitionProxy(transition.getSource(), tau,
                                                transition.getTarget());
         newTransitions.add(newTrans);
+        transitionMap.put(newTrans, transition);
       } else {
         newTransitions.add(transition);
       }
@@ -260,7 +267,9 @@ public class CompositionalGeneralisedConflictChecker extends
             .createAutomatonProxy(automaton.getName(), automaton.getKind(),
                                   newEvents, automaton.getStates(),
                                   newTransitions);
-    return newAut;
+    final HidingEventsMap hidingMap =
+        new HidingEventsMap(automaton, newAut, transitionMap);
+    return hidingMap;
   }
 
   /**
@@ -349,6 +358,42 @@ public class CompositionalGeneralisedConflictChecker extends
     candidates.add(candidate);
     return candidates;
     // TODO: needs proper implementation
+  }
+
+
+  private class HidingEventsMap
+  {
+    private final AutomatonProxy aut;
+    private final AutomatonProxy originalAut;
+    private final Map<TransitionProxy,TransitionProxy> transitionMap;
+
+    public HidingEventsMap(
+                           final AutomatonProxy original,
+                           final AutomatonProxy convertedAut,
+                           final Map<TransitionProxy,TransitionProxy> transitionsMap)
+    {
+      aut = convertedAut;
+      originalAut = original;
+      transitionMap = transitionsMap;
+    }
+
+    @SuppressWarnings("unused")
+    public TransitionProxy getOriginalTransition(
+                                                 final TransitionProxy transition)
+    {
+      return transitionMap.get(transition);
+    }
+
+    @SuppressWarnings("unused")
+    public AutomatonProxy getOriginalAut()
+    {
+      return originalAut;
+    }
+
+    public AutomatonProxy getConvertedAut()
+    {
+      return aut;
+    }
   }
 
 
@@ -682,18 +727,31 @@ public class CompositionalGeneralisedConflictChecker extends
 
     // #######################################################################
     // # Constructor
-    private HidingStep(final AutomatonProxy result)
+    private HidingStep(final AutomatonProxy result,
+                       final HidingEventsMap hiddenEventsMap)
     {
       super(result);
+      mHiddenEventsMap = hiddenEventsMap;
     }
 
     // #######################################################################
     // # Trace Computation
-    ConflictTraceProxy convertTrace(final ConflictTraceProxy counterexample)
+    ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
-      // TODO Auto-generated method stub
+
+      /*
+       * final ConflictTraceProxy convertedTrace =
+       * getFactory().createConflictTraceProxy( conflictTrace.getName(),
+       * conflictTrace.getComment(), conflictTrace.getLocation(),
+       * mHiddenEventsMap .getOriginalAut(), conflictTrace.getAutomata(),
+       * conflictTrace.getTraceSteps(), ConflictKind.CONFLICT);
+       */
       return null;
     }
+
+    // #######################################################################
+    // # Data Members
+    private final HidingEventsMap mHiddenEventsMap;
 
   }
 
