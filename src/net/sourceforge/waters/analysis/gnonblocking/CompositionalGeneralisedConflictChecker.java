@@ -705,34 +705,41 @@ public class CompositionalGeneralisedConflictChecker extends
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      final AutomatonProxy resultAut = getResultAutomaton();
+      StateProxy sourceState = getInitialState(resultAut);
       for (final TraceStepProxy step : traceSteps) {
         final EventProxy stepEvent = step.getEvent();
+        final Map<StateProxy,TransitionProxy> successors =
+            getSuccessorStates(sourceState, stepEvent);
+        final Iterator it = successors.keySet().iterator();
         if (stepEvent == mTau) {
           final Map<AutomatonProxy,StateProxy> stepsStateMap =
               step.getStateMap();
           final StateProxy[] targetStates =
               stepsStateMap.values().toArray(new StateProxy[0]);
           final StateProxy targetState = targetStates[0];
-          for (final TransitionProxy transition : mTransitionMap.keySet()) {
+          for (final StateProxy succ : successors.keySet()) {
             // TODO: this is not quite right? what about states with more than 1
             // incoming transition
-            if (transition.getTarget() == targetState
-                && transition.getEvent() == stepEvent) {
+            if (succ == targetState) {
               final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
                   new HashMap<AutomatonProxy,StateProxy>(stepsStateMap.size());
               stepsNewStateMap.put(getOriginalAutomaton(), targetState);
               final TraceStepProxy convertedStep =
                   getFactory().createTraceStepProxy(
-                                                    mTransitionMap
-                                                        .get(transition)
+                                                    successors.get(succ)
                                                         .getEvent(),
                                                     stepsNewStateMap);
               convertedSteps.add(convertedStep);
+              sourceState = targetState;
               break;
             }
           }
         } else {
           convertedSteps.add(step);
+        }
+        if (it.hasNext()) {
+          sourceState = (StateProxy) it.next();
         }
       }
 
@@ -746,6 +753,34 @@ public class CompositionalGeneralisedConflictChecker extends
                                                 convertedSteps,
                                                 ConflictKind.CONFLICT);
       return convertedTrace;
+    }
+
+    private StateProxy getInitialState(final AutomatonProxy aut)
+    {// TODO: currently only works for one initial state
+      StateProxy initial = null;
+      for (final StateProxy state : aut.getStates()) {
+        if (state.isInitial()) {
+          initial = state;
+          break;
+        }
+      }
+      return initial;
+    }
+
+    private Map<StateProxy,TransitionProxy> getSuccessorStates(
+                                                               final StateProxy currentState,
+                                                               final EventProxy event)
+    {
+      final Map<StateProxy,TransitionProxy> successor =
+          new HashMap<StateProxy,TransitionProxy>();
+      for (final TransitionProxy transition : getResultAutomaton()
+          .getTransitions()) {
+        if (transition.getEvent() == event
+            && transition.getSource() == currentState) {
+          successor.put(transition.getTarget(), transition);
+        }
+      }
+      return successor;
     }
 
     // #######################################################################
