@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -185,8 +186,10 @@ public class CompositionalGeneralisedConflictChecker extends
     } else {
       final ConflictTraceProxy counterexample = checker.getCounterExample();
       ConflictTraceProxy convertedTrace = counterexample;
-      for (int i = mModifyingSteps.size() - 1; i >= 0; i--) {
-        final Step step = mModifyingSteps.get(i);
+      final int size = mModifyingSteps.size();
+      final ListIterator<Step> iter = mModifyingSteps.listIterator(size);
+      while (iter.hasPrevious()) {
+        final Step step = iter.previous();
         convertedTrace = step.convertTrace(convertedTrace);
       }
       setFailedResult(convertedTrace);
