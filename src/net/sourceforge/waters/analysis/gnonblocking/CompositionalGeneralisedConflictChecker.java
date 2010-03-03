@@ -129,6 +129,7 @@ public class CompositionalGeneralisedConflictChecker extends
       setMarkingProposition(getUsedMarkingProposition());
     }
     ProductDESProxy model = getModel();
+    System.out.println(model);
     final List<SynchronousProductStateMap> stateMaps =
         new ArrayList<SynchronousProductStateMap>();
     final List<AutomatonProxy> composedAut = new ArrayList<AutomatonProxy>();
@@ -192,6 +193,8 @@ public class CompositionalGeneralisedConflictChecker extends
         System.out.println(convertedTrace);
       }
       setFailedResult(convertedTrace);
+      System.out.println(convertedTrace.getProductDES());
+
     }
     return result;
   }
@@ -230,6 +233,7 @@ public class CompositionalGeneralisedConflictChecker extends
    *
    * @param syncProduct
    */
+  @SuppressWarnings("unused")
   private HidingEventsMap hideLocalEvents(final AutomatonProxy automaton,
                                           final Set<EventProxy> localEvents)
   {
@@ -390,6 +394,7 @@ public class CompositionalGeneralisedConflictChecker extends
       return originalAut;
     }
 
+    @SuppressWarnings("unused")
     public AutomatonProxy getConvertedAut()
     {
       return aut;
@@ -694,20 +699,11 @@ public class CompositionalGeneralisedConflictChecker extends
       for (final AutomatonProxy aut : traceAutomata) {
         events.addAll(aut.getEvents());
       }
-      final ProductDESProxy originalModel =
-          getFactory().createProductDESProxy(
-                                             conflictTrace.getProductDES()
-                                                 .getName(),
-                                             conflictTrace.getProductDES()
-                                                 .getComment(),
-                                             conflictTrace.getProductDES()
-                                                 .getLocation(), events,
-                                             traceAutomata);
       final ConflictTraceProxy convertedTrace =
           getFactory().createConflictTraceProxy(conflictTrace.getName(),
                                                 conflictTrace.getComment(),
                                                 conflictTrace.getLocation(),
-                                                originalModel, traceAutomata,
+                                                getModel(), traceAutomata,
                                                 convertedSteps,
                                                 ConflictKind.CONFLICT);
       return convertedTrace;
