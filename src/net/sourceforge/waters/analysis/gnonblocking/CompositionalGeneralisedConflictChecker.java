@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,6 +25,7 @@ import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -663,15 +665,16 @@ public class CompositionalGeneralisedConflictChecker extends
 
     // #######################################################################
     // # Constructor
-    Step(final AutomatonProxy aut)
+    Step(final AutomatonProxy aut,
+         final Collection<AutomatonProxy> originals)
     {
       mResultAutomaton = aut;
+      mOriginalAutomata = originals;
     }
 
     Step(final AutomatonProxy resultAut, final AutomatonProxy originalAut)
     {
-      mResultAutomaton = resultAut;
-      mOriginalAutomaton = originalAut;
+      this(resultAut, Collections.singletonList(originalAut));
     }
 
     // #######################################################################
@@ -681,9 +684,23 @@ public class CompositionalGeneralisedConflictChecker extends
       return mResultAutomaton;
     }
 
+    @SuppressWarnings("unused")
+    Collection<AutomatonProxy> getOriginalAutomata()
+    {
+      return mOriginalAutomata;
+    }
+
+    // Simpler solution, instead of additional subclass :-)
     AutomatonProxy getOriginalAutomaton()
     {
-      return mOriginalAutomaton;
+      if (mOriginalAutomata.size() == 1) {
+        return mOriginalAutomata.iterator().next();
+      } else {
+        throw new IllegalStateException
+          ("Attempting to get a single input automaton from " +
+           ProxyTools.getShortClassName(this) + " with " +
+           mOriginalAutomata.size() + " input automata!");
+      }
     }
 
     // #######################################################################
@@ -694,7 +711,7 @@ public class CompositionalGeneralisedConflictChecker extends
     // #######################################################################
     // # Data Members
     private final AutomatonProxy mResultAutomaton;
-    private AutomatonProxy mOriginalAutomaton;
+    private final Collection<AutomatonProxy> mOriginalAutomata;
 
   }
 
@@ -709,7 +726,7 @@ public class CompositionalGeneralisedConflictChecker extends
     private CompositionStep(final AutomatonProxy composedAut,
                             final SynchronousProductStateMap stateMap)
     {
-      super(composedAut);
+      super(composedAut, stateMap.getInputAutomata());
       mStateMap = stateMap;
     }
 
