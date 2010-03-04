@@ -141,7 +141,7 @@ public class CompositionalGeneralisedConflictChecker extends
     // TODO: later, need to consider when an automaton is too large to be a
     // candidate and so may not always be left with only one automaton
     while (remainingAut.size() > 1) {
-      final Set<Candidate> candidates = findCandidates(model);
+      final Collection<Candidate> candidates = findCandidates(model);
       final Candidate candidate = evaluateCandidates(candidates);
 
       final NonDeterministicComposer composer =
@@ -158,6 +158,7 @@ public class CompositionalGeneralisedConflictChecker extends
       candidate.setLocalEvents(localEvents);
       final AutomatonProxy autToAbstract =
           hideLocalEvents(syncProduct, localEvents);
+      // final AutomatonProxy autToAbstract = syncProduct;
 
       // TODO Abstraction rules here
 
@@ -337,11 +338,20 @@ public class CompositionalGeneralisedConflictChecker extends
    * @param candidates
    * @return
    */
-  private Candidate evaluateCandidates(final Set<Candidate> candidates)
+  private Candidate evaluateCandidates(final Collection<Candidate> candidates)
   {
     // returns one random candidate initially
     return candidates.iterator().next();
     // TODO: needs proper implementation
+    /*
+     * final ListIterator<SelectingHeuristic> iter =
+     * mSelectingHeuristics.listIterator(); List<Candidate> selectedCandidates =
+     * null; while (iter.hasNext()) { final SelectingHeuristic heuristic =
+     * iter.next(); selectedCandidates = heuristic.evaluate((List<Candidate>)
+     * candidates); if (selectedCandidates.size() == 1) { break; } else {
+     * candidates = new ArrayList<Candidate>(selectedCandidates); } } return
+     * selectedCandidates.get(0);
+     */
   }
 
   /**
@@ -350,14 +360,82 @@ public class CompositionalGeneralisedConflictChecker extends
    * @param model
    * @return
    */
-  private Set<Candidate> findCandidates(final ProductDESProxy model)
+  private Collection<Candidate> findCandidates(final ProductDESProxy model)
   {
     // initially all automaton are in a set as a candidate
     final Candidate candidate = new Candidate(model.getAutomata());
-    final Set<Candidate> candidates = new HashSet<Candidate>();
+    final Collection<Candidate> candidates = new HashSet<Candidate>();
     candidates.add(candidate);
     return candidates;
     // TODO: needs proper implementation
+    // return mPreselectingHeuristic.evaluate(model);
+  }
+
+  public HeuristicMinT createHeuristicMinT()
+  {
+    return new HeuristicMinT();
+  }
+
+  public HeuristicMaxS createHeuristicMaxS()
+  {
+    return new HeuristicMaxS();
+  }
+
+  public HeuristicMustL createHeuristicMustL()
+  {
+    return new HeuristicMustL();
+  }
+
+  public HeuristicMaxL createHeuristicMaxL()
+  {
+    return new HeuristicMaxL();
+  }
+
+  public HeuristicMaxC createHeuristicMaxC()
+  {
+    return new HeuristicMaxC();
+  }
+
+  public HeuristicMinS createHeuristicMinS()
+  {
+    return new HeuristicMinS();
+  }
+
+  public void setPreselctingHeuristic(final PreselectingHeuristic heuristic)
+  {
+    mPreselectingHeuristic = heuristic;
+  }
+
+  /**
+   * The given heuristic is used first to select a candidate to compose.
+   *
+   * @param heuristic
+   */
+  public void setSelectingHeuristic(final SelectingHeuristic heuristic)
+  {
+    mSelectingHeuristics = new ArrayList<SelectingHeuristic>(3);
+    mSelectingHeuristics.add(heuristic);
+    if (heuristic instanceof HeuristicMaxL) {
+      mSelectingHeuristics.add(new HeuristicMaxC());
+      mSelectingHeuristics.add(new HeuristicMinS());
+    } else if (heuristic instanceof HeuristicMaxS) {
+      mSelectingHeuristics.add(new HeuristicMaxL());
+      mSelectingHeuristics.add(new HeuristicMinS());
+    } else if (heuristic instanceof HeuristicMinS) {
+      mSelectingHeuristics.add(new HeuristicMaxL());
+      mSelectingHeuristics.add(new HeuristicMaxC());
+    }
+  }
+
+  /**
+   * The first item in the list should be the first heuristic used to select a
+   * candidate to compose, the last item in the list should be the last option.
+   *
+   * @param heuristicList
+   */
+  public void setSelectingHeuristic(final List<SelectingHeuristic> heuristicList)
+  {
+    mSelectingHeuristics = heuristicList;
   }
 
 
@@ -390,12 +468,6 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  @SuppressWarnings("unused")
-  /**
-   * Performs step 1 of the approach to select the automata to compose.
-   * A candidate is produced by pairing the automaton with the fewest transitions
-   * to every other automaton in the model.
-   */
   private class HeuristicMinT extends HeuristicPairing implements
       PreselectingHeuristic
   {
@@ -427,7 +499,6 @@ public class CompositionalGeneralisedConflictChecker extends
    * candidate is produced by pairing the automaton with the most states to
    * every other automaton in the model.
    */
-  @SuppressWarnings("unused")
   private class HeuristicMaxS extends HeuristicPairing implements
       PreselectingHeuristic
   {
@@ -455,12 +526,6 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  @SuppressWarnings("unused")
-  /**
-   * Performs step 1 of the approach to select the automata to compose.
-   * A candidate is produced for every event in the model, each candidate
-   * contains the set of automaton which use that event.
-   */
   private class HeuristicMustL implements PreselectingHeuristic
   {
     public Collection<Candidate> evaluate(final ProductDESProxy model)
@@ -482,7 +547,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
   private interface SelectingHeuristic
   {
-    public Candidate evaluate(final List<Candidate> candidates);
+    public List<Candidate> evaluate(final List<Candidate> candidates);
 
   }
 
@@ -491,12 +556,12 @@ public class CompositionalGeneralisedConflictChecker extends
    * Performs step 2 of the approach to select the automata to compose. The
    * chosen candidate is the one with the highest proportion of local events.
    */
-  @SuppressWarnings("unused")
   private class HeuristicMaxL implements SelectingHeuristic
   {
-    public Candidate evaluate(final List<Candidate> candidates)
+    public List<Candidate> evaluate(final List<Candidate> candidates)
     {
       final Iterator<Candidate> it = candidates.iterator();
+      List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
       int maxLocal =
           chosenCandidate.getLocalEventCount()
@@ -506,11 +571,16 @@ public class CompositionalGeneralisedConflictChecker extends
         final int proportion =
             nextCan.getLocalEventCount() / nextCan.getNumberOfEvents();
         if (proportion > maxLocal) {
+          chosenCandidates = new ArrayList<Candidate>();
           maxLocal = proportion;
           chosenCandidate = nextCan;
+          chosenCandidates.add(chosenCandidate);
+        } else if (proportion == maxLocal) {
+          chosenCandidate = nextCan;
+          chosenCandidates.add(chosenCandidate);
         }
       }
-      return chosenCandidate;
+      return chosenCandidates;
     }
   }
 
@@ -519,12 +589,12 @@ public class CompositionalGeneralisedConflictChecker extends
    * Performs step 2 of the approach to select the automata to compose. The
    * chosen candidate is the one with the highest proportion of common events.
    */
-  @SuppressWarnings("unused")
   private class HeuristicMaxC implements SelectingHeuristic
   {
-    public Candidate evaluate(final List<Candidate> candidates)
+    public List<Candidate> evaluate(final List<Candidate> candidates)
     {
       final Iterator<Candidate> it = candidates.iterator();
+      List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
       int maxCommon =
           (chosenCandidate.getNumberOfEvents() - chosenCandidate
@@ -536,31 +606,41 @@ public class CompositionalGeneralisedConflictChecker extends
             (nextCan.getNumberOfEvents() - nextCan.getLocalEventCount())
                 / nextCan.getNumberOfEvents();
         if (proportion > maxCommon) {
+          chosenCandidates = new ArrayList<Candidate>();
           maxCommon = proportion;
           chosenCandidate = nextCan;
+          chosenCandidates.add(chosenCandidate);
+        } else if (proportion == maxCommon) {
+          chosenCandidate = nextCan;
+          chosenCandidates.add(chosenCandidate);
         }
       }
-      return chosenCandidate;
+      return chosenCandidates;
     }
   }
 
 
-  @SuppressWarnings("unused")
   private class HeuristicMinS implements SelectingHeuristic
   {
-    public Candidate evaluate(final List<Candidate> candidates)
+    public List<Candidate> evaluate(final List<Candidate> candidates)
     {
       Candidate chosenCandidate = candidates.get(0);
+      List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       int smallestProduct = calculateProduct(chosenCandidate);
       for (int i = 1; i < candidates.size(); i++) {
         final Candidate candidate = candidates.get(i);
         final int newproduct = calculateProduct(candidate);
         if (smallestProduct > newproduct) {
+          chosenCandidates = new ArrayList<Candidate>();
           smallestProduct = newproduct;
           chosenCandidate = candidate;
+          chosenCandidates.add(chosenCandidate);
+        } else if (smallestProduct == newproduct) {
+          chosenCandidate = candidate;
+          chosenCandidates.add(chosenCandidate);
         }
       }
-      return chosenCandidate;
+      return chosenCandidates;
     }
 
     private int calculateProduct(final Candidate candidate)
@@ -799,6 +879,9 @@ public class CompositionalGeneralisedConflictChecker extends
       new HashMap<EventProxy,Set<AutomatonProxy>>();
   private EventProxy mTau;
   private List<Step> mModifyingSteps;
+  @SuppressWarnings("unused")
+  private PreselectingHeuristic mPreselectingHeuristic;
+  private List<SelectingHeuristic> mSelectingHeuristics;
 
   // #########################################################################
   // # Class Constants
