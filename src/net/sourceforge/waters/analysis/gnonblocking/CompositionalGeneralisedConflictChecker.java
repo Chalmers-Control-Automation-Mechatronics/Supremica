@@ -784,32 +784,34 @@ public class CompositionalGeneralisedConflictChecker extends
 
     // #######################################################################
     // # Trace Computation
-    @SuppressWarnings("unchecked")
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
-      final AutomatonProxy resultAut = getResultAutomaton();
-      StateProxy sourceState = getInitialState(resultAut);
+      StateProxy sourceState = getInitialState(getOriginalAutomaton());
       for (final TraceStepProxy step : traceSteps) {
+        // replaces automaton in step's step map
+        final Map<AutomatonProxy,StateProxy> stepStateMap = step.getStateMap();
+        final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(stepStateMap.size());
+        if (stepStateMap.containsKey(getResultAutomaton())) {
+          stepsNewStateMap.put(getOriginalAutomaton(), stepStateMap
+              .get(getResultAutomaton()));
+
+        }
         final EventProxy stepEvent = step.getEvent();
         final Map<StateProxy,TransitionProxy> successors =
             getSuccessorStates(sourceState, stepEvent);
-        final Iterator it = successors.keySet().iterator();
+        final Iterator<StateProxy> it = successors.keySet().iterator();
+
+        // replaces tau events with original event before hiding
         if (stepEvent == mTau) {
-          final Map<AutomatonProxy,StateProxy> stepsStateMap =
-              step.getStateMap();
           final StateProxy[] targetStates =
-              stepsStateMap.values().toArray(new StateProxy[0]);
+              stepStateMap.values().toArray(new StateProxy[0]);
           final StateProxy targetState = targetStates[0];
           for (final StateProxy succ : successors.keySet()) {
-            // TODO: this is not quite right? what about states with more than 1
-            // incoming transition
             if (succ == targetState) {
-              final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
-                  new HashMap<AutomatonProxy,StateProxy>(stepsStateMap.size());
-              stepsNewStateMap.put(getOriginalAutomaton(), targetState);
               final TraceStepProxy convertedStep =
                   getFactory().createTraceStepProxy(
                                                     successors.get(succ)
