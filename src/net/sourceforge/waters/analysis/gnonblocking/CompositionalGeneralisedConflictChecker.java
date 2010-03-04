@@ -235,7 +235,9 @@ public class CompositionalGeneralisedConflictChecker extends
   private AutomatonProxy hideLocalEvents(final AutomatonProxy automaton,
                                          final Set<EventProxy> localEvents)
   {
-    mTau = getFactory().createEventProxy("tau", EventKind.UNCONTROLLABLE);
+    final String tauStateName = "tau:" + automaton.getName();
+    final EventProxy tau =
+        getFactory().createEventProxy(tauStateName, EventKind.UNCONTROLLABLE);
 
     final Map<TransitionProxy,TransitionProxy> transitionMap =
         new HashMap<TransitionProxy,TransitionProxy>(automaton.getTransitions()
@@ -248,7 +250,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final EventProxy event = transition.getEvent();
       if (localEvents.contains(event)) {
         final TransitionProxy newTrans =
-            getFactory().createTransitionProxy(transition.getSource(), mTau,
+            getFactory().createTransitionProxy(transition.getSource(), tau,
                                                transition.getTarget());
         newTransitions.add(newTrans);
         transitionMap.put(newTrans, transition);
@@ -262,13 +264,13 @@ public class CompositionalGeneralisedConflictChecker extends
         newEvents.add(event);
       }
     }
-    newEvents.add(mTau);
+    newEvents.add(tau);
     final AutomatonProxy newAut =
         getFactory()
             .createAutomatonProxy(automaton.getName(), automaton.getKind(),
                                   newEvents, automaton.getStates(),
                                   newTransitions);
-    final HidingStep step = new HidingStep(newAut, automaton, transitionMap);
+    final HidingStep step = new HidingStep(newAut, automaton, tau);
     mModifyingSteps.add(step);
     return newAut;
   }
@@ -774,11 +776,10 @@ public class CompositionalGeneralisedConflictChecker extends
     // #######################################################################
     // # Constructor
     private HidingStep(final AutomatonProxy result,
-                       final AutomatonProxy originalAut,
-                       final Map<TransitionProxy,TransitionProxy> transitionMap)
+                       final AutomatonProxy originalAut, final EventProxy tau)
     {
       super(result, originalAut);
-      mTransitionMap = transitionMap;
+      mTau = tau;
     }
 
     // #######################################################################
@@ -857,7 +858,7 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       final Map<StateProxy,TransitionProxy> successor =
           new HashMap<StateProxy,TransitionProxy>();
-      for (final TransitionProxy transition : getResultAutomaton()
+      for (final TransitionProxy transition : getOriginalAutomaton()
           .getTransitions()) {
         if (transition.getEvent() == event
             && transition.getSource() == currentState) {
@@ -869,15 +870,13 @@ public class CompositionalGeneralisedConflictChecker extends
 
     // #######################################################################
     // # Data Members
-    @SuppressWarnings("unused")
-    private final Map<TransitionProxy,TransitionProxy> mTransitionMap;
+    private final EventProxy mTau;
   }
 
   // #########################################################################
   // # Data Members
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =
       new HashMap<EventProxy,Set<AutomatonProxy>>();
-  private EventProxy mTau;
   private List<Step> mModifyingSteps;
   @SuppressWarnings("unused")
   private PreselectingHeuristic mPreselectingHeuristic;
