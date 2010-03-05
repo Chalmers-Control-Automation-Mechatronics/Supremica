@@ -874,22 +874,34 @@ public class CompositionalGeneralisedConflictChecker extends
       for (final TraceStepProxy step : traceSteps) {
         // replaces automaton in step's step map
         final Map<AutomatonProxy,StateProxy> stepStateMap = step.getStateMap();
+        // TODO: Fix bug: stepStateMap also contains entries for other automata,
+        // those must be copied ...
         Map<AutomatonProxy,StateProxy> stepsNewStateMap = null;
         if (stepStateMap.containsKey(getResultAutomaton())) {
           stepsNewStateMap = new HashMap<AutomatonProxy,StateProxy>(1);
           stepsNewStateMap.put(getOriginalAutomaton(), stepStateMap
               .get(getResultAutomaton()));
         }
+        // TODO: The code below does not determine the target state correctly.
+        // To build the trace, first find target state. It is in the step map,
+        // (stepStateMap.get(resultAutomaton)) or in the deterministic case
+        // (the above may return null), search the transition list of the
+        // result automaton for a transition with matching source state and
+        // event. There can only be one.
+        // Second, if the event is tau, find an event in the original automaton.
+        // Search the transition list for the first transition with matching
+        // source and target states.
         final EventProxy stepEvent = step.getEvent();
         final Map<StateProxy,EventProxy> successors =
             getSuccessorStates(sourceState, stepEvent);
-
         // replaces tau events with original event before hiding
         boolean newSource = false;
         if (stepEvent == mTau) {
           final StateProxy[] targetStates =
               stepStateMap.values().toArray(new StateProxy[0]);
           final StateProxy targetState = targetStates[0];
+          // ??? Bug --- first state in stepMap.values(). It may belong to
+          // another automaton ???
           for (final StateProxy succ : successors.keySet()) {
             if (succ == targetState) {
               final TraceStepProxy convertedStep;
@@ -940,14 +952,11 @@ public class CompositionalGeneralisedConflictChecker extends
     private StateProxy getInitialState(final AutomatonProxy aut,
                                        final TraceStepProxy traceStep)
     {
-      StateProxy initial = null;
       // if there is more than one initial state, the trace has the info
       final Map<AutomatonProxy,StateProxy> stepMap = traceStep.getStateMap();
-      if (!stepMap.isEmpty()) {
-        initial = stepMap.get(aut);
-      }
+      StateProxy initial = stepMap.get(aut);
       // else there is only one initial state
-      else {
+      if (initial == null) {
         for (final StateProxy state : aut.getStates()) {
           if (state.isInitial()) {
             initial = state;
