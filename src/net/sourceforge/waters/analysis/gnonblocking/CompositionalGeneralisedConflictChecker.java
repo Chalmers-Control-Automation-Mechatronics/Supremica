@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -347,6 +348,7 @@ public class CompositionalGeneralisedConflictChecker extends
     // returns one random candidate initially
     return candidates.iterator().next();
     // TODO: needs proper implementation
+
     /*
      * final ListIterator<SelectingHeuristic> iter =
      * mSelectingHeuristics.listIterator(); List<Candidate> selectedCandidates =
@@ -356,6 +358,7 @@ public class CompositionalGeneralisedConflictChecker extends
      * candidates = new ArrayList<Candidate>(selectedCandidates); } } return
      * selectedCandidates.get(0);
      */
+
   }
 
   /**
@@ -429,6 +432,7 @@ public class CompositionalGeneralisedConflictChecker extends
       mSelectingHeuristics.add(new HeuristicMaxL());
       mSelectingHeuristics.add(new HeuristicMaxC());
     }
+    mSelectingHeuristics.add(new HeuristicDefault());
   }
 
   /**
@@ -440,6 +444,7 @@ public class CompositionalGeneralisedConflictChecker extends
   public void setSelectingHeuristic(final List<SelectingHeuristic> heuristicList)
   {
     mSelectingHeuristics = heuristicList;
+    mSelectingHeuristics.add(new HeuristicDefault());
   }
 
 
@@ -655,6 +660,64 @@ public class CompositionalGeneralisedConflictChecker extends
       }
       return product;
     }
+  }
+
+
+  /**
+   * Compares two automaton alphabetically by name.
+   *
+   * @author Rach
+   */
+  private class AutomatonComparator implements Comparator<AutomatonProxy>
+  {
+    public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
+    {
+      final String aut1Nm = aut1.getName();
+      final String aut2Nm = aut2.getName();
+      return aut1Nm.compareTo(aut2Nm);
+    }
+  }
+
+
+  /**
+   * This heuristic is provided for when the other 3 fail to find one unique
+   * candidate. The selection is made by comparing the candidates automata names
+   * alphabetically.
+   *
+   * @author Rach
+   */
+  private class HeuristicDefault implements SelectingHeuristic
+  {
+    public List<Candidate> evaluate(final List<Candidate> candidates)
+    {
+      final Set<List<AutomatonProxy>> sortedAut = sortAutomata(candidates);
+      final int numAut = sortedAut.size();
+      for (int i = 0; i < numAut; i++) {
+        final List<String> autNames = new ArrayList<String>(numAut);
+        for (final List<AutomatonProxy> autLists : sortedAut) {
+          autNames.add(autLists.get(i).getName());
+        }
+        Collections.sort(autNames);
+      }
+      // TODO: think about a nicer way to implement this, early in the morning!
+      return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set<List<AutomatonProxy>> sortAutomata(
+                                                   final List<Candidate> candidates)
+    {
+      final Set<List<AutomatonProxy>> sortedAut =
+          new HashSet<List<AutomatonProxy>>(candidates.size());
+      for (final Candidate candidate : candidates) {
+        final List<AutomatonProxy> aut =
+            (List<AutomatonProxy>) candidate.getAutomata();
+        Collections.sort(aut, new AutomatonComparator());
+        sortedAut.add(aut);
+      }
+      return sortedAut;
+    }
+
   }
 
 
