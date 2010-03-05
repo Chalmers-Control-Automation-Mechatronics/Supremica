@@ -721,6 +721,7 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
+  // TODO: need to add subclasses of Step for each abstraction rule
   // #########################################################################
   // # Inner Class Step
   private abstract class Step
