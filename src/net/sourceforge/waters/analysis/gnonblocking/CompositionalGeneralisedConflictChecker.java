@@ -665,8 +665,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
     // #######################################################################
     // # Constructor
-    Step(final AutomatonProxy aut,
-         final Collection<AutomatonProxy> originals)
+    Step(final AutomatonProxy aut, final Collection<AutomatonProxy> originals)
     {
       mResultAutomaton = aut;
       mOriginalAutomata = originals;
@@ -696,10 +695,10 @@ public class CompositionalGeneralisedConflictChecker extends
       if (mOriginalAutomata.size() == 1) {
         return mOriginalAutomata.iterator().next();
       } else {
-        throw new IllegalStateException
-          ("Attempting to get a single input automaton from " +
-           ProxyTools.getShortClassName(this) + " with " +
-           mOriginalAutomata.size() + " input automata!");
+        throw new IllegalStateException(
+            "Attempting to get a single input automaton from "
+                + ProxyTools.getShortClassName(this) + " with "
+                + mOriginalAutomata.size() + " input automata!");
       }
     }
 
@@ -810,40 +809,58 @@ public class CompositionalGeneralisedConflictChecker extends
       for (final TraceStepProxy step : traceSteps) {
         // replaces automaton in step's step map
         final Map<AutomatonProxy,StateProxy> stepStateMap = step.getStateMap();
-        final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
-            new HashMap<AutomatonProxy,StateProxy>(stepStateMap.size());
+        Map<AutomatonProxy,StateProxy> stepsNewStateMap = null;
         if (stepStateMap.containsKey(getResultAutomaton())) {
+          // TODO: only one automaton can be in the state map here so dont need
+          // to bother copying the orignal stepMap and removing the aut?
+          stepsNewStateMap =
+              new HashMap<AutomatonProxy,StateProxy>(stepStateMap);
+          stepsNewStateMap.remove(getResultAutomaton());
           stepsNewStateMap.put(getOriginalAutomaton(), stepStateMap
               .get(getResultAutomaton()));
-
         }
         final EventProxy stepEvent = step.getEvent();
-        final Map<StateProxy,TransitionProxy> successors =
+        final Map<StateProxy,EventProxy> successors =
             getSuccessorStates(sourceState, stepEvent);
-        final Iterator<StateProxy> it = successors.keySet().iterator();
 
         // replaces tau events with original event before hiding
+        boolean newSource = false;
         if (stepEvent == mTau) {
           final StateProxy[] targetStates =
               stepStateMap.values().toArray(new StateProxy[0]);
           final StateProxy targetState = targetStates[0];
           for (final StateProxy succ : successors.keySet()) {
             if (succ == targetState) {
-              final TraceStepProxy convertedStep =
-                  getFactory().createTraceStepProxy(
-                                                    successors.get(succ)
-                                                        .getEvent(),
-                                                    stepsNewStateMap);
+              final TraceStepProxy convertedStep;
+              if (stepsNewStateMap != null) {
+                convertedStep =
+                    getFactory().createTraceStepProxy(successors.get(succ),
+                                                      stepsNewStateMap);
+              } else {
+                convertedStep =
+                    getFactory().createTraceStepProxy(successors.get(succ),
+                                                      stepStateMap);
+              }
               convertedSteps.add(convertedStep);
               sourceState = targetState;
+              newSource = true;
               break;
             }
           }
         } else {
-          convertedSteps.add(step);
+          if (stepsNewStateMap != null) {
+            final TraceStepProxy convertedStep =
+                getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
+            convertedSteps.add(convertedStep);
+          } else {
+            convertedSteps.add(step);
+          }
         }
-        if (it.hasNext()) {
-          sourceState = (StateProxy) it.next();
+        if (!newSource) {
+          final Iterator<StateProxy> it = successors.keySet().iterator();
+          if (it.hasNext()) {
+            sourceState = (StateProxy) it.next();
+          }
         }
       }
 
@@ -871,17 +888,32 @@ public class CompositionalGeneralisedConflictChecker extends
       return initial;
     }
 
-    private Map<StateProxy,TransitionProxy> getSuccessorStates(
-                                                               final StateProxy currentState,
-                                                               final EventProxy event)
+    private Map<StateProxy,EventProxy> getSuccessorStates(
+                                                          final StateProxy currentState,
+                                                          final EventProxy event)
     {
-      final Map<StateProxy,TransitionProxy> successor =
-          new HashMap<StateProxy,TransitionProxy>();
-      for (final TransitionProxy transition : getOriginalAutomaton()
+      final Map<StateProxy,EventProxy> successor =
+          new HashMap<StateProxy,EventProxy>();
+      // the target states must be found from the result automaton because that
+      // is the one with the tau event given by the trace which is used for
+      // searching
+      final List<StateProxy> targets = new ArrayList<StateProxy>();
+      for (final TransitionProxy transition : getResultAutomaton()
           .getTransitions()) {
         if (transition.getEvent() == event
             && transition.getSource() == currentState) {
-          successor.put(transition.getTarget(), transition);
+          targets.add(transition.getTarget());
+        }
+      }
+      // TODO:the original event before hiding must now be found in the original
+      // automaton...this is not very nice, hmm
+      for (final TransitionProxy transition : getOriginalAutomaton()
+          .getTransitions()) {
+        for (final StateProxy target : targets) {
+          if (transition.getTarget() == target
+              && transition.getSource() == currentState) {
+            successor.put(target, transition.getEvent());
+          }
         }
       }
       return successor;
