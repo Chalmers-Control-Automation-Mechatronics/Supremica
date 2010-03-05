@@ -805,17 +805,14 @@ public class CompositionalGeneralisedConflictChecker extends
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
-      StateProxy sourceState = getInitialState(getOriginalAutomaton());
+      StateProxy sourceState =
+          getInitialState(getOriginalAutomaton(), traceSteps.get(0));
       for (final TraceStepProxy step : traceSteps) {
         // replaces automaton in step's step map
         final Map<AutomatonProxy,StateProxy> stepStateMap = step.getStateMap();
         Map<AutomatonProxy,StateProxy> stepsNewStateMap = null;
         if (stepStateMap.containsKey(getResultAutomaton())) {
-          // TODO: only one automaton can be in the state map here so dont need
-          // to bother copying the orignal stepMap and removing the aut?
-          stepsNewStateMap =
-              new HashMap<AutomatonProxy,StateProxy>(stepStateMap);
-          stepsNewStateMap.remove(getResultAutomaton());
+          stepsNewStateMap = new HashMap<AutomatonProxy,StateProxy>(1);
           stepsNewStateMap.put(getOriginalAutomaton(), stepStateMap
               .get(getResultAutomaton()));
         }
@@ -876,13 +873,22 @@ public class CompositionalGeneralisedConflictChecker extends
       return convertedTrace;
     }
 
-    private StateProxy getInitialState(final AutomatonProxy aut)
-    {// TODO: currently only works for one initial state
+    private StateProxy getInitialState(final AutomatonProxy aut,
+                                       final TraceStepProxy traceStep)
+    {
       StateProxy initial = null;
-      for (final StateProxy state : aut.getStates()) {
-        if (state.isInitial()) {
-          initial = state;
-          break;
+      // if there is more than one initial state, the trace has the info
+      final Map<AutomatonProxy,StateProxy> stepMap = traceStep.getStateMap();
+      if (!stepMap.isEmpty()) {
+        initial = stepMap.get(aut);
+      }
+      // else there is only one initial state
+      else {
+        for (final StateProxy state : aut.getStates()) {
+          if (state.isInitial()) {
+            initial = state;
+            break;
+          }
         }
       }
       return initial;
