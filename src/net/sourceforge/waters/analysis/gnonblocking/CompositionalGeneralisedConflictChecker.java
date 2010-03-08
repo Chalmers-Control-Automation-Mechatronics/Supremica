@@ -346,18 +346,22 @@ public class CompositionalGeneralisedConflictChecker extends
   private Candidate evaluateCandidates(final Collection<Candidate> candidates)
   {
     // returns one random candidate initially
-    return candidates.iterator().next();
+     return candidates.iterator().next();
     // TODO: needs proper implementation
 
-    /*
-     * final ListIterator<SelectingHeuristic> iter =
-     * mSelectingHeuristics.listIterator(); List<Candidate> selectedCandidates =
-     * null; while (iter.hasNext()) { final SelectingHeuristic heuristic =
-     * iter.next(); selectedCandidates = heuristic.evaluate((List<Candidate>)
-     * candidates); if (selectedCandidates.size() == 1) { break; } else {
-     * candidates = new ArrayList<Candidate>(selectedCandidates); } } return
-     * selectedCandidates.get(0);
-     */
+   /* final ListIterator<SelectingHeuristic> iter =
+        mSelectingHeuristics.listIterator();
+    List<Candidate> selectedCandidates = null;
+    while (iter.hasNext()) {
+      final SelectingHeuristic heuristic = iter.next();
+      selectedCandidates = heuristic.evaluate((List<Candidate>) candidates);
+      if (selectedCandidates.size() == 1) {
+        break;
+      } else {
+        candidates = new ArrayList<Candidate>(selectedCandidates);
+      }
+    }
+    return selectedCandidates.get(0);*/
 
   }
 
@@ -693,26 +697,37 @@ public class CompositionalGeneralisedConflictChecker extends
     public List<Candidate> evaluate(final List<Candidate> candidates)
     {
       sortAutomata(candidates);
-      final ListIterator<Candidate> iter = candidates.listIterator();
-      @SuppressWarnings("unused")
-      final List<Candidate> chosenCandidates = new ArrayList<Candidate>();
+      ListIterator<Candidate> iter = candidates.listIterator();
+      List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosen = iter.next();
+      chosenCandidates.add(chosen);
       String chosenAutName = chosen.getAutomata().get(0).getName();
-
+      boolean found = false;
       int index = 0;
-      while (iter.hasNext()) {
-        final Candidate nextCandidate = iter.next();
-        final String nextAutName =
-            nextCandidate.getAutomata().get(index).getName();
+      while (!found) {
+        while (iter.hasNext()) {
+          final Candidate nextCandidate = iter.next();
+          final String nextAutName =
+              nextCandidate.getAutomata().get(index).getName();
 
-        if (chosenAutName.compareTo(nextAutName) > 0) {
-          chosenAutName = nextAutName;
-          chosen = nextCandidate;
+          if (chosenAutName.compareTo(nextAutName) > 0) {
+            chosenAutName = nextAutName;
+            chosen = nextCandidate;
+            chosenCandidates = new ArrayList<Candidate>();
+            chosenCandidates.add(chosen);
+          } else if (chosenAutName.compareTo(nextAutName) == 0) {
+            chosenCandidates.add(nextCandidate);
+          }
+          index++;
         }
-        index++;
+        if (chosenCandidates.size() == 1) {
+          found = true;
+        } else {
+          iter = candidates.listIterator(0);
+        }
       }
-      // TODO: think about a nicer way to implement this, early in the morning!
-      return null;
+      return chosenCandidates;
+      // TODO: this isnt very nice, shouldnt really return a list...
     }
 
     /**
