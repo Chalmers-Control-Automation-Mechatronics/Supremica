@@ -49,6 +49,7 @@ import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
@@ -103,7 +104,7 @@ class EventDeclDeleteVisitor
     }
   }
 
-  void insertItems(List<InsertInfo> inserts)
+  void insertItems(final List<InsertInfo> inserts)
   {
     final EditorWindowInterface iface = mRoot.getActiveEditorWindowInterface();
     final GraphEditorPanel surface;
@@ -132,7 +133,8 @@ class EventDeclDeleteVisitor
         list.add(index, proxy);
         if (proxy instanceof IdentifierSubject) {
           final IdentifierSubject subject = (IdentifierSubject) proxy;
-          final GraphSubject graph = subject.getAncestor(GraphSubject.class);
+          final GraphSubject graph =
+            SubjectTools.getAncestor(subject, GraphSubject.class);
           if (graph == visiblegraph) {
             final ProxySubject selectable = findSelectable(proxy);
             if (selectable != last) {
@@ -149,7 +151,7 @@ class EventDeclDeleteVisitor
     }
   }
 
-  void deleteItems(List<InsertInfo> deletes)
+  void deleteItems(final List<InsertInfo> deletes)
   {
     final ModuleSubject module = mRoot.getModuleSubject();
     final List<EventDeclSubject> events = module.getEventDeclListModifiable();
@@ -164,7 +166,7 @@ class EventDeclDeleteVisitor
         if (proxy instanceof IdentifierSubject) {
           final IdentifierSubject subject = (IdentifierSubject) proxy;
           final SimpleComponentSubject comp =
-            subject.getAncestor(SimpleComponentSubject.class);
+            SubjectTools.getAncestor(subject, SimpleComponentSubject.class);
           final EditorWindowInterface iface =
             mRoot.getEditorWindowInterface(comp);
           if (iface != null) {
@@ -394,7 +396,7 @@ class EventDeclDeleteVisitor
     return result;
   }
 
-  private ProxySubject findSelectable(ProxySubject subject)
+  private ProxySubject findSelectable(final ProxySubject subject)
   {
     final ProxySubject parent = findNodeOrEdge(subject);
     if (parent instanceof EdgeProxy) {

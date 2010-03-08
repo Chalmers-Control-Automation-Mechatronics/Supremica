@@ -36,11 +36,11 @@ import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
-import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
@@ -434,25 +434,23 @@ public class EventTableModel
     public void modelChanged(final ModelChangeEvent event)
     {
       final Subject source = event.getSource();
-      final AbstractSubject subject;
+      final EventDeclSubject decl;
       int kind = event.getKind();
       switch (kind) {
       case ModelChangeEvent.ITEM_ADDED:
       case ModelChangeEvent.ITEM_REMOVED:
-        final Subject parent = source.getParent();
-        if (parent instanceof EventDeclSubject) {
-          kind = ModelChangeEvent.STATE_CHANGED;
-          subject = (AbstractSubject) parent;
+        final Object value = event.getValue();
+        if (value instanceof EventDeclSubject) {
+          decl = (EventDeclSubject) value;
         } else {
-          subject = (AbstractSubject) event.getValue();
+          decl = SubjectTools.getAncestor(source, EventDeclSubject.class);
+          kind = ModelChangeEvent.STATE_CHANGED;
         }
         break;
       default:
-        subject = (AbstractSubject) event.getSource();
+        decl = SubjectTools.getAncestor(source, EventDeclSubject.class);
         break;
       }
-      final EventDeclSubject decl =
-        subject.getAncestor(EventDeclSubject.class);
       final int rowcount = getRowCount();
       int row0, row1;
       switch (kind) {

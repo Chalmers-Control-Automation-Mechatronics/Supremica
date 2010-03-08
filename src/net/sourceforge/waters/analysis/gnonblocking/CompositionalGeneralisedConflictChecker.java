@@ -932,6 +932,7 @@ public class CompositionalGeneralisedConflictChecker extends
     private StateProxy findSuccessor(final StateProxy sourceState,
                                      final EventProxy stepEvent)
     {
+      // TODO: What if the event is not in the automaton alphabet?
       StateProxy targetState = null;
       for (final TransitionProxy transition : getResultAutomaton()
           .getTransitions()) {

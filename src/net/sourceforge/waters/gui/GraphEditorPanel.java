@@ -122,6 +122,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.ForeachEventSubject;
@@ -715,10 +716,11 @@ public class GraphEditorPanel
       for (final Proxy proxy : list) {
         if (proxy instanceof IdentifierSubject ||
             proxy instanceof ForeachEventSubject) {
-          final AbstractSubject subject = (AbstractSubject) proxy;
+          final Subject subject = (Subject) proxy;
           final ProxySubject parent =
-            (ProxySubject) subject.getAncestor(LabelBlockSubject.class,
-                                               SimpleNodeSubject.class);
+            (ProxySubject) SubjectTools.getAncestor(subject,
+                                                    LabelBlockSubject.class,
+                                                    SimpleNodeSubject.class);
           scrollable.add(parent);
         } else {
           scrollable.add(proxy);
@@ -4076,9 +4078,8 @@ public class GraphEditorPanel
       for (final Proxy proxy : proxies) {
         final ProxySubject subject = (ProxySubject) proxy;
         if (subject instanceof IdentifierSubject) {
-          final IdentifierSubject ident = (IdentifierSubject) subject;
           final LabelBlockSubject block =
-            ident.getAncestor(LabelBlockSubject.class);
+            SubjectTools.getAncestor(subject, LabelBlockSubject.class);
           if (block != null && mSelectedSet.add(block)) {
             mSelectedList.add(block);
             change = true;
@@ -4163,8 +4164,10 @@ public class GraphEditorPanel
     private AbstractSubject visitEventListMember(final Proxy proxy)
     {
       final AbstractSubject subject = (AbstractSubject) proxy;
-      final Subject ancestor = subject.getAncestor(SimpleNodeSubject.class,
-                                                   LabelBlockSubject.class);
+      final Subject ancestor =
+        SubjectTools.getAncestor(subject,
+                                 SimpleNodeSubject.class,
+                                 LabelBlockSubject.class);
       if (ancestor instanceof SimpleNodeSubject) {
         return (SimpleNodeSubject) ancestor;
       } else {

@@ -67,6 +67,8 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.ForeachEventSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
@@ -170,7 +172,9 @@ public class AutomatonDisplayPane
         {
           final Proxy proxy = infomap.get(trans).getGraphSourceObject();
           mEnabledProxy.add(proxy);
-          mEnabledProxy.add(((IdentifierSubject)proxy).getAncestor(EdgeSubject.class));
+          final EdgeSubject edge =
+            SubjectTools.getAncestor((Subject) proxy, EdgeSubject.class);
+          mEnabledProxy.add(edge);
           continue transitions;
         }
       }
@@ -178,8 +182,12 @@ public class AutomatonDisplayPane
       {
         if (infomap.get(trans) != null)
         {
-          mNonOptimizedProxy.add(infomap.get(trans).getGraphSourceObject());
-          mNonOptimizedProxy.add(((IdentifierSubject)infomap.get(trans).getGraphSourceObject()).getAncestor(EdgeSubject.class));
+          final SourceInfo info = infomap.get(trans);
+          final Proxy source = info.getGraphSourceObject();
+          final EdgeSubject edge =
+            SubjectTools.getAncestor((Subject) source, EdgeSubject.class);
+          mNonOptimizedProxy.add(source);
+          mNonOptimizedProxy.add(edge);
         }
       }
     }
@@ -533,8 +541,9 @@ public class AutomatonDisplayPane
         for (final TransitionProxy trans : mAutomaton.getTransitions()) {
           final Proxy source = infomap.get(trans).getGraphSourceObject();
           final AbstractSubject subject = (AbstractSubject) source;
-          if (subject.getAncestor(EdgeSubject.class) == proxyToFire
-              && eventCanBeFired(mSim, trans)) {
+          final EdgeSubject edge =
+            SubjectTools.getAncestor(subject, EdgeSubject.class);
+          if (proxyToFire == edge && eventCanBeFired(mSim, trans)) {
             possibleSteps.addAll(getSteps(trans));
           }
         }
@@ -700,7 +709,9 @@ public class AutomatonDisplayPane
             }
           } else {
             final AbstractSubject subject = (AbstractSubject) source;
-            if (subject.getAncestor(EdgeSubject.class) == orig) {
+            final EdgeSubject edge =
+              SubjectTools.getAncestor(subject, EdgeSubject.class);
+            if (edge == orig) {
               proxyIsActive = true;
             }
           }
@@ -708,50 +719,44 @@ public class AutomatonDisplayPane
         if (isEnabled(orig)) {
           proxyIsEnabled = true;
         }
-        if (mFocusedItem != null)
-        {
+        if (mFocusedItem != null) {
           if (orig == mFocusedItem) {
             proxyIsSelected = true;
           } else if (orig instanceof IdentifierSubject) {
-            final AbstractSubject subject = (AbstractSubject) orig;
-            if (subject.getAncestor(EdgeSubject.class) == mFocusedItem) {
+            final Subject subject = (Subject) orig;
+            final EdgeSubject edge =
+              SubjectTools.getAncestor(subject, EdgeSubject.class);
+            if (mFocusedItem == edge) {
               proxyIsSelected = true;
             }
           }
         }
         boolean found = (proxyIsActive || proxyIsEnabled);
-        if (!found)
-        {
-          found = (mNonOptimizedProxy.contains(orig));
+        if (!found) {
+          found = mNonOptimizedProxy.contains(orig);
         }
-        if (!found)
+        if (!found) {
           proxyIsInvalid = true;
-      }
-      else if (orig instanceof ForeachEventSubject)
-      {
+        }
+      } else if (orig instanceof ForeachEventSubject) {
         if (orig == mFocusedItem) {
           proxyIsSelected = true;
-        }
-        else
-        {
-          final AbstractSubject subject = (AbstractSubject) orig;
-          if (subject.getAncestor(EdgeSubject.class) == mFocusedItem) {
+        } else {
+          final Subject subject = (Subject) orig;
+          final EdgeSubject edge =
+            SubjectTools.getAncestor(subject, EdgeSubject.class);
+          if (mFocusedItem == edge) {
             proxyIsSelected = true;
           }
         }
-      }
-      else if (orig instanceof LabelGeometryProxy)
-      {
-        if (mFocusedItem instanceof SimpleNodeProxy)
-        {
+      } else if (orig instanceof LabelGeometryProxy) {
+        if (mFocusedItem instanceof SimpleNodeProxy) {
           final LabelGeometryProxy label = ((SimpleNodeProxy)mFocusedItem).getLabelGeometry();
-          if (orig == label)
-          {
+          if (orig == label) {
             proxyIsSelected = true;
           }
         }
-        if (orig instanceof LabelGeometrySubject)
-        {
+        if (orig instanceof LabelGeometrySubject) {
           final SimpleNodeSubject parent = (SimpleNodeSubject)(((LabelGeometrySubject)orig).getParent());
           final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
           final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);

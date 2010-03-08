@@ -20,6 +20,7 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 
 
 /**
@@ -95,7 +96,7 @@ public abstract class AbstractEditCommand
     mName = name;
     mUpdatesSelection = updatesSelection;
   }
-        
+
 
   //#########################################################################
   //# Simple Access
@@ -158,7 +159,8 @@ public abstract class AbstractEditCommand
     for (final InsertInfo delete : deletes) {
       final Proxy proxy = delete.getProxy();
       final AbstractSubject subject = (AbstractSubject) proxy;
-      final AbstractSubject parent = subject.getProxyParent();
+      final AbstractSubject parent =
+        (AbstractSubject) SubjectTools.getProxyParent(subject);
       final Proxy ancestor = mPanel.getSelectableAncestor(parent);
       if (ancestor != null && ancestor != proxy && set.add(ancestor)) {
         result.add(ancestor);
