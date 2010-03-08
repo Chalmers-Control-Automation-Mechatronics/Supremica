@@ -138,8 +138,8 @@ public class CompositionalGeneralisedConflictChecker extends
         new ArrayList<SynchronousProductStateMap>();
     final List<AutomatonProxy> composedAut = new ArrayList<AutomatonProxy>();
     mapEventsToAutomata(model);
-    final Set<AutomatonProxy> remainingAut =
-        new HashSet<AutomatonProxy>(model.getAutomata());
+    final List<AutomatonProxy> remainingAut =
+        new ArrayList<AutomatonProxy>(model.getAutomata());
 
     // TODO: later, need to consider when an automaton is too large to be a
     // candidate and so may not always be left with only one automaton
@@ -286,7 +286,7 @@ public class CompositionalGeneralisedConflictChecker extends
    * @return
    */
   private Set<EventProxy> getEventsForNewModel(
-                                               final Set<AutomatonProxy> automataOfNewModel)
+                                               final List<AutomatonProxy> automataOfNewModel)
   {
     final Set<EventProxy> events = new HashSet<EventProxy>();
     for (final AutomatonProxy aut : automataOfNewModel) {
@@ -324,7 +324,7 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private Set<EventProxy> identifyLocalEvents(
                                               final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton,
-                                              final Set<AutomatonProxy> candidate)
+                                              final List<AutomatonProxy> candidate)
   {
     final Set<EventProxy> localEvents = new HashSet<EventProxy>();
     for (final EventProxy event : eventAutomaton.keySet()) {
@@ -370,7 +370,9 @@ public class CompositionalGeneralisedConflictChecker extends
   private Collection<Candidate> findCandidates(final ProductDESProxy model)
   {
     // initially all automaton are in a set as a candidate
-    final Candidate candidate = new Candidate(model.getAutomata());
+    final List<AutomatonProxy> modelAut =
+        new ArrayList<AutomatonProxy>(model.getAutomata());
+    final Candidate candidate = new Candidate(modelAut);
     final Collection<Candidate> candidates = new HashSet<Candidate>();
     candidates.add(candidate);
     return candidates;
@@ -466,7 +468,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final Collection<Candidate> candidates =
           new HashSet<Candidate>(aut.size());
       for (final AutomatonProxy a : aut) {
-        final Set<AutomatonProxy> pair = new HashSet<AutomatonProxy>(2);
+        final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
         pair.add(a);
         pair.add(chosenAut);
         final Candidate candidate = new Candidate(pair);
@@ -542,7 +544,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final HashMap<EventProxy,Candidate> eventCandidates =
           new HashMap<EventProxy,Candidate>(mEventsToAutomata.keySet().size());
       for (final EventProxy event : mEventsToAutomata.keySet()) {
-        final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
+        final List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>();
         final Candidate candidate = new Candidate(automata);
         eventCandidates.put(event, candidate);
         for (final AutomatonProxy aut : mEventsToAutomata.get(event)) {
@@ -690,34 +692,44 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     public List<Candidate> evaluate(final List<Candidate> candidates)
     {
-      final Set<List<AutomatonProxy>> sortedAut = sortAutomata(candidates);
-      final int numAut = sortedAut.size();
-      for (int i = 0; i < numAut; i++) {
-        final List<String> autNames = new ArrayList<String>(numAut);
-        for (final List<AutomatonProxy> autLists : sortedAut) {
-          autNames.add(autLists.get(i).getName());
+      sortAutomata(candidates);
+      final ListIterator<Candidate> iter = candidates.listIterator();
+      @SuppressWarnings("unused")
+      final List<Candidate> chosenCandidates = new ArrayList<Candidate>();
+      Candidate chosen = iter.next();
+      String chosenAutName = chosen.getAutomata().get(0).getName();
+
+      int index = 0;
+      while (iter.hasNext()) {
+        final Candidate nextCandidate = iter.next();
+        final String nextAutName =
+            nextCandidate.getAutomata().get(index).getName();
+
+        if (chosenAutName.compareTo(nextAutName) > 0) {
+          chosenAutName = nextAutName;
+          chosen = nextCandidate;
         }
-        Collections.sort(autNames);
+        index++;
       }
       // TODO: think about a nicer way to implement this, early in the morning!
       return null;
     }
 
-    @SuppressWarnings("unchecked")
-    private Set<List<AutomatonProxy>> sortAutomata(
-                                                   final List<Candidate> candidates)
+    /**
+     * For a list of candidates the list of automata is sorted alphabetically by
+     * name.
+     *
+     * @param candidates
+     */
+    private void sortAutomata(final List<Candidate> candidates)
     {
-      final Set<List<AutomatonProxy>> sortedAut =
-          new HashSet<List<AutomatonProxy>>(candidates.size());
       for (final Candidate candidate : candidates) {
         final List<AutomatonProxy> aut =
             (List<AutomatonProxy>) candidate.getAutomata();
         Collections.sort(aut, new AutomatonComparator());
-        sortedAut.add(aut);
+        candidate.setAutomata(aut);
       }
-      return sortedAut;
     }
-
   }
 
 
