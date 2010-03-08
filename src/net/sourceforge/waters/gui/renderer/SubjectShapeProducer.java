@@ -130,7 +130,7 @@ public class SubjectShapeProducer
         }
       } else if (parent instanceof GuardActionBlockProxy) {
         removeMapping((GuardActionBlockProxy) parent);
-      } else {
+      } else if (parent instanceof GraphProxy) {
         removeMapping((Subject) event.getValue());
       }
       break;

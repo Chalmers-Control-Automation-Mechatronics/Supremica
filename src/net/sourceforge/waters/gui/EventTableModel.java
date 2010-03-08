@@ -433,14 +433,18 @@ public class EventTableModel
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
     public void modelChanged(final ModelChangeEvent event)
     {
-      int kind = event.getKind();
+      final Subject source = event.getSource();
       final AbstractSubject subject;
+      int kind = event.getKind();
       switch (kind) {
       case ModelChangeEvent.ITEM_ADDED:
       case ModelChangeEvent.ITEM_REMOVED:
-        subject = (AbstractSubject) event.getValue();
-        if (!(subject instanceof EventDeclSubject)) {
+        final Subject parent = source.getParent();
+        if (parent instanceof EventDeclSubject) {
           kind = ModelChangeEvent.STATE_CHANGED;
+          subject = (AbstractSubject) parent;
+        } else {
+          subject = (AbstractSubject) event.getValue();
         }
         break;
       default:
