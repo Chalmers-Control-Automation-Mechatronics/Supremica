@@ -874,70 +874,41 @@ public class CompositionalGeneralisedConflictChecker extends
       for (final TraceStepProxy step : traceSteps) {
         // replaces automaton in step's step map
         final Map<AutomatonProxy,StateProxy> stepStateMap = step.getStateMap();
-        // TODO: Fix bug: stepStateMap also contains entries for other automata,
-        // those must be copied ...
-        Map<AutomatonProxy,StateProxy> stepsNewStateMap = null;
+        final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(stepStateMap);
         if (stepStateMap.containsKey(getResultAutomaton())) {
-          stepsNewStateMap = new HashMap<AutomatonProxy,StateProxy>(1);
+          stepsNewStateMap.remove(getResultAutomaton());
           stepsNewStateMap.put(getOriginalAutomaton(), stepStateMap
               .get(getResultAutomaton()));
         }
-        // TODO: The code below does not determine the target state correctly.
-        // To build the trace, first find target state. It is in the step map,
-        // (stepStateMap.get(resultAutomaton)) or in the deterministic case
-        // (the above may return null), search the transition list of the
-        // result automaton for a transition with matching source state and
-        // event. There can only be one.
-        // Second, if the event is tau, find an event in the original automaton.
-        // Search the transition list for the first transition with matching
-        // source and target states.
-        final EventProxy stepEvent = step.getEvent();
-        final Map<StateProxy,EventProxy> successors =
-            getSuccessorStates(sourceState, stepEvent);
         // replaces tau events with original event before hiding
-        boolean newSource = false;
-        if (stepEvent == mTau) {
-          final StateProxy[] targetStates =
-              stepStateMap.values().toArray(new StateProxy[0]);
-          final StateProxy targetState = targetStates[0];
-          // ??? Bug --- first state in stepMap.values(). It may belong to
-          // another automaton ???
-          for (final StateProxy succ : successors.keySet()) {
-            if (succ == targetState) {
-              final TraceStepProxy convertedStep;
-              if (stepsNewStateMap != null) {
-                convertedStep =
-                    getFactory().createTraceStepProxy(successors.get(succ),
-                                                      stepsNewStateMap);
-              } else {
-                convertedStep =
-                    getFactory().createTraceStepProxy(successors.get(succ),
-                                                      stepStateMap);
-              }
-              convertedSteps.add(convertedStep);
-              sourceState = targetState;
-              newSource = true;
-              break;
-            }
+        final EventProxy stepEvent = step.getEvent();
+        if (stepEvent != null) {
+          StateProxy targetState = stepStateMap.get(getResultAutomaton());
+          if (targetState == null) {
+            // MUST be deterministic in this step
+            targetState = findSuccessor(sourceState, stepEvent);
           }
-        } else {
-          if (stepsNewStateMap != null) {
-            final TraceStepProxy convertedStep =
-                getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
-            convertedSteps.add(convertedStep);
+          TraceStepProxy convertedStep;
+          if (stepEvent == mTau) {
+            final EventProxy originalEvent =
+                findOriginalEvent(sourceState, targetState);
+            convertedStep =
+                getFactory().createTraceStepProxy(originalEvent,
+                                                  stepsNewStateMap);
           } else {
-            convertedSteps.add(step);
+            convertedStep =
+                getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
           }
-        }
-        if (!newSource) {
-          final Iterator<StateProxy> it = successors.keySet().iterator();
-          if (it.hasNext()) {
-            sourceState = (StateProxy) it.next();
-          }
+          convertedSteps.add(convertedStep);
+          sourceState = targetState;
+        } else {
+          convertedSteps.add(step);
         }
       }
-
-      final Set<AutomatonProxy> traceAutomata = new HashSet<AutomatonProxy>(1);
+      final Set<AutomatonProxy> traceAutomata =
+          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
+      traceAutomata.remove(getResultAutomaton());
       traceAutomata.add(getOriginalAutomaton());
       final ConflictTraceProxy convertedTrace =
           getFactory().createConflictTraceProxy(conflictTrace.getName(),
@@ -949,6 +920,61 @@ public class CompositionalGeneralisedConflictChecker extends
       return convertedTrace;
     }
 
+    /**
+     * Finds the successor/target state in the automaton which resulted after a
+     * hiding step, given a source state and event. Used in deterministic cases
+     * only.
+     *
+     * @param sourceState
+     * @param stepEvent
+     * @return
+     */
+    private StateProxy findSuccessor(final StateProxy sourceState,
+                                     final EventProxy stepEvent)
+    {
+      StateProxy targetState = null;
+      for (final TransitionProxy transition : getResultAutomaton()
+          .getTransitions()) {
+        if (transition.getEvent() == stepEvent
+            && transition.getSource() == sourceState) {
+          targetState = transition.getTarget();
+          break;
+        }
+      }
+      return targetState;
+    }
+
+    /**
+     * Finds the event which was in the original automaton before hiding was
+     * used and the event was replaced with tau.
+     *
+     * @param source
+     * @param target
+     * @return
+     */
+    private EventProxy findOriginalEvent(final StateProxy source,
+                                         final StateProxy target)
+    {
+      EventProxy originalEvent = null;
+      for (final TransitionProxy transition : getOriginalAutomaton()
+          .getTransitions()) {
+        if (transition.getTarget() == target
+            && transition.getSource() == source) {
+          originalEvent = transition.getEvent();
+          break;
+        }
+      }
+      return originalEvent;
+    }
+
+    /**
+     * Finds the initial state(s) of an automaton. A TraceStepProxy object is
+     * passed for the case of multiple initial states.
+     *
+     * @param aut
+     * @param traceStep
+     * @return
+     */
     private StateProxy getInitialState(final AutomatonProxy aut,
                                        final TraceStepProxy traceStep)
     {
@@ -965,37 +991,6 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
       return initial;
-    }
-
-    private Map<StateProxy,EventProxy> getSuccessorStates(
-                                                          final StateProxy currentState,
-                                                          final EventProxy event)
-    {
-      final Map<StateProxy,EventProxy> successor =
-          new HashMap<StateProxy,EventProxy>();
-      // the target states must be found from the result automaton because that
-      // is the one with the tau event given by the trace which is used for
-      // searching
-      final List<StateProxy> targets = new ArrayList<StateProxy>();
-      for (final TransitionProxy transition : getResultAutomaton()
-          .getTransitions()) {
-        if (transition.getEvent() == event
-            && transition.getSource() == currentState) {
-          targets.add(transition.getTarget());
-        }
-      }
-      // TODO:the original event before hiding must now be found in the original
-      // automaton...this is not very nice, hmm
-      for (final TransitionProxy transition : getOriginalAutomaton()
-          .getTransitions()) {
-        for (final StateProxy target : targets) {
-          if (transition.getTarget() == target
-              && transition.getSource() == currentState) {
-            successor.put(target, transition.getEvent());
-          }
-        }
-      }
-      return successor;
     }
 
     // #######################################################################
