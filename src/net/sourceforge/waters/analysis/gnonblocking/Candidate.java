@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -21,41 +22,46 @@ import net.sourceforge.waters.model.des.EventProxy;
  */
 public class Candidate implements Comparable<Candidate>
 {
-  private final Set<AutomatonProxy> automata;
+  private List<AutomatonProxy> mAutomata;
   // TODO: at this stage there is no benefit from storing the local events for
   // a candidate...i do use the count of them
-  private Set<EventProxy> localEvents;
+  private Set<EventProxy> mLocalEvents;
   private int eventCount;
 
-  public Candidate(final Set<AutomatonProxy> autSet)
+  public Candidate(final List<AutomatonProxy> autSet)
   {
-    automata = autSet;
-    localEvents = null;
+    mAutomata = autSet;
+    mLocalEvents = null;
     countEvents();
   }
 
   private void countEvents()
   {
     final Set<EventProxy> events = new HashSet<EventProxy>();
-    for (final AutomatonProxy aut : automata) {
+    for (final AutomatonProxy aut : mAutomata) {
       events.addAll(aut.getEvents());
     }
     eventCount = events.size();
   }
 
-  public Set<AutomatonProxy> getAutomata()
+  public List<AutomatonProxy> getAutomata()
   {
-    return automata;
+    return mAutomata;
+  }
+
+  public void setAutomata(final List<AutomatonProxy> aut)
+  {
+    mAutomata = aut;
   }
 
   public void setLocalEvents(final Set<EventProxy> localevents)
   {
-    localEvents = localevents;
+    mLocalEvents = localevents;
   }
 
   public int getLocalEventCount()
   {
-    return localEvents.size();
+    return mLocalEvents.size();
   }
 
   public int getNumberOfEvents()
@@ -65,7 +71,7 @@ public class Candidate implements Comparable<Candidate>
 
   public int compareTo(final Candidate t)
   {
-    final int mSize = localEvents.size();
+    final int mSize = mLocalEvents.size();
     if (mSize < t.getLocalEventCount()) {
       return -1;
     } else if (mSize == t.getLocalEventCount()) {
