@@ -727,10 +727,12 @@ public class CompositionalGeneralisedConflictChecker extends
       while (!found) {
         while (iter.hasNext()) {
           final Candidate nextCandidate = iter.next();
-          // currently if two candidates have the same automaton names up until
-          // a point where one has run out of automata, the candidate with more
+          // currently if two candidates have the same automaton names up
+          // until
+          // a point where one has run out of automata, the candidate with
+          // more
           // automata is selected
-          if (nextCandidate.getAutomata().size() < index) {
+          if (index < nextCandidate.getAutomata().size()) {
             final String nextAutName =
                 nextCandidate.getAutomata().get(index).getName();
             if (chosenAutName.compareTo(nextAutName) > 0) {
@@ -742,13 +744,18 @@ public class CompositionalGeneralisedConflictChecker extends
               chosenCandidates.add(nextCandidate);
             }
           }
-          index++;
         }
         if (chosenCandidates.size() == 1) {
           found = true;
+          break;
         } else {
           iter = candidates.listIterator(0);
+          chosenCandidates = new ArrayList<Candidate>();
+          chosen = iter.next();
+          chosenCandidates.add(chosen);
+          chosenAutName = chosen.getAutomata().get(0).getName();
         }
+        index++;
       }
       return chosenCandidates;
     }
