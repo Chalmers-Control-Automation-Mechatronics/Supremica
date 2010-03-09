@@ -790,6 +790,104 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     // #######################################################################
+    /**
+     * Fills in the target states in the stateMaps for each step of the trace
+     * for the result automaton.
+     */
+    protected ConflictTraceProxy saturateTrace(
+                                               final ConflictTraceProxy counterexample)
+    {
+      final List<TraceStepProxy> traceSteps = counterexample.getTraceSteps();
+      final List<TraceStepProxy> convertedSteps =
+          new ArrayList<TraceStepProxy>();
+      StateProxy sourceState =
+          getInitialState(getResultAutomaton(), traceSteps.get(0));
+
+      for (final TraceStepProxy step : traceSteps) {
+        final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
+        final EventProxy stepEvent = step.getEvent();
+        if (stepEvent != null) {
+          StateProxy targetState = stepMap.get(getResultAutomaton());
+          if (targetState == null) {
+            targetState = findSuccessor(sourceState, stepEvent);
+            final Map<AutomatonProxy,StateProxy> statemap =
+                new HashMap<AutomatonProxy,StateProxy>(1);
+            statemap.put(getResultAutomaton(), targetState);
+            final TraceStepProxy convertedStep =
+                getFactory().createTraceStepProxy(stepEvent, statemap);
+            convertedSteps.add(convertedStep);
+          } else {
+            convertedSteps.add(step);
+          }
+          sourceState = targetState;
+        } else {
+          convertedSteps.add(step);
+        }
+      }
+      final ConflictTraceProxy saturatedCounterexample =
+          getFactory().createConflictTraceProxy(counterexample.getName(),
+                                                counterexample.getComment(),
+                                                counterexample.getLocation(),
+                                                counterexample.getProductDES(),
+                                                counterexample.getAutomata(),
+                                                convertedSteps,
+                                                counterexample.getKind());
+      return saturatedCounterexample;
+    }
+
+    /**
+     * Finds the successor/target state in the automaton which resulted after
+     * some step, given a source state and event. Used in deterministic cases
+     * only (in nondeterministic cases the successors are already available in
+     * the step's stateMap).
+     *
+     * @param sourceState
+     * @param stepEvent
+     * @return
+     */
+    private StateProxy findSuccessor(final StateProxy sourceState,
+                                     final EventProxy stepEvent)
+    {
+      // TODO: What if the event is not in the automaton alphabet?
+      StateProxy targetState = null;
+      for (final TransitionProxy transition : getResultAutomaton()
+          .getTransitions()) {
+        if (transition.getEvent() == stepEvent
+            && transition.getSource() == sourceState) {
+          targetState = transition.getTarget();
+          break;
+        }
+      }
+      return targetState;
+    }
+
+    /**
+     * Finds the initial state(s) of an automaton. A TraceStepProxy object is
+     * passed for the case of multiple initial states.
+     *
+     * @param aut
+     * @param traceStep
+     * @return
+     */
+    protected StateProxy getInitialState(final AutomatonProxy aut,
+                                         final TraceStepProxy traceStep)
+    {
+      // if there is more than one initial state, the trace has the info
+      final Map<AutomatonProxy,StateProxy> stepMap = traceStep.getStateMap();
+      StateProxy initial = stepMap.get(aut);
+      // else there is only one initial state
+      if (initial == null) {
+        for (final StateProxy state : aut.getStates()) {
+          if (state.isInitial()) {
+            initial = state;
+            break;
+          }
+        }
+      }
+      return initial;
+    }
+
+    // #######################################################################
     // # Trace Computation
     abstract ConflictTraceProxy convertTrace(
                                              final ConflictTraceProxy counterexample);
@@ -891,9 +989,10 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
-      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      final ConflictTraceProxy saturatedTrace = saturateTrace(conflictTrace);
+      final List<TraceStepProxy> traceSteps = saturatedTrace.getTraceSteps();
       StateProxy sourceState =
-          getInitialState(getOriginalAutomaton(), traceSteps.get(0));
+          getInitialState(getResultAutomaton(), traceSteps.get(0));
       for (final TraceStepProxy step : traceSteps) {
         // replaces automaton in step's step map
         final Map<AutomatonProxy,StateProxy> stepStateMap = step.getStateMap();
@@ -907,11 +1006,8 @@ public class CompositionalGeneralisedConflictChecker extends
         // replaces tau events with original event before hiding
         final EventProxy stepEvent = step.getEvent();
         if (stepEvent != null) {
-          StateProxy targetState = stepStateMap.get(getResultAutomaton());
-          if (targetState == null) {
-            // MUST be deterministic in this step
-            targetState = findSuccessor(sourceState, stepEvent);
-          }
+          final StateProxy targetState = stepStateMap.get(getResultAutomaton());
+          assert targetState != null;
           TraceStepProxy convertedStep;
           if (stepEvent == mTau) {
             final EventProxy originalEvent =
@@ -930,42 +1026,17 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
       final Set<AutomatonProxy> traceAutomata =
-          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
+          new HashSet<AutomatonProxy>(saturatedTrace.getAutomata());
       traceAutomata.remove(getResultAutomaton());
       traceAutomata.add(getOriginalAutomaton());
       final ConflictTraceProxy convertedTrace =
-          getFactory().createConflictTraceProxy(conflictTrace.getName(),
-                                                conflictTrace.getComment(),
-                                                conflictTrace.getLocation(),
+          getFactory().createConflictTraceProxy(saturatedTrace.getName(),
+                                                saturatedTrace.getComment(),
+                                                saturatedTrace.getLocation(),
                                                 getModel(), traceAutomata,
                                                 convertedSteps,
                                                 ConflictKind.CONFLICT);
       return convertedTrace;
-    }
-
-    /**
-     * Finds the successor/target state in the automaton which resulted after a
-     * hiding step, given a source state and event. Used in deterministic cases
-     * only.
-     *
-     * @param sourceState
-     * @param stepEvent
-     * @return
-     */
-    private StateProxy findSuccessor(final StateProxy sourceState,
-                                     final EventProxy stepEvent)
-    {
-      // TODO: What if the event is not in the automaton alphabet?
-      StateProxy targetState = null;
-      for (final TransitionProxy transition : getResultAutomaton()
-          .getTransitions()) {
-        if (transition.getEvent() == stepEvent
-            && transition.getSource() == sourceState) {
-          targetState = transition.getTarget();
-          break;
-        }
-      }
-      return targetState;
     }
 
     /**
@@ -989,32 +1060,6 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
       return originalEvent;
-    }
-
-    /**
-     * Finds the initial state(s) of an automaton. A TraceStepProxy object is
-     * passed for the case of multiple initial states.
-     *
-     * @param aut
-     * @param traceStep
-     * @return
-     */
-    private StateProxy getInitialState(final AutomatonProxy aut,
-                                       final TraceStepProxy traceStep)
-    {
-      // if there is more than one initial state, the trace has the info
-      final Map<AutomatonProxy,StateProxy> stepMap = traceStep.getStateMap();
-      StateProxy initial = stepMap.get(aut);
-      // else there is only one initial state
-      if (initial == null) {
-        for (final StateProxy state : aut.getStates()) {
-          if (state.isInitial()) {
-            initial = state;
-            break;
-          }
-        }
-      }
-      return initial;
     }
 
     // #######################################################################
