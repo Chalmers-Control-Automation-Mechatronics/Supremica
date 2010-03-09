@@ -112,6 +112,40 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
                      "fin_exit", true);
   }
 
+  // TODO: i have added these test and by default said true is expected, i have
+  // not checked if this is the actual expected result
+  public void testSIC5__parManEg_I_mfb_lowlevel_multiAnswers__compl_pol()
+      throws Exception
+  {
+    testSICPropertyV("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers.wmod", "compl_pol",
+                     true);
+  }
+
+  public void testSIC5__parManEg_I_mfb_lowlevel_multiAnswers__finA_attch()
+      throws Exception
+  {
+    testSICPropertyV("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers.wmod", "finA_attch",
+                     true);
+  }
+
+  public void testSIC5__parManEg_I_mfb_lowlevel_multiAnswers__finB_attch()
+      throws Exception
+  {
+    testSICPropertyV("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers.wmod", "finB_attch",
+                     true);
+  }
+
+  public void testSIC5__parManEg_I_mfb_lowlevel_multiAnswers__compl_case()
+      throws Exception
+  {
+    testSICPropertyV("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers.wmod", "compl_case",
+                     true);
+  }
+
   // #########################################################################
   // # Overrides for abstract base class
   // # net.sourceforge.waters.analysis.AbstractModelVerifierTest

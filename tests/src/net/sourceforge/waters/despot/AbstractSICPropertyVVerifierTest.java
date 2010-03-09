@@ -43,6 +43,13 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     runModelVerifier("tests", "hisc", "parManEg_I_mfb_lowlevel.wmod", true);
   }
 
+  public void testSICPropertyVVerifier_parManEg_I_mfb_lowlevel_multiAnswers()
+      throws Exception
+  {
+    runModelVerifier("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers.wmod", true);
+  }
+
   // SimpleManufacturingExample
   public void testSICPropertyVVerifier_Manuf_Cells() throws Exception
   {
