@@ -25,6 +25,7 @@ import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -129,11 +130,8 @@ public class CompositionalGeneralisedConflictChecker extends
   // # Invocation
   public boolean run() throws AnalysisException
   {
-    if (getMarkingProposition() == null) {
-      setMarkingProposition(getUsedMarkingProposition());
-    }
+    initialise();
     ProductDESProxy model = getModel();
-    mModifyingSteps = new ArrayList<Step>();
     final List<SynchronousProductStateMap> stateMaps =
         new ArrayList<SynchronousProductStateMap>();
     final List<AutomatonProxy> composedAut = new ArrayList<AutomatonProxy>();
@@ -146,6 +144,7 @@ public class CompositionalGeneralisedConflictChecker extends
     while (remainingAut.size() > 1) {
       final Collection<Candidate> candidates = findCandidates(model);
       final Candidate candidate = evaluateCandidates(candidates);
+      // TODO: candidate selection (i.e. heuristics) still need testing
 
       final NonDeterministicComposer composer =
           composeSynchronousProduct(candidate);
@@ -202,6 +201,24 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
   /**
+   * Initialises required variables to default values if the user hasn't
+   * configured them.
+   *
+   * @throws EventNotFoundException
+   */
+  private void initialise() throws EventNotFoundException
+  {
+    if (getMarkingProposition() == null) {
+      setMarkingProposition(getUsedMarkingProposition());
+    }
+    if (mPreselectingHeuristic == null) {
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      mPreselectingHeuristic = defaultHeuristic;
+    }
+    mModifyingSteps = new ArrayList<Step>();
+  }
+
+  /**
    * Builds the synchronous product for a given candidate.
    *
    * @param candidate
@@ -226,7 +243,7 @@ public class CompositionalGeneralisedConflictChecker extends
         new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
             candidateModel.getAutomata()), getFactory(),
             getMarkingProposition(), getGeneralisedPrecondition());
-    composer.setNodeLimit(100000);
+    // composer.setNodeLimit(100000);
     return composer;
   }
 
@@ -370,15 +387,7 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private Collection<Candidate> findCandidates(final ProductDESProxy model)
   {
-    // initially all automaton are in a set as a candidate
-    final List<AutomatonProxy> modelAut =
-        new ArrayList<AutomatonProxy>(model.getAutomata());
-    final Candidate candidate = new Candidate(modelAut);
-    final Collection<Candidate> candidates = new HashSet<Candidate>();
-    candidates.add(candidate);
-    return candidates;
-    // TODO: needs proper implementation
-    // return mPreselectingHeuristic.evaluate(model);
+    return mPreselectingHeuristic.evaluate(model);
   }
 
   public HeuristicMinT createHeuristicMinT()
@@ -1027,7 +1036,6 @@ public class CompositionalGeneralisedConflictChecker extends
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =
       new HashMap<EventProxy,Set<AutomatonProxy>>();
   private List<Step> mModifyingSteps;
-  @SuppressWarnings("unused")
   private PreselectingHeuristic mPreselectingHeuristic;
   private List<SelectingHeuristic> mSelectingHeuristics;
 
