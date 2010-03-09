@@ -525,6 +525,9 @@ Has multiple request/answer pairs.</ns2:Comment>
                     </Edge>
                 </EdgeList>
             </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
         </SimpleComponent>
     </ComponentList>
 </Module>

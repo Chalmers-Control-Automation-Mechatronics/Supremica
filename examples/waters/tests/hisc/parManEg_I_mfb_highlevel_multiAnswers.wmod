@@ -868,12 +868,6 @@ Has multiple request/answer pairs.</ns2:Comment>
             </Graph>
         </SimpleComponent>
         <Instance ModuleName="parManEg_I_mfb_lowlevel_multiAnswers" Name="lowlevel">
-            <ParameterBinding Name="part_ent">
-                <SimpleIdentifier Name="part_ent"/>
-            </ParameterBinding>
-            <ParameterBinding Name="fin_exit">
-                <SimpleIdentifier Name="fin_exit"/>
-            </ParameterBinding>
             <ParameterBinding Name="start_pol">
                 <SimpleIdentifier Name="start_pol"/>
             </ParameterBinding>
