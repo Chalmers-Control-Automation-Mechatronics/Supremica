@@ -22,11 +22,16 @@ import net.sourceforge.waters.model.des.EventProxy;
  */
 public class Candidate implements Comparable<Candidate>
 {
+  // TODO Since the automata are stored in a list, best sort them when the
+  // candidate is created. Collections.sort() without Comparator can do this
+  // because AutomatonProxy implements Comparable. This reduces nondeterministic
+  // behaviour and also means we do not have to modify candidates when
+  // evaluating the default heuristic.
   private List<AutomatonProxy> mAutomata;
   // TODO: at this stage there is no benefit from storing the local events for
   // a candidate...i do use the count of them
   private Set<EventProxy> mLocalEvents;
-  private int eventCount;
+  private int mEventCount;
 
   public Candidate(final List<AutomatonProxy> autSet,
                    final Set<EventProxy> localEvents)
@@ -42,7 +47,7 @@ public class Candidate implements Comparable<Candidate>
     for (final AutomatonProxy aut : mAutomata) {
       events.addAll(aut.getEvents());
     }
-    eventCount = events.size();
+    mEventCount = events.size();
   }
 
   public List<AutomatonProxy> getAutomata()
@@ -67,7 +72,7 @@ public class Candidate implements Comparable<Candidate>
 
   public int getNumberOfEvents()
   {
-    return eventCount;
+    return mEventCount;
   }
 
   public int compareTo(final Candidate t)
