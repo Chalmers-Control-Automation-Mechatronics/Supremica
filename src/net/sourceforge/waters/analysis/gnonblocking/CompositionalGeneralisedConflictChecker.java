@@ -213,7 +213,11 @@ public class CompositionalGeneralisedConflictChecker extends
     }
     if (mPreselectingHeuristic == null) {
       final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
-      mPreselectingHeuristic = defaultHeuristic;
+      setPreselectingHeuristic(defaultHeuristic);
+    }
+    if (mSelectingHeuristics == null) {
+      final SelectingHeuristic defaultHeuristic = new HeuristicMaxL();
+      setSelectingHeuristic(defaultHeuristic);
     }
     mModifyingSteps = new ArrayList<Step>();
   }
@@ -361,22 +365,21 @@ public class CompositionalGeneralisedConflictChecker extends
    * @param candidates
    * @return
    */
-  private Candidate evaluateCandidates(final Collection<Candidate> candidates)
+  private Candidate evaluateCandidates(Collection<Candidate> candidates)
   {
-    // returns one random candidate initially
-    return candidates.iterator().next();
-    // TODO: needs proper implementation
-
-    /*
-     * final ListIterator<SelectingHeuristic> iter =
-     * mSelectingHeuristics.listIterator(); List<Candidate> selectedCandidates =
-     * null; while (iter.hasNext()) { final SelectingHeuristic heuristic =
-     * iter.next(); selectedCandidates = heuristic.evaluate((List<Candidate>)
-     * candidates); if (selectedCandidates.size() == 1) { break; } else {
-     * candidates = new ArrayList<Candidate>(selectedCandidates); } } return
-     * selectedCandidates.get(0);
-     */
-
+    final ListIterator<SelectingHeuristic> iter =
+        mSelectingHeuristics.listIterator();
+    List<Candidate> selectedCandidates = new ArrayList<Candidate>(candidates);
+    while (iter.hasNext()) {
+      final SelectingHeuristic heuristic = iter.next();
+      selectedCandidates = heuristic.evaluate(selectedCandidates);
+      if (selectedCandidates.size() == 1) {
+        break;
+      } else {
+        candidates = new ArrayList<Candidate>(selectedCandidates);
+      }
+    }
+    return selectedCandidates.get(0);
   }
 
   /**
@@ -420,7 +423,7 @@ public class CompositionalGeneralisedConflictChecker extends
     return new HeuristicMinS();
   }
 
-  public void setPreselctingHeuristic(final PreselectingHeuristic heuristic)
+  public void setPreselectingHeuristic(final PreselectingHeuristic heuristic)
   {
     mPreselectingHeuristic = heuristic;
   }
@@ -481,7 +484,9 @@ public class CompositionalGeneralisedConflictChecker extends
         final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
         pair.add(a);
         pair.add(chosenAut);
-        final Candidate candidate = new Candidate(pair);
+        final Set<EventProxy> localEvents =
+            identifyLocalEvents(mEventsToAutomata, pair);
+        final Candidate candidate = new Candidate(pair, localEvents);
         candidates.add(candidate);
       }
       return candidates;
@@ -554,12 +559,12 @@ public class CompositionalGeneralisedConflictChecker extends
       final HashMap<EventProxy,Candidate> eventCandidates =
           new HashMap<EventProxy,Candidate>(mEventsToAutomata.keySet().size());
       for (final EventProxy event : mEventsToAutomata.keySet()) {
-        final List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>();
-        final Candidate candidate = new Candidate(automata);
+        final List<AutomatonProxy> automata =
+            new ArrayList<AutomatonProxy>(mEventsToAutomata.get(event));
+        final Set<EventProxy> localEvents =
+            identifyLocalEvents(mEventsToAutomata, automata);
+        final Candidate candidate = new Candidate(automata, localEvents);
         eventCandidates.put(event, candidate);
-        for (final AutomatonProxy aut : mEventsToAutomata.get(event)) {
-          eventCandidates.get(event).getAutomata().add(aut);
-        }
       }
       return eventCandidates.values();
     }
@@ -614,7 +619,7 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     public List<Candidate> evaluate(final List<Candidate> candidates)
     {
-      final Iterator<Candidate> it = candidates.iterator();
+      final ListIterator<Candidate> it = candidates.listIterator();
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
       int maxCommon =

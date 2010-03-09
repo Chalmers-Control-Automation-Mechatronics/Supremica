@@ -28,10 +28,11 @@ public class Candidate implements Comparable<Candidate>
   private Set<EventProxy> mLocalEvents;
   private int eventCount;
 
-  public Candidate(final List<AutomatonProxy> autSet)
+  public Candidate(final List<AutomatonProxy> autSet,
+                   final Set<EventProxy> localEvents)
   {
     mAutomata = autSet;
-    mLocalEvents = null;
+    mLocalEvents = localEvents;
     countEvents();
   }
 
