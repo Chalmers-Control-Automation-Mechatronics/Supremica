@@ -143,7 +143,13 @@ public class CompositionalGeneralisedConflictChecker extends
     // candidate and so may not always be left with only one automaton
     while (remainingAut.size() > 1) {
       final Collection<Candidate> candidates = findCandidates(model);
-      final Candidate candidate = evaluateCandidates(candidates);
+      final Candidate candidate;
+      if (candidates.size() > 1) {
+        candidate = evaluateCandidates(candidates);
+      } else {
+        final Iterator<Candidate> it = candidates.iterator();
+        candidate = it.next();
+      }
       // TODO: candidate selection (i.e. heuristics) still need testing
 
       final NonDeterministicComposer composer =
