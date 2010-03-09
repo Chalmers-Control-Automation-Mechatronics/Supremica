@@ -595,6 +595,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final Iterator<Candidate> it = candidates.iterator();
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
+      chosenCandidates.add(chosenCandidate);
       int maxLocal =
           chosenCandidate.getLocalEventCount()
               / chosenCandidate.getNumberOfEvents();
