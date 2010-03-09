@@ -628,6 +628,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final ListIterator<Candidate> it = candidates.listIterator();
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
+      chosenCandidates.add(chosenCandidate);
       int maxCommon =
           (chosenCandidate.getNumberOfEvents() - chosenCandidate
               .getLocalEventCount())
