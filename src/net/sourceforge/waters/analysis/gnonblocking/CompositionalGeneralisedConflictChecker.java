@@ -659,6 +659,7 @@ public class CompositionalGeneralisedConflictChecker extends
       Candidate chosenCandidate = candidates.get(0);
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       int smallestProduct = calculateProduct(chosenCandidate);
+      chosenCandidates.add(chosenCandidate);
       for (int i = 1; i < candidates.size(); i++) {
         final Candidate candidate = candidates.get(i);
         final int newproduct = calculateProduct(candidate);
