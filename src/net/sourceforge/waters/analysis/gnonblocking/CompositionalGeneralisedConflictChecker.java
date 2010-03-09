@@ -226,6 +226,7 @@ public class CompositionalGeneralisedConflictChecker extends
         new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
             candidateModel.getAutomata()), getFactory(),
             getMarkingProposition(), getGeneralisedPrecondition());
+    composer.setNodeLimit(100000);
     return composer;
   }
 
@@ -346,22 +347,18 @@ public class CompositionalGeneralisedConflictChecker extends
   private Candidate evaluateCandidates(final Collection<Candidate> candidates)
   {
     // returns one random candidate initially
-     return candidates.iterator().next();
+    return candidates.iterator().next();
     // TODO: needs proper implementation
 
-   /* final ListIterator<SelectingHeuristic> iter =
-        mSelectingHeuristics.listIterator();
-    List<Candidate> selectedCandidates = null;
-    while (iter.hasNext()) {
-      final SelectingHeuristic heuristic = iter.next();
-      selectedCandidates = heuristic.evaluate((List<Candidate>) candidates);
-      if (selectedCandidates.size() == 1) {
-        break;
-      } else {
-        candidates = new ArrayList<Candidate>(selectedCandidates);
-      }
-    }
-    return selectedCandidates.get(0);*/
+    /*
+     * final ListIterator<SelectingHeuristic> iter =
+     * mSelectingHeuristics.listIterator(); List<Candidate> selectedCandidates =
+     * null; while (iter.hasNext()) { final SelectingHeuristic heuristic =
+     * iter.next(); selectedCandidates = heuristic.evaluate((List<Candidate>)
+     * candidates); if (selectedCandidates.size() == 1) { break; } else {
+     * candidates = new ArrayList<Candidate>(selectedCandidates); } } return
+     * selectedCandidates.get(0);
+     */
 
   }
 
@@ -727,7 +724,6 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
       return chosenCandidates;
-      // TODO: this isnt very nice, shouldnt really return a list...
     }
 
     /**
