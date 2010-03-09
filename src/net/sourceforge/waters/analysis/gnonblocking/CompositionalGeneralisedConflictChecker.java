@@ -718,16 +718,20 @@ public class CompositionalGeneralisedConflictChecker extends
       while (!found) {
         while (iter.hasNext()) {
           final Candidate nextCandidate = iter.next();
-          final String nextAutName =
-              nextCandidate.getAutomata().get(index).getName();
-
-          if (chosenAutName.compareTo(nextAutName) > 0) {
-            chosenAutName = nextAutName;
-            chosen = nextCandidate;
-            chosenCandidates = new ArrayList<Candidate>();
-            chosenCandidates.add(chosen);
-          } else if (chosenAutName.compareTo(nextAutName) == 0) {
-            chosenCandidates.add(nextCandidate);
+          // currently if two candidates have the same automaton names up until
+          // a point where one has run out of automata, the candidate with more
+          // automata is selected
+          if (nextCandidate.getAutomata().size() < index) {
+            final String nextAutName =
+                nextCandidate.getAutomata().get(index).getName();
+            if (chosenAutName.compareTo(nextAutName) > 0) {
+              chosenAutName = nextAutName;
+              chosen = nextCandidate;
+              chosenCandidates = new ArrayList<Candidate>();
+              chosenCandidates.add(chosen);
+            } else if (chosenAutName.compareTo(nextAutName) == 0) {
+              chosenCandidates.add(nextCandidate);
+            }
           }
           index++;
         }
