@@ -12,7 +12,6 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -690,22 +689,6 @@ public class CompositionalGeneralisedConflictChecker extends
 
 
   /**
-   * Compares two automaton alphabetically by name.
-   *
-   * @author Rach
-   */
-  private class AutomatonComparator implements Comparator<AutomatonProxy>
-  {
-    public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
-    {
-      final String aut1Nm = aut1.getName();
-      final String aut2Nm = aut2.getName();
-      return aut1Nm.compareTo(aut2Nm);
-    }
-  }
-
-
-  /**
    * This heuristic is provided for when the other 3 fail to find one unique
    * candidate. The selection is made by comparing the candidates automata names
    * alphabetically.
@@ -716,7 +699,6 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     public List<Candidate> evaluate(final List<Candidate> candidates)
     {
-      sortAutomata(candidates);
       ListIterator<Candidate> iter = candidates.listIterator();
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosen = iter.next();
@@ -758,22 +740,6 @@ public class CompositionalGeneralisedConflictChecker extends
         index++;
       }
       return chosenCandidates;
-    }
-
-    /**
-     * For a list of candidates the list of automata is sorted alphabetically by
-     * name.
-     *
-     * @param candidates
-     */
-    private void sortAutomata(final List<Candidate> candidates)
-    {
-      for (final Candidate candidate : candidates) {
-        final List<AutomatonProxy> aut =
-            (List<AutomatonProxy>) candidate.getAutomata();
-        Collections.sort(aut, new AutomatonComparator());
-        candidate.setAutomata(aut);
-      }
     }
   }
 

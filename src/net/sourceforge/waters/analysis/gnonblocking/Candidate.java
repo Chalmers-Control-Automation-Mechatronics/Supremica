@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,11 +23,7 @@ import net.sourceforge.waters.model.des.EventProxy;
  */
 public class Candidate implements Comparable<Candidate>
 {
-  // TODO Since the automata are stored in a list, best sort them when the
-  // candidate is created. Collections.sort() without Comparator can do this
-  // because AutomatonProxy implements Comparable. This reduces nondeterministic
-  // behaviour and also means we do not have to modify candidates when
-  // evaluating the default heuristic.
+  // the list of automata is sorted alphabetically by automaton names
   private List<AutomatonProxy> mAutomata;
   // TODO: at this stage there is no benefit from storing the local events for
   // a candidate...i do use the count of them
@@ -37,6 +34,7 @@ public class Candidate implements Comparable<Candidate>
                    final Set<EventProxy> localEvents)
   {
     mAutomata = autSet;
+    Collections.sort(autSet);
     mLocalEvents = localEvents;
     countEvents();
   }
@@ -58,6 +56,7 @@ public class Candidate implements Comparable<Candidate>
   public void setAutomata(final List<AutomatonProxy> aut)
   {
     mAutomata = aut;
+    Collections.sort(mAutomata);
   }
 
   public void setLocalEvents(final Set<EventProxy> localevents)
