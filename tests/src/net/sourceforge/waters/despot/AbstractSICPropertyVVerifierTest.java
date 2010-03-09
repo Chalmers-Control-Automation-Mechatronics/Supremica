@@ -50,6 +50,20 @@ public abstract class AbstractSICPropertyVVerifierTest extends
                      "parManEg_I_mfb_lowlevel_multiAnswers.wmod", true);
   }
 
+  public void testSICPropertyVVerifier_parManEg_I_mfb_middlelevel()
+      throws Exception
+  {
+    runModelVerifier("tests", "hisc", "parManEg_I_mfb_middlelevel.wmod", true);
+  }
+
+  public void testSICPropertyVVerifier_parManEg_I_mfb_parManEg_I_mfb_lowlevel_multiAnswers_noInterface()
+      throws Exception
+  {
+    runModelVerifier("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
+                     false);
+  }
+
   // SimpleManufacturingExample
   public void testSICPropertyVVerifier_Manuf_Cells() throws Exception
   {

@@ -146,6 +146,44 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
                      true);
   }
 
+  public void testSIC5__parManEg_I_mfb_lowlevel_multiAnswers_noInterface__compl_pol()
+      throws Exception
+  {
+    testSICPropertyV("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
+                     "compl_pol", true);
+  }
+
+  public void testSIC5__parManEg_I_mfb_lowlevel_multiAnswers_noInterface__finA_attch()
+      throws Exception
+  {
+    testSICPropertyV("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
+                     "finA_attch", true);
+  }
+
+  public void testSIC5__parManEg_I_mfb_lowlevel_multiAnswers_noInterface__finB_attch()
+      throws Exception
+  {
+    testSICPropertyV("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
+                     "finB_attch", true);
+  }
+
+  public void testSIC5__parManEg_I_mfb_lowlevel_multiAnswers_noInterface__compl_case()
+      throws Exception
+  {
+    testSICPropertyV("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
+                     "compl_case", true);
+  }
+
+  public void testSIC5__parManEg_I_mfb_middlelevel() throws Exception
+  {
+    testSICPropertyV("tests", "hisc", "parManEg_I_mfb_middlelevel.wmod",
+                     "fin_exit", true);
+  }
+
   // #########################################################################
   // # Overrides for abstract base class
   // # net.sourceforge.waters.analysis.AbstractModelVerifierTest

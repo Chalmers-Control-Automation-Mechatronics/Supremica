@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="parManEg_I_mfb_lowlevel_multiAnswers" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="parManEg_I_mfb_lowlevel_multiAnswers_noInterface" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A modified low level of Parallel Manufacturing Example of Ryan Leduc's PhD thesis.
-Has multiple request/answer pairs.</ns2:Comment>
+Has multiple request/answer pairs and no interface.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Name="attch_case"/>
         <EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="compl_pol">
@@ -525,9 +525,6 @@ Has multiple request/answer pairs.</ns2:Comment>
                     </Edge>
                 </EdgeList>
             </Graph>
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:Interface"/>
-            </ns2:AttributeMap>
         </SimpleComponent>
     </ComponentList>
 </Module>
