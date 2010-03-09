@@ -193,11 +193,12 @@ public class CompositionalGeneralisedConflictChecker extends
       setSatisfiedResult();
     } else {
       final ConflictTraceProxy counterexample = checker.getCounterExample();
-      ConflictTraceProxy convertedTrace = counterexample;
       final int size = mModifyingSteps.size();
       final ListIterator<Step> iter = mModifyingSteps.listIterator(size);
+      ConflictTraceProxy convertedTrace = counterexample;
       while (iter.hasPrevious()) {
         final Step step = iter.previous();
+        convertedTrace = step.saturateTrace(convertedTrace);
         convertedTrace = step.convertTrace(convertedTrace);
       }
       setFailedResult(convertedTrace);
@@ -252,7 +253,7 @@ public class CompositionalGeneralisedConflictChecker extends
         new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
             candidateModel.getAutomata()), getFactory(),
             getMarkingProposition(), getGeneralisedPrecondition());
-    // composer.setNodeLimit(400000);
+    composer.setNodeLimit(100000);
     return composer;
   }
 
@@ -790,12 +791,13 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     // #######################################################################
+
     /**
      * Fills in the target states in the stateMaps for each step of the trace
      * for the result automaton.
      */
-    protected ConflictTraceProxy saturateTrace(
-                                               final ConflictTraceProxy counterexample)
+    private ConflictTraceProxy saturateTrace(
+                                             final ConflictTraceProxy counterexample)
     {
       final List<TraceStepProxy> traceSteps = counterexample.getTraceSteps();
       final List<TraceStepProxy> convertedSteps =
@@ -836,10 +838,9 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     /**
-     * Finds the successor/target state in the automaton which resulted after
-     * some step, given a source state and event. Used in deterministic cases
-     * only (in nondeterministic cases the successors are already available in
-     * the step's stateMap).
+     * Finds the successor/target state in the result automaton, given a source
+     * state and event. Used in deterministic cases only (in nondeterministic
+     * cases the successors are already available in the step's stateMap).
      *
      * @param sourceState
      * @param stepEvent
@@ -848,8 +849,7 @@ public class CompositionalGeneralisedConflictChecker extends
     private StateProxy findSuccessor(final StateProxy sourceState,
                                      final EventProxy stepEvent)
     {
-      // TODO: What if the event is not in the automaton alphabet?
-      StateProxy targetState = null;
+      StateProxy targetState = sourceState;
       for (final TransitionProxy transition : getResultAutomaton()
           .getTransitions()) {
         if (transition.getEvent() == stepEvent
@@ -889,6 +889,9 @@ public class CompositionalGeneralisedConflictChecker extends
 
     // #######################################################################
     // # Trace Computation
+    /**
+     * Assumes that a saturated trace is being passed.
+     */
     abstract ConflictTraceProxy convertTrace(
                                              final ConflictTraceProxy counterexample);
 
@@ -989,8 +992,7 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
-      final ConflictTraceProxy saturatedTrace = saturateTrace(conflictTrace);
-      final List<TraceStepProxy> traceSteps = saturatedTrace.getTraceSteps();
+      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
       StateProxy sourceState =
           getInitialState(getResultAutomaton(), traceSteps.get(0));
       for (final TraceStepProxy step : traceSteps) {
@@ -1026,13 +1028,13 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
       final Set<AutomatonProxy> traceAutomata =
-          new HashSet<AutomatonProxy>(saturatedTrace.getAutomata());
+          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
       traceAutomata.remove(getResultAutomaton());
       traceAutomata.add(getOriginalAutomaton());
       final ConflictTraceProxy convertedTrace =
-          getFactory().createConflictTraceProxy(saturatedTrace.getName(),
-                                                saturatedTrace.getComment(),
-                                                saturatedTrace.getLocation(),
+          getFactory().createConflictTraceProxy(conflictTrace.getName(),
+                                                conflictTrace.getComment(),
+                                                conflictTrace.getLocation(),
                                                 getModel(), traceAutomata,
                                                 convertedSteps,
                                                 ConflictKind.CONFLICT);
