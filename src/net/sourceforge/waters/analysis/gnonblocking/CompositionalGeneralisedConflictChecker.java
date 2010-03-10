@@ -501,7 +501,7 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   public void setSelectingHeuristic(final SelectingHeuristic heuristic)
   {
-    mSelectingHeuristics = new ArrayList<SelectingHeuristic>(3);
+    mSelectingHeuristics = new ArrayList<SelectingHeuristic>(4);
     mSelectingHeuristics.add(heuristic);
     if (heuristic instanceof HeuristicMaxL) {
       mSelectingHeuristics.add(new HeuristicMaxC());

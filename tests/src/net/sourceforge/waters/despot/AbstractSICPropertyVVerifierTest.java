@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
@@ -309,7 +308,8 @@ public abstract class AbstractSICPropertyVVerifierTest extends
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final String name = ":disableNonLocalEvents";
-    final Collection<EventProxy> disabledevents = new HashSet<EventProxy>();
+    final Collection<EventProxy> disabledevents =
+      new ArrayList<EventProxy>(events.size());
     for (final EventProxy event : events) {
       final Map<String,String> attribs = event.getAttributes();
       if (HISCAttributes.getEventType(attribs) !=
