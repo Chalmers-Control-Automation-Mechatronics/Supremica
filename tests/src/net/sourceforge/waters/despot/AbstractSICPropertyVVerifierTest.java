@@ -256,17 +256,17 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     if (!blocking) {
       final TraceProxy ltrace = lchecker.getCounterExample();
       final File filename = saveCounterExample(ltrace);
-      fail("Counterexample does not lead to a state where the answer event "
-          + failedAnswer.getName() + " can never be executed (trace written to"
-          + filename + ")!");
+      fail("Counterexample does not lead to a state where the answer event " +
+           failedAnswer.getName() +
+           " can never be executed (trace written to " + filename + ")!");
     }
-
   }
 
   protected SICPropertyVVerifier getModelVerifier()
   {
     return (SICPropertyVVerifier) super.getModelVerifier();
   }
+
 
   // #########################################################################
   // # Coreachability Model
@@ -296,9 +296,11 @@ public abstract class AbstractSICPropertyVVerifierTest extends
           createLanguageInclusionAutomaton(oldaut, init);
       newautomata.add(newaut);
     }
+    // TODO Include a one-state plant automaton that always disables any
+    // request, answer, an low data events in the model.
     final AutomatonProxy prop = createPropertyAutomaton(answer);
     newautomata.add(prop);
-    final String name = des.getName() + "-sic5";
+    final String name = des.getName() + '-' + answer.getName() + "-sic5";
     return factory.createProductDESProxy(name, newevents, newautomata);
   }
 
