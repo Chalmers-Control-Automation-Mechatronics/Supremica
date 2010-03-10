@@ -304,16 +304,16 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     return factory.createProductDESProxy(name, newevents, newautomata);
   }
 
-  private AutomatonProxy createDisabledNonLocalEventsAutomaton(
-                                                               final Collection<EventProxy> events)
+  private AutomatonProxy createDisabledNonLocalEventsAutomaton
+    (final Collection<EventProxy> events)
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final String name = ":disableNonLocalEvents";
     final Collection<EventProxy> disabledevents = new HashSet<EventProxy>();
     for (final EventProxy event : events) {
-      if (event.getAttributes() != HISCAttributes.ATTRIBUTES_ANSWER
-          && event.getAttributes() != HISCAttributes.ATTRIBUTES_REQUEST
-          && event.getAttributes() != HISCAttributes.ATTRIBUTES_LOWDATA) {
+      final Map<String,String> attribs = event.getAttributes();
+      if (HISCAttributes.getEventType(attribs) !=
+          HISCAttributes.EventType.DEFAULT) {
         disabledevents.add(event);
       }
     }
