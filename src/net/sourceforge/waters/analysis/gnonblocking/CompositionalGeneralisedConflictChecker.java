@@ -25,6 +25,7 @@ import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -168,13 +169,14 @@ public class CompositionalGeneralisedConflictChecker extends
       // final AutomatonProxy autToAbstract = syncProduct;
 
       // TODO Abstraction rules here
+      final AutomatonProxy abstractedAut = applyAbstractionRules(autToAbstract);
 
       // removes the composed automata for this candidate from the set of
       // remaining automata and adds the newly composed candidate
       remainingAut.removeAll(candidate.getAutomata());
-      remainingAut.add(autToAbstract);
+      remainingAut.add(abstractedAut);
       if (mPreselectingHeuristic instanceof HeuristicMustL) {
-        updateEventsToAutomata(autToAbstract, candidate.getAutomata());
+        updateEventsToAutomata(abstractedAut, candidate.getAutomata());
       }
 
       // updates the current model to find candidates from
@@ -207,6 +209,28 @@ public class CompositionalGeneralisedConflictChecker extends
       setFailedResult(convertedTrace);
     }
     return result;
+  }
+
+  private AutomatonProxy applyAbstractionRules(
+                                               final AutomatonProxy autToAbstract)
+      throws OverflowException
+  {
+    @SuppressWarnings("unused")
+    final AutomatonProxy autObsEq = applyObservationEquivalence(autToAbstract);
+    return autToAbstract;
+  }
+
+  private AutomatonProxy applyObservationEquivalence(
+                                                     final AutomatonProxy autToAbstract)
+      throws OverflowException
+  {
+    final TransitionRelation tr =
+        new TransitionRelation(autToAbstract, getMarkingProposition(),
+            getGeneralisedPrecondition());
+    // TODO: have to pass tau as int??
+    @SuppressWarnings("unused")
+    final TransBiSimulator transBiSimulator = new TransBiSimulator(tr, 1);
+    return tr.getAutomaton(getFactory());
   }
 
   /**
