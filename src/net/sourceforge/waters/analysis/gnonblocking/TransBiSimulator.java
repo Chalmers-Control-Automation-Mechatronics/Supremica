@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.TransitionRelation;
+import net.sourceforge.waters.analysis.gnonblocking.TransitionRelation;
 import net.sourceforge.waters.model.analysis.OverflowException;
 
 
 /**
- * @author Simon Ware
+ * @author Simon Ware and Rachel Francis
  */
 
 public class TransBiSimulator
@@ -34,6 +34,7 @@ public class TransBiSimulator
   private final THashSet<ComplexEquivalenceClass> mWC;
   private final THashSet<SimpleEquivalenceClass> mP;
   private final boolean[] mMarked;
+  private final boolean[] mPreMarked;
   private final int[][] mTauPreds;
   private int mStates;
   private final int mEventNum;
@@ -69,6 +70,7 @@ public class TransBiSimulator
     mStates = tr.numberOfStates();
     mEventNum = tr.numberOfEvents();
     mMarked = new boolean[mTrans.numberOfStates()];
+    mPreMarked = new boolean[mTrans.numberOfStates()];
     mTauPreds = new int[mTrans.numberOfStates()][];
     for (int s = 0; s < mTauPreds.length; s++) {
       final TIntHashSet hashtaupreds = new TIntHashSet();
@@ -79,6 +81,8 @@ public class TransBiSimulator
         final int taupred = list.remove(list.size() - 1);
         mMarked[taupred] =
             mMarked[taupred] || mMarked[s] || mTrans.isMarked(taupred);
+        mPreMarked[taupred] =
+            mPreMarked[taupred] || mPreMarked[s] || mTrans.isPreMarked(taupred);
         final TIntHashSet taupreds = mTrans.getPredecessors(taupred, mTau);
         if (taupreds == null) {
           continue;
@@ -102,14 +106,24 @@ public class TransBiSimulator
     mWC.clear();
     mP.clear();
     final TIntArrayList marked = new TIntArrayList();
+    final TIntArrayList premarked = new TIntArrayList();
+    final TIntArrayList bothmarkings = new TIntArrayList();
     final TIntArrayList notmarked = new TIntArrayList();
     mStates = 0;
     for (int i = 0; i < mTrans.numberOfStates(); i++) {
       if (!mTrans.hasPredecessors(i)) {
         continue;
       }
-      if (mMarked[i]) {
+      if (mMarked[i] && !mPreMarked[i]) {
         marked.add(i);
+        mStates++;
+        continue;
+      } else if (!mMarked[i] && mPreMarked[i]) {
+        premarked.add(i);
+        mStates++;
+        continue;
+      } else if (mMarked[i] && mPreMarked[i]) {
+        bothmarkings.add(i);
         mStates++;
         continue;
       } else {
@@ -124,6 +138,12 @@ public class TransBiSimulator
     }
     if (!notmarked.isEmpty()) {
       mWS.add(new SimpleEquivalenceClass(notmarked.toNativeArray()));
+    }
+    if (!premarked.isEmpty()) {
+      mWS.add(new SimpleEquivalenceClass(premarked.toNativeArray()));
+    }
+    if (!bothmarkings.isEmpty()) {
+      mWS.add(new SimpleEquivalenceClass(bothmarkings.toNativeArray()));
     }
   }
 

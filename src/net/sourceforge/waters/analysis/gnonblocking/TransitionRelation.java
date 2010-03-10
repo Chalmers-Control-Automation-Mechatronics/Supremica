@@ -149,10 +149,12 @@ public class TransitionRelation
     }
     STATES: for (int s = 0; s < mSuccessors.length; s++) {
       markState(s, false, mMarkedEvent);
+      markState(s, false, mPreMarking);
       for (i = 0; i < evs.length; i++) {
         final int e = evs[i];
         if (mSuccessors[s][e] != null && !mSuccessors[s][e].isEmpty()) {
           markState(s, true, mMarkedEvent);
+          markState(s, true, mPreMarking);
           continue STATES;
         }
       }
@@ -248,6 +250,9 @@ public class TransitionRelation
       if (isMarked(s) && mMarkedEvent != null) {
         props.add(mMarkedEvent);
       }
+      if (isPreMarked(s) && mPreMarking != null) {
+        props.add(mPreMarking);
+      }
       final boolean isInitial = isInitial(s);
       states.add(new AnnotatedMemStateProxy(s, props, isInitial));
     }
@@ -259,7 +264,7 @@ public class TransitionRelation
       final StateProxy source = states.get(s);
       for (int e = 0; e < mSuccessors[s].length; e++) {
         final EventProxy event = mEvents[e];
-        if (event == mMarkedEvent || event == null) {
+        if (event == mMarkedEvent || event == mPreMarking || event == null) {
           continue;
         }
         final TIntHashSet succs = mSuccessors[s][e];
@@ -348,6 +353,10 @@ public class TransitionRelation
         if (mMarked[state]) {
           ae.add(e);
         }
+      } else if (mEvents[e] == mPreMarking) {
+        if (mPreMarked[state]) {
+          ae.add(e);
+        }
       } else if (mSuccessors[state][e] != null
           && !mSuccessors[state][e].isEmpty()) {
         ae.add(e);
@@ -428,6 +437,7 @@ public class TransitionRelation
   public void removeAllIncoming(final int s)
   {
     markState(s, false, mMarkedEvent);
+    markState(s, false, mPreMarking);
     for (int e = 0; e < mPredecessors[s].length; e++) {
       final TIntHashSet preds = mPredecessors[s][e];
       if (preds == null) {
@@ -463,6 +473,11 @@ public class TransitionRelation
   public boolean isMarkingEvent(final int event)
   {
     return mEvents[event] == mMarkedEvent;
+  }
+
+  public boolean isPreMarkingEvent(final int event)
+  {
+    return mEvents[event] == mPreMarking;
   }
 
   public int eventToInt(final EventProxy event)
@@ -661,8 +676,13 @@ public class TransitionRelation
     if (from == to) {
       return;
     }
+    // TODO: does this make sense to use mark state twice in a row with the same
+    // event..
     markState(to, mMarked[to] || mMarked[from], mMarkedEvent);
     markState(from, false, mMarkedEvent);
+    markState(to, mPreMarked[to] || mPreMarked[from], mPreMarking);
+    markState(from, false, mPreMarking);
+
     for (int e = 0; e < mEvents.length; e++) {
       final TIntHashSet succs = mSuccessors[from][e];
       if (succs == null) {
@@ -683,6 +703,7 @@ public class TransitionRelation
       return;
     }
     markState(to, mMarked[to] || mMarked[from], mMarkedEvent);
+    markState(to, mPreMarked[to] || mPreMarked[from], mPreMarking);
     for (int e = 0; e < mEvents.length; e++) {
       final TIntHashSet succs = mSuccessors[from][e];
       if (succs == null) {
@@ -766,6 +787,7 @@ public class TransitionRelation
   public void removeAllOutgoing(final int s)
   {
     markState(s, false, mMarkedEvent);
+    markState(s, false, mPreMarking);
     for (int e = 0; e < mSuccessors[s].length; e++) {
       final TIntHashSet succs = mSuccessors[s][e];
       if (succs == null) {
@@ -820,7 +842,8 @@ public class TransitionRelation
   {
     final Collection<EventProxy> selfs = new ArrayList<EventProxy>();
     SELFLOOPS: for (int e = 0; e < mEvents.length; e++) {
-      if (mEvents[e] == null || mEvents[e].equals(mMarkedEvent)) {
+      if (mEvents[e] == null || mEvents[e].equals(mMarkedEvent)
+          || mEvents[e].equals(mPreMarking)) {
         continue;
       }
       for (int s = 0; s < mSuccessors.length; s++) {
