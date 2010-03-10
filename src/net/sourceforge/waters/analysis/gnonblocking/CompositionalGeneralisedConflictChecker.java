@@ -173,6 +173,9 @@ public class CompositionalGeneralisedConflictChecker extends
       // remaining automata and adds the newly composed candidate
       remainingAut.removeAll(candidate.getAutomata());
       remainingAut.add(autToAbstract);
+      if (mPreselectingHeuristic instanceof HeuristicMustL) {
+        updateEventsToAutomata(autToAbstract, candidate.getAutomata());
+      }
 
       // updates the current model to find candidates from
       final Set<EventProxy> composedModelAlphabet =
@@ -218,7 +221,9 @@ public class CompositionalGeneralisedConflictChecker extends
       setMarkingProposition(getUsedMarkingProposition());
     }
     if (mPreselectingHeuristic == null) {
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
       setPreselectingHeuristic(defaultHeuristic);
     }
     if (mSelectingHeuristics == null) {
@@ -339,6 +344,25 @@ public class CompositionalGeneralisedConflictChecker extends
             mEventsToAutomata.put(event, automata);
           }
           mEventsToAutomata.get(event).add(aut);
+        }
+      }
+    }
+  }
+
+  private void updateEventsToAutomata(final AutomatonProxy aut,
+                                      final List<AutomatonProxy> autToRemove)
+  {
+    for (final EventProxy event : aut.getEvents()) {
+      if (event.getKind() != EventKind.PROPOSITION) {
+        if (!mEventsToAutomata.containsKey(event)) {
+          final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
+          mEventsToAutomata.put(event, automata);
+        }
+        mEventsToAutomata.get(event).add(aut);
+        for (final AutomatonProxy composedAut : autToRemove) {
+          if (mEventsToAutomata.get(event).contains(composedAut)) {
+            mEventsToAutomata.get(event).remove(composedAut);
+          }
         }
       }
     }
@@ -562,17 +586,17 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     public Collection<Candidate> evaluate(final ProductDESProxy model)
     {
-      final HashMap<EventProxy,Candidate> eventCandidates =
-          new HashMap<EventProxy,Candidate>(mEventsToAutomata.keySet().size());
+      final Collection<Candidate> candidates =
+          new HashSet<Candidate>(mEventsToAutomata.keySet().size());
       for (final EventProxy event : mEventsToAutomata.keySet()) {
         final List<AutomatonProxy> automata =
             new ArrayList<AutomatonProxy>(mEventsToAutomata.get(event));
         final Set<EventProxy> localEvents =
             identifyLocalEvents(mEventsToAutomata, automata);
         final Candidate candidate = new Candidate(automata, localEvents);
-        eventCandidates.put(event, candidate);
+        candidates.add(candidate);
       }
-      return eventCandidates.values();
+      return candidates;
     }
   }
 
