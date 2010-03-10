@@ -221,9 +221,10 @@ public class CompositionalGeneralisedConflictChecker extends
       setMarkingProposition(getUsedMarkingProposition());
     }
     if (mPreselectingHeuristic == null) {
-      // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
+      // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
+      // TODO: HeuristicMustL causes problems
       setPreselectingHeuristic(defaultHeuristic);
     }
     if (mSelectingHeuristics == null) {
@@ -423,6 +424,41 @@ public class CompositionalGeneralisedConflictChecker extends
     return mPreselectingHeuristic.evaluate(model);
   }
 
+  /**
+   * Creates a list which contains all the automata in a collection except for
+   * one specified automaton.
+   *
+   * @param automata
+   * @param autToRemove
+   * @return
+   */
+  private List<AutomatonProxy> removeAutomaton(
+                                               final Collection<AutomatonProxy> automata,
+                                               final AutomatonProxy autToRemove)
+  {
+    final List<AutomatonProxy> aut = new ArrayList<AutomatonProxy>();
+    for (final AutomatonProxy a : automata) {
+      if (a != autToRemove) {
+        aut.add(a);
+      }
+    }
+    return aut;
+  }
+
+  private Map<AutomatonProxy,StateProxy> removeAutomaton(
+                                                         final Map<AutomatonProxy,StateProxy> stepMap,
+                                                         final AutomatonProxy autToRemove)
+  {
+    final Map<AutomatonProxy,StateProxy> aut =
+        new HashMap<AutomatonProxy,StateProxy>();
+    for (final AutomatonProxy a : stepMap.keySet()) {
+      if (a != autToRemove) {
+        aut.put(a, stepMap.get(a));
+      }
+    }
+    return aut;
+  }
+
   public HeuristicMinT createHeuristicMinT()
   {
     return new HeuristicMinT();
@@ -506,8 +542,7 @@ public class CompositionalGeneralisedConflictChecker extends
                                                   final AutomatonProxy chosenAut,
                                                   final Set<AutomatonProxy> automata)
     {
-      final Set<AutomatonProxy> aut = new HashSet<AutomatonProxy>(automata);
-      aut.remove(chosenAut);
+      final List<AutomatonProxy> aut = removeAutomaton(automata, chosenAut);
       final Collection<Candidate> candidates =
           new HashSet<Candidate>(aut.size());
       for (final AutomatonProxy a : aut) {
@@ -946,9 +981,8 @@ public class CompositionalGeneralisedConflictChecker extends
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
       final AutomatonProxy composed = getResultAutomaton();
-      final Set<AutomatonProxy> traceAutomata =
-          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
-      traceAutomata.remove(composed);
+      final List<AutomatonProxy> traceAutomata =
+          removeAutomaton(conflictTrace.getAutomata(), composed);
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
@@ -956,8 +990,7 @@ public class CompositionalGeneralisedConflictChecker extends
         final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
         if (stepMap.containsKey(composed)) {
           final Map<AutomatonProxy,StateProxy> convertedStepMap =
-              new HashMap<AutomatonProxy,StateProxy>(stepMap);
-          convertedStepMap.remove(composed);
+              removeAutomaton(stepMap, composed);
           final StateProxy convertedState = stepMap.get(composed);
           // add original automata and states
           final Collection<AutomatonProxy> autOfComposition =
@@ -1023,9 +1056,8 @@ public class CompositionalGeneralisedConflictChecker extends
         // replaces automaton in step's step map
         final Map<AutomatonProxy,StateProxy> stepStateMap = step.getStateMap();
         final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
-            new HashMap<AutomatonProxy,StateProxy>(stepStateMap);
+            removeAutomaton(stepStateMap, getResultAutomaton());
         if (stepStateMap.containsKey(getResultAutomaton())) {
-          stepsNewStateMap.remove(getResultAutomaton());
           stepsNewStateMap.put(getOriginalAutomaton(), stepStateMap
               .get(getResultAutomaton()));
         }
@@ -1051,9 +1083,8 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(step);
         }
       }
-      final Set<AutomatonProxy> traceAutomata =
-          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
-      traceAutomata.remove(getResultAutomaton());
+      final List<AutomatonProxy> traceAutomata =
+          removeAutomaton(conflictTrace.getAutomata(), getResultAutomaton());
       traceAutomata.add(getOriginalAutomaton());
       final ConflictTraceProxy convertedTrace =
           getFactory().createConflictTraceProxy(conflictTrace.getName(),
