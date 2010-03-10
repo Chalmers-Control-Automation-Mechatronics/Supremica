@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
@@ -256,9 +256,9 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     if (!blocking) {
       final TraceProxy ltrace = lchecker.getCounterExample();
       final File filename = saveCounterExample(ltrace);
-      fail("Counterexample does not lead to a state where the answer event " +
-           failedAnswer.getName() +
-           " can never be executed (trace written to " + filename + ")!");
+      fail("Counterexample does not lead to a state where the answer event "
+          + failedAnswer.getName()
+          + " can never be executed (trace written to " + filename + ")!");
     }
   }
 
@@ -266,7 +266,6 @@ public abstract class AbstractSICPropertyVVerifierTest extends
   {
     return (SICPropertyVVerifier) super.getModelVerifier();
   }
-
 
   // #########################################################################
   // # Coreachability Model
@@ -296,12 +295,32 @@ public abstract class AbstractSICPropertyVVerifierTest extends
           createLanguageInclusionAutomaton(oldaut, init);
       newautomata.add(newaut);
     }
-    // TODO Include a one-state plant automaton that always disables any
-    // request, answer, an low data events in the model.
     final AutomatonProxy prop = createPropertyAutomaton(answer);
     newautomata.add(prop);
+    final AutomatonProxy nonLocalEventsDisabled =
+        createDisabledNonLocalEventsAutomaton(newevents);
+    newautomata.add(nonLocalEventsDisabled);
     final String name = des.getName() + '-' + answer.getName() + "-sic5";
     return factory.createProductDESProxy(name, newevents, newautomata);
+  }
+
+  private AutomatonProxy createDisabledNonLocalEventsAutomaton(
+                                                               final Collection<EventProxy> events)
+  {
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final String name = ":disableNonLocalEvents";
+    final Collection<EventProxy> disabledevents = new HashSet<EventProxy>();
+    for (final EventProxy event : events) {
+      if (event.getAttributes() != HISCAttributes.ATTRIBUTES_ANSWER
+          && event.getAttributes() != HISCAttributes.ATTRIBUTES_REQUEST
+          && event.getAttributes() != HISCAttributes.ATTRIBUTES_LOWDATA) {
+        disabledevents.add(event);
+      }
+    }
+    final StateProxy state = factory.createStateProxy("s0", true, null);
+    final Collection<StateProxy> states = Collections.singletonList(state);
+    return factory.createAutomatonProxy(name, ComponentKind.PLANT,
+                                        disabledevents, states, null);
   }
 
   private AutomatonProxy createLanguageInclusionAutomaton(

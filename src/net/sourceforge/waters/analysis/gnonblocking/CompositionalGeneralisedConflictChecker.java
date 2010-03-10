@@ -253,7 +253,7 @@ public class CompositionalGeneralisedConflictChecker extends
         new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
             candidateModel.getAutomata()), getFactory(),
             getMarkingProposition(), getGeneralisedPrecondition());
-    composer.setNodeLimit(100000);
+    composer.setNodeLimit(getNodeLimit());
     return composer;
   }
 

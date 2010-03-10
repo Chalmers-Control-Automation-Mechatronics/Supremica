@@ -76,7 +76,7 @@ public class NonDeterministicComposer
   {
     mNewMarked = new TIntArrayList();
     mNewPreMarked = new TIntArrayList();
-    mStates = new IntMap(mNodeLimit);
+    mStates = new IntMap(500000);
     TObjectIntHashMap<EventProxy> eventToIndex =
         new TObjectIntHashMap<EventProxy>();
     events = unionEvents();
