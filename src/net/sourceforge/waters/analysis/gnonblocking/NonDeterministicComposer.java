@@ -19,6 +19,7 @@ import java.util.Set;
 //import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
 import net.sourceforge.waters.analysis.modular.DisabledEvents;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -266,7 +267,7 @@ public class NonDeterministicComposer
 
   private void addState(final int[] successor, final int source,
                         final int event, final boolean isInitial)
-      throws AnalysisException
+      throws OverflowException
   {
     Integer target = mStates.get(successor);
     if (target == null) {
@@ -274,7 +275,7 @@ public class NonDeterministicComposer
       mStates.put(successor, target);
       numStates++;
       if (numStates > mNodeLimit) {
-        throw new AnalysisException("State Limit Exceeded");
+        throw new OverflowException(mNodeLimit);
       }
       unvisited.offer(successor);
       if (determineMarked(successor)) {
