@@ -25,8 +25,6 @@ public class Candidate implements Comparable<Candidate>
 {
   // the list of automata is sorted alphabetically by automaton names
   private List<AutomatonProxy> mAutomata;
-  // TODO: at this stage there is no benefit from storing the local events for
-  // a candidate...i do use the count of them
   private Set<EventProxy> mLocalEvents;
   private int mEventCount;
 
@@ -62,6 +60,11 @@ public class Candidate implements Comparable<Candidate>
   public void setLocalEvents(final Set<EventProxy> localevents)
   {
     mLocalEvents = localevents;
+  }
+
+  public Set<EventProxy> getLocalEvents()
+  {
+    return mLocalEvents;
   }
 
   public int getLocalEventCount()

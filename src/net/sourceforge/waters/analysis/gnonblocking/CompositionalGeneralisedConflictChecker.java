@@ -161,23 +161,22 @@ public class CompositionalGeneralisedConflictChecker extends
           new CompositionStep(syncProduct, composer.getStateMap());
       mModifyingSteps.add(step);
 
-      final Set<EventProxy> localEvents =
-          identifyLocalEvents(mEventsToAutomata, candidate.getAutomata());
-      candidate.setLocalEvents(localEvents);
       final AutomatonProxy autToAbstract =
-          hideLocalEvents(syncProduct, localEvents);
+          hideLocalEvents(syncProduct, candidate.getLocalEvents());
       // final AutomatonProxy autToAbstract = syncProduct;
 
       // TODO Abstraction rules here
-      final AutomatonProxy abstractedAut = applyAbstractionRules(autToAbstract);
+      // final AutomatonProxy abstractedAut =
+      // applyAbstractionRules(autToAbstract);
 
       // removes the composed automata for this candidate from the set of
       // remaining automata and adds the newly composed candidate
       remainingAut.removeAll(candidate.getAutomata());
-      remainingAut.add(abstractedAut);
-      if (mPreselectingHeuristic instanceof HeuristicMustL) {
-        updateEventsToAutomata(abstractedAut, candidate.getAutomata());
-      }
+      remainingAut.add(autToAbstract);
+      /*
+       * if (mPreselectingHeuristic instanceof HeuristicMustL) {
+       * updateEventsToAutomata(autToAbstract, candidate.getAutomata()); }
+       */
 
       // updates the current model to find candidates from
       final Set<EventProxy> composedModelAlphabet =
@@ -211,11 +210,11 @@ public class CompositionalGeneralisedConflictChecker extends
     return result;
   }
 
+  @SuppressWarnings("unused")
   private AutomatonProxy applyAbstractionRules(
                                                final AutomatonProxy autToAbstract)
       throws OverflowException
   {
-    @SuppressWarnings("unused")
     final AutomatonProxy autObsEq = applyObservationEquivalence(autToAbstract);
     return autToAbstract;
   }
@@ -374,6 +373,7 @@ public class CompositionalGeneralisedConflictChecker extends
     }
   }
 
+  @SuppressWarnings("unused")
   private void updateEventsToAutomata(final AutomatonProxy aut,
                                       final List<AutomatonProxy> autToRemove)
   {
@@ -422,6 +422,7 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private Candidate evaluateCandidates(Collection<Candidate> candidates)
   {
+
     final ListIterator<SelectingHeuristic> iter =
         mSelectingHeuristics.listIterator();
     List<Candidate> selectedCandidates = new ArrayList<Candidate>(candidates);
@@ -435,6 +436,8 @@ public class CompositionalGeneralisedConflictChecker extends
       }
     }
     return selectedCandidates.get(0);
+
+    // return candidates.iterator().next();
   }
 
   /**
@@ -445,6 +448,14 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private Collection<Candidate> findCandidates(final ProductDESProxy model)
   {
+    /*
+     * final Collection<Candidate> candidates = new ArrayList<Candidate>(1);
+     * final List<AutomatonProxy> aut = new
+     * ArrayList<AutomatonProxy>(model.getAutomata()); final Set<EventProxy>
+     * localEvents = identifyLocalEvents(mEventsToAutomata, aut); final
+     * Candidate candidate = new Candidate(aut, localEvents);
+     * candidates.add(candidate); return candidates;
+     */
     return mPreselectingHeuristic.evaluate(model);
   }
 
@@ -994,7 +1005,8 @@ public class CompositionalGeneralisedConflictChecker extends
             traceAutomata.add(aut);
           }
           final TraceStepProxy convertedStep =
-              getFactory().createTraceStepProxy(step.getEvent(), stepMap);
+              getFactory().createTraceStepProxy(step.getEvent(),
+                                                convertedStepMap);
           convertedSteps.add(convertedStep);
         } else {
           convertedSteps.add(step);
