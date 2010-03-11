@@ -297,24 +297,26 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     final AutomatonProxy prop = createPropertyAutomaton(answer);
     newautomata.add(prop);
     final AutomatonProxy nonLocalEventsDisabled =
-        createDisabledNonLocalEventsAutomaton(newevents);
+        createDisabledNonLocalEventsAutomaton(newevents, answer);
     newautomata.add(nonLocalEventsDisabled);
     final String name = des.getName() + '-' + answer.getName() + "-sic5";
     return factory.createProductDESProxy(name, newevents, newautomata);
   }
 
   private AutomatonProxy createDisabledNonLocalEventsAutomaton
-    (final Collection<EventProxy> events)
+    (final Collection<EventProxy> events, final EventProxy answer)
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final String name = ":disableNonLocalEvents";
     final Collection<EventProxy> disabledevents =
       new ArrayList<EventProxy>(events.size());
     for (final EventProxy event : events) {
-      final Map<String,String> attribs = event.getAttributes();
-      if (HISCAttributes.getEventType(attribs) !=
-          HISCAttributes.EventType.DEFAULT) {
-        disabledevents.add(event);
+      if (event != answer) {
+        final Map<String,String> attribs = event.getAttributes();
+        if (HISCAttributes.getEventType(attribs) !=
+            HISCAttributes.EventType.DEFAULT) {
+          disabledevents.add(event);
+        }
       }
     }
     final StateProxy state = factory.createStateProxy("s0", true, null);
