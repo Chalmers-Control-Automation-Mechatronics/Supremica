@@ -29,6 +29,12 @@ public class CompositionalSICPropertyVVerifierTest extends
 
   // #########################################################################
   // # Overridden Test Cases
+
+  public void testSICPropertyVVerifier_aip3_syn_as3() throws Exception
+  {
+
+  }
+
   public void testSICPropertyVVerifier_aip3_syn_tu1() throws Exception
   {
     /*
