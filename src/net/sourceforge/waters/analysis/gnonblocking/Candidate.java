@@ -24,8 +24,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 public class Candidate implements Comparable<Candidate>
 {
   // the list of automata is sorted alphabetically by automaton names
-  private List<AutomatonProxy> mAutomata;
-  private Set<EventProxy> mLocalEvents;
+  private final List<AutomatonProxy> mAutomata;
+  private final Set<EventProxy> mLocalEvents;
   private int mEventCount;
 
   public Candidate(final List<AutomatonProxy> autSet,
@@ -49,17 +49,6 @@ public class Candidate implements Comparable<Candidate>
   public List<AutomatonProxy> getAutomata()
   {
     return mAutomata;
-  }
-
-  public void setAutomata(final List<AutomatonProxy> aut)
-  {
-    mAutomata = aut;
-    Collections.sort(mAutomata);
-  }
-
-  public void setLocalEvents(final Set<EventProxy> localevents)
-  {
-    mLocalEvents = localevents;
   }
 
   public Set<EventProxy> getLocalEvents()
