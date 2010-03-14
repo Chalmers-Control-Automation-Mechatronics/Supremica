@@ -28,13 +28,14 @@ public class QMCControladorTablaTerminos extends MouseAdapter {
     QMCFuncion funcion;
     QMCBinarioBean termino, terminoListaOrdenada;
     JTable tablaTerminos;
+    @SuppressWarnings("unchecked")
     ArrayList listaTerminos, listaTerminosOrdenados;
     int contador, fila, columna;
     String tipoTermino;
     boolean check;
 
 
-    public QMCControladorTablaTerminos (QMCInicio aplicacion, QMCFuncion funcion, QMCAlgoritmo algoritmo)
+    public QMCControladorTablaTerminos (final QMCInicio aplicacion, final QMCFuncion funcion, final QMCAlgoritmo algoritmo)
     {
         this.aplicacion = aplicacion;
         this.algoritmo = algoritmo;
@@ -54,7 +55,7 @@ public class QMCControladorTablaTerminos extends MouseAdapter {
      * Implementación del método mouseClicked que realiza las comprobaciones pertinentes
      * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
      */
-    public void mouseClicked(MouseEvent e)
+    public void mouseClicked(final MouseEvent e)
     {
         tablaTerminos = (JTable)e.getSource();
         columna = tablaTerminos.getSelectedColumn();

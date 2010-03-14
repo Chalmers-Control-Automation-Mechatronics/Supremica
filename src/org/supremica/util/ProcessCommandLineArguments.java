@@ -73,11 +73,14 @@ import javax.xml.bind.JAXBException;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
+import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.model.base.AbstractProxyVisitor;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -510,14 +513,14 @@ public class ProcessCommandLineArguments
 class EPSPrinterVisitor
     extends AbstractModuleProxyVisitor
 {
-    final boolean verbose;
 
     //#######################################################################
     //# Constructor
     EPSPrinterVisitor(final ModuleProxy module, final boolean verbose)
     {
-        mModule = module;
-        this.verbose = verbose;
+        final ModuleContext mcontext = new ModuleContext(module);
+        mContext = new ModuleRenderingContext(mcontext);
+        mVerbose = verbose;
     }
 
 
@@ -546,15 +549,13 @@ class EPSPrinterVisitor
             final String name = comp.getName();
             final File file = new File(name + ".eps");
             final GraphProxy graph = comp.getGraph();
-            final EPSGraphPrinter printer = new EPSGraphPrinter(graph, file);
+            final EPSGraphPrinter printer =
+              new EPSGraphPrinter(graph, mContext, file);
             printer.print();
-
             // Log
-            if (verbose)
-            {
+            if (mVerbose) {
                 System.out.println("Wrote " + file.getAbsolutePath());
             }
-
             // Return any value ...
             return null;
         } catch (final IOException exception) {
@@ -564,6 +565,7 @@ class EPSPrinterVisitor
 
     //#######################################################################
     //# Data Members
-    final ModuleProxy mModule;
+    private final RenderingContext mContext;
+    private final boolean mVerbose;
 
 }

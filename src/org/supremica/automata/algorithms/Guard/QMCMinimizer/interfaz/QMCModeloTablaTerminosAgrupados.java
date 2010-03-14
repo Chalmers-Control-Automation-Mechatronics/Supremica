@@ -11,27 +11,24 @@ public class QMCModeloTablaTerminosAgrupados extends DefaultTableModel
 {
     private static final long serialVersionUID = 1L;
 
-    public QMCModeloTablaTerminosAgrupados(String [] cabecera, Object[][] datos)
+    public QMCModeloTablaTerminosAgrupados(final String [] cabecera, final Object[][] datos)
     {
         super(datos,cabecera);
-            
+
     }
-    
-    Class [] tipoColumna = {Integer.class,Integer.class,Boolean.class};
-    
+
+    Class<?> [] tipoColumna = {Integer.class,Integer.class,Boolean.class};
+
     boolean [] columnaEditable = {false,false,true};
-    
-    public Class<?> getColumnClass (int indColumn)
+
+    public Class<?> getColumnClass (final int indColumn)
     {
         return tipoColumna[indColumn];
     }
-    
-    public boolean isCellEditable(int indFila, int indColumna)
+
+    public boolean isCellEditable(final int indFila, final int indColumna)
     {
         return columnaEditable[indColumna];
     }
-    
-    
-    
 
 }

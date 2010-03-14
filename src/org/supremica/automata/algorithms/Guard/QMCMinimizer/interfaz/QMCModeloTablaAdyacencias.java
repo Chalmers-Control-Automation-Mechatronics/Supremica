@@ -11,27 +11,23 @@ public class QMCModeloTablaAdyacencias extends DefaultTableModel
 {
     private static final long serialVersionUID = 1L;
 
-    public QMCModeloTablaAdyacencias(String [] cabecera, Object[][] datos)
+    public QMCModeloTablaAdyacencias(final String [] cabecera, final Object[][] datos)
     {
         super(datos,cabecera);
-            
     }
-    
-    Class [] tipoColumna = {String.class, String.class, String.class, Boolean.class};
-    
+
+    Class<?> [] tipoColumna = {String.class, String.class, String.class, Boolean.class};
+
     boolean [] columnaEditable = {false,false,false,true};
-    
-    public Class<?> getColumnClass (int indColumn)
+
+    public Class<?> getColumnClass (final int indColumn)
     {
         return tipoColumna[indColumn];
     }
-    
-    public boolean isCellEditable(int indFila, int indColumna)
+
+    public boolean isCellEditable(final int indFila, final int indColumna)
     {
         return columnaEditable[indColumna];
     }
-    
-    
-    
 
 }
