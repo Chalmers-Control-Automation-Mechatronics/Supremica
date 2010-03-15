@@ -172,10 +172,7 @@ public class CompositionalGeneralisedConflictChecker extends
       // remaining automata and adds the newly composed candidate
       remainingAut.removeAll(candidate.getAutomata());
       remainingAut.add(autToAbstract);
-
-      if (mPreselectingHeuristic instanceof HeuristicMustL) {
-        updateEventsToAutomata(autToAbstract, candidate.getAutomata());
-      }
+      updateEventsToAutomata(autToAbstract, candidate.getAutomata());
 
       // updates the current model to find candidates from
       final Set<EventProxy> composedModelAlphabet =
@@ -244,8 +241,8 @@ public class CompositionalGeneralisedConflictChecker extends
     }
     if (mPreselectingHeuristic == null) {
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
-      // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
+      // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
       // TODO: HeuristicMustL causes problems
       setPreselectingHeuristic(defaultHeuristic);
     }
@@ -375,11 +372,6 @@ public class CompositionalGeneralisedConflictChecker extends
   private void updateEventsToAutomata(final AutomatonProxy autToAdd,
                                       final List<AutomatonProxy> autToRemove)
   {
-    // removes the automata which have been composed
-    for (final EventProxy event : mEventsToAutomata.keySet())
-      for (final AutomatonProxy aut : autToRemove) {
-        mEventsToAutomata.get(event).remove(aut);
-      }
     // adds the new automaton to the events it contains
     for (final EventProxy event : autToAdd.getEvents()) {
       if (event.getKind() != EventKind.PROPOSITION) {
@@ -389,6 +381,17 @@ public class CompositionalGeneralisedConflictChecker extends
         }
         mEventsToAutomata.get(event).add(autToAdd);
       }
+    }
+    // removes the automata which have been composed
+    final Set<EventProxy> eventsToRemove = new HashSet<EventProxy>();
+    for (final EventProxy event : mEventsToAutomata.keySet()) {
+      mEventsToAutomata.get(event).removeAll(autToRemove);
+      if (mEventsToAutomata.get(event).size() == 0) {
+        eventsToRemove.add(event);
+      }
+    }
+    for (final EventProxy event : eventsToRemove) {
+      mEventsToAutomata.remove(event);
     }
   }
 
@@ -435,8 +438,6 @@ public class CompositionalGeneralisedConflictChecker extends
       }
     }
     return selectedCandidates.get(0);
-
-    // return candidates.iterator().next();
   }
 
   /**
@@ -626,6 +627,7 @@ public class CompositionalGeneralisedConflictChecker extends
       for (final EventProxy event : mEventsToAutomata.keySet()) {
         final List<AutomatonProxy> automata =
             new ArrayList<AutomatonProxy>(mEventsToAutomata.get(event));
+        assert automata.size() > 0;
         final Set<EventProxy> localEvents =
             identifyLocalEvents(mEventsToAutomata, automata);
         final Candidate candidate = new Candidate(automata, localEvents);
