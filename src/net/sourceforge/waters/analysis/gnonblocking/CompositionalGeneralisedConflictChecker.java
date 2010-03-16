@@ -1130,6 +1130,28 @@ public class CompositionalGeneralisedConflictChecker extends
     private final EventProxy mTau;
   }
 
+
+  // #########################################################################
+  // # Inner Class CompositionStep
+  @SuppressWarnings("unused")
+  private class ObservationEquivalenceStep extends Step
+  {
+
+    ObservationEquivalenceStep(final AutomatonProxy resultAut,
+                               final AutomatonProxy originalAut)
+    {
+      super(resultAut, originalAut);
+      // TODO Auto-generated constructor stub
+    }
+
+    ConflictTraceProxy convertTrace(final ConflictTraceProxy counterexample)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+  }
+
   // #########################################################################
   // # Data Members
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =

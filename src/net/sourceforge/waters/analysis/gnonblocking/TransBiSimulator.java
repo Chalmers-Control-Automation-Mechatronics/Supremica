@@ -180,7 +180,7 @@ public class TransBiSimulator
       if (sec.mStates.length == 1) {
         continue;
       }
-      mTrans.mergewithannotations(sec.mStates);
+      mTrans.merge(sec.mStates);
       STATESREMOVED += sec.mStates.length - 1;
     }
     // System.out.println("OBSSTATESREMOVED: " + (mStates - mP.size()));
