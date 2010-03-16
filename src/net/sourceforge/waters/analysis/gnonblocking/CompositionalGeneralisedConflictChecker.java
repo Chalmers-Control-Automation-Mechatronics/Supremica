@@ -134,7 +134,7 @@ public class CompositionalGeneralisedConflictChecker extends
     ProductDESProxy model = getModel();
     final List<SynchronousProductStateMap> stateMaps =
         new ArrayList<SynchronousProductStateMap>();
-    final List<AutomatonProxy> composedAut = new ArrayList<AutomatonProxy>();
+    // final List<AutomatonProxy> composedAut = new ArrayList<AutomatonProxy>();
     mapEventsToAutomata(model);
     final List<AutomatonProxy> remainingAut =
         new ArrayList<AutomatonProxy>(model.getAutomata());
@@ -156,7 +156,7 @@ public class CompositionalGeneralisedConflictChecker extends
           composeSynchronousProduct(candidate);
       final AutomatonProxy syncProduct = composer.run();
       stateMaps.add(composer.getStateMap());
-      composedAut.add(syncProduct);
+      // composedAut.add(syncProduct);
       final CompositionStep step =
           new CompositionStep(syncProduct, composer.getStateMap());
       mModifyingSteps.add(step);
@@ -198,7 +198,10 @@ public class CompositionalGeneralisedConflictChecker extends
       ConflictTraceProxy convertedTrace = counterexample;
       while (iter.hasPrevious()) {
         final Step step = iter.previous();
-        convertedTrace = step.saturateTrace(convertedTrace);
+        convertedTrace = step.saturateTrace(convertedTrace);// is trace
+        // saturation
+        // necessary for
+        // every step
         convertedTrace = step.convertTrace(convertedTrace);
       }
       setFailedResult(convertedTrace);
@@ -241,8 +244,8 @@ public class CompositionalGeneralisedConflictChecker extends
     }
     if (mPreselectingHeuristic == null) {
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
-      // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
+      // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
       // TODO: HeuristicMustL causes problems
       setPreselectingHeuristic(defaultHeuristic);
     }
@@ -628,10 +631,12 @@ public class CompositionalGeneralisedConflictChecker extends
         final List<AutomatonProxy> automata =
             new ArrayList<AutomatonProxy>(mEventsToAutomata.get(event));
         assert automata.size() > 0;
-        final Set<EventProxy> localEvents =
-            identifyLocalEvents(mEventsToAutomata, automata);
-        final Candidate candidate = new Candidate(automata, localEvents);
-        candidates.add(candidate);
+        if (automata.size() > 1) {
+          final Set<EventProxy> localEvents =
+              identifyLocalEvents(mEventsToAutomata, automata);
+          final Candidate candidate = new Candidate(automata, localEvents);
+          candidates.add(candidate);
+        }
       }
       return candidates;
     }
