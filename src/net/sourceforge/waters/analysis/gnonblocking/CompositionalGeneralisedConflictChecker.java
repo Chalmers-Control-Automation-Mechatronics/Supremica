@@ -132,9 +132,6 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     initialise();
     ProductDESProxy model = getModel();
-    final List<SynchronousProductStateMap> stateMaps =
-        new ArrayList<SynchronousProductStateMap>();
-    // final List<AutomatonProxy> composedAut = new ArrayList<AutomatonProxy>();
     mapEventsToAutomata(model);
     final List<AutomatonProxy> remainingAut =
         new ArrayList<AutomatonProxy>(model.getAutomata());
@@ -155,8 +152,6 @@ public class CompositionalGeneralisedConflictChecker extends
       final NonDeterministicComposer composer =
           composeSynchronousProduct(candidate);
       final AutomatonProxy syncProduct = composer.run();
-      stateMaps.add(composer.getStateMap());
-      // composedAut.add(syncProduct);
       final CompositionStep step =
           new CompositionStep(syncProduct, composer.getStateMap());
       mModifyingSteps.add(step);
@@ -215,7 +210,7 @@ public class CompositionalGeneralisedConflictChecker extends
       throws OverflowException
   {
     final AutomatonProxy autObsEq = applyObservationEquivalence(autToAbstract);
-    return autToAbstract;
+    return autObsEq;
   }
 
   private AutomatonProxy applyObservationEquivalence(
@@ -243,9 +238,9 @@ public class CompositionalGeneralisedConflictChecker extends
       setMarkingProposition(getUsedMarkingProposition());
     }
     if (mPreselectingHeuristic == null) {
-      // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
+      // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
       // TODO: HeuristicMustL causes problems
       setPreselectingHeuristic(defaultHeuristic);
     }
