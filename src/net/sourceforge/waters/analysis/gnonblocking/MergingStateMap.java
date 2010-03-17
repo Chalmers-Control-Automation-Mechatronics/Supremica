@@ -9,29 +9,28 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import java.util.List;
-
+import java.util.Collection;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 
 
 /**
  * Additional information to be returned by the observation equivalence
- * abstraction rule to decompose transitions into their original components.
+ * and similar abstraction rules to identify sets of original states after
+ * merging.
  *
  * @author Rachel Francis
  */
 
-public interface ObservationEquivalenceTransitionMap
+public interface MergingStateMap
 {
   /**
-   * Gets the collection of automata composed.
+   * Gets the automaton that was simplified.
    */
-  // public Collection<AutomatonProxy> getInputAutomata();
+  // public AutomatonProxy getInputAutomaton();
 
   /**
-   * Gets a list of transitions of an original automaton which were replaced.
+   * Gets the set of states of the original automaton, which were merged
+   * into the given state.
    */
-  public List<TransitionProxy> getOriginalTransitions(final StateProxy source,
-                                                      final StateProxy target);
+  public Collection<StateProxy> getOriginalStates(final StateProxy state);
 }
