@@ -14,7 +14,6 @@ import gnu.trove.THashSet;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntProcedure;
 import gnu.trove.TObjectIntHashMap;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -154,11 +153,18 @@ public class TransitionRelation
 
     // #######################################################################
     // # Constructor
+    @SuppressWarnings("unchecked")
     private MemStateMap(final AutomatonProxy automaton,
                         final TObjectIntHashMap<StateProxy> unmodifiedStateMap)
     {
       mInputAutomaton = automaton;
-      mOriginalStateMap = unmodifiedStateMap;
+      mOriginalStateMap = new StateProxy[automaton.getStates().size()];
+      final Iterator<StateProxy> iter =
+          (Iterator<StateProxy>) unmodifiedStateMap.iterator();
+      while (iter.hasNext()) {
+        final StateProxy state = iter.next();
+        mOriginalStateMap[unmodifiedStateMap.get(state)] = state;
+      }
       mMergedStates = new int[automaton.getStates().size()][];
     }
 
@@ -186,7 +192,7 @@ public class TransitionRelation
     // # Data Members
     private final AutomatonProxy mInputAutomaton;
     @SuppressWarnings("unused")
-    private final TObjectIntHashMap<StateProxy> mOriginalStateMap;
+    private final StateProxy[] mOriginalStateMap;
     private final int[][] mMergedStates;
 
   }
