@@ -52,6 +52,7 @@ public class TransitionRelation
   private final EventProxy mPreMarking;
   private final String mName;
   private final Map<Set<Set<EventProxy>>,EventProxy> mAnnToEvent;
+  private final MemStateMap mMemStateMap;
 
   public TransitionRelation(final AutomatonProxy aut, final EventProxy marked,
                             final EventProxy preconditionMarking)
@@ -119,6 +120,7 @@ public class TransitionRelation
       // TODO work out annotations
       numstates++;
     }
+    mMemStateMap = new MemStateMap(aut, stateToInt);
     for (final TransitionProxy tran : aut.getTransitions()) {
       final int s = stateToInt.get(tran.getSource());
       final int t = stateToInt.get(tran.getTarget());
@@ -137,6 +139,56 @@ public class TransitionRelation
       }
     }
     mAnnToEvent = new THashMap<Set<Set<EventProxy>>,EventProxy>();
+  }
+
+  public MergingStateMap getStateMap()
+  {
+    return mMemStateMap;
+  }
+
+
+  // #########################################################################
+  // # Inner Class MemStateMap
+  private static class MemStateMap implements MergingStateMap
+  {
+
+    // #######################################################################
+    // # Constructor
+    private MemStateMap(final AutomatonProxy automaton,
+                        final TObjectIntHashMap<StateProxy> unmodifiedStateMap)
+    {
+      mInputAutomaton = automaton;
+      mOriginalStateMap = unmodifiedStateMap;
+      mMergedStates = new int[automaton.getStates().size()][];
+    }
+
+    // #######################################################################
+    // # Interface
+    // # net.sourceforge.waters.analysis.gnonblocking.MergingStateMap;
+
+    public AutomatonProxy getInputAutomaton()
+    {
+      return mInputAutomaton;
+    }
+
+    public Collection<StateProxy> getOriginalStates(final StateProxy state)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    private void mergeStates(final int[] statesToMerge, final int keptState)
+    {
+      mMergedStates[keptState] = statesToMerge;
+    }
+
+    // #######################################################################
+    // # Data Members
+    private final AutomatonProxy mInputAutomaton;
+    @SuppressWarnings("unused")
+    private final TObjectIntHashMap<StateProxy> mOriginalStateMap;
+    private final int[][] mMergedStates;
+
   }
 
   public void setMarkingToStatesWithOutgoing(final Collection<EventProxy> events)
@@ -255,6 +307,8 @@ public class TransitionRelation
       }
       final boolean isInitial = isInitial(s);
       states.add(new AnnotatedMemStateProxy(s, props, isInitial));
+      // TODO: need to remove annotations, will make next step of converting
+      // trace easier for this section
     }
     // System.out.println(mAnnToEvent.size());
     for (int s = 0; s < mSuccessors.length; s++) {
@@ -822,14 +876,15 @@ public class TransitionRelation
     }
   }
 
-  public void merge(final int[] stuff)
+  public void merge(final int[] statesToMerge)
   {
-    final int to = stuff[0];
-    for (int i = 1; i < stuff.length; i++) {
-      final int from = stuff[i];
+    final int to = statesToMerge[0];
+    for (int i = 1; i < statesToMerge.length; i++) {
+      final int from = statesToMerge[i];
       moveAllSuccessors(from, to);
       moveAllPredeccessors(from, to);
     }
+    mMemStateMap.mergeStates(statesToMerge, to);
   }
 
   /**
