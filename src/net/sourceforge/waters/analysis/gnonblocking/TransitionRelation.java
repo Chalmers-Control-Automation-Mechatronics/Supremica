@@ -191,7 +191,6 @@ public class TransitionRelation
     // #######################################################################
     // # Data Members
     private final AutomatonProxy mInputAutomaton;
-    @SuppressWarnings("unused")
     private final StateProxy[] mOriginalStateMap;
     private final int[][] mMergedStates;
 
