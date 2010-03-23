@@ -1201,22 +1201,65 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     @SuppressWarnings("unused")
-    private StateProxy findOriginalTargetState(final StateProxy sourceState,
-                                               final EventProxy stepEvent)
+    private List<TraceStepProxy> findOriginalTargetState(
+                                                         final StateProxy sourceState,
+                                                         final EventProxy stepEvent)
     {
+      final List<TransitionProxy> possibleTrace =
+          new ArrayList<TransitionProxy>();
+
       final List<TransitionProxy> transitionsToTargets =
+          findTransitionsToSuccessors(sourceState, stepEvent);
+      final Map<StateProxy,List<TransitionProxy>> sourcesToTargets =
+          new HashMap<StateProxy,List<TransitionProxy>>();
+      sourcesToTargets.put(sourceState, transitionsToTargets);
+      final boolean traceFound = false;
+      return null;
+      /*
+       * while (!traceFound) { for (final StateProxy source :
+       * sourcesToTargets.keySet()) { final List<TransitionProxy> transForSource
+       * = new ArrayList<TransitionProxy>(sourcesToTargets.get(source)); final
+       * int i = 0; /* while (findTransitionsToSuccessors(transForSource.get(i),
+       * stepEvent)) for (final TransitionProxy tr : transForSource) { if
+       * (tr.getEvent() == stepEvent) { traceFound = true; break; } } if
+       * (!traceFound) { sourcesToTargets = new
+       * HashMap<StateProxy,List<TransitionProxy>>(); for (final TransitionProxy
+       * transition : transForSource) {
+       * sourcesToTargets.put(transition.getSource(),
+       * findTransitionsToSuccessors(transition .getSource(), stepEvent)); } } }
+       *
+       * for (final StateProxy source : sourcesToTargets.keySet()) { final
+       * List<TransitionProxy> transForSource = new
+       * ArrayList<TransitionProxy>(sourcesToTargets.get(source)); for (final
+       * TransitionProxy tr : transForSource) { if (tr.getEvent() == stepEvent)
+       * { traceFound = true; break; } } if (!traceFound) { sourcesToTargets =
+       * new HashMap<StateProxy,List<TransitionProxy>>(); for (final
+       * TransitionProxy transition : transForSource) {
+       * sourcesToTargets.put(transition.getSource(),
+       * findTransitionsToSuccessors(transition .getSource(), stepEvent)); } } }
+       */
+
+    }
+
+    private List<TransitionProxy> findTransitionsToSuccessors(
+                                                              final StateProxy sourceState,
+                                                              final EventProxy event)
+    {
+      List<TransitionProxy> transitionsToTargets =
           new ArrayList<TransitionProxy>();
       for (final TransitionProxy transition : getOriginalAutomaton()
           .getTransitions()) {
-        if (transition.getSource() == sourceState
-            && transition.getEvent() == stepEvent) {
-          transitionsToTargets.add(transition);
+        if (transition.getSource() == sourceState) {
+          if (transition.getEvent() == event) {
+            transitionsToTargets = new ArrayList<TransitionProxy>();
+            transitionsToTargets.add(transition);
+            break;
+          } else if (transition.getEvent().getName().contains("tau:")) {
+            transitionsToTargets.add(transition);
+          }
         }
-        // I realise this isnt correct, i have just looked up what to do, will
-        // fix soon
       }
-      // TODO Auto-generated method stub
-      return null;
+      return transitionsToTargets;
     }
 
     /**
