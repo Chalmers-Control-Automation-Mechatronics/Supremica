@@ -221,8 +221,12 @@ public class CompositionalGeneralisedConflictChecker extends
         new TransitionRelation(autToAbstract, getMarkingProposition(),
             getGeneralisedPrecondition());
     // TODO: have to pass tau as int??
-    @SuppressWarnings("unused")
     final TransBiSimulator transBiSimulator = new TransBiSimulator(tr, 1);
+    final ObservationEquivalenceStep oeStep =
+        new ObservationEquivalenceStep(tr.getAutomaton(getFactory()),
+            autToAbstract, tr.getOriginalIntToStateMap(), transBiSimulator
+                .getStateClasses(), tr.getResultingStateToIntMap());
+    mModifyingSteps.add(oeStep);
     return tr.getAutomaton(getFactory());
   }
 
@@ -1132,16 +1136,21 @@ public class CompositionalGeneralisedConflictChecker extends
 
 
   // #########################################################################
-  // # Inner Class CompositionStep
-  @SuppressWarnings("unused")
+  // # Inner Class ObservationEquivalenceStep
   private class ObservationEquivalenceStep extends Step
   {
 
-    ObservationEquivalenceStep(final AutomatonProxy resultAut,
-                               final AutomatonProxy originalAut)
+    ObservationEquivalenceStep(
+                               final AutomatonProxy resultAut,
+                               final AutomatonProxy originalAut,
+                               final StateProxy[] originalStates,
+                               final Map<Integer,int[]> classMap,
+                               final Map<StateProxy,Integer> reverseOutputStateMap)
     {
       super(resultAut, originalAut);
-      // TODO Auto-generated constructor stub
+      mOriginalStates = originalStates;
+      mClassMap = classMap;
+      mReverseOutputStateMap = reverseOutputStateMap;
     }
 
     ConflictTraceProxy convertTrace(final ConflictTraceProxy counterexample)
@@ -1150,6 +1159,46 @@ public class CompositionalGeneralisedConflictChecker extends
       return null;
     }
 
+    /**
+     * Demo implementation of getOriginalStates method as above. Probably not
+     * needed in this form. More likely, the convertTrace() method will use the
+     * individual maps directly.
+     */
+    @SuppressWarnings("unused")
+    private Collection<StateProxy> getOriginalStates(final StateProxy outstate)
+    {
+      final int outcode = mReverseOutputStateMap.get(outstate);
+      final int[] incodes = mClassMap.get(outcode);
+      final Collection<StateProxy> result =
+          new ArrayList<StateProxy>(incodes.length);
+      for (int i = 0; i < incodes.length; i++) {
+        final StateProxy instate = mOriginalStates[i];
+        result.add(instate);
+      }
+      return result;
+    }
+
+    // #######################################################################
+    // # Data Members
+    /**
+     * Array of original states. Maps state codes in the input
+     * TransitionRelation to state objects in the input automaton. Obtained from
+     * TransitionRelation.
+     */
+    private final StateProxy[] mOriginalStates;
+    /**
+     * Maps state codes of the output TransitionRelation to list of state codes
+     * in input TransitionRelation. This gives the class of states merged to
+     * form the given state in the simplified automaton. Obtained from
+     * TransBiSimulator.
+     */
+    private final Map<Integer,int[]> mClassMap;
+    /**
+     * Reverse encoding of output states. Maps states in output automaton
+     * (simplified automaton) to state code in output transition relation.
+     * Obtained from TransitionRelation.
+     */
+    private final Map<StateProxy,Integer> mReverseOutputStateMap;
   }
 
   // #########################################################################

@@ -16,8 +16,10 @@ import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIntProcedure;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.analysis.gnonblocking.TransitionRelation;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -30,17 +32,18 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 public class TransBiSimulator
 {
   private final SimpleEquivalenceClass[] mStateToClass;
+  private final Map<Integer,int[]> mClassMap;
+
   private final THashSet<SimpleEquivalenceClass> mWS;
   private final THashSet<ComplexEquivalenceClass> mWC;
   private final THashSet<SimpleEquivalenceClass> mP;
   private final boolean[] mMarked;
   private final boolean[] mPreMarked;
   private final int[][] mTauPreds;
-  private int mStates;
+  private int mStateNum;
   private final int mEventNum;
   private final int mTau;
-
-  private final TransitionRelation mTrans;
+  private final TransitionRelation mTransitionRelation;
 
   public static int STATESREMOVED = 0;
   public static int TIME = 0;
@@ -62,16 +65,18 @@ public class TransBiSimulator
       throws OverflowException
   {
     mTau = tau;
-    mTrans = tr;
+    mTransitionRelation = tr;
     mWS = new THashSet<SimpleEquivalenceClass>();
     mWC = new THashSet<ComplexEquivalenceClass>();
     mP = new THashSet<SimpleEquivalenceClass>();
-    mStateToClass = new SimpleEquivalenceClass[mTrans.numberOfStates()];
-    mStates = tr.numberOfStates();
+    mStateToClass =
+        new SimpleEquivalenceClass[mTransitionRelation.numberOfStates()];
+    mClassMap = new HashMap<Integer,int[]>();
+    mStateNum = tr.numberOfStates();
     mEventNum = tr.numberOfEvents();
-    mMarked = new boolean[mTrans.numberOfStates()];
-    mPreMarked = new boolean[mTrans.numberOfStates()];
-    mTauPreds = new int[mTrans.numberOfStates()][];
+    mMarked = new boolean[mTransitionRelation.numberOfStates()];
+    mPreMarked = new boolean[mTransitionRelation.numberOfStates()];
+    mTauPreds = new int[mTransitionRelation.numberOfStates()][];
     for (int s = 0; s < mTauPreds.length; s++) {
       final TIntHashSet hashtaupreds = new TIntHashSet();
       final TIntArrayList list = new TIntArrayList();
@@ -80,10 +85,13 @@ public class TransBiSimulator
       while (!list.isEmpty()) {
         final int taupred = list.remove(list.size() - 1);
         mMarked[taupred] =
-            mMarked[taupred] || mMarked[s] || mTrans.isMarked(taupred);
+            mMarked[taupred] || mMarked[s]
+                || mTransitionRelation.isMarked(taupred);
         mPreMarked[taupred] =
-            mPreMarked[taupred] || mPreMarked[s] || mTrans.isPreMarked(taupred);
-        final TIntHashSet taupreds = mTrans.getPredecessors(taupred, mTau);
+            mPreMarked[taupred] || mPreMarked[s]
+                || mTransitionRelation.isPreMarked(taupred);
+        final TIntHashSet taupreds =
+            mTransitionRelation.getPredecessors(taupred, mTau);
         if (taupreds == null) {
           continue;
         }
@@ -109,26 +117,26 @@ public class TransBiSimulator
     final TIntArrayList premarked = new TIntArrayList();
     final TIntArrayList bothmarkings = new TIntArrayList();
     final TIntArrayList notmarked = new TIntArrayList();
-    mStates = 0;
-    for (int i = 0; i < mTrans.numberOfStates(); i++) {
-      if (!mTrans.hasPredecessors(i)) {
+    mStateNum = 0;
+    for (int i = 0; i < mTransitionRelation.numberOfStates(); i++) {
+      if (!mTransitionRelation.hasPredecessors(i)) {
         continue;
       }
       if (mMarked[i] && !mPreMarked[i]) {
         marked.add(i);
-        mStates++;
+        mStateNum++;
         continue;
       } else if (!mMarked[i] && mPreMarked[i]) {
         premarked.add(i);
-        mStates++;
+        mStateNum++;
         continue;
       } else if (mMarked[i] && mPreMarked[i]) {
         bothmarkings.add(i);
-        mStates++;
+        mStateNum++;
         continue;
       } else {
         notmarked.add(i);
-        mStates++;
+        mStateNum++;
         continue;
       }
     }
@@ -168,19 +176,20 @@ public class TransBiSimulator
       }
       break;
     }
-    if (mP.size() > mStates) {
+    if (mP.size() > mStateNum) {
       System.out.println("WTF?");
       System.exit(4);
     }
-    if (mP.size() == mStates) {
+    if (mP.size() == mStateNum) {
       return false;
     }
     for (final SimpleEquivalenceClass sec : mP) {
       // System.out.println("sec:" + Arrays.toString(sec.mStates));
+      mClassMap.put(sec.mStates[0], sec.mStates);
       if (sec.mStates.length == 1) {
         continue;
       }
-      mTrans.merge(sec.mStates);
+      mTransitionRelation.merge(sec.mStates);
       STATESREMOVED += sec.mStates.length - 1;
     }
     // System.out.println("OBSSTATESREMOVED: " + (mStates - mP.size()));
@@ -191,6 +200,11 @@ public class TransBiSimulator
     return true;
   }
 
+  public Map<Integer,int[]> getStateClasses()
+  {
+    return mClassMap;
+  }
+
   private int[] getPredecessors(final int state, final int event)
   {
     if (event == mTau) {
@@ -199,7 +213,8 @@ public class TransBiSimulator
     final TIntHashSet preds = new TIntHashSet();
     for (int i = 0; i < mTauPreds[state].length; i++) {
       final int taupred = mTauPreds[state][i];
-      final TIntHashSet tpreds = mTrans.getPredecessors(taupred, event);
+      final TIntHashSet tpreds =
+          mTransitionRelation.getPredecessors(taupred, event);
       if (tpreds == null) {
         continue;
       }
@@ -340,7 +355,7 @@ public class TransBiSimulator
       final List<SimpleEquivalenceClass> classes =
           new ArrayList<SimpleEquivalenceClass>();
       for (int e = 0; e < mEventNum; e++) {
-        if (mTrans.isMarkingEvent(e)) {
+        if (mTransitionRelation.isMarkingEvent(e)) {
           continue;
         }
         mInfo[e] = new TIntIntHashMap();
@@ -399,7 +414,7 @@ public class TransBiSimulator
       }
       info = new TIntIntHashMap();
       mInfo[event] = info;
-      if (mTrans.isMarkingEvent(event)) {
+      if (mTransitionRelation.isMarkingEvent(event)) {
         return info;
       }
       for (int i = 0; i < mStates.length; i++) {
