@@ -1153,8 +1153,68 @@ public class CompositionalGeneralisedConflictChecker extends
       mReverseOutputStateMap = reverseOutputStateMap;
     }
 
-    ConflictTraceProxy convertTrace(final ConflictTraceProxy counterexample)
+    ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
+      final List<TraceStepProxy> convertedSteps =
+          new ArrayList<TraceStepProxy>();
+      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      @SuppressWarnings("unused")
+      final StateProxy sourceState =
+          getInitialState(getResultAutomaton(), traceSteps.get(0));
+      for (final TraceStepProxy step : traceSteps) {
+        // replaces automaton in step's step map
+        final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
+        if (stepsNewStateMap.containsKey(getResultAutomaton())) {
+          stepsNewStateMap.put(getOriginalAutomaton(), stepsNewStateMap
+              .get(getResultAutomaton()));
+        }
+
+        // replaces tau events with original event before hiding
+        /*
+         * final EventProxy stepEvent = step.getEvent(); if (stepEvent != null)
+         * { final StateProxy targetState =
+         * stepsNewStateMap.get(getResultAutomaton()); assert targetState !=
+         * null; stepsNewStateMap.remove(getResultAutomaton()); TraceStepProxy
+         * convertedStep; if (stepEvent == mTau) { final StateProxy
+         * originalTargetState = findOriginalTargetState(sourceState,
+         * stepEvent); convertedStep =
+         * getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap); //
+         * need to add states to state map } else { convertedStep =
+         * getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap); }
+         * convertedSteps.add(convertedStep); sourceState = targetState; } else
+         * { convertedSteps.add(step); }
+         */
+      }
+      final Set<AutomatonProxy> traceAutomata =
+          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
+      traceAutomata.remove(getResultAutomaton());
+      traceAutomata.add(getOriginalAutomaton());
+      final ConflictTraceProxy convertedTrace =
+          getFactory().createConflictTraceProxy(conflictTrace.getName(),
+                                                conflictTrace.getComment(),
+                                                conflictTrace.getLocation(),
+                                                getModel(), traceAutomata,
+                                                convertedSteps,
+                                                ConflictKind.CONFLICT);
+      return convertedTrace;
+    }
+
+    @SuppressWarnings("unused")
+    private StateProxy findOriginalTargetState(final StateProxy sourceState,
+                                               final EventProxy stepEvent)
+    {
+      final List<TransitionProxy> transitionsToTargets =
+          new ArrayList<TransitionProxy>();
+      for (final TransitionProxy transition : getOriginalAutomaton()
+          .getTransitions()) {
+        if (transition.getSource() == sourceState
+            && transition.getEvent() == stepEvent) {
+          transitionsToTargets.add(transition);
+        }
+        // I realise this isnt correct, i have just looked up what to do, will
+        // fix soon
+      }
       // TODO Auto-generated method stub
       return null;
     }
