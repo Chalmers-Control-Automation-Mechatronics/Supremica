@@ -52,19 +52,21 @@ public class TransitionRelation
   private final TObjectIntHashMap<EventProxy> mEventToInt;
   private final EventProxy mMarkedEvent;
   private final EventProxy mPreMarking;
+  private int mCodeOfTau = -1;
   private final String mName;
   private final Map<Set<Set<EventProxy>>,EventProxy> mAnnToEvent;
 
   public TransitionRelation(final AutomatonProxy aut, final EventProxy marked,
-                            final EventProxy preconditionMarking)
+                            final EventProxy preconditionMarking,
+                            final EventProxy tau)
   {
-    this(aut, marked, preconditionMarking, aut.getEvents());
+    this(aut, marked, preconditionMarking, tau, aut.getEvents());
   }
 
   @SuppressWarnings("unchecked")
   public TransitionRelation(final AutomatonProxy aut, final EventProxy marked,
                             final EventProxy preconditionMarking,
-                            Set<EventProxy> eventsall)
+                            final EventProxy tau, Set<EventProxy> eventsall)
   {
     eventsall = new THashSet<EventProxy>(eventsall);
     eventsall.addAll(aut.getEvents());
@@ -80,6 +82,9 @@ public class TransitionRelation
         new TObjectIntHashMap<EventProxy>(mEvents.length);
     for (int i = 0; i < mEvents.length; i++) {
       eventToInt.put(mEvents[i], i);
+      if (mEvents[i] == tau) {
+        mCodeOfTau = i;
+      }
     }
     mEventToInt = eventToInt;
     final TObjectIntHashMap<StateProxy> stateToInt =
@@ -192,6 +197,11 @@ public class TransitionRelation
   public Map<StateProxy,Integer> getResultingStateToIntMap()
   {
     return mResultingStates;
+  }
+
+  public int getCodeOfTau()
+  {
+    return mCodeOfTau;
   }
 
   public void setMarkingToStatesWithOutgoing(final Collection<EventProxy> events)

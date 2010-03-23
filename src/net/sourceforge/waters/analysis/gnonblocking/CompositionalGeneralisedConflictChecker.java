@@ -9,15 +9,21 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntIterator;
+
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
@@ -156,12 +162,13 @@ public class CompositionalGeneralisedConflictChecker extends
           new CompositionStep(syncProduct, composer.getStateMap());
       mModifyingSteps.add(step);
 
+      final EventProxy tauEvent = createTauEvent(syncProduct);
       final AutomatonProxy autToAbstract =
-          hideLocalEvents(syncProduct, candidate.getLocalEvents());
+          hideLocalEvents(syncProduct, candidate.getLocalEvents(), tauEvent);
 
       // TODO Abstraction rules here
       // final AutomatonProxy abstractedAut =
-      // applyAbstractionRules(autToAbstract);
+      // applyAbstractionRules(autToAbstract,tau);
 
       // removes the composed automata for this candidate from the set of
       // remaining automata and adds the newly composed candidate
@@ -206,25 +213,28 @@ public class CompositionalGeneralisedConflictChecker extends
 
   @SuppressWarnings("unused")
   private AutomatonProxy applyAbstractionRules(
-                                               final AutomatonProxy autToAbstract)
+                                               final AutomatonProxy autToAbstract,
+                                               final EventProxy tau)
       throws OverflowException
   {
-    final AutomatonProxy autObsEq = applyObservationEquivalence(autToAbstract);
+    final AutomatonProxy autObsEq =
+        applyObservationEquivalence(autToAbstract, tau);
     return autObsEq;
   }
 
   private AutomatonProxy applyObservationEquivalence(
-                                                     final AutomatonProxy autToAbstract)
+                                                     final AutomatonProxy autToAbstract,
+                                                     final EventProxy tau)
       throws OverflowException
   {
     final TransitionRelation tr =
         new TransitionRelation(autToAbstract, getMarkingProposition(),
-            getGeneralisedPrecondition());
-    // TODO: have to pass tau as int??
-    final TransBiSimulator transBiSimulator = new TransBiSimulator(tr, 1);
+            getGeneralisedPrecondition(), tau);
+    final TransBiSimulator transBiSimulator =
+        new TransBiSimulator(tr, tr.getCodeOfTau());
     final ObservationEquivalenceStep oeStep =
         new ObservationEquivalenceStep(tr.getAutomaton(getFactory()),
-            autToAbstract, tr.getOriginalIntToStateMap(), transBiSimulator
+            autToAbstract, tau, tr.getOriginalIntToStateMap(), transBiSimulator
                 .getStateClasses(), tr.getResultingStateToIntMap());
     mModifyingSteps.add(oeStep);
     return tr.getAutomaton(getFactory());
@@ -245,7 +255,6 @@ public class CompositionalGeneralisedConflictChecker extends
       final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
-      // TODO: HeuristicMustL causes problems
       setPreselectingHeuristic(defaultHeuristic);
     }
     if (mSelectingHeuristics == null) {
@@ -285,18 +294,30 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
   /**
+   * Creates a tau event with a name that reflects the automaton's alphabet it
+   * will becomes part of.
+   *
+   * @param automaton
+   * @return
+   */
+  private EventProxy createTauEvent(final AutomatonProxy automaton)
+  {
+    final String tauStateName = "tau:" + automaton.getName();
+    final EventProxy tau =
+        getFactory().createEventProxy(tauStateName, EventKind.UNCONTROLLABLE);
+    return tau;
+  }
+
+  /**
    * Hides the local events for a given candidate (replaces the events with a
    * silent event "tau").
    *
    * @param syncProduct
    */
   private AutomatonProxy hideLocalEvents(final AutomatonProxy automaton,
-                                         final Set<EventProxy> localEvents)
+                                         final Set<EventProxy> localEvents,
+                                         final EventProxy tau)
   {
-    final String tauStateName = "tau:" + automaton.getName();
-    final EventProxy tau =
-        getFactory().createEventProxy(tauStateName, EventKind.UNCONTROLLABLE);
-
     final Map<TransitionProxy,TransitionProxy> transitionMap =
         new HashMap<TransitionProxy,TransitionProxy>(automaton.getTransitions()
             .size());
@@ -810,7 +831,6 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  // TODO: need to add subclasses of Step for each abstraction rule
   // #########################################################################
   // # Inner Class Step
   private abstract class Step
@@ -1143,6 +1163,7 @@ public class CompositionalGeneralisedConflictChecker extends
     ObservationEquivalenceStep(
                                final AutomatonProxy resultAut,
                                final AutomatonProxy originalAut,
+                               final EventProxy tau,
                                final StateProxy[] originalStates,
                                final Map<Integer,int[]> classMap,
                                final Map<StateProxy,Integer> reverseOutputStateMap)
@@ -1151,6 +1172,10 @@ public class CompositionalGeneralisedConflictChecker extends
       mOriginalStates = originalStates;
       mClassMap = classMap;
       mReverseOutputStateMap = reverseOutputStateMap;
+      mTransitionRelation =
+          new TransitionRelation(originalAut, getMarkingProposition(),
+              getGeneralisedPrecondition(), tau);
+      mCodeOfTau = mTransitionRelation.getCodeOfTau();
     }
 
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
@@ -1200,274 +1225,148 @@ public class CompositionalGeneralisedConflictChecker extends
       return convertedTrace;
     }
 
+    // TODO
+    // Here is how I would do the breadth-first search,
+    // assuming I have got a TransitionRelation,
+    // and the codes of all states and events including tau.
+    // This is still tricky because of the need to create a trace containing
+    // the event exactly once, but possibly with taus before and after,
+    // so I am using two visited sets. (Alternatively, we could use a visited
+    // set of search records, which implement equality and hash code based on
+    // their state and hasEvent attributes.)
+    // Also note how the search records store the trace in reverse order.
+    // I just hope the code is at least half-way correct ...
+
+    // TODO
+    // You need to do similar things for initial states and end (alpha) states.
+    // That will be simpler, using only one visited set.
+
+    /**
+     * Finds a partial trace in the original automaton before observation
+     * equivalence. This method computes a sequence of tau transitions, followed
+     * by a transition with the given event, followed by another sequence of tau
+     * transitions linking the source state to some state in the class of the
+     * target state in the simplified automaton.
+     *
+     * @param originalSource
+     *          State number of the source state in the original automaton.
+     * @param event
+     *          Integer code of the event to be included in the trace.
+     * @param targetClass
+     *          State number of the state in the simplified automaton (code of
+     *          state class).
+     * @return List of search records describing the trace from source to
+     *         target. The first entry in the list represents the first step
+     *         after the source state, with its event and target state. The
+     *         final step has a target state in the given target class. Events
+     *         in the list can only be tau or the given event. The list cannot
+     *         be empty, because it must include at least the given event.
+     */
     @SuppressWarnings("unused")
-    private List<TraceStepProxy> findOriginalTargetState(
-                                                         final StateProxy sourceState,
-                                                         final EventProxy stepEvent)
+    private List<SearchRecord> findSubTrace(final int originalSource,
+                                            final int event,
+                                            final int targetClass)
     {
-      final List<TransitionProxy> possibleTrace =
-          new ArrayList<TransitionProxy>();
-
-      final Map<StateProxy,List<TransitionProxy>> statesToExpand =
-          new HashMap<StateProxy,List<TransitionProxy>>();
-
-      statesToExpand.put(sourceState, findTransitionsToSuccessors(sourceState,
-                                                                  stepEvent));
-      Iterator<StateProxy> iter = statesToExpand.keySet().iterator();
-      while (iter.hasNext()) {
-        final StateProxy source = iter.next();
-        for (final TransitionProxy transitionToTarget : statesToExpand
-            .get(source)) {
-          final StateProxy target = transitionToTarget.getTarget();
-          statesToExpand.put(target, findTransitionsToSuccessors(target,
-                                                                 stepEvent));
+      final int[] targetArray = mClassMap.get(targetClass);
+      final TIntHashSet targetSet = new TIntHashSet(targetArray);
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      final TIntHashSet visited0 = new TIntHashSet(); // event not in trace
+      final TIntHashSet visited1 = new TIntHashSet();// event in trace
+      SearchRecord record = new SearchRecord(originalSource);
+      open.add(record);
+      visited0.add(originalSource);
+      outer: while (true) {
+        final SearchRecord current = open.remove();
+        // Target must be reachable due to observation equivalence.
+        assert current != null;
+        final int source = current.getState();
+        final boolean hasEvent = current.hasProperEvent();
+        final TIntHashSet visited = hasEvent ? visited1 : visited0;
+        TIntHashSet successors =
+            mTransitionRelation.getSuccessors(source, mCodeOfTau);
+        TIntIterator iter = successors.iterator();
+        while (iter.hasNext()) {
+          final int target = iter.next();
+          if (!visited.contains(target)) {
+            record = new SearchRecord(target, hasEvent, mCodeOfTau, current);
+            if (hasEvent && targetSet.contains(target)) {
+              break outer;
+            }
+            open.add(record);
+            visited.add(target);
+          }
         }
-      }
-      // im guessing you cant iterate over a collection which being modified,
-      // will change this tomorrow, just trying to get my idea down
-      iter = statesToExpand.keySet().iterator();
-      boolean traceFound = false;
-      while (iter.hasNext() && !traceFound) {
-        final StateProxy source = iter.next();
-        final List<TransitionProxy> transitionsToTargets =
-            statesToExpand.get(source);
-        final int numTargets = transitionsToTargets.size();
-        if (numTargets == 0) {
-          statesToExpand.remove(source);
-        } else if (numTargets == 1
-            && transitionsToTargets.get(0).getEvent() == stepEvent) {
-          traceFound = true;
-        } else {
-
-        }
-      }
-
-      return null;
-      /*
-       * statesToExpand.put(sourceState, findSuccessors(sourceState,
-       * stepEvent)); final Iterator<StateProxy> sourceIter =
-       * statesToExpand.keySet().iterator(); while (sourceIter.hasNext() &&
-       * !traceFound) { boolean expand = true; StateProxy currentSource =
-       * sourceIter.next(); int i = 0; while (expand) { final
-       * List<TransitionProxy> transitionsToTargets =
-       * findTransitionsToSuccessors(currentSource, stepEvent); final int
-       * numTargets = transitionsToTargets.size(); // have come across an event
-       * which is not the one we are looking // for and is non-tau (i.e. not the
-       * right trace) if (numTargets == 0) {
-       * statesToExpand.remove(currentSource); if (i < numTargets) {
-       * currentSource = transitionsToTargets.get(i++).getTarget(); } expand =
-       * false; break; } // correct trace found else if (numTargets == 1 &&
-       * transitionsToTargets.get(0).getEvent() == stepEvent) { traceFound =
-       * true; expand = false; possibleTrace.add(transitionsToTargets.get(0));
-       * break; }// else tau events only exist here else { for (final
-       * TransitionProxy tr : transitionsToTargets) {
-       * statesToExpand.add(tr.getTarget()); }
-       * possibleTrace.add(transitionsToTargets.get(i)); currentSource =
-       * transitionsToTargets.get(i++).getTarget(); } } }
-       *
-       * return null; /* while (!traceFound) { for (final TransitionProxy tr :
-       * transitionsToTargets) { if (tr.getEvent() == stepEvent) { traceFound =
-       * true; break; } } final int i = 0; final StateProxy nextState =
-       * transitionsToTargets.get(i).getSource(); /* while
-       * (findTransitionsToSuccessors(transForSource.get(i), stepEvent))
-       *
-       * if (!traceFound) { sourcesToTargets = new
-       * HashMap<StateProxy,List<TransitionProxy>>(); for (final TransitionProxy
-       * transition : transForSource) {
-       * sourcesToTargets.put(transition.getSource(),
-       * findTransitionsToSuccessors(transition .getSource(), stepEvent)); } } }
-       */
-
-      /*
-       * for (final StateProxy source : sourcesToTargets.keySet()) { final
-       * List<TransitionProxy> transForSource = new
-       * ArrayList<TransitionProxy>(sourcesToTargets.get(source)); for (final
-       * TransitionProxy tr : transForSource) { if (tr.getEvent() == stepEvent)
-       * { traceFound = true; break; } } if (!traceFound) { sourcesToTargets =
-       * new HashMap<StateProxy,List<TransitionProxy>>(); for (final
-       * TransitionProxy transition : transForSource) {
-       * sourcesToTargets.put(transition.getSource(),
-       * findTransitionsToSuccessors(transition .getSource(), stepEvent)); } } }
-       */
-
-    }
-
-// TODO
-// Here is how I would do the breadth-first search,
-// assuming I have got a TransitionRelation,
-// and the codes of all states and events including tau.
-// This is still tricky because of the need to create a trace containing
-// the event exactly once, but possibly with taus before and after,
-// so I am using two visited sets. (Alternatively, we could use a visited
-// set of search records, which implement equality and hash code based on
-// their state and hasEvent attributes.)
-// Also note how the search records store the trace in reverse order.
-// I just hope the code is at least half-way correct ...
-
-// TODO
-// You need to do similar things for initial states and end (alpha) states.
-// That will be simpler, using only one visited set.
-
-//    /**
-//     * Finds a partial trace in the original automaton before observation
-//     * equivalence. This method computes a sequence of tau transitions, followed
-//     * by a transition with the given event, followed by another sequence of tau
-//     * transitions linking the source state to some state in the class of the
-//     * target state in the simplified automaton.
-//     * @param  originalSource  State number of the source state in the original
-//     *                         automaton.
-//     * @param  event           Integer code of the event to be included in the
-//     *                         trace.
-//     * @param  targetClass     State number of the state in the simplified
-//     *                         automaton (code of state class).
-//     * @return List of search records describing the trace from source to
-//     *         target. The first entry in the list represents the first step
-//     *         after the source state, with its event and target state.
-//     *         The final step has a target state in the given target class.
-//     *         Events in the list can only be tau or the given event.
-//     *         The list cannot be empty, because it must include at least
-//     *         the given event.
-//     */
-//    private List<SearchRecord> findSubTrace(final int originalSource,
-//                                            final int event,
-//                                            final int targetClass)
-//    {
-//      final int[] targetArray = mClassMap.get(targetClass);
-//      final TIntHashSet targetSet = new TIntHashSet(targetArray);
-//      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
-//      final TIntHashSet visited0 = new TIntHashSet(); // event not in trace
-//      final TIntHashSet visited1 = new TIntHashSet(); // event in trace
-//      SearchRecord record = new SearchRecord(originalSource);
-//      open.add(record);
-//      visited0.add(originalSource);
-//      outer:
-//      while (true) {
-//        final SearchRecord current = open.remove();
-//        // Target must be reachable due to observation equivalence.
-//        assert current != null;
-//        final int source = current.getState();
-//        final boolean hasEvent = current.hasProperEvent();
-//        final TIntHashSet visited = hasEvent ? visited1 : visited0;
-//        TIntHashSet successors =
-//          mTransitionRelation.getSuccessors(source, mCodeOfTau);
-//        TIntIterator iter = successors.iterator();
-//        while (iter.hasNext()) {
-//          final int target = iter.next();
-//          if (!visited.contains(target)) {
-//            record = new SearchRecord(target, hasEvent, mCodeOfTau, current);
-//            if (hasEvent && targetSet.contains(target)) {
-//              break outer;
-//            }
-//            open.add(record);
-//            visited.add(target);
-//          }
-//        }
-//        if (!hasEvent) {
-//          successors = mTransitionRelation.getSuccessors(source, event);
-//          iter = successors.iterator();
-//          while (iter.hasNext()) {
-//            final int target = iter.next();
-//            if (!visited1.contains(target)) {
-//              record = new SearchRecord(target, true, event, current);
-//              if (targetSet.contains(target)) {
-//                break outer;
-//              }
-//              open.add(record);
-//              visited1.add(target);
-//            }
-//          }
-//        }
-//      }
-//      final List<SearchRecord> trace = new LinkedList<SearchRecord>();
-//      do {
-//        trace.add(0, record);
-//        record = record.getPredecessor();
-//      } while (record.getState() != originalSource);
-//      return trace;
-//    }
-
-// This class is local to CompositionalGeneralisedConflictChecker.
-
-//  //#########################################################################
-//  //# Inner Class SearchRecord
-//  private static class SearchRecord {
-//
-//    //#######################################################################
-//    //# Constructors
-//    private SearchRecord(final int state)
-//    {
-//      this(state, false, -1, null);
-//    }
-//
-//    private SearchRecord(final int state, final boolean hasEvent,
-//                         final int event, final SearchRecord pred)
-//    {
-//      mState = state;
-//      mHasProperEvent = hasEvent;
-//      mEvent = event;
-//      mPredecessor = pred;
-//    }
-//
-//    //#######################################################################
-//    //# Getters
-//    // TODO
-//
-//    //#######################################################################
-//    //# Data Members
-//    private final int mState;
-//    private final boolean mHasProperEvent;
-//    private final int mEvent;
-//    private final SearchRecord mPredecessor;
-//  }
-
-
-    @SuppressWarnings("unused")
-    private List<StateProxy> findSuccessors(final StateProxy sourceState,
-                                            final EventProxy event)
-    {
-      List<StateProxy> successors = new ArrayList<StateProxy>();
-      for (final TransitionProxy transition : getOriginalAutomaton()
-          .getTransitions()) {
-        if (transition.getSource() == sourceState) {
-          if (transition.getEvent() == event) {
-            successors = new ArrayList<StateProxy>();
-            successors.add(transition.getTarget());
-            break;
-          } else if (transition.getEvent().getName().contains("tau:")) {
-            successors.add(transition.getTarget());
+        if (!hasEvent) {
+          successors = mTransitionRelation.getSuccessors(source, event);
+          iter = successors.iterator();
+          while (iter.hasNext()) {
+            final int target = iter.next();
+            if (!visited1.contains(target)) {
+              record = new SearchRecord(target, true, event, current);
+              if (targetSet.contains(target)) {
+                break outer;
+              }
+              open.add(record);
+              visited1.add(target);
+            }
           }
         }
       }
-      return successors;
+      final List<SearchRecord> trace = new LinkedList<SearchRecord>();
+      do {
+        trace.add(0, record);
+        record = record.getPredecessor();
+      } while (record.getState() != originalSource);
+      return trace;
     }
 
-    // TODO This is certainly better than searching the transition list
-    // each time a state is encountered, but still tedious. Perhaps construct
-    // a TransitionRelation at the beginning and use it for the entire search.
-    // (Unfortunately, the original transition relation passed to the
-    // BiSimulator cannot be used any longer because it has been destructively
-    // modified to give the minimised automaton.
-    private List<TransitionProxy> findTransitionsToSuccessors(
-                                                              final StateProxy sourceState,
-                                                              final EventProxy event)
+
+    // #########################################################################
+    // # Inner Class SearchRecord
+    private class SearchRecord
     {
-      List<TransitionProxy> transitionsToTargets =
-          new ArrayList<TransitionProxy>();
-      for (final TransitionProxy transition : getOriginalAutomaton()
-          .getTransitions()) {
-        if (transition.getSource() == sourceState) {
-          if (transition.getEvent() == event) {
-            // TODO Fix bug: this deletes any transitions stored before.
-            transitionsToTargets = new ArrayList<TransitionProxy>();
-            transitionsToTargets.add(transition);
-            break;
-          } else if (transition.getEvent().getName().contains("tau:")) {
-            // TODO Do not use string matching. Need to know the event object.
-            transitionsToTargets.add(transition);
-          }
-        }
+      //
+      // #######################################################################
+      // # Constructors
+      private SearchRecord(final int state)
+      {
+        this(state, false, -1, null);
       }
-      return transitionsToTargets;
+
+      private SearchRecord(final int state, final boolean hasEvent,
+                           final int event, final SearchRecord pred)
+      {
+        mState = state;
+        mHasProperEvent = hasEvent;
+        mEvent = event;
+        mPredecessor = pred;
+      }
+
+      // #######################################################################
+      // # Getters
+      public boolean hasProperEvent()
+      {
+        return mHasProperEvent;
+      }
+
+      public int getState()
+      {
+        return mState;
+      }
+
+      public SearchRecord getPredecessor()
+      {
+        return mPredecessor;
+      }
+
+      //
+      // #######################################################################
+      // # Data Members
+      private final int mState;
+      private final boolean mHasProperEvent;
+      @SuppressWarnings("unused")
+      private final int mEvent;
+      private final SearchRecord mPredecessor;
     }
 
     /**
@@ -1510,6 +1409,8 @@ public class CompositionalGeneralisedConflictChecker extends
      * Obtained from TransitionRelation.
      */
     private final Map<StateProxy,Integer> mReverseOutputStateMap;
+    private final TransitionRelation mTransitionRelation;
+    private final int mCodeOfTau;
   }
 
   // #########################################################################
