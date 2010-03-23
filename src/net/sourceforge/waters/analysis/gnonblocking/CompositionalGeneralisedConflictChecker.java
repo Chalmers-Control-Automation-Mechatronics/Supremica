@@ -1208,12 +1208,64 @@ public class CompositionalGeneralisedConflictChecker extends
       final List<TransitionProxy> possibleTrace =
           new ArrayList<TransitionProxy>();
 
-      final List<TransitionProxy> transitionsToTargets =
-          findTransitionsToSuccessors(sourceState, stepEvent);
-      final boolean traceFound = false;
+      final Map<StateProxy,List<TransitionProxy>> statesToExpand =
+          new HashMap<StateProxy,List<TransitionProxy>>();
+
+      statesToExpand.put(sourceState, findTransitionsToSuccessors(sourceState,
+                                                                  stepEvent));
+      Iterator<StateProxy> iter = statesToExpand.keySet().iterator();
+      while (iter.hasNext()) {
+        final StateProxy source = iter.next();
+        for (final TransitionProxy transitionToTarget : statesToExpand
+            .get(source)) {
+          final StateProxy target = transitionToTarget.getTarget();
+          statesToExpand.put(target, findTransitionsToSuccessors(target,
+                                                                 stepEvent));
+        }
+      }
+      // im guessing you cant iterate over a collection which being modified,
+      // will change this tomorrow, just trying to get my idea down
+      iter = statesToExpand.keySet().iterator();
+      boolean traceFound = false;
+      while (iter.hasNext() && !traceFound) {
+        final StateProxy source = iter.next();
+        final List<TransitionProxy> transitionsToTargets =
+            statesToExpand.get(source);
+        final int numTargets = transitionsToTargets.size();
+        if (numTargets == 0) {
+          statesToExpand.remove(source);
+        } else if (numTargets == 1
+            && transitionsToTargets.get(0).getEvent() == stepEvent) {
+          traceFound = true;
+        } else {
+
+        }
+      }
+
       return null;
       /*
-       * while (!traceFound) { for (final TransitionProxy tr :
+       * statesToExpand.put(sourceState, findSuccessors(sourceState,
+       * stepEvent)); final Iterator<StateProxy> sourceIter =
+       * statesToExpand.keySet().iterator(); while (sourceIter.hasNext() &&
+       * !traceFound) { boolean expand = true; StateProxy currentSource =
+       * sourceIter.next(); int i = 0; while (expand) { final
+       * List<TransitionProxy> transitionsToTargets =
+       * findTransitionsToSuccessors(currentSource, stepEvent); final int
+       * numTargets = transitionsToTargets.size(); // have come across an event
+       * which is not the one we are looking // for and is non-tau (i.e. not the
+       * right trace) if (numTargets == 0) {
+       * statesToExpand.remove(currentSource); if (i < numTargets) {
+       * currentSource = transitionsToTargets.get(i++).getTarget(); } expand =
+       * false; break; } // correct trace found else if (numTargets == 1 &&
+       * transitionsToTargets.get(0).getEvent() == stepEvent) { traceFound =
+       * true; expand = false; possibleTrace.add(transitionsToTargets.get(0));
+       * break; }// else tau events only exist here else { for (final
+       * TransitionProxy tr : transitionsToTargets) {
+       * statesToExpand.add(tr.getTarget()); }
+       * possibleTrace.add(transitionsToTargets.get(i)); currentSource =
+       * transitionsToTargets.get(i++).getTarget(); } } }
+       *
+       * return null; /* while (!traceFound) { for (final TransitionProxy tr :
        * transitionsToTargets) { if (tr.getEvent() == stepEvent) { traceFound =
        * true; break; } } final int i = 0; final StateProxy nextState =
        * transitionsToTargets.get(i).getSource(); /* while
@@ -1238,6 +1290,26 @@ public class CompositionalGeneralisedConflictChecker extends
        * findTransitionsToSuccessors(transition .getSource(), stepEvent)); } } }
        */
 
+    }
+
+    @SuppressWarnings("unused")
+    private List<StateProxy> findSuccessors(final StateProxy sourceState,
+                                            final EventProxy event)
+    {
+      List<StateProxy> successors = new ArrayList<StateProxy>();
+      for (final TransitionProxy transition : getOriginalAutomaton()
+          .getTransitions()) {
+        if (transition.getSource() == sourceState) {
+          if (transition.getEvent() == event) {
+            successors = new ArrayList<StateProxy>();
+            successors.add(transition.getTarget());
+            break;
+          } else if (transition.getEvent().getName().contains("tau:")) {
+            successors.add(transition.getTarget());
+          }
+        }
+      }
+      return successors;
     }
 
     private List<TransitionProxy> findTransitionsToSuccessors(
