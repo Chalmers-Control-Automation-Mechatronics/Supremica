@@ -1210,24 +1210,23 @@ public class CompositionalGeneralisedConflictChecker extends
 
       final List<TransitionProxy> transitionsToTargets =
           findTransitionsToSuccessors(sourceState, stepEvent);
-      final Map<StateProxy,List<TransitionProxy>> sourcesToTargets =
-          new HashMap<StateProxy,List<TransitionProxy>>();
-      sourcesToTargets.put(sourceState, transitionsToTargets);
       final boolean traceFound = false;
       return null;
       /*
-       * while (!traceFound) { for (final StateProxy source :
-       * sourcesToTargets.keySet()) { final List<TransitionProxy> transForSource
-       * = new ArrayList<TransitionProxy>(sourcesToTargets.get(source)); final
-       * int i = 0; /* while (findTransitionsToSuccessors(transForSource.get(i),
-       * stepEvent)) for (final TransitionProxy tr : transForSource) { if
-       * (tr.getEvent() == stepEvent) { traceFound = true; break; } } if
-       * (!traceFound) { sourcesToTargets = new
+       * while (!traceFound) { for (final TransitionProxy tr :
+       * transitionsToTargets) { if (tr.getEvent() == stepEvent) { traceFound =
+       * true; break; } } final int i = 0; final StateProxy nextState =
+       * transitionsToTargets.get(i).getSource(); /* while
+       * (findTransitionsToSuccessors(transForSource.get(i), stepEvent))
+       *
+       * if (!traceFound) { sourcesToTargets = new
        * HashMap<StateProxy,List<TransitionProxy>>(); for (final TransitionProxy
        * transition : transForSource) {
        * sourcesToTargets.put(transition.getSource(),
        * findTransitionsToSuccessors(transition .getSource(), stepEvent)); } } }
-       *
+       */
+
+      /*
        * for (final StateProxy source : sourcesToTargets.keySet()) { final
        * List<TransitionProxy> transForSource = new
        * ArrayList<TransitionProxy>(sourcesToTargets.get(source)); for (final
