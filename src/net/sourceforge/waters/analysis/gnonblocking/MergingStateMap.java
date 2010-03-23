@@ -90,5 +90,5 @@ public interface MergingStateMap
 //    * (simplified automaton) to state code in output transition relation.
 //    * Obtained from TransitionRelation.
 //    */
-//   private final Map<StateProxy,Integer> mReverseOutputStateMap;
+//   private final TObjectIntHashMap<StateProxy> mReverseOutputStateMap;
 // }
