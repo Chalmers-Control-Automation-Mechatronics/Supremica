@@ -164,6 +164,7 @@ public class MonolithicControlLoopChecker
   //#########################################################################
   //# Algorithm
   protected void setUp()
+    throws AnalysisException
   {
     super.setUp();
     final ProductDESProxy des = getModel();

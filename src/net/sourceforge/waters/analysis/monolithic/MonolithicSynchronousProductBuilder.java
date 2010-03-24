@@ -71,6 +71,16 @@ public class MonolithicSynchronousProductBuilder
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
+  public Collection<EventProxy> getPropositions()
+  {
+    return mUsedPropositions;
+  }
+
+  public void setPropositions(final Collection<EventProxy> props)
+  {
+    mUsedPropositions = props;
+  }
+
   public void addMask(final Collection<EventProxy> hidden,
                       final EventProxy replacement)
   {
@@ -81,14 +91,9 @@ public class MonolithicSynchronousProductBuilder
     mMaskingPairs.add(pair);
   }
 
-  public Collection<EventProxy> getPropositions()
+  public void clearMask()
   {
-    return mUsedPropositions;
-  }
-
-  public void setPropositions(final Collection<EventProxy> props)
-  {
-    mUsedPropositions = props;
+    mMaskingPairs = null;
   }
 
   public SynchronousProductStateMap getStateMap()
@@ -130,6 +135,7 @@ public class MonolithicSynchronousProductBuilder
   //# Overrides for Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   protected void setUp()
+    throws AnalysisException
   {
     super.setUp();
 

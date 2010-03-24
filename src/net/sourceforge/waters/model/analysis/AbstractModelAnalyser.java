@@ -109,8 +109,10 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
    * This method should be called by all subclasses at the beginning of
    * each {@link ModelAnalyser#run() run()}. If overridden, the overriding
    * method should call the superclass methods first.
+   * @throws AnalysisException
    */
   protected void setUp()
+    throws AnalysisException
   {
     mIsAborting = false;
   }

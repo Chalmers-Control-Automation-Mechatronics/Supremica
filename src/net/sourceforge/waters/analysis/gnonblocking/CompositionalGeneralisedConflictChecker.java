@@ -50,13 +50,12 @@ import net.sourceforge.waters.xsd.des.ConflictKind;
  * @author Rachel Francis
  */
 
-public class CompositionalGeneralisedConflictChecker extends
-    AbstractConflictChecker implements ConflictChecker
+public class CompositionalGeneralisedConflictChecker
+  extends AbstractConflictChecker
 {
 
   // #########################################################################
   // # Constructors
-
   /**
    * Creates a new conflict checker without a model or marking proposition.
    */
@@ -108,7 +107,6 @@ public class CompositionalGeneralisedConflictChecker extends
   /**
    * Creates a new conflict checker to check a particular model for generalised
    * nonblocking.
-   *
    * @param model
    *          The model to be checked by this conflict checker.
    * @param marking
@@ -204,6 +202,7 @@ public class CompositionalGeneralisedConflictChecker extends
         // saturation
         // necessary for
         // every step
+        // TODO No---at least it shouldn't ...
         convertedTrace = step.convertTrace(convertedTrace);
       }
       setFailedResult(convertedTrace);
@@ -265,12 +264,6 @@ public class CompositionalGeneralisedConflictChecker extends
 
   /**
    * Builds the synchronous product for a given candidate.
-   *
-   * @param candidate
-   *
-   * @return
-   *
-   * @throws AnalysisException
    */
   private NonDeterministicComposer composeSynchronousProduct(
                                                              final Candidate candidate)
@@ -295,9 +288,6 @@ public class CompositionalGeneralisedConflictChecker extends
   /**
    * Creates a tau event with a name that reflects the automaton's alphabet it
    * will becomes part of.
-   *
-   * @param automaton
-   * @return
    */
   private EventProxy createTauEvent(final AutomatonProxy automaton)
   {
@@ -310,8 +300,6 @@ public class CompositionalGeneralisedConflictChecker extends
   /**
    * Hides the local events for a given candidate (replaces the events with a
    * silent event "tau").
-   *
-   * @param syncProduct
    */
   private AutomatonProxy hideLocalEvents(final AutomatonProxy automaton,
                                          final Set<EventProxy> localEvents,
@@ -356,9 +344,6 @@ public class CompositionalGeneralisedConflictChecker extends
   /**
    * Returns a set of events for a new model which is the alphabet from a given
    * set of automata.
-   *
-   * @param automataOfNewModel
-   * @return
    */
   private Set<EventProxy> getEventsForNewModel(
                                                final List<AutomatonProxy> automataOfNewModel)
@@ -418,10 +403,8 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
   /**
-   * <P>
    * Finds the set of events that are local to a candidate (i.e. a set of
    * automata).
-   * </P>
    */
   private Set<EventProxy> identifyLocalEvents(
                                               final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton,
@@ -440,9 +423,6 @@ public class CompositionalGeneralisedConflictChecker extends
   /**
    * Uses a heuristic to evaluate the set of candidates to select a suitable
    * candidate to compose next.
-   *
-   * @param candidates
-   * @return
    */
   private Candidate evaluateCandidates(Collection<Candidate> candidates)
   {
@@ -464,9 +444,6 @@ public class CompositionalGeneralisedConflictChecker extends
 
   /**
    * Finds the set of candidates to compose for a given model.
-   *
-   * @param model
-   * @return
    */
   private Collection<Candidate> findCandidates(final ProductDESProxy model)
   {
@@ -518,8 +495,6 @@ public class CompositionalGeneralisedConflictChecker extends
 
   /**
    * The given heuristic is used first to select a candidate to compose.
-   *
-   * @param heuristic
    */
   public void setSelectingHeuristic(final SelectingHeuristic heuristic)
   {
@@ -541,8 +516,6 @@ public class CompositionalGeneralisedConflictChecker extends
   /**
    * The first item in the list should be the first heuristic used to select a
    * candidate to compose, the last item in the list should be the last option.
-   *
-   * @param heuristicList
    */
   public void setSelectingHeuristic(final List<SelectingHeuristic> heuristicList)
   {
@@ -778,8 +751,6 @@ public class CompositionalGeneralisedConflictChecker extends
    * This heuristic is provided for when the other 3 fail to find one unique
    * candidate. The selection is made by comparing the candidates automata names
    * alphabetically.
-   *
-   * @author Rach
    */
   private class HeuristicDefault implements SelectingHeuristic
   {
@@ -875,7 +846,7 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     // #######################################################################
-
+    // # Auxiliary Methods
     /**
      * Fills in the target states in the stateMaps for each step of the trace
      * for the result automaton.
@@ -925,10 +896,6 @@ public class CompositionalGeneralisedConflictChecker extends
      * Finds the successor/target state in the result automaton, given a source
      * state and event. Used in deterministic cases only (in nondeterministic
      * cases the successors are already available in the step's stateMap).
-     *
-     * @param sourceState
-     * @param stepEvent
-     * @return
      */
     private StateProxy findSuccessor(final StateProxy sourceState,
                                      final EventProxy stepEvent)
@@ -948,10 +915,6 @@ public class CompositionalGeneralisedConflictChecker extends
     /**
      * Finds the initial state(s) of an automaton. A TraceStepProxy object is
      * passed for the case of multiple initial states.
-     *
-     * @param aut
-     * @param traceStep
-     * @return
      */
     protected StateProxy getInitialState(final AutomatonProxy aut,
                                          final TraceStepProxy traceStep)
@@ -1128,10 +1091,6 @@ public class CompositionalGeneralisedConflictChecker extends
     /**
      * Finds the event which was in the original automaton before hiding was
      * used and the event was replaced with tau.
-     *
-     * @param source
-     * @param target
-     * @return
      */
     private EventProxy findOriginalEvent(final StateProxy source,
                                          final StateProxy target)
@@ -1159,13 +1118,13 @@ public class CompositionalGeneralisedConflictChecker extends
   private class ObservationEquivalenceStep extends Step
   {
 
-    ObservationEquivalenceStep(
-                               final AutomatonProxy resultAut,
-                               final AutomatonProxy originalAut,
-                               final EventProxy tau,
-                               final StateProxy[] originalStates,
-                               final Map<Integer,int[]> classMap,
-                               final Map<StateProxy,Integer> reverseOutputStateMap)
+    private ObservationEquivalenceStep
+      (final AutomatonProxy resultAut,
+       final AutomatonProxy originalAut,
+       final EventProxy tau,
+       final StateProxy[] originalStates,
+       final Map<Integer,int[]> classMap,
+       final Map<StateProxy,Integer> reverseOutputStateMap)
     {
       super(resultAut, originalAut);
       mOriginalStates = originalStates;
@@ -1183,6 +1142,17 @@ public class CompositionalGeneralisedConflictChecker extends
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      // TODO Fix bug.
+      // The trace contains an initial state (the state you get from
+      // getInitialState()) in the result automaton, not the original
+      // automaton. Let us call this state S0. This state S0 represents
+      // a __class__ of states of the original automaton. It must be
+      // converted to a __state__ in the original automaton.
+      // To do so, start a breadth-first search from all initial states
+      // of the original automaton, following all tau transitions, until
+      // you find a state in the class of S0. The state you find becomes
+      // the originalSource, and the trace built up during the search
+      // becomes the initial segment of the converted trace.
       StateProxy originalSource =
           getInitialState(getOriginalAutomaton(), traceSteps.get(0));
       for (final TraceStepProxy step : traceSteps) {
@@ -1272,40 +1242,33 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       if (mOriginalStates[originalSource].getPropositions()
           .contains(getGeneralisedPrecondition())) {
-        return null;
+        return Collections.emptyList();
       }
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
       final TIntHashSet visited = new TIntHashSet();
       SearchRecord record = new SearchRecord(originalSource);
       open.add(record);
       visited.add(originalSource);
-      outer: while (true) {
+      while (true) {
         final SearchRecord current = open.remove();
         assert current != null;
         final int source = current.getState();
-        final boolean hasEvent = current.hasProperEvent();
         final TIntHashSet successors =
             mTransitionRelation.getSuccessors(source, mCodeOfTau);
         final TIntIterator iter = successors.iterator();
         while (iter.hasNext()) {
           final int target = iter.next();
           if (!visited.contains(target)) {
-            record = new SearchRecord(target, hasEvent, mCodeOfTau, current);
+            record = new SearchRecord(target, false, mCodeOfTau, current);
             if (mOriginalStates[target].getPropositions()
                 .contains(getGeneralisedPrecondition())) {
-              break outer;
+              return buildSearchRecordTrace(record);
             }
             open.add(record);
             visited.add(target);
           }
         }
       }
-      final List<SearchRecord> trace = new LinkedList<SearchRecord>();
-      do {
-        trace.add(0, record);
-        record = record.getPredecessor();
-      } while (record.getState() != originalSource);
-      return trace;
     }
 
     /**
@@ -1337,11 +1300,11 @@ public class CompositionalGeneralisedConflictChecker extends
       final TIntHashSet targetSet = new TIntHashSet(targetArray);
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
       final TIntHashSet visited0 = new TIntHashSet(); // event not in trace
-      final TIntHashSet visited1 = new TIntHashSet();// event in trace
+      final TIntHashSet visited1 = new TIntHashSet(); // event in trace
       SearchRecord record = new SearchRecord(originalSource);
       open.add(record);
       visited0.add(originalSource);
-      outer: while (true) {
+      while (true) {
         final SearchRecord current = open.remove();
         // Target must be reachable due to observation equivalence.
         assert current != null;
@@ -1356,7 +1319,7 @@ public class CompositionalGeneralisedConflictChecker extends
           if (!visited.contains(target)) {
             record = new SearchRecord(target, hasEvent, mCodeOfTau, current);
             if (hasEvent && targetSet.contains(target)) {
-              break outer;
+              return buildSearchRecordTrace(record);
             }
             open.add(record);
             visited.add(target);
@@ -1370,7 +1333,7 @@ public class CompositionalGeneralisedConflictChecker extends
             if (!visited1.contains(target)) {
               record = new SearchRecord(target, true, event, current);
               if (targetSet.contains(target)) {
-                break outer;
+                return buildSearchRecordTrace(record);
               }
               open.add(record);
               visited1.add(target);
@@ -1378,29 +1341,35 @@ public class CompositionalGeneralisedConflictChecker extends
           }
         }
       }
+    }
+
+    private List<SearchRecord> buildSearchRecordTrace(SearchRecord record)
+    {
       final List<SearchRecord> trace = new LinkedList<SearchRecord>();
       do {
         trace.add(0, record);
         record = record.getPredecessor();
-      } while (record.getState() != originalSource);
+      } while (record.getPredecessor() != null);
       return trace;
     }
 
 
+    // TODO Move out into main class, and make static.
+    // This now is a double-nested class, too much nesting ...
     // #########################################################################
     // # Inner Class SearchRecord
     private class SearchRecord
     {
-      //
+
       // #######################################################################
       // # Constructors
-      private SearchRecord(final int state)
+      SearchRecord(final int state)
       {
         this(state, false, -1, null);
       }
 
-      private SearchRecord(final int state, final boolean hasEvent,
-                           final int event, final SearchRecord pred)
+      SearchRecord(final int state, final boolean hasEvent,
+                   final int event, final SearchRecord pred)
       {
         mState = state;
         mHasProperEvent = hasEvent;
@@ -1410,27 +1379,26 @@ public class CompositionalGeneralisedConflictChecker extends
 
       // #######################################################################
       // # Getters
-      public boolean hasProperEvent()
+      boolean hasProperEvent()
       {
         return mHasProperEvent;
       }
 
-      public int getState()
+      int getState()
       {
         return mState;
       }
 
-      public SearchRecord getPredecessor()
+      SearchRecord getPredecessor()
       {
         return mPredecessor;
       }
 
-      public int getEvent()
+      int getEvent()
       {
         return mEvent;
       }
 
-      //
       // #######################################################################
       // # Data Members
       private final int mState;

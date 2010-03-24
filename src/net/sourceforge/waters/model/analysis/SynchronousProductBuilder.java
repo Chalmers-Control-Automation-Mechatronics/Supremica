@@ -24,7 +24,7 @@ import net.sourceforge.waters.model.des.EventProxy;
  * @author Robi Malik
  */
 
-public interface SynchronousProductBuilder extends ModelAnalyser
+public interface SynchronousProductBuilder extends AutomatonBuilder
 {
 
   //#########################################################################
@@ -57,6 +57,13 @@ public interface SynchronousProductBuilder extends ModelAnalyser
    */
   public void addMask(final Collection<EventProxy> hidden,
                       final EventProxy replacement);
+
+  /**
+   * Resets all event masks. This method clears any masks set by the
+   * {@link addMask(Collection<EventProxy>,EventProxy) addMask()} method,
+   * so any further computation is done without hiding.
+   */
+  public void clearMask();
 
 
   //#########################################################################
