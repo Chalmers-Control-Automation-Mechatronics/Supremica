@@ -1175,7 +1175,7 @@ public class CompositionalGeneralisedConflictChecker extends
           beginTrace(initialStates, tracesInitialState);
       assert initialSteps.size() > 0;
 
-      if (initialSteps.size() > 1) {
+      if (initialSteps.get(0).getPredecessor() != null) {
         final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
             new HashMap<AutomatonProxy,StateProxy>(1);
         final List<TraceStepProxy> substeps =
