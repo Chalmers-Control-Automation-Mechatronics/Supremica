@@ -1300,6 +1300,7 @@ public class CompositionalGeneralisedConflictChecker extends
         }
         final SearchRecord record = new SearchRecord(initStateID);
         open.add(record);
+        // visited.add(initStateID);
       }
       while (true) {
         final SearchRecord current = open.remove();
@@ -1315,7 +1316,7 @@ public class CompositionalGeneralisedConflictChecker extends
             if (!visited.contains(target)) {
               final SearchRecord record =
                   new SearchRecord(target, false, mCodeOfTau, current);
-              if (initialStatesIDs.contains(mOriginalStatesMap.get(target))) {
+              if (initialStatesIDs.contains(target)) {
                 return buildSearchRecordTrace(record);
               }
               open.add(record);
