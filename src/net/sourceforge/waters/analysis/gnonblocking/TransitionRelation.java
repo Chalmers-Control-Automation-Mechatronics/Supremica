@@ -43,6 +43,7 @@ public class TransitionRelation
   private final TIntHashSet[][] mPredecessors;
   private final TIntHashSet[] mActiveEvents;
   private final StateProxy[] mOriginalStates;
+  private final Map<StateProxy,Integer> mOriginalStatesMap;
   private Map<StateProxy,Integer> mResultingStates = null;
   private final boolean[] mMarked;
   private final boolean[] mPreMarked;
@@ -98,10 +99,12 @@ public class TransitionRelation
     mPreMarked = new boolean[aut.getStates().size()];
     mIsInitial = new boolean[aut.getStates().size()];
     mOriginalStates = new StateProxy[aut.getStates().size()];
-
+    mOriginalStatesMap =
+        new HashMap<StateProxy,Integer>(aut.getStates().size());
     for (final StateProxy s : aut.getStates()) {
       stateToInt.put(s, numstates);
       mOriginalStates[numstates] = s;
+      mOriginalStatesMap.put(s, numstates);
       if (s.getPropositions().contains(marked)
           || !aut.getEvents().contains(marked)) {
         markState(numstates, true, marked);
@@ -192,6 +195,11 @@ public class TransitionRelation
   public StateProxy[] getOriginalIntToStateMap()
   {
     return mOriginalStates;
+  }
+
+  public Map<StateProxy,Integer> getOriginalStateToIntMap()
+  {
+    return mOriginalStatesMap;
   }
 
   public Map<StateProxy,Integer> getResultingStateToIntMap()

@@ -1176,6 +1176,7 @@ public class CompositionalGeneralisedConflictChecker extends
           new TransitionRelation(originalAut, getMarkingProposition(),
               getGeneralisedPrecondition(), tau);
       mCodeOfTau = mTransitionRelation.getCodeOfTau();
+      mOriginalStatesMap = mTransitionRelation.getOriginalStateToIntMap();
     }
 
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
@@ -1183,33 +1184,41 @@ public class CompositionalGeneralisedConflictChecker extends
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
-      @SuppressWarnings("unused")
-      final StateProxy sourceState =
+      StateProxy originalSource =
           getInitialState(getResultAutomaton(), traceSteps.get(0));
       for (final TraceStepProxy step : traceSteps) {
         // replaces automaton in step's step map
         final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
             new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
-        if (stepsNewStateMap.containsKey(getResultAutomaton())) {
-          stepsNewStateMap.put(getOriginalAutomaton(), stepsNewStateMap
-              .get(getResultAutomaton()));
-        }
 
-        // replaces tau events with original event before hiding
-        /*
-         * final EventProxy stepEvent = step.getEvent(); if (stepEvent != null)
-         * { final StateProxy targetState =
-         * stepsNewStateMap.get(getResultAutomaton()); assert targetState !=
-         * null; stepsNewStateMap.remove(getResultAutomaton()); TraceStepProxy
-         * convertedStep; if (stepEvent == mTau) { final StateProxy
-         * originalTargetState = findOriginalTargetState(sourceState,
-         * stepEvent); convertedStep =
-         * getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap); //
-         * need to add states to state map } else { convertedStep =
-         * getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap); }
-         * convertedSteps.add(convertedStep); sourceState = targetState; } else
-         * { convertedSteps.add(step); }
-         */
+        final EventProxy stepEvent = step.getEvent();
+        if (stepEvent != null) {
+          final StateProxy resultTargetState =
+              stepsNewStateMap.get(getResultAutomaton());
+          assert resultTargetState != null;
+          stepsNewStateMap.remove(getResultAutomaton());
+          TraceStepProxy convertedStep;
+          final List<SearchRecord> subtrace =
+              findSubTrace(mOriginalStatesMap.get(originalSource),
+                           mTransitionRelation.getEventInt(stepEvent),
+                           mReverseOutputStateMap.get(resultTargetState));
+          for (final SearchRecord subStep : subtrace) {
+            final int subStepTargetStateID = subStep.getState();
+            stepsNewStateMap.put(getOriginalAutomaton(),
+                                 mOriginalStates[subStepTargetStateID]);
+            final int subStepEventID = subStep.getEvent();
+            convertedStep =
+                getFactory()
+                    .createTraceStepProxy(
+                                          mTransitionRelation
+                                              .getEvent(subStepEventID),
+                                          stepsNewStateMap);
+            convertedSteps.add(convertedStep);
+          }
+          final int originalTargetID =
+              subtrace.get(subtrace.size() - 1).getState();
+          originalSource = mOriginalStates[originalTargetID];
+        }
       }
       final Set<AutomatonProxy> traceAutomata =
           new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
@@ -1262,7 +1271,6 @@ public class CompositionalGeneralisedConflictChecker extends
      *         in the list can only be tau or the given event. The list cannot
      *         be empty, because it must include at least the given event.
      */
-    @SuppressWarnings("unused")
     private List<SearchRecord> findSubTrace(final int originalSource,
                                             final int event,
                                             final int targetClass)
@@ -1359,12 +1367,16 @@ public class CompositionalGeneralisedConflictChecker extends
         return mPredecessor;
       }
 
+      public int getEvent()
+      {
+        return mEvent;
+      }
+
       //
       // #######################################################################
       // # Data Members
       private final int mState;
       private final boolean mHasProperEvent;
-      @SuppressWarnings("unused")
       private final int mEvent;
       private final SearchRecord mPredecessor;
     }
@@ -1409,8 +1421,10 @@ public class CompositionalGeneralisedConflictChecker extends
      * Obtained from TransitionRelation.
      */
     private final Map<StateProxy,Integer> mReverseOutputStateMap;
+
     private final TransitionRelation mTransitionRelation;
     private final int mCodeOfTau;
+    private final Map<StateProxy,Integer> mOriginalStatesMap;
   }
 
   // #########################################################################
