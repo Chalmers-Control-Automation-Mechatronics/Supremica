@@ -1197,28 +1197,27 @@ public class CompositionalGeneralisedConflictChecker extends
               stepsNewStateMap.get(getResultAutomaton());
           assert resultTargetState != null;
           stepsNewStateMap.remove(getResultAutomaton());
-          TraceStepProxy convertedStep;
           final List<SearchRecord> subtrace =
               findSubTrace(mOriginalStatesMap.get(originalSource),
                            mTransitionRelation.getEventInt(stepEvent),
                            mReverseOutputStateMap.get(resultTargetState));
-          for (final SearchRecord subStep : subtrace) {
-            final int subStepTargetStateID = subStep.getState();
-            stepsNewStateMap.put(getOriginalAutomaton(),
-                                 mOriginalStates[subStepTargetStateID]);
-            final int subStepEventID = subStep.getEvent();
-            convertedStep =
-                getFactory()
-                    .createTraceStepProxy(
-                                          mTransitionRelation
-                                              .getEvent(subStepEventID),
-                                          stepsNewStateMap);
-            convertedSteps.add(convertedStep);
-          }
+          final List<TraceStepProxy> substeps =
+              createTraceSteps(stepsNewStateMap, subtrace);
+          convertedSteps.addAll(substeps);
           final int originalTargetID =
               subtrace.get(subtrace.size() - 1).getState();
           originalSource = mOriginalStates[originalTargetID];
         }
+      }
+      // makes the state end in an alpha state
+      final List<SearchRecord> finalSteps =
+          completeTrace(mOriginalStatesMap.get(originalSource));
+      if (finalSteps != null) {
+        final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(1);
+        final List<TraceStepProxy> substeps =
+            createTraceSteps(finalStepsStateMap, finalSteps);
+        convertedSteps.addAll(substeps);
       }
       final Set<AutomatonProxy> traceAutomata =
           new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
@@ -1249,6 +1248,66 @@ public class CompositionalGeneralisedConflictChecker extends
     // TODO
     // You need to do similar things for initial states and end (alpha) states.
     // That will be simpler, using only one visited set.
+
+    private List<TraceStepProxy> createTraceSteps(
+                                                  final Map<AutomatonProxy,StateProxy> stepsStateMap,
+                                                  final List<SearchRecord> subtrace)
+    {
+      final List<TraceStepProxy> substeps = new LinkedList<TraceStepProxy>();
+      for (final SearchRecord subStep : subtrace) {
+        final int subStepTargetStateID = subStep.getState();
+        stepsStateMap.put(getOriginalAutomaton(),
+                          mOriginalStates[subStepTargetStateID]);
+        final int subStepEventID = subStep.getEvent();
+        final TraceStepProxy convertedStep =
+            getFactory().createTraceStepProxy(
+                                              mTransitionRelation
+                                                  .getEvent(subStepEventID),
+                                              stepsStateMap);
+        substeps.add(convertedStep);
+      }
+      return substeps;
+    }
+
+    private List<SearchRecord> completeTrace(final int originalSource)
+    {
+      if (mOriginalStates[originalSource].getPropositions()
+          .contains(getGeneralisedPrecondition())) {
+        return null;
+      }
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      final TIntHashSet visited = new TIntHashSet();
+      SearchRecord record = new SearchRecord(originalSource);
+      open.add(record);
+      visited.add(originalSource);
+      outer: while (true) {
+        final SearchRecord current = open.remove();
+        assert current != null;
+        final int source = current.getState();
+        final boolean hasEvent = current.hasProperEvent();
+        final TIntHashSet successors =
+            mTransitionRelation.getSuccessors(source, mCodeOfTau);
+        final TIntIterator iter = successors.iterator();
+        while (iter.hasNext()) {
+          final int target = iter.next();
+          if (!visited.contains(target)) {
+            record = new SearchRecord(target, hasEvent, mCodeOfTau, current);
+            if (mOriginalStates[target].getPropositions()
+                .contains(getGeneralisedPrecondition())) {
+              break outer;
+            }
+            open.add(record);
+            visited.add(target);
+          }
+        }
+      }
+      final List<SearchRecord> trace = new LinkedList<SearchRecord>();
+      do {
+        trace.add(0, record);
+        record = record.getPredecessor();
+      } while (record.getState() != originalSource);
+      return trace;
+    }
 
     /**
      * Finds a partial trace in the original automaton before observation
