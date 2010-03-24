@@ -1159,6 +1159,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      final int originalSourceID;
 
       // makes the trace begin in the correct initial state
       final StateProxy tracesInitialState =
@@ -1167,15 +1168,19 @@ public class CompositionalGeneralisedConflictChecker extends
           (Set<StateProxy>) getInitialStates(getOriginalAutomaton());
       final List<SearchRecord> initialSteps =
           beginTrace(initialStates, tracesInitialState);
-      if (initialSteps.size() > 0) {
+      assert initialSteps.size() > 0;
+
+      if (initialSteps.size() > 1) {
         final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
             new HashMap<AutomatonProxy,StateProxy>(1);
         final List<TraceStepProxy> substeps =
             createTraceSteps(finalStepsStateMap, initialSteps);
         convertedSteps.addAll(substeps);
+        originalSourceID = initialSteps.get(initialSteps.size() - 1).getState();
+      } else {
+        originalSourceID = initialSteps.get(0).getState();
       }
-      final int originalSourceID =
-          initialSteps.get(initialSteps.size() - 1).getState();
+
       StateProxy originalSource = mOriginalStates[originalSourceID];
       for (final TraceStepProxy step : traceSteps) {
         final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
@@ -1280,8 +1285,10 @@ public class CompositionalGeneralisedConflictChecker extends
       }
       initialStates = null;
       for (final StateProxy initialstate : initialstates) {
-        if (initialStatesIDs.contains(mOriginalStatesMap.get(initialstate))) {
-          return Collections.emptyList();
+        final int initStateID = mOriginalStatesMap.get(initialstate);
+        if (initialStatesIDs.contains(initStateID)) {
+          return Collections.singletonList(new SearchRecord(initStateID, false,
+              mCodeOfTau, null));
         }
       }
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
