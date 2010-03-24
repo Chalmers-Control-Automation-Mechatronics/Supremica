@@ -1290,18 +1290,15 @@ public class CompositionalGeneralisedConflictChecker extends
         initialStatesIDs.add(s);
       }
       initialStates = null;
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      final TIntHashSet visited = new TIntHashSet();
       for (final StateProxy initialstate : initialstates) {
         final int initStateID = mOriginalStatesMap.get(initialstate);
         if (initialStatesIDs.contains(initStateID)) {
           return Collections.singletonList(new SearchRecord(initStateID, false,
               mCodeOfTau, null));
         }
-      }
-      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
-      final TIntHashSet visited = new TIntHashSet();
-      for (final StateProxy initialState : initialstates) {
-        final SearchRecord record =
-            new SearchRecord(mOriginalStatesMap.get(initialState));
+        final SearchRecord record = new SearchRecord(initStateID);
         open.add(record);
       }
       while (true) {
@@ -1311,17 +1308,19 @@ public class CompositionalGeneralisedConflictChecker extends
         visited.add(source);
         final TIntHashSet successors =
             mTransitionRelation.getSuccessors(source, mCodeOfTau);
-        final TIntIterator iter = successors.iterator();
-        while (iter.hasNext()) {
-          final int target = iter.next();
-          if (!visited.contains(target)) {
-            final SearchRecord record =
-                new SearchRecord(target, false, mCodeOfTau, current);
-            if (initialStatesIDs.contains(mOriginalStatesMap.get(target))) {
-              return buildSearchRecordTrace(record);
+        if (successors != null) {
+          final TIntIterator iter = successors.iterator();
+          while (iter.hasNext()) {
+            final int target = iter.next();
+            if (!visited.contains(target)) {
+              final SearchRecord record =
+                  new SearchRecord(target, false, mCodeOfTau, current);
+              if (initialStatesIDs.contains(mOriginalStatesMap.get(target))) {
+                return buildSearchRecordTrace(record);
+              }
+              open.add(record);
+              visited.add(target);
             }
-            open.add(record);
-            visited.add(target);
           }
         }
       }
