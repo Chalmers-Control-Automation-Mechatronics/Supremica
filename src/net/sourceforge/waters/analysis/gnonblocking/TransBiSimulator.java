@@ -180,10 +180,11 @@ public class TransBiSimulator
       System.out.println("WTF?");
       System.exit(4);
     }
-    if (mP.size() == mStateNum) {
-      for (final SimpleEquivalenceClass sec : mP) {
-        mClassMap.put(sec.mStates[0], sec.mStates);
-      }
+    if (mP.size() == mStateNum) {/*
+                                  * for (final SimpleEquivalenceClass sec : mP)
+                                  * { mClassMap.put(sec.mStates[0],
+                                  * sec.mStates); }
+                                  */
       return false;
     }
     for (final SimpleEquivalenceClass sec : mP) {

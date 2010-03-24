@@ -231,14 +231,18 @@ public class CompositionalGeneralisedConflictChecker extends
             getGeneralisedPrecondition(), tau);
     final TransBiSimulator transBiSimulator =
         new TransBiSimulator(tr, tr.getCodeOfTau());
-    transBiSimulator.run();
-    final AutomatonProxy convertedAut = tr.getAutomaton(getFactory());
-    final ObservationEquivalenceStep oeStep =
-        new ObservationEquivalenceStep(convertedAut, autToAbstract, tau, tr
-            .getOriginalIntToStateMap(), transBiSimulator.getStateClasses(), tr
-            .getResultingStateToIntMap());
-    mModifyingSteps.add(oeStep);
-    return convertedAut;
+    final boolean modified = transBiSimulator.run();
+    if (modified) {
+      final AutomatonProxy convertedAut = tr.getAutomaton(getFactory());
+      final ObservationEquivalenceStep oeStep =
+          new ObservationEquivalenceStep(convertedAut, autToAbstract, tau, tr
+              .getOriginalIntToStateMap(), transBiSimulator.getStateClasses(),
+              tr.getResultingStateToIntMap());
+      mModifyingSteps.add(oeStep);
+      return convertedAut;
+    } else {
+      return autToAbstract;
+    }
   }
 
   /**
@@ -1157,68 +1161,65 @@ public class CompositionalGeneralisedConflictChecker extends
 
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
-      List<TraceStepProxy> convertedSteps = new ArrayList<TraceStepProxy>();
-      if (mClassMap.size() > 0) {
-        final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
-        final int originalSourceID;
+      final List<TraceStepProxy> convertedSteps =
+          new ArrayList<TraceStepProxy>();
+      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      final int originalSourceID;
 
-        // makes the trace begin in the correct initial state
-        final StateProxy tracesInitialState =
-            getInitialState(getResultAutomaton(), traceSteps.get(0));
-        final Set<StateProxy> initialStates =
-            (Set<StateProxy>) getInitialStates(getOriginalAutomaton());
-        final List<SearchRecord> initialSteps =
-            beginTrace(initialStates, tracesInitialState);
-        assert initialSteps.size() > 0;
+      // makes the trace begin in the correct initial state
+      final StateProxy tracesInitialState =
+          getInitialState(getResultAutomaton(), traceSteps.get(0));
+      final Set<StateProxy> initialStates =
+          (Set<StateProxy>) getInitialStates(getOriginalAutomaton());
+      final List<SearchRecord> initialSteps =
+          beginTrace(initialStates, tracesInitialState);
+      assert initialSteps.size() > 0;
 
-        if (initialSteps.size() > 1) {
-          final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
-              new HashMap<AutomatonProxy,StateProxy>(1);
-          final List<TraceStepProxy> substeps =
-              createTraceSteps(finalStepsStateMap, initialSteps);
-          convertedSteps.addAll(substeps);
-          originalSourceID =
-              initialSteps.get(initialSteps.size() - 1).getState();
-        } else {
-          originalSourceID = initialSteps.get(0).getState();
-        }
-
-        StateProxy originalSource = mOriginalStates[originalSourceID];
-        for (final TraceStepProxy step : traceSteps) {
-          final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
-              new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
-
-          final EventProxy stepEvent = step.getEvent();
-          if (stepEvent != null) {
-            final StateProxy resultTargetState =
-                stepsNewStateMap.get(getResultAutomaton());
-            assert resultTargetState != null;
-            stepsNewStateMap.remove(getResultAutomaton());
-            final List<SearchRecord> subtrace =
-                findSubTrace(mOriginalStatesMap.get(originalSource),
-                             mTransitionRelation.getEventInt(stepEvent),
-                             mReverseOutputStateMap.get(resultTargetState));
-            final List<TraceStepProxy> substeps =
-                createTraceSteps(stepsNewStateMap, subtrace);
-            convertedSteps.addAll(substeps);
-            final int originalTargetID =
-                subtrace.get(subtrace.size() - 1).getState();
-            originalSource = mOriginalStates[originalTargetID];
-          }
-        }
-        // makes the trace end in an alpha state
-        final List<SearchRecord> finalSteps =
-            completeTrace(mOriginalStatesMap.get(originalSource));
-        if (finalSteps.size() > 0) {
-          final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
-              new HashMap<AutomatonProxy,StateProxy>(1);
-          final List<TraceStepProxy> substeps =
-              createTraceSteps(finalStepsStateMap, finalSteps);
-          convertedSteps.addAll(substeps);
-        }
+      if (initialSteps.size() > 1) {
+        final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(1);
+        final List<TraceStepProxy> substeps =
+            createTraceSteps(finalStepsStateMap, initialSteps);
+        convertedSteps.addAll(substeps);
+        originalSourceID = initialSteps.get(initialSteps.size() - 1).getState();
       } else {
-        convertedSteps = conflictTrace.getTraceSteps();
+        originalSourceID = initialSteps.get(0).getState();
       }
+
+      StateProxy originalSource = mOriginalStates[originalSourceID];
+      for (final TraceStepProxy step : traceSteps) {
+        final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
+
+        final EventProxy stepEvent = step.getEvent();
+        if (stepEvent != null) {
+          final StateProxy resultTargetState =
+              stepsNewStateMap.get(getResultAutomaton());
+          assert resultTargetState != null;
+          stepsNewStateMap.remove(getResultAutomaton());
+          final List<SearchRecord> subtrace =
+              findSubTrace(mOriginalStatesMap.get(originalSource),
+                           mTransitionRelation.getEventInt(stepEvent),
+                           mReverseOutputStateMap.get(resultTargetState));
+          final List<TraceStepProxy> substeps =
+              createTraceSteps(stepsNewStateMap, subtrace);
+          convertedSteps.addAll(substeps);
+          final int originalTargetID =
+              subtrace.get(subtrace.size() - 1).getState();
+          originalSource = mOriginalStates[originalTargetID];
+        }
+      }
+      // makes the trace end in an alpha state
+      final List<SearchRecord> finalSteps =
+          completeTrace(mOriginalStatesMap.get(originalSource));
+      if (finalSteps.size() > 0) {
+        final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(1);
+        final List<TraceStepProxy> substeps =
+            createTraceSteps(finalStepsStateMap, finalSteps);
+        convertedSteps.addAll(substeps);
+      }
+
       final Set<AutomatonProxy> traceAutomata =
           new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
       traceAutomata.remove(getResultAutomaton());
