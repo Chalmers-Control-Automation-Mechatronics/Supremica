@@ -940,7 +940,7 @@ public class CompositionalGeneralisedConflictChecker extends
      */
     protected Collection<StateProxy> getInitialStates(final AutomatonProxy aut)
     {
-      final Collection<StateProxy> initialstates = new ArrayList<StateProxy>();
+      final Collection<StateProxy> initialstates = new HashSet<StateProxy>();
       for (final StateProxy state : aut.getStates()) {
         if (state.isInitial()) {
           initialstates.add(state);
@@ -1273,7 +1273,7 @@ public class CompositionalGeneralisedConflictChecker extends
           mReverseOutputStateMap.get(resultAutInitialStateClass);
       int[] initialStates = mClassMap.get(initialStateClass);
       final List<Integer> initialStatesIDs =
-          new ArrayList<Integer>(initialStates.clone().length);
+          new ArrayList<Integer>(initialStates.length);
       for (final int s : initialStates) {
         initialStatesIDs.add(s);
       }
