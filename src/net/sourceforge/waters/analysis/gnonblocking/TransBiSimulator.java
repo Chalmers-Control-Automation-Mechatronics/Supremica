@@ -181,6 +181,9 @@ public class TransBiSimulator
       System.exit(4);
     }
     if (mP.size() == mStateNum) {
+      for (final SimpleEquivalenceClass sec : mP) {
+        mClassMap.put(sec.mStates[0], sec.mStates);
+      }
       return false;
     }
     for (final SimpleEquivalenceClass sec : mP) {
