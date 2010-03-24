@@ -50,8 +50,8 @@ import net.sourceforge.waters.xsd.des.ConflictKind;
  * @author Rachel Francis
  */
 
-public class CompositionalGeneralisedConflictChecker
-  extends AbstractConflictChecker
+public class CompositionalGeneralisedConflictChecker extends
+    AbstractConflictChecker
 {
 
   // #########################################################################
@@ -107,6 +107,7 @@ public class CompositionalGeneralisedConflictChecker
   /**
    * Creates a new conflict checker to check a particular model for generalised
    * nonblocking.
+   *
    * @param model
    *          The model to be checked by this conflict checker.
    * @param marking
@@ -913,7 +914,7 @@ public class CompositionalGeneralisedConflictChecker
     }
 
     /**
-     * Finds the initial state(s) of an automaton. A TraceStepProxy object is
+     * Finds the initial state of an automaton. A TraceStepProxy object is
      * passed for the case of multiple initial states.
      */
     protected StateProxy getInitialState(final AutomatonProxy aut,
@@ -932,6 +933,21 @@ public class CompositionalGeneralisedConflictChecker
         }
       }
       return initial;
+    }
+
+    /**
+     * Returns a collection containing all initial states of an automaton.
+     */
+    protected Collection<StateProxy> getInitialStates(final AutomatonProxy aut)
+    {
+      final Collection<StateProxy> initialstates = new ArrayList<StateProxy>();
+      for (final StateProxy state : aut.getStates()) {
+        if (state.isInitial()) {
+          initialstates.add(state);
+        }
+      }
+      assert initialstates.size() > 0;
+      return initialstates;
     }
 
     // #######################################################################
@@ -1118,13 +1134,13 @@ public class CompositionalGeneralisedConflictChecker
   private class ObservationEquivalenceStep extends Step
   {
 
-    private ObservationEquivalenceStep
-      (final AutomatonProxy resultAut,
-       final AutomatonProxy originalAut,
-       final EventProxy tau,
-       final StateProxy[] originalStates,
-       final Map<Integer,int[]> classMap,
-       final Map<StateProxy,Integer> reverseOutputStateMap)
+    private ObservationEquivalenceStep(
+                                       final AutomatonProxy resultAut,
+                                       final AutomatonProxy originalAut,
+                                       final EventProxy tau,
+                                       final StateProxy[] originalStates,
+                                       final Map<Integer,int[]> classMap,
+                                       final Map<StateProxy,Integer> reverseOutputStateMap)
     {
       super(resultAut, originalAut);
       mOriginalStates = originalStates;
@@ -1142,21 +1158,25 @@ public class CompositionalGeneralisedConflictChecker
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
-      // TODO Fix bug.
-      // The trace contains an initial state (the state you get from
-      // getInitialState()) in the result automaton, not the original
-      // automaton. Let us call this state S0. This state S0 represents
-      // a __class__ of states of the original automaton. It must be
-      // converted to a __state__ in the original automaton.
-      // To do so, start a breadth-first search from all initial states
-      // of the original automaton, following all tau transitions, until
-      // you find a state in the class of S0. The state you find becomes
-      // the originalSource, and the trace built up during the search
-      // becomes the initial segment of the converted trace.
-      StateProxy originalSource =
-          getInitialState(getOriginalAutomaton(), traceSteps.get(0));
+
+      // makes the trace begin in the correct initial state
+      final StateProxy tracesInitialState =
+          getInitialState(getResultAutomaton(), traceSteps.get(0));
+      final Set<StateProxy> initialStates =
+          (Set<StateProxy>) getInitialStates(getOriginalAutomaton());
+      final List<SearchRecord> initialSteps =
+          beginTrace(initialStates, tracesInitialState);
+      if (initialSteps.size() > 0) {
+        final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(1);
+        final List<TraceStepProxy> substeps =
+            createTraceSteps(finalStepsStateMap, initialSteps);
+        convertedSteps.addAll(substeps);
+      }
+      final int originalSourceID =
+          initialSteps.get(initialSteps.size() - 1).getState();
+      StateProxy originalSource = mOriginalStates[originalSourceID];
       for (final TraceStepProxy step : traceSteps) {
-        // replaces automaton in step's step map
         final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
             new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
 
@@ -1178,10 +1198,10 @@ public class CompositionalGeneralisedConflictChecker
           originalSource = mOriginalStates[originalTargetID];
         }
       }
-      // makes the state end in an alpha state
+      // makes the trace end in an alpha state
       final List<SearchRecord> finalSteps =
           completeTrace(mOriginalStatesMap.get(originalSource));
-      if (finalSteps != null) {
+      if (finalSteps.size() > 0) {
         final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
             new HashMap<AutomatonProxy,StateProxy>(1);
         final List<TraceStepProxy> substeps =
@@ -1202,22 +1222,16 @@ public class CompositionalGeneralisedConflictChecker
       return convertedTrace;
     }
 
-    // TODO
-    // Here is how I would do the breadth-first search,
-    // assuming I have got a TransitionRelation,
-    // and the codes of all states and events including tau.
-    // This is still tricky because of the need to create a trace containing
-    // the event exactly once, but possibly with taus before and after,
-    // so I am using two visited sets. (Alternatively, we could use a visited
-    // set of search records, which implement equality and hash code based on
-    // their state and hasEvent attributes.)
-    // Also note how the search records store the trace in reverse order.
-    // I just hope the code is at least half-way correct ...
-
-    // TODO
-    // You need to do similar things for initial states and end (alpha) states.
-    // That will be simpler, using only one visited set.
-
+    /**
+     * Given a list of SearchRecord's a list of TraceStepProxy's is created and
+     * returned. A TraceStepProxy is created for each SearchRecord.
+     *
+     * @param stepsStateMap
+     *          The state map for the step before adding the new information.
+     * @param subtrace
+     *          The list of search records to convert into steps of a trace.
+     * @return A list of steps for a trace.
+     */
     private List<TraceStepProxy> createTraceSteps(
                                                   final Map<AutomatonProxy,StateProxy> stepsStateMap,
                                                   final List<SearchRecord> subtrace)
@@ -1238,6 +1252,77 @@ public class CompositionalGeneralisedConflictChecker
       return substeps;
     }
 
+    /**
+     * Creates the beginning of a trace by doing a breadth-first search to find
+     * the correct initial state of the original automaton. Steps are added for
+     * tau transitions (if necessary) until the initial state of the result
+     * automaton is reached.
+     *
+     * @param originalSource
+     *          The original end state, which may or may not have the alpha
+     *          marking proposition.
+     * @return A list of SearchRecord's that represent each extra step needed
+     *         for the start of the trace. (The first item being the very first
+     *         state of the trace).
+     */
+    private List<SearchRecord> beginTrace(
+                                          final Set<StateProxy> initialstates,
+                                          final StateProxy resultAutInitialStateClass)
+    {
+      final int initialStateClass =
+          mReverseOutputStateMap.get(resultAutInitialStateClass);
+      int[] initialStates = mClassMap.get(initialStateClass);
+      final List<Integer> initialStatesIDs =
+          new ArrayList<Integer>(initialStates.clone().length);
+      for (final int s : initialStates) {
+        initialStatesIDs.add(s);
+      }
+      initialStates = null;
+      for (final StateProxy initialstate : initialstates) {
+        if (initialStatesIDs.contains(mOriginalStatesMap.get(initialstate))) {
+          return Collections.emptyList();
+        }
+      }
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      final TIntHashSet visited = new TIntHashSet();
+      for (final StateProxy initialState : initialstates) {
+        final SearchRecord record =
+            new SearchRecord(mOriginalStatesMap.get(initialState));
+        open.add(record);
+      }
+      while (true) {
+        final SearchRecord current = open.remove();
+        assert current != null;
+        final int source = current.getState();
+        visited.add(source);
+        final TIntHashSet successors =
+            mTransitionRelation.getSuccessors(source, mCodeOfTau);
+        final TIntIterator iter = successors.iterator();
+        while (iter.hasNext()) {
+          final int target = iter.next();
+          if (!visited.contains(target)) {
+            final SearchRecord record =
+                new SearchRecord(target, false, mCodeOfTau, current);
+            if (initialStatesIDs.contains(mOriginalStatesMap.get(target))) {
+              return buildSearchRecordTrace(record);
+            }
+            open.add(record);
+            visited.add(target);
+          }
+        }
+      }
+    }
+
+    /**
+     * Completes a trace by adding steps for tau transitions (if necessary)
+     * until the end state of the trace has the alpha marking.
+     *
+     * @param originalSource
+     *          The original end state, which may or may not have the alpha
+     *          marking proposition.
+     * @return A list of SearchRecord's that represent each extra step added of
+     *         the trace. (The last item being the end state of the trace).
+     */
     private List<SearchRecord> completeTrace(final int originalSource)
     {
       if (mOriginalStates[originalSource].getPropositions()
@@ -1353,60 +1438,6 @@ public class CompositionalGeneralisedConflictChecker
       return trace;
     }
 
-
-    // TODO Move out into main class, and make static.
-    // This now is a double-nested class, too much nesting ...
-    // #########################################################################
-    // # Inner Class SearchRecord
-    private class SearchRecord
-    {
-
-      // #######################################################################
-      // # Constructors
-      SearchRecord(final int state)
-      {
-        this(state, false, -1, null);
-      }
-
-      SearchRecord(final int state, final boolean hasEvent,
-                   final int event, final SearchRecord pred)
-      {
-        mState = state;
-        mHasProperEvent = hasEvent;
-        mEvent = event;
-        mPredecessor = pred;
-      }
-
-      // #######################################################################
-      // # Getters
-      boolean hasProperEvent()
-      {
-        return mHasProperEvent;
-      }
-
-      int getState()
-      {
-        return mState;
-      }
-
-      SearchRecord getPredecessor()
-      {
-        return mPredecessor;
-      }
-
-      int getEvent()
-      {
-        return mEvent;
-      }
-
-      // #######################################################################
-      // # Data Members
-      private final int mState;
-      private final boolean mHasProperEvent;
-      private final int mEvent;
-      private final SearchRecord mPredecessor;
-    }
-
     /**
      * Demo implementation of getOriginalStates method as above. Probably not
      * needed in this form. More likely, the convertTrace() method will use the
@@ -1451,6 +1482,58 @@ public class CompositionalGeneralisedConflictChecker
     private final TransitionRelation mTransitionRelation;
     private final int mCodeOfTau;
     private final Map<StateProxy,Integer> mOriginalStatesMap;
+  }
+
+
+  // #########################################################################
+  // # Inner Class SearchRecord
+  private static class SearchRecord
+  {
+
+    // #######################################################################
+    // # Constructors
+    SearchRecord(final int state)
+    {
+      this(state, false, -1, null);
+    }
+
+    SearchRecord(final int state, final boolean hasEvent, final int event,
+                 final SearchRecord pred)
+    {
+      mState = state;
+      mHasProperEvent = hasEvent;
+      mEvent = event;
+      mPredecessor = pred;
+    }
+
+    // #######################################################################
+    // # Getters
+    boolean hasProperEvent()
+    {
+      return mHasProperEvent;
+    }
+
+    int getState()
+    {
+      return mState;
+    }
+
+    SearchRecord getPredecessor()
+    {
+      return mPredecessor;
+    }
+
+    int getEvent()
+    {
+      return mEvent;
+    }
+
+    // #######################################################################
+    // # Data Members
+    private final int mState;
+    private final boolean mHasProperEvent;
+    private final int mEvent;
+    private final SearchRecord mPredecessor;
   }
 
   // #########################################################################
