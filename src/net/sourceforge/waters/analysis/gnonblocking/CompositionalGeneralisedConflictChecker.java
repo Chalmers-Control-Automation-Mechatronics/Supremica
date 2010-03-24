@@ -232,12 +232,13 @@ public class CompositionalGeneralisedConflictChecker extends
     final TransBiSimulator transBiSimulator =
         new TransBiSimulator(tr, tr.getCodeOfTau());
     transBiSimulator.run();
+    final AutomatonProxy convertedAut = tr.getAutomaton(getFactory());
     final ObservationEquivalenceStep oeStep =
-        new ObservationEquivalenceStep(tr.getAutomaton(getFactory()),
-            autToAbstract, tau, tr.getOriginalIntToStateMap(), transBiSimulator
-                .getStateClasses(), tr.getResultingStateToIntMap());
+        new ObservationEquivalenceStep(convertedAut, autToAbstract, tau, tr
+            .getOriginalIntToStateMap(), transBiSimulator.getStateClasses(), tr
+            .getResultingStateToIntMap());
     mModifyingSteps.add(oeStep);
-    return tr.getAutomaton(getFactory());
+    return convertedAut;
   }
 
   /**
@@ -1217,6 +1218,8 @@ public class CompositionalGeneralisedConflictChecker extends
       final Set<AutomatonProxy> traceAutomata =
           new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
       traceAutomata.remove(getResultAutomaton());
+      System.out.println(getResultAutomaton());
+      System.out.println(getOriginalAutomaton());
       traceAutomata.add(getOriginalAutomaton());
       final ConflictTraceProxy convertedTrace =
           getFactory().createConflictTraceProxy(conflictTrace.getName(),
