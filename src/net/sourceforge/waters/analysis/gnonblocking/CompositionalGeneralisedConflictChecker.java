@@ -167,14 +167,14 @@ public class CompositionalGeneralisedConflictChecker extends
           hideLocalEvents(syncProduct, candidate.getLocalEvents(), tauEvent);
 
       // TODO Abstraction rules here
-      // final AutomatonProxy abstractedAut =
-      // applyAbstractionRules(autToAbstract,tau);
+      final AutomatonProxy abstractedAut =
+          applyAbstractionRules(autToAbstract, tauEvent);
 
       // removes the composed automata for this candidate from the set of
       // remaining automata and adds the newly composed candidate
       remainingAut.removeAll(candidate.getAutomata());
-      remainingAut.add(autToAbstract);
-      updateEventsToAutomata(autToAbstract, candidate.getAutomata());
+      remainingAut.add(abstractedAut);
+      updateEventsToAutomata(abstractedAut, candidate.getAutomata());
 
       // updates the current model to find candidates from
       final Set<EventProxy> composedModelAlphabet =
@@ -1185,7 +1185,7 @@ public class CompositionalGeneralisedConflictChecker extends
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
       StateProxy originalSource =
-          getInitialState(getResultAutomaton(), traceSteps.get(0));
+          getInitialState(getOriginalAutomaton(), traceSteps.get(0));
       for (final TraceStepProxy step : traceSteps) {
         // replaces automaton in step's step map
         final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
