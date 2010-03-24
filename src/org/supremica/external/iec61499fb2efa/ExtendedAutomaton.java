@@ -92,23 +92,6 @@ class ExtendedAutomaton
         allAcceptingStates = acceptingStates;
 	}
 
-    // 	 ExtendedAutomaton(String name, ComponentKind kind, ExtendedAutomata automata) 
-    // 	{
-    // 		this.name = name;
-
-    // 		factory = ModuleSubjectFactory.getInstance();
-		
-    // 		this.automata = automata;
-		
-    // 		module = automata.getModule();
-
-    // 		identifier = factory.createSimpleIdentifierProxy(name);
-    // 		graph = factory.createGraphProxy();
-    // 		component = factory.createSimpleComponentProxy(identifier, kind, graph);
-
-    // 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-    // 	}
-
 	SimpleComponentSubject getComponent()
 	{
 		return component;

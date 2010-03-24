@@ -97,7 +97,7 @@ class ModelMaker
             }
             else if (args[i].equals("-p"))
             {
-				properties.setProperty("generatePlantModels","false");
+				properties.setProperty("generatePlantModels","true");
             }
             else if (args[i].equals("-m"))
             {
