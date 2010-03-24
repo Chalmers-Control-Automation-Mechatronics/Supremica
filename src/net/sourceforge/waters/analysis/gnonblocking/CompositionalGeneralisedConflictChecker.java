@@ -231,6 +231,7 @@ public class CompositionalGeneralisedConflictChecker extends
             getGeneralisedPrecondition(), tau);
     final TransBiSimulator transBiSimulator =
         new TransBiSimulator(tr, tr.getCodeOfTau());
+    transBiSimulator.run();
     final ObservationEquivalenceStep oeStep =
         new ObservationEquivalenceStep(tr.getAutomaton(getFactory()),
             autToAbstract, tau, tr.getOriginalIntToStateMap(), transBiSimulator
