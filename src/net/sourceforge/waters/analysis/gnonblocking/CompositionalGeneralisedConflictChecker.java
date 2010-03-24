@@ -211,7 +211,6 @@ public class CompositionalGeneralisedConflictChecker extends
     return result;
   }
 
-  @SuppressWarnings("unused")
   private AutomatonProxy applyAbstractionRules(
                                                final AutomatonProxy autToAbstract,
                                                final EventProxy tau)
