@@ -9,6 +9,9 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -30,30 +33,35 @@ public class EventNotFoundException extends AnalysisException
   /**
    * Constructs a new exception indicating that the given product DES does not
    * contain the given event.
-   * @param des     The product DES that causes the problem.
-   * @param name    The name of the missing event.
+   * @param container    The product DES or automaton that causes the problem.
+   * @param name         The name of the missing event.
    */
-  public EventNotFoundException(final ProductDESProxy des,
+  public EventNotFoundException(final NamedProxy container,
                                 final String name)
   {
-    this(des, name, null);
+    this(container, name, null, false);
   }
 
   /**
    * Constructs a new exception indicating that the given product DES does not
    * contain the given event.
-   * @param des     The product DES that causes the problem.
-   * @param name    The name of the missing event.
-   * @param kind    The expected event kind. This is used to produce a more
-   *                specific message for propositions.
+   * @param container    The product DES or automaton that causes the problem.
+   * @param name         The name of the missing event.
+   * @param kind         The expected event kind.
+   * @param includeKind  A flag, indicating whether the exception message
+   *                     should include detailed event kind information.
+   *                     If false, it will only distinguish between events
+   *                     and propositions.
    */
-  public EventNotFoundException(final ProductDESProxy des,
+  public EventNotFoundException(final NamedProxy container,
                                 final String name,
-                                final EventKind kind)
+                                final EventKind kind,
+                                final boolean includeKind)
   {
-    mProductDES = des;
+    mContainer = container;
     mEventName = name;
     mEventKind = kind;
+    mIncludeKind = includeKind;
   }
 
 
@@ -62,14 +70,12 @@ public class EventNotFoundException extends AnalysisException
   public String getMessage()
   {
     final StringBuffer buffer = new StringBuffer();
-    buffer.append("The model '");
-    buffer.append(mProductDES.getName());
+    buffer.append("The ");
+    buffer.append(getContainerClassName());
+    buffer.append(" '");
+    buffer.append(mContainer.getName());
     buffer.append("' does not contain any ");
-    if (mEventKind == EventKind.PROPOSITION) {
-      buffer.append("proposition");
-    } else {
-      buffer.append("event");
-    }
+    buffer.append(getEventKindName());
     buffer.append(" named '");
     buffer.append(mEventName);
     buffer.append("'!");
@@ -78,10 +84,42 @@ public class EventNotFoundException extends AnalysisException
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  private String getContainerClassName()
+  {
+    if (mContainer instanceof ProductDESProxy) {
+      return "model";
+    } else if (mContainer instanceof AutomatonProxy) {
+      return "automaton";
+    } else {
+      return ProxyTools.getShortClassName(mContainer);
+    }
+  }
+
+  private String getEventKindName()
+  {
+    switch (mEventKind) {
+    case CONTROLLABLE:
+    case UNCONTROLLABLE:
+      if (mIncludeKind) {
+        return mEventKind.toString().toLowerCase() + " event";
+      } else {
+        return "event";
+      }
+    case PROPOSITION:
+      return "proposition";
+    default:
+      return mEventKind.toString();
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
-  private final ProductDESProxy mProductDES;
+  private final NamedProxy mContainer;
   private final String mEventName;
   private final EventKind mEventKind;
+  private final boolean mIncludeKind;
 
 
   //#########################################################################

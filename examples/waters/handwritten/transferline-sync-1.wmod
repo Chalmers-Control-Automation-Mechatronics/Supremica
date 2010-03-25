@@ -1,0 +1,1113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="transferline_1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>The expected synchronous product of the transferline model with parameter N=1.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+            <ConstantAliasExpression>
+                <IntConstant Value="1"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="GROUPS">
+            <ConstantAliasExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="IGROUPS">
+            <ConstantAliasExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Name="tu_reject">
+            <RangeList>
+                <SimpleIdentifier Name="GROUPS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="tu_load">
+            <RangeList>
+                <SimpleIdentifier Name="IGROUPS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="tu_accept">
+            <RangeList>
+                <SimpleIdentifier Name="IGROUPS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="machine_unload">
+            <RangeList>
+                <SimpleIdentifier Name="GROUPS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="machine_load">
+            <RangeList>
+                <SimpleIdentifier Name="GROUPS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="transferline_1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="q20">
+                        <PointGeometry>
+                            <Point Y="64" X="111"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q21">
+                        <PointGeometry>
+                            <Point Y="255" X="183"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q22">
+                        <PointGeometry>
+                            <Point Y="229" X="117"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q23">
+                        <PointGeometry>
+                            <Point Y="320" X="386"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q24">
+                        <PointGeometry>
+                            <Point Y="228" X="351"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q25">
+                        <PointGeometry>
+                            <Point Y="281" X="387"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q26">
+                        <PointGeometry>
+                            <Point Y="265" X="495"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q27">
+                        <PointGeometry>
+                            <Point Y="190" X="260"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="51" X="53"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q6">
+                        <PointGeometry>
+                            <Point Y="299" X="260"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q5">
+                        <PointGeometry>
+                            <Point Y="115" X="170"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q8">
+                        <PointGeometry>
+                            <Point Y="270" X="429"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q7">
+                        <PointGeometry>
+                            <Point Y="285" X="309"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q2">
+                        <PointGeometry>
+                            <Point Y="253" X="311"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <PointGeometry>
+                            <Point Y="374" X="333"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q4">
+                        <PointGeometry>
+                            <Point Y="325" X="339"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q3">
+                        <PointGeometry>
+                            <Point Y="148" X="260"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q9">
+                        <PointGeometry>
+                            <Point Y="325" X="460"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q12">
+                        <PointGeometry>
+                            <Point Y="144" X="171"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q13">
+                        <PointGeometry>
+                            <Point Y="342" X="258"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q10">
+                        <PointGeometry>
+                            <Point Y="216" X="430"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q11">
+                        <PointGeometry>
+                            <Point Y="254" X="233"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q16">
+                        <PointGeometry>
+                            <Point Y="359" X="416"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q17">
+                        <PointGeometry>
+                            <Point Y="123" X="97"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q14">
+                        <PointGeometry>
+                            <Point Y="218" X="232"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q15">
+                        <PointGeometry>
+                            <Point Y="187" X="354"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q18">
+                        <PointGeometry>
+                            <Point Y="311" X="187"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q19">
+                        <PointGeometry>
+                            <Point Y="198" X="159"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="q8" Source="q24">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="245" X="398"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q14" Source="q3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="176" X="243"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q5" Source="q27">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="144" X="215"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q3" Source="q12">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_reject">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="138" X="215"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q2" Source="q23">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="288" X="352"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q2" Source="q11">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_reject">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q19" Source="q5">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="150" X="157"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q14" Source="q19">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q23" Source="q7">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="307" X="350"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q20" Source="q12">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q21" Source="q13">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="308" X="214"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q12" Source="q17">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q23" Source="q8">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="299" X="416"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q16" Source="q4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="352" X="380"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q12" Source="q21">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="200" X="172"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q5" Source="q17">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_reject">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="112" X="129"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q27" Source="q12">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="162" X="215"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q25" Source="q2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="265" X="352"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q26" Source="q10">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="235" X="472"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q10" Source="q15">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="192" X="399"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q16" Source="q9">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_unload">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="350" X="447"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q21" Source="q22">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="246" X="141"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q18" Source="q11">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_unload">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q3" Source="q24">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="179" X="309"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q15" Source="q8">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="223" X="400"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q5" Source="q20">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="81" X="139"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q1" Source="q23">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_unload">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="357" X="364"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q6" Source="q1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="346" X="295"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q4" Source="q6">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="320" X="298"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q25" Source="q7">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_reject">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="285" X="351"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q7" Source="q24">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="257" X="334"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q19" Source="q11">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="227" X="190"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q6" Source="q18">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_reject">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="312" X="219"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q2" Source="q14">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="232" X="271"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q26" Source="q8">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_reject">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q11" Source="q27">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q2" Source="q15">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="214" X="334"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q24" Source="q27">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="203" X="308"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q14" Source="q7">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="252" X="269"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q22" Source="q19">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_unload">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="212" X="130"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q25" Source="q10">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="246" X="415"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q9" Source="q26">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="298" X="489"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q8" Source="q16">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="319" X="432"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q6" Source="q2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_unload">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q1" Source="q13">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="371" X="293"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q15" Source="q27">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_reject">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="179" X="310"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q17" Source="q22">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="176" X="96"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q13" Source="q7">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_unload">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="321" X="283"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q27" Source="q6">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="q20" Source="q0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="51" X="78"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q3" Source="q5">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="120" X="215"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q15" Source="q3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="156" X="311"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q9" Source="q25">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="305" X="431"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q4" Source="q13">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_reject">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="344" X="298"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q4" Source="q25">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_unload">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="307" X="366"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q6" Source="q21">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="282" X="215"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q21" Source="q14">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_unload">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="236" X="201"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q16" Source="q1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_reject">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="379" X="379"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q24" Source="q4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="279" X="349"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q10" Source="q24">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_reject">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="216" X="396"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q13" Source="q18">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="337" X="216"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q7" Source="q11">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="273" X="269"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q9" Source="q23">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_reject">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="328" X="430"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q22" Source="q18">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="276" X="141"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="q0" Source="q17">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="84" X="68"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

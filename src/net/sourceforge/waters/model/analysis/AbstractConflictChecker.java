@@ -189,7 +189,7 @@ public abstract class AbstractConflictChecker
         return event;
       }
     }
-    throw new EventNotFoundException(model, name, EventKind.PROPOSITION);
+    throw new EventNotFoundException(model, name, EventKind.PROPOSITION, false);
   }
 
 

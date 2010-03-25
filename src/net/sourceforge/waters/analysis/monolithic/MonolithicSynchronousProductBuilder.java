@@ -193,6 +193,7 @@ public class MonolithicSynchronousProductBuilder
     mStateMarkings = new List<?>[mNumAutomata][];
     // transitions indexed first by automaton then by event then by source state
     mTransitions = new int[mNumAutomata][mNumInputEvents][][];
+    mTargetTuple = new int[mNumAutomata];
     mNDTuple = new int[mNumAutomata][];
 
     int a = 0;
@@ -209,10 +210,11 @@ public class MonolithicSynchronousProductBuilder
       final Collection<StateProxy> states = aut.getStates();
       final int numStates = states.size();
       final TObjectIntHashMap<StateProxy> stateToIndex =
-        new TObjectIntHashMap<StateProxy>(mNumStates);
+        new TObjectIntHashMap<StateProxy>(numStates);
       final TIntArrayList initials = new TIntArrayList(1);
       int snum = 0;
-      mOriginalStates[a] = new StateProxy[mNumStates];
+      mOriginalStates[a] = new StateProxy[numStates];
+      mStateMarkings[a] = new List<?>[numStates];
       for (final StateProxy state : states) {
         stateToIndex.put(state, snum);
         mOriginalStates[a][snum] = state;
@@ -251,12 +253,14 @@ public class MonolithicSynchronousProductBuilder
         list.add(target);
       }
       for (final EventProxy event : localEvents) {
-        e = eventToIndex.get(event);
-        mTransitions[a][e] = new int[numStates][];
-        for (int source = 0; source < numStates; source++) {
-          final TIntArrayList list = autTransitionLists[e][source];
-          if (list != null) {
-            mTransitions[a][e][source] = list.toNativeArray();
+        if (event.getKind() != EventKind.PROPOSITION) {
+          e = eventToIndex.get(event);
+          mTransitions[a][e] = new int[numStates][];
+          for (int source = 0; source < numStates; source++) {
+            final TIntArrayList list = autTransitionLists[e][source];
+            if (list != null) {
+              mTransitions[a][e][source] = list.toNativeArray();
+            }
           }
         }
       }
@@ -329,9 +333,6 @@ public class MonolithicSynchronousProductBuilder
     throws OverflowException
   {
     final int source = mStates.get(sourceTuple);
-    for (int a = 0; a < mNumAutomata; a++) {
-      mNDTuple[a] = null;
-    }
     if (mCurrentSuccessors != null) {
       for (int e = 0; e < mNumEvents; e++) {
         mCurrentSuccessors[e].clear();
@@ -339,6 +340,7 @@ public class MonolithicSynchronousProductBuilder
     }
     events:
     for (int e = 0; e < mNumInputEvents; e++) {
+      Arrays.fill(mNDTuple, null);
       for (final int a : mEventAutomata[e]) {
         if (mTransitions[a][e] != null) {
           final int[] succ = mTransitions[a][e][sourceTuple[a]];
@@ -365,6 +367,7 @@ public class MonolithicSynchronousProductBuilder
       final int[] codes = mNDTuple[a];
       if (codes == null) {
         mTargetTuple[a] = sourceTuple[a];
+        permutations(a, sourceTuple, source, event);
       } else {
         for (int i = 0; i < codes.length; i++) {
           mTargetTuple[a] = codes[i];
@@ -386,21 +389,20 @@ public class MonolithicSynchronousProductBuilder
         throw new OverflowException(limit);
       }
       target = mNumStates++;
-      final int[] newTuple = new int[mNumAutomata];
-      for (int a = 0; a < mNumAutomata; a++) {
-        newTuple[a] = mTargetTuple[a];
-      }
+      final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
       mStates.put(newTuple, target);
-      mTargetTuple = new int[mNumAutomata];
       mUnvisited.offer(newTuple);
       mStateTuples.add(newTuple);
     }
     // Only add a transition if not adding in an initial state,
     // and avoid duplicates.
-    if (!isInitial && mCurrentSuccessors[event].add(target)) {
-      mTransitionBuffer.add(source);
-      mTransitionBuffer.add(event);
-      mTransitionBuffer.add(target);
+    if (!isInitial) {
+      if (mCurrentSuccessors == null ||
+          mCurrentSuccessors[event].add(target)) {
+        mTransitionBuffer.add(source);
+        mTransitionBuffer.add(event);
+        mTransitionBuffer.add(target);
+      }
     }
   }
 
@@ -432,7 +434,7 @@ public class MonolithicSynchronousProductBuilder
       props:
       for (final EventProxy prop : mCurrentPropositions) {
         for (int a = 0; a < mNumAutomata; a++) {
-          final List<EventProxy> stateMarking = getStateMarking(a, code);
+          final List<EventProxy> stateMarking = getStateMarking(a, tuple[a]);
           if (Collections.binarySearch(stateMarking, prop) < 0) {
             continue props;
           }
@@ -460,7 +462,7 @@ public class MonolithicSynchronousProductBuilder
       transitions.add(factory.createTransitionProxy(source, event, target));
     }
 
-    final StringBuffer buffer = new StringBuffer('{');
+    final StringBuffer buffer = new StringBuffer("{");
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> automata = model.getAutomata();
     boolean first = true;
@@ -626,7 +628,7 @@ public class MonolithicSynchronousProductBuilder
 
     public String getName()
     {
-      return Integer.toString(mName);
+      return "S:" + mName;
     }
 
     public int[] getStateTuple()
@@ -669,7 +671,7 @@ public class MonolithicSynchronousProductBuilder
 
     public String toString()
     {
-      return "S:" + mName;
+      return getName();
     }
 
     //#######################################################################
