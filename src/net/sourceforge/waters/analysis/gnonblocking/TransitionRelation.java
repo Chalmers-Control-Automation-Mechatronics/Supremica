@@ -54,26 +54,21 @@ public class TransitionRelation
   private final TObjectIntHashMap<EventProxy> mEventToInt;
   private final EventProxy mMarkedEvent;
   private final EventProxy mPreMarking;
-  private int mCodeOfTau = -1;
   private final String mName;
   private final Map<Set<Set<EventProxy>>,EventProxy> mAnnToEvent;
 
-
-  //#########################################################################
-  //# Constructors
-  // TODO tau should not be an argument to this.
-  // Better use getEventInt() from outside to find the code of an event.
+  // #########################################################################
+  // # Constructors
   public TransitionRelation(final AutomatonProxy aut, final EventProxy marked,
-                            final EventProxy preconditionMarking,
-                            final EventProxy tau)
+                            final EventProxy preconditionMarking)
   {
-    this(aut, marked, preconditionMarking, tau, aut.getEvents());
+    this(aut, marked, preconditionMarking, aut.getEvents());
   }
 
   @SuppressWarnings("unchecked")
   public TransitionRelation(final AutomatonProxy aut, final EventProxy marked,
                             final EventProxy preconditionMarking,
-                            final EventProxy tau, Set<EventProxy> eventsall)
+                            Set<EventProxy> eventsall)
   {
     eventsall = new THashSet<EventProxy>(eventsall);
     eventsall.addAll(aut.getEvents());
@@ -89,9 +84,6 @@ public class TransitionRelation
         new TObjectIntHashMap<EventProxy>(mEvents.length);
     for (int i = 0; i < mEvents.length; i++) {
       eventToInt.put(mEvents[i], i);
-      if (mEvents[i] == tau) {
-        mCodeOfTau = i;
-      }
     }
     mEventToInt = eventToInt;
     final TObjectIntHashMap<StateProxy> stateToInt =
@@ -211,11 +203,6 @@ public class TransitionRelation
   public Map<StateProxy,Integer> getResultingStateToIntMap()
   {
     return mResultingStates;
-  }
-
-  public int getCodeOfTau()
-  {
-    return mCodeOfTau;
   }
 
   public void setMarkingToStatesWithOutgoing(final Collection<EventProxy> events)
@@ -927,6 +914,7 @@ public class TransitionRelation
   /**
    * Returns a collection of all the events which are only ever self looped in
    * this automaton.
+   *
    * @return Collection of selflooped events.
    */
   public Collection<EventProxy> getAllSelfLoops()

@@ -229,9 +229,9 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     final TransitionRelation tr =
         new TransitionRelation(autToAbstract, getMarkingProposition(),
-            getGeneralisedPrecondition(), tau);
+            getGeneralisedPrecondition());
     final TransBiSimulator transBiSimulator =
-        new TransBiSimulator(tr, tr.getCodeOfTau());
+        new TransBiSimulator(tr, tr.getEventInt(tau));
     final boolean modified = transBiSimulator.run();
     if (modified) {
       final AutomatonProxy convertedAut = tr.getAutomaton(getFactory());
@@ -1156,8 +1156,8 @@ public class CompositionalGeneralisedConflictChecker extends
       mReverseOutputStateMap = reverseOutputStateMap;
       mTransitionRelation =
           new TransitionRelation(originalAut, getMarkingProposition(),
-              getGeneralisedPrecondition(), tau);
-      mCodeOfTau = mTransitionRelation.getCodeOfTau();
+              getGeneralisedPrecondition());
+      mCodeOfTau = mTransitionRelation.getEventInt(tau);
       mOriginalStatesMap = mTransitionRelation.getOriginalStateToIntMap();
     }
 
@@ -1170,20 +1170,20 @@ public class CompositionalGeneralisedConflictChecker extends
 
       // makes the trace begin in the correct initial state
       final TIntArrayList initialStates =
-        mTransitionRelation.getInitialStates();
+          mTransitionRelation.getInitialStates();
       final StateProxy tracesInitialState =
-        getInitialState(getResultAutomaton(), traceSteps.get(0));
+          getInitialState(getResultAutomaton(), traceSteps.get(0));
       final List<SearchRecord> initialRecords =
-        beginTrace(initialStates,
-                   mReverseOutputStateMap.get(tracesInitialState));
+          beginTrace(initialStates, mReverseOutputStateMap
+              .get(tracesInitialState));
       assert initialRecords.size() > 0;
       final Map<AutomatonProxy,StateProxy> initialStepsStateMap =
-        new HashMap<AutomatonProxy,StateProxy>(1);
+          new HashMap<AutomatonProxy,StateProxy>(1);
       final List<TraceStepProxy> initialSteps =
-        createTraceSteps(initialStepsStateMap, initialRecords);
+          createTraceSteps(initialStepsStateMap, initialRecords);
       convertedSteps.addAll(initialSteps);
       originalSourceID =
-        initialRecords.get(initialRecords.size() - 1).getState();
+          initialRecords.get(initialRecords.size() - 1).getState();
 
       StateProxy originalSource = mOriginalStates[originalSourceID];
       for (final TraceStepProxy step : traceSteps) {
@@ -1255,11 +1255,10 @@ public class CompositionalGeneralisedConflictChecker extends
                           mOriginalStates[subStepTargetStateID]);
         final int subStepEventID = subStep.getEvent();
         final EventProxy event =
-          subStepEventID >= 0 ?
-          mTransitionRelation.getEvent(subStepEventID) :
-          null;
+            subStepEventID >= 0 ? mTransitionRelation.getEvent(subStepEventID)
+                : null;
         final TraceStepProxy convertedStep =
-          factory.createTraceStepProxy(event, stepsStateMap);
+            factory.createTraceStepProxy(event, stepsStateMap);
         substeps.add(convertedStep);
       }
       return substeps;
@@ -1284,13 +1283,13 @@ public class CompositionalGeneralisedConflictChecker extends
      * the correct initial state of the original automaton. Steps are added for
      * tau transitions (if necessary) until the initial state of the result
      * automaton is reached.
+     *
      * @return A list of SearchRecord's that represent each extra step needed
      *         for the start of the trace. (The first item being the very first
      *         state of the trace).
      */
-    private List<SearchRecord> beginTrace
-      (final TIntArrayList initialStateIDs,
-       final int resultAutInitialStateClass)
+    private List<SearchRecord> beginTrace(final TIntArrayList initialStateIDs,
+                                          final int resultAutInitialStateClass)
     {
       final int[] targetArray = mClassMap.get(resultAutInitialStateClass);
       final TIntHashSet targetSet = new TIntHashSet(targetArray);
@@ -1303,7 +1302,7 @@ public class CompositionalGeneralisedConflictChecker extends
       for (int i = 0; i < numInit; i++) {
         final int initStateID = initialStateIDs.get(i);
         final SearchRecord record =
-          new SearchRecord(initStateID, false, -1, dummy);
+            new SearchRecord(initStateID, false, -1, dummy);
         open.add(record);
         visited.add(initStateID);
       }
