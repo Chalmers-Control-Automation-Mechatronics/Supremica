@@ -167,7 +167,9 @@ public class MonolithicSynchronousProductBuilder
     mNumInputEvents = mNumEvents = mEvents.size();
     if (mMaskingPairs != null) {
       mProjectionMask = new int[mNumInputEvents];
-      Arrays.fill(mProjectionMask, -1);
+      for (e = 0; e < mNumInputEvents; e++) {
+        mProjectionMask[e] = e;
+      }
       for (final MaskingPair pair : mMaskingPairs) {
         final EventProxy replacement = pair.getReplacement();
         if (eventToIndex.containsKey(replacement)) {
@@ -397,11 +399,17 @@ public class MonolithicSynchronousProductBuilder
     // Only add a transition if not adding in an initial state,
     // and avoid duplicates.
     if (!isInitial) {
-      if (mCurrentSuccessors == null ||
-          mCurrentSuccessors[event].add(target)) {
+      if (mProjectionMask == null) {
         mTransitionBuffer.add(source);
         mTransitionBuffer.add(event);
         mTransitionBuffer.add(target);
+      } else {
+        final int masked = mProjectionMask[event];
+        if (mCurrentSuccessors[masked].add(target)) {
+          mTransitionBuffer.add(source);
+          mTransitionBuffer.add(masked);
+          mTransitionBuffer.add(target);
+        }
       }
     }
   }

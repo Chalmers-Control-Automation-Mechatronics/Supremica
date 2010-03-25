@@ -82,7 +82,7 @@ public class Candidate implements Comparable<Candidate>
   public ProductDESProxy createProductDESProxy
     (final ProductDESProxyFactory factory)
   {
-    final StringBuffer buffer = new StringBuffer('{');
+    final StringBuffer buffer = new StringBuffer("{");
     boolean first = true;
     for (final AutomatonProxy aut : mAutomata) {
       if (first) {
