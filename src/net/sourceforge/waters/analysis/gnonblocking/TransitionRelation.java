@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import gnu.trove.THashMap;
 import gnu.trove.THashSet;
+import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntProcedure;
 import gnu.trove.TObjectIntHashMap;
@@ -389,6 +390,18 @@ public class TransitionRelation
   public boolean isInitial(final int state)
   {
     return mIsInitial[state];
+  }
+
+  // Should this list be pre-calculated?
+  public TIntArrayList getInitialStates()
+  {
+    final TIntArrayList result = new TIntArrayList();
+    for (int state = 0; state < mIsInitial.length; state++) {
+      if (mIsInitial[state]) {
+        result.add(state);
+      }
+    }
+    return result;
   }
 
   public void markState(final int state, final boolean value,

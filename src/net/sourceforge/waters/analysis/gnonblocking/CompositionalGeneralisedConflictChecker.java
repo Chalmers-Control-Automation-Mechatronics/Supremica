@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
 
@@ -944,6 +945,7 @@ public class CompositionalGeneralisedConflictChecker extends
     /**
      * Returns a collection containing all initial states of an automaton.
      */
+    @SuppressWarnings("unused")
     protected Collection<StateProxy> getInitialStates(final AutomatonProxy aut)
     {
       final Collection<StateProxy> initialstates = new HashSet<StateProxy>();
@@ -1167,24 +1169,21 @@ public class CompositionalGeneralisedConflictChecker extends
       final int originalSourceID;
 
       // makes the trace begin in the correct initial state
+      final TIntArrayList initialStates =
+        mTransitionRelation.getInitialStates();
       final StateProxy tracesInitialState =
-          getInitialState(getResultAutomaton(), traceSteps.get(0));
-      final Set<StateProxy> initialStates =
-          (Set<StateProxy>) getInitialStates(getOriginalAutomaton());
-      final List<SearchRecord> initialSteps =
-          beginTrace(initialStates, tracesInitialState);
-      assert initialSteps.size() > 0;
-
-      if (initialSteps.get(0).getPredecessor() != null) {
-        final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
-            new HashMap<AutomatonProxy,StateProxy>(1);
-        final List<TraceStepProxy> substeps =
-            createTraceSteps(finalStepsStateMap, initialSteps);
-        convertedSteps.addAll(substeps);
-        originalSourceID = initialSteps.get(initialSteps.size() - 1).getState();
-      } else {
-        originalSourceID = initialSteps.get(0).getState();
-      }
+        getInitialState(getResultAutomaton(), traceSteps.get(0));
+      final List<SearchRecord> initialRecords =
+        beginTrace(initialStates,
+                   mReverseOutputStateMap.get(tracesInitialState));
+      assert initialRecords.size() > 0;
+      final Map<AutomatonProxy,StateProxy> initialStepsStateMap =
+        new HashMap<AutomatonProxy,StateProxy>(1);
+      final List<TraceStepProxy> initialSteps =
+        createTraceSteps(initialStepsStateMap, initialRecords);
+      convertedSteps.addAll(initialSteps);
+      originalSourceID =
+        initialRecords.get(initialRecords.size() - 1).getState();
 
       StateProxy originalSource = mOriginalStates[originalSourceID];
       for (final TraceStepProxy step : traceSteps) {
@@ -1264,47 +1263,44 @@ public class CompositionalGeneralisedConflictChecker extends
       return substeps;
     }
 
+    // I have fixed two bugs. First, beginTrace() used the initial state
+    // instead of the target states for testing at the end. Second, I
+    // added some more tests whether the successors are non-null. I also
+    // simplified the way how initial states are passed into beginTrace().
+    // But there still is a bug with the parManEg tests, it looks like
+    // the beginTrace() method fails to find a trace. May have to look
+    // in detail at that example ...
+
     /**
      * Creates the beginning of a trace by doing a breadth-first search to find
      * the correct initial state of the original automaton. Steps are added for
      * tau transitions (if necessary) until the initial state of the result
      * automaton is reached.
-     *
-     * @param originalSource
-     *          The original end state, which may or may not have the alpha
-     *          marking proposition.
      * @return A list of SearchRecord's that represent each extra step needed
      *         for the start of the trace. (The first item being the very first
      *         state of the trace).
      */
-    private List<SearchRecord> beginTrace(
-                                          final Set<StateProxy> initialstates,
-                                          final StateProxy resultAutInitialStateClass)
+    private List<SearchRecord> beginTrace
+      (final TIntArrayList initialStateIDs,
+       final int resultAutInitialStateClass)
     {
-      final int initialStateClass =
-          mReverseOutputStateMap.get(resultAutInitialStateClass);
-      int[] initialStates = mClassMap.get(initialStateClass);
-      final List<Integer> initialStatesIDs =
-          new ArrayList<Integer>(initialStates.length);
-      for (final int s : initialStates) {
-        initialStatesIDs.add(s);
-      }
-      initialStates = null;
+      final int[] targetArray = mClassMap.get(resultAutInitialStateClass);
+      final TIntHashSet targetSet = new TIntHashSet(targetArray);
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
       final TIntHashSet visited = new TIntHashSet();
-      for (final StateProxy initialstate : initialstates) {
-        final int initStateID = mOriginalStatesMap.get(initialstate);
-        if (initialStatesIDs.contains(initStateID)) {
-          return Collections.singletonList(new SearchRecord(initStateID, false,
-              mCodeOfTau, null));
-        }
-        final SearchRecord record = new SearchRecord(initStateID);
+      // The dummy record ensures that the first real search record will
+      // later be included in the trace.
+      final SearchRecord dummy = new SearchRecord(-1);
+      final int numInit = initialStateIDs.size();
+      for (int i = 0; i < numInit; i++) {
+        final int initStateID = initialStateIDs.get(i);
+        final SearchRecord record =
+          new SearchRecord(initStateID, false, mCodeOfTau, dummy);
         open.add(record);
-        // visited.add(initStateID);
+        visited.add(initStateID);
       }
       while (true) {
         final SearchRecord current = open.remove();
-        assert current != null;
         final int source = current.getState();
         visited.add(source);
         final TIntHashSet successors =
@@ -1316,7 +1312,7 @@ public class CompositionalGeneralisedConflictChecker extends
             if (!visited.contains(target)) {
               final SearchRecord record =
                   new SearchRecord(target, false, mCodeOfTau, current);
-              if (initialStatesIDs.contains(target)) {
+              if (targetSet.contains(target)) {
                 return buildSearchRecordTrace(record);
               }
               open.add(record);
@@ -1350,21 +1346,22 @@ public class CompositionalGeneralisedConflictChecker extends
       visited.add(originalSource);
       while (true) {
         final SearchRecord current = open.remove();
-        assert current != null;
         final int source = current.getState();
         final TIntHashSet successors =
             mTransitionRelation.getSuccessors(source, mCodeOfTau);
-        final TIntIterator iter = successors.iterator();
-        while (iter.hasNext()) {
-          final int target = iter.next();
-          if (!visited.contains(target)) {
-            record = new SearchRecord(target, false, mCodeOfTau, current);
-            if (mOriginalStates[target].getPropositions()
-                .contains(getGeneralisedPrecondition())) {
-              return buildSearchRecordTrace(record);
+        if (successors != null) {
+          final TIntIterator iter = successors.iterator();
+          while (iter.hasNext()) {
+            final int target = iter.next();
+            if (!visited.contains(target)) {
+              record = new SearchRecord(target, false, mCodeOfTau, current);
+              if (mOriginalStates[target].getPropositions()
+                  .contains(getGeneralisedPrecondition())) {
+                return buildSearchRecordTrace(record);
+              }
+              open.add(record);
+              visited.add(target);
             }
-            open.add(record);
-            visited.add(target);
           }
         }
       }
@@ -1405,37 +1402,39 @@ public class CompositionalGeneralisedConflictChecker extends
       visited0.add(originalSource);
       while (true) {
         final SearchRecord current = open.remove();
-        // Target must be reachable due to observation equivalence.
-        assert current != null;
         final int source = current.getState();
         final boolean hasEvent = current.hasProperEvent();
         final TIntHashSet visited = hasEvent ? visited1 : visited0;
         TIntHashSet successors =
             mTransitionRelation.getSuccessors(source, mCodeOfTau);
-        TIntIterator iter = successors.iterator();
-        while (iter.hasNext()) {
-          final int target = iter.next();
-          if (!visited.contains(target)) {
-            record = new SearchRecord(target, hasEvent, mCodeOfTau, current);
-            if (hasEvent && targetSet.contains(target)) {
-              return buildSearchRecordTrace(record);
+        if (successors != null) {
+          final TIntIterator iter = successors.iterator();
+          while (iter.hasNext()) {
+            final int target = iter.next();
+            if (!visited.contains(target)) {
+              record = new SearchRecord(target, hasEvent, mCodeOfTau, current);
+              if (hasEvent && targetSet.contains(target)) {
+                return buildSearchRecordTrace(record);
+              }
+              open.add(record);
+              visited.add(target);
             }
-            open.add(record);
-            visited.add(target);
           }
         }
         if (!hasEvent) {
           successors = mTransitionRelation.getSuccessors(source, event);
-          iter = successors.iterator();
-          while (iter.hasNext()) {
-            final int target = iter.next();
-            if (!visited1.contains(target)) {
-              record = new SearchRecord(target, true, event, current);
-              if (targetSet.contains(target)) {
-                return buildSearchRecordTrace(record);
+          if (successors != null) {
+            final TIntIterator iter = successors.iterator();
+            while (iter.hasNext()) {
+              final int target = iter.next();
+              if (!visited1.contains(target)) {
+                record = new SearchRecord(target, true, event, current);
+                if (targetSet.contains(target)) {
+                  return buildSearchRecordTrace(record);
+                }
+                open.add(record);
+                visited1.add(target);
               }
-              open.add(record);
-              visited1.add(target);
             }
           }
         }
