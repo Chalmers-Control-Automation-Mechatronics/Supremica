@@ -1247,29 +1247,37 @@ public class CompositionalGeneralisedConflictChecker extends
                                                   final Map<AutomatonProxy,StateProxy> stepsStateMap,
                                                   final List<SearchRecord> subtrace)
     {
+      final ProductDESProxyFactory factory = getFactory();
       final List<TraceStepProxy> substeps = new LinkedList<TraceStepProxy>();
       for (final SearchRecord subStep : subtrace) {
         final int subStepTargetStateID = subStep.getState();
         stepsStateMap.put(getOriginalAutomaton(),
                           mOriginalStates[subStepTargetStateID]);
         final int subStepEventID = subStep.getEvent();
+        final EventProxy event =
+          subStepEventID >= 0 ?
+          mTransitionRelation.getEvent(subStepEventID) :
+          null;
         final TraceStepProxy convertedStep =
-            getFactory().createTraceStepProxy(
-                                              mTransitionRelation
-                                                  .getEvent(subStepEventID),
-                                              stepsStateMap);
+          factory.createTraceStepProxy(event, stepsStateMap);
         substeps.add(convertedStep);
       }
       return substeps;
     }
 
-    // I have fixed two bugs. First, beginTrace() used the initial state
+    // I have fixed some bugs. First, beginTrace() used the initial state
     // instead of the target states for testing at the end. Second, I
-    // added some more tests whether the successors are non-null. I also
-    // simplified the way how initial states are passed into beginTrace().
-    // But there still is a bug with the parManEg tests, it looks like
-    // the beginTrace() method fails to find a trace. May have to look
-    // in detail at that example ...
+    // added some more tests whether the successors are non-null (not sure
+    // whether this is needed?). I also changed the way of including the very
+    // first trace step and simplified the way how initial states are passed
+    // into beginTrace().
+
+    // There still are bugs with hisc_low2__a2 and parManEg examples.
+    // The first suggests some structural problems in the trace automata
+    // list. Look for the second exception in the 'Failure Trace' window.
+    // The parManEg failures seem to return 'blocking' when 'nonblocking'
+    // is expected (and verified monolithically ???).
+    // To me, both failures suggest problems outside of trace computation.
 
     /**
      * Creates the beginning of a trace by doing a breadth-first search to find
@@ -1295,14 +1303,13 @@ public class CompositionalGeneralisedConflictChecker extends
       for (int i = 0; i < numInit; i++) {
         final int initStateID = initialStateIDs.get(i);
         final SearchRecord record =
-          new SearchRecord(initStateID, false, mCodeOfTau, dummy);
+          new SearchRecord(initStateID, false, -1, dummy);
         open.add(record);
         visited.add(initStateID);
       }
       while (true) {
         final SearchRecord current = open.remove();
         final int source = current.getState();
-        visited.add(source);
         final TIntHashSet successors =
             mTransitionRelation.getSuccessors(source, mCodeOfTau);
         if (successors != null) {

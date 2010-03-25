@@ -58,6 +58,11 @@ public class TransitionRelation
   private final String mName;
   private final Map<Set<Set<EventProxy>>,EventProxy> mAnnToEvent;
 
+
+  //#########################################################################
+  //# Constructors
+  // TODO tau should not be an argument to this.
+  // Better use getEventInt() from outside to find the code of an event.
   public TransitionRelation(final AutomatonProxy aut, final EventProxy marked,
                             final EventProxy preconditionMarking,
                             final EventProxy tau)
@@ -572,11 +577,6 @@ public class TransitionRelation
     return mEvents[event] == mPreMarking;
   }
 
-  public int eventToInt(final EventProxy event)
-  {
-    return mEventToInt.get(event);
-  }
-
   public int mergeEvents(final Collection<EventProxy> events)
   {
     final Iterator<EventProxy> it = events.iterator();
@@ -927,8 +927,7 @@ public class TransitionRelation
   /**
    * Returns a collection of all the events which are only ever self looped in
    * this automaton.
-   *
-   * @return Collection of self looped events.
+   * @return Collection of selflooped events.
    */
   public Collection<EventProxy> getAllSelfLoops()
   {
