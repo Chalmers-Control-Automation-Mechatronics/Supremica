@@ -28,6 +28,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
@@ -155,26 +156,20 @@ public class CompositionalGeneralisedConflictChecker extends
       }
       // TODO: candidate selection (i.e. heuristics) still need testing
 
-      final NonDeterministicComposer composer =
-          composeSynchronousProduct(candidate);
-      final AutomatonProxy syncProduct = composer.run();
-      final CompositionStep step =
-          new CompositionStep(syncProduct, composer.getStateMap());
-      mModifyingSteps.add(step);
+      final AutomatonProxy syncProduct = composeSynchronousProduct(candidate);
 
-      final EventProxy tauEvent = createTauEvent(syncProduct);
       final AutomatonProxy autToAbstract =
-          hideLocalEvents(syncProduct, candidate.getLocalEvents(), tauEvent);
+          hideLocalEvents(syncProduct, candidate.getLocalEvents());
 
       // TODO Abstraction rules here
-      final AutomatonProxy abstractedAut =
-          applyAbstractionRules(autToAbstract, tauEvent);
+      // final AutomatonProxy abstractedAut =
+      // applyAbstractionRules(autToAbstract, tauEvent);
 
       // removes the composed automata for this candidate from the set of
       // remaining automata and adds the newly composed candidate
       remainingAut.removeAll(candidate.getAutomata());
-      remainingAut.add(abstractedAut);
-      updateEventsToAutomata(abstractedAut, candidate.getAutomata());
+      remainingAut.add(autToAbstract);
+      updateEventsToAutomata(autToAbstract, candidate.getAutomata());
 
       // updates the current model to find candidates from
       final Set<EventProxy> composedModelAlphabet =
@@ -212,6 +207,7 @@ public class CompositionalGeneralisedConflictChecker extends
     return result;
   }
 
+  @SuppressWarnings("unused")
   private AutomatonProxy applyAbstractionRules(
                                                final AutomatonProxy autToAbstract,
                                                final EventProxy tau)
@@ -273,8 +269,7 @@ public class CompositionalGeneralisedConflictChecker extends
   /**
    * Builds the synchronous product for a given candidate.
    */
-  private NonDeterministicComposer composeSynchronousProduct(
-                                                             final Candidate candidate)
+  private AutomatonProxy composeSynchronousProduct(final Candidate candidate)
       throws AnalysisException
   {
     // creates a model which includes only the candidate, to build the
@@ -285,12 +280,18 @@ public class CompositionalGeneralisedConflictChecker extends
         getFactory().createProductDESProxy("Candidate model", candidateEvents,
                                            candidate.getAutomata());
 
-    final NonDeterministicComposer composer =
-        new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
-            candidateModel.getAutomata()), getFactory(),
-            getMarkingProposition(), getGeneralisedPrecondition());
-    composer.setNodeLimit(getNodeLimit());
-    return composer;
+    final MonolithicSynchronousProductBuilder composer =
+        new MonolithicSynchronousProductBuilder(candidateModel, getFactory());
+    final Collection<EventProxy> propositions = new HashSet<EventProxy>();
+    propositions.add(getMarkingProposition());
+    propositions.add(getGeneralisedPrecondition());
+    composer.setPropositions(propositions);
+    composer.run();
+    final AutomatonProxy syncProduct = composer.getComputedAutomaton();
+    final CompositionStep step =
+        new CompositionStep(syncProduct, composer.getStateMap());
+    mModifyingSteps.add(step);
+    return syncProduct;
   }
 
   /**
@@ -310,9 +311,9 @@ public class CompositionalGeneralisedConflictChecker extends
    * silent event "tau").
    */
   private AutomatonProxy hideLocalEvents(final AutomatonProxy automaton,
-                                         final Set<EventProxy> localEvents,
-                                         final EventProxy tau)
+                                         final Set<EventProxy> localEvents)
   {
+    final EventProxy tau = createTauEvent(automaton);
     final Map<TransitionProxy,TransitionProxy> transitionMap =
         new HashMap<TransitionProxy,TransitionProxy>(automaton.getTransitions()
             .size());
