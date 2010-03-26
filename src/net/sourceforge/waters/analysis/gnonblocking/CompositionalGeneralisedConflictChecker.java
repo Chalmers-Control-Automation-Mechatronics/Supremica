@@ -1411,9 +1411,10 @@ public class CompositionalGeneralisedConflictChecker extends
      */
     private List<SearchRecord> completeTrace(final int originalSource)
     {
-      // TODO Also return if alpha is not in the automaton alphabet.
-      if (mOriginalStates[originalSource].getPropositions()
-          .contains(getGeneralisedPrecondition())) {
+      if (!getOriginalAutomaton().getEvents()
+          .contains(getGeneralisedPrecondition())
+          && mOriginalStates[originalSource].getPropositions()
+              .contains(getGeneralisedPrecondition())) {
         return Collections.emptyList();
       }
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
