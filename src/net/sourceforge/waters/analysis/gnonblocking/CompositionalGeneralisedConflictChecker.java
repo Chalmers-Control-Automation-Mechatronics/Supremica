@@ -206,6 +206,7 @@ public class CompositionalGeneralisedConflictChecker extends
         // for all automata, once for all. Then the convertTrace() methods
         // should never have to worry about missing state information in
         // the traces passed to them.
+        // TODO: Ok, I will change this once we have all tests passing again.
         convertedTrace = step.convertTrace(convertedTrace);
       }
       setFailedResult(convertedTrace);
@@ -1245,9 +1246,8 @@ public class CompositionalGeneralisedConflictChecker extends
               .get(tracesInitialState));
       assert initialRecords.size() > 0;
       final Map<AutomatonProxy,StateProxy> initialStepsStateMap =
-          new HashMap<AutomatonProxy,StateProxy>(1);
-      // TODO Fix bug.
-      // Do not forget about the state information for the other automata.
+          new HashMap<AutomatonProxy,StateProxy>(traceSteps.get(0)
+              .getStateMap());
       final List<TraceStepProxy> initialSteps =
           createTraceSteps(initialStepsStateMap, initialRecords);
       convertedSteps.addAll(initialSteps);
@@ -1286,10 +1286,9 @@ public class CompositionalGeneralisedConflictChecker extends
       final List<SearchRecord> finalSteps =
           completeTrace(mOriginalStatesMap.get(originalSource));
       if (finalSteps.size() > 0) {
-        // TODO Fix bug.
-        // Do not forget about the state information for the other automata.
         final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
-            new HashMap<AutomatonProxy,StateProxy>(1);
+            new HashMap<AutomatonProxy,StateProxy>(traceSteps
+                .get(traceSteps.size() - 1).getStateMap());
         final List<TraceStepProxy> substeps =
             createTraceSteps(finalStepsStateMap, finalSteps);
         convertedSteps.addAll(substeps);
