@@ -249,11 +249,21 @@ public class CompositionalGeneralisedConflictChecker extends
                                                final EventProxy tau)
       throws OverflowException
   {
+    final int size = mAbstractionRules.size();
+    final ListIterator<AbstractionRule> iter =
+        mAbstractionRules.listIterator(size);
+    AutomatonProxy aut = autToAbstract;
+    while (iter.hasNext()) {
+      final AbstractionRule rule = iter.next();
+      aut = rule.applyRule(aut);
+    }
+    // TODO: create classes for abstraction rules
     final AutomatonProxy autObsEq =
         applyObservationEquivalence(autToAbstract, tau);
+    @SuppressWarnings("unused")
     final AutomatonProxy autRemoveAlpha =
         applyRemovalOfAlphaMarkings(autObsEq, tau);
-    return autRemoveAlpha;
+    return aut;
   }
 
   private AutomatonProxy applyRemovalOfAlphaMarkings(
@@ -595,6 +605,18 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     mSelectingHeuristics = heuristicList;
     mSelectingHeuristics.add(new HeuristicDefault());
+  }
+
+  /**
+   * Sets the abstraction rules to apply and in which order.
+   *
+   * @param ruleList
+   *          Rules are applied in order from the first item in the list through
+   *          until the last.
+   */
+  public void setAbstractionRules(final List<AbstractionRule> ruleList)
+  {
+    mAbstractionRules = ruleList;
   }
 
 
@@ -1707,6 +1729,7 @@ public class CompositionalGeneralisedConflictChecker extends
   private List<Step> mModifyingSteps;
   private PreselectingHeuristic mPreselectingHeuristic;
   private List<SelectingHeuristic> mSelectingHeuristics;
+  private List<AbstractionRule> mAbstractionRules;
   private Collection<EventProxy> mPropositions;
 
   // #########################################################################
