@@ -1264,21 +1264,26 @@ public class CompositionalGeneralisedConflictChecker extends
         // and tau events in the automaton must be treated separately and
         // specially. That makes two additional cases.
         if (stepEvent != null) {
-          final StateProxy resultTargetState =
-              stepsNewStateMap.get(getResultAutomaton());
-          assert resultTargetState != null;
-          stepsNewStateMap.remove(getResultAutomaton());
-          final List<SearchRecord> subtrace =
-              findSubTrace(mOriginalStatesMap.get(originalSource),
-                           mTransitionRelation.getEventInt(stepEvent),
-                           mReverseOutputStateMap.get(resultTargetState));
-          final List<TraceStepProxy> substeps =
-              createTraceSteps(stepsNewStateMap, subtrace);
-          convertedSteps.addAll(substeps);
-          final int subsize = subtrace.size();
-          if (subsize > 0) {
-            final int originalTargetID = subtrace.get(subsize - 1).getState();
-            originalSource = mOriginalStates[originalTargetID];
+          // handles events not in the simplified automaton
+          if (getResultAutomaton().getEvents().contains(stepEvent)) {
+            final StateProxy resultTargetState =
+                stepsNewStateMap.get(getResultAutomaton());
+            assert resultTargetState != null;
+            stepsNewStateMap.remove(getResultAutomaton());
+            final List<SearchRecord> subtrace =
+                findSubTrace(mOriginalStatesMap.get(originalSource),
+                             mTransitionRelation.getEventInt(stepEvent),
+                             mReverseOutputStateMap.get(resultTargetState));
+            final List<TraceStepProxy> substeps =
+                createTraceSteps(stepsNewStateMap, subtrace);
+            convertedSteps.addAll(substeps);
+            final int subsize = subtrace.size();
+            if (subsize > 0) {
+              final int originalTargetID = subtrace.get(subsize - 1).getState();
+              originalSource = mOriginalStates[originalTargetID];
+            }
+          } else {
+            convertedSteps.add(step);
           }
         }
       }
