@@ -44,4 +44,12 @@ public class ObserverProjectionConflictCheckerTest extends
     return new ObserverProjectionConflictChecker(factory);
   }
 
+
+  //#########################################################################
+  //# Test Cases
+  public void testProfisafeI4SlaveEFA() throws Exception
+  {
+    // disabled --- too many events?
+  }
+
 }

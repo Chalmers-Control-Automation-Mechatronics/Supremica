@@ -300,8 +300,8 @@ public class CompositionalGeneralisedConflictChecker extends
             // the marking tested is alpha, not tau.
             // TODO Watch out for tau selfloops.
             // TODO You want to stop once you have removed the marking,
-            // and probably you do not even want to start of the source state
-            // does not have the alpha marking
+            // and probably you do not even want to start unless the source
+            // state has the alpha marking
             final int targetID = iter.next();
             if (targetID != sourceID) {
               tr.markState(sourceID, false, tau);
@@ -348,7 +348,7 @@ public class CompositionalGeneralisedConflictChecker extends
     final ProductDESProxy candidateModel =
         getFactory().createProductDESProxy("Candidate model", candidateEvents,
                                            candidate.getAutomata());
-
+    // TODO Pass on the node limit.
     final MonolithicSynchronousProductBuilder composer =
         new MonolithicSynchronousProductBuilder(candidateModel, getFactory());
     composer.setPropositions(mPropositions);
@@ -1229,6 +1229,9 @@ public class CompositionalGeneralisedConflictChecker extends
 
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
+      // TODO For later, may also have to consider the case that the
+      // simplified automaton does not contain any tau event, and only
+      // bisimulation was used.
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
@@ -1259,6 +1262,9 @@ public class CompositionalGeneralisedConflictChecker extends
             new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
 
         final EventProxy stepEvent = step.getEvent();
+        // TODO Several bugs here. Events not in the simplified automaton,
+        // and tau events in the automaton must be treated separately and
+        // specially. That makes two additional cases.
         if (stepEvent != null) {
           final StateProxy resultTargetState =
               stepsNewStateMap.get(getResultAutomaton());

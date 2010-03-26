@@ -221,6 +221,12 @@ public class ObserverProjectionTransitionRelation
     return mMarkingDefinitions.get(m);
   }
 
+  public boolean isMarked(final int state, final int prop)
+  {
+    final TIntHashSet markings = getMarkings(state);
+    return markings.contains(prop);
+  }
+
 
   // #########################################################################
   // # State Modifications
@@ -620,7 +626,16 @@ public class ObserverProjectionTransitionRelation
       final int from = statesToMerge[i];
       moveAllSuccessors(from, to);
       moveAllPredeccessors(from, to);
-      copyMarkings(from, to);
+    }
+  }
+
+  public void merge(final int[] statesToMerge, final int tau)
+  {
+    final int to = statesToMerge[0];
+    for (int i = 1; i < statesToMerge.length; i++) {
+      final int from = statesToMerge[i];
+      moveAllSuccessors(from, to, tau);
+      moveAllPredeccessors(from, to, tau);
     }
   }
 
@@ -643,6 +658,7 @@ public class ObserverProjectionTransitionRelation
     return num;
   }
 
+
   // #########################################################################
   // # Automaton Output
   public AutomatonProxy createAutomaton(final ProductDESProxyFactory factory)
@@ -656,7 +672,8 @@ public class ObserverProjectionTransitionRelation
       }
     }
 
-    final List<StateProxy> reachable = new ArrayList<StateProxy>(numStates);
+    final List<MemStateProxy> reachable =
+      new ArrayList<MemStateProxy>(numStates);
     mResultingStates = new TObjectIntHashMap<StateProxy>(numStates);
     final StateProxy[] outputMap = new StateProxy[numStates];
     final Collection<TransitionProxy> transitions =
@@ -674,14 +691,14 @@ public class ObserverProjectionTransitionRelation
           final EventProxy prop = mEvents[e];
           props.add(prop);
         }
-        final StateProxy state = new MemStateProxy(s, init, props);
+        final MemStateProxy state = new MemStateProxy(s, init, props);
         reachable.add(state);
         mResultingStates.put(state, s);
         outputMap[s] = state;
       }
     }
-    int s = 0;
-    for (final StateProxy source : reachable) {
+    for (final MemStateProxy source : reachable) {
+      final int s = source.getCode();
       for (int e = 0; e < mNumProperEvents; e++) {
         final TIntHashSet succs = mSuccessors[s][e];
         if (succs == null) {
@@ -697,7 +714,6 @@ public class ObserverProjectionTransitionRelation
           transitions.add(trans);
         }
       }
-      s++;
     }
     return factory.createAutomatonProxy(mName, mKind, events, reachable,
                                         transitions);
@@ -705,6 +721,53 @@ public class ObserverProjectionTransitionRelation
 
   // #########################################################################
   // # Auxiliary Methods
+  private void moveAllSuccessors(final int from, final int to,
+                                 final int suppress)
+  {
+    if (from == to) {
+      return;
+    }
+    copyMarkings(from, to);
+    clearMarkings(from);
+    for (int e = 0; e < mNumProperEvents; e++) {
+      final TIntHashSet succs = mSuccessors[from][e];
+      if (succs == null) {
+        continue;
+      }
+      final int[] arsuccs = succs.toArray();
+      for (int i = 0; i < arsuccs.length; i++) {
+        final int succ = arsuccs[i];
+        removeTransition(from, e, succ);
+        if (e != suppress || to != succ) {
+          addTransition(to, e, succ);
+        }
+      }
+    }
+  }
+
+  private void moveAllPredeccessors(final int from, final int to,
+                                    final int suppress)
+  {
+    if (from == to) {
+      return;
+    }
+    makeInitialState(to, mIsInitial[to] || mIsInitial[from]);
+    makeInitialState(from, false);
+    for (int e = 0; e < mNumProperEvents; e++) {
+      final TIntHashSet preds = mPredecessors[from][e];
+      if (preds != null) {
+        final int[] arpreds = preds.toArray();
+        for (int i = 0; i < arpreds.length; i++) {
+          final int pred = arpreds[i];
+          removeTransition(pred, e, from);
+          if (e != suppress || pred != to) {
+            addTransition(pred, e, to);
+          }
+        }
+      }
+    }
+  }
+
   private TIntHashSet getFromArray(final int i, final TIntHashSet[] array)
   {
     TIntHashSet intset = array[i];
@@ -744,8 +807,15 @@ public class ObserverProjectionTransitionRelation
       mProps = props;
     }
 
-    // #######################################################################
-    // # Interface net.sourceforge.waters.model.des.StateProxy
+    //#######################################################################
+    //# Simple Access
+    int getCode()
+    {
+      return mCode;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.des.StateProxy
     public String getName()
     {
       return "S:" + mCode;

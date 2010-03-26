@@ -117,7 +117,7 @@ public class ObserverProjectionBisimulator
       if (sec.mStates.length == 1) {
         continue;
       }
-      mTransitionRelation.merge(sec.mStates);
+      mTransitionRelation.merge(sec.mStates, mTau);
     }
     return true;
   }
