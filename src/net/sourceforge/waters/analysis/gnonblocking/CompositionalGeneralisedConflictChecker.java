@@ -1260,19 +1260,20 @@ public class CompositionalGeneralisedConflictChecker extends
             new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
 
         final EventProxy stepEvent = step.getEvent();
-        // TODO Several bugs here. Events not in the simplified automaton,
-        // and tau events in the automaton must be treated separately and
-        // specially. That makes two additional cases.
+        // TODO
+        // tau events in the automaton must be treated separately and
+        // specially.
         if (stepEvent != null) {
           // handles events not in the simplified automaton
           if (getResultAutomaton().getEvents().contains(stepEvent)) {
+            final int eventID = mTransitionRelation.getEventInt(stepEvent);
+
             final StateProxy resultTargetState =
                 stepsNewStateMap.get(getResultAutomaton());
             assert resultTargetState != null;
             stepsNewStateMap.remove(getResultAutomaton());
             final List<SearchRecord> subtrace =
-                findSubTrace(mOriginalStatesMap.get(originalSource),
-                             mTransitionRelation.getEventInt(stepEvent),
+                findSubTrace(mOriginalStatesMap.get(originalSource), eventID,
                              mReverseOutputStateMap.get(resultTargetState));
             final List<TraceStepProxy> substeps =
                 createTraceSteps(stepsNewStateMap, subtrace);
