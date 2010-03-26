@@ -267,7 +267,9 @@ public class CompositionalGeneralisedConflictChecker extends
     mModifyingSteps = new ArrayList<Step>();
     mPropositions = new HashSet<EventProxy>(2);
     mPropositions.add(getMarkingProposition());
-    mPropositions.add(getGeneralisedPrecondition());
+    if (getGeneralisedPrecondition() != null) {
+      mPropositions.add(getGeneralisedPrecondition());
+    }
   }
 
   /**
