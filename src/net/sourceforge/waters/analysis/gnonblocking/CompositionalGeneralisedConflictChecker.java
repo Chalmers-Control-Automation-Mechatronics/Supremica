@@ -217,7 +217,54 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     final AutomatonProxy autObsEq =
         applyObservationEquivalence(autToAbstract, tau);
-    return autObsEq;
+    final AutomatonProxy autRemoveAlpha =
+        applyRemovalOfAlphaMarkings(autObsEq, tau);
+    return autRemoveAlpha;
+  }
+
+  private AutomatonProxy applyRemovalOfAlphaMarkings(
+                                                     final AutomatonProxy autToAbstract,
+                                                     final EventProxy tau)
+  {
+    final ObserverProjectionTransitionRelation tr =
+        new ObserverProjectionTransitionRelation(autToAbstract, mPropositions);
+    removeAlphaMarkings(tr, tau);
+    final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
+    final RemovalOfAlphaMarkingsStep ramStep =
+        new RemovalOfAlphaMarkingsStep(convertedAut, autToAbstract);
+    mModifyingSteps.add(ramStep);
+    return convertedAut;
+  }
+
+  /**
+   * Removes alpha marking from state x if state x and state y have a transition
+   * containing a silent event directly between them.
+   *
+   * @param tr
+   *          The transition relation for the automaton to remove alpha markings
+   *          from.
+   * @param tau
+   *          The silent event which is required to be on the transition between
+   *          the two states.
+   */
+  private void removeAlphaMarkings(
+                                   final ObserverProjectionTransitionRelation tr,
+                                   final EventProxy tau)
+  {
+    final int tauID = tr.getEventInt(tau);
+    for (final StateProxy state : tr.getOriginalIntToStateMap()) {
+      final int sourceID = tr.getStateInt(state);
+      final TIntHashSet successors = tr.getSuccessors(sourceID, tauID);
+      if (successors != null) {
+        final TIntIterator iter = successors.iterator();
+        while (iter.hasNext()) {
+          final int targetID = iter.next();
+          if (targetID != sourceID) {
+            tr.markState(sourceID, false, tau);
+          }
+        }
+      }
+    }
   }
 
   private AutomatonProxy applyObservationEquivalence(
@@ -1504,6 +1551,27 @@ public class CompositionalGeneralisedConflictChecker extends
     private final ObserverProjectionTransitionRelation mTransitionRelation;
     private final int mCodeOfTau;
     private final Map<StateProxy,Integer> mOriginalStatesMap;
+  }
+
+
+  // #########################################################################
+  // # Inner Class RemovalOfAlphaMarkingsStep
+  private class RemovalOfAlphaMarkingsStep extends Step
+  {
+
+    RemovalOfAlphaMarkingsStep(final AutomatonProxy resultAut,
+                               final AutomatonProxy originalAut)
+    {
+      super(resultAut, originalAut);
+      // TODO Auto-generated constructor stub
+    }
+
+    ConflictTraceProxy convertTrace(final ConflictTraceProxy counterexample)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
   }
 
 

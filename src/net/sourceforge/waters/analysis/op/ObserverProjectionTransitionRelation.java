@@ -53,7 +53,6 @@ public class ObserverProjectionTransitionRelation
   {
     mName = aut.getName();
     mKind = aut.getKind();
-
     mNumProperEvents = 0;
     int numPropositions = 0;
     final Collection<EventProxy> events = aut.getEvents();
@@ -166,6 +165,11 @@ public class ObserverProjectionTransitionRelation
   public int getNumberOfStates()
   {
     return mSuccessors.length;
+  }
+
+  public int getStateInt(final StateProxy state)
+  {
+    return mOriginalStatesMap.get(state);
   }
 
   public StateProxy[] getOriginalIntToStateMap()
@@ -687,8 +691,8 @@ public class ObserverProjectionTransitionRelation
       }
       s++;
     }
-    return factory.createAutomatonProxy
-      (mName, mKind, events, reachable, transitions);
+    return factory.createAutomatonProxy(mName, mKind, events, reachable,
+                                        transitions);
   }
 
   // #########################################################################
