@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.op;
 
 import gnu.trove.THashSet;
+import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
 import gnu.trove.TObjectIntHashMap;
@@ -39,16 +40,16 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public class ObserverProjectionTransitionRelation
 {
 
-  //#########################################################################
-  //# Constructors
+  // #########################################################################
+  // # Constructors
   public ObserverProjectionTransitionRelation(final AutomatonProxy aut)
   {
     this(aut, null);
   }
 
-  public ObserverProjectionTransitionRelation
-    (final AutomatonProxy aut,
-     final Collection<EventProxy> allprops)
+  public ObserverProjectionTransitionRelation(
+                                              final AutomatonProxy aut,
+                                              final Collection<EventProxy> allprops)
   {
     mName = aut.getName();
     mKind = aut.getKind();
@@ -83,8 +84,7 @@ public class ObserverProjectionTransitionRelation
     final TObjectIntHashMap<StateProxy> stateToInt =
         new TObjectIntHashMap<StateProxy>(numStates);
     mOriginalStates = new StateProxy[numStates];
-    mOriginalStatesMap =
-        new HashMap<StateProxy,Integer>(numStates);
+    mOriginalStatesMap = new HashMap<StateProxy,Integer>(numStates);
     mIsInitial = new boolean[numStates];
     mStateMarkings = new int[numStates];
     mMarkingDefinitions = new ArrayList<TIntHashSet>();
@@ -127,9 +127,8 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
-
-  //#########################################################################
-  //# Simple Access
+  // #########################################################################
+  // # Simple Access
   public String getName()
   {
     return mName;
@@ -140,9 +139,8 @@ public class ObserverProjectionTransitionRelation
     return mKind;
   }
 
-
-  //#########################################################################
-  //# Events Access
+  // #########################################################################
+  // # Events Access
   public int getNumberOfProperEvents()
   {
     return mNumProperEvents;
@@ -163,9 +161,8 @@ public class ObserverProjectionTransitionRelation
     return mEventToInt.get(event);
   }
 
-
-  //#########################################################################
-  //# States Access
+  // #########################################################################
+  // # States Access
   public int getNumberOfStates()
   {
     return mSuccessors.length;
@@ -191,6 +188,17 @@ public class ObserverProjectionTransitionRelation
     return mIsInitial[state];
   }
 
+  public TIntArrayList getAllInitialStates()
+  {
+    final TIntArrayList result = new TIntArrayList();
+    for (int state = 0; state < mIsInitial.length; state++) {
+      if (mIsInitial[state]) {
+        result.add(state);
+      }
+    }
+    return result;
+  }
+
   public int getMarkingsInt(final int state)
   {
     return mStateMarkings[state];
@@ -202,19 +210,16 @@ public class ObserverProjectionTransitionRelation
     return mMarkingDefinitions.get(m);
   }
 
-
-  //#########################################################################
-  //# State Modifications
+  // #########################################################################
+  // # State Modifications
   public void makeInitialState(final int state, final boolean initial)
   {
     mIsInitial[state] = initial;
   }
 
-
-  //#########################################################################
-  //# Marking Modifications
-  public void markState(final int state,
-                        final boolean value,
+  // #########################################################################
+  // # Marking Modifications
+  public void markState(final int state, final boolean value,
                         final EventProxy marking)
   {
     final int e = mEventToInt.get(marking);
@@ -262,8 +267,7 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
-  public void markState(final int state,
-                        final TIntHashSet markings)
+  public void markState(final int state, final TIntHashSet markings)
   {
     final int m;
     if (mMarkingMap.contains(markings)) {
@@ -276,9 +280,8 @@ public class ObserverProjectionTransitionRelation
     mStateMarkings[state] = m;
   }
 
-
-  //#########################################################################
-  //# Transitions Access
+  // #########################################################################
+  // # Transitions Access
   public TIntHashSet getActiveEvents(final int state)
   {
     return mActiveEvents[state];
@@ -320,9 +323,8 @@ public class ObserverProjectionTransitionRelation
     return false;
   }
 
-
-  //#########################################################################
-  //# Transitions Modifications
+  // #########################################################################
+  // # Transitions Modifications
   public void removeOutgoing(final int state, final int event)
   {
     final TIntHashSet succs = mSuccessors[state][event];
@@ -628,9 +630,8 @@ public class ObserverProjectionTransitionRelation
     return num;
   }
 
-
-  //#########################################################################
-  //# Automaton Output
+  // #########################################################################
+  // # Automaton Output
   public AutomatonProxy createAutomaton(final ProductDESProxyFactory factory)
   {
     final int numEvents = getNumberOfEvents();
@@ -645,14 +646,14 @@ public class ObserverProjectionTransitionRelation
     final List<StateProxy> states = new ArrayList<StateProxy>(numStates);
     mResultingStates = new TObjectIntHashMap<StateProxy>(numStates);
     final Collection<TransitionProxy> transitions =
-      new ArrayList<TransitionProxy>();
+        new ArrayList<TransitionProxy>();
     for (int s = 0; s < numStates; s++) {
       if (hasPredecessors(s)) {
         final boolean init = isInitial(s);
         final TIntHashSet markings = getMarkings(s);
         final int numprops = markings.size();
         final Collection<EventProxy> props =
-          new ArrayList<EventProxy>(numprops);
+            new ArrayList<EventProxy>(numprops);
         final TIntIterator iter = markings.iterator();
         while (iter.hasNext()) {
           final int e = iter.next();
@@ -677,18 +678,17 @@ public class ObserverProjectionTransitionRelation
           final int succ = iter.next();
           final StateProxy target = states.get(succ);
           final TransitionProxy trans =
-            factory.createTransitionProxy(source, event, target);
+              factory.createTransitionProxy(source, event, target);
           transitions.add(trans);
         }
       }
     }
-    return factory.createAutomatonProxy
-      (mName, mKind, events, states, transitions);
+    return factory.createAutomatonProxy(mName, mKind, events, states,
+                                        transitions);
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
+  // #########################################################################
+  // # Auxiliary Methods
   private TIntHashSet getFromArray(final int i, final TIntHashSet[] array)
   {
     TIntHashSet intset = array[i];
@@ -711,17 +711,16 @@ public class ObserverProjectionTransitionRelation
   }
 
 
-  //#########################################################################
-  //# Inner Class MemStateProxy
+  // #########################################################################
+  // # Inner Class MemStateProxy
   /**
    * Stores states, encoding the name as an int rather than a long string value.
    */
   private static class MemStateProxy implements StateProxy
   {
-    //#######################################################################
-    //# Constructor
-    private MemStateProxy(final int code,
-                          final boolean init,
+    // #######################################################################
+    // # Constructor
+    private MemStateProxy(final int code, final boolean init,
                           final Collection<EventProxy> props)
     {
       mCode = code;
@@ -729,8 +728,8 @@ public class ObserverProjectionTransitionRelation
       mProps = props;
     }
 
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.des.StateProxy
+    // #######################################################################
+    // # Interface net.sourceforge.waters.model.des.StateProxy
     public String getName()
     {
       return "S:" + mCode;
@@ -784,25 +783,22 @@ public class ObserverProjectionTransitionRelation
       return n.getName().compareTo(getName());
     }
 
-
-    //#######################################################################
-    //# Overrides for java.lang.Object
+    // #######################################################################
+    // # Overrides for java.lang.Object
     public String toString()
     {
       return getName();
     }
 
-
-    //#######################################################################
-    //# Data Members
+    // #######################################################################
+    // # Data Members
     private final int mCode;
     private final boolean mIsInitial;
     private final Collection<EventProxy> mProps;
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
+  // #########################################################################
+  // # Auxiliary Methods
   private final String mName;
   private final ComponentKind mKind;
   private int mNumProperEvents;
@@ -820,9 +816,8 @@ public class ObserverProjectionTransitionRelation
 
   private TObjectIntHashMap<StateProxy> mResultingStates;
 
-
-  //#########################################################################
-  //# Auxiliary Methods
+  // #########################################################################
+  // # Auxiliary Methods
   private static final TIntHashSet EMPTY_MARKING = new TIntHashSet();
 
 }

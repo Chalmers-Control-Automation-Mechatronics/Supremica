@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
+import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.op.ObserverProjectionBisimulator;
+import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
@@ -157,19 +160,19 @@ public class CompositionalGeneralisedConflictChecker extends
       // TODO: candidate selection (i.e. heuristics) still need testing
 
       final AutomatonProxy syncProduct = composeSynchronousProduct(candidate);
-
+      final EventProxy tau = createTauEvent(syncProduct);
       final AutomatonProxy autToAbstract =
-          hideLocalEvents(syncProduct, candidate.getLocalEvents());
+          hideLocalEvents(syncProduct, candidate.getLocalEvents(), tau);
 
       // TODO Abstraction rules here
-      // final AutomatonProxy abstractedAut =
-      // applyAbstractionRules(autToAbstract, tauEvent);
+      final AutomatonProxy abstractedAut =
+          applyAbstractionRules(autToAbstract, tau);
 
       // removes the composed automata for this candidate from the set of
       // remaining automata and adds the newly composed candidate
       remainingAut.removeAll(candidate.getAutomata());
-      remainingAut.add(autToAbstract);
-      updateEventsToAutomata(autToAbstract, candidate.getAutomata());
+      remainingAut.add(abstractedAut);
+      updateEventsToAutomata(abstractedAut, candidate.getAutomata());
 
       // updates the current model to find candidates from
       final Set<EventProxy> composedModelAlphabet =
@@ -207,7 +210,6 @@ public class CompositionalGeneralisedConflictChecker extends
     return result;
   }
 
-  @SuppressWarnings("unused")
   private AutomatonProxy applyAbstractionRules(
                                                final AutomatonProxy autToAbstract,
                                                final EventProxy tau)
@@ -223,18 +225,17 @@ public class CompositionalGeneralisedConflictChecker extends
                                                      final EventProxy tau)
       throws OverflowException
   {
-    final TransitionRelation tr =
-        new TransitionRelation(autToAbstract, getMarkingProposition(),
-            getGeneralisedPrecondition());
-    final TransBiSimulator transBiSimulator =
-        new TransBiSimulator(tr, tr.getEventInt(tau));
-    final boolean modified = transBiSimulator.run();
+    final ObserverProjectionTransitionRelation tr =
+        new ObserverProjectionTransitionRelation(autToAbstract, mPropositions);
+    final ObserverProjectionBisimulator biSimulator =
+        new ObserverProjectionBisimulator(tr, tr.getEventInt(tau));
+    final boolean modified = biSimulator.run();
     if (modified) {
-      final AutomatonProxy convertedAut = tr.getAutomaton(getFactory());
+      final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
       final ObservationEquivalenceStep oeStep =
           new ObservationEquivalenceStep(convertedAut, autToAbstract, tau, tr
-              .getOriginalIntToStateMap(), transBiSimulator.getStateClasses(),
-              tr.getResultingStateToIntMap());
+              .getOriginalIntToStateMap(), biSimulator.getStateClasses(), tr
+              .getResultingStateToIntMap());
       mModifyingSteps.add(oeStep);
       return convertedAut;
     } else {
@@ -264,6 +265,9 @@ public class CompositionalGeneralisedConflictChecker extends
       setSelectingHeuristic(defaultHeuristic);
     }
     mModifyingSteps = new ArrayList<Step>();
+    mPropositions = new HashSet<EventProxy>(2);
+    mPropositions.add(getMarkingProposition());
+    mPropositions.add(getGeneralisedPrecondition());
   }
 
   /**
@@ -282,10 +286,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
     final MonolithicSynchronousProductBuilder composer =
         new MonolithicSynchronousProductBuilder(candidateModel, getFactory());
-    final Collection<EventProxy> propositions = new HashSet<EventProxy>();
-    propositions.add(getMarkingProposition());
-    propositions.add(getGeneralisedPrecondition());
-    composer.setPropositions(propositions);
+    composer.setPropositions(mPropositions);
     composer.run();
     final AutomatonProxy syncProduct = composer.getComputedAutomaton();
     final CompositionStep step =
@@ -311,9 +312,9 @@ public class CompositionalGeneralisedConflictChecker extends
    * silent event "tau").
    */
   private AutomatonProxy hideLocalEvents(final AutomatonProxy automaton,
-                                         final Set<EventProxy> localEvents)
+                                         final Set<EventProxy> localEvents,
+                                         final EventProxy tau)
   {
-    final EventProxy tau = createTauEvent(automaton);
     final Map<TransitionProxy,TransitionProxy> transitionMap =
         new HashMap<TransitionProxy,TransitionProxy>(automaton.getTransitions()
             .size());
@@ -1149,15 +1150,14 @@ public class CompositionalGeneralisedConflictChecker extends
                                        final EventProxy tau,
                                        final StateProxy[] originalStates,
                                        final Map<Integer,int[]> classMap,
-                                       final Map<StateProxy,Integer> reverseOutputStateMap)
+                                       final TObjectIntHashMap<StateProxy> reverseOutputStateMap)
     {
       super(resultAut, originalAut);
       mOriginalStates = originalStates;
       mClassMap = classMap;
       mReverseOutputStateMap = reverseOutputStateMap;
       mTransitionRelation =
-          new TransitionRelation(originalAut, getMarkingProposition(),
-              getGeneralisedPrecondition());
+          new ObserverProjectionTransitionRelation(originalAut, mPropositions);
       mCodeOfTau = mTransitionRelation.getEventInt(tau);
       mOriginalStatesMap = mTransitionRelation.getOriginalStateToIntMap();
     }
@@ -1171,7 +1171,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
       // makes the trace begin in the correct initial state
       final TIntArrayList initialStates =
-          mTransitionRelation.getInitialStates();
+          mTransitionRelation.getAllInitialStates();
       final StateProxy tracesInitialState =
           getInitialState(getResultAutomaton(), traceSteps.get(0));
       final List<SearchRecord> initialRecords =
@@ -1497,9 +1497,9 @@ public class CompositionalGeneralisedConflictChecker extends
      * (simplified automaton) to state code in output transition relation.
      * Obtained from TransitionRelation.
      */
-    private final Map<StateProxy,Integer> mReverseOutputStateMap;
+    private final TObjectIntHashMap<StateProxy> mReverseOutputStateMap;
 
-    private final TransitionRelation mTransitionRelation;
+    private final ObserverProjectionTransitionRelation mTransitionRelation;
     private final int mCodeOfTau;
     private final Map<StateProxy,Integer> mOriginalStatesMap;
   }
@@ -1563,6 +1563,7 @@ public class CompositionalGeneralisedConflictChecker extends
   private List<Step> mModifyingSteps;
   private PreselectingHeuristic mPreselectingHeuristic;
   private List<SelectingHeuristic> mSelectingHeuristics;
+  private Collection<EventProxy> mPropositions;
 
   // #########################################################################
   // # Class Constants
