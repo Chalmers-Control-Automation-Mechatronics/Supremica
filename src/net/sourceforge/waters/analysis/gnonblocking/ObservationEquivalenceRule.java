@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
 //# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
-//# CLASS:   AbstractionRule
+//# CLASS:   ObservationEquivalenceRule
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -15,8 +15,13 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 /**
  * @author Rachel Francis
  */
-public abstract interface AbstractionRule
+public class ObservationEquivalenceRule implements AbstractionRule
 {
-  public AutomatonProxy applyRule(final AutomatonProxy autToAbstract);
+
+  public AutomatonProxy applyRule(final AutomatonProxy autToAbstract)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }
