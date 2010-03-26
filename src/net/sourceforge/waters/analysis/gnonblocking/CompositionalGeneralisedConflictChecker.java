@@ -35,7 +35,6 @@ import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -140,7 +139,7 @@ public class CompositionalGeneralisedConflictChecker extends
   // # Invocation
   public boolean run() throws AnalysisException
   {
-    initialise();
+    setUp();
     ProductDESProxy model = getModel();
     mapEventsToAutomata(model);
     final List<AutomatonProxy> remainingAut =
@@ -185,7 +184,7 @@ public class CompositionalGeneralisedConflictChecker extends
                                              remainingAut);
     }
     final ConflictChecker checker =
-        new MonolithicConflictChecker(model, getMarkingProposition(),
+        new MonolithicConflictChecker(model, getUsedMarkingProposition(),
             getGeneralisedPrecondition(), getFactory());
     final boolean result = checker.run();
 
@@ -202,14 +201,51 @@ public class CompositionalGeneralisedConflictChecker extends
         // saturation
         // necessary for
         // every step
-        // TODO No---at least it shouldn't ...
+        // TODO No---at least it shouldn't. The saturateTrace() method
+        // should be a method of the main class, and saturate the trace
+        // for all automata, once for all. Then the convertTrace() methods
+        // should never have to worry about missing state information in
+        // the traces passed to them.
         convertedTrace = step.convertTrace(convertedTrace);
       }
       setFailedResult(convertedTrace);
     }
+    tearDown();
     return result;
   }
 
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
+  /**
+   * Initialises required variables to default values if the user hasn't
+   * configured them.
+   */
+  protected void setUp()
+    throws AnalysisException
+  {
+    super.setUp();
+    if (mPreselectingHeuristic == null) {
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
+      // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
+      setPreselectingHeuristic(defaultHeuristic);
+    }
+    if (mSelectingHeuristics == null) {
+      final SelectingHeuristic defaultHeuristic = new HeuristicMaxL();
+      setSelectingHeuristic(defaultHeuristic);
+    }
+    mModifyingSteps = new ArrayList<Step>();
+    mPropositions = new ArrayList<EventProxy>(2);
+    mPropositions.add(getUsedMarkingProposition());
+    if (getGeneralisedPrecondition() != null) {
+      mPropositions.add(getGeneralisedPrecondition());
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   private AutomatonProxy applyAbstractionRules(
                                                final AutomatonProxy autToAbstract,
                                                final EventProxy tau)
@@ -252,15 +288,24 @@ public class CompositionalGeneralisedConflictChecker extends
                                    final EventProxy tau)
   {
     final int tauID = tr.getEventInt(tau);
-    for (final StateProxy state : tr.getOriginalIntToStateMap()) {
-      final int sourceID = tr.getStateInt(state);
-      final TIntHashSet successors = tr.getSuccessors(sourceID, tauID);
-      if (successors != null) {
-        final TIntIterator iter = successors.iterator();
-        while (iter.hasNext()) {
-          final int targetID = iter.next();
-          if (targetID != sourceID) {
-            tr.markState(sourceID, false, tau);
+    final int numStates = tr.getNumberOfStates();
+    for (int sourceID = 0; sourceID < numStates; sourceID++) {
+      // Skip states marked as unreachable ...
+      if (tr.hasPredecessors(sourceID)) {
+        final TIntHashSet successors = tr.getSuccessors(sourceID, tauID);
+        if (successors != null) {
+          final TIntIterator iter = successors.iterator();
+          while (iter.hasNext()) {
+            // TODO Fix bug. Only unmark if successor state is marked alpha;
+            // the marking tested is alpha, not tau.
+            // TODO Watch out for tau selfloops.
+            // TODO You want to stop once you have removed the marking,
+            // and probably you do not even want to start of the source state
+            // does not have the alpha marking
+            final int targetID = iter.next();
+            if (targetID != sourceID) {
+              tr.markState(sourceID, false, tau);
+            }
           }
         }
       }
@@ -287,35 +332,6 @@ public class CompositionalGeneralisedConflictChecker extends
       return convertedAut;
     } else {
       return autToAbstract;
-    }
-  }
-
-  /**
-   * Initialises required variables to default values if the user hasn't
-   * configured them.
-   *
-   * @throws EventNotFoundException
-   */
-  private void initialise() throws EventNotFoundException
-  {
-    if (getMarkingProposition() == null) {
-      setMarkingProposition(getUsedMarkingProposition());
-    }
-    if (mPreselectingHeuristic == null) {
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
-      // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
-      // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
-      setPreselectingHeuristic(defaultHeuristic);
-    }
-    if (mSelectingHeuristics == null) {
-      final SelectingHeuristic defaultHeuristic = new HeuristicMaxL();
-      setSelectingHeuristic(defaultHeuristic);
-    }
-    mModifyingSteps = new ArrayList<Step>();
-    mPropositions = new HashSet<EventProxy>(2);
-    mPropositions.add(getMarkingProposition());
-    if (getGeneralisedPrecondition() != null) {
-      mPropositions.add(getGeneralisedPrecondition());
     }
   }
 
@@ -891,8 +907,7 @@ public class CompositionalGeneralisedConflictChecker extends
       return mOriginalAutomata;
     }
 
-    // Simpler solution, instead of additional subclass :-)
-    AutomatonProxy getOriginalAutomaton()
+   AutomatonProxy getOriginalAutomaton()
     {
       if (mOriginalAutomata.size() == 1) {
         return mOriginalAutomata.iterator().next();
@@ -1064,6 +1079,7 @@ public class CompositionalGeneralisedConflictChecker extends
             final StateProxy originalState =
                 mStateMap.getOriginalState(convertedState, aut);
             convertedStepMap.put(aut, originalState);
+            // Bug? How often do we add aut? What if there are no steps?
             traceAutomata.add(aut);
           }
           final TraceStepProxy convertedStep =
@@ -1229,6 +1245,8 @@ public class CompositionalGeneralisedConflictChecker extends
       assert initialRecords.size() > 0;
       final Map<AutomatonProxy,StateProxy> initialStepsStateMap =
           new HashMap<AutomatonProxy,StateProxy>(1);
+      // TODO Fix bug.
+      // Do not forget about the state information for the other automata.
       final List<TraceStepProxy> initialSteps =
           createTraceSteps(initialStepsStateMap, initialRecords);
       convertedSteps.addAll(initialSteps);
@@ -1253,15 +1271,19 @@ public class CompositionalGeneralisedConflictChecker extends
           final List<TraceStepProxy> substeps =
               createTraceSteps(stepsNewStateMap, subtrace);
           convertedSteps.addAll(substeps);
-          final int originalTargetID =
-              subtrace.get(subtrace.size() - 1).getState();
-          originalSource = mOriginalStates[originalTargetID];
+          final int subsize = subtrace.size();
+          if (subsize > 0) {
+            final int originalTargetID = subtrace.get(subsize - 1).getState();
+            originalSource = mOriginalStates[originalTargetID];
+          }
         }
       }
       // makes the trace end in an alpha state
       final List<SearchRecord> finalSteps =
           completeTrace(mOriginalStatesMap.get(originalSource));
       if (finalSteps.size() > 0) {
+        // TODO Fix bug.
+        // Do not forget about the state information for the other automata.
         final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
             new HashMap<AutomatonProxy,StateProxy>(1);
         final List<TraceStepProxy> substeps =
@@ -1314,27 +1336,13 @@ public class CompositionalGeneralisedConflictChecker extends
       return substeps;
     }
 
-    // I have fixed some bugs. First, beginTrace() used the initial state
-    // instead of the target states for testing at the end. Second, I
-    // added some more tests whether the successors are non-null (not sure
-    // whether this is needed?). I also changed the way of including the very
-    // first trace step and simplified the way how initial states are passed
-    // into beginTrace().
-
-    // There still are bugs with hisc_low2__a2 and parManEg examples.
-    // The first suggests some structural problems in the trace automata
-    // list. Look for the second exception in the 'Failure Trace' window.
-    // The parManEg failures seem to return 'blocking' when 'nonblocking'
-    // is expected (and verified monolithically ???).
-    // To me, both failures suggest problems outside of trace computation.
-
     /**
      * Creates the beginning of a trace by doing a breadth-first search to find
      * the correct initial state of the original automaton. Steps are added for
      * tau transitions (if necessary) until the initial state of the result
      * automaton is reached.
      *
-     * @return A list of SearchRecord's that represent each extra step needed
+     * @return A list of SearchRecords that represent each extra step needed
      *         for the start of the trace. (The first item being the very first
      *         state of the trace).
      */
@@ -1353,6 +1361,9 @@ public class CompositionalGeneralisedConflictChecker extends
         final int initStateID = initialStateIDs.get(i);
         final SearchRecord record =
             new SearchRecord(initStateID, false, -1, dummy);
+        if (targetSet.contains(initStateID)) {
+          return Collections.singletonList(record);
+        }
         open.add(record);
         visited.add(initStateID);
       }
@@ -1391,6 +1402,7 @@ public class CompositionalGeneralisedConflictChecker extends
      */
     private List<SearchRecord> completeTrace(final int originalSource)
     {
+      // TODO Also return if alpha is not in the automaton alphabet.
       if (mOriginalStates[originalSource].getPropositions()
           .contains(getGeneralisedPrecondition())) {
         return Collections.emptyList();
@@ -1441,8 +1453,7 @@ public class CompositionalGeneralisedConflictChecker extends
      *         target. The first entry in the list represents the first step
      *         after the source state, with its event and target state. The
      *         final step has a target state in the given target class. Events
-     *         in the list can only be tau or the given event. The list cannot
-     *         be empty, because it must include at least the given event.
+     *         in the list can only be tau or the given event.
      */
     private List<SearchRecord> findSubTrace(final int originalSource,
                                             final int event,
@@ -1453,9 +1464,21 @@ public class CompositionalGeneralisedConflictChecker extends
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
       final TIntHashSet visited0 = new TIntHashSet(); // event not in trace
       final TIntHashSet visited1 = new TIntHashSet(); // event in trace
-      SearchRecord record = new SearchRecord(originalSource);
+      // The given event may be tau. In this case, we must search for a
+      // (possibly empty) string of tau events. This is achieved here by
+      // by creating a first search record with the 'hasevent' property,
+      // i.e., pretending the trace already has an event.
+      SearchRecord record;
+      if (event != mCodeOfTau) {
+        record = new SearchRecord(originalSource);
+        visited0.add(originalSource);
+      } else if (!targetSet.contains(originalSource)) {
+        record = new SearchRecord(originalSource, true, -1, null);
+        visited1.add(originalSource);
+      } else {
+        return Collections.emptyList();
+      }
       open.add(record);
-      visited0.add(originalSource);
       while (true) {
         final SearchRecord current = open.remove();
         final int source = current.getState();
@@ -1573,16 +1596,16 @@ public class CompositionalGeneralisedConflictChecker extends
 
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
-      final List<TraceStepProxy> convertedSteps =
-          new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      final int numSteps = traceSteps.size();
+      final List<TraceStepProxy> convertedSteps =
+          new ArrayList<TraceStepProxy>(numSteps);
       for (final TraceStepProxy step : traceSteps) {
         final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
             new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
-        if (stepsNewStateMap.containsKey(getResultAutomaton())) {
-          final StateProxy targetState =
-              stepsNewStateMap.get(getResultAutomaton());
-          assert targetState != null;
+        final StateProxy targetState =
+          stepsNewStateMap.get(getResultAutomaton());
+        if (targetState != null) {
           stepsNewStateMap.remove(getResultAutomaton());
           final int stateID = mResultingStates.get(targetState);
           final StateProxy replacementState = mOriginalStates[stateID];

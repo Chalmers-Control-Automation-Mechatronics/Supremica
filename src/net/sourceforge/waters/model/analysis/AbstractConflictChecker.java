@@ -122,15 +122,27 @@ public abstract class AbstractConflictChecker
   {
     return mMarking;
   }
+
   public void setGeneralisedPrecondition(final EventProxy marking){
     mPreconditionMarking = marking;
   }
+
   public EventProxy getGeneralisedPrecondition(){
     return mPreconditionMarking;
   }
+
   public ConflictTraceProxy getCounterExample()
   {
     return (ConflictTraceProxy) super.getCounterExample();
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.ModelAnalyser
+  protected void tearDown()
+  {
+    mUsedMarking = null;
+    super.tearDown();
   }
 
 

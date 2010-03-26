@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis
-//# CLASS:   TransitionRelation
+//# PACKAGE: net.sourceforge.waters.analysis.op
+//# CLASS:   ObserverProjectionTransitionRelation
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -47,9 +47,8 @@ public class ObserverProjectionTransitionRelation
     this(aut, null);
   }
 
-  public ObserverProjectionTransitionRelation(
-                                              final AutomatonProxy aut,
-                                              final Collection<EventProxy> allprops)
+  public ObserverProjectionTransitionRelation
+    (final AutomatonProxy aut, final Collection<EventProxy> allprops)
   {
     mName = aut.getName();
     mKind = aut.getKind();
@@ -126,6 +125,7 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
+
   // #########################################################################
   // # Simple Access
   public String getName()
@@ -137,6 +137,7 @@ public class ObserverProjectionTransitionRelation
   {
     return mKind;
   }
+
 
   // #########################################################################
   // # Events Access
@@ -157,8 +158,13 @@ public class ObserverProjectionTransitionRelation
 
   public int getEventInt(final EventProxy event)
   {
-    return mEventToInt.get(event);
+    if (mEventToInt.containsKey(event)) {
+      return mEventToInt.get(event);
+    } else {
+      return -1;
+    }
   }
+
 
   // #########################################################################
   // # States Access
@@ -215,12 +221,14 @@ public class ObserverProjectionTransitionRelation
     return mMarkingDefinitions.get(m);
   }
 
+
   // #########################################################################
   // # State Modifications
   public void makeInitialState(final int state, final boolean initial)
   {
     mIsInitial[state] = initial;
   }
+
 
   // #########################################################################
   // # Marking Modifications
@@ -805,8 +813,9 @@ public class ObserverProjectionTransitionRelation
     private final Collection<EventProxy> mProps;
   }
 
+
   // #########################################################################
-  // # Auxiliary Methods
+  // # Data Members
   private final String mName;
   private final ComponentKind mKind;
   private int mNumProperEvents;
@@ -824,8 +833,9 @@ public class ObserverProjectionTransitionRelation
 
   private TObjectIntHashMap<StateProxy> mResultingStates;
 
+
   // #########################################################################
-  // # Auxiliary Methods
+  // # Class Constants
   private static final TIntHashSet EMPTY_MARKING = new TIntHashSet();
 
 }

@@ -235,23 +235,25 @@ public class ObserverProjectionConflictChecker
     final int limit = getNodeLimit();
     mMonolithicConflictChecker.setNodeLimit(limit);
     mMonolithicConflictChecker.setModel(model);
-    final EventProxy marking = getMarkingProposition();
+    final EventProxy marking = getUsedMarkingProposition();
     mMonolithicConflictChecker.setMarkingProposition(marking);
     final boolean result = mMonolithicConflictChecker.run();
 
     if (result) {
-      return setSatisfiedResult();
+      setSatisfiedResult();
     } else {
       final ConflictTraceProxy trace0 =
         mMonolithicConflictChecker.getCounterExample();
       final ConflictTraceProxy trace1 = expandTrace(trace0);
-      return setFailedResult(trace1);
+      setFailedResult(trace1);
     }
+    tearDown();
+    return result;
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.ModelAnalyser
+  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   /**
    * Initialises required variables to default values if the user hasn't
    * configured them.
@@ -260,10 +262,7 @@ public class ObserverProjectionConflictChecker
     throws AnalysisException
   {
     super.setUp();
-    if (getMarkingProposition() == null) {
-      setMarkingProposition(getUsedMarkingProposition());
-    }
-    final EventProxy marking = getMarkingProposition();
+    final EventProxy marking = getUsedMarkingProposition();
     mPropositions = Collections.singletonList(marking);
     if (mPreselectingHeuristic == null) {
       final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
@@ -282,6 +281,15 @@ public class ObserverProjectionConflictChecker
     mModifyingSteps = new ArrayList<Step>();
   }
 
+  protected void tearDown()
+  {
+    mPropositions = null;
+    mSynchronousProductBuilder = null;
+    mEventsToAutomata = null;
+    mModifyingSteps = null;
+    super.tearDown();
+  }
+
 
   //#########################################################################
   //# Candidate Selection
@@ -289,11 +297,11 @@ public class ObserverProjectionConflictChecker
    * Returns a set of events for a new model which is the alphabet from a given
    * set of automata.
    */
-  private Set<EventProxy> getEventsForNewModel(
-                                               final List<AutomatonProxy> automataOfNewModel)
+  private Set<EventProxy> getEventsForNewModel
+    (final List<AutomatonProxy> automata)
   {
-    final Set<EventProxy> events = new HashSet<EventProxy>();
-    for (final AutomatonProxy aut : automataOfNewModel) {
+    final Set<EventProxy> events = new THashSet<EventProxy>();
+    for (final AutomatonProxy aut : automata) {
       events.addAll(aut.getEvents());
     }
     return events;
@@ -406,12 +414,16 @@ public class ObserverProjectionConflictChecker
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = candidate.createProductDESProxy(factory);
-    final Collection<EventProxy> local = candidate.getLocalEvents();
-    final String tauname = "tau:" + des.getName();
-    final EventProxy tau =
-      factory.createEventProxy(tauname, EventKind.UNCONTROLLABLE, false);
     mSynchronousProductBuilder.setModel(des);
-    mSynchronousProductBuilder.addMask(local, tau);
+    final Collection<EventProxy> local = candidate.getLocalEvents();
+    final EventProxy tau;
+    if (local.isEmpty()) {
+      tau = null;
+    } else {
+      final String tauname = "tau:" + des.getName();
+      tau = factory.createEventProxy(tauname, EventKind.UNCONTROLLABLE, false);
+      mSynchronousProductBuilder.addMask(local, tau);
+    }
     mSynchronousProductBuilder.run();
     final AutomatonProxy sync =
       mSynchronousProductBuilder.getComputedAutomaton();
@@ -973,7 +985,7 @@ public class ObserverProjectionConflictChecker
           convertedStepMap.put(aut, originalState);
         }
         EventProxy event = step.getEvent();
-        if (event == mHiddenEvent) {
+        if (event != null && event == mHiddenEvent) {
           event = findEvent(previousMap, convertedStepMap);
         }
         final TraceStepProxy convertedStep =
@@ -1085,20 +1097,35 @@ public class ObserverProjectionConflictChecker
         initialRecords.get(initialRecords.size() - 1).getState();
       while (iter.hasNext()) {
         final TraceStepProxy step = iter.next();
-        stepsNewStateMap =
-          new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
         final EventProxy stepEvent = step.getEvent();
-        final StateProxy resultTargetState =
-          stepsNewStateMap.get(resultAutomaton);
-        assert resultTargetState != null;
-        stepsNewStateMap.remove(resultAutomaton);
-        final List<SearchRecord> subtrace =
-          findSubTrace(originalSourceID,
-                       mTransitionRelation.getEventInt(stepEvent),
-                       mReverseOutputStateMap.get(resultTargetState));
-        appendTraceSteps(subtrace, stepsNewStateMap, convertedSteps);
-        final int subsize = subtrace.size();
-        if (subsize > 0) {
+        final int eventID = mTransitionRelation.getEventInt(stepEvent);
+        if (eventID == mCodeOfTau) {
+          final Map<AutomatonProxy,StateProxy> stepsAfterStateMap =
+            step.getStateMap();
+          final StateProxy resultTargetState =
+            stepsAfterStateMap.get(resultAutomaton);
+          final List<SearchRecord> subtrace =
+            findSubTrace(originalSourceID, eventID,
+                         mReverseOutputStateMap.get(resultTargetState));
+          appendTraceSteps(subtrace, stepsNewStateMap, convertedSteps);
+          final int subsize = subtrace.size();
+          if (subsize > 0) {
+            originalSourceID = subtrace.get(subsize - 1).getState();
+          }
+        } else {
+          final Map<AutomatonProxy,StateProxy> stepsAfterStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
+          final StateProxy resultTargetState =
+            stepsAfterStateMap.get(resultAutomaton);
+          assert resultTargetState != null;
+          stepsAfterStateMap.remove(resultAutomaton);
+          final List<SearchRecord> subtrace =
+            findSubTrace(originalSourceID, eventID,
+                         mReverseOutputStateMap.get(resultTargetState));
+          appendTraceSteps(subtrace, stepEvent, stepsNewStateMap,
+                           stepsAfterStateMap, convertedSteps);
+          stepsNewStateMap = stepsAfterStateMap;
+          final int subsize = subtrace.size();
           originalSourceID = subtrace.get(subsize - 1).getState();
         }
       }
@@ -1267,28 +1294,43 @@ public class ObserverProjectionConflictChecker
      *          Trace steps created are appended to this list.
      */
     private void appendTraceSteps
-      (final List<SearchRecord> recordTrace,
-       final Map<AutomatonProxy,StateProxy> stepsStateMap,
-       final List<TraceStepProxy> outputTrace)
-    {
-      final ProductDESProxyFactory factory = getFactory();
-      final AutomatonProxy originalAutomaton = getOriginalAutomaton();
-      for (final SearchRecord record : recordTrace) {
-        final int subStepTargetStateID = record.getState();
-        stepsStateMap.put(originalAutomaton,
-                          mOriginalStates[subStepTargetStateID]);
-        final int subStepEventID = record.getEvent();
-        final EventProxy event;
-        if (subStepEventID >= 0) {
-          event = mTransitionRelation.getEvent(subStepEventID);
-        } else {
-          event = null;
+    (final List<SearchRecord> recordTrace,
+     final Map<AutomatonProxy,StateProxy> stepsStateMap,
+     final List<TraceStepProxy> outputTrace)
+  {
+    appendTraceSteps(recordTrace, null,
+                     stepsStateMap, stepsStateMap, outputTrace);
+  }
+
+  private void appendTraceSteps
+    (final List<SearchRecord> recordTrace,
+     final EventProxy event,
+     final Map<AutomatonProxy,StateProxy> beforeEventStateMap,
+     final Map<AutomatonProxy,StateProxy> afterEventStateMap,
+     final List<TraceStepProxy> outputTrace)
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final AutomatonProxy originalAutomaton = getOriginalAutomaton();
+    Map<AutomatonProxy,StateProxy> currentStateMap = beforeEventStateMap;
+    for (final SearchRecord record : recordTrace) {
+      final int subStepEventID = record.getEvent();
+      final EventProxy stepEvent;
+      if (subStepEventID >= 0) {
+        stepEvent = mTransitionRelation.getEvent(subStepEventID);
+        if (stepEvent == event) {
+          currentStateMap = afterEventStateMap;
         }
-        final TraceStepProxy convertedStep =
-          factory.createTraceStepProxy(event, stepsStateMap);
-        outputTrace.add(convertedStep);
+      } else {
+        stepEvent = null;
       }
+      final int subStepTargetStateID = record.getState();
+      currentStateMap.put(originalAutomaton,
+                          mOriginalStates[subStepTargetStateID]);
+      final TraceStepProxy convertedStep =
+        factory.createTraceStepProxy(event, currentStateMap);
+      outputTrace.add(convertedStep);
     }
+  }
 
     //#######################################################################
     //# Data Members
@@ -1368,14 +1410,14 @@ public class ObserverProjectionConflictChecker
 
   //#########################################################################
   //# Data Members
+  private PreselectingHeuristic mPreselectingHeuristic;
+  private List<SelectingHeuristic> mSelectingHeuristics;
+
   private Collection<EventProxy> mPropositions;
   private SynchronousProductBuilder mSynchronousProductBuilder;
   private ConflictChecker mMonolithicConflictChecker;
-
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =
       new HashMap<EventProxy,Set<AutomatonProxy>>();
   private List<Step> mModifyingSteps;
-  private PreselectingHeuristic mPreselectingHeuristic;
-  private List<SelectingHeuristic> mSelectingHeuristics;
 
 }

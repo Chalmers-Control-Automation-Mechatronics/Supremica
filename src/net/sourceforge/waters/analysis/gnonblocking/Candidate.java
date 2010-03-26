@@ -73,14 +73,8 @@ public class Candidate implements Comparable<Candidate>
 
 
   //#########################################################################
-  //# Model Creation
-  /**
-   * Creates a product DES containing all the automata and events in this
-   * candidate.
-   * @param  factory   The factory to be used to create the proxies.
-   */
-  public ProductDESProxy createProductDESProxy
-    (final ProductDESProxyFactory factory)
+  //# Overrides for java.lang.Object
+  public String toString()
   {
     final StringBuffer buffer = new StringBuffer("{");
     boolean first = true;
@@ -93,7 +87,21 @@ public class Candidate implements Comparable<Candidate>
       buffer.append(aut.getName());
     }
     buffer.append('}');
-    final String name = buffer.toString();
+    return buffer.toString();
+  }
+
+
+  //#########################################################################
+  //# Model Creation
+  /**
+   * Creates a product DES containing all the automata and events in this
+   * candidate.
+   * @param  factory   The factory to be used to create the proxies.
+   */
+  public ProductDESProxy createProductDESProxy
+    (final ProductDESProxyFactory factory)
+  {
+    final String name = toString();
     final Collection<EventProxy> events = getAllEvents();
     return factory.createProductDESProxy
       (name, "Automatically created from candidate.", null, events, mAutomata);
