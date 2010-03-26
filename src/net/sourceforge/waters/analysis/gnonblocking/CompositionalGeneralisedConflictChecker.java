@@ -1558,20 +1558,61 @@ public class CompositionalGeneralisedConflictChecker extends
   // # Inner Class RemovalOfAlphaMarkingsStep
   private class RemovalOfAlphaMarkingsStep extends Step
   {
-
     RemovalOfAlphaMarkingsStep(final AutomatonProxy resultAut,
                                final AutomatonProxy originalAut)
     {
       super(resultAut, originalAut);
-      // TODO Auto-generated constructor stub
+      final ObserverProjectionTransitionRelation originalTransitionRelation =
+          new ObserverProjectionTransitionRelation(originalAut, mPropositions);
+      final ObserverProjectionTransitionRelation resultingTransitionRelation =
+          new ObserverProjectionTransitionRelation(resultAut, mPropositions);
+      mOriginalStates = originalTransitionRelation.getOriginalIntToStateMap();
+      mResultingStates = resultingTransitionRelation.getOriginalStateToIntMap();
+
     }
 
-    ConflictTraceProxy convertTrace(final ConflictTraceProxy counterexample)
+    ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
-      // TODO Auto-generated method stub
-      return null;
+      final List<TraceStepProxy> convertedSteps =
+          new ArrayList<TraceStepProxy>();
+      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      for (final TraceStepProxy step : traceSteps) {
+        final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
+        if (stepsNewStateMap.containsKey(getResultAutomaton())) {
+          final StateProxy targetState =
+              stepsNewStateMap.get(getResultAutomaton());
+          assert targetState != null;
+          stepsNewStateMap.remove(getResultAutomaton());
+          final int stateID = mResultingStates.get(targetState);
+          final StateProxy replacementState = mOriginalStates[stateID];
+          stepsNewStateMap.put(getOriginalAutomaton(), replacementState);
+          final TraceStepProxy convertedStep =
+              getFactory().createTraceStepProxy(step.getEvent(),
+                                                stepsNewStateMap);
+          convertedSteps.add(convertedStep);
+        } else {
+          convertedSteps.add(step);
+        }
+      }
+      final Set<AutomatonProxy> traceAutomata =
+          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
+      traceAutomata.remove(getResultAutomaton());
+      traceAutomata.add(getOriginalAutomaton());
+      final ConflictTraceProxy convertedTrace =
+          getFactory().createConflictTraceProxy(conflictTrace.getName(),
+                                                conflictTrace.getComment(),
+                                                conflictTrace.getLocation(),
+                                                getModel(), traceAutomata,
+                                                convertedSteps,
+                                                ConflictKind.CONFLICT);
+      return convertedTrace;
     }
 
+    // #######################################################################
+    // # Data Members
+    private final Map<StateProxy,Integer> mResultingStates;
+    private final StateProxy[] mOriginalStates;
   }
 
 
