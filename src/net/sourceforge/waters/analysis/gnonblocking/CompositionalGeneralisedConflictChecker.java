@@ -214,15 +214,13 @@ public class CompositionalGeneralisedConflictChecker extends
     return result;
   }
 
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
+  // #########################################################################
+  // # Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   /**
    * Initialises required variables to default values if the user hasn't
    * configured them.
    */
-  protected void setUp()
-    throws AnalysisException
+  protected void setUp() throws AnalysisException
   {
     super.setUp();
     if (mPreselectingHeuristic == null) {
@@ -243,9 +241,8 @@ public class CompositionalGeneralisedConflictChecker extends
     }
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
+  // #########################################################################
+  // # Auxiliary Methods
   private AutomatonProxy applyAbstractionRules(
                                                final AutomatonProxy autToAbstract,
                                                final EventProxy tau)
@@ -352,6 +349,7 @@ public class CompositionalGeneralisedConflictChecker extends
     final MonolithicSynchronousProductBuilder composer =
         new MonolithicSynchronousProductBuilder(candidateModel, getFactory());
     composer.setPropositions(mPropositions);
+    composer.setNodeLimit(getNodeLimit());
     composer.run();
     final AutomatonProxy syncProduct = composer.getComputedAutomaton();
     final CompositionStep step =
@@ -907,7 +905,7 @@ public class CompositionalGeneralisedConflictChecker extends
       return mOriginalAutomata;
     }
 
-   AutomatonProxy getOriginalAutomaton()
+    AutomatonProxy getOriginalAutomaton()
     {
       if (mOriginalAutomata.size() == 1) {
         return mOriginalAutomata.iterator().next();
@@ -1348,8 +1346,8 @@ public class CompositionalGeneralisedConflictChecker extends
      * tau transitions (if necessary) until the initial state of the result
      * automaton is reached.
      *
-     * @return A list of SearchRecords that represent each extra step needed
-     *         for the start of the trace. (The first item being the very first
+     * @return A list of SearchRecords that represent each extra step needed for
+     *         the start of the trace. (The first item being the very first
      *         state of the trace).
      */
     private List<SearchRecord> beginTrace(final TIntArrayList initialStateIDs,
@@ -1610,7 +1608,7 @@ public class CompositionalGeneralisedConflictChecker extends
         final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
             new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
         final StateProxy targetState =
-          stepsNewStateMap.get(getResultAutomaton());
+            stepsNewStateMap.get(getResultAutomaton());
         if (targetState != null) {
           stepsNewStateMap.remove(getResultAutomaton());
           final int stateID = mResultingStates.get(targetState);
