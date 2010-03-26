@@ -10,7 +10,12 @@
 package net.sourceforge.waters.analysis.op;
 
 import gnu.trove.THashSet;
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntIterator;
+import gnu.trove.TObjectIntHashMap;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.gnonblocking.Candidate;
@@ -189,32 +195,33 @@ public class ObserverProjectionConflictChecker
 
     // TODO: later, need to consider when an automaton is too large to be a
     // candidate and so may not always be left with only one automaton
+    loop:
     while (remainingAut.size() > 1) {
       final Collection<Candidate> candidates = findCandidates(model);
       final Candidate candidate;
-      if (candidates.size() > 1) {
+      switch (candidates.size()) {
+      case 0:
+        break loop;
+      case 1:
+        candidate = candidates.iterator().next();
+        break;
+      default:
         candidate = evaluateCandidates(candidates);
-      } else {
-        final Iterator<Candidate> it = candidates.iterator();
-        candidate = it.next();
+        break;
       }
       // TODO: candidate selection (i.e. heuristics) still need testing
       final CompositionStep step =
         composeSynchronousProduct(candidate);
       mModifyingSteps.add(step);
-      final AutomatonProxy autToAbstract = step.getResultAutomaton();
-
-      // TODO Abstraction rules here
-      // final AutomatonProxy abstractedAut =
-      // applyAbstractionRules(autToAbstract);
-
-      // removes the composed automata for this candidate from the set of
-      // remaining automata and adds the newly composed candidate
+      final EventProxy tau = step.getHiddenEvent();
+      AutomatonProxy autToAbstract = step.getResultAutomaton();
+      autToAbstract = applyObservationEquivalence(autToAbstract, tau);
+      // Remove the composed automata for this candidate from the set of
+      // remaining automata and adds the newly composed candidate.
       remainingAut.removeAll(candidate.getAutomata());
       remainingAut.add(autToAbstract);
       updateEventsToAutomata(autToAbstract, candidate.getAutomata());
-
-      // updates the current model to find candidates from
+      // Updates the current model to find candidates from.
       final Set<EventProxy> composedModelAlphabet =
         getEventsForNewModel(remainingAut);
       model = factory.createProductDESProxy(model.getName(), null, null,
@@ -256,6 +263,8 @@ public class ObserverProjectionConflictChecker
     if (getMarkingProposition() == null) {
       setMarkingProposition(getUsedMarkingProposition());
     }
+    final EventProxy marking = getMarkingProposition();
+    mPropositions = Collections.singletonList(marking);
     if (mPreselectingHeuristic == null) {
       final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       setPreselectingHeuristic(defaultHeuristic);
@@ -267,6 +276,7 @@ public class ObserverProjectionConflictChecker
     final ProductDESProxyFactory factory = getFactory();
     mSynchronousProductBuilder =
       new MonolithicSynchronousProductBuilder(factory);
+    mSynchronousProductBuilder.setPropositions(mPropositions);
     final int limit = getNodeLimit();
     mSynchronousProductBuilder.setNodeLimit(limit);
     mModifyingSteps = new ArrayList<Step>();
@@ -274,30 +284,7 @@ public class ObserverProjectionConflictChecker
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  /**
-   * Builds the synchronous product for a given candidate.
-   */
-  private CompositionStep composeSynchronousProduct(final Candidate candidate)
-    throws AnalysisException
-  {
-    final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy des = candidate.createProductDESProxy(factory);
-    final Collection<EventProxy> local = candidate.getLocalEvents();
-    final String tauname = "tau:" + des.getName();
-    final EventProxy tau =
-      factory.createEventProxy(tauname, EventKind.UNCONTROLLABLE, false);
-    mSynchronousProductBuilder.setModel(des);
-    mSynchronousProductBuilder.addMask(local, tau);
-    mSynchronousProductBuilder.run();
-    final AutomatonProxy sync =
-      mSynchronousProductBuilder.getComputedAutomaton();
-    final SynchronousProductStateMap stateMap =
-      mSynchronousProductBuilder.getStateMap();
-    mSynchronousProductBuilder.clearMask();
-    return new CompositionStep(sync, local, tau, stateMap);
-  }
-
+  //# Candidate Selection
   /**
    * Returns a set of events for a new model which is the alphabet from a given
    * set of automata.
@@ -361,10 +348,8 @@ public class ObserverProjectionConflictChecker
   }
 
   /**
-   * <P>
    * Finds the set of events that are local to a candidate (i.e. a set of
    * automata).
-   * </P>
    */
   private Set<EventProxy> identifyLocalEvents(
                                               final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton,
@@ -383,9 +368,6 @@ public class ObserverProjectionConflictChecker
   /**
    * Uses a heuristic to evaluate the set of candidates to select a suitable
    * candidate to compose next.
-   *
-   * @param candidates
-   * @return
    */
   private Candidate evaluateCandidates(Collection<Candidate> candidates)
   {
@@ -407,21 +389,62 @@ public class ObserverProjectionConflictChecker
 
   /**
    * Finds the set of candidates to compose for a given model.
-   *
-   * @param model
-   * @return
    */
   private Collection<Candidate> findCandidates(final ProductDESProxy model)
   {
-    /*
-     * final Collection<Candidate> candidates = new ArrayList<Candidate>(1);
-     * final List<AutomatonProxy> aut = new
-     * ArrayList<AutomatonProxy>(model.getAutomata()); final Set<EventProxy>
-     * localEvents = identifyLocalEvents(mEventsToAutomata, aut); final
-     * Candidate candidate = new Candidate(aut, localEvents);
-     * candidates.add(candidate); return candidates;
-     */
     return mPreselectingHeuristic.evaluate(model);
+  }
+
+
+  //#########################################################################
+  //# Abstraction Steps
+  /**
+   * Builds the synchronous product for a given candidate.
+   */
+  private CompositionStep composeSynchronousProduct(final Candidate candidate)
+    throws AnalysisException
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy des = candidate.createProductDESProxy(factory);
+    final Collection<EventProxy> local = candidate.getLocalEvents();
+    final String tauname = "tau:" + des.getName();
+    final EventProxy tau =
+      factory.createEventProxy(tauname, EventKind.UNCONTROLLABLE, false);
+    mSynchronousProductBuilder.setModel(des);
+    mSynchronousProductBuilder.addMask(local, tau);
+    mSynchronousProductBuilder.run();
+    final AutomatonProxy sync =
+      mSynchronousProductBuilder.getComputedAutomaton();
+    final SynchronousProductStateMap stateMap =
+      mSynchronousProductBuilder.getStateMap();
+    mSynchronousProductBuilder.clearMask();
+    return new CompositionStep(sync, local, tau, stateMap);
+  }
+
+  private AutomatonProxy applyObservationEquivalence(final AutomatonProxy aut,
+                                                     final EventProxy tau)
+  {
+    final ObserverProjectionTransitionRelation rel =
+        new ObserverProjectionTransitionRelation(aut, mPropositions);
+    final int codeOfTau = rel.getEventInt(tau);
+    final ObserverProjectionBisimulator bisimulator =
+        new ObserverProjectionBisimulator(rel, codeOfTau);
+    final boolean modified = bisimulator.run();
+    if (modified) {
+      final ProductDESProxyFactory factory = getFactory();
+      final AutomatonProxy convertedAut = rel.createAutomaton(factory);
+      final StateProxy[] inputMap = rel.getOriginalIntToStateMap();
+      final Map<Integer,int[]> partition = bisimulator.getStateClasses();
+      final TObjectIntHashMap<StateProxy> outputMap =
+        rel.getResultingStateToIntMap();
+      final ObservationEquivalenceStep step =
+          new ObservationEquivalenceStep(convertedAut, aut, tau,
+                                         inputMap, partition, outputMap);
+      mModifyingSteps.add(step);
+      return convertedAut;
+    } else {
+      return aut;
+    }
   }
 
 
@@ -853,7 +876,6 @@ public class ObserverProjectionConflictChecker
       mOriginalAutomata = originals;
     }
 
-    @SuppressWarnings("unused")
     Step(final AutomatonProxy resultAut, final AutomatonProxy originalAut)
     {
       this(resultAut, Collections.singletonList(originalAut));
@@ -871,8 +893,6 @@ public class ObserverProjectionConflictChecker
       return mOriginalAutomata;
     }
 
-    // Simpler solution, instead of additional subclass :-)
-    @SuppressWarnings("unused")
     AutomatonProxy getOriginalAutomaton()
     {
       if (mOriginalAutomata.size() == 1) {
@@ -906,8 +926,8 @@ public class ObserverProjectionConflictChecker
   private class CompositionStep extends Step
   {
 
-    // #######################################################################
-    // # Constructor
+    //#######################################################################
+    //# Constructor
     private CompositionStep(final AutomatonProxy composedAut,
                             final Collection<EventProxy> localEvents,
                             final EventProxy tau,
@@ -919,8 +939,15 @@ public class ObserverProjectionConflictChecker
       mStateMap = stateMap;
     }
 
-    // #######################################################################
-    // # Trace Computation
+    //#######################################################################
+    //# Simple Access
+    EventProxy getHiddenEvent()
+    {
+      return mHiddenEvent;
+    }
+
+    //#######################################################################
+    //# Trace Computation
     List<TraceStepProxy> convertTraceSteps(final List<TraceStepProxy> steps)
     {
       final ProductDESProxyFactory factory = getFactory();
@@ -1004,7 +1031,344 @@ public class ObserverProjectionConflictChecker
 
 
   //#########################################################################
+  //# Inner Class ObservationEquivalenceStep
+  private class ObservationEquivalenceStep extends Step
+  {
+
+    //#######################################################################
+    //# Constructor
+    private ObservationEquivalenceStep
+      (final AutomatonProxy resultAut,
+       final AutomatonProxy originalAut,
+       final EventProxy tau,
+       final StateProxy[] originalStates,
+       final Map<Integer,int[]> classMap,
+       final TObjectIntHashMap<StateProxy> reverseOutputStateMap)
+    {
+      super(resultAut, originalAut);
+      mOriginalStates = originalStates;
+      mClassMap = classMap;
+      mReverseOutputStateMap = reverseOutputStateMap;
+      mTransitionRelation =
+        new ObserverProjectionTransitionRelation(originalAut, mPropositions);
+      mCodeOfTau = mTransitionRelation.getEventInt(tau);
+    }
+
+    //#######################################################################
+    //# Trace Computation
+    List<TraceStepProxy> convertTraceSteps
+      (final List<TraceStepProxy> traceSteps)
+    {
+      final AutomatonProxy resultAutomaton = getResultAutomaton();
+      final List<TraceStepProxy> convertedSteps =
+        new LinkedList<TraceStepProxy>();
+
+      // Make the trace begin in the correct initial state ...
+      final TIntArrayList initialStates =
+        mTransitionRelation.getAllInitialStates();
+      final Iterator<TraceStepProxy> iter = traceSteps.iterator();
+      final TraceStepProxy initialStep = iter.next();
+      Map<AutomatonProxy,StateProxy> stepsNewStateMap =
+        new HashMap<AutomatonProxy,StateProxy>(initialStep.getStateMap());
+      final StateProxy tracesInitialState =
+        stepsNewStateMap.get(resultAutomaton);
+      stepsNewStateMap.remove(resultAutomaton);
+      final int tracesInitialStateID =
+        mReverseOutputStateMap.get(tracesInitialState);
+      final List<SearchRecord> initialRecords =
+        beginTrace(initialStates, tracesInitialStateID);
+      assert initialRecords.size() > 0;
+      appendTraceSteps(initialRecords, stepsNewStateMap, convertedSteps);
+
+      // Append internal steps, with intermittent tau as needed ...
+      int originalSourceID =
+        initialRecords.get(initialRecords.size() - 1).getState();
+      while (iter.hasNext()) {
+        final TraceStepProxy step = iter.next();
+        stepsNewStateMap =
+          new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
+        final EventProxy stepEvent = step.getEvent();
+        final StateProxy resultTargetState =
+          stepsNewStateMap.get(resultAutomaton);
+        assert resultTargetState != null;
+        stepsNewStateMap.remove(resultAutomaton);
+        final List<SearchRecord> subtrace =
+          findSubTrace(originalSourceID,
+                       mTransitionRelation.getEventInt(stepEvent),
+                       mReverseOutputStateMap.get(resultTargetState));
+        appendTraceSteps(subtrace, stepsNewStateMap, convertedSteps);
+        final int subsize = subtrace.size();
+        if (subsize > 0) {
+          originalSourceID = subtrace.get(subsize - 1).getState();
+        }
+      }
+
+      return convertedSteps;
+    }
+
+    /**
+     * Creates the beginning of a trace by doing a breadth-first search to find
+     * the correct initial state of the original automaton. Steps are added for
+     * tau transitions (if necessary) until the initial state of the result
+     * automaton is reached.
+     *
+     * @return A list of SearchRecords that represent each extra step needed
+     *         for the start of the trace. (The first item being the very first
+     *         state of the trace).
+     */
+    private List<SearchRecord> beginTrace(final TIntArrayList initialStateIDs,
+                                          final int resultAutInitialStateClass)
+    {
+      final int[] targetArray = mClassMap.get(resultAutInitialStateClass);
+      final TIntHashSet targetSet = new TIntHashSet(targetArray);
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      final TIntHashSet visited = new TIntHashSet();
+      // The dummy record ensures that the first real search record will
+      // later be included in the trace.
+      final SearchRecord dummy = new SearchRecord(-1);
+      final int numInit = initialStateIDs.size();
+      for (int i = 0; i < numInit; i++) {
+        final int initStateID = initialStateIDs.get(i);
+        final SearchRecord record =
+            new SearchRecord(initStateID, false, -1, dummy);
+        if (targetSet.contains(initStateID)) {
+          return Collections.singletonList(record);
+        }
+        open.add(record);
+        visited.add(initStateID);
+      }
+      while (true) {
+        final SearchRecord current = open.remove();
+        final int source = current.getState();
+        final TIntHashSet successors =
+            mTransitionRelation.getSuccessors(source, mCodeOfTau);
+        if (successors != null) {
+          final TIntIterator iter = successors.iterator();
+          while (iter.hasNext()) {
+            final int target = iter.next();
+            if (!visited.contains(target)) {
+              final SearchRecord record =
+                  new SearchRecord(target, false, mCodeOfTau, current);
+              if (targetSet.contains(target)) {
+                return buildSearchRecordTrace(record);
+              }
+              open.add(record);
+              visited.add(target);
+            }
+          }
+        }
+      }
+    }
+
+    /**
+     * Finds a partial trace in the original automaton before observation
+     * equivalence. This method computes a sequence of tau transitions, followed
+     * by a transition with the given event, followed by another sequence of tau
+     * transitions linking the source state to some state in the class of the
+     * target state in the simplified automaton.
+     *
+     * @param originalSource
+     *          State number of the source state in the original automaton.
+     * @param event
+     *          Integer code of the event to be included in the trace.
+     * @param targetClass
+     *          State number of the state in the simplified automaton (code of
+     *          state class).
+     * @return List of search records describing the trace from source to
+     *         target. The first entry in the list represents the first step
+     *         after the source state, with its event and target state. The
+     *         final step has a target state in the given target class. Events
+     *         in the list can only be tau or the given event.
+     */
+    private List<SearchRecord> findSubTrace(final int originalSource,
+                                            final int event,
+                                            final int targetClass)
+    {
+      final int[] targetArray = mClassMap.get(targetClass);
+      final TIntHashSet targetSet = new TIntHashSet(targetArray);
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      final TIntHashSet visited0 = new TIntHashSet(); // event not in trace
+      final TIntHashSet visited1 = new TIntHashSet(); // event in trace
+      // The given event may be tau. In this case, we must search for a
+      // (possibly empty) string of tau events. This is achieved here by
+      // by creating a first search record with the 'hasevent' property,
+      // i.e., pretending the trace already has an event.
+      SearchRecord record;
+      if (event != mCodeOfTau) {
+        record = new SearchRecord(originalSource);
+        visited0.add(originalSource);
+      } else if (!targetSet.contains(originalSource)) {
+        record = new SearchRecord(originalSource, true, -1, null);
+        visited1.add(originalSource);
+      } else {
+        return Collections.emptyList();
+      }
+      open.add(record);
+      while (true) {
+        final SearchRecord current = open.remove();
+        final int source = current.getState();
+        final boolean hasEvent = current.hasProperEvent();
+        final TIntHashSet visited = hasEvent ? visited1 : visited0;
+        TIntHashSet successors =
+            mTransitionRelation.getSuccessors(source, mCodeOfTau);
+        if (successors != null) {
+          final TIntIterator iter = successors.iterator();
+          while (iter.hasNext()) {
+            final int target = iter.next();
+            if (!visited.contains(target)) {
+              record = new SearchRecord(target, hasEvent, mCodeOfTau, current);
+              if (hasEvent && targetSet.contains(target)) {
+                return buildSearchRecordTrace(record);
+              }
+              open.add(record);
+              visited.add(target);
+            }
+          }
+        }
+        if (!hasEvent) {
+          successors = mTransitionRelation.getSuccessors(source, event);
+          if (successors != null) {
+            final TIntIterator iter = successors.iterator();
+            while (iter.hasNext()) {
+              final int target = iter.next();
+              if (!visited1.contains(target)) {
+                record = new SearchRecord(target, true, event, current);
+                if (targetSet.contains(target)) {
+                  return buildSearchRecordTrace(record);
+                }
+                open.add(record);
+                visited1.add(target);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    private List<SearchRecord> buildSearchRecordTrace(SearchRecord record)
+    {
+      final List<SearchRecord> trace = new LinkedList<SearchRecord>();
+      do {
+        trace.add(0, record);
+        record = record.getPredecessor();
+      } while (record.getPredecessor() != null);
+      return trace;
+    }
+
+    /**
+     * Given a list of SearchRecord objects, a list of {@link TraceStepProxy}
+     * objects is created and appended to a given list.
+     * A {@link TraceStepProxy} is created for each SearchRecord.
+     * @param recordTrace
+     *          The list of search records to convert into steps of a trace.
+     * @param stepsStateMap
+     *          The state map for the step before adding the new information.
+     * @param outputTrace
+     *          Trace steps created are appended to this list.
+     */
+    private void appendTraceSteps
+      (final List<SearchRecord> recordTrace,
+       final Map<AutomatonProxy,StateProxy> stepsStateMap,
+       final List<TraceStepProxy> outputTrace)
+    {
+      final ProductDESProxyFactory factory = getFactory();
+      final AutomatonProxy originalAutomaton = getOriginalAutomaton();
+      for (final SearchRecord record : recordTrace) {
+        final int subStepTargetStateID = record.getState();
+        stepsStateMap.put(originalAutomaton,
+                          mOriginalStates[subStepTargetStateID]);
+        final int subStepEventID = record.getEvent();
+        final EventProxy event;
+        if (subStepEventID >= 0) {
+          event = mTransitionRelation.getEvent(subStepEventID);
+        } else {
+          event = null;
+        }
+        final TraceStepProxy convertedStep =
+          factory.createTraceStepProxy(event, stepsStateMap);
+        outputTrace.add(convertedStep);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    /**
+     * Array of original states. Maps state codes in the input
+     * transition relation to state objects in the input automaton.
+     */
+    private final StateProxy[] mOriginalStates;
+    /**
+     * Maps state codes of the output transition relation to list of state codes
+     * in input transition relation. This gives the class of states merged to
+     * form the given state in the simplified automaton.
+     */
+    private final Map<Integer,int[]> mClassMap;
+    /**
+     * Reverse encoding of output states. Maps states in output automaton
+     * (simplified automaton) to state code in output transition relation.
+     */
+    private final TObjectIntHashMap<StateProxy> mReverseOutputStateMap;
+
+    private final ObserverProjectionTransitionRelation mTransitionRelation;
+    private final int mCodeOfTau;
+  }
+
+
+  // #########################################################################
+  // # Inner Class SearchRecord
+  private static class SearchRecord
+  {
+
+    //#######################################################################
+    //# Constructors
+    SearchRecord(final int state)
+    {
+      this(state, false, -1, null);
+    }
+
+    SearchRecord(final int state, final boolean hasEvent, final int event,
+                 final SearchRecord pred)
+    {
+      mState = state;
+      mHasProperEvent = hasEvent;
+      mEvent = event;
+      mPredecessor = pred;
+    }
+
+    //#######################################################################
+    //# Getters
+    boolean hasProperEvent()
+    {
+      return mHasProperEvent;
+    }
+
+    int getState()
+    {
+      return mState;
+    }
+
+    SearchRecord getPredecessor()
+    {
+      return mPredecessor;
+    }
+
+    int getEvent()
+    {
+      return mEvent;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int mState;
+    private final boolean mHasProperEvent;
+    private final int mEvent;
+    private final SearchRecord mPredecessor;
+  }
+
+
+  //#########################################################################
   //# Data Members
+  private Collection<EventProxy> mPropositions;
   private SynchronousProductBuilder mSynchronousProductBuilder;
   private ConflictChecker mMonolithicConflictChecker;
 

@@ -188,6 +188,7 @@ public class ObserverProjectionTransitionRelation
     return mIsInitial[state];
   }
 
+  // Should this list be pre-calculated?
   public TIntArrayList getAllInitialStates()
   {
     final TIntArrayList result = new TIntArrayList();
@@ -643,8 +644,9 @@ public class ObserverProjectionTransitionRelation
       }
     }
 
-    final List<StateProxy> states = new ArrayList<StateProxy>(numStates);
+    final List<StateProxy> reachable = new ArrayList<StateProxy>(numStates);
     mResultingStates = new TObjectIntHashMap<StateProxy>(numStates);
+    final StateProxy[] outputMap = new StateProxy[numStates];
     final Collection<TransitionProxy> transitions =
         new ArrayList<TransitionProxy>();
     for (int s = 0; s < numStates; s++) {
@@ -661,12 +663,13 @@ public class ObserverProjectionTransitionRelation
           props.add(prop);
         }
         final StateProxy state = new MemStateProxy(s, init, props);
-        states.add(state);
+        reachable.add(state);
         mResultingStates.put(state, s);
+        outputMap[s] = state;
       }
     }
-    for (int s = 0; s < numStates; s++) {
-      final StateProxy source = states.get(s);
+    int s = 0;
+    for (final StateProxy source : reachable) {
       for (int e = 0; e < mNumProperEvents; e++) {
         final TIntHashSet succs = mSuccessors[s][e];
         if (succs == null) {
@@ -676,15 +679,16 @@ public class ObserverProjectionTransitionRelation
         final TIntIterator iter = succs.iterator();
         while (iter.hasNext()) {
           final int succ = iter.next();
-          final StateProxy target = states.get(succ);
+          final StateProxy target = outputMap[succ];
           final TransitionProxy trans =
               factory.createTransitionProxy(source, event, target);
           transitions.add(trans);
         }
       }
+      s++;
     }
-    return factory.createAutomatonProxy(mName, mKind, events, states,
-                                        transitions);
+    return factory.createAutomatonProxy
+      (mName, mKind, events, reachable, transitions);
   }
 
   // #########################################################################
