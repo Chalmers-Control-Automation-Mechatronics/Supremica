@@ -284,24 +284,25 @@ public class CompositionalGeneralisedConflictChecker extends
                                    final ObserverProjectionTransitionRelation tr,
                                    final EventProxy tau)
   {
+    final int alphaID = tr.getEventInt(getGeneralisedPrecondition());
     final int tauID = tr.getEventInt(tau);
+
     final int numStates = tr.getNumberOfStates();
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       // Skip states marked as unreachable ...
-      if (tr.hasPredecessors(sourceID)) {
+      if (tr.hasPredecessors(sourceID) && tr.isMarked(sourceID, alphaID)) {
         final TIntHashSet successors = tr.getSuccessors(sourceID, tauID);
         if (successors != null) {
           final TIntIterator iter = successors.iterator();
           while (iter.hasNext()) {
-            // TODO Fix bug. Only unmark if successor state is marked alpha;
-            // the marking tested is alpha, not tau.
-            // TODO Watch out for tau selfloops.
-            // TODO You want to stop once you have removed the marking,
-            // and probably you do not even want to start unless the source
-            // state has the alpha marking
+            // TODO Watch out for tau selfloops......The if statement below does
+            // that I thought? (if (targetID != sourceID))
             final int targetID = iter.next();
-            if (targetID != sourceID) {
-              tr.markState(sourceID, false, tau);
+            if (tr.isMarked(targetID, alphaID)) {
+              if (targetID != sourceID) {
+                tr.markState(sourceID, false, tau);
+                break;
+              }
             }
           }
         }
@@ -345,7 +346,6 @@ public class CompositionalGeneralisedConflictChecker extends
     final ProductDESProxy candidateModel =
         getFactory().createProductDESProxy("Candidate model", candidateEvents,
                                            candidate.getAutomata());
-    // TODO Pass on the node limit.
     final MonolithicSynchronousProductBuilder composer =
         new MonolithicSynchronousProductBuilder(candidateModel, getFactory());
     composer.setPropositions(mPropositions);
