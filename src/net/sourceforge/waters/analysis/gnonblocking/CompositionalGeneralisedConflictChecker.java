@@ -292,6 +292,9 @@ public class CompositionalGeneralisedConflictChecker extends
       }
     }
   }
+  // OK. But these inner classes cannot be tested in isolation.
+  // How hard would it be to design an interface such that the rules
+  // can be isolated from the CompositionalGeneralisedConflictChecker?
 
 
   // #########################################################################
@@ -311,19 +314,18 @@ public class CompositionalGeneralisedConflictChecker extends
       for (int sourceID = 0; sourceID < numStates; sourceID++) {
         // Skip states marked as unreachable ...
         // TODO: to me this IS processing the marked states and skipping
-        // unmarked states...
+        // unmarked states --- OK (only the comment above seems wrong)
         if (tr.hasPredecessors(sourceID) && tr.isMarked(sourceID, alphaID)) {
           final TIntHashSet successors = tr.getSuccessors(sourceID, tauID);
           if (successors != null) {
             final TIntIterator iter = successors.iterator();
             while (iter.hasNext()) {
               // TODO Watch out for tau selfloops......The if statement below
-              // does
-              // that I thought? (if (targetID != sourceID))
+              // does that I thought? --- OK
               final int targetID = iter.next();
               if (tr.isMarked(targetID, alphaID)) {
                 if (targetID != sourceID) {
-                  tr.markState(sourceID, false, getGeneralisedPrecondition());
+                  tr.markState(sourceID, false, alphaID);
                   break;
                 }
               }

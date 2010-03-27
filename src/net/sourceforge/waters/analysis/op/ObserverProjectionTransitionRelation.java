@@ -238,18 +238,16 @@ public class ObserverProjectionTransitionRelation
 
   // #########################################################################
   // # Marking Modifications
-  public void markState(final int state, final boolean value,
-                        final EventProxy marking)
+  public void markState(final int state, final boolean value, final int prop)
   {
-    final int e = mEventToInt.get(marking);
     final int m = mStateMarkings[state];
     final TIntHashSet markings = mMarkingDefinitions.get(m);
-    if (value != markings.contains(e)) {
+    if (value != markings.contains(prop)) {
       final TIntHashSet newset = new TIntHashSet(markings);
       if (value) {
-        newset.add(e);
+        newset.add(prop);
       } else {
-        newset.remove(e);
+        newset.remove(prop);
       }
       markState(state, newset);
     }
