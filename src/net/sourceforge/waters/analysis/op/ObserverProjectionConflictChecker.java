@@ -21,8 +21,8 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,13 +30,13 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-
 import net.sourceforge.waters.analysis.gnonblocking.Candidate;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -50,6 +50,13 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+
+/**
+ * A compositional conflict checker that uses only observation equivalence
+ * or observer projection for simplification steps.
+ *
+ * @author Robi Malik, Rachel Francis
+ */
 
 public class ObserverProjectionConflictChecker
   extends AbstractConflictChecker
@@ -150,37 +157,35 @@ public class ObserverProjectionConflictChecker
   }
 
   /**
-   * The given heuristic is used first to select a candidate to compose.
-   *
-   * @param heuristic
+   * Defines the preferred candidate selection heuristics.
    */
   public void setSelectingHeuristic(final SelectingHeuristic heuristic)
   {
-    mSelectingHeuristics = new ArrayList<SelectingHeuristic>(4);
-    mSelectingHeuristics.add(heuristic);
+    final List<SelectingHeuristic> list = new ArrayList<SelectingHeuristic>(3);
+    list.add(heuristic);
     if (heuristic instanceof HeuristicMaxL) {
-      mSelectingHeuristics.add(new HeuristicMaxC());
-      mSelectingHeuristics.add(new HeuristicMinS());
-    } else if (heuristic instanceof HeuristicMaxS) {
-      mSelectingHeuristics.add(new HeuristicMaxL());
-      mSelectingHeuristics.add(new HeuristicMinS());
+      list.add(new HeuristicMaxC());
+      list.add(new HeuristicMinS());
+    } else if (heuristic instanceof HeuristicMaxC) {
+      list.add(new HeuristicMaxL());
+      list.add(new HeuristicMinS());
     } else if (heuristic instanceof HeuristicMinS) {
-      mSelectingHeuristics.add(new HeuristicMaxL());
-      mSelectingHeuristics.add(new HeuristicMaxC());
+      list.add(new HeuristicMaxL());
+      list.add(new HeuristicMaxC());
     }
-    mSelectingHeuristics.add(new HeuristicDefault());
+    setSelectingHeuristic(list);
   }
 
   /**
-   * The first item in the list should be the first heuristic used to select a
-   * candidate to compose, the last item in the list should be the last option.
-   *
+   * Defines the list of candidate selection heuristics in the chosen order.
    * @param heuristicList
+   *          The first item in the list should be the first heuristic used to
+   *          select a candidate to compose, the last item in the list should be
+   *          the last option.
    */
   public void setSelectingHeuristic(final List<SelectingHeuristic> heuristicList)
   {
-    mSelectingHeuristics = heuristicList;
-    mSelectingHeuristics.add(new HeuristicDefault());
+    mSelectingHeuristics = new SelectingComparator(heuristicList);
   }
 
 
@@ -189,53 +194,49 @@ public class ObserverProjectionConflictChecker
   public boolean run() throws AnalysisException
   {
     setUp();
-    mapEventsToAutomata();
-    final ProductDESProxyFactory factory = getFactory();
-    ProductDESProxy model = getModel();
-    final List<AutomatonProxy> remainingAut =
-      new ArrayList<AutomatonProxy>(model.getAutomata());
+    initialiseEventsToAutomata();
 
-    // TODO: later, need to consider when an automaton is too large to be a
-    // candidate and so may not always be left with only one automaton
-    loop:
-    while (remainingAut.size() > 1) {
-      final Collection<Candidate> candidates = findCandidates(model);
-      final Candidate candidate;
-      switch (candidates.size()) {
-      case 0:
-        break loop;
-      case 1:
-        candidate = candidates.iterator().next();
-        break;
-      default:
-        candidate = evaluateCandidates(candidates);
-        break;
+    Collection<Candidate> candidates;
+    outer:
+    do {
+      candidates = mPreselectingHeuristic.findCandidates();
+      while (!candidates.isEmpty()) {
+        final Candidate candidate =
+          Collections.min(candidates, mSelectingHeuristics);
+        try {
+          final CompositionStep syncStep = composeSynchronousProduct(candidate);
+          final EventProxy tau = syncStep.getHiddenEvent();
+          AutomatonProxy autToAbstract = syncStep.getResultAutomaton();
+          final ObservationEquivalenceStep oeStep =
+            applyObservationEquivalence(autToAbstract, tau);
+          if (oeStep != null) {
+            autToAbstract = oeStep.getResultAutomaton();
+          }
+          mModifyingSteps.add(syncStep);
+          if (oeStep != null) {
+            mModifyingSteps.add(oeStep);
+          }
+          updateEventsToAutomata(autToAbstract, candidate.getAutomata());
+          break;
+        } catch (final OverflowException overflow) {
+          mNumOverflows++;
+          if (mNumOverflows > MAX_OVERFLOWS) {
+            break outer;
+          }
+          final List<AutomatonProxy> automata = candidate.getAutomata();
+          mOverflowCandidates.add(automata);
+          candidates.remove(candidate);
+        }
       }
-      // TODO: candidate selection (i.e. heuristics) still need testing
-      final CompositionStep step =
-        composeSynchronousProduct(candidate);
-      mModifyingSteps.add(step);
-      final EventProxy tau = step.getHiddenEvent();
-      AutomatonProxy autToAbstract = step.getResultAutomaton();
-      autToAbstract = applyObservationEquivalence(autToAbstract, tau);
-      // Remove the composed automata for this candidate from the set of
-      // remaining automata and adds the newly composed candidate.
-      remainingAut.removeAll(candidate.getAutomata());
-      remainingAut.add(autToAbstract);
-      updateEventsToAutomata(autToAbstract, candidate.getAutomata());
-      // Updates the current model to find candidates from.
-      final Set<EventProxy> composedModelAlphabet =
-        getEventsForNewModel(remainingAut);
-      model = factory.createProductDESProxy(model.getName(), null, null,
-                                            composedModelAlphabet,
-                                            remainingAut);
-    }
+    } while (!candidates.isEmpty());
 
     if (mMonolithicConflictChecker == null) {
+      final ProductDESProxyFactory factory = getFactory();
       mMonolithicConflictChecker = new NativeConflictChecker(factory);
     }
     final int limit = getNodeLimit();
     mMonolithicConflictChecker.setNodeLimit(limit);
+    final ProductDESProxy model = createCurrentModel();
     mMonolithicConflictChecker.setModel(model);
     final EventProxy marking = getUsedMarkingProposition();
     mMonolithicConflictChecker.setMarkingProposition(marking);
@@ -281,6 +282,8 @@ public class ObserverProjectionConflictChecker
     final int limit = getNodeLimit();
     mSynchronousProductBuilder.setNodeLimit(limit);
     mModifyingSteps = new ArrayList<Step>();
+    mNumOverflows = 0;
+    mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
   }
 
   protected void tearDown()
@@ -289,45 +292,25 @@ public class ObserverProjectionConflictChecker
     mSynchronousProductBuilder = null;
     mEventsToAutomata = null;
     mModifyingSteps = null;
+    mOverflowCandidates = null;
     super.tearDown();
   }
 
 
   //#########################################################################
-  //# Candidate Selection
-  /**
-   * Returns a set of events for a new model which is the alphabet from a given
-   * set of automata.
-   */
-  private Set<EventProxy> getEventsForNewModel
-    (final List<AutomatonProxy> automata)
-  {
-    final Set<EventProxy> events = new THashSet<EventProxy>();
-    for (final AutomatonProxy aut : automata) {
-      events.addAll(aut.getEvents());
-    }
-    return events;
-  }
-
+  //# Events+Automata Maps
   /**
    * Maps the events in the model to a set of the automaton that contain the
    * event in their alphabet.
    */
-  private void mapEventsToAutomata()
+  private void initialiseEventsToAutomata()
   {
     final ProductDESProxy model = getModel();
+    mCurrentAutomata = new ArrayList<AutomatonProxy>(model.getAutomata());
     mEventsToAutomata =
         new HashMap<EventProxy,Set<AutomatonProxy>>(model.getEvents().size());
-    for (final AutomatonProxy aut : model.getAutomata()) {
-      for (final EventProxy event : aut.getEvents()) {
-        if (event.getKind() != EventKind.PROPOSITION) {
-          if (!mEventsToAutomata.containsKey(event)) {
-            final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
-            mEventsToAutomata.put(event, automata);
-          }
-          mEventsToAutomata.get(event).add(aut);
-        }
-      }
+    for (final AutomatonProxy aut : mCurrentAutomata) {
+      addEventsToAutomata(aut);
     }
   }
 
@@ -335,20 +318,36 @@ public class ObserverProjectionConflictChecker
                                       final List<AutomatonProxy> autToRemove)
   {
     // adds the new automaton to the events it contains
-    for (final EventProxy event : autToAdd.getEvents()) {
+    mCurrentAutomata.add(autToAdd);
+    addEventsToAutomata(autToAdd);
+    // removes the automata which have been composed
+    mCurrentAutomata.removeAll(autToRemove);
+    removeEventsToAutomata(autToRemove);
+  }
+
+  private void addEventsToAutomata(final AutomatonProxy aut)
+  {
+    for (final EventProxy event : aut.getEvents()) {
       if (event.getKind() != EventKind.PROPOSITION) {
-        if (!mEventsToAutomata.containsKey(event)) {
-          final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
-          mEventsToAutomata.put(event, automata);
+        Set<AutomatonProxy> set = mEventsToAutomata.get(event);
+        if (set == null) {
+          set = new THashSet<AutomatonProxy>();
+          mEventsToAutomata.put(event, set);
         }
-        mEventsToAutomata.get(event).add(autToAdd);
+        set.add(aut);
       }
     }
-    // removes the automata which have been composed
-    final Set<EventProxy> eventsToRemove = new HashSet<EventProxy>();
-    for (final EventProxy event : mEventsToAutomata.keySet()) {
-      mEventsToAutomata.get(event).removeAll(autToRemove);
-      if (mEventsToAutomata.get(event).size() == 0) {
+  }
+
+  private void removeEventsToAutomata(final Collection<AutomatonProxy> victims)
+  {
+    final Set<EventProxy> eventsToRemove = new THashSet<EventProxy>();
+    for (final Map.Entry<EventProxy,Set<AutomatonProxy>> entry :
+         mEventsToAutomata.entrySet()) {
+      final Set<AutomatonProxy> set = entry.getValue();
+      set.removeAll(victims);
+      if (set.isEmpty()) {
+        final EventProxy event = entry.getKey();
         eventsToRemove.add(event);
       }
     }
@@ -361,13 +360,12 @@ public class ObserverProjectionConflictChecker
    * Finds the set of events that are local to a candidate (i.e. a set of
    * automata).
    */
-  private Set<EventProxy> identifyLocalEvents(
-                                              final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton,
-                                              final List<AutomatonProxy> candidate)
+  private Set<EventProxy> identifyLocalEvents
+    (final Collection<AutomatonProxy> candidate)
   {
-    final Set<EventProxy> localEvents = new HashSet<EventProxy>();
-    for (final EventProxy event : eventAutomaton.keySet()) {
-      final Set<AutomatonProxy> autWithEvent = eventAutomaton.get(event);
+    final Set<EventProxy> localEvents = new THashSet<EventProxy>();
+    for (final EventProxy event : mEventsToAutomata.keySet()) {
+      final Set<AutomatonProxy> autWithEvent = mEventsToAutomata.get(event);
       if (candidate.containsAll(autWithEvent)) {
         localEvents.add(event);
       }
@@ -375,34 +373,25 @@ public class ObserverProjectionConflictChecker
     return localEvents;
   }
 
-  /**
-   * Uses a heuristic to evaluate the set of candidates to select a suitable
-   * candidate to compose next.
-   */
-  private Candidate evaluateCandidates(Collection<Candidate> candidates)
+  private boolean isPermissibleCandidate(final List<AutomatonProxy> automata)
   {
-
-    final ListIterator<SelectingHeuristic> iter =
-        mSelectingHeuristics.listIterator();
-    List<Candidate> selectedCandidates = new ArrayList<Candidate>(candidates);
-    while (iter.hasNext()) {
-      final SelectingHeuristic heuristic = iter.next();
-      selectedCandidates = heuristic.evaluate(selectedCandidates);
-      if (selectedCandidates.size() == 1) {
-        break;
-      } else {
-        candidates = new ArrayList<Candidate>(selectedCandidates);
-      }
-    }
-    return selectedCandidates.get(0);
+    return
+      automata.size() < mCurrentAutomata.size() &&
+      !mOverflowCandidates.contains(automata);
   }
 
-  /**
-   * Finds the set of candidates to compose for a given model.
-   */
-  private Collection<Candidate> findCandidates(final ProductDESProxy model)
+  private ProductDESProxy createCurrentModel()
   {
-    return mPreselectingHeuristic.evaluate(model);
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy model = getModel();
+    final String name = model.getName();
+    final Set<EventProxy> eventSet = new THashSet<EventProxy>();
+    for (final AutomatonProxy aut : mCurrentAutomata) {
+      eventSet.addAll(aut.getEvents());
+    }
+    final List<EventProxy> eventList = new ArrayList<EventProxy>(eventSet);
+    Collections.sort(eventList);
+    return factory.createProductDESProxy(name, eventList, mCurrentAutomata);
   }
 
 
@@ -426,17 +415,20 @@ public class ObserverProjectionConflictChecker
       tau = factory.createEventProxy(tauname, EventKind.UNCONTROLLABLE, false);
       mSynchronousProductBuilder.addMask(local, tau);
     }
-    mSynchronousProductBuilder.run();
-    final AutomatonProxy sync =
-      mSynchronousProductBuilder.getComputedAutomaton();
-    final SynchronousProductStateMap stateMap =
-      mSynchronousProductBuilder.getStateMap();
-    mSynchronousProductBuilder.clearMask();
-    return new CompositionStep(sync, local, tau, stateMap);
+    try {
+      mSynchronousProductBuilder.run();
+      final AutomatonProxy sync =
+        mSynchronousProductBuilder.getComputedAutomaton();
+      final SynchronousProductStateMap stateMap =
+        mSynchronousProductBuilder.getStateMap();
+      return new CompositionStep(sync, local, tau, stateMap);
+    } finally {
+      mSynchronousProductBuilder.clearMask();
+    }
   }
 
-  private AutomatonProxy applyObservationEquivalence(final AutomatonProxy aut,
-                                                     final EventProxy tau)
+  private ObservationEquivalenceStep applyObservationEquivalence
+    (final AutomatonProxy aut, final EventProxy tau)
     throws AnalysisException
   {
     final ObserverProjectionTransitionRelation rel =
@@ -466,13 +458,10 @@ public class ObserverProjectionConflictChecker
       }
       final TObjectIntHashMap<StateProxy> outputMap =
         rel.getResultingStateToIntMap();
-      final ObservationEquivalenceStep step =
-          new ObservationEquivalenceStep(convertedAut, aut, tau,
-                                         inputMap, partition, outputMap);
-      mModifyingSteps.add(step);
-      return convertedAut;
+      return new ObservationEquivalenceStep(convertedAut, aut, tau,
+                                            inputMap, partition, outputMap);
     } else {
-      return aut;
+      return null;
     }
   }
 
@@ -630,128 +619,208 @@ public class ObserverProjectionConflictChecker
   //# Local Interface PreselectingHeuristic
   private interface PreselectingHeuristic
   {
-    public Collection<Candidate> evaluate(final ProductDESProxy model);
-
+    public Collection<Candidate> findCandidates();
   }
 
 
   //#########################################################################
   //# Inner Class HeuristicPairing
-  private class HeuristicPairing
+  private abstract class HeuristicPairing
+    implements PreselectingHeuristic, Comparator<AutomatonProxy>
   {
-    protected Collection<Candidate> pairAutomaton(
-                                                  final AutomatonProxy chosenAut,
-                                                  final Set<AutomatonProxy> automata)
+
+    //#######################################################################
+    //# Interface PreselectingHeuristic
+    public Collection<Candidate> findCandidates()
     {
-      final Collection<Candidate> candidates =
-          new HashSet<Candidate>(automata.size() - 1);
-      for (final AutomatonProxy a : automata) {
-        if (a != chosenAut) {
+      final AutomatonProxy chosenAut = Collections.min(mCurrentAutomata, this);
+      return pairAutomaton(chosenAut, mCurrentAutomata);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private Collection<Candidate> pairAutomaton
+      (final AutomatonProxy chosenAut,
+       final Collection<AutomatonProxy> automata)
+    {
+      final Set<EventProxy> chosenEvents =
+        new THashSet<EventProxy>(chosenAut.getEvents());
+      final Collection<Candidate> candidates = new LinkedList<Candidate>();
+      for (final AutomatonProxy aut : automata) {
+        if (aut != chosenAut && intersects(chosenEvents, aut.getEvents())) {
           final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
-          pair.add(a);
-          pair.add(chosenAut);
-          final Set<EventProxy> localEvents =
-              identifyLocalEvents(mEventsToAutomata, pair);
-          final Candidate candidate = new Candidate(pair, localEvents);
-          candidates.add(candidate);
+          if (chosenAut.compareTo(aut) < 0) {
+            pair.add(chosenAut);
+            pair.add(aut);
+          } else {
+            pair.add(aut);
+            pair.add(chosenAut);
+          }
+          if (isPermissibleCandidate(pair)) {
+            final Set<EventProxy> localEvents = identifyLocalEvents(pair);
+            final Candidate candidate = new Candidate(pair, localEvents);
+            candidates.add(candidate);
+          }
         }
       }
       return candidates;
     }
-  }
 
-
-  //#########################################################################
-  //# Inner Class HeuristicPairing
-  private class HeuristicMinT extends HeuristicPairing implements
-      PreselectingHeuristic
-  {
-    public Collection<Candidate> evaluate(final ProductDESProxy model)
+    private <T> boolean intersects(final Set<? extends T> set,
+                                   final Collection<? extends T> collection)
     {
-      // Find automaton with fewest transitions
-      final Set<AutomatonProxy> automata = model.getAutomata();
-      final Iterator<AutomatonProxy> it = automata.iterator();
-      AutomatonProxy chosenAut = it.next();
-      int minTrans = chosenAut.getTransitions().size();
-      while (it.hasNext()) {
-        final AutomatonProxy nextAut = it.next();
-        final int transCount = nextAut.getTransitions().size();
-        if (transCount < minTrans) {
-          minTrans = transCount;
-          chosenAut = nextAut;
+      for (final T elem : collection) {
+        if (set.contains(elem)) {
+          return true;
         }
       }
-      // pairs chosen automaton with all others
-      final Collection<Candidate> candidates =
-          pairAutomaton(chosenAut, automata);
-      return candidates;
+      return false;
     }
   }
 
 
   //#########################################################################
   //# Inner Class HeuristicPairing
+  private class HeuristicMinT
+    extends HeuristicPairing
+  {
+
+    //#######################################################################
+    //# Interface java.util.Comparator<AutomatonProxy>
+    public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
+    {
+      final int numtrans1 = aut1.getTransitions().size();
+      final int numtrans2 = aut2.getTransitions().size();
+      if (numtrans1 != numtrans2) {
+        return numtrans1 - numtrans2;
+      }
+      final int numstates1 = aut1.getStates().size();
+      final int numstates2 = aut2.getStates().size();
+      if (numstates1 != numstates2) {
+        return numstates1 - numstates2;
+      }
+      return aut1.compareTo(aut2);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class HeuristicMaxS
   /**
    * Performs step 1 of the approach to select the automata to compose. A
    * candidate is produced by pairing the automaton with the most states to
    * every other automaton in the model.
    */
-  private class HeuristicMaxS extends HeuristicPairing implements
-      PreselectingHeuristic
+  private class HeuristicMaxS
+    extends HeuristicPairing
   {
 
-    public Collection<Candidate> evaluate(final ProductDESProxy model)
+    //#######################################################################
+    //# Interface java.util.Comparator<AutomatonProxy>
+    public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
     {
-      // Find automaton with the most states
-      final Set<AutomatonProxy> automata = model.getAutomata();
-      final Iterator<AutomatonProxy> it = automata.iterator();
-      AutomatonProxy chosenAut = it.next();
-      int maxStates = chosenAut.getStates().size();
-      while (it.hasNext()) {
-        final AutomatonProxy nextAut = it.next();
-        final int statesCount = nextAut.getStates().size();
-        if (statesCount > maxStates) {
-          maxStates = statesCount;
-          chosenAut = nextAut;
+      final int numstates1 = aut1.getStates().size();
+      final int numstates2 = aut2.getStates().size();
+      if (numstates1 != numstates2) {
+        return numstates2 - numstates1;
+      }
+      final int numtrans1 = aut1.getTransitions().size();
+      final int numtrans2 = aut2.getTransitions().size();
+      if (numtrans1 != numtrans2) {
+        return numtrans2 - numtrans1;
+      }
+      return aut1.compareTo(aut2);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class HeuristicMustL
+  private class HeuristicMustL
+    implements PreselectingHeuristic
+  {
+
+    //#######################################################################
+    //# Interface PreselectingHeuristic
+    public Collection<Candidate> findCandidates()
+    {
+      final Collection<Candidate> candidates = new LinkedList<Candidate>();
+      for (final Set<AutomatonProxy> set : mEventsToAutomata.values()) {
+        assert set.size() > 0;
+        if (set.size() > 1) {
+          final List<AutomatonProxy> list = new ArrayList<AutomatonProxy>(set);
+          Collections.sort(list);
+          if (isPermissibleCandidate(list)) {
+            final Set<EventProxy> localEvents = identifyLocalEvents(list);
+            final Candidate candidate = new Candidate(list, localEvents);
+            candidates.add(candidate);
+          }
         }
       }
-      // pairs chosen automaton with all others
-      final Collection<Candidate> candidates =
-          pairAutomaton(chosenAut, automata);
       return candidates;
     }
   }
 
 
   //#########################################################################
-  //# Inner Class HeuristicPairing
-  private class HeuristicMustL implements PreselectingHeuristic
+  //# Inner Class SelectionComparator
+  private class SelectingComparator
+    implements Comparator<Candidate>
   {
-    public Collection<Candidate> evaluate(final ProductDESProxy model)
+
+    //#######################################################################
+    //# Constructor
+    private SelectingComparator(final List<SelectingHeuristic> list)
     {
-      final Collection<Candidate> candidates =
-          new HashSet<Candidate>(mEventsToAutomata.keySet().size());
-      for (final EventProxy event : mEventsToAutomata.keySet()) {
-        final List<AutomatonProxy> automata =
-            new ArrayList<AutomatonProxy>(mEventsToAutomata.get(event));
-        assert automata.size() > 0;
-        if (automata.size() > 1) {
-          final Set<EventProxy> localEvents =
-              identifyLocalEvents(mEventsToAutomata, automata);
-          final Candidate candidate = new Candidate(automata, localEvents);
-          candidates.add(candidate);
+      mHeuristics = list;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Comparator<Candidate>
+    public int compare(final Candidate cand1, final Candidate cand2)
+    {
+      for (final SelectingHeuristic heu : mHeuristics) {
+        final int result = heu.compare(cand1, cand2);
+        if (result != 0) {
+          return result;
         }
       }
-      return candidates;
+      return cand1.compareTo(cand2);
     }
+
+    //#######################################################################
+    //# Data Members
+    private final List<SelectingHeuristic> mHeuristics;
+
   }
 
 
   //#########################################################################
-  //# Inner Class HeuristicPairing
-  private interface SelectingHeuristic
+  //# Inner Class SelectingHeuristic
+  private abstract class SelectingHeuristic
+    implements Comparator<Candidate>
   {
-    public List<Candidate> evaluate(final List<Candidate> candidates);
+
+    //#######################################################################
+    //# Interface java.util.Comparator<Candidate>
+    public int compare(final Candidate cand1, final Candidate cand2)
+    {
+      final double heu1 = getHeuristicValue(cand1);
+      final double heu2 = getHeuristicValue(cand2);
+      if (heu1 < heu2) {
+        return -1;
+      } else if (heu1 > heu2) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    abstract double getHeuristicValue(final Candidate candidate);
 
   }
 
@@ -762,33 +831,17 @@ public class ObserverProjectionConflictChecker
    * Performs step 2 of the approach to select the automata to compose. The
    * chosen candidate is the one with the highest proportion of local events.
    */
-  private class HeuristicMaxL implements SelectingHeuristic
+  private class HeuristicMaxL extends SelectingHeuristic
   {
-    public List<Candidate> evaluate(final List<Candidate> candidates)
+
+    //#######################################################################
+    //# Overrides for SelectingHeuristic
+    double getHeuristicValue(final Candidate candidate)
     {
-      final Iterator<Candidate> it = candidates.iterator();
-      List<Candidate> chosenCandidates = new ArrayList<Candidate>();
-      Candidate chosenCandidate = it.next();
-      chosenCandidates.add(chosenCandidate);
-      int maxLocal =
-          chosenCandidate.getLocalEventCount()
-              / chosenCandidate.getNumberOfEvents();
-      while (it.hasNext()) {
-        final Candidate nextCan = it.next();
-        final int proportion =
-            nextCan.getLocalEventCount() / nextCan.getNumberOfEvents();
-        if (proportion > maxLocal) {
-          chosenCandidates = new ArrayList<Candidate>();
-          maxLocal = proportion;
-          chosenCandidate = nextCan;
-          chosenCandidates.add(chosenCandidate);
-        } else if (proportion == maxLocal) {
-          chosenCandidate = nextCan;
-          chosenCandidates.add(chosenCandidate);
-        }
-      }
-      return chosenCandidates;
+      return - (double) candidate.getLocalEventCount() /
+               (double) candidate.getNumberOfEvents();
     }
+
   }
 
 
@@ -798,65 +851,29 @@ public class ObserverProjectionConflictChecker
    * Performs step 2 of the approach to select the automata to compose. The
    * chosen candidate is the one with the highest proportion of common events.
    */
-  private class HeuristicMaxC implements SelectingHeuristic
+  private class HeuristicMaxC extends SelectingHeuristic
   {
-    public List<Candidate> evaluate(final List<Candidate> candidates)
+
+    //#######################################################################
+    //# Overrides for SelectingHeuristic
+    double getHeuristicValue(final Candidate candidate)
     {
-      final ListIterator<Candidate> it = candidates.listIterator();
-      List<Candidate> chosenCandidates = new ArrayList<Candidate>();
-      Candidate chosenCandidate = it.next();
-      chosenCandidates.add(chosenCandidate);
-      int maxCommon =
-          (chosenCandidate.getNumberOfEvents() - chosenCandidate
-              .getLocalEventCount())
-              / chosenCandidate.getNumberOfEvents();
-      while (it.hasNext()) {
-        final Candidate nextCan = it.next();
-        final int proportion =
-            (nextCan.getNumberOfEvents() - nextCan.getLocalEventCount())
-                / nextCan.getNumberOfEvents();
-        if (proportion > maxCommon) {
-          chosenCandidates = new ArrayList<Candidate>();
-          maxCommon = proportion;
-          chosenCandidate = nextCan;
-          chosenCandidates.add(chosenCandidate);
-        } else if (proportion == maxCommon) {
-          chosenCandidate = nextCan;
-          chosenCandidates.add(chosenCandidate);
-        }
-      }
-      return chosenCandidates;
+      final int local = candidate.getLocalEventCount();
+      final int total = candidate.getLocalEventCount();
+      return - (double) (total - local) / (double) total;
     }
+
   }
 
 
   //#########################################################################
   //# Inner Class HeuristicMinS
-  private class HeuristicMinS implements SelectingHeuristic
+  private class HeuristicMinS extends SelectingHeuristic
   {
-    public List<Candidate> evaluate(final List<Candidate> candidates)
-    {
-      Candidate chosenCandidate = candidates.get(0);
-      List<Candidate> chosenCandidates = new ArrayList<Candidate>();
-      double smallestProduct = calculateProduct(chosenCandidate);
-      chosenCandidates.add(chosenCandidate);
-      for (int i = 1; i < candidates.size(); i++) {
-        final Candidate candidate = candidates.get(i);
-        final double newproduct = calculateProduct(candidate);
-        if (smallestProduct > newproduct) {
-          chosenCandidates = new ArrayList<Candidate>();
-          smallestProduct = newproduct;
-          chosenCandidate = candidate;
-          chosenCandidates.add(chosenCandidate);
-        } else if (smallestProduct == newproduct) {
-          chosenCandidate = candidate;
-          chosenCandidates.add(chosenCandidate);
-        }
-      }
-      return chosenCandidates;
-    }
 
-    private double calculateProduct(final Candidate candidate)
+    //#######################################################################
+    //# Overrides for SelectingHeuristic
+    double getHeuristicValue(final Candidate candidate)
     {
       double product = 1.0;
       for (final AutomatonProxy aut : candidate.getAutomata()) {
@@ -866,62 +883,7 @@ public class ObserverProjectionConflictChecker
       final double localEvents = candidate.getLocalEventCount();
       return product * (totalEvents - localEvents) / totalEvents;
     }
-  }
 
-
-  //#########################################################################
-  //# Inner Class HeuristicPairing
-  /**
-   * This heuristic is provided for when the other 3 fail to find one unique
-   * candidate. The selection is made by comparing the candidates automata names
-   * alphabetically.
-   */
-  private class HeuristicDefault implements SelectingHeuristic
-  {
-    public List<Candidate> evaluate(final List<Candidate> candidates)
-    {
-      ListIterator<Candidate> iter = candidates.listIterator();
-      List<Candidate> chosenCandidates = new ArrayList<Candidate>();
-      Candidate chosen = iter.next();
-      chosenCandidates.add(chosen);
-      String chosenAutName = chosen.getAutomata().get(0).getName();
-      boolean found = false;
-      int index = 0;
-      while (!found) {
-        while (iter.hasNext()) {
-          final Candidate nextCandidate = iter.next();
-          // currently if two candidates have the same automaton names up
-          // until
-          // a point where one has run out of automata, the candidate with
-          // more
-          // automata is selected
-          if (index < nextCandidate.getAutomata().size()) {
-            final String nextAutName =
-                nextCandidate.getAutomata().get(index).getName();
-            if (chosenAutName.compareTo(nextAutName) > 0) {
-              chosenAutName = nextAutName;
-              chosen = nextCandidate;
-              chosenCandidates = new ArrayList<Candidate>();
-              chosenCandidates.add(chosen);
-            } else if (chosenAutName.compareTo(nextAutName) == 0) {
-              chosenCandidates.add(nextCandidate);
-            }
-          }
-        }
-        if (chosenCandidates.size() == 1) {
-          found = true;
-          break;
-        } else {
-          iter = candidates.listIterator(0);
-          chosenCandidates = new ArrayList<Candidate>();
-          chosen = iter.next();
-          chosenCandidates.add(chosen);
-          chosenAutName = chosen.getAutomata().get(0).getName();
-        }
-        index++;
-      }
-      return chosenCandidates;
-    }
   }
 
 
@@ -1482,13 +1444,22 @@ public class ObserverProjectionConflictChecker
   //#########################################################################
   //# Data Members
   private PreselectingHeuristic mPreselectingHeuristic;
-  private List<SelectingHeuristic> mSelectingHeuristics;
+  private Comparator<Candidate> mSelectingHeuristics;
 
   private Collection<EventProxy> mPropositions;
   private SynchronousProductBuilder mSynchronousProductBuilder;
   private ConflictChecker mMonolithicConflictChecker;
+
+  private Collection<AutomatonProxy> mCurrentAutomata;
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =
       new HashMap<EventProxy,Set<AutomatonProxy>>();
   private List<Step> mModifyingSteps;
+  private Set<List<AutomatonProxy>> mOverflowCandidates;
+  private int mNumOverflows;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final int MAX_OVERFLOWS = 50;
 
 }

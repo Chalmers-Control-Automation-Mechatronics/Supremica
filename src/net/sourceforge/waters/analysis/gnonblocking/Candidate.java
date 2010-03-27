@@ -9,17 +9,19 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import gnu.trove.THashSet;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
-
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -31,11 +33,15 @@ public class Candidate implements Comparable<Candidate>
 
   //#########################################################################
   //# Constructor
-  public Candidate(final List<AutomatonProxy> autSet,
+  /**
+   * Creates a new candidate.
+   * @param  autList      List of automata in candidate in defined order.
+   * @param  localEvents  Identified set of local events of this candidate.
+   */
+  public Candidate(final List<AutomatonProxy> autList,
                    final Set<EventProxy> localEvents)
   {
-    mAutomata = autSet;
-    Collections.sort(autSet);
+    mAutomata = autList;
     mLocalEvents = localEvents;
     countEvents();
   }
@@ -43,21 +49,38 @@ public class Candidate implements Comparable<Candidate>
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Gets the list of automata in this candidate.
+   * @return List of automata in defined order as passed to constructor.
+   */
   public List<AutomatonProxy> getAutomata()
   {
     return mAutomata;
   }
 
+  /**
+   * Gets the set of local events of this candidates.
+   * @return Set of events as passed to constructor.
+   *         Ordering may be randomised.
+   */
   public Set<EventProxy> getLocalEvents()
   {
     return mLocalEvents;
   }
 
+  /**
+   * Gets the number of local events in this candidate.
+   */
   public int getLocalEventCount()
   {
     return mLocalEvents.size();
   }
 
+  /**
+   * Gets the total number of events of this candidate.
+   * @return The total number of distinct events found in all automata
+   *         of the candidate (including propositions).
+   */
   public int getNumberOfEvents()
   {
     return mEventCount;
@@ -66,9 +89,32 @@ public class Candidate implements Comparable<Candidate>
 
   //#########################################################################
   //# Interface java.util.Comparable<Candidate>
-  public int compareTo(final Candidate cand)
+  /**
+   * Implements default candidate ordering.
+   * If both candidates have different numbers of automata, the candidate
+   * with fewer automata is considered smaller. If the number of automata
+   * is equal, the lists are compared lexicographically by automaton names.
+   */
+  public int compareTo(final Candidate candidate)
   {
-    return getLocalEventCount() - cand.getLocalEventCount();
+    final List<AutomatonProxy> automata1 = mAutomata;
+    final List<AutomatonProxy> automata2 = candidate.mAutomata;
+    final int size1 = automata1.size();
+    final int size2 = automata2.size();
+    if (size1 != size2) {
+      return size1 - size2;
+    }
+    final Iterator<AutomatonProxy> iter1 = automata1.iterator();
+    final Iterator<AutomatonProxy> iter2 = automata2.iterator();
+    while (iter1.hasNext()) {
+      final AutomatonProxy aut1 = iter1.next();
+      final AutomatonProxy aut2 = iter2.next();
+      final int result = aut1.compareTo(aut2);
+      if (result != 0) {
+        return result;
+      }
+    }
+    return 0;
   }
 
 
@@ -110,21 +156,34 @@ public class Candidate implements Comparable<Candidate>
 
   //#########################################################################
   //# Auxiliary Methods
-  private Set<EventProxy> getAllEvents()
+  /**
+   * Returns an ordered list of all events in the automata of this candidate,
+   * including propositions.
+   */
+  private List<EventProxy> getAllEvents()
   {
-    // Mind that event ordering!
-    final Set<EventProxy> events = new TreeSet<EventProxy>();
+    final Set<EventProxy> set = new THashSet<EventProxy>();
     for (final AutomatonProxy aut : mAutomata) {
-      events.addAll(aut.getEvents());
+      set.addAll(aut.getEvents());
     }
-    return events;
+    final List<EventProxy> list = new ArrayList<EventProxy>(set);
+    Collections.sort(list);
+    return list;
   }
 
+  /**
+   * Determines the total number of events in the automata of this candidate,
+   * not including propositions, and stores the result in {@link #mEventCount}.
+   */
   private void countEvents()
   {
-    final Set<EventProxy> events = new HashSet<EventProxy>();
+    final Set<EventProxy> events = new THashSet<EventProxy>();
     for (final AutomatonProxy aut : mAutomata) {
-      events.addAll(aut.getEvents());
+      for (final EventProxy event : aut.getEvents()) {
+        if (event.getKind() != EventKind.PROPOSITION) {
+          events.add(event);
+        }
+      }
     }
     mEventCount = events.size();
   }

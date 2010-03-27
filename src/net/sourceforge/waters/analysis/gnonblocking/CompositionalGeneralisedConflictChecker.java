@@ -267,13 +267,11 @@ public class CompositionalGeneralisedConflictChecker extends
     return autToAbstract;
   }
 
-  // #########################################################################
-  // # Inner Class ObservationEquivalenceRule
   /*
    * private class ObservationEquivalenceRule extends AbstractionRule { public
    * ObservationEquivalenceRule(final ProductDESProxyFactory factory, final
    * Collection<EventProxy> propositions) { super(factory, propositions); //
-   * TODO Auto-generated constructor stub }
+   * Auto-generated constructor stub }
    *
    * public AutomatonProxy applyRule(final AutomatonProxy autToAbstract, final
    * EventProxy tau) { final ObserverProjectionTransitionRelation tr = new
@@ -295,7 +293,7 @@ public class CompositionalGeneralisedConflictChecker extends
    * private class RemovalOfAlphaMarkingsRule extends AbstractionRule { public
    * RemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory, final
    * Collection<EventProxy> propositions) { super(factory, propositions); //
-   * TODO Auto-generated constructor stub }
+   * Auto-generated constructor stub }
    *
    * public AutomatonProxy applyRule(final AutomatonProxy autToAbstract, final
    * EventProxy tau) { final ObserverProjectionTransitionRelation tr = new
@@ -306,12 +304,12 @@ public class CompositionalGeneralisedConflictChecker extends
    *
    * final int numStates = tr.getNumberOfStates(); for (int sourceID = 0;
    * sourceID < numStates; sourceID++) { // Skip states marked as unreachable
-   * ... // TODO: to me this IS processing the marked states and skipping //
+   * ... // to me this IS processing the marked states and skipping //
    * unmarked states --- OK (only the comment above seems wrong) if
    * (tr.hasPredecessors(sourceID) && tr.isMarked(sourceID, alphaID)) { final
    * TIntHashSet successors = tr.getSuccessors(sourceID, tauID); if (successors
    * != null) { final TIntIterator iter = successors.iterator(); while
-   * (iter.hasNext()) { // TODO Watch out for tau selfloops......The if
+   * (iter.hasNext()) { // Watch out for tau selfloops......The if
    * statement below // does that I thought? --- OK final int targetID =
    * iter.next(); if (tr.isMarked(targetID, alphaID)) { if (targetID !=
    * sourceID) { tr.markState(sourceID, false, alphaID); break; } } } } } }
@@ -564,6 +562,7 @@ public class CompositionalGeneralisedConflictChecker extends
     if (heuristic instanceof HeuristicMaxL) {
       mSelectingHeuristics.add(new HeuristicMaxC());
       mSelectingHeuristics.add(new HeuristicMinS());
+      // TODO Should the following line be MaxC instead of MaxS?
     } else if (heuristic instanceof HeuristicMaxS) {
       mSelectingHeuristics.add(new HeuristicMaxL());
       mSelectingHeuristics.add(new HeuristicMinS());
@@ -615,8 +614,15 @@ public class CompositionalGeneralisedConflictChecker extends
       for (final AutomatonProxy a : automata) {
         if (a != chosenAut) {
           final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
-          pair.add(a);
-          pair.add(chosenAut);
+          // Bring pair into defined ordering.
+          // (Better do this here than as side effect of constructor.)
+          if (chosenAut.compareTo(a) < 0) {
+            pair.add(chosenAut);
+            pair.add(a);
+          } else {
+            pair.add(a);
+            pair.add(chosenAut);
+          }
           final Set<EventProxy> localEvents =
               identifyLocalEvents(mEventsToAutomata, pair);
           final Candidate candidate = new Candidate(pair, localEvents);
@@ -697,6 +703,9 @@ public class CompositionalGeneralisedConflictChecker extends
             new ArrayList<AutomatonProxy>(mEventsToAutomata.get(event));
         assert automata.size() > 0;
         if (automata.size() > 1) {
+          // Bring automata into defined ordering.
+          // (Better do this here than as side effect of constructor.)
+          Collections.sort(automata);
           final Set<EventProxy> localEvents =
               identifyLocalEvents(mEventsToAutomata, automata);
           final Candidate candidate = new Candidate(automata, localEvents);
@@ -727,6 +736,7 @@ public class CompositionalGeneralisedConflictChecker extends
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
       chosenCandidates.add(chosenCandidate);
+      // TODO Use double. The expression below (almost) always gives 0.
       int maxLocal =
           chosenCandidate.getLocalEventCount()
               / chosenCandidate.getNumberOfEvents();
@@ -761,6 +771,7 @@ public class CompositionalGeneralisedConflictChecker extends
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
       chosenCandidates.add(chosenCandidate);
+      // TODO Use double. The expression below (almost) always gives 0.
       int maxCommon =
           (chosenCandidate.getNumberOfEvents() - chosenCandidate
               .getLocalEventCount())
@@ -844,6 +855,8 @@ public class CompositionalGeneralisedConflictChecker extends
           // a point where one has run out of automata, the candidate with
           // more
           // automata is selected
+          // TODO Consider using Candidate.compareTo(). Not exactly the same
+          // ordering, though ...
           if (index < nextCandidate.getAutomata().size()) {
             final String nextAutName =
                 nextCandidate.getAutomata().get(index).getName();
@@ -876,7 +889,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
   // #########################################################################
   // # Inner Class Step
-  private abstract class Step
+  abstract class Step
   {
 
     // #######################################################################
@@ -899,7 +912,6 @@ public class CompositionalGeneralisedConflictChecker extends
       return mResultAutomaton;
     }
 
-    @SuppressWarnings("unused")
     Collection<AutomatonProxy> getOriginalAutomata()
     {
       return mOriginalAutomata;
@@ -1009,7 +1021,6 @@ public class CompositionalGeneralisedConflictChecker extends
     /**
      * Returns a collection containing all initial states of an automaton.
      */
-    @SuppressWarnings("unused")
     protected Collection<StateProxy> getInitialStates(final AutomatonProxy aut)
     {
       final Collection<StateProxy> initialstates = new HashSet<StateProxy>();

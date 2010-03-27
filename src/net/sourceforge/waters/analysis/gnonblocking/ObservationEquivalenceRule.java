@@ -21,34 +21,43 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 /**
  * @author Rachel Francis
  */
-public class ObservationEquivalenceRule extends AbstractionRule
+
+class ObservationEquivalenceRule extends AbstractionRule
 {
   // #######################################################################
   // # Constructor
-  public ObservationEquivalenceRule(final ProductDESProxyFactory factory,
-                                    final AutomatonProxy autToAbstract,
-                                    final EventProxy tau,
-                                    final Collection<EventProxy> propositions)
+  ObservationEquivalenceRule(final ProductDESProxyFactory factory,
+                             final Collection<EventProxy> propositions)
   {
-    super(factory, autToAbstract, tau, propositions);
+    super(factory, propositions);
 
   }
 
   // #######################################################################
   // # Rule Application
-  public AutomatonProxy applyRule()
+  AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
+                           final EventProxy tau)
   {
     final ObserverProjectionTransitionRelation tr =
-        new ObserverProjectionTransitionRelation(getAutomaton(),
+        new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
     final ObservationEquivalenceTRSimplifier biSimulator =
-        new ObservationEquivalenceTRSimplifier(tr, tr.getEventInt(getTau()));
+        new ObservationEquivalenceTRSimplifier(tr, tr.getEventInt(tau));
     final boolean modified = biSimulator.run();
     if (modified) {
       final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
       return convertedAut;
     } else {
-      return getAutomaton();
+      return autToAbstract;
     }
   }
+
+  CompositionalGeneralisedConflictChecker.Step createStep
+    (final CompositionalGeneralisedConflictChecker checker,
+     final AutomatonProxy abstractedAut)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

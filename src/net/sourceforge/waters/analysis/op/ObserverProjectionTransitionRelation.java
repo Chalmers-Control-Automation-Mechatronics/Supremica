@@ -341,6 +341,51 @@ public class ObserverProjectionTransitionRelation
   }
 
   // #########################################################################
+  // # Event Distinction
+  /**
+   * Determines whether the given event is globally disabled in this transition
+   * relation.
+   * @param  event   The ID of the event to be tested.
+   * @return <CODE>true</CODE> if the given event is disabled in every
+   *         state.
+   */
+  public boolean isGloballyDisabled(final int event)
+  {
+    final int numStates = getNumberOfStates();
+    for (int state = 0; state < numStates; state++) {
+      if (hasPredecessors(state)) {
+        final TIntHashSet succs = mSuccessors[state][event];
+        if (succs != null) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the given event is selflooped in this transition
+   * relation.
+   * @param  event   The ID of the event to be tested.
+   * @return <CODE>true</CODE> if the given event is selflooped in every
+   *         state, and appears on no other transitions.
+   */
+  public boolean isPureSelfloopEvent(final int event)
+  {
+    final int numStates = getNumberOfStates();
+    for (int state = 0; state < numStates; state++) {
+      if (hasPredecessors(state)) {
+        final TIntHashSet succs = mSuccessors[state][event];
+        if (succs == null || succs.size() > 1 || !succs.contains(state)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+
+  // #########################################################################
   // # Transitions Modifications
   public void removeOutgoing(final int state, final int event)
   {
@@ -372,16 +417,14 @@ public class ObserverProjectionTransitionRelation
   public void removeEvent(final int event)
   {
     mEvents[event] = null;
-    for (int s = 0; s < mSuccessors.length; s++) {
-      final TIntHashSet succ = mSuccessors[s][event];
-      if (succ == null) {
-        continue;
+    for (int state = 0; state < mSuccessors.length; state++) {
+      final TIntHashSet succ = mSuccessors[state][event];
+      if (succ != null) {
+        mSuccessors[state][event] = null;
+        final TIntHashSet active = getFromArray(state, mActiveEvents);
+        active.remove(event);
       }
-      final int[] intsuccs = succ.toArray();
-      for (int i = 0; i < intsuccs.length; i++) {
-        final int t = intsuccs[i];
-        removeTransition(s, event, t);
-      }
+      mPredecessors[state][event] = null;
     }
   }
 
@@ -808,15 +851,15 @@ public class ObserverProjectionTransitionRelation
       mProps = props;
     }
 
-    //#######################################################################
-    //# Simple Access
+    // #######################################################################
+    // # Simple Access
     int getCode()
     {
       return mCode;
     }
 
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.des.StateProxy
+    // #######################################################################
+    // # Interface net.sourceforge.waters.model.des.StateProxy
     public String getName()
     {
       return "S:" + mCode;

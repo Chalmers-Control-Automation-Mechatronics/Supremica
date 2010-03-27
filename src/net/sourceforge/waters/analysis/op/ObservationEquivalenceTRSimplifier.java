@@ -42,8 +42,9 @@ public class ObservationEquivalenceTRSimplifier
   public ObservationEquivalenceTRSimplifier
     (final ObserverProjectionTransitionRelation tr, final int tau)
   {
-    mTau = tau;
+    mHiddenEvent = tau;
     mTransitionRelation = tr;
+    mSuppressHiddenEvent = true;
   }
 
 
@@ -59,6 +60,44 @@ public class ObservationEquivalenceTRSimplifier
     mTransitionRelation = rel;
   }
 
+  public int getHiddenEventID()
+  {
+    return mHiddenEvent;
+  }
+
+  public void setHiddenEventID(final int event)
+  {
+    mHiddenEvent = event;
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  /**
+   * Sets whether the hidden event is to be suppressed in the output
+   * automaton when possible. If this is set to <CODE>true</CODE>,
+   * the hidden event will only be in the alphabet of the output automaton,
+   * if it has at least one non-selfloop transition. The default of this
+   * setting is <CODE>true</CODE>.
+   */
+  public void setSuppressHiddenEvent(final boolean suppress)
+  {
+    mSuppressHiddenEvent = suppress;
+  }
+
+  /**
+   * Gets whether the hidden event is to be suppressed in the output
+   * automaton when possible.
+   * @see {@link #setSuppressHiddenEvent(boolean) setSuppressHiddenEvent()}
+   */
+  public boolean getSuppressHiddenEvent()
+  {
+    return mSuppressHiddenEvent;
+  }
+
+
+  //#########################################################################
+  //# Invocation
   public boolean run()
   {
     setUp();
@@ -76,19 +115,33 @@ public class ObservationEquivalenceTRSimplifier
       it.remove();
       ec.splitOn();
     }
+
     assert mP.size() >= 0;
     assert mP.size() <= mNumStates;
     if (mP.size() == mNumStates) {
       return false;
     }
+
     mClassMap = new TIntObjectHashMap<int[]>();
     for (final SimpleEquivalenceClass sec : mP) {
       mClassMap.put(sec.mStates[0], sec.mStates);
       if (sec.mStates.length == 1) {
         continue;
       }
-      mTransitionRelation.merge(sec.mStates, mTau);
+      mTransitionRelation.merge(sec.mStates, mHiddenEvent);
     }
+
+    if (mSuppressHiddenEvent && mHiddenEvent >= 0) {
+      if (mTransitionRelation.isGloballyDisabled(mHiddenEvent)) {
+        mTransitionRelation.removeEvent(mHiddenEvent);
+      }
+    }
+    for (int e = 0; e < mTransitionRelation.getNumberOfProperEvents(); e++) {
+      if (mTransitionRelation.isPureSelfloopEvent(e)) {
+        mTransitionRelation.removeEvent(e);
+      }
+    }
+
     return true;
   }
 
@@ -106,7 +159,7 @@ public class ObservationEquivalenceTRSimplifier
     mNumEvents = mTransitionRelation.getNumberOfProperEvents();
     mTauPreds = new int[mNumStates][];
     for (int s = 0; s < mNumStates; s++) {
-      if (mTau >= 0) {
+      if (mHiddenEvent >= 0) {
         final TIntHashSet hashTauPreds = new TIntHashSet();
         final TIntArrayList list = new TIntArrayList();
         hashTauPreds.add(s);
@@ -115,7 +168,7 @@ public class ObservationEquivalenceTRSimplifier
           final int taupred = list.remove(list.size() - 1);
           mTransitionRelation.copyMarkings(s, taupred);
           final TIntHashSet preds =
-            mTransitionRelation.getPredecessors(taupred, mTau);
+            mTransitionRelation.getPredecessors(taupred, mHiddenEvent);
           if (preds != null) {
             final TIntIterator iter = preds.iterator();
             while (iter.hasNext()) {
@@ -171,7 +224,7 @@ public class ObservationEquivalenceTRSimplifier
 
   private int[] getPredecessors(final int state, final int event)
   {
-    if (event == mTau) {
+    if (event == mHiddenEvent) {
       return mTauPreds[state];
     }
     final TIntHashSet preds = new TIntHashSet();
@@ -534,8 +587,10 @@ public class ObservationEquivalenceTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private final int mTau;
+  private int mHiddenEvent;
   private ObserverProjectionTransitionRelation mTransitionRelation;
+  private boolean mSuppressHiddenEvent;
+
   private int mNumStates;
   private int mNumEvents;
 

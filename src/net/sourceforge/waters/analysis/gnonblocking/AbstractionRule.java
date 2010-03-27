@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.Collection;
+
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -18,55 +19,61 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 /**
  * @author Rachel Francis
  */
-public abstract class AbstractionRule
+
+abstract class AbstractionRule
 {
   // #######################################################################
   // # Constructor
-  public AbstractionRule(final ProductDESProxyFactory factory,
-                         final AutomatonProxy autToAbstract,
-                         final EventProxy tau,
-                         final Collection<EventProxy> propositions)
+  AbstractionRule(final ProductDESProxyFactory factory,
+                  final Collection<EventProxy> propositions)
   {
     mFactory = factory;
-    mAutToAbstract = autToAbstract;
-    mTau = tau;
     mPropositions = propositions;
   }
 
+
   // #######################################################################
   // # Simple Access
-  protected ProductDESProxyFactory getFactory()
+  ProductDESProxyFactory getFactory()
   {
     return mFactory;
   }
 
-  protected AutomatonProxy getAutomaton()
-  {
-    return mAutToAbstract;
-  }
-
-  protected EventProxy getTau()
-  {
-    return mTau;
-  }
-
-  protected Collection<EventProxy> getPropositions()
+  Collection<EventProxy> getPropositions()
   {
     return mPropositions;
   }
 
+
   // #######################################################################
-  // # Auxiliary Methods
+  // # Invocation
+  CompositionalGeneralisedConflictChecker.Step applyRuleAndCreateStep
+    (final CompositionalGeneralisedConflictChecker checker,
+     final AutomatonProxy autToAbstract,
+     final EventProxy tau)
+  {
+    final AutomatonProxy abstractedAut = applyRule(autToAbstract, tau);
+    if (abstractedAut != autToAbstract) {
+      return createStep(checker, abstractedAut);
+    } else {
+      return null;
+    }
+  }
+
 
   // #######################################################################
   // # Rule Application
-  abstract AutomatonProxy applyRule();
+  abstract AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
+                                    final EventProxy tau);
+
+  abstract CompositionalGeneralisedConflictChecker.Step createStep
+    (final CompositionalGeneralisedConflictChecker checker,
+     final AutomatonProxy abstractedAut);
+
 
   // #######################################################################
   // # Data Members
   private final ProductDESProxyFactory mFactory;
   private final Collection<EventProxy> mPropositions;
-  private final AutomatonProxy mAutToAbstract;
-  private final EventProxy mTau;
 
 }

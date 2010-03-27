@@ -23,31 +23,29 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 /**
  * @author Rachel Francis
  */
-public class RemovalOfAlphaMarkingsRule extends AbstractionRule
+
+class RemovalOfAlphaMarkingsRule extends AbstractionRule
 {
   // #######################################################################
   // # Constructor
-  public RemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory,
-                                    final AutomatonProxy autToAbstract,
-                                    final EventProxy tau,
-                                    final Collection<EventProxy> propositions,
-                                    final EventProxy alphaMarking)
+  RemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory,
+                             final Collection<EventProxy> propositions,
+                             final EventProxy alphaMarking)
   {
-    super(factory, autToAbstract, tau, propositions);
+    super(factory, propositions);
     mAlphaMarking = alphaMarking;
   }
 
   // #######################################################################
   // # Rule Application
-  AutomatonProxy applyRule()
+  AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
+                           final EventProxy tau)
   {
     final ObserverProjectionTransitionRelation tr =
-        new ObserverProjectionTransitionRelation(getAutomaton(),
+        new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
-
     final int alphaID = tr.getEventInt(mAlphaMarking);
-    final int tauID = tr.getEventInt(getTau());
-
+    final int tauID = tr.getEventInt(tau);
     final int numStates = tr.getNumberOfStates();
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if (tr.hasPredecessors(sourceID) && tr.isMarked(sourceID, alphaID)) {
@@ -55,7 +53,6 @@ public class RemovalOfAlphaMarkingsRule extends AbstractionRule
         if (successors != null) {
           final TIntIterator iter = successors.iterator();
           while (iter.hasNext()) {
-
             final int targetID = iter.next();
             if (tr.isMarked(targetID, alphaID)) {
               if (targetID != sourceID) {
@@ -67,9 +64,20 @@ public class RemovalOfAlphaMarkingsRule extends AbstractionRule
         }
       }
     }
+    // TODO Check if there was no change, and suppress automaton construction
+    // in this case.
     final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
     return convertedAut;
   }
+
+  CompositionalGeneralisedConflictChecker.Step createStep
+    (final CompositionalGeneralisedConflictChecker checker,
+     final AutomatonProxy abstractedAut)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 
   // #######################################################################
   // # Data Members

@@ -20,7 +20,7 @@ public class TauLoopRemovalTRSimplifier
      final int tau)
   {
     mTransitionRelation = transitionrelation;
-    mTau = tau;
+    mHiddenEvent = tau;
   }
 
 
@@ -37,10 +37,20 @@ public class TauLoopRemovalTRSimplifier
     mTransitionRelation = rel;
   }
 
+  public int getHiddenEventID()
+  {
+    return mHiddenEvent;
+  }
+
+  public void setHiddenEventID(final int event)
+  {
+    mHiddenEvent = event;
+  }
+
   public boolean run()
   {
     setUp();
-    boolean modified = mTransitionRelation.removeAllSelfLoops(mTau);
+    boolean modified = mTransitionRelation.removeAllSelfLoops(mHiddenEvent);
     for (int s = 0; s < mTarjan.length; s++) {
       if (mTarjan[s] == 0) {
         tarjan(s);
@@ -51,7 +61,7 @@ public class TauLoopRemovalTRSimplifier
       mClassMap = new TIntObjectHashMap<int[]>(numStates);
       for (final TIntArrayList merge : mToBeMerged) {
         final int[] clazz = merge.toNativeArray();
-        mTransitionRelation.merge(clazz, mTau);
+        mTransitionRelation.merge(clazz, mHiddenEvent);
         final int code = clazz[0];
         mClassMap.put(code, clazz);
         modified |= clazz.length > 1;
@@ -97,7 +107,7 @@ public class TauLoopRemovalTRSimplifier
     mLowLink[state] = mIndex;
     mIndex++;
     final TIntHashSet successors =
-      mTransitionRelation.getSuccessors(state, mTau);
+      mTransitionRelation.getSuccessors(state, mHiddenEvent);
     if (successors == null) {
       return;
     }
@@ -135,7 +145,7 @@ public class TauLoopRemovalTRSimplifier
   //#########################################################################
   //# Data Members
   private ObserverProjectionTransitionRelation mTransitionRelation;
-  private final int mTau;
+  private int mHiddenEvent;
   private TIntObjectHashMap<int[]> mClassMap;
 
   private int mIndex;

@@ -36,6 +36,16 @@ public interface TransitionRelationSimplifier
     (final ObserverProjectionTransitionRelation rel);
 
   /**
+   * Gets the ID of the silent (tau) event used for simplification.
+   */
+  public int getHiddenEventID();
+
+  /**
+   * Sets the ID of the silent (tau) event used for simplification.
+   */
+  public void setHiddenEventID(final int event);
+
+  /**
    * Runs this simplifier.
    * When run, the simplifier will destructively modify its transition
    * relation.
