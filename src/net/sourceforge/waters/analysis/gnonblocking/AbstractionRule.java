@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 
 
 /**
@@ -17,6 +18,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
  */
 public abstract interface AbstractionRule
 {
-  public AutomatonProxy applyRule(final AutomatonProxy autToAbstract);
+  public AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
+                                  final EventProxy tau);
 
 }
