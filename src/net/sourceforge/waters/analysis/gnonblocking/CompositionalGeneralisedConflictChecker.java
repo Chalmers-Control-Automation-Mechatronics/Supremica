@@ -240,8 +240,16 @@ public class CompositionalGeneralisedConflictChecker extends
     if (getGeneralisedPrecondition() != null) {
       mPropositions.add(getGeneralisedPrecondition());
     }
+
+    mAbstractionRules = new LinkedList<AbstractionRule>();
+    final ObservationEquivalenceRule oeRule = new ObservationEquivalenceRule();
+    mAbstractionRules.add(oeRule);
+    final RemovalOfAlphaMarkingsRule ramRule = new RemovalOfAlphaMarkingsRule();
+    mAbstractionRules.add(ramRule);
   }
 
+  // #########################################################################
+  // # Auxiliary Methods
   // #########################################################################
   // # Auxiliary Methods
   private AutomatonProxy applyAbstractionRules(
@@ -249,98 +257,83 @@ public class CompositionalGeneralisedConflictChecker extends
                                                final EventProxy tau)
       throws OverflowException
   {
-    final int size = mAbstractionRules.size();
-    final ListIterator<AbstractionRule> iter =
-        mAbstractionRules.listIterator(size);
+    final ListIterator<AbstractionRule> iter = mAbstractionRules.listIterator();
     AutomatonProxy aut = autToAbstract;
     while (iter.hasNext()) {
       final AbstractionRule rule = iter.next();
       aut = rule.applyRule(aut, tau);
     }
-    // TODO: create classes for abstraction rules
-    final AutomatonProxy autObsEq =
-        applyObservationEquivalence(autToAbstract, tau);
-    @SuppressWarnings("unused")
-    final AutomatonProxy autRemoveAlpha =
-        applyRemovalOfAlphaMarkings(autObsEq, tau);
     return aut;
   }
 
-  private AutomatonProxy applyRemovalOfAlphaMarkings(
-                                                     final AutomatonProxy autToAbstract,
-                                                     final EventProxy tau)
+
+  // #########################################################################
+  // # Inner Class ObservationEquivalenceRule
+  private class ObservationEquivalenceRule implements AbstractionRule
   {
-    final ObserverProjectionTransitionRelation tr =
-        new ObserverProjectionTransitionRelation(autToAbstract, mPropositions);
-    removeAlphaMarkings(tr, tau);
-    final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
-    final RemovalOfAlphaMarkingsStep ramStep =
-        new RemovalOfAlphaMarkingsStep(convertedAut, autToAbstract);
-    mModifyingSteps.add(ramStep);
-    return convertedAut;
+    public AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
+                                    final EventProxy tau)
+    {
+      final ObserverProjectionTransitionRelation tr =
+          new ObserverProjectionTransitionRelation(autToAbstract, mPropositions);
+      final ObservationEquivalenceTRSimplifier biSimulator =
+          new ObservationEquivalenceTRSimplifier(tr, tr.getEventInt(tau));
+      final boolean modified = biSimulator.run();
+      if (modified) {
+        final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
+        final ObservationEquivalenceStep oeStep =
+            new ObservationEquivalenceStep(convertedAut, autToAbstract, tau, tr
+                .getOriginalIntToStateMap(), biSimulator.getStateClasses(), tr
+                .getResultingStateToIntMap());
+        mModifyingSteps.add(oeStep);
+        return convertedAut;
+      } else {
+        return autToAbstract;
+      }
+    }
   }
 
-  /**
-   * Removes alpha marking from state x if state x and state y have a transition
-   * containing a silent event directly between them.
-   *
-   * @param tr
-   *          The transition relation for the automaton to remove alpha markings
-   *          from.
-   * @param tau
-   *          The silent event which is required to be on the transition between
-   *          the two states.
-   */
-  private void removeAlphaMarkings(
-                                   final ObserverProjectionTransitionRelation tr,
-                                   final EventProxy tau)
-  {
-    final int alphaID = tr.getEventInt(getGeneralisedPrecondition());
-    final int tauID = tr.getEventInt(tau);
 
-    final int numStates = tr.getNumberOfStates();
-    for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      // Skip states marked as unreachable ...
-      // TODO Shouldn't we skip UNmarked states, and process marked states?
-      if (tr.hasPredecessors(sourceID) && tr.isMarked(sourceID, alphaID)) {
-        final TIntHashSet successors = tr.getSuccessors(sourceID, tauID);
-        if (successors != null) {
-          final TIntIterator iter = successors.iterator();
-          while (iter.hasNext()) {
-            final int targetID = iter.next();
-            if (tr.isMarked(targetID, alphaID)) {
-              if (targetID != sourceID) {
-                // TODO I do not think tau is the right marking ...
-                tr.markState(sourceID, false, tau);
-                break;
+  // #########################################################################
+  // # Inner Class RemovalOfAlphaMarkingsRule
+  private class RemovalOfAlphaMarkingsRule implements AbstractionRule
+  {
+    public AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
+                                    final EventProxy tau)
+    {
+      final ObserverProjectionTransitionRelation tr =
+          new ObserverProjectionTransitionRelation(autToAbstract, mPropositions);
+
+      final int alphaID = tr.getEventInt(getGeneralisedPrecondition());
+      final int tauID = tr.getEventInt(tau);
+
+      final int numStates = tr.getNumberOfStates();
+      for (int sourceID = 0; sourceID < numStates; sourceID++) {
+        // Skip states marked as unreachable ...
+        if (tr.hasPredecessors(sourceID) && tr.isMarked(sourceID, alphaID)) {
+          final TIntHashSet successors = tr.getSuccessors(sourceID, tauID);
+          if (successors != null) {
+            final TIntIterator iter = successors.iterator();
+            while (iter.hasNext()) {
+              // TODO Watch out for tau selfloops......The if statement below
+              // does
+              // that I thought? (if (targetID != sourceID))
+              final int targetID = iter.next();
+              if (tr.isMarked(targetID, alphaID)) {
+                if (targetID != sourceID) {
+                  tr.markState(sourceID, false, tau);
+                  break;
+                }
               }
             }
           }
         }
       }
-    }
-  }
-
-  private AutomatonProxy applyObservationEquivalence(
-                                                     final AutomatonProxy autToAbstract,
-                                                     final EventProxy tau)
-      throws OverflowException
-  {
-    final ObserverProjectionTransitionRelation tr =
-        new ObserverProjectionTransitionRelation(autToAbstract, mPropositions);
-    final ObservationEquivalenceTRSimplifier biSimulator =
-        new ObservationEquivalenceTRSimplifier(tr, tr.getEventInt(tau));
-    final boolean modified = biSimulator.run();
-    if (modified) {
       final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
-      final ObservationEquivalenceStep oeStep =
-          new ObservationEquivalenceStep(convertedAut, autToAbstract, tau, tr
-              .getOriginalIntToStateMap(), biSimulator.getStateClasses(), tr
-              .getResultingStateToIntMap());
-      mModifyingSteps.add(oeStep);
+      final RemovalOfAlphaMarkingsStep ramStep =
+          new RemovalOfAlphaMarkingsStep(convertedAut, autToAbstract);
+      mModifyingSteps.add(ramStep);
       return convertedAut;
-    } else {
-      return autToAbstract;
     }
   }
 
