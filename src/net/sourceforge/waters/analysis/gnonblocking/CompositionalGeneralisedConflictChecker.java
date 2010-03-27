@@ -310,6 +310,8 @@ public class CompositionalGeneralisedConflictChecker extends
       final int numStates = tr.getNumberOfStates();
       for (int sourceID = 0; sourceID < numStates; sourceID++) {
         // Skip states marked as unreachable ...
+        // TODO: to me this IS processing the marked states and skipping
+        // unmarked states...
         if (tr.hasPredecessors(sourceID) && tr.isMarked(sourceID, alphaID)) {
           final TIntHashSet successors = tr.getSuccessors(sourceID, tauID);
           if (successors != null) {
@@ -321,7 +323,7 @@ public class CompositionalGeneralisedConflictChecker extends
               final int targetID = iter.next();
               if (tr.isMarked(targetID, alphaID)) {
                 if (targetID != sourceID) {
-                  tr.markState(sourceID, false, tau);
+                  tr.markState(sourceID, false, getGeneralisedPrecondition());
                   break;
                 }
               }
