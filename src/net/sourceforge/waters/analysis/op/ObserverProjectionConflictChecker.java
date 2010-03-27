@@ -13,6 +13,8 @@ import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
+import gnu.trove.TIntObjectHashMap;
+import gnu.trove.TIntObjectIterator;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayDeque;
@@ -265,11 +267,11 @@ public class ObserverProjectionConflictChecker
     final EventProxy marking = getUsedMarkingProposition();
     mPropositions = Collections.singletonList(marking);
     if (mPreselectingHeuristic == null) {
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
       setPreselectingHeuristic(defaultHeuristic);
     }
     if (mSelectingHeuristics == null) {
-      final SelectingHeuristic defaultHeuristic = new HeuristicMaxL();
+      final SelectingHeuristic defaultHeuristic = new HeuristicMinS();
       setSelectingHeuristic(defaultHeuristic);
     }
     final ProductDESProxyFactory factory = getFactory();
@@ -435,18 +437,33 @@ public class ObserverProjectionConflictChecker
 
   private AutomatonProxy applyObservationEquivalence(final AutomatonProxy aut,
                                                      final EventProxy tau)
+    throws AnalysisException
   {
     final ObserverProjectionTransitionRelation rel =
         new ObserverProjectionTransitionRelation(aut, mPropositions);
     final int codeOfTau = rel.getEventInt(tau);
-    final ObserverProjectionBisimulator bisimulator =
-        new ObserverProjectionBisimulator(rel, codeOfTau);
-    final boolean modified = bisimulator.run();
-    if (modified) {
+    final TransitionRelationSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier(rel, codeOfTau);
+    final boolean hadLoops = loopRemover.run();
+    final TransitionRelationSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier(rel, codeOfTau);
+    final boolean hadBisim = bisimulator.run();
+    if (hadLoops || hadBisim) {
       final ProductDESProxyFactory factory = getFactory();
       final AutomatonProxy convertedAut = rel.createAutomaton(factory);
       final StateProxy[] inputMap = rel.getOriginalIntToStateMap();
-      final Map<Integer,int[]> partition = bisimulator.getStateClasses();
+      final TIntObjectHashMap<int[]> partition;
+      if (!hadBisim) {
+        partition = loopRemover.getStateClasses();
+      } else if (!hadLoops) {
+        partition = bisimulator.getStateClasses();
+      } else {
+        final TIntObjectHashMap<int[]> partition1 =
+          loopRemover.getStateClasses();
+        final TIntObjectHashMap<int[]> partition2 =
+          bisimulator.getStateClasses();
+        partition = combinePartitions(partition1, partition2);
+      }
       final TObjectIntHashMap<StateProxy> outputMap =
         rel.getResultingStateToIntMap();
       final ObservationEquivalenceStep step =
@@ -457,6 +474,37 @@ public class ObserverProjectionConflictChecker
     } else {
       return aut;
     }
+  }
+
+  private TIntObjectHashMap<int[]> combinePartitions
+    (final TIntObjectHashMap<int[]> first,
+     final TIntObjectHashMap<int[]> second)
+  {
+    final TIntObjectIterator<int[]> iter = second.iterator();
+    while (iter.hasNext()) {
+      iter.advance();
+      final int[] class2 = iter.value();
+      int count = 0;
+      for (final int s2 : class2) {
+        final int[] class1 = first.get(s2);
+        count += class1.length;
+      }
+      final int[] newclass;
+      if (class2.length == count) {
+        newclass = class2;
+      } else {
+        newclass = new int[count];
+        iter.setValue(newclass);
+      }
+      int i = 0;
+      for (final int s2 : class2) {
+        final int[] class1 = first.get(s2);
+        for (final int s1 : class1) {
+          newclass[i++] = s1;
+        }
+      }
+    }
+    return second;
   }
 
 
@@ -709,7 +757,7 @@ public class ObserverProjectionConflictChecker
 
 
   //#########################################################################
-  //# Inner Class HeuristicPairing
+  //# Inner Class HeuristicMaxL
   /**
    * Performs step 2 of the approach to select the automata to compose. The
    * chosen candidate is the one with the highest proportion of local events.
@@ -745,7 +793,7 @@ public class ObserverProjectionConflictChecker
 
 
   //#########################################################################
-  //# Inner Class HeuristicPairing
+  //# Inner Class HeuristicMaxC
   /**
    * Performs step 2 of the approach to select the automata to compose. The
    * chosen candidate is the one with the highest proportion of common events.
@@ -783,18 +831,18 @@ public class ObserverProjectionConflictChecker
 
 
   //#########################################################################
-  //# Inner Class HeuristicPairing
+  //# Inner Class HeuristicMinS
   private class HeuristicMinS implements SelectingHeuristic
   {
     public List<Candidate> evaluate(final List<Candidate> candidates)
     {
       Candidate chosenCandidate = candidates.get(0);
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
-      int smallestProduct = calculateProduct(chosenCandidate);
+      double smallestProduct = calculateProduct(chosenCandidate);
       chosenCandidates.add(chosenCandidate);
       for (int i = 1; i < candidates.size(); i++) {
         final Candidate candidate = candidates.get(i);
-        final int newproduct = calculateProduct(candidate);
+        final double newproduct = calculateProduct(candidate);
         if (smallestProduct > newproduct) {
           chosenCandidates = new ArrayList<Candidate>();
           smallestProduct = newproduct;
@@ -808,13 +856,15 @@ public class ObserverProjectionConflictChecker
       return chosenCandidates;
     }
 
-    private int calculateProduct(final Candidate candidate)
+    private double calculateProduct(final Candidate candidate)
     {
-      int product = 1;
+      double product = 1.0;
       for (final AutomatonProxy aut : candidate.getAutomata()) {
         product *= aut.getStates().size();
       }
-      return product;
+      final double totalEvents = candidate.getNumberOfEvents();
+      final double localEvents = candidate.getLocalEventCount();
+      return product * (totalEvents - localEvents) / totalEvents;
     }
   }
 
@@ -1054,12 +1104,12 @@ public class ObserverProjectionConflictChecker
        final AutomatonProxy originalAut,
        final EventProxy tau,
        final StateProxy[] originalStates,
-       final Map<Integer,int[]> classMap,
+       final TIntObjectHashMap<int[]> partition,
        final TObjectIntHashMap<StateProxy> reverseOutputStateMap)
     {
       super(resultAut, originalAut);
       mOriginalStates = originalStates;
-      mClassMap = classMap;
+      mClassMap = partition;
       mReverseOutputStateMap = reverseOutputStateMap;
       mTransitionRelation =
         new ObserverProjectionTransitionRelation(originalAut, mPropositions);
@@ -1365,7 +1415,7 @@ public class ObserverProjectionConflictChecker
      * in input transition relation. This gives the class of states merged to
      * form the given state in the simplified automaton.
      */
-    private final Map<Integer,int[]> mClassMap;
+    private final TIntObjectHashMap<int[]> mClassMap;
     /**
      * Reverse encoding of output states. Maps states in output automaton
      * (simplified automaton) to state code in output transition relation.

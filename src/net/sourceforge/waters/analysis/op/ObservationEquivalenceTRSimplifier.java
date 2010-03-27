@@ -19,35 +19,91 @@ import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TObjectProcedure;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 
 /**
  * @author Simon Ware, Rachel Francis, Robi Malik
  */
 
-public class ObserverProjectionBisimulator
+public class ObservationEquivalenceTRSimplifier
+  implements TransitionRelationSimplifier
 {
 
   //#########################################################################
   //# Constructors
-  public ObserverProjectionBisimulator
+  public ObservationEquivalenceTRSimplifier
     (final ObserverProjectionTransitionRelation tr)
   {
     this(tr, -1);
   }
 
-  public ObserverProjectionBisimulator
+  public ObservationEquivalenceTRSimplifier
     (final ObserverProjectionTransitionRelation tr, final int tau)
   {
     mTau = tau;
     mTransitionRelation = tr;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
+  public ObserverProjectionTransitionRelation getTransitionRelation()
+  {
+    return mTransitionRelation;
+  }
+
+  public void setTransitionRelation(final ObserverProjectionTransitionRelation rel)
+  {
+    mTransitionRelation = rel;
+  }
+
+  public boolean run()
+  {
+    setUp();
+    setupInitialPartitions();
+    while (true) {
+      Iterator<? extends EquivalenceClass> it = null;
+      if (!mWS.isEmpty()) {
+        it = mWS.iterator();
+      } else if (!mWC.isEmpty()) {
+        it = mWC.iterator();
+      } else {
+        break;
+      }
+      final EquivalenceClass ec = it.next();
+      it.remove();
+      ec.splitOn();
+    }
+    assert mP.size() >= 0;
+    assert mP.size() <= mNumStates;
+    if (mP.size() == mNumStates) {
+      return false;
+    }
+    mClassMap = new TIntObjectHashMap<int[]>();
+    for (final SimpleEquivalenceClass sec : mP) {
+      mClassMap.put(sec.mStates[0], sec.mStates);
+      if (sec.mStates.length == 1) {
+        continue;
+      }
+      mTransitionRelation.merge(sec.mStates, mTau);
+    }
+    return true;
+  }
+
+  public TIntObjectHashMap<int[]> getStateClasses()
+  {
+    return mClassMap;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void setUp()
+  {
     mNumStates = mTransitionRelation.getNumberOfStates();
     mNumEvents = mTransitionRelation.getNumberOfProperEvents();
-
     mTauPreds = new int[mNumStates][];
     for (int s = 0; s < mNumStates; s++) {
       if (mTau >= 0) {
@@ -79,52 +135,6 @@ public class ObserverProjectionBisimulator
     }
   }
 
-
-  //#########################################################################
-  //# Simple Access
-  public Map<Integer,int[]> getStateClasses()
-  {
-    return mClassMap;
-  }
-
-
-  //#########################################################################
-  //# Invocation
-  public boolean run()
-  {
-    setupInitialPartitions();
-    while (true) {
-      Iterator<? extends EquivalenceClass> it = null;
-      if (!mWS.isEmpty()) {
-        it = mWS.iterator();
-      } else if (!mWC.isEmpty()) {
-        it = mWC.iterator();
-      } else {
-        break;
-      }
-      final EquivalenceClass ec = it.next();
-      it.remove();
-      ec.splitOn();
-    }
-    assert mP.size() >= 0;
-    assert mP.size() <= mNumStates;
-    if (mP.size() == mNumStates) {
-      return false;
-    }
-    mClassMap = new HashMap<Integer,int[]>();
-    for (final SimpleEquivalenceClass sec : mP) {
-      mClassMap.put(sec.mStates[0], sec.mStates);
-      if (sec.mStates.length == 1) {
-        continue;
-      }
-      mTransitionRelation.merge(sec.mStates, mTau);
-    }
-    return true;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
   private void setupInitialPartitions()
   {
     mWS = new THashSet<SimpleEquivalenceClass>();
@@ -525,15 +535,15 @@ public class ObserverProjectionBisimulator
   //#########################################################################
   //# Data Members
   private final int mTau;
-  private final ObserverProjectionTransitionRelation mTransitionRelation;
-  private final int mNumStates;
-  private final int mNumEvents;
+  private ObserverProjectionTransitionRelation mTransitionRelation;
+  private int mNumStates;
+  private int mNumEvents;
 
-  private final int[][] mTauPreds;
+  private int[][] mTauPreds;
   private THashSet<SimpleEquivalenceClass> mWS;
   private THashSet<ComplexEquivalenceClass> mWC;
   private THashSet<SimpleEquivalenceClass> mP;
   private SimpleEquivalenceClass[] mStateToClass;
-  private Map<Integer,int[]> mClassMap;
+  private TIntObjectHashMap<int[]> mClassMap;
 
 }

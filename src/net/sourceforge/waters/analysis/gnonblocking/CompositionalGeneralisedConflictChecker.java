@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
+import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayDeque;
@@ -30,7 +31,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.op.ObserverProjectionBisimulator;
+import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -163,7 +164,6 @@ public class CompositionalGeneralisedConflictChecker extends
       final AutomatonProxy autToAbstract =
           hideLocalEvents(syncProduct, candidate.getLocalEvents(), tau);
 
-      // TODO Abstraction rules here
       final AutomatonProxy abstractedAut =
           applyAbstractionRules(autToAbstract, tau);
 
@@ -301,16 +301,16 @@ public class CompositionalGeneralisedConflictChecker extends
     final int numStates = tr.getNumberOfStates();
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       // Skip states marked as unreachable ...
+      // TODO Shouldn't we skip UNmarked states, and process marked states?
       if (tr.hasPredecessors(sourceID) && tr.isMarked(sourceID, alphaID)) {
         final TIntHashSet successors = tr.getSuccessors(sourceID, tauID);
         if (successors != null) {
           final TIntIterator iter = successors.iterator();
           while (iter.hasNext()) {
-            // TODO Watch out for tau selfloops......The if statement below does
-            // that I thought? (if (targetID != sourceID))
             final int targetID = iter.next();
             if (tr.isMarked(targetID, alphaID)) {
               if (targetID != sourceID) {
+                // TODO I do not think tau is the right marking ...
                 tr.markState(sourceID, false, tau);
                 break;
               }
@@ -328,8 +328,8 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     final ObserverProjectionTransitionRelation tr =
         new ObserverProjectionTransitionRelation(autToAbstract, mPropositions);
-    final ObserverProjectionBisimulator biSimulator =
-        new ObserverProjectionBisimulator(tr, tr.getEventInt(tau));
+    final ObservationEquivalenceTRSimplifier biSimulator =
+        new ObservationEquivalenceTRSimplifier(tr, tr.getEventInt(tau));
     final boolean modified = biSimulator.run();
     if (modified) {
       final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
@@ -1235,7 +1235,7 @@ public class CompositionalGeneralisedConflictChecker extends
                                        final AutomatonProxy originalAut,
                                        final EventProxy tau,
                                        final StateProxy[] originalStates,
-                                       final Map<Integer,int[]> classMap,
+                                       final TIntObjectHashMap<int[]> classMap,
                                        final TObjectIntHashMap<StateProxy> reverseOutputStateMap)
     {
       super(resultAut, originalAut);
@@ -1595,7 +1595,7 @@ public class CompositionalGeneralisedConflictChecker extends
      * form the given state in the simplified automaton. Obtained from
      * TransBiSimulator.
      */
-    private final Map<Integer,int[]> mClassMap;
+    private final TIntObjectHashMap<int[]> mClassMap;
     /**
      * Reverse encoding of output states. Maps states in output automaton
      * (simplified automaton) to state code in output transition relation.

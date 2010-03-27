@@ -35,6 +35,7 @@ public class ObserverProjectionConflictCheckerTest extends
     junit.textui.TestRunner.run(suite());
   }
 
+
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
@@ -42,14 +43,6 @@ public class ObserverProjectionConflictCheckerTest extends
     (final ProductDESProxyFactory factory)
   {
     return new ObserverProjectionConflictChecker(factory);
-  }
-
-
-  //#########################################################################
-  //# Test Cases
-  public void testProfisafeI4SlaveEFA() throws Exception
-  {
-    // disabled --- too many events?
   }
 
 }

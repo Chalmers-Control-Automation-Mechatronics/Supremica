@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import gnu.trove.TIntObjectHashMap;
+import gnu.trove.TIntObjectIterator;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.op.ObserverProjectionBisimulator;
+import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -39,7 +41,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  *
  * <P>This implementation merges the two automata into a single
  * {@link ObserverProjectionTransitionRelation} and then uses a
- * {@link ObserverProjectionBisimulator} to find the coarsest bisimulation
+ * {@link ObservationEquivalenceTRSimplifier} to find the coarsest bisimulation
  * relation. Afterwards it tests whether the two automata have matching
  * initial states, and whether all equivalence classes have equal numbers
  * of states for both input automata.</P>
@@ -86,11 +88,10 @@ public class IsomorphismChecker
     final AutomatonProxy aut = createTestAutomaton(aut1, aut2);
     final ObserverProjectionTransitionRelation rel =
       new ObserverProjectionTransitionRelation(aut);
-    final ObserverProjectionBisimulator bisimulator =
-      new ObserverProjectionBisimulator(rel);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier(rel);
     bisimulator.run();
-    final Map<Integer,int[]> map = bisimulator.getStateClasses();
-    final Collection<int[]> partition = map.values();
+    final TIntObjectHashMap<int[]> partition = bisimulator.getStateClasses();
     checkPartition(partition, rel);
   }
 
@@ -207,14 +208,16 @@ public class IsomorphismChecker
       (name, ComponentKind.PLANT, events, states, transitions);
   }
 
-  private void checkPartition(final Collection<int[]> partition,
+  private void checkPartition(final TIntObjectHashMap<int[]> partition,
                               final ObserverProjectionTransitionRelation rel)
     throws IsomorphismException
   {
     final StateProxy[] origMap = rel.getOriginalIntToStateMap();
     final int[] count = new int[2];
     final int[] initCount = new int[2];
-    for (final int[] clazz : partition) {
+    final TIntObjectIterator<int[]> iter = partition.iterator();
+    while (iter.hasNext()) {
+      final int[] clazz = iter.value();
       Arrays.fill(count, 0);
       Arrays.fill(initCount, 0);
       for (int i = 0; i < clazz.length; i++) {

@@ -564,8 +564,9 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
-  public void removeAllSelfLoops(final int e)
+  public boolean removeAllSelfLoops(final int e)
   {
+    boolean modified = false;
     for (int s = 0; s < mSuccessors.length; s++) {
       final TIntHashSet succs = mSuccessors[s][e];
       if (succs == null) {
@@ -573,8 +574,10 @@ public class ObserverProjectionTransitionRelation
       }
       if (succs.contains(s)) {
         removeTransition(s, e, s);
+        modified = true;
       }
     }
+    return modified;
   }
 
   public void removeTransition(final int s, final int e, final int t)
