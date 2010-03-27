@@ -260,6 +260,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     mModelVerifier.setModel(des);
   }
 
+
   // #########################################################################
   // # Auxiliary Methods
   protected void runModelVerifierWithBindings(final ProductDESProxy des,
@@ -285,12 +286,15 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 
   private void setNodeLimit()
   {
-    final String prop = System.getProperty("waters.analysis.statelimit");
-    if (prop != null) {
-      final int limit = Integer.parseInt(prop);
-      mModelVerifier.setNodeLimit(limit);
+    if (mModelVerifier.getNodeLimit() == Integer.MAX_VALUE) {
+      final String prop = System.getProperty("waters.analysis.statelimit");
+      if (prop != null) {
+        final int limit = Integer.parseInt(prop);
+        mModelVerifier.setNodeLimit(limit);
+      }
     }
   }
+
 
   // #########################################################################
   // # Data Members

@@ -42,7 +42,11 @@ public class ObserverProjectionConflictCheckerTest extends
   protected ConflictChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    return new ObserverProjectionConflictChecker(factory);
+    final ObserverProjectionConflictChecker checker =
+      new ObserverProjectionConflictChecker(factory);
+    checker.setInternalStepNodeLimit(5000);
+    checker.setFinalStepNodeLimit(100000);
+    return checker;
   }
 
 }

@@ -36,6 +36,8 @@ import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
@@ -48,6 +50,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -113,9 +116,76 @@ public class ObserverProjectionConflictChecker
 
   //#########################################################################
   //# Configuration
+  public void setNodeLimit(final int limit)
+  {
+    super.setNodeLimit(limit);
+    setInternalStepNodeLimit(limit);
+  }
+
+  public void setInternalStepNodeLimit(final int limit)
+  {
+    mInternalStepNodeLimit = limit;
+  }
+
+  public void setFinalStepNodeLimit(final int limit)
+  {
+    super.setNodeLimit(limit);
+  }
+
+  public int getInternalStepNodeLimit()
+  {
+    return mInternalStepNodeLimit;
+  }
+
+  public int getFinalStepNodeLimit()
+  {
+    return super.getNodeLimit();
+  }
+
+
+  public void setSynchronousProductBuilder
+    (final SynchronousProductBuilder builder)
+  {
+    mSynchronousProductBuilder = builder;
+  }
+
   public void setMonolithicConflictChecker(final ConflictChecker checker)
   {
     mMonolithicConflictChecker = checker;
+  }
+
+
+  private SynchronousProductBuilder getSynchronousProductBuilder
+    (final ProductDESProxy model)
+  {
+    if (mSynchronousProductBuilder == null) {
+      final ProductDESProxyFactory factory = getFactory();
+      mSynchronousProductBuilder =
+        new MonolithicSynchronousProductBuilder(factory);
+    }
+    mSynchronousProductBuilder.setPropositions(mPropositions);
+    final int limit = getInternalStepNodeLimit();
+    mSynchronousProductBuilder.setNodeLimit(limit);
+    mSynchronousProductBuilder.setModel(model);
+    return mSynchronousProductBuilder;
+  }
+
+  private ConflictChecker getMonolithicConflictChecker
+    (final ProductDESProxy model)
+    throws EventNotFoundException
+  {
+    if (mMonolithicConflictChecker == null) {
+      final ProductDESProxyFactory factory = getFactory();
+      mMonolithicConflictChecker = new NativeConflictChecker(factory);
+    }
+    final int limit = getFinalStepNodeLimit();
+    mMonolithicConflictChecker.setNodeLimit(limit);
+    mMonolithicConflictChecker.setModel(model);
+    final KindTranslator translator = getKindTranslator();
+    mMonolithicConflictChecker.setKindTranslator(translator);
+    final EventProxy marking = getUsedMarkingProposition();
+    mMonolithicConflictChecker.setMarkingProposition(marking);
+    return mMonolithicConflictChecker;
   }
 
 
@@ -195,6 +265,7 @@ public class ObserverProjectionConflictChecker
   {
     setUp();
     initialiseEventsToAutomata();
+    simplifyInitialAutomata();
 
     Collection<Candidate> candidates;
     outer:
@@ -204,19 +275,7 @@ public class ObserverProjectionConflictChecker
         final Candidate candidate =
           Collections.min(candidates, mSelectingHeuristics);
         try {
-          final CompositionStep syncStep = composeSynchronousProduct(candidate);
-          final EventProxy tau = syncStep.getHiddenEvent();
-          AutomatonProxy autToAbstract = syncStep.getResultAutomaton();
-          final ObservationEquivalenceStep oeStep =
-            applyObservationEquivalence(autToAbstract, tau);
-          if (oeStep != null) {
-            autToAbstract = oeStep.getResultAutomaton();
-          }
-          mModifyingSteps.add(syncStep);
-          if (oeStep != null) {
-            mModifyingSteps.add(oeStep);
-          }
-          updateEventsToAutomata(autToAbstract, candidate.getAutomata());
+          applyCandidate(candidate);
           break;
         } catch (final OverflowException overflow) {
           mNumOverflows++;
@@ -230,26 +289,17 @@ public class ObserverProjectionConflictChecker
       }
     } while (!candidates.isEmpty());
 
-    if (mMonolithicConflictChecker == null) {
-      final ProductDESProxyFactory factory = getFactory();
-      mMonolithicConflictChecker = new NativeConflictChecker(factory);
-    }
-    final int limit = getNodeLimit();
-    mMonolithicConflictChecker.setNodeLimit(limit);
     final ProductDESProxy model = createCurrentModel();
-    mMonolithicConflictChecker.setModel(model);
-    final EventProxy marking = getUsedMarkingProposition();
-    mMonolithicConflictChecker.setMarkingProposition(marking);
-    final boolean result = mMonolithicConflictChecker.run();
-
+    final ConflictChecker checker = getMonolithicConflictChecker(model);
+    final boolean result = checker.run();
     if (result) {
       setSatisfiedResult();
     } else {
-      final ConflictTraceProxy trace0 =
-        mMonolithicConflictChecker.getCounterExample();
+      final ConflictTraceProxy trace0 = checker.getCounterExample();
       final ConflictTraceProxy trace1 = expandTrace(trace0);
       setFailedResult(trace1);
     }
+
     tearDown();
     return result;
   }
@@ -275,12 +325,6 @@ public class ObserverProjectionConflictChecker
       final SelectingHeuristic defaultHeuristic = new HeuristicMinS();
       setSelectingHeuristic(defaultHeuristic);
     }
-    final ProductDESProxyFactory factory = getFactory();
-    mSynchronousProductBuilder =
-      new MonolithicSynchronousProductBuilder(factory);
-    mSynchronousProductBuilder.setPropositions(mPropositions);
-    final int limit = getNodeLimit();
-    mSynchronousProductBuilder.setNodeLimit(limit);
     mModifyingSteps = new ArrayList<Step>();
     mNumOverflows = 0;
     mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
@@ -300,13 +344,21 @@ public class ObserverProjectionConflictChecker
   //#########################################################################
   //# Events+Automata Maps
   /**
-   * Maps the events in the model to a set of the automaton that contain the
+   * Maps the events in the model to a set of the automata that contain the
    * event in their alphabet.
    */
   private void initialiseEventsToAutomata()
   {
     final ProductDESProxy model = getModel();
-    mCurrentAutomata = new ArrayList<AutomatonProxy>(model.getAutomata());
+    final Collection<AutomatonProxy> automata = model.getAutomata();
+    final int numAutomata = automata.size();
+    final KindTranslator translator = getKindTranslator();
+    mCurrentAutomata = new ArrayList<AutomatonProxy>(numAutomata);
+    for (final AutomatonProxy aut : automata) {
+      if (translator.getComponentKind(aut) != ComponentKind.PROPERTY) {
+        mCurrentAutomata.add(aut);
+      }
+    }
     mEventsToAutomata =
         new HashMap<EventProxy,Set<AutomatonProxy>>(model.getEvents().size());
     for (final AutomatonProxy aut : mCurrentAutomata) {
@@ -317,18 +369,17 @@ public class ObserverProjectionConflictChecker
   private void updateEventsToAutomata(final AutomatonProxy autToAdd,
                                       final List<AutomatonProxy> autToRemove)
   {
-    // adds the new automaton to the events it contains
+    mCurrentAutomata.removeAll(autToRemove);
     mCurrentAutomata.add(autToAdd);
     addEventsToAutomata(autToAdd);
-    // removes the automata which have been composed
-    mCurrentAutomata.removeAll(autToRemove);
     removeEventsToAutomata(autToRemove);
   }
 
   private void addEventsToAutomata(final AutomatonProxy aut)
   {
+    final KindTranslator translator = getKindTranslator();
     for (final EventProxy event : aut.getEvents()) {
-      if (event.getKind() != EventKind.PROPOSITION) {
+      if (translator.getEventKind(event) != EventKind.PROPOSITION) {
         Set<AutomatonProxy> set = mEventsToAutomata.get(event);
         if (set == null) {
           set = new THashSet<AutomatonProxy>();
@@ -397,6 +448,54 @@ public class ObserverProjectionConflictChecker
 
   //#########################################################################
   //# Abstraction Steps
+  private void simplifyInitialAutomata()
+    throws AnalysisException
+  {
+    if (mCurrentAutomata.size() > 1) {
+      final List<AutomatonProxy> automata = new LinkedList<AutomatonProxy>();
+      final Map<AutomatonProxy,Set<EventProxy>> autToLocalEvents =
+        new HashMap<AutomatonProxy,Set<EventProxy>>();
+      for (final Map.Entry<EventProxy,Set<AutomatonProxy>> entry :
+           mEventsToAutomata.entrySet()) {
+        final Set<AutomatonProxy> autSet = entry.getValue();
+        if (autSet.size() == 1) {
+          final AutomatonProxy aut = autSet.iterator().next();
+          Set<EventProxy> localEvents = autToLocalEvents.get(aut);
+          if (localEvents == null) {
+            localEvents = new THashSet<EventProxy>();
+            autToLocalEvents.put(aut, localEvents);
+            automata.add(aut);
+          }
+          final EventProxy event = entry.getKey();
+          localEvents.add(event);
+        }
+      }
+      Collections.sort(automata);
+      for (final AutomatonProxy aut : automata) {
+        final List<AutomatonProxy> singleton = Collections.singletonList(aut);
+        final Set<EventProxy> localEvents = autToLocalEvents.get(aut);
+        final Candidate candidate = new Candidate(singleton, localEvents);
+        applyCandidate(candidate);
+      }
+    }
+  }
+
+  private void applyCandidate(final Candidate candidate)
+    throws AnalysisException
+  {
+    final CompositionStep syncStep = composeSynchronousProduct(candidate);
+    final EventProxy tau = syncStep.getHiddenEvent();
+    AutomatonProxy autToAbstract = syncStep.getResultAutomaton();
+    final ObservationEquivalenceStep oeStep =
+      applyObservationEquivalence(autToAbstract, tau);
+    mModifyingSteps.add(syncStep);
+    if (oeStep != null) {
+      autToAbstract = oeStep.getResultAutomaton();
+      mModifyingSteps.add(oeStep);
+    }
+    updateEventsToAutomata(autToAbstract, candidate.getAutomata());
+  }
+
   /**
    * Builds the synchronous product for a given candidate.
    */
@@ -405,7 +504,7 @@ public class ObserverProjectionConflictChecker
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = candidate.createProductDESProxy(factory);
-    mSynchronousProductBuilder.setModel(des);
+    final SynchronousProductBuilder builder = getSynchronousProductBuilder(des);
     final Collection<EventProxy> local = candidate.getLocalEvents();
     final EventProxy tau;
     if (local.isEmpty()) {
@@ -413,17 +512,15 @@ public class ObserverProjectionConflictChecker
     } else {
       final String tauname = "tau:" + des.getName();
       tau = factory.createEventProxy(tauname, EventKind.UNCONTROLLABLE, false);
-      mSynchronousProductBuilder.addMask(local, tau);
+      builder.addMask(local, tau);
     }
     try {
-      mSynchronousProductBuilder.run();
-      final AutomatonProxy sync =
-        mSynchronousProductBuilder.getComputedAutomaton();
-      final SynchronousProductStateMap stateMap =
-        mSynchronousProductBuilder.getStateMap();
+      builder.run();
+      final AutomatonProxy sync = builder.getComputedAutomaton();
+      final SynchronousProductStateMap stateMap = builder.getStateMap();
       return new CompositionStep(sync, local, tau, stateMap);
     } finally {
-      mSynchronousProductBuilder.clearMask();
+      builder.clearMask();
     }
   }
 
@@ -647,7 +744,7 @@ public class ObserverProjectionConflictChecker
         new THashSet<EventProxy>(chosenAut.getEvents());
       final Collection<Candidate> candidates = new LinkedList<Candidate>();
       for (final AutomatonProxy aut : automata) {
-        if (aut != chosenAut && intersects(chosenEvents, aut.getEvents())) {
+        if (aut != chosenAut && synchronises(chosenEvents, aut.getEvents())) {
           final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
           if (chosenAut.compareTo(aut) < 0) {
             pair.add(chosenAut);
@@ -666,11 +763,13 @@ public class ObserverProjectionConflictChecker
       return candidates;
     }
 
-    private <T> boolean intersects(final Set<? extends T> set,
-                                   final Collection<? extends T> collection)
+    private boolean synchronises(final Set<EventProxy> set,
+                                 final Collection<EventProxy> collection)
     {
-      for (final T elem : collection) {
-        if (set.contains(elem)) {
+      final KindTranslator translator = getKindTranslator();
+      for (final EventProxy event : collection) {
+        if (translator.getEventKind(event) != EventKind.PROPOSITION &&
+            set.contains(event)) {
           return true;
         }
       }
@@ -1449,6 +1548,7 @@ public class ObserverProjectionConflictChecker
   private Collection<EventProxy> mPropositions;
   private SynchronousProductBuilder mSynchronousProductBuilder;
   private ConflictChecker mMonolithicConflictChecker;
+  private int mInternalStepNodeLimit;
 
   private Collection<AutomatonProxy> mCurrentAutomata;
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =
