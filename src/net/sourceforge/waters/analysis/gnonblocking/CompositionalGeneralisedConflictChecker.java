@@ -31,7 +31,6 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -242,10 +241,12 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
-    final ObservationEquivalenceRule oeRule = new ObservationEquivalenceRule();
-    mAbstractionRules.add(oeRule);
-    final RemovalOfAlphaMarkingsRule ramRule = new RemovalOfAlphaMarkingsRule();
-    mAbstractionRules.add(ramRule);
+    // final ObservationEquivalenceRule oeRule = new
+    // ObservationEquivalenceRule();
+    // mAbstractionRules.add(oeRule);
+    // final RemovalOfAlphaMarkingsRule ramRule = new
+    // RemovalOfAlphaMarkingsRule();
+    // mAbstractionRules.add(ramRule);
   }
 
   // #########################################################################
@@ -257,89 +258,68 @@ public class CompositionalGeneralisedConflictChecker extends
                                                final EventProxy tau)
       throws OverflowException
   {
-    final ListIterator<AbstractionRule> iter = mAbstractionRules.listIterator();
-    AutomatonProxy aut = autToAbstract;
-    while (iter.hasNext()) {
-      final AbstractionRule rule = iter.next();
-      aut = rule.applyRule(aut, tau);
-    }
-    return aut;
+    /*
+     * final ListIterator<AbstractionRule> iter =
+     * mAbstractionRules.listIterator(); AutomatonProxy aut = autToAbstract;
+     * while (iter.hasNext()) { final AbstractionRule rule = iter.next(); aut =
+     * rule.applyRule(aut, tau); }
+     */
+    return autToAbstract;
   }
-
 
   // #########################################################################
   // # Inner Class ObservationEquivalenceRule
-  private class ObservationEquivalenceRule implements AbstractionRule
-  {
-    public AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
-                                    final EventProxy tau)
-    {
-      final ObserverProjectionTransitionRelation tr =
-          new ObserverProjectionTransitionRelation(autToAbstract, mPropositions);
-      final ObservationEquivalenceTRSimplifier biSimulator =
-          new ObservationEquivalenceTRSimplifier(tr, tr.getEventInt(tau));
-      final boolean modified = biSimulator.run();
-      if (modified) {
-        final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
-        final ObservationEquivalenceStep oeStep =
-            new ObservationEquivalenceStep(convertedAut, autToAbstract, tau, tr
-                .getOriginalIntToStateMap(), biSimulator.getStateClasses(), tr
-                .getResultingStateToIntMap());
-        mModifyingSteps.add(oeStep);
-        return convertedAut;
-      } else {
-        return autToAbstract;
-      }
-    }
-  }
-  // OK. But these inner classes cannot be tested in isolation.
-  // How hard would it be to design an interface such that the rules
-  // can be isolated from the CompositionalGeneralisedConflictChecker?
-
+  /*
+   * private class ObservationEquivalenceRule extends AbstractionRule { public
+   * ObservationEquivalenceRule(final ProductDESProxyFactory factory, final
+   * Collection<EventProxy> propositions) { super(factory, propositions); //
+   * TODO Auto-generated constructor stub }
+   *
+   * public AutomatonProxy applyRule(final AutomatonProxy autToAbstract, final
+   * EventProxy tau) { final ObserverProjectionTransitionRelation tr = new
+   * ObserverProjectionTransitionRelation(autToAbstract, mPropositions); final
+   * ObservationEquivalenceTRSimplifier biSimulator = new
+   * ObservationEquivalenceTRSimplifier(tr, tr.getEventInt(tau)); final boolean
+   * modified = biSimulator.run(); if (modified) { final AutomatonProxy
+   * convertedAut = tr.createAutomaton(getFactory()); final
+   * ObservationEquivalenceStep oeStep = new
+   * ObservationEquivalenceStep(convertedAut, autToAbstract, tau, tr
+   * .getOriginalIntToStateMap(), biSimulator.getStateClasses(), tr
+   * .getResultingStateToIntMap()); mModifyingSteps.add(oeStep); return
+   * convertedAut; } else { return autToAbstract; } } }
+   */
 
   // #########################################################################
   // # Inner Class RemovalOfAlphaMarkingsRule
-  private class RemovalOfAlphaMarkingsRule implements AbstractionRule
-  {
-    public AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
-                                    final EventProxy tau)
-    {
-      final ObserverProjectionTransitionRelation tr =
-          new ObserverProjectionTransitionRelation(autToAbstract, mPropositions);
-
-      final int alphaID = tr.getEventInt(getGeneralisedPrecondition());
-      final int tauID = tr.getEventInt(tau);
-
-      final int numStates = tr.getNumberOfStates();
-      for (int sourceID = 0; sourceID < numStates; sourceID++) {
-        // Skip states marked as unreachable ...
-        // TODO: to me this IS processing the marked states and skipping
-        // unmarked states --- OK (only the comment above seems wrong)
-        if (tr.hasPredecessors(sourceID) && tr.isMarked(sourceID, alphaID)) {
-          final TIntHashSet successors = tr.getSuccessors(sourceID, tauID);
-          if (successors != null) {
-            final TIntIterator iter = successors.iterator();
-            while (iter.hasNext()) {
-              // TODO Watch out for tau selfloops......The if statement below
-              // does that I thought? --- OK
-              final int targetID = iter.next();
-              if (tr.isMarked(targetID, alphaID)) {
-                if (targetID != sourceID) {
-                  tr.markState(sourceID, false, alphaID);
-                  break;
-                }
-              }
-            }
-          }
-        }
-      }
-      final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
-      final RemovalOfAlphaMarkingsStep ramStep =
-          new RemovalOfAlphaMarkingsStep(convertedAut, autToAbstract);
-      mModifyingSteps.add(ramStep);
-      return convertedAut;
-    }
-  }
+  /*
+   * private class RemovalOfAlphaMarkingsRule extends AbstractionRule { public
+   * RemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory, final
+   * Collection<EventProxy> propositions) { super(factory, propositions); //
+   * TODO Auto-generated constructor stub }
+   *
+   * public AutomatonProxy applyRule(final AutomatonProxy autToAbstract, final
+   * EventProxy tau) { final ObserverProjectionTransitionRelation tr = new
+   * ObserverProjectionTransitionRelation(autToAbstract, mPropositions);
+   *
+   * final int alphaID = tr.getEventInt(getGeneralisedPrecondition()); final int
+   * tauID = tr.getEventInt(tau);
+   *
+   * final int numStates = tr.getNumberOfStates(); for (int sourceID = 0;
+   * sourceID < numStates; sourceID++) { // Skip states marked as unreachable
+   * ... // TODO: to me this IS processing the marked states and skipping //
+   * unmarked states --- OK (only the comment above seems wrong) if
+   * (tr.hasPredecessors(sourceID) && tr.isMarked(sourceID, alphaID)) { final
+   * TIntHashSet successors = tr.getSuccessors(sourceID, tauID); if (successors
+   * != null) { final TIntIterator iter = successors.iterator(); while
+   * (iter.hasNext()) { // TODO Watch out for tau selfloops......The if
+   * statement below // does that I thought? --- OK final int targetID =
+   * iter.next(); if (tr.isMarked(targetID, alphaID)) { if (targetID !=
+   * sourceID) { tr.markState(sourceID, false, alphaID); break; } } } } } }
+   * final AutomatonProxy convertedAut = tr.createAutomaton(getFactory()); final
+   * RemovalOfAlphaMarkingsStep ramStep = new
+   * RemovalOfAlphaMarkingsStep(convertedAut, autToAbstract);
+   * mModifyingSteps.add(ramStep); return convertedAut; } }
+   */
 
   /**
    * Builds the synchronous product for a given candidate.
@@ -1224,6 +1204,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
   // #########################################################################
   // # Inner Class ObservationEquivalenceStep
+  @SuppressWarnings("unused")
   private class ObservationEquivalenceStep extends Step
   {
 
@@ -1564,7 +1545,6 @@ public class CompositionalGeneralisedConflictChecker extends
      * needed in this form. More likely, the convertTrace() method will use the
      * individual maps directly.
      */
-    @SuppressWarnings("unused")
     private Collection<StateProxy> getOriginalStates(final StateProxy outstate)
     {
       final int outcode = mReverseOutputStateMap.get(outstate);
@@ -1608,6 +1588,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
   // #########################################################################
   // # Inner Class RemovalOfAlphaMarkingsStep
+  @SuppressWarnings("unused")
   private class RemovalOfAlphaMarkingsStep extends Step
   {
     RemovalOfAlphaMarkingsStep(final AutomatonProxy resultAut,
@@ -1726,6 +1707,7 @@ public class CompositionalGeneralisedConflictChecker extends
   private List<Step> mModifyingSteps;
   private PreselectingHeuristic mPreselectingHeuristic;
   private List<SelectingHeuristic> mSelectingHeuristics;
+  @SuppressWarnings("unused")
   private List<AbstractionRule> mAbstractionRules;
   private Collection<EventProxy> mPropositions;
 
