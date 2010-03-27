@@ -255,7 +255,7 @@ public class CompositionalGeneralisedConflictChecker extends
     AutomatonProxy aut = autToAbstract;
     while (iter.hasNext()) {
       final AbstractionRule rule = iter.next();
-      aut = rule.applyRule(aut);
+      aut = rule.applyRule(aut, tau);
     }
     // TODO: create classes for abstraction rules
     final AutomatonProxy autObsEq =
