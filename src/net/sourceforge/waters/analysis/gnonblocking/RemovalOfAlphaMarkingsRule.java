@@ -27,7 +27,12 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 class RemovalOfAlphaMarkingsRule extends AbstractionRule
 {
   // #######################################################################
-  // # Constructor
+  // # Constructors
+  RemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory)
+  {
+    this(factory, null, null);
+  }
+
   RemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory,
                              final Collection<EventProxy> propositions,
                              final EventProxy alphaMarking)
@@ -35,6 +40,20 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     super(factory, propositions);
     mAlphaMarking = alphaMarking;
   }
+
+
+  // #######################################################################
+  // # Configuration
+  EventProxy getAlphaMarking()
+  {
+    return mAlphaMarking;
+  }
+
+  void setAlphaMarking(final EventProxy alphaMarking)
+  {
+    mAlphaMarking = alphaMarking;
+  }
+
 
   // #######################################################################
   // # Rule Application
@@ -81,5 +100,5 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
 
   // #######################################################################
   // # Data Members
-  private final EventProxy mAlphaMarking;
+  private EventProxy mAlphaMarking;
 }

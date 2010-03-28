@@ -10,6 +10,9 @@
 package net.sourceforge.waters.model.analysis;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
@@ -25,6 +28,8 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -55,13 +60,14 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
       new JAXBProductDESMarshaller(mProductDESProxyFactory);
     mModuleProxyFactory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
-    final JAXBModuleMarshaller modmarshaller =
+    mModuleMarshaller =
       new JAXBModuleMarshaller(mModuleProxyFactory, optable, false);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
-    mDocumentManager.registerUnmarshaller(modmarshaller);
+    mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
-    mDocumentManager.registerMarshaller(modmarshaller);
+    mDocumentManager.registerMarshaller(mModuleMarshaller);
+    mProductDESImporter = new ProductDESImporter(mModuleProxyFactory);
   }
 
 
@@ -124,14 +130,24 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
                                  final String name)
     throws NameNotFoundException
   {
+    final EventProxy event = getEvent(des, name);
+    if (event != null) {
+      return event;
+    } else {
+      throw new NameNotFoundException
+        ("DES '" + des.getName() + "' does not have any event named '" +
+         name + "'!");
+    }
+  }
+
+  protected EventProxy getEvent(final ProductDESProxy des, final String name)
+  {
     for (final EventProxy event : des.getEvents()) {
       if (event.getName().equals(name)) {
         return event;
       }
     }
-    throw new NameNotFoundException
-      ("DES '" + des.getName() + "' does not have any event named '" +
-       name + "'!");
+    return null;
   }
 
   protected AutomatonProxy findAutomaton(final ProductDESProxy des,
@@ -148,12 +164,62 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
        name + "'!");
   }
 
+  protected String appendSuffixes(final String name,
+                                  final List<ParameterBindingProxy> bindings)
+  {
+    if (bindings == null) {
+      return name;
+    } else {
+      final StringBuffer buffer = new StringBuffer(name);
+      for (final ParameterBindingProxy binding : bindings) {
+        buffer.append('-');
+        buffer.append(binding.getExpression().toString());
+      }
+      return buffer.toString();
+    }
+  }
+
+  protected void saveAutomaton(final AutomatonProxy aut,
+                               final String basename, final String comment)
+    throws WatersMarshalException, IOException
+  {
+    assertNotNull(aut);
+    final Collection<EventProxy> events = aut.getEvents();
+    final Collection<AutomatonProxy> automata =
+      Collections.singletonList(aut);
+    final ProductDESProxy des = mProductDESProxyFactory.createProductDESProxy
+      (basename, comment, null, events, automata);
+    saveDES(des, basename);
+  }
+
+  protected void saveDES(final ProductDESProxy des, final String basename)
+    throws WatersMarshalException, IOException
+  {
+    assertNotNull(des);
+    final String desext = mProductDESMarshaller.getDefaultExtension();
+    final String desname = basename + desext;
+    assertTrue("File name '" + desname + "' contains colon, " +
+               "which does not work on all platforms!",
+               desname.indexOf(':') < 0);
+    final File dir = getOutputDirectory();
+    final File desfilename = new File(dir, desname);
+    ensureParentDirectoryExists(desfilename);
+    mDocumentManager.saveAs(des, desfilename);
+    final ModuleProxy module = mProductDESImporter.importModule(des);
+    final String modext = mModuleMarshaller.getDefaultExtension();
+    final String modname = basename + modext;
+    final File modfilename = new File(dir, modname);
+    mDocumentManager.saveAs(module, modfilename);
+  }
+
 
   //#########################################################################
   //# Data Members
   private ProductDESProxyFactory mProductDESProxyFactory;
   private ModuleProxyFactory mModuleProxyFactory;
   private JAXBProductDESMarshaller mProductDESMarshaller;
+  private JAXBModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
+  private ProductDESImporter mProductDESImporter;
 
 }

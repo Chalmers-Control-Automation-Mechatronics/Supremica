@@ -217,6 +217,7 @@ public class IsomorphismChecker
     final int[] initCount = new int[2];
     final TIntObjectIterator<int[]> iter = partition.iterator();
     while (iter.hasNext()) {
+      iter.advance();
       final int[] clazz = iter.value();
       Arrays.fill(count, 0);
       Arrays.fill(initCount, 0);

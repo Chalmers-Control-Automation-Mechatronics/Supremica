@@ -12,15 +12,12 @@ package net.sourceforge.waters.model.analysis;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
@@ -43,18 +40,15 @@ public abstract class AbstractAutomatonBuilderTest
   protected void setUp() throws Exception
   {
     super.setUp();
-    mFactory = getProductDESProxyFactory();
-    mProductDESMarshaller = new JAXBProductDESMarshaller(mFactory);
-    mAutomatonBuilder = createAutomatonBuilder(mFactory);
-    mIsomorphismChecker = new IsomorphismChecker(mFactory, true);
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    mAutomatonBuilder = createAutomatonBuilder(factory);
+    mIsomorphismChecker = new IsomorphismChecker(factory, true);
     setNodeLimit();
   }
 
   protected void tearDown()
     throws Exception
   {
-    mFactory = null;
-    mProductDESMarshaller = null;
     mAutomatonBuilder = null;
     mIsomorphismChecker = null;
     mBindings = null;
@@ -98,10 +92,9 @@ public abstract class AbstractAutomatonBuilderTest
   {
     final String ext = getTestExtension();
     final File filename = new File(dir, name + ext);
-    final String expectedName = getExpectedName(name);
-    final String expectedSuffixed =
-      appendSuffixes(expectedName, bindings, ext);
-    final File expectedFile = new File(dir, expectedSuffixed);
+    final String suffixed = appendSuffixes(name, bindings);
+    final String expectedName = getExpectedName(suffixed);
+    final File expectedFile = new File(dir, expectedName + ext);
     runAutomatonBuilder(filename, bindings, expectedFile);
   }
 
@@ -255,50 +248,14 @@ public abstract class AbstractAutomatonBuilderTest
     throws WatersMarshalException, IOException, AnalysisException
   {
     final String name = des.getName();
+    final String basename = appendSuffixes(name, mBindings);
     final String comment = "Test output from " +
-      ProxyTools.getShortClassName(mAutomatonBuilder);
-    final Collection<EventProxy> events = result.getEvents();
-    final Collection<AutomatonProxy> resultAutomata =
-      Collections.singletonList(result);
-    final ProductDESProxy resultDES = mFactory.createProductDESProxy
-      (name, comment, null, events, resultAutomata);
-    saveDES(resultDES);
+      ProxyTools.getShortClassName(mAutomatonBuilder) + '.';
+    saveAutomaton(result, basename, comment);
     final Collection<AutomatonProxy> expectedAutomata =
       expectedDES.getAutomata();
     final AutomatonProxy expected = expectedAutomata.iterator().next();
     mIsomorphismChecker.checkIsomorphism(result, expected);
-  }
-
-  private File saveDES(final ProductDESProxy des)
-    throws WatersMarshalException, IOException
-  {
-    assertNotNull(des);
-    final String name = des.getName();
-    final String ext = mProductDESMarshaller.getDefaultExtension();
-    final String extname = appendSuffixes(name, mBindings, ext);
-    assertTrue("File name '" + extname + "' contains colon, " +
-               "which does not work on all platforms!",
-               extname.indexOf(':') < 0);
-    final File dir = getOutputDirectory();
-    final File filename = new File(dir, extname);
-    ensureParentDirectoryExists(filename);
-    mProductDESMarshaller.marshal(des, filename);
-    return filename;
-  }
-
-  private String appendSuffixes(final String name,
-                                final List<ParameterBindingProxy> bindings,
-                                final String ext)
-  {
-    final StringBuffer buffer = new StringBuffer(name);
-    if (bindings != null) {
-      for (final ParameterBindingProxy binding : bindings) {
-        buffer.append('-');
-        buffer.append(binding.getExpression().toString());
-      }
-    }
-    buffer.append(ext);
-    return buffer.toString();
   }
 
   private void setNodeLimit()
@@ -313,8 +270,6 @@ public abstract class AbstractAutomatonBuilderTest
 
   //#########################################################################
   //# Data Members
-  private ProductDESProxyFactory mFactory;
-  private JAXBProductDESMarshaller mProductDESMarshaller;
   private AutomatonBuilder mAutomatonBuilder;
   private IsomorphismChecker mIsomorphismChecker;
   private List<ParameterBindingProxy> mBindings;

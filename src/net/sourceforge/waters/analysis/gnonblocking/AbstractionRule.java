@@ -24,6 +24,11 @@ abstract class AbstractionRule
 {
   // #######################################################################
   // # Constructor
+  AbstractionRule(final ProductDESProxyFactory factory)
+  {
+    this(factory, null);
+  }
+
   AbstractionRule(final ProductDESProxyFactory factory,
                   final Collection<EventProxy> propositions)
   {
@@ -33,7 +38,7 @@ abstract class AbstractionRule
 
 
   // #######################################################################
-  // # Simple Access
+  // # Configuration
   ProductDESProxyFactory getFactory()
   {
     return mFactory;
@@ -42,6 +47,11 @@ abstract class AbstractionRule
   Collection<EventProxy> getPropositions()
   {
     return mPropositions;
+  }
+
+  void setPropositions(final Collection<EventProxy> props)
+  {
+    mPropositions = props;
   }
 
 
@@ -74,6 +84,6 @@ abstract class AbstractionRule
   // #######################################################################
   // # Data Members
   private final ProductDESProxyFactory mFactory;
-  private final Collection<EventProxy> mPropositions;
+  private Collection<EventProxy> mPropositions;
 
 }
