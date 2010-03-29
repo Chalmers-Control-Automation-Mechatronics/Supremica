@@ -39,32 +39,40 @@ class ObservationEquivalenceRule extends AbstractionRule
 
   }
 
-
   // #######################################################################
   // # Rule Application
   AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
                            final EventProxy tau)
   {
-    final ObserverProjectionTransitionRelation tr =
+    mTau = tau;
+    mAutToAbstract = autToAbstract;
+    mTr =
         new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
-    final ObservationEquivalenceTRSimplifier biSimulator =
-        new ObservationEquivalenceTRSimplifier(tr, tr.getEventInt(tau));
-    final boolean modified = biSimulator.run();
+    mBiSimulator =
+        new ObservationEquivalenceTRSimplifier(mTr, mTr.getEventInt(tau));
+    final boolean modified = mBiSimulator.run();
     if (modified) {
-      final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
+      final AutomatonProxy convertedAut = mTr.createAutomaton(getFactory());
       return convertedAut;
     } else {
       return autToAbstract;
     }
   }
 
-  CompositionalGeneralisedConflictChecker.Step createStep
-    (final CompositionalGeneralisedConflictChecker checker,
-     final AutomatonProxy abstractedAut)
+  CompositionalGeneralisedConflictChecker.Step createStep(
+                                                          final CompositionalGeneralisedConflictChecker checker,
+                                                          final AutomatonProxy abstractedAut)
   {
-    // TODO Auto-generated method stub
-    return null;
+    return checker.createObservationEquivalenceStep(abstractedAut,
+                                                    mAutToAbstract, mTau, mTr,
+                                                    mBiSimulator);
   }
 
+  // #######################################################################
+  // # Data Members
+  private AutomatonProxy mAutToAbstract;
+  private EventProxy mTau;
+  private ObserverProjectionTransitionRelation mTr;
+  private ObservationEquivalenceTRSimplifier mBiSimulator;
 }

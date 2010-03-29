@@ -30,17 +30,14 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
   // # Constructors
   RemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory)
   {
-    this(factory, null, null);
+    this(factory, null);
   }
 
   RemovalOfAlphaMarkingsRule(final ProductDESProxyFactory factory,
-                             final Collection<EventProxy> propositions,
-                             final EventProxy alphaMarking)
+                             final Collection<EventProxy> propositions)
   {
     super(factory, propositions);
-    mAlphaMarking = alphaMarking;
   }
-
 
   // #######################################################################
   // # Configuration
@@ -54,12 +51,12 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     mAlphaMarking = alphaMarking;
   }
 
-
   // #######################################################################
   // # Rule Application
   AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
                            final EventProxy tau)
   {
+    mAutToAbstract = autToAbstract;
     final ObserverProjectionTransitionRelation tr =
         new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
@@ -89,16 +86,16 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     return convertedAut;
   }
 
-  CompositionalGeneralisedConflictChecker.Step createStep
-    (final CompositionalGeneralisedConflictChecker checker,
-     final AutomatonProxy abstractedAut)
+  CompositionalGeneralisedConflictChecker.Step createStep(
+                                                          final CompositionalGeneralisedConflictChecker checker,
+                                                          final AutomatonProxy abstractedAut)
   {
-    // TODO Auto-generated method stub
-    return null;
+    return checker.createRemovalOfAlphaMarkingsStep(abstractedAut,
+                                                    mAutToAbstract);
   }
-
 
   // #######################################################################
   // # Data Members
   private EventProxy mAlphaMarking;
+  private AutomatonProxy mAutToAbstract;
 }
