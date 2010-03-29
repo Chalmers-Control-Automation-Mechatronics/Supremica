@@ -242,31 +242,37 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
-    final ObservationEquivalenceRule oeRule =
-        new ObservationEquivalenceRule(getFactory(), mPropositions);
-    mAbstractionRules.add(oeRule);
+    /*
+     * final ObservationEquivalenceRule oeRule = new
+     * ObservationEquivalenceRule(getFactory(), mPropositions);
+     * mAbstractionRules.add(oeRule);
+     */
     final RemovalOfAlphaMarkingsRule ramRule =
         new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+    ramRule.setAlphaMarking(getGeneralisedPrecondition());
     mAbstractionRules.add(ramRule);
+
   }
 
   // #########################################################################
   // # Auxiliary Methods
-  private AutomatonProxy applyAbstractionRules(
-                                               final AutomatonProxy autToAbstract,
+  private AutomatonProxy applyAbstractionRules(AutomatonProxy autToAbstract,
                                                final EventProxy tau)
       throws OverflowException
   {
 
     final ListIterator<AbstractionRule> iter = mAbstractionRules.listIterator();
-    AutomatonProxy aut = autToAbstract;
+    AutomatonProxy abstractedAut = autToAbstract;
     while (iter.hasNext()) {
       final AbstractionRule rule = iter.next();
-      aut = rule.applyRule(aut, tau);
-      final Step step = rule.createStep(this, aut);
-      mModifyingSteps.add(step);
+      abstractedAut = rule.applyRule(autToAbstract, tau);
+      if (autToAbstract != abstractedAut) {
+        final Step step = rule.createStep(this, abstractedAut);
+        mModifyingSteps.add(step);
+      }
+      autToAbstract = abstractedAut;
     }
-    return aut;
+    return abstractedAut;
   }
 
   /**

@@ -57,6 +57,9 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
                            final EventProxy tau)
   {
     mAutToAbstract = autToAbstract;
+    if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
+      return autToAbstract;
+    }
     final ObserverProjectionTransitionRelation tr =
         new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
