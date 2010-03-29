@@ -151,7 +151,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
   {
     testSICPropertyV("tests", "hisc",
                      "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
-                     "compl_pol", true);
+                     "compl_pol", false);
   }
 
   public void testSIC5__parManEg_I_mfb_lowlevel_multiAnswers_noInterface__finA_attch()
@@ -159,7 +159,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
   {
     testSICPropertyV("tests", "hisc",
                      "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
-                     "finA_attch", true);
+                     "finA_attch", false);
   }
 
   public void testSIC5__parManEg_I_mfb_lowlevel_multiAnswers_noInterface__finB_attch()
@@ -167,7 +167,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
   {
     testSICPropertyV("tests", "hisc",
                      "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
-                     "finB_attch", true);
+                     "finB_attch", false);
   }
 
   public void testSIC5__parManEg_I_mfb_lowlevel_multiAnswers_noInterface__compl_case()
@@ -175,7 +175,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
   {
     testSICPropertyV("tests", "hisc",
                      "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
-                     "compl_case", true);
+                     "compl_case", false);
   }
 
   public void testSIC5__parManEg_I_mfb_middlelevel() throws Exception
