@@ -304,16 +304,16 @@ public class CompositionalGeneralisedConflictChecker extends
    *
    * final int numStates = tr.getNumberOfStates(); for (int sourceID = 0;
    * sourceID < numStates; sourceID++) { // Skip states marked as unreachable
-   * ... // to me this IS processing the marked states and skipping //
-   * unmarked states --- OK (only the comment above seems wrong) if
+   * ... // to me this IS processing the marked states and skipping // unmarked
+   * states --- OK (only the comment above seems wrong) if
    * (tr.hasPredecessors(sourceID) && tr.isMarked(sourceID, alphaID)) { final
    * TIntHashSet successors = tr.getSuccessors(sourceID, tauID); if (successors
    * != null) { final TIntIterator iter = successors.iterator(); while
-   * (iter.hasNext()) { // Watch out for tau selfloops......The if
-   * statement below // does that I thought? --- OK final int targetID =
-   * iter.next(); if (tr.isMarked(targetID, alphaID)) { if (targetID !=
-   * sourceID) { tr.markState(sourceID, false, alphaID); break; } } } } } }
-   * final AutomatonProxy convertedAut = tr.createAutomaton(getFactory()); final
+   * (iter.hasNext()) { // Watch out for tau selfloops......The if statement
+   * below // does that I thought? --- OK final int targetID = iter.next(); if
+   * (tr.isMarked(targetID, alphaID)) { if (targetID != sourceID) {
+   * tr.markState(sourceID, false, alphaID); break; } } } } } } final
+   * AutomatonProxy convertedAut = tr.createAutomaton(getFactory()); final
    * RemovalOfAlphaMarkingsStep ramStep = new
    * RemovalOfAlphaMarkingsStep(convertedAut, autToAbstract);
    * mModifyingSteps.add(ramStep); return convertedAut; } }
@@ -562,8 +562,7 @@ public class CompositionalGeneralisedConflictChecker extends
     if (heuristic instanceof HeuristicMaxL) {
       mSelectingHeuristics.add(new HeuristicMaxC());
       mSelectingHeuristics.add(new HeuristicMinS());
-      // TODO Should the following line be MaxC instead of MaxS?
-    } else if (heuristic instanceof HeuristicMaxS) {
+    } else if (heuristic instanceof HeuristicMaxC) {
       mSelectingHeuristics.add(new HeuristicMaxL());
       mSelectingHeuristics.add(new HeuristicMinS());
     } else if (heuristic instanceof HeuristicMinS) {
@@ -736,8 +735,7 @@ public class CompositionalGeneralisedConflictChecker extends
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
       chosenCandidates.add(chosenCandidate);
-      // TODO Use double. The expression below (almost) always gives 0.
-      int maxLocal =
+      double maxLocal =
           chosenCandidate.getLocalEventCount()
               / chosenCandidate.getNumberOfEvents();
       while (it.hasNext()) {
@@ -771,8 +769,7 @@ public class CompositionalGeneralisedConflictChecker extends
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
       chosenCandidates.add(chosenCandidate);
-      // TODO Use double. The expression below (almost) always gives 0.
-      int maxCommon =
+      double maxCommon =
           (chosenCandidate.getNumberOfEvents() - chosenCandidate
               .getLocalEventCount())
               / chosenCandidate.getNumberOfEvents();
