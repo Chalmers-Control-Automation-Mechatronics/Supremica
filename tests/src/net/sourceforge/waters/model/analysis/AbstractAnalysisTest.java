@@ -154,14 +154,24 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
                                          final String name)
     throws NameNotFoundException
   {
+    final AutomatonProxy aut = getAutomaton(des, name);
+    if (aut == null) {
+      throw new NameNotFoundException
+        ("DES '" + des.getName() + "' does not have any automaton named '" +
+         name + "'!");
+    }
+    return aut;
+  }
+
+  protected AutomatonProxy getAutomaton(final ProductDESProxy des,
+                                        final String name)
+  {
     for (final AutomatonProxy automaton : des.getAutomata()) {
       if (automaton.getName().equals(name)) {
         return automaton;
       }
     }
-    throw new NameNotFoundException
-      ("DES '" + des.getName() + "' does not have any automaton named '" +
-       name + "'!");
+    return null;
   }
 
   protected String appendSuffixes(final String name,

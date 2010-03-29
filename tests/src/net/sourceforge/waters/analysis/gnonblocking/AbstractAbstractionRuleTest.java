@@ -165,11 +165,12 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
     final EventProxy tau = getEvent(des, TAU);
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     final AutomatonProxy result = mAbstractionRule.applyRule(before, tau);
-    checkResult(des, result);
+    checkResult(des, before, result);
     getLogger().info("Done " + des.getName());
   }
 
   private void checkResult(final ProductDESProxy des,
+                           final AutomatonProxy before,
                            final AutomatonProxy result)
     throws WatersMarshalException, IOException, AnalysisException
   {
@@ -178,8 +179,14 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
     final String comment = "Test output from " +
       ProxyTools.getShortClassName(mAbstractionRule) + '.';
     saveAutomaton(result, basename, comment);
-    final AutomatonProxy expected = findAutomaton(des, AFTER);
-    mIsomorphismChecker.checkIsomorphism(result, expected);
+    final AutomatonProxy expected = getAutomaton(des, AFTER);
+    if (expected == null) {
+      assertSame("Test expects no change, " +
+                 "but the object returned is not the same as the input!",
+                 before, result);
+    } else {
+      mIsomorphismChecker.checkIsomorphism(result, expected);
+    }
   }
 
 

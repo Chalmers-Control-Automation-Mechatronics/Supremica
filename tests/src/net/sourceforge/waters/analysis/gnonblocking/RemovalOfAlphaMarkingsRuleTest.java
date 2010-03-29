@@ -61,22 +61,37 @@ public class RemovalOfAlphaMarkingsRuleTest
   //#########################################################################
   //# Test Cases
   /**
-   * Tests the model in file
-   * {supremica}/examples/waters/tests/abstraction/alpharemoval_1.wmod.
-   * All test modules contain two automata, named "before" and "after",
-   * defining an automaton to be simplified and the expected result.
-   * The names of critical events are expected to be "tau", ":alpha",
-   * and ":accepting", respectively.
-   * After running the test, any automaton created by the rule is saved in
+   * <P>Tests the model in file
+   * {supremica}/examples/waters/tests/abstraction/alpharemoval_1.wmod.</P>
+   *
+   * <P>All test modules contain up to two automata, named "before" and "after".
+   * The automaton named "before" is required to be present, and defines the
+   * input automaton for the abstraction rule. The automaton "after" defines the
+   * expected result of abstraction. It may be missing, in which case the
+   * abstraction should have no effect and return the unchanged input automaton
+   * (the test expects the same object, not an identical copy).</P>
+   *
+   * <P>The names of critical events are expected to be "tau", ":alpha", and
+   * ":accepting", respectively.</P>
+   *
+   * <P>After running the test, any automaton created by the rule is saved in
    * {supremica}/logs/results/analysis/gnonblocking/RemovalOfAlphaMarkingsRuleTest
    * as a .des file (for text viewing) and as a .wmod file (to load into the
-   * IDE).
+   * IDE).</P>
    */
   public void test_alpharemoval_1() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_1.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_alpharemoval_2() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_2.wmod";
     runAbstractionRule(group, subdir, name);
   }
 
@@ -88,10 +103,11 @@ public class RemovalOfAlphaMarkingsRuleTest
    */
   public void testReentrant() throws Exception
   {
-    // TODO As soon as there are more tests, try some variation here.
+    // TODO As soon as there are more tests, try some more variation here.
     test_alpharemoval_1();
+    test_alpharemoval_2();
     test_alpharemoval_1();
-    test_alpharemoval_1();
+    test_alpharemoval_2();
   }
 
 }

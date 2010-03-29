@@ -26,12 +26,19 @@ class ObservationEquivalenceRule extends AbstractionRule
 {
   // #######################################################################
   // # Constructor
+  ObservationEquivalenceRule(final ProductDESProxyFactory factory)
+  {
+    this(factory, null);
+
+  }
+
   ObservationEquivalenceRule(final ProductDESProxyFactory factory,
                              final Collection<EventProxy> propositions)
   {
     super(factory, propositions);
 
   }
+
 
   // #######################################################################
   // # Rule Application
