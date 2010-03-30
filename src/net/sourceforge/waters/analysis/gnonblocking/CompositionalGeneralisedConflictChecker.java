@@ -236,27 +236,29 @@ public class CompositionalGeneralisedConflictChecker extends
     }
     mModifyingSteps = new ArrayList<Step>();
     mPropositions = new ArrayList<EventProxy>(2);
-    mPropositions.add(getUsedMarkingProposition());
     if (getGeneralisedPrecondition() != null) {
       mPropositions.add(getGeneralisedPrecondition());
     }
+    mPropositions.add(getUsedMarkingProposition());
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
-    /*
-     * final ObservationEquivalenceRule oeRule = new
-     * ObservationEquivalenceRule(getFactory(), mPropositions);
-     * mAbstractionRules.add(oeRule);
-     */
-    final RemovalOfAlphaMarkingsRule ramRule =
-        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-    ramRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(ramRule);
 
-    final RemovalOfDefaultMarkingsRule rdmRule =
-        new RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
-    rdmRule.setAlphaMarking(getGeneralisedPrecondition());
-    rdmRule.setDefaultMarking(getMarkingProposition());
-    mAbstractionRules.add(rdmRule);
+    final ObservationEquivalenceRule oeRule =
+        new ObservationEquivalenceRule(getFactory(), mPropositions);
+    mAbstractionRules.add(oeRule);
+
+    /*
+     * final RemovalOfAlphaMarkingsRule ramRule = new
+     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(ramRule);
+     *
+     * final RemovalOfDefaultMarkingsRule rdmRule = new
+     * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
+     * rdmRule.setAlphaMarking(getGeneralisedPrecondition());
+     * rdmRule.setDefaultMarking(getMarkingProposition());
+     * mAbstractionRules.add(rdmRule);
+     */
   }
 
   // #########################################################################
@@ -1245,6 +1247,7 @@ public class CompositionalGeneralisedConflictChecker extends
       convertedSteps.addAll(initialSteps);
       originalSourceID =
           initialRecords.get(initialRecords.size() - 1).getState();
+      Map<AutomatonProxy,StateProxy> stepsPrevStateMap = null;
 
       StateProxy originalSource = mOriginalStates[originalSourceID];
       for (final TraceStepProxy step : traceSteps) {
@@ -1252,9 +1255,6 @@ public class CompositionalGeneralisedConflictChecker extends
             new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
 
         final EventProxy stepEvent = step.getEvent();
-        // TODO
-        // tau events in the automaton must be treated separately and
-        // specially.
         if (stepEvent != null) {
           // handles events not in the simplified automaton
           if (getResultAutomaton().getEvents().contains(stepEvent)) {
@@ -1268,7 +1268,8 @@ public class CompositionalGeneralisedConflictChecker extends
                 findSubTrace(mOriginalStatesMap.get(originalSource), eventID,
                              mReverseOutputStateMap.get(resultTargetState));
             final List<TraceStepProxy> substeps =
-                createTraceSteps(stepsNewStateMap, subtrace);
+                createTraceSteps(stepsPrevStateMap, stepsNewStateMap, subtrace,
+                                 stepEvent);
             convertedSteps.addAll(substeps);
             final int subsize = subtrace.size();
             if (subsize > 0) {
@@ -1278,6 +1279,7 @@ public class CompositionalGeneralisedConflictChecker extends
           } else {
             convertedSteps.add(step);
           }
+          stepsPrevStateMap = stepsNewStateMap;
         }
       }
       // makes the trace end in an alpha state
@@ -1310,12 +1312,49 @@ public class CompositionalGeneralisedConflictChecker extends
      * Given a list of SearchRecord's a list of TraceStepProxy's is created and
      * returned. A TraceStepProxy is created for each SearchRecord.
      *
-     * @param stepsStateMap
+     * @param stepsNewStateMap
      *          The state map for the step before adding the new information.
      * @param subtrace
      *          The list of search records to convert into steps of a trace.
      * @return A list of steps for a trace.
      */
+    private List<TraceStepProxy> createTraceSteps(
+                                                  final Map<AutomatonProxy,StateProxy> stepsPrevStateMap,
+                                                  final Map<AutomatonProxy,StateProxy> stepsNewStateMap,
+                                                  final List<SearchRecord> subtrace,
+                                                  final EventProxy stepEvent)
+    {
+      Map<AutomatonProxy,StateProxy> stepStateMap = null;
+      boolean eventFound = false;
+      final ProductDESProxyFactory factory = getFactory();
+      final List<TraceStepProxy> substeps = new LinkedList<TraceStepProxy>();
+      for (final SearchRecord subStep : subtrace) {
+        final int subStepTargetStateID = subStep.getState();
+        final int subStepEventID = subStep.getEvent();
+        final EventProxy event =
+            subStepEventID >= 0 ? mTransitionRelation.getEvent(subStepEventID)
+                : null;
+        if (event != stepEvent && !eventFound) {
+          stepStateMap = stepsPrevStateMap;
+          stepStateMap.put(getOriginalAutomaton(),
+                           mOriginalStates[subStepTargetStateID]);
+        } else if (event != stepEvent && eventFound) {
+          stepStateMap = stepsNewStateMap;
+          stepStateMap.put(getOriginalAutomaton(),
+                           mOriginalStates[subStepTargetStateID]);
+        } else if (event == stepEvent) {
+          eventFound = true;
+          stepStateMap = stepsNewStateMap;
+          stepStateMap.put(getOriginalAutomaton(),
+                           mOriginalStates[subStepTargetStateID]);
+        }
+        final TraceStepProxy convertedStep =
+            factory.createTraceStepProxy(event, stepStateMap);
+        substeps.add(convertedStep);
+      }
+      return substeps;
+    }
+
     private List<TraceStepProxy> createTraceSteps(
                                                   final Map<AutomatonProxy,StateProxy> stepsStateMap,
                                                   final List<SearchRecord> subtrace)
