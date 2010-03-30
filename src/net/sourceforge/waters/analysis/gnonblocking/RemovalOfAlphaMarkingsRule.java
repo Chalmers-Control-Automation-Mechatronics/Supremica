@@ -97,8 +97,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
                                                           final CompositionalGeneralisedConflictChecker checker,
                                                           final AutomatonProxy abstractedAut)
   {
-    return checker.createRemovalOfAlphaMarkingsStep(abstractedAut,
-                                                    mAutToAbstract);
+    return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract);
   }
 
   // #######################################################################

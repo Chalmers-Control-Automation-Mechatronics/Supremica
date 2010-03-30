@@ -91,8 +91,7 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
         while (!open.isEmpty()) {
           final int newSource = open.remove();
           if (tr.hasPredecessors(newSource)) {
-            final TIntHashSet[] predecessors =
-                tr.getAllPredecessors(newSource);
+            final TIntHashSet[] predecessors = tr.getAllPredecessors(newSource);
             for (int e = 0; e < predecessors.length; e++) {
               final TIntHashSet preds = predecessors[e];
               if (preds != null) {
@@ -124,15 +123,12 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
                                                           final CompositionalGeneralisedConflictChecker checker,
                                                           final AutomatonProxy abstractedAut)
   {
-    // return checker.createRemovalOfDefaultMarkingsStep(abstractedAut,
-    // mAutToAbstract);
-    return null;
+    return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract);
   }
 
   // #######################################################################
   // # Data Members
   private EventProxy mAlphaMarking;
   private EventProxy mDefaultMarking;
-  @SuppressWarnings("unused")
   private AutomatonProxy mAutToAbstract;
 }

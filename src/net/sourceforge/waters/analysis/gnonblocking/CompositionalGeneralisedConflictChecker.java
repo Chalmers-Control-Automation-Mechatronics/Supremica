@@ -242,16 +242,21 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
-
-    final ObservationEquivalenceRule oeRule =
-        new ObservationEquivalenceRule(getFactory(), mPropositions);
-    mAbstractionRules.add(oeRule);
     /*
-     * final RemovalOfAlphaMarkingsRule ramRule = new
-     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(ramRule);
+     * final ObservationEquivalenceRule oeRule = new
+     * ObservationEquivalenceRule(getFactory(), mPropositions);
+     * mAbstractionRules.add(oeRule);
      */
+    final RemovalOfAlphaMarkingsRule ramRule =
+        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+    ramRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(ramRule);
+
+    final RemovalOfDefaultMarkingsRule rdmRule =
+        new RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
+    rdmRule.setAlphaMarking(getGeneralisedPrecondition());
+    rdmRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rdmRule);
   }
 
   // #########################################################################
@@ -853,11 +858,11 @@ public class CompositionalGeneralisedConflictChecker extends
     return oeStep;
   }
 
-  public RemovalOfAlphaMarkingsStep createRemovalOfAlphaMarkingsStep(
-                                                                     final AutomatonProxy abstractedAut,
-                                                                     final AutomatonProxy autToAbstract)
+  public RemovalOfMarkingsStep createRemovalOfMarkingsStep(
+                                                           final AutomatonProxy abstractedAut,
+                                                           final AutomatonProxy autToAbstract)
   {
-    return new RemovalOfAlphaMarkingsStep(abstractedAut, autToAbstract);
+    return new RemovalOfMarkingsStep(abstractedAut, autToAbstract);
   }
 
 
@@ -1572,11 +1577,16 @@ public class CompositionalGeneralisedConflictChecker extends
 
 
   // #########################################################################
-  // # Inner Class RemovalOfAlphaMarkingsStep
-  private class RemovalOfAlphaMarkingsStep extends Step
+  // # Inner Class RemovalOfMarkingsStep
+  /**
+   * This step class performs correct counterexample trace conversion for both
+   * the removal of alpha markings and the removal of omega markings (even
+   * though the application of these rules is different).
+   */
+  private class RemovalOfMarkingsStep extends Step
   {
-    RemovalOfAlphaMarkingsStep(final AutomatonProxy resultAut,
-                               final AutomatonProxy originalAut)
+    RemovalOfMarkingsStep(final AutomatonProxy resultAut,
+                          final AutomatonProxy originalAut)
     {
       super(resultAut, originalAut);
       final ObserverProjectionTransitionRelation originalTransitionRelation =
