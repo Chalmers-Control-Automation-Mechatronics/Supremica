@@ -1595,18 +1595,19 @@ public class CompositionalGeneralisedConflictChecker extends
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>(numSteps);
       for (final TraceStepProxy step : traceSteps) {
-        final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
-            new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
-        final StateProxy targetState =
-            stepsNewStateMap.get(getResultAutomaton());
-        if (targetState != null) {
+        final EventProxy stepEvent = step.getEvent();
+        if (stepEvent != null) {
+          final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
+              new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
+          final StateProxy targetState =
+              stepsNewStateMap.get(getResultAutomaton());
+
           stepsNewStateMap.remove(getResultAutomaton());
           final int stateID = mResultingStates.get(targetState);
           final StateProxy replacementState = mOriginalStates[stateID];
           stepsNewStateMap.put(getOriginalAutomaton(), replacementState);
           final TraceStepProxy convertedStep =
-              getFactory().createTraceStepProxy(step.getEvent(),
-                                                stepsNewStateMap);
+              getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
           convertedSteps.add(convertedStep);
         } else {
           convertedSteps.add(step);
