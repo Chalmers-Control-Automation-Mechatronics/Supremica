@@ -243,16 +243,17 @@ public class CompositionalGeneralisedConflictChecker extends
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
-    final ObservationEquivalenceRule oeRule =
-        new ObservationEquivalenceRule(getFactory(), mPropositions);
-    mAbstractionRules.add(oeRule);
-
     /*
-     * final RemovalOfAlphaMarkingsRule ramRule = new
-     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(ramRule);
-     *
+     * final ObservationEquivalenceRule oeRule = new
+     * ObservationEquivalenceRule(getFactory(), mPropositions);
+     * mAbstractionRules.add(oeRule);
+     */
+
+    final RemovalOfAlphaMarkingsRule ramRule =
+        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+    ramRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(ramRule);
+    /*
      * final RemovalOfDefaultMarkingsRule rdmRule = new
      * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
      * rdmRule.setAlphaMarking(getGeneralisedPrecondition());
@@ -864,9 +865,12 @@ public class CompositionalGeneralisedConflictChecker extends
 
   public RemovalOfMarkingsStep createRemovalOfMarkingsStep(
                                                            final AutomatonProxy abstractedAut,
-                                                           final AutomatonProxy autToAbstract)
+                                                           final AutomatonProxy autToAbstract,
+                                                           final StateProxy[] originalStates,
+                                                           final TObjectIntHashMap<StateProxy> resultingStates)
   {
-    return new RemovalOfMarkingsStep(abstractedAut, autToAbstract);
+    return new RemovalOfMarkingsStep(abstractedAut, autToAbstract,
+        originalStates, resultingStates);
   }
 
 
@@ -1627,19 +1631,13 @@ public class CompositionalGeneralisedConflictChecker extends
   private class RemovalOfMarkingsStep extends Step
   {
     RemovalOfMarkingsStep(final AutomatonProxy resultAut,
-                          final AutomatonProxy originalAut)
+                          final AutomatonProxy originalAut,
+                          final StateProxy[] originalStates,
+                          final TObjectIntHashMap<StateProxy> resultingStates)
     {
       super(resultAut, originalAut);
-      // TODO I would avoid creating the transition relation a second time.
-      // It can be BIG. Either pass in the maps or transition relation
-      // from the rule (if possible), or stick with the automata and only
-      // create the maps when a trace is requested.
-      final ObserverProjectionTransitionRelation originalTransitionRelation =
-          new ObserverProjectionTransitionRelation(originalAut, mPropositions);
-      final ObserverProjectionTransitionRelation resultingTransitionRelation =
-          new ObserverProjectionTransitionRelation(resultAut, mPropositions);
-      mOriginalStates = originalTransitionRelation.getOriginalIntToStateMap();
-      mResultingStates = resultingTransitionRelation.getOriginalStateToIntMap();
+      mOriginalStates = originalStates;
+      mResultingStates = resultingStates;
 
     }
 
@@ -1684,7 +1682,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
     // #######################################################################
     // # Data Members
-    private final Map<StateProxy,Integer> mResultingStates;
+    private final TObjectIntHashMap<StateProxy> mResultingStates;
     private final StateProxy[] mOriginalStates;
   }
 

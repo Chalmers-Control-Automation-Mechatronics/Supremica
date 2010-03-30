@@ -77,28 +77,29 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
       return autToAbstract;
     }
     boolean modified = false;
-    final ObserverProjectionTransitionRelation tr =
+    mTR =
         new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
-    final int alphaID = tr.getEventInt(mAlphaMarking);
-    final int defaultID = tr.getEventInt(mDefaultMarking);
-    final int numStates = tr.getNumberOfStates();
+    final int alphaID = mTR.getEventInt(mAlphaMarking);
+    final int defaultID = mTR.getEventInt(mDefaultMarking);
+    final int numStates = mTR.getNumberOfStates();
 
     nextSource: for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      if (tr.isMarked(sourceID, defaultID)) {
+      if (mTR.isMarked(sourceID, defaultID)) {
         final Queue<Integer> open = new ArrayDeque<Integer>();
         open.add(sourceID);
         while (!open.isEmpty()) {
           final int newSource = open.remove();
-          if (tr.hasPredecessors(newSource)) {
-            final TIntHashSet[] predecessors = tr.getAllPredecessors(newSource);
+          if (mTR.hasPredecessors(newSource)) {
+            final TIntHashSet[] predecessors =
+                mTR.getAllPredecessors(newSource);
             for (int e = 0; e < predecessors.length; e++) {
               final TIntHashSet preds = predecessors[e];
               if (preds != null) {
                 final TIntIterator iter = preds.iterator();
                 while (iter.hasNext()) {
                   final int predID = iter.next();
-                  if (tr.isMarked(predID, alphaID)) {
+                  if (mTR.isMarked(predID, alphaID)) {
                     continue nextSource;
                   }
                   open.add(predID);
@@ -107,12 +108,12 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
             }
           }
         }
-        tr.markState(sourceID, false, defaultID);
+        mTR.markState(sourceID, false, defaultID);
         modified = true;
       }
     }
     if (modified) {
-      final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
+      final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
       return convertedAut;
     } else {
       return autToAbstract;
@@ -123,7 +124,9 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
                                                           final CompositionalGeneralisedConflictChecker checker,
                                                           final AutomatonProxy abstractedAut)
   {
-    return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract);
+    return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract,
+                                               mTR.getOriginalIntToStateMap(),
+                                               mTR.getResultingStateToIntMap());
   }
 
   // #######################################################################
@@ -131,4 +134,5 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
   private EventProxy mAlphaMarking;
   private EventProxy mDefaultMarking;
   private AutomatonProxy mAutToAbstract;
+  private ObserverProjectionTransitionRelation mTR;
 }

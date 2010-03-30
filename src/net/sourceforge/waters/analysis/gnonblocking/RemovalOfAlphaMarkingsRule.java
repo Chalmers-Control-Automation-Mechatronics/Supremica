@@ -62,22 +62,22 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
       return autToAbstract;
     }
     boolean modified = false;
-    final ObserverProjectionTransitionRelation tr =
+    mTR =
         new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
-    final int alphaID = tr.getEventInt(mAlphaMarking);
-    final int tauID = tr.getEventInt(tau);
-    final int numStates = tr.getNumberOfStates();
+    final int alphaID = mTR.getEventInt(mAlphaMarking);
+    final int tauID = mTR.getEventInt(tau);
+    final int numStates = mTR.getNumberOfStates();
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      if (tr.hasPredecessors(sourceID) && tr.isMarked(sourceID, alphaID)) {
-        final TIntHashSet successors = tr.getSuccessors(sourceID, tauID);
+      if (mTR.hasPredecessors(sourceID) && mTR.isMarked(sourceID, alphaID)) {
+        final TIntHashSet successors = mTR.getSuccessors(sourceID, tauID);
         if (successors != null) {
           final TIntIterator iter = successors.iterator();
           while (iter.hasNext()) {
             final int targetID = iter.next();
-            if (tr.isMarked(targetID, alphaID)) {
+            if (mTR.isMarked(targetID, alphaID)) {
               if (targetID != sourceID) {
-                tr.markState(sourceID, false, alphaID);
+                mTR.markState(sourceID, false, alphaID);
                 modified = true;
                 break;
               }
@@ -87,7 +87,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
       }
     }
     if (modified) {
-      final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
+      final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
       return convertedAut;
     } else {
       return autToAbstract;
@@ -98,11 +98,14 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
                                                           final CompositionalGeneralisedConflictChecker checker,
                                                           final AutomatonProxy abstractedAut)
   {
-    return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract);
+    return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract,
+                                               mTR.getOriginalIntToStateMap(),
+                                               mTR.getResultingStateToIntMap());
   }
 
   // #######################################################################
   // # Data Members
   private EventProxy mAlphaMarking;
   private AutomatonProxy mAutToAbstract;
+  private ObserverProjectionTransitionRelation mTR;
 }
