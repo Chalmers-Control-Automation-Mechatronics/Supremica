@@ -696,17 +696,14 @@ public class CompositionalGeneralisedConflictChecker extends
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
       chosenCandidates.add(chosenCandidate);
-      // TODO Use double correctly.
-      // double x = (double) a / (double) b.
-      // The following uses integer division and converts the result to double.
       double maxLocal =
-          chosenCandidate.getLocalEventCount()
-              / chosenCandidate.getNumberOfEvents();
+          (double) chosenCandidate.getLocalEventCount()
+              / (double) chosenCandidate.getNumberOfEvents();
       while (it.hasNext()) {
         final Candidate nextCan = it.next();
-        // TODO Use double correctly.
-        final int proportion =
-            nextCan.getLocalEventCount() / nextCan.getNumberOfEvents();
+        final double proportion =
+            (double) nextCan.getLocalEventCount()
+                / (double) nextCan.getNumberOfEvents();
         if (proportion > maxLocal) {
           chosenCandidates = new ArrayList<Candidate>();
           maxLocal = proportion;
@@ -734,17 +731,16 @@ public class CompositionalGeneralisedConflictChecker extends
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
       chosenCandidates.add(chosenCandidate);
-      // TODO Use double correctly.
       double maxCommon =
-          (chosenCandidate.getNumberOfEvents() - chosenCandidate
+          (double) (chosenCandidate.getNumberOfEvents() - chosenCandidate
               .getLocalEventCount())
-              / chosenCandidate.getNumberOfEvents();
+              / (double) chosenCandidate.getNumberOfEvents();
       while (it.hasNext()) {
         final Candidate nextCan = it.next();
-        // TODO Use double correctly.
-        final int proportion =
-            (nextCan.getNumberOfEvents() - nextCan.getLocalEventCount())
-                / nextCan.getNumberOfEvents();
+        final double proportion =
+            (double) (nextCan.getNumberOfEvents() - nextCan
+                .getLocalEventCount())
+                / (double) nextCan.getNumberOfEvents();
         if (proportion > maxCommon) {
           chosenCandidates = new ArrayList<Candidate>();
           maxCommon = proportion;
