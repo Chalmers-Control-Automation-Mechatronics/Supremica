@@ -46,6 +46,7 @@ public class ObserverProjectionConflictCheckerTest extends
       new ObserverProjectionConflictChecker(factory);
     checker.setInternalStepNodeLimit(5000);
     checker.setFinalStepNodeLimit(100000);
+    checker.setInternalStepTransitionLimit(500000);
     return checker;
   }
 

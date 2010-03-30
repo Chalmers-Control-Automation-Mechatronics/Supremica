@@ -73,7 +73,37 @@ public class ObservationEquivalenceRuleTest
     runAbstractionRule(group, subdir, name);
   }
 
-  // TODO More tests needed ...
+  public void test_oeq_2() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_2.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_oeq_3() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_3.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_oeq_4() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_4.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_oeq_5() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_5.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
 
   /**
    * A test to see whether a single abstraction rule object can perform
@@ -81,10 +111,12 @@ public class ObservationEquivalenceRuleTest
    */
   public void testReentrant() throws Exception
   {
-    // TODO As soon as there are more tests, try some variation here.
     test_oeq_1();
+    test_oeq_2();
+    test_oeq_3();
+    test_oeq_4();
     test_oeq_1();
-    test_oeq_1();
+    test_oeq_2();
   }
 
 }

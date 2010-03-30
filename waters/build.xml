@@ -310,7 +310,8 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}" if="native.make">
         <fileset dir="${supremica.testsrc}">
-          <include name="**/DESpot*.java"/>
+          <include name="**/op/*.java"/>
+          <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
@@ -328,7 +329,8 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="**/Native*.java"/>
+          <include name="**/gnonblocking/*.java"/>
+          <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>

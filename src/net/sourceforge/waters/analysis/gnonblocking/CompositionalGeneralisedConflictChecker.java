@@ -696,11 +696,15 @@ public class CompositionalGeneralisedConflictChecker extends
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
       chosenCandidates.add(chosenCandidate);
+      // TODO Use double correctly.
+      // double x = (double) a / (double) b.
+      // The following uses integer division and converts the result to double.
       double maxLocal =
           chosenCandidate.getLocalEventCount()
               / chosenCandidate.getNumberOfEvents();
       while (it.hasNext()) {
         final Candidate nextCan = it.next();
+        // TODO Use double correctly.
         final int proportion =
             nextCan.getLocalEventCount() / nextCan.getNumberOfEvents();
         if (proportion > maxLocal) {
@@ -730,12 +734,14 @@ public class CompositionalGeneralisedConflictChecker extends
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       Candidate chosenCandidate = it.next();
       chosenCandidates.add(chosenCandidate);
+      // TODO Use double correctly.
       double maxCommon =
           (chosenCandidate.getNumberOfEvents() - chosenCandidate
               .getLocalEventCount())
               / chosenCandidate.getNumberOfEvents();
       while (it.hasNext()) {
         final Candidate nextCan = it.next();
+        // TODO Use double correctly.
         final int proportion =
             (nextCan.getNumberOfEvents() - nextCan.getLocalEventCount())
                 / nextCan.getNumberOfEvents();
@@ -1589,6 +1595,10 @@ public class CompositionalGeneralisedConflictChecker extends
                           final AutomatonProxy originalAut)
     {
       super(resultAut, originalAut);
+      // TODO I would avoid creating the transition relation a second time.
+      // It can be BIG. Either pass in the maps or transition relation
+      // from the rule (if possible), or stick with the automata and only
+      // create the maps when a trace is requested.
       final ObserverProjectionTransitionRelation originalTransitionRelation =
           new ObserverProjectionTransitionRelation(originalAut, mPropositions);
       final ObserverProjectionTransitionRelation resultingTransitionRelation =

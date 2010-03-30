@@ -22,6 +22,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.ProxyTools;
+
+import org.apache.log4j.Logger;
+
 
 /**
  * @author Simon Ware, Rachel Francis, Robi Malik
@@ -100,8 +104,21 @@ public class ObservationEquivalenceTRSimplifier
   //# Invocation
   public boolean run()
   {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      final String msg =
+        "ENTER " + ProxyTools.getShortClassName(this) + ".run(): " +
+        mTransitionRelation.getName() + " with " +
+        mTransitionRelation.getNumberOfReachableStates() + " states and " +
+        mTransitionRelation.getNumberOfTransitions() + " transitions ...";
+      logger.debug(msg);
+    }
+
     setUp();
-    setupInitialPartitions();
+    setUpTauPredecessors();
+    final boolean redundant = removeRedundantTransitions();
+    setUpInitialPartitions();
+
     while (true) {
       Iterator<? extends EquivalenceClass> it = null;
       if (!mWS.isEmpty()) {
@@ -118,17 +135,21 @@ public class ObservationEquivalenceTRSimplifier
 
     assert mP.size() >= 0;
     assert mP.size() <= mNumStates;
-    if (mP.size() == mNumStates) {
+    if (mP.size() == mNumStates && !redundant) {
+      if (logger.isDebugEnabled()) {
+        final String msg =
+          "EXIT " + ProxyTools.getShortClassName(this) + ".run(): no change.";
+        logger.debug(msg);
+      }
       return false;
     }
 
     mClassMap = new TIntObjectHashMap<int[]>();
     for (final SimpleEquivalenceClass sec : mP) {
       mClassMap.put(sec.mStates[0], sec.mStates);
-      if (sec.mStates.length == 1) {
-        continue;
+      if (sec.mStates.length != 1) {
+        mTransitionRelation.merge(sec.mStates, mHiddenEvent);
       }
-      mTransitionRelation.merge(sec.mStates, mHiddenEvent);
     }
 
     if (mSuppressHiddenEvent && mHiddenEvent >= 0) {
@@ -142,6 +163,13 @@ public class ObservationEquivalenceTRSimplifier
       }
     }
 
+    if (logger.isDebugEnabled()) {
+      final String msg =
+        "EXIT " + ProxyTools.getShortClassName(this) + ".run(): " +
+        mTransitionRelation.getNumberOfReachableStates() + " states and " +
+        mTransitionRelation.getNumberOfTransitions() + " transitions ...";
+      logger.debug(msg);
+    }
     return true;
   }
 
@@ -154,6 +182,12 @@ public class ObservationEquivalenceTRSimplifier
   //#########################################################################
   //# Auxiliary Methods
   private void setUp()
+  {
+    mNumStates = mTransitionRelation.getNumberOfStates();
+    mNumEvents = mTransitionRelation.getNumberOfProperEvents();
+  }
+
+  private void setUpTauPredecessors()
   {
     mNumStates = mTransitionRelation.getNumberOfStates();
     mNumEvents = mTransitionRelation.getNumberOfProperEvents();
@@ -188,7 +222,7 @@ public class ObservationEquivalenceTRSimplifier
     }
   }
 
-  private void setupInitialPartitions()
+  private void setUpInitialPartitions()
   {
     mWS = new THashSet<SimpleEquivalenceClass>();
     mWC = new THashSet<ComplexEquivalenceClass>();
@@ -220,6 +254,53 @@ public class ObservationEquivalenceTRSimplifier
         return true;
       }
     });
+  }
+
+  private boolean removeRedundantTransitions()
+  {
+    boolean removed = false;
+    for (int s = 0; s < mNumStates; s++) {
+      if (mTransitionRelation.hasPredecessors(s)) {
+        for (int e = 0; e < mNumEvents; e++) {
+          final TIntHashSet preds =
+            mTransitionRelation.getPredecessors(s, e);
+          if (preds != null) {
+            final int[] predcopy = preds.toArray();
+            trans:
+            for (final int pred : predcopy) {
+              for (final int p1 : mTauPreds[s]) {
+                final TIntHashSet preds1 =
+                  mTransitionRelation.getPredecessors(p1, e);
+                if (preds1 != null) {
+                  final TIntIterator iter = preds1.iterator();
+                  while (iter.hasNext()) {
+                    final int p2 = iter.next();
+                    if (e == mHiddenEvent) {
+                      if (p1 != s && p2 == pred) {
+                        mTransitionRelation.removeTransition(pred, e, s);
+                        removed = true;
+                        break trans;
+                      }
+                    } else {
+                      if (p1 != s || p2 != pred) {
+                        for (final int p3 : mTauPreds[p2]) {
+                          if (p3 == pred) {
+                            mTransitionRelation.removeTransition(pred, e, s);
+                            removed = true;
+                            break trans;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return removed;
   }
 
   private int[] getPredecessors(final int state, final int event)
@@ -582,6 +663,15 @@ public class ObservationEquivalenceTRSimplifier
       mInfo[event] = res;
       return res;
     }
+  }
+
+
+  //#########################################################################
+  //# Logging
+  private Logger getLogger()
+  {
+    final Class<?> clazz = getClass();
+    return Logger.getLogger(clazz);
   }
 
 

@@ -444,6 +444,9 @@ public abstract class AbstractStandardConflictCheckerTest extends
     runModelVerifier(group, dir, name, true);
   }
 
+  /*
+   * This test seems to be too much for compositional methods in Eclipse.
+   * Move to 'large' test suite?
   public void testProfisafeI3HostEFA() throws Exception
   {
     final String group = "tests";
@@ -454,6 +457,7 @@ public abstract class AbstractStandardConflictCheckerTest extends
         Collections.singletonList(binding);
     runModelVerifier(group, dir, name, bindings, true);
   }
+   */
 
   public void testProfisafeI3HostEFABlock() throws Exception
   {

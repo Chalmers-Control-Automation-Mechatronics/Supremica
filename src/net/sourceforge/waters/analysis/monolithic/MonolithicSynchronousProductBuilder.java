@@ -25,6 +25,7 @@ import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -36,6 +37,8 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -110,24 +113,43 @@ public class MonolithicSynchronousProductBuilder
   public boolean run()
     throws AnalysisException
   {
-    setUp();
-
-    final int tableSize = Math.min(getNodeLimit(), MAX_TABLE_SIZE);
-    mStates = new IntArrayMap(tableSize);
-    mStateTuples = new ArrayList<int[]>();
-    mTransitionBuffer = new TIntArrayList();
-    mNumStates = 0;
-    mUnvisited = new ArrayDeque<int[]>(100);
-    permutations(mNumAutomata, null, -1, -1);
-    mNumInitialStates = mNumStates;
-    while (!mUnvisited.isEmpty()) {
-      final int[] tuple = mUnvisited.remove();
-      explore(tuple);
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      final String msg =
+        "ENTER " + ProxyTools.getShortClassName(this) + ".run()";
+      logger.debug(msg);
     }
+    AutomatonProxy aut = null;
 
-    final AutomatonProxy aut = createAutomaton();
-    tearDown();
-    return setAutomatonResult(aut);
+    try {
+      setUp();
+
+      final int tableSize = Math.min(getNodeLimit(), MAX_TABLE_SIZE);
+      mStates = new IntArrayMap(tableSize);
+      mStateTuples = new ArrayList<int[]>();
+      mTransitionBuffer = new TIntArrayList();
+      mTransitionBufferLimit = 3 * getTransitionLimit();
+      mNumStates = 0;
+      mUnvisited = new ArrayDeque<int[]>(100);
+      permutations(mNumAutomata, null, -1, -1);
+      mNumInitialStates = mNumStates;
+      while (!mUnvisited.isEmpty()) {
+        final int[] tuple = mUnvisited.remove();
+        explore(tuple);
+      }
+
+      aut = createAutomaton();
+      return setAutomatonResult(aut);
+    } finally {
+      tearDown();
+      if (logger.isDebugEnabled()) {
+        final String head = aut == null ? "ABORT" : "EXIT";
+        final String msg =
+          head + " " + ProxyTools.getShortClassName(this) + ".run(): " +
+          mNumStates + " states.";
+        logger.debug(msg);
+      }
+    }
   }
 
 
@@ -400,12 +422,20 @@ public class MonolithicSynchronousProductBuilder
     // and avoid duplicates.
     if (!isInitial) {
       if (mProjectionMask == null) {
+        if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
+          throw new OverflowException
+            (OverflowException.Kind.TRANSITION, getTransitionLimit());
+        }
         mTransitionBuffer.add(source);
         mTransitionBuffer.add(event);
         mTransitionBuffer.add(target);
       } else {
         final int masked = mProjectionMask[event];
         if (mCurrentSuccessors[masked].add(target)) {
+          if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
+            throw new OverflowException
+              (OverflowException.Kind.TRANSITION, getTransitionLimit());
+          }
           mTransitionBuffer.add(source);
           mTransitionBuffer.add(masked);
           mTransitionBuffer.add(target);
@@ -802,6 +832,15 @@ public class MonolithicSynchronousProductBuilder
 
 
   //#########################################################################
+  //# Logging
+  private Logger getLogger()
+  {
+    final Class<?> clazz = getClass();
+    return Logger.getLogger(clazz);
+  }
+
+
+  //#########################################################################
   //# Data Members
   private Collection<EventProxy> mUsedPropositions;
   private Collection<MaskingPair> mMaskingPairs;
@@ -824,6 +863,7 @@ public class MonolithicSynchronousProductBuilder
   private List<int[]> mStateTuples;
   private Queue<int[]> mUnvisited;
   private TIntArrayList mTransitionBuffer;
+  private int mTransitionBufferLimit;
 
   private int[][] mNDTuple;
   private int[] mTargetTuple;

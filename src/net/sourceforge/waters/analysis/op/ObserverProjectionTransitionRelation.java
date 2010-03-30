@@ -173,6 +173,17 @@ public class ObserverProjectionTransitionRelation
     return mSuccessors.length;
   }
 
+  public int getNumberOfReachableStates()
+  {
+    int count = 0;
+    for (int s = 0; s < mSuccessors.length; s++) {
+      if (hasPredecessors(s)) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   public int getStateInt(final StateProxy state)
   {
     return mOriginalStatesMap.get(state);
@@ -297,8 +308,24 @@ public class ObserverProjectionTransitionRelation
     mStateMarkings[state] = m;
   }
 
+
   // #########################################################################
   // # Transitions Access
+  public int getNumberOfTransitions()
+  {
+    int count = 0;
+    for (int s = 0; s < mSuccessors.length; s++) {
+      if (hasPredecessors(s)) {
+        for (final TIntHashSet succ : getAllSuccessors(s)) {
+          if (succ != null) {
+            count += succ.size();
+          }
+        }
+      }
+    }
+    return count;
+  }
+
   public TIntHashSet getActiveEvents(final int state)
   {
     return mActiveEvents[state];

@@ -58,6 +58,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
   {
     mAutToAbstract = autToAbstract;
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
+      // TODO Is this correct?
       return autToAbstract;
     }
     boolean modified = false;

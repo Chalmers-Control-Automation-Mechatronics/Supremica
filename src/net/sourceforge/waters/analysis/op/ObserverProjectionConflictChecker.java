@@ -143,6 +143,33 @@ public class ObserverProjectionConflictChecker
   }
 
 
+  public void setTransitionLimit(final int limit)
+  {
+    super.setTransitionLimit(limit);
+    setInternalStepTransitionLimit(limit);
+  }
+
+  public void setInternalStepTransitionLimit(final int limit)
+  {
+    mInternalStepTransitionLimit = limit;
+  }
+
+  public void setFinalStepTransitionLimit(final int limit)
+  {
+    super.setTransitionLimit(limit);
+  }
+
+  public int getInternalStepTransitionLimit()
+  {
+    return mInternalStepTransitionLimit;
+  }
+
+  public int getFinalStepTransitionLimit()
+  {
+    return super.getTransitionLimit();
+  }
+
+
   public void setSynchronousProductBuilder
     (final SynchronousProductBuilder builder)
   {
@@ -164,8 +191,10 @@ public class ObserverProjectionConflictChecker
         new MonolithicSynchronousProductBuilder(factory);
     }
     mSynchronousProductBuilder.setPropositions(mPropositions);
-    final int limit = getInternalStepNodeLimit();
-    mSynchronousProductBuilder.setNodeLimit(limit);
+    final int nlimit = getInternalStepNodeLimit();
+    mSynchronousProductBuilder.setNodeLimit(nlimit);
+    final int tlimit = getInternalStepTransitionLimit();
+    mSynchronousProductBuilder.setTransitionLimit(tlimit);
     mSynchronousProductBuilder.setModel(model);
     return mSynchronousProductBuilder;
   }
@@ -178,13 +207,15 @@ public class ObserverProjectionConflictChecker
       final ProductDESProxyFactory factory = getFactory();
       mMonolithicConflictChecker = new NativeConflictChecker(factory);
     }
-    final int limit = getFinalStepNodeLimit();
-    mMonolithicConflictChecker.setNodeLimit(limit);
-    mMonolithicConflictChecker.setModel(model);
+    final int nlimit = getFinalStepNodeLimit();
+    mMonolithicConflictChecker.setNodeLimit(nlimit);
+    final int tlimit = getFinalStepTransitionLimit();
+    mMonolithicConflictChecker.setTransitionLimit(tlimit);
     final KindTranslator translator = getKindTranslator();
     mMonolithicConflictChecker.setKindTranslator(translator);
     final EventProxy marking = getUsedMarkingProposition();
     mMonolithicConflictChecker.setMarkingProposition(marking);
+    mMonolithicConflictChecker.setModel(model);
     return mMonolithicConflictChecker;
   }
 
@@ -1549,6 +1580,7 @@ public class ObserverProjectionConflictChecker
   private SynchronousProductBuilder mSynchronousProductBuilder;
   private ConflictChecker mMonolithicConflictChecker;
   private int mInternalStepNodeLimit;
+  private int mInternalStepTransitionLimit;
 
   private Collection<AutomatonProxy> mCurrentAutomata;
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =
