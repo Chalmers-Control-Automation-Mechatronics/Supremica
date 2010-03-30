@@ -16,6 +16,7 @@ import gnu.trove.TIntIterator;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -141,11 +142,19 @@ public class ObserverProjectionTransitionRelation
 
   // #########################################################################
   // # Events Access
+  /**
+   * Gets the number of non-proposition events used by this transition
+   * relation.
+   */
   public int getNumberOfProperEvents()
   {
     return mNumProperEvents;
   }
 
+  /**
+   * Gets the total number of events (including propositions) used by this
+   * transition relation.
+   */
   public int getNumberOfEvents()
   {
     return mEvents.length;
@@ -249,6 +258,11 @@ public class ObserverProjectionTransitionRelation
 
   // #########################################################################
   // # Marking Modifications
+  public void clearMarkings(final int state)
+  {
+    markState(state, EMPTY_MARKING);
+  }
+
   public void markState(final int state, final boolean value, final int prop)
   {
     final int m = mStateMarkings[state];
@@ -264,9 +278,17 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
-  public void clearMarkings(final int state)
+  public void markState(final int state, final TIntHashSet markings)
   {
-    markState(state, EMPTY_MARKING);
+    final int m;
+    if (mMarkingMap.contains(markings)) {
+      m = mMarkingMap.get(markings);
+    } else {
+      m = mMarkingDefinitions.size();
+      mMarkingDefinitions.add(markings);
+      mMarkingMap.put(markings, m);
+    }
+    mStateMarkings[state] = m;
   }
 
   public void copyMarkings(final int from, final int to)
@@ -295,17 +317,26 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
-  public void markState(final int state, final TIntHashSet markings)
+  /**
+   * Adds the given proposition to the event alphabet of this transition
+   * relation.
+   * @param prop       The event to be added.
+   * @param markStates A flag. If <CODE>true</CODE> all states will be
+   *                   marked with the new proposition. If <CODE>false</CODE>,
+   *                   no states will be marked.
+   */
+  public void addProposition(final EventProxy prop, final boolean markStates)
   {
-    final int m;
-    if (mMarkingMap.contains(markings)) {
-      m = mMarkingMap.get(markings);
-    } else {
-      m = mMarkingDefinitions.size();
-      mMarkingDefinitions.add(markings);
-      mMarkingMap.put(markings, m);
+    final int propID = mEvents.length;
+    final int newNumEvents = propID + 1;
+    final EventProxy[] newEvents = Arrays.copyOf(mEvents, newNumEvents);
+    newEvents[propID] = prop;
+    mEventToInt.put(prop, propID);
+    if (markStates) {
+      for (final TIntHashSet set : mMarkingDefinitions) {
+        set.add(propID);
+      }
     }
-    mStateMarkings[state] = m;
   }
 
 
