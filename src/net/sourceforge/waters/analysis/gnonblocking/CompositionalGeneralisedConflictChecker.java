@@ -239,7 +239,7 @@ public class CompositionalGeneralisedConflictChecker extends
     if (getGeneralisedPrecondition() != null) {
       mPropositions.add(getGeneralisedPrecondition());
     }
-    mPropositions.add(getMarkingProposition());
+    mPropositions.add(getMarkingProposition(getModel()));
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
