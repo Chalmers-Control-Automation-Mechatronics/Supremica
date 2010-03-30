@@ -18,6 +18,7 @@ import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IsomorphismChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -231,6 +232,15 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
   protected AbstractionRule getAbstractionRule()
   {
     return mAbstractionRule;
+  }
+
+
+  //#########################################################################
+  //# Overrides for Abstract Base Class
+  //# net.sourceforge.waters.model.analysis.AbstractAnalysisTest
+  protected void configure(final ModuleCompiler compiler)
+  {
+    compiler.setOptimizationEnabled(false);
   }
 
 

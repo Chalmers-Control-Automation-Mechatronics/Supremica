@@ -211,7 +211,7 @@ public abstract class AbstractConflictCheckerTest extends
           }
           assertTrue("There is no transition from state " + current.getName()
               + " to state " + target.getName() + " with event "
-              + event.getName() + " in automaton" + aut.getName()
+              + event.getName() + " in automaton " + aut.getName()
               + " as specified in the counterexample trace.", found);
           current = target;
         } else {
