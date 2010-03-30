@@ -90,7 +90,10 @@ public class IsomorphismChecker
       new ObserverProjectionTransitionRelation(aut);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier(rel);
-    bisimulator.run();
+    final boolean result = bisimulator.run();
+    if (!result) {
+      throw new IsomorphismException("Bisimulator did not identify any sates!");
+    }
     final TIntObjectHashMap<int[]> partition = bisimulator.getStateClasses();
     checkPartition(partition, rel);
   }
