@@ -94,19 +94,21 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
             final TIntHashSet[] predecessors = tr.getAllPredecessors(sourceID);
             for (int e = 0; e < predecessors.length; e++) {
               final TIntHashSet preds = predecessors[e];
-              final TIntIterator iter = preds.iterator();
-              while (iter.hasNext()) {
-                final int predID = iter.next();
-                if (tr.isMarked(predID, alphaID)) {
-                  tr.markState(sourceID, false, defaultID);
-                  modified = true;
-                  continue nextSource;
+              if (preds != null) {
+                final TIntIterator iter = preds.iterator();
+                while (iter.hasNext()) {
+                  final int predID = iter.next();
+                  if (tr.isMarked(predID, alphaID)) {
+                    continue nextSource;
+                  }
+                  open.add(predID);
                 }
-                open.add(predID);
               }
             }
           }
         }
+        tr.markState(sourceID, false, defaultID);
+        modified = true;
       }
     }
     if (modified) {
