@@ -60,6 +60,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
       return autToAbstract;
     }
+    boolean modified = false;
     final ObserverProjectionTransitionRelation tr =
         new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
@@ -76,6 +77,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
             if (tr.isMarked(targetID, alphaID)) {
               if (targetID != sourceID) {
                 tr.markState(sourceID, false, alphaID);
+                modified = true;
                 break;
               }
             }
@@ -83,10 +85,12 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
         }
       }
     }
-    // TODO Check if there was no change, and suppress automaton construction
-    // in this case.
-    final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
-    return convertedAut;
+    if (modified) {
+      final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
+      return convertedAut;
+    } else {
+      return autToAbstract;
+    }
   }
 
   CompositionalGeneralisedConflictChecker.Step createStep(
