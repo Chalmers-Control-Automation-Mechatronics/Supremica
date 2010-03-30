@@ -89,9 +89,10 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
         final Queue<Integer> open = new ArrayDeque<Integer>();
         open.add(sourceID);
         while (!open.isEmpty()) {
-          final int predecessor = open.remove();
-          if (tr.hasPredecessors(predecessor)) {
-            final TIntHashSet[] predecessors = tr.getAllPredecessors(sourceID);
+          final int newSource = open.remove();
+          if (tr.hasPredecessors(newSource)) {
+            final TIntHashSet[] predecessors =
+                tr.getAllPredecessors(newSource);
             for (int e = 0; e < predecessors.length; e++) {
               final TIntHashSet preds = predecessors[e];
               if (preds != null) {
