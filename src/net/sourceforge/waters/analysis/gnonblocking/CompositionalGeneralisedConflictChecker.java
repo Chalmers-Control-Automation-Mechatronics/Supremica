@@ -242,16 +242,16 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
-    /*
-     * final ObservationEquivalenceRule oeRule = new
-     * ObservationEquivalenceRule(getFactory(), mPropositions);
-     * mAbstractionRules.add(oeRule);
-     */
-    final RemovalOfAlphaMarkingsRule ramRule =
-        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-    ramRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(ramRule);
 
+    final ObservationEquivalenceRule oeRule =
+        new ObservationEquivalenceRule(getFactory(), mPropositions);
+    mAbstractionRules.add(oeRule);
+    /*
+     * final RemovalOfAlphaMarkingsRule ramRule = new
+     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(ramRule);
+     */
   }
 
   // #########################################################################

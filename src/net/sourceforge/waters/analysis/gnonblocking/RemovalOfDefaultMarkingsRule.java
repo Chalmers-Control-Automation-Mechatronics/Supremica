@@ -1,0 +1,135 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
+//# CLASS:   RemovalOfAlphaMarkingsRule
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.analysis.gnonblocking;
+
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntIterator;
+
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Queue;
+
+import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
+
+/**
+ * For a given Automaton applies an abstraction rule which removes the default
+ * marking proposition from states which are not reachable from any state with
+ * an alpha marking.
+ *
+ * @author Rachel Francis
+ */
+
+class RemovalOfDefaultMarkingsRule extends AbstractionRule
+{
+  // #######################################################################
+  // # Constructors
+  RemovalOfDefaultMarkingsRule(final ProductDESProxyFactory factory)
+  {
+    this(factory, null);
+  }
+
+  RemovalOfDefaultMarkingsRule(final ProductDESProxyFactory factory,
+                               final Collection<EventProxy> propositions)
+  {
+    super(factory, propositions);
+  }
+
+  // #######################################################################
+  // # Configuration
+  EventProxy getAlphaMarking()
+  {
+    return mAlphaMarking;
+  }
+
+  void setAlphaMarking(final EventProxy alphaMarking)
+  {
+    mAlphaMarking = alphaMarking;
+  }
+
+  EventProxy getDefaultMarking()
+  {
+    return mDefaultMarking;
+  }
+
+  void setDefaultMarking(final EventProxy defaultMarking)
+  {
+    mDefaultMarking = defaultMarking;
+  }
+
+  // #######################################################################
+  // # Rule Application
+  AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
+                           final EventProxy tau)
+  {
+    mAutToAbstract = autToAbstract;
+    if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
+      return autToAbstract;
+    }
+    boolean modified = false;
+    final ObserverProjectionTransitionRelation tr =
+        new ObserverProjectionTransitionRelation(autToAbstract,
+            getPropositions());
+    final int alphaID = tr.getEventInt(mAlphaMarking);
+    final int defaultID = tr.getEventInt(mDefaultMarking);
+    final int numStates = tr.getNumberOfStates();
+
+    nextSource: for (int sourceID = 0; sourceID < numStates; sourceID++) {
+      if (tr.isMarked(sourceID, defaultID)) {
+        final Queue<Integer> open = new ArrayDeque<Integer>();
+        open.add(sourceID);
+        while (!open.isEmpty()) {
+          final int predecessor = open.remove();
+          if (tr.hasPredecessors(predecessor)) {
+            final TIntHashSet[] predecessors = tr.getAllPredecessors(sourceID);
+            for (int e = 0; e < predecessors.length; e++) {
+              final TIntHashSet preds = predecessors[e];
+              final TIntIterator iter = preds.iterator();
+              while (iter.hasNext()) {
+                final int predID = iter.next();
+                if (tr.isMarked(predID, alphaID)) {
+                  tr.markState(sourceID, false, defaultID);
+                  modified = true;
+                  continue nextSource;
+                }
+                open.add(predID);
+              }
+            }
+          }
+        }
+      }
+    }
+    if (modified) {
+      final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
+      return convertedAut;
+    } else {
+      return autToAbstract;
+    }
+  }
+
+  CompositionalGeneralisedConflictChecker.Step createStep(
+                                                          final CompositionalGeneralisedConflictChecker checker,
+                                                          final AutomatonProxy abstractedAut)
+  {
+    // return checker.createRemovalOfDefaultMarkingsStep(abstractedAut,
+    // mAutToAbstract);
+    return null;
+  }
+
+  // #######################################################################
+  // # Data Members
+  private EventProxy mAlphaMarking;
+  private EventProxy mDefaultMarking;
+  @SuppressWarnings("unused")
+  private AutomatonProxy mAutToAbstract;
+}
