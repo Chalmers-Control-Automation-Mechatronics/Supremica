@@ -258,30 +258,47 @@ public class ObserverProjectionTransitionRelation
 
   // #########################################################################
   // # Marking Modifications
+  /**
+   * Removes all markings from the given state.
+   * @param  state    ID of the state to be modified.
+   */
   public void clearMarkings(final int state)
   {
     markState(state, EMPTY_MARKING);
   }
 
+  /**
+   * Changes a particular marking for a the given state.
+   * @param  state    ID of the state to be modified.
+   * @param  prop     ID of proposition identifying the marking to be modified.
+   * @param  value    Whether the marking should be set (<CODE>true</CODE>)
+   *                  or cleared (<CODE>false</CODE>) for the given state
+   *                  and proposition.
+   */
   public void markState(final int state, final int prop, final boolean value)
   {
     final int m = mStateMarkings[state];
     final TIntHashSet markings = mMarkingDefinitions.get(m);
     if (value != markings.contains(prop)) {
       final int size = markings.size();
-      final TIntHashSet newset = new TIntHashSet(size);
-      final TIntIterator iter = markings.iterator();
-      if (value) {
-        while (iter.hasNext()) {
-          final int e = iter.next();
-          newset.add(e);
-        }
-        newset.add(prop);
+      final TIntHashSet newset;
+      if (!value && size == 1) {
+        newset = EMPTY_MARKING;
       } else {
-        while (iter.hasNext()) {
-          final int e = iter.next();
-          if (e != prop) {
+        newset = new TIntHashSet(size);
+        final TIntIterator iter = markings.iterator();
+        if (value) {
+          while (iter.hasNext()) {
+            final int e = iter.next();
             newset.add(e);
+          }
+          newset.add(prop);
+        } else {
+          while (iter.hasNext()) {
+            final int e = iter.next();
+            if (e != prop) {
+              newset.add(e);
+            }
           }
         }
       }
@@ -289,6 +306,13 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
+  /**
+   * Replaces all markings for a given state.
+   * @param  state    ID of the state to be modified.
+   * @param  markings The new markings to be set for the state. The state
+   *                  will be marked with precisely the propositions whose
+   *                  IDs are in this set.
+   */
   public void markState(final int state, final TIntHashSet markings)
   {
     final int m;
@@ -302,6 +326,15 @@ public class ObserverProjectionTransitionRelation
     mStateMarkings[state] = m;
   }
 
+  /**
+   * Copies markings from one state to another.
+   * This methods add all the markings of the given source state (from) to
+   * the given target state (to). The markings of the source state will not
+   * be changed, and the target state retains any markings it previously had
+   * in addition to the new ones.
+   * @param  from   ID of source state to copy markings from.
+   * @param  to     ID of target state to copy markings to.
+   */
   public void copyMarkings(final int from, final int to)
   {
     final TIntHashSet fromSet = getMarkings(from);
