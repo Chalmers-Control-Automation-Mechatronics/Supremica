@@ -1449,7 +1449,7 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       if (!getOriginalAutomaton().getEvents()
           .contains(getGeneralisedPrecondition())
-          && mOriginalStates[originalSource].getPropositions()
+          || mOriginalStates[originalSource].getPropositions()
               .contains(getGeneralisedPrecondition())) {
         return Collections.emptyList();
       }
