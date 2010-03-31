@@ -1282,9 +1282,15 @@ public class CompositionalGeneralisedConflictChecker extends
               originalSource = mOriginalStates[originalTargetID];
             }
           } else {
-            convertedSteps.add(step);
+            // convertedSteps.add(step);
+            stepsNewStateMap.remove(getResultAutomaton());
+            final TraceStepProxy convertedStep =
+                getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
+            convertedSteps.add(convertedStep);
           }
-          stepsPrevStateMap = stepsNewStateMap;
+          stepsPrevStateMap =
+              new HashMap<AutomatonProxy,StateProxy>(stepsNewStateMap);
+          stepsPrevStateMap.remove(getResultAutomaton());
         }
       }
       // makes the trace end in an alpha state
@@ -1364,6 +1370,7 @@ public class CompositionalGeneralisedConflictChecker extends
                                                   final Map<AutomatonProxy,StateProxy> stepsStateMap,
                                                   final List<SearchRecord> subtrace)
     {
+      stepsStateMap.remove(getResultAutomaton());
       final ProductDESProxyFactory factory = getFactory();
       final List<TraceStepProxy> substeps = new LinkedList<TraceStepProxy>();
       for (final SearchRecord subStep : subtrace) {
