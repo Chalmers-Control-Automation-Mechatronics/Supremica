@@ -91,6 +91,8 @@ public class ObservationEquivalenceRuleTest
 
   public void test_oeq_4() throws Exception
   {
+    final ObservationEquivalenceRule rule = getAbstractionRule();
+    rule.setSuppressRedundantHiddenTransitions(true);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_4.wmod";
@@ -102,6 +104,14 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_5.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_oeq_6() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_6.wmod";
     runAbstractionRule(group, subdir, name);
   }
 

@@ -36,8 +36,36 @@ class ObservationEquivalenceRule extends AbstractionRule
                              final Collection<EventProxy> propositions)
   {
     super(factory, propositions);
-
+    mSuppressRedundantHiddenTransitions = false;
   }
+
+  // #######################################################################
+  // # Rule Application
+  /**
+   * Sets whether redundant hidden transitions can be suppressed in the
+   * output automaton. If this is set to <CODE>true</CODE>, the transition
+   * minimisation algorithm will attempt to remove tau-transitions that
+   * can be replaced by a sequence of two or more other tau-transitions.
+   * This only works if the input automaton is already tau-loop free, so it
+   * should only be set in this case. The default is <CODE>false</CODE>, which
+   * guarantees a correct but not necessarily minimal result for all inputs.
+   */
+  public void setSuppressRedundantHiddenTransitions(final boolean suppress)
+  {
+    mSuppressRedundantHiddenTransitions = suppress;
+  }
+
+  /**
+   * Gets whether redundant hidden transitions can be suppressed in the
+   * output automaton.
+   * @see {@link #setSuppressRedundantHiddenTransitions(boolean)
+   *      setSuppressHiddenEvent()}
+   */
+  public boolean getSuppressRedundantHiddenTransitions()
+  {
+    return mSuppressRedundantHiddenTransitions;
+  }
+
 
   // #######################################################################
   // # Rule Application
@@ -51,6 +79,8 @@ class ObservationEquivalenceRule extends AbstractionRule
             getPropositions());
     mBiSimulator =
         new ObservationEquivalenceTRSimplifier(mTr, mTr.getEventInt(tau));
+    mBiSimulator.setSuppressRedundantHiddenTransitions
+      (mSuppressRedundantHiddenTransitions);
     final boolean modified = mBiSimulator.run();
     if (modified) {
       final AutomatonProxy convertedAut = mTr.createAutomaton(getFactory());
@@ -69,10 +99,13 @@ class ObservationEquivalenceRule extends AbstractionRule
                                                     mBiSimulator);
   }
 
+
   // #######################################################################
   // # Data Members
   private AutomatonProxy mAutToAbstract;
   private EventProxy mTau;
   private ObserverProjectionTransitionRelation mTr;
   private ObservationEquivalenceTRSimplifier mBiSimulator;
+  private boolean mSuppressRedundantHiddenTransitions;
+
 }

@@ -37,18 +37,33 @@ public class ObservationEquivalenceTRSimplifier
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a new bisimulation simplifier for the given transition
+   * relation.
+   */
   public ObservationEquivalenceTRSimplifier
     (final ObserverProjectionTransitionRelation tr)
   {
     this(tr, -1);
   }
 
+  /**
+   * Creates a new observation equivalence simplifier.
+   * The transition relation may contain tau-loops, and the result is
+   * not guaranteed to have a minimal set of tau-transitions.
+   * @param  tr           The transition relation to be simplified.
+   * @param  tau          The ID of the silent event for observation
+   *                      equivalence. This may be negative, in which case
+   *                      no silent event will be used, i.e., only bisimulation
+   *                      will be computed.
+   */
   public ObservationEquivalenceTRSimplifier
     (final ObserverProjectionTransitionRelation tr, final int tau)
   {
     mHiddenEvent = tau;
     mTransitionRelation = tr;
-    mSuppressHiddenEvent = true;
+    mSuppressHiddenSelfLoops = true;
+    mSuppressRedundantHiddenTransitions = false;
   }
 
 
@@ -84,21 +99,45 @@ public class ObservationEquivalenceTRSimplifier
    * if it has at least one non-selfloop transition. The default of this
    * setting is <CODE>true</CODE>.
    */
-  public void setSuppressHiddenEvent(final boolean suppress)
+  public void setSuppressHiddenSelfLoops(final boolean suppress)
   {
-    mSuppressHiddenEvent = suppress;
+    mSuppressHiddenSelfLoops = suppress;
   }
 
   /**
    * Gets whether the hidden event is to be suppressed in the output
    * automaton when possible.
-   * @see {@link #setSuppressHiddenEvent(boolean) setSuppressHiddenEvent()}
+   * @see {@link #setSuppressHiddenSelfLoops(boolean) setSuppressHiddenEvent()}
    */
   public boolean getSuppressHiddenEvent()
   {
-    return mSuppressHiddenEvent;
+    return mSuppressHiddenSelfLoops;
   }
 
+  /**
+   * Sets whether redundant hidden transitions can be suppressed in the
+   * output automaton. If this is set to <CODE>true</CODE>, the transition
+   * minimisation algorithm will attempt to remove tau-transitions that
+   * can be replaced by a sequence of two or more other tau-transitions.
+   * This only works if the input automaton is already tau-loop free, so it
+   * should only be set in this case. The default is <CODE>false</CODE>, which
+   * guarantees a correct but not necessarily minimal result for all inputs.
+   */
+  public void setSuppressRedundantHiddenTransitions(final boolean suppress)
+  {
+    mSuppressRedundantHiddenTransitions = suppress;
+  }
+
+  /**
+   * Gets whether redundant hidden transitions can be suppressed in the
+   * output automaton.
+   * @see {@link #setSuppressRedundantHiddenTransitions(boolean)
+   *      setSuppressHiddenEvent()}
+   */
+  public boolean getSuppressRedundantHiddenTransitions()
+  {
+    return mSuppressRedundantHiddenTransitions;
+  }
 
   //#########################################################################
   //# Invocation
@@ -152,7 +191,7 @@ public class ObservationEquivalenceTRSimplifier
       }
     }
 
-    if (mSuppressHiddenEvent && mHiddenEvent >= 0) {
+    if (mSuppressHiddenSelfLoops && mHiddenEvent >= 0) {
       if (mTransitionRelation.isGloballyDisabled(mHiddenEvent)) {
         mTransitionRelation.removeEvent(mHiddenEvent);
       }
@@ -262,6 +301,9 @@ public class ObservationEquivalenceTRSimplifier
     for (int s = 0; s < mNumStates; s++) {
       if (mTransitionRelation.hasPredecessors(s)) {
         for (int e = 0; e < mNumEvents; e++) {
+          if (e == mHiddenEvent && !mSuppressRedundantHiddenTransitions) {
+            continue;
+          }
           final TIntHashSet preds =
             mTransitionRelation.getPredecessors(s, e);
           if (preds != null) {
@@ -679,7 +721,8 @@ public class ObservationEquivalenceTRSimplifier
   //# Data Members
   private int mHiddenEvent;
   private ObserverProjectionTransitionRelation mTransitionRelation;
-  private boolean mSuppressHiddenEvent;
+  private boolean mSuppressHiddenSelfLoops;
+  private boolean mSuppressRedundantHiddenTransitions;
 
   private int mNumStates;
   private int mNumEvents;
