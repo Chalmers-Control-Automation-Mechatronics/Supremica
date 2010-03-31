@@ -1227,6 +1227,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
+      System.out.println(conflictTrace);
       // TODO For later, may also have to consider the case that the
       // simplified automaton does not contain any tau event, and only
       // bisimulation was used.
@@ -1316,6 +1317,8 @@ public class CompositionalGeneralisedConflictChecker extends
                                                 getModel(), traceAutomata,
                                                 convertedSteps,
                                                 ConflictKind.CONFLICT);
+
+      System.out.println("CONVERTED  " + " " + convertedTrace);
       return convertedTrace;
     }
 
