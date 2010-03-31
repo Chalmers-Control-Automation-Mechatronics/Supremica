@@ -95,6 +95,14 @@ public class RemovalOfAlphaMarkingsRuleTest
     runAbstractionRule(group, subdir, name);
   }
 
+  public void test_alpharemoval_3() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_3.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
   // TODO More tests needed ...
 
   /**
@@ -103,11 +111,12 @@ public class RemovalOfAlphaMarkingsRuleTest
    */
   public void testReentrant() throws Exception
   {
-    // TODO As soon as there are more tests, try some more variation here.
     test_alpharemoval_1();
     test_alpharemoval_2();
+    test_alpharemoval_3();
     test_alpharemoval_1();
     test_alpharemoval_2();
+    test_alpharemoval_3();
   }
 
 }

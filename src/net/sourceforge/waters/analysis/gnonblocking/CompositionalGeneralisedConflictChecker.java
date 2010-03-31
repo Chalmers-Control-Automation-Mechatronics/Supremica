@@ -160,6 +160,7 @@ public class CompositionalGeneralisedConflictChecker extends
       // TODO: candidate selection (i.e. heuristics) still need testing
 
       final AutomatonProxy syncProduct = composeSynchronousProduct(candidate);
+      // TODO: Skip hiding step if there are no local events (?)
       final EventProxy tau = createTauEvent(syncProduct);
       final AutomatonProxy autToAbstract =
           hideLocalEvents(syncProduct, candidate.getLocalEvents(), tau);
@@ -578,6 +579,10 @@ public class CompositionalGeneralisedConflictChecker extends
       for (final AutomatonProxy a : automata) {
         if (a != chosenAut) {
           final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
+          // TODO Only allow candidates if the two automata share at least
+          // one non-proposition event. If there are is no synchronisation,
+          // do not create any candidate for this pair.
+
           // Bring pair into defined ordering.
           // (Better do this here than as side effect of constructor.)
           if (chosenAut.compareTo(a) < 0) {
@@ -1159,6 +1164,8 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(convertedStep);
           sourceState = targetState;
         } else {
+          // TODO To fix the marshalling bug, make sure the initial step
+          // (stepEvent == null) also has its state map modified correctly.
           convertedSteps.add(step);
         }
       }

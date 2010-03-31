@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="oeq_7" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>This test checks whether redundant tau transitions originating from loops of silent transitions can be handled correctly by the observation equivalence algorithm. The critical question here is whether the tau transition from S0 to S2 is retained in the abstraction.</ns2:Comment>
+    <ns2:Comment>This test checks whether the observation equivalence algorithm can correctly add markings to a state that already has some.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
             <ColorGeometry>

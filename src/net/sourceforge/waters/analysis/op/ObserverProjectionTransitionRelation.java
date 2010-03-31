@@ -263,16 +263,27 @@ public class ObserverProjectionTransitionRelation
     markState(state, EMPTY_MARKING);
   }
 
-  public void markState(final int state, final boolean value, final int prop)
+  public void markState(final int state, final int prop, final boolean value)
   {
     final int m = mStateMarkings[state];
     final TIntHashSet markings = mMarkingDefinitions.get(m);
     if (value != markings.contains(prop)) {
-      final TIntHashSet newset = new TIntHashSet(markings);
+      final int size = markings.size();
+      final TIntHashSet newset = new TIntHashSet(size);
+      final TIntIterator iter = markings.iterator();
       if (value) {
+        while (iter.hasNext()) {
+          final int e = iter.next();
+          newset.add(e);
+        }
         newset.add(prop);
       } else {
-        newset.remove(prop);
+        while (iter.hasNext()) {
+          final int e = iter.next();
+          if (e != prop) {
+            newset.add(e);
+          }
+        }
       }
       markState(state, newset);
     }

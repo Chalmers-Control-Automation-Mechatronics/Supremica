@@ -77,7 +77,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
             final int targetID = iter.next();
             if (mTR.isMarked(targetID, alphaID)) {
               if (targetID != sourceID) {
-                mTR.markState(sourceID, false, alphaID);
+                mTR.markState(sourceID, alphaID, false);
                 modified = true;
                 break;
               }

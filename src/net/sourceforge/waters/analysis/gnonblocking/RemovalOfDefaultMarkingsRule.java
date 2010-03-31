@@ -108,7 +108,7 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
             }
           }
         }
-        mTR.markState(sourceID, false, defaultID);
+        mTR.markState(sourceID, defaultID, false);
         modified = true;
       }
     }
