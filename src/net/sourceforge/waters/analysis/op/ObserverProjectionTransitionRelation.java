@@ -370,12 +370,13 @@ public class ObserverProjectionTransitionRelation
   /**
    * Adds the given proposition to the event alphabet of this transition
    * relation.
-   * @param prop       The event to be added.
-   * @param markStates A flag. If <CODE>true</CODE> all states will be
-   *                   marked with the new proposition. If <CODE>false</CODE>,
-   *                   no states will be marked.
+   * @param  prop       The event to be added.
+   * @param  markStates A flag. If <CODE>true</CODE> all states will be
+   *                    marked with the new proposition. If <CODE>false</CODE>,
+   *                    no states will be marked.
+   * @return The event ID given to the new proposition.
    */
-  public void addProposition(final EventProxy prop, final boolean markStates)
+  public int addProposition(final EventProxy prop, final boolean markStates)
   {
     final int propID = mEvents.length;
     final int newNumEvents = propID + 1;
@@ -387,6 +388,7 @@ public class ObserverProjectionTransitionRelation
         set.add(propID);
       }
     }
+    return propID;
   }
 
 
