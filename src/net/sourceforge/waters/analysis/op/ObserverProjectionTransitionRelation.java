@@ -306,8 +306,14 @@ public class ObserverProjectionTransitionRelation
         }
       }
       if (!containsAll) {
-        final TIntHashSet newset = new TIntHashSet(toSet);
+        final int size = fromSet.size() + toSet.size();
+        final TIntHashSet newset = new TIntHashSet(size);
         iter = fromSet.iterator();
+        while (iter.hasNext()) {
+          final int e = iter.next();
+          newset.add(e);
+        }
+        iter = toSet.iterator();
         while (iter.hasNext()) {
           final int e = iter.next();
           newset.add(e);

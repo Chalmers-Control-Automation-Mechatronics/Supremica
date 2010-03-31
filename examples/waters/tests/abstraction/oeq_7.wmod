@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="oeq_7" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This test checks whether redundant tau transitions originating from loops of silent transitions can be handled correctly by the observation equivalence algorithm. The critical question here is whether the tau transition from S0 to S2 is retained in the abstraction.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting">
+            <ColorGeometry>
+                <Color Red="0" Green="0" Blue="0"/>
+            </ColorGeometry>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":alpha">
+            <ColorGeometry>
+                <Color Red="255" Green="0" Blue="0"/>
+            </ColorGeometry>
+        </EventDecl>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="before">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Name="S2">
+                        <EventList>
+                            <SimpleIdentifier Name=":alpha"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="224" X="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="0" X="-24"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="128" X="48"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="0" X="-27"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="6" X="-27"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="S0" Source="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="224" X="48"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="176" X="61"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="128" X="48"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="S1" Source="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="2" X="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="176" X="35"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S0" Source="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="6" X="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="128" X="144"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="144" X="95"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="128" X="48"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="S2" Source="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="128" X="48"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="115" X="97"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="128" X="144"/>
+                        </EndPointGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="after">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                            <SimpleIdentifier Name=":alpha"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="48" X="48"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="0" X="-27"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="8" X="-16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

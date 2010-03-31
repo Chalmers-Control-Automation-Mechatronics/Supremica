@@ -565,8 +565,9 @@ public class ObserverProjectionConflictChecker
     final TransitionRelationSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier(rel, codeOfTau);
     final boolean hadLoops = loopRemover.run();
-    final TransitionRelationSimplifier bisimulator =
+    final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier(rel, codeOfTau);
+    bisimulator.setSuppressRedundantHiddenTransitions(true);
     final boolean hadBisim = bisimulator.run();
     if (hadLoops || hadBisim) {
       final ProductDESProxyFactory factory = getFactory();
