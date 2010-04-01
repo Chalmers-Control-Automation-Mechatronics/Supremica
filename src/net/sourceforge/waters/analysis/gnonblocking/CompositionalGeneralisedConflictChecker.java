@@ -255,12 +255,11 @@ public class CompositionalGeneralisedConflictChecker extends
         new ObservationEquivalenceRule(getFactory(), mPropositions);
     mAbstractionRules.add(oeRule);
 
-    /*
-     * final RemovalOfAlphaMarkingsRule ramRule = new
-     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(ramRule);
-     */
+    final RemovalOfAlphaMarkingsRule ramRule =
+        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+    ramRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(ramRule);
+
     /*
      * final RemovalOfDefaultMarkingsRule rdmRule = new
      * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
@@ -1298,7 +1297,6 @@ public class CompositionalGeneralisedConflictChecker extends
               originalSource = mOriginalStates[originalTargetID];
             }
           } else {
-            // convertedSteps.add(step);
             stepsNewStateMap.remove(getResultAutomaton());
             final TraceStepProxy convertedStep =
                 getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
@@ -1673,9 +1671,9 @@ public class CompositionalGeneralisedConflictChecker extends
           new ArrayList<TraceStepProxy>(numSteps);
       for (final TraceStepProxy step : traceSteps) {
         final EventProxy stepEvent = step.getEvent();
+        final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
         if (stepEvent != null) {
-          final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
-              new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
           final StateProxy targetState =
               stepsNewStateMap.get(getResultAutomaton());
 
@@ -1687,7 +1685,10 @@ public class CompositionalGeneralisedConflictChecker extends
               getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
           convertedSteps.add(convertedStep);
         } else {
-          convertedSteps.add(step);
+          stepsNewStateMap.remove(getResultAutomaton());
+          final TraceStepProxy convertedStep =
+              getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
+          convertedSteps.add(convertedStep);
         }
       }
       final Set<AutomatonProxy> traceAutomata =
