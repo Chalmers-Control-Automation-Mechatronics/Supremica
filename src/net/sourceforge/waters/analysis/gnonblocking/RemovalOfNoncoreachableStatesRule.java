@@ -70,7 +70,8 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
                            final EventProxy tau)
   {
     mAutToAbstract = autToAbstract;
-    if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
+    if (!autToAbstract.getEvents().contains(mAlphaMarking)
+        && !autToAbstract.getEvents().contains(mDefaultMarking)) {
       return autToAbstract;
     }
     boolean modified = false;
@@ -90,6 +91,7 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
       if ((mTR.isMarked(sourceID, defaultID) || mTR.isMarked(sourceID, alphaID))
           && !reachableStates.contains(sourceID)) {
         unvisitedStates.push(sourceID);
+        reachableStates.add(sourceID);
         while (unvisitedStates.size() > 0) {
           final int newSource = unvisitedStates.pop();
           if (mTR.hasPredecessors(newSource)) {
