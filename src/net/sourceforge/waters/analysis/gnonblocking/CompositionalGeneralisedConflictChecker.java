@@ -251,22 +251,22 @@ public class CompositionalGeneralisedConflictChecker extends
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
-    final ObservationEquivalenceRule oeRule =
-        new ObservationEquivalenceRule(getFactory(), mPropositions);
-    mAbstractionRules.add(oeRule);
-
-    final RemovalOfAlphaMarkingsRule ramRule =
-        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-    ramRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(ramRule);
-
     /*
-     * final RemovalOfDefaultMarkingsRule rdmRule = new
-     * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
-     * rdmRule.setAlphaMarking(getGeneralisedPrecondition());
-     * rdmRule.setDefaultMarking(getMarkingProposition());
-     * mAbstractionRules.add(rdmRule);
+     * final ObservationEquivalenceRule oeRule = new
+     * ObservationEquivalenceRule(getFactory(), mPropositions);
+     * mAbstractionRules.add(oeRule);
+     *
+     * final RemovalOfAlphaMarkingsRule ramRule = new
+     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(ramRule);
      */
+
+    final RemovalOfDefaultMarkingsRule rdmRule =
+        new RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
+    rdmRule.setAlphaMarking(getGeneralisedPrecondition());
+    rdmRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rdmRule);
 
   }
 
@@ -1267,7 +1267,9 @@ public class CompositionalGeneralisedConflictChecker extends
       convertedSteps.addAll(initialSteps);
       originalSourceID =
           initialRecords.get(initialRecords.size() - 1).getState();
-      Map<AutomatonProxy,StateProxy> stepsPrevStateMap = null;
+      Map<AutomatonProxy,StateProxy> stepsPrevStateMap =
+          new HashMap<AutomatonProxy,StateProxy>(traceSteps.get(0)
+              .getStateMap());
 
       StateProxy originalSource = mOriginalStates[originalSourceID];
       for (final TraceStepProxy step : traceSteps) {

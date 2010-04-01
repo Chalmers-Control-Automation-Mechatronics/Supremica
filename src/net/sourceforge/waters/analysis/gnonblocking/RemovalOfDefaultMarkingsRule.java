@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
+import gnu.trove.TIntStack;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -69,8 +70,8 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
 
   // #######################################################################
   // # Rule Application
-  AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
-                           final EventProxy tau)
+  AutomatonProxy applyRuleOld(final AutomatonProxy autToAbstract,
+                              final EventProxy tau)
   {
     mAutToAbstract = autToAbstract;
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
@@ -108,6 +109,64 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
             }
           }
         }
+        mTR.markState(sourceID, defaultID, false);
+        modified = true;
+      }
+    }
+    if (modified) {
+      final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
+      return convertedAut;
+    } else {
+      return autToAbstract;
+    }
+  }
+
+  AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
+                           final EventProxy tau)
+  {
+    mAutToAbstract = autToAbstract;
+    if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
+      return autToAbstract;
+    }
+    boolean modified = false;
+    mTR =
+        new ObserverProjectionTransitionRelation(autToAbstract,
+            getPropositions());
+    final int alphaID = mTR.getEventInt(mAlphaMarking);
+    final int defaultID = mTR.getEventInt(mDefaultMarking);
+    final int numStates = mTR.getNumberOfStates();
+
+    final TIntHashSet reachableStates = new TIntHashSet();
+    final TIntStack unvisitedStates = new TIntStack();
+
+    // creates a hash set of all states which are reachable from an alpha marked
+    // state
+    for (int sourceID = 0; sourceID < numStates; sourceID++) {
+      if (mTR.isMarked(sourceID, alphaID)
+          && !reachableStates.contains(sourceID)) {
+        unvisitedStates.push(sourceID);
+        while (unvisitedStates.size() > 0) {
+          final int newSource = unvisitedStates.pop();
+          final TIntHashSet[] successors = mTR.getAllSuccessors(newSource);
+          if (successors != null) {
+            for (int e = 0; e < successors.length; e++) {
+              final TIntHashSet targets = successors[e];
+              if (targets != null) {
+                final TIntIterator iter = targets.iterator();
+                while (iter.hasNext()) {
+                  final int targetID = iter.next();
+                  reachableStates.add(targetID);
+                  unvisitedStates.push(targetID);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    // removes default marking from all states which were not found as reachable
+    for (int sourceID = 0; sourceID < numStates; sourceID++) {
+      if (!reachableStates.contains(sourceID)) {
         mTR.markState(sourceID, defaultID, false);
         modified = true;
       }
