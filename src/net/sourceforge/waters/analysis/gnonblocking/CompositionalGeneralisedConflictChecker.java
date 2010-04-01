@@ -150,12 +150,19 @@ public class CompositionalGeneralisedConflictChecker extends
     // candidate and so may not always be left with only one automaton
     while (remainingAut.size() > 1) {
       final Collection<Candidate> candidates = findCandidates(model);
-      final Candidate candidate;
-      if (candidates.size() > 1) {
+      Candidate candidate = null;
+      final int numCandidates = candidates.size();
+      if (numCandidates > 1) {
         candidate = evaluateCandidates(candidates);
-      } else {
+      } else if (numCandidates == 1) {
         final Iterator<Candidate> it = candidates.iterator();
         candidate = it.next();
+      } else {
+        // TODO: consider whether its worth forcing the use of another candidate
+        // selection heuristic here (i.e. the remaining aut don't share any
+        // events,and so are no longer paired together as a candidate since they
+        // don't synchronise on any events)
+        break;
       }
       // TODO: candidate selection (i.e. heuristics) still need testing
 
@@ -579,10 +586,6 @@ public class CompositionalGeneralisedConflictChecker extends
       for (final AutomatonProxy a : automata) {
         if (a != chosenAut) {
           final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
-          // TODO Only allow candidates if the two automata share at least
-          // one non-proposition event. If there are is no synchronisation,
-          // do not create any candidate for this pair.
-
           // Bring pair into defined ordering.
           // (Better do this here than as side effect of constructor.)
           if (chosenAut.compareTo(a) < 0) {
@@ -594,8 +597,11 @@ public class CompositionalGeneralisedConflictChecker extends
           }
           final Set<EventProxy> localEvents =
               identifyLocalEvents(mEventsToAutomata, pair);
-          final Candidate candidate = new Candidate(pair, localEvents);
-          candidates.add(candidate);
+
+          if (localEvents.size() > 0) {
+            final Candidate candidate = new Candidate(pair, localEvents);
+            candidates.add(candidate);
+          }
         }
       }
       return candidates;
@@ -1166,7 +1172,10 @@ public class CompositionalGeneralisedConflictChecker extends
         } else {
           // TODO To fix the marshalling bug, make sure the initial step
           // (stepEvent == null) also has its state map modified correctly.
-          convertedSteps.add(step);
+          stepsNewStateMap.remove(getResultAutomaton());
+          final TraceStepProxy convertedStep =
+              getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
+          convertedSteps.add(convertedStep);
         }
       }
       final Set<AutomatonProxy> traceAutomata =
@@ -1234,7 +1243,6 @@ public class CompositionalGeneralisedConflictChecker extends
 
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
-      System.out.println(conflictTrace);
       // TODO For later, may also have to consider the case that the
       // simplified automaton does not contain any tau event, and only
       // bisimulation was used.
@@ -1324,8 +1332,6 @@ public class CompositionalGeneralisedConflictChecker extends
                                                 getModel(), traceAutomata,
                                                 convertedSteps,
                                                 ConflictKind.CONFLICT);
-
-      System.out.println("CONVERTED  " + " " + convertedTrace);
       return convertedTrace;
     }
 
