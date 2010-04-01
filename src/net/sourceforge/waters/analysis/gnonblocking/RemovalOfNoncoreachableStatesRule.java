@@ -9,7 +9,10 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntIterator;
+import gnu.trove.TIntStack;
+
 import java.util.Collection;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -67,22 +70,81 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
                            final EventProxy tau)
   {
     mAutToAbstract = autToAbstract;
-    final boolean modified = false;
-    final ObserverProjectionTransitionRelation tr =
+    if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
+      return autToAbstract;
+    }
+    boolean modified = false;
+    mTR =
         new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
-    @SuppressWarnings("unused")
-    final int alphaID = tr.getEventInt(mAlphaMarking);
-    @SuppressWarnings("unused")
-    final int defaultID = tr.getEventInt(mDefaultMarking);
-    @SuppressWarnings("unused")
-    final int numStates = tr.getNumberOfStates();
+    final int alphaID = mTR.getEventInt(mAlphaMarking);
+    final int defaultID = mTR.getEventInt(mDefaultMarking);
+    final int numStates = mTR.getNumberOfStates();
 
-    @SuppressWarnings("unused")
-    final TIntArrayList initialStates = tr.getAllInitialStates();
+    final TIntHashSet reachableStates = new TIntHashSet();
+    final TIntStack unvisitedStates = new TIntStack();
 
+    // creates a hash set of all states which can reach an omega marked or alpha
+    // marked state
+    for (int sourceID = 0; sourceID < numStates; sourceID++) {
+      if ((mTR.isMarked(sourceID, defaultID) || mTR.isMarked(sourceID, alphaID))
+          && !reachableStates.contains(sourceID)) {
+        unvisitedStates.push(sourceID);
+        while (unvisitedStates.size() > 0) {
+          final int newSource = unvisitedStates.pop();
+          if (mTR.hasPredecessors(newSource)) {
+            final TIntHashSet[] predecessors =
+                mTR.getAllPredecessors(newSource);
+            for (int e = 0; e < predecessors.length; e++) {
+              final TIntHashSet preds = predecessors[e];
+              if (preds != null) {
+                final TIntIterator iter = preds.iterator();
+                while (iter.hasNext()) {
+                  final int predID = iter.next();
+                  reachableStates.add(predID);
+                  unvisitedStates.push(predID);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    // removes states which can not reach a state marked alpha or omega
+    for (int sourceID = 0; sourceID < numStates; sourceID++) {
+      if (!reachableStates.contains(sourceID)) {
+        if (mTR.hasPredecessors(sourceID)) {
+          final TIntHashSet[] predecessors = mTR.getAllPredecessors(sourceID);
+          for (int e = 0; e < predecessors.length; e++) {
+            final TIntHashSet preds = predecessors[e];
+            if (preds != null) {
+              final TIntIterator iter = preds.iterator();
+              while (iter.hasNext()) {
+                final int predID = iter.next();
+                mTR.moveAllSuccessors(sourceID, predID);
+                modified = true;
+              }
+            }
+          }
+        }
+        final TIntHashSet[] successors = mTR.getAllSuccessors(sourceID);
+        if (successors.length > 0) {
+          for (int e = 0; e < successors.length; e++) {
+            final TIntHashSet targets = successors[e];
+            if (targets != null) {
+              final TIntIterator iter = targets.iterator();
+              while (iter.hasNext()) {
+                final int targetID = iter.next();
+                mTR.moveAllPredeccessors(sourceID, targetID);
+                modified = true;
+              }
+            }
+          }
+        }
+      }
+    }
     if (modified) {
-      final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
+      final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
       return convertedAut;
     } else {
       return autToAbstract;
@@ -96,63 +158,11 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
     return null;
   }
 
-
-  // #########################################################################
-  // # Inner Class SearchRecord
-  @SuppressWarnings("unused")
-  private static class SearchRecord
-  {
-
-    // #######################################################################
-    // # Constructors
-    SearchRecord(final int state)
-    {
-      this(state, false, -1, null);
-    }
-
-    SearchRecord(final int state, final boolean hasEvent, final int event,
-                 final SearchRecord pred)
-    {
-      mState = state;
-      mHasMarking = hasEvent;
-      mEvent = event;
-      mPredecessor = pred;
-    }
-
-    // #######################################################################
-    // # Getters
-    boolean hasProperEvent()
-    {
-      return mHasMarking;
-    }
-
-    int getState()
-    {
-      return mState;
-    }
-
-    SearchRecord getPredecessor()
-    {
-      return mPredecessor;
-    }
-
-    int getEvent()
-    {
-      return mEvent;
-    }
-
-    // #######################################################################
-    // # Data Members
-    private final int mState;
-    private final boolean mHasMarking;
-    private final int mEvent;
-    private final SearchRecord mPredecessor;
-  }
-
   // #######################################################################
   // # Data Members
   private EventProxy mAlphaMarking;
   private EventProxy mDefaultMarking;
   @SuppressWarnings("unused")
   private AutomatonProxy mAutToAbstract;
+  private ObserverProjectionTransitionRelation mTR;
 }
