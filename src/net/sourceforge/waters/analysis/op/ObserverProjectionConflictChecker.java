@@ -182,41 +182,45 @@ public class ObserverProjectionConflictChecker
   }
 
 
-  private SynchronousProductBuilder getSynchronousProductBuilder
-    (final ProductDESProxy model)
+  private SynchronousProductBuilder setupSynchronousProductBuilder()
   {
-    if (mSynchronousProductBuilder == null) {
-      final ProductDESProxyFactory factory = getFactory();
-      mSynchronousProductBuilder =
-        new MonolithicSynchronousProductBuilder(factory);
+    if (mCurrentSynchronousProductBuilder == null) {
+      if (mSynchronousProductBuilder == null) {
+        final ProductDESProxyFactory factory = getFactory();
+        mCurrentSynchronousProductBuilder =
+          new MonolithicSynchronousProductBuilder(factory);
+      } else {
+        mCurrentSynchronousProductBuilder = mSynchronousProductBuilder;
+      }
+      mCurrentSynchronousProductBuilder.setPropositions(mPropositions);
+      final int nlimit = getInternalStepNodeLimit();
+      mCurrentSynchronousProductBuilder.setNodeLimit(nlimit);
+      final int tlimit = getInternalStepTransitionLimit();
+      mCurrentSynchronousProductBuilder.setTransitionLimit(tlimit);
     }
-    mSynchronousProductBuilder.setPropositions(mPropositions);
-    final int nlimit = getInternalStepNodeLimit();
-    mSynchronousProductBuilder.setNodeLimit(nlimit);
-    final int tlimit = getInternalStepTransitionLimit();
-    mSynchronousProductBuilder.setTransitionLimit(tlimit);
-    mSynchronousProductBuilder.setModel(model);
-    return mSynchronousProductBuilder;
+    return mCurrentSynchronousProductBuilder;
   }
 
-  private ConflictChecker getMonolithicConflictChecker
-    (final ProductDESProxy model)
+  private ConflictChecker setupMonolithicConflictChecker()
     throws EventNotFoundException
   {
-    if (mMonolithicConflictChecker == null) {
-      final ProductDESProxyFactory factory = getFactory();
-      mMonolithicConflictChecker = new NativeConflictChecker(factory);
+    if (mCurrentMonolithicConflictChecker == null) {
+      if (mMonolithicConflictChecker == null) {
+        final ProductDESProxyFactory factory = getFactory();
+        mCurrentMonolithicConflictChecker = new NativeConflictChecker(factory);
+      } else {
+        mCurrentMonolithicConflictChecker = mMonolithicConflictChecker;
+      }
+      final int nlimit = getFinalStepNodeLimit();
+      mCurrentMonolithicConflictChecker.setNodeLimit(nlimit);
+      final int tlimit = getFinalStepTransitionLimit();
+      mCurrentMonolithicConflictChecker.setTransitionLimit(tlimit);
+      final KindTranslator translator = getKindTranslator();
+      mCurrentMonolithicConflictChecker.setKindTranslator(translator);
+      final EventProxy marking = getUsedMarkingProposition();
+      mCurrentMonolithicConflictChecker.setMarkingProposition(marking);
     }
-    final int nlimit = getFinalStepNodeLimit();
-    mMonolithicConflictChecker.setNodeLimit(nlimit);
-    final int tlimit = getFinalStepTransitionLimit();
-    mMonolithicConflictChecker.setTransitionLimit(tlimit);
-    final KindTranslator translator = getKindTranslator();
-    mMonolithicConflictChecker.setKindTranslator(translator);
-    final EventProxy marking = getUsedMarkingProposition();
-    mMonolithicConflictChecker.setMarkingProposition(marking);
-    mMonolithicConflictChecker.setModel(model);
-    return mMonolithicConflictChecker;
+    return mCurrentMonolithicConflictChecker;
   }
 
 
@@ -320,17 +324,7 @@ public class ObserverProjectionConflictChecker
       }
     } while (!candidates.isEmpty());
 
-    final ProductDESProxy model = createCurrentModel();
-    final ConflictChecker checker = getMonolithicConflictChecker(model);
-    final boolean result = checker.run();
-    if (result) {
-      setSatisfiedResult();
-    } else {
-      final ConflictTraceProxy trace0 = checker.getCounterExample();
-      final ConflictTraceProxy trace1 = expandTrace(trace0);
-      setFailedResult(trace1);
-    }
-
+    final boolean result = runMonolithicConflictCheck();
     tearDown();
     return result;
   }
@@ -356,6 +350,8 @@ public class ObserverProjectionConflictChecker
       final SelectingHeuristic defaultHeuristic = new HeuristicMinS();
       setSelectingHeuristic(defaultHeuristic);
     }
+    setupSynchronousProductBuilder();
+    setupMonolithicConflictChecker();
     mModifyingSteps = new ArrayList<Step>();
     mNumOverflows = 0;
     mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
@@ -364,7 +360,8 @@ public class ObserverProjectionConflictChecker
   protected void tearDown()
   {
     mPropositions = null;
-    mSynchronousProductBuilder = null;
+    mCurrentSynchronousProductBuilder = null;
+    mCurrentMonolithicConflictChecker = null;
     mEventsToAutomata = null;
     mModifyingSteps = null;
     mOverflowCandidates = null;
@@ -462,18 +459,87 @@ public class ObserverProjectionConflictChecker
       !mOverflowCandidates.contains(automata);
   }
 
-  private ProductDESProxy createCurrentModel()
+  private boolean runMonolithicConflictCheck()
+    throws AnalysisException
+  {
+    final EventProxy marking = getUsedMarkingProposition();
+    final Collection<AutomatonProxy> remainingAutomata =
+      new THashSet<AutomatonProxy>(mCurrentAutomata);
+    final List<EventProxy> remainingEvents =
+      new LinkedList<EventProxy>(mEventsToAutomata.keySet());
+    Collections.sort(remainingEvents);
+    final List<ProductDESProxy> tasks = new LinkedList<ProductDESProxy>();
+    while (!remainingEvents.isEmpty()) {
+      final int numAutomata = remainingAutomata.size();
+      final Collection<AutomatonProxy> subSystemAutomata =
+        new THashSet<AutomatonProxy>(numAutomata);
+      final int numEvents = remainingEvents.size() + 1;
+      final List<EventProxy> subSystemEvents =
+        new ArrayList<EventProxy>(numEvents);
+      boolean change;
+      do {
+        change = false;
+        final Iterator<EventProxy> iter = remainingEvents.iterator();
+        while (iter.hasNext()) {
+          final EventProxy event = iter.next();
+          final Collection<AutomatonProxy> eventAutomata =
+            mEventsToAutomata.get(event);
+          if (!subSystemAutomata.isEmpty()) {
+            boolean intersects = false;
+            for (final AutomatonProxy aut : eventAutomata) {
+              if (subSystemAutomata.contains(aut)) {
+                intersects = true;
+                break;
+              }
+            }
+            if (!intersects) {
+              continue;
+            }
+          }
+          change |= subSystemAutomata.addAll(eventAutomata);
+          subSystemEvents.add(event);
+          iter.remove();
+        }
+      } while (change);
+      remainingAutomata.removeAll(subSystemAutomata);
+      final List<AutomatonProxy> subSystemAutomataList =
+        new ArrayList<AutomatonProxy>(subSystemAutomata);
+      Collections.sort(subSystemAutomataList);
+      subSystemEvents.add(marking);
+      final ProductDESProxy des = createDES(subSystemEvents,
+                                            subSystemAutomataList);
+      tasks.add(des);
+    }
+    if (!remainingAutomata.isEmpty()) {
+      final List<EventProxy> markings = Collections.singletonList(marking);
+      for (final AutomatonProxy aut : remainingAutomata) {
+        final List<AutomatonProxy> automata = Collections.singletonList(aut);
+        final ProductDESProxy des = createDES(markings, automata);
+        tasks.add(des);
+      }
+    }
+    if (tasks.size() > 1) {
+      final Comparator<ProductDESProxy> comparator = new DESSizeComparator();
+      Collections.sort(tasks, comparator);
+    }
+    for (final ProductDESProxy des : tasks) {
+      mCurrentMonolithicConflictChecker.setModel(des);
+      if (!mCurrentMonolithicConflictChecker.run()) {
+        final ConflictTraceProxy trace0 =
+          mCurrentMonolithicConflictChecker.getCounterExample();
+        final ConflictTraceProxy trace1 = expandTrace(trace0);
+        return setFailedResult(trace1);
+      }
+    }
+    return setSatisfiedResult();
+  }
+
+  private ProductDESProxy createDES(final List<EventProxy> events,
+                                    final List<AutomatonProxy> automata)
   {
     final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy model = getModel();
-    final String name = model.getName();
-    final Set<EventProxy> eventSet = new THashSet<EventProxy>();
-    for (final AutomatonProxy aut : mCurrentAutomata) {
-      eventSet.addAll(aut.getEvents());
-    }
-    final List<EventProxy> eventList = new ArrayList<EventProxy>(eventSet);
-    Collections.sort(eventList);
-    return factory.createProductDESProxy(name, eventList, mCurrentAutomata);
+    final String name = Candidate.getCompositionName(automata);
+    return factory.createProductDESProxy(name, events, automata);
   }
 
 
@@ -535,7 +601,7 @@ public class ObserverProjectionConflictChecker
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = candidate.createProductDESProxy(factory);
-    final SynchronousProductBuilder builder = getSynchronousProductBuilder(des);
+    mCurrentSynchronousProductBuilder.setModel(des);
     final Collection<EventProxy> local = candidate.getLocalEvents();
     final EventProxy tau;
     if (local.isEmpty()) {
@@ -543,15 +609,17 @@ public class ObserverProjectionConflictChecker
     } else {
       final String tauname = "tau:" + des.getName();
       tau = factory.createEventProxy(tauname, EventKind.UNCONTROLLABLE, false);
-      builder.addMask(local, tau);
+      mCurrentSynchronousProductBuilder.addMask(local, tau);
     }
     try {
-      builder.run();
-      final AutomatonProxy sync = builder.getComputedAutomaton();
-      final SynchronousProductStateMap stateMap = builder.getStateMap();
+      mCurrentSynchronousProductBuilder.run();
+      final AutomatonProxy sync =
+        mCurrentSynchronousProductBuilder.getComputedAutomaton();
+      final SynchronousProductStateMap stateMap =
+        mCurrentSynchronousProductBuilder.getStateMap();
       return new CompositionStep(sync, local, tau, stateMap);
     } finally {
-      builder.clearMask();
+      mCurrentSynchronousProductBuilder.clearMask();
     }
   }
 
@@ -638,11 +706,12 @@ public class ObserverProjectionConflictChecker
       traceSteps = step.convertTraceSteps(traceSteps);
     }
     final ProductDESProxyFactory factory = getFactory();
+    final String tracename = getTraceName();
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> automata = model.getAutomata();
-    return factory.createConflictTraceProxy(trace.getName(),
+    return factory.createConflictTraceProxy(tracename,
                                             trace.getComment(),
-                                            trace.getLocation(),
+                                            null,
                                             model,
                                             automata,
                                             traceSteps,
@@ -657,8 +726,7 @@ public class ObserverProjectionConflictChecker
     (final ConflictTraceProxy trace)
   {
     final ProductDESProxyFactory factory = getFactory();
-    final Collection<AutomatonProxy> automata = trace.getAutomata();
-    final int numAutomata = automata.size();
+    final int numAutomata = mCurrentAutomata.size();
     final List<TraceStepProxy> steps = trace.getTraceSteps();
     final int numSteps = steps.size();
     final List<TraceStepProxy> convertedSteps =
@@ -669,7 +737,7 @@ public class ObserverProjectionConflictChecker
     final Map<AutomatonProxy,StateProxy> firstMap = firstStep.getStateMap();
     final Map<AutomatonProxy,StateProxy> convertedFirstMap =
       new HashMap<AutomatonProxy,StateProxy>(numAutomata);
-    for (final AutomatonProxy aut : automata) {
+    for (final AutomatonProxy aut : mCurrentAutomata) {
       final StateProxy state = getInitialState(aut, firstMap);
       convertedFirstMap.put(aut, state);
     }
@@ -683,7 +751,7 @@ public class ObserverProjectionConflictChecker
       final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
       final Map<AutomatonProxy,StateProxy> convertedStepMap =
         new HashMap<AutomatonProxy,StateProxy>(numAutomata);
-      for (final AutomatonProxy aut : automata) {
+      for (final AutomatonProxy aut : mCurrentAutomata) {
         final StateProxy prev = previousStepMap.get(aut);
         final StateProxy state = findSuccessor(aut, event, prev, stepMap);
         convertedStepMap.put(aut, state);
@@ -1520,8 +1588,8 @@ public class ObserverProjectionConflictChecker
   }
 
 
-  // #########################################################################
-  // # Inner Class SearchRecord
+  //#########################################################################
+  //# Inner Class SearchRecord
   private static class SearchRecord
   {
 
@@ -1573,10 +1641,34 @@ public class ObserverProjectionConflictChecker
 
 
   //#########################################################################
+  //# Inner Class DESComparator
+  private static class DESSizeComparator implements Comparator<ProductDESProxy>
+  {
+
+    //#######################################################################
+    //# Interface java.util.Comparator<ProductDESProxy>
+    public int compare(final ProductDESProxy des1, final ProductDESProxy des2)
+    {
+      final int aut1 = des1.getAutomata().size();
+      final int aut2 = des2.getAutomata().size();
+      if (aut1 != aut2) {
+        return aut1 - aut2;
+      }
+      final int events1 = des1.getEvents().size();
+      final int events2 = des2.getEvents().size();
+      if (events1 != events2) {
+        return events1 - events2;
+      }
+      return des1.compareTo(des2);
+    }
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   private PreselectingHeuristic mPreselectingHeuristic;
   private Comparator<Candidate> mSelectingHeuristics;
-
   private Collection<EventProxy> mPropositions;
   private SynchronousProductBuilder mSynchronousProductBuilder;
   private ConflictChecker mMonolithicConflictChecker;
@@ -1589,6 +1681,8 @@ public class ObserverProjectionConflictChecker
   private List<Step> mModifyingSteps;
   private Set<List<AutomatonProxy>> mOverflowCandidates;
   private int mNumOverflows;
+  private SynchronousProductBuilder mCurrentSynchronousProductBuilder;
+  private ConflictChecker mCurrentMonolithicConflictChecker;
 
 
   //#########################################################################

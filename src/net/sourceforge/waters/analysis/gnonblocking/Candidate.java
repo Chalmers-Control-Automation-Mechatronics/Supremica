@@ -122,18 +122,7 @@ public class Candidate implements Comparable<Candidate>
   //# Overrides for java.lang.Object
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer("{");
-    boolean first = true;
-    for (final AutomatonProxy aut : mAutomata) {
-      if (first) {
-        first = false;
-      } else {
-        buffer.append(',');
-      }
-      buffer.append(aut.getName());
-    }
-    buffer.append('}');
-    return buffer.toString();
+    return getCompositionName(mAutomata);
   }
 
 
@@ -190,8 +179,29 @@ public class Candidate implements Comparable<Candidate>
 
 
   //#########################################################################
+  //# Static Methods
+  /**
+   * Calculates a name that can be given to a synchronous product automaton.
+   */
+  public static String getCompositionName(final List<AutomatonProxy> automata)
+  {
+    final StringBuffer buffer = new StringBuffer("{");
+    boolean first = true;
+    for (final AutomatonProxy aut : automata) {
+      if (first) {
+        first = false;
+      } else {
+        buffer.append(',');
+      }
+      buffer.append(aut.getName());
+    }
+    buffer.append('}');
+    return buffer.toString();
+  }
+
+
+  //#########################################################################
   //# Invocation
-  /** The list of automata is sorted alphabetically by automaton names. */
   private final List<AutomatonProxy> mAutomata;
   private final Set<EventProxy> mLocalEvents;
   private int mEventCount;
