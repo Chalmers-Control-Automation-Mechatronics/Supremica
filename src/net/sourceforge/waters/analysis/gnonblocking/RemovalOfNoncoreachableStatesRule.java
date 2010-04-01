@@ -104,9 +104,10 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
                 final TIntIterator iter = preds.iterator();
                 while (iter.hasNext()) {
                   final int predID = iter.next();
-                  // TODO do not add if the state is already in reachable
-                  reachableStates.add(predID);
-                  unvisitedStates.push(predID);
+                  if (!reachableStates.contains(predID)) {
+                    reachableStates.add(predID);
+                    unvisitedStates.push(predID);
+                  }
                 }
               }
             }

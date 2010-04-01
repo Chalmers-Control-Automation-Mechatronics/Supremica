@@ -107,7 +107,6 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
                                                mResultingStateToIntMap);
   }
 
-
   // #######################################################################
   // # Data Members
   private EventProxy mAlphaMarking;
