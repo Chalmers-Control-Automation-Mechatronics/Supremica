@@ -90,6 +90,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
    */
   public void test_noncoreachableStatesRemoval_1() throws Exception
   {
+    // TODO Please check in those .wmod files.
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_1.wmod";

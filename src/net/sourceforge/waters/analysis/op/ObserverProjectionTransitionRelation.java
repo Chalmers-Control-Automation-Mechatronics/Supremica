@@ -510,20 +510,6 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
-  public void removeSharedSuccessors(final int has, final int remove)
-  {
-    for (int e = 0; e < mSuccessors[has].length; e++) {
-      final TIntHashSet hassuccs = mSuccessors[has][e];
-      if (hassuccs == null) {
-        continue;
-      }
-      final int[] succs = hassuccs.toArray();
-      for (int i = 0; i < succs.length; i++) {
-        removeTransition(remove, e, succs[i]);
-      }
-    }
-  }
-
   public void removeEvent(final int event)
   {
     mEvents[event] = null;
@@ -872,6 +858,7 @@ public class ObserverProjectionTransitionRelation
     return factory.createAutomatonProxy(mName, mKind, events, reachable,
                                         transitions);
   }
+
 
   // #########################################################################
   // # Auxiliary Methods

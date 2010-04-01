@@ -94,6 +94,7 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
         reachableStates.add(sourceID);
         while (unvisitedStates.size() > 0) {
           final int newSource = unvisitedStates.pop();
+          // TODO don't put unreachable states on the stack in the first place.
           if (mTR.hasPredecessors(newSource)) {
             final TIntHashSet[] predecessors =
                 mTR.getAllPredecessors(newSource);
@@ -103,6 +104,7 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
                 final TIntIterator iter = preds.iterator();
                 while (iter.hasNext()) {
                   final int predID = iter.next();
+                  // TODO do not add if the state is already in reachable
                   reachableStates.add(predID);
                   unvisitedStates.push(predID);
                 }
@@ -115,6 +117,7 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
     // removes states which can not reach a state marked alpha or omega
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if (!reachableStates.contains(sourceID)) {
+        // TODO don't visit unreachable states in the first place.
         if (mTR.hasPredecessors(sourceID)) {
           final TIntHashSet[] predecessors = mTR.getAllPredecessors(sourceID);
           for (int e = 0; e < predecessors.length; e++) {
@@ -123,6 +126,8 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
               final TIntIterator iter = preds.iterator();
               while (iter.hasNext()) {
                 final int predID = iter.next();
+                // TODO why move successors? Try removeAllIncoming() ...
+                // Then the loop below should not be needed.
                 mTR.moveAllSuccessors(sourceID, predID);
                 modified = true;
               }

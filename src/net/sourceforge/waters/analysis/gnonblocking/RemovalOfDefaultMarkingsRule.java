@@ -85,6 +85,10 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
     final int defaultID = mTR.getEventInt(mDefaultMarking);
     final int numStates = mTR.getNumberOfStates();
 
+    // TODO Use TIntHashSet + TIntStack like in coreachability rule,
+    // and check whether a state is visited before queueing it.
+    // TODO Also first push all marked states on the stack, then
+    // start a single search.
     nextSource: for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if (mTR.isMarked(sourceID, defaultID)) {
         final Queue<Integer> open = new ArrayDeque<Integer>();

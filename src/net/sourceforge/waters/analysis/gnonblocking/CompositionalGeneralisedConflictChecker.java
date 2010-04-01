@@ -162,6 +162,7 @@ public class CompositionalGeneralisedConflictChecker extends
         // selection heuristic here (i.e. the remaining aut don't share any
         // events,and so are no longer paired together as a candidate since they
         // don't synchronise on any events)
+        // This is how it would have done it, too.
         break;
       }
       // TODO: candidate selection (i.e. heuristics) still need testing
@@ -233,13 +234,13 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     super.setUp();
     if (mPreselectingHeuristic == null) {
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
-      // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
       setPreselectingHeuristic(defaultHeuristic);
     }
     if (mSelectingHeuristics == null) {
-      final SelectingHeuristic defaultHeuristic = new HeuristicMaxL();
+      final SelectingHeuristic defaultHeuristic = new HeuristicMinS();
       setSelectingHeuristic(defaultHeuristic);
     }
     mModifyingSteps = new ArrayList<Step>();
@@ -268,11 +269,13 @@ public class CompositionalGeneralisedConflictChecker extends
      * rdmRule.setDefaultMarking(getMarkingProposition());
      * mAbstractionRules.add(rdmRule);
      */
+    /*
     final RemovalOfNoncoreachableStatesRule rnsRule =
         new RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
     rnsRule.setAlphaMarking(getGeneralisedPrecondition());
     rnsRule.setDefaultMarking(getMarkingProposition());
     mAbstractionRules.add(rnsRule);
+    */
 
   }
 
@@ -1175,8 +1178,6 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(convertedStep);
           sourceState = targetState;
         } else {
-          // TODO To fix the marshalling bug, make sure the initial step
-          // (stepEvent == null) also has its state map modified correctly.
           stepsNewStateMap.remove(getResultAutomaton());
           final TraceStepProxy convertedStep =
               getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
