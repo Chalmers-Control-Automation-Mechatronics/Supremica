@@ -146,6 +146,7 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
       if (mTR.isMarked(sourceID, alphaID)
           && !reachableStates.contains(sourceID)) {
         unvisitedStates.push(sourceID);
+        reachableStates.add(sourceID);
         while (unvisitedStates.size() > 0) {
           final int newSource = unvisitedStates.pop();
           final TIntHashSet[] successors = mTR.getAllSuccessors(newSource);
@@ -167,7 +168,8 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
     }
     // removes default marking from all states which were not found as reachable
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      if (!reachableStates.contains(sourceID)) {
+      if (!reachableStates.contains(sourceID)
+          && mTR.isMarked(sourceID, defaultID)) {
         mTR.markState(sourceID, defaultID, false);
         modified = true;
       }
