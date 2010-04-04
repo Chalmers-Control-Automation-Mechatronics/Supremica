@@ -13,10 +13,7 @@ import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
 import gnu.trove.TIntStack;
 
-import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.Queue;
-
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -70,61 +67,6 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
 
   // #######################################################################
   // # Rule Application
-  AutomatonProxy applyRuleOld(final AutomatonProxy autToAbstract,
-                              final EventProxy tau)
-  {
-    mAutToAbstract = autToAbstract;
-    if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
-      return autToAbstract;
-    }
-    boolean modified = false;
-    mTR =
-        new ObserverProjectionTransitionRelation(autToAbstract,
-            getPropositions());
-    final int alphaID = mTR.getEventInt(mAlphaMarking);
-    final int defaultID = mTR.getEventInt(mDefaultMarking);
-    final int numStates = mTR.getNumberOfStates();
-
-    // TODO Use TIntHashSet + TIntStack like in coreachability rule,
-    // and check whether a state is visited before queueing it.
-    // TODO Also first push all marked states on the stack, then
-    // start a single search.
-    nextSource: for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      if (mTR.isMarked(sourceID, defaultID)) {
-        final Queue<Integer> open = new ArrayDeque<Integer>();
-        open.add(sourceID);
-        while (!open.isEmpty()) {
-          final int newSource = open.remove();
-          if (mTR.hasPredecessors(newSource)) {
-            final TIntHashSet[] predecessors =
-                mTR.getAllPredecessors(newSource);
-            for (int e = 0; e < predecessors.length; e++) {
-              final TIntHashSet preds = predecessors[e];
-              if (preds != null) {
-                final TIntIterator iter = preds.iterator();
-                while (iter.hasNext()) {
-                  final int predID = iter.next();
-                  if (mTR.isMarked(predID, alphaID)) {
-                    continue nextSource;
-                  }
-                  open.add(predID);
-                }
-              }
-            }
-          }
-        }
-        mTR.markState(sourceID, defaultID, false);
-        modified = true;
-      }
-    }
-    if (modified) {
-      final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
-      return convertedAut;
-    } else {
-      return autToAbstract;
-    }
-  }
-
   AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
                            final EventProxy tau)
   {
@@ -161,8 +103,10 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
                 final TIntIterator iter = targets.iterator();
                 while (iter.hasNext()) {
                   final int targetID = iter.next();
-                  reachableStates.add(targetID);
-                  unvisitedStates.push(targetID);
+                  if (!reachableStates.contains(targetID)) {
+                    reachableStates.add(targetID);
+                    unvisitedStates.push(targetID);
+                  }
                 }
               }
             }
