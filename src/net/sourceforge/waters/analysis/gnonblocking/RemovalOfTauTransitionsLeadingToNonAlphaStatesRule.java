@@ -9,13 +9,11 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -24,9 +22,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 /**
  * For a given Automaton applies an abstraction rule which removes a transition
- * when a tau event links two states where at most one of them contains the
+ * when a tau event links two states where at most the source contains the
  * alpha marking proposition (if the unmarked state becomes unreachable it is
- * removed to). All transitions originating from the removed state (y) are
+ * removed, too). All transitions originating from the removed state (y) are
  * copied to state x.
  *
  * @author Rachel Francis
@@ -93,8 +91,6 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     mTau = tau;
 
     final int alphaID = mTR.getEventInt(mAlphaMarking);
-    @SuppressWarnings("unused")
-    final int defaultID = mTR.getEventInt(mDefaultMarking);
     final int numStates = mTR.getNumberOfStates();
 
     // creates a hash set of all states which are reachable from an alpha marked
@@ -102,9 +98,9 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       final TIntHashSet successors = mTR.getSuccessors(sourceID, tauID);
       if (successors != null) {
+        final TIntArrayList transToRemove =
+          new TIntArrayList(successors.size());
         final TIntIterator iter = successors.iterator();
-        final List<Integer> transToRemove =
-            new ArrayList<Integer>(successors.size());
         while (iter.hasNext()) {
           final int targetID = iter.next();
           if (!mTR.isMarked(targetID, alphaID)) {
@@ -113,9 +109,10 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
             }
           }
         }
-        for (final int target : transToRemove) {
-          mTR.removeTransition(sourceID, tauID, target);
-          mTR.moveAllSuccessors(target, sourceID);
+        for (int i = 0; i < transToRemove.size(); i++) {
+          final int targetID = transToRemove.get(i);
+          mTR.removeTransition(sourceID, tauID, targetID);
+          mTR.moveAllSuccessors(targetID, sourceID);
           modified = true;
         }
       }
