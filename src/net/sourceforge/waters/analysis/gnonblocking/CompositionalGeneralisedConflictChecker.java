@@ -1319,10 +1319,15 @@ public class CompositionalGeneralisedConflictChecker extends
           // the event is selflooped in all states of the result, and removed
           // it. (You can disable this optimisation, but that is not a good
           // idea.)
-          // If the event is not in the original automaton, do as you are doing
-          // below. If the event is in the original automaton but not in the
+          // If the event is not in the original automaton, consider it as a
+          // selfloop in the original automaton. This seems to be what you are
+          // doing below, but is it guaranteed in all cases that the unchanged
+          // target state is stored in the trace?
+          // If the event is in the original automaton but not in the
           // result automaton, consider it as a selfloop in the result
-          // automaton and still search for a trace.
+          // automaton and still search for a trace. We need to find a way
+          // how the original automaton can execute the step event and then
+          // return to the current state---this is not always just a selfloop.
           if (getResultAutomaton().getEvents().contains(stepEvent)) {
             final int eventID = mTransitionRelation.getEventInt(stepEvent);
 
@@ -1380,9 +1385,9 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     /**
-     * Given a list of SearchRecord's a list of TraceStepProxy's is created and
-     * returned. A TraceStepProxy is created for each SearchRecord.
-     *
+     * Given a list of {@link SearchRecord} objects a list of
+     * {@link TraceStepProxy} objects is created and returned.
+     * A TraceStepProxy is created for each SearchRecord.
      * @param stepsNewStateMap
      *          The state map for the step before adding the new information.
      * @param subtrace
