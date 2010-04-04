@@ -79,8 +79,6 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     final int alphaID = mTR.getEventInt(mAlphaMarking);
     final int numStates = mTR.getNumberOfStates();
 
-    // creates a hash set of all states which are reachable from an alpha marked
-    // state
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       final TIntHashSet successors = mTR.getSuccessors(sourceID, tauID);
       if (successors != null) {

@@ -267,12 +267,10 @@ public class CompositionalGeneralisedConflictChecker extends
      * mAbstractionRules.add(oeRule);
      */
 
-    /*
-     * final RemovalOfAlphaMarkingsRule ramRule = new
-     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(ramRule);
-     */
+    final RemovalOfAlphaMarkingsRule ramRule =
+        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+    ramRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(ramRule);
 
     /*
      * final RemovalOfDefaultMarkingsRule rdmRule = new
@@ -290,11 +288,12 @@ public class CompositionalGeneralisedConflictChecker extends
      * mAbstractionRules.add(rnsRule);
      */
 
-    final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttnsRule =
-        new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
-            mPropositions);
-    rttnsRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(rttnsRule);
+    /*
+     * final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttnsRule = new
+     * RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
+     * mPropositions); rttnsRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(rttnsRule);
+     */
   }
 
   // #########################################################################
@@ -970,7 +969,6 @@ public class CompositionalGeneralisedConflictChecker extends
                                              final ConflictTraceProxy counterexample)
     {
       // TODO Fix bug. Also saturate initial state.
-      // TODO Fix bug. Do not erase info for other automata.
       final List<TraceStepProxy> traceSteps = counterexample.getTraceSteps();
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
@@ -978,17 +976,16 @@ public class CompositionalGeneralisedConflictChecker extends
           getInitialState(getResultAutomaton(), traceSteps.get(0));
 
       for (final TraceStepProxy step : traceSteps) {
-        final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
+        final Map<AutomatonProxy,StateProxy> stepMap =
+            new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
         final EventProxy stepEvent = step.getEvent();
         if (stepEvent != null) {
           StateProxy targetState = stepMap.get(getResultAutomaton());
           if (targetState == null) {
             targetState = findSuccessor(sourceState, stepEvent);
-            final Map<AutomatonProxy,StateProxy> statemap =
-                new HashMap<AutomatonProxy,StateProxy>(1);
-            statemap.put(getResultAutomaton(), targetState);
+            stepMap.put(getResultAutomaton(), targetState);
             final TraceStepProxy convertedStep =
-                getFactory().createTraceStepProxy(stepEvent, statemap);
+                getFactory().createTraceStepProxy(stepEvent, stepMap);
             convertedSteps.add(convertedStep);
           } else {
             convertedSteps.add(step);
