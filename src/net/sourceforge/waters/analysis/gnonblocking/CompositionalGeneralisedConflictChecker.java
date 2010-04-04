@@ -294,7 +294,6 @@ public class CompositionalGeneralisedConflictChecker extends
         new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
             mPropositions);
     rttnsRule.setAlphaMarking(getGeneralisedPrecondition());
-    rttnsRule.setDefaultMarking(getMarkingProposition());
     mAbstractionRules.add(rttnsRule);
   }
 
@@ -1386,8 +1385,9 @@ public class CompositionalGeneralisedConflictChecker extends
 
     /**
      * Given a list of {@link SearchRecord} objects a list of
-     * {@link TraceStepProxy} objects is created and returned.
-     * A TraceStepProxy is created for each SearchRecord.
+     * {@link TraceStepProxy} objects is created and returned. A TraceStepProxy
+     * is created for each SearchRecord.
+     *
      * @param stepsNewStateMap
      *          The state map for the step before adding the new information.
      * @param subtrace

@@ -60,26 +60,12 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     mAlphaMarking = alphaMarking;
   }
 
-  EventProxy getDefaultMarking()
-  {
-    return mDefaultMarking;
-  }
-
-  void setDefaultMarking(final EventProxy defaultMarking)
-  {
-    mDefaultMarking = defaultMarking;
-  }
-
   // #######################################################################
   // # Rule Application
   AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
                            final EventProxy tau)
   {
     mAutToAbstract = autToAbstract;
-    /*
-     * if (!autToAbstract.getEvents().contains(mAlphaMarking)) { return
-     * autToAbstract; }
-     */
     boolean modified = false;
     mTR =
         new ObserverProjectionTransitionRelation(autToAbstract,
@@ -119,8 +105,8 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     }
     if (modified) {
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
-      System.out.println(autToAbstract);
-      System.out.println("CONVERTED------------" + convertedAut);
+      // System.out.println(autToAbstract);
+      // System.out.println("CONVERTED------------" + convertedAut);
       return convertedAut;
     } else {
       return autToAbstract;
@@ -141,7 +127,6 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
   // #######################################################################
   // # Data Members
   private EventProxy mAlphaMarking;
-  private EventProxy mDefaultMarking;
   private EventProxy mTau;
   private AutomatonProxy mAutToAbstract;
   private ObserverProjectionTransitionRelation mTR;

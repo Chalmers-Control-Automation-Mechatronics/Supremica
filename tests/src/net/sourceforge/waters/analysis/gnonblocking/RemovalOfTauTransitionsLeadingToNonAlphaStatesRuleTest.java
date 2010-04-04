@@ -52,8 +52,6 @@ public class RemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest extends
         getAbstractionRule();
     final EventProxy alphaMarking = findEvent(des, ALPHA);
     rule.setAlphaMarking(alphaMarking);
-    final EventProxy defaultMarking = findEvent(des, OMEGA);
-    rule.setDefaultMarking(defaultMarking);
   }
 
   protected RemovalOfTauTransitionsLeadingToNonAlphaStatesRule getAbstractionRule()

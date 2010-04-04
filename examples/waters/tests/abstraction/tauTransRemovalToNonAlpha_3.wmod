@@ -157,7 +157,7 @@
                             <SimpleIdentifier Name=":alpha"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="48" X="64"/>
+                            <Point Y="64" X="64"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
                             <Point Y="0" X="-27"/>
@@ -184,12 +184,20 @@
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
+                    <Edge Target="S3" Source="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
                     <Edge Target="S4" Source="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="e2"/>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="11" X="75"/>
+                            <Point Y="19" X="68"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="S1" Source="S4">
