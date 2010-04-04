@@ -968,7 +968,6 @@ public class CompositionalGeneralisedConflictChecker extends
     private ConflictTraceProxy saturateTrace(
                                              final ConflictTraceProxy counterexample)
     {
-      // TODO Fix bug. Also saturate initial state.
       final List<TraceStepProxy> traceSteps = counterexample.getTraceSteps();
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
@@ -979,21 +978,21 @@ public class CompositionalGeneralisedConflictChecker extends
         final Map<AutomatonProxy,StateProxy> stepMap =
             new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
         final EventProxy stepEvent = step.getEvent();
-        if (stepEvent != null) {
-          StateProxy targetState = stepMap.get(getResultAutomaton());
-          if (targetState == null) {
+        StateProxy targetState = stepMap.get(getResultAutomaton());
+        if (targetState == null) {
+          if (stepEvent != null) {
             targetState = findSuccessor(sourceState, stepEvent);
-            stepMap.put(getResultAutomaton(), targetState);
-            final TraceStepProxy convertedStep =
-                getFactory().createTraceStepProxy(stepEvent, stepMap);
-            convertedSteps.add(convertedStep);
           } else {
-            convertedSteps.add(step);
+            targetState = sourceState;
           }
-          sourceState = targetState;
+          stepMap.put(getResultAutomaton(), targetState);
+          final TraceStepProxy convertedStep =
+              getFactory().createTraceStepProxy(stepEvent, stepMap);
+          convertedSteps.add(convertedStep);
         } else {
           convertedSteps.add(step);
         }
+        sourceState = targetState;
       }
       final ConflictTraceProxy saturatedCounterexample =
           getFactory().createConflictTraceProxy(counterexample.getName(),
