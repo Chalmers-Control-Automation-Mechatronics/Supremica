@@ -61,7 +61,7 @@ public abstract class AbstractStandardConflictCheckerTest extends
     testSmallFactory2();
   }
 
-  /*public void testOverflowException() throws Exception
+  public void testOverflowException() throws Exception
   {
     try {
       final ModelVerifier verifier = getModelVerifier();
@@ -71,7 +71,7 @@ public abstract class AbstractStandardConflictCheckerTest extends
     } catch (final OverflowException exception) {
       // O.K.
     }
-  }*/
+  }
 
   // #########################################################################
   // # Test Cases --- nondeterministic
@@ -445,18 +445,13 @@ public abstract class AbstractStandardConflictCheckerTest extends
   }
 
   /*
-   * This test seems to be too much for compositional methods in Eclipse.
-   * Move to 'large' test suite?
-  public void testProfisafeI3HostEFA() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "profisafe";
-    final String name = "profisafe_ihost_efa.wmod";
-    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
-    final List<ParameterBindingProxy> bindings =
-        Collections.singletonList(binding);
-    runModelVerifier(group, dir, name, bindings, true);
-  }
+   * This test seems to be too much for compositional methods in Eclipse. Move
+   * to 'large' test suite? public void testProfisafeI3HostEFA() throws
+   * Exception { final String group = "tests"; final String dir = "profisafe";
+   * final String name = "profisafe_ihost_efa.wmod"; final ParameterBindingProxy
+   * binding = createBinding("MAXSEQNO", 3); final List<ParameterBindingProxy>
+   * bindings = Collections.singletonList(binding); runModelVerifier(group, dir,
+   * name, bindings, true); }
    */
 
   public void testProfisafeI3HostEFABlock() throws Exception
