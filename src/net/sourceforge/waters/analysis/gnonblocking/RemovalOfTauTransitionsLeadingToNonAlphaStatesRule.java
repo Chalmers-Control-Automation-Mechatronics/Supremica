@@ -90,6 +90,7 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     if (tauID == -1) {
       return autToAbstract;
     }
+    mTau = tau;
 
     final int alphaID = mTR.getEventInt(mAlphaMarking);
     @SuppressWarnings("unused")
@@ -135,13 +136,14 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
         .createRemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
                                                                   abstractedAut,
                                                                   mAutToAbstract,
-                                                                  mTR);
+                                                                  mTau, mTR);
   }
 
   // #######################################################################
   // # Data Members
   private EventProxy mAlphaMarking;
   private EventProxy mDefaultMarking;
+  private EventProxy mTau;
   private AutomatonProxy mAutToAbstract;
   private ObserverProjectionTransitionRelation mTR;
 }
