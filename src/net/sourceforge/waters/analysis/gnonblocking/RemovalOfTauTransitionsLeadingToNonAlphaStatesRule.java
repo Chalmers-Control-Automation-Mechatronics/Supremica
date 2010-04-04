@@ -109,13 +109,13 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
           if (!mTR.isMarked(targetID, alphaID)) {
             if (targetID != sourceID) {
               transToRemove.add(targetID);
-              mTR.moveAllSuccessors(targetID, sourceID);
-              modified = true;
             }
           }
         }
         for (final int target : transToRemove) {
           mTR.removeTransition(sourceID, tauID, target);
+          mTR.moveAllSuccessors(target, sourceID);
+          modified = true;
         }
       }
     }
@@ -131,9 +131,10 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
                                                           final CompositionalGeneralisedConflictChecker checker,
                                                           final AutomatonProxy abstractedAut)
   {
-    return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract,
-                                               mTR.getOriginalIntToStateMap(),
-                                               mTR.getResultingStateToIntMap());
+    return checker
+        .createRemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
+                                                                  abstractedAut,
+                                                                  mAutToAbstract);
   }
 
   // #######################################################################

@@ -263,23 +263,35 @@ public class CompositionalGeneralisedConflictChecker extends
      * mAbstractionRules.add(oeRule);
      */
 
-    final RemovalOfAlphaMarkingsRule ramRule =
-        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-    ramRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(ramRule);
+    /*
+     * final RemovalOfAlphaMarkingsRule ramRule = new
+     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(ramRule);
+     */
 
-    final RemovalOfDefaultMarkingsRule rdmRule =
-        new RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
-    rdmRule.setAlphaMarking(getGeneralisedPrecondition());
-    rdmRule.setDefaultMarking(getMarkingProposition());
-    mAbstractionRules.add(rdmRule);
+    /*
+     * final RemovalOfDefaultMarkingsRule rdmRule = new
+     * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
+     * rdmRule.setAlphaMarking(getGeneralisedPrecondition());
+     * rdmRule.setDefaultMarking(getMarkingProposition());
+     * mAbstractionRules.add(rdmRule);
+     */
 
-    final RemovalOfNoncoreachableStatesRule rnsRule =
-        new RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
-    rnsRule.setAlphaMarking(getGeneralisedPrecondition());
-    rnsRule.setDefaultMarking(getMarkingProposition());
-    mAbstractionRules.add(rnsRule);
+    /*
+     * final RemovalOfNoncoreachableStatesRule rnsRule = new
+     * RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
+     * rnsRule.setAlphaMarking(getGeneralisedPrecondition());
+     * rnsRule.setDefaultMarking(getMarkingProposition());
+     * mAbstractionRules.add(rnsRule);
+     */
 
+    final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttnsRule =
+        new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
+            mPropositions);
+    rttnsRule.setAlphaMarking(getGeneralisedPrecondition());
+    rttnsRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rttnsRule);
   }
 
   // #########################################################################
@@ -890,6 +902,14 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     return new RemovalOfMarkingsOrNoncoreachableStatesStep(abstractedAut,
         autToAbstract, originalStates, resultingStates);
+  }
+
+  public RemovalOfTauTransitionsLeadingToNonAlphaStatesStep createRemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
+                                                                                                                     final AutomatonProxy abstractedAut,
+                                                                                                                     final AutomatonProxy autToAbstract)
+  {
+    return new RemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
+        abstractedAut, autToAbstract);
   }
 
 
@@ -1719,6 +1739,29 @@ public class CompositionalGeneralisedConflictChecker extends
     // # Data Members
     private final TObjectIntHashMap<StateProxy> mResultingStates;
     private final StateProxy[] mOriginalStates;
+  }
+
+
+  // #########################################################################
+  // # Inner Class RemovalOfTauTransitionsLeadingToNonAlphaStatesStep
+  /**
+   * This step class performs correct counterexample trace conversion for
+   * RemovalOfTauTransitionsLeadingToNonAlphaStatesRule.
+   */
+  private class RemovalOfTauTransitionsLeadingToNonAlphaStatesStep extends Step
+  {
+    RemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
+                                                       final AutomatonProxy resultAut,
+                                                       final AutomatonProxy originalAut)
+    {
+      super(resultAut, originalAut);
+
+    }
+
+    ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
+    {
+      return null;
+    }
   }
 
 
