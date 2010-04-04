@@ -11,7 +11,11 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -94,22 +98,29 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
       final TIntHashSet successors = mTR.getSuccessors(sourceID, tauID);
       if (successors != null) {
         final TIntIterator iter = successors.iterator();
+        final List<Integer> transToRemove =
+            new ArrayList<Integer>(successors.size());
         while (iter.hasNext()) {
           final int targetID = iter.next();
           if (!mTR.isMarked(targetID, alphaID)) {
             if (targetID != sourceID) {
+              transToRemove.add(targetID);
               mTR.moveAllSuccessors(targetID, sourceID);
               // TODO: need to determine if this state is reachable and remove
               // it if not
               modified = true;
-              break;
             }
           }
+        }
+        for (final int target : transToRemove) {
+          mTR.removeTransition(sourceID, tauID, target);
         }
       }
     }
     if (modified) {
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
+      System.out.println(autToAbstract);
+      System.out.println("CONVERTED----------" + convertedAut);
       return convertedAut;
     } else {
       return autToAbstract;
