@@ -95,19 +95,17 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
         while (unvisitedStates.size() > 0) {
           final int newSource = unvisitedStates.pop();
           // TODO don't put unreachable states on the stack in the first place.
-          if (mTR.hasPredecessors(newSource)) {
-            final TIntHashSet[] predecessors =
-                mTR.getAllPredecessors(newSource);
-            for (int e = 0; e < predecessors.length; e++) {
-              final TIntHashSet preds = predecessors[e];
-              if (preds != null) {
-                final TIntIterator iter = preds.iterator();
-                while (iter.hasNext()) {
-                  final int predID = iter.next();
-                  if (!reachableStates.contains(predID)) {
-                    reachableStates.add(predID);
-                    unvisitedStates.push(predID);
-                  }
+          final TIntHashSet[] predecessors = mTR.getAllPredecessors(newSource);
+          for (int e = 0; e < predecessors.length; e++) {
+            final TIntHashSet preds = predecessors[e];
+            if (preds != null) {
+              final TIntIterator iter = preds.iterator();
+              while (iter.hasNext()) {
+                final int predID = iter.next();
+                if (!reachableStates.contains(predID)
+                    && mTR.hasPredecessors(predID)) {
+                  reachableStates.add(predID);
+                  unvisitedStates.push(predID);
                 }
               }
             }

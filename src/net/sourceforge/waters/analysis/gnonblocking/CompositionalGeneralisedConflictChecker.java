@@ -158,11 +158,6 @@ public class CompositionalGeneralisedConflictChecker extends
         final Iterator<Candidate> it = candidates.iterator();
         candidate = it.next();
       } else {
-        // TODO: consider whether its worth forcing the use of another candidate
-        // selection heuristic here (i.e. the remaining aut don't share any
-        // events,and so are no longer paired together as a candidate since they
-        // don't synchronise on any events)
-        // This is how it would have done it, too.
         break;
       }
       // TODO: candidate selection (i.e. heuristics) still need testing
@@ -252,16 +247,16 @@ public class CompositionalGeneralisedConflictChecker extends
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
-    /*
-     * final ObservationEquivalenceRule oeRule = new
-     * ObservationEquivalenceRule(getFactory(), mPropositions);
-     * mAbstractionRules.add(oeRule);
-     */
-    final RemovalOfAlphaMarkingsRule ramRule =
-        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-    ramRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(ramRule);
+    final ObservationEquivalenceRule oeRule =
+        new ObservationEquivalenceRule(getFactory(), mPropositions);
+    mAbstractionRules.add(oeRule);
 
+    /*
+     * final RemovalOfAlphaMarkingsRule ramRule = new
+     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(ramRule);
+     */
     /*
      * final RemovalOfDefaultMarkingsRule rdmRule = new
      * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
@@ -270,12 +265,12 @@ public class CompositionalGeneralisedConflictChecker extends
      * mAbstractionRules.add(rdmRule);
      */
     /*
-    final RemovalOfNoncoreachableStatesRule rnsRule =
-        new RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
-    rnsRule.setAlphaMarking(getGeneralisedPrecondition());
-    rnsRule.setDefaultMarking(getMarkingProposition());
-    mAbstractionRules.add(rnsRule);
-    */
+     * final RemovalOfNoncoreachableStatesRule rnsRule = new
+     * RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
+     * rnsRule.setAlphaMarking(getGeneralisedPrecondition());
+     * rnsRule.setDefaultMarking(getMarkingProposition());
+     * mAbstractionRules.add(rnsRule);
+     */
 
   }
 
@@ -1277,6 +1272,7 @@ public class CompositionalGeneralisedConflictChecker extends
       Map<AutomatonProxy,StateProxy> stepsPrevStateMap =
           new HashMap<AutomatonProxy,StateProxy>(traceSteps.get(0)
               .getStateMap());
+      stepsPrevStateMap.remove(getResultAutomaton());
 
       StateProxy originalSource = mOriginalStates[originalSourceID];
       for (final TraceStepProxy step : traceSteps) {
