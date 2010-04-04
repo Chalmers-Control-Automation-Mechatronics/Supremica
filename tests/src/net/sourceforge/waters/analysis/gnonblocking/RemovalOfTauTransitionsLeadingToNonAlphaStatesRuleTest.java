@@ -117,6 +117,23 @@ public class RemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest extends
     runAbstractionRule(group, subdir, name);
   }
 
+  public void test_tauTransRemovalToNonAlpha_TwoConsecutiveTau()
+      throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "tauTransRemovalToNonAlpha_4.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_tauTransRemovalToNonAlpha_TwoTau() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "tauTransRemovalToNonAlpha_5.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
   // TODO More tests needed ...
 
   /**

@@ -122,6 +122,8 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     }
     if (modified) {
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
+      System.out.println(autToAbstract);
+      System.out.println("CONVERTED------------" + convertedAut);
       return convertedAut;
     } else {
       return autToAbstract;
