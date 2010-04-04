@@ -87,6 +87,10 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
         new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
     final int tauID = mTR.getEventInt(tau);
+    if (tauID == -1) {
+      return autToAbstract;
+    }
+
     final int alphaID = mTR.getEventInt(mAlphaMarking);
     @SuppressWarnings("unused")
     final int defaultID = mTR.getEventInt(mDefaultMarking);
@@ -106,8 +110,6 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
             if (targetID != sourceID) {
               transToRemove.add(targetID);
               mTR.moveAllSuccessors(targetID, sourceID);
-              // TODO: need to determine if this state is reachable and remove
-              // it if not
               modified = true;
             }
           }
@@ -119,8 +121,6 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     }
     if (modified) {
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
-      System.out.println(autToAbstract);
-      System.out.println("CONVERTED----------" + convertedAut);
       return convertedAut;
     } else {
       return autToAbstract;
