@@ -256,15 +256,15 @@ public class CompositionalGeneralisedConflictChecker extends
             targetState = getInitialState(aut, step);
           }
           stepMap.put(aut, targetState);
-          final TraceStepProxy convertedStep =
-              getFactory().createTraceStepProxy(stepEvent, stepMap);
-          convertedSteps.add(convertedStep);
           stepOriginallySaturated = false;
         }
       }
       if (stepOriginallySaturated) {
         convertedSteps.add(step);
       } else {
+        final TraceStepProxy convertedStep =
+            getFactory().createTraceStepProxy(stepEvent, stepMap);
+        convertedSteps.add(convertedStep);
         stepOriginallySaturated = true;
       }
       prevStepMap = stepMap;
@@ -277,6 +277,8 @@ public class CompositionalGeneralisedConflictChecker extends
                                               counterexample.getAutomata(),
                                               convertedSteps,
                                               counterexample.getKind());
+    System.out.println(counterexample);
+    System.out.println("SATURATED---------" + saturatedCounterexample);
     return saturatedCounterexample;
   }
 
