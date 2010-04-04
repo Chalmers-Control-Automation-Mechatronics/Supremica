@@ -906,10 +906,11 @@ public class CompositionalGeneralisedConflictChecker extends
 
   public RemovalOfTauTransitionsLeadingToNonAlphaStatesStep createRemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
                                                                                                                      final AutomatonProxy abstractedAut,
-                                                                                                                     final AutomatonProxy autToAbstract)
+                                                                                                                     final AutomatonProxy autToAbstract,
+                                                                                                                     final ObserverProjectionTransitionRelation tr)
   {
     return new RemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
-        abstractedAut, autToAbstract);
+        abstractedAut, autToAbstract, tr);
   }
 
 
@@ -1752,16 +1753,62 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     RemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
                                                        final AutomatonProxy resultAut,
-                                                       final AutomatonProxy originalAut)
+                                                       final AutomatonProxy originalAut,
+                                                       final ObserverProjectionTransitionRelation tr)
     {
       super(resultAut, originalAut);
-
+      mTR = tr;
     }
 
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
-      return null;
+      final StateProxy[] originalStates = mTR.getOriginalIntToStateMap();
+      final TObjectIntHashMap<StateProxy> resultingStates =
+          mTR.getResultingStateToIntMap();
+      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      final int numSteps = traceSteps.size();
+      final List<TraceStepProxy> convertedSteps =
+          new ArrayList<TraceStepProxy>(numSteps);
+
+      // final int orginalSource = mTR.getAllInitialStates();
+      for (final TraceStepProxy step : traceSteps) {
+        final EventProxy stepEvent = step.getEvent();
+        final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
+        if (stepEvent != null) {
+          final StateProxy resultTargetState =
+              stepsNewStateMap.get(getResultAutomaton());
+          stepsNewStateMap.remove(getResultAutomaton());
+          final int stateID = resultingStates.get(resultTargetState);
+          final StateProxy replacementState = originalStates[stateID];
+          stepsNewStateMap.put(getOriginalAutomaton(), replacementState);
+          final TraceStepProxy convertedStep =
+              getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
+          convertedSteps.add(convertedStep);
+        } else {
+          stepsNewStateMap.remove(getResultAutomaton());
+          final TraceStepProxy convertedStep =
+              getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
+          convertedSteps.add(convertedStep);
+        }
+      }
+      final Set<AutomatonProxy> traceAutomata =
+          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
+      traceAutomata.remove(getResultAutomaton());
+      traceAutomata.add(getOriginalAutomaton());
+      final ConflictTraceProxy convertedTrace =
+          getFactory().createConflictTraceProxy(conflictTrace.getName(),
+                                                conflictTrace.getComment(),
+                                                conflictTrace.getLocation(),
+                                                getModel(), traceAutomata,
+                                                convertedSteps,
+                                                ConflictKind.CONFLICT);
+      return convertedTrace;
     }
+
+    // #######################################################################
+    // # Data Members
+    private final ObserverProjectionTransitionRelation mTR;
   }
 
 

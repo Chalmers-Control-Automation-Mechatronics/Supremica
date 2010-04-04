@@ -134,7 +134,8 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     return checker
         .createRemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
                                                                   abstractedAut,
-                                                                  mAutToAbstract);
+                                                                  mAutToAbstract,
+                                                                  mTR);
   }
 
   // #######################################################################
