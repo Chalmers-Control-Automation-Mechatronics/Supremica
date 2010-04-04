@@ -60,7 +60,10 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
   {
     mAutToAbstract = autToAbstract;
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
-      // TODO Is this correct?
+      // TODO Is this correct? I don't see why not, this rule can only remove
+      // alpha markings, if the automaton alphabet doesn't contain it why bother
+      // running the algorithm (or atleast this is what I think I am
+      // checking...)
       return autToAbstract;
     }
     boolean modified = false;

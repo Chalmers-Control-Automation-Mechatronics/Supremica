@@ -94,7 +94,6 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
         reachableStates.add(sourceID);
         while (unvisitedStates.size() > 0) {
           final int newSource = unvisitedStates.pop();
-          // TODO don't put unreachable states on the stack in the first place.
           final TIntHashSet[] predecessors = mTR.getAllPredecessors(newSource);
           for (int e = 0; e < predecessors.length; e++) {
             final TIntHashSet preds = predecessors[e];
@@ -118,34 +117,8 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
       if (!reachableStates.contains(sourceID)) {
         // TODO don't visit unreachable states in the first place.
         if (mTR.hasPredecessors(sourceID)) {
-          final TIntHashSet[] predecessors = mTR.getAllPredecessors(sourceID);
-          for (int e = 0; e < predecessors.length; e++) {
-            final TIntHashSet preds = predecessors[e];
-            if (preds != null) {
-              final TIntIterator iter = preds.iterator();
-              while (iter.hasNext()) {
-                final int predID = iter.next();
-                // TODO why move successors? Try removeAllIncoming() ...
-                // Then the loop below should not be needed.
-                mTR.moveAllSuccessors(sourceID, predID);
-                modified = true;
-              }
-            }
-          }
-        }
-        final TIntHashSet[] successors = mTR.getAllSuccessors(sourceID);
-        if (successors.length > 0) {
-          for (int e = 0; e < successors.length; e++) {
-            final TIntHashSet targets = successors[e];
-            if (targets != null) {
-              final TIntIterator iter = targets.iterator();
-              while (iter.hasNext()) {
-                final int targetID = iter.next();
-                mTR.moveAllPredeccessors(sourceID, targetID);
-                modified = true;
-              }
-            }
-          }
+          mTR.removeAllIncoming(sourceID);
+          modified = true;
         }
       }
     }

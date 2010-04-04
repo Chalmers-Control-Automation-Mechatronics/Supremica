@@ -247,9 +247,11 @@ public class CompositionalGeneralisedConflictChecker extends
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
-    final ObservationEquivalenceRule oeRule =
-        new ObservationEquivalenceRule(getFactory(), mPropositions);
-    mAbstractionRules.add(oeRule);
+    /*
+     * final ObservationEquivalenceRule oeRule = new
+     * ObservationEquivalenceRule(getFactory(), mPropositions);
+     * mAbstractionRules.add(oeRule);
+     */
 
     /*
      * final RemovalOfAlphaMarkingsRule ramRule = new
@@ -257,6 +259,7 @@ public class CompositionalGeneralisedConflictChecker extends
      * ramRule.setAlphaMarking(getGeneralisedPrecondition());
      * mAbstractionRules.add(ramRule);
      */
+
     /*
      * final RemovalOfDefaultMarkingsRule rdmRule = new
      * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
@@ -264,13 +267,12 @@ public class CompositionalGeneralisedConflictChecker extends
      * rdmRule.setDefaultMarking(getMarkingProposition());
      * mAbstractionRules.add(rdmRule);
      */
-    /*
-     * final RemovalOfNoncoreachableStatesRule rnsRule = new
-     * RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
-     * rnsRule.setAlphaMarking(getGeneralisedPrecondition());
-     * rnsRule.setDefaultMarking(getMarkingProposition());
-     * mAbstractionRules.add(rnsRule);
-     */
+
+    final RemovalOfNoncoreachableStatesRule rnsRule =
+        new RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
+    rnsRule.setAlphaMarking(getGeneralisedPrecondition());
+    rnsRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rnsRule);
 
   }
 
