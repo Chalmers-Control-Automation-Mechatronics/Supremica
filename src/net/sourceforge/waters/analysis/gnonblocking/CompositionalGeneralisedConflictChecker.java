@@ -880,14 +880,14 @@ public class CompositionalGeneralisedConflictChecker extends
     return oeStep;
   }
 
-  public RemovalOfMarkingsStep createRemovalOfMarkingsStep(
-                                                           final AutomatonProxy abstractedAut,
-                                                           final AutomatonProxy autToAbstract,
-                                                           final StateProxy[] originalStates,
-                                                           final TObjectIntHashMap<StateProxy> resultingStates)
+  public RemovalOfMarkingsOrNoncoreachableStatesStep createRemovalOfMarkingsStep(
+                                                                                 final AutomatonProxy abstractedAut,
+                                                                                 final AutomatonProxy autToAbstract,
+                                                                                 final StateProxy[] originalStates,
+                                                                                 final TObjectIntHashMap<StateProxy> resultingStates)
   {
-    return new RemovalOfMarkingsStep(abstractedAut, autToAbstract,
-        originalStates, resultingStates);
+    return new RemovalOfMarkingsOrNoncoreachableStatesStep(abstractedAut,
+        autToAbstract, originalStates, resultingStates);
   }
 
 
@@ -1657,12 +1657,13 @@ public class CompositionalGeneralisedConflictChecker extends
    * the removal of alpha markings and the removal of omega markings (even
    * though the application of these rules is different).
    */
-  private class RemovalOfMarkingsStep extends Step
+  private class RemovalOfMarkingsOrNoncoreachableStatesStep extends Step
   {
-    RemovalOfMarkingsStep(final AutomatonProxy resultAut,
-                          final AutomatonProxy originalAut,
-                          final StateProxy[] originalStates,
-                          final TObjectIntHashMap<StateProxy> resultingStates)
+    RemovalOfMarkingsOrNoncoreachableStatesStep(
+                                                final AutomatonProxy resultAut,
+                                                final AutomatonProxy originalAut,
+                                                final StateProxy[] originalStates,
+                                                final TObjectIntHashMap<StateProxy> resultingStates)
     {
       super(resultAut, originalAut);
       mOriginalStates = originalStates;

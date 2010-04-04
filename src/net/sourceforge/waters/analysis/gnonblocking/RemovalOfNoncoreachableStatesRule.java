@@ -134,14 +134,15 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
                                                           final CompositionalGeneralisedConflictChecker checker,
                                                           final AutomatonProxy abstractedAut)
   {
-    return null;
+    return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract,
+                                               mTR.getOriginalIntToStateMap(),
+                                               mTR.getResultingStateToIntMap());
   }
 
   // #######################################################################
   // # Data Members
   private EventProxy mAlphaMarking;
   private EventProxy mDefaultMarking;
-  @SuppressWarnings("unused")
   private AutomatonProxy mAutToAbstract;
   private ObserverProjectionTransitionRelation mTR;
 }
