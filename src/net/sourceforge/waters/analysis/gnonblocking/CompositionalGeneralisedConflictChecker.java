@@ -163,6 +163,15 @@ public class CompositionalGeneralisedConflictChecker extends
       // TODO: candidate selection (i.e. heuristics) still need testing
 
       final AutomatonProxy syncProduct = composeSynchronousProduct(candidate);
+      // TODO: added this next while loop to allow a new candidate to be chosen
+      // if an overflow exception occurs, to get more tests passing. But this
+      // causes tests to take too long to run, and of course the
+      // testOverflowException test can not be run
+      /*
+       * while (syncProduct == null) { candidates.remove(candidate); final
+       * Candidate nextCandidate = evaluateCandidates(candidates); syncProduct =
+       * composeSynchronousProduct(nextCandidate); }
+       */
       // TODO: Skip hiding step if there are no local events (?)
       final EventProxy tau = createTauEvent(syncProduct);
       final AutomatonProxy autToAbstract =
@@ -190,6 +199,7 @@ public class CompositionalGeneralisedConflictChecker extends
     final ConflictChecker checker =
         new MonolithicConflictChecker(model, getUsedMarkingProposition(),
             getGeneralisedPrecondition(), getFactory());
+    checker.setNodeLimit(1000000);
     final boolean result = checker.run();
 
     if (result) {
@@ -253,12 +263,10 @@ public class CompositionalGeneralisedConflictChecker extends
      * mAbstractionRules.add(oeRule);
      */
 
-    /*
-     * final RemovalOfAlphaMarkingsRule ramRule = new
-     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(ramRule);
-     */
+    final RemovalOfAlphaMarkingsRule ramRule =
+        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+    ramRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(ramRule);
 
     final RemovalOfDefaultMarkingsRule rdmRule =
         new RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
@@ -266,13 +274,12 @@ public class CompositionalGeneralisedConflictChecker extends
     rdmRule.setDefaultMarking(getMarkingProposition());
     mAbstractionRules.add(rdmRule);
 
-    /*
-     * final RemovalOfNoncoreachableStatesRule rnsRule = new
-     * RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
-     * rnsRule.setAlphaMarking(getGeneralisedPrecondition());
-     * rnsRule.setDefaultMarking(getMarkingProposition());
-     * mAbstractionRules.add(rnsRule);
-     */
+    final RemovalOfNoncoreachableStatesRule rnsRule =
+        new RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
+    rnsRule.setAlphaMarking(getGeneralisedPrecondition());
+    rnsRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rnsRule);
+
   }
 
   // #########################################################################
@@ -313,12 +320,16 @@ public class CompositionalGeneralisedConflictChecker extends
         new MonolithicSynchronousProductBuilder(candidateModel, getFactory());
     composer.setPropositions(mPropositions);
     composer.setNodeLimit(getNodeLimit());
+    // try {
     composer.run();
     final AutomatonProxy syncProduct = composer.getComputedAutomaton();
     final CompositionStep step =
         new CompositionStep(syncProduct, composer.getStateMap());
     mModifyingSteps.add(step);
     return syncProduct;
+    /*
+     * } catch (final OverflowException e) { return null; }
+     */// TODO: see comments in run()
   }
 
   /**
@@ -483,14 +494,6 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private Collection<Candidate> findCandidates(final ProductDESProxy model)
   {
-    /*
-     * final Collection<Candidate> candidates = new ArrayList<Candidate>(1);
-     * final List<AutomatonProxy> aut = new
-     * ArrayList<AutomatonProxy>(model.getAutomata()); final Set<EventProxy>
-     * localEvents = identifyLocalEvents(mEventsToAutomata, aut); final
-     * Candidate candidate = new Candidate(aut, localEvents);
-     * candidates.add(candidate); return candidates;
-     */
     return mPreselectingHeuristic.evaluate(model);
   }
 
@@ -681,7 +684,7 @@ public class CompositionalGeneralisedConflictChecker extends
         final List<AutomatonProxy> automata =
             new ArrayList<AutomatonProxy>(mEventsToAutomata.get(event));
         assert automata.size() > 0;
-        if (automata.size() > 1) {
+        if (automata.size() > 1 && automata.size() < model.getAutomata().size()) {
           // Bring automata into defined ordering.
           // (Better do this here than as side effect of constructor.)
           Collections.sort(automata);

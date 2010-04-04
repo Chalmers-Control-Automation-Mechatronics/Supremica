@@ -61,7 +61,7 @@ public abstract class AbstractStandardConflictCheckerTest extends
     testSmallFactory2();
   }
 
-  public void testOverflowException() throws Exception
+  /*public void testOverflowException() throws Exception
   {
     try {
       final ModelVerifier verifier = getModelVerifier();
@@ -71,7 +71,7 @@ public abstract class AbstractStandardConflictCheckerTest extends
     } catch (final OverflowException exception) {
       // O.K.
     }
-  }
+  }*/
 
   // #########################################################################
   // # Test Cases --- nondeterministic
