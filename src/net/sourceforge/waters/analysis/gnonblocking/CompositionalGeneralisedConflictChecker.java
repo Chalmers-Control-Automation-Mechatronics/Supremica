@@ -245,10 +245,10 @@ public class CompositionalGeneralisedConflictChecker extends
 
     for (final TraceStepProxy step : traceSteps) {
       final Map<AutomatonProxy,StateProxy> stepMap =
-          new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
+          new HashMap<AutomatonProxy,StateProxy>();
       final EventProxy stepEvent = step.getEvent();
-      for (final AutomatonProxy aut : stepMap.keySet()) {
-        StateProxy targetState = stepMap.get(aut);
+      for (final AutomatonProxy aut : step.getStateMap().keySet()) {
+        StateProxy targetState = step.getStateMap().get(aut);
         if (targetState == null) {
           if (stepEvent != null) {
             targetState = findSuccessor(aut, prevStepMap.get(aut), stepEvent);
