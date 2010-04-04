@@ -22,10 +22,10 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 /**
  * For a given Automaton applies an abstraction rule which removes a transition
- * when a tau event links two states where at most the source contains the
- * alpha marking proposition (if the unmarked state becomes unreachable it is
- * removed, too). All transitions originating from the removed state (y) are
- * copied to state x.
+ * when a tau event links two states where at most the source contains the alpha
+ * marking proposition (if the unmarked state becomes unreachable it is removed,
+ * too). All transitions originating from the removed state (y) are copied to
+ * state x.
  *
  * @author Rachel Francis
  */
@@ -99,7 +99,7 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
       final TIntHashSet successors = mTR.getSuccessors(sourceID, tauID);
       if (successors != null) {
         final TIntArrayList transToRemove =
-          new TIntArrayList(successors.size());
+            new TIntArrayList(successors.size());
         final TIntIterator iter = successors.iterator();
         while (iter.hasNext()) {
           final int targetID = iter.next();
@@ -111,8 +111,8 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
         }
         for (int i = 0; i < transToRemove.size(); i++) {
           final int targetID = transToRemove.get(i);
+          mTR.addAllSuccessors(targetID, sourceID);
           mTR.removeTransition(sourceID, tauID, targetID);
-          mTR.moveAllSuccessors(targetID, sourceID);
           modified = true;
         }
       }
