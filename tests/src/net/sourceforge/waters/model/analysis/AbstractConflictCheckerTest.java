@@ -164,19 +164,30 @@ public abstract class AbstractConflictCheckerTest extends
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
-    StateProxy current = null;
-    for (final StateProxy state : states) {
-      if (state.isInitial()) {
-        current = state;
-        break;
-      }
-    }
-    if (current == null) {
-      return null;
-    }
     final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
     final Iterator<TraceStepProxy> iter = traceSteps.iterator();
-    iter.next(); // skip initial step
+    final TraceStepProxy initStep = iter.next();
+    final Map<AutomatonProxy,StateProxy> initMap = initStep.getStateMap();
+    StateProxy current = initMap.get(aut);
+    if (current == null) {
+      for (final StateProxy state : states) {
+        if (state.isInitial()) {
+          if (current == null) {
+            current = state;
+          } else {
+            fail("Trace specifies no initial state for automaton " +
+                 aut.getName() + ", which has more than one initial state!");
+          }
+        }
+      }
+      assertNotNull("The automaton " + aut.getName() +
+                    " has no initial state!", current);
+    } else {
+      assertTrue("Trace initial state " + current.getName() +
+                 " for automaton " + aut.getName() +
+                 " is not an initial state of the automaton!",
+                 current.isInitial());
+    }
     while (iter.hasNext()) {
       final TraceStepProxy traceStep = iter.next();
       final EventProxy event = traceStep.getEvent();
@@ -190,7 +201,7 @@ public abstract class AbstractConflictCheckerTest extends
               if (next == null) {
                 next = trans.getTarget();
               } else {
-                fail("The counter example trace does not contain a "
+                fail("The counterexample trace does not contain a "
                     + "successor state for the nondeterministic transition"
                     + " in automaton " + aut.getName() + " from source state "
                     + current.getName() + " with event " + event.getName()
@@ -198,6 +209,11 @@ public abstract class AbstractConflictCheckerTest extends
               }
             }
           }
+          assertNotNull("The automaton " + aut.getName() +
+                        " has no successor state for event " +
+                        event.getName() + " from state " +
+                        current.getName() + "!",
+                        next);
           current = next;
         }
       } else {
@@ -217,7 +233,7 @@ public abstract class AbstractConflictCheckerTest extends
         } else {
           assertSame("The target state specified in the counterexample "
               + "for the selflooped event " + event.getName()
-              + "is different from the current state of automaton "
+              + " is different from the current state of automaton "
               + aut.getName() + ".", current, target);
         }
       }

@@ -211,17 +211,21 @@ public class CompositionalGeneralisedConflictChecker extends
       ConflictTraceProxy convertedTrace = counterexample;
       while (iter.hasPrevious()) {
         final Step step = iter.previous();
-        convertedTrace = step.saturateTrace(convertedTrace);// is trace
-        // saturation
-        // necessary for
-        // every step
+        convertedTrace = step.saturateTrace(convertedTrace);
+        // You can use this new tool to check whether your counterexample
+        // works in the intermediate steps. Throws exceptions if something
+        // is wrong.
+        // TraceChecker.checkCounterExample(convertedTrace);
+        // Is trace saturation necessary for every step?
         // TODO No---at least it shouldn't. The saturateTrace() method
         // should be a method of the main class, and saturate the trace
         // for all automata, once for all. Then the convertTrace() methods
         // should never have to worry about missing state information in
         // the traces passed to them.
         // TODO: Ok, I will change this once we have all tests passing again.
+        // TODO Better do this ASAP. Presently conceals bugs.
         convertedTrace = step.convertTrace(convertedTrace);
+        // TraceChecker.checkCounterExample(convertedTrace);
       }
       setFailedResult(convertedTrace);
     }
@@ -966,6 +970,8 @@ public class CompositionalGeneralisedConflictChecker extends
     private ConflictTraceProxy saturateTrace(
                                              final ConflictTraceProxy counterexample)
     {
+      // TODO Fix bug. Also saturate initial state.
+      // TODO Fix bug. Do not erase info for other automata.
       final List<TraceStepProxy> traceSteps = counterexample.getTraceSteps();
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
@@ -1307,6 +1313,16 @@ public class CompositionalGeneralisedConflictChecker extends
         final EventProxy stepEvent = step.getEvent();
         if (stepEvent != null) {
           // handles events not in the simplified automaton
+          // TODO Fix bug.
+          // If the event is not in the result automaton, it may still be
+          // in the original automaton. The simplifier may have detected that
+          // the event is selflooped in all states of the result, and removed
+          // it. (You can disable this optimisation, but that is not a good
+          // idea.)
+          // If the event is not in the original automaton, do as you are doing
+          // below. If the event is in the original automaton but not in the
+          // result automaton, consider it as a selfloop in the result
+          // automaton and still search for a trace.
           if (getResultAutomaton().getEvents().contains(stepEvent)) {
             final int eventID = mTransitionRelation.getEventInt(stepEvent);
 
