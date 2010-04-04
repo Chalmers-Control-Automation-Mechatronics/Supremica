@@ -241,7 +241,6 @@ public class CompositionalGeneralisedConflictChecker extends
     final List<TraceStepProxy> traceSteps = counterexample.getTraceSteps();
     final List<TraceStepProxy> convertedSteps = new ArrayList<TraceStepProxy>();
     Map<AutomatonProxy,StateProxy> prevStepMap = null;
-    boolean stepOriginallySaturated = true;
 
     for (final TraceStepProxy step : traceSteps) {
       final Map<AutomatonProxy,StateProxy> stepMap =
@@ -256,18 +255,14 @@ public class CompositionalGeneralisedConflictChecker extends
             targetState = getInitialState(aut, step);
           }
           stepMap.put(aut, targetState);
-          stepOriginallySaturated = false;
+        } else {
+          stepMap.put(aut, targetState);
         }
       }
-      if (stepOriginallySaturated) {
-        convertedSteps.add(step);
-      } else {
-        final TraceStepProxy convertedStep =
-            getFactory().createTraceStepProxy(stepEvent, stepMap);
-        convertedSteps.add(convertedStep);
-        stepOriginallySaturated = true;
-      }
-      prevStepMap = stepMap;
+      final TraceStepProxy convertedStep =
+          getFactory().createTraceStepProxy(stepEvent, stepMap);
+      convertedSteps.add(convertedStep);
+      prevStepMap = new HashMap<AutomatonProxy,StateProxy>(stepMap);
     }
     final ConflictTraceProxy saturatedCounterexample =
         getFactory().createConflictTraceProxy(counterexample.getName(),
