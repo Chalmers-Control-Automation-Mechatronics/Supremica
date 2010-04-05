@@ -347,16 +347,16 @@ public class CompositionalGeneralisedConflictChecker extends
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
-    /*
-     * final ObservationEquivalenceRule oeRule = new
-     * ObservationEquivalenceRule(getFactory(), mPropositions);
-     * mAbstractionRules.add(oeRule);
-     */
+    final ObservationEquivalenceRule oeRule =
+        new ObservationEquivalenceRule(getFactory(), mPropositions);
+    mAbstractionRules.add(oeRule);
 
-    final RemovalOfAlphaMarkingsRule ramRule =
-        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-    ramRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(ramRule);
+    /*
+     * final RemovalOfAlphaMarkingsRule ramRule = new
+     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(ramRule);
+     */
 
     /*
      * final RemovalOfDefaultMarkingsRule rdmRule = new
@@ -1323,7 +1323,8 @@ public class CompositionalGeneralisedConflictChecker extends
           // automaton and still search for a trace. We need to find a way
           // how the original automaton can execute the step event and then
           // return to the current state---this is not always just a selfloop.
-          if (getResultAutomaton().getEvents().contains(stepEvent)) {
+          if (getResultAutomaton().getEvents().contains(stepEvent)
+              || getOriginalAutomaton().getEvents().contains(stepEvent)) {
             final int eventID = mTransitionRelation.getEventInt(stepEvent);
 
             final StateProxy resultTargetState =
