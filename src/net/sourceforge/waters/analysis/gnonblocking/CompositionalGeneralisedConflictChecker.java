@@ -207,21 +207,15 @@ public class CompositionalGeneralisedConflictChecker extends
     } else {
       final ConflictTraceProxy counterexample = checker.getCounterExample();
       final int size = mModifyingSteps.size();
-      final ListIterator<Step> iter = mModifyingSteps.listIterator(size);
       ConflictTraceProxy convertedTrace = counterexample;
       convertedTrace = saturateTrace(counterexample);
+      final ListIterator<Step> iter = mModifyingSteps.listIterator(size);
       while (iter.hasPrevious()) {
         final Step step = iter.previous();
         // You can use this new tool to check whether your counterexample
         // works in the intermediate steps. Throws exceptions if something
         // is wrong.
         // TraceChecker.checkCounterExample(convertedTrace);
-        // Is trace saturation necessary for every step?
-        // TODO No---at least it shouldn't. The saturateTrace() method
-        // should be a method of the main class, and saturate the trace
-        // for all automata, once for all. Then the convertTrace() methods
-        // should never have to worry about missing state information in
-        // the traces passed to them.
         convertedTrace = step.convertTrace(convertedTrace);
         // TraceChecker.checkCounterExample(convertedTrace);
       }
@@ -246,7 +240,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final Map<AutomatonProxy,StateProxy> stepMap =
           new HashMap<AutomatonProxy,StateProxy>();
       final EventProxy stepEvent = step.getEvent();
-      for (final AutomatonProxy aut : step.getStateMap().keySet()) {
+      for (final AutomatonProxy aut : counterexample.getAutomata()) {
         StateProxy targetState = step.getStateMap().get(aut);
         if (targetState == null) {
           if (stepEvent != null) {
