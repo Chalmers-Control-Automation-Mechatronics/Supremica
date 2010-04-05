@@ -266,8 +266,6 @@ public class CompositionalGeneralisedConflictChecker extends
                                               counterexample.getAutomata(),
                                               convertedSteps,
                                               counterexample.getKind());
-    System.out.println(counterexample);
-    System.out.println("SATURATED---------" + saturatedCounterexample);
     return saturatedCounterexample;
   }
 
@@ -341,9 +339,11 @@ public class CompositionalGeneralisedConflictChecker extends
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
-    final ObservationEquivalenceRule oeRule =
-        new ObservationEquivalenceRule(getFactory(), mPropositions);
-    mAbstractionRules.add(oeRule);
+    /*
+     * final ObservationEquivalenceRule oeRule = new
+     * ObservationEquivalenceRule(getFactory(), mPropositions);
+     * mAbstractionRules.add(oeRule);
+     */
 
     /*
      * final RemovalOfAlphaMarkingsRule ramRule = new
@@ -351,7 +351,6 @@ public class CompositionalGeneralisedConflictChecker extends
      * ramRule.setAlphaMarking(getGeneralisedPrecondition());
      * mAbstractionRules.add(ramRule);
      */
-
     /*
      * final RemovalOfDefaultMarkingsRule rdmRule = new
      * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
@@ -368,12 +367,12 @@ public class CompositionalGeneralisedConflictChecker extends
      * mAbstractionRules.add(rnsRule);
      */
 
-    /*
-     * final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttnsRule = new
-     * RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
-     * mPropositions); rttnsRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(rttnsRule);
-     */
+    final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttnsRule =
+        new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
+            mPropositions);
+    rttnsRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(rttnsRule);
+
   }
 
   // #########################################################################
