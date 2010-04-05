@@ -122,12 +122,15 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
               mTR.removeTransition(sourceID, tauID, targetID);
               modified = true;
             }
+            mTR.removeAllIncoming(sourceID);
           }
         }
       }
     }
     if (modified) {
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
+      // System.out.println(autToAbstract);
+      // System.out.println("CONVERTED--------------" + convertedAut);
       return convertedAut;
     } else {
       return autToAbstract;
