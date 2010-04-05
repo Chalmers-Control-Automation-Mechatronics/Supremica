@@ -1345,6 +1345,7 @@ public class CompositionalGeneralisedConflictChecker extends
             }
           } else {
             stepsNewStateMap.remove(getResultAutomaton());
+            stepsNewStateMap.put(getOriginalAutomaton(), originalSource);
             final TraceStepProxy convertedStep =
                 getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
             convertedSteps.add(convertedStep);
