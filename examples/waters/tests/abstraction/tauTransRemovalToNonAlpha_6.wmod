@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tauTransRemovalToNonAlpha_6" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A simple test for the tauTransRemovalToNonAlphaStates rule. This tests that the correct transitions are removed but state y is kept as it it still reachable.</ns2:Comment>
+    <ns2:Comment>A simple test for the tauTransRemovalToNonAlphaStates rule. This tests that the correct transitions are removed but state y is kept as it it still reachable.
+Not sure about this test. It is not part of the test suite? The tau-transition from S3 to S5 leads to a non-alpha state, so should it not be eliminated?</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":alpha">
             <ColorGeometry>

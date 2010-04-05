@@ -79,7 +79,7 @@ public class Candidate implements Comparable<Candidate>
   /**
    * Gets the total number of events of this candidate.
    * @return The total number of distinct events found in all automata
-   *         of the candidate (including propositions).
+   *         of the candidate (not including propositions).
    */
   public int getNumberOfEvents()
   {

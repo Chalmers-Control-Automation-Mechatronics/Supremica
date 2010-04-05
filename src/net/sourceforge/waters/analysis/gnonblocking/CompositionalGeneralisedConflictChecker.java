@@ -903,6 +903,11 @@ public class CompositionalGeneralisedConflictChecker extends
       return chosenCandidates;
     }
 
+    // TODO Fix bug. Use double, because int is likely to overflow and give
+    // wrong results.
+    // TODO Improve estimation by taking event numbers into consideration.
+    // Return product * <number of non-local events> / <total number of events>.
+    // Use this heuristic or a new one for the change.
     private int calculateProduct(final Candidate candidate)
     {
       int product = 1;
@@ -1749,7 +1754,8 @@ public class CompositionalGeneralisedConflictChecker extends
   // # Inner Class RemovalOfTauTransitionsLeadingToNonAlphaStatesStep
   /**
    * This step class performs correct counterexample trace conversion for
-   * RemovalOfTauTransitionsLeadingToNonAlphaStatesRule.
+   * {@link RemovalOfTauTransitionsLeadingToNonAlphaStatesRule} and.
+   * {@link RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule}.
    */
   private class RemovalOfTauTransitionsStep extends Step
   {
@@ -1860,6 +1866,8 @@ public class CompositionalGeneralisedConflictChecker extends
       return convertedTrace;
     }
 
+    // TODO Check if inheritance can be used to avoid code duplication
+    // and thus bugs.
     /**
      * Given a list of SearchRecord's a list of TraceStepProxy's is created and
      * returned. A TraceStepProxy is created for each SearchRecord.

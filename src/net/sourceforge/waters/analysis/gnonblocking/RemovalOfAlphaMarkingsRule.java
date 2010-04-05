@@ -62,8 +62,9 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
       // TODO Is this correct? I don't see why not, this rule can only remove
       // alpha markings, if the automaton alphabet doesn't contain it why bother
-      // running the algorithm (or atleast this is what I think I am
-      // checking...)
+      // running the algorithm (or at least this is what I think I am
+      // checking...) No, if alpha is not in the alphabet, it means all states
+      // are marked alpha, so there is plenty to remove ...
       return autToAbstract;
     }
     boolean modified = false;

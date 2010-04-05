@@ -118,8 +118,8 @@ public class ObserverProjectionConflictChecker
   //# Configuration
   public void setNodeLimit(final int limit)
   {
-    super.setNodeLimit(limit);
     setInternalStepNodeLimit(limit);
+    setFinalStepNodeLimit(limit);
   }
 
   public void setInternalStepNodeLimit(final int limit)
@@ -130,6 +130,13 @@ public class ObserverProjectionConflictChecker
   public void setFinalStepNodeLimit(final int limit)
   {
     super.setNodeLimit(limit);
+  }
+
+  public int getNodeLimit()
+  {
+    final int limit1 = getInternalStepNodeLimit();
+    final int limit2 = getFinalStepNodeLimit();
+    return Math.max(limit1, limit2);
   }
 
   public int getInternalStepNodeLimit()

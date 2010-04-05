@@ -330,13 +330,17 @@
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
           <include name="**/gnonblocking/*.java"/>
+          <include name="**/despot/*.java"/>
           <exclude name="**/Abstract*.java"/>
+          <exclude name="**/Large*.java"/>
+          <exclude name="**/Native*.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="waters.test.ant" value="true"/>
+      <sysproperty key="waters.analysis.statelimit" value="5000"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
       <jvmarg value="-enableassertions"/>
     </junit>
