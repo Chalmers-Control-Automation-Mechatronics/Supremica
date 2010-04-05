@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TIntObjectIterator;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayList;
@@ -84,18 +82,21 @@ public class IsomorphismChecker
                                final AutomatonProxy aut2)
     throws AnalysisException
   {
-    setupEventMap(aut1, aut2);
-    final AutomatonProxy aut = createTestAutomaton(aut1, aut2);
-    final ObserverProjectionTransitionRelation rel =
-      new ObserverProjectionTransitionRelation(aut);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier(rel);
-    final boolean result = bisimulator.run();
-    if (!result) {
-      throw new IsomorphismException("Bisimulator did not identify any sates!");
+    if (aut1.getStates().size() != 0 || aut2.getStates().size() != 0) {
+      setupEventMap(aut1, aut2);
+      final AutomatonProxy aut = createTestAutomaton(aut1, aut2);
+      final ObserverProjectionTransitionRelation rel =
+        new ObserverProjectionTransitionRelation(aut);
+      final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier(rel);
+      final boolean result = bisimulator.run();
+      if (!result) {
+        throw new IsomorphismException
+          ("Bisimulator did not identify any states!");
+      }
+      final Collection<int[]> partition = bisimulator.getResultPartition();
+      checkPartition(partition, rel);
     }
-    final TIntObjectHashMap<int[]> partition = bisimulator.getStateClasses();
-    checkPartition(partition, rel);
   }
 
 
@@ -211,17 +212,14 @@ public class IsomorphismChecker
       (name, ComponentKind.PLANT, events, states, transitions);
   }
 
-  private void checkPartition(final TIntObjectHashMap<int[]> partition,
+  private void checkPartition(final Collection<int[]> partition,
                               final ObserverProjectionTransitionRelation rel)
     throws IsomorphismException
   {
     final StateProxy[] origMap = rel.getOriginalIntToStateMap();
     final int[] count = new int[2];
     final int[] initCount = new int[2];
-    final TIntObjectIterator<int[]> iter = partition.iterator();
-    while (iter.hasNext()) {
-      iter.advance();
-      final int[] clazz = iter.value();
+    for (final int[] clazz : partition) {
       Arrays.fill(count, 0);
       Arrays.fill(initCount, 0);
       for (int i = 0; i < clazz.length; i++) {

@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.op;
 
-import net.sourceforge.waters.model.analysis.AnalysisException;
+import java.util.Collection;
 
-import gnu.trove.TIntObjectHashMap;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
 /**
@@ -56,13 +56,13 @@ public interface TransitionRelationSimplifier
 
   /**
    * Gets the partition produced by the last {@link #run()}.
-   * @return A map that assigns to each state number in the modified
-   *         transition relation after the {@link #run()} an array of
-   *         state numbers in the original transition relation.
+   * @return The calculated partitioning. Each array in the collection
+   *         defines the state codes comprising an equivalence class
+   *         to be merged into a single state.
    * @throws IllegalStateException if this method is called before a
    *         {@link #run()}, or if the {@link #run()} resulted in no
    *         change.
    */
-  public TIntObjectHashMap<int[]> getStateClasses();
+  public Collection<int[]> getResultPartition();
 
 }

@@ -31,7 +31,6 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -339,11 +338,9 @@ public class CompositionalGeneralisedConflictChecker extends
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
-    /*
-     * final ObservationEquivalenceRule oeRule = new
-     * ObservationEquivalenceRule(getFactory(), mPropositions);
-     * mAbstractionRules.add(oeRule);
-     */
+    final ObservationEquivalenceRule oeRule =
+      new ObservationEquivalenceRule(getFactory(), mPropositions);
+    mAbstractionRules.add(oeRule);
 
     /*
      * final RemovalOfAlphaMarkingsRule ramRule = new
@@ -974,18 +971,17 @@ public class CompositionalGeneralisedConflictChecker extends
     }
   }
 
-  public ObservationEquivalenceStep createObservationEquivalenceStep(
-                                                                     final AutomatonProxy abstractedAut,
-                                                                     final AutomatonProxy autToAbstract,
-                                                                     final EventProxy tau,
-                                                                     final ObserverProjectionTransitionRelation tr,
-                                                                     final ObservationEquivalenceTRSimplifier biSimulator)
+  public ObservationEquivalenceStep createObservationEquivalenceStep
+    (final AutomatonProxy abstractedAut,
+     final AutomatonProxy autToAbstract,
+     final EventProxy tau,
+     final ObserverProjectionTransitionRelation tr,
+     final TIntObjectHashMap<int[]> classMap)
   {
-    final ObservationEquivalenceStep oeStep =
-        new ObservationEquivalenceStep(abstractedAut, autToAbstract, tau, tr
-            .getOriginalIntToStateMap(), biSimulator.getStateClasses(), tr
-            .getResultingStateToIntMap());
-    return oeStep;
+    return new ObservationEquivalenceStep(abstractedAut, autToAbstract, tau,
+                                          tr.getOriginalIntToStateMap(),
+                                          classMap,
+                                          tr.getResultingStateToIntMap());
   }
 
   public RemovalOfMarkingsOrNoncoreachableStatesStep createRemovalOfMarkingsStep(

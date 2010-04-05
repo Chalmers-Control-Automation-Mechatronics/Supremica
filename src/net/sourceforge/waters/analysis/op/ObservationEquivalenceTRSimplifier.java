@@ -16,9 +16,9 @@ import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIntProcedure;
 import gnu.trove.TIntIterator;
 import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TObjectProcedure;
-
+import gnu.trove.TIntObjectIterator;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -62,7 +62,6 @@ public class ObservationEquivalenceTRSimplifier
   {
     mHiddenEvent = tau;
     mTransitionRelation = tr;
-    mSuppressHiddenSelfLoops = true;
     mSuppressRedundantHiddenTransitions = false;
   }
 
@@ -93,28 +92,6 @@ public class ObservationEquivalenceTRSimplifier
   //#########################################################################
   //# Configuration
   /**
-   * Sets whether the hidden event is to be suppressed in the output
-   * automaton when possible. If this is set to <CODE>true</CODE>,
-   * the hidden event will only be in the alphabet of the output automaton,
-   * if it has at least one non-selfloop transition. The default of this
-   * setting is <CODE>true</CODE>.
-   */
-  public void setSuppressHiddenSelfLoops(final boolean suppress)
-  {
-    mSuppressHiddenSelfLoops = suppress;
-  }
-
-  /**
-   * Gets whether the hidden event is to be suppressed in the output
-   * automaton when possible.
-   * @see {@link #setSuppressHiddenSelfLoops(boolean) setSuppressHiddenEvent()}
-   */
-  public boolean getSuppressHiddenEvent()
-  {
-    return mSuppressHiddenSelfLoops;
-  }
-
-  /**
    * Sets whether redundant hidden transitions can be suppressed in the
    * output automaton. If this is set to <CODE>true</CODE>, the transition
    * minimisation algorithm will attempt to remove tau-transitions that
@@ -139,6 +116,17 @@ public class ObservationEquivalenceTRSimplifier
     return mSuppressRedundantHiddenTransitions;
   }
 
+  public Collection<int[]> getInitialPartition()
+  {
+    return mInitialPartition;
+  }
+
+  public void setInitialPartition(final Collection<int[]> partition)
+  {
+    mInitialPartition = partition;
+  }
+
+
   //#########################################################################
   //# Invocation
   public boolean run()
@@ -154,12 +142,9 @@ public class ObservationEquivalenceTRSimplifier
     }
 
     setUp();
-    setUpTauPredecessors();
-    final boolean redundant = removeRedundantTransitions();
-    setUpInitialPartitions();
 
     while (true) {
-      Iterator<? extends EquivalenceClass> it = null;
+      final Iterator<? extends EquivalenceClass> it;
       if (!mWS.isEmpty()) {
         it = mWS.iterator();
       } else if (!mWC.isEmpty()) {
@@ -171,10 +156,11 @@ public class ObservationEquivalenceTRSimplifier
       it.remove();
       ec.splitOn();
     }
-
-    assert mP.size() >= 0;
-    assert mP.size() <= mNumStates;
-    if (mP.size() == mNumStates && !redundant) {
+    final int numClasses = mP.size();
+    assert numClasses >= 0;
+    assert numClasses <= mNumStates;
+    mHasModifications |= numClasses != mNumStates;
+    if (!mHasModifications) {
       if (logger.isDebugEnabled()) {
         final String msg =
           "EXIT " + ProxyTools.getShortClassName(this) + ".run(): no change.";
@@ -183,23 +169,10 @@ public class ObservationEquivalenceTRSimplifier
       return false;
     }
 
-    mClassMap = new TIntObjectHashMap<int[]>();
+    mResultPartition = new ArrayList<int[]>(numClasses);
     for (final SimpleEquivalenceClass sec : mP) {
-      mClassMap.put(sec.mStates[0], sec.mStates);
-      if (sec.mStates.length != 1) {
-        mTransitionRelation.merge(sec.mStates, mHiddenEvent);
-      }
-    }
-
-    if (mSuppressHiddenSelfLoops && mHiddenEvent >= 0) {
-      if (mTransitionRelation.isGloballyDisabled(mHiddenEvent)) {
-        mTransitionRelation.removeEvent(mHiddenEvent);
-      }
-    }
-    for (int e = 0; e < mTransitionRelation.getNumberOfProperEvents(); e++) {
-      if (mTransitionRelation.isPureSelfloopEvent(e)) {
-        mTransitionRelation.removeEvent(e);
-      }
+      final int[] array = sec.mStates;
+      mResultPartition.add(array);
     }
 
     if (logger.isDebugEnabled()) {
@@ -212,9 +185,9 @@ public class ObservationEquivalenceTRSimplifier
     return true;
   }
 
-  public TIntObjectHashMap<int[]> getStateClasses()
+  public Collection<int[]> getResultPartition()
   {
-    return mClassMap;
+    return mResultPartition;
   }
 
 
@@ -224,12 +197,15 @@ public class ObservationEquivalenceTRSimplifier
   {
     mNumStates = mTransitionRelation.getNumberOfStates();
     mNumEvents = mTransitionRelation.getNumberOfProperEvents();
+    mHasModifications = false;
+    setUpTauPredecessors();
+    removeRedundantTransitions();
+    final Collection<int[]> partition = createInitialPartition();
+    setUpInitialPartition(partition);
   }
 
   private void setUpTauPredecessors()
   {
-    mNumStates = mTransitionRelation.getNumberOfStates();
-    mNumEvents = mTransitionRelation.getNumberOfProperEvents();
     mTauPreds = new int[mNumStates][];
     for (int s = 0; s < mNumStates; s++) {
       if (mHiddenEvent >= 0) {
@@ -261,43 +237,8 @@ public class ObservationEquivalenceTRSimplifier
     }
   }
 
-  private void setUpInitialPartitions()
+  private void removeRedundantTransitions()
   {
-    mWS = new THashSet<SimpleEquivalenceClass>();
-    mWC = new THashSet<ComplexEquivalenceClass>();
-    mP = new THashSet<SimpleEquivalenceClass>();
-    mStateToClass = new SimpleEquivalenceClass[mNumStates];
-    final TIntObjectHashMap<TIntArrayList> tempClassMap =
-      new TIntObjectHashMap<TIntArrayList>();
-    for (int state = 0; state < mNumStates; state++) {
-      if (mTransitionRelation.hasPredecessors(state)) {
-        final int m = mTransitionRelation.getMarkingsInt(state);
-        TIntArrayList list = tempClassMap.get(m);
-        if (list == null) {
-          list = new TIntArrayList();
-          tempClassMap.put(m, list);
-        }
-        list.add(state);
-      }
-    }
-    tempClassMap.forEachValue(new TObjectProcedure<TIntArrayList>() {
-      public boolean execute(final TIntArrayList list)
-      {
-        final int[] array = list.toNativeArray();
-        final SimpleEquivalenceClass clazz =
-          new SimpleEquivalenceClass(array);
-        mWS.add(clazz);
-        for (final int state : array) {
-          mStateToClass[state] = clazz;
-        }
-        return true;
-      }
-    });
-  }
-
-  private boolean removeRedundantTransitions()
-  {
-    boolean removed = false;
     for (int s = 0; s < mNumStates; s++) {
       if (mTransitionRelation.hasPredecessors(s)) {
         for (int e = 0; e < mNumEvents; e++) {
@@ -320,7 +261,7 @@ public class ObservationEquivalenceTRSimplifier
                     if (e == mHiddenEvent) {
                       if (p1 != s && p2 == pred) {
                         mTransitionRelation.removeTransition(pred, e, s);
-                        removed = true;
+                        mHasModifications = true;
                         break trans;
                       }
                     } else {
@@ -328,7 +269,7 @@ public class ObservationEquivalenceTRSimplifier
                         for (final int p3 : mTauPreds[p2]) {
                           if (p3 == pred) {
                             mTransitionRelation.removeTransition(pred, e, s);
-                            removed = true;
+                            mHasModifications = true;
                             break trans;
                           }
                         }
@@ -342,8 +283,54 @@ public class ObservationEquivalenceTRSimplifier
         }
       }
     }
-    return removed;
   }
+
+  private Collection<int[]> createInitialPartition()
+  {
+    if (mInitialPartition == null) {
+      final TIntObjectHashMap<TIntArrayList> prepartition =
+        new TIntObjectHashMap<TIntArrayList>();
+      for (int state = 0; state < mNumStates; state++) {
+        if (mTransitionRelation.hasPredecessors(state)) {
+          final int m = mTransitionRelation.getMarkingsInt(state);
+          TIntArrayList list = prepartition.get(m);
+          if (list == null) {
+            list = new TIntArrayList();
+            prepartition.put(m, list);
+          }
+          list.add(state);
+        }
+      }
+      final Collection<int[]> partition =
+        new ArrayList<int[]>(prepartition.size());
+      final TIntObjectIterator<TIntArrayList> iter = prepartition.iterator();
+      while (iter.hasNext()) {
+        iter.advance();
+        final TIntArrayList list = iter.value();
+        final int[] array = list.toNativeArray();
+        partition.add(array);
+      }
+      return partition;
+    } else {
+      return mInitialPartition;
+    }
+  }
+
+  private void setUpInitialPartition(final Collection<int[]> partition)
+  {
+    mWS = new THashSet<SimpleEquivalenceClass>();
+    mWC = new THashSet<ComplexEquivalenceClass>();
+    mP = new THashSet<SimpleEquivalenceClass>();
+    mStateToClass = new SimpleEquivalenceClass[mNumStates];
+    for (final int[] array : partition) {
+      final SimpleEquivalenceClass clazz = new SimpleEquivalenceClass(array);
+      mWS.add(clazz);
+      for (final int state : array) {
+        mStateToClass[state] = clazz;
+      }
+    }
+  }
+
 
   private int[] getPredecessors(final int state, final int event)
   {
@@ -435,7 +422,7 @@ public class ObservationEquivalenceTRSimplifier
   {
     ComplexEquivalenceClass mParent = null;
     TIntIntHashMap[] mInfo = null;
-    int size;
+    int mSize;
 
     public abstract TIntIntHashMap getInfo(int event);
 
@@ -457,7 +444,7 @@ public class ObservationEquivalenceTRSimplifier
     public SimpleEquivalenceClass(final int[] states)
     {
       mStates = states;
-      size = states.length; // TODO make this into function so less space
+      mSize = states.length; // TODO make this into function so less space
       for (int i = 0; i < states.length; i++) {
         mStateToClass[states[i]] = this;
       }
@@ -485,7 +472,7 @@ public class ObservationEquivalenceTRSimplifier
             final SimpleEquivalenceClass ec = mStateToClass[pred];
             TIntHashSet split = ec.mSplit1;
             if (split == null) {
-              split = new TIntHashSet(ec.size);
+              split = new TIntHashSet(ec.mSize);
               ec.mSplit1 = split;
               classes.add(ec);
             }
@@ -495,8 +482,8 @@ public class ObservationEquivalenceTRSimplifier
         }
         for (int c = 0; c < classes.size(); c++) {
           final SimpleEquivalenceClass sec = classes.get(c);
-          if (sec.mSplit1.size() != sec.size) {
-            final int[] X1 = new int[sec.size - sec.mSplit1.size()];
+          if (sec.mSplit1.size() != sec.mSize) {
+            final int[] X1 = new int[sec.mSize - sec.mSplit1.size()];
             final int[] X2 = new int[sec.mSplit1.size()];
             int x1 = 0, x2 = 0;
             for (int s = 0; s < sec.mStates.length; s++) {
@@ -552,7 +539,7 @@ public class ObservationEquivalenceTRSimplifier
     public ComplexEquivalenceClass(final EquivalenceClass child1,
                                    final EquivalenceClass child2)
     {
-      if (child1.size < child2.size) {
+      if (child1.mSize < child2.mSize) {
         mChild1 = child1;
         mChild2 = child2;
       } else {
@@ -561,7 +548,7 @@ public class ObservationEquivalenceTRSimplifier
       }
       mChild1.mParent = this;
       mChild2.mParent = this;
-      size = child1.size + child2.size;
+      mSize = child1.mSize + child2.mSize;
     }
 
     public void splitOn()
@@ -721,7 +708,7 @@ public class ObservationEquivalenceTRSimplifier
   //# Data Members
   private int mHiddenEvent;
   private ObserverProjectionTransitionRelation mTransitionRelation;
-  private boolean mSuppressHiddenSelfLoops;
+  private Collection<int[]> mInitialPartition;
   private boolean mSuppressRedundantHiddenTransitions;
 
   private int mNumStates;
@@ -732,6 +719,7 @@ public class ObservationEquivalenceTRSimplifier
   private THashSet<ComplexEquivalenceClass> mWC;
   private THashSet<SimpleEquivalenceClass> mP;
   private SimpleEquivalenceClass[] mStateToClass;
-  private TIntObjectHashMap<int[]> mClassMap;
+  private Collection<int[]> mResultPartition;
+  private boolean mHasModifications;
 
 }

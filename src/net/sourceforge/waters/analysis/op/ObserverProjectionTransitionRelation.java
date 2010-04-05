@@ -13,6 +13,7 @@ import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
+import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayList;
@@ -779,28 +780,67 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
-  public int unreachableStates()
+
+  //#########################################################################
+  //# Automaton Simplification
+  /**
+   * Attempts to simplify the automaton by removing redundant selfloop events.
+   * This method searches for any events that are selflooped in all states of
+   * the transition relation, and removes any such events and the selfloops
+   * from the transition relation.
+   * @param  tau    The ID of a silent event. If this is an event of the
+   *                transition relation, it is treated specially. It can also
+   *                be removed if it is disabled in all states.
+   */
+  public void removeSelfLoopEvents(final int tau)
   {
-    int num = 0;
-    STATES: for (int s = 0; s < mPredecessors.length; s++) {
-      if (mIsInitial[s]) {
-        continue;
-      }
-      for (int e = 0; e < mNumProperEvents; e++) {
-        if (mPredecessors[s][e] != null) {
-          if (!mPredecessors[s][e].isEmpty()) {
-            continue STATES;
-          }
-        }
-      }
-      num++;
+    if (tau >= 0 && isGloballyDisabled(tau)) {
+      removeEvent(tau);
     }
-    return num;
+    for (int e = 0; e < getNumberOfProperEvents(); e++) {
+      if (isPureSelfloopEvent(e)) {
+        removeEvent(e);
+      }
+    }
+  }
+
+  /**
+   * Repartitions the states of this transition relation.
+   * This method is used to merge states after a partition has been obtained
+   * through a {@link TransitionRelationSimplifier}.
+   * @param partition The partitioning to be imposed. Each array in the
+   *                  collection defines the state codes comprising an
+   *                  equivalence class to be merged into a single state.
+   *                  The first element of each array identifies the state
+   *                  code to be given to the new merged state.
+   * @param tau       The event code of a silent event. If the event is present
+   *                  in the transition relations, any selfloops with this
+   *                  events obtained while merging states will be deleted.
+   * @param classMap  If non-null, this map will be augmented with the reverse
+   *                  state map resulting from the merge. Each merged state
+   *                  code will be mapped to the array of state code present
+   *                  before the merge.
+   */
+  public void mergePartition(final Collection<int[]> partition,
+                             final int tau,
+                             final TIntObjectHashMap<int[]> classMap)
+  {
+    for (final int[] array : partition) {
+      final int key = array[0];
+      for (int i = 1; i < array.length; i++) {
+        final int state = array[i];
+        moveAllSuccessors(state, key, tau);
+        moveAllPredeccessors(state, key, tau);
+      }
+      if (classMap != null) {
+        classMap.put(key, array);
+      }
+    }
   }
 
 
-  // #########################################################################
-  // # Automaton Output
+  //#########################################################################
+  //# Automaton Output
   public AutomatonProxy createAutomaton(final ProductDESProxyFactory factory)
   {
     final int numEvents = getNumberOfEvents();

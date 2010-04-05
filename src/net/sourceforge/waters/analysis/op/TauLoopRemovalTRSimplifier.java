@@ -3,9 +3,9 @@ package net.sourceforge.waters.analysis.op;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
-import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntStack;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 
 
@@ -58,33 +58,31 @@ public class TauLoopRemovalTRSimplifier
     }
     if (modified || !mToBeMerged.isEmpty()) {
       final int numStates = mTransitionRelation.getNumberOfStates();
-      mClassMap = new TIntObjectHashMap<int[]>(numStates);
+      mResultPartition = new ArrayList<int[]>(numStates);
+      final BitSet merged = new BitSet(numStates);
       for (final TIntArrayList merge : mToBeMerged) {
-        final int[] clazz = merge.toNativeArray();
-        mTransitionRelation.merge(clazz, mHiddenEvent);
-        final int code = clazz[0];
-        mClassMap.put(code, clazz);
-        modified |= clazz.length > 1;
+        final int[] array = merge.toNativeArray();
+        mResultPartition.add(array);
+        modified |= array.length > 1;
       }
       if (modified) {
         for (int s = 0; s < numStates; s++) {
-          if (mTransitionRelation.hasPredecessors(s) &&
-              !mClassMap.containsKey(s)) {
-            final int[] clazz = new int[1];
-            clazz[0] = s;
-            mClassMap.put(s, clazz);
+          if (mTransitionRelation.hasPredecessors(s) && !merged.get(s)) {
+            final int[] array = new int[1];
+            array[0] = s;
+            mResultPartition.add(array);
           }
         }
       } else {
-        mClassMap = null;
+        mResultPartition = null;
       }
     }
     return modified;
   }
 
-  public TIntObjectHashMap<int[]> getStateClasses()
+  public Collection<int[]> getResultPartition()
   {
-    return mClassMap;
+    return mResultPartition;
   }
 
 
@@ -146,7 +144,7 @@ public class TauLoopRemovalTRSimplifier
   //# Data Members
   private ObserverProjectionTransitionRelation mTransitionRelation;
   private int mHiddenEvent;
-  private TIntObjectHashMap<int[]> mClassMap;
+  private Collection<int[]> mResultPartition;
 
   private int mIndex;
   private int[] mTarjan;

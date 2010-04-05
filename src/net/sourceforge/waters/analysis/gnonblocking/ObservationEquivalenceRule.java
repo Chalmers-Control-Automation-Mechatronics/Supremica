@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import gnu.trove.TIntObjectHashMap;
+
 import java.util.Collection;
 
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
@@ -74,29 +76,34 @@ class ObservationEquivalenceRule extends AbstractionRule
   {
     mTau = tau;
     mAutToAbstract = autToAbstract;
-    mTr =
-        new ObserverProjectionTransitionRelation(autToAbstract,
-            getPropositions());
-    mBiSimulator =
-        new ObservationEquivalenceTRSimplifier(mTr, mTr.getEventInt(tau));
-    mBiSimulator.setSuppressRedundantHiddenTransitions
+    mTr = new ObserverProjectionTransitionRelation(autToAbstract,
+                                                   getPropositions());
+    final int codeOfTau = mTr.getEventInt(tau);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier(mTr, codeOfTau);
+    bisimulator.setSuppressRedundantHiddenTransitions
       (mSuppressRedundantHiddenTransitions);
-    final boolean modified = mBiSimulator.run();
+    final boolean modified = bisimulator.run();
     if (modified) {
-      final AutomatonProxy convertedAut = mTr.createAutomaton(getFactory());
-      return convertedAut;
+      final Collection<int[]> partition = bisimulator.getResultPartition();
+      final int size = partition.size();
+      mClassMap = new TIntObjectHashMap<int[]>(size);
+      mTr.mergePartition(partition, codeOfTau, mClassMap);
+      final int suppress = mSuppressRedundantHiddenTransitions ? codeOfTau : -1;
+      mTr.removeSelfLoopEvents(suppress);
+      return mTr.createAutomaton(getFactory());
     } else {
       return autToAbstract;
     }
   }
 
-  CompositionalGeneralisedConflictChecker.Step createStep(
-                                                          final CompositionalGeneralisedConflictChecker checker,
-                                                          final AutomatonProxy abstractedAut)
+  CompositionalGeneralisedConflictChecker.Step createStep
+    (final CompositionalGeneralisedConflictChecker checker,
+     final AutomatonProxy abstractedAut)
   {
     return checker.createObservationEquivalenceStep(abstractedAut,
                                                     mAutToAbstract, mTau, mTr,
-                                                    mBiSimulator);
+                                                    mClassMap);
   }
 
 
@@ -105,7 +112,7 @@ class ObservationEquivalenceRule extends AbstractionRule
   private AutomatonProxy mAutToAbstract;
   private EventProxy mTau;
   private ObserverProjectionTransitionRelation mTr;
-  private ObservationEquivalenceTRSimplifier mBiSimulator;
+  private TIntObjectHashMap<int[]> mClassMap;
   private boolean mSuppressRedundantHiddenTransitions;
 
 }

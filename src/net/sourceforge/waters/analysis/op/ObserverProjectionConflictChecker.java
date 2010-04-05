@@ -639,37 +639,53 @@ public class ObserverProjectionConflictChecker
     final int codeOfTau = rel.getEventInt(tau);
     final TransitionRelationSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier(rel, codeOfTau);
-    final boolean hadLoops = loopRemover.run();
+    final TIntObjectHashMap<int[]> loopClassMap =
+      applyPartition(loopRemover, rel, codeOfTau);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier(rel, codeOfTau);
     bisimulator.setSuppressRedundantHiddenTransitions(true);
-    final boolean hadBisim = bisimulator.run();
-    if (hadLoops || hadBisim) {
+    final TIntObjectHashMap<int[]> bisimClassMap =
+      applyPartition(bisimulator, rel, codeOfTau);
+    if (loopClassMap != null || bisimClassMap != null) {
       final ProductDESProxyFactory factory = getFactory();
       final AutomatonProxy convertedAut = rel.createAutomaton(factory);
       final StateProxy[] inputMap = rel.getOriginalIntToStateMap();
-      final TIntObjectHashMap<int[]> partition;
-      if (!hadBisim) {
-        partition = loopRemover.getStateClasses();
-      } else if (!hadLoops) {
-        partition = bisimulator.getStateClasses();
+      final TIntObjectHashMap<int[]> classMap;
+      if (loopClassMap == null) {
+        classMap = bisimClassMap;
+      } else if (bisimClassMap == null) {
+        classMap = loopClassMap;
       } else {
-        final TIntObjectHashMap<int[]> partition1 =
-          loopRemover.getStateClasses();
-        final TIntObjectHashMap<int[]> partition2 =
-          bisimulator.getStateClasses();
-        partition = combinePartitions(partition1, partition2);
+        classMap = combineClassMaps(loopClassMap, bisimClassMap);
       }
       final TObjectIntHashMap<StateProxy> outputMap =
         rel.getResultingStateToIntMap();
       return new ObservationEquivalenceStep(convertedAut, aut, tau,
-                                            inputMap, partition, outputMap);
+                                            inputMap, classMap, outputMap);
     } else {
       return null;
     }
   }
 
-  private TIntObjectHashMap<int[]> combinePartitions
+  private TIntObjectHashMap<int[]> applyPartition
+    (final TransitionRelationSimplifier simplifier,
+     final ObserverProjectionTransitionRelation rel,
+     final int tau)
+    throws AnalysisException
+  {
+    if (simplifier.run()) {
+      final Collection<int[]> partition = simplifier.getResultPartition();
+      final int size = partition.size();
+      final TIntObjectHashMap<int[]> map = new TIntObjectHashMap<int[]>(size);
+      rel.mergePartition(partition, tau, map);
+      rel.removeSelfLoopEvents(tau);
+      return map;
+    } else {
+      return null;
+    }
+  }
+
+  private TIntObjectHashMap<int[]> combineClassMaps
     (final TIntObjectHashMap<int[]> first,
      final TIntObjectHashMap<int[]> second)
   {
