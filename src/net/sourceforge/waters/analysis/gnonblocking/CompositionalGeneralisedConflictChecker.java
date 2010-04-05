@@ -367,11 +367,19 @@ public class CompositionalGeneralisedConflictChecker extends
      * mAbstractionRules.add(rnsRule);
      */
 
-    final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttnsRule =
-        new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
-            mPropositions);
-    rttnsRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(rttnsRule);
+    /*
+     * final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule = new
+     * RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
+     * mPropositions); rttlnsRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(rttlnsRule);
+     */
+
+    final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule =
+        new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
+            getFactory(), mPropositions);
+    rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
+    rttonsRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rttonsRule);
 
   }
 
@@ -985,14 +993,14 @@ public class CompositionalGeneralisedConflictChecker extends
         autToAbstract, originalStates, resultingStates);
   }
 
-  public RemovalOfTauTransitionsLeadingToNonAlphaStatesStep createRemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
-                                                                                                                     final AutomatonProxy abstractedAut,
-                                                                                                                     final AutomatonProxy autToAbstract,
-                                                                                                                     final EventProxy tau,
-                                                                                                                     final ObserverProjectionTransitionRelation tr)
+  public RemovalOfTauTransitionsStep createRemovalOfTauTransitionsStep(
+                                                                       final AutomatonProxy abstractedAut,
+                                                                       final AutomatonProxy autToAbstract,
+                                                                       final EventProxy tau,
+                                                                       final ObserverProjectionTransitionRelation tr)
   {
-    return new RemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
-        abstractedAut, autToAbstract, tau, tr);
+    return new RemovalOfTauTransitionsStep(abstractedAut, autToAbstract, tau,
+        tr);
   }
 
 
@@ -1743,13 +1751,12 @@ public class CompositionalGeneralisedConflictChecker extends
    * This step class performs correct counterexample trace conversion for
    * RemovalOfTauTransitionsLeadingToNonAlphaStatesRule.
    */
-  private class RemovalOfTauTransitionsLeadingToNonAlphaStatesStep extends Step
+  private class RemovalOfTauTransitionsStep extends Step
   {
-    RemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
-                                                       final AutomatonProxy resultAut,
-                                                       final AutomatonProxy originalAut,
-                                                       final EventProxy tau,
-                                                       final ObserverProjectionTransitionRelation tr)
+    RemovalOfTauTransitionsStep(final AutomatonProxy resultAut,
+                                final AutomatonProxy originalAut,
+                                final EventProxy tau,
+                                final ObserverProjectionTransitionRelation tr)
     {
       super(resultAut, originalAut);
       mTR = tr;

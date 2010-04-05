@@ -106,7 +106,7 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
               tauSuccessors = allSuccessors[eventID];
             }
           }
-          if (!nonTauSuccessors) {
+          if (!nonTauSuccessors && tauSuccessors != null) {
             final TIntArrayList transToRemove =
                 new TIntArrayList(tauSuccessors.size());
             final TIntIterator iter = tauSuccessors.iterator();
@@ -141,11 +141,8 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
                                                           final CompositionalGeneralisedConflictChecker checker,
                                                           final AutomatonProxy abstractedAut)
   {
-    return checker
-        .createRemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
-                                                                  abstractedAut,
-                                                                  mAutToAbstract,
-                                                                  mTau, mTR);
+    return checker.createRemovalOfTauTransitionsStep(abstractedAut,
+                                                     mAutToAbstract, mTau, mTR);
   }
 
   // #######################################################################

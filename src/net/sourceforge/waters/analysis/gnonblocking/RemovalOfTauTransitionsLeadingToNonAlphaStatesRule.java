@@ -113,11 +113,8 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
                                                           final CompositionalGeneralisedConflictChecker checker,
                                                           final AutomatonProxy abstractedAut)
   {
-    return checker
-        .createRemovalOfTauTransitionsLeadingToNonAlphaStatesStep(
-                                                                  abstractedAut,
-                                                                  mAutToAbstract,
-                                                                  mTau, mTR);
+    return checker.createRemovalOfTauTransitionsStep(abstractedAut,
+                                                     mAutToAbstract, mTau, mTR);
   }
 
   // #######################################################################
