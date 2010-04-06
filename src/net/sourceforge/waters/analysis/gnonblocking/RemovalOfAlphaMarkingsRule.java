@@ -63,11 +63,11 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
         new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
     final int numStates = rel.getNumberOfStates();
+    boolean modified = false;
     int alphaID = rel.getEventInt(mAlphaMarking);
     if (alphaID == -1) {
       alphaID = rel.addProposition(mAlphaMarking, true);
     }
-    boolean modified = false;
     final int tauID = rel.getEventInt(tau);
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if (rel.hasPredecessors(sourceID) && rel.isMarked(sourceID, alphaID)) {

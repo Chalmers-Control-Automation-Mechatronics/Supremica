@@ -35,8 +35,8 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
 {
 
-  //#########################################################################
-  //# Overrides for base class junit.framework.TestCase
+  // #########################################################################
+  // # Overrides for base class junit.framework.TestCase
   public AbstractAbstractionRuleTest()
   {
   }
@@ -46,7 +46,6 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
     super(name);
   }
 
-
   protected void setUp() throws Exception
   {
     super.setUp();
@@ -55,8 +54,7 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
     mIsomorphismChecker = new IsomorphismChecker(factory, false);
   }
 
-  protected void tearDown()
-    throws Exception
+  protected void tearDown() throws Exception
   {
     mAbstractionRule = null;
     mIsomorphismChecker = null;
@@ -64,12 +62,11 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
     super.tearDown();
   }
 
-
-  //#########################################################################
-  //# Instantiating and Checking Modules
+  // #########################################################################
+  // # Instantiating and Checking Modules
   protected void runAbstractionRule(final String group, final String name,
                                     final List<ParameterBindingProxy> bindings)
-    throws Exception
+      throws Exception
   {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
@@ -79,7 +76,7 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
   protected void runAbstractionRule(final String group, final String subdir,
                                     final String name,
                                     final List<ParameterBindingProxy> bindings)
-    throws Exception
+      throws Exception
   {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
@@ -89,7 +86,7 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
   protected void runAbstractionRule(final File groupdir, final String subdir,
                                     final String name,
                                     final List<ParameterBindingProxy> bindings)
-    throws Exception
+      throws Exception
   {
     final File dir = new File(groupdir, subdir);
     runAbstractionRule(dir, name, bindings);
@@ -97,69 +94,61 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
 
   protected void runAbstractionRule(final File dir, final String name,
                                     final List<ParameterBindingProxy> bindings)
-    throws Exception
+      throws Exception
   {
     final File filename = new File(dir, name);
     runAbstractionRule(filename, bindings);
   }
 
-
-  //#########################################################################
-  //# Checking Instantiated Product DES problems
+  // #########################################################################
+  // # Checking Instantiated Product DES problems
   protected void runAbstractionRule(final String group, final String name)
-    throws Exception
+      throws Exception
   {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runAbstractionRule(groupdir, name);
   }
 
-  protected void runAbstractionRule(final String group,
-                                    final String subdir,
-                                    final String name)
-    throws Exception
+  protected void runAbstractionRule(final String group, final String subdir,
+                                    final String name) throws Exception
   {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runAbstractionRule(groupdir, subdir, name);
   }
 
-  protected void runAbstractionRule(final File groupdir,
-                                    final String subdir,
-                                    final String name)
-    throws Exception
+  protected void runAbstractionRule(final File groupdir, final String subdir,
+                                    final String name) throws Exception
   {
     final File dir = new File(groupdir, subdir);
     runAbstractionRule(dir, name);
   }
 
   protected void runAbstractionRule(final File dir, final String name)
-    throws Exception
+      throws Exception
   {
     final File filename = new File(dir, name);
     runAbstractionRule(filename);
   }
 
-  protected void runAbstractionRule(final File filename)
-    throws Exception
+  protected void runAbstractionRule(final File filename) throws Exception
   {
     runAbstractionRule(filename, (List<ParameterBindingProxy>) null);
   }
 
   protected void runAbstractionRule(final File filename,
                                     final List<ParameterBindingProxy> bindings)
-    throws Exception
+      throws Exception
   {
     mBindings = bindings;
     final ProductDESProxy des = getCompiledDES(filename, bindings);
     runAbstractionRule(des);
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void runAbstractionRule(final ProductDESProxy des)
-      throws Exception
+  // #########################################################################
+  // # Auxiliary Methods
+  private void runAbstractionRule(final ProductDESProxy des) throws Exception
   {
     getLogger().info("Checking " + des.getName() + " ...");
     configureAbstractionRule(des);
@@ -173,42 +162,44 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
   private void checkResult(final ProductDESProxy des,
                            final AutomatonProxy before,
                            final AutomatonProxy result)
-    throws WatersMarshalException, IOException, AnalysisException
+      throws WatersMarshalException, IOException, AnalysisException
   {
     final String name = des.getName();
     final String basename = appendSuffixes(name, mBindings);
-    final String comment = "Test output from " +
-      ProxyTools.getShortClassName(mAbstractionRule) + '.';
+    final String comment =
+        "Test output from " + ProxyTools.getShortClassName(mAbstractionRule)
+            + '.';
     saveAutomaton(result, basename, comment);
     final AutomatonProxy expected = getAutomaton(des, AFTER);
     if (expected == null) {
-      assertSame("Test expects no change, " +
-                 "but the object returned is not the same as the input!",
-                 before, result);
+      assertSame("Test expects no change, "
+          + "but the object returned is not the same as the input!", before,
+                 result);
     } else {
       mIsomorphismChecker.checkIsomorphism(result, expected);
     }
   }
 
-
-  //#########################################################################
-  //# To be Provided by Subclasses
+  // #########################################################################
+  // # To be Provided by Subclasses
   /**
-   * Creates an instance of the abstraction rule test. This method
-   * instantiates the class of the abstraction rule tested by the particular
-   * subclass of this test, and configures it as needed.
+   * Creates an instance of the abstraction rule test. This method instantiates
+   * the class of the abstraction rule tested by the particular subclass of this
+   * test, and configures it as needed.
+   *
    * @param factory
    *          The factory used by the abstraction rule to create its output.
    * @return An instance of the abstraction rule.
    */
-  protected abstract AbstractionRule createAbstractionRule
-    (ProductDESProxyFactory factory);
+  protected abstract AbstractionRule createAbstractionRule(
+                                                           ProductDESProxyFactory factory);
 
   /**
    * Configures the automaton builder under test for a given product DES. This
    * method is called just before the automaton builder is started for each
    * model to be tested. Subclasses that override this method should call the
    * superclass method first.
+   *
    * @param des
    *          The model to be analysed for the current test case.
    */
@@ -234,25 +225,22 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
     return mAbstractionRule;
   }
 
-
-  //#########################################################################
-  //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.model.analysis.AbstractAnalysisTest
+  // #########################################################################
+  // # Overrides for Abstract Base Class
+  // # net.sourceforge.waters.model.analysis.AbstractAnalysisTest
   protected void configure(final ModuleCompiler compiler)
   {
     compiler.setOptimizationEnabled(false);
   }
 
-
-  //#########################################################################
-  //# Data Members
+  // #########################################################################
+  // # Data Members
   private AbstractionRule mAbstractionRule;
   private IsomorphismChecker mIsomorphismChecker;
   private List<ParameterBindingProxy> mBindings;
 
-
-  //#########################################################################
-  //# Class Constants
+  // #########################################################################
+  // # Class Constants
   final String ALPHA = ":alpha";
   final String OMEGA = EventDeclProxy.DEFAULT_MARKING_NAME;
   final String TAU = "tau";

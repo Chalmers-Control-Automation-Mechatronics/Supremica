@@ -126,11 +126,12 @@ public class RemovalOfAlphaMarkingsRuleTest extends AbstractAbstractionRuleTest
   public void testReentrant() throws Exception
   {
     test_alpharemoval_1();
+    test_allStatesImplicitlyMarkedAlpha();
     test_alpharemoval_2();
     test_alpharemoval_3();
     test_alpharemoval_1();
     test_alpharemoval_2();
+    test_allStatesImplicitlyMarkedAlpha();
     test_alpharemoval_3();
   }
-
 }
