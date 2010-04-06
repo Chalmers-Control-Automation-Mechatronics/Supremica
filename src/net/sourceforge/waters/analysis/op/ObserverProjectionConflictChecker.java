@@ -640,12 +640,12 @@ public class ObserverProjectionConflictChecker
     final TransitionRelationSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier(rel, codeOfTau);
     final TIntObjectHashMap<int[]> loopClassMap =
-      applyPartition(loopRemover, rel, codeOfTau);
+      applySimplifier(loopRemover, rel, codeOfTau);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier(rel, codeOfTau);
     bisimulator.setSuppressRedundantHiddenTransitions(true);
     final TIntObjectHashMap<int[]> bisimClassMap =
-      applyPartition(bisimulator, rel, codeOfTau);
+      applySimplifier(bisimulator, rel, codeOfTau);
     if (loopClassMap != null || bisimClassMap != null) {
       final ProductDESProxyFactory factory = getFactory();
       final AutomatonProxy convertedAut = rel.createAutomaton(factory);
@@ -667,7 +667,7 @@ public class ObserverProjectionConflictChecker
     }
   }
 
-  private TIntObjectHashMap<int[]> applyPartition
+  private TIntObjectHashMap<int[]> applySimplifier
     (final TransitionRelationSimplifier simplifier,
      final ObserverProjectionTransitionRelation rel,
      final int tau)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="alpharemoval_1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A simple test for the alpha-removal rule. This is the first example from the paper "A Compositional Approach for Verifying Generalised Nonblocking" by Robi Malik and Ryan Leduc, ICCA 2009.</ns2:Comment>
+<Module Name="alpharemoval_5" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A simple test for the alpha-removal rule that involves a loop of non-silent events.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":alpha">
             <ColorGeometry>

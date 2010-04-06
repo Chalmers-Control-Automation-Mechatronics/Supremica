@@ -42,26 +42,67 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public class ObserverProjectionTransitionRelation
 {
 
-  // #########################################################################
-  // # Constructors
+  //#########################################################################
+  //# Constructors
+  /**
+   * Creates a new transition relation from the given automaton.
+   */
   public ObserverProjectionTransitionRelation(final AutomatonProxy aut)
   {
     this(aut, null);
   }
 
-  public ObserverProjectionTransitionRelation(
-                                              final AutomatonProxy aut,
-                                              final Collection<EventProxy> allprops)
+  /**
+   * Creates a new transition relation from the given automaton.
+   * @param allProps    The propositions to be used. If non-null, only
+   *                    propositions in this collection will be included in
+   *                    the new transition relation. If null, all propositions
+   *                    of the automaton will be used.
+   */
+  public ObserverProjectionTransitionRelation
+    (final AutomatonProxy aut, final Collection<EventProxy> allProps)
+  {
+    this(aut, null, allProps);
+  }
+
+  /**
+   * Creates a new transition relation from the given automaton.
+   * @param extraEvents Additional events to be added to the transition
+   *                    relation. Any events in this collection will be
+   *                    added to the event alphabet of the new transition
+   *                    relation, but without any transitions associated
+   *                    to them.
+   * @param allProps    The propositions to be used. If non-null, only
+   *                    propositions in this collection will be included in
+   *                    the new transition relation. If null, all propositions
+   *                    of the automaton will be used.
+   */
+  public ObserverProjectionTransitionRelation
+    (final AutomatonProxy aut,
+     final Collection<EventProxy> extraEvents,
+     final Collection<EventProxy> allProps)
   {
     mName = aut.getName();
     mKind = aut.getKind();
     mNumProperEvents = 0;
     int numPropositions = 0;
-    final Collection<EventProxy> events = aut.getEvents();
+    Collection<EventProxy> events = aut.getEvents();
+    if (extraEvents != null) {
+      final int size = events.size() + extraEvents.size();
+      final Collection<EventProxy> autEvents = new THashSet<EventProxy>(events);
+      final Collection<EventProxy> allEvents = new ArrayList<EventProxy>(size);
+      allEvents.addAll(events);
+      for (final EventProxy event : extraEvents) {
+        if (autEvents.add(event)) {
+          allEvents.add(event);
+        }
+      }
+      events = allEvents;
+    }
     for (final EventProxy event : events) {
       if (event.getKind() != EventKind.PROPOSITION) {
         mNumProperEvents++;
-      } else if (allprops == null || allprops.contains(event)) {
+      } else if (allProps == null || allProps.contains(event)) {
         numPropositions++;
       }
     }
@@ -74,7 +115,7 @@ public class ObserverProjectionTransitionRelation
       if (event.getKind() != EventKind.PROPOSITION) {
         mEvents[ee] = event;
         mEventToInt.put(event, ee++);
-      } else if (allprops == null || allprops.contains(event)) {
+      } else if (allProps == null || allProps.contains(event)) {
         mEvents[pp] = event;
         mEventToInt.put(event, pp++);
       }
@@ -284,7 +325,7 @@ public class ObserverProjectionTransitionRelation
       final int size = markings.size();
       final TIntHashSet newset;
       if (!value && size == 1) {
-        newset = new TIntHashSet();
+        newset = EMPTY_MARKING;
       } else {
         newset = new TIntHashSet(size);
         final TIntIterator iter = markings.iterator();
@@ -387,9 +428,8 @@ public class ObserverProjectionTransitionRelation
   {
     final int propID = mEvents.length;
     final int newNumEvents = propID + 1;
-    final EventProxy[] newEvents = Arrays.copyOf(mEvents, newNumEvents);
-    newEvents[propID] = prop;
-    mEvents = Arrays.copyOf(newEvents, newNumEvents);
+    mEvents = Arrays.copyOf(mEvents, newNumEvents);
+    mEvents[propID] = prop;
     mEventToInt.put(prop, propID);
     if (markStates) {
       for (final TIntHashSet set : mMarkingDefinitions) {
@@ -1072,6 +1112,7 @@ public class ObserverProjectionTransitionRelation
     private final Collection<EventProxy> mProps;
   }
 
+
   // #########################################################################
   // # Data Members
   private final String mName;
@@ -1090,4 +1131,10 @@ public class ObserverProjectionTransitionRelation
   private final TIntHashSet[][] mPredecessors;
 
   private TObjectIntHashMap<StateProxy> mResultingStates;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final TIntHashSet EMPTY_MARKING = new TIntHashSet();
+
 }
