@@ -417,6 +417,7 @@ public class CompositionalGeneralisedConflictChecker extends
     final MonolithicSynchronousProductBuilder composer =
         new MonolithicSynchronousProductBuilder(candidateModel, getFactory());
     composer.setPropositions(mPropositions);
+    composer.setTransitionLimit(getTransitionLimit());
     composer.setNodeLimit(getNodeLimit());
     // try {
     composer.run();

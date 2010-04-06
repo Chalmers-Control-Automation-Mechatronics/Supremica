@@ -43,6 +43,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     mTraceMarshaller = new JAXBTraceMarshaller(factory);
     mModelVerifier = createModelVerifier(factory);
     setNodeLimit();
+    mModelVerifier.setTransitionLimit(200000);
   }
 
   // #########################################################################
@@ -260,7 +261,6 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     mModelVerifier.setModel(des);
   }
 
-
   // #########################################################################
   // # Auxiliary Methods
   protected void runModelVerifierWithBindings(final ProductDESProxy des,
@@ -294,7 +294,6 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
       }
     }
   }
-
 
   // #########################################################################
   // # Data Members
