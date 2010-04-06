@@ -59,21 +59,16 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
                            final EventProxy tau)
   {
     mAutToAbstract = autToAbstract;
-    if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
-      // TODO Is this correct? I don't see why not, this rule can only remove
-      // alpha markings, if the automaton alphabet doesn't contain it why bother
-      // running the algorithm (or at least this is what I think I am
-      // checking...) No, if alpha is not in the alphabet, it means all states
-      // are marked alpha, so there is plenty to remove ...
-      return autToAbstract;
-    }
-    boolean modified = false;
     final ObserverProjectionTransitionRelation rel =
         new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
-    final int alphaID = rel.getEventInt(mAlphaMarking);
-    final int tauID = rel.getEventInt(tau);
     final int numStates = rel.getNumberOfStates();
+    int alphaID = rel.getEventInt(mAlphaMarking);
+    if (alphaID == -1) {
+      alphaID = rel.addProposition(mAlphaMarking, true);
+    }
+    boolean modified = false;
+    final int tauID = rel.getEventInt(tau);
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if (rel.hasPredecessors(sourceID) && rel.isMarked(sourceID, alphaID)) {
         final TIntHashSet successors = rel.getSuccessors(sourceID, tauID);
@@ -96,6 +91,8 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
       final AutomatonProxy convertedAut = rel.createAutomaton(getFactory());
       mOriginalIntToStateMap = rel.getOriginalIntToStateMap();
       mResultingStateToIntMap = rel.getResultingStateToIntMap();
+      System.out.println(autToAbstract);
+      System.out.println("CONVERTED-------------- " + convertedAut);
       return convertedAut;
     } else {
       return autToAbstract;

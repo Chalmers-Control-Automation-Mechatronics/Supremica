@@ -49,8 +49,9 @@ public class ObserverProjectionTransitionRelation
     this(aut, null);
   }
 
-  public ObserverProjectionTransitionRelation
-    (final AutomatonProxy aut, final Collection<EventProxy> allprops)
+  public ObserverProjectionTransitionRelation(
+                                              final AutomatonProxy aut,
+                                              final Collection<EventProxy> allprops)
   {
     mName = aut.getName();
     mKind = aut.getKind();
@@ -127,7 +128,6 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
-
   // #########################################################################
   // # Simple Access
   public String getName()
@@ -140,12 +140,10 @@ public class ObserverProjectionTransitionRelation
     return mKind;
   }
 
-
   // #########################################################################
   // # Events Access
   /**
-   * Gets the number of non-proposition events used by this transition
-   * relation.
+   * Gets the number of non-proposition events used by this transition relation.
    */
   public int getNumberOfProperEvents()
   {
@@ -174,7 +172,6 @@ public class ObserverProjectionTransitionRelation
       return -1;
     }
   }
-
 
   // #########################################################################
   // # States Access
@@ -248,7 +245,6 @@ public class ObserverProjectionTransitionRelation
     return markings.contains(prop);
   }
 
-
   // #########################################################################
   // # State Modifications
   public void makeInitialState(final int state, final boolean initial)
@@ -256,12 +252,13 @@ public class ObserverProjectionTransitionRelation
     mIsInitial[state] = initial;
   }
 
-
   // #########################################################################
   // # Marking Modifications
   /**
    * Removes all markings from the given state.
-   * @param  state    ID of the state to be modified.
+   *
+   * @param state
+   *          ID of the state to be modified.
    */
   public void clearMarkings(final int state)
   {
@@ -270,11 +267,14 @@ public class ObserverProjectionTransitionRelation
 
   /**
    * Changes a particular marking for a the given state.
-   * @param  state    ID of the state to be modified.
-   * @param  prop     ID of proposition identifying the marking to be modified.
-   * @param  value    Whether the marking should be set (<CODE>true</CODE>)
-   *                  or cleared (<CODE>false</CODE>) for the given state
-   *                  and proposition.
+   *
+   * @param state
+   *          ID of the state to be modified.
+   * @param prop
+   *          ID of proposition identifying the marking to be modified.
+   * @param value
+   *          Whether the marking should be set (<CODE>true</CODE>) or cleared (
+   *          <CODE>false</CODE>) for the given state and proposition.
    */
   public void markState(final int state, final int prop, final boolean value)
   {
@@ -309,10 +309,12 @@ public class ObserverProjectionTransitionRelation
 
   /**
    * Replaces all markings for a given state.
-   * @param  state    ID of the state to be modified.
-   * @param  markings The new markings to be set for the state. The state
-   *                  will be marked with precisely the propositions whose
-   *                  IDs are in this set.
+   *
+   * @param state
+   *          ID of the state to be modified.
+   * @param markings
+   *          The new markings to be set for the state. The state will be marked
+   *          with precisely the propositions whose IDs are in this set.
    */
   public void markState(final int state, final TIntHashSet markings)
   {
@@ -328,13 +330,15 @@ public class ObserverProjectionTransitionRelation
   }
 
   /**
-   * Copies markings from one state to another.
-   * This methods add all the markings of the given source state (from) to
-   * the given target state (to). The markings of the source state will not
-   * be changed, and the target state retains any markings it previously had
-   * in addition to the new ones.
-   * @param  from   ID of source state to copy markings from.
-   * @param  to     ID of target state to copy markings to.
+   * Copies markings from one state to another. This methods add all the
+   * markings of the given source state (from) to the given target state (to).
+   * The markings of the source state will not be changed, and the target state
+   * retains any markings it previously had in addition to the new ones.
+   *
+   * @param from
+   *          ID of source state to copy markings from.
+   * @param to
+   *          ID of target state to copy markings to.
    */
   public void copyMarkings(final int from, final int to)
   {
@@ -371,10 +375,12 @@ public class ObserverProjectionTransitionRelation
   /**
    * Adds the given proposition to the event alphabet of this transition
    * relation.
-   * @param  prop       The event to be added.
-   * @param  markStates A flag. If <CODE>true</CODE> all states will be
-   *                    marked with the new proposition. If <CODE>false</CODE>,
-   *                    no states will be marked.
+   *
+   * @param prop
+   *          The event to be added.
+   * @param markStates
+   *          A flag. If <CODE>true</CODE> all states will be marked with the
+   *          new proposition. If <CODE>false</CODE>, no states will be marked.
    * @return The event ID given to the new proposition.
    */
   public int addProposition(final EventProxy prop, final boolean markStates)
@@ -383,6 +389,7 @@ public class ObserverProjectionTransitionRelation
     final int newNumEvents = propID + 1;
     final EventProxy[] newEvents = Arrays.copyOf(mEvents, newNumEvents);
     newEvents[propID] = prop;
+    mEvents = newEvents;
     mEventToInt.put(prop, propID);
     if (markStates) {
       for (final TIntHashSet set : mMarkingDefinitions) {
@@ -391,7 +398,6 @@ public class ObserverProjectionTransitionRelation
     }
     return propID;
   }
-
 
   // #########################################################################
   // # Transitions Access
@@ -456,9 +462,10 @@ public class ObserverProjectionTransitionRelation
   /**
    * Determines whether the given event is globally disabled in this transition
    * relation.
-   * @param  event   The ID of the event to be tested.
-   * @return <CODE>true</CODE> if the given event is disabled in every
-   *         state.
+   *
+   * @param event
+   *          The ID of the event to be tested.
+   * @return <CODE>true</CODE> if the given event is disabled in every state.
    */
   public boolean isGloballyDisabled(final int event)
   {
@@ -477,9 +484,11 @@ public class ObserverProjectionTransitionRelation
   /**
    * Determines whether the given event is selflooped in this transition
    * relation.
-   * @param  event   The ID of the event to be tested.
-   * @return <CODE>true</CODE> if the given event is selflooped in every
-   *         state, and appears on no other transitions.
+   *
+   * @param event
+   *          The ID of the event to be tested.
+   * @return <CODE>true</CODE> if the given event is selflooped in every state,
+   *         and appears on no other transitions.
    */
   public boolean isPureSelfloopEvent(final int event)
   {
@@ -494,7 +503,6 @@ public class ObserverProjectionTransitionRelation
     }
     return true;
   }
-
 
   // #########################################################################
   // # Transitions Modifications
@@ -780,17 +788,18 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
-
-  //#########################################################################
-  //# Automaton Simplification
+  // #########################################################################
+  // # Automaton Simplification
   /**
    * Attempts to simplify the automaton by removing redundant selfloop events.
    * This method searches for any events that are selflooped in all states of
-   * the transition relation, and removes any such events and the selfloops
-   * from the transition relation.
-   * @param  tau    The ID of a silent event. If this is an event of the
-   *                transition relation, it is treated specially. It can also
-   *                be removed if it is disabled in all states.
+   * the transition relation, and removes any such events and the selfloops from
+   * the transition relation.
+   *
+   * @param tau
+   *          The ID of a silent event. If this is an event of the transition
+   *          relation, it is treated specially. It can also be removed if it is
+   *          disabled in all states.
    */
   public void removeSelfLoopEvents(final int tau)
   {
@@ -805,24 +814,25 @@ public class ObserverProjectionTransitionRelation
   }
 
   /**
-   * Repartitions the states of this transition relation.
-   * This method is used to merge states after a partition has been obtained
-   * through a {@link TransitionRelationSimplifier}.
-   * @param partition The partitioning to be imposed. Each array in the
-   *                  collection defines the state codes comprising an
-   *                  equivalence class to be merged into a single state.
-   *                  The first element of each array identifies the state
-   *                  code to be given to the new merged state.
-   * @param tau       The event code of a silent event. If the event is present
-   *                  in the transition relations, any selfloops with this
-   *                  events obtained while merging states will be deleted.
-   * @param classMap  If non-null, this map will be augmented with the reverse
-   *                  state map resulting from the merge. Each merged state
-   *                  code will be mapped to the array of state code present
-   *                  before the merge.
+   * Repartitions the states of this transition relation. This method is used to
+   * merge states after a partition has been obtained through a
+   * {@link TransitionRelationSimplifier}.
+   *
+   * @param partition
+   *          The partitioning to be imposed. Each array in the collection
+   *          defines the state codes comprising an equivalence class to be
+   *          merged into a single state. The first element of each array
+   *          identifies the state code to be given to the new merged state.
+   * @param tau
+   *          The event code of a silent event. If the event is present in the
+   *          transition relations, any selfloops with this events obtained
+   *          while merging states will be deleted.
+   * @param classMap
+   *          If non-null, this map will be augmented with the reverse state map
+   *          resulting from the merge. Each merged state code will be mapped to
+   *          the array of state code present before the merge.
    */
-  public void mergePartition(final Collection<int[]> partition,
-                             final int tau,
+  public void mergePartition(final Collection<int[]> partition, final int tau,
                              final TIntObjectHashMap<int[]> classMap)
   {
     for (final int[] array : partition) {
@@ -838,9 +848,8 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
-
-  //#########################################################################
-  //# Automaton Output
+  // #########################################################################
+  // # Automaton Output
   public AutomatonProxy createAutomaton(final ProductDESProxyFactory factory)
   {
     final int numEvents = getNumberOfEvents();
@@ -853,7 +862,7 @@ public class ObserverProjectionTransitionRelation
     }
 
     final List<MemStateProxy> reachable =
-      new ArrayList<MemStateProxy>(numStates);
+        new ArrayList<MemStateProxy>(numStates);
     mResultingStates = new TObjectIntHashMap<StateProxy>(numStates);
     final StateProxy[] outputMap = new StateProxy[numStates];
     final Collection<TransitionProxy> transitions =
@@ -898,7 +907,6 @@ public class ObserverProjectionTransitionRelation
     return factory.createAutomatonProxy(mName, mKind, events, reachable,
                                         transitions);
   }
-
 
   // #########################################################################
   // # Auxiliary Methods
@@ -1064,13 +1072,12 @@ public class ObserverProjectionTransitionRelation
     private final Collection<EventProxy> mProps;
   }
 
-
   // #########################################################################
   // # Data Members
   private final String mName;
   private final ComponentKind mKind;
   private int mNumProperEvents;
-  private final EventProxy[] mEvents;
+  private EventProxy[] mEvents;
   private final TObjectIntHashMap<EventProxy> mEventToInt;
   private final StateProxy[] mOriginalStates;
   private final Map<StateProxy,Integer> mOriginalStatesMap;
@@ -1083,7 +1090,6 @@ public class ObserverProjectionTransitionRelation
   private final TIntHashSet[][] mPredecessors;
 
   private TObjectIntHashMap<StateProxy> mResultingStates;
-
 
   // #########################################################################
   // # Class Constants
