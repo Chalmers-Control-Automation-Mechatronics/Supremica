@@ -117,8 +117,6 @@ public class RemovalOfAlphaMarkingsRuleTest extends AbstractAbstractionRuleTest
     runAbstractionRule(group, subdir, name);
   }
 
-  // TODO More tests needed ...
-
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
