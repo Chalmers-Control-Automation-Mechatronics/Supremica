@@ -28,7 +28,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  *
  * @author Rachel Francis
  */
-
+// TODO: a lot of bugs with standard conflict checker, needs a more test
+// cases
 class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
     AbstractionRule
 {
