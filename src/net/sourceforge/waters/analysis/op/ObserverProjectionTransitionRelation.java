@@ -143,16 +143,12 @@ public class ObserverProjectionTransitionRelation
       mIsInitial[statecode] = state.isInitial();
       final Collection<EventProxy> props = state.getPropositions();
       final int numprops = props.size();
-      if (numprops == 0) {
-        clearMarkings(statecode);
-      } else {
-        final TIntHashSet markings = new TIntHashSet(numprops);
-        for (final EventProxy prop : props) {
-          final int e = mEventToInt.get(prop);
-          markings.add(e);
-        }
-        markState(statecode, markings);
+      final TIntHashSet markings = new TIntHashSet(numprops);
+      for (final EventProxy prop : props) {
+        final int e = mEventToInt.get(prop);
+        markings.add(e);
       }
+      markState(statecode, markings);
       statecode++;
     }
 
@@ -303,7 +299,8 @@ public class ObserverProjectionTransitionRelation
    */
   public void clearMarkings(final int state)
   {
-    markState(state, new TIntHashSet());
+    final TIntHashSet empty = new TIntHashSet(0);
+    markState(state, empty);
   }
 
   /**
@@ -323,24 +320,19 @@ public class ObserverProjectionTransitionRelation
     final TIntHashSet markings = mMarkingDefinitions.get(m);
     if (value != markings.contains(prop)) {
       final int size = markings.size();
-      final TIntHashSet newset;
-      if (!value && size == 1) {
-        newset = EMPTY_MARKING;
+      final TIntHashSet newset = new TIntHashSet(size);
+      final TIntIterator iter = markings.iterator();
+      if (value) {
+        while (iter.hasNext()) {
+          final int e = iter.next();
+          newset.add(e);
+        }
+        newset.add(prop);
       } else {
-        newset = new TIntHashSet(size);
-        final TIntIterator iter = markings.iterator();
-        if (value) {
-          while (iter.hasNext()) {
-            final int e = iter.next();
+        while (iter.hasNext()) {
+          final int e = iter.next();
+          if (e != prop) {
             newset.add(e);
-          }
-          newset.add(prop);
-        } else {
-          while (iter.hasNext()) {
-            final int e = iter.next();
-            if (e != prop) {
-              newset.add(e);
-            }
           }
         }
       }
@@ -431,13 +423,12 @@ public class ObserverProjectionTransitionRelation
     mEvents = Arrays.copyOf(mEvents, newNumEvents);
     mEvents[propID] = prop;
     mEventToInt.put(prop, propID);
-    if (markStates) {
-      for (final TIntHashSet set : mMarkingDefinitions) {
-        set.add(propID);
-      }
+    for (final TIntHashSet set : mMarkingDefinitions) {
+      set.add(propID);
     }
     return propID;
   }
+
 
   // #########################################################################
   // # Transitions Access
@@ -1131,10 +1122,5 @@ public class ObserverProjectionTransitionRelation
   private final TIntHashSet[][] mPredecessors;
 
   private TObjectIntHashMap<StateProxy> mResultingStates;
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final TIntHashSet EMPTY_MARKING = new TIntHashSet();
 
 }
