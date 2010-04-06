@@ -91,8 +91,6 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
       final AutomatonProxy convertedAut = rel.createAutomaton(getFactory());
       mOriginalIntToStateMap = rel.getOriginalIntToStateMap();
       mResultingStateToIntMap = rel.getResultingStateToIntMap();
-      System.out.println(autToAbstract);
-      System.out.println("CONVERTED-------------- " + convertedAut);
       return convertedAut;
     } else {
       return autToAbstract;

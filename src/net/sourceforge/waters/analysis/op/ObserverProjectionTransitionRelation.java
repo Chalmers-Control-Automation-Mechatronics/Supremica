@@ -262,7 +262,7 @@ public class ObserverProjectionTransitionRelation
    */
   public void clearMarkings(final int state)
   {
-    markState(state, EMPTY_MARKING);
+    markState(state, new TIntHashSet());
   }
 
   /**
@@ -284,7 +284,7 @@ public class ObserverProjectionTransitionRelation
       final int size = markings.size();
       final TIntHashSet newset;
       if (!value && size == 1) {
-        newset = EMPTY_MARKING;
+        newset = new TIntHashSet();
       } else {
         newset = new TIntHashSet(size);
         final TIntIterator iter = markings.iterator();
@@ -389,7 +389,7 @@ public class ObserverProjectionTransitionRelation
     final int newNumEvents = propID + 1;
     final EventProxy[] newEvents = Arrays.copyOf(mEvents, newNumEvents);
     newEvents[propID] = prop;
-    mEvents = newEvents;
+    mEvents = Arrays.copyOf(newEvents, newNumEvents);
     mEventToInt.put(prop, propID);
     if (markStates) {
       for (final TIntHashSet set : mMarkingDefinitions) {
@@ -1090,9 +1090,4 @@ public class ObserverProjectionTransitionRelation
   private final TIntHashSet[][] mPredecessors;
 
   private TObjectIntHashMap<StateProxy> mResultingStates;
-
-  // #########################################################################
-  // # Class Constants
-  private static final TIntHashSet EMPTY_MARKING = new TIntHashSet();
-
 }
