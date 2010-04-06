@@ -338,16 +338,17 @@ public class CompositionalGeneralisedConflictChecker extends
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
-    final ObservationEquivalenceRule oeRule =
-      new ObservationEquivalenceRule(getFactory(), mPropositions);
-    mAbstractionRules.add(oeRule);
-
     /*
-     * final RemovalOfAlphaMarkingsRule ramRule = new
-     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(ramRule);
+     * final ObservationEquivalenceRule oeRule = new
+     * ObservationEquivalenceRule(getFactory(), mPropositions);
+     * mAbstractionRules.add(oeRule);
      */
+
+    final RemovalOfAlphaMarkingsRule ramRule =
+        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+    ramRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(ramRule);
+
     /*
      * final RemovalOfDefaultMarkingsRule rdmRule = new
      * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
@@ -371,13 +372,14 @@ public class CompositionalGeneralisedConflictChecker extends
      * mAbstractionRules.add(rttlnsRule);
      */
 
-    final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule =
-        new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
-            getFactory(), mPropositions);
-    rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
-    rttonsRule.setDefaultMarking(getMarkingProposition());
-    mAbstractionRules.add(rttonsRule);
-
+    /*
+     * final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule
+     * = new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
+     * getFactory(), mPropositions);
+     * rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
+     * rttonsRule.setDefaultMarking(getMarkingProposition());
+     * mAbstractionRules.add(rttonsRule);
+     */
   }
 
   // #########################################################################
@@ -882,11 +884,11 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       Candidate chosenCandidate = candidates.get(0);
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
-      int smallestProduct = calculateProduct(chosenCandidate);
+      double smallestProduct = calculateProduct(chosenCandidate);
       chosenCandidates.add(chosenCandidate);
       for (int i = 1; i < candidates.size(); i++) {
         final Candidate candidate = candidates.get(i);
-        final int newproduct = calculateProduct(candidate);
+        final double newproduct = calculateProduct(candidate);
         if (smallestProduct > newproduct) {
           chosenCandidates = new ArrayList<Candidate>();
           smallestProduct = newproduct;
@@ -900,18 +902,15 @@ public class CompositionalGeneralisedConflictChecker extends
       return chosenCandidates;
     }
 
-    // TODO Fix bug. Use double, because int is likely to overflow and give
-    // wrong results.
-    // TODO Improve estimation by taking event numbers into consideration.
-    // Return product * <number of non-local events> / <total number of events>.
-    // Use this heuristic or a new one for the change.
-    private int calculateProduct(final Candidate candidate)
+    private double calculateProduct(final Candidate candidate)
     {
-      int product = 1;
+      double product = 1;
       for (final AutomatonProxy aut : candidate.getAutomata()) {
         product *= aut.getStates().size();
       }
-      return product;
+      final int totalEvents = candidate.getNumberOfEvents();
+      final int nonLocalEvents = totalEvents - candidate.getLocalEventCount();
+      return product * (double) nonLocalEvents / (double) totalEvents;
     }
   }
 
@@ -971,17 +970,15 @@ public class CompositionalGeneralisedConflictChecker extends
     }
   }
 
-  public ObservationEquivalenceStep createObservationEquivalenceStep
-    (final AutomatonProxy abstractedAut,
-     final AutomatonProxy autToAbstract,
-     final EventProxy tau,
-     final ObserverProjectionTransitionRelation tr,
-     final TIntObjectHashMap<int[]> classMap)
+  public ObservationEquivalenceStep createObservationEquivalenceStep(
+                                                                     final AutomatonProxy abstractedAut,
+                                                                     final AutomatonProxy autToAbstract,
+                                                                     final EventProxy tau,
+                                                                     final ObserverProjectionTransitionRelation tr,
+                                                                     final TIntObjectHashMap<int[]> classMap)
   {
-    return new ObservationEquivalenceStep(abstractedAut, autToAbstract, tau,
-                                          tr.getOriginalIntToStateMap(),
-                                          classMap,
-                                          tr.getResultingStateToIntMap());
+    return new ObservationEquivalenceStep(abstractedAut, autToAbstract, tau, tr
+        .getOriginalIntToStateMap(), classMap, tr.getResultingStateToIntMap());
   }
 
   public RemovalOfMarkingsOrNoncoreachableStatesStep createRemovalOfMarkingsStep(
