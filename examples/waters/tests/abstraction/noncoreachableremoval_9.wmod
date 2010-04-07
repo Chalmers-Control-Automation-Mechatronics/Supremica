@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="defaultremoval_10" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="noncoreachableremoval_9" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Tests whether multiple incoming transitions are handled correctly. Includes a deterministic and nondetermenistic choice.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":alpha">
@@ -93,9 +93,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S7">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="256" X="96"/>
                         </PointGeometry>
@@ -189,11 +186,6 @@
                     <Edge Target="S7" Source="S6">
                         <LabelBlock>
                             <SimpleIdentifier Name="e3"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S5" Source="S7">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>
@@ -265,22 +257,6 @@
                             <Point Y="10" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S6">
-                        <PointGeometry>
-                            <Point Y="192" X="32"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S7">
-                        <PointGeometry>
-                            <Point Y="256" X="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
-                        </LabelGeometry>
-                    </SimpleNode>
                 </NodeList>
                 <EdgeList>
                     <Edge Target="S2" Source="S0">
@@ -354,24 +330,6 @@
                     <Edge Target="S2" Source="S5">
                         <LabelBlock>
                             <SimpleIdentifier Name="e3"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S6" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="113" X="3"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="S7" Source="S6">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e3"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S5" Source="S7">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>

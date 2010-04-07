@@ -160,7 +160,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     runAbstractionRule(group, subdir, name);
   }
 
-  public void test_multipleTauTransitionsBetween() throws Exception
+  public void test_multipleOutgoingTransitions() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
@@ -168,7 +168,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     runAbstractionRule(group, subdir, name);
   }
 
-  public void test_multipleOutgoingTransitions() throws Exception
+  public void test_reachableBeforeNotAfter() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
@@ -176,19 +176,11 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     runAbstractionRule(group, subdir, name);
   }
 
-  public void test_noRemovalWithNoTau() throws Exception
+  public void test_stateWithReachableAndNonreachablePath() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "noncoreachableremoval_12.wmod";
-    runAbstractionRule(group, subdir, name);
-  }
-
-  public void test_twoTransitionsBetweenTauStates() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "noncoreachableremoval_13.wmod";
     runAbstractionRule(group, subdir, name);
   }
 
@@ -202,22 +194,22 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     test_reachableLoop();
     test_allStatesImplicitlyMarkedAlpha();
     test_selfLoops();
-    test_noRemovalWithNoTau();
+    test_reachableBeforeNotAfter();
     test_multipleIncomingTransitions();
     test_multipleOutgoingTransitions();
     test_noncoreachableStatesRemoval_2();
     test_noTransitions();
-    test_multipleTauTransitionsBetween();
-    test_twoTransitionsBetweenTauStates();
     test_unreachableLoop();
     test_noncoreachableStatesRemoval_1();
     test_selfLoops();
+    test_reachableBeforeNotAfter();
     test_noncoreachableStatesRemoval_2();
+    test_stateWithReachableAndNonreachablePath();
     test_noTransitions();
     test_unreachableLoop();
     test_allStatesImplicitlyMarkedAlpha();
-    test_noRemovalWithNoTau();
     test_multipleOutgoingTransitions();
+    test_stateWithReachableAndNonreachablePath();
     test_reachableLoop();
   }
 
