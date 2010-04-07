@@ -132,7 +132,7 @@ public class RemovalOfDefaultMarkingsRuleTest extends
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "defaultremoval_5.wmod";
+    final String name = "defaultremoval_6.wmod";
     runAbstractionRule(group, subdir, name);
   }
 
@@ -140,7 +140,7 @@ public class RemovalOfDefaultMarkingsRuleTest extends
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "defaultremoval_6.wmod";
+    final String name = "defaultremoval_7.wmod";
     runAbstractionRule(group, subdir, name);
   }
 
@@ -148,7 +148,7 @@ public class RemovalOfDefaultMarkingsRuleTest extends
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "defaultremoval_7.wmod";
+    final String name = "defaultremoval_8.wmod";
     runAbstractionRule(group, subdir, name);
   }
 
@@ -156,19 +156,11 @@ public class RemovalOfDefaultMarkingsRuleTest extends
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "defaultremoval_8.wmod";
-    runAbstractionRule(group, subdir, name);
-  }
-
-  public void test_multipleIncomingTransitions() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
     final String name = "defaultremoval_9.wmod";
     runAbstractionRule(group, subdir, name);
   }
 
-  public void test_multipleTauTransitionsBetween() throws Exception
+  public void test_multipleIncomingTransitions() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
@@ -184,22 +176,6 @@ public class RemovalOfDefaultMarkingsRuleTest extends
     runAbstractionRule(group, subdir, name);
   }
 
-  public void test_noRemovalWithNoTau() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_12.wmod";
-    runAbstractionRule(group, subdir, name);
-  }
-
-  public void test_twoTransitionsBetweenTauStates() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_13.wmod";
-    runAbstractionRule(group, subdir, name);
-  }
-
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
@@ -211,14 +187,11 @@ public class RemovalOfDefaultMarkingsRuleTest extends
     test_allStatesImplicitlyMarkedAlpha();
     test_allStatesImplicitlyMarkedOmega();
     test_selfLoops();
-    test_noRemovalWithNoTau();
     test_multipleIncomingTransitions();
     test_multipleOutgoingTransitions();
     test_defaultremoval_2();
     test_nonDefaultRemovalWithAlphaOnSameState();
     test_noTransitions();
-    test_multipleTauTransitionsBetween();
-    test_twoTransitionsBetweenTauStates();
     test_nonTauLoop();
     test_defaultremoval_1();
     test_allStatesImplicitlyMarkedOmega();
@@ -227,7 +200,6 @@ public class RemovalOfDefaultMarkingsRuleTest extends
     test_noTransitions();
     test_nonTauLoop();
     test_allStatesImplicitlyMarkedAlpha();
-    test_noRemovalWithNoTau();
     test_multipleOutgoingTransitions();
     test_nonDefaultRemovalWithAlphaOnSameState();
     test_tauLoop();
