@@ -12,6 +12,8 @@ package net.sourceforge.waters.analysis.op;
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
+import gnu.trove.TIntIntHashMap;
+import gnu.trove.TIntIntIterator;
 import gnu.trove.TIntIterator;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntObjectIterator;
@@ -73,7 +75,7 @@ public class ObserverProjectionConflictChecker
   public ObserverProjectionConflictChecker
     (final ProductDESProxyFactory factory)
   {
-    super(null, factory);
+    this(null, factory);
   }
 
   /**
@@ -88,7 +90,7 @@ public class ObserverProjectionConflictChecker
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory)
   {
-    super(model, factory);
+    this(model, null, factory);
   }
 
   /**
@@ -111,11 +113,22 @@ public class ObserverProjectionConflictChecker
      final ProductDESProxyFactory factory)
   {
     super(model, marking, factory);
+    mMethod = Method.OBSERVATION_EQUIVALENCE;
   }
 
 
   //#########################################################################
   //# Configuration
+  public void setMethod(final Method method)
+  {
+    mMethod = method;
+  }
+
+  public Method getMethod()
+  {
+    return mMethod;
+  }
+
   public void setNodeLimit(final int limit)
   {
     setInternalStepNodeLimit(limit);
@@ -357,9 +370,20 @@ public class ObserverProjectionConflictChecker
       final SelectingHeuristic defaultHeuristic = new HeuristicMinS();
       setSelectingHeuristic(defaultHeuristic);
     }
+    switch (mMethod) {
+    case OBSERVATION_EQUIVALENCE:
+      mAbstractionRule = new ObservationEquivalenceAbstractionRule();
+      break;
+    case OBSERVER_PROJECTION:
+      mAbstractionRule = new ObserverProjectionAbstractionRule();
+      break;
+    default:
+      throw new IllegalStateException("Unknown method " + mMethod + " in " +
+                                      ProxyTools.getShortClassName(this) + "!");
+    }
     setupSynchronousProductBuilder();
     setupMonolithicConflictChecker();
-    mModifyingSteps = new ArrayList<Step>();
+    mModifyingSteps = new ArrayList<AbstractionStep>();
     mNumOverflows = 0;
     mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
   }
@@ -591,7 +615,7 @@ public class ObserverProjectionConflictChecker
     final EventProxy tau = syncStep.getHiddenEvent();
     AutomatonProxy autToAbstract = syncStep.getResultAutomaton();
     final ObservationEquivalenceStep oeStep =
-      applyObservationEquivalence(autToAbstract, tau);
+      mAbstractionRule.applyRule(autToAbstract, tau);
     mModifyingSteps.add(syncStep);
     if (oeStep != null) {
       autToAbstract = oeStep.getResultAutomaton();
@@ -630,102 +654,15 @@ public class ObserverProjectionConflictChecker
     }
   }
 
-  private ObservationEquivalenceStep applyObservationEquivalence
-    (final AutomatonProxy aut, final EventProxy tau)
-    throws AnalysisException
-  {
-    final ObserverProjectionTransitionRelation rel =
-        new ObserverProjectionTransitionRelation(aut, mPropositions);
-    final int codeOfTau = rel.getEventInt(tau);
-    final TransitionRelationSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier(rel, codeOfTau);
-    final TIntObjectHashMap<int[]> loopClassMap =
-      applySimplifier(loopRemover, rel, codeOfTau);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier(rel, codeOfTau);
-    bisimulator.setSuppressRedundantHiddenTransitions(true);
-    final TIntObjectHashMap<int[]> bisimClassMap =
-      applySimplifier(bisimulator, rel, codeOfTau);
-    if (loopClassMap != null || bisimClassMap != null) {
-      final ProductDESProxyFactory factory = getFactory();
-      final AutomatonProxy convertedAut = rel.createAutomaton(factory);
-      final StateProxy[] inputMap = rel.getOriginalIntToStateMap();
-      final TIntObjectHashMap<int[]> classMap;
-      if (loopClassMap == null) {
-        classMap = bisimClassMap;
-      } else if (bisimClassMap == null) {
-        classMap = loopClassMap;
-      } else {
-        classMap = combineClassMaps(loopClassMap, bisimClassMap);
-      }
-      final TObjectIntHashMap<StateProxy> outputMap =
-        rel.getResultingStateToIntMap();
-      return new ObservationEquivalenceStep(convertedAut, aut, tau,
-                                            inputMap, classMap, outputMap);
-    } else {
-      return null;
-    }
-  }
-
-  private TIntObjectHashMap<int[]> applySimplifier
-    (final TransitionRelationSimplifier simplifier,
-     final ObserverProjectionTransitionRelation rel,
-     final int tau)
-    throws AnalysisException
-  {
-    if (simplifier.run()) {
-      final Collection<int[]> partition = simplifier.getResultPartition();
-      final int size = partition.size();
-      final TIntObjectHashMap<int[]> map = new TIntObjectHashMap<int[]>(size);
-      rel.mergePartition(partition, tau, map);
-      rel.removeSelfLoopEvents(tau);
-      return map;
-    } else {
-      return null;
-    }
-  }
-
-  private TIntObjectHashMap<int[]> combineClassMaps
-    (final TIntObjectHashMap<int[]> first,
-     final TIntObjectHashMap<int[]> second)
-  {
-    final TIntObjectIterator<int[]> iter = second.iterator();
-    while (iter.hasNext()) {
-      iter.advance();
-      final int[] class2 = iter.value();
-      int count = 0;
-      for (final int s2 : class2) {
-        final int[] class1 = first.get(s2);
-        count += class1.length;
-      }
-      final int[] newclass;
-      if (class2.length == count) {
-        newclass = class2;
-      } else {
-        newclass = new int[count];
-        iter.setValue(newclass);
-      }
-      int i = 0;
-      for (final int s2 : class2) {
-        final int[] class1 = first.get(s2);
-        for (final int s1 : class1) {
-          newclass[i++] = s1;
-        }
-      }
-    }
-    return second;
-  }
-
-
   //#########################################################################
   //# Trace Computation
   private ConflictTraceProxy expandTrace(final ConflictTraceProxy trace)
   {
     List<TraceStepProxy> traceSteps = getSaturatedTraceSteps(trace);
     final int size = mModifyingSteps.size();
-    final ListIterator<Step> iter = mModifyingSteps.listIterator(size);
+    final ListIterator<AbstractionStep> iter = mModifyingSteps.listIterator(size);
     while (iter.hasPrevious()) {
-      final Step step = iter.previous();
+      final AbstractionStep step = iter.previous();
       traceSteps = step.convertTraceSteps(traceSteps);
     }
     final ProductDESProxyFactory factory = getFactory();
@@ -832,6 +769,15 @@ public class ObserverProjectionConflictChecker
       }
     }
     return targetState;
+  }
+
+
+  //#########################################################################
+  //# Inner Enumeration Method
+  public enum Method
+  {
+    OBSERVATION_EQUIVALENCE,
+    OBSERVER_PROJECTION
   }
 
 
@@ -1110,19 +1056,242 @@ public class ObserverProjectionConflictChecker
 
 
   //#########################################################################
-  //# Inner Class Step
-  private abstract class Step
+  //# Inner Class AbstractionRule
+  private abstract class AbstractionRule
+  {
+
+    //#######################################################################
+    //# Rule Application
+    abstract ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
+                                                  final EventProxy tau)
+    throws AnalysisException;
+
+    //#######################################################################
+    //# Auxiliary Methods
+    TIntObjectHashMap<int[]> applySimplifier
+      (final TransitionRelationSimplifier simplifier,
+       final ObserverProjectionTransitionRelation rel,
+       final int tau)
+    throws AnalysisException
+    {
+      if (simplifier.run()) {
+        final Collection<int[]> partition = simplifier.getResultPartition();
+        final int size = partition.size();
+        final TIntObjectHashMap<int[]> map = new TIntObjectHashMap<int[]>(size);
+        rel.mergePartition(partition, tau, map);
+        rel.removeSelfLoopEvents(tau);
+        return map;
+      } else {
+        return null;
+      }
+    }
+
+    TIntObjectHashMap<int[]> combineClassMaps
+      (final TIntObjectHashMap<int[]> first,
+       final TIntObjectHashMap<int[]> second)
+    {
+      final TIntObjectIterator<int[]> iter = second.iterator();
+      while (iter.hasNext()) {
+        iter.advance();
+        final int[] class2 = iter.value();
+        int count = 0;
+        for (final int s2 : class2) {
+          final int[] class1 = first.get(s2);
+          count += class1.length;
+        }
+        final int[] newclass;
+        if (class2.length == count) {
+          newclass = class2;
+        } else {
+          newclass = new int[count];
+          iter.setValue(newclass);
+        }
+        int i = 0;
+        for (final int s2 : class2) {
+          final int[] class1 = first.get(s2);
+          for (final int s1 : class1) {
+            newclass[i++] = s1;
+          }
+        }
+      }
+      return second;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class ObservationEquivalenceAbstractionRule
+  private class ObservationEquivalenceAbstractionRule
+    extends AbstractionRule
+  {
+
+    //#######################################################################
+    //# Rule Application
+    ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
+                                         final EventProxy tau)
+    throws AnalysisException
+    {
+      final ObserverProjectionTransitionRelation rel =
+        new ObserverProjectionTransitionRelation(aut, mPropositions);
+      final int codeOfTau = rel.getEventInt(tau);
+      final TransitionRelationSimplifier loopRemover =
+        new TauLoopRemovalTRSimplifier(rel, codeOfTau);
+      final TIntObjectHashMap<int[]> loopClassMap =
+        applySimplifier(loopRemover, rel, codeOfTau);
+      final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier(rel, codeOfTau);
+      bisimulator.setSuppressRedundantHiddenTransitions(true);
+      final TIntObjectHashMap<int[]> bisimClassMap =
+        applySimplifier(bisimulator, rel, codeOfTau);
+      if (loopClassMap != null || bisimClassMap != null) {
+        final ProductDESProxyFactory factory = getFactory();
+        final AutomatonProxy convertedAut = rel.createAutomaton(factory);
+        final StateProxy[] inputMap = rel.getOriginalIntToStateMap();
+        final TIntObjectHashMap<int[]> classMap;
+        if (loopClassMap == null) {
+          classMap = bisimClassMap;
+        } else if (bisimClassMap == null) {
+          classMap = loopClassMap;
+        } else {
+          classMap = combineClassMaps(loopClassMap, bisimClassMap);
+        }
+        final TObjectIntHashMap<StateProxy> outputMap =
+          rel.getResultingStateToIntMap();
+        return new ObservationEquivalenceStep(convertedAut, aut, tau,
+                                              inputMap, classMap, outputMap);
+      } else {
+        return null;
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class ObserverProjectionAbstractionRule
+  private class ObserverProjectionAbstractionRule
+    extends AbstractionRule
+  {
+
+    //#######################################################################
+    //# Rule Application
+    ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
+                                         final EventProxy tau)
+    throws AnalysisException
+    {
+      final ProductDESProxyFactory factory = getFactory();
+      final String name = "vtau:" + aut.getName();
+      final EventProxy vtau =
+        factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
+      final Collection<EventProxy> extra = Collections.singletonList(vtau);
+      final ObserverProjectionTransitionRelation rel =
+        new ObserverProjectionTransitionRelation(aut, extra, mPropositions);
+      final int codeOfTau = rel.getEventInt(tau);
+      final int codeOfVTau = rel.getEventInt(vtau);
+      final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier(rel, codeOfTau);
+      final TIntObjectHashMap<int[]> classMap =
+        applySimplifier(bisimulator, rel, codeOfTau, codeOfVTau);
+      if (classMap != null) {
+        final AutomatonProxy convertedAut = rel.createAutomaton(factory);
+        final StateProxy[] inputMap = rel.getOriginalIntToStateMap();
+        final TObjectIntHashMap<StateProxy> outputMap =
+          rel.getResultingStateToIntMap();
+        return new ObservationEquivalenceStep(convertedAut, aut, tau,
+                                              inputMap, classMap, outputMap);
+      } else {
+        return null;
+      }
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private TIntObjectHashMap<int[]> applySimplifier
+      (final ObservationEquivalenceTRSimplifier simplifier,
+       final ObserverProjectionTransitionRelation rel,
+       final int tau,
+       final int vtau)
+    throws AnalysisException
+    {
+      final int numTransBefore = rel.getNumberOfTransitions();
+      Collection<int[]> partition;
+      int psize;
+      do {
+        final boolean modified = simplifier.run();
+        if (!modified && rel.getNumberOfTransitions() == numTransBefore) {
+          return null;
+        }
+        partition = simplifier.getResultPartition();
+        psize = partition.size();
+        if (!makeEventsVisible(rel, partition, tau, vtau)) {
+          break;
+        }
+        simplifier.setInitialPartition(partition);
+      } while (psize < rel.getNumberOfStates());
+      final TIntObjectHashMap<int[]> map = new TIntObjectHashMap<int[]>(psize);
+      rel.mergePartition(partition, tau, map);
+      rel.replaceEvent(vtau, tau);
+      rel.removeEvent(vtau);
+      rel.removeSelfLoopEvents(tau);
+      return map;
+    }
+
+    private boolean makeEventsVisible
+      (final ObserverProjectionTransitionRelation rel,
+       final Collection<int[]> partition,
+       final int tau,
+       final int vtau)
+    {
+      int size = 0;
+      for (final int[] array : partition) {
+        size += array.length;
+      }
+      final TIntIntHashMap pmap = new TIntIntHashMap(size);
+      int code = 0;
+      for (final int[] array : partition) {
+        for (final int state : array) {
+          pmap.put(state, code);
+        }
+        code++;
+      }
+      boolean modified = false;
+      final TIntIntIterator iter = pmap.iterator();
+      while (iter.hasNext()) {
+        iter.advance();
+        final int source = iter.key();
+        final int clazz = iter.value();
+        final TIntHashSet successors = rel.getSuccessors(source, tau);
+        if (successors != null) {
+          final int[] succarray = successors.toArray();
+          for (final int target : succarray) {
+            if (pmap.get(target) != clazz) {
+              rel.removeTransition(source, tau, target);
+              rel.addTransition(source, vtau, target);
+              modified = true;
+            }
+          }
+        }
+      }
+      return modified;
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class AbstractionStep
+  private abstract class AbstractionStep
   {
 
     //#######################################################################
     //# Constructors
-    Step(final AutomatonProxy aut, final Collection<AutomatonProxy> originals)
+    AbstractionStep(final AutomatonProxy aut, final Collection<AutomatonProxy> originals)
     {
       mResultAutomaton = aut;
       mOriginalAutomata = originals;
     }
 
-    Step(final AutomatonProxy resultAut, final AutomatonProxy originalAut)
+    AbstractionStep(final AutomatonProxy resultAut, final AutomatonProxy originalAut)
     {
       this(resultAut, Collections.singletonList(originalAut));
     }
@@ -1169,7 +1338,7 @@ public class ObserverProjectionConflictChecker
 
   // #########################################################################
   // # Inner Class CompositionStep
-  private class CompositionStep extends Step
+  private class CompositionStep extends AbstractionStep
   {
 
     //#######################################################################
@@ -1278,7 +1447,7 @@ public class ObserverProjectionConflictChecker
 
   //#########################################################################
   //# Inner Class ObservationEquivalenceStep
-  private class ObservationEquivalenceStep extends Step
+  private class ObservationEquivalenceStep extends AbstractionStep
   {
 
     //#######################################################################
@@ -1690,20 +1859,23 @@ public class ObserverProjectionConflictChecker
 
   //#########################################################################
   //# Data Members
-  private PreselectingHeuristic mPreselectingHeuristic;
-  private Comparator<Candidate> mSelectingHeuristics;
   private Collection<EventProxy> mPropositions;
-  private SynchronousProductBuilder mSynchronousProductBuilder;
-  private ConflictChecker mMonolithicConflictChecker;
   private int mInternalStepNodeLimit;
   private int mInternalStepTransitionLimit;
+
+  private Method mMethod;
+  private PreselectingHeuristic mPreselectingHeuristic;
+  private Comparator<Candidate> mSelectingHeuristics;
+  private SynchronousProductBuilder mSynchronousProductBuilder;
+  private ConflictChecker mMonolithicConflictChecker;
 
   private Collection<AutomatonProxy> mCurrentAutomata;
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =
       new HashMap<EventProxy,Set<AutomatonProxy>>();
-  private List<Step> mModifyingSteps;
+  private List<AbstractionStep> mModifyingSteps;
   private Set<List<AutomatonProxy>> mOverflowCandidates;
   private int mNumOverflows;
+  private AbstractionRule mAbstractionRule;
   private SynchronousProductBuilder mCurrentSynchronousProductBuilder;
   private ConflictChecker mCurrentMonolithicConflictChecker;
 

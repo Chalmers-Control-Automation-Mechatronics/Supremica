@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -537,19 +535,12 @@ public class ObserverProjectionTransitionRelation
 
   // #########################################################################
   // # Transitions Modifications
-  public void removeOutgoing(final int state, final int event)
-  {
-    final TIntHashSet succs = mSuccessors[state][event];
-    if (succs == null) {
-      return;
-    }
-    final int[] arr = succs.toArray();
-    for (int i = 0; i < arr.length; i++) {
-      final int suc = arr[i];
-      removeTransition(state, event, suc);
-    }
-  }
-
+  /**
+   * Removes the given event from this transition relation.
+   * This method removes the given event including all its transitions
+   * from the transition relation.
+   * @param  event   The ID of the event to be removed.
+   */
   public void removeEvent(final int event)
   {
     mEvents[event] = null;
@@ -564,18 +555,27 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
-  public void removeAllIncoming(final int s)
+  /**
+   * Replaces an event by another.
+   * This method replaces all transitions with the given old event ID
+   * by transitions with the given new event ID. Both events must be
+   * present in the transition relation, and will remain present after
+   * this operation.
+   * @param  oldID   The ID of the old event to be replaced.
+   * @param  newID   The ID of the new event replacing the old event.
+   */
+  public void replaceEvent(final int oldID, final int newID)
   {
-    clearMarkings(s);
-    for (int e = 0; e < mNumProperEvents; e++) {
-      final TIntHashSet preds = mPredecessors[s][e];
-      if (preds == null) {
-        continue;
-      }
-      final int[] arpreds = preds.toArray();
-      for (int i = 0; i < arpreds.length; i++) {
-        final int pred = arpreds[i];
-        removeTransition(pred, e, s);
+    for (int state = 0; state < mSuccessors.length; state++) {
+      if (hasPredecessors(state)) {
+        final TIntHashSet successors = getSuccessors(state, oldID);
+        if (successors != null) {
+          final int[] succarray = successors.toArray();
+          for (final int succ : succarray) {
+            removeTransition(state, oldID, succ);
+            removeTransition(state, newID, succ);
+          }
+        }
       }
     }
   }
@@ -606,61 +606,33 @@ public class ObserverProjectionTransitionRelation
     return f;
   }
 
-  public Set<TIntHashSet> subsets(final Collection<TIntHashSet> from,
-                                  final Set<TIntHashSet> to)
+  public void removeOutgoing(final int state, final int event)
   {
-    final Set<TIntHashSet> tobeadded = new THashSet<TIntHashSet>();
-    outside: for (final TIntHashSet ann : from) {
-      boolean subset = false;
-      final Iterator<TIntHashSet> it = to.iterator();
-      while (it.hasNext()) {
-        final TIntHashSet ann2 = it.next();
-        if (ann2.size() >= ann.size()) {
-          // TODO can be optimized so not creating the array everytime
-          if (ann2.containsAll(ann.toArray())) {
-            subset = true;
-            it.remove();
-            if (ann2.size() == ann.size()) {
-              break;
-            }
-          }
-        } else {
-          // if a subset already can't be done again
-          if (subset) {
-            continue;
-          }
-          if (ann.containsAll(ann2.toArray())) {
-            continue outside;
-          }
-        }
-      }
-      tobeadded.add(ann);
+    final TIntHashSet succs = mSuccessors[state][event];
+    if (succs == null) {
+      return;
     }
-    to.addAll(tobeadded);
-    return to;
+    final int[] arr = succs.toArray();
+    for (int i = 0; i < arr.length; i++) {
+      final int suc = arr[i];
+      removeTransition(state, event, suc);
+    }
   }
 
-  public boolean equivalentIncoming(final int state1, final int state2)
+  public void removeAllIncoming(final int s)
   {
-    if (isInitial(state1) != isInitial(state2)) {
-      return false;
-    }
+    clearMarkings(s);
     for (int e = 0; e < mNumProperEvents; e++) {
-      final TIntHashSet preds1 = mPredecessors[state1][e];
-      final TIntHashSet preds2 = mPredecessors[state2][e];
-      final boolean empty1 = preds1 == null || preds1.isEmpty();
-      final boolean empty2 = preds2 == null || preds2.isEmpty();
-      if (empty1 && empty2) {
+      final TIntHashSet preds = mPredecessors[s][e];
+      if (preds == null) {
         continue;
       }
-      if (empty1 != empty2) {
-        return false;
-      }
-      if (!preds1.equals(preds2)) {
-        return false;
+      final int[] arpreds = preds.toArray();
+      for (int i = 0; i < arpreds.length; i++) {
+        final int pred = arpreds[i];
+        removeTransition(pred, e, s);
       }
     }
-    return true;
   }
 
   public void moveAllSuccessors(final int from, final int to)

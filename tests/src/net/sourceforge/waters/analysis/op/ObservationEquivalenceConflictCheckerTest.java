@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.op
-//# CLASS:   ObserverProjectionConflictCheckerTest
+//# CLASS:   ObservationEquivalenceConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class ObserverProjectionConflictCheckerTest extends
+public class ObservationEquivalenceConflictCheckerTest extends
     AbstractStandardConflictCheckerTest
 {
 
@@ -26,7 +26,7 @@ public class ObserverProjectionConflictCheckerTest extends
   public static Test suite()
   {
     final TestSuite testSuite =
-        new TestSuite(ObserverProjectionConflictCheckerTest.class);
+        new TestSuite(ObservationEquivalenceConflictCheckerTest.class);
     return testSuite;
   }
 
@@ -45,7 +45,7 @@ public class ObserverProjectionConflictCheckerTest extends
     final ObserverProjectionConflictChecker checker =
       new ObserverProjectionConflictChecker(factory);
     checker.setMethod
-      (ObserverProjectionConflictChecker.Method.OBSERVER_PROJECTION);
+      (ObserverProjectionConflictChecker.Method.OBSERVATION_EQUIVALENCE);
     checker.setInternalStepNodeLimit(5000);
     checker.setFinalStepNodeLimit(100000);
     checker.setInternalStepTransitionLimit(500000);

@@ -116,14 +116,28 @@ public class ObservationEquivalenceTRSimplifier
     return mSuppressRedundantHiddenTransitions;
   }
 
-  public Collection<int[]> getInitialPartition()
-  {
-    return mInitialPartition;
-  }
-
+  /**
+   * Sets an initial partition for the bisimulation algorithm.
+   * If non-null, any partition computed will be a refinement of the given
+   * initial partition. If null, an initial partition will be determined
+   * based on the propositions of the states.
+   * @param partition A collection of classes constituting the initial
+   *                  partition. Each array in the collection represents
+   *                  a class of equivalent state codes.
+   */
   public void setInitialPartition(final Collection<int[]> partition)
   {
     mInitialPartition = partition;
+  }
+
+  /**
+   * Gets the initial partition, if any was set.
+   * @return Initial partition or <CODE>null</CODE>.
+   * @see {@link #setInitialPartition(Collection) setInitialPartition()}
+   */
+  public Collection<int[]> getInitialPartition()
+  {
+    return mInitialPartition;
   }
 
 

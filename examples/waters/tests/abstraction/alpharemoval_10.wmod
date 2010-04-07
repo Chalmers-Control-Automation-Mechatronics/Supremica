@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="alpharemoval_9" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Tests whethermultiple incoming transitions are handled correctly. Includes a deterministic and nondetermenistic choice.</ns2:Comment>
+<Module Name="alpharemoval_10" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test for the alpha-removal rule that involves a duplicate tau transition.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":alpha">
             <ColorGeometry>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="alpharemoval_13" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Tests that an alpha marking is NOT removed when there are two transitions between state x and y, one with tau and one without.</ns2:Comment>
+    <ns2:Comment>Tests that an alpha marking is also removed when there are two transitions between state x and y, one with tau and one with a non-tau event.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":alpha">
             <ColorGeometry>
