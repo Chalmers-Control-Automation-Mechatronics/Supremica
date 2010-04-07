@@ -149,6 +149,38 @@ public class RemovalOfAlphaMarkingsRuleTest extends AbstractAbstractionRuleTest
     runAbstractionRule(group, subdir, name);
   }
 
+  public void test_multipleIncomingTransitions() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_9.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_multipleTauTransitionsBetween() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_10.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_multipleOutgoingTransitions() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_11.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_noRemovalWithNoTau() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_12.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
@@ -156,13 +188,26 @@ public class RemovalOfAlphaMarkingsRuleTest extends AbstractAbstractionRuleTest
   public void testReentrant() throws Exception
   {
     test_alpharemoval_1();
+    test_tauLoop();
     test_allStatesImplicitlyMarkedAlpha();
+    test_selfLoops();
+    test_noRemovalWithNoTau();
+    test_multipleIncomingTransitions();
+    test_multipleOutgoingTransitions();
     test_alpharemoval_2();
     test_alpharemoval_3();
+    test_noTransitions();
+    test_multipleTauTransitionsBetween();
     test_nonTauLoop();
     test_alpharemoval_1();
+    test_selfLoops();
     test_alpharemoval_2();
+    test_noTransitions();
+    test_nonTauLoop();
     test_allStatesImplicitlyMarkedAlpha();
+    test_noRemovalWithNoTau();
+    test_multipleOutgoingTransitions();
     test_alpharemoval_3();
+    test_tauLoop();
   }
 }
