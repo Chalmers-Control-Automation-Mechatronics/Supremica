@@ -104,7 +104,93 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     runAbstractionRule(group, subdir, name);
   }
 
-  // TODO More tests needed ...
+  public void test_allStatesImplicitlyMarkedAlpha() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "noncoreachableremoval_3.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_allStatesImplicitlyMarkedOmega() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "defaultremoval_5.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_nonTauLoop() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "noncoreachableremoval_5.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_tauLoop() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "noncoreachableremoval_6.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_selfLoops() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "noncoreachableremoval_7.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_noTransitions() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "noncoreachableremoval_8.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_multipleIncomingTransitions() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "noncoreachableremoval_9.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_multipleTauTransitionsBetween() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "noncoreachableremoval_10.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_multipleOutgoingTransitions() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "noncoreachableremoval_11.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_noRemovalWithNoTau() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "noncoreachableremoval_12.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_twoTransitionsBetweenTauStates() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "noncoreachableremoval_13.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
 
   /**
    * A test to see whether a single abstraction rule object can perform multiple
@@ -112,11 +198,27 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
    */
   public void testReentrant() throws Exception
   {
-    // TODO As soon as there are more tests, try some more variation here.
     test_noncoreachableStatesRemoval_1();
+    test_tauLoop();
+    test_allStatesImplicitlyMarkedAlpha();
+    test_selfLoops();
+    test_noRemovalWithNoTau();
+    test_multipleIncomingTransitions();
+    test_multipleOutgoingTransitions();
     test_noncoreachableStatesRemoval_2();
+    test_noTransitions();
+    test_multipleTauTransitionsBetween();
+    test_twoTransitionsBetweenTauStates();
+    test_nonTauLoop();
     test_noncoreachableStatesRemoval_1();
+    test_selfLoops();
     test_noncoreachableStatesRemoval_2();
+    test_noTransitions();
+    test_nonTauLoop();
+    test_allStatesImplicitlyMarkedAlpha();
+    test_noRemovalWithNoTau();
+    test_multipleOutgoingTransitions();
+    test_tauLoop();
   }
 
 }

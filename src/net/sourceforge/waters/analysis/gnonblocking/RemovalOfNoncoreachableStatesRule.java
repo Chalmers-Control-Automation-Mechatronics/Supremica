@@ -71,7 +71,7 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
   {
     mAutToAbstract = autToAbstract;
     if (!autToAbstract.getEvents().contains(mAlphaMarking)
-        && !autToAbstract.getEvents().contains(mDefaultMarking)) {
+        || !autToAbstract.getEvents().contains(mDefaultMarking)) {
       return autToAbstract;
     }
     boolean modified = false;

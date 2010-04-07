@@ -353,13 +353,11 @@ public class CompositionalGeneralisedConflictChecker extends
     rdmRule.setDefaultMarking(getMarkingProposition());
     mAbstractionRules.add(rdmRule);
 
-    /*
-     * final RemovalOfNoncoreachableStatesRule rnsRule = new
-     * RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
-     * rnsRule.setAlphaMarking(getGeneralisedPrecondition());
-     * rnsRule.setDefaultMarking(getMarkingProposition());
-     * mAbstractionRules.add(rnsRule);
-     */
+    final RemovalOfNoncoreachableStatesRule rnsRule =
+        new RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
+    rnsRule.setAlphaMarking(getGeneralisedPrecondition());
+    rnsRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rnsRule);
 
     /*
      * final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule = new
