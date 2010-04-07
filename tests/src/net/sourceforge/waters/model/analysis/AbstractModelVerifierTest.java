@@ -43,7 +43,6 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     mTraceMarshaller = new JAXBTraceMarshaller(factory);
     mModelVerifier = createModelVerifier(factory);
     setNodeLimit();
-    mModelVerifier.setTransitionLimit(200000);
   }
 
   // #########################################################################

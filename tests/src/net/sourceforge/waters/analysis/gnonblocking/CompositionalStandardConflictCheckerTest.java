@@ -38,12 +38,14 @@ public class CompositionalStandardConflictCheckerTest extends
   // #########################################################################
   // # Overrides for abstract base class
   // # net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ConflictChecker createModelVerifier(
-                                                final ProductDESProxyFactory factory)
+  protected ConflictChecker createModelVerifier
+    (final ProductDESProxyFactory factory)
   {
-    return new CompositionalGeneralisedConflictChecker(factory);
+    final CompositionalGeneralisedConflictChecker checker =
+      new CompositionalGeneralisedConflictChecker(factory);
+    // TODO Configure state limits here.
+    checker.setTransitionLimit(200000);
+    return checker;
   }
-
-  // #########################################################################
 
 }
