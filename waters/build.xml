@@ -323,7 +323,7 @@
     </junit>
   </target>
 
-  <target name="test2" depends="test-jar,cpp">
+  <target name="runtest2" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
@@ -462,6 +462,9 @@
           description="Run the test cases."/>
 
   <target name="test1" depends="runtest1,test-report"
+          description="Run some test cases."/>
+          
+  <target name="test2" depends="runtest2,test-report"
           description="Run some test cases."/>
           
   <target name="test3" depends="runtest3,test-report"
