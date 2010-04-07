@@ -116,11 +116,11 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "defaultremoval_5.wmod";
+    final String name = "defaultremoval_4.wmod";
     runAbstractionRule(group, subdir, name);
   }
 
-  public void test_nonTauLoop() throws Exception
+  public void test_unreachableLoop() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
@@ -128,7 +128,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     runAbstractionRule(group, subdir, name);
   }
 
-  public void test_tauLoop() throws Exception
+  public void test_reachableLoop() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
@@ -199,7 +199,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
   public void testReentrant() throws Exception
   {
     test_noncoreachableStatesRemoval_1();
-    test_tauLoop();
+    test_reachableLoop();
     test_allStatesImplicitlyMarkedAlpha();
     test_selfLoops();
     test_noRemovalWithNoTau();
@@ -209,16 +209,16 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
     test_noTransitions();
     test_multipleTauTransitionsBetween();
     test_twoTransitionsBetweenTauStates();
-    test_nonTauLoop();
+    test_unreachableLoop();
     test_noncoreachableStatesRemoval_1();
     test_selfLoops();
     test_noncoreachableStatesRemoval_2();
     test_noTransitions();
-    test_nonTauLoop();
+    test_unreachableLoop();
     test_allStatesImplicitlyMarkedAlpha();
     test_noRemovalWithNoTau();
     test_multipleOutgoingTransitions();
-    test_tauLoop();
+    test_reachableLoop();
   }
 
 }
