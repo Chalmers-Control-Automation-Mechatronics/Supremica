@@ -101,7 +101,7 @@ public class RemovalOfAlphaMarkingsRuleTest extends AbstractAbstractionRuleTest
     runAbstractionRule(group, subdir, name);
   }
 
-  public void test_alpharemoval_3() throws Exception
+  public void test_alphaRemovalFromStateWithMultiMarkings() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
@@ -203,7 +203,7 @@ public class RemovalOfAlphaMarkingsRuleTest extends AbstractAbstractionRuleTest
     test_multipleIncomingTransitions();
     test_multipleOutgoingTransitions();
     test_alpharemoval_2();
-    test_alpharemoval_3();
+    test_alphaRemovalFromStateWithMultiMarkings();
     test_noTransitions();
     test_multipleTauTransitionsBetween();
     test_twoTransitionsBetweenTauStates();
@@ -216,7 +216,7 @@ public class RemovalOfAlphaMarkingsRuleTest extends AbstractAbstractionRuleTest
     test_allStatesImplicitlyMarkedAlpha();
     test_noRemovalWithNoTau();
     test_multipleOutgoingTransitions();
-    test_alpharemoval_3();
+    test_alphaRemovalFromStateWithMultiMarkings();
     test_tauLoop();
   }
 }

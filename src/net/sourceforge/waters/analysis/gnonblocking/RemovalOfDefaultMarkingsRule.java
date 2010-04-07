@@ -71,8 +71,7 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
                            final EventProxy tau)
   {
     mAutToAbstract = autToAbstract;
-    if (!autToAbstract.getEvents().contains(mAlphaMarking)
-        || !autToAbstract.getEvents().contains(mDefaultMarking)) {
+    if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
       return autToAbstract;
     }
     boolean modified = false;
@@ -80,7 +79,10 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
         new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
     final int alphaID = mTR.getEventInt(mAlphaMarking);
-    final int defaultID = mTR.getEventInt(mDefaultMarking);
+    int defaultID = mTR.getEventInt(mDefaultMarking);
+    if (defaultID == -1) {
+      defaultID = mTR.addProposition(mDefaultMarking, true);
+    }
     final int numStates = mTR.getNumberOfStates();
 
     final TIntHashSet reachableStates = new TIntHashSet();

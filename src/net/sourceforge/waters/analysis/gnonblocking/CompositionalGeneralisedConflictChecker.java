@@ -344,18 +344,18 @@ public class CompositionalGeneralisedConflictChecker extends
      * mAbstractionRules.add(oeRule);
      */
 
-    final RemovalOfAlphaMarkingsRule ramRule =
-        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-    ramRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(ramRule);
-
     /*
-     * final RemovalOfDefaultMarkingsRule rdmRule = new
-     * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
-     * rdmRule.setAlphaMarking(getGeneralisedPrecondition());
-     * rdmRule.setDefaultMarking(getMarkingProposition());
-     * mAbstractionRules.add(rdmRule);
+     * final RemovalOfAlphaMarkingsRule ramRule = new
+     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(ramRule);
      */
+
+    final RemovalOfDefaultMarkingsRule rdmRule =
+        new RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
+    rdmRule.setAlphaMarking(getGeneralisedPrecondition());
+    rdmRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rdmRule);
 
     /*
      * final RemovalOfNoncoreachableStatesRule rnsRule = new
