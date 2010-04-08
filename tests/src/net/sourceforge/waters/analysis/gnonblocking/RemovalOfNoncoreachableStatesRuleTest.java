@@ -116,7 +116,7 @@ public class RemovalOfNoncoreachableStatesRuleTest extends
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "defaultremoval_4.wmod";
+    final String name = "noncoreachableremoval_4.wmod";
     runAbstractionRule(group, subdir, name);
   }
 
