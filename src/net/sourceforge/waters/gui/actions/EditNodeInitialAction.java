@@ -22,14 +22,12 @@ import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.command.UpdateCommand;
-import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.NodeSubject;
-import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 import org.supremica.gui.ide.IDE;
@@ -142,10 +140,6 @@ public class EditNodeInitialAction
     cloned.setInitial(!initial);
     if (initial) {
       cloned.setInitialArrowGeometry(null);
-    } else {
-      final PointGeometrySubject geo =
-        new PointGeometrySubject(SimpleNodeProxyShape.DEFAULT_INITARROW);
-      cloned.setInitialArrowGeometry(geo);
     }
     final SelectionOwner panel = getCurrentSelectionOwner();
     return new EditCommand(node, cloned, panel, "Initial State Change");

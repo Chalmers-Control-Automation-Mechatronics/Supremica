@@ -143,7 +143,7 @@ public class SubjectShapeProducer
       }
       break;
     case ModelChangeEvent.STATE_CHANGED:
-      if (esource instanceof EdgeProxy) {
+      if (esource instanceof EdgeProxy || esource instanceof SimpleNodeProxy) {
         removeMapping(esource);
       } else if (esource == getGraph() &&
                  getGraph().getBlockedEvents() == null &&

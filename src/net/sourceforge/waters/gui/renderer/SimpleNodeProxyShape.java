@@ -178,11 +178,6 @@ public class SimpleNodeProxyShape
   public static final Point2D DEFAULT_OFFSET =
     new Point(DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
 
-  public static final int DEFAULT_INITARROW_X = -5;
-  public static final int DEFAULT_INITARROW_Y = -5;
-  public static final Point2D DEFAULT_INITARROW =
-    new Point(DEFAULT_INITARROW_X, DEFAULT_INITARROW_Y);
-
   private static final Color FILLCOLOR = Color.WHITE;
 
 }

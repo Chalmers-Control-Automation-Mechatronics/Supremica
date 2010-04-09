@@ -186,13 +186,6 @@ public class SpringEmbedder
     for (final NodeSubject node : mNodes) {
       if (node instanceof SimpleNodeSubject) {
         final SimpleNodeSubject simple = (SimpleNodeSubject) node;
-        if (simple.isInitial()) {
-          if (simple.getInitialArrowGeometry() == null) {
-            final PointGeometrySubject geo =
-              new PointGeometrySubject(SimpleNodeProxyShape.DEFAULT_INITARROW);
-            simple.setInitialArrowGeometry(geo);
-          }
-        }
         if (simple.getPointGeometry() == null) {
           runEmbedder = true;
           final int base;
