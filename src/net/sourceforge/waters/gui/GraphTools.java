@@ -10,7 +10,6 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -69,9 +68,7 @@ public class GraphTools {
     final PointGeometrySubject geo = new PointGeometrySubject(pos);
     final LabelGeometrySubject label =
       new LabelGeometrySubject(LabelProxyShape.DEFAULT_OFFSET);
-    final PointGeometrySubject initgeo =
-      initial ? new PointGeometrySubject(new Point(-5, -5)) : null;
-    return new SimpleNodeSubject(name, null, initial, geo, initgeo, label);
+    return new SimpleNodeSubject(name, null, initial, geo, null, label);
   }
 
   /**
@@ -231,6 +228,18 @@ public class GraphTools {
       }
     }
     return false;
+  }
+
+  public static void setInitialArrowOffset(final SimpleNodeSubject node,
+                                           final Point2D offset)
+  {
+    PointGeometrySubject geo = node.getInitialArrowGeometry();
+    if (geo == null) {
+      geo = new PointGeometrySubject(offset);
+      node.setInitialArrowGeometry(geo);
+    } else {
+      geo.setPoint(offset);
+    }
   }
 
 

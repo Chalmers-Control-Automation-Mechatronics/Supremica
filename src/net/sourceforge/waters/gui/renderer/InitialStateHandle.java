@@ -31,8 +31,8 @@ class InitialStateHandle
   public InitialStateHandle(final SimpleNodeProxy node)
   {
     final PointGeometryProxy geo = node.getInitialArrowGeometry();
-    double dx = -1.0;
-    double dy = -1.0;
+    final double dx;
+    final double dy;
     if (geo != null) {
       final Point2D dir = geo.getPoint();
       final double dirx = dir.getX();
@@ -41,7 +41,11 @@ class InitialStateHandle
       if (len > GeometryTools.EPSILON) {
         dx = dirx / len;
         dy = diry / len;
+      } else {
+        dx = dy = -0.5 * GeometryTools.SQRT2;
       }
+    } else {
+      dx = dy = -0.5 * GeometryTools.SQRT2;
     }
     final int radius = Config.GUI_EDITOR_NODE_RADIUS.get();
     final Point2D normdir = new Point2D.Double(dx, dy);

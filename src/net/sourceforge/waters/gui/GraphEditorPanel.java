@@ -2969,7 +2969,7 @@ public class GraphEditorPanel
           return false;
         }
         final Point2D dir = new Point2D.Double(dx, dy);
-        node.getInitialArrowGeometry().setPoint(dir);
+        GraphTools.setInitialArrowOffset(node, dir);
         return true;
       } else {
         return false;
