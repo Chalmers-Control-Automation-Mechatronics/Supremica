@@ -430,7 +430,10 @@ public class AutomatonDisplayPane
               warning = step;
           }
           if (warning != null)
-            toolTipText += ", firing this event will cause the property " + mSim.getWarningProperties().get(warning) + " to be disabled";
+            toolTipText +=
+              ", firing this event will cause the property " +
+              mSim.getWarningProperties().get(warning).getName() +
+              " to be disabled";
           this.setToolTipText(toolTipText);
           foundTrans = true;
         }
