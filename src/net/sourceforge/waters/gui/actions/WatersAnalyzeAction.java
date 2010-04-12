@@ -1,12 +1,11 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -61,9 +60,9 @@ public abstract class WatersAnalyzeAction
     final AnalyzerDialog dialog = new AnalyzerDialog();
   }
 
-  // ###################################################################
-  // # Auxillary Methods
-  public void updateProductDES()
+  //########################################################################
+  //# Auxiliary Methods
+  private void updateProductDES()
   {
     if (getIDE() != null)
     {
@@ -83,6 +82,15 @@ public abstract class WatersAnalyzeAction
       des = null;
   }
 
+
+  //########################################################################
+  //# Auxiliary Static Methods
+  private static String wrapInHTML(final String raw)
+  {
+    return "<html><P STYLE=\"text-align:center;word-wrap:break-word;width:100%;left:0\">" + raw + "</p></html>";
+  }
+
+
   // ##############################################################################
   // # Abstract Methods
   protected void updateEnabledStatus()
@@ -99,39 +107,39 @@ public abstract class WatersAnalyzeAction
   protected abstract String getSuccessDescription();
   protected abstract ModelVerifier getModelVerifier(ModelVerifierFactory factory, ProductDESProxyFactory desFactory);
 
-  // ##############################################################################
-  // # Inner class
+
+  //#########################################################################
+  //# Inner Class AnalyzerDialog
   private class AnalyzerDialog extends JDialog
   {
     // #######################################################################
     // # Constructor
     public AnalyzerDialog()
     {
-      this.setSize(DEFAULT_DIALOG_SIZE);
-      this.setLocation(DEFAULT_DIALOG_LOCATION);
-      this.setVisible(true);
-      this.setTitle(getCheckName() + " Check");
-      topPanel = new JPanel();
-      bottomPanel = new JPanel();
-      informationLabel = new WrapperLabel(getCheckName() + " Check is running...", topPanel);
-      informationLabel.setHorizontalAlignment(SwingConstants.CENTER);
-      cancelButton = new JButton("Abort");
-      cancelButton.addActionListener(new ActionListener(){
-        public void actionPerformed(final ActionEvent e)
-        {
-          runner.abort();
-          AnalyzerDialog.this.dispose();
-        }
-      });
+      setSize(DEFAULT_DIALOG_SIZE);
+      setLocation(DEFAULT_DIALOG_LOCATION);
+      setVisible(true);
+      setTitle(getCheckName() + " Check");
+      mBottomPanel = new JPanel();
+      mInformationLabel =
+        new WrapperLabel(getCheckName() + " Check is running...");
+      mInformationLabel.setHorizontalAlignment(SwingConstants.CENTER);
       final Border outer = BorderFactory.createRaisedBevelBorder();
       final Border inner = BorderFactory.createEmptyBorder(4, 4, 4, 4);
       final Border border = BorderFactory.createCompoundBorder(outer, inner);
-      topPanel.setBorder(border);
-      bottomPanel.add(cancelButton, BorderLayout.WEST);
-      topPanel.add(informationLabel, BorderLayout.NORTH);
-      this.getContentPane().add(topPanel, BorderLayout.CENTER);
-      this.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
-      repaint();
+      mInformationLabel.setBorder(border);
+      mExitButton = new JButton("Abort");
+      mExitButton.addActionListener(new ActionListener(){
+        public void actionPerformed(final ActionEvent e)
+        {
+          runner.abort();
+          dispose();
+        }
+      });
+      mBottomPanel.add(mExitButton, BorderLayout.WEST);
+      final Container pane = getContentPane();
+      pane.add(mInformationLabel, BorderLayout.CENTER);
+      pane.add(mBottomPanel, BorderLayout.SOUTH);
       updateProductDES();
       runner = new AnalyzerThread();
       runner.setPriority(Thread.MIN_PRIORITY);
@@ -140,10 +148,10 @@ public abstract class WatersAnalyzeAction
 
     public void succeed()
     {
-      informationLabel.setText("Model " + des.getName() + " " + getSuccessDescription() + ".");
-      cancelButton.setText("OK");
-      cancelButton.removeActionListener(cancelButton.getActionListeners()[0]);
-      cancelButton.addActionListener(new ActionListener(){
+      mInformationLabel.setText("Model " + des.getName() + " " + getSuccessDescription() + ".");
+      mExitButton.setText("OK");
+      mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
+      mExitButton.addActionListener(new ActionListener(){
         public void actionPerformed(final ActionEvent e)
         {
           AnalyzerDialog.this.dispose();
@@ -154,10 +162,10 @@ public abstract class WatersAnalyzeAction
 
     public void fail()
     {
-      cancelButton.setText("OK");
-      cancelButton.removeActionListener(cancelButton.getActionListeners()[0]);
+      mExitButton.setText("OK");
+      mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
       traceButton = new JButton("Show Trace");
-      cancelButton.addActionListener(new ActionListener(){
+      mExitButton.addActionListener(new ActionListener(){
         public void actionPerformed(final ActionEvent e)
         {
           AnalyzerDialog.this.dispose();
@@ -199,24 +207,24 @@ public abstract class WatersAnalyzeAction
         }
       });
       if (verifier.getCounterExample().getComment() == null)
-        informationLabel.setText("Model " + des.getName() + " " + getFailureDescription());
+        mInformationLabel.setText("Model " + des.getName() + " " + getFailureDescription());
       else if (verifier.getCounterExample().getComment().compareTo("") == 0)
-        informationLabel.setText("Model " + des.getName() + " " + getFailureDescription());
+        mInformationLabel.setText("Model " + des.getName() + " " + getFailureDescription());
       else
-        informationLabel.setText(verifier.getCounterExample().getComment());
-      bottomPanel.add(traceButton, BorderLayout.EAST);
+        mInformationLabel.setText(verifier.getCounterExample().getComment());
+      mBottomPanel.add(traceButton, BorderLayout.EAST);
       repaint();
     }
 
     public void error(final Throwable exception)
     {
       if (exception instanceof OutOfMemoryError)
-        informationLabel.setText("ERROR: Out of Memory");
+        mInformationLabel.setText("ERROR: Out of Memory");
       else
-        informationLabel.setText("ERROR: " + exception.getMessage());
-      cancelButton.setText("OK");
-      cancelButton.removeActionListener(cancelButton.getActionListeners()[0]);
-      cancelButton.addActionListener(new ActionListener(){
+        mInformationLabel.setText("ERROR: " + exception.getMessage());
+      mExitButton.setText("OK");
+      mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
+      mExitButton.addActionListener(new ActionListener(){
         public void actionPerformed(final ActionEvent e)
         {
           AnalyzerDialog.this.dispose();
@@ -225,74 +233,9 @@ public abstract class WatersAnalyzeAction
       repaint();
     }
 
-    // ######################################################################
-    // # Auxillary Methods
-    private String HTMLinize(final String raw)
-    {
-      return "<html><P STYLE=\"text-align:center;word-wrap:break-word;width:100%;left:0\">" + raw + "</p></html>";
-      //return raw;
-    }
 
-    // ######################################################################
-    // # Inner Classes
-    private class WrapperLabel extends JLabel implements ComponentListener
-    {
-
-      // ######################################################################
-      // # Constructor
-      @SuppressWarnings("unused")
-      public WrapperLabel(final JPanel parent)
-      {
-        super();
-        this.parent = parent;
-        parent.addComponentListener(this);
-        this.setPreferredSize(new Dimension((int)DEFAULT_DIALOG_SIZE.getWidth(), ((int)DEFAULT_DIALOG_SIZE.getHeight() - OUTSIDE_PANEL_DIALOG_SIZE - TITLEBAR_HEIGHT)));
-      }
-      public WrapperLabel(final String e, final JPanel parent)
-      {
-        super(HTMLinize(e));
-        this.parent = parent;
-        parent.addComponentListener(this);
-        this.setPreferredSize(new Dimension((int)DEFAULT_DIALOG_SIZE.getWidth(), ((int)DEFAULT_DIALOG_SIZE.getHeight() - OUTSIDE_PANEL_DIALOG_SIZE - TITLEBAR_HEIGHT)));
-      }
-
-      public void setText(final String e)
-      {
-        super.setText(HTMLinize(e));
-      }
-
-      // ######################################################################
-      // # Interface ComponentListener
-      public void componentHidden(final ComponentEvent e)
-      {
-        // Do Nothing
-      }
-
-      public void componentMoved(final ComponentEvent e)
-      {
-        // Do nothing
-      }
-
-      public void componentResized(final ComponentEvent e)
-      {
-        this.setPreferredSize(new Dimension(((int)parent.getSize().getWidth()), ((int)parent.getSize().getHeight() - TITLEBAR_HEIGHT)));
-      }
-
-      public void componentShown(final ComponentEvent e)
-      {
-        // Do nothing
-      }
-
-      // #####################################################################
-      // # Data Members
-      private final JPanel parent;
-
-      // #####################################################################
-      // # Class Constants
-      private static final int TITLEBAR_HEIGHT = 30;
-      private static final long serialVersionUID = -6693747793242415495L;
-    }
-
+    //######################################################################
+    //# Inner Class AnalyzerThread
     private class AnalyzerThread extends Thread
     {
       public AnalyzerThread()
@@ -308,7 +251,7 @@ public abstract class WatersAnalyzeAction
         verifier.setModel(des);
         if (des == null)
         {
-          SwingUtilities.invokeLater(new Runnable(){public void run(){error(new IllegalArgumentException("The model was unable to be compiled"));}});
+          SwingUtilities.invokeLater(new Runnable() {public void run(){error(new IllegalArgumentException("The model was unable to be compiled"));}});
           return;
         }
         try {
@@ -350,27 +293,54 @@ public abstract class WatersAnalyzeAction
 
     // ######################################################################
     // # Data Members
-    AnalyzerThread runner;
-    ModelVerifier verifier;
-    JPanel topPanel;
-    JPanel bottomPanel;
-    JButton cancelButton;
-    JButton traceButton;
-    WrapperLabel informationLabel;
+    private final AnalyzerThread runner;
+    private ModelVerifier verifier;
+    private final JPanel mBottomPanel;
+    private final JButton mExitButton;
+    private JButton traceButton;
+    private final WrapperLabel mInformationLabel;
 
     // #####################################################################
     // # Class Constants
     private final Dimension DEFAULT_DIALOG_SIZE = new Dimension(290, 160);
-    private static final int OUTSIDE_PANEL_DIALOG_SIZE = 65;
     private final Point DEFAULT_DIALOG_LOCATION = new Point(250, 150);
     private static final long serialVersionUID = -2478548485525996982L;
   }
 
-  // ##############################################################################
-  // # Data Members
-  ProductDESProxy des;
 
-  // ##############################################################################
-  // # Class Constants
+  //########################################################################
+  //# Inner Class WrapperLabel
+  private class WrapperLabel extends JLabel
+  {
+
+    //######################################################################
+    //# Constructor
+    private WrapperLabel(final String e)
+    {
+      super(wrapInHTML(e));
+    }
+
+    //######################################################################
+    //# Overrides for javax.swing.JLabel
+    public void setText(final String e)
+    {
+      super.setText(wrapInHTML(e));
+    }
+
+    //######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = -6693747793242415495L;
+
+  }
+
+
+  //########################################################################
+  //# Data Members
+  private ProductDESProxy des;
+
+
+  //########################################################################
+  //# Class Constants
   private static final long serialVersionUID = -3797986885054648213L;
+
 }
