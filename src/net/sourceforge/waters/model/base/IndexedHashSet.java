@@ -26,7 +26,7 @@ import net.sourceforge.waters.model.unchecked.Casting;
  * <P>This implementation is based a {@link HashMap} that maps names to the
  * elements of the set. It therefore provides fast access to elements given
  * their name, but does not guarantee any particular order of the inserted
- * elements. All elements added to a <CODE>BaseHashSetElement</CODE> must be of
+ * elements. All elements added to an <CODE>IndexedHashSet</CODE> must be of
  * type {@link NamedProxy}.</P>
  *
  * @author Robi Malik
@@ -269,21 +269,13 @@ public class IndexedHashSet<P extends NamedProxy>
 
   protected void appendContainerName(final StringBuffer buffer)
   {
-    final Class<?> clazz = getClass();
-    final String name = getShortClassName(clazz);
+    final String name = ProxyTools.getShortClassName(this);
     buffer.append(name);
   }
 
   protected void appendItemKindName(final StringBuffer buffer)
   {
     buffer.append("item");
-  }
-
-  protected String getShortClassName(final Class<?> clazz)
-  {
-    final String fullclazzname = clazz.getName();
-    final int dotpos = fullclazzname.lastIndexOf('.');
-    return fullclazzname.substring(dotpos + 1);
   }
 
 

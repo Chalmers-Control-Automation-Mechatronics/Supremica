@@ -15,6 +15,7 @@ import java.util.Collection;
 
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -39,7 +40,9 @@ class ObservationEquivalenceRule extends AbstractionRule
   {
     super(factory, propositions);
     mSuppressRedundantHiddenTransitions = false;
+    mTransitionLimit = Integer.MAX_VALUE;
   }
+
 
   // #######################################################################
   // # Rule Application
@@ -68,11 +71,36 @@ class ObservationEquivalenceRule extends AbstractionRule
     return mSuppressRedundantHiddenTransitions;
   }
 
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions (including stored silent transitions of the
+   * transitive closure) that will be constructed by the observation
+   * equivalence algorithm. An attempt to store more transitions leads to an
+   * {@link net.sourceforge.waters.model.analysis.OverflowException
+   * OverflowException}.
+   * @param limit     The new transition limit, or {@link Integer#MAX_VALUE}
+   *                  to allow an unlimited number of transitions.
+   */
+  public void setTransitionLimit(final int limit)
+  {
+    mTransitionLimit = limit;
+  }
+
+  /**
+   * Gets the transition limit.
+   * @see {@link #setTransitionLimit(int) setTransitionLimit()}
+   */
+  public int getTransitionLimit()
+  {
+    return mTransitionLimit;
+  }
+
 
   // #######################################################################
   // # Rule Application
   AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
                            final EventProxy tau)
+    throws AnalysisException
   {
     mTau = tau;
     mAutToAbstract = autToAbstract;
@@ -83,6 +111,7 @@ class ObservationEquivalenceRule extends AbstractionRule
       new ObservationEquivalenceTRSimplifier(mTr, codeOfTau);
     bisimulator.setSuppressRedundantHiddenTransitions
       (mSuppressRedundantHiddenTransitions);
+    bisimulator.setTransitionLimit(mTransitionLimit);
     final boolean modified = bisimulator.run();
     if (modified) {
       final Collection<int[]> partition = bisimulator.getResultPartition();
@@ -109,10 +138,12 @@ class ObservationEquivalenceRule extends AbstractionRule
 
   // #######################################################################
   // # Data Members
+  private boolean mSuppressRedundantHiddenTransitions;
+  private int mTransitionLimit;
+
   private AutomatonProxy mAutToAbstract;
   private EventProxy mTau;
   private ObserverProjectionTransitionRelation mTr;
   private TIntObjectHashMap<int[]> mClassMap;
-  private boolean mSuppressRedundantHiddenTransitions;
 
 }

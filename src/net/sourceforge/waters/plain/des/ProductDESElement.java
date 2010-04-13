@@ -11,11 +11,10 @@ package net.sourceforge.waters.plain.des;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.IndexedHashSet;
+import net.sourceforge.waters.model.base.ImmutableOrderedSet;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -52,13 +51,8 @@ public class ProductDESElement
    *                      or <CODE>null</CODE> if empty.
    * @param  automata     The set of automata for the new product DES,
    *                      or <CODE>null</CODE> if empty.
-   * @throws DuplicateNameException to indicate that some event or automaton
-   *                      name is used more than once.
-   * @throws NameNotFoundException to indicate that some automaton refers
-   *                      to an with an unknown name.
-   * @throws ItemNotFoundException to indicate that some automaton uses
-   *                      an event object that does not belong
-   *                      to the given set of events.
+   * @throws DuplicateNameException to indicate that some automaton, event,
+   *                      or state name is used more than once.
    */
   ProductDESElement(final String name,
                     final String comment,
@@ -67,19 +61,8 @@ public class ProductDESElement
                     final Collection<? extends AutomatonProxy> automata)
   {
     super(name, comment, location);
-    final EventSet eventscopy =
-      events == null ? new EventSet() : new EventSet(events);
-    mEvents = Collections.unmodifiableSet(eventscopy);
-    if (automata == null || automata.isEmpty()) {
-      mAutomata = Collections.emptySet();
-    } else {
-      final AutomataSet automatacopy = new AutomataSet(automata.size());
-      for (final AutomatonProxy aut : automata) {
-        eventscopy.checkAllUnique(aut.getEvents());
-        automatacopy.insertUnique(aut);
-      }
-      mAutomata = Collections.unmodifiableSet(automatacopy);
-    }
+    mEvents = new EventSet(events);
+    mAutomata = new AutomataSet(automata);
   }
 
   /**
@@ -181,76 +164,46 @@ public class ProductDESElement
 
   //#########################################################################
   //# Local Class EventSet
-  private class EventSet extends IndexedHashSet<EventProxy> {
+  private class EventSet extends ImmutableOrderedSet<EventProxy>
+  {
 
     //#######################################################################
     //# Constructors
-    EventSet()
-    {
-    }
-
     EventSet(final Collection<? extends EventProxy> events)
-      throws DuplicateNameException
     {
       super(events);
     }
 
     //#######################################################################
-    //# Overrides from abstract class HashSetProxy
-    protected ItemNotFoundException createItemNotFound(final String name)
-    {
-      return new ItemNotFoundException
-        ("ProductDES '" + getName() +
-         "' does not contain the event named '" + name + "'!");
-    }
-
-    protected NameNotFoundException createNameNotFound(final String name)
-    {
-      return new NameNotFoundException
-        ("ProductDES '" + getName() +
-         "' does not contain an event named '" + name + "'!");
-    }
-
+    //# Overrides from base class ImmutableOrderedSet
     protected DuplicateNameException createDuplicateName(final String name)
     {
       return new DuplicateNameException
-        ("ProductDES '" + getName() +
+        ("Product DES '" + getName() +
          "' already contains an event named '" + name + "'!");
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
+
   }
 
 
   //#########################################################################
   //# Local Class AutomataSet
-  private class AutomataSet extends IndexedHashSet<AutomatonProxy> {
+  private class AutomataSet extends ImmutableOrderedSet<AutomatonProxy>
+  {
 
     //#######################################################################
     //# Constructor
-    AutomataSet(final int size)
+    AutomataSet(final Collection<? extends AutomatonProxy> automata)
     {
-      super(size);
+      super(automata);
     }
 
     //#######################################################################
-    //# Overrides from abstract class HashSetProxy
-    protected ItemNotFoundException createItemNotFound(final String name)
-    {
-      return new ItemNotFoundException
-        ("Product DES '" + getName() +
-         "' does not contain the automaton named '" + name + "'!");
-    }
-
-    protected NameNotFoundException createNameNotFound(final String name)
-    {
-      return new NameNotFoundException
-        ("Product DES '" + getName() +
-         "' does not contain an automaton named '" + name + "'!");
-    }
-
+    //# Overrides from base class ImmutableOrderedSet
     protected DuplicateNameException createDuplicateName(final String name)
     {
       return new DuplicateNameException
@@ -261,6 +214,7 @@ public class ProductDESElement
     //#########################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
+
   }
 
 

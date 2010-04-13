@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.Collection;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -61,6 +62,7 @@ abstract class AbstractionRule
     (final CompositionalGeneralisedConflictChecker checker,
      final AutomatonProxy autToAbstract,
      final EventProxy tau)
+    throws AnalysisException
   {
     final AutomatonProxy abstractedAut = applyRule(autToAbstract, tau);
     if (abstractedAut != autToAbstract) {
@@ -74,7 +76,8 @@ abstract class AbstractionRule
   // #######################################################################
   // # Rule Application
   abstract AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
-                                    final EventProxy tau);
+                                    final EventProxy tau)
+    throws AnalysisException;
 
   abstract CompositionalGeneralisedConflictChecker.Step createStep
     (final CompositionalGeneralisedConflictChecker checker,

@@ -44,7 +44,7 @@ public class CompositionalStandardConflictCheckerTest extends
     final CompositionalGeneralisedConflictChecker checker =
       new CompositionalGeneralisedConflictChecker(factory);
     // TODO Configure state limits here.
-    checker.setTransitionLimit(200000);
+    checker.setTransitionLimit(1000000);
     return checker;
   }
 

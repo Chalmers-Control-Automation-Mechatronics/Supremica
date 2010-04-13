@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 
 import org.apache.log4j.Logger;
@@ -63,6 +65,7 @@ public class ObservationEquivalenceTRSimplifier
     mHiddenEvent = tau;
     mTransitionRelation = tr;
     mSuppressRedundantHiddenTransitions = false;
+    mTransitionLimit = Integer.MAX_VALUE;
   }
 
 
@@ -140,10 +143,33 @@ public class ObservationEquivalenceTRSimplifier
     return mInitialPartition;
   }
 
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions (including stored silent transitions of the
+   * transitive closure) that will be constructed. An attempt to store
+   * more transitions leads to an {@link OverflowException}.
+   * @param limit     The new transition limit, or {@link Integer#MAX_VALUE}
+   *                  to allow an unlimit number of transitions.
+   */
+  public void setTransitionLimit(final int limit)
+  {
+    mTransitionLimit = limit;
+  }
+
+  /**
+   * Gets the transition limit.
+   * @see {@link #setTransitionLimit(int) setTransitionLimit()}
+   */
+  public int getTransitionLimit()
+  {
+    return mTransitionLimit;
+  }
+
 
   //#########################################################################
   //# Invocation
   public boolean run()
+    throws AnalysisException
   {
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
@@ -208,6 +234,7 @@ public class ObservationEquivalenceTRSimplifier
   //#########################################################################
   //# Auxiliary Methods
   private void setUp()
+    throws OverflowException
   {
     mNumStates = mTransitionRelation.getNumberOfStates();
     mNumEvents = mTransitionRelation.getNumberOfProperEvents();
@@ -219,7 +246,9 @@ public class ObservationEquivalenceTRSimplifier
   }
 
   private void setUpTauPredecessors()
+    throws OverflowException
   {
+    int numtrans = mTransitionRelation.getNumberOfTransitions();
     mTauPreds = new int[mNumStates][];
     for (int s = 0; s < mNumStates; s++) {
       if (mHiddenEvent >= 0) {
@@ -243,6 +272,11 @@ public class ObservationEquivalenceTRSimplifier
           }
         }
         mTauPreds[s] = hashTauPreds.toArray();
+        numtrans += mTauPreds[s].length - 1;
+        if (numtrans > mTransitionLimit) {
+          throw new OverflowException(OverflowException.Kind.TRANSITION,
+                                      mTransitionLimit);
+        }
       } else {
         final int[] array = new int[1];
         array[0] = s;
@@ -724,6 +758,7 @@ public class ObservationEquivalenceTRSimplifier
   private ObserverProjectionTransitionRelation mTransitionRelation;
   private Collection<int[]> mInitialPartition;
   private boolean mSuppressRedundantHiddenTransitions;
+  private int mTransitionLimit;
 
   private int mNumStates;
   private int mNumEvents;

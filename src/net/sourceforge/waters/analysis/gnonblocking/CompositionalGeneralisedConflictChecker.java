@@ -35,7 +35,6 @@ import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -340,6 +339,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
     final ObservationEquivalenceRule oeRule =
         new ObservationEquivalenceRule(getFactory(), mPropositions);
+    oeRule.setTransitionLimit(getTransitionLimit());
     mAbstractionRules.add(oeRule);
 
     final RemovalOfAlphaMarkingsRule ramRule =
@@ -379,7 +379,7 @@ public class CompositionalGeneralisedConflictChecker extends
   // # Auxiliary Methods
   private AutomatonProxy applyAbstractionRules(AutomatonProxy autToAbstract,
                                                final EventProxy tau)
-      throws OverflowException
+    throws AnalysisException
   {
 
     final ListIterator<AbstractionRule> iter = mAbstractionRules.listIterator();

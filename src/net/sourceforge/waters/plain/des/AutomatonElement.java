@@ -18,9 +18,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.IndexedHashSet;
-import net.sourceforge.waters.model.base.ItemNotFoundException;
-import net.sourceforge.waters.model.base.NameNotFoundException;
+import net.sourceforge.waters.model.base.ImmutableOrderedSet;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -62,11 +60,6 @@ public final class AutomatonElement
    *                      or <CODE>null</CODE> if empty.
    * @throws DuplicateNameException to indicate that some state or event
    *                      name is used more than once.
-   * @throws NameNotFoundException to indicate that some transition refers
-   *                      to a state or event with an unknown name.
-   * @throws ItemNotFoundException to indicate that some transition uses
-   *                      a state or event object that does not belong
-   *                      to the given set of states or events.
    */
   AutomatonElement(final String name,
                    final ComponentKind kind,
@@ -76,30 +69,21 @@ public final class AutomatonElement
                    final Map<String,String> attribs)
   {
     super(name);
-    final EventSet eventscopy =
-      events == null ? new EventSet() : new EventSet(events);
-    final StateSet statescopy =
-      states == null ? new StateSet() : new StateSet(states);
     mKind = kind;
-    mEvents = Collections.unmodifiableSet(eventscopy);
-    mStates = Collections.unmodifiableSet(statescopy);
+    mEvents = new EventSet(events);
+    mStates = new StateSet(states);
     if (transitions == null || transitions.isEmpty()) {
       mTransitions = Collections.emptyList();
     } else {
       final List<TransitionProxy> transitionscopy =
-        new ArrayList<TransitionProxy>(transitions.size());
-      for (final TransitionProxy trans : transitions) {
-        statescopy.checkUnique(trans.getSource());
-        eventscopy.checkUnique(trans.getEvent());
-        statescopy.checkUnique(trans.getTarget());
-        transitionscopy.add(trans);
-      }
+        new ArrayList<TransitionProxy>(transitions);
       mTransitions = Collections.unmodifiableList(transitionscopy);
     }
     if (attribs == null) {
       mAttributes = Collections.emptyMap();
     } else {
-      final Map<String,String> attribscopy = new TreeMap<String,String>(attribs);
+      final Map<String,String> attribscopy =
+        new TreeMap<String,String>(attribs);
       mAttributes = Collections.unmodifiableMap(attribscopy);
     }
   }
@@ -237,36 +221,18 @@ public final class AutomatonElement
 
   //#########################################################################
   //# Local Class EventSet
-  private class EventSet extends IndexedHashSet<EventProxy> {
+  private class EventSet extends ImmutableOrderedSet<EventProxy>
+  {
 
     //#######################################################################
-    //# Constructors
-    EventSet()
-    {
-    }
-
+    //# Constructor
     EventSet(final Collection<? extends EventProxy> events)
-      throws DuplicateNameException
     {
       super(events);
     }
 
     //#######################################################################
-    //# Overrides from abstract class HashSetProxy
-    protected ItemNotFoundException createItemNotFound(final String name)
-    {
-      return new ItemNotFoundException
-        ("Automaton '" + getName() +
-         "' does not contain the event named '" + name + "'!");
-    }
-
-    protected NameNotFoundException createNameNotFound(final String name)
-    {
-      return new NameNotFoundException
-        ("Automaton '" + getName() +
-         "' does not contain an event named '" + name + "'!");
-    }
-
+    //# Overrides from base class ImmutableOrderedSet
     protected DuplicateNameException createDuplicateName(final String name)
     {
       return new DuplicateNameException
@@ -277,19 +243,17 @@ public final class AutomatonElement
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
+
   }
 
 
   //#########################################################################
   //# Local Class StateSet
-  private class StateSet extends IndexedHashSet<StateProxy> {
+  private class StateSet extends ImmutableOrderedSet<StateProxy>
+  {
 
     //#######################################################################
-    //# Constructors
-    StateSet()
-    {
-    }
-
+    //# Constructor
     StateSet(final Collection<? extends StateProxy> states)
       throws DuplicateNameException
     {
@@ -297,21 +261,7 @@ public final class AutomatonElement
     }
 
     //#######################################################################
-    //# Overrides from abstract class HashSetProxy
-    protected ItemNotFoundException createItemNotFound(final String name)
-    {
-      return new ItemNotFoundException
-        ("Automaton '" + getName() +
-         "' does not contain the state named '" + name + "'!");
-    }
-
-    protected NameNotFoundException createNameNotFound(final String name)
-    {
-      return new NameNotFoundException
-        ("Automaton '" + getName() +
-         "' does not contain a state named '" + name + "'!");
-    }
-
+    //# Overrides from base class ImmutableOrderedSet
     protected DuplicateNameException createDuplicateName(final String name)
     {
       return new DuplicateNameException
@@ -322,6 +272,7 @@ public final class AutomatonElement
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
+
   }
 
 
