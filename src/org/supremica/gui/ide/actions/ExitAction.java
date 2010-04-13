@@ -23,7 +23,7 @@ import org.supremica.gui.ide.IDE;
 public class ExitAction
     extends net.sourceforge.waters.gui.actions.IDEAction
 {
-    
+
     //#######################################################################
     //# Constructor
     ExitAction(final IDE ide)
@@ -33,10 +33,10 @@ public class ExitAction
         putValue(Action.SHORT_DESCRIPTION, "Exit the IDE");
         putValue(Action.MNEMONIC_KEY, KeyEvent.VK_X);
         putValue(Action.ACCELERATOR_KEY,
-            KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
+            KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.ALT_MASK));
     }
-    
-    
+
+
     //#######################################################################
     //# Interface java.awt.event.ActionListener
     public void actionPerformed(final ActionEvent event)
@@ -50,9 +50,9 @@ public class ExitAction
         }
     }
 
-    
+
 	//#######################################################################
     //# Class Constants
 	private static final long serialVersionUID = 1L;
-    
+
 }

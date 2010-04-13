@@ -1,7 +1,10 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
+import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.simulator.Simulation;
@@ -19,6 +22,8 @@ public class SimulationBackToStartAction extends WatersSimulationAction
     putValue(Action.NAME, "Jump To Start");
     putValue(Action.SHORT_DESCRIPTION, "Return the simulation to the initial state");
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_TO_START);
+    putValue(Action.ACCELERATOR_KEY,
+             KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
   }
 
   //#########################################################################

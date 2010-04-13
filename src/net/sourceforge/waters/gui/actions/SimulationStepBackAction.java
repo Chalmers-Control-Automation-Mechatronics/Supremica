@@ -25,7 +25,8 @@ public class SimulationStepBackAction
     putValue(Action.NAME, "Step Back");
     putValue(Action.SHORT_DESCRIPTION, "Travel back through the trace");
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_BACK);
-    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.ALT_MASK));
+    putValue(Action.ACCELERATOR_KEY,
+             KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
   }
 
   //#########################################################################

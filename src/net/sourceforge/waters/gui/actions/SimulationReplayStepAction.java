@@ -25,7 +25,8 @@ public class SimulationReplayStepAction
     putValue(Action.NAME, "Replay Step");
     putValue(Action.SHORT_DESCRIPTION, "Replay the next event");
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_REPLAY);
-    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK));
+    putValue(Action.ACCELERATOR_KEY,
+             KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
   }
 
   //#########################################################################

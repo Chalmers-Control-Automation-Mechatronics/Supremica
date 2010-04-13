@@ -103,22 +103,83 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  * @author Knut &Aring;kesson, Robi Malik
  */
 
-/*
- * ALT-Hotkeys: ALT-a: Create/New automaton ALT-b: Simulator/Step back ALT-c:
- * Create menu ALT-d: Edit menu ALT-e: Create/New event ALT-f: File menu ALT-g:
- * ALT-h: Help menu ALT-i: ALT-j: ALT-k: ALT-l: ALT-m: Modules menu ALT-n:
- * ALT-o: Configure menu ALT-p: Simulator/Step ALT-q: Simulator/Replay Step
- * ALT-r: Simulator/Reset ALT-s: Simulator menu ALT-t: Tools menu ALT-u: ALT-v:
- * Create/New variable ALT-w: ALT-x: Examples menu ALT-y: ALT-z: Analyze menu
- * (in the Analyse menu) / New Analyze menu (in the Editor menu)
- *
- * CTRL-Hotkeys: CTRL-a: Edit/Select all CTRL-b: CTRL-c: Edit/Copy CTRL-d:
- * CTRL-e: CTRL-f: CTRL-g: CTRL-h: CTRL-i: CTRL-j: CTRL-k: CTRL-l: Edit/Layout
- * graph CTRL-m: CTRL-n: File/New CTRL-o: File/Open CTRL-p: File/Print CTRL-q:
- * File/Exit CTRL-r: CTRL-s: File/Save CTRL-t: Examples/Dynamic examples CTRL-u:
- * CTRL-v: Edit/Paste, Analyze/Verify CTRL-w: Analyze/Workbench CTRL-x: Edit/Cut
- * CTRL-y: Edit/Redo CTRL-z: Edit/Undo
- */
+//###########################################################################
+//# Function keys:
+//###########################################################################
+//# F1:
+//# F2: <??? has system binding ???>
+//# F3: Simulator/Jump to start
+//# F4: Simulator/Step back
+//# F5: Simulator/Replay step
+//# F6: <??? has system binding ???>
+//# F7: Simulator/Jump to end
+//# F8:
+//# F9:
+//# F10:
+//# F11:
+//# F12:
+
+//###########################################################################
+//# ALT-Hotkeys:
+//###########################################################################
+//# ALT-a: Create/New automaton
+//# ALT-b: Simulator/Step back
+//# ALT-c: Create menu
+//# ALT-d: Edit menu
+//# ALT-e: Create/New event
+//# ALT-f: File menu
+//# ALT-g:
+//# ALT-h: Help menu
+//# ALT-i:
+//# ALT-j:
+//# ALT-k:
+//# ALT-l:
+//# ALT-m: Modules menu
+//# ALT-n:
+//# ALT-o: Configure menu
+//# ALT-p: Examples menu
+//# ALT-q:
+//# ALT-r:
+//# ALT-s: Simulator menu
+//# ALT-t: Tools menu
+//# ALT-u:
+//# ALT-v: Create/New variable
+//# ALT-w:
+//# ALT-x: File/Exit
+//# ALT-y:
+//# ALT-z: Analyze menu (in the Analyse menu) /
+//#        New Analyze menu (in the Editor menu)
+
+//###########################################################################
+//# CTRL-Hotkeys:
+//###########################################################################
+//# CTRL-a: Edit/Select all
+//# CTRL-b:
+//# CTRL-c: Edit/Copy
+//# CTRL-d:
+//# CTRL-e:
+//# CTRL-f:
+//# CTRL-g:
+//# CTRL-h:
+//# CTRL-i:
+//# CTRL-j:
+//# CTRL-k:
+//# CTRL-l: Edit/Layout graph
+//# CTRL-m: Edit/Show module comments
+//# CTRL-n: File/New
+//# CTRL-o: File/Open
+//# CTRL-p: File/Print
+//# CTRL-q:
+//# CTRL-r:
+//# CTRL-s: File/Save
+//# CTRL-t: Examples/Dynamic examples
+//# CTRL-u:
+//# CTRL-v: Edit/Paste, Analyze/Verify
+//# CTRL-w: Analyze/Workbench
+//# CTRL-x: Edit/Cut
+//# CTRL-y: Edit/Redo
+//# CTRL-z: Edit/Undo
+
 
 public class IDEMenuBar extends JMenuBar
 {
@@ -266,20 +327,20 @@ public class IDEMenuBar extends JMenuBar
         mSimulateMenu.setMnemonic(KeyEvent.VK_S);
         final Action reset = actions.getAction(SimulationResetAction.class);
         mSimulateMenu.add(reset);
+        final Action stepBeginning =
+          actions.getAction(SimulationBackToStartAction.class);
+        mSimulateMenu.add(stepBeginning);
+        final Action stepBack =
+          actions.getAction(SimulationStepBackAction.class);
+        mSimulateMenu.add(stepBack);
         final Action step = actions.getAction(SimulationStepAction.class);
         mSimulateMenu.add(step);
-        final Action endTrace =
-            actions.getAction(SimulationJumpToEndAction.class);
-        mSimulateMenu.add(endTrace);
         final Action replayStep =
-            actions.getAction(SimulationReplayStepAction.class);
+          actions.getAction(SimulationReplayStepAction.class);
         mSimulateMenu.add(replayStep);
-        final Action stepBack =
-            actions.getAction(SimulationStepBackAction.class);
-        mSimulateMenu.add(stepBack);
-        final Action stepBeginning =
-            actions.getAction(SimulationBackToStartAction.class);
-        mSimulateMenu.add(stepBeginning);
+        final Action endTrace =
+          actions.getAction(SimulationJumpToEndAction.class);
+        mSimulateMenu.add(endTrace);
       }
 
       // Analyze
@@ -342,7 +403,7 @@ public class IDEMenuBar extends JMenuBar
     // Examples
     if (mExamplesMenu == null) {
       mExamplesMenu = new JMenu("Examples");
-      mExamplesMenu.setMnemonic(KeyEvent.VK_X);
+      mExamplesMenu.setMnemonic(KeyEvent.VK_P);
       mExamplesMenu.add(actions.toolsTestCasesAction.getMenuItem());
       final ExampleTemplates exTempl = ExampleTemplates.getInstance();
       for (final TemplateGroup currGroup : exTempl) {
