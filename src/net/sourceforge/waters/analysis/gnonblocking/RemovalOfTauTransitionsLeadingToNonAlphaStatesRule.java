@@ -71,12 +71,12 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
         new ObserverProjectionTransitionRelation(autToAbstract,
             getPropositions());
     final int tauID = mTR.getEventInt(tau);
-    if (tauID == -1) {
+    final int alphaID = mTR.getEventInt(mAlphaMarking);
+    if (tauID == -1 || alphaID == -1) {
       return autToAbstract;
     }
     mTau = tau;
 
-    final int alphaID = mTR.getEventInt(mAlphaMarking);
     final int numStates = mTR.getNumberOfStates();
 
     for (int sourceID = 0; sourceID < numStates; sourceID++) {

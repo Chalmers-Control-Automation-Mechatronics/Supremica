@@ -359,12 +359,12 @@ public class CompositionalGeneralisedConflictChecker extends
     rnsRule.setDefaultMarking(getMarkingProposition());
     mAbstractionRules.add(rnsRule);
 
-    /*
-     * final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule = new
-     * RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
-     * mPropositions); rttlnsRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(rttlnsRule);
-     */
+    final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
+        new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
+            mPropositions);
+    rttlnsRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(rttlnsRule);
+
     /*
      * final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule
      * = new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(

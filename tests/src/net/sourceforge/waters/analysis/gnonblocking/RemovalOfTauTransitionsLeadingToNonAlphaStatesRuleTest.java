@@ -115,6 +115,14 @@ public class RemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest extends
     runAbstractionRule(group, subdir, name);
   }
 
+  public void test_allStatesImplicitlyMarkedAlpha() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "tauTransRemovalToNonAlpha_8.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
   public void test_tauTransRemovalToNonAlpha_TwoConsecutiveTauUnreachable()
       throws Exception
   {
@@ -141,19 +149,19 @@ public class RemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest extends
     runAbstractionRule(group, subdir, name);
   }
 
-  // TODO More tests needed ...
-
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
    */
   public void testReentrant() throws Exception
   {
-    // TODO As soon as there are more tests, try some more variation here.
     test_tauTransRemovalToNonAlpha_StateUnreachable();
     test_tauTransRemovalToNonAlpha_NoFurther();
+    test_tauTransRemovalToNonAlpha_TwoConsecutiveTauReachable();
     test_tauTransRemovalToNonAlpha_StateReachable();
     test_tauTransRemovalToNonAlpha_StateUnreachable();
+    test_tauTransRemovalToNonAlpha_TwoConsecutiveTauUnreachable();
+    test_tauTransRemovalToNonAlpha_TwoTau();
     test_tauTransRemovalToNonAlpha_NoFurther();
   }
 
