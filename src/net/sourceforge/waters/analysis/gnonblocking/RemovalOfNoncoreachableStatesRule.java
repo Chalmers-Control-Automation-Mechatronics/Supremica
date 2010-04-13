@@ -89,7 +89,8 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
     // marked state
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if ((mTR.isMarked(sourceID, defaultID) || mTR.isMarked(sourceID, alphaID))
-          && !reachableStates.contains(sourceID)) {
+          && !reachableStates.contains(sourceID)
+          && mTR.hasPredecessors(sourceID)) {
         unvisitedStates.push(sourceID);
         reachableStates.add(sourceID);
         while (unvisitedStates.size() > 0) {
@@ -115,11 +116,8 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
     // removes states which can not reach a state marked alpha or omega
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if (!reachableStates.contains(sourceID)) {
-        // TODO don't visit unreachable states in the first place.
-        if (mTR.hasPredecessors(sourceID)) {
-          mTR.removeAllIncoming(sourceID);
-          modified = true;
-        }
+        mTR.removeAllIncoming(sourceID);
+        modified = true;
       }
     }
     if (modified) {
