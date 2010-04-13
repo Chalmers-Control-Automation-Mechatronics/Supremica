@@ -573,7 +573,7 @@ public class ObserverProjectionTransitionRelation
           final int[] succarray = successors.toArray();
           for (final int succ : succarray) {
             removeTransition(state, oldID, succ);
-            removeTransition(state, newID, succ);
+            addTransition(state, newID, succ);
           }
         }
       }
