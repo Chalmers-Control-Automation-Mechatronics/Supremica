@@ -341,7 +341,7 @@
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="waters.analysis.statelimit" value="5000"/>
+      <sysproperty key="waters.analysis.statelimit" value="10000"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
       <jvmarg value="-enableassertions"/>
     </junit>

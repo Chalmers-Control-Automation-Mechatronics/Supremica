@@ -735,7 +735,7 @@ public class MonolithicControlLoopChecker
         mask = mNumBitsMasks[j];
         value = tmp & mask;
         currTuple[j] = value;
-        tmp = tmp >> mNumBits[j];
+        tmp = tmp >>> mNumBits[j];
       }
     }
   }
