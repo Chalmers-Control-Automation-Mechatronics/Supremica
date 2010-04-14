@@ -291,16 +291,19 @@ expandNonblockingReachabilityState(uint32 source,
 #   undef ADD_TRANSITION
 #   undef ADD_TRANSITION_ALLOC
   } else {
-    bool markedoff = false;
+    // Nondeterministic transitions only need to be marked off once per
+    // state and event. The 'markedoff' flag suppresses the call to
+    // markTransitionsTakenFast() for subsequent nondeterministic transitions.
+    const BroadEventRecord* markedoff = 0;
 #   define ADD_TRANSITION(source, target) {                             \
       incNumberOfTransitions();                                         \
       event->markTransitionsTakenFast(sourcetuple);                     \
     }
 #   define ADD_TRANSITION_ALLOC(source, target) {                       \
       incNumberOfTransitions();                                         \
-      if (!markedoff) {                                                 \
+      if (markedoff != event) {                                         \
         event->markTransitionsTakenFast(sourcetuple);                   \
-        markedoff = true;                                               \
+        markedoff = event;                                              \
       }                                                                 \
     }
     EXPAND(numwords, source, sourcetuple, sourcepacked);

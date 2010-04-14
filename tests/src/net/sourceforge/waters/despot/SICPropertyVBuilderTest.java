@@ -157,6 +157,13 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     testIntegrity("tests", "hisc", "parManEg_I_mfb_lowlevel");
   }
 
+  public void testIntegrity_parManEg_I_mfb_lowlevel_multiAnswers_noInterface()
+    throws Exception
+  {
+    testIntegrity("tests", "hisc",
+                  "parManEg_I_mfb_lowlevel_multiAnswers_noInterface");
+  }
+
   public void testIntegrity_rhone_subsystem1_ld_failsic5() throws Exception
   {
     testIntegrity("tests", "hisc", "rhone_subsystem1_ld_failsic5");

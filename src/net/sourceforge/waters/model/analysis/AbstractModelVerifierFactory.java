@@ -358,8 +358,8 @@ public abstract class AbstractModelVerifierFactory
     private PreMarkingArgument()
     {
       super("-premarking",
-            "Name of precondition marking proposition " +
-            " for generalised conflict check");
+            "Name of precondition marking proposition\n" +
+            "for generalised conflict check");
     }
 
     //#######################################################################

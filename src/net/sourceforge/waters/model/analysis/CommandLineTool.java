@@ -86,6 +86,7 @@ public class CommandLineTool
 
       boolean verbose = true;
       boolean stats = false;
+      boolean optimise = true;
       boolean noargs = false;
       final String factoryname = args[0];
       final List<String> arglist = new LinkedList<String>();
@@ -97,6 +98,8 @@ public class CommandLineTool
           verbose = false;
         } else if (arg.equals("-stats")) {
           stats = true;
+        } else if (arg.equals("-noopt")) {
+          optimise = false;
         } else if (arg.startsWith("-D")) {
           final int eqpos = arg.indexOf('=', 2);
           if (eqpos > 2) {
@@ -179,6 +182,7 @@ public class CommandLineTool
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
+          compiler.setOptimizationEnabled(optimise);
           if (noProperties) {
             compiler.setEnabledPropertyNames(empty);
           }
