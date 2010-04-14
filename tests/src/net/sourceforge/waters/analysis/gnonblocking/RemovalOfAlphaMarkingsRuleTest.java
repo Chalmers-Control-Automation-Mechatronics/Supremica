@@ -189,6 +189,14 @@ public class RemovalOfAlphaMarkingsRuleTest extends AbstractAbstractionRuleTest
     runAbstractionRule(group, subdir, name);
   }
 
+  public void test_manyTauInSequence() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_14.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
@@ -206,6 +214,7 @@ public class RemovalOfAlphaMarkingsRuleTest extends AbstractAbstractionRuleTest
     test_alphaRemovalFromStateWithMultiMarkings();
     test_noTransitions();
     test_multipleTauTransitionsBetween();
+    test_manyTauInSequence();
     test_twoTransitionsBetweenTauStates();
     test_nonTauLoop();
     test_alpharemoval_1();
