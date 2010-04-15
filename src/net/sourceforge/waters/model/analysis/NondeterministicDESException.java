@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.des.StateProxy;
  * @author Robi Malik
  */
 
-public class NondeterministicDESException extends AnalysisException {
+public class NondeterministicDESException extends InvalidModelException {
 
   //#########################################################################
   //# Constructors
@@ -60,8 +60,8 @@ public class NondeterministicDESException extends AnalysisException {
           "' originating from state '" + state.getName() +
           "' in automaton '" + aut.getName() + "'!");
   }
-  
-  
+
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
