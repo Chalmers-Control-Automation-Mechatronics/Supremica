@@ -12,6 +12,8 @@ package net.sourceforge.waters.analysis.op;
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntStack;
+import gnu.trove.TLongArrayList;
+import gnu.trove.TLongIntHashMap;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayList;
@@ -131,6 +133,7 @@ public class OPSearchAutomatonSimplifier
     mReadOnlyIterator = mListBuffer.createReadOnlyIterator();
     setUpAutomatonEncoding();
     setUpStronglyConnectedComponents();
+    setUpVerifier();
   }
 
   protected void tearDown()
@@ -257,6 +260,87 @@ public class OPSearchAutomatonSimplifier
     }
   }
 
+  private void setUpVerifier()
+  {
+    final int numStates = mOriginalStates.length;
+    mVerifierStatePairs = new TLongArrayList(numStates);
+    mVerifierStateMap = new TLongIntHashMap(numStates);
+
+    for (final StronglyConnectedComponent comp1 : mComponents) {
+      if (comp1.isEnabledEvent(mUnobservableTau)) {
+        final int code1 = comp1.getCode();
+        for (final int state1 : comp1.getStates()) {
+          final int successors = mUnobservableTauSuccessors[state1];
+          if (successors != IntListBuffer.NULL) {
+            mReadOnlyIterator.reset(successors);
+            while (mReadOnlyIterator.advance()) {
+              final int state2 = mReadOnlyIterator.getCurrentData();
+              final StronglyConnectedComponent comp2 = mComponents.get(state2);
+              final int code2 = comp2 == null ? state2 : comp2.getCode();
+              exploreVerifierPair(code1, code2);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private void exploreVerifierPair(final int code1, final int code2)
+  {
+    if (code1 < code2) {
+      exploreVerifierPairRaw(code1, code2);
+    } else if (code1 > code2) {
+      exploreVerifierPairRaw(code2, code1);
+    }
+  }
+
+  private void exploreVerifierPairRaw(final int code1, final int code2)
+  {
+    final long pair = code1 | (code2 << 32);
+    int pcode = mVerifierStateMap.get(pair);
+    if (pcode > 0) {
+      pcode = mVerifierStateMap.size() + mOriginalStates.length;
+      mVerifierStatePairs.add(pair);
+      mVerifierStateMap.put(pair, pcode);
+      expandVerifierPairRaw(pcode, code1, code2);
+    }
+  }
+
+  private void expandVerifierPairRaw(final int pcode,
+                                     final int code1, final int code2)
+  {
+    for (int e = 0; e < mUnobservableTau; e++) {
+      final boolean en1 = isEnabledObservableEvent(code1, e);
+      final boolean en2 = isEnabledObservableEvent(code1, e);
+      if (en1 && en2) {
+
+      } else if (en1 && !isEnabledUnobservableTau(code2) ||
+                 en2 && !isEnabledUnobservableTau(code1)) {
+
+      }
+    }
+  }
+
+  private boolean isEnabledObservableEvent(final int s, final int e)
+  {
+    final StronglyConnectedComponent comp = mComponents.get(s);
+    if (comp == null) {
+      return mObservableSucessor[e][s] != NO_TRANSITION;
+    } else {
+      return comp.isEnabledEvent(e);
+    }
+  }
+
+  private boolean isEnabledUnobservableTau(final int s)
+  {
+    final StronglyConnectedComponent comp = mComponents.get(s);
+    if (comp == null) {
+      return mUnobservableTauSuccessors[s] != IntListBuffer.NULL;
+    } else {
+      return comp.isEnabledEvent(mUnobservableTau);
+    }
+  }
+
 
   //#########################################################################
   //# Inner Class Tarjan
@@ -273,9 +357,11 @@ public class OPSearchAutomatonSimplifier
       mStack = new TIntStack();
       mOnStack = new boolean[numStates];
       mTempComponent = new TIntArrayList();
-      mCallIndex = 0;
+      mCallIndex = 1;
       for (int state = 0; state < numStates; state++) {
-        tarjan(state);
+        if (mTarjan[state] == 0) {
+          tarjan(state);
+        }
       }
     }
 
@@ -283,9 +369,7 @@ public class OPSearchAutomatonSimplifier
     //# Inner Class Tarjan
     private void tarjan(final int state)
     {
-      mTarjan[state] = mCallIndex;
-      mLowLink[state] = mCallIndex;
-      mCallIndex++;
+      mTarjan[state] = mLowLink[state] = mCallIndex++;
       final int successors = mUnobservableTauSuccessors[state];
       if (successors == IntListBuffer.NULL) {
         return;
@@ -315,7 +399,7 @@ public class OPSearchAutomatonSimplifier
         if (mTempComponent.size() > 1) {
           final int[] array = mTempComponent.toNativeArray();
           final StronglyConnectedComponent comp =
-            new StronglyConnectedComponent(array);
+            new StronglyConnectedComponent(state, array);
           mComponents.add(comp);
           for (final int elem : array) {
             mComponentOfState[elem] = comp;
@@ -344,14 +428,32 @@ public class OPSearchAutomatonSimplifier
 
     //#######################################################################
     //# Constructor
-    private StronglyConnectedComponent(final int[] states)
+    private StronglyConnectedComponent(final int code, final int[] states)
     {
+      mCode = code;
       mStates = states;
       mEnabledEvents = new BitSet(mObservableTau);
     }
 
     //#######################################################################
-    //# Flag Access
+    //# Simple Access
+    private int getCode()
+    {
+      return mCode;
+    }
+
+    private int[] getStates()
+    {
+      return mStates;
+    }
+
+    private boolean isEnabledEvent(final int e)
+    {
+      return mEnabledEvents.get(e);
+    }
+
+    //#######################################################################
+    //# Flag Setup
     private void setUpEventStatus()
     {
       events:
@@ -380,14 +482,9 @@ public class OPSearchAutomatonSimplifier
       }
     }
 
-    @SuppressWarnings("unused")
-    private boolean mayExecuteEvent(final int e)
-    {
-      return mEnabledEvents.get(e) || mEnabledEvents.get(mUnobservableTau);
-    }
-
     //#######################################################################
     //# Data Members
+    private final int mCode;
     private final int[] mStates;
     private final BitSet mEnabledEvents;
 
@@ -410,6 +507,9 @@ public class OPSearchAutomatonSimplifier
   private int[] mObservableTauSuccessors;
   private List<StronglyConnectedComponent> mComponents;
   private StronglyConnectedComponent[] mComponentOfState;
+
+  private TLongArrayList mVerifierStatePairs;
+  private TLongIntHashMap mVerifierStateMap;
 
 
   //#########################################################################

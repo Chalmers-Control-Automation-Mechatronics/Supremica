@@ -17,6 +17,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * An abstract base class that can be used for all model analyser
@@ -141,6 +143,15 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     if (mIsAborting) {
       throw new AbortException();
     }
+  }
+
+
+  //#########################################################################
+  //# Logging
+  public Logger getLogger()
+  {
+    final Class<?> clazz = getClass();
+    return Logger.getLogger(clazz);
   }
 
 

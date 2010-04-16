@@ -10,11 +10,8 @@
 package net.sourceforge.waters.model.analysis;
 
 import java.util.Collection;
-import java.util.Collections;
-
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -47,7 +44,7 @@ public abstract class AbstractAutomatonTransformer
   public AbstractAutomatonTransformer(final AutomatonProxy aut,
                                       final ProductDESProxyFactory factory)
   {
-    super(createAutomatonModel(aut, factory), factory);
+    super(createProductDESProxy(aut, factory), factory);
   }
 
 
@@ -56,7 +53,7 @@ public abstract class AbstractAutomatonTransformer
   public void setModel(final AutomatonProxy aut)
   {
     final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy des = createAutomatonModel(aut, factory);
+    final ProductDESProxy des = createProductDESProxy(aut, factory);
     setModel(des);
   }
 
@@ -76,18 +73,6 @@ public abstract class AbstractAutomatonTransformer
          "' does not contain exactly one automaton, which is required for " +
          ProxyTools.getShortClassName(this) + "!");
     }
-  }
-
-
-  //#########################################################################
-  //# Static Methods
-  public static ProductDESProxy createAutomatonModel
-    (final AutomatonProxy aut, final ProductDESProxyFactory factory)
-  {
-    final String name = aut.getName();
-    final Collection<EventProxy> events = aut.getEvents();
-    final Collection<AutomatonProxy> automata = Collections.singletonList(aut);
-    return factory.createProductDESProxy(name, events, automata);
   }
 
 }

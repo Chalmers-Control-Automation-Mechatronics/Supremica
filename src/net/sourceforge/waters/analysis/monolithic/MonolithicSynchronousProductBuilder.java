@@ -832,15 +832,6 @@ public class MonolithicSynchronousProductBuilder
 
 
   //#########################################################################
-  //# Logging
-  private Logger getLogger()
-  {
-    final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
-  }
-
-
-  //#########################################################################
   //# Data Members
   private Collection<EventProxy> mUsedPropositions;
   private Collection<MaskingPair> mMaskingPairs;

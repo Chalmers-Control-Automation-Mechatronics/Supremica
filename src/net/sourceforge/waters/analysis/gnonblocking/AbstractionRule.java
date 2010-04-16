@@ -16,6 +16,8 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * @author Rachel Francis
@@ -82,6 +84,15 @@ abstract class AbstractionRule
   abstract CompositionalGeneralisedConflictChecker.Step createStep
     (final CompositionalGeneralisedConflictChecker checker,
      final AutomatonProxy abstractedAut);
+
+
+  //#########################################################################
+  //# Logging
+  Logger getLogger()
+  {
+    final Class<?> clazz = getClass();
+    return Logger.getLogger(clazz);
+  }
 
 
   // #######################################################################

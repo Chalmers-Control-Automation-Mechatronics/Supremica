@@ -210,7 +210,7 @@
     <javac srcdir="${src}" destdir="${waters.classes}" 
            includes="net/sourceforge/waters/build/jniglue/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
-      <classpath refid="jaxb.classpath"/>
+      <classpath refid="waters.compile.classpath"/>
       <compilerarg value="-Xlint:unchecked"/>
     </javac>
   </target>
@@ -229,10 +229,9 @@
     <java classname="net.sourceforge.waters.build.jniglue.GlueCompiler"
           fork="true" failonerror="true">
       <classpath>
-        <pathelement location="${jaxb.jar}"/>
         <pathelement location="${jniglue.jar}"/>
         <pathelement location="${waters.jar}"/>
-        <path refid="jaxb.classpath"/>
+        <path refid="waters.compile.classpath"/>
       </classpath>
       <arg file="${jniglue.indir}"/>
       <arg file="${jniglue.outdir}"/>

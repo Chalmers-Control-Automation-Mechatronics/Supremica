@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
@@ -272,9 +273,9 @@ public class CompositionalGeneralisedConflictChecker extends
    * state and event. Used in deterministic cases only (in nondeterministic
    * cases the successors are already available in the step's stateMap).
    */
-  private StateProxy findSuccessor(final AutomatonProxy aut,
-                                   final StateProxy sourceState,
-                                   final EventProxy stepEvent)
+  private static StateProxy findSuccessor(final AutomatonProxy aut,
+                                          final StateProxy sourceState,
+                                          final EventProxy stepEvent)
   {
     StateProxy targetState = sourceState;
     for (final TransitionProxy transition : aut.getTransitions()) {
@@ -446,6 +447,7 @@ public class CompositionalGeneralisedConflictChecker extends
                                          final Set<EventProxy> localEvents,
                                          final EventProxy tau)
   {
+    // TODO This map is never read. Remove it?
     final Map<TransitionProxy,TransitionProxy> transitionMap =
         new HashMap<TransitionProxy,TransitionProxy>(automaton.getTransitions()
             .size());
@@ -465,6 +467,7 @@ public class CompositionalGeneralisedConflictChecker extends
         newTransitions.add(transition);
       }
     }
+    // TODO Change to ArrayList --- mind that ordering!
     final Set<EventProxy> newEvents = new HashSet<EventProxy>();
     for (final EventProxy event : automaton.getEvents()) {
       if (!localEvents.contains(event)) {
@@ -489,6 +492,8 @@ public class CompositionalGeneralisedConflictChecker extends
   private Set<EventProxy> getEventsForNewModel(
                                                final List<AutomatonProxy> automataOfNewModel)
   {
+    // TODO Ensure deterministic ordering of output.
+    // (Or use new method in Candidate class instead of this.)
     final Set<EventProxy> events = new HashSet<EventProxy>();
     for (final AutomatonProxy aut : automataOfNewModel) {
       events.addAll(aut.getEvents());
@@ -508,7 +513,7 @@ public class CompositionalGeneralisedConflictChecker extends
       for (final EventProxy event : aut.getEvents()) {
         if (event.getKind() != EventKind.PROPOSITION) {
           if (!mEventsToAutomata.containsKey(event)) {
-            final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
+            final Set<AutomatonProxy> automata = new THashSet<AutomatonProxy>();
             mEventsToAutomata.put(event, automata);
           }
           mEventsToAutomata.get(event).add(aut);
@@ -524,7 +529,7 @@ public class CompositionalGeneralisedConflictChecker extends
     for (final EventProxy event : autToAdd.getEvents()) {
       if (event.getKind() != EventKind.PROPOSITION) {
         if (!mEventsToAutomata.containsKey(event)) {
-          final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
+          final Set<AutomatonProxy> automata = new THashSet<AutomatonProxy>();
           mEventsToAutomata.put(event, automata);
         }
         mEventsToAutomata.get(event).add(autToAdd);
@@ -567,7 +572,8 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private Candidate evaluateCandidates(Collection<Candidate> candidates)
   {
-
+    // TODO Fix bug. This method always returns the first element of
+    // the original list of candidates.
     final ListIterator<SelectingHeuristic> iter =
         mSelectingHeuristics.listIterator();
     List<Candidate> selectedCandidates = new ArrayList<Candidate>(candidates);
@@ -683,7 +689,7 @@ public class CompositionalGeneralisedConflictChecker extends
                                                   final Set<AutomatonProxy> automata)
     {
       final Collection<Candidate> candidates =
-          new HashSet<Candidate>(automata.size() - 1);
+          new THashSet<Candidate>(automata.size() - 1);
       for (final AutomatonProxy a : automata) {
         if (a != chosenAut) {
           final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
@@ -773,7 +779,7 @@ public class CompositionalGeneralisedConflictChecker extends
     public Collection<Candidate> evaluate(final ProductDESProxy model)
     {
       final Collection<Candidate> candidates =
-          new HashSet<Candidate>(mEventsToAutomata.keySet().size());
+          new THashSet<Candidate>(mEventsToAutomata.keySet().size());
       for (final EventProxy event : mEventsToAutomata.keySet()) {
         final List<AutomatonProxy> automata =
             new ArrayList<AutomatonProxy>(mEventsToAutomata.get(event));
@@ -1039,23 +1045,6 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     // #######################################################################
-    // # Auxiliary Methods
-    /**
-     * Returns a collection containing all initial states of an automaton.
-     */
-    protected Collection<StateProxy> getInitialStates(final AutomatonProxy aut)
-    {
-      final Collection<StateProxy> initialstates = new HashSet<StateProxy>();
-      for (final StateProxy state : aut.getStates()) {
-        if (state.isInitial()) {
-          initialstates.add(state);
-        }
-      }
-      assert initialstates.size() > 0;
-      return initialstates;
-    }
-
-    // #######################################################################
     // # Trace Computation
     /**
      * Assumes that a saturated trace is being passed.
@@ -1090,8 +1079,12 @@ public class CompositionalGeneralisedConflictChecker extends
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
       final AutomatonProxy composed = getResultAutomaton();
+      // TODO Change traceAutomata to ArrayList. (Unfortunately, then you
+      // cannot use remove efficiently, so the contents should be collected
+      // in a loop.)
+      // TODO Check/fix bug below.
       final Set<AutomatonProxy> traceAutomata =
-          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
+          new THashSet<AutomatonProxy>(conflictTrace.getAutomata());
       traceAutomata.remove(composed);
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
@@ -1121,6 +1114,7 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(step);
         }
       }
+      // TODO This set is never read. Delete?
       final Set<EventProxy> events = new HashSet<EventProxy>();
       for (final AutomatonProxy aut : traceAutomata) {
         events.addAll(aut.getEvents());
@@ -1199,8 +1193,9 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(convertedStep);
         }
       }
+      // TODO Change to ArrayList. Do not use remove().
       final Set<AutomatonProxy> traceAutomata =
-          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
+          new THashSet<AutomatonProxy>(conflictTrace.getAutomata());
       traceAutomata.remove(getResultAutomaton());
       traceAutomata.add(getOriginalAutomaton());
       final ConflictTraceProxy convertedTrace =
@@ -1223,6 +1218,9 @@ public class CompositionalGeneralisedConflictChecker extends
       EventProxy originalEvent = null;
       for (final TransitionProxy transition : getOriginalAutomaton()
           .getTransitions()) {
+        // TODO Fix bug. Only insert events that were actually hidden.
+        // There may be observable events linking the source and target
+        // states, but those cannot be used to replace tau.
         if (transition.getTarget() == target
             && transition.getSource() == source) {
           originalEvent = transition.getEvent();
@@ -1758,8 +1756,9 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(convertedStep);
         }
       }
+      // TODO Change to ArrayList. Do not use remove().
       final Set<AutomatonProxy> traceAutomata =
-          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
+          new THashSet<AutomatonProxy>(conflictTrace.getAutomata());
       traceAutomata.remove(getResultAutomaton());
       traceAutomata.add(getOriginalAutomaton());
       final ConflictTraceProxy convertedTrace =
@@ -2032,6 +2031,7 @@ public class CompositionalGeneralisedConflictChecker extends
     private final SearchRecord mPredecessor;
   }
 
+
   // #########################################################################
   // # Data Members
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =
@@ -2041,8 +2041,5 @@ public class CompositionalGeneralisedConflictChecker extends
   private List<SelectingHeuristic> mSelectingHeuristics;
   private List<AbstractionRule> mAbstractionRules;
   private Collection<EventProxy> mPropositions;
-
-  // #########################################################################
-  // # Class Constants
 
 }
