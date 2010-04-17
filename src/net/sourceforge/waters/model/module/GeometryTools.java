@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui.renderer
+//# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   GeometryTools
 //###########################################################################
 //# $Id$
@@ -29,6 +29,15 @@ import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 
 import net.sourceforge.waters.xsd.module.SplineKind;
 
+
+/**
+ * A collection of methods to read and modify the geometry of module
+ * elements. This class provides several static methods to read and
+ * write geometry attributes and fill in default values if the actual
+ * value is absent.
+ *
+ * @author Robi Malik
+ */
 
 public final class GeometryTools
 {

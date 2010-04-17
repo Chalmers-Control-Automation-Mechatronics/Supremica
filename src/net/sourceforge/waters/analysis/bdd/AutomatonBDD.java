@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.bdd
 //# CLASS:   AutomatonBDD
 //###########################################################################
@@ -26,6 +26,7 @@ import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -50,7 +51,7 @@ class AutomatonBDD
     mBitIndex = autindex;
     final Collection<StateProxy> states = aut.getStates();
     final int numstates = states.size();
-    mNumberOfBits = log2(numstates);
+    mNumberOfBits = AutomatonTools.log2(numstates);
     mFirstVariableIndex = factory.varNum();
     mStateMap = new HashMap<StateProxy,StateCode>(numstates);
     int index = 0;
@@ -300,7 +301,7 @@ class AutomatonBDD
   {
     final Collection<StateProxy> states = aut.getStates();
     final int numstates = states.size();
-    return 2 * log2(numstates);
+    return 2 * AutomatonTools.log2(numstates);
   }
 
 
@@ -338,7 +339,7 @@ class AutomatonBDD
   {
     return mFirstVariableIndex + 2 * bitno + 1;
   }
-  
+
   private BDD getStateVariable(final BDDFactory factory, final int bitno)
   {
     final int index = getStateVariableIndex(bitno);
@@ -349,19 +350,6 @@ class AutomatonBDD
   {
     final int index = getNextStateVariableIndex(bitno);
     return factory.ithVar(index);
-  }
-  
-  private static int log2(int x)
-  {
-    int result = 0;
-    if (x > 1) {
-      x--;
-      do {
-	x >>= 1;
-	result++;
-      } while (x > 0);
-    }
-    return result;
   }
 
 
@@ -453,7 +441,7 @@ class AutomatonBDD
     private int mNumIncomingTransitions;
     private int mStateCode;
     private boolean mUsesTwoCodes;
- 
+
   }
 
 
