@@ -29,7 +29,7 @@ class IntListBuffer
     final int[] block = new int[BLOCK_SIZE];
     mBlocks.add(block);
     mRecycleStart = NULL;
-    mNextFreeIndex = 2;
+    mNextFreeIndex = NODE_SIZE;
   }
 
 
@@ -91,10 +91,10 @@ class IntListBuffer
     while (next != NULL) {
       final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
       final int offset = next & BLOCK_MASK;
-      if (block[offset + 1] == data) {
+      if (block[offset + OFFSET_DATA] == data) {
         return true;
       }
-      next = block[offset];
+      next = block[offset + OFFSET_NEXT];
     }
     return false;
   }
@@ -107,10 +107,10 @@ class IntListBuffer
       while (current != NULL) {
         final int[] block = mBlocks.get(current >> BLOCK_SHIFT);
         final int offset = current & BLOCK_MASK;
-        final int next = block[offset];
-        if (block[offset + 1] == data) {
+        final int next = block[offset + OFFSET_NEXT];
+        if (block[offset + OFFSET_NEXT] == data) {
           setNext(prev, next);
-          block[offset] = mRecycleStart;
+          block[offset + OFFSET_NEXT] = mRecycleStart;
           mRecycleStart = current;
           return true;
         }
@@ -137,37 +137,37 @@ class IntListBuffer
 
 
   //#########################################################################
-  //# Auxiliary Members
+  //# Auxiliary Methods
   private int getData(final int list)
   {
     final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
-    return block[(list & BLOCK_MASK) + 1];
+    return block[(list & BLOCK_MASK) + OFFSET_DATA];
   }
 
   private int getNext(final int list)
   {
     final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
-    return block[list & BLOCK_MASK];
-  }
-
-  private void setNext(final int list, final int next)
-  {
-    final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
-    block[list & BLOCK_MASK] = next;
+    return block[(list & BLOCK_MASK) + OFFSET_NEXT];
   }
 
   private void setData(final int list, final int data)
   {
     final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
-    block[list & BLOCK_MASK + 1] = data;
+    block[(list & BLOCK_MASK) + OFFSET_DATA] = data;
+  }
+
+  private void setNext(final int list, final int next)
+  {
+    final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
+    block[(list & BLOCK_MASK) + OFFSET_NEXT] = next;
   }
 
   private void setDataAndNext(final int list, final int data, final int next)
   {
     final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
     final int offset = list & BLOCK_MASK;
-    block[offset] = next;
-    block[offset + 1] = data;
+    block[offset + OFFSET_NEXT] = next;
+    block[offset + OFFSET_DATA] = data;
   }
 
   private int allocatePair()
@@ -326,9 +326,9 @@ class IntListBuffer
       if (mPrevious != NULL) {
         final int[] block = mBlocks.get(mCurrent >> BLOCK_SHIFT);
         final int offset = mCurrent & BLOCK_MASK;
-        final int next = block[offset];
+        final int next = block[offset + OFFSET_NEXT];
         setNext(mPrevious, next);
-        block[offset] = mRecycleStart;
+        block[offset + OFFSET_NEXT] = mRecycleStart;
         mRecycleStart = mCurrent;
         mCurrent = mPrevious;
         mPrevious = NULL;
@@ -357,6 +357,10 @@ class IntListBuffer
   //#########################################################################
   //# Class Constants
   public static final int NULL = 0;
+
+  private static final int OFFSET_NEXT = 0;
+  private static final int OFFSET_DATA = 1;
+  private static final int NODE_SIZE = 2;
 
   private static final int BLOCK_SHIFT = 10;
   private static final int BLOCK_SIZE = 1 << BLOCK_SHIFT;
