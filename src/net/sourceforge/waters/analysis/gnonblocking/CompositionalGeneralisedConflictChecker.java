@@ -171,11 +171,15 @@ public class CompositionalGeneralisedConflictChecker extends
        * Candidate nextCandidate = evaluateCandidates(candidates); syncProduct =
        * composeSynchronousProduct(nextCandidate); }
        */
-      // TODO: Skip hiding step if there are no local events (?)
+      final AutomatonProxy autToAbstract;
       final EventProxy tau = createTauEvent(syncProduct);
-      final AutomatonProxy autToAbstract =
-          hideLocalEvents(syncProduct, candidate.getLocalEvents(), tau);
-
+      final Set<EventProxy> candidatesLocalEvents = candidate.getLocalEvents();
+      if (candidatesLocalEvents != null && candidatesLocalEvents.size() > 0) {
+        autToAbstract =
+            hideLocalEvents(syncProduct, candidatesLocalEvents, tau);
+      } else {
+        autToAbstract = syncProduct;
+      }
       final AutomatonProxy abstractedAut =
           applyAbstractionRules(autToAbstract, tau);
 
@@ -186,14 +190,8 @@ public class CompositionalGeneralisedConflictChecker extends
       updateEventsToAutomata(abstractedAut, candidate.getAutomata());
 
       // updates the current model to find candidates from
-      final Set<EventProxy> composedModelAlphabet =
-          getEventsForNewModel(remainingAut);
-      model =
-          getFactory().createProductDESProxy(model.getName(),
-                                             model.getComment(),
-                                             model.getLocation(),
-                                             composedModelAlphabet,
-                                             remainingAut);
+      final Candidate newModel = new Candidate(remainingAut, null);
+      model = newModel.createProductDESProxy(getFactory());
     }
     final ConflictChecker checker =
         new MonolithicConflictChecker(model, getUsedMarkingProposition(),
@@ -380,7 +378,7 @@ public class CompositionalGeneralisedConflictChecker extends
   // # Auxiliary Methods
   private AutomatonProxy applyAbstractionRules(AutomatonProxy autToAbstract,
                                                final EventProxy tau)
-    throws AnalysisException
+      throws AnalysisException
   {
 
     final ListIterator<AbstractionRule> iter = mAbstractionRules.listIterator();
@@ -405,11 +403,9 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     // creates a model which includes only the candidate, to build the
     // synchronous product of
-    final Set<EventProxy> candidateEvents =
-        getEventsForNewModel(candidate.getAutomata());
     final ProductDESProxy candidateModel =
-        getFactory().createProductDESProxy("Candidate model", candidateEvents,
-                                           candidate.getAutomata());
+        candidate.createProductDESProxy(getFactory());
+
     final MonolithicSynchronousProductBuilder composer =
         new MonolithicSynchronousProductBuilder(candidateModel, getFactory());
     composer.setPropositions(mPropositions);
@@ -447,10 +443,6 @@ public class CompositionalGeneralisedConflictChecker extends
                                          final Set<EventProxy> localEvents,
                                          final EventProxy tau)
   {
-    // TODO This map is never read. Remove it?
-    final Map<TransitionProxy,TransitionProxy> transitionMap =
-        new HashMap<TransitionProxy,TransitionProxy>(automaton.getTransitions()
-            .size());
     // replaces events on transitions with silent event and removes the local
     // events from the automaton alphabet
     final Collection<TransitionProxy> newTransitions =
@@ -462,13 +454,11 @@ public class CompositionalGeneralisedConflictChecker extends
             getFactory().createTransitionProxy(transition.getSource(), tau,
                                                transition.getTarget());
         newTransitions.add(newTrans);
-        transitionMap.put(newTrans, transition);
       } else {
         newTransitions.add(transition);
       }
     }
-    // TODO Change to ArrayList --- mind that ordering!
-    final Set<EventProxy> newEvents = new HashSet<EventProxy>();
+    final ArrayList<EventProxy> newEvents = new ArrayList<EventProxy>();
     for (final EventProxy event : automaton.getEvents()) {
       if (!localEvents.contains(event)) {
         newEvents.add(event);
@@ -483,22 +473,6 @@ public class CompositionalGeneralisedConflictChecker extends
     final HidingStep step = new HidingStep(newAut, automaton, tau);
     mModifyingSteps.add(step);
     return newAut;
-  }
-
-  /**
-   * Returns a set of events for a new model which is the alphabet from a given
-   * set of automata.
-   */
-  private Set<EventProxy> getEventsForNewModel(
-                                               final List<AutomatonProxy> automataOfNewModel)
-  {
-    // TODO Ensure deterministic ordering of output.
-    // (Or use new method in Candidate class instead of this.)
-    final Set<EventProxy> events = new HashSet<EventProxy>();
-    for (final AutomatonProxy aut : automataOfNewModel) {
-      events.addAll(aut.getEvents());
-    }
-    return events;
   }
 
   /**
@@ -1086,6 +1060,13 @@ public class CompositionalGeneralisedConflictChecker extends
       final Set<AutomatonProxy> traceAutomata =
           new THashSet<AutomatonProxy>(conflictTrace.getAutomata());
       traceAutomata.remove(composed);
+
+      /*
+       * final ArrayList<AutomatonProxy> traceAutomata = new
+       * ArrayList<AutomatonProxy>(); for (final AutomatonProxy aut :
+       * conflictTrace.getAutomata()) { if (aut != composed) {
+       * traceAutomata.add(aut); } }
+       */
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
@@ -1113,11 +1094,6 @@ public class CompositionalGeneralisedConflictChecker extends
         } else {
           convertedSteps.add(step);
         }
-      }
-      // TODO This set is never read. Delete?
-      final Set<EventProxy> events = new HashSet<EventProxy>();
-      for (final AutomatonProxy aut : traceAutomata) {
-        events.addAll(aut.getEvents());
       }
       final ConflictTraceProxy convertedTrace =
           getFactory().createConflictTraceProxy(conflictTrace.getName(),
@@ -1193,10 +1169,13 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(convertedStep);
         }
       }
-      // TODO Change to ArrayList. Do not use remove().
-      final Set<AutomatonProxy> traceAutomata =
-          new THashSet<AutomatonProxy>(conflictTrace.getAutomata());
-      traceAutomata.remove(getResultAutomaton());
+      final ArrayList<AutomatonProxy> traceAutomata =
+          new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size());
+      for (final AutomatonProxy aut : conflictTrace.getAutomata()) {
+        if (aut != getResultAutomaton()) {
+          traceAutomata.add(aut);
+        }
+      }
       traceAutomata.add(getOriginalAutomaton());
       final ConflictTraceProxy convertedTrace =
           getFactory().createConflictTraceProxy(conflictTrace.getName(),
@@ -1756,10 +1735,13 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(convertedStep);
         }
       }
-      // TODO Change to ArrayList. Do not use remove().
-      final Set<AutomatonProxy> traceAutomata =
-          new THashSet<AutomatonProxy>(conflictTrace.getAutomata());
-      traceAutomata.remove(getResultAutomaton());
+      final ArrayList<AutomatonProxy> traceAutomata =
+          new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size());
+      for (final AutomatonProxy aut : conflictTrace.getAutomata()) {
+        if (aut != getResultAutomaton()) {
+          traceAutomata.add(aut);
+        }
+      }
       traceAutomata.add(getOriginalAutomaton());
       final ConflictTraceProxy convertedTrace =
           getFactory().createConflictTraceProxy(conflictTrace.getName(),
@@ -2030,7 +2012,6 @@ public class CompositionalGeneralisedConflictChecker extends
     private final int mEvent;
     private final SearchRecord mPredecessor;
   }
-
 
   // #########################################################################
   // # Data Members

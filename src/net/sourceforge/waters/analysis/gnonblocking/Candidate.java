@@ -31,12 +31,15 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public class Candidate implements Comparable<Candidate>
 {
 
-  //#########################################################################
-  //# Constructor
+  // #########################################################################
+  // # Constructor
   /**
    * Creates a new candidate.
-   * @param  autList      List of automata in candidate in defined order.
-   * @param  localEvents  Identified set of local events of this candidate.
+   *
+   * @param autList
+   *          List of automata in candidate in defined order.
+   * @param localEvents
+   *          Identified set of local events of this candidate.
    */
   public Candidate(final List<AutomatonProxy> autList,
                    final Set<EventProxy> localEvents)
@@ -46,11 +49,11 @@ public class Candidate implements Comparable<Candidate>
     countEvents();
   }
 
-
-  //#########################################################################
-  //# Simple Access
+  // #########################################################################
+  // # Simple Access
   /**
    * Gets the list of automata in this candidate.
+   *
    * @return List of automata in defined order as passed to constructor.
    */
   public List<AutomatonProxy> getAutomata()
@@ -60,8 +63,8 @@ public class Candidate implements Comparable<Candidate>
 
   /**
    * Gets the set of local events of this candidates.
-   * @return Set of events as passed to constructor.
-   *         Ordering may be randomised.
+   *
+   * @return Set of events as passed to constructor. Ordering may be randomised.
    */
   public Set<EventProxy> getLocalEvents()
   {
@@ -78,22 +81,22 @@ public class Candidate implements Comparable<Candidate>
 
   /**
    * Gets the total number of events of this candidate.
-   * @return The total number of distinct events found in all automata
-   *         of the candidate (not including propositions).
+   *
+   * @return The total number of distinct events found in all automata of the
+   *         candidate (not including propositions).
    */
   public int getNumberOfEvents()
   {
     return mEventCount;
   }
 
-
-  //#########################################################################
-  //# Interface java.util.Comparable<Candidate>
+  // #########################################################################
+  // # Interface java.util.Comparable<Candidate>
   /**
-   * Implements default candidate ordering.
-   * If both candidates have different numbers of automata, the candidate
-   * with fewer automata is considered smaller. If the number of automata
-   * is equal, the lists are compared lexicographically by automaton names.
+   * Implements default candidate ordering. If both candidates have different
+   * numbers of automata, the candidate with fewer automata is considered
+   * smaller. If the number of automata is equal, the lists are compared
+   * lexicographically by automaton names.
    */
   public int compareTo(final Candidate candidate)
   {
@@ -117,34 +120,34 @@ public class Candidate implements Comparable<Candidate>
     return 0;
   }
 
-
-  //#########################################################################
-  //# Overrides for java.lang.Object
+  // #########################################################################
+  // # Overrides for java.lang.Object
   public String toString()
   {
-    return getCompositionName(mAutomata);
+    return getCompositionName(mAutomata).replaceAll(":", "-");
   }
 
-
-  //#########################################################################
-  //# Model Creation
+  // #########################################################################
+  // # Model Creation
   /**
    * Creates a product DES containing all the automata and events in this
    * candidate.
-   * @param  factory   The factory to be used to create the proxies.
+   *
+   * @param factory
+   *          The factory to be used to create the proxies.
    */
-  public ProductDESProxy createProductDESProxy
-    (final ProductDESProxyFactory factory)
+  public ProductDESProxy createProductDESProxy(
+                                               final ProductDESProxyFactory factory)
   {
     final String name = toString();
     final Collection<EventProxy> events = getAllEvents();
-    return factory.createProductDESProxy
-      (name, "Automatically created from candidate.", null, events, mAutomata);
+    return factory
+        .createProductDESProxy(name, "Automatically created from candidate.",
+                               null, events, mAutomata);
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
+  // #########################################################################
+  // # Auxiliary Methods
   /**
    * Returns an ordered list of all events in the automata of this candidate,
    * including propositions.
@@ -177,9 +180,8 @@ public class Candidate implements Comparable<Candidate>
     mEventCount = events.size();
   }
 
-
-  //#########################################################################
-  //# Static Methods
+  // #########################################################################
+  // # Static Methods
   /**
    * Calculates a name that can be given to a synchronous product automaton.
    */
@@ -199,9 +201,8 @@ public class Candidate implements Comparable<Candidate>
     return buffer.toString();
   }
 
-
-  //#########################################################################
-  //# Invocation
+  // #########################################################################
+  // # Invocation
   private final List<AutomatonProxy> mAutomata;
   private final Set<EventProxy> mLocalEvents;
   private int mEventCount;
