@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -214,6 +215,20 @@ public abstract class TransitionListBuffer
   }
 
   /**
+   * Gets the total number of transitions currently stored in this buffer.
+   * As the number of transitions is not stored, this method is of linear
+   * complexity.
+   */
+  public int getNumberOfTransitions()
+  {
+    int count = 0;
+    for (final int list : mStateTransitions) {
+      count += getLength(list);
+    }
+    return count;
+  }
+
+  /**
    * Adds a transition to this buffer. The new transition is inserted in
    * front of any other transitions with the same from-state and event.
    * @param  from   The ID of the from-state of the new transition.
@@ -329,7 +344,7 @@ public abstract class TransitionListBuffer
   /**
    * Copies all transitions associated with the given source state to
    * the given destination state. This method rebuilds the transition list
-   * of the destination states so it contains any event-to-state pairs that
+   * of the destination state so it contains any event-to-state pairs that
    * originally are associated with at least one of the two states.
    * Duplicates are suppressed, and ordering is preserved such that
    * transitions originally associated with the source state appear
@@ -411,7 +426,7 @@ public abstract class TransitionListBuffer
    * @return <CODE>true</CODE> if at least one transition was removed;
    *         <CODE>false</CODE> otherwise.
    */
-  public boolean removeTransitions(final int from)
+  public boolean removeStateTransitions(final int from)
   {
     final int list = mStateTransitions[from];
     if (list == NULL) {
@@ -439,6 +454,149 @@ public abstract class TransitionListBuffer
       mStateTransitions[from] = NULL;
       return remove;
     }
+  }
+
+  /**
+   * Removes all transitions associated with the given event.
+   * @return <CODE>true</CODE> if at least one transition was removed;
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean removeEventTransitions(final int event)
+  {
+    final TransitionIterator iter = createModifyingIterator();
+    boolean remove = false;
+    for (int state = 0; state < getNumberOfStates(); state++) {
+      iter.reset(state, event);
+      if (iter.advance()) {
+        do {
+          iter.remove();
+        } while (iter.advance());
+        remove = true;
+      }
+    }
+    return remove;
+  }
+
+  /**
+   * Replaces an event by another.
+   * This method replaces all transitions with the given old event ID
+   * by transitions with the given new event ID. Any new transitions with the
+   * new event ID are inserted after any transitions already present in the
+   * lists.
+   * @param  old     The ID of the old event to be replaced.
+   * @param  new     The ID of the new event replacing the old event.
+   */
+  public void replaceEvent(final int oldID, final int newID)
+  {
+    if (newID >= mNumEvents) {
+      throw new IllegalArgumentException
+        ("New event ID " + newID + " out of range in " +
+         ProxyTools.getShortClassName(this) +
+         " (only configured for " + mNumEvents + " events)!");
+    }
+    final TIntHashSet successors = new TIntHashSet();
+    final TransitionIterator iter1 = createReadOnlyIterator();
+    final TransitionIterator iter2 = createModifyingIterator();
+    for (int state = 0; state < getNumberOfStates(); state++) {
+      final int oldCode = (state << mStateShift) | oldID;
+      int list = mStateEventTransitions.get(oldCode);
+      int next = getNext(list);
+      while (next != NULL) {
+        final int[] block = mBlocks.get(next >>> BLOCK_SHIFT);
+        final int offset = next & BLOCK_MASK;
+        final int data = block[offset + OFFSET_DATA];
+        final int e = data & mEventMask;
+        if (e != newID) {
+          break;
+        }
+        successors.add(data >>> mStateShift);
+        list = next;
+        next = block[offset + OFFSET_NEXT];
+      }
+      final int stateShifted = state << mStateShift;
+      iter1.reset(state, newID);
+      while (iter1.advance()) {
+        final int succ = iter1.getCurrentToState();
+        if (successors.add(succ)) {
+          final int code = stateShifted | oldID;
+          list = prepend(list, code);
+        }
+      }
+      iter2.reset(state, newID);
+      while (iter2.advance()) {
+        iter2.remove();
+      }
+    }
+  }
+
+  /**
+   * Determines whether the given event is globally disabled in this buffer.
+   * @param event
+   *          The ID of the event to be tested.
+   * @return <CODE>true</CODE> if the given event is disabled in every state.
+   */
+  public boolean isGloballyDisabled(final int event)
+  {
+    final TransitionIterator iter = createReadOnlyIterator();
+    for (int state = 0; state < getNumberOfStates(); state++) {
+      iter.reset(state, event);
+      if (iter.advance()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the given event is selflooped in this buffer.
+   * @param event
+   *          The ID of the event to be tested.
+   * @return <CODE>true</CODE> if the given event is selflooped in every state,
+   *         and appears on no other transitions.
+   */
+  public boolean isPureSelfloopEvent(final int event)
+  {
+    final TransitionIterator iter = createReadOnlyIterator();
+    for (int state = 0; state < getNumberOfStates(); state++) {
+      iter.reset(state, event);
+      if (iter.advance()) {
+        do {
+          if (iter.getCurrentToState() != state) {
+            return false;
+          }
+        } while (iter.advance());
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Helps to clean up tau selfloops.This method removes all selfloops
+   * associated with the given event and tests whether this results in
+   * the event being redundant.
+   * @param tau
+   *          The ID of the tau event to be removed.
+   * @return <CODE>true</CODE> if all transitions with the given event
+   *         were selfloops and have been removed, <CODE>false</CODE>
+   *         otherwise.
+   */
+  public boolean removeTauSelfloops(final int tau)
+  {
+    boolean removable = true;
+    final TransitionIterator iter = createReadOnlyIterator();
+    for (int state = 0; state < getNumberOfStates(); state++) {
+      iter.reset(state, tau);
+      while (iter.advance()) {
+        if (iter.getCurrentToState() == state) {
+          iter.remove();
+        } else {
+          removable = false;
+        }
+      }
+    }
+    return removable;
   }
 
 
@@ -476,7 +634,7 @@ public abstract class TransitionListBuffer
    * Creates a read-only iterator for this buffer that is set up to iterate
    * over the transitions associated with the given from-state and event.
    * The iterator returned produces all transitions with the given-from-state
-   * and event in the buffer's defined ordering, no matter what event they use.
+   * and event in the buffer's defined ordering.
    * Being a read-only iterator, it does not implement the
    * {@link TransitionIterator#remove()} method.
    */
@@ -502,7 +660,7 @@ public abstract class TransitionListBuffer
   /**
    * Creates a read/write iterator for this buffer that is set up to
    * iterate over the transitions associated with the given from-state.
-   * The iterator returned produces all transitions with the given-from-state
+   * The iterator returned produces all transitions with the given from-state
    * in the buffer's defined ordering, no matter what event they use.
    */
   public TransitionIterator createModifyingIterator(final int state)
@@ -515,8 +673,8 @@ public abstract class TransitionListBuffer
   /**
    * Creates a read/write iterator for this buffer that is set up to iterate
    * over the transitions associated with the given from-state and event.
-   * The iterator returned produces all transitions with the given-from-state
-   * and event in the buffer's defined ordering, no matter what event they use.
+   * The iterator returned produces all transitions with the given from-state
+   * and event in the buffer's defined ordering.
    */
   public TransitionIterator createModifyingIterator(final int state,
                                                     final int event)
@@ -590,6 +748,19 @@ public abstract class TransitionListBuffer
     return pair;
   }
 
+  public int getLength(final int list)
+  {
+    if (list == NULL) {
+      return 0;
+    } else {
+      int count = 0;
+      for (int next = getNext(list); next != NULL; next = getNext(next)) {
+        count++;
+      }
+      return count;
+    }
+  }
+
   private boolean contains(final int list, final int data)
   {
     final int event = data & mEventMask;
@@ -641,6 +812,11 @@ public abstract class TransitionListBuffer
 
   //#########################################################################
   //# Auxiliary Methods
+  private int getNumberOfStates()
+  {
+    return mStateTransitions.length;
+  }
+
   @SuppressWarnings("unused")
   private int getState(final int list)
   {
