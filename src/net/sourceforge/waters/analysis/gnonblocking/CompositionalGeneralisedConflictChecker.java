@@ -546,8 +546,8 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private Candidate evaluateCandidates(Collection<Candidate> candidates)
   {
-    // TODO Fix bug. This method always returns the first element of
-    // the original list of candidates.
+    // TODO Change all candidate collections to List type. Avoid copying
+    // in this method. Ensure determinism.
     final ListIterator<SelectingHeuristic> iter =
         mSelectingHeuristics.listIterator();
     List<Candidate> selectedCandidates = new ArrayList<Candidate>(candidates);
@@ -1062,7 +1062,7 @@ public class CompositionalGeneralisedConflictChecker extends
       traceAutomata.remove(composed);
 
       /*
-       * final ArrayList<AutomatonProxy> traceAutomata = new
+       * final List<AutomatonProxy> traceAutomata = new
        * ArrayList<AutomatonProxy>(); for (final AutomatonProxy aut :
        * conflictTrace.getAutomata()) { if (aut != composed) {
        * traceAutomata.add(aut); } }
@@ -1169,7 +1169,7 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(convertedStep);
         }
       }
-      final ArrayList<AutomatonProxy> traceAutomata =
+      final List<AutomatonProxy> traceAutomata =
           new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size());
       for (final AutomatonProxy aut : conflictTrace.getAutomata()) {
         if (aut != getResultAutomaton()) {
@@ -1735,7 +1735,7 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(convertedStep);
         }
       }
-      final ArrayList<AutomatonProxy> traceAutomata =
+      final List<AutomatonProxy> traceAutomata =
           new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size());
       for (final AutomatonProxy aut : conflictTrace.getAutomata()) {
         if (aut != getResultAutomaton()) {
