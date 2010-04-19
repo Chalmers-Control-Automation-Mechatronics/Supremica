@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.op;
 
+import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TObjectIntHashMap;
 
@@ -36,6 +37,7 @@ public abstract class TransitionListBuffer
   //# Constructors
   public TransitionListBuffer(final int numEvents, final int numStates)
   {
+    mNumEvents = numEvents;
     mStateShift = AutomatonTools.log2(numStates);
     mEventMask = (1 << mStateShift) - 1;
     mBlocks = new ArrayList<int[]>();
@@ -123,6 +125,75 @@ public abstract class TransitionListBuffer
    * subclasses to handle forward and backward transition buffers uniformly.
    */
   public abstract StateProxy getToState(TransitionProxy trans);
+
+
+  public void merge(final List<int[]> partition, final int tau)
+  {
+    final int[] recoding = new int[mStateTransitions.length];
+    int code = 0;
+    int size = 0;
+    for (final int[] clazz : partition) {
+      for (final int state : clazz) {
+        recoding[state] = code;
+      }
+      code++;
+      if (clazz.length > size) {
+        size = clazz.length;
+      }
+    }
+    final int[] newStateTransitions = new int[code];
+    mStateEventTransitions.clear();
+    final int[] iter = new int[size];
+    final TIntHashSet successors = new TIntHashSet(partition.size());
+    int from = 0;
+    int list = NULL;
+    for (final int[] clazz : partition) {
+      size = clazz.length;
+      for (int i = 0; i < size; i++) {
+        final int oldState = clazz[i];
+        final int oldList = mStateTransitions[oldState];
+        iter[i] = getNext(oldList);
+      }
+      final int fromShift = from << mStateShift;
+      for (int e = 0; e < mNumEvents; e++) {
+        successors.clear();
+        for (int i = 0; i < size; i++) {
+          int current = iter[i];
+          while (current != NULL) {
+            final int[] block = mBlocks.get(current >>> BLOCK_SHIFT);
+            final int offset = current & BLOCK_MASK;
+            final int data = block[offset + OFFSET_DATA];
+            if ((data & mEventMask) != e) {
+              break;
+            }
+            final int to = recoding[data >>> mStateShift];
+            if (e == tau && from == to) {
+              // Nothing --- suppress tau selfloop.
+            } else if (successors.add(to)) {
+              if (list == NULL) {
+                newStateTransitions[from] = list = createList();
+              }
+              if (successors.size() == 1) {
+                final int fromCode = fromShift | e;
+                mStateEventTransitions.put(fromCode, list);
+              }
+              list = prepend(list, (to << mStateShift) | e);
+            }
+            final int next = block[offset + OFFSET_NEXT];
+            if (next == NULL) {
+              block[offset + OFFSET_NEXT] = mRecycleStart;
+              final int oldState = clazz[i];
+              mRecycleStart = mStateTransitions[oldState];
+            }
+            current = next;
+          }
+          iter[i] = current;
+        }
+      }
+      from++;
+    }
+    mStateTransitions = newStateTransitions;
+  }
 
 
   //#########################################################################
@@ -213,7 +284,7 @@ public abstract class TransitionListBuffer
     boolean first = true;
     int next = getNext(list);
     while (next != NULL) {
-      final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
+      final int[] block = mBlocks.get(next >>> BLOCK_SHIFT);
       final int offset = next & BLOCK_MASK;
       final int data = block[offset + OFFSET_DATA];
       if (data == toCode) {
@@ -253,6 +324,121 @@ public abstract class TransitionListBuffer
       first = false;
     }
     return false;
+  }
+
+  /**
+   * Copies all transitions associated with the given source state to
+   * the given destination state. This method rebuilds the transition list
+   * of the destination states so it contains any event-to-state pairs that
+   * originally are associated with at least one of the two states.
+   * Duplicates are suppressed, and ordering is preserved such that
+   * transitions originally associated with the source state appear
+   * earlier in the resultant list.
+   * @param  source   From-state containing transitions to be copied.
+   * @param  dest     From-state to receive transitions.
+   * @return <CODE>true</CODE> if at least one transition was copied;
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean copyTransitions(final int source, final int dest)
+  {
+    int list2 = mStateTransitions[dest];
+    if (list2 == NULL) {
+      return false;
+    }
+    list2 = getNext(list2);
+    final int fromShift1 = source << mStateShift;
+    int list1 = mStateTransitions[source];
+    list1 = getNext(list1);
+    int end1 = list1;
+    int list = NULL;
+    final TIntHashSet successors = new TIntHashSet();
+    int e0 = -1;
+    int data1 = 0;
+    int data2 = 0;
+    boolean copied = false;
+    while (list1 != NULL || list2 != NULL) {
+      final int e1;
+      if (list1 == NULL) {
+        e1 = Integer.MAX_VALUE;
+      } else {
+        data1 = getData(list1);
+        e1 = data1 & mEventMask;
+      }
+      final int e2;
+      if (list2 == NULL) {
+        e2 = Integer.MAX_VALUE;
+      } else {
+        data2 = getData(list2);
+        e2 = data2 & mEventMask;
+      }
+      final int e;
+      final int data;
+      if (e1 <= e2) {
+        e = e1;
+        data = data1;
+        end1 = list1;
+        list1 = getNext(list1);
+      } else {
+        e = e2;
+        data = data2;
+        list2 = getNext(list2);
+        copied = true;
+      }
+      final int to = data >> mStateShift;
+      if (e != e0) {
+        successors.clear();
+        successors.add(to);
+        e0 = e;
+      } else if (!successors.add(to)) {
+        continue;
+      }
+      if (list == NULL) {
+        list = createList();
+      }
+      if (successors.size() == 1) {
+        mStateEventTransitions.put(fromShift1 | e, list);
+      }
+      list = prepend(list, data);
+    }
+    setNext(end1, mRecycleStart);
+    mRecycleStart = mStateTransitions[source];
+    mStateTransitions[source] = list;
+    return copied;
+  }
+
+  /**
+   * Removes all transitions associated with the given from-state.
+   * @return <CODE>true</CODE> if at least one transition was removed;
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean removeTransitions(final int from)
+  {
+    final int list = mStateTransitions[from];
+    if (list == NULL) {
+      return false;
+    } else {
+      final int fromShift = from << mStateShift;
+      int current = list;
+      int next = getNext(current);
+      int e0 = -1;
+      final boolean remove = next != NULL;
+      while (next != NULL) {
+        current = next;
+        final int[] block = mBlocks.get(current >>> BLOCK_SHIFT);
+        final int offset = current & BLOCK_MASK;
+        final int data = block[offset + OFFSET_DATA];
+        final int e = data & mEventMask;
+        if (e != e0) {
+          mStateEventTransitions.remove(fromShift | e);
+          e0 = e;
+        }
+        next = block[offset + OFFSET_NEXT];
+      }
+      setNext(current, mRecycleStart);
+      mRecycleStart = list;
+      mStateTransitions[from] = NULL;
+      return remove;
+    }
   }
 
 
@@ -320,7 +506,7 @@ public abstract class TransitionListBuffer
     final int event = data & mEventMask;
     int next = getNext(list);
     while (next != NULL) {
-      final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
+      final int[] block = mBlocks.get(next >>> BLOCK_SHIFT);
       final int offset = next & BLOCK_MASK;
       final int found = block[offset + OFFSET_DATA];
       if (found == data) {
@@ -351,7 +537,7 @@ public abstract class TransitionListBuffer
   {
     int next = getNext(list);
     while (next != NULL) {
-      final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
+      final int[] block = mBlocks.get(next >>> BLOCK_SHIFT);
       final int offset = next & BLOCK_MASK;
       final int data = block[offset + OFFSET_DATA];
       if ((data & mEventMask) >= event) {
@@ -369,7 +555,7 @@ public abstract class TransitionListBuffer
   @SuppressWarnings("unused")
   private int getState(final int list)
   {
-    return getData(list) >> mStateShift;
+    return getData(list) >>> mStateShift;
   }
 
   private int getEvent(final int list)
@@ -379,25 +565,25 @@ public abstract class TransitionListBuffer
 
   private int getData(final int list)
   {
-    final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
+    final int[] block = mBlocks.get(list >>> BLOCK_SHIFT);
     return block[(list & BLOCK_MASK) + OFFSET_DATA];
   }
 
   private int getNext(final int list)
   {
-    final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
+    final int[] block = mBlocks.get(list >>> BLOCK_SHIFT);
     return block[(list & BLOCK_MASK) + OFFSET_NEXT];
   }
 
   private void setNext(final int list, final int next)
   {
-    final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
+    final int[] block = mBlocks.get(list >>> BLOCK_SHIFT);
     block[(list & BLOCK_MASK) + OFFSET_NEXT] = next;
   }
 
   private void setDataAndNext(final int list, final int data, final int next)
   {
-    final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
+    final int[] block = mBlocks.get(list >>> BLOCK_SHIFT);
     final int offset = list & BLOCK_MASK;
     block[offset + OFFSET_NEXT] = next;
     block[offset + OFFSET_DATA] = data;
@@ -479,7 +665,7 @@ public abstract class TransitionListBuffer
 
     public int getCurrentState()
     {
-      return getCurrentData() >> mStateShift;
+      return getCurrentData() >>> mStateShift;
     }
 
     public void remove()
@@ -567,7 +753,7 @@ public abstract class TransitionListBuffer
         throw new IllegalStateException
           ("Attempting to remove nonexistent element in TransitionListBuffer!");
       }
-      final int[] block = mBlocks.get(current >> BLOCK_SHIFT);
+      final int[] block = mBlocks.get(current >>> BLOCK_SHIFT);
       final int offset = current & BLOCK_MASK;
       final int next = block[offset + OFFSET_NEXT];
       setNext(mPrevious, next);
@@ -665,10 +851,11 @@ public abstract class TransitionListBuffer
 
   //#########################################################################
   //# Data Members
+  private final int mNumEvents;
   private final int mStateShift;
   private final int mEventMask;
   private final List<int[]> mBlocks;
-  private final int[] mStateTransitions;
+  private int[] mStateTransitions;
   private final TIntIntHashMap mStateEventTransitions;
 
   private int mRecycleStart;
