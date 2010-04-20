@@ -26,6 +26,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -74,18 +75,17 @@ public abstract class TransitionListBuffer
    * Creates a new transition list buffer.
    * The transition buffer is set up for a fixed number of states and events,
    * which defines an encoding and can no more be changed.
-   * @param  numEvents   The number of events the transition buffer can handle.
-   * @param  numStates   The number of states the new transition buffer can
-   *                     handle.
    * @throws OverflowException if the encoding for states and events does
    *         not fit in the 32 bits available.
    */
-  public TransitionListBuffer(final int numEvents, final int numStates)
+  public TransitionListBuffer(final EventEncoding eventEnc,
+                              final StateEncoding stateEnc)
     throws OverflowException
   {
-    mNumEvents = numEvents;
+    final int numStates = stateEnc.getNumberOfStates();
+    mNumEvents = eventEnc.getNumberOfProperEvents();
     mStateShift = AutomatonTools.log2(numStates);
-    final int numBits = mStateShift + AutomatonTools.log2(numEvents);
+    final int numBits = mStateShift + AutomatonTools.log2(mNumEvents);
     if (numBits > 32) {
       throw new OverflowException
         ("Encoding requires " + numBits + " bits for states + events, but " +
@@ -103,148 +103,10 @@ public abstract class TransitionListBuffer
 
 
   //#########################################################################
-  //# Automata Conversion Methods
-  /**
-   * Initialises this transition buffer with transitions from a given list.
-   * This method replaces all transitions in the buffer by given transitions.
-   * Transitions are added in a fixed order that is determined from the
-   * given state and event encoding.
-   * The method assumes that this transition buffer is empty when called,
-   * if this is not the case, transitions will be overwritten without
-   * releasing all memory. To correctly replace transitions in a used buffer,
-   * call {@link #clear()} first.
-   * @param  transitions  List of transitions to populate the new buffer.
-   *                      The list will be reordered to match the order
-   *                      chosen by the buffer.
-   * @param  stateMap     State encoding map, assigns to each state used by
-   *                      the given transitions an integer to encode it.
-   *                      The state code must be within the range of valid
-   *                      state codes passed to the constructor.
-   * @param  eventMap     Event encoding map, assigns to each event used by
-   *                      the given transitions an integer to encode it.
-   *                      The event code must be within the range of valid
-   *                      event codes passed to the constructor.
-   */
-  public void setUpTransitions(final List<TransitionProxy> transitions,
-                               final TObjectIntHashMap<StateProxy> stateMap,
-                               final TObjectIntHashMap<EventProxy> eventMap)
+  //# Simple Access
+  public int getNumberOfEvents()
   {
-    final Comparator<TransitionProxy> comparator =
-      new TransitionComparator(stateMap, eventMap);
-    Collections.sort(transitions, comparator);
-    int from0 = -1;
-    int e0 = -1;
-    int toCode0 = -1;
-    int list = NULL;
-    for (final TransitionProxy trans : transitions) {
-      final StateProxy fromState = getFromState(trans);
-      final int from = stateMap.get(fromState);
-      final EventProxy event = trans.getEvent();
-      final int e = eventMap.get(event);
-      final StateProxy toState = getToState(trans);
-      final int to = stateMap.get(toState);
-      final int toCode = (to << mStateShift) | e;
-      if (from != from0) {
-        mStateTransitions[from] = list = createList();
-        final int fromCode = (from << mStateShift) | e;
-        mStateEventTransitions.put(fromCode, list);
-        from0 = from;
-        e0 = e;
-      } else if (toCode0 == toCode) {
-        continue;
-      } else if (e0 != e) {
-        final int fromCode = (from << mStateShift) | e;
-        mStateEventTransitions.put(fromCode, list);
-        e0 = e;
-      }
-      toCode0 = toCode;
-      list = prepend(list, toCode);
-    }
-  }
-
-  /**
-   * Gets the from-state for the given transition. This method is used by
-   * {@link #setUpTransitions(List,TObjectIntHashMap,TObjectIntHashMap)
-   * setUpTransitions()} to interpret transitions. It is overridden by
-   * subclasses to handle forward and backward transition buffers uniformly.
-   */
-  public abstract StateProxy getFromState(TransitionProxy trans);
-
-  /**
-   * Gets the to-state for the given transition. This method is used by
-   * {@link #setUpTransitions(List,TObjectIntHashMap,TObjectIntHashMap)
-   * setUpTransitions()} to interpret transitions. It is overridden by
-   * subclasses to handle forward and backward transition buffers uniformly.
-   */
-  public abstract StateProxy getToState(TransitionProxy trans);
-
-
-  public void merge(final List<int[]> partition, final int tau)
-  {
-    final int[] recoding = new int[mStateTransitions.length];
-    int code = 0;
-    int size = 0;
-    for (final int[] clazz : partition) {
-      for (final int state : clazz) {
-        recoding[state] = code;
-      }
-      code++;
-      if (clazz.length > size) {
-        size = clazz.length;
-      }
-    }
-    final int[] newStateTransitions = new int[code];
-    mStateEventTransitions.clear();
-    final int[] iter = new int[size];
-    final TIntHashSet successors = new TIntHashSet(partition.size());
-    int from = 0;
-    int list = NULL;
-    for (final int[] clazz : partition) {
-      size = clazz.length;
-      for (int i = 0; i < size; i++) {
-        final int oldState = clazz[i];
-        final int oldList = mStateTransitions[oldState];
-        iter[i] = getNext(oldList);
-      }
-      final int fromShift = from << mStateShift;
-      for (int e = 0; e < mNumEvents; e++) {
-        successors.clear();
-        for (int i = 0; i < size; i++) {
-          int current = iter[i];
-          while (current != NULL) {
-            final int[] block = mBlocks.get(current >>> BLOCK_SHIFT);
-            final int offset = current & BLOCK_MASK;
-            final int data = block[offset + OFFSET_DATA];
-            if ((data & mEventMask) != e) {
-              break;
-            }
-            final int to = recoding[data >>> mStateShift];
-            if (e == tau && from == to) {
-              // Nothing --- suppress tau selfloop.
-            } else if (successors.add(to)) {
-              if (list == NULL) {
-                newStateTransitions[from] = list = createList();
-              }
-              if (successors.size() == 1) {
-                final int fromCode = fromShift | e;
-                mStateEventTransitions.put(fromCode, list);
-              }
-              list = prepend(list, (to << mStateShift) | e);
-            }
-            final int next = block[offset + OFFSET_NEXT];
-            if (next == NULL) {
-              block[offset + OFFSET_NEXT] = mRecycleStart;
-              final int oldState = clazz[i];
-              mRecycleStart = mStateTransitions[oldState];
-            }
-            current = next;
-          }
-          iter[i] = current;
-        }
-      }
-      from++;
-    }
-    mStateTransitions = newStateTransitions;
+    return mNumEvents;
   }
 
 
@@ -782,6 +644,158 @@ public abstract class TransitionListBuffer
 
 
   //#########################################################################
+  //# Automata Conversion Methods
+  /**
+   * Initialises this transition buffer with transitions from a given list.
+   * This method replaces all transitions in the buffer by given transitions.
+   * Transitions are added in a fixed order that is determined from the
+   * given state and event encoding.
+   * The method assumes that this transition buffer is empty when called,
+   * if this is not the case, transitions will be overwritten without
+   * releasing all memory. To correctly replace transitions in a used buffer,
+   * call {@link #clear()} first.
+   * @param  transitions  List of transitions to populate the new buffer.
+   *                      The list will be reordered to match the order
+   *                      chosen by the buffer.
+   */
+  public void setUpTransitions(final List<TransitionProxy> transitions,
+                               final EventEncoding eventEnc,
+                               final StateEncoding stateEnc)
+  {
+    final Comparator<TransitionProxy> comparator =
+      new TransitionComparator(eventEnc, stateEnc);
+    Collections.sort(transitions, comparator);
+    int from0 = -1;
+    int e0 = -1;
+    int toCode0 = -1;
+    int list = NULL;
+    for (final TransitionProxy trans : transitions) {
+      final EventProxy event = trans.getEvent();
+      final int e = eventEnc.getEventCode(event);
+      if (e >= 0) {
+        final StateProxy fromState = getFromState(trans);
+        final int from = stateEnc.getStateCode(fromState);
+        final StateProxy toState = getToState(trans);
+        final int to = stateEnc.getStateCode(toState);
+        final int toCode = (to << mStateShift) | e;
+        if (from != from0) {
+          mStateTransitions[from] = list = createList();
+          final int fromCode = (from << mStateShift) | e;
+          mStateEventTransitions.put(fromCode, list);
+          from0 = from;
+          e0 = e;
+        } else if (toCode0 == toCode) {
+          continue;
+        } else if (e0 != e) {
+          final int fromCode = (from << mStateShift) | e;
+          mStateEventTransitions.put(fromCode, list);
+          e0 = e;
+        }
+        toCode0 = toCode;
+        list = prepend(list, toCode);
+      }
+    }
+    final List<EventProxy> extra = eventEnc.getExtraSelfloops();
+    if (extra != null) {
+      final int numStates = getNumberOfStates();
+      for (final EventProxy event : extra) {
+        if (event.getKind() != EventKind.PROPOSITION) {
+          final int e = eventEnc.getEventCode(event);
+          for (int s = 0; s < numStates; s++) {
+            addTransition(s, e, s);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Gets the from-state for the given transition. This method is used by
+   * {@link #setUpTransitions(List,TObjectIntHashMap,TObjectIntHashMap)
+   * setUpTransitions()} to interpret transitions. It is overridden by
+   * subclasses to handle forward and backward transition buffers uniformly.
+   */
+  public abstract StateProxy getFromState(TransitionProxy trans);
+
+  /**
+   * Gets the to-state for the given transition. This method is used by
+   * {@link #setUpTransitions(List,TObjectIntHashMap,TObjectIntHashMap)
+   * setUpTransitions()} to interpret transitions. It is overridden by
+   * subclasses to handle forward and backward transition buffers uniformly.
+   */
+  public abstract StateProxy getToState(TransitionProxy trans);
+
+
+  public void merge(final List<int[]> partition, final int tau)
+  {
+    final int[] recoding = new int[mStateTransitions.length];
+    int code = 0;
+    int size = 0;
+    for (final int[] clazz : partition) {
+      for (final int state : clazz) {
+        recoding[state] = code;
+      }
+      code++;
+      if (clazz.length > size) {
+        size = clazz.length;
+      }
+    }
+    final int[] newStateTransitions = new int[code];
+    mStateEventTransitions.clear();
+    final int[] iter = new int[size];
+    final TIntHashSet successors = new TIntHashSet(partition.size());
+    int from = 0;
+    int list = NULL;
+    for (final int[] clazz : partition) {
+      size = clazz.length;
+      for (int i = 0; i < size; i++) {
+        final int oldState = clazz[i];
+        final int oldList = mStateTransitions[oldState];
+        iter[i] = getNext(oldList);
+      }
+      final int fromShift = from << mStateShift;
+      for (int e = 0; e < mNumEvents; e++) {
+        successors.clear();
+        for (int i = 0; i < size; i++) {
+          int current = iter[i];
+          while (current != NULL) {
+            final int[] block = mBlocks.get(current >>> BLOCK_SHIFT);
+            final int offset = current & BLOCK_MASK;
+            final int data = block[offset + OFFSET_DATA];
+            if ((data & mEventMask) != e) {
+              break;
+            }
+            final int to = recoding[data >>> mStateShift];
+            if (e == tau && from == to) {
+              // Nothing --- suppress tau selfloop.
+            } else if (successors.add(to)) {
+              if (list == NULL) {
+                newStateTransitions[from] = list = createList();
+              }
+              if (successors.size() == 1) {
+                final int fromCode = fromShift | e;
+                mStateEventTransitions.put(fromCode, list);
+              }
+              list = prepend(list, (to << mStateShift) | e);
+            }
+            final int next = block[offset + OFFSET_NEXT];
+            if (next == NULL) {
+              block[offset + OFFSET_NEXT] = mRecycleStart;
+              final int oldState = clazz[i];
+              mRecycleStart = mStateTransitions[oldState];
+            }
+            current = next;
+          }
+          iter[i] = current;
+        }
+      }
+      from++;
+    }
+    mStateTransitions = newStateTransitions;
+  }
+
+
+  //#########################################################################
   //# Raw List Access Methods
   private int createList()
   {
@@ -1249,11 +1263,11 @@ public abstract class TransitionListBuffer
 
     //#######################################################################
     //# Constructor
-    private TransitionComparator(final TObjectIntHashMap<StateProxy> stateMap,
-                                 final TObjectIntHashMap<EventProxy> eventMap)
+    private TransitionComparator(final EventEncoding eventEnc,
+                                 final StateEncoding stateEnc)
     {
-      mStateMap = stateMap;
-      mEventMap = eventMap;
+      mEventEncoding = eventEnc;
+      mStateEncoding = stateEnc;
     }
 
     //#######################################################################
@@ -1263,25 +1277,28 @@ public abstract class TransitionListBuffer
     {
       final StateProxy from1 = getFromState(trans1);
       final StateProxy from2 = getFromState(trans2);
-      int delta = mStateMap.get(from1) - mStateMap.get(from2);
+      int delta = mStateEncoding.getStateCode(from1) -
+                  mStateEncoding.getStateCode(from2);
       if (delta != 0) {
         return delta;
       }
       final EventProxy event1 = trans1.getEvent();
       final EventProxy event2 = trans2.getEvent();
-      delta = mEventMap.get(event1) - mEventMap.get(event2);
+      delta = mEventEncoding.getEventCode(event1) -
+              mEventEncoding.getEventCode(event2);
       if (delta != 0) {
         return delta;
       }
       final StateProxy to1 = getToState(trans1);
       final StateProxy to2 = getToState(trans2);
-      return mStateMap.get(to1) - mStateMap.get(to2);
+      return mStateEncoding.getStateCode(to1) -
+             mStateEncoding.getStateCode(to2);
     }
 
     //#######################################################################
     //# Data Members
-    private final TObjectIntHashMap<StateProxy> mStateMap;
-    private final TObjectIntHashMap<EventProxy> mEventMap;
+    private final EventEncoding mEventEncoding;
+    private final StateEncoding mStateEncoding;
 
   }
 

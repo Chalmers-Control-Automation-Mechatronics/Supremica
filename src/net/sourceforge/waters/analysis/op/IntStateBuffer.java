@@ -9,14 +9,13 @@
 
 package net.sourceforge.waters.analysis.op;
 
-import gnu.trove.TObjectIntHashMap;
-
-import java.util.Collection;
+import java.util.List;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
  * @author Robi Malik
@@ -28,55 +27,42 @@ public class IntStateBuffer
   //# Constructors
   /**
    * Creates a new state buffer.
-   * @param  states   The original state objects to define the buffer states.
-   *                  State codes will be assigned in the order in which they
-   *                  appear in this collection.
-   * @param  propMap  A map defining the encoding of propositions. The map
-   *                  should assign an integer in the range from 0 to&nbsp;29
-   *                  to each proposition to be represented. Propositions
-   *                  without map entry will be suppressed. The map should
-   *                  only contain relevant propositions, otherwise the number
-   *                  of propositions will be estimated incorrectly.
-   * @throws OverflowException if the proposition map has more than 30 entries.
+   * @throws OverflowException if the event encoding map has more than 30
+   *                  propositions.
    */
-  public IntStateBuffer(final Collection<StateProxy> states,
-                        final TObjectIntHashMap<EventProxy> propMap)
+  public IntStateBuffer(final EventEncoding eventEnc,
+                        final StateEncoding stateEnc)
     throws OverflowException
   {
-    this(states, propMap, propMap.size());
-  }
-
-  /**
-   * Creates a new state buffer.
-   * @param  states   The original state objects to define the buffer states.
-   *                  State codes will be assigned in the order in which they
-   *                  appear in this collection.
-   * @param  propMap  A map defining the encoding of propositions. The map
-   *                  should assign an integer in the range from 0
-   *                  to&nbsp;(numProps-1) to each proposition to be
-   *                  represented. Propositions without map entry will be
-   *                  suppressed. It may contain entries for other events.
-   * @param  numProps The number of propositions to be represented.
-   * @throws OverflowException if the numProps parameter is greater or
-   *                  equal to&nbsp;30.
-   */
-  public IntStateBuffer(final Collection<StateProxy> states,
-                        final TObjectIntHashMap<EventProxy> propMap,
-                        final int numProps)
-    throws OverflowException
-  {
+    final int numProps = eventEnc.getNumberOfPropositions();
     if (numProps > MAX_PROPOSITIONS) {
       throw new OverflowException
-        (ProxyTools.getShortClassName(this) + " can only handle up to " +
+        ("Encoding has " + numProps + " propositions, but " +
+         ProxyTools.getShortClassName(this) + " can only handle up to " +
          MAX_PROPOSITIONS + " different propositions!");
     }
-    mStateInfo = new int[states.size()];
+    int tags0 = TAG_REACHABLE;
+    final List<EventProxy> extra = eventEnc.getExtraSelfloops();
+    if (extra != null) {
+      for (final EventProxy event : extra) {
+        if (event.getKind() == EventKind.PROPOSITION) {
+          final int code = eventEnc.getEventCode(event);
+          tags0 |= (1 << code);
+        }
+      }
+    }
+    final int numStates = stateEnc.getNumberOfStates();
+    mStateInfo = new int[numStates];
     int i = 0;
-    for (final StateProxy state : states) {
-      int tags = state.isInitial() ? TAG_ALL : TAG_REACHABLE;
-      for (final EventProxy prop : state.getPropositions()) {
-        if (propMap.containsKey(prop)) {
-          tags |= 1 << propMap.get(prop);
+    for (final StateProxy state : stateEnc.getStates()) {
+      int tags = tags0;
+      if (state.isInitial()) {
+        tags |= TAG_INITIAL;
+      }
+      for (final EventProxy event : state.getPropositions()) {
+        final int code = eventEnc.getEventCode(event);
+        if (code >= 0) {
+          tags |= 1 << code;
         }
       }
       mStateInfo[i++] = tags;
@@ -86,6 +72,11 @@ public class IntStateBuffer
 
   //#########################################################################
   //# Simple Access
+  public int getNumberOfStates()
+  {
+    return mStateInfo.length;
+  }
+
   public boolean isInitial(final int state)
   {
     return (mStateInfo[state] & TAG_INITIAL) != 0;
@@ -141,21 +132,6 @@ public class IntStateBuffer
   public void copyMarkings(final int source, final int dest)
   {
     mStateInfo[dest] |= (mStateInfo[source] & ~TAG_ALL);
-  }
-
-  public void addProposition(final int prop, final boolean markStates)
-    throws OverflowException
-  {
-    if (prop >= MAX_PROPOSITIONS) {
-      throw new OverflowException
-        (ProxyTools.getShortClassName(this) + " can only handle up to " +
-         MAX_PROPOSITIONS + " different propositions!");
-    } else if (markStates) {
-      final int tag = 1 << prop;
-      for (int i = 0; i < mStateInfo.length; i++) {
-        mStateInfo[i] |= tag;
-      }
-    }
   }
 
 

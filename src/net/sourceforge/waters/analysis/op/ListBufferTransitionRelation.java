@@ -10,9 +10,8 @@
 package net.sourceforge.waters.analysis.op;
 
 import gnu.trove.TLongObjectHashMap;
-import gnu.trove.TObjectIntHashMap;
-
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -36,76 +35,57 @@ public class ListBufferTransitionRelation
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new transition relation from the given automaton.
+   * Creates a new transition relation from the given automaton,
+   * using default (temporary) state and event encodings.
+   * @throws OverflowException if the automaton's number of states and events
+   *         is too large to be encoded in the bit sizes used by the
+   *         list buffer implementations.
+   * @throws IllegalArgumentException if the given configuration does not
+   *         specify an incoming or outgoing transition buffer.
    */
-  public ListBufferTransitionRelation(final AutomatonProxy aut)
+  public ListBufferTransitionRelation(final AutomatonProxy aut,
+                                      final int config)
     throws OverflowException
   {
-    this(aut, null);
+    this(aut, new EventEncoding(aut), new StateEncoding(aut), config);
   }
 
   /**
-   * Creates a new transition relation from the given automaton.
-   * @param allProps    The propositions to be used. If non-null, only
-   *                    propositions in this collection will be included in
-   *                    the new transition relation. If null, all propositions
-   *                    of the automaton will be used.
+   * Creates a new transition relation from the given automaton,
+   * using the given state and event encoding.
+   * @throws OverflowException if the given number of states and events
+   *         is too large to be encoded in the bit sizes used by the
+   *         list buffer implementations.
+   * @throws IllegalArgumentException if the given configuration does not
+   *         specify an incoming or outgoing transition buffer.
    */
   public ListBufferTransitionRelation
-    (final AutomatonProxy aut, final Collection<EventProxy> allProps)
+    (final AutomatonProxy aut,
+     final EventEncoding eventEnc,
+     final StateEncoding stateEnc,
+     final int config)
     throws OverflowException
   {
+    checkConfig(config);
     mName = aut.getName();
     mKind = aut.getKind();
-
-    final Collection<EventProxy> events = aut.getEvents();
-    final int numEvents = events.size();
-    mProperEvents = new ArrayList<EventProxy>(numEvents);
-    mPropositions = new ArrayList<EventProxy>(numEvents);
-    mEventsMap = new TObjectIntHashMap<EventProxy>(numEvents);
-    for (final EventProxy event : events) {
-      switch (event.getKind()) {
-      case CONTROLLABLE:
-      case UNCONTROLLABLE:
-        final int e = mProperEvents.size();
-        mEventsMap.put(event, e);
-        mProperEvents.add(event);
-        break;
-      case PROPOSITION:
-        if (allProps == null || allProps.contains(event)) {
-          final int p = mPropositions.size();
-          mEventsMap.put(event, p);
-          mPropositions.add(event);
-        }
-        break;
-      default:
-        break;
-      }
-    }
-
-    final Collection<StateProxy> states = aut.getStates();
-    final int numStates = states.size();
-    final int numProps = mPropositions.size();
-    mOriginalStates = new StateProxy[numStates];
-    mOriginalStatesMap = new TObjectIntHashMap<StateProxy>(numStates);
-    int s = 0;
-    for (final StateProxy state : states) {
-      mOriginalStates[s] = state;
-      mOriginalStatesMap.put(state, s);
-      s++;
-    }
-    mStateBuffer = new IntStateBuffer(states, mEventsMap, numProps);
-
-    final int numProperEvents = mProperEvents.size();
+    mStateBuffer = new IntStateBuffer(eventEnc, stateEnc);
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     final List<TransitionProxy> list =
       new ArrayList<TransitionProxy>(transitions);
-    mSuccessorBuffer =
-      new OutgoingTransitionListBuffer(numProperEvents, numStates);
-    mSuccessorBuffer.setUpTransitions(list, mOriginalStatesMap, mEventsMap);
-    mPredecessorBuffer =
-      new IncomingTransitionListBuffer(numProperEvents, numStates);
-    mPredecessorBuffer.setUpTransitions(list, mOriginalStatesMap, mEventsMap);
+    if ((config & CONFIG_SUCCESSORS) != 0) {
+      mSuccessorBuffer =
+        new OutgoingTransitionListBuffer(eventEnc, stateEnc);
+      mSuccessorBuffer.setUpTransitions(list, eventEnc, stateEnc);
+    }
+    if ((config & CONFIG_PREDECESSORS) != 0) {
+      mPredecessorBuffer =
+        new IncomingTransitionListBuffer(eventEnc, stateEnc);
+      mPredecessorBuffer.setUpTransitions(list, eventEnc, stateEnc);
+    }
+    final int numEvents = eventEnc.getNumberOfProperEvents();
+    mUsedEvents = new BitSet(numEvents);
+    mUsedEvents.set(0, numEvents - 1, true);
   }
 
 
@@ -116,69 +96,19 @@ public class ListBufferTransitionRelation
     return mName;
   }
 
+  public void setName(final String name)
+  {
+    mName = name;
+  }
+
   public ComponentKind getKind()
   {
     return mKind;
   }
 
-
-  // #########################################################################
-  // # Event Access
-  /**
-   * Gets the number of non-proposition events used by this transition relation.
-   */
-  public int getNumberOfProperEvents()
+  public void setKind(final ComponentKind kind)
   {
-    return mProperEvents.size();
-  }
-
-  /**
-   * Gets the number of proposition events used by this transition relation.
-   */
-  public int getNumberOfPropositions()
-  {
-    return mPropositions.size();
-  }
-
-  /**
-   * Gets the total number of events (including propositions) used by this
-   * transition relation.
-   */
-  public int getNumberOfEvents()
-  {
-    return getNumberOfProperEvents() + getNumberOfPropositions();
-  }
-
-  /**
-   * Gets the non-proposition event with the given ID.
-   */
-  public EventProxy getProperEvent(final int e)
-  {
-    return mProperEvents.get(e);
-  }
-
-  /**
-   * Gets the proposition event with the given ID.
-   */
-  public EventProxy getProposition(final int e)
-  {
-    return mPropositions.get(e);
-  }
-
-  /**
-   * Gets the event ID of the given event.
-   * @param  event  The event to be examined.
-   *                May be a proposition or a non-proposition event.
-   * @return ID of event or proposition, or <CODE>-1</CODE> if the event
-   *         does not appear in the transition relation.
-   */
-  public int getEventInt(final EventProxy event)
-  {
-    if (mEventsMap.containsKey(event)) {
-      return mEventsMap.get(event);
-    } else {
-      return -1;
-    }
+    mKind = kind;
   }
 
 
@@ -186,27 +116,12 @@ public class ListBufferTransitionRelation
   //# State Access
   public int getNumberOfStates()
   {
-    return mOriginalStates.length;
+    return mStateBuffer.getNumberOfStates();
   }
 
   public int getNumberOfReachableStates()
   {
     return mStateBuffer.getNumberOfReachableStates();
-  }
-
-  public int getStateInt(final StateProxy state)
-  {
-    return mOriginalStatesMap.get(state);
-  }
-
-  public StateProxy[] getOriginalIntToStateMap()
-  {
-    return mOriginalStates;
-  }
-
-  public TObjectIntHashMap<StateProxy> getOriginalStateToIntMap()
-  {
-    return mOriginalStatesMap;
   }
 
   public boolean isInitial(final int state)
@@ -285,28 +200,6 @@ public class ListBufferTransitionRelation
     mStateBuffer.copyMarkings(source, dest);
   }
 
-  /**
-   * Adds the given proposition to the event alphabet of this transition
-   * relation.
-   *
-   * @param prop
-   *          The event to be added.
-   * @param markStates
-   *          A flag. If <CODE>true</CODE> all states will be marked with the
-   *          new proposition. If <CODE>false</CODE>, no states will be marked.
-   * @return The event ID given to the new proposition.
-   * @throws OverflowException if adding a proposition would exceed the
-   *          the capacity of the underlying buffer.
-   */
-  public int addProposition(final EventProxy prop, final boolean markStates)
-    throws OverflowException
-  {
-    final int code = mPropositions.size();
-    mStateBuffer.addProposition(code, markStates);
-    mPropositions.add(prop);
-    return code;
-  }
-
 
   //#########################################################################
   //# Transition Access
@@ -326,6 +219,15 @@ public class ListBufferTransitionRelation
     }
   }
 
+  /**
+   * Creates a read-only iterator for this transition relation's
+   * outgoing transitions.
+   * The iterator returned is not initialised, so one of the methods
+   * {@link TransitionIterator#reset(int)} or
+   * {@link TransitionIterator#reset(int, int)} before it can be used.
+   * Being a read-only iterator, it does not implement the
+   * {@link TransitionIterator#remove()} method.
+   */
   public TransitionIterator createSuccessorsIterator()
   {
     if (mSuccessorBuffer != null) {
@@ -362,7 +264,7 @@ public class ListBufferTransitionRelation
    * Being a read-only iterator, it does not implement the
    * {@link TransitionIterator#remove()} method.
    * @throws IllegalStateException if the transition relation is not
-   *         configure to use an outgoing transition buffer.
+   *         configured to use an outgoing transition buffer.
    */
   public TransitionIterator createSuccessorsIterator(final int source,
                                                      final int event)
@@ -375,6 +277,24 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Creates a read-only iterator for this transition relation's
+   * incoming transitions.
+   * The iterator returned is not initialised, so one of the methods
+   * {@link TransitionIterator#reset(int)} or
+   * {@link TransitionIterator#reset(int, int)} before it can be used.
+   * Being a read-only iterator, it does not implement the
+   * {@link TransitionIterator#remove()} method.
+   */
+  public TransitionIterator createPredecessorsIterator()
+  {
+    if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createReadOnlyIterator();
+    } else {
+      throw createNoBufferException("predecessor");
+    }
+  }
+
+  /**
    * Creates a read-only iterator for this transition relation that is set up
    * to iterate over the incoming transitions associated with the given state.
    * The iterator returned produces all transitions associated with the given
@@ -382,7 +302,7 @@ public class ListBufferTransitionRelation
    * Being a read-only iterator, it does not implement the
    * {@link TransitionIterator#remove()} method.
    * @throws IllegalStateException if the transition relation is not
-   *         configure to use an incoming transition buffer.
+   *         configured to use an incoming transition buffer.
    */
   public TransitionIterator createPredecessorsIterator(final int target)
   {
@@ -401,7 +321,7 @@ public class ListBufferTransitionRelation
    * Being a read-only iterator, it does not implement the
    * {@link TransitionIterator#remove()} method.
    * @throws IllegalStateException if the transition relation is not
-   *         configure to use an incoming transition buffer.
+   *         configured to use an incoming transition buffer.
    */
   public TransitionIterator createPredecessorsIterator(final int target,
                                                        final int event)
@@ -785,19 +705,20 @@ public class ListBufferTransitionRelation
   /**
    * Removes the given event from this transition relation.
    * This method removes the given event including all its transitions
-   * from the transition relation. The event's entry in the event list
-   * is set to <CODE>null</CODE>, and all associated transitions are
-   * deleted.
+   * from the transition relation. The event is marked as unused,
+   * and all associated transitions are deleted.
    * @param  event   The ID of the event to be removed.
    */
   public void removeEvent(final int event)
   {
-    mProperEvents.set(event, null);
-    if (mSuccessorBuffer != null) {
-      mSuccessorBuffer.removeEventTransitions(event);
-    }
-    if (mPredecessorBuffer != null) {
-      mPredecessorBuffer.removeEventTransitions(event);
+    if (mUsedEvents.get(event)) {
+      mUsedEvents.clear(event);
+      if (mSuccessorBuffer != null) {
+        mSuccessorBuffer.removeEventTransitions(event);
+      }
+      if (mPredecessorBuffer != null) {
+        mPredecessorBuffer.removeEventTransitions(event);
+      }
     }
   }
 
@@ -838,11 +759,8 @@ public class ListBufferTransitionRelation
    */
   public void removeSelfLoopEvents(final int tau)
   {
-    if (tau >= 0 && mProperEvents.get(tau) != null && isGloballyDisabled(tau)) {
-      removeEvent(tau);
-    }
     for (int e = 0; e < getNumberOfProperEvents(); e++) {
-      if (mProperEvents.get(e) == null) {
+      if (mUsedEvents.get(e)) {
         // skip ...
       } else if (e == tau) {
         boolean removable = false;
@@ -853,7 +771,7 @@ public class ListBufferTransitionRelation
           removable = mPredecessorBuffer.removeTauSelfloops(tau);
         }
         if (removable) {
-          mProperEvents.set(tau, null);
+          mUsedEvents.clear(tau);
         }
       } else if (isPureSelfloopEvent(e)) {
         removeEvent(e);
@@ -890,29 +808,35 @@ public class ListBufferTransitionRelation
   //#########################################################################
   //# Automaton Output
   public AutomatonProxy createAutomaton
-    (final ProductDESProxyFactory factory,
-     final TObjectIntHashMap<StateProxy> outputMap)
+    (final ProductDESProxyFactory factory, final EventEncoding eventEnc)
   {
-    final int numEvents = getNumberOfEvents();
+    return createAutomaton(factory, eventEnc, null);
+  }
+
+  public AutomatonProxy createAutomaton
+    (final ProductDESProxyFactory factory,
+     final EventEncoding eventEnc,
+     StateEncoding stateEnc)
+  {
+    final int numEvents = eventEnc.getNumberOfEvents();
+    final int numProps = eventEnc.getNumberOfPropositions();
     final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
-    for (final EventProxy event : mProperEvents) {
-      if (event != null) {
+    for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
+      final EventProxy event = eventEnc.getProperEvent(e);
+      if (mUsedEvents.get(e)) {
         events.add(event);
       }
     }
-    for (final EventProxy event : mPropositions) {
-      if (event != null) {
-        events.add(event);
-      }
+    for (int p = 0; p < numProps; p++) {
+      final EventProxy event = eventEnc.getProposition(p);
+      events.add(event);
     }
 
-    final int numProps = getNumberOfPropositions();
     final int numStates = getNumberOfStates();
-    final List<MemStateProxy> reachable =
-        new ArrayList<MemStateProxy>(numStates);
-    final StateProxy[] outputArray = new StateProxy[numStates];
+    final List<StateProxy> reachable = new ArrayList<StateProxy>(numStates);
     final TLongObjectHashMap<Collection<EventProxy>> markingsMap =
       new TLongObjectHashMap<Collection<EventProxy>>();
+    int code = 0;
     for (int s = 0; s < numStates; s++) {
       if (isReachable(s)) {
         final boolean init = isInitial(s);
@@ -922,19 +846,20 @@ public class ListBufferTransitionRelation
           props = new ArrayList<EventProxy>(numProps);
           for (int p = 0; p < numProps; p++) {
             if (isMarked(s, p)) {
-              final EventProxy prop = mPropositions.get(p);
+              final EventProxy prop = eventEnc.getProposition(p);
               props.add(prop);
             }
           }
           markingsMap.put(markings, props);
         }
-        final MemStateProxy state = new MemStateProxy(s, init, props);
+        final StateProxy state = new MemStateProxy(code++, init, props);
         reachable.add(state);
-        outputArray[s] = state;
-        if (outputMap != null) {
-          outputMap.put(state, s);
-        }
       }
+    }
+    if (stateEnc == null) {
+      stateEnc = new StateEncoding(reachable);
+    } else {
+      stateEnc.init(reachable);
     }
 
     final int numTrans = getNumberOfTransitions();
@@ -943,11 +868,11 @@ public class ListBufferTransitionRelation
     final TransitionIterator iter = createAllTransitionsIterator();
     while (iter.advance()) {
       final int s = iter.getCurrentSourceState();
-      final StateProxy source = outputArray[s];
+      final StateProxy source = stateEnc.getState(s);
       final int e = iter.getCurrentEvent();
-      final EventProxy event = mProperEvents.get(e);
+      final EventProxy event = eventEnc.getProperEvent(e);
       final int t = iter.getCurrentSourceState();
-      final StateProxy target = outputArray[t];
+      final StateProxy target = stateEnc.getState(t);
       final TransitionProxy trans =
         factory.createTransitionProxy(source, event, target);
       transitions.add(trans);
@@ -958,7 +883,30 @@ public class ListBufferTransitionRelation
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  private int getNumberOfProperEvents()
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.getNumberOfEvents();
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.getNumberOfEvents();
+    } else {
+      throw createNoBufferException();
+    }
+  }
+
+
+  //#########################################################################
   //# Errors
+  private void checkConfig(final int config)
+  {
+    if ((config & CONFIG_ALL) == 0) {
+      throw new IllegalArgumentException
+        (ProxyTools.getShortClassName(this) + " configuration error: " +
+         "no incoming or outgoing transition buffer specified!");
+    }
+  }
+
   private IllegalStateException createNoBufferException()
   {
     return new IllegalStateException
@@ -1072,16 +1020,19 @@ public class ListBufferTransitionRelation
 
   //#########################################################################
   //# Data Members
-  private final String mName;
-  private final ComponentKind mKind;
-  private final List<EventProxy> mProperEvents;
-  private final List<EventProxy> mPropositions;
-  private final TObjectIntHashMap<EventProxy> mEventsMap;
-  private final StateProxy[] mOriginalStates;
-  private final TObjectIntHashMap<StateProxy> mOriginalStatesMap;
+  private String mName;
+  private ComponentKind mKind;
 
   private final IntStateBuffer mStateBuffer;
   private TransitionListBuffer mSuccessorBuffer;
   private TransitionListBuffer mPredecessorBuffer;
+  private final BitSet mUsedEvents;
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final int CONFIG_SUCCESSORS = 0x01;
+  public static final int CONFIG_PREDECESSORS = 0x02;
+  public static final int CONFIG_ALL = CONFIG_SUCCESSORS | CONFIG_PREDECESSORS;
 
 }
