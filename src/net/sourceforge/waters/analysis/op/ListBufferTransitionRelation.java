@@ -60,16 +60,16 @@ public class ListBufferTransitionRelation
 
     final Collection<EventProxy> events = aut.getEvents();
     final int numEvents = events.size();
-    mEvents = new ArrayList<EventProxy>(numEvents);
+    mProperEvents = new ArrayList<EventProxy>(numEvents);
     mPropositions = new ArrayList<EventProxy>(numEvents);
     mEventsMap = new TObjectIntHashMap<EventProxy>(numEvents);
     for (final EventProxy event : events) {
       switch (event.getKind()) {
       case CONTROLLABLE:
       case UNCONTROLLABLE:
-        final int e = mEvents.size();
+        final int e = mProperEvents.size();
         mEventsMap.put(event, e);
-        mEvents.add(event);
+        mProperEvents.add(event);
         break;
       case PROPOSITION:
         if (allProps == null || allProps.contains(event)) {
@@ -96,11 +96,16 @@ public class ListBufferTransitionRelation
     }
     mStateBuffer = new IntStateBuffer(states, mEventsMap, numProps);
 
-    /*
+    final int numProperEvents = mProperEvents.size();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
+    final List<TransitionProxy> list =
+      new ArrayList<TransitionProxy>(transitions);
     mSuccessorBuffer =
-      new TransitionListBuffer(transitions, mOriginalStatesMap, mEventToInt);
-    */
+      new OutgoingTransitionListBuffer(numProperEvents, numStates);
+    mSuccessorBuffer.setUpTransitions(list, mOriginalStatesMap, mEventsMap);
+    mPredecessorBuffer =
+      new IncomingTransitionListBuffer(numProperEvents, numStates);
+    mPredecessorBuffer.setUpTransitions(list, mOriginalStatesMap, mEventsMap);
   }
 
 
@@ -124,7 +129,7 @@ public class ListBufferTransitionRelation
    */
   public int getNumberOfProperEvents()
   {
-    return mEvents.size();
+    return mProperEvents.size();
   }
 
   /**
@@ -149,7 +154,7 @@ public class ListBufferTransitionRelation
    */
   public EventProxy getProperEvent(final int e)
   {
-    return mEvents.get(e);
+    return mProperEvents.get(e);
   }
 
   /**
@@ -787,7 +792,7 @@ public class ListBufferTransitionRelation
    */
   public void removeEvent(final int event)
   {
-    mEvents.set(event, null);
+    mProperEvents.set(event, null);
     if (mSuccessorBuffer != null) {
       mSuccessorBuffer.removeEventTransitions(event);
     }
@@ -833,11 +838,11 @@ public class ListBufferTransitionRelation
    */
   public void removeSelfLoopEvents(final int tau)
   {
-    if (tau >= 0 && mEvents.get(tau) != null && isGloballyDisabled(tau)) {
+    if (tau >= 0 && mProperEvents.get(tau) != null && isGloballyDisabled(tau)) {
       removeEvent(tau);
     }
     for (int e = 0; e < getNumberOfProperEvents(); e++) {
-      if (mEvents.get(e) == null) {
+      if (mProperEvents.get(e) == null) {
         // skip ...
       } else if (e == tau) {
         boolean removable = false;
@@ -848,7 +853,7 @@ public class ListBufferTransitionRelation
           removable = mPredecessorBuffer.removeTauSelfloops(tau);
         }
         if (removable) {
-          mEvents.set(tau, null);
+          mProperEvents.set(tau, null);
         }
       } else if (isPureSelfloopEvent(e)) {
         removeEvent(e);
@@ -890,7 +895,7 @@ public class ListBufferTransitionRelation
   {
     final int numEvents = getNumberOfEvents();
     final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
-    for (final EventProxy event : mEvents) {
+    for (final EventProxy event : mProperEvents) {
       if (event != null) {
         events.add(event);
       }
@@ -940,7 +945,7 @@ public class ListBufferTransitionRelation
       final int s = iter.getCurrentSourceState();
       final StateProxy source = outputArray[s];
       final int e = iter.getCurrentEvent();
-      final EventProxy event = mEvents.get(e);
+      final EventProxy event = mProperEvents.get(e);
       final int t = iter.getCurrentSourceState();
       final StateProxy target = outputArray[t];
       final TransitionProxy trans =
@@ -1069,7 +1074,7 @@ public class ListBufferTransitionRelation
   //# Data Members
   private final String mName;
   private final ComponentKind mKind;
-  private final List<EventProxy> mEvents;
+  private final List<EventProxy> mProperEvents;
   private final List<EventProxy> mPropositions;
   private final TObjectIntHashMap<EventProxy> mEventsMap;
   private final StateProxy[] mOriginalStates;

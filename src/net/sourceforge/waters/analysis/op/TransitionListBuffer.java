@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -28,6 +29,39 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 
 
 /**
+ * A data structure that stores ordered lists of transitions in a compact
+ * way.
+ *
+ * The transition list buffer uses linked lists of integers stored in
+ * pre-allocated arrays to store lists of transitions in a memory efficient
+ * way. Each transition is stored in a list under its from-state, with the
+ * event and to-state stored packed together in a single integer. This limits
+ * the size to automata whose states and events numbers together can be packed
+ * in 32 bits.
+ *
+ * In addition, a single hash map is used to map pairs of from-state and
+ * event to their list of transitions. This leads to a memory requirement
+ * of approximately 24 byte per transition in the worst case where there are
+ * only deterministic transitions.
+ *
+ * Iterators are provided to access transitions indexed by their from-state
+ * and/or their event. Individual transitions can be added efficiently.
+ * The test for existence of a particular transition or the removal of
+ * a transition requires a search of all transitions with the corresponding
+ * from-state and event and therefore may be of linear complexity.
+ *
+ * The list construction methods ensure that transitions are added in a defined
+ * ordering, which depends on the contents and encoding of input transition
+ * lists, or on the ordering of other transition lists when they are merged.
+ * All iterators obey the defined ordering.
+ *
+ * This implementation is a shared superclass for buffers of incoming and
+ * outgoing transitions in a {@link ListBufferTransitionRelation}. The 'from'
+ * states used for indexing can be either actual source or target states.
+ * Two subclasses {@link OutgoingTransitionListBuffer} and {@link
+ * IncomingTransitionListBuffer} are used to adjust the access to
+ * source and target states for these two types from user's point of view.
+ *
  * @author Robi Malik
  */
 
@@ -36,10 +70,27 @@ public abstract class TransitionListBuffer
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a new transition list buffer.
+   * The transition buffer is set up for a fixed number of states and events,
+   * which defines an encoding and can no more be changed.
+   * @param  numEvents   The number of events the transition buffer can handle.
+   * @param  numStates   The number of states the new transition buffer can
+   *                     handle.
+   * @throws OverflowException if the encoding for states and events does
+   *         not fit in the 32 bits available.
+   */
   public TransitionListBuffer(final int numEvents, final int numStates)
+    throws OverflowException
   {
     mNumEvents = numEvents;
     mStateShift = AutomatonTools.log2(numStates);
+    final int numBits = mStateShift + AutomatonTools.log2(numEvents);
+    if (numBits > 32) {
+      throw new OverflowException
+        ("Encoding requires " + numBits + " bits for states + events, but " +
+         ProxyTools.getShortClassName(this) + " only has 32 bits available!");
+    }
     mEventMask = (1 << mStateShift) - 1;
     mBlocks = new ArrayList<int[]>();
     mStateTransitions = new int[numStates];
