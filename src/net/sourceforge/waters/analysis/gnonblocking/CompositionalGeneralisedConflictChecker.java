@@ -148,7 +148,7 @@ public class CompositionalGeneralisedConflictChecker extends
     // TODO: later, need to consider when an automaton is too large to be a
     // candidate and so may not always be left with only one automaton
     while (remainingAut.size() > 1) {
-      final Collection<Candidate> candidates = findCandidates(model);
+      final List<Candidate> candidates = findCandidates(model);
       Candidate candidate = null;
       final int numCandidates = candidates.size();
       if (numCandidates > 1) {
@@ -544,29 +544,24 @@ public class CompositionalGeneralisedConflictChecker extends
    * Uses a heuristic to evaluate the set of candidates to select a suitable
    * candidate to compose next.
    */
-  private Candidate evaluateCandidates(Collection<Candidate> candidates)
+  private Candidate evaluateCandidates(List<Candidate> candidates)
   {
-    // TODO Change all candidate collections to List type. Avoid copying
-    // in this method. Ensure determinism.
     final ListIterator<SelectingHeuristic> iter =
         mSelectingHeuristics.listIterator();
-    List<Candidate> selectedCandidates = new ArrayList<Candidate>(candidates);
     while (iter.hasNext()) {
       final SelectingHeuristic heuristic = iter.next();
-      selectedCandidates = heuristic.evaluate(selectedCandidates);
-      if (selectedCandidates.size() == 1) {
+      candidates = heuristic.evaluate(candidates);
+      if (candidates.size() == 1) {
         break;
-      } else {
-        candidates = new ArrayList<Candidate>(selectedCandidates);
       }
     }
-    return selectedCandidates.get(0);
+    return candidates.get(0);
   }
 
   /**
    * Finds the set of candidates to compose for a given model.
    */
-  private Collection<Candidate> findCandidates(final ProductDESProxy model)
+  private List<Candidate> findCandidates(final ProductDESProxy model)
   {
     return mPreselectingHeuristic.evaluate(model);
   }
@@ -651,19 +646,18 @@ public class CompositionalGeneralisedConflictChecker extends
 
   private interface PreselectingHeuristic
   {
-    public Collection<Candidate> evaluate(final ProductDESProxy model);
+    public List<Candidate> evaluate(final ProductDESProxy model);
 
   }
 
 
   private class HeuristicPairing
   {
-    protected Collection<Candidate> pairAutomaton(
-                                                  final AutomatonProxy chosenAut,
-                                                  final Set<AutomatonProxy> automata)
+    protected List<Candidate> pairAutomaton(final AutomatonProxy chosenAut,
+                                            final Set<AutomatonProxy> automata)
     {
-      final Collection<Candidate> candidates =
-          new THashSet<Candidate>(automata.size() - 1);
+      final List<Candidate> candidates =
+          new ArrayList<Candidate>(automata.size() - 1);
       for (final AutomatonProxy a : automata) {
         if (a != chosenAut) {
           final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
@@ -693,7 +687,7 @@ public class CompositionalGeneralisedConflictChecker extends
   private class HeuristicMinT extends HeuristicPairing implements
       PreselectingHeuristic
   {
-    public Collection<Candidate> evaluate(final ProductDESProxy model)
+    public List<Candidate> evaluate(final ProductDESProxy model)
     {
       // Find automaton with fewest transitions
       final Set<AutomatonProxy> automata = model.getAutomata();
@@ -709,8 +703,7 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
       // pairs chosen automaton with all others
-      final Collection<Candidate> candidates =
-          pairAutomaton(chosenAut, automata);
+      final List<Candidate> candidates = pairAutomaton(chosenAut, automata);
       return candidates;
     }
   }
@@ -725,7 +718,7 @@ public class CompositionalGeneralisedConflictChecker extends
       PreselectingHeuristic
   {
 
-    public Collection<Candidate> evaluate(final ProductDESProxy model)
+    public List<Candidate> evaluate(final ProductDESProxy model)
     {
       // Find automaton with the most states
       final Set<AutomatonProxy> automata = model.getAutomata();
@@ -741,8 +734,7 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
       // pairs chosen automaton with all others
-      final Collection<Candidate> candidates =
-          pairAutomaton(chosenAut, automata);
+      final List<Candidate> candidates = pairAutomaton(chosenAut, automata);
       return candidates;
     }
   }
@@ -750,10 +742,10 @@ public class CompositionalGeneralisedConflictChecker extends
 
   private class HeuristicMustL implements PreselectingHeuristic
   {
-    public Collection<Candidate> evaluate(final ProductDESProxy model)
+    public List<Candidate> evaluate(final ProductDESProxy model)
     {
-      final Collection<Candidate> candidates =
-          new THashSet<Candidate>(mEventsToAutomata.keySet().size());
+      final List<Candidate> candidates =
+          new ArrayList<Candidate>(mEventsToAutomata.keySet().size());
       for (final EventProxy event : mEventsToAutomata.keySet()) {
         final List<AutomatonProxy> automata =
             new ArrayList<AutomatonProxy>(mEventsToAutomata.get(event));
