@@ -470,7 +470,7 @@ public class CompositionalGeneralisedConflictChecker extends
             .createAutomatonProxy(automaton.getName(), automaton.getKind(),
                                   newEvents, automaton.getStates(),
                                   newTransitions);
-    final HidingStep step = new HidingStep(newAut, automaton, tau);
+    final HidingStep step = new HidingStep(newAut, automaton, localEvents, tau);
     mModifyingSteps.add(step);
     return newAut;
   }
@@ -1049,6 +1049,7 @@ public class CompositionalGeneralisedConflictChecker extends
       // cannot use remove efficiently, so the contents should be collected
       // in a loop.)
       // TODO Check/fix bug below.
+
       final Set<AutomatonProxy> traceAutomata =
           new THashSet<AutomatonProxy>(conflictTrace.getAutomata());
       traceAutomata.remove(composed);
@@ -1059,6 +1060,7 @@ public class CompositionalGeneralisedConflictChecker extends
        * conflictTrace.getAutomata()) { if (aut != composed) {
        * traceAutomata.add(aut); } }
        */
+
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
@@ -1111,10 +1113,12 @@ public class CompositionalGeneralisedConflictChecker extends
     // #######################################################################
     // # Constructor
     private HidingStep(final AutomatonProxy result,
-                       final AutomatonProxy originalAut, final EventProxy tau)
+                       final AutomatonProxy originalAut,
+                       final Set<EventProxy> localEvents, final EventProxy tau)
     {
       super(result, originalAut);
       mTau = tau;
+      mLocalEvents = localEvents;
     }
 
     // #######################################################################
@@ -1186,24 +1190,23 @@ public class CompositionalGeneralisedConflictChecker extends
     private EventProxy findOriginalEvent(final StateProxy source,
                                          final StateProxy target)
     {
-      EventProxy originalEvent = null;
+      EventProxy transitionEvent = null;
       for (final TransitionProxy transition : getOriginalAutomaton()
           .getTransitions()) {
-        // TODO Fix bug. Only insert events that were actually hidden.
-        // There may be observable events linking the source and target
-        // states, but those cannot be used to replace tau.
+        transitionEvent = transition.getEvent();
         if (transition.getTarget() == target
-            && transition.getSource() == source) {
-          originalEvent = transition.getEvent();
+            && transition.getSource() == source
+            && mLocalEvents.contains(transitionEvent)) {
           break;
         }
       }
-      return originalEvent;
+      return transitionEvent;
     }
 
     // #######################################################################
     // # Data Members
     private final EventProxy mTau;
+    private final Set<EventProxy> mLocalEvents;
   }
 
 
