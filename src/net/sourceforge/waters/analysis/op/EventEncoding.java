@@ -15,6 +15,7 @@ import java.util.List;
 
 import gnu.trove.TObjectIntHashMap;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 
@@ -30,7 +31,12 @@ public class EventEncoding
   //# Constructor
   public EventEncoding(final AutomatonProxy aut)
   {
-    this(aut, null, FILTER_NONE);
+    this(aut, null);
+  }
+
+  public EventEncoding(final AutomatonProxy aut, final EventProxy tau)
+  {
+    this(aut, tau, null, FILTER_NONE);
   }
 
   public EventEncoding(final AutomatonProxy aut,
@@ -40,12 +46,34 @@ public class EventEncoding
     this(aut.getEvents(), filter, filterMode);
   }
 
+  public EventEncoding(final AutomatonProxy aut,
+                       final EventProxy tau,
+                       final Collection<EventProxy> filter,
+                       final int filterMode)
+  {
+    this(aut.getEvents(), tau, filter, filterMode);
+  }
+
   public EventEncoding(final Collection<EventProxy> events)
   {
     this(events, null, FILTER_NONE);
   }
 
   public EventEncoding(final Collection<EventProxy> events,
+                       final EventProxy tau)
+  {
+    this(events, tau, null, FILTER_NONE);
+  }
+
+  public EventEncoding(final Collection<EventProxy> events,
+                       final Collection<EventProxy> filter,
+                       final int filterMode)
+  {
+    this(events, null, filter, filterMode);
+  }
+
+  public EventEncoding(final Collection<EventProxy> events,
+                       final EventProxy tau,
                        final Collection<EventProxy> filter,
                        final int filterMode)
   {
@@ -53,27 +81,33 @@ public class EventEncoding
     mProperEvents = new ArrayList<EventProxy>(numEvents);
     mPropositions = new ArrayList<EventProxy>(numEvents);
     mEventCodeMap = new TObjectIntHashMap<EventProxy>(numEvents);
+    mProperEvents.add(tau);
+    if (tau != null) {
+      mEventCodeMap.put(tau, TAU);
+    }
     for (final EventProxy event : events) {
-      switch (event.getKind()) {
-      case CONTROLLABLE:
-      case UNCONTROLLABLE:
-        if ((filterMode & FILTER_PROPER_EVENTS) == 0 ||
-            filter.contains(event)) {
-          final int e = mProperEvents.size();
-          mEventCodeMap.put(event, e);
-          mProperEvents.add(event);
+      if (event != tau) {
+        switch (event.getKind()) {
+        case CONTROLLABLE:
+        case UNCONTROLLABLE:
+          if ((filterMode & FILTER_PROPER_EVENTS) == 0 ||
+              filter.contains(event)) {
+            final int e = mProperEvents.size();
+            mEventCodeMap.put(event, e);
+            mProperEvents.add(event);
+          }
+          break;
+        case PROPOSITION:
+          if ((filterMode & FILTER_PROPOSITIONS) == 0 ||
+              filter.contains(event)) {
+            final int p = mPropositions.size();
+            mEventCodeMap.put(event, p);
+            mPropositions.add(event);
+          }
+          break;
+        default:
+          break;
         }
-        break;
-      case PROPOSITION:
-        if ((filterMode & FILTER_PROPOSITIONS) == 0 ||
-            filter.contains(event)) {
-          final int p = mPropositions.size();
-          mEventCodeMap.put(event, p);
-          mPropositions.add(event);
-        }
-        break;
-      default:
-        break;
       }
     }
     mExtraSelfLoops = null;
@@ -84,12 +118,16 @@ public class EventEncoding
   //# Simple Access
   public int getNumberOfEvents()
   {
-    return mEventCodeMap.size();
+    return getNumberOfProperEvents() + getNumberOfPropositions();
   }
 
   public int getNumberOfProperEvents()
   {
-    return mProperEvents.size();
+    if (mProperEvents.get(TAU) != null) {
+      return mProperEvents.size();
+    } else {
+      return mProperEvents.size() - 1;
+    }
   }
 
   public int getNumberOfPropositions()
@@ -97,18 +135,29 @@ public class EventEncoding
     return mPropositions.size();
   }
 
-  public int getEventCode(final EventProxy Event)
+  public int getEventCode(final EventProxy event)
   {
-    if (mEventCodeMap.containsKey(Event)) {
-      return mEventCodeMap.get(Event);
+    if (mEventCodeMap.containsKey(event)) {
+      return mEventCodeMap.get(event);
     } else {
       return -1;
     }
   }
 
+  public EventProxy getTauEvent()
+  {
+    return mProperEvents.get(TAU);
+  }
+
   public EventProxy getProperEvent(final int code)
   {
-    return mProperEvents.get(code);
+    final EventProxy event = mProperEvents.get(code);
+    if (event == null) {
+      throw new IndexOutOfBoundsException("No silent (tau) event defined in " +
+                                          ProxyTools.getShortClassName(this) +
+                                          "!");
+    }
+    return event;
   }
 
   public EventProxy getProposition(final int code)
@@ -120,7 +169,11 @@ public class EventEncoding
   {
     final int numEvents = getNumberOfEvents();
     final List<EventProxy> list = new ArrayList<EventProxy>(numEvents);
-    list.addAll(mProperEvents);
+    for (final EventProxy event : mProperEvents) {
+      if (event != null) {
+        list.add(event);
+      }
+    }
     list.addAll(mPropositions);
     return list;
   }
@@ -161,6 +214,14 @@ public class EventEncoding
     return mExtraSelfLoops;
   }
 
+  public void addSilentEvent(final EventProxy event)
+  {
+    if (mProperEvents.get(TAU) == null) {
+      mProperEvents.set(TAU, event);
+    }
+    mEventCodeMap.put(event, TAU);
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -172,6 +233,8 @@ public class EventEncoding
 
   //#########################################################################
   //# Class Constants
+  public static final int TAU = 0;
+
   public static final int FILTER_NONE = 0;
   public static final int FILTER_PROPER_EVENTS = 0x01;
   public static final int FILTER_PROPOSITIONS = 0x02;

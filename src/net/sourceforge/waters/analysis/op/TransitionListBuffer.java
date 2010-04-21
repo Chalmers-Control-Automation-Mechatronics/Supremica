@@ -156,6 +156,9 @@ public abstract class TransitionListBuffer
    */
   public boolean addTransition(final int from, final int event, final int to)
   {
+    if (event == EventEncoding.TAU && from == to) {
+      return false;
+    }
     final int fromShift = from << mStateShift;
     final int fromCode = fromShift | event;
     final int toCode = (to << mStateShift) | event;
@@ -272,6 +275,9 @@ public abstract class TransitionListBuffer
    */
   public boolean copyTransitions(final int source, final int dest)
   {
+    if (source == dest) {
+      return false;
+    }
     int list2 = mStateTransitions[dest];
     if (list2 == NULL) {
       return false;
@@ -281,6 +287,7 @@ public abstract class TransitionListBuffer
     int list1 = mStateTransitions[source];
     list1 = getNext(list1);
     int end1 = list1;
+    final int tau = EventEncoding.TAU;
     int list = NULL;
     final TIntHashSet successors = new TIntHashSet();
     int e0 = -1;
@@ -316,7 +323,9 @@ public abstract class TransitionListBuffer
         copied = true;
       }
       final int to = data >> mStateShift;
-      if (e != e0) {
+      if (e == tau && to == dest) {
+        continue;
+      } else if (e != e0) {
         successors.clear();
         successors.add(to);
         e0 = e;
@@ -410,6 +419,7 @@ public abstract class TransitionListBuffer
          ProxyTools.getShortClassName(this) +
          " (only configured for " + mNumEvents + " events)!");
     }
+    final boolean tau = (newID == EventEncoding.TAU);
     final TIntHashSet successors = new TIntHashSet();
     final TransitionIterator iter1 = createReadOnlyIterator();
     final TransitionIterator iter2 = createModifyingIterator();
@@ -433,7 +443,9 @@ public abstract class TransitionListBuffer
       iter1.reset(state, newID);
       while (iter1.advance()) {
         final int succ = iter1.getCurrentToState();
-        if (successors.add(succ)) {
+        if (tau && state == succ) {
+          // nothing --- suppress tau selfloops ...
+        } else if (successors.add(succ)) {
           final int code = stateShifted | oldID;
           list = prepend(list, code);
         }
@@ -489,17 +501,17 @@ public abstract class TransitionListBuffer
   }
 
   /**
-   * Helps to clean up tau selfloops.This method removes all selfloops
+   * Helps to clean up tau selfloops. This method removes all selfloops
    * associated with the given event and tests whether this results in
-   * the event being redundant.
-   * @param tau
-   *          The ID of the tau event to be removed.
-   * @return <CODE>true</CODE> if all transitions with the given event
+   * the event being redundant. Tau events are recognised by their standard
+   * code {@link EventEncoding#TAU}.
+   * @return <CODE>true</CODE> if all transitions with the tau event
    *         were selfloops and have been removed, <CODE>false</CODE>
    *         otherwise.
    */
-  public boolean removeTauSelfloops(final int tau)
+  public boolean removeTauSelfloops()
   {
+    final int tau = EventEncoding.TAU;
     boolean removable = true;
     final TransitionIterator iter = createReadOnlyIterator();
     for (int state = 0; state < getNumberOfStates(); state++) {
@@ -668,6 +680,7 @@ public abstract class TransitionListBuffer
     final Comparator<TransitionProxy> comparator =
       new TransitionComparator(eventEnc, stateEnc);
     Collections.sort(transitions, comparator);
+    final int tau = EventEncoding.TAU;
     int from0 = -1;
     int e0 = -1;
     int data0 = -1;
@@ -677,8 +690,11 @@ public abstract class TransitionListBuffer
       final int e = eventEnc.getEventCode(event);
       if (e >= 0) {
         final StateProxy fromState = getFromState(trans);
-        final int from = stateEnc.getStateCode(fromState);
         final StateProxy toState = getToState(trans);
+        if (e == tau && fromState == toState) {
+          continue;
+        }
+        final int from = stateEnc.getStateCode(fromState);
         final int to = stateEnc.getStateCode(toState);
         final int data = (to << mStateShift) | e;
         if (from != from0) {
@@ -804,8 +820,9 @@ public abstract class TransitionListBuffer
   public abstract int getOtherIteratorToState(TransitionIterator iter);
 
 
-  public void merge(final List<int[]> partition, final int tau)
+  public void merge(final List<int[]> partition)
   {
+    final int tau = EventEncoding.TAU;
     final int[] recoding = new int[mStateTransitions.length];
     int code = 0;
     int size = 0;

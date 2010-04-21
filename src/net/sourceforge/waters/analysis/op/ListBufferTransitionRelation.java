@@ -30,8 +30,6 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
-// TODO Handle tau uniformly.
-
 // TODO Write documentation.
 
 
@@ -790,61 +788,71 @@ public class ListBufferTransitionRelation
   //#########################################################################
   //# Automaton Simplification
   /**
-   * Attempts to simplify the automaton by removing redundant selfloop events.
-   * This method searches for any events that are selflooped in all states of
-   * the transition relation, and removes any such events and the selfloops from
-   * the transition relation.
-   *
-   * @param tau
-   *          The ID of a silent event. If this is an event of the transition
-   *          relation, it is treated specially. Any selfloops with this event
-   *          are removed, and if this results in the event being disabled in
-   *          all states, it is removed.
+   * Attempts to simplify the automaton by removing all tau selfloops.
+   * If this results in the tau being disabled in, the tau event is
+   * marked as unused. Tau events are recognised by their standard
+   * code {@link EventEncoding#TAU}.
+   * @return <CODE>true</CODE> if all transitions with the tau event
+   *         were selfloops and have been removed, <CODE>false</CODE>
+   *         otherwise.
    */
-  public void removeSelfLoopEvents(final int tau)
+  public boolean removeTauSelfLoops()
   {
+    if (mUsedEvents.get(EventEncoding.TAU)) {
+      boolean removable = false;
+      if (mSuccessorBuffer != null) {
+        removable = mSuccessorBuffer.removeTauSelfloops();
+      }
+      if (mPredecessorBuffer != null) {
+        removable = mPredecessorBuffer.removeTauSelfloops();
+      }
+      if (removable) {
+        mUsedEvents.clear(EventEncoding.TAU);
+      }
+      return removable;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Attempts to simplify the automaton by removing redundant selfloop events.
+   * This method searches for any non-tau events that are selflooped in all
+   * states of the transition relation, and removes any such events as unused
+   * and removes the selfloops from the transition relation.
+   * @return <CODE>true</CODE> if at least one event was removed,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean removeProperSelfLoopEvents()
+  {
+    final int tau = EventEncoding.TAU;
+    boolean result = false;
     for (int e = 0; e < getNumberOfProperEvents(); e++) {
-      if (mUsedEvents.get(e)) {
-        // skip ...
-      } else if (e == tau) {
-        boolean removable = false;
-        if (mSuccessorBuffer != null) {
-          removable = mSuccessorBuffer.removeTauSelfloops(tau);
-        }
-        if (mPredecessorBuffer != null) {
-          removable = mPredecessorBuffer.removeTauSelfloops(tau);
-        }
-        if (removable) {
-          mUsedEvents.clear(tau);
-        }
-      } else if (isPureSelfloopEvent(e)) {
+      if (e != tau && mUsedEvents.get(e) && isPureSelfloopEvent(e)) {
         removeEvent(e);
+        result = true;
       }
     }
+    return result;
   }
 
   /**
    * Repartitions the states of this transition relation. This method is used to
    * merge states after a partition has been obtained through a
    * {@link TransitionRelationSimplifier}.
-   *
    * @param partition
    *          The partitioning to be imposed. Each array in the list
    *          defines the state codes comprising an equivalence class to be
    *          merged into a single state. The index position in the list
    *          identifies the state code to be given to the new merged state.
-   * @param tau
-   *          The event code of a silent event. If the event is present in the
-   *          transition relations, any selfloops with this events obtained
-   *          while merging states will be deleted.
    */
-  public void merge(final List<int[]> partition, final int tau)
+  public void merge(final List<int[]> partition)
   {
     if (mSuccessorBuffer != null) {
-      mSuccessorBuffer.merge(partition, tau);
+      mSuccessorBuffer.merge(partition);
     }
     if (mPredecessorBuffer != null) {
-      mPredecessorBuffer.merge(partition, tau);
+      mPredecessorBuffer.merge(partition);
     }
   }
 
