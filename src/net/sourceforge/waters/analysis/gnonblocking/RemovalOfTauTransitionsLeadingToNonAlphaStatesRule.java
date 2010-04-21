@@ -12,8 +12,10 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
-
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -78,8 +80,13 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     mTau = tau;
 
     final int numStates = mTR.getNumberOfStates();
+    final Queue<Integer> visitStates = new LinkedList<Integer>();
 
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
+      visitStates.offer(sourceID);
+    }
+    while (visitStates.size() > 0) {
+      final int sourceID = visitStates.remove();
       final TIntHashSet successors = mTR.getSuccessors(sourceID, tauID);
       if (successors != null) {
         final TIntArrayList transToRemove =
@@ -97,6 +104,7 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
           final int targetID = transToRemove.get(i);
           mTR.addAllSuccessors(targetID, sourceID);
           mTR.removeTransition(sourceID, tauID, targetID);
+          visitStates.offer(sourceID);
           modified = true;
         }
       }

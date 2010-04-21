@@ -40,8 +40,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public class ObserverProjectionTransitionRelation
 {
 
-  //#########################################################################
-  //# Constructors
+  // #########################################################################
+  // # Constructors
   /**
    * Creates a new transition relation from the given automaton.
    */
@@ -52,33 +52,36 @@ public class ObserverProjectionTransitionRelation
 
   /**
    * Creates a new transition relation from the given automaton.
-   * @param allProps    The propositions to be used. If non-null, only
-   *                    propositions in this collection will be included in
-   *                    the new transition relation. If null, all propositions
-   *                    of the automaton will be used.
+   *
+   * @param allProps
+   *          The propositions to be used. If non-null, only propositions in
+   *          this collection will be included in the new transition relation.
+   *          If null, all propositions of the automaton will be used.
    */
-  public ObserverProjectionTransitionRelation
-    (final AutomatonProxy aut, final Collection<EventProxy> allProps)
+  public ObserverProjectionTransitionRelation(
+                                              final AutomatonProxy aut,
+                                              final Collection<EventProxy> allProps)
   {
     this(aut, null, allProps);
   }
 
   /**
    * Creates a new transition relation from the given automaton.
-   * @param extraEvents Additional events to be added to the transition
-   *                    relation. Any events in this collection will be
-   *                    added to the event alphabet of the new transition
-   *                    relation, but without any transitions associated
-   *                    to them.
-   * @param allProps    The propositions to be used. If non-null, only
-   *                    propositions in this collection will be included in
-   *                    the new transition relation. If null, all propositions
-   *                    of the automaton will be used.
+   *
+   * @param extraEvents
+   *          Additional events to be added to the transition relation. Any
+   *          events in this collection will be added to the event alphabet of
+   *          the new transition relation, but without any transitions
+   *          associated to them.
+   * @param allProps
+   *          The propositions to be used. If non-null, only propositions in
+   *          this collection will be included in the new transition relation.
+   *          If null, all propositions of the automaton will be used.
    */
-  public ObserverProjectionTransitionRelation
-    (final AutomatonProxy aut,
-     final Collection<EventProxy> extraEvents,
-     final Collection<EventProxy> allProps)
+  public ObserverProjectionTransitionRelation(
+                                              final AutomatonProxy aut,
+                                              final Collection<EventProxy> extraEvents,
+                                              final Collection<EventProxy> allProps)
   {
     mName = aut.getName();
     mKind = aut.getKind();
@@ -427,7 +430,6 @@ public class ObserverProjectionTransitionRelation
     return propID;
   }
 
-
   // #########################################################################
   // # Transitions Access
   public int getNumberOfTransitions()
@@ -479,7 +481,15 @@ public class ObserverProjectionTransitionRelation
       for (int e = 0; e < mPredecessors[state].length; e++) {
         final TIntHashSet preds = mPredecessors[state][e];
         if (preds != null && !preds.isEmpty()) {
-          return true;
+          // method returns false if the state only has a self loop and no
+          // unique predecessors
+          final TIntIterator iter = preds.iterator();
+          while (iter.hasNext()) {
+            final int pred = iter.next();
+            if (pred != state) {
+              return true;
+            }
+          }
         }
       }
     }
@@ -536,10 +546,11 @@ public class ObserverProjectionTransitionRelation
   // #########################################################################
   // # Transitions Modifications
   /**
-   * Removes the given event from this transition relation.
-   * This method removes the given event including all its transitions
-   * from the transition relation.
-   * @param  event   The ID of the event to be removed.
+   * Removes the given event from this transition relation. This method removes
+   * the given event including all its transitions from the transition relation.
+   *
+   * @param event
+   *          The ID of the event to be removed.
    */
   public void removeEvent(final int event)
   {
@@ -556,13 +567,15 @@ public class ObserverProjectionTransitionRelation
   }
 
   /**
-   * Replaces an event by another.
-   * This method replaces all transitions with the given old event ID
-   * by transitions with the given new event ID. Both events must be
-   * present in the transition relation, and will remain present after
+   * Replaces an event by another. This method replaces all transitions with the
+   * given old event ID by transitions with the given new event ID. Both events
+   * must be present in the transition relation, and will remain present after
    * this operation.
-   * @param  oldID   The ID of the old event to be replaced.
-   * @param  newID   The ID of the new event replacing the old event.
+   *
+   * @param oldID
+   *          The ID of the old event to be replaced.
+   * @param newID
+   *          The ID of the new event replacing the old event.
    */
   public void replaceEvent(final int oldID, final int newID)
   {
@@ -1074,7 +1087,6 @@ public class ObserverProjectionTransitionRelation
     private final boolean mIsInitial;
     private final Collection<EventProxy> mProps;
   }
-
 
   // #########################################################################
   // # Data Members

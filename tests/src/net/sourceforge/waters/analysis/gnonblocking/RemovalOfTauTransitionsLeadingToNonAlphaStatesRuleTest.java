@@ -157,11 +157,21 @@ public class RemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest extends
     runAbstractionRule(group, subdir, name);
   }
 
-  public void test_tauTransRemovalToNonAlpha_tauLoopNoMarking() throws Exception
+  public void test_tauTransRemovalToNonAlpha_tauLoopNoMarking()
+      throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalToNonAlpha_10.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_tauTransRemovalToNonAlpha_oneRemovaableTauAndOneNonremovable()
+      throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "tauTransRemovalToNonAlpha_11.wmod";
     runAbstractionRule(group, subdir, name);
   }
 
@@ -179,6 +189,7 @@ public class RemovalOfTauTransitionsLeadingToNonAlphaStatesRuleTest extends
     test_tauTransRemovalToNonAlpha_StateUnreachable();
     test_tauTransRemovalToNonAlpha_TwoConsecutiveTauUnreachable();
     test_tauTransRemovalToNonAlpha_TwoTau();
+    test_tauTransRemovalToNonAlpha_oneRemovaableTauAndOneNonremovable();
     test_allStatesImplicitlyMarkedAlpha();
     test_tauTransRemovalToNonAlpha_NoFurther();
   }
