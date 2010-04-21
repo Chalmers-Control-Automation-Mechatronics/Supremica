@@ -108,51 +108,8 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     }
     if (modified) {
       final AutomatonProxy convertedAut = tr.createAutomaton(getFactory());
-      return convertedAut;
-    } else {
-      return autToAbstract;
-    }
-  }
-
-  AutomatonProxy applyRuleOld(final AutomatonProxy autToAbstract,
-                              final EventProxy tau)
-  {
-    mAutToAbstract = autToAbstract;
-    final ObserverProjectionTransitionRelation rel =
-        new ObserverProjectionTransitionRelation(autToAbstract,
-            getPropositions());
-    final int tauID = rel.getEventInt(tau);
-    if (tauID == -1) {
-      return autToAbstract;
-    }
-    final int numStates = rel.getNumberOfStates();
-    boolean modified = false;
-    int alphaID = rel.getEventInt(mAlphaMarking);
-    if (alphaID == -1) {
-      alphaID = rel.addProposition(mAlphaMarking, true);
-    }
-    for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      if (rel.hasPredecessors(sourceID) && rel.isMarked(sourceID, alphaID)) {
-        final TIntHashSet successors = rel.getSuccessors(sourceID, tauID);
-        if (successors != null) {
-          final TIntIterator iter = successors.iterator();
-          while (iter.hasNext()) {
-            final int targetID = iter.next();
-            if (rel.isMarked(targetID, alphaID)) {
-              if (targetID != sourceID) {
-                rel.markState(sourceID, alphaID, false);
-                modified = true;
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-    if (modified) {
-      final AutomatonProxy convertedAut = rel.createAutomaton(getFactory());
-      mOriginalIntToStateMap = rel.getOriginalIntToStateMap();
-      mResultingStateToIntMap = rel.getResultingStateToIntMap();
+      mOriginalIntToStateMap = tr.getOriginalIntToStateMap();
+      mResultingStateToIntMap = tr.getResultingStateToIntMap();
       return convertedAut;
     } else {
       return autToAbstract;
