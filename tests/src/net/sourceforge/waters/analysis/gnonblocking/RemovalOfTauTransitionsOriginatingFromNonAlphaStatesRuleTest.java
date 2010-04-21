@@ -108,7 +108,67 @@ public class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRuleTest
     runAbstractionRule(group, subdir, name);
   }
 
-  // TODO More tests needed ...
+  public void test_tauTransRemovalFromNonAlpha_tauAndNonTauOutgoingTransitions()
+      throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "tauTransRemovalFromNonAlpha_3.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_allStatesImplicitlyMarkedAlpha() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "tauTransRemovalFromNonAlpha_8.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_allStatesImplicitlyMarkedOmega() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "tauTransRemovalFromNonAlpha_9.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_tauTransRemovalFromNonAlpha_TwoConsecutiveTauUnreachable()
+      throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "tauTransRemovalFromNonAlpha_7.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_tauTransRemovalFromNonAlpha_TwoTauOutgoing()
+      throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "tauTransRemovalFromNonAlpha_4.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_tauTransRemovalFromNonAlpha_multipleIncomingTransitions()
+      throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "tauTransRemovalFromNonAlpha_5.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_tauTransRemovalFromNonAlpha_tauLoopNoMarking()
+      throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "tauTransRemovalFromNonAlpha_10.wmod";
+    // TODO:wondering if there should be a tau self loop on state s5 in after...
+    runAbstractionRule(group, subdir, name);
+  }
 
   /**
    * A test to see whether a single abstraction rule object can perform multiple
@@ -116,10 +176,15 @@ public class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRuleTest
    */
   public void testReentrant() throws Exception
   {
-    // TODO As soon as there are more tests, try some more variation here.
     test_tauTransRemovalFromNonAlpha_StateUnreachable();
     test_tauTransRemovalFromNonAlpha_NoFurther();
+    test_tauTransRemovalFromNonAlpha_TwoTauOutgoing();
+    test_tauTransRemovalFromNonAlpha_tauAndNonTauOutgoingTransitions();
+    test_allStatesImplicitlyMarkedOmega();
     test_tauTransRemovalFromNonAlpha_StateUnreachable();
+    test_tauTransRemovalFromNonAlpha_TwoConsecutiveTauUnreachable();
+    test_tauTransRemovalFromNonAlpha_multipleIncomingTransitions();
+    test_allStatesImplicitlyMarkedAlpha();
     test_tauTransRemovalFromNonAlpha_NoFurther();
   }
 

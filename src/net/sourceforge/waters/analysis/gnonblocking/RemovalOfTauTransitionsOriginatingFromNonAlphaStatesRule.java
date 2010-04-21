@@ -31,8 +31,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  *
  * @author Rachel Francis
  */
-// TODO: a lot of bugs with standard conflict checker, needs a more test
-// cases
 class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
     AbstractionRule
 {
@@ -132,7 +130,7 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
             final int targetID = transToRemove.get(i);
             mTR.addAllPredeccessors(sourceID, targetID);
             mTR.removeTransition(sourceID, tauID, targetID);
-            visitStates.offer(sourceID);
+            // visitStates.offer(sourceID);
             modified = true;
           }
           mTR.removeAllIncoming(sourceID);
@@ -141,8 +139,8 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
     }
     if (modified) {
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
-      // System.out.println(autToAbstract);
-      // System.out.println("CONVERTED--------------" + convertedAut);
+      System.out.println(autToAbstract);
+      System.out.println("CONVERTED--------------" + convertedAut);
       return convertedAut;
     } else {
       return autToAbstract;
