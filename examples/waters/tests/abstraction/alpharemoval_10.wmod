@@ -277,14 +277,6 @@
                             <SimpleIdentifier Name="e2"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S4" Source="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="119" X="218"/>
-                        </SplineGeometry>
-                    </Edge>
                     <Edge Target="S4" Source="S5">
                         <LabelBlock>
                             <SimpleIdentifier Name="e2"/>

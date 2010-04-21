@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
 
-import net.sourceforge.waters.model.base.IndexedSet;
+import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -92,13 +92,13 @@ class JAXBProductDESImporter
     try {
       final String name = element.getName();
       final String comment = element.getComment();
-      mProductDESEvents = new CheckedImportSet<EventProxy>
+      mProductDESEvents = new CheckedImportList<EventProxy>
         (ProductDESProxy.class, name, "event");
       mProductDESEventRefImporter = new EventRefImporter(mProductDESEvents);
       mProductDESEventListHandler.fromJAXBChecked
         (this, element, mProductDESEvents);
-      final IndexedSet<AutomatonProxy> automata =
-        new CheckedImportSet<AutomatonProxy>
+      final IndexedList<AutomatonProxy> automata =
+        new CheckedImportList<AutomatonProxy>
         (ProductDESProxy.class, name, "automaton");
       mProductDESAutomataListHandler.fromJAXBChecked(this, element, automata);
       return mFactory.createProductDESProxy
@@ -115,12 +115,12 @@ class JAXBProductDESImporter
     try {
       final String name = element.getName();
       final ComponentKind kind = element.getKind();
-      mAutomatonEvents = new CheckedImportSet<EventProxy>
+      mAutomatonEvents = new CheckedImportList<EventProxy>
         (AutomatonProxy.class, name, "event");
       mAutomatonEventRefImporter = new EventRefImporter(mAutomatonEvents);
       mAutomatonEventRefListHandler.fromJAXBChecked
         (mProductDESEventRefImporter, element, mAutomatonEvents);
-      mAutomatonStates = new CheckedImportSet<StateProxy>
+      mAutomatonStates = new CheckedImportList<StateProxy>
         (AutomatonProxy.class, name, "state");
       mAutomatonStateListHandler.fromJAXBChecked
         (this, element, mAutomatonStates);
@@ -179,7 +179,7 @@ class JAXBProductDESImporter
 
     //#######################################################################
     //# Constructors
-    private EventRefImporter(final IndexedSet<EventProxy> alphabet)
+    private EventRefImporter(final IndexedList<EventProxy> alphabet)
     {
       mAlphabet = alphabet;
     }
@@ -195,7 +195,7 @@ class JAXBProductDESImporter
 
     //#######################################################################
     //# Data Members
-    private final IndexedSet<EventProxy> mAlphabet;
+    private final IndexedList<EventProxy> mAlphabet;
 
   }
 
@@ -203,9 +203,9 @@ class JAXBProductDESImporter
 
   //#########################################################################
   //# Data Members
-  private IndexedSet<EventProxy> mProductDESEvents;
-  private IndexedSet<EventProxy> mAutomatonEvents;
-  private IndexedSet<StateProxy> mAutomatonStates;
+  private IndexedList<EventProxy> mProductDESEvents;
+  private IndexedList<EventProxy> mAutomatonEvents;
+  private IndexedList<StateProxy> mAutomatonStates;
   private EventRefImporter mProductDESEventRefImporter;
   private EventRefImporter mAutomatonEventRefImporter;
 

@@ -832,7 +832,7 @@ public abstract class JAXBAbstractModuleImporter
     final PlainEventListProxy propositions =
       mFactory.createPlainEventListProxy(eventList);
     final Collection<NodeProxy> immediateChildNodes =
-      new CheckedImportSet<NodeProxy>(GroupNodeProxy.class, name, "node");
+      new CheckedImportList<NodeProxy>(GroupNodeProxy.class, name, "node");
     final List<NodeRef> immediateChildNodesElement =
       Casting.toList(element.getNodes());
     for (final NodeRef ref : immediateChildNodesElement) {

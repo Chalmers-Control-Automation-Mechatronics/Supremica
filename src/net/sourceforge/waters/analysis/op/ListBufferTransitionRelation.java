@@ -856,6 +856,7 @@ public class ListBufferTransitionRelation
         reachable.add(state);
       }
     }
+    // TODO Fix encoding ...
     if (stateEnc == null) {
       stateEnc = new StateEncoding(reachable);
     } else {

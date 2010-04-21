@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -100,7 +101,7 @@ class JAXBTraceImporter
     final String name = element.getName();
     final String comment = element.getComment();
     final ProductDESProxy des = getProductDES(element, uri);
-    final IndexedSet<AutomatonProxy> automata = getAutomata(element, des);
+    final IndexedList<AutomatonProxy> automata = getAutomata(element, des);
     final TraceStepList listelem = element.getTraceStepList();
     final List<TraceStepProxy> steps = getTraceSteps(listelem, des, automata);
     final ConflictKind kind = element.getKind();
@@ -115,7 +116,7 @@ class JAXBTraceImporter
     final String name = element.getName();
     final String comment = element.getComment();
     final ProductDESProxy des = getProductDES(element, uri);
-    final IndexedSet<AutomatonProxy> automata = getAutomata(element, des);
+    final IndexedList<AutomatonProxy> automata = getAutomata(element, des);
     final TraceStepList listelem = element.getTraceStepList();
     final List<TraceStepProxy> steps = getTraceSteps(listelem, des, automata);
     final int loopindex = element.getLoopIndex();
@@ -130,7 +131,7 @@ class JAXBTraceImporter
     final String name = element.getName();
     final String comment = element.getComment();
     final ProductDESProxy des = getProductDES(element, uri);
-    final IndexedSet<AutomatonProxy> automata = getAutomata(element, des);
+    final IndexedList<AutomatonProxy> automata = getAutomata(element, des);
     final TraceStepList listelem = element.getTraceStepList();
     final List<TraceStepProxy> steps = getTraceSteps(listelem, des, automata);
     return mFactory.createSafetyTraceProxy
@@ -165,7 +166,7 @@ class JAXBTraceImporter
     }
   }
 
-  private IndexedSet<AutomatonProxy> getAutomata(final TraceType element,
+  private IndexedList<AutomatonProxy> getAutomata(final TraceType element,
                                                  final ProductDESProxy des)
     throws WatersUnmarshalException
   {
@@ -174,8 +175,8 @@ class JAXBTraceImporter
       new CheckedExportSet<AutomatonProxy>(des.getAutomata(),
                                            des, "automaton");
     final AutomatonRefImporter importer = new AutomatonRefImporter(automata0);
-    final IndexedSet<AutomatonProxy> automata1 =
-      new CheckedImportSet<AutomatonProxy>
+    final IndexedList<AutomatonProxy> automata1 =
+      new CheckedImportList<AutomatonProxy>
         (TraceProxy.class, name, "automaton");
     mTraceAutomatonRefListHandler.fromJAXBChecked
       (importer, element, automata1);
@@ -185,7 +186,7 @@ class JAXBTraceImporter
   private List<TraceStepProxy> getTraceSteps
     (final TraceStepList element,
      final ProductDESProxy des,
-     final IndexedSet<AutomatonProxy> automata)
+     final IndexedList<AutomatonProxy> automata)
   {
     try {
       if (element == null) {
@@ -228,7 +229,7 @@ class JAXBTraceImporter
   private TraceStepProxy getTraceStep
     (final EventProxy event,
      final TraceStateTupleType element,
-     final IndexedSet<AutomatonProxy> automata)
+     final IndexedList<AutomatonProxy> automata)
   {
     Map<AutomatonProxy,StateProxy> statemap = null;
     if (element != null) {
@@ -251,7 +252,7 @@ class JAXBTraceImporter
     return cache.find(name);
   }
 
-  private void initStateCaches(final IndexedSet<AutomatonProxy> automata)
+  private void initStateCaches(final IndexedList<AutomatonProxy> automata)
   {
     final int size = automata.size();
     mStateCaches =
