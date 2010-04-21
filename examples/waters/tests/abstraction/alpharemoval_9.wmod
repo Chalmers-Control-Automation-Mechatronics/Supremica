@@ -70,7 +70,7 @@
                             <SimpleIdentifier Name=":alpha"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="192" X="320"/>
+                            <Point Y="192" X="352"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="10" X="0"/>
@@ -114,13 +114,16 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="107" X="345"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Target="S5" Source="S4">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="228" X="197"/>
+                            <Point Y="234" X="213"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="S1" Source="S5">
@@ -148,11 +151,17 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="103" X="236"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Target="S4" Source="S5">
                         <LabelBlock>
                             <SimpleIdentifier Name="e2"/>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="194" X="208"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Target="S2" Source="S5">
                         <LabelBlock>
@@ -207,11 +216,8 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S4">
-                        <EventList>
-                            <SimpleIdentifier Name=":alpha"/>
-                        </EventList>
                         <PointGeometry>
-                            <Point Y="192" X="320"/>
+                            <Point Y="208" X="368"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="10" X="0"/>
@@ -255,13 +261,16 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="121" X="335"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Target="S5" Source="S4">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="228" X="197"/>
+                            <Point Y="245" X="218"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Target="S1" Source="S5">
@@ -289,6 +298,9 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="113" X="254"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Target="S4" Source="S5">
                         <LabelBlock>

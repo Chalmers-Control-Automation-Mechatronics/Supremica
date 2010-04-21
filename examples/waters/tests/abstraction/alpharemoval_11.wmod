@@ -115,14 +115,6 @@
                             <SimpleIdentifier Name="tau"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S5" Source="S4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="241" X="183"/>
-                        </SplineGeometry>
-                    </Edge>
                     <Edge Target="S1" Source="S5">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
@@ -274,14 +266,6 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Target="S5" Source="S4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="241" X="183"/>
-                        </SplineGeometry>
                     </Edge>
                     <Edge Target="S1" Source="S5">
                         <LabelBlock>

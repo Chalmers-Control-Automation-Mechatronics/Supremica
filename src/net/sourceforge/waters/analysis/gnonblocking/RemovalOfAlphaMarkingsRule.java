@@ -90,7 +90,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
             final TIntIterator iter = predeccessors.iterator();
             while (iter.hasNext()) {
               final int predID = iter.next();
-              if (!reachableStates.contains(predID)) {
+              if (predID != newState && !reachableStates.contains(predID)) {
                 reachableStates.add(predID);
                 unvisitedStates.push(predID);
               }
