@@ -66,7 +66,9 @@ public class StateEncoding
     int code = 0;
     for (final StateProxy state : states) {
       mStates[code] = state;
-      mStateCodeMap.put(state, code);
+      if (state != null) {
+        mStateCodeMap.put(state, code);
+      }
       code++;
     }
   }

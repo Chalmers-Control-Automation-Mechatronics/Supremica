@@ -19,6 +19,7 @@ import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -27,6 +28,11 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
+
+
+// TODO Handle tau uniformly.
+
+// TODO Write documentation.
 
 
 public class ListBufferTransitionRelation
@@ -73,17 +79,18 @@ public class ListBufferTransitionRelation
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     final List<TransitionProxy> list =
       new ArrayList<TransitionProxy>(transitions);
+    final int numEvents = eventEnc.getNumberOfProperEvents();
+    final int numStates = stateEnc.getNumberOfStates();
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(eventEnc, stateEnc);
+        new OutgoingTransitionListBuffer(numEvents, numStates);
       mSuccessorBuffer.setUpTransitions(list, eventEnc, stateEnc);
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer =
-        new IncomingTransitionListBuffer(eventEnc, stateEnc);
+        new IncomingTransitionListBuffer(numEvents, numStates);
       mPredecessorBuffer.setUpTransitions(list, eventEnc, stateEnc);
     }
-    final int numEvents = eventEnc.getNumberOfProperEvents();
     mUsedEvents = new BitSet(numEvents);
     mUsedEvents.set(0, numEvents - 1, true);
   }
@@ -354,48 +361,10 @@ public class ListBufferTransitionRelation
     }
   }
 
-  /**
-   * Determines whether the given event is globally disabled in this transition
-   * relation.
-   *
-   * @param event
-   *          The ID of the event to be tested.
-   * @return <CODE>true</CODE> if the given event is disabled in every state.
-   */
-  public boolean isGloballyDisabled(final int event)
-  {
-    if (mSuccessorBuffer != null) {
-      return mSuccessorBuffer.isGloballyDisabled(event);
-    } else if (mPredecessorBuffer != null) {
-      return mPredecessorBuffer.isGloballyDisabled(event);
-    } else {
-      throw createNoBufferException();
-    }
-  }
-
-  /**
-   * Determines whether the given event is selflooped in this transition
-   * relation.
-   *
-   * @param event
-   *          The ID of the event to be tested.
-   * @return <CODE>true</CODE> if the given event is selflooped in every state,
-   *         and appears on no other transitions.
-   */
-  public boolean isPureSelfloopEvent(final int event)
-  {
-    if (mSuccessorBuffer != null) {
-      return mSuccessorBuffer.isPureSelfloopEvent(event);
-    } else if (mPredecessorBuffer != null) {
-      return mPredecessorBuffer.isPureSelfloopEvent(event);
-    } else {
-      throw createNoBufferException();
-    }
-  }
-
 
   //#########################################################################
   //# Transition Modifications
+
   /**
    * Adds a transition to this transition relation. The new transition is
    * inserted in a defined ordering in the predecessor and/or successor
@@ -500,7 +469,6 @@ public class ListBufferTransitionRelation
       throw createNoBufferException("successor");
     }
   }
-
 
   /**
    * Removes all incoming transitions associated with the given target
@@ -703,6 +671,45 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Determines whether the given event is globally disabled in this transition
+   * relation.
+   *
+   * @param event
+   *          The ID of the event to be tested.
+   * @return <CODE>true</CODE> if the given event is disabled in every state.
+   */
+  public boolean isGloballyDisabled(final int event)
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.isGloballyDisabled(event);
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.isGloballyDisabled(event);
+    } else {
+      throw createNoBufferException();
+    }
+  }
+
+  /**
+   * Determines whether the given event is selflooped in this transition
+   * relation.
+   *
+   * @param event
+   *          The ID of the event to be tested.
+   * @return <CODE>true</CODE> if the given event is selflooped in every state,
+   *         and appears on no other transitions.
+   */
+  public boolean isPureSelfloopEvent(final int event)
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.isPureSelfloopEvent(event);
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.isPureSelfloopEvent(event);
+    } else {
+      throw createNoBufferException();
+    }
+  }
+
+  /**
    * Removes the given event from this transition relation.
    * This method removes the given event including all its transitions
    * from the transition relation. The event is marked as unused,
@@ -739,6 +746,43 @@ public class ListBufferTransitionRelation
     }
     if (mPredecessorBuffer != null) {
       mPredecessorBuffer.replaceEvent(oldID, newID);
+    }
+  }
+
+
+  //#########################################################################
+  //# Buffer Maintenance
+  public void reconfigure(final int config)
+  {
+    try {
+      checkConfig(config);
+      final int numEvents = getNumberOfProperEvents();
+      final int numStates = getNumberOfStates();
+      if (mSuccessorBuffer == null && (config & CONFIG_SUCCESSORS) != 0) {
+        if (mPredecessorBuffer != null) {
+          mSuccessorBuffer =
+            new OutgoingTransitionListBuffer(numEvents, numStates);
+          mSuccessorBuffer.setUpTransitions(mPredecessorBuffer);
+        } else {
+          throw createNoBufferException("predecessor");
+        }
+      }
+      if (mPredecessorBuffer == null && (config & CONFIG_PREDECESSORS) != 0) {
+        if (mSuccessorBuffer != null) {
+          mPredecessorBuffer =
+            new OutgoingTransitionListBuffer(numEvents, numStates);
+          mPredecessorBuffer.setUpTransitions(mSuccessorBuffer);
+        } else {
+          throw createNoBufferException("successor");
+        }
+      }
+      if ((config & CONFIG_SUCCESSORS) == 0) {
+        mSuccessorBuffer = null;
+      } else if ((config & CONFIG_PREDECESSORS) == 0) {
+        mPredecessorBuffer = null;
+      }
+    } catch (final OverflowException exception) {
+      throw new WatersRuntimeException(exception);
     }
   }
 
@@ -833,6 +877,7 @@ public class ListBufferTransitionRelation
     }
 
     final int numStates = getNumberOfStates();
+    final StateProxy[] states = new StateProxy[numStates];
     final List<StateProxy> reachable = new ArrayList<StateProxy>(numStates);
     final TLongObjectHashMap<Collection<EventProxy>> markingsMap =
       new TLongObjectHashMap<Collection<EventProxy>>();
@@ -853,14 +898,14 @@ public class ListBufferTransitionRelation
           markingsMap.put(markings, props);
         }
         final StateProxy state = new MemStateProxy(code++, init, props);
+        states[s] = state;
         reachable.add(state);
       }
     }
-    // TODO Fix encoding ...
     if (stateEnc == null) {
-      stateEnc = new StateEncoding(reachable);
+      stateEnc = new StateEncoding(states);
     } else {
-      stateEnc.init(reachable);
+      stateEnc.init(states);
     }
 
     final int numTrans = getNumberOfTransitions();

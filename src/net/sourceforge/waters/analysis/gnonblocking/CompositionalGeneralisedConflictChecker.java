@@ -1210,7 +1210,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
 
   // #########################################################################
-  // # Inner Class ObservationEquivalenceStep
+  // # Inner Class RemovalOfTransitionsStep
   abstract class RemovalOfTransitionsStep extends Step
   {
     RemovalOfTransitionsStep(final AutomatonProxy resultAut,

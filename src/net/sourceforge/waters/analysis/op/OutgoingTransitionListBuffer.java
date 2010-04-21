@@ -36,14 +36,17 @@ public class OutgoingTransitionListBuffer extends TransitionListBuffer
    * Creates a new outgoing transition list buffer.
    * The transition buffer is set up for a fixed number of states and events,
    * which defines an encoding and can no more be changed.
+   * @param  numEvents   The number of events that can be encoded in
+   *                     transitions.
+   * @param  numStates   The number of states that can be encoded in
+   *                     transitions.
    * @throws OverflowException if the encoding for states and events does
    *         not fit in the 32 bits available.
    */
-  public OutgoingTransitionListBuffer(final EventEncoding eventEnc,
-                                      final StateEncoding stateEnc)
-      throws OverflowException
+  public OutgoingTransitionListBuffer(final int numEvents, final int numStates)
+    throws OverflowException
   {
-    super(eventEnc, stateEnc);
+    super(numEvents, numStates);
   }
 
 
@@ -67,6 +70,18 @@ public class OutgoingTransitionListBuffer extends TransitionListBuffer
   public int getIteratorTargetState(final TransitionIterator iter)
   {
     return iter.getCurrentToState();
+  }
+
+
+  public int getOtherIteratorFromState(final TransitionIterator iter)
+  {
+    return iter.getCurrentSourceState();
+  }
+
+
+  public int getOtherIteratorToState(final TransitionIterator iter)
+  {
+    return iter.getCurrentTargetState();
   }
 
 }

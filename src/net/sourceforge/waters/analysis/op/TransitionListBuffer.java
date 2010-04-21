@@ -75,17 +75,20 @@ public abstract class TransitionListBuffer
    * Creates a new transition list buffer.
    * The transition buffer is set up for a fixed number of states and events,
    * which defines an encoding and can no more be changed.
+   * @param  numEvents   The number of events that can be encoded in
+   *                     transitions.
+   * @param  numStates   The number of states that can be encoded in
+   *                     transitions.
    * @throws OverflowException if the encoding for states and events does
    *         not fit in the 32 bits available.
    */
-  public TransitionListBuffer(final EventEncoding eventEnc,
-                              final StateEncoding stateEnc)
+  public TransitionListBuffer(final int numEvents, final int numStates)
     throws OverflowException
   {
-    final int numStates = stateEnc.getNumberOfStates();
-    mNumEvents = eventEnc.getNumberOfProperEvents();
-    mStateShift = AutomatonTools.log2(numStates);
-    final int numBits = mStateShift + AutomatonTools.log2(mNumEvents);
+    mNumStates = numStates;
+    mNumEvents = numEvents;
+    mStateShift = AutomatonTools.log2(mNumEvents);
+    final int numBits = mStateShift + AutomatonTools.log2(mNumStates);
     if (numBits > 32) {
       throw new OverflowException
         ("Encoding requires " + numBits + " bits for states + events, but " +
@@ -667,7 +670,7 @@ public abstract class TransitionListBuffer
     Collections.sort(transitions, comparator);
     int from0 = -1;
     int e0 = -1;
-    int toCode0 = -1;
+    int data0 = -1;
     int list = NULL;
     for (final TransitionProxy trans : transitions) {
       final EventProxy event = trans.getEvent();
@@ -677,22 +680,22 @@ public abstract class TransitionListBuffer
         final int from = stateEnc.getStateCode(fromState);
         final StateProxy toState = getToState(trans);
         final int to = stateEnc.getStateCode(toState);
-        final int toCode = (to << mStateShift) | e;
+        final int data = (to << mStateShift) | e;
         if (from != from0) {
           mStateTransitions[from] = list = createList();
           final int fromCode = (from << mStateShift) | e;
           mStateEventTransitions.put(fromCode, list);
           from0 = from;
           e0 = e;
-        } else if (toCode0 == toCode) {
+        } else if (data0 == data) {
           continue;
         } else if (e0 != e) {
           final int fromCode = (from << mStateShift) | e;
           mStateEventTransitions.put(fromCode, list);
           e0 = e;
         }
-        toCode0 = toCode;
-        list = prepend(list, toCode);
+        data0 = data;
+        list = prepend(list, data);
       }
     }
     final List<EventProxy> extra = eventEnc.getExtraSelfloops();
@@ -724,6 +727,81 @@ public abstract class TransitionListBuffer
    * subclasses to handle forward and backward transition buffers uniformly.
    */
   public abstract StateProxy getToState(TransitionProxy trans);
+
+
+  //#########################################################################
+  //# Automata Conversion Methods
+  /**
+   * Initialises this transition buffer with transitions from another
+   * transition list buffer. This can be used to duplicate transition buffers,
+   * or to convert from forward to backward indexing and vice versa.
+   * This method replaces all transitions in the buffer by given transitions.
+   * Transitions are added in a fixed order that is determined from the
+   * given state and event encoding.
+   * The method assumes that this transition buffer is empty when called,
+   * if this is not the case, transitions will be overwritten without
+   * releasing all memory. To correctly replace transitions in a used buffer,
+   * call {@link #clear()} first.
+   * @param  transitions  List of transitions to populate the new buffer.
+   *                      The list will be reordered to match the order
+   *                      chosen by the buffer.
+   */
+  public void setUpTransitions(final TransitionListBuffer other)
+  {
+    final int numTrans = other.getNumberOfTransitions();
+    final long[] transitions = new long[numTrans];
+    final int eventShift = AutomatonTools.log2(mNumStates);
+    final int fromShift = eventShift + AutomatonTools.log2(mNumEvents);
+    final int toMask = (1 << eventShift) - 1;
+    final TransitionIterator iter =
+      other.createAllTransitionsReadOnlyIterator();
+    int i = 0;
+    while (iter.advance()) {
+      final int from = getOtherIteratorFromState(iter);
+      final int event = iter.getCurrentEvent();
+      final int to = getOtherIteratorToState(iter);
+      transitions[i++] = (from << fromShift) | (event << eventShift) | to;
+    }
+    Arrays.sort(transitions);
+    int from0 = -1;
+    int event0 = -1;
+    int list = NULL;
+    for (final long trans : transitions) {
+      final int from = (int) (trans >>> fromShift);
+      final int event = (int) (trans >>> eventShift) & mEventMask;
+      final int to = (int) (trans & toMask);
+      if (from != from0) {
+        mStateTransitions[from] = list = createList();
+        from0 = from;
+        event0 = -1;
+      }
+      if (event0 != event) {
+        final int fromCode = (from << mStateShift) | event;
+        mStateEventTransitions.put(fromCode, list);
+        event0 = event;
+      }
+      final int data = (to << mStateShift) | event;
+      list = prepend(list, data);
+    }
+  }
+
+  /**
+   * Gets a from-state from the given iterator, which may belong to another
+   * transition list buffer. This method is used by {@link
+   * #setUpTransitions(TransitionListBuffer) setUpTransitions()} to interpret
+   * transitions. It is overridden by subclasses to handle forward and backward
+   * transition buffers uniformly.
+   */
+  public abstract int getOtherIteratorFromState(TransitionIterator iter);
+
+  /**
+   * Gets a to-state from the given iterator, which may belong to another
+   * transition list buffer. This method is used by {@link
+   * #setUpTransitions(TransitionListBuffer) setUpTransitions()} to interpret
+   * transitions. It is overridden by subclasses to handle forward and backward
+   * transition buffers uniformly.
+   */
+  public abstract int getOtherIteratorToState(TransitionIterator iter);
 
 
   public void merge(final List<int[]> partition, final int tau)
@@ -1305,6 +1383,7 @@ public abstract class TransitionListBuffer
 
   //#########################################################################
   //# Data Members
+  private final int mNumStates;
   private final int mNumEvents;
   private final int mStateShift;
   private final int mEventMask;
