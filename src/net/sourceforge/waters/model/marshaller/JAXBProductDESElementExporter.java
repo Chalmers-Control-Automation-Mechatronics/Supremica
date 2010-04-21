@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.model.base.IndexedSet;
+import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AbstractProductDESProxyVisitor;
@@ -161,13 +161,13 @@ abstract class JAXBProductDESElementExporter
     try {
       copyNamedProxy(proxy, element);
       element.setKind(proxy.getKind());
-      mAutomatonEvents = new CheckedExportSet<EventProxy>
+      mAutomatonEvents = new CheckedExportList<EventProxy>
         (proxy.getEvents(), proxy, "event");
       mAutomatonEventRefExporter =
         new RefExporter<EventProxy>(mAutomatonEvents);
       mAutomatonEventRefListHandler.toJAXB
         (mProductDESEventRefExporter, mAutomatonEvents, element);
-      mAutomatonStates = new CheckedExportSet<StateProxy>
+      mAutomatonStates = new CheckedExportList<StateProxy>
         (proxy.getStates(), proxy, "state");
       mAutomatonStateListHandler.toJAXB(this, mAutomatonStates, element);
       final Set<TransitionProxy> transitions =
@@ -217,13 +217,14 @@ abstract class JAXBProductDESElementExporter
   {
     try {
       copyDocumentProxy(proxy, element);
-      mProductDESEvents = new CheckedExportSet<EventProxy>
+      mProductDESEvents = new CheckedExportList<EventProxy>
         (proxy.getEvents(), proxy, "event");
       mProductDESEventRefExporter =
         new RefExporter<EventProxy>(mProductDESEvents);
       mProductDESEventListHandler.toJAXB(this, mProductDESEvents, element);
-      final Set<AutomatonProxy> automata = new CheckedExportSet<AutomatonProxy>
-        (proxy.getAutomata(), proxy, "automaton");
+      final Collection<AutomatonProxy> automata =
+        new CheckedExportList<AutomatonProxy>
+          (proxy.getAutomata(), proxy, "automaton");
       mProductDESAutomataListHandler.toJAXB(this, automata, element);
     } finally {
       mProductDESEvents = null;
@@ -258,16 +259,16 @@ abstract class JAXBProductDESElementExporter
     try {
       final ProductDESProxy des = proxy.getProductDES();
       element.setProductDES(des.getName());
-      final IndexedSet<EventProxy> events =
-        new CheckedExportSet<EventProxy>(des.getEvents(), proxy, "event");
+      final IndexedList<EventProxy> events =
+        new CheckedExportList<EventProxy>(des.getEvents(), proxy, "event");
       final RefExporter<EventProxy> eventexporter =
         new RefExporter<EventProxy>(events);
-      final IndexedSet<AutomatonProxy> automata =
-        new CheckedExportSet<AutomatonProxy>
+      final IndexedList<AutomatonProxy> automata =
+        new CheckedExportList<AutomatonProxy>
           (des.getAutomata(), proxy, "automaton");
       final RefExporter<AutomatonProxy> autexporter =
         new RefExporter<AutomatonProxy>(automata);
-      mTraceAutomata = new CheckedExportSet<AutomatonProxy>
+      mTraceAutomata = new CheckedExportList<AutomatonProxy>
         (proxy.getAutomata(), proxy, "automaton");
       mTraceAutomatonRefListHandler.toJAXB
         (autexporter, mTraceAutomata, element);
@@ -348,9 +349,9 @@ abstract class JAXBProductDESElementExporter
 
     //#######################################################################
     //# Constructors
-    private RefExporter(final IndexedSet<P> alphabet)
+    private RefExporter(final IndexedList<? extends P> automatonEvents)
     {
-      mAlphabet = alphabet;
+      mAlphabet = automatonEvents;
     }
 
     //#######################################################################
@@ -375,17 +376,17 @@ abstract class JAXBProductDESElementExporter
 
     //#######################################################################
     //# Data Members
-    private final IndexedSet<P> mAlphabet;
+    private final IndexedList<? extends P> mAlphabet;
 
   }
 
 
   //#########################################################################
   //# Data Members
-  private IndexedSet<EventProxy> mProductDESEvents;
-  private IndexedSet<EventProxy> mAutomatonEvents;
-  private IndexedSet<StateProxy> mAutomatonStates;
-  private IndexedSet<AutomatonProxy> mTraceAutomata;
+  private IndexedList<EventProxy> mProductDESEvents;
+  private IndexedList<EventProxy> mAutomatonEvents;
+  private IndexedList<StateProxy> mAutomatonStates;
+  private IndexedList<AutomatonProxy> mTraceAutomata;
   private RefExporter<EventProxy> mProductDESEventRefExporter;
   private RefExporter<EventProxy> mAutomatonEventRefExporter;
   private boolean mIsFirstTraceStep;

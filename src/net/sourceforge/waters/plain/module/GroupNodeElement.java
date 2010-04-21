@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.IndexedHashSet;
+import net.sourceforge.waters.model.base.ImmutableOrderedSet;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -55,10 +55,8 @@ public final class GroupNodeElement
     if (immediateChildNodes == null) {
       mImmediateChildNodes = Collections.emptySet();
     } else {
-      final Set<NodeProxy> immediateChildNodesModifiable =
-        new IndexedHashSet<NodeProxy>(immediateChildNodes);
       mImmediateChildNodes =
-        Collections.unmodifiableSet(immediateChildNodesModifiable);
+        new ImmutableOrderedSet<NodeProxy>(immediateChildNodes);
     }
     mGeometry = geometry;
   }

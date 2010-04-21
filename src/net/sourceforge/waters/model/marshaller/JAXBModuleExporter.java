@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.IndexedList;
-import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -829,8 +828,8 @@ public class JAXBModuleExporter
   {
     copyNodeProxy(proxy, element);
     final Set<NodeProxy> childrenProxy = proxy.getImmediateChildNodes();
-    final IndexedSet<NodeProxy> childrenChecked =
-      new CheckedExportSet<NodeProxy>(childrenProxy, proxy, "node");
+    final IndexedList<NodeProxy> childrenChecked =
+      new CheckedExportList<NodeProxy>(childrenProxy, proxy, "node");
     final List<ElementType> childrenElement =
       Casting.toList(element.getNodes());
     for (final NodeProxy node : childrenChecked) {

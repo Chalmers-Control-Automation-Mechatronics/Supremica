@@ -18,9 +18,8 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.IndexedHashSet;
+import net.sourceforge.waters.model.base.ImmutableOrderedSet;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
-import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -170,32 +169,18 @@ public abstract class TraceElement
 
   //#########################################################################
   //# Local Class AutomataSet
-  private class AutomataSet extends IndexedHashSet<AutomatonProxy> {
+  private class AutomataSet extends ImmutableOrderedSet<AutomatonProxy> {
 
     //#######################################################################
     //# Constructor
     AutomataSet(final Collection<? extends AutomatonProxy> automata)
     {
-      super(automata.size());
-      insertAllUnique(automata);
+      super(automata);
     }
 
     //#######################################################################
-    //# Overrides from abstract class HashSetProxy
-    protected ItemNotFoundException createItemNotFound(final String name)
-    {
-      return new ItemNotFoundException
-        ("Trace '" + getName() +
-         "' does not contain the automaton named '" + name + "'!");
-    }
-
-    protected NameNotFoundException createNameNotFound(final String name)
-    {
-      return new NameNotFoundException
-        ("Trace '" + getName() +
-         "' does not contain an automaton named '" + name + "'!");
-    }
-
+    //# Overrides from abstract class
+    //# net.sourceforge.waters.model.base.ImmutableOrderedSet
     protected DuplicateNameException createDuplicateName(final String name)
     {
       return new DuplicateNameException

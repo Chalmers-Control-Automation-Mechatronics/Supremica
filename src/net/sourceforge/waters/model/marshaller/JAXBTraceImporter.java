@@ -19,7 +19,6 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.IndexedList;
-import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -171,9 +170,9 @@ class JAXBTraceImporter
     throws WatersUnmarshalException
   {
     final String name = element.getName();
-    final IndexedSet<AutomatonProxy> automata0 =
-      new CheckedExportSet<AutomatonProxy>(des.getAutomata(),
-                                           des, "automaton");
+    final IndexedList<AutomatonProxy> automata0 =
+      new CheckedExportList<AutomatonProxy>(des.getAutomata(),
+                                            des, "automaton");
     final AutomatonRefImporter importer = new AutomatonRefImporter(automata0);
     final IndexedList<AutomatonProxy> automata1 =
       new CheckedImportList<AutomatonProxy>
@@ -195,8 +194,8 @@ class JAXBTraceImporter
       } else {
         initStateCaches(automata);
         final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
-        final IndexedSet<EventProxy> events =
-          new CheckedExportSet<EventProxy>(des.getEvents(), des, "event");
+        final IndexedList<EventProxy> events =
+          new CheckedExportList<EventProxy>(des.getEvents(), des, "event");
         final EventRefImporter importer = new EventRefImporter(events);
         final TraceStateTupleType tuple0 = element.getInitialState();
         final TraceStepProxy step0 = getTraceStep(null, tuple0, automata);
@@ -248,7 +247,7 @@ class JAXBTraceImporter
 
   private StateProxy getState(final AutomatonProxy aut, final String name)
   {
-    final IndexedSet<StateProxy> cache = getStateCache(aut);
+    final IndexedList<StateProxy> cache = getStateCache(aut);
     return cache.find(name);
   }
 
@@ -256,14 +255,14 @@ class JAXBTraceImporter
   {
     final int size = automata.size();
     mStateCaches =
-      new IdentityHashMap<AutomatonProxy,IndexedSet<StateProxy>>(size);
+      new IdentityHashMap<AutomatonProxy,IndexedList<StateProxy>>(size);
   }
 
-  private IndexedSet<StateProxy> getStateCache(final AutomatonProxy aut)
+  private IndexedList<StateProxy> getStateCache(final AutomatonProxy aut)
   {
-    IndexedSet<StateProxy> cache = mStateCaches.get(aut);
+    IndexedList<StateProxy> cache = mStateCaches.get(aut);
     if (cache == null) {
-      cache = new CheckedExportSet<StateProxy>(aut.getStates(), aut, "state");
+      cache = new CheckedExportList<StateProxy>(aut.getStates(), aut, "state");
       mStateCaches.put(aut, cache);
     }
     return cache;
@@ -283,9 +282,9 @@ class JAXBTraceImporter
 
     //#######################################################################
     //# Constructors
-    private AutomatonRefImporter(final IndexedSet<AutomatonProxy> alphabet)
+    private AutomatonRefImporter(final IndexedList<AutomatonProxy> automata0)
     {
-      mAlphabet = alphabet;
+      mAlphabet = automata0;
     }
 
     //#######################################################################
@@ -305,7 +304,7 @@ class JAXBTraceImporter
 
     //#######################################################################
     //# Data Members
-    private final IndexedSet<AutomatonProxy> mAlphabet;
+    private final IndexedList<AutomatonProxy> mAlphabet;
 
   }
 
@@ -318,7 +317,7 @@ class JAXBTraceImporter
 
     //#######################################################################
     //# Constructors
-    private EventRefImporter(final IndexedSet<EventProxy> alphabet)
+    private EventRefImporter(final IndexedList<EventProxy> alphabet)
     {
       mAlphabet = alphabet;
     }
@@ -340,7 +339,7 @@ class JAXBTraceImporter
 
     //#######################################################################
     //# Data Members
-    private final IndexedSet<EventProxy> mAlphabet;
+    private final IndexedList<EventProxy> mAlphabet;
 
   }
 
@@ -352,6 +351,6 @@ class JAXBTraceImporter
     mTraceAutomatonRefListHandler = new TraceAutomatonRefListHandler();
 
   private ProductDESProxy mProductDES;
-  private Map<AutomatonProxy,IndexedSet<StateProxy>> mStateCaches;
+  private Map<AutomatonProxy,IndexedList<StateProxy>> mStateCaches;
 
 }
