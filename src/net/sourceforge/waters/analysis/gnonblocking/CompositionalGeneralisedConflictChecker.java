@@ -1257,7 +1257,7 @@ public class CompositionalGeneralisedConflictChecker extends
     // #######################################################################
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
-      // TODO For later, may also have to consider the case that the
+      // TODO Need to consider specially the case that the
       // simplified automaton does not contain any tau event, and only
       // bisimulation was used.
       final List<TraceStepProxy> convertedSteps =
@@ -1342,6 +1342,11 @@ public class CompositionalGeneralisedConflictChecker extends
           new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
       traceAutomata.remove(getResultAutomaton());
       traceAutomata.add(getOriginalAutomaton());
+      // TODO Fix bug. Trace name should be "<model>-conflicting" where
+      // <model> is the name of the original input model, location can be null.
+      // This bug appears several times in this file, so I would say it is an
+      // excellent opportunity to move this trace creation instruction to a
+      // superclass method ;-)
       final ConflictTraceProxy convertedTrace =
           getFactory().createConflictTraceProxy(conflictTrace.getName(),
                                                 conflictTrace.getComment(),
