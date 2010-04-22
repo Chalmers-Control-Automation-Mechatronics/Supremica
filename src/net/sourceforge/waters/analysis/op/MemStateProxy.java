@@ -14,6 +14,7 @@ import java.util.Collection;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -22,13 +23,15 @@ import net.sourceforge.waters.model.printer.ProductDESProxyPrinter;
 
 /**
  * A more efficient implementation of the {@link StateProxy} interface.
- * This class stores that state name as an integer in order to avoid
- * storing a long string when it is not needed.
+ * This class stores the state name together with the initial status
+ * as an integer in order to avoid storing a long string when it is not
+ * needed.
  *
- * @author Simon Ware
+ * @author Simon Ware, Robi Malik
  */
 
-public class MemStateProxy implements StateProxy
+public class MemStateProxy
+  implements StateProxy, Cloneable
 {
 
   //#######################################################################
@@ -37,8 +40,7 @@ public class MemStateProxy implements StateProxy
                        final boolean init,
                        final Collection<EventProxy> props)
   {
-    mCode = code;
-    mIsInitial = init;
+    mCode = init ? (code | TAG_INITIAL) : code;
     mProps = props;
   }
 
@@ -47,12 +49,12 @@ public class MemStateProxy implements StateProxy
   //# Interface net.sourceforge.waters.model.des.StateProxy
   public String getName()
   {
-    return "S:" + mCode;
+    return "S:" + getStateCode();
   }
 
   public boolean isInitial()
   {
-    return mIsInitial;
+    return (mCode & TAG_INITIAL) != 0;
   }
 
   public Collection<EventProxy> getPropositions()
@@ -62,14 +64,18 @@ public class MemStateProxy implements StateProxy
 
   public MemStateProxy clone()
   {
-    return new MemStateProxy(mCode, mIsInitial, mProps);
+    try {
+      return (MemStateProxy) super.clone();
+    } catch (final CloneNotSupportedException exception) {
+      throw new WatersRuntimeException(exception);
+    }
   }
 
   public boolean refequals(final NamedProxy named)
   {
     if (named != null && named.getClass() == getClass()) {
-      final MemStateProxy s = (MemStateProxy) named;
-      return s.mCode == mCode;
+      final MemStateProxy state = (MemStateProxy) named;
+      return state.getStateCode() == getStateCode();
     } else {
       return false;
     }
@@ -77,7 +83,7 @@ public class MemStateProxy implements StateProxy
 
   public int refHashCode()
   {
-    return mCode;
+    return getStateCode();
   }
 
   public Object acceptVisitor(final ProxyVisitor visitor)
@@ -98,8 +104,8 @@ public class MemStateProxy implements StateProxy
     final Class<?> clazz1 = getClass();
     final Class<?> clazz2 = named.getClass();
     if (clazz1 == clazz2) {
-      final MemStateProxy s = (MemStateProxy) named;
-      return mCode - s.mCode;
+      final MemStateProxy state = (MemStateProxy) named;
+      return getStateCode() - state.getStateCode();
     }
     final String name1 = getName();
     final String name2 = named.getName();
@@ -123,16 +129,20 @@ public class MemStateProxy implements StateProxy
 
   //#######################################################################
   //# Simple Access
-  public int getCode()
+  public int getStateCode()
   {
-    return mCode;
+    return mCode & ~TAG_INITIAL;
   }
 
 
   //#######################################################################
   //# Data Members
   private final int mCode;
-  private final boolean mIsInitial;
   private final Collection<EventProxy> mProps;
+
+
+  //#######################################################################
+  //# Data Members
+  private static final int TAG_INITIAL = 0x80000000;
 
 }
