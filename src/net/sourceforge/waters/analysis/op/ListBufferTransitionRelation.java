@@ -30,8 +30,40 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
-// TODO Write documentation.
-
+/**
+ * A more convenient means to store and retrieve transitions of an automaton.
+ *
+ * The list buffer transition relation is created from an automaton to
+ * index its transitions, making it easier to associate states with
+ * transitions, and to modify the transition structure.
+ *
+ * Transitions are stored in a {@link TransitionListBuffer} in bit-packed form
+ * in blocked linked lists. The user may choose to create a buffer for outgoing
+ * transitions, which enables quick access to transitions given their source
+ * state, or a buffer for incoming transitions, which enables quick access
+ * to transitions given their target state, or both.
+ *
+ * Reconfiguration of the buffer selection is possible, but time-consuming.
+ * Some methods require the presence or absence of the incoming or outgoing
+ * buffer, see details with each method.
+ *
+ * The encoding of states and events is defined by the user upon creation
+ * of the transition relation, using a {@link StateEncoding} and an
+ * {@link EventEncoding}. After construction, the encoding can no longer
+ * be changed, except that events can be removed (marked as unused) and
+ * states can be marked as unreachable. These settings will be respected
+ * when creating an automaton from the transition relation.
+ *
+ * The transition relation also associates with each states its initial state
+ * status and its propositions in a bit set, using a {@link IntStateBuffer}.
+ *
+ * @see {@link StateEncoding}
+ * @see {@link EventEncoding}
+ * @see {@link IntStateBuffer}
+ * @see {@link TransitionListBuffer}
+ *
+ * @author Robi Malik
+ */
 
 public class ListBufferTransitionRelation
 {
@@ -41,11 +73,14 @@ public class ListBufferTransitionRelation
   /**
    * Creates a new transition relation from the given automaton,
    * using default (temporary) state and event encodings.
+   * @param  aut      The automaton to be encoded.
+   * @param  config   Configuration flags defining which transition buffers
+   *                  are to be created. Should be one of
+   *                  {@link #CONFIG_SUCCESSORS},
+   *                  {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
    * @throws OverflowException if the automaton's number of states and events
    *         is too large to be encoded in the bit sizes used by the
    *         list buffer implementations.
-   * @throws IllegalArgumentException if the given configuration does not
-   *         specify an incoming or outgoing transition buffer.
    */
   public ListBufferTransitionRelation(final AutomatonProxy aut,
                                       final int config)
@@ -57,11 +92,18 @@ public class ListBufferTransitionRelation
   /**
    * Creates a new transition relation from the given automaton,
    * using the given state and event encoding.
+   * @param  aut      The automaton to be encoded.
+   * @param  eventEnc Event encoding to define the assignment of integer
+   *                  codes to events in the transition buffers.
+   * @param  stateEnc State encoding to define the assignment of integer
+   *                  codes to events in the transition buffers.
+   * @param  config   Configuration flags defining which transition buffers
+   *                  are to be created. Should be one of
+   *                  {@link #CONFIG_SUCCESSORS},
+   *                  {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
    * @throws OverflowException if the given number of states and events
    *         is too large to be encoded in the bit sizes used by the
    *         list buffer implementations.
-   * @throws IllegalArgumentException if the given configuration does not
-   *         specify an incoming or outgoing transition buffer.
    */
   public ListBufferTransitionRelation
     (final AutomatonProxy aut,
@@ -119,11 +161,19 @@ public class ListBufferTransitionRelation
 
   //#########################################################################
   //# State Access
+  /**
+   * Gets the number of states in the transition relation,
+   * including any states set to be unreachable.
+   */
   public int getNumberOfStates()
   {
     return mStateBuffer.getNumberOfStates();
   }
 
+  /**
+   * Gets the number of reachable states in the transition relation.
+   * A state is considered reachable if its reachability flag is set.
+   */
   public int getNumberOfReachableStates()
   {
     return mStateBuffer.getNumberOfReachableStates();
@@ -152,11 +202,23 @@ public class ListBufferTransitionRelation
 
   //#########################################################################
   //# Markings Access
+  /**
+   * Tests whether a state is marked with a particular proposition.
+   * @param state
+   *          ID of the state to be tested.
+   * @param prop
+   *          ID of proposition identifying the marking to be looked up.
+   * @return <CODE>true</CODE> if the state is marked, <CODE>false</CODE>
+   *         otherwise.
+   */
   public boolean isMarked(final int state, final int prop)
   {
     return mStateBuffer.isMarked(state, prop);
   }
 
+  /**
+   * Gets a number characterising all markings of the given state.
+   */
   public long getAllMarkings(final int state)
   {
     return mStateBuffer.getAllMarkings(state);
@@ -750,6 +812,13 @@ public class ListBufferTransitionRelation
 
   //#########################################################################
   //# Buffer Maintenance
+  /**
+   * Reconfigures the current set of transition buffers.
+   * @param  config   Configuration flags defining which transition buffers
+   *                  are to be used from now on. Should be one of
+   *                  {@link #CONFIG_SUCCESSORS},
+   *                  {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   */
   public void reconfigure(final int config)
   {
     try {
@@ -859,12 +928,34 @@ public class ListBufferTransitionRelation
 
   //#########################################################################
   //# Automaton Output
+  /**
+   * Creates an automaton from this transition relation.
+   * This method creates an {@link AutomatonProxy} object that contains all
+   * events not marked as unused and all reachable states of the transition
+   * relation, and links them with all the transitions stored.
+   * @param factory  Factory used from proxy creation.
+   * @param eventEnc Event encoding defining what events are to be used
+   *                 for the integer codes in the transition relation.
+   */
   public AutomatonProxy createAutomaton
     (final ProductDESProxyFactory factory, final EventEncoding eventEnc)
   {
     return createAutomaton(factory, eventEnc, null);
   }
 
+  /**
+   * Creates an automaton from this transition relation.
+   * This method creates an {@link AutomatonProxy} object that contains all
+   * events not marked as unused and all reachable states of the transition
+   * relation, and links them with all the transitions stored.
+   * @param factory  Factory used from proxy creation.
+   * @param eventEnc Event encoding defining what events are to be used
+   *                 for the integer codes in the transition relation.
+   * @param stateEnc State encoding to be created. If non-null, the
+   *                 method will add to the state encoding the states
+   *                 created for the output automaton and their assignment
+   *                 to state codes in the transition relation.
+   */
   public AutomatonProxy createAutomaton
     (final ProductDESProxyFactory factory,
      final EventEncoding eventEnc,
@@ -1085,8 +1176,20 @@ public class ListBufferTransitionRelation
 
   //#########################################################################
   //# Class Constants
+  /**
+   * Configuration setting specifying that the transition relation is to
+   * use an outgoing transition buffer.
+   */
   public static final int CONFIG_SUCCESSORS = 0x01;
+  /**
+   * Configuration setting specifying that the transition relation is to
+   * use an incoming transition buffer.
+   */
   public static final int CONFIG_PREDECESSORS = 0x02;
+  /**
+   * Configuration setting specifying that the transition relation is to
+   * use both an outgoing and an incoming transition buffer.
+   */
   public static final int CONFIG_ALL = CONFIG_SUCCESSORS | CONFIG_PREDECESSORS;
 
 }

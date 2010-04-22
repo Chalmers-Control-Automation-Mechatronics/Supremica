@@ -10,6 +10,13 @@
 package net.sourceforge.waters.analysis.op;
 
 /**
+ * An iterator to visit transitions in a {@link TransitionListBuffer}.
+ * This interface provides a basis for iteration over all or subsets of
+ * transitions in a transition relation.
+ *
+ * @see {@link ListBufferTransitionRelation}
+ * @see {@link TransitionListBuffer}
+ *
  * @author Robi Malik
  */
 
