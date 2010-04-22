@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.analysis;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -35,7 +36,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   //# Constructors
   public AbstractModelAnalyser(final ProductDESProxyFactory factory)
   {
-    this(null, factory);
+    this((ProductDESProxy) null, factory);
   }
 
   public AbstractModelAnalyser(final ProductDESProxy model,
@@ -46,6 +47,12 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     mNodeLimit = Integer.MAX_VALUE;
     mTransitionLimit = Integer.MAX_VALUE;
     mIsAborting = false;
+  }
+
+  public AbstractModelAnalyser(final AutomatonProxy aut,
+                               final ProductDESProxyFactory factory)
+  {
+    this(createProductDESProxy(aut, factory), factory);
   }
 
 
@@ -145,6 +152,27 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     }
   }
 
+  /**
+   * Attempts to retrieve the single input automaton from the input model.
+   * This method checks whether the input model contains exactly one
+   * automaton, and if this is the case, returns it.
+   * @throws InvalidModelException if the input model does not contain
+   *         exactly one automaton.
+   */
+  protected AutomatonProxy getInputAutomaton()
+    throws InvalidModelException
+  {
+    final ProductDESProxy des = getModel();
+    final Collection<AutomatonProxy> automata = des.getAutomata();
+    if (automata.size() == 1) {
+      return automata.iterator().next();
+    } else {
+      throw new InvalidModelException
+        ("The input product DES '" + des.getName() +
+         "' does not contain exactly one automaton, which is required for " +
+         ProxyTools.getShortClassName(this) + "!");
+    }
+  }
 
   //#########################################################################
   //# Logging

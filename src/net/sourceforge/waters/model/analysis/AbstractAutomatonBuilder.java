@@ -33,7 +33,7 @@ public abstract class AbstractAutomatonBuilder
   //# Constructors
   public AbstractAutomatonBuilder(final ProductDESProxyFactory factory)
   {
-    this(null, factory);
+    super(factory);
   }
 
   public AbstractAutomatonBuilder(final ProductDESProxy model,
@@ -41,6 +41,13 @@ public abstract class AbstractAutomatonBuilder
   {
     super(model, factory);
     mResult = null;
+  }
+
+
+  public AbstractAutomatonBuilder(final AutomatonProxy aut,
+                                  final ProductDESProxyFactory factory)
+  {
+    super(aut, factory);
   }
 
 
@@ -96,7 +103,7 @@ public abstract class AbstractAutomatonBuilder
    * in the given automaton result. This default implementation does
    * nothing, it needs to be overridden by subclasses.
    */
-  protected void addStatistics(AutomatonResult result)
+  protected void addStatistics(final AutomatonResult result)
   {
   }
 

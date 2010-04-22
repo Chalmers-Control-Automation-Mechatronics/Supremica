@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.model.analysis.AbstractAutomatonTransformer;
+import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -41,7 +41,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
  */
 
 public class OPSearchAutomatonSimplifier
-  extends AbstractAutomatonTransformer
+  extends AbstractAutomatonBuilder
 {
 
   //#########################################################################
