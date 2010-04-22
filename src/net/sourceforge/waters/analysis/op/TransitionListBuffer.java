@@ -38,7 +38,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * way. Each transition is stored in a list under its from-state, with the
  * event and to-state stored packed together in a single integer. This limits
  * the size to automata whose states and events numbers together can be packed
- * in 32 bits.
+ * in 32&nbsp;bits.
  *
  * In addition, a single hash map is used to map pairs of from-state and
  * event to their list of transitions. This leads to a memory requirement
@@ -55,6 +55,10 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * ordering, which depends on the contents and encoding of input transition
  * lists, or on the ordering of other transition lists when they are merged.
  * All iterators obey the defined ordering.
+ *
+ * The transition list buffer recognises the silent event code
+ * {@link EventEncoding#TAU} and automatically suppresses all selfloops using
+ * this event.
  *
  * This implementation is a shared superclass for buffers of incoming and
  * outgoing transitions in a {@link ListBufferTransitionRelation}. The 'from'

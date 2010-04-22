@@ -9,21 +9,18 @@
 
 package net.sourceforge.waters.analysis.op;
 
+import gnu.trove.TIntStack;
 import gnu.trove.TLongObjectHashMap;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.base.ProxyVisitor;
-import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
@@ -53,6 +50,10 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * be changed, except that events can be removed (marked as unused) and
  * states can be marked as unreachable. These settings will be respected
  * when creating an automaton from the transition relation.
+ *
+ * The transition buffers recognise the silent event code
+ * {@link EventEncoding#TAU} and automatically suppress all selfloops using
+ * this event.
  *
  * The transition relation also associates with each states its initial state
  * status and its propositions in a bit set, using a {@link IntStateBuffer}.
@@ -138,21 +139,53 @@ public class ListBufferTransitionRelation
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Gets the name of this transition relation.
+   * This name will be given to any automaton created from this
+   * transition relation.
+   * @see {@link #createAutomaton(ProductDESProxyFactory, EventEncoding)}
+   * @see {@link #createAutomaton(ProductDESProxyFactory, EventEncoding,
+   *      StateEncoding)}
+   */
   public String getName()
   {
     return mName;
   }
 
+  /**
+   * Sets a new name for this transition relation.
+   * This name will be given to any automaton created from this
+   * transition relation.
+   * @see {@link #createAutomaton(ProductDESProxyFactory, EventEncoding)}
+   * @see {@link #createAutomaton(ProductDESProxyFactory, EventEncoding,
+   *      StateEncoding)}
+   */
   public void setName(final String name)
   {
     mName = name;
   }
 
+  /**
+   * Gets the kind of this transition relation.
+   * This attribute will be used for any automaton created from this
+   * transition relation.
+   * @see {@link #createAutomaton(ProductDESProxyFactory, EventEncoding)}
+   * @see {@link #createAutomaton(ProductDESProxyFactory, EventEncoding,
+   *      StateEncoding)}
+   */
   public ComponentKind getKind()
   {
     return mKind;
   }
 
+  /**
+   * Sets the kind of this transition relation.
+   * This attribute will be used for any automaton created from this
+   * transition relation.
+   * @see {@link #createAutomaton(ProductDESProxyFactory, EventEncoding)}
+   * @see {@link #createAutomaton(ProductDESProxyFactory, EventEncoding,
+   *      StateEncoding)}
+   */
   public void setKind(final ComponentKind kind)
   {
     mKind = kind;
@@ -179,24 +212,56 @@ public class ListBufferTransitionRelation
     return mStateBuffer.getNumberOfReachableStates();
   }
 
+  /**
+   * Gets the initial status of the given state.
+   * @return <CODE>true</CODE> if the state is an initial state,
+   *         <CODE>false</CODE> otherwise.
+   */
   public boolean isInitial(final int state)
   {
     return mStateBuffer.isInitial(state);
   }
 
+  /**
+   * Sets the initial status of the given state.
+   * @param  state  The ID of state to be modified.
+   * @param  init   <CODE>true</CODE> if the state is to be ab initial state,
+   *                <CODE>false</CODE> otherwise.
+   */
   public void setInitial(final int state, final boolean init)
   {
     mStateBuffer.setInitial(state, init);
   }
 
+  /**
+   * Gets the reachability status of the given state.
+   * Each state has a reachability flag associated with it, which is used
+   * to suppress unreachable states when creating an automaton from the
+   * transition relation. The reachability status is not set automatically;
+   * it is to be set by the user when a state is deemed unreachable.
+   * @see {@link #setReachable(int) setReachable()}
+   * @see {@link #checkReachability()}
+   * @see {@link #createAutomaton(ProductDESProxyFactory, EventEncoding)}
+   * @see {@link #createAutomaton(ProductDESProxyFactory, EventEncoding,
+   *      StateEncoding)}
+   */
   public boolean isReachable(final int state)
   {
     return mStateBuffer.isReachable(state);
   }
 
+  /**
+   * Sets the reachability status of the given state.
+   * If a state is set to be unreachable, transitions linked to the state
+   * will be removed automatically.
+   * @see {@link #removeTransitions(int) removeTransitions()}
+   */
   public void setReachable(final int state, final boolean reachable)
   {
     mStateBuffer.setReachable(state, reachable);
+    if (!reachable) {
+      removeTransitions(state);
+    }
   }
 
 
@@ -217,7 +282,14 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * Gets a number characterising all markings of the given state.
+   * Gets a number that identifies the complete set of markings for the
+   * given state.
+   * @param  state   ID of the state to be examined.
+   * @return A marking pattern for the state. The only guarantee about the
+   *         number returned is that two states with the same set of markings
+   *         will always have the same marking patterns, and states with
+   *         different sets of markings will always have different marking
+   *         patterns.
    */
   public long getAllMarkings(final int state)
   {
@@ -232,8 +304,8 @@ public class ListBufferTransitionRelation
    * @param prop
    *          ID of proposition identifying the marking to be modified.
    * @param value
-   *          Whether the marking should be set (<CODE>true</CODE>) or cleared (
-   *          <CODE>false</CODE>) for the given state and proposition.
+   *          Whether the marking should be set (<CODE>true</CODE>) or cleared
+   *          (<CODE>false</CODE>) for the given state and proposition.
    */
   public void setMarked(final int state, final int prop, final boolean value)
   {
@@ -252,15 +324,10 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * Copies markings from one state to another. This methods add all the
-   * markings of the given source state (from) to the given target state (to).
-   * The markings of the source state will not be changed, and the target state
-   * retains any markings it previously had in addition to the new ones.
-   *
-   * @param source
-   *          ID of source state to copy markings from.
-   * @param dest
-   *          ID of target state to copy markings to.
+   * Copies markings from one state to another. This method adds all the
+   * markings of the given source state to the given destination state.
+   * The markings of the source state will not be changed, and the destination
+   * state retains any markings it previously had in addition to the new ones.
    */
   public void copyMarkings(final int source, final int dest)
   {
@@ -424,7 +491,6 @@ public class ListBufferTransitionRelation
 
   //#########################################################################
   //# Transition Modifications
-
   /**
    * Adds a transition to this transition relation. The new transition is
    * inserted in a defined ordering in the predecessor and/or successor
@@ -469,6 +535,27 @@ public class ListBufferTransitionRelation
     }
     if (mPredecessorBuffer != null) {
       result = mPredecessorBuffer.removeTransition(target, event, source);
+    }
+    return result;
+  }
+
+  /**
+   * Removes all transitions associated with the given state.
+   * This method removes all transitions indexed under the given state.
+   * Depending on the buffer configuration, this does not necessarily
+   * remove all transitions linked to the state, only those that are
+   * readily accessible.
+   * @return <CODE>true</CODE> if at least one transition was removed,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean removeTransitions(final int state)
+  {
+    boolean result = false;
+    if (mSuccessorBuffer != null) {
+      result = removeOutgoingTransitions(state);
+    }
+    if (mPredecessorBuffer != null) {
+      result |= removeIncomingTransitions(state);
     }
     return result;
   }
@@ -925,6 +1012,59 @@ public class ListBufferTransitionRelation
     }
   }
 
+  /**
+   * Re-evaluates reachability.
+   * This method does a full reachability search of the transition relation,
+   * and resets the reachability status of all states according to the
+   * result. If any states are found to be unreachable, transitions
+   * attached to these states are removed.
+   * @return <CODE>true</CODE> if the reachability status of at least one
+   *         state was changed, <CODE>false</CODE> otherwise.
+   * @throws IllegalStateException
+   *           if the transition relation is not configured to use an outgoing
+   *           transition buffer.
+   * @see {@link #removeTransitions(int) removeTransitions()}
+   */
+  public boolean checkReachability()
+  {
+    if (mSuccessorBuffer != null) {
+      final int numStates = getNumberOfStates();
+      final TIntStack stack = new TIntStack();
+      final BitSet reached = new BitSet(numStates);
+      for (int s = 0; s < numStates; s++) {
+        if (isInitial(s)) {
+          stack.push(s);
+          reached.set(s);
+        }
+      }
+      final TransitionIterator iter =
+        mSuccessorBuffer.createReadOnlyIterator();
+      while (stack.size() > 0) {
+        final int current = stack.pop();
+        iter.reset(current);
+        while (iter.advance()) {
+          final int s = iter.getCurrentTargetState();
+          if (!reached.get(s)) {
+            stack.push(s);
+            reached.set(s);
+          }
+        }
+      }
+      boolean modified = false;
+      for (int s = 0; s < numStates; s++) {
+        final boolean oldstatus = isReachable(s);
+        final boolean newstatus = reached.get(s);
+        if (oldstatus != newstatus) {
+          setReachable(s, newstatus);
+          modified = true;
+        }
+      }
+      return modified;
+    } else {
+      throw createNoBufferException("successor");
+    }
+  }
+
 
   //#########################################################################
   //# Automaton Output
@@ -1064,102 +1204,6 @@ public class ListBufferTransitionRelation
     return new IllegalStateException
       (ProxyTools.getShortClassName(this) +
        " configuration error: " + name + " buffer not initialised!");
-  }
-
-
-  //#########################################################################
-  //# Inner Class MemStateProxy
-  /**
-   * Stores states, encoding the name as an int rather than a long string value.
-   */
-  private static class MemStateProxy implements StateProxy
-  {
-
-    //#######################################################################
-    //# Constructor
-    private MemStateProxy(final int code, final boolean init,
-                          final Collection<EventProxy> props)
-    {
-      mCode = code;
-      mIsInitial = init;
-      mProps = props;
-    }
-
-    //#######################################################################
-    //# Simple Access
-    @SuppressWarnings("unused")
-    int getCode()
-    {
-      return mCode;
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.des.StateProxy
-    public String getName()
-    {
-      return "S:" + mCode;
-    }
-
-    public boolean isInitial()
-    {
-      return mIsInitial;
-    }
-
-    public Collection<EventProxy> getPropositions()
-    {
-      return mProps;
-    }
-
-    public MemStateProxy clone()
-    {
-      return new MemStateProxy(mCode, mIsInitial, mProps);
-    }
-
-    public boolean refequals(final NamedProxy o)
-    {
-      if (o instanceof MemStateProxy) {
-        final MemStateProxy s = (MemStateProxy) o;
-        return s.mCode == mCode;
-      } else {
-        return false;
-      }
-    }
-
-    public int refHashCode()
-    {
-      return mCode;
-    }
-
-    public Object acceptVisitor(final ProxyVisitor visitor)
-        throws VisitorException
-    {
-      final ProductDESProxyVisitor desvisitor =
-          (ProductDESProxyVisitor) visitor;
-      return desvisitor.visitStateProxy(this);
-    }
-
-    public Class<StateProxy> getProxyInterface()
-    {
-      return StateProxy.class;
-    }
-
-    public int compareTo(final NamedProxy n)
-    {
-      return n.getName().compareTo(getName());
-    }
-
-    //#######################################################################
-    //# Overrides for java.lang.Object
-    public String toString()
-    {
-      return getName();
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final int mCode;
-    private final boolean mIsInitial;
-    private final Collection<EventProxy> mProps;
   }
 
 

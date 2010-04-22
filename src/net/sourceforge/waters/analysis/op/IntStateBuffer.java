@@ -17,9 +17,26 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+
 /**
+ * A data structure that stores status information for states in a transition
+ * relation in a compact way.
+ *
+ * The state buffer considers a state space represented consisting of integer
+ * state code ranging from&nbsp;0 up to the number of states minus&nbsp;1.
+ * For each state code, it stores the following status information.
+ * Each state can be designated as <I>initial</I> and/or <I>reachable</I>,
+ * and can be <I>marked</I> with zero or more propositions.
+ *
+ * The information is stored packed into the bits of a single integer for
+ * each state. This allows for the encoding of up to 30 distinct marking
+ * propositions.
+ *
+ * @see {@link StateEncoding}
+ *
  * @author Robi Malik
  */
+
 public class IntStateBuffer
 {
 
@@ -27,6 +44,10 @@ public class IntStateBuffer
   //# Constructors
   /**
    * Creates a new state buffer.
+   * @param  eventEnc   Event encoding that defines event codes for proposition
+   *                    events used as markings of the states.
+   * @param  stateEnc   State encoding that defines the assignment of state
+   *                    codes for the states in the buffer.
    * @throws OverflowException if the event encoding map has more than 30
    *                  propositions.
    */
@@ -72,16 +93,25 @@ public class IntStateBuffer
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Gets the number of states in the buffer.
+   */
   public int getNumberOfStates()
   {
     return mStateInfo.length;
   }
 
+  /**
+   * Determines whether the given state is initial.
+   */
   public boolean isInitial(final int state)
   {
     return (mStateInfo[state] & TAG_INITIAL) != 0;
   }
 
+  /**
+   * Sets the initial status of the given state.
+   */
   public void setInitial(final int state, final boolean value)
   {
     if (value) {
@@ -91,11 +121,21 @@ public class IntStateBuffer
     }
   }
 
+  /**
+   * Determines whether the given state is reachable.
+   * Reachability is merely handled as a flag by this class,
+   * to be interpreted by the users.
+   */
   public boolean isReachable(final int state)
   {
     return (mStateInfo[state] & TAG_REACHABLE) != 0;
   }
 
+  /**
+   * Sets the reachability status of the given state.
+   * Reachability is merely handled as a flag by this class,
+   * to be interpreted by the users.
+   */
   public void setReachable(final int state, final boolean value)
   {
     if (value) {
@@ -105,16 +145,38 @@ public class IntStateBuffer
     }
   }
 
+  /**
+   * Checks whether a state is marked.
+   * @param  state   ID of the state to be tested.
+   * @param  prop    ID of the marking proposition to be tested.
+   */
   public boolean isMarked(final int state, final int prop)
   {
     return (mStateInfo[state] & (1 << prop)) != 0;
   }
 
+  /**
+   * Gets a number that identifies the complete set of markings for the
+   * given state.
+   * @param  state   ID of the state to be examined.
+   * @return A marking pattern for the state. The only guarantee about the
+   *         number returned is that two states with the same set of markings
+   *         will always have the same marking patterns, and states with
+   *         different sets of markings will always have different marking
+   *         patterns.
+   */
   public long getAllMarkings(final int state)
   {
     return mStateInfo[state] & ~TAG_ALL;
   }
 
+  /**
+   * Sets the marking of a state.
+   * @param  state   ID of the state to be modified.
+   * @param  prop    ID of the marking proposition to be modified.
+   * @param  value   <CODE>true</CODE> if the state is to be marked,
+   *                 <CODE>false</CODE> if it is to be unmarked.
+   */
   public void setMarked(final int state, final int prop, final boolean value)
   {
     if (value) {
@@ -124,11 +186,20 @@ public class IntStateBuffer
     }
   }
 
+  /**
+   * Removes all markings from the given state.
+   */
   public void clearMarkings(final int state)
   {
     mStateInfo[state] &= TAG_ALL;
   }
 
+  /**
+   * Copies markings from one state to another. This method adds all the
+   * markings of the given source state to the given destination state.
+   * The markings of the source state will not be changed, and the destination
+   * state retains any markings it previously had in addition to the new ones.
+   */
   public void copyMarkings(final int source, final int dest)
   {
     mStateInfo[dest] |= (mStateInfo[source] & ~TAG_ALL);
@@ -137,6 +208,10 @@ public class IntStateBuffer
 
   //#########################################################################
   //# Advanced Access
+  /**
+   * Gets the number of states currently marked as reachable in this state
+   * buffer.
+   */
   public int getNumberOfReachableStates()
   {
     int count = 0;
