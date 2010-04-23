@@ -32,8 +32,10 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+
 import net.sourceforge.waters.analysis.gnonblocking.Candidate;
-import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.monolithic.
+  MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -80,7 +82,7 @@ public class ObserverProjectionConflictChecker
 
   /**
    * Creates a new conflict checker to check whether the given model is
-   * nonblocking.
+   * nonblocking with respect to the default marking.
    * @param model
    *          The model to be checked by this conflict checker.
    * @param factory
@@ -94,7 +96,7 @@ public class ObserverProjectionConflictChecker
   }
 
   /**
-   * Creates a new conflict checker to check a particular model for
+   * Creates a new conflict checker to check whether the given model is
    * nonblocking.
    * @param model
    *          The model to be checked by this conflict checker.
@@ -103,7 +105,7 @@ public class ObserverProjectionConflictChecker
    *          state has a list of propositions attached to it; the conflict
    *          checker considers only those states as marked that are labelled by
    *          <CODE>marking</CODE>, i.e., their list of propositions must
-   *          contain this event(exactly the same object).
+   *          contain this event (exactly the same object).
    * @param factory
    *          Factory used for trace construction.
    */
