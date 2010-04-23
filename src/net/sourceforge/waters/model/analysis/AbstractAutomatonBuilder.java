@@ -34,6 +34,7 @@ public abstract class AbstractAutomatonBuilder
   public AbstractAutomatonBuilder(final ProductDESProxyFactory factory)
   {
     super(factory);
+    mResult = null;
   }
 
   public AbstractAutomatonBuilder(final ProductDESProxy model,
@@ -43,11 +44,11 @@ public abstract class AbstractAutomatonBuilder
     mResult = null;
   }
 
-
   public AbstractAutomatonBuilder(final AutomatonProxy aut,
                                   final ProductDESProxyFactory factory)
   {
     super(aut, factory);
+    mResult = null;
   }
 
 

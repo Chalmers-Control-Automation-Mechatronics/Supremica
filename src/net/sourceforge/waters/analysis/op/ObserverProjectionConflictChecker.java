@@ -114,6 +114,8 @@ public class ObserverProjectionConflictChecker
   {
     super(model, marking, factory);
     mMethod = Method.OBSERVATION_EQUIVALENCE;
+    mInternalStepNodeLimit = super.getNodeLimit();
+    mInternalStepTransitionLimit = super.getTransitionLimit();
   }
 
 

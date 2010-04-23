@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.op.ObserverProjectionConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -50,6 +51,12 @@ public class ModularModelVerifierFactory
        factory,
        new NativeControllabilityChecker(factory),
        false);
+  }
+
+  public ObserverProjectionConflictChecker createConflictChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new ObserverProjectionConflictChecker(null, factory);
   }
 
   public ModularLanguageInclusionChecker createLanguageInclusionChecker
