@@ -13,13 +13,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import net.sourceforge.waters.model.base.AbstractProxyVisitor;
-import net.sourceforge.waters.model.base.ComparableProxy;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -239,44 +234,6 @@ public class ProxyPrinter
       printEmptyRefCollection(collection);
       println();
     }
-  }
-
-  public <P extends ComparableProxy<? super P>>
-  void printSortedCollection(final String label,
-                             final Collection<? extends P> collection)
-    throws VisitorException
-  {
-    final List<P> list = new ArrayList<P>(collection);
-    Collections.sort(list);
-    printCollection(label, list);
-  }
-
-  public <P extends ComparableProxy<? super P>>
-  void printSortedCollection(final Collection<? extends P> collection)
-    throws VisitorException
-  {
-    final List<P> list = new ArrayList<P>(collection);
-    Collections.sort(list);
-    printCollection(list);
-  }
-
-  public <P extends ComparableProxy<? super P>>
-  void printSortedEmptyCollection(final Collection<? extends P> collection)
-    throws VisitorException
-  {
-    final List<P> list = new ArrayList<P>(collection);
-    Collections.sort(list);
-    printEmptyCollection(list);
-  }
-
-  public void printSortedRefCollection
-    (final String label,
-     final Collection<? extends NamedProxy> collection)
-    throws VisitorException
-  {
-    final List<NamedProxy> list = new ArrayList<NamedProxy>(collection);
-    Collections.sort(list);
-    printRefCollection(label, list);
   }
 
 

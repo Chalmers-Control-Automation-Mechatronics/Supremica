@@ -85,9 +85,9 @@ public class ProductDESProxyPrinter
     print(aut.getName());
     println(" {");
     indentIn();
-    printSortedCollection("EVENTS", aut.getEvents());
-    printSortedCollection("STATES", aut.getStates());
-    printSortedCollection("TRANSITIONS", aut.getTransitions());
+    printCollection("EVENTS", aut.getEvents());
+    printCollection("STATES", aut.getStates());
+    printCollection("TRANSITIONS", aut.getTransitions());
     indentOut();
     print('}');
     return null;
@@ -124,8 +124,8 @@ public class ProductDESProxyPrinter
     print("DES ");
     println(des.getName());
     printComment(des);
-    printSortedCollection("EVENTS", des.getEvents());
-    printSortedCollection("AUTOMATA", des.getAutomata());
+    printCollection("EVENTS", des.getEvents());
+    printCollection("AUTOMATA", des.getAutomata());
     return null;
   }
 
@@ -148,7 +148,7 @@ public class ProductDESProxyPrinter
     final Collection<EventProxy> propositions = state.getPropositions();
     if (!propositions.isEmpty()) {
       print(' ');
-      printSortedCollection(propositions);
+      printCollection(propositions);
     }
     return null;
   }
@@ -212,8 +212,8 @@ public class ProductDESProxyPrinter
     printComment(trace);
     final ProductDESProxy des = trace.getProductDES();
     final List<ProductDESProxy> list = Collections.singletonList(des);
-    printSortedRefCollection("DES", list);
-    printSortedRefCollection("AUTOMATA", trace.getAutomata());
+    printRefCollection("DES", list);
+    printRefCollection("AUTOMATA", trace.getAutomata());
     println("STEPS {");
     indentIn();
     int index = 0;

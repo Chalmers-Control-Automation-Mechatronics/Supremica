@@ -338,7 +338,7 @@ public class ModuleProxyPrinter
     print("groupnode ");
     print(proxy.getName());
     print(" = ");
-    printSortedEmptyCollection(proxy.getImmediateChildNodes());
+    printEmptyCollection(proxy.getImmediateChildNodes());
     visitNodeProxy(proxy);
     return null;
   }
