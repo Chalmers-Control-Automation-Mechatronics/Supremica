@@ -53,136 +53,307 @@ public class ListBufferTransitionRelationTest extends
 
   //#########################################################################
   //# Test Cases
-  public void test_alpharemoval_1() throws Exception
+  public void test_alpharemoval_1_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_1.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_2() throws Exception
+  public void test_alpharemoval_2_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_2.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_3() throws Exception
+  public void test_alpharemoval_3_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_3.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_4() throws Exception
+  public void test_alpharemoval_4_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_4.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_5() throws Exception
+  public void test_alpharemoval_5_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_5.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_6() throws Exception
+  public void test_alpharemoval_6_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_6.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_7() throws Exception
+  public void test_alpharemoval_7_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_7.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_8() throws Exception
+  public void test_alpharemoval_8_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_8.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_9() throws Exception
+  public void test_alpharemoval_9_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_9.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_10() throws Exception
+  public void test_alpharemoval_10_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_10.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_11() throws Exception
+  public void test_alpharemoval_11_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_11.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_12() throws Exception
+  public void test_alpharemoval_12_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_12.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_13() throws Exception
+  public void test_alpharemoval_13_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_13.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_14() throws Exception
+  public void test_alpharemoval_14_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_14.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_15() throws Exception
+  public void test_alpharemoval_15_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_15.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_16() throws Exception
+  public void test_alpharemoval_16_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_16.wmod";
     runAutomatonBuilder(group, subdir, name);
   }
 
-  public void test_alpharemoval_17() throws Exception
+  public void test_alpharemoval_17_fwd() throws Exception
   {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_17.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+
+  public void test_alpharemoval_1_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_1.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_2_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_2.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_3_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_3.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_4_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_4.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_5_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_5.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_6_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_6.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_7_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_7.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_8_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_8.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_9_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_9.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_10_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_10.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_11_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_11.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_12_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_12.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_13_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_13.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_14_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_14.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_15_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_15.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_16_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_16.wmod";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+  public void test_alpharemoval_17_back() throws Exception
+  {
+    setBufferConfig(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_17.wmod";
@@ -197,6 +368,11 @@ public class ListBufferTransitionRelationTest extends
     (final ProductDESProxyFactory factory)
   {
     return new ListBufferAutomatonBuilder(factory);
+  }
+
+  protected ListBufferAutomatonBuilder getAutomatonBuilder()
+  {
+    return (ListBufferAutomatonBuilder) super.getAutomatonBuilder();
   }
 
   protected String getExpectedName(final String desname)
@@ -248,10 +424,14 @@ public class ListBufferTransitionRelationTest extends
     throws WatersMarshalException, IOException, AnalysisException
   {
     configureAutomatonBuilder(aut);
-    final AutomatonBuilder builder = getAutomatonBuilder();
+    final ListBufferAutomatonBuilder builder = getAutomatonBuilder();
     builder.run();
     final AutomatonProxy result = builder.getComputedAutomaton();
-    checkResult(result, aut, name);
+    final boolean fwd =
+      (builder.getBufferConfig() &
+       ListBufferTransitionRelation.CONFIG_SUCCESSORS) != 0;
+    final String suffix = fwd ? "_fwd" : "_back";
+    checkResult(result, aut, name + suffix);
   }
 
   private void checkResult(final AutomatonProxy aut,
@@ -266,6 +446,12 @@ public class ListBufferTransitionRelationTest extends
     checker.checkIsomorphism(aut, expected);
   }
 
+  private void setBufferConfig(final int config)
+  {
+    final ListBufferAutomatonBuilder builder = getAutomatonBuilder();
+    builder.setBufferConfig(config);
+  }
+
 
   //#########################################################################
   //# Inner Class ListBufferAutomatonBuilder
@@ -275,9 +461,21 @@ public class ListBufferTransitionRelationTest extends
 
     //#######################################################################
     //# Constructors
-    public ListBufferAutomatonBuilder(final ProductDESProxyFactory factory)
+    private ListBufferAutomatonBuilder(final ProductDESProxyFactory factory)
     {
       super(factory);
+    }
+
+    //#######################################################################
+    //# Configuration
+    private int getBufferConfig()
+    {
+      return mBufferConfig;
+    }
+
+    private void setBufferConfig(final int config)
+    {
+      mBufferConfig = config;
     }
 
     //#######################################################################
@@ -287,13 +485,17 @@ public class ListBufferTransitionRelationTest extends
     {
       final AutomatonProxy aut = getInputAutomaton();
       final EventEncoding enc = new EventEncoding(aut);
-      final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
-        (aut, enc, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(aut, enc, mBufferConfig);
       rel.setName("output");
       final ProductDESProxyFactory factory = getFactory();
       final AutomatonProxy result = rel.createAutomaton(factory, enc);
       return setAutomatonResult(result);
     }
+
+    //#######################################################################
+    //# Data Members
+    private int mBufferConfig;
 
   }
 
