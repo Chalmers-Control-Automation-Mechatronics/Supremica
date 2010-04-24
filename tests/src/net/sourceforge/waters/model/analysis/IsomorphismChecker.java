@@ -123,7 +123,9 @@ public class IsomorphismChecker
       for (final EventProxy event2 : events2) {
         final String name = event2.getName();
         final EventProxy event1 = nameMap.get(name);
-        if (event1 == null || event1.getKind() != event2.getKind()) {
+        if (event1 == null) {
+          throw new EventNotFoundException(target, name);
+        } else if (event1.getKind() != event2.getKind()) {
           throw new EventNotFoundException
             (target, name, event1.getKind(), true);
         }

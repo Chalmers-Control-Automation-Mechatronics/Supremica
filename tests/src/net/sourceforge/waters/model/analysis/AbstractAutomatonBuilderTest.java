@@ -16,6 +16,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
@@ -179,6 +180,19 @@ public abstract class AbstractAutomatonBuilderTest
   protected AutomatonBuilder getAutomatonBuilder()
   {
     return mAutomatonBuilder;
+  }
+
+  protected IsomorphismChecker getIsomorphismChecker()
+  {
+    return mIsomorphismChecker;
+  }
+
+  protected void configureAutomatonBuilder(final AutomatonProxy aut)
+  {
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy(aut, factory);
+    configureAutomatonBuilder(des);
   }
 
 

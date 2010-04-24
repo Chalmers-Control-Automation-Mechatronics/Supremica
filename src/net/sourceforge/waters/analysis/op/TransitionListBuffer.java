@@ -1127,11 +1127,7 @@ public abstract class TransitionListBuffer
     //# Auxiliary Methods
     void resetRaw(final int state, final int event, final int list)
     {
-      if (list == NULL) {
-        mCurrent = NULL;
-      } else {
-        mCurrent = getNext(list);
-      }
+      mCurrent = list;
       mState = state;
       mEvent = event;
     }
@@ -1303,7 +1299,7 @@ public abstract class TransitionListBuffer
             return false;
           }
         } while (mStateTransitions[mCurrentFromState] == NULL);
-        mInnerIterator.reset(mStateTransitions[mCurrentFromState]);
+        mInnerIterator.reset(mCurrentFromState);
         return mInnerIterator.advance();
       }
     }

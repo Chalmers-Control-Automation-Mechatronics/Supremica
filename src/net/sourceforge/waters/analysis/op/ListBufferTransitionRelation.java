@@ -87,7 +87,29 @@ public class ListBufferTransitionRelation
                                       final int config)
     throws OverflowException
   {
-    this(aut, new EventEncoding(aut), new StateEncoding(aut), config);
+    this(aut, new EventEncoding(aut), config);
+  }
+
+  /**
+   * Creates a new transition relation from the given automaton,
+   * using default (temporary) state encoding.
+   * @param  aut      The automaton to be encoded.
+   * @param  eventEnc Event encoding to define the assignment of integer
+   *                  codes to events in the transition buffers.
+   * @param  config   Configuration flags defining which transition buffers
+   *                  are to be created. Should be one of
+   *                  {@link #CONFIG_SUCCESSORS},
+   *                  {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   * @throws OverflowException if the automaton's number of states and events
+   *         is too large to be encoded in the bit sizes used by the
+   *         list buffer implementations.
+   */
+  public ListBufferTransitionRelation(final AutomatonProxy aut,
+                                      final EventEncoding eventEnc,
+                                      final int config)
+    throws OverflowException
+  {
+    this(aut, eventEnc, new StateEncoding(aut), config);
   }
 
   /**
@@ -133,7 +155,7 @@ public class ListBufferTransitionRelation
       mPredecessorBuffer.setUpTransitions(list, eventEnc, stateEnc);
     }
     mUsedEvents = new BitSet(numEvents);
-    mUsedEvents.set(0, numEvents - 1, true);
+    mUsedEvents.set(0, numEvents, true);
   }
 
 
@@ -1105,9 +1127,11 @@ public class ListBufferTransitionRelation
     final int numProps = eventEnc.getNumberOfPropositions();
     final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
     for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
-      final EventProxy event = eventEnc.getProperEvent(e);
       if (mUsedEvents.get(e)) {
-        events.add(event);
+        final EventProxy event = eventEnc.getProperEvent(e);
+        if (event != null) {
+          events.add(event);
+        }
       }
     }
     for (int p = 0; p < numProps; p++) {
@@ -1156,7 +1180,7 @@ public class ListBufferTransitionRelation
       final StateProxy source = stateEnc.getState(s);
       final int e = iter.getCurrentEvent();
       final EventProxy event = eventEnc.getProperEvent(e);
-      final int t = iter.getCurrentSourceState();
+      final int t = iter.getCurrentTargetState();
       final StateProxy target = stateEnc.getState(t);
       final TransitionProxy trans =
         factory.createTransitionProxy(source, event, target);

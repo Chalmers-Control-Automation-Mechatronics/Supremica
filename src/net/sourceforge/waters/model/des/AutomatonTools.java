@@ -9,6 +9,9 @@
 
 package net.sourceforge.waters.model.des;
 
+import java.util.Collection;
+import java.util.Collections;
+
 
 /**
  * A collection of static methods commonly used in combination with
@@ -38,6 +41,22 @@ public final class AutomatonTools
       } while (x > 0);
     }
     return result;
+  }
+
+  /**
+   * Creates a product DES consisting of a single automaton.
+   * @param  aut     The automaton to be used in the product DES.
+   * @param  factory Factory to construct objects.
+   * @return A product DES with only one automaton. The product DES name
+   *         and event list are taken from the given automaton.
+   */
+  public static ProductDESProxy createProductDESProxy
+    (final AutomatonProxy aut, final ProductDESProxyFactory factory)
+  {
+    final String name = aut.getName();
+    final Collection<EventProxy> events = aut.getEvents();
+    final Collection<AutomatonProxy> automata = Collections.singletonList(aut);
+    return factory.createProductDESProxy(name, events, automata);
   }
 
 }

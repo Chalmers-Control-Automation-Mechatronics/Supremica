@@ -240,8 +240,12 @@ public abstract class WatersAnalyzeAction
     {
       public AnalyzerThread()
       {
-        final ProductDESProxyFactory  desfactory = ProductDESElementFactory.getInstance();
-        final ModelVerifierFactory vfactory = MonolithicModelVerifierFactory.getInstance();
+        final ProductDESProxyFactory  desfactory =
+          ProductDESElementFactory.getInstance();
+        final ModelVerifierFactory vfactory =
+          MonolithicModelVerifierFactory.getInstance();
+        // TODO Make this configurable.
+        // NativeModelVerifierFactory.getInstance();
         verifier = getModelVerifier(vfactory, desfactory);
       }
 

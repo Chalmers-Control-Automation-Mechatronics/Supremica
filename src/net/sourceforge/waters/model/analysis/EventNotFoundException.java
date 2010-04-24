@@ -98,18 +98,22 @@ public class EventNotFoundException extends AnalysisException
 
   private String getEventKindName()
   {
-    switch (mEventKind) {
-    case CONTROLLABLE:
-    case UNCONTROLLABLE:
-      if (mIncludeKind) {
-        return mEventKind.toString().toLowerCase() + " event";
-      } else {
-        return "event";
+    if (mEventKind == null) {
+      return "event";
+    } else {
+      switch (mEventKind) {
+      case CONTROLLABLE:
+      case UNCONTROLLABLE:
+        if (mIncludeKind) {
+          return mEventKind.toString().toLowerCase() + " event";
+        } else {
+          return "event";
+        }
+      case PROPOSITION:
+        return "proposition";
+      default:
+        return mEventKind.toString();
       }
-    case PROPOSITION:
-      return "proposition";
-    default:
-      return mEventKind.toString();
     }
   }
 
