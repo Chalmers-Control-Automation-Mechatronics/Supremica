@@ -9,11 +9,15 @@
 
 package net.sourceforge.waters.model.marshaller;
 
+import gnu.trove.THashSet;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -163,16 +167,19 @@ public class ProductDESImporter
       mCurrentBlockedEvents = new HashSet<EventProxy>(mCurrentEvents);
       final Set<StateProxy> states = aut.getStates();
       final int numstates = states.size();
+      final Collection<SimpleNodeProxy> nodes =
+        new ArrayList<SimpleNodeProxy>(numstates);
       mCurrentNodeMap = new HashMap<StateProxy,SimpleNodeProxy>(numstates);
       for (final StateProxy state : states) {
         final SimpleNodeProxy node = importNode(state);
+        nodes.add(node);
         mCurrentNodeMap.put(state, node);
       }
       final Collection<TransitionProxy> transitions = aut.getTransitions();
       final int numtrans = transitions.size();
       final Map<NodePair,Set<EventProxy>> transmap =
         new HashMap<NodePair,Set<EventProxy>>(numtrans);
-      final Set<StateEventPair> dettest = new HashSet<StateEventPair>();
+      final Set<StateEventPair> dettest = new THashSet<StateEventPair>();
       boolean deterministic = true;
       for (final TransitionProxy trans : transitions) {
         final StateProxy source = trans.getSource();
@@ -197,13 +204,12 @@ public class ProductDESImporter
       }
       final int numedges = transmap.size();
       final Collection<EdgeProxy> edges = new ArrayList<EdgeProxy>(numedges);
-      final Set<Map.Entry<NodePair,Set<EventProxy>>> entries =
-        transmap.entrySet();
-      for (final Map.Entry<NodePair,Set<EventProxy>> entry : entries) {
-        final NodePair pair = entry.getKey();
+      final List<NodePair> pairs = new ArrayList<NodePair>(transmap.keySet());
+      Collections.sort(pairs);
+      for (final NodePair pair : pairs) {
         final SimpleNodeProxy source = pair.getSource();
         final SimpleNodeProxy target = pair.getTarget();
-        final Set<EventProxy> events = entry.getValue();
+        final Set<EventProxy> events = transmap.get(pair);
         final int numevents = events.size();
         final Collection<SimpleIdentifierProxy> labels =
           new ArrayList<SimpleIdentifierProxy>(numevents);
@@ -220,14 +226,15 @@ public class ProductDESImporter
       final int numblocked = mCurrentBlockedEvents.size();
       final Collection<SimpleIdentifierProxy> blockedlabels =
         new ArrayList<SimpleIdentifierProxy>(numblocked);
-      for (final EventProxy event : mCurrentBlockedEvents) {
-        final SimpleIdentifierProxy label = importEvent(event);
-        blockedlabels.add(label);
+      for (final EventProxy event : mCurrentEvents) {
+        if (mCurrentBlockedEvents.contains(event)) {
+          final SimpleIdentifierProxy label = importEvent(event);
+          blockedlabels.add(label);
+        }
       }
       final LabelBlockProxy blockedblock =
         blockedlabels.isEmpty() ? null :
         mFactory.createLabelBlockProxy(blockedlabels, null);
-      final Collection<SimpleNodeProxy> nodes = mCurrentNodeMap.values();
       final GraphProxy graph =
         mFactory.createGraphProxy(deterministic, blockedblock,
                                   nodes, edges);
@@ -333,7 +340,7 @@ public class ProductDESImporter
 
   //#########################################################################
   //# Inner Class NodePair
-  private static class NodePair {
+  private static class NodePair implements Comparable<NodePair> {
 
     //#######################################################################
     //# Constructors
@@ -371,6 +378,18 @@ public class ProductDESImporter
     public int hashCode()
     {
       return mSource.hashCode() + 5 * mTarget.hashCode();
+    }
+
+    //#######################################################################
+    //# Interface java.util.Comparable<NodePair>
+    public int compareTo(final NodePair pair)
+    {
+      final int result = mSource.compareTo(pair.mSource);
+      if (result != 0) {
+        return result;
+      } else {
+        return mTarget.compareTo(pair.mTarget);
+      }
     }
 
     //#######################################################################
