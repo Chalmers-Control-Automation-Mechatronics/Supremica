@@ -869,13 +869,31 @@ public class ListBufferTransitionRelation
    */
   public boolean isPureSelfloopEvent(final int event)
   {
+    final TransitionListBuffer buffer;
     if (mSuccessorBuffer != null) {
-      return mSuccessorBuffer.isPureSelfloopEvent(event);
+      buffer = mSuccessorBuffer;
     } else if (mPredecessorBuffer != null) {
-      return mPredecessorBuffer.isPureSelfloopEvent(event);
+      buffer = mPredecessorBuffer;
     } else {
       throw createNoBufferException();
     }
+    final int numStates = getNumberOfStates();
+    final TransitionIterator iter = buffer.createReadOnlyIterator();
+    for (int state = 0; state < numStates; state++) {
+      if (isReachable(state)) {
+        iter.reset(state, event);
+        if (iter.advance()) {
+          do {
+            if (iter.getCurrentToState() != state) {
+              return false;
+            }
+          } while (iter.advance());
+        } else {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   /**
@@ -1177,14 +1195,16 @@ public class ListBufferTransitionRelation
     final TransitionIterator iter = createAllTransitionsIterator();
     while (iter.advance()) {
       final int s = iter.getCurrentSourceState();
-      final StateProxy source = stateEnc.getState(s);
-      final int e = iter.getCurrentEvent();
-      final EventProxy event = eventEnc.getProperEvent(e);
       final int t = iter.getCurrentTargetState();
-      final StateProxy target = stateEnc.getState(t);
-      final TransitionProxy trans =
-        factory.createTransitionProxy(source, event, target);
-      transitions.add(trans);
+      if (isReachable(s) && isReachable(t)) {
+        final StateProxy source = stateEnc.getState(s);
+        final int e = iter.getCurrentEvent();
+        final EventProxy event = eventEnc.getProperEvent(e);
+        final StateProxy target = stateEnc.getState(t);
+        final TransitionProxy trans =
+          factory.createTransitionProxy(source, event, target);
+        transitions.add(trans);
+      }
     }
     return factory.createAutomatonProxy(mName, mKind, events, reachable,
                                         transitions);

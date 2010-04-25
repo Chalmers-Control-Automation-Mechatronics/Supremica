@@ -29,6 +29,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -72,6 +73,8 @@ class AltRemovalOfAlphaMarkingsRule extends AbstractionRule
     throws OverflowException
   {
     mAutToAbstract = autToAbstract;
+    mOriginalIntToStateMap = null;
+    mResultingStateToIntMap = null;
 
     // If the automaton does not use the silent event tau, return it unchanged.
     final Collection<EventProxy> events = autToAbstract.getEvents();
@@ -160,13 +163,22 @@ class AltRemovalOfAlphaMarkingsRule extends AbstractionRule
     final ComponentKind kind = autToAbstract.getKind();
 
     final Collection<EventProxy> oldEvents = autToAbstract.getEvents();
-    final Collection<EventProxy> newEvents;
-    if (oldEvents.contains(mAlphaMarking)) {
-      newEvents = oldEvents;
-    } else {
-      final int numEvents = oldEvents.size() + 1;
-      newEvents = new ArrayList<EventProxy>(numEvents);
-      newEvents.addAll(oldEvents);
+    final int numEvents = oldEvents.size();
+    final Collection<EventProxy> newEvents =
+      new ArrayList<EventProxy>(numEvents + 1);
+    final Collection<EventProxy> props = getPropositions();
+    boolean containsAlpha = false;
+    for (final EventProxy event : oldEvents) {
+      if (event.getKind() != EventKind.PROPOSITION) {
+        newEvents.add(event);
+      } else if (event == mAlphaMarking) {
+        containsAlpha = true;
+        newEvents.add(event);
+      } else if (props.contains(event)) {
+        newEvents.add(event);
+      }
+    }
+    if (!containsAlpha) {
       newEvents.add(mAlphaMarking);
     }
     final int alphaID = eventEnc.getEventCode(mAlphaMarking);

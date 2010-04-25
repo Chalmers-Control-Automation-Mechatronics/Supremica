@@ -480,31 +480,6 @@ public abstract class TransitionListBuffer
   }
 
   /**
-   * Determines whether the given event is selflooped in this buffer.
-   * @param event
-   *          The ID of the event to be tested.
-   * @return <CODE>true</CODE> if the given event is selflooped in every state,
-   *         and appears on no other transitions.
-   */
-  public boolean isPureSelfloopEvent(final int event)
-  {
-    final TransitionIterator iter = createReadOnlyIterator();
-    for (int state = 0; state < getNumberOfStates(); state++) {
-      iter.reset(state, event);
-      if (iter.advance()) {
-        do {
-          if (iter.getCurrentToState() != state) {
-            return false;
-          }
-        } while (iter.advance());
-      } else {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
    * Helps to clean up tau selfloops. This method removes all selfloops
    * associated with the given event and tests whether this results in
    * the event being redundant. Tau events are recognised by their standard
@@ -1180,8 +1155,7 @@ public abstract class TransitionListBuffer
     //# Constructor
     private ModifyingIterator()
     {
-      mPrevious = NULL;
-      mFirst = true;
+      mStart = mPrevious = NULL;
     }
 
     //#########################################################################
@@ -1189,7 +1163,6 @@ public abstract class TransitionListBuffer
     public boolean advance()
     {
       mPrevious = getCurrent();
-      mFirst = false;
       return super.advance();
     }
 
@@ -1214,7 +1187,7 @@ public abstract class TransitionListBuffer
       final int state = getState();
       final int fromCode = (state << mStateShift) | getEvent();
       if (next == NULL) {
-        if (mFirst) {
+        if (mPrevious == mStart) {
           mStateEventTransitions.remove(fromCode);
           if (mStateTransitions[state] == mPrevious) {
             mStateTransitions[state] = NULL;
@@ -1224,11 +1197,11 @@ public abstract class TransitionListBuffer
       } else {
         final int nextEvent = TransitionListBuffer.this.getEvent(next);
         if (nextEvent == getEvent()) {
-          if (mFirst) {
+          if (mPrevious == mStart) {
             mStateEventTransitions.put(fromCode, next);
           }
         } else {
-          if (mFirst) {
+          if (mPrevious == mStart) {
             mStateEventTransitions.remove(fromCode);
           }
           final int nextCode = (state << mStateShift) | nextEvent;
@@ -1244,13 +1217,12 @@ public abstract class TransitionListBuffer
     void resetRaw(final int state, final int event, final int list)
     {
       super.resetRaw(state, event, list);
-      mFirst = true;
-      mPrevious = list;
+      mStart = mPrevious = list;
     }
 
     //#########################################################################
     //# Data Members
-    private boolean mFirst;
+    private int mStart;
     private int mPrevious;
 
   }

@@ -34,6 +34,9 @@ import net.sourceforge.waters.model.des.StateProxy;
  * state encoding will not affect any transition relation that have been
  * created.</P>
  *
+ * <P>States in the encoding may be missing, represented by <CODE>null</CODE>.
+ * This can be used to represent unreachable states.<P>
+ *
  * @see {@link ListBufferTransitionRelation}
  * @see {@link StateBuffer}
  *
@@ -67,7 +70,8 @@ public class StateEncoding
   /**
    * Creates a new state encoding for the given states.
    * State codes are assigned in the order they appear in the given
-   * collection.
+   * collection. Any <CODE>null</CODE> entries cause code numbers to be
+   * skipped.
    */
   public StateEncoding(final Collection<? extends StateProxy> states)
   {
@@ -77,7 +81,8 @@ public class StateEncoding
   /**
    * Creates a new state encoding for the given states.
    * State codes are assigned according to their indexes in the given
-   * array.
+   * array. Any <CODE>null</CODE> entries cause code numbers to be skipped.
+   * @param  states  New states array. Will not be copied.
    */
   public StateEncoding(final StateProxy[] states)
   {
@@ -88,20 +93,10 @@ public class StateEncoding
   //#########################################################################
   //# Initialisation
   /**
-   * Resets this state encoding to use the given states.
-   * State codes are assigned according to their indexes in the given
-   * array.
-   */
-  public void init(final StateProxy[] states)
-  {
-    final List<StateProxy> list = Arrays.asList(states);
-    init(list);
-  }
-
-  /**
    * Creates a new state encoding for the given states.
    * State codes are assigned in the order they appear in the given
-   * collection.
+   * collection. Any <CODE>null</CODE> entries cause code numbers to be
+   * skipped.
    */
   public void init(final Collection<? extends StateProxy> states)
   {
@@ -111,6 +106,26 @@ public class StateEncoding
     int code = 0;
     for (final StateProxy state : states) {
       mStates[code] = state;
+      if (state != null) {
+        mStateCodeMap.put(state, code);
+      }
+      code++;
+    }
+  }
+
+  /**
+   * Resets this state encoding to use the given states.
+   * State codes are assigned according to their indexes in the given
+   * array. Any <CODE>null</CODE> entries cause code numbers to be skipped.
+   * @param  states  New states array. Will not be copied.
+   */
+  public void init(final StateProxy[] states)
+  {
+    final int numStates = states.length;
+    mStates = states;
+    mStateCodeMap = new TObjectIntHashMap<StateProxy>(numStates);
+    for (int code = 0; code < numStates; code++) {
+      final StateProxy state = states[code];
       if (state != null) {
         mStateCodeMap.put(state, code);
       }
