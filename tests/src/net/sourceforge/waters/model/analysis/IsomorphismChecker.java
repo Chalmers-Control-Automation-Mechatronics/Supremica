@@ -150,18 +150,20 @@ public class IsomorphismChecker
     final Collection<StateProxy> states =
       new ArrayList<StateProxy>(numstates);
     final Map<StateProxy,StateProxy> stateMap =
-      new HashMap<StateProxy,StateProxy>(numstates2);
+      new HashMap<StateProxy,StateProxy>(numstates);
     mSplitMap = new TObjectIntHashMap<StateProxy>(numstates);
     for (final StateProxy state1 : states1) {
-      states.add(state1);
-      mSplitMap.put(state1, 0);
+      final StateProxy renamed = getAltState(state1, 1);
+      states.add(renamed);
+      mSplitMap.put(renamed, 0);
+      stateMap.put(state1, renamed);
     }
     for (final StateProxy state2 : states2) {
+      final StateProxy renamed;
       if (mMatchingNames) {
         final Collection<EventProxy> props2 = state2.getPropositions();
-        final StateProxy state1;
         if (props2.isEmpty()) {
-          state1 = state2;
+          renamed = getAltState(state2, 2);
         } else {
           final int numprops = props2.size();
           final Collection<EventProxy> props1 =
@@ -170,17 +172,16 @@ public class IsomorphismChecker
             final EventProxy prop1 = getMappedEvent(prop2);
             props1.add(prop1);
           }
-          final String name = state2.getName();
+          final String name = getAltStateName(state2, 2);
           final boolean initial = state2.isInitial();
-          state1 = mFactory.createStateProxy(name, initial, props1);
+          renamed = mFactory.createStateProxy(name, initial, props1);
         }
-        states.add(state1);
-        stateMap.put(state2, state1);
-        mSplitMap.put(state1, 1);
       } else {
-        states.add(state2);
-        mSplitMap.put(state2, 1);
+        renamed = getAltState(state2, 2);
       }
+      states.add(renamed);
+      stateMap.put(state2, renamed);
+      mSplitMap.put(renamed, 1);
     }
     final Collection<TransitionProxy> transitions1 = aut1.getTransitions();
     final Collection<TransitionProxy> transitions2 = aut2.getTransitions();
@@ -191,22 +192,8 @@ public class IsomorphismChecker
     }
     final Collection<TransitionProxy> transitions =
       new ArrayList<TransitionProxy>(numtrans1 + numtrans2);
-    transitions.addAll(transitions1);
-    if (mMatchingNames) {
-      for (final TransitionProxy trans2 : transitions2) {
-        final StateProxy source2 = trans2.getSource();
-        final StateProxy source1 = stateMap.get(source2);
-        final EventProxy event2 = trans2.getEvent();
-        final EventProxy event1 = getMappedEvent(event2);
-        final StateProxy target2 = trans2.getTarget();
-        final StateProxy target1 = stateMap.get(target2);
-        final TransitionProxy trans1 =
-          mFactory.createTransitionProxy(source1, event1, target1);
-        transitions.add(trans1);
-      }
-    } else {
-      transitions.addAll(transitions2);
-    }
+    addAltTransitions(transitions1, transitions, stateMap);
+    addAltTransitions(transitions2, transitions, stateMap);
     final String name1 = aut1.getName();
     final String name2 = aut2.getName();
     final String name = '{' + name1 + '=' + name2 + '}';
@@ -243,10 +230,41 @@ public class IsomorphismChecker
     }
   }
 
+  private StateProxy getAltState(final StateProxy state, final int index)
+  {
+    final String name = getAltStateName(state, index);
+    final boolean init = state.isInitial();
+    final Collection<EventProxy> props = state.getPropositions();
+    return mFactory.createStateProxy(name, init, props);
+  }
+
+  private String getAltStateName(final StateProxy state, final int index)
+  {
+    return state.getName() + ":" + index;
+  }
+
+  private void addAltTransitions(final Collection<TransitionProxy> in,
+                                 final Collection<TransitionProxy> out,
+                                 final Map<StateProxy,StateProxy> stateMap)
+  {
+    for (final TransitionProxy trans2 : in) {
+      final StateProxy source2 = trans2.getSource();
+      final StateProxy source1 = stateMap.get(source2);
+      final EventProxy event2 = trans2.getEvent();
+      final EventProxy event1 = getMappedEvent(event2);
+      final StateProxy target2 = trans2.getTarget();
+      final StateProxy target1 = stateMap.get(target2);
+      final TransitionProxy trans1 =
+        mFactory.createTransitionProxy(source1, event1, target1);
+      out.add(trans1);
+    }
+  }
+
   private EventProxy getMappedEvent(final EventProxy event)
   {
     if (mMatchingNames) {
-      return mEventMap.get(event);
+      final EventProxy mapped = mEventMap.get(event);
+      return mapped == null ? event : mapped;
     } else {
       return event;
     }

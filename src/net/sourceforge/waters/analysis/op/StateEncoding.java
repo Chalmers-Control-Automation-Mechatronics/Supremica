@@ -140,9 +140,19 @@ public class StateEncoding
     return mStates[code];
   }
 
+  public StateProxy[] getStatesArray()
+  {
+    return mStates;
+  }
+
   public List<StateProxy> getStates()
   {
     return Arrays.asList(mStates);
+  }
+
+  public TObjectIntHashMap<StateProxy> getStateCodeMap()
+  {
+    return mStateCodeMap;
   }
 
 

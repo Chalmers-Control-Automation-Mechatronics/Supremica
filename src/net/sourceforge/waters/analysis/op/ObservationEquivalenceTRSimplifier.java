@@ -149,7 +149,7 @@ public class ObservationEquivalenceTRSimplifier
    * transitive closure) that will be constructed. An attempt to store
    * more transitions leads to an {@link OverflowException}.
    * @param limit     The new transition limit, or {@link Integer#MAX_VALUE}
-   *                  to allow an unlimit number of transitions.
+   *                  to allow an unlimited number of transitions.
    */
   public void setTransitionLimit(final int limit)
   {

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.op
 //# CLASS:   ListBufferTransitionRelationTest
 //###########################################################################
@@ -29,9 +29,16 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
+
 /**
+ * A simple test for the {@link ListBufferTransitionRelation} class.
+ * This test creates transition relations for a few simple automata,
+ * converts them back to automata, and checks whether the result is
+ * bisimulation equivalent to the original.
+ *
  * @author Robi Malik
  */
+
 public class ListBufferTransitionRelationTest extends
     AbstractAutomatonBuilderTest
 {
