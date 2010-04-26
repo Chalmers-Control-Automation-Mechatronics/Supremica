@@ -1010,6 +1010,20 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     // #######################################################################
+    ConflictTraceProxy createConvertedTrace(
+                                            final List<AutomatonProxy> traceAutomata,
+                                            final List<TraceStepProxy> convertedSteps)
+    {
+      final String traceName = getModel().getName() + "-conflicting";
+      final ConflictTraceProxy convertedTrace =
+          getFactory().createConflictTraceProxy(traceName, null, null,
+                                                getModel(), traceAutomata,
+                                                convertedSteps,
+                                                ConflictKind.CONFLICT);
+      return convertedTrace;
+    }
+
+    // #######################################################################
     // # Trace Computation
     /**
      * Assumes that a saturated trace is being passed.
@@ -1044,21 +1058,14 @@ public class CompositionalGeneralisedConflictChecker extends
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
       final AutomatonProxy composed = getResultAutomaton();
-      // TODO Change traceAutomata to ArrayList. (Unfortunately, then you
-      // cannot use remove efficiently, so the contents should be collected
-      // in a loop.)
-      // TODO Check/fix bug below.
 
-      final Set<AutomatonProxy> traceAutomata =
-          new THashSet<AutomatonProxy>(conflictTrace.getAutomata());
-      traceAutomata.remove(composed);
-
-      /*
-       * final List<AutomatonProxy> traceAutomata = new
-       * ArrayList<AutomatonProxy>(); for (final AutomatonProxy aut :
-       * conflictTrace.getAutomata()) { if (aut != composed) {
-       * traceAutomata.add(aut); } }
-       */
+      final List<AutomatonProxy> traceAutomata =
+          new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size() - 1);
+      for (final AutomatonProxy aut : conflictTrace.getAutomata()) {
+        if (aut != getResultAutomaton()) {
+          traceAutomata.add(aut);
+        }
+      }
 
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
@@ -1077,8 +1084,13 @@ public class CompositionalGeneralisedConflictChecker extends
             final StateProxy originalState =
                 mStateMap.getOriginalState(convertedState, aut);
             convertedStepMap.put(aut, originalState);
-            // Bug? How often do we add aut? What if there are no steps?
-            traceAutomata.add(aut);
+            // TODO: it doesn't seem like using contains() would be very
+            // efficient, but as far as I know there are no list implementations
+            // which don't
+            // allow duplicates like the Set I had automatically did....
+            if (!traceAutomata.contains(aut)) {
+              traceAutomata.add(aut);
+            }
           }
           final TraceStepProxy convertedStep =
               getFactory().createTraceStepProxy(step.getEvent(),
@@ -1088,14 +1100,7 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedSteps.add(step);
         }
       }
-      final ConflictTraceProxy convertedTrace =
-          getFactory().createConflictTraceProxy(conflictTrace.getName(),
-                                                conflictTrace.getComment(),
-                                                conflictTrace.getLocation(),
-                                                getModel(), traceAutomata,
-                                                convertedSteps,
-                                                ConflictKind.CONFLICT);
-      return convertedTrace;
+      return createConvertedTrace(traceAutomata, convertedSteps);
     }
 
     // #######################################################################
@@ -1172,14 +1177,8 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
       traceAutomata.add(getOriginalAutomaton());
-      final ConflictTraceProxy convertedTrace =
-          getFactory().createConflictTraceProxy(conflictTrace.getName(),
-                                                conflictTrace.getComment(),
-                                                conflictTrace.getLocation(),
-                                                getModel(), traceAutomata,
-                                                convertedSteps,
-                                                ConflictKind.CONFLICT);
-      return convertedTrace;
+      return createConvertedTrace(traceAutomata, convertedSteps);
+
     }
 
     /**
@@ -1337,24 +1336,16 @@ public class CompositionalGeneralisedConflictChecker extends
             createTraceSteps(finalStepsStateMap, finalSteps);
         convertedSteps.addAll(substeps);
       }
-
-      final Set<AutomatonProxy> traceAutomata =
-          new HashSet<AutomatonProxy>(conflictTrace.getAutomata());
-      traceAutomata.remove(getResultAutomaton());
+      final List<AutomatonProxy> traceAutomata =
+          new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size());
+      for (final AutomatonProxy aut : conflictTrace.getAutomata()) {
+        if (aut != getResultAutomaton()) {
+          traceAutomata.add(aut);
+        }
+      }
       traceAutomata.add(getOriginalAutomaton());
-      // TODO Fix bug. Trace name should be "<model>-conflicting" where
-      // <model> is the name of the original input model, location can be null.
-      // This bug appears several times in this file, so I would say it is an
-      // excellent opportunity to move this trace creation instruction to a
-      // superclass method ;-)
-      final ConflictTraceProxy convertedTrace =
-          getFactory().createConflictTraceProxy(conflictTrace.getName(),
-                                                conflictTrace.getComment(),
-                                                conflictTrace.getLocation(),
-                                                getModel(), traceAutomata,
-                                                convertedSteps,
-                                                ConflictKind.CONFLICT);
-      return convertedTrace;
+
+      return createConvertedTrace(traceAutomata, convertedSteps);
     }
 
     /**
@@ -1742,14 +1733,8 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
       traceAutomata.add(getOriginalAutomaton());
-      final ConflictTraceProxy convertedTrace =
-          getFactory().createConflictTraceProxy(conflictTrace.getName(),
-                                                conflictTrace.getComment(),
-                                                conflictTrace.getLocation(),
-                                                getModel(), traceAutomata,
-                                                convertedSteps,
-                                                ConflictKind.CONFLICT);
-      return convertedTrace;
+      return createConvertedTrace(traceAutomata, convertedSteps);
+
     }
 
     // #######################################################################

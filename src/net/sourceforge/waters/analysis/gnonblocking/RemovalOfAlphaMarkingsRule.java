@@ -106,9 +106,6 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     }
     if (modified) {
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
-
-      System.out.println(autToAbstract);
-      System.out.println(convertedAut);
       mOriginalIntToStateMap = mTR.getOriginalIntToStateMap();
       mResultingStateToIntMap = mTR.getResultingStateToIntMap();
       return convertedAut;
