@@ -89,29 +89,14 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
             final TIntIterator iter = predeccessors.iterator();
             while (iter.hasNext()) {
               final int predID = iter.next();
-              if (predID != stateID) {
-                if (predID != newState) {
-                  if (!reachableStates.contains(predID)) {
-                    reachableStates.add(predID);
-                    unvisitedStates.push(predID);
-                    if (mTR.isMarked(predID, alphaID)) {
-                      mTR.markState(predID, alphaID, false);
-                      modified = true;
-                    }
+              if (predID != stateID && predID != newState) {
+                if (!reachableStates.contains(predID)) {
+                  reachableStates.add(predID);
+                  unvisitedStates.push(predID);
+                  if (mTR.isMarked(predID, alphaID)) {
+                    mTR.markState(predID, alphaID, false);
+                    modified = true;
                   }
-                }
-              } else {
-                // TODO Is this really needed? The algorithm I described you
-                // should handle this case automatically. Remove alpha marking
-                // from all states encountered except stateID. That is all.
-                // (If there is a tau-loop L with reachable alpha-marked
-                // state S, outside of L, all states in L will be unmarked
-                // when searching the predecessors staring from S.)
-                // ~~~Robi
-                final boolean outgoing = expandTauLoop(predID, tauID, alphaID);
-                if (!outgoing) {
-                  mTR.markState(predID, alphaID, true);
-                  modified = true;
                 }
               }
             }
@@ -127,54 +112,6 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     } else {
       return autToAbstract;
     }
-  }
-
-  /**
-   * Expands a loop of tau transitions to determine whether any of the states
-   * within the loop have outgoing tau transitions which lead to alpha marked
-   * states.
-   *
-   * @param stateIDs
-   *          The ID of a state within the tau loop.
-   * @return True if there is an outgoing tau transition from the loop which
-   *         leads towards an alpha marked state, otherwise false.
-   */
-  private boolean expandTauLoop(final int stateID, final int tauID,
-                                final int alphaID)
-  {
-    final TIntHashSet reachableStates = new TIntHashSet();
-    final TIntStack unvisitedStates = new TIntStack();
-    unvisitedStates.push(stateID);
-    while (unvisitedStates.size() > 0) {
-      final int newState = unvisitedStates.pop();
-      final TIntHashSet tauSuccessors = mTR.getSuccessors(newState, tauID);
-      // if there is not more than one successor then the single successor is
-      // only the one as part of the tau loop (rather than an outgoing
-      // transition we need to find)
-      assert tauSuccessors != null;
-      if (tauSuccessors.size() > 1) {
-        final TIntIterator iter = tauSuccessors.iterator();
-        while (iter.hasNext()) {
-          final int succID = iter.next();
-          if (!reachableStates.contains(succID)) {
-            if (mTR.isMarked(succID, alphaID)) {
-              return true;
-            }
-            reachableStates.add(succID);
-            unvisitedStates.push(succID);
-            // TODO: need a way to determine which states are part of the tau
-            // loop and which is the outgoing transition
-          }
-        }
-      } else {
-        final TIntIterator iter = tauSuccessors.iterator();
-        final int tauSucc = iter.next();
-        if (tauSucc != stateID) {
-          unvisitedStates.push(tauSucc);
-        }
-      }
-    }
-    return false;
   }
 
   CompositionalGeneralisedConflictChecker.Step createStep(
