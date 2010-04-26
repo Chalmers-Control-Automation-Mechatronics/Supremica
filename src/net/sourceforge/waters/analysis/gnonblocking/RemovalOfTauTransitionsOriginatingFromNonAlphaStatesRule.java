@@ -130,7 +130,6 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
             final int targetID = transToRemove.get(i);
             mTR.addAllPredeccessors(sourceID, targetID);
             mTR.removeTransition(sourceID, tauID, targetID);
-            // visitStates.offer(sourceID);
             modified = true;
           }
           mTR.removeAllIncoming(sourceID);

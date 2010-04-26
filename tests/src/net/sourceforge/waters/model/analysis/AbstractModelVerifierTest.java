@@ -221,8 +221,12 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
         buffer.append(binding.getExpression().toString());
       }
     }
-    buffer.append(ext);
-    final String extname = buffer.toString();
+    String bindingString = buffer.toString();
+    if (bindingString.length() > 250) {
+      bindingString = bindingString.substring(0, 249);
+    }
+    bindingString += ext;
+    final String extname = bindingString;
     assertTrue("File name '" + extname + "' contains colon, "
         + "which does not work on all platforms!", extname.indexOf(':') < 0);
     final File dir = getOutputDirectory();
