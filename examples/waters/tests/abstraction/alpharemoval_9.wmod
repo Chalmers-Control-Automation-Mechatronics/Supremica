@@ -186,6 +186,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
+                        <EventList>
+                            <SimpleIdentifier Name=":alpha"/>
+                        </EventList>
                         <PointGeometry>
                             <Point Y="32" X="128"/>
                         </PointGeometry>
