@@ -101,6 +101,13 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
                   }
                 }
               } else {
+                // TODO Is this really needed? The algorithm I described you
+                // should handle this case automatically. Remove alpha marking
+                // from all states encountered except stateID. That is all.
+                // (If there is a tau-loop L with reachable alpha-marked
+                // state S, outside of L, all states in L will be unmarked
+                // when searching the predecessors staring from S.)
+                // ~~~Robi
                 final boolean outgoing = expandTauLoop(predID, tauID, alphaID);
                 if (!outgoing) {
                   mTR.markState(predID, alphaID, true);
