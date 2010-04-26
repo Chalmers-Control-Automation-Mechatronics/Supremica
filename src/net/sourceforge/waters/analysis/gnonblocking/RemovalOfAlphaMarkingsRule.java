@@ -93,10 +93,10 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
                 if (!reachableStates.contains(predID)) {
                   reachableStates.add(predID);
                   unvisitedStates.push(predID);
-                  if (mTR.isMarked(predID, alphaID)) {
-                    mTR.markState(predID, alphaID, false);
-                    modified = true;
-                  }
+                }
+                if (mTR.isMarked(predID, alphaID)) {
+                  mTR.markState(predID, alphaID, false);
+                  modified = true;
                 }
               }
             }
@@ -106,6 +106,9 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     }
     if (modified) {
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
+
+      System.out.println(autToAbstract);
+      System.out.println(convertedAut);
       mOriginalIntToStateMap = mTR.getOriginalIntToStateMap();
       mResultingStateToIntMap = mTR.getResultingStateToIntMap();
       return convertedAut;
