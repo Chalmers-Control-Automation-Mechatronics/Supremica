@@ -49,7 +49,7 @@ public class IntStateBuffer
    * @param  stateEnc   State encoding that defines the assignment of state
    *                    codes for the states in the buffer.
    * @throws OverflowException if the event encoding map has more than 30
-   *                  propositions.
+   *                    propositions.
    */
   public IntStateBuffer(final EventEncoding eventEnc,
                         final StateEncoding stateEnc)
@@ -88,6 +88,18 @@ public class IntStateBuffer
       }
       mStateInfo[i++] = tags;
     }
+  }
+
+  /**
+   * Creates a new empty state buffer.
+   * This constructor allocates a new state buffer with the given number
+   * of states. All attributes and markings of the states are initialised
+   * to be <CODE>false</CODE>.
+   * @param  size       The number of states in the new buffer.
+   */
+  public IntStateBuffer(final int size)
+  {
+    mStateInfo = new int[size];
   }
 
 
@@ -172,10 +184,10 @@ public class IntStateBuffer
 
   /**
    * Sets the marking of a state.
-   * @param  state   ID of the state to be modified.
-   * @param  prop    ID of the marking proposition to be modified.
-   * @param  value   <CODE>true</CODE> if the state is to be marked,
-   *                 <CODE>false</CODE> if it is to be unmarked.
+   * @param  state    ID of the state to be modified.
+   * @param  prop     ID of the marking proposition to be modified.
+   * @param  value    <CODE>true</CODE> if the state is to be marked,
+   *                  <CODE>false</CODE> if it is to be unmarked.
    */
   public void setMarked(final int state, final int prop, final boolean value)
   {
@@ -184,6 +196,18 @@ public class IntStateBuffer
     } else {
       mStateInfo[state] &= ~(1 << prop);
     }
+  }
+
+  /**
+   * Sets all markings for the given state simultaneously.
+   * @param  state    ID of the state to be modified.
+   * @param  markings A new marking pattern for the state. This pattern
+   *                  can be obtained through the {@link #getAllMarkings(int)
+   *                  getAllMarkings()} method.
+   */
+  public void setAllMarkings(final int state, final long markings)
+  {
+    mStateInfo[state] = (mStateInfo[state] & TAG_ALL) | (int) markings;
   }
 
   /**

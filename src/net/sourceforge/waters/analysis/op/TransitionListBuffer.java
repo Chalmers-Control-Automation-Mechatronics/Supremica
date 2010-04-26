@@ -1016,7 +1016,7 @@ public abstract class TransitionListBuffer
   private class ReadOnlyIterator implements TransitionIterator
   {
 
-    //#########################################################################
+    //#######################################################################
     //# Constructor
     private ReadOnlyIterator()
     {
@@ -1024,7 +1024,7 @@ public abstract class TransitionListBuffer
       mState = mEvent = -1;
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Interface net.sourceforge.waters.op.TransitionIterator
     public void reset()
     {
@@ -1098,7 +1098,7 @@ public abstract class TransitionListBuffer
         ("ReadOnlyIterator does not support removal of elements!");
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Auxiliary Methods
     void resetRaw(final int state, final int event, final int list)
     {
@@ -1137,7 +1137,7 @@ public abstract class TransitionListBuffer
       return mEvent;
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Data Members
     private int mState;
     private int mCurrent;
@@ -1151,14 +1151,14 @@ public abstract class TransitionListBuffer
   private class ModifyingIterator extends ReadOnlyIterator
   {
 
-    //#########################################################################
+    //#######################################################################
     //# Constructor
     private ModifyingIterator()
     {
       mStart = mPrevious = NULL;
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Interface net.sourceforge.waters.op.TransitionIterator
     public boolean advance()
     {
@@ -1212,7 +1212,7 @@ public abstract class TransitionListBuffer
       mPrevious = NULL;
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Auxiliary Methods
     void resetRaw(final int state, final int event, final int list)
     {
@@ -1220,7 +1220,7 @@ public abstract class TransitionListBuffer
       mStart = mPrevious = list;
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Data Members
     private int mStart;
     private int mPrevious;

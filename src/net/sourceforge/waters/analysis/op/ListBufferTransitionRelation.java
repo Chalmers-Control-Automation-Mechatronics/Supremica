@@ -215,6 +215,20 @@ public class ListBufferTransitionRelation
 
 
   //#########################################################################
+  //# Event Access
+  public int getNumberOfProperEvents()
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.getNumberOfEvents();
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.getNumberOfEvents();
+    } else {
+      throw createNoBufferException();
+    }
+  }
+
+
+  //#########################################################################
   //# State Access
   /**
    * Gets the number of states in the transition relation,
@@ -499,12 +513,35 @@ public class ListBufferTransitionRelation
    * being a read-only iterator, it also does not implement the
    * {@link TransitionIterator#remove()} method.
    */
-  public TransitionIterator createAllTransitionsIterator()
+  public TransitionIterator createAllTransitionsReadOnlyIterator()
   {
     if (mSuccessorBuffer != null) {
       return mSuccessorBuffer.createAllTransitionsReadOnlyIterator();
     } else if (mPredecessorBuffer != null) {
       return mPredecessorBuffer.createAllTransitionsReadOnlyIterator();
+    } else {
+      throw createNoBufferException();
+    }
+  }
+
+  /**
+   * <P>Creates a read/write iterator over all transitions in this transition
+   * relation.</P>
+   * <P>The iterator returned is set up to return the first transition in
+   * this buffer after calling {@link TransitionIterator#advance()}.
+   * It does not implement the methods {@link TransitionIterator#reset(int)}
+   * or {@link TransitionIterator#reset(int,int)}.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured
+   * to use only one transition buffer. If both buffers are configured, the
+   * predecessor buffer will be closed!</P>
+   */
+  public TransitionIterator createAllTransitionsModifyingIterator()
+  {
+    if (mSuccessorBuffer != null) {
+      mPredecessorBuffer = null;
+      return mSuccessorBuffer.createAllTransitionsModifyingIterator();
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createAllTransitionsModifyingIterator();
     } else {
       throw createNoBufferException();
     }
@@ -1044,11 +1081,29 @@ public class ListBufferTransitionRelation
    */
   public void merge(final List<int[]> partition)
   {
-    if (mSuccessorBuffer != null) {
-      mSuccessorBuffer.merge(partition);
-    }
-    if (mPredecessorBuffer != null) {
-      mPredecessorBuffer.merge(partition);
+    final int newSize = partition.size();
+    if (newSize != getNumberOfStates()) {
+      if (mSuccessorBuffer != null) {
+        mSuccessorBuffer.merge(partition);
+      }
+      if (mPredecessorBuffer != null) {
+        mPredecessorBuffer.merge(partition);
+      }
+      final IntStateBuffer newStateBuffer = new IntStateBuffer(newSize);
+      int c = 0;
+      for (final int[] clazz : partition) {
+        boolean init = false;
+        long markings = 0;
+        for (final int state : clazz) {
+          init |= mStateBuffer.isInitial(state);
+          markings |= mStateBuffer.getAllMarkings(state);
+        }
+        newStateBuffer.setInitial(c, init);
+        newStateBuffer.setReachable(c, true);
+        newStateBuffer.setAllMarkings(c, markings);
+        c++;
+      }
+      mStateBuffer = newStateBuffer;
     }
   }
 
@@ -1192,7 +1247,7 @@ public class ListBufferTransitionRelation
     final int numTrans = getNumberOfTransitions();
     final Collection<TransitionProxy> transitions =
       new ArrayList<TransitionProxy>(numTrans);
-    final TransitionIterator iter = createAllTransitionsIterator();
+    final TransitionIterator iter = createAllTransitionsReadOnlyIterator();
     while (iter.advance()) {
       final int s = iter.getCurrentSourceState();
       final int t = iter.getCurrentTargetState();
@@ -1208,20 +1263,6 @@ public class ListBufferTransitionRelation
     }
     return factory.createAutomatonProxy(mName, mKind, events, reachable,
                                         transitions);
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private int getNumberOfProperEvents()
-  {
-    if (mSuccessorBuffer != null) {
-      return mSuccessorBuffer.getNumberOfEvents();
-    } else if (mPredecessorBuffer != null) {
-      return mPredecessorBuffer.getNumberOfEvents();
-    } else {
-      throw createNoBufferException();
-    }
   }
 
 
@@ -1256,7 +1297,7 @@ public class ListBufferTransitionRelation
   private String mName;
   private ComponentKind mKind;
 
-  private final IntStateBuffer mStateBuffer;
+  private IntStateBuffer mStateBuffer;
   private TransitionListBuffer mSuccessorBuffer;
   private TransitionListBuffer mPredecessorBuffer;
   private final BitSet mUsedEvents;
