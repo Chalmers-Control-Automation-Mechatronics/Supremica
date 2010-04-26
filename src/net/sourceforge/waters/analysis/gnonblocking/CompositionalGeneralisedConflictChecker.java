@@ -1058,6 +1058,8 @@ public class CompositionalGeneralisedConflictChecker extends
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
       final AutomatonProxy composed = getResultAutomaton();
+      final Collection<AutomatonProxy> autOfComposition =
+          mStateMap.getInputAutomata();
 
       final List<AutomatonProxy> traceAutomata =
           new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size() - 1);
@@ -1065,6 +1067,9 @@ public class CompositionalGeneralisedConflictChecker extends
         if (aut != getResultAutomaton()) {
           traceAutomata.add(aut);
         }
+      }
+      for (final AutomatonProxy aut : autOfComposition) {
+        traceAutomata.add(aut);
       }
 
       final List<TraceStepProxy> convertedSteps =
@@ -1078,19 +1083,10 @@ public class CompositionalGeneralisedConflictChecker extends
           convertedStepMap.remove(composed);
           final StateProxy convertedState = stepMap.get(composed);
           // add original automata and states
-          final Collection<AutomatonProxy> autOfComposition =
-              mStateMap.getInputAutomata();
           for (final AutomatonProxy aut : autOfComposition) {
             final StateProxy originalState =
                 mStateMap.getOriginalState(convertedState, aut);
             convertedStepMap.put(aut, originalState);
-            // TODO: it doesn't seem like using contains() would be very
-            // efficient, but as far as I know there are no list implementations
-            // which don't
-            // allow duplicates like the Set I had automatically did....
-            if (!traceAutomata.contains(aut)) {
-              traceAutomata.add(aut);
-            }
           }
           final TraceStepProxy convertedStep =
               getFactory().createTraceStepProxy(step.getEvent(),
