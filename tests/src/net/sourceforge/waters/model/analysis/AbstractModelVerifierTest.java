@@ -190,8 +190,16 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace) throws Exception
   {
-    assertSame("Product DES in trace is not the original model!", des, trace
-        .getProductDES());
+    assertSame("Product DES in trace is not the original model!",
+               des, trace.getProductDES());
+    /*
+     * Sorry, Rachel, but this is a real bug that needs to be fixed
+     * in CompositionalGeneralisedConflictChecker.
+     */
+    final String desName = des.getName();
+    final String traceName = trace.getName();
+    assertTrue("Trace name '" + traceName + "' does not match model name '" +
+               desName + "'!", traceName.startsWith(desName));
     final Collection<AutomatonProxy> automata = des.getAutomata();
     for (final AutomatonProxy aut : trace.getAutomata()) {
       if (!automata.contains(aut)) {
@@ -222,13 +230,13 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
       }
     }
     String bindingString = buffer.toString();
-    if (bindingString.length() > 250) {
-      bindingString = bindingString.substring(0, 249);
-    }
     bindingString += ext;
     final String extname = bindingString;
-    assertTrue("File name '" + extname + "' contains colon, "
-        + "which does not work on all platforms!", extname.indexOf(':') < 0);
+    assertTrue("File name '" + extname + "' too long!",
+               bindingString.length() < 255);
+    assertTrue("File name '" + extname + "' contains a colon, " +
+               "which does not work on all platforms!",
+               extname.indexOf(':') < 0);
     final File dir = getOutputDirectory();
     final File filename = new File(dir, extname);
     ensureParentDirectoryExists(filename);
@@ -247,8 +255,8 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
    *          The factory used by the model verifier for trace construction.
    * @return An instance of the model verifier
    */
-  protected abstract ModelVerifier createModelVerifier(
-                                                       ProductDESProxyFactory factory);
+  protected abstract ModelVerifier createModelVerifier
+    (ProductDESProxyFactory factory);
 
   /**
    * Configures the model verifier under test for a given product DES. This
