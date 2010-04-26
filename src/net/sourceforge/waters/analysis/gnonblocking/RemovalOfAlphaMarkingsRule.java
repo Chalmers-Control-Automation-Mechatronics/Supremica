@@ -155,6 +155,8 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
             }
             reachableStates.add(succID);
             unvisitedStates.push(succID);
+            // TODO: need a way to determine which states are part of the tau
+            // loop and which is the outgoing transition
           }
         }
       } else {
