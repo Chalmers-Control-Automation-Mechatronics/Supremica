@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="determinisation_7" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>This test checks whether the determinisation of non alpha states algorithm can correctly add markings to a state that already has some.</ns2:Comment>
+    <ns2:Comment>This test checks whether the determinisation of non alpha states algorithm can correctly distinguish states with different markings. In this example, state S2 is marked alpha and will not be merged with the other states, despite the fact that all states are on a strongly tau-connected component and thus observation equivalent.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
             <ColorGeometry>
@@ -124,22 +124,68 @@
         <SimpleComponent Kind="SPEC" Name="after">
             <Graph Deterministic="false">
                 <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
+                    <SimpleNode Initial="true" Name="S01">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
-                            <SimpleIdentifier Name=":alpha"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="48" X="48"/>
+                            <Point Y="64" X="80"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
                             <Point Y="0" X="-27"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="-16"/>
+                            <Point Y="6" X="-27"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <EventList>
+                            <SimpleIdentifier Name=":alpha"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="64" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
+                <EdgeList>
+                    <Edge Target="S01" Source="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="6" X="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="80" X="96"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="80" X="127"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="80" X="0"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="S2" Source="S01">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="80" X="0"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="51" X="129"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="80" X="96"/>
+                        </EndPointGeometry>
+                    </Edge>
+                </EdgeList>
             </Graph>
         </SimpleComponent>
     </ComponentList>
