@@ -1,0 +1,1054 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="oeq_10" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This is a larger test for observation equivalence from the central locking model. The test checks whether multiple observation equivalent transitions are removed correctly while not merging any states.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Name="Timers">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="FT"/>
+                    <SimpleIdentifier Name="BT"/>
+                    <SimpleIdentifier Name="FH"/>
+                    <SimpleIdentifier Name="BH"/>
+                    <SimpleIdentifier Name="FS"/>
+                    <SimpleIdentifier Name="WSP"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="Counters">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="WSP"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="FahrerTueren">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="FT"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="VorderTueren">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="FT"/>
+                    <SimpleIdentifier Name="BT"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="Tueren">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="FT"/>
+                    <SimpleIdentifier Name="BT"/>
+                    <SimpleIdentifier Name="FH"/>
+                    <SimpleIdentifier Name="BH"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="SERFS"/>
+        <EventDecl Kind="CONTROLLABLE" Name="soft_ZS"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ZS"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TAST"/>
+        <EventDecl Kind="CONTROLLABLE" Name="soft_CS"/>
+        <EventDecl Kind="CONTROLLABLE" Name="soft_SER">
+            <RangeList>
+                <SimpleIdentifier Name="Tueren"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="soft_ER"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ER"/>
+        <EventDecl Kind="CONTROLLABLE" Name="SER"/>
+        <EventDecl Kind="CONTROLLABLE" Name="soft_VR"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="IN">
+                        <PointGeometry>
+                            <Point Y="48" X="352"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point Y="-11" X="-4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQZS">
+                        <PointGeometry>
+                            <Point Y="144" X="544"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-10" X="-11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQSER">
+                        <PointGeometry>
+                            <Point Y="144" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-11" X="-17"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="COD">
+                        <PointGeometry>
+                            <Point Y="272" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="20" X="-20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQVR">
+                        <PointGeometry>
+                            <Point Y="144" X="416"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-9" X="1"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="VR">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="400" X="416"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="16" X="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="TSTZS">
+                        <PointGeometry>
+                            <Point Y="272" X="480"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="18" X="-2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQER">
+                        <PointGeometry>
+                            <Point Y="144" X="288"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-9" X="-28"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="SER">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="400" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="18" X="-11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="ER">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="400" X="288"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="18" X="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="ZS">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="400" X="544"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="18" X="-2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <GroupNode Name=":1">
+                        <NodeRef Name="ZS"/>
+                        <NodeRef Name="ER"/>
+                        <NodeRef Name="TSTZS"/>
+                        <NodeRef Name="RQSER"/>
+                        <NodeRef Name="SER"/>
+                        <NodeRef Name="IN"/>
+                        <NodeRef Name="COD"/>
+                        <NodeRef Name="VR"/>
+                        <NodeRef Name="RQVR"/>
+                        <NodeRef Name="RQZS"/>
+                        <NodeRef Name="RQER"/>
+                        <BoxGeometry>
+                            <Box Y="16" X="112" Width="480" Height="416"/>
+                        </BoxGeometry>
+                    </GroupNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="RQER" Source="VR">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER"/>
+                            <SimpleIdentifier Name="TAST"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="17" X="16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="400" X="416"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="278" X="339"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="288"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="COD" Source="VR">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="SER"/>
+                            <SimpleIdentifier Name="SERFS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-39" X="-70"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="400" X="416"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="346" X="314"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="272" X="224"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="TSTZS" Source="VR">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="6" X="-4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="400" X="416"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="336" X="448"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="272" X="480"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="SER" Source="RQSER">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="soft_SER">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-38" X="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="144" X="160"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="272" X="141"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="400" X="160"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="ER" Source="RQER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-60" X="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="144" X="288"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="272" X="296"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="400" X="288"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="ZS" Source="RQZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-17" X="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="144" X="544"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="274" X="551"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="400" X="544"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQZS" Source="TSTZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-25" X="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="272" X="480"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="208" X="512"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="544"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQVR" Source="TSTZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-25" X="-4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="272" X="480"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="208" X="448"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="416"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQER" Source="ER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER"/>
+                            <SimpleIdentifier Name="SER"/>
+                            <SimpleIdentifier Name="SERFS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="400" X="288"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="272" X="278"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="288"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="TSTZS" Source="ER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="400" X="288"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="336" X="384"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="272" X="480"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQVR" Source="ER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TAST"/>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-35" X="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="400" X="288"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="272" X="352"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="416"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQER" Source="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="48" X="352"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="96" X="320"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="288"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="COD" Source="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="SER"/>
+                            <SimpleIdentifier Name="SERFS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-33" X="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="48" X="352"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="104" X="252"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="272" X="224"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="TSTZS" Source="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-27" X="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="48" X="352"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="104" X="449"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="272" X="480"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQVR" Source="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TAST"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="48" X="352"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="96" X="384"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="416"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQER" Source="SER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER"/>
+                            <SimpleIdentifier Name="SER"/>
+                            <SimpleIdentifier Name="SERFS"/>
+                            <SimpleIdentifier Name="TAST"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="4" X="-39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="400" X="160"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="256" X="192"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="288"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="TSTZS" Source="SER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-22" X="11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="400" X="160"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="336" X="320"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="272" X="480"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQVR" Source="SER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="72" X="-105"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="400" X="160"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="272" X="288"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="416"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQER" Source="COD">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="272" X="224"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="208" X="256"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="288"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQSER" Source="COD">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-22" X="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="272" X="224"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="208" X="192"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="160"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQER" Source="ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="-26"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="400" X="544"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="273" X="416"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="288"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="COD" Source="ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="SER"/>
+                            <SimpleIdentifier Name="SERFS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="19" X="98"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="400" X="544"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="362" X="374"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="272" X="224"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQZS" Source="ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ZS"/>
+                            <SimpleIdentifier Name="TAST"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="36" X="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="400" X="544"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="273" X="524"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="144" X="544"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="VR" Source="RQVR">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-44" X="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="144" X="416"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="272" X="416"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="400" X="416"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="ER" Source=":1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="-52"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="432" X="276"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="410" X="262"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="400" X="288"/>
+                        </EndPointGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="after">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Name="COD">
+                        <PointGeometry>
+                            <Point Y="112" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="ER">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="272" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="IN">
+                        <PointGeometry>
+                            <Point Y="32" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-14" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQER">
+                        <PointGeometry>
+                            <Point Y="112" X="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-13" X="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQSER">
+                        <PointGeometry>
+                            <Point Y="112" X="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQVR">
+                        <PointGeometry>
+                            <Point Y="112" X="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-15" X="3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQZS">
+                        <PointGeometry>
+                            <Point Y="112" X="384"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-12" X="4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="SER">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="272" X="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="TSTZS">
+                        <PointGeometry>
+                            <Point Y="192" X="336"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-21" X="-13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="VR">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="272" X="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="ZS">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="272" X="384"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="RQER" Source="COD">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="RQSER" Source="COD">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-32" X="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="RQER" Source="ER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER"/>
+                            <SimpleIdentifier Name="SER"/>
+                            <SimpleIdentifier Name="SERFS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-54" X="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="188" X="199"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RQVR" Source="ER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TAST"/>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="0" X="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="176" X="241"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="TSTZS" Source="ER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="213" X="275"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="COD" Source="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="SER"/>
+                            <SimpleIdentifier Name="SERFS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="-34"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="ER" Source="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-77" X="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="100" X="99"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RQER" Source="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-16" X="8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="73" X="198"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RQVR" Source="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TAST"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="77" X="263"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="TSTZS" Source="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="4" X="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="70" X="313"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="ER" Source="RQER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <SimpleIdentifier Name="soft_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-26" X="-43"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="ER" Source="RQSER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="SER" Source="RQSER">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="soft_SER">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-34" X="-41"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="ER" Source="RQVR">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-60" X="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="172" X="230"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="VR" Source="RQVR">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-25" X="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="ER" Source="RQZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="-45"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="301" X="312"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="ZS" Source="RQZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-38" X="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="193" X="413"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RQER" Source="SER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER"/>
+                            <SimpleIdentifier Name="SER"/>
+                            <SimpleIdentifier Name="SERFS"/>
+                            <SimpleIdentifier Name="TAST"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="-31"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="203" X="90"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RQVR" Source="SER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="15" X="-51"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="324" X="146"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="TSTZS" Source="SER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="223" X="174"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RQVR" Source="TSTZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-20" X="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="153" X="316"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RQZS" Source="TSTZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="COD" Source="VR">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="SER"/>
+                            <SimpleIdentifier Name="SERFS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="16" X="14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="323" X="159"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="ER" Source="VR">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-1" X="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="RQER" Source="VR">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER"/>
+                            <SimpleIdentifier Name="TAST"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-35" X="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="150" X="231"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="TSTZS" Source="VR">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="7" X="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="COD" Source="ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="SER"/>
+                            <SimpleIdentifier Name="SERFS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="65" X="437"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="ER" Source="ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="332" X="284"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RQER" Source="ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="18" X="39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="329" X="334"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="RQZS" Source="ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TAST"/>
+                            <SimpleIdentifier Name="ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

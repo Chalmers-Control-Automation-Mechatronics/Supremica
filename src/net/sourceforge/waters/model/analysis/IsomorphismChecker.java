@@ -9,16 +9,20 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import gnu.trove.THashSet;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.op.EventEncoding;
+import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -26,19 +30,20 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+
 /**
- * <P>A testing tool to check whether two nondeterministic automata
- * are isomorphic.</P>
+ * <P>A debugging tool to check whether two nondeterministic automata
+ * are isomorphic or observation equivalent.</P>
  *
  * <P>This tester receives two {@link AutomatonProxy} objects as input
- * and checks whether they have isomorphic transition structures. For
- * isomorphism, state names do not have to be the same, only transition
+ * and checks whether they have bisimilar transition structures.
+ * State names do not have to be the same, only transition
  * structures, initial state status, and marking must match. It is
  * configurable whether events are matched by object identity or by
  * name.</P>
  *
  * <P>This implementation merges the two automata into a single
- * {@link ObserverProjectionTransitionRelation} and then uses a
+ * {@link ListBufferTransitionRelation} and then uses a
  * {@link ObservationEquivalenceTRSimplifier} to find the coarsest bisimulation
  * relation. Afterwards it tests whether the two automata have matching
  * initial states, and whether all equivalence classes have equal numbers
@@ -46,6 +51,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  *
  * @author Robi Malik
  */
+
 public class IsomorphismChecker
 {
 
@@ -84,9 +90,12 @@ public class IsomorphismChecker
   {
     if (aut1.getStates().size() != 0 || aut2.getStates().size() != 0) {
       setupEventMap(aut1, aut2);
-      final AutomatonProxy aut = createTestAutomaton(aut1, aut2);
-      final ObserverProjectionTransitionRelation rel =
-        new ObserverProjectionTransitionRelation(aut);
+      final AutomatonProxy aut = createTestAutomaton(aut1, aut2, true);
+      final EventEncoding eventEnc = new EventEncoding(aut);
+      final StateEncoding stateEnc = new StateEncoding(aut);
+      final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
+        (aut, eventEnc, stateEnc,
+         ListBufferTransitionRelation.CONFIG_PREDECESSORS);
       final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier(rel);
       final boolean result = bisimulator.run();
@@ -94,8 +103,37 @@ public class IsomorphismChecker
         throw new IsomorphismException
           ("Bisimulator did not identify any states!");
       }
-      final Collection<int[]> partition = bisimulator.getResultPartition();
-      checkPartition(partition, rel);
+      final List<int[]> partition = bisimulator.getResultPartition();
+      checkBisimulationPartition(partition, rel, stateEnc);
+    }
+  }
+
+  /**
+   * Checks whether the two given automata are observation equivalent.
+   * @throws AnalysisException if the input automata are not isomorphic.
+   */
+  public void checkObservationEquivalence(final AutomatonProxy aut1,
+                                          final AutomatonProxy aut2,
+                                          final EventProxy tau)
+    throws AnalysisException
+  {
+    if (aut1.getStates().size() != 0 || aut2.getStates().size() != 0) {
+      setupEventMap(aut1, aut2);
+      final AutomatonProxy aut = createTestAutomaton(aut1, aut2, false);
+      final EventEncoding eventEnc = new EventEncoding(aut, tau);
+      final StateEncoding stateEnc = new StateEncoding(aut);
+      final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
+        (aut, eventEnc, stateEnc,
+         ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+      final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier(rel);
+      final boolean result = bisimulator.run();
+      if (!result) {
+        throw new IsomorphismException
+          ("Bisimulator did not identify any states!");
+      }
+      final List<int[]> partition = bisimulator.getResultPartition();
+      checkObservationEquivalencePartition(partition, rel, stateEnc);
     }
   }
 
@@ -106,12 +144,17 @@ public class IsomorphismChecker
                              final AutomatonProxy source)
     throws EventNotFoundException
   {
+    final Collection<EventProxy> events1 = target.getEvents();
+    final Collection<EventProxy> events2 = source.getEvents();
+    mSelfloops1 = new ArrayList<EventProxy>(events2.size());
+    mExtraProperties1 = new ArrayList<EventProxy>(events2.size());
+    mSelfloops2 = new ArrayList<EventProxy>(events1.size());
+    mExtraProperties2 = new ArrayList<EventProxy>(events2.size());
     if (mMatchingNames) {
-      final Collection<EventProxy> events1 = target.getEvents();
-      final Collection<EventProxy> events2 = source.getEvents();
       final int numevents = events1.size();
       if (numevents > events2.size()) {
-        setupEventMap(source, target); // will throw exception
+        setupEventMap(source, target);
+        return;
       }
       final Map<String,EventProxy> nameMap =
         new HashMap<String,EventProxy>(numevents);
@@ -120,22 +163,61 @@ public class IsomorphismChecker
         nameMap.put(name, event);
       }
       mEventMap = new HashMap<EventProxy,EventProxy>(numevents);
+      final Collection<EventProxy> eset2 = new THashSet<EventProxy>(numevents);
       for (final EventProxy event2 : events2) {
         final String name = event2.getName();
         final EventProxy event1 = nameMap.get(name);
         if (event1 == null) {
-          throw new EventNotFoundException(target, name);
+          addSelfLoop(event2, mSelfloops1, mExtraProperties1);
         } else if (event1.getKind() != event2.getKind()) {
           throw new EventNotFoundException
             (target, name, event1.getKind(), true);
+        } else {
+          mEventMap.put(event2, event1);
+          eset2.add(event1);
         }
-        mEventMap.put(event2, event1);
+      }
+      for (final EventProxy event1 : events1) {
+        if (!eset2.contains(event1)) {
+          addSelfLoop(event1, mSelfloops2, mExtraProperties2);
+        }
+      }
+    } else {
+      final Collection<EventProxy> eset1 = new THashSet<EventProxy>(events1);
+      for (final EventProxy event2 : events2) {
+        if (!eset1.contains(event2)) {
+          addSelfLoop(event2, mSelfloops1, mExtraProperties1);
+        }
+      }
+      final Collection<EventProxy> eset2 = new THashSet<EventProxy>(events2);
+      for (final EventProxy event1 : events1) {
+        if (!eset2.contains(event1)) {
+          addSelfLoop(event1, mSelfloops2, mExtraProperties2);
+        }
       }
     }
   }
 
+  private void addSelfLoop(final EventProxy event,
+                           final Collection<EventProxy> properEvents,
+                           final Collection<EventProxy> props)
+  {
+    switch (event.getKind()) {
+    case CONTROLLABLE:
+    case UNCONTROLLABLE:
+      properEvents.add(event);
+      break;
+    case PROPOSITION:
+      props.add(event);
+    default:
+      throw new IllegalArgumentException
+        ("Unknown event kind " + event.getKind() + "!");
+    }
+  }
+
   private AutomatonProxy createTestAutomaton(final AutomatonProxy aut1,
-                                             final AutomatonProxy aut2)
+                                             final AutomatonProxy aut2,
+                                             final boolean iso)
     throws IsomorphismException
   {
     final Collection<EventProxy> events = aut1.getEvents();
@@ -143,7 +225,7 @@ public class IsomorphismChecker
     final Collection<StateProxy> states2 = aut2.getStates();
     final int numstates1 = states1.size();
     final int numstates2 = states2.size();
-    if (numstates1 != numstates2) {
+    if (iso && numstates1 != numstates2) {
       throw new IsomorphismException("Different number of states!");
     }
     final int numstates = numstates1 + numstates2;
@@ -151,12 +233,30 @@ public class IsomorphismChecker
       new ArrayList<StateProxy>(numstates);
     final Map<StateProxy,StateProxy> stateMap =
       new HashMap<StateProxy,StateProxy>(numstates);
+
+    final Collection<TransitionProxy> transitions1 = aut1.getTransitions();
+    final Collection<TransitionProxy> transitions2 = aut2.getTransitions();
+    final int numtrans1 =
+      transitions1.size() + mSelfloops1.size() * states1.size();
+    final int numtrans2 =
+      transitions2.size() + mSelfloops2.size() * states2.size();
+    if (iso && numtrans1 != numtrans2) {
+      throw new IsomorphismException("Different number of transitions!");
+    }
+    final Collection<TransitionProxy> transitions =
+      new ArrayList<TransitionProxy>(numtrans1 + numtrans2);
+
     mSplitMap = new TObjectIntHashMap<StateProxy>(numstates);
     for (final StateProxy state1 : states1) {
       final StateProxy renamed = getAltState(state1, 1);
       states.add(renamed);
       mSplitMap.put(renamed, 0);
       stateMap.put(state1, renamed);
+      for (final EventProxy event : mSelfloops1) {
+        final TransitionProxy selfloop =
+          mFactory.createTransitionProxy(renamed, event, renamed);
+        transitions.add(selfloop);
+      }
     }
     for (final StateProxy state2 : states2) {
       final StateProxy renamed;
@@ -172,6 +272,7 @@ public class IsomorphismChecker
             final EventProxy prop1 = getMappedEvent(prop2);
             props1.add(prop1);
           }
+          props1.addAll(mExtraProperties2);
           final String name = getAltStateName(state2, 2);
           final boolean initial = state2.isInitial();
           renamed = mFactory.createStateProxy(name, initial, props1);
@@ -182,16 +283,13 @@ public class IsomorphismChecker
       states.add(renamed);
       stateMap.put(state2, renamed);
       mSplitMap.put(renamed, 1);
+      for (final EventProxy event : mSelfloops2) {
+        final TransitionProxy selfloop =
+          mFactory.createTransitionProxy(renamed, event, renamed);
+        transitions.add(selfloop);
+      }
     }
-    final Collection<TransitionProxy> transitions1 = aut1.getTransitions();
-    final Collection<TransitionProxy> transitions2 = aut2.getTransitions();
-    final int numtrans1 = transitions1.size();
-    final int numtrans2 = transitions2.size();
-    if (numtrans1 != numtrans2) {
-      throw new IsomorphismException("Different number of transitions!");
-    }
-    final Collection<TransitionProxy> transitions =
-      new ArrayList<TransitionProxy>(numtrans1 + numtrans2);
+
     addAltTransitions(transitions1, transitions, stateMap);
     addAltTransitions(transitions2, transitions, stateMap);
     final String name1 = aut1.getName();
@@ -201,11 +299,11 @@ public class IsomorphismChecker
       (name, ComponentKind.PLANT, events, states, transitions);
   }
 
-  private void checkPartition(final Collection<int[]> partition,
-                              final ObserverProjectionTransitionRelation rel)
+  private void checkBisimulationPartition(final List<int[]> partition,
+                                          final ListBufferTransitionRelation rel,
+                                          final StateEncoding enc)
     throws IsomorphismException
   {
-    final StateProxy[] origMap = rel.getOriginalIntToStateMap();
     final int[] count = new int[2];
     final int[] initCount = new int[2];
     for (final int[] clazz : partition) {
@@ -213,7 +311,7 @@ public class IsomorphismChecker
       Arrays.fill(initCount, 0);
       for (int i = 0; i < clazz.length; i++) {
         final int s = clazz[i];
-        final StateProxy state = origMap[s];
+        final StateProxy state = enc.getState(s);
         final int split = mSplitMap.get(state);
         count[split]++;
         if (state.isInitial()) {
@@ -230,12 +328,53 @@ public class IsomorphismChecker
     }
   }
 
+  private void checkObservationEquivalencePartition
+    (final List<int[]> partition,
+     final ListBufferTransitionRelation rel,
+     final StateEncoding enc)
+    throws IsomorphismException
+  {
+    final boolean[] count = new boolean[2];
+    final boolean[] initCount = new boolean[2];
+    for (final int[] clazz : partition) {
+      Arrays.fill(count, false);
+      Arrays.fill(initCount, false);
+      for (int i = 0; i < clazz.length; i++) {
+        final int s = clazz[i];
+        final StateProxy state = enc.getState(s);
+        final int split = mSplitMap.get(state);
+        count[split] = true;
+        if (state.isInitial()) {
+          initCount[split] = true;
+        }
+      }
+      if (count[0] != count[1]) {
+        throw new IsomorphismException
+          ("Automata contain non-observation equivalent states!");
+      } else if (initCount[0] != initCount[1]) {
+        throw new IsomorphismException
+          ("Initial states do not match!");
+      }
+    }
+  }
+
   private StateProxy getAltState(final StateProxy state, final int index)
   {
     final String name = getAltStateName(state, index);
     final boolean init = state.isInitial();
     final Collection<EventProxy> props = state.getPropositions();
-    return mFactory.createStateProxy(name, init, props);
+    final Collection<EventProxy> extra =
+      index == 1 ? mExtraProperties1 : mExtraProperties2;
+    final Collection<EventProxy> allProps;
+    if (extra.isEmpty()) {
+      allProps = props;
+    } else {
+      final int numProps = props.size() + extra.size();
+      allProps = new ArrayList<EventProxy>(numProps);
+      allProps.addAll(props);
+      allProps.addAll(extra);
+    }
+    return mFactory.createStateProxy(name, init, allProps);
   }
 
   private String getAltStateName(final StateProxy state, final int index)
@@ -295,6 +434,10 @@ public class IsomorphismChecker
   private boolean mMatchingNames;
 
   private Map<EventProxy,EventProxy> mEventMap;
+  private Collection<EventProxy> mSelfloops1;
+  private Collection<EventProxy> mExtraProperties1;
+  private Collection<EventProxy> mSelfloops2;
+  private Collection<EventProxy> mExtraProperties2;
   private TObjectIntHashMap<StateProxy> mSplitMap;
 
 }

@@ -100,7 +100,7 @@ class AltRemovalOfAlphaMarkingsRule extends AbstractionRule
     final ListBufferTransitionRelation tr = new ListBufferTransitionRelation
       (autToAbstract, eventEnc, stateEnc,
        ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    final TransitionIterator iter = tr.createPredecessorsIterator();
+    final TransitionIterator iter = tr.createPredecessorsReadOnlyIterator();
 
     // Visit all alpha-marked states. For each of them, to a depth-first
     // search, removing alpha-markings from all states other than the start

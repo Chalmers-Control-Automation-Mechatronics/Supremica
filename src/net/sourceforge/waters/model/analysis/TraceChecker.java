@@ -52,8 +52,9 @@ public class TraceChecker
    * @throws AssertionError to indicate that something is wrong with the
    *                        trace.
    */
-  public static void checkCounterExample(final TraceProxy trace,
-                                         final Collection<AutomatonProxy> automata)
+  public static void checkCounterExample
+    (final TraceProxy trace,
+     final Collection<AutomatonProxy> automata)
   {
     for (final AutomatonProxy aut : automata) {
       checkCounterExample(trace, aut);
@@ -72,11 +73,40 @@ public class TraceChecker
   {
     assertTrue(trace.getAutomata().contains(aut),
                "Automaton " + aut.getName() + " is not mentioned in trace!");
+    final List<TraceStepProxy> steps = trace.getTraceSteps();
+    return checkCounterExample(steps, aut);
+  }
+
+  /**
+   * Checks whether the given list of trace steps is accepted by each of
+   * the given automata.
+   * @throws AssertionError to indicate that something is wrong with the
+   *                        trace.
+   */
+  public static void checkCounterExample
+    (final List<TraceStepProxy> steps,
+     final Collection<AutomatonProxy> automata)
+  {
+    for (final AutomatonProxy aut : automata) {
+      checkCounterExample(steps, aut);
+    }
+  }
+
+  /**
+   * Checks whether the given list of trace steps is accepted by the given
+   * automaton.
+   * @return Predicted end state of the automaton after execution of the
+   *         trace steps.
+   * @throws AssertionError to indicate that something is wrong with the
+   *                        trace.
+   */
+  public static StateProxy checkCounterExample(final List<TraceStepProxy> steps,
+                                               final AutomatonProxy aut)
+  {
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
-    final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
-    final Iterator<TraceStepProxy> iter = traceSteps.iterator();
+    final Iterator<TraceStepProxy> iter = steps.iterator();
     final TraceStepProxy initStep = iter.next();
     final Map<AutomatonProxy,StateProxy> initMap = initStep.getStateMap();
     StateProxy current = initMap.get(aut);

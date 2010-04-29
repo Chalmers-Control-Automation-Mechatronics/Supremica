@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.op;
 
-import java.util.Collection;
+import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
@@ -27,23 +27,13 @@ public interface TransitionRelationSimplifier
   /**
    * Gets the transition relation modified by this simplifier.
    */
-  public ObserverProjectionTransitionRelation getTransitionRelation();
+  public ListBufferTransitionRelation getTransitionRelation();
 
   /**
    * Sets a new transition relation to be modified by this simplifier.
    */
   public void setTransitionRelation
-    (final ObserverProjectionTransitionRelation rel);
-
-  /**
-   * Gets the ID of the silent (tau) event used for simplification.
-   */
-  public int getHiddenEventID();
-
-  /**
-   * Sets the ID of the silent (tau) event used for simplification.
-   */
-  public void setHiddenEventID(final int event);
+    (final ListBufferTransitionRelation rel);
 
   /**
    * Runs this simplifier.
@@ -63,6 +53,6 @@ public interface TransitionRelationSimplifier
    *         {@link #run()}, or if the {@link #run()} resulted in no
    *         change.
    */
-  public Collection<int[]> getResultPartition();
+  public List<int[]> getResultPartition();
 
 }

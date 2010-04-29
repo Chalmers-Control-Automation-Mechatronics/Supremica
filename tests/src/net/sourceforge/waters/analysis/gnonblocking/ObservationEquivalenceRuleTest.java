@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
-//# CLASS:   ObservationEquivalenceRuleTest
+//# CLASS:   AltObservationEquivalenceRuleTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -120,6 +120,58 @@ public class ObservationEquivalenceRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_7.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_oeq_8() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_8.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_oeq_9() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_9.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_oeq_10() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_10.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_oeq_11() throws Exception
+  {
+    final ObservationEquivalenceRule rule = getAbstractionRule();
+    rule.setSuppressRedundantHiddenTransitions(true);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_11.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_oeq_12() throws Exception
+  {
+    final ObservationEquivalenceRule rule = getAbstractionRule();
+    rule.setSuppressRedundantHiddenTransitions(true);
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_12.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_oeq_13() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "oeq_13.wmod";
     runAbstractionRule(group, subdir, name);
   }
 

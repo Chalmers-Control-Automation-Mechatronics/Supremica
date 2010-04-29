@@ -91,6 +91,30 @@ public class StateEncoding
 
 
   //#########################################################################
+  //# Overrides for java.lang.Object
+  public String toString()
+  {
+    final StringBuffer buffer = new StringBuffer("{");
+    if (mStates != null) {
+      int code = 0;
+      for (final StateProxy state : mStates) {
+        if (state != null) {
+          if (code > 0) {
+            buffer.append(", ");
+          }
+          buffer.append(code);
+          buffer.append('=');
+          buffer.append(state.getName());
+        }
+        code++;
+      }
+    }
+    buffer.append('}');
+    return buffer.toString();
+  }
+
+
+  //#########################################################################
   //# Initialisation
   /**
    * Creates a new state encoding for the given states.
@@ -129,7 +153,6 @@ public class StateEncoding
       if (state != null) {
         mStateCodeMap.put(state, code);
       }
-      code++;
     }
   }
 

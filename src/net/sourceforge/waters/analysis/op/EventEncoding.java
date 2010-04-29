@@ -14,9 +14,11 @@ import java.util.Collection;
 import java.util.List;
 
 import gnu.trove.TObjectIntHashMap;
+import gnu.trove.TObjectIntIterator;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -198,6 +200,69 @@ public class EventEncoding
       }
     }
     mExtraSelfLoops = null;
+  }
+
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
+  public String toString()
+  {
+    final StringBuffer buffer = new StringBuffer("{");
+    int ecode = 0;
+    EventProxy tau = null;
+    if (mProperEvents != null) {
+      for (final EventProxy event : mProperEvents) {
+        if (ecode > 0) {
+          buffer.append(", ");
+        } else {
+          tau = event;
+        }
+        buffer.append(ecode++);
+        buffer.append('=');
+        buffer.append(event == null ? "(null)" : event.getName());
+        if (mExtraSelfLoops != null && mExtraSelfLoops.contains(event)) {
+          buffer.append('+');
+        }
+      }
+    }
+    final TObjectIntIterator<EventProxy> iter = mEventCodeMap.iterator();
+    while (iter.hasNext()) {
+      iter.advance();
+      final EventProxy event = iter.key();
+      final int code = iter.value();
+      if (code == TAU && event != tau &&
+          (event == null || event.getKind() != EventKind.PROPOSITION)) {
+        if (ecode > 0) {
+          buffer.append(", ");
+        } else {
+          ecode = 1;
+        }
+        buffer.append(code);
+        buffer.append('=');
+        buffer.append(event == null ? "(null)" : event.getName());
+        if (mExtraSelfLoops != null && mExtraSelfLoops.contains(event)) {
+          buffer.append('+');
+        }
+      }
+    }
+    if (mPropositions != null) {
+      int pcode = 0;
+      for (final EventProxy prop : mPropositions) {
+        if (pcode > 0) {
+          buffer.append(", ");
+        } else if (ecode > 0) {
+          buffer.append("; ");
+        }
+        buffer.append(pcode++);
+        buffer.append('=');
+        buffer.append(prop == null ? "(null)" : prop.getName());
+        if (mExtraSelfLoops != null && mExtraSelfLoops.contains(prop)) {
+          buffer.append('+');
+        }
+      }
+    }
+    buffer.append('}');
+    return buffer.toString();
   }
 
 

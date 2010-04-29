@@ -144,18 +144,33 @@ public class ListBufferTransitionRelation
       new ArrayList<TransitionProxy>(transitions);
     final int numEvents = eventEnc.getNumberOfProperEvents();
     final int numStates = stateEnc.getNumberOfStates();
+    final int numTrans = aut.getTransitions().size();
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(numEvents, numStates);
+        new OutgoingTransitionListBuffer(numEvents, numStates, numTrans);
       mSuccessorBuffer.setUpTransitions(list, eventEnc, stateEnc);
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer =
-        new IncomingTransitionListBuffer(numEvents, numStates);
+        new IncomingTransitionListBuffer(numEvents, numStates, numTrans);
       mPredecessorBuffer.setUpTransitions(list, eventEnc, stateEnc);
     }
     mUsedEvents = new BitSet(numEvents);
     mUsedEvents.set(0, numEvents, true);
+  }
+
+
+  //#########################################################################
+  //# Overrides for java.lang.object
+  public String toString()
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.toString();
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.toString();
+    } else {
+      return "{ListBufferTransitionRelation: no buffer configured.}";
+    }
   }
 
 
@@ -455,10 +470,30 @@ public class ListBufferTransitionRelation
    * Being a read-only iterator, it does not implement the
    * {@link TransitionIterator#remove()} method.
    */
-  public TransitionIterator createPredecessorsIterator()
+  public TransitionIterator createPredecessorsReadOnlyIterator()
   {
     if (mPredecessorBuffer != null) {
       return mPredecessorBuffer.createReadOnlyIterator();
+    } else {
+      throw createNoBufferException("predecessor");
+    }
+  }
+
+  /**
+   * Creates a read/write iterator for this transition relation's
+   * incoming transitions.
+   * The iterator returned is not initialised, so one of the methods
+   * {@link TransitionIterator#reset(int)} or
+   * {@link TransitionIterator#reset(int, int)} before it can be used.
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured
+   * to use only a predecessor buffer. If both buffers are configured, the
+   * successor buffer will be closed!</P>
+   */
+  public TransitionIterator createPredecessorsModifyingIterator()
+  {
+    if (mPredecessorBuffer != null) {
+      mSuccessorBuffer = null;
+      return mPredecessorBuffer.createModifyingIterator();
     } else {
       throw createNoBufferException("predecessor");
     }
@@ -500,6 +535,46 @@ public class ListBufferTransitionRelation
       return mPredecessorBuffer.createReadOnlyIterator(target, event);
     } else {
       throw createNoBufferException("predecessor");
+    }
+  }
+
+  /**
+   * Creates a read-only iterator for this transition relation that is set up
+   * to iterate over the incoming or outgoing transitions associated with the
+   * given state, whichever is available.
+   * The iterator returned produces all transitions associated with the given
+   * state in the buffer's defined ordering, no matter what event they use.
+   * Being a read-only iterator, it does not implement the
+   * {@link TransitionIterator#remove()} method.
+   */
+  public TransitionIterator createAnyIterator(final int state)
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.createReadOnlyIterator(state);
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createReadOnlyIterator(state);
+    } else {
+      throw createNoBufferException("successor");
+    }
+  }
+
+  /**
+   * Creates a read-only iterator for this transition relation that is set up
+   * to iterate over the incoming or outgoing transitions associated with the
+   * given state and event, whichever is available.
+   * The iterator returned produces all transitions associated with
+   * the given state and event in the buffer's defined ordering.
+   * Being a read-only iterator, it does not implement the
+   * {@link TransitionIterator#remove()} method.
+   */
+  public TransitionIterator createAnyIterator(final int state, final int event)
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.createReadOnlyIterator(state, event);
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createReadOnlyIterator(state, event);
+    } else {
+      throw createNoBufferException("successor");
     }
   }
 
@@ -1074,15 +1149,18 @@ public class ListBufferTransitionRelation
    * merge states after a partition has been obtained through a
    * {@link TransitionRelationSimplifier}.
    * @param partition
-   *          The partitioning to be imposed. Each array in the list
-   *          defines the state codes comprising an equivalence class to be
-   *          merged into a single state. The index position in the list
-   *          identifies the state code to be given to the new merged state.
+   *          The partitioning to be imposed, or <CODE>null</CODE>.
+   *          Each array in the list defines the state codes comprising an
+   *          equivalence class to be merged into a single state. The index
+   *          position in the list identifies the state code to be given to
+   *          the new merged state.
+   *          An argument of <CODE>null</CODE> indicates a trivial partition,
+   *          and has no effect,
    */
   public void merge(final List<int[]> partition)
   {
-    final int newSize = partition.size();
-    if (newSize != getNumberOfStates()) {
+    if (partition != null) {
+      final int newSize = partition.size();
       if (mSuccessorBuffer != null) {
         mSuccessorBuffer.merge(partition);
       }

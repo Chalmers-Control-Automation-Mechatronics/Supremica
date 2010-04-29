@@ -97,7 +97,7 @@ class AltRemovalOfNoncoreachableStatesRule extends AbstractionRule
     final ListBufferTransitionRelation tr = new ListBufferTransitionRelation
       (autToAbstract, eventEnc, stateEnc,
        ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    final TransitionIterator iter = tr.createPredecessorsIterator();
+    final TransitionIterator iter = tr.createPredecessorsReadOnlyIterator();
 
     // Collects in a bit vector all states which can reach an omega-marked
     // or alpha-marked state

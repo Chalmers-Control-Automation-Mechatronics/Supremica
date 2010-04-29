@@ -49,6 +49,27 @@ public class OutgoingTransitionListBuffer extends TransitionListBuffer
     super(numEvents, numStates);
   }
 
+  /**
+   * Creates a new outgoing transition list buffer.
+   * The transition buffer is set up for a fixed number of states and events,
+   * which defines an encoding and can no more be changed.
+   * @param  numEvents   The number of events that can be encoded in
+   *                     transitions.
+   * @param  numStates   The number of states that can be encoded in
+   *                     transitions.
+   * @param  numTrans    Estimated number of transitions, used to determine
+   *                     buffer size.
+   * @throws OverflowException if the encoding for states and events does
+   *         not fit in the 32 bits available.
+   */
+  public OutgoingTransitionListBuffer(final int numEvents,
+                                      final int numStates,
+                                      final int numTrans)
+    throws OverflowException
+  {
+    super(numEvents, numStates, numTrans);
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.water.analysis.op.TransitionListBuffer

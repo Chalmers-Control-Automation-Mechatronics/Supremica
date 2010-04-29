@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis Algorithms
 //# PACKAGE: net.sourceforge.waters.analysis.op
-//# CLASS:   ObserverProjectionBisimulator
+//# CLASS:   ObservationEquivalenceTRSimplifier
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -14,13 +14,15 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIntProcedure;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TIntObjectIterator;
+import gnu.trove.TIntStack;
+import gnu.trove.TLongObjectHashMap;
+import gnu.trove.TLongObjectIterator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -44,26 +46,9 @@ public class ObservationEquivalenceTRSimplifier
    * relation.
    */
   public ObservationEquivalenceTRSimplifier
-    (final ObserverProjectionTransitionRelation tr)
+    (final ListBufferTransitionRelation rel)
   {
-    this(tr, -1);
-  }
-
-  /**
-   * Creates a new observation equivalence simplifier.
-   * The transition relation may contain tau-loops, and the result is
-   * not guaranteed to have a minimal set of tau-transitions.
-   * @param  tr           The transition relation to be simplified.
-   * @param  tau          The ID of the silent event for observation
-   *                      equivalence. This may be negative, in which case
-   *                      no silent event will be used, i.e., only bisimulation
-   *                      will be computed.
-   */
-  public ObservationEquivalenceTRSimplifier
-    (final ObserverProjectionTransitionRelation tr, final int tau)
-  {
-    mHiddenEvent = tau;
-    mTransitionRelation = tr;
+    mTransitionRelation = rel;
     mSuppressRedundantHiddenTransitions = false;
     mTransitionLimit = Integer.MAX_VALUE;
   }
@@ -71,24 +56,14 @@ public class ObservationEquivalenceTRSimplifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
-  public ObserverProjectionTransitionRelation getTransitionRelation()
+  public ListBufferTransitionRelation getTransitionRelation()
   {
     return mTransitionRelation;
   }
 
-  public void setTransitionRelation(final ObserverProjectionTransitionRelation rel)
+  public void setTransitionRelation(final ListBufferTransitionRelation rel)
   {
     mTransitionRelation = rel;
-  }
-
-  public int getHiddenEventID()
-  {
-    return mHiddenEvent;
-  }
-
-  public void setHiddenEventID(final int event)
-  {
-    mHiddenEvent = event;
   }
 
 
@@ -209,10 +184,14 @@ public class ObservationEquivalenceTRSimplifier
       return false;
     }
 
-    mResultPartition = new ArrayList<int[]>(numClasses);
-    for (final SimpleEquivalenceClass sec : mP) {
-      final int[] array = sec.mStates;
-      mResultPartition.add(array);
+    if (numClasses == mNumStates) {
+      mResultPartition = null;
+    } else {
+      mResultPartition = new ArrayList<int[]>(numClasses);
+      for (final SimpleEquivalenceClass sec : mP) {
+        final int[] array = sec.mStates;
+        mResultPartition.add(array);
+      }
     }
 
     if (logger.isDebugEnabled()) {
@@ -225,7 +204,15 @@ public class ObservationEquivalenceTRSimplifier
     return true;
   }
 
-  public Collection<int[]> getResultPartition()
+  /**
+   * Gets the partition resulting from the last call to {@link #run()}.
+   * @return A list of classes constituting the partition,
+   *         or <CODE>null</CODE>. <CODE>null</CODE> may be returned to
+   *         indicate a trivial partition, i.e., no states are merged.
+   *         Otherwise each array in the returned list represents a class of
+   *         equivalent state codes.
+   */
+  public List<int[]> getResultPartition()
   {
     return mResultPartition;
   }
@@ -248,82 +235,75 @@ public class ObservationEquivalenceTRSimplifier
   private void setUpTauPredecessors()
     throws OverflowException
   {
+    final int tau = EventEncoding.TAU;
+    final TransitionIterator iter =
+      mTransitionRelation.createPredecessorsReadOnlyIterator();
     int numtrans = mTransitionRelation.getNumberOfTransitions();
+    final TIntHashSet hashTauPreds = new TIntHashSet();
+    final TIntArrayList listTauPreds = new TIntArrayList();
+    final TIntStack stack = new TIntStack();
     mTauPreds = new int[mNumStates][];
     for (int s = 0; s < mNumStates; s++) {
-      if (mHiddenEvent >= 0) {
-        final TIntHashSet hashTauPreds = new TIntHashSet();
-        final TIntArrayList list = new TIntArrayList();
+      if (mTransitionRelation.isReachable(s)) {
         hashTauPreds.add(s);
-        list.add(s);
-        while (!list.isEmpty()) {
-          final int taupred = list.remove(list.size() - 1);
+        listTauPreds.add(s);
+        stack.push(s);
+        while (stack.size() > 0) {
+          final int taupred = stack.pop();
           mTransitionRelation.copyMarkings(s, taupred);
-          final TIntHashSet preds =
-            mTransitionRelation.getPredecessors(taupred, mHiddenEvent);
-          if (preds != null) {
-            final TIntIterator iter = preds.iterator();
-            while (iter.hasNext()) {
-              final int pred = iter.next();
-              if (hashTauPreds.add(pred)) {
-                list.add(pred);
-              }
+          iter.reset(taupred, tau);
+          while (iter.advance()) {
+            final int pred = iter.getCurrentSourceState();
+            if (hashTauPreds.add(pred)) {
+              listTauPreds.add(pred);
+              stack.push(pred);
             }
           }
         }
-        mTauPreds[s] = hashTauPreds.toArray();
-        numtrans += mTauPreds[s].length - 1;
+        mTauPreds[s] = listTauPreds.toNativeArray();
+        numtrans += listTauPreds.size();
         if (numtrans > mTransitionLimit) {
           throw new OverflowException(OverflowException.Kind.TRANSITION,
                                       mTransitionLimit);
         }
-      } else {
-        final int[] array = new int[1];
-        array[0] = s;
-        mTauPreds[s] = array;
+        hashTauPreds.clear();
+        listTauPreds.clear();
       }
     }
   }
 
   private void removeRedundantTransitions()
   {
-    for (int s = 0; s < mNumStates; s++) {
-      if (mTransitionRelation.hasPredecessors(s)) {
-        for (int e = 0; e < mNumEvents; e++) {
-          if (e == mHiddenEvent && !mSuppressRedundantHiddenTransitions) {
-            continue;
-          }
-          final TIntHashSet preds =
-            mTransitionRelation.getPredecessors(s, e);
-          if (preds != null) {
-            final int[] predcopy = preds.toArray();
-            trans:
-            for (final int pred : predcopy) {
-              for (final int p1 : mTauPreds[s]) {
-                final TIntHashSet preds1 =
-                  mTransitionRelation.getPredecessors(p1, e);
-                if (preds1 != null) {
-                  final TIntIterator iter = preds1.iterator();
-                  while (iter.hasNext()) {
-                    final int p2 = iter.next();
-                    if (e == mHiddenEvent) {
-                      if (p1 != s && p2 == pred) {
-                        mTransitionRelation.removeTransition(pred, e, s);
-                        mHasModifications = true;
-                        break trans;
-                      }
-                    } else {
-                      if (p1 != s || p2 != pred) {
-                        for (final int p3 : mTauPreds[p2]) {
-                          if (p3 == pred) {
-                            mTransitionRelation.removeTransition(pred, e, s);
-                            mHasModifications = true;
-                            break trans;
-                          }
-                        }
-                      }
-                    }
-                  }
+    final int tau = EventEncoding.TAU;
+    final TransitionIterator iter0 =
+      mTransitionRelation.createAllTransitionsModifyingIterator();
+    final TransitionIterator iter2 =
+      mTransitionRelation.createPredecessorsReadOnlyIterator();
+    trans:
+    while (iter0.advance()) {
+      final int e = iter0.getCurrentEvent();
+      if (e == tau && !mSuppressRedundantHiddenTransitions) {
+        continue;
+      }
+      final int source0 = iter0.getCurrentSourceState();
+      final int target0 = iter0.getCurrentTargetState();
+      for (final int p1 : mTauPreds[target0]) {
+        iter2.reset(p1, e);
+        while (iter2.advance()) {
+          final int p2 = iter2.getCurrentSourceState();
+          if (e == tau) {
+            if (p1 != target0 && p2 == source0) {
+              iter0.remove();
+              mHasModifications = true;
+              continue trans;
+            }
+          } else {
+            if (p1 != target0 || p2 != source0) {
+              for (final int p3 : mTauPreds[p2]) {
+                if (p3 == source0) {
+                  iter0.remove();
+                  mHasModifications = true;
+                  continue trans;
                 }
               }
             }
@@ -333,14 +313,15 @@ public class ObservationEquivalenceTRSimplifier
     }
   }
 
+
   private Collection<int[]> createInitialPartition()
   {
     if (mInitialPartition == null) {
-      final TIntObjectHashMap<TIntArrayList> prepartition =
-        new TIntObjectHashMap<TIntArrayList>();
+      final TLongObjectHashMap<TIntArrayList> prepartition =
+        new TLongObjectHashMap<TIntArrayList>();
       for (int state = 0; state < mNumStates; state++) {
-        if (mTransitionRelation.hasPredecessors(state)) {
-          final int m = mTransitionRelation.getMarkingsInt(state);
+        if (mTransitionRelation.isReachable(state)) {
+          final long m = mTransitionRelation.getAllMarkings(state);
           TIntArrayList list = prepartition.get(m);
           if (list == null) {
             list = new TIntArrayList();
@@ -351,7 +332,7 @@ public class ObservationEquivalenceTRSimplifier
       }
       final Collection<int[]> partition =
         new ArrayList<int[]>(prepartition.size());
-      final TIntObjectIterator<TIntArrayList> iter = prepartition.iterator();
+      final TLongObjectIterator<TIntArrayList> iter = prepartition.iterator();
       while (iter.hasNext()) {
         iter.advance();
         final TIntArrayList list = iter.value();
@@ -380,30 +361,14 @@ public class ObservationEquivalenceTRSimplifier
   }
 
 
-  private int[] getPredecessors(final int state, final int event)
+  private TransitionIterator getPredecessorIterator(final int state,
+                                                    final int event)
   {
-    if (event == mHiddenEvent) {
-      return mTauPreds[state];
+    if (event == EventEncoding.TAU) {
+      return new TauClosureTransitionIterator(state);
+    } else {
+      return new ProperEventClosureTransitionIterator(state, event);
     }
-    final TIntHashSet preds = new TIntHashSet();
-    for (int i = 0; i < mTauPreds[state].length; i++) {
-      final int taupred = mTauPreds[state][i];
-      final TIntHashSet tpreds =
-          mTransitionRelation.getPredecessors(taupred, event);
-      if (tpreds == null) {
-        continue;
-      }
-      preds.addAll(tpreds.toArray());
-    }
-    if (preds.isEmpty()) {
-      return null;
-    }
-    final int[] arrpreds = preds.toArray();
-    for (int i = 0; i < arrpreds.length; i++) {
-      final int pred = arrpreds[i];
-      preds.addAll(mTauPreds[pred]);
-    }
-    return preds.toArray();
   }
 
   private void addToW(final SimpleEquivalenceClass sec,
@@ -482,13 +447,9 @@ public class ObservationEquivalenceTRSimplifier
   //# Inner Class EquivalenceClass
   private class SimpleEquivalenceClass extends EquivalenceClass
   {
-    int[] mStates;
-    TIntHashSet mSplit1 = null;
-    TIntArrayList X1 = null;
-    TIntArrayList X2 = null;
-    TIntArrayList X3 = null;
-    boolean mSplit = false;
 
+    //#######################################################################
+    //# Constructor
     public SimpleEquivalenceClass(final int[] states)
     {
       mStates = states;
@@ -499,8 +460,10 @@ public class ObservationEquivalenceTRSimplifier
       mP.add(this);
     }
 
-    // TODO maybe keep track of what events an equivalence class has no incoming
-    // events from
+    //#######################################################################
+    //# Splitting
+    // TODO maybe keep track of what events an equivalence class has no
+    // incoming events from
     public void splitOn()
     {
       mInfo = new TIntIntHashMap[mNumEvents];
@@ -510,13 +473,10 @@ public class ObservationEquivalenceTRSimplifier
         mInfo[e] = new TIntIntHashMap();
         final TIntIntHashMap map = mInfo[e];
         for (int s = 0; s < mStates.length; s++) {
-          final int targ = mStates[s];
-          final int[] preds = getPredecessors(targ, e);
-          if (preds == null) {
-            continue;
-          }
-          for (int p = 0; p < preds.length; p++) {
-            final int pred = preds[p];
+          final int target = mStates[s];
+          final TransitionIterator iter = getPredecessorIterator(target, e);
+          while (iter.advance()) {
+            final int pred = iter.getCurrentSourceState();
             final SimpleEquivalenceClass ec = mStateToClass[pred];
             TIntHashSet split = ec.mSplit1;
             if (split == null) {
@@ -528,8 +488,7 @@ public class ObservationEquivalenceTRSimplifier
             map.adjustOrPutValue(pred, 1, 1);
           }
         }
-        for (int c = 0; c < classes.size(); c++) {
-          final SimpleEquivalenceClass sec = classes.get(c);
+        for (final SimpleEquivalenceClass sec : classes) {
           if (sec.mSplit1.size() != sec.mSize) {
             final int[] X1 = new int[sec.mSize - sec.mSplit1.size()];
             final int[] X2 = new int[sec.mSplit1.size()];
@@ -563,17 +522,26 @@ public class ObservationEquivalenceTRSimplifier
       }
       info = new TIntIntHashMap();
       mInfo[event] = info;
-      for (int i = 0; i < mStates.length; i++) {
-        final int[] preds = getPredecessors(mStates[i], event);
-        if (preds == null) {
-          continue;
-        }
-        for (int j = 0; j < preds.length; j++) {
-          info.adjustOrPutValue(preds[j], 1, 1);
+      for (int s = 0; s < mStates.length; s++) {
+        final int state = mStates[s];
+        final TransitionIterator iter = getPredecessorIterator(state, event);
+        while (iter.advance()) {
+          final int pred = iter.getCurrentSourceState();
+          info.adjustOrPutValue(pred, 1, 1);
         }
       }
       return info;
     }
+
+    //#######################################################################
+    //# Data Members
+    private final int[] mStates;
+    private TIntHashSet mSplit1 = null;
+    private TIntArrayList mX1 = null;
+    private TIntArrayList mX2 = null;
+    private TIntArrayList mX3 = null;
+    private boolean mSplit = false;
+
   }
 
 
@@ -623,24 +591,24 @@ public class ObservationEquivalenceTRSimplifier
               sec.mSplit = true;
             }
             if (value == value1) {
-              TIntArrayList X1 = sec.X1;
+              TIntArrayList X1 = sec.mX1;
               if (X1 == null) {
                 X1 = new TIntArrayList();
-                sec.X1 = X1;
+                sec.mX1 = X1;
               }
               X1.add(state);
             } else if (value1 == 0) {
-              TIntArrayList X2 = sec.X2;
+              TIntArrayList X2 = sec.mX2;
               if (X2 == null) {
                 X2 = new TIntArrayList();
-                sec.X2 = X2;
+                sec.mX2 = X2;
               }
               X2.add(state);
             } else {
-              TIntArrayList X3 = sec.X3;
+              TIntArrayList X3 = sec.mX3;
               if (X3 == null) {
                 X3 = new TIntArrayList();
-                sec.X3 = X3;
+                sec.mX3 = X3;
               }
               X3.add(state);
             }
@@ -655,9 +623,9 @@ public class ObservationEquivalenceTRSimplifier
         for (int c = 0; c < classes.size(); c++) {
           final SimpleEquivalenceClass sec = classes.get(c);
           int[] X1, X2, X3;
-          int number = sec.X1 != null ? 1 : 0;
-          number = sec.X2 != null ? number + 1 : number;
-          number = sec.X3 != null ? number + 1 : number;
+          int number = sec.mX1 != null ? 1 : 0;
+          number = sec.mX2 != null ? number + 1 : number;
+          number = sec.mX3 != null ? number + 1 : number;
           /*
            * System.out.println("number:" + number); System.out.println("X1:" +
            * (sec.X1 != null) + " X2:" + (sec.X2 != null) + " X3:" + (sec.X3 !=
@@ -670,9 +638,9 @@ public class ObservationEquivalenceTRSimplifier
            * Arrays.toString(sec.mStates));
            */
           if (number == 2) {
-            X1 = sec.X1 == null ? null : sec.X1.toNativeArray();
-            X2 = sec.X2 == null ? null : sec.X2.toNativeArray();
-            X3 = sec.X3 == null ? null : sec.X3.toNativeArray();
+            X1 = sec.mX1 == null ? null : sec.mX1.toNativeArray();
+            X2 = sec.mX2 == null ? null : sec.mX2.toNativeArray();
+            X3 = sec.mX3 == null ? null : sec.mX3.toNativeArray();
             if (X1 == null) {
               X1 = X3;
             } else if (X2 == null) {
@@ -680,15 +648,15 @@ public class ObservationEquivalenceTRSimplifier
             }
             addToW(sec, X1, X2);
           } else if (number == 3) {
-            X1 = sec.X1.toNativeArray();
-            X2 = sec.X2.toNativeArray();
-            X3 = sec.X3.toNativeArray();
+            X1 = sec.mX1.toNativeArray();
+            X2 = sec.mX2.toNativeArray();
+            X3 = sec.mX3.toNativeArray();
             sec.mSplit = false;
             addToW(sec, X1, X2, X3);
           }
-          sec.X1 = null;
-          sec.X2 = null;
-          sec.X3 = null;
+          sec.mX1 = null;
+          sec.mX2 = null;
+          sec.mX3 = null;
           sec.mSplit = false;
         }
         classes.clear();
@@ -744,6 +712,233 @@ public class ObservationEquivalenceTRSimplifier
 
 
   //#########################################################################
+  //# Inner Class TauClosureTransitionIterator
+  private class TauClosureTransitionIterator
+    implements TransitionIterator
+  {
+
+    //#######################################################################
+    //# Constructor
+    private TauClosureTransitionIterator()
+    {
+      mTarget = -1;
+      mTauPreds = EMPTY_ARRAY;
+      mIndex = -1;
+    }
+
+    private TauClosureTransitionIterator(final int target)
+    {
+      reset(target);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
+    public void reset()
+    {
+      mTauPreds =
+        ObservationEquivalenceTRSimplifier.this.mTauPreds[mTarget];
+      mIndex = -1;
+    }
+
+    public void reset(final int from)
+    {
+      mTarget = from;
+      reset();
+    }
+
+    public void reset(final int from, final int event)
+    {
+      if (event == EventEncoding.TAU) {
+        reset(from);
+      } else {
+        throw new UnsupportedOperationException
+          (ProxyTools.getShortClassName(this) +
+           " only iterates with tau event!");
+      }
+    }
+
+    public boolean advance()
+    {
+      return ++mIndex < mTauPreds.length;
+    }
+
+    public int getCurrentEvent()
+    {
+      return EventEncoding.TAU;
+    }
+
+    public int getCurrentSourceState()
+    {
+      return getCurrentToState();
+    }
+
+    public int getCurrentToState()
+    {
+      if (mIndex < mTauPreds.length) {
+        return mTauPreds[mIndex];
+      } else {
+        throw new NoSuchElementException("Reading past end of list in " +
+                                         ProxyTools.getShortClassName(this));
+      }
+    }
+
+    public int getCurrentTargetState()
+    {
+       return mTarget;
+    }
+
+    public int getCurrentFromState()
+    {
+      return mTarget;
+    }
+
+    public void remove()
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition removal!");
+    }
+
+    //#########################################################################
+    //# Data Members
+    private int mTarget;
+    private int[] mTauPreds;
+    private int mIndex;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class ProperEventClosureTransitionIterator
+  private class ProperEventClosureTransitionIterator
+    implements TransitionIterator
+  {
+
+    //#######################################################################
+    //# Constructor
+    private ProperEventClosureTransitionIterator()
+    {
+      mInnerIterator = mTransitionRelation.createPredecessorsReadOnlyIterator();
+      mVisited = new TIntHashSet();
+      reset();
+    }
+
+    private ProperEventClosureTransitionIterator(final int target,
+                                                 final int event)
+    {
+      mInnerIterator = mTransitionRelation.createPredecessorsReadOnlyIterator();
+      mVisited = new TIntHashSet();
+      reset(target, event);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.analysis.op.TransitionIterator
+    public void reset()
+    {
+      mTauPreds1 = mTauPreds[mTarget];
+      mTauPreds2 = EMPTY_ARRAY;
+      mIndex1 = mIndex2 = -1;
+      mVisited.clear();
+    }
+
+    public void reset(final int from)
+    {
+      mTarget = from;
+      reset();
+    }
+
+    public void reset(final int from, final int event)
+    {
+      mEvent = event;
+      reset(from);
+    }
+
+    public boolean advance()
+    {
+      while (seek()) {
+        final int state = mTauPreds2[mIndex2];
+        if (mVisited.add(state)) {
+          return true;
+        }
+      }
+      reset();
+      return false;
+    }
+
+    public int getCurrentEvent()
+    {
+      return mEvent;
+    }
+
+    public int getCurrentSourceState()
+    {
+      return getCurrentToState();
+    }
+
+    public int getCurrentToState()
+    {
+      if (mIndex2 < mTauPreds2.length) {
+        return mTauPreds2[mIndex2];
+      } else {
+        throw new NoSuchElementException("Reading past end of list in " +
+                                         ProxyTools.getShortClassName(this));
+      }
+    }
+
+    public int getCurrentTargetState()
+    {
+       return mTarget;
+    }
+
+    public int getCurrentFromState()
+    {
+      return mTarget;
+    }
+
+    public void remove()
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition removal!");
+    }
+
+    //#########################################################################
+    //# Auxiliary Methods
+    private boolean seek()
+    {
+      if (++mIndex2 < mTauPreds2.length) {
+        return true;
+      } else {
+        while (mIndex1 < 0 || !mInnerIterator.advance()) {
+          if (++mIndex1 >= mTauPreds1.length) {
+            return false;
+          }
+          final int taupred1 = mTauPreds1[mIndex1];
+          mInnerIterator.reset(taupred1, mEvent);
+        }
+        final int taupred2 = mInnerIterator.getCurrentSourceState();
+        mTauPreds2 = mTauPreds[taupred2];
+        mIndex2 = 0;
+        return true;
+      }
+    }
+
+    //#########################################################################
+    //# Data Members
+    private int mTarget;
+    private int mEvent;
+
+    private int[] mTauPreds1;
+    private int mIndex1;
+    private final TransitionIterator mInnerIterator;
+    private int[] mTauPreds2;
+    private int mIndex2;
+    private final TIntHashSet mVisited;
+
+  }
+
+
+  //#########################################################################
   //# Logging
   private Logger getLogger()
   {
@@ -754,8 +949,7 @@ public class ObservationEquivalenceTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private int mHiddenEvent;
-  private ObserverProjectionTransitionRelation mTransitionRelation;
+  private ListBufferTransitionRelation mTransitionRelation;
   private Collection<int[]> mInitialPartition;
   private boolean mSuppressRedundantHiddenTransitions;
   private int mTransitionLimit;
@@ -768,7 +962,12 @@ public class ObservationEquivalenceTRSimplifier
   private THashSet<ComplexEquivalenceClass> mWC;
   private THashSet<SimpleEquivalenceClass> mP;
   private SimpleEquivalenceClass[] mStateToClass;
-  private Collection<int[]> mResultPartition;
+  private List<int[]> mResultPartition;
   private boolean mHasModifications;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final int[] EMPTY_ARRAY = new int[0];
 
 }

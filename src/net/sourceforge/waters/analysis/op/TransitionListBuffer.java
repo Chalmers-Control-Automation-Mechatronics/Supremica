@@ -86,9 +86,42 @@ public abstract class TransitionListBuffer
    * @throws OverflowException if the encoding for states and events does
    *         not fit in the 32 bits available.
    */
-  public TransitionListBuffer(final int numEvents, final int numStates)
+  public TransitionListBuffer(final int numEvents,
+                              final int numStates)
     throws OverflowException
   {
+    this(numEvents, numStates, MAX_BLOCK_SIZE);
+  }
+
+
+  /**
+   * Creates a new transition list buffer.
+   * The transition buffer is set up for a fixed number of states and events,
+   * which defines an encoding and can no more be changed.
+   * @param  numEvents   The number of events that can be encoded in
+   *                     transitions.
+   * @param  numStates   The number of states that can be encoded in
+   *                     transitions.
+   * @param  numTrans    Estimated number of transitions, used to determine
+   *                     buffer size.
+   * @throws OverflowException if the encoding for states and events does
+   *         not fit in the 32 bits available.
+   */
+  public TransitionListBuffer(final int numEvents,
+                              final int numStates,
+                              final int numTrans)
+    throws OverflowException
+  {
+    final int estimate = 2 * (numTrans + numStates);
+    if (estimate <= MIN_BLOCK_SIZE) {
+      mBlockSize = MIN_BLOCK_SIZE;
+    } else if (estimate >= MAX_BLOCK_SIZE) {
+      mBlockSize = MAX_BLOCK_SIZE;
+    } else {
+      mBlockSize = 1 << AutomatonTools.log2(estimate);
+    }
+    mBlockShift = AutomatonTools.log2(mBlockSize);
+    mBlockMask = mBlockSize - 1;
     mNumStates = numStates;
     mNumEvents = numEvents;
     mStateShift = AutomatonTools.log2(mNumEvents);
@@ -102,7 +135,7 @@ public abstract class TransitionListBuffer
     mBlocks = new ArrayList<int[]>();
     mStateTransitions = new int[numStates];
     mStateEventTransitions = new TIntIntHashMap(numStates);
-    final int[] block = new int[BLOCK_SIZE];
+    final int[] block = new int[mBlockSize];
     mBlocks.add(block);
     mRecycleStart = NULL;
     mNextFreeIndex = NODE_SIZE;
@@ -118,6 +151,30 @@ public abstract class TransitionListBuffer
 
 
   //#########################################################################
+  //# Overrides for java.lang.Object
+  public String toString()
+  {
+    final StringBuffer buffer = new StringBuffer("{");
+    final TransitionIterator iter = createAllTransitionsReadOnlyIterator();
+    boolean first = true;
+    while (iter.advance()) {
+      if (first) {
+        first = false;
+      } else {
+        buffer.append(", ");
+      }
+      buffer.append(iter.getCurrentSourceState());
+      buffer.append(" -");
+      buffer.append(iter.getCurrentEvent());
+      buffer.append("-> ");
+      buffer.append(iter.getCurrentTargetState());
+    }
+    buffer.append('}');
+    return buffer.toString();
+  }
+
+
+  //#########################################################################
   //# Transition Access Methods
   /**
    * Removes all transitions from this buffer, releasing memory to
@@ -126,7 +183,7 @@ public abstract class TransitionListBuffer
   public void clear()
   {
     mBlocks.clear();
-    final int[] block = new int[BLOCK_SIZE];
+    final int[] block = new int[mBlockSize];
     mBlocks.add(block);
     Arrays.fill(mStateTransitions, NULL);
     mStateEventTransitions.clear();
@@ -163,42 +220,19 @@ public abstract class TransitionListBuffer
     if (event == EventEncoding.TAU && from == to) {
       return false;
     }
-    final int fromShift = from << mStateShift;
-    final int fromCode = fromShift | event;
+    final int list = createList(from, event);
     final int toCode = (to << mStateShift) | event;
-    int list = mStateEventTransitions.get(fromCode);
-    if (list != NULL) {
-      if (contains(list, toCode)) {
-        return false;
-      } else {
-        prepend(list, toCode);
-        return true;
-      }
-    } else {
-      for (int e = event - 1; e >= 0; e--) {
-        final int code = fromShift | e;
-        list = mStateEventTransitions.get(code);
-        if (list != NULL) {
-          list = seek(list, event);
-          break;
-        }
-      }
-      if (list == NULL) {
-        list = mStateTransitions[from];
-        if (list == NULL) {
-          list = mStateTransitions[from] = createList();
-        }
-      }
-      mStateEventTransitions.put(fromCode, list);
-      list = prepend(list, toCode);
-      final int next = getNext(list);
-      if (next != NULL) {
-        final int nextEvent = getEvent(next);
-        final int code = fromShift | nextEvent;
-        mStateEventTransitions.put(code, list);
-      }
-      return true;
+    if (contains(list, toCode)) {
+      return false;
     }
+    final int nextList = prepend(list, toCode);
+    final int next = getNext(nextList);
+    if (next != NULL) {
+      final int nextEvent = getEvent(next);
+      final int code = (from << mStateShift) | nextEvent;
+      mStateEventTransitions.put(code, nextList);
+    }
+    return true;
   }
 
   /**
@@ -222,8 +256,8 @@ public abstract class TransitionListBuffer
     boolean first = true;
     int next = getNext(list);
     while (next != NULL) {
-      final int[] block = mBlocks.get(next >>> BLOCK_SHIFT);
-      final int offset = next & BLOCK_MASK;
+      final int[] block = mBlocks.get(next >>> mBlockShift);
+      final int offset = next & mBlockMask;
       final int data = block[offset + OFFSET_DATA];
       if (data == toCode) {
         final int victim = next;
@@ -231,27 +265,21 @@ public abstract class TransitionListBuffer
         setNext(list, next);
         block[offset + OFFSET_NEXT] = mRecycleStart;
         mRecycleStart = victim;
-        if (next == NULL) {
-          if (first) {
+        final int nextEvent = next == NULL ? -1 : getEvent(next);
+        if (first) {
+          if (next == NULL) {
             mStateEventTransitions.remove(fromCode);
             if (mStateTransitions[from] == list) {
               mStateTransitions[from] = NULL;
               dispose(list);
             }
+          } else if (nextEvent != event) {
+            mStateEventTransitions.remove(fromCode);
           }
-        } else {
-          final int nextEvent = getEvent(next);
-          if (nextEvent == event) {
-            if (first) {
-              mStateEventTransitions.put(fromCode, next);
-            }
-          } else {
-            if (first) {
-              mStateEventTransitions.remove(fromCode);
-            }
-            final int nextCode = (from << mStateShift) | nextEvent;
-            mStateEventTransitions.put(nextCode, list);
-          }
+        }
+        if (nextEvent != event && nextEvent >= 0) {
+          final int nextCode = (from << mStateShift) | nextEvent;
+          mStateEventTransitions.put(nextCode, list);
         }
         return true;
       } else if ((data & mEventMask) != event) {
@@ -368,8 +396,8 @@ public abstract class TransitionListBuffer
       final boolean remove = next != NULL;
       while (next != NULL) {
         current = next;
-        final int[] block = mBlocks.get(current >>> BLOCK_SHIFT);
-        final int offset = current & BLOCK_MASK;
+        final int[] block = mBlocks.get(current >>> mBlockShift);
+        final int offset = current & mBlockMask;
         final int data = block[offset + OFFSET_DATA];
         final int e = data & mEventMask;
         if (e != e0) {
@@ -424,37 +452,50 @@ public abstract class TransitionListBuffer
          " (only configured for " + mNumEvents + " events)!");
     }
     final boolean tau = (newID == EventEncoding.TAU);
-    final TIntHashSet successors = new TIntHashSet();
+    final TIntHashSet found = new TIntHashSet();
     final TransitionIterator iter1 = createReadOnlyIterator();
     final TransitionIterator iter2 = createModifyingIterator();
     for (int state = 0; state < getNumberOfStates(); state++) {
-      final int oldCode = (state << mStateShift) | oldID;
-      int list = mStateEventTransitions.get(oldCode);
+      final int newCode = (state << mStateShift) | newID;
+      int list = mStateEventTransitions.get(newCode);
       int next = getNext(list);
       while (next != NULL) {
-        final int[] block = mBlocks.get(next >>> BLOCK_SHIFT);
-        final int offset = next & BLOCK_MASK;
+        final int[] block = mBlocks.get(next >>> mBlockShift);
+        final int offset = next & mBlockMask;
         final int data = block[offset + OFFSET_DATA];
         final int e = data & mEventMask;
         if (e != newID) {
           break;
         }
-        successors.add(data >>> mStateShift);
+        found.add(data >>> mStateShift);
         list = next;
         next = block[offset + OFFSET_NEXT];
       }
-      final int stateShifted = state << mStateShift;
-      iter1.reset(state, newID);
+      boolean added = false;
+      iter1.reset(state, oldID);
       while (iter1.advance()) {
-        final int succ = iter1.getCurrentToState();
-        if (tau && state == succ) {
+        final int to = iter1.getCurrentToState();
+        if (tau && state == to) {
           // nothing --- suppress tau selfloops ...
-        } else if (successors.add(succ)) {
-          final int code = stateShifted | oldID;
+        } else if (found.add(to)) {
+          if (list == NULL) {
+            list = createList(state, newID);
+          }
+          final int code = (to << mStateShift) | newID;
           list = prepend(list, code);
+          added = true;
         }
       }
-      iter2.reset(state, newID);
+      found.clear();
+      if (added) {
+        next = getNext(list);
+        if (next != NULL) {
+          final int nextEvent = getEvent(next);
+          final int nextCode = (state << mStateShift) | nextEvent;
+          mStateEventTransitions.put(nextCode, list);
+        }
+      }
+      iter2.reset(state, oldID);
       while (iter2.advance()) {
         iter2.remove();
       }
@@ -492,7 +533,7 @@ public abstract class TransitionListBuffer
   {
     final int tau = EventEncoding.TAU;
     boolean removable = true;
-    final TransitionIterator iter = createReadOnlyIterator();
+    final TransitionIterator iter = createModifyingIterator();
     for (int state = 0; state < getNumberOfStates(); state++) {
       iter.reset(state, tau);
       while (iter.advance()) {
@@ -752,9 +793,9 @@ public abstract class TransitionListBuffer
       other.createAllTransitionsReadOnlyIterator();
     int i = 0;
     while (iter.advance()) {
-      final int from = getOtherIteratorFromState(iter);
-      final int event = iter.getCurrentEvent();
-      final int to = getOtherIteratorToState(iter);
+      final long from = getOtherIteratorFromState(iter);
+      final long event = iter.getCurrentEvent();
+      final long to = getOtherIteratorToState(iter);
       transitions[i++] = (from << fromShift) | (event << eventShift) | to;
     }
     Arrays.sort(transitions);
@@ -819,7 +860,6 @@ public abstract class TransitionListBuffer
     final int[] iter = new int[size];
     final TIntHashSet successors = new TIntHashSet(partition.size());
     int from = 0;
-    int list = NULL;
     for (final int[] clazz : partition) {
       size = clazz.length;
       for (int i = 0; i < size; i++) {
@@ -827,14 +867,15 @@ public abstract class TransitionListBuffer
         final int oldList = mStateTransitions[oldState];
         iter[i] = getNext(oldList);
       }
+      int list = NULL;
       final int fromShift = from << mStateShift;
       for (int e = 0; e < mNumEvents; e++) {
         successors.clear();
         for (int i = 0; i < size; i++) {
           int current = iter[i];
           while (current != NULL) {
-            final int[] block = mBlocks.get(current >>> BLOCK_SHIFT);
-            final int offset = current & BLOCK_MASK;
+            final int[] block = mBlocks.get(current >>> mBlockShift);
+            final int offset = current & mBlockMask;
             final int data = block[offset + OFFSET_DATA];
             if ((data & mEventMask) != e) {
               break;
@@ -905,8 +946,8 @@ public abstract class TransitionListBuffer
     final int event = data & mEventMask;
     int next = getNext(list);
     while (next != NULL) {
-      final int[] block = mBlocks.get(next >>> BLOCK_SHIFT);
-      final int offset = next & BLOCK_MASK;
+      final int[] block = mBlocks.get(next >>> mBlockShift);
+      final int offset = next & mBlockMask;
       final int found = block[offset + OFFSET_DATA];
       if (found == data) {
         return true;
@@ -932,12 +973,37 @@ public abstract class TransitionListBuffer
     }
   }
 
+  private int createList(final int from, final int event)
+  {
+    final int fromShift = from << mStateShift;
+    final int fromCode = fromShift | event;
+    int list = mStateEventTransitions.get(fromCode);
+    if (list == NULL) {
+      for (int e = event - 1; e >= 0; e--) {
+        final int code = fromShift | e;
+        list = mStateEventTransitions.get(code);
+        if (list != NULL) {
+          list = seek(list, event);
+          break;
+        }
+      }
+      if (list == NULL) {
+        list = mStateTransitions[from];
+        if (list == NULL) {
+          list = mStateTransitions[from] = createList();
+        }
+      }
+      mStateEventTransitions.put(fromCode, list);
+    }
+    return list;
+  }
+
   private int seek(int list, final int event)
   {
     int next = getNext(list);
     while (next != NULL) {
-      final int[] block = mBlocks.get(next >>> BLOCK_SHIFT);
-      final int offset = next & BLOCK_MASK;
+      final int[] block = mBlocks.get(next >>> mBlockShift);
+      final int offset = next & mBlockMask;
       final int data = block[offset + OFFSET_DATA];
       if ((data & mEventMask) >= event) {
         return list;
@@ -969,26 +1035,26 @@ public abstract class TransitionListBuffer
 
   private int getData(final int list)
   {
-    final int[] block = mBlocks.get(list >>> BLOCK_SHIFT);
-    return block[(list & BLOCK_MASK) + OFFSET_DATA];
+    final int[] block = mBlocks.get(list >>> mBlockShift);
+    return block[(list & mBlockMask) + OFFSET_DATA];
   }
 
   private int getNext(final int list)
   {
-    final int[] block = mBlocks.get(list >>> BLOCK_SHIFT);
-    return block[(list & BLOCK_MASK) + OFFSET_NEXT];
+    final int[] block = mBlocks.get(list >>> mBlockShift);
+    return block[(list & mBlockMask) + OFFSET_NEXT];
   }
 
   private void setNext(final int list, final int next)
   {
-    final int[] block = mBlocks.get(list >>> BLOCK_SHIFT);
-    block[(list & BLOCK_MASK) + OFFSET_NEXT] = next;
+    final int[] block = mBlocks.get(list >>> mBlockShift);
+    block[(list & mBlockMask) + OFFSET_NEXT] = next;
   }
 
   private void setDataAndNext(final int list, final int data, final int next)
   {
-    final int[] block = mBlocks.get(list >>> BLOCK_SHIFT);
-    final int offset = list & BLOCK_MASK;
+    final int[] block = mBlocks.get(list >>> mBlockShift);
+    final int offset = list & mBlockMask;
     block[offset + OFFSET_NEXT] = next;
     block[offset + OFFSET_DATA] = data;
   }
@@ -1000,8 +1066,8 @@ public abstract class TransitionListBuffer
       mRecycleStart = getNext(mRecycleStart);
       return result;
     } else {
-      if ((mNextFreeIndex & BLOCK_MASK) >= BLOCK_SIZE) {
-        final int[] block = new int[BLOCK_SIZE];
+      if ((mNextFreeIndex >>> mBlockShift) >= mBlocks.size()) {
+        final int[] block = new int[mBlockSize];
         mBlocks.add(block);
       }
       final int result = mNextFreeIndex;
@@ -1132,11 +1198,6 @@ public abstract class TransitionListBuffer
       return mState;
     }
 
-    int getEvent()
-    {
-      return mEvent;
-    }
-
     //#######################################################################
     //# Data Members
     private int mState;
@@ -1155,7 +1216,7 @@ public abstract class TransitionListBuffer
     //# Constructor
     private ModifyingIterator()
     {
-      mStart = mPrevious = NULL;
+      mPrevious = NULL;
     }
 
     //#######################################################################
@@ -1178,51 +1239,41 @@ public abstract class TransitionListBuffer
         throw new IllegalStateException
           ("Attempting to remove nonexistent element in TransitionListBuffer!");
       }
-      final int[] block = mBlocks.get(current >>> BLOCK_SHIFT);
-      final int offset = current & BLOCK_MASK;
+      final int state = getState();
+      final boolean isRoot = (mStateTransitions[state] == mPrevious);
+      final int prevEvent = isRoot ? -1 : getEvent(mPrevious);
+      final int[] block = mBlocks.get(current >>> mBlockShift);
+      final int offset = current & mBlockMask;
       final int next = block[offset + OFFSET_NEXT];
       setNext(mPrevious, next);
       block[offset + OFFSET_NEXT] = mRecycleStart;
       mRecycleStart = current;
-      final int state = getState();
-      final int fromCode = (state << mStateShift) | getEvent();
-      if (next == NULL) {
-        if (mPrevious == mStart) {
+      final int data = block[offset + OFFSET_DATA];
+      final int event = data & mEventMask;
+      final int nextEvent = next == NULL ? -1 : getEvent(next);
+      if (event != prevEvent) {
+        final int fromCode = (state << mStateShift) | event;
+        if (next == NULL) {
           mStateEventTransitions.remove(fromCode);
-          if (mStateTransitions[state] == mPrevious) {
+          if (isRoot) {
             mStateTransitions[state] = NULL;
             dispose(mPrevious);
+            mPrevious = NULL;
           }
+        } else if (nextEvent != event) {
+          mStateEventTransitions.remove(fromCode);
         }
-      } else {
-        final int nextEvent = TransitionListBuffer.this.getEvent(next);
-        if (nextEvent == getEvent()) {
-          if (mPrevious == mStart) {
-            mStateEventTransitions.put(fromCode, next);
-          }
-        } else {
-          if (mPrevious == mStart) {
-            mStateEventTransitions.remove(fromCode);
-          }
-          final int nextCode = (state << mStateShift) | nextEvent;
-          mStateEventTransitions.put(nextCode, mPrevious);
-        }
+      }
+      if (nextEvent != event && nextEvent >= 0) {
+        final int nextCode = (state << mStateShift) | nextEvent;
+        mStateEventTransitions.put(nextCode, mPrevious);
       }
       setCurrent(mPrevious);
       mPrevious = NULL;
     }
 
     //#######################################################################
-    //# Auxiliary Methods
-    void resetRaw(final int state, final int event, final int list)
-    {
-      super.resetRaw(state, event, list);
-      mStart = mPrevious = list;
-    }
-
-    //#######################################################################
     //# Data Members
-    private int mStart;
     private int mPrevious;
 
   }
@@ -1372,6 +1423,10 @@ public abstract class TransitionListBuffer
 
   //#########################################################################
   //# Data Members
+  private final int mBlockShift;
+  private final int mBlockMask;
+  private final int mBlockSize;
+
   private final int mNumStates;
   private final int mNumEvents;
   private final int mStateShift;
@@ -1392,8 +1447,7 @@ public abstract class TransitionListBuffer
   private static final int OFFSET_DATA = 1;
   private static final int NODE_SIZE = 2;
 
-  private static final int BLOCK_SHIFT = 10;
-  private static final int BLOCK_SIZE = 1 << BLOCK_SHIFT;
-  private static final int BLOCK_MASK = BLOCK_SIZE - 1;
+  private static final int MIN_BLOCK_SIZE = 64;
+  private static final int MAX_BLOCK_SIZE = 2048;
 
 }

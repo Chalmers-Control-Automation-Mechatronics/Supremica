@@ -13,10 +13,6 @@ import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntIterator;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TIntObjectIterator;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayDeque;
@@ -45,7 +41,9 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.TraceChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -662,12 +660,23 @@ public class ObserverProjectionConflictChecker
   //# Trace Computation
   private ConflictTraceProxy expandTrace(final ConflictTraceProxy trace)
   {
+    TraceChecker.checkCounterExample(trace);
     List<TraceStepProxy> traceSteps = getSaturatedTraceSteps(trace);
     final int size = mModifyingSteps.size();
-    final ListIterator<AbstractionStep> iter = mModifyingSteps.listIterator(size);
+    final ListIterator<AbstractionStep> iter =
+      mModifyingSteps.listIterator(size);
+    /*
+    final Collection<AutomatonProxy> check =
+      new LinkedList<AutomatonProxy>(trace.getAutomata());
+    */
     while (iter.hasPrevious()) {
       final AbstractionStep step = iter.previous();
       traceSteps = step.convertTraceSteps(traceSteps);
+      /*
+      check.remove(step.getResultAutomaton());
+      check.addAll(step.getOriginalAutomata());
+      TraceChecker.checkCounterExample(traceSteps, check);
+      */
     }
     final ProductDESProxyFactory factory = getFactory();
     final String tracename = getTraceName();
@@ -1072,53 +1081,39 @@ public class ObserverProjectionConflictChecker
 
     //#######################################################################
     //# Auxiliary Methods
-    TIntObjectHashMap<int[]> applySimplifier
+    List<int[]> applySimplifier
       (final TransitionRelationSimplifier simplifier,
-       final ObserverProjectionTransitionRelation rel,
-       final int tau)
+       final ListBufferTransitionRelation rel)
     throws AnalysisException
     {
       if (simplifier.run()) {
-        final Collection<int[]> partition = simplifier.getResultPartition();
-        final int size = partition.size();
-        final TIntObjectHashMap<int[]> map = new TIntObjectHashMap<int[]>(size);
-        rel.mergePartition(partition, tau, map);
-        rel.removeSelfLoopEvents(tau);
-        return map;
+        final List<int[]> partition = simplifier.getResultPartition();
+        rel.merge(partition);
+        rel.removeTauSelfLoops();
+        rel.removeProperSelfLoopEvents();
+        return partition;
       } else {
         return null;
       }
     }
 
-    TIntObjectHashMap<int[]> combineClassMaps
-      (final TIntObjectHashMap<int[]> first,
-       final TIntObjectHashMap<int[]> second)
+    List<int[]> combinePartitions(final List<int[]> first,
+                                  final List<int[]> second)
     {
-      final TIntObjectIterator<int[]> iter = second.iterator();
-      while (iter.hasNext()) {
-        iter.advance();
-        final int[] class2 = iter.value();
-        int count = 0;
-        for (final int s2 : class2) {
-          final int[] class1 = first.get(s2);
-          count += class1.length;
-        }
-        final int[] newclass;
-        if (class2.length == count) {
-          newclass = class2;
-        } else {
-          newclass = new int[count];
-          iter.setValue(newclass);
-        }
-        int i = 0;
-        for (final int s2 : class2) {
-          final int[] class1 = first.get(s2);
-          for (final int s1 : class1) {
-            newclass[i++] = s1;
+      final int secondSize = second.size();
+      final List<int[]> result = new ArrayList<int[]>(secondSize);
+      final TIntArrayList current = new TIntArrayList();
+      for (final int[] clazz2 : second) {
+        for (final int state2 : clazz2) {
+          final int[] clazz1 = first.get(state2);
+          for (final int state1 : clazz1) {
+            current.add(state1);
           }
         }
+        result.add(current.toNativeArray());
+        current.clear();
       }
-      return second;
+      return result;
     }
 
   }
@@ -1136,34 +1131,36 @@ public class ObserverProjectionConflictChecker
                                          final EventProxy tau)
     throws AnalysisException
     {
-      final ObserverProjectionTransitionRelation rel =
-        new ObserverProjectionTransitionRelation(aut, mPropositions);
-      final int codeOfTau = rel.getEventInt(tau);
+      final EventEncoding eventEnc =
+        new EventEncoding(aut, tau, mPropositions,
+                          EventEncoding.FILTER_PROPOSITIONS);
+      final StateEncoding inputStateEnc = new StateEncoding(aut);
+      final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
+        (aut, eventEnc, inputStateEnc,
+         ListBufferTransitionRelation.CONFIG_PREDECESSORS);
       final TransitionRelationSimplifier loopRemover =
-        new TauLoopRemovalTRSimplifier(rel, codeOfTau);
-      final TIntObjectHashMap<int[]> loopClassMap =
-        applySimplifier(loopRemover, rel, codeOfTau);
+        new TauLoopRemovalTRSimplifier(rel);
+      final List<int[]> loopPartition = applySimplifier(loopRemover, rel);
       final ObservationEquivalenceTRSimplifier bisimulator =
-        new ObservationEquivalenceTRSimplifier(rel, codeOfTau);
+        new ObservationEquivalenceTRSimplifier(rel);
       bisimulator.setSuppressRedundantHiddenTransitions(true);
-      final TIntObjectHashMap<int[]> bisimClassMap =
-        applySimplifier(bisimulator, rel, codeOfTau);
-      if (loopClassMap != null || bisimClassMap != null) {
+      final List<int[]> bisimPartition = applySimplifier(bisimulator, rel);
+      if (loopPartition != null || bisimPartition != null) {
         final ProductDESProxyFactory factory = getFactory();
-        final AutomatonProxy convertedAut = rel.createAutomaton(factory);
-        final StateProxy[] inputMap = rel.getOriginalIntToStateMap();
-        final TIntObjectHashMap<int[]> classMap;
-        if (loopClassMap == null) {
-          classMap = bisimClassMap;
-        } else if (bisimClassMap == null) {
-          classMap = loopClassMap;
+        final StateEncoding outputStateEnc = new StateEncoding();
+        final AutomatonProxy convertedAut =
+          rel.createAutomaton(factory, eventEnc, outputStateEnc);
+        final List<int[]> partition;
+        if (loopPartition == null) {
+          partition = bisimPartition;
+        } else if (bisimPartition == null) {
+          partition = loopPartition;
         } else {
-          classMap = combineClassMaps(loopClassMap, bisimClassMap);
+          partition = combinePartitions(loopPartition, bisimPartition);
         }
-        final TObjectIntHashMap<StateProxy> outputMap =
-          rel.getResultingStateToIntMap();
-        return new ObservationEquivalenceStep(convertedAut, aut, tau,
-                                              inputMap, classMap, outputMap);
+        return new ObservationEquivalenceStep(convertedAut, aut, eventEnc,
+                                              inputStateEnc, partition,
+                                              outputStateEnc);
       } else {
         return null;
       }
@@ -1188,22 +1185,31 @@ public class ObserverProjectionConflictChecker
       final String name = "vtau:" + aut.getName();
       final EventProxy vtau =
         factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
-      final Collection<EventProxy> extra = Collections.singletonList(vtau);
-      final ObserverProjectionTransitionRelation rel =
-        new ObserverProjectionTransitionRelation(aut, extra, mPropositions);
-      final int codeOfTau = rel.getEventInt(tau);
-      final int codeOfVTau = rel.getEventInt(vtau);
+      final EventEncoding eventEnc =
+        new EventEncoding(aut, tau, mPropositions,
+                          EventEncoding.FILTER_PROPOSITIONS);
+      eventEnc.addEvent(vtau, false);
+      final StateEncoding inputStateEnc = new StateEncoding(aut);
+      final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
+        (aut, eventEnc, inputStateEnc,
+         ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+      final int codeOfVTau = eventEnc.getEventCode(vtau);
       final ObservationEquivalenceTRSimplifier bisimulator =
-        new ObservationEquivalenceTRSimplifier(rel, codeOfTau);
-      final TIntObjectHashMap<int[]> classMap =
-        applySimplifier(bisimulator, rel, codeOfTau, codeOfVTau);
-      if (classMap != null) {
-        final AutomatonProxy convertedAut = rel.createAutomaton(factory);
-        final StateProxy[] inputMap = rel.getOriginalIntToStateMap();
-        final TObjectIntHashMap<StateProxy> outputMap =
-          rel.getResultingStateToIntMap();
-        return new ObservationEquivalenceStep(convertedAut, aut, tau,
-                                              inputMap, classMap, outputMap);
+        new ObservationEquivalenceTRSimplifier(rel);
+      final List<int[]> partition =
+        applySimplifier(bisimulator, rel, codeOfVTau);
+      if (partition != null) {
+        final StateEncoding outputStateEnc = new StateEncoding();
+        final AutomatonProxy convertedAut =
+          rel.createAutomaton(factory, eventEnc, outputStateEnc);
+        /*
+        final IsomorphismChecker checker =
+          new IsomorphismChecker(factory, false);
+        checker.checkObservationEquivalence(aut, convertedAut, tau);
+        */
+        return new ObservationEquivalenceStep(convertedAut, aut, eventEnc,
+                                              inputStateEnc, partition,
+                                              outputStateEnc);
       } else {
         return null;
       }
@@ -1211,47 +1217,43 @@ public class ObserverProjectionConflictChecker
 
     //#######################################################################
     //# Auxiliary Methods
-    private TIntObjectHashMap<int[]> applySimplifier
+    private List<int[]> applySimplifier
       (final ObservationEquivalenceTRSimplifier simplifier,
-       final ObserverProjectionTransitionRelation rel,
-       final int tau,
+       final ListBufferTransitionRelation rel,
        final int vtau)
-    throws AnalysisException
+      throws AnalysisException
     {
+      final int tau = EventEncoding.TAU;
       final int numTransBefore = rel.getNumberOfTransitions();
-      Collection<int[]> partition;
-      int psize;
-      do {
+      List<int[]> partition;
+      while (true) {
         final boolean modified = simplifier.run();
         if (!modified && rel.getNumberOfTransitions() == numTransBefore) {
           return null;
         }
         partition = simplifier.getResultPartition();
-        psize = partition.size();
-        if (!makeEventsVisible(rel, partition, tau, vtau)) {
+        if (partition == null) {
+          break;
+        } else if (!makeEventsVisible(rel, partition, vtau)) {
           break;
         }
         simplifier.setInitialPartition(partition);
-      } while (psize < rel.getNumberOfStates());
-      final TIntObjectHashMap<int[]> map = new TIntObjectHashMap<int[]>(psize);
-      rel.mergePartition(partition, tau, map);
+      }
+      rel.merge(partition);
       rel.replaceEvent(vtau, tau);
       rel.removeEvent(vtau);
-      rel.removeSelfLoopEvents(tau);
-      return map;
+      rel.removeTauSelfLoops();
+      rel.removeProperSelfLoopEvents();
+      return partition;
     }
 
     private boolean makeEventsVisible
-      (final ObserverProjectionTransitionRelation rel,
-       final Collection<int[]> partition,
-       final int tau,
+      (final ListBufferTransitionRelation rel,
+       final List<int[]> partition,
        final int vtau)
     {
-      int size = 0;
-      for (final int[] array : partition) {
-        size += array.length;
-      }
-      final TIntIntHashMap pmap = new TIntIntHashMap(size);
+      final int numStates = rel.getNumberOfStates();
+      final TIntIntHashMap pmap = new TIntIntHashMap(numStates);
       int code = 0;
       for (final int[] array : partition) {
         for (final int state : array) {
@@ -1259,21 +1261,30 @@ public class ObserverProjectionConflictChecker
         }
         code++;
       }
+      final TransitionIterator iter =
+        rel.createPredecessorsModifyingIterator();
+      final TIntArrayList victims = new TIntArrayList();
+      final int tau = EventEncoding.TAU;
       boolean modified = false;
-      final TIntIntIterator iter = pmap.iterator();
-      while (iter.hasNext()) {
-        iter.advance();
-        final int source = iter.key();
-        final int clazz = iter.value();
-        final TIntHashSet successors = rel.getSuccessors(source, tau);
-        if (successors != null) {
-          final int[] succarray = successors.toArray();
-          for (final int target : succarray) {
-            if (pmap.get(target) != clazz) {
-              rel.removeTransition(source, tau, target);
-              rel.addTransition(source, vtau, target);
-              modified = true;
+      for (int target= 0; target < numStates; target++) {
+        if (rel.isReachable(target)) {
+          final int targetClass = pmap.get(target);
+          iter.reset(target, tau);
+          while (iter.advance()) {
+            final int source = iter.getCurrentSourceState();
+            final int sourceClass = pmap.get(source);
+            if (sourceClass != targetClass) {
+              iter.remove();
+              victims.add(source);
             }
+          }
+          if (!victims.isEmpty()) {
+            modified = true;
+            for (int i = 0; i < victims.size(); i++) {
+              final int source = victims.get(i);
+              rel.addTransition(source, vtau, target);
+            }
+            victims.clear();
           }
         }
       }
@@ -1289,13 +1300,15 @@ public class ObserverProjectionConflictChecker
 
     //#######################################################################
     //# Constructors
-    AbstractionStep(final AutomatonProxy aut, final Collection<AutomatonProxy> originals)
+    AbstractionStep(final AutomatonProxy aut,
+                    final Collection<AutomatonProxy> originals)
     {
       mResultAutomaton = aut;
       mOriginalAutomata = originals;
     }
 
-    AbstractionStep(final AutomatonProxy resultAut, final AutomatonProxy originalAut)
+    AbstractionStep(final AutomatonProxy resultAut,
+                    final AutomatonProxy originalAut)
     {
       this(resultAut, Collections.singletonList(originalAut));
     }
@@ -1459,18 +1472,16 @@ public class ObserverProjectionConflictChecker
     private ObservationEquivalenceStep
       (final AutomatonProxy resultAut,
        final AutomatonProxy originalAut,
-       final EventProxy tau,
-       final StateProxy[] originalStates,
-       final TIntObjectHashMap<int[]> partition,
-       final TObjectIntHashMap<StateProxy> reverseOutputStateMap)
+       final EventEncoding eventEnc,
+       final StateEncoding originalStateEnc,
+       final List<int[]> partition,
+       final StateEncoding resultStateEnc)
     {
       super(resultAut, originalAut);
-      mOriginalStates = originalStates;
-      mClassMap = partition;
-      mReverseOutputStateMap = reverseOutputStateMap;
-      mTransitionRelation =
-        new ObserverProjectionTransitionRelation(originalAut, mPropositions);
-      mCodeOfTau = mTransitionRelation.getEventInt(tau);
+      mEventEncoding = eventEnc;
+      mOriginalStateEncoding = originalStateEnc;
+      mPartition = partition;
+      mReverseOutputStateMap = resultStateEnc.getStateCodeMap();
     }
 
     //#######################################################################
@@ -1481,12 +1492,18 @@ public class ObserverProjectionConflictChecker
       final ProductDESProxyFactory factory = getFactory();
       final AutomatonProxy originalAutomaton = getOriginalAutomaton();
       final AutomatonProxy resultAutomaton = getResultAutomaton();
+      try {
+        mTransitionRelation = new ListBufferTransitionRelation
+          (originalAutomaton, mEventEncoding, mOriginalStateEncoding,
+           ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      } catch (final OverflowException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+
       final List<TraceStepProxy> convertedSteps =
         new LinkedList<TraceStepProxy>();
 
       // Make the trace begin in the correct initial state ...
-      final TIntArrayList initialStates =
-        mTransitionRelation.getAllInitialStates();
       final Iterator<TraceStepProxy> iter = traceSteps.iterator();
       final TraceStepProxy initialStep = iter.next();
       Map<AutomatonProxy,StateProxy> stepsNewStateMap =
@@ -1497,17 +1514,18 @@ public class ObserverProjectionConflictChecker
       final int tracesInitialStateID =
         mReverseOutputStateMap.get(tracesInitialState);
       final List<SearchRecord> initialRecords =
-        beginTrace(initialStates, tracesInitialStateID);
+        beginTrace(tracesInitialStateID);
       assert initialRecords.size() > 0;
       appendTraceSteps(initialRecords, stepsNewStateMap, convertedSteps);
 
       // Append internal steps, with intermittent tau as needed ...
+      final int tau = EventEncoding.TAU;
       int originalSourceID =
         initialRecords.get(initialRecords.size() - 1).getState();
       while (iter.hasNext()) {
         final TraceStepProxy step = iter.next();
         final EventProxy stepEvent = step.getEvent();
-        final int eventID = mTransitionRelation.getEventInt(stepEvent);
+        final int eventID = mEventEncoding.getEventCode(stepEvent);
         final Map<AutomatonProxy,StateProxy> stepsStateMap =
           step.getStateMap();
         if (eventID < 0) {
@@ -1516,12 +1534,13 @@ public class ObserverProjectionConflictChecker
           stepsNewStateMap =
             new HashMap<AutomatonProxy,StateProxy>(stepsStateMap);
           stepsNewStateMap.remove(resultAutomaton);
-          final StateProxy state = mOriginalStates[originalSourceID];
+          final StateProxy state =
+            mOriginalStateEncoding.getState(originalSourceID);
           stepsNewStateMap.put(originalAutomaton, state);
           final TraceStepProxy convertedStep =
             factory.createTraceStepProxy(stepEvent, stepsNewStateMap);
           convertedSteps.add(convertedStep);
-        } else if (eventID == mCodeOfTau) {
+        } else if (eventID == tau) {
           // The event is tau: find and append a tau*-only trace
           final Map<AutomatonProxy,StateProxy> stepsAfterStateMap =
             stepsStateMap;
@@ -1568,45 +1587,44 @@ public class ObserverProjectionConflictChecker
      *         for the start of the trace. (The first item being the very first
      *         state of the trace).
      */
-    private List<SearchRecord> beginTrace(final TIntArrayList initialStateIDs,
-                                          final int resultAutInitialStateClass)
+    private List<SearchRecord> beginTrace(final int resultAutInitialStateClass)
     {
-      final int[] targetArray = mClassMap.get(resultAutInitialStateClass);
+      final int[] targetArray = mPartition.get(resultAutInitialStateClass);
       final TIntHashSet targetSet = new TIntHashSet(targetArray);
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
       final TIntHashSet visited = new TIntHashSet();
       // The dummy record ensures that the first real search record will
       // later be included in the trace.
       final SearchRecord dummy = new SearchRecord(-1);
-      final int numInit = initialStateIDs.size();
-      for (int i = 0; i < numInit; i++) {
-        final int initStateID = initialStateIDs.get(i);
-        final SearchRecord record =
-            new SearchRecord(initStateID, false, -1, dummy);
-        if (targetSet.contains(initStateID)) {
-          return Collections.singletonList(record);
+      final int numStates = mTransitionRelation.getNumberOfStates();
+      for (int state = 0; state < numStates; state++) {
+        if (mTransitionRelation.isInitial(state)) {
+          final SearchRecord record =
+            new SearchRecord(state, false, -1, dummy);
+          if (targetSet.contains(state)) {
+            return Collections.singletonList(record);
+          }
+          open.add(record);
+          visited.add(state);
         }
-        open.add(record);
-        visited.add(initStateID);
       }
+      final int tau = EventEncoding.TAU;
+      final TransitionIterator iter =
+        mTransitionRelation.createSuccessorsIterator();
       while (true) {
         final SearchRecord current = open.remove();
         final int source = current.getState();
-        final TIntHashSet successors =
-            mTransitionRelation.getSuccessors(source, mCodeOfTau);
-        if (successors != null) {
-          final TIntIterator iter = successors.iterator();
-          while (iter.hasNext()) {
-            final int target = iter.next();
-            if (!visited.contains(target)) {
-              final SearchRecord record =
-                  new SearchRecord(target, false, mCodeOfTau, current);
-              if (targetSet.contains(target)) {
-                return buildSearchRecordTrace(record);
-              }
-              open.add(record);
-              visited.add(target);
+        iter.reset(source, tau);
+        while (iter.advance()) {
+          final int target = iter.getCurrentTargetState();
+          if (!visited.contains(target)) {
+            final SearchRecord record =
+              new SearchRecord(target, false, tau, current);
+            if (targetSet.contains(target)) {
+              return buildSearchRecordTrace(record);
             }
+            open.add(record);
+            visited.add(target);
           }
         }
       }
@@ -1636,7 +1654,7 @@ public class ObserverProjectionConflictChecker
                                             final int event,
                                             final int targetClass)
     {
-      final int[] targetArray = mClassMap.get(targetClass);
+      final int[] targetArray = mPartition.get(targetClass);
       final TIntHashSet targetSet = new TIntHashSet(targetArray);
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
       final TIntHashSet visited0 = new TIntHashSet(); // event not in trace
@@ -1645,8 +1663,9 @@ public class ObserverProjectionConflictChecker
       // (possibly empty) string of tau events. This is achieved here by
       // by creating a first search record with the 'hasevent' property,
       // i.e., pretending the trace already has an event.
+      final int tau = EventEncoding.TAU;
       SearchRecord record;
-      if (event != mCodeOfTau) {
+      if (event != tau) {
         record = new SearchRecord(originalSource);
         visited0.add(originalSource);
       } else if (!targetSet.contains(originalSource)) {
@@ -1655,45 +1674,37 @@ public class ObserverProjectionConflictChecker
       } else {
         return Collections.emptyList();
       }
+      final TransitionIterator iter =
+        mTransitionRelation.createSuccessorsIterator();
       open.add(record);
       while (true) {
         final SearchRecord current = open.remove();
         final int source = current.getState();
         final boolean hasEvent = current.hasProperEvent();
         final TIntHashSet visited = hasEvent ? visited1 : visited0;
-        if (mCodeOfTau >= 0) {
-          final TIntHashSet successors =
-            mTransitionRelation.getSuccessors(source, mCodeOfTau);
-          if (successors != null) {
-            final TIntIterator iter = successors.iterator();
-            while (iter.hasNext()) {
-              final int target = iter.next();
-              if (!visited.contains(target)) {
-                record = new SearchRecord(target, hasEvent, mCodeOfTau, current);
-                if (hasEvent && targetSet.contains(target)) {
-                  return buildSearchRecordTrace(record);
-                }
-                open.add(record);
-                visited.add(target);
-              }
+        iter.reset(source, tau);
+        while (iter.advance()) {
+          final int target = iter.getCurrentTargetState();
+          if (!visited.contains(target)) {
+            record = new SearchRecord(target, hasEvent, tau, current);
+            if (hasEvent && targetSet.contains(target)) {
+              return buildSearchRecordTrace(record);
             }
+            open.add(record);
+            visited.add(target);
           }
         }
         if (!hasEvent) {
-          final TIntHashSet successors =
-            mTransitionRelation.getSuccessors(source, event);
-          if (successors != null) {
-            final TIntIterator iter = successors.iterator();
-            while (iter.hasNext()) {
-              final int target = iter.next();
-              if (!visited1.contains(target)) {
-                record = new SearchRecord(target, true, event, current);
-                if (targetSet.contains(target)) {
-                  return buildSearchRecordTrace(record);
-                }
-                open.add(record);
-                visited1.add(target);
+          iter.reset(source, event);
+          while (iter.advance()) {
+            final int target = iter.getCurrentTargetState();
+            if (!visited1.contains(target)) {
+              record = new SearchRecord(target, true, event, current);
+              if (targetSet.contains(target)) {
+                return buildSearchRecordTrace(record);
               }
+              open.add(record);
+              visited1.add(target);
             }
           }
         }
@@ -1744,7 +1755,7 @@ public class ObserverProjectionConflictChecker
         final int subStepEventID = record.getEvent();
         final EventProxy stepEvent;
         if (subStepEventID >= 0) {
-          stepEvent = mTransitionRelation.getEvent(subStepEventID);
+          stepEvent = mEventEncoding.getProperEvent(subStepEventID);
           if (stepEvent == event) {
             currentStateMap = afterEventStateMap;
           }
@@ -1752,8 +1763,9 @@ public class ObserverProjectionConflictChecker
           stepEvent = null;
         }
         final int subStepTargetStateID = record.getState();
-        currentStateMap.put(originalAutomaton,
-                            mOriginalStates[subStepTargetStateID]);
+        final StateProxy subStepTargetState =
+          mOriginalStateEncoding.getState(subStepTargetStateID);
+        currentStateMap.put(originalAutomaton, subStepTargetState);
         final TraceStepProxy convertedStep =
           factory.createTraceStepProxy(stepEvent, currentStateMap);
         outputTrace.add(convertedStep);
@@ -1763,24 +1775,32 @@ public class ObserverProjectionConflictChecker
     //#######################################################################
     //# Data Members
     /**
-     * Array of original states. Maps state codes in the input
+     * Event encoding of original automaton. Maps event codes in the
+     * transition relation to event objects in the input and output automata
+     * and vice versa.
+     */
+    private final EventEncoding mEventEncoding;
+    /**
+     * State encoding of original automaton. Maps state codes in the input
      * transition relation to state objects in the input automaton.
      */
-    private final StateProxy[] mOriginalStates;
+    private final StateEncoding mOriginalStateEncoding;
     /**
-     * Maps state codes of the output transition relation to list of state codes
-     * in input transition relation. This gives the class of states merged to
-     * form the given state in the simplified automaton.
+     * Partition applied to original automaton.
+     * Each entry lists states of the input encoding that have been merged.
      */
-    private final TIntObjectHashMap<int[]> mClassMap;
+    private final List<int[]> mPartition;
     /**
      * Reverse encoding of output states. Maps states in output automaton
      * (simplified automaton) to state code in output transition relation.
      */
     private final TObjectIntHashMap<StateProxy> mReverseOutputStateMap;
 
-    private final ObserverProjectionTransitionRelation mTransitionRelation;
-    private final int mCodeOfTau;
+    /**
+     * Transition relation that was simplified.
+     * Only constructed when expanding trace.
+     */
+    private ListBufferTransitionRelation mTransitionRelation;
   }
 
 

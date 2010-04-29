@@ -9,12 +9,13 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TIntObjectHashMap;
-
 import java.util.Collection;
+import java.util.List;
 
+import net.sourceforge.waters.analysis.op.EventEncoding;
+import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -104,23 +105,28 @@ class ObservationEquivalenceRule extends AbstractionRule
   {
     mTau = tau;
     mAutToAbstract = autToAbstract;
-    mTr = new ObserverProjectionTransitionRelation(autToAbstract,
-                                                   getPropositions());
-    final int codeOfTau = mTr.getEventInt(tau);
+    final EventEncoding eventEnc =
+      new EventEncoding(autToAbstract, tau,
+                        getPropositions(), EventEncoding.FILTER_PROPOSITIONS);
+    //final int codeOfTau = eventEnc.getEventCode(tau);
+    mInputEncoding = new StateEncoding(autToAbstract);
+    mTr = new ListBufferTransitionRelation
+      (autToAbstract, eventEnc, mInputEncoding,
+       ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier(mTr, codeOfTau);
+      new ObservationEquivalenceTRSimplifier(mTr);
     bisimulator.setSuppressRedundantHiddenTransitions
       (mSuppressRedundantHiddenTransitions);
     bisimulator.setTransitionLimit(mTransitionLimit);
     final boolean modified = bisimulator.run();
     if (modified) {
-      final Collection<int[]> partition = bisimulator.getResultPartition();
-      final int size = partition.size();
-      mClassMap = new TIntObjectHashMap<int[]>(size);
-      mTr.mergePartition(partition, codeOfTau, mClassMap);
-      final int suppress = mSuppressRedundantHiddenTransitions ? codeOfTau : -1;
-      mTr.removeSelfLoopEvents(suppress);
-      return mTr.createAutomaton(getFactory());
+      mPartition = bisimulator.getResultPartition();
+      mTr.merge(mPartition);
+      // mTr.removeTauSelfLoops();
+      mTr.removeProperSelfLoopEvents();
+      final ProductDESProxyFactory factory = getFactory();
+      mOutputEncoding = new StateEncoding();
+      return mTr.createAutomaton(factory, eventEnc, mOutputEncoding);
     } else {
       return autToAbstract;
     }
@@ -130,9 +136,9 @@ class ObservationEquivalenceRule extends AbstractionRule
     (final CompositionalGeneralisedConflictChecker checker,
      final AutomatonProxy abstractedAut)
   {
-    return checker.createObservationEquivalenceStep(abstractedAut,
-                                                    mAutToAbstract, mTau, mTr,
-                                                    mClassMap);
+    return checker.createObservationEquivalenceStep
+      (abstractedAut, mAutToAbstract, mTau,
+       mInputEncoding, mPartition, mOutputEncoding);
   }
 
 
@@ -143,7 +149,9 @@ class ObservationEquivalenceRule extends AbstractionRule
 
   private AutomatonProxy mAutToAbstract;
   private EventProxy mTau;
-  private ObserverProjectionTransitionRelation mTr;
-  private TIntObjectHashMap<int[]> mClassMap;
+  private ListBufferTransitionRelation mTr;
+  private StateEncoding mInputEncoding;
+  private List<int[]> mPartition;
+  private StateEncoding mOutputEncoding;
 
 }

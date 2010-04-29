@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="oeq_13" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This is a larger test for observation equivalence from the batch tank model. The test checks whether states linked by tau and other transitions are merged correctly.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Name="s2_on"/>
+        <EventDecl Kind="CONTROLLABLE" Name="open_in"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="jelly"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="s2_off"/>
+        <EventDecl Kind="CONTROLLABLE" Name="open_out"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Observable="false" Kind="CONTROLLABLE" Name="tau"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="BOTH_CLOSED.EMPTY.CLOSED.CLOSED">
+                        <PointGeometry>
+                            <Point Y="87" X="79"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="BOTH_CLOSED.FULL.CLOSED.CLOSED">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="298" X="344"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED">
+                        <PointGeometry>
+                            <Point Y="192" X="209"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="IN_OPEN.EMPTY.OPEN.CLOSED">
+                        <PointGeometry>
+                            <Point Y="169" X="69"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="IN_OPEN.FULL.OPEN.CLOSED">
+                        <PointGeometry>
+                            <Point Y="326" X="264"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="6" X="-167"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="IN_OPEN.PARTIAL.OPEN.CLOSED">
+                        <PointGeometry>
+                            <Point Y="251" X="162"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="OUT_OPEN.EMPTY.CLOSED.OPEN">
+                        <PointGeometry>
+                            <Point Y="59" X="157"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="OUT_OPEN.FULL.CLOSED.OPEN">
+                        <PointGeometry>
+                            <Point Y="213" X="353"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="OUT_OPEN.PARTIAL.CLOSED.OPEN">
+                        <PointGeometry>
+                            <Point Y="132" X="257"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="IN_OPEN.EMPTY.OPEN.CLOSED" Source="BOTH_CLOSED.EMPTY.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-2" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="127" X="76"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="OUT_OPEN.EMPTY.CLOSED.OPEN" Source="BOTH_CLOSED.EMPTY.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-1" X="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="75" X="118"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.FULL.CLOSED.CLOSED" Source="BOTH_CLOSED.FULL.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="jelly"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="5" X="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="331" X="387"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="IN_OPEN.FULL.OPEN.CLOSED" Source="BOTH_CLOSED.FULL.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-36"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="330" X="311"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="OUT_OPEN.FULL.CLOSED.OPEN" Source="BOTH_CLOSED.FULL.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="258" X="368"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED" Source="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="jelly"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="-7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="219" X="246"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="IN_OPEN.PARTIAL.OPEN.CLOSED" Source="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-1" X="-10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="231" X="192"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="OUT_OPEN.PARTIAL.CLOSED.OPEN" Source="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-6" X="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="166" X="243"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.EMPTY.CLOSED.CLOSED" Source="IN_OPEN.EMPTY.OPEN.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-1" X="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="124" X="54"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="IN_OPEN.PARTIAL.OPEN.CLOSED" Source="IN_OPEN.EMPTY.OPEN.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="215" X="108"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.FULL.CLOSED.CLOSED" Source="IN_OPEN.FULL.OPEN.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-22" X="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="309" X="304"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED" Source="IN_OPEN.PARTIAL.OPEN.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-19" X="-27"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="217" X="175"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="IN_OPEN.FULL.OPEN.CLOSED" Source="IN_OPEN.PARTIAL.OPEN.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s2_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="9" X="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="297" X="209"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.EMPTY.CLOSED.CLOSED" Source="OUT_OPEN.EMPTY.CLOSED.OPEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-21" X="-31"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="54" X="110"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.FULL.CLOSED.CLOSED" Source="OUT_OPEN.FULL.CLOSED.OPEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-15" X="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="256" X="346"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="OUT_OPEN.PARTIAL.CLOSED.OPEN" Source="OUT_OPEN.FULL.CLOSED.OPEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s2_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="167" X="312"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED" Source="OUT_OPEN.PARTIAL.CLOSED.OPEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-16" X="-28"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="152" X="226"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="OUT_OPEN.EMPTY.CLOSED.OPEN" Source="OUT_OPEN.PARTIAL.CLOSED.OPEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="87" X="210"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="after">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Name="BOTH_CLOSED.FULL.CLOSED.CLOSED,IN_OPEN.FULL.OPEN.CLOSED">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="338" X="226"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="7" X="-22"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED">
+                        <PointGeometry>
+                            <Point Y="165" X="259"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="IN_OPEN.EMPTY.OPEN.CLOSED">
+                        <PointGeometry>
+                            <Point Y="171" X="95"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="8" X="-86"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="IN_OPEN.PARTIAL.OPEN.CLOSED">
+                        <PointGeometry>
+                            <Point Y="232" X="222"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="OUT_OPEN.EMPTY.CLOSED.OPEN,BOTH_CLOSED.EMPTY.CLOSED.CLOSED">
+                        <PointGeometry>
+                            <Point Y="108" X="94"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-14" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="OUT_OPEN.FULL.CLOSED.OPEN">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="305" X="172"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="7" X="-164"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="OUT_OPEN.PARTIAL.CLOSED.OPEN">
+                        <PointGeometry>
+                            <Point Y="164" X="183"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-16" X="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="BOTH_CLOSED.FULL.CLOSED.CLOSED,IN_OPEN.FULL.OPEN.CLOSED" Source="BOTH_CLOSED.FULL.CLOSED.CLOSED,IN_OPEN.FULL.OPEN.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="jelly"/>
+                            <SimpleIdentifier Name="open_in"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-43" X="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="351" X="276"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="OUT_OPEN.FULL.CLOSED.OPEN" Source="BOTH_CLOSED.FULL.CLOSED.CLOSED,IN_OPEN.FULL.OPEN.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-60"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="340" X="192"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED" Source="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="jelly"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-21" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="137" X="307"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="IN_OPEN.PARTIAL.OPEN.CLOSED" Source="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="204" X="258"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="OUT_OPEN.PARTIAL.CLOSED.OPEN" Source="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="0" X="-40"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="169" X="226"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="IN_OPEN.PARTIAL.OPEN.CLOSED" Source="IN_OPEN.EMPTY.OPEN.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="4" X="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="207" X="154"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="OUT_OPEN.EMPTY.CLOSED.OPEN,BOTH_CLOSED.EMPTY.CLOSED.CLOSED" Source="IN_OPEN.EMPTY.OPEN.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="135" X="97"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.FULL.CLOSED.CLOSED,IN_OPEN.FULL.OPEN.CLOSED" Source="IN_OPEN.PARTIAL.OPEN.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s2_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="291" X="231"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED" Source="IN_OPEN.PARTIAL.OPEN.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="-31"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="192" X="239"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="IN_OPEN.EMPTY.OPEN.CLOSED" Source="OUT_OPEN.EMPTY.CLOSED.OPEN,BOTH_CLOSED.EMPTY.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-45"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="133" X="67"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="OUT_OPEN.EMPTY.CLOSED.OPEN,BOTH_CLOSED.EMPTY.CLOSED.CLOSED" Source="OUT_OPEN.EMPTY.CLOSED.OPEN,BOTH_CLOSED.EMPTY.CLOSED.CLOSED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="63" X="60"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.FULL.CLOSED.CLOSED,IN_OPEN.FULL.OPEN.CLOSED" Source="OUT_OPEN.FULL.CLOSED.OPEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-22" X="-2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="321" X="204"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="OUT_OPEN.PARTIAL.CLOSED.OPEN" Source="OUT_OPEN.FULL.CLOSED.OPEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s2_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="236" X="170"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="BOTH_CLOSED.PARTIAL.CLOSED.CLOSED" Source="OUT_OPEN.PARTIAL.CLOSED.OPEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="147" X="224"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="OUT_OPEN.EMPTY.CLOSED.OPEN,BOTH_CLOSED.EMPTY.CLOSED.CLOSED" Source="OUT_OPEN.PARTIAL.CLOSED.OPEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="127" X="136"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

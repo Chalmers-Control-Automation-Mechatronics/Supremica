@@ -1,12 +1,11 @@
 package net.sourceforge.waters.analysis.op;
 
 import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
 import gnu.trove.TIntStack;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
 
 
 public class TauLoopRemovalTRSimplifier
@@ -15,42 +14,28 @@ public class TauLoopRemovalTRSimplifier
 
   //#########################################################################
   //# Constructor
-  public TauLoopRemovalTRSimplifier
-    (final ObserverProjectionTransitionRelation transitionrelation,
-     final int tau)
+  public TauLoopRemovalTRSimplifier(final ListBufferTransitionRelation rel)
   {
-    mTransitionRelation = transitionrelation;
-    mHiddenEvent = tau;
+    mTransitionRelation = rel;
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.op.TransitionRelationSimplifier
-  public ObserverProjectionTransitionRelation getTransitionRelation()
+  public ListBufferTransitionRelation getTransitionRelation()
   {
     return mTransitionRelation;
   }
 
-  public void setTransitionRelation
-    (final ObserverProjectionTransitionRelation rel)
+  public void setTransitionRelation(final ListBufferTransitionRelation rel)
   {
     mTransitionRelation = rel;
-  }
-
-  public int getHiddenEventID()
-  {
-    return mHiddenEvent;
-  }
-
-  public void setHiddenEventID(final int event)
-  {
-    mHiddenEvent = event;
   }
 
   public boolean run()
   {
     setUp();
-    boolean modified = mTransitionRelation.removeAllSelfLoops(mHiddenEvent);
+    boolean modified = false;
     for (int s = 0; s < mTarjan.length; s++) {
       if (mTarjan[s] == 0) {
         tarjan(s);
@@ -64,10 +49,13 @@ public class TauLoopRemovalTRSimplifier
         final int[] array = merge.toNativeArray();
         mResultPartition.add(array);
         modified |= array.length > 1;
+        for (final int s : array) {
+          merged.set(s);
+        }
       }
       if (modified) {
         for (int s = 0; s < numStates; s++) {
-          if (mTransitionRelation.hasPredecessors(s) && !merged.get(s)) {
+          if (mTransitionRelation.isReachable(s) && !merged.get(s)) {
             final int[] array = new int[1];
             array[0] = s;
             mResultPartition.add(array);
@@ -80,7 +68,7 @@ public class TauLoopRemovalTRSimplifier
     return modified;
   }
 
-  public Collection<int[]> getResultPartition()
+  public List<int[]> getResultPartition()
   {
     return mResultPartition;
   }
@@ -104,16 +92,12 @@ public class TauLoopRemovalTRSimplifier
     mTarjan[state] = mIndex;
     mLowLink[state] = mIndex;
     mIndex++;
-    final TIntHashSet successors =
-      mTransitionRelation.getSuccessors(state, mHiddenEvent);
-    if (successors == null) {
-      return;
-    }
     mOnstack[state] = true;
     mStack.push(state);
-    final TIntIterator targets = successors.iterator();
-    while (targets.hasNext()) {
-      final int suc = targets.next();
+    final TransitionIterator iter =
+      mTransitionRelation.createAnyIterator(state, EventEncoding.TAU);
+    while (iter.advance()) {
+      final int suc = iter.getCurrentToState();
       if(mOnstack[suc]) {
         mLowLink[state] = mTarjan[suc] < mLowLink[state] ? mTarjan[suc]
                                                          : mLowLink[state];
@@ -142,9 +126,8 @@ public class TauLoopRemovalTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private ObserverProjectionTransitionRelation mTransitionRelation;
-  private int mHiddenEvent;
-  private Collection<int[]> mResultPartition;
+  private ListBufferTransitionRelation mTransitionRelation;
+  private List<int[]> mResultPartition;
 
   private int mIndex;
   private int[] mTarjan;

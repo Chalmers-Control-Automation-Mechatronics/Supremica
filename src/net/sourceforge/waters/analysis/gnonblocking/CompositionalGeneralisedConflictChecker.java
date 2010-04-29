@@ -33,6 +33,7 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
@@ -341,6 +342,7 @@ public class CompositionalGeneralisedConflictChecker extends
     oeRule.setTransitionLimit(getTransitionLimit());
     mAbstractionRules.add(oeRule);
 
+    /*
     final RemovalOfAlphaMarkingsRule ramRule =
         new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
     ramRule.setAlphaMarking(getGeneralisedPrecondition());
@@ -370,6 +372,7 @@ public class CompositionalGeneralisedConflictChecker extends
     rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
     rttonsRule.setDefaultMarking(getMarkingProposition());
     mAbstractionRules.add(rttonsRule);
+    */
 
   }
 
@@ -935,15 +938,27 @@ public class CompositionalGeneralisedConflictChecker extends
     }
   }
 
-  public ObservationEquivalenceStep createObservationEquivalenceStep(
-                                                                     final AutomatonProxy abstractedAut,
-                                                                     final AutomatonProxy autToAbstract,
-                                                                     final EventProxy tau,
-                                                                     final ObserverProjectionTransitionRelation tr,
-                                                                     final TIntObjectHashMap<int[]> classMap)
+  public ObservationEquivalenceStep createObservationEquivalenceStep
+    (final AutomatonProxy abstractedAut,
+     final AutomatonProxy autToAbstract,
+     final EventProxy tau,
+     final StateEncoding inputEnc,
+     final List<int[]> partition,
+     final StateEncoding outputEnc)
   {
     return new ObservationEquivalenceStep(abstractedAut, autToAbstract, tau,
-        tr, classMap);
+                                          inputEnc, partition, outputEnc);
+  }
+
+  public ObservationEquivalenceStep createObservationEquivalenceStep
+    (final AutomatonProxy abstractedAut,
+     final AutomatonProxy autToAbstract,
+     final EventProxy tau,
+     final ObserverProjectionTransitionRelation tr,
+     final TIntObjectHashMap<int[]> classMap)
+  {
+    return new ObservationEquivalenceStep(abstractedAut, autToAbstract, tau,
+                                          tr, classMap);
   }
 
   public RemovalOfMarkingsOrNoncoreachableStatesStep createRemovalOfMarkingsStep(
@@ -1211,6 +1226,21 @@ public class CompositionalGeneralisedConflictChecker extends
     RemovalOfTransitionsStep(final AutomatonProxy resultAut,
                              final AutomatonProxy originalAut,
                              final EventProxy tau,
+                             final StateEncoding inputEnc,
+                             final StateEncoding outputEnc)
+    {
+      super(resultAut, originalAut);
+      mOriginalStates = inputEnc.getStatesArray();
+      mReverseOutputStateMap = outputEnc.getStateCodeMap();
+      mTransitionRelation =
+          new ObserverProjectionTransitionRelation(originalAut, mPropositions);
+      mCodeOfTau = mTransitionRelation.getEventInt(tau);
+      mOriginalStatesMap = mTransitionRelation.getOriginalStateToIntMap();
+    }
+
+    RemovalOfTransitionsStep(final AutomatonProxy resultAut,
+                             final AutomatonProxy originalAut,
+                             final EventProxy tau,
                              final ObserverProjectionTransitionRelation tr)
     {
       super(resultAut, originalAut);
@@ -1470,7 +1500,32 @@ public class CompositionalGeneralisedConflictChecker extends
                                final TIntObjectHashMap<int[]> classMap)
     {
       super(resultAut, originalAut, tau, tr);
-      mClassMap = classMap;
+      mClasMap = classMap;
+    }
+
+    ObservationEquivalenceStep(final AutomatonProxy resultAut,
+                               final AutomatonProxy originalAut,
+                               final EventProxy tau,
+                               final StateEncoding inputEnc,
+                               final List<int[]> partition,
+                               final StateEncoding outputEnc)
+    {
+      super(resultAut, originalAut, tau, inputEnc, outputEnc);
+      if (partition == null) {
+        final int size = originalAut.getStates().size();
+        mClasMap = new TIntObjectHashMap<int[]>(size);
+        for (int i = 0; i < size; i++) {
+          final int[] clazz = new int[] {i};
+          mClasMap.put(i, clazz);
+        }
+      } else {
+        final int size = partition.size();
+        mClasMap = new TIntObjectHashMap<int[]>(size);
+        int i = 0;
+        for (final int[] clazz : partition) {
+          mClasMap.put(i++, clazz);
+        }
+      }
     }
 
     /**
@@ -1487,7 +1542,7 @@ public class CompositionalGeneralisedConflictChecker extends
                                             final TIntArrayList initialStateIDs,
                                             final int resultAutInitialStateClass)
     {
-      final int[] targetArray = mClassMap.get(resultAutInitialStateClass);
+      final int[] targetArray = mClasMap.get(resultAutInitialStateClass);
       final TIntHashSet targetSet = new TIntHashSet(targetArray);
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
       final TIntHashSet visited = new TIntHashSet();
@@ -1598,7 +1653,7 @@ public class CompositionalGeneralisedConflictChecker extends
                                               final int event,
                                               final int targetClass)
     {
-      final int[] targetArray = mClassMap.get(targetClass);
+      final int[] targetArray = mClasMap.get(targetClass);
       final TIntHashSet targetSet = new TIntHashSet(targetArray);
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
       final TIntHashSet visited0 = new TIntHashSet(); // event not in trace
@@ -1668,7 +1723,7 @@ public class CompositionalGeneralisedConflictChecker extends
      * form the given state in the simplified automaton. Obtained from
      * TransBiSimulator.
      */
-    private final TIntObjectHashMap<int[]> mClassMap;
+    private final TIntObjectHashMap<int[]> mClasMap;
   }
 
 
