@@ -110,6 +110,7 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
       }
     }
     if (modified) {
+      mTR.removeTauSelfLoops(tauID);
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
       return convertedAut;
     } else {

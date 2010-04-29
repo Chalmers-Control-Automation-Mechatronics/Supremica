@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="noncoreachableremoval_7" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Tests whether self loops are correctly handled. Also checks that an omega marking is not removed which does not become reachable from an alpha state, until a loop which is outgoing from the omega state is reached.</ns2:Comment>
+    <ns2:Comment>Tests whether selfloops are correctly handled. Also checks that an omega marking is not removed which does not become reachable from an alpha state, until a loop which is outgoing from the omega state is reached.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":alpha">
             <ColorGeometry>
@@ -222,11 +222,6 @@
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-8" X="-30"/>
                             </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S4" Source="S4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
                         </LabelBlock>
                     </Edge>
                     <Edge Target="S1" Source="S1">

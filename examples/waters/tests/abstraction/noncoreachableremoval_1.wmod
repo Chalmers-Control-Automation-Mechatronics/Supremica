@@ -20,6 +20,12 @@
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="after">
             <Graph Deterministic="false">
+                <LabelBlock>
+                    <SimpleIdentifier Name="e1"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="20" X="42"/>
+                    </LabelGeometry>
+                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="S1">
                         <EventList>

@@ -195,11 +195,6 @@
                             <SimpleIdentifier Name="e2"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S5" Source="S5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
-                        </LabelBlock>
-                    </Edge>
                     <Edge Target="S5" Source="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="e2"/>

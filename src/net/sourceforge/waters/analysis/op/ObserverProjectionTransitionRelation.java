@@ -726,6 +726,38 @@ public class ObserverProjectionTransitionRelation
     }
   }
 
+  /**
+   * Attempts to simplify the automaton by removing all tau selfloops.
+   * If this results in the tau being disabled in, the tau event is
+   * marked as unused. Tau events are recognised by their standard
+   * code {@link EventEncoding#TAU}.
+   * @return <CODE>true</CODE> if all transitions with the tau event
+   *         were selfloops and have been removed, <CODE>false</CODE>
+   *         otherwise.
+   */
+  public boolean removeTauSelfLoops(final int tau)
+  {
+    if (tau >= 0) {
+      boolean removable = true;
+      for (int s = 0; s < mSuccessors.length; s++) {
+        final TIntHashSet succs = mSuccessors[s][tau];
+        if (succs != null) {
+          if (succs.contains(s)) {
+            removeTransition(s, tau, s);
+          }
+          removable &= succs.isEmpty();
+        }
+      }
+      if (removable) {
+        removeEvent(tau);
+      }
+      return removable;
+    } else {
+      return false;
+    }
+  }
+
+
   public boolean removeAllSelfLoops(final int e)
   {
     boolean modified = false;

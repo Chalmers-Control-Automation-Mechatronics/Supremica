@@ -166,7 +166,10 @@ public class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRuleTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "tauTransRemovalFromNonAlpha_10.wmod";
-    // TODO:wondering if there should be a tau self loop on state s5 in after...
+    // TODO Wondering if there should be a tau selfloop on state s5 in after.
+    // The tau selfloop is redundant due to observation equivalence.
+    // Transition relation implementations remove it automatically.
+    // TODO Fix bug. State S5 must not be deleted.
     runAbstractionRule(group, subdir, name);
   }
 

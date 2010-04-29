@@ -121,6 +121,8 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
       }
     }
     if (modified) {
+      final int tauID = mTR.getEventInt(tau);
+      mTR.removeTauSelfLoops(tauID);
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
       return convertedAut;
     } else {

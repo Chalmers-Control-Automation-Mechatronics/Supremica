@@ -137,9 +137,10 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
       }
     }
     if (modified) {
+      mTR.removeTauSelfLoops(tauID);
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
-      System.out.println(autToAbstract);
-      System.out.println("CONVERTED--------------" + convertedAut);
+      // System.out.println(autToAbstract);
+      // System.out.println("CONVERTED--------------" + convertedAut);
       return convertedAut;
     } else {
       return autToAbstract;
