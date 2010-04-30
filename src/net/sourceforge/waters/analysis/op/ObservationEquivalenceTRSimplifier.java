@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.op
 //# CLASS:   ObservationEquivalenceTRSimplifier
 //###########################################################################
-//# $Id$
+//# $Id: ObservationEquivalenceTRSimplifier.java 5595 2010-04-29 20:18:41Z robi $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.op;
@@ -19,6 +19,7 @@ import gnu.trove.TLongObjectHashMap;
 import gnu.trove.TLongObjectIterator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -184,15 +185,7 @@ public class ObservationEquivalenceTRSimplifier
       return false;
     }
 
-    if (numClasses == mNumStates) {
-      mResultPartition = null;
-    } else {
-      mResultPartition = new ArrayList<int[]>(numClasses);
-      for (final SimpleEquivalenceClass sec : mP) {
-        final int[] array = sec.mStates;
-        mResultPartition.add(array);
-      }
-    }
+    buildResultPartition();
 
     if (logger.isDebugEnabled()) {
       final String msg =
@@ -428,6 +421,31 @@ public class ObservationEquivalenceTRSimplifier
     }
   }
 
+  private void buildResultPartition()
+  {
+    final int numClasses = mP.size();
+    if (numClasses == mNumStates) {
+      mResultPartition = null;
+    } else {
+      int nextCode = 0;
+      final int[] index = new int[numClasses];
+      final int[][] partition = new int[numClasses][];
+      for (int state = 0; state < mNumStates; state++) {
+        if (mTransitionRelation.isReachable(state)) {
+          final SimpleEquivalenceClass sec = mStateToClass[state];
+          int code = sec.getCode();
+          if (code < 0) {
+            code = nextCode++;
+            sec.setCode(code);
+            partition[code] = new int[sec.mSize];
+          }
+          final int i = index[code]++;
+          partition[code][i] = state;
+        }
+      }
+      mResultPartition = Arrays.asList(partition);
+    }
+  }
 
   //#########################################################################
   //# Inner Class EquivalenceClass
@@ -454,10 +472,23 @@ public class ObservationEquivalenceTRSimplifier
     {
       mStates = states;
       mSize = states.length; // TODO make this into function so less space
+      mCode = -1;
       for (int i = 0; i < states.length; i++) {
         mStateToClass[states[i]] = this;
       }
       mP.add(this);
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private int getCode()
+    {
+      return mCode;
+    }
+
+    private void setCode(final int code)
+    {
+      mCode = code;
     }
 
     //#######################################################################
@@ -536,6 +567,7 @@ public class ObservationEquivalenceTRSimplifier
     //#######################################################################
     //# Data Members
     private final int[] mStates;
+    private int mCode;
     private TIntHashSet mSplit1 = null;
     private TIntArrayList mX1 = null;
     private TIntArrayList mX2 = null;
