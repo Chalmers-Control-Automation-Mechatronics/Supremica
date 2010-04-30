@@ -1076,7 +1076,7 @@ public class ListBufferTransitionRelation
       if (mPredecessorBuffer == null && (config & CONFIG_PREDECESSORS) != 0) {
         if (mSuccessorBuffer != null) {
           mPredecessorBuffer =
-            new OutgoingTransitionListBuffer(numEvents, numStates);
+            new IncomingTransitionListBuffer(numEvents, numStates);
           mPredecessorBuffer.setUpTransitions(mSuccessorBuffer);
         } else {
           throw createNoBufferException("successor");
@@ -1102,12 +1102,12 @@ public class ListBufferTransitionRelation
    */
   public void reverse()
   {
-    final IncomingTransitionListBuffer newSucc =
+    final OutgoingTransitionListBuffer newSucc =
       mPredecessorBuffer == null ?
-          null : new IncomingTransitionListBuffer(mPredecessorBuffer);
-    final OutgoingTransitionListBuffer newPred =
+          null : new OutgoingTransitionListBuffer(mPredecessorBuffer);
+    final IncomingTransitionListBuffer newPred =
       mSuccessorBuffer == null ?
-          null : new OutgoingTransitionListBuffer(mSuccessorBuffer);
+          null : new IncomingTransitionListBuffer(mSuccessorBuffer);
     mSuccessorBuffer = newSucc;
     mPredecessorBuffer = newPred;
   }
@@ -1396,8 +1396,8 @@ public class ListBufferTransitionRelation
   private ComponentKind mKind;
 
   private IntStateBuffer mStateBuffer;
-  private TransitionListBuffer mSuccessorBuffer;
-  private TransitionListBuffer mPredecessorBuffer;
+  private OutgoingTransitionListBuffer mSuccessorBuffer;
+  private IncomingTransitionListBuffer mPredecessorBuffer;
   private final BitSet mUsedEvents;
 
 
