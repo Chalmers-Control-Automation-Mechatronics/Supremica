@@ -70,6 +70,18 @@ public class OutgoingTransitionListBuffer extends TransitionListBuffer
     super(numEvents, numStates, numTrans);
   }
 
+  /**
+   * Creates a copy of the given transition list buffer.
+   * This method performs a shallow copy of the given source transition list
+   * buffer, no matter whether the source is an incoming or outgoing buffer.
+   * Data structures are shared, so the source should no longer be used after
+   * the copy.
+   */
+  OutgoingTransitionListBuffer(final TransitionListBuffer buffer)
+  {
+    super(buffer);
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.water.analysis.op.TransitionListBuffer

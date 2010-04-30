@@ -1092,6 +1092,26 @@ public class ListBufferTransitionRelation
     }
   }
 
+  /**
+   * Reverses this transition relation.
+   * This method reverses all transitions by swapping their source and
+   * target. Initial states and markings are not affected by this method.
+   * Reversing implemented by simple swapping the incoming and outgoing
+   * transition buffers, so the buffer configuration is also swapped by
+   * this method.
+   */
+  public void reverse()
+  {
+    final IncomingTransitionListBuffer newSucc =
+      mPredecessorBuffer == null ?
+          null : new IncomingTransitionListBuffer(mPredecessorBuffer);
+    final OutgoingTransitionListBuffer newPred =
+      mSuccessorBuffer == null ?
+          null : new OutgoingTransitionListBuffer(mSuccessorBuffer);
+    mSuccessorBuffer = newSucc;
+    mPredecessorBuffer = newPred;
+  }
+
 
   //#########################################################################
   //# Automaton Simplification

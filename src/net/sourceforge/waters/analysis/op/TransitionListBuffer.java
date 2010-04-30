@@ -141,6 +141,28 @@ public abstract class TransitionListBuffer
     mNextFreeIndex = NODE_SIZE;
   }
 
+  /**
+   * Creates a copy of the given transition list buffer.
+   * This method performs a shallow copy of the given source transition list
+   * buffer. Data structures are shared, so the source should no longer be
+   * used after the copy.
+   */
+  TransitionListBuffer(final TransitionListBuffer buffer)
+  {
+    mBlockShift = buffer.mBlockShift;
+    mBlockMask = buffer.mBlockMask;
+    mBlockSize = buffer.mBlockSize;
+    mNumStates = buffer.mNumStates;
+    mNumEvents = buffer.mNumEvents;
+    mStateShift = buffer.mStateShift;
+    mEventMask = buffer.mEventMask;
+    mBlocks = buffer.mBlocks;
+    mStateTransitions = buffer.mStateTransitions;
+    mStateEventTransitions = buffer.mStateEventTransitions;
+    mRecycleStart = buffer.mRecycleStart;
+    mNextFreeIndex = buffer.mNextFreeIndex;
+  }
+
 
   //#########################################################################
   //# Simple Access
