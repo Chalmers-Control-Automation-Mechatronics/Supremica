@@ -1365,6 +1365,22 @@ public class ListBufferTransitionRelation
 
 
   //#########################################################################
+  //# Debugging
+  public void checkIntegrity()
+  {
+    if (mPredecessorBuffer == null && mSuccessorBuffer == null) {
+      throw createNoBufferException();
+    }
+    if (mPredecessorBuffer != null) {
+      mPredecessorBuffer.checkIntegrity();
+    }
+    if (mSuccessorBuffer != null) {
+      mSuccessorBuffer.checkIntegrity();
+    }
+  }
+
+
+  //#########################################################################
   //# Errors
   private void checkConfig(final int config)
   {

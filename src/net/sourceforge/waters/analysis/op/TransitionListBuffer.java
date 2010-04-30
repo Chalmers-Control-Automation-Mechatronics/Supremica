@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.op;
 
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
+import gnu.trove.TIntIntIterator;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayList;
@@ -251,8 +252,10 @@ public abstract class TransitionListBuffer
     final int next = getNext(nextList);
     if (next != NULL) {
       final int nextEvent = getEvent(next);
-      final int code = (from << mStateShift) | nextEvent;
-      mStateEventTransitions.put(code, nextList);
+      if (nextEvent != event) {
+        final int code = (from << mStateShift) | nextEvent;
+        mStateEventTransitions.put(code, nextList);
+      }
     }
     return true;
   }
@@ -929,6 +932,121 @@ public abstract class TransitionListBuffer
       from++;
     }
     mStateTransitions = newStateTransitions;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  /**
+   * Checks the integrity of this transition list buffer.
+   * This method examines all transition lists and checks whether all lists
+   * have consistent and well-ordered data and link structure and whether the
+   * index structure is complete and correctly linked to the transition lists.
+   * @throws AssertionError if the data structure is found to be in an
+   *                        inconsistent state.
+   */
+  public void checkIntegrity()
+  {
+    final int[] block0 = mBlocks.get(0);
+    if (block0[0] != 0 || block0[1] != 0) {
+      throw new AssertionError("Zero-block was tampered with in " +
+                               ProxyTools.getShortClassName(this) + "!");
+    }
+
+    final TIntIntIterator iter = mStateEventTransitions.iterator();
+    while (iter.hasNext()) {
+      iter.advance();
+      final int key = iter.key();
+      final int from = (key >>> mStateShift);
+      checkState(from);
+      final int event = key & mEventMask;
+      checkEvent(event);
+      final int list = iter.value();
+      checkList(list);
+      if (list == NULL) {
+        throw new AssertionError("NULL list found for key " + from + "/" +
+                                 event + " in " +
+                                 ProxyTools.getShortClassName(this));
+      }
+      final int next = getNext(list);
+      checkList(next);
+      final int data = getData(next);
+      final int to = (data >>> mStateShift);
+      checkState(to);
+      final int dataEvent = data & mEventMask;
+      if (dataEvent != event) {
+        throw new AssertionError("Unexpected event " + dataEvent +
+                                 " found in list for key " + from + "/" +
+                                 event + " in " +
+                                 ProxyTools.getShortClassName(this));
+      }
+    }
+
+    for (int from = 0; from < mNumStates; from++) {
+      int list = mStateTransitions[from];
+      if (list != NULL) {
+        checkList(list);
+        int prev = list;
+        int prevEvent = -1;
+        list = getNext(list);
+        checkList(list);
+        if (list == NULL) {
+          throw new AssertionError("Empty non-NULL list found for state " +
+                                   from + " in " +
+                                   ProxyTools.getShortClassName(this) + "!");
+        }
+        do {
+          final int data = getData(list);
+          final int to = (data >>> mStateShift);
+          checkState(to);
+          final int event = data & mEventMask;
+          checkEvent(event);
+          if (event > prevEvent) {
+            final int key = (from << mStateShift) | event;
+            final int lookup = mStateEventTransitions.get(key);
+            if (lookup != prev) {
+              throw new AssertionError("List for key " + from + "/" + event +
+                                       " not indexed correctly in " +
+                                       ProxyTools.getShortClassName(this) +
+                                       "!");
+            }
+            prevEvent = event;
+          } else if (event < prevEvent) {
+            throw new AssertionError("Event number " + event +
+                                     " out of sequence, after " + prevEvent +
+                                     ", in list for " + from + " in " +
+                                     ProxyTools.getShortClassName(this) + "!");
+          }
+          prev = list;
+          list = getNext(list);
+          checkList(list);
+        } while (list != NULL);
+      }
+    }
+  }
+
+  private void checkState(final int state)
+  {
+    if (state < 0 || state >= mNumStates) {
+      throw new AssertionError("Invalid state number " + state +
+                               " in " + ProxyTools.getShortClassName(this));
+    }
+  }
+
+  private void checkEvent(final int event)
+  {
+    if (event < 0 || event >= mNumEvents) {
+      throw new AssertionError("Invalid event number " + event + " in " +
+                               ProxyTools.getShortClassName(this) + "!");
+    }
+  }
+
+  private void checkList(final int list)
+  {
+    if (list < 0 || list >= mNextFreeIndex) {
+      throw new AssertionError("Invalid list address " + list +
+                               " in " + ProxyTools.getShortClassName(this));
+    }
   }
 
 
