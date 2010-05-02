@@ -9,12 +9,13 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TIntObjectHashMap;
-
 import java.util.Collection;
+import java.util.List;
 
-import net.sourceforge.waters.analysis.op.DeterminisationOfNonAlphaStatesTRSimplifier;
-import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
+import net.sourceforge.waters.analysis.op.EventEncoding;
+import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -105,24 +106,28 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
   {
     mTau = tau;
     mAutToAbstract = autToAbstract;
+    final EventEncoding eventEnc =
+        new EventEncoding(autToAbstract, tau, getPropositions(),
+            EventEncoding.FILTER_PROPOSITIONS);
+    mInputEncoding = new StateEncoding(autToAbstract);
     mTr =
-        new ObserverProjectionTransitionRelation(autToAbstract,
-            getPropositions());
-    final int codeOfTau = mTr.getEventInt(tau);
-    final DeterminisationOfNonAlphaStatesTRSimplifier bisimulator =
-        new DeterminisationOfNonAlphaStatesTRSimplifier(mTr, codeOfTau);
+        new ListBufferTransitionRelation(autToAbstract, eventEnc,
+            mInputEncoding, ListBufferTransitionRelation.CONFIG_ALL);
+    mTr.reverse();
+    final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier(mTr);
     bisimulator
         .setSuppressRedundantHiddenTransitions(mSuppressRedundantHiddenTransitions);
     bisimulator.setTransitionLimit(mTransitionLimit);
     final boolean modified = bisimulator.run();
     if (modified) {
-      final Collection<int[]> partition = bisimulator.getResultPartition();
-      final int size = partition.size();
-      mClassMap = new TIntObjectHashMap<int[]>(size);
-      mTr.mergePartition(partition, codeOfTau, mClassMap);
-      final int suppress = mSuppressRedundantHiddenTransitions ? codeOfTau : -1;
-      mTr.removeSelfLoopEvents(suppress);
-      return mTr.createAutomaton(getFactory());
+      mPartition = bisimulator.getResultPartition();
+      mTr.merge(mPartition);
+      mTr.removeTauSelfLoops();
+      mTr.removeProperSelfLoopEvents();
+      final ProductDESProxyFactory factory = getFactory();
+      mOutputEncoding = new StateEncoding();
+      return mTr.createAutomaton(factory, eventEnc, mOutputEncoding);
     } else {
       return autToAbstract;
     }
@@ -133,8 +138,9 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
                                                           final AutomatonProxy abstractedAut)
   {
     return checker.createObservationEquivalenceStep(abstractedAut,
-                                                    mAutToAbstract, mTau, mTr,
-                                                    mClassMap);
+                                                    mAutToAbstract, mTau,
+                                                    mInputEncoding, mPartition,
+                                                    mOutputEncoding);
   }
 
   // #######################################################################
@@ -144,7 +150,9 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
 
   private AutomatonProxy mAutToAbstract;
   private EventProxy mTau;
-  private ObserverProjectionTransitionRelation mTr;
-  private TIntObjectHashMap<int[]> mClassMap;
+  private ListBufferTransitionRelation mTr;
+  private StateEncoding mInputEncoding;
+  private List<int[]> mPartition;
+  private StateEncoding mOutputEncoding;
 
 }
