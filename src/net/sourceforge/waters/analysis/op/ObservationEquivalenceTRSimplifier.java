@@ -581,8 +581,8 @@ public class ObservationEquivalenceTRSimplifier
   //# Inner Class EquivalenceClass
   private class ComplexEquivalenceClass extends EquivalenceClass
   {
-    EquivalenceClass mChild1;
-    EquivalenceClass mChild2;
+    private EquivalenceClass mChild1;
+    private EquivalenceClass mChild2;
 
     public ComplexEquivalenceClass(final EquivalenceClass child1,
                                    final EquivalenceClass child2)

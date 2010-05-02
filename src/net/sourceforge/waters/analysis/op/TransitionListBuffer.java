@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.op;
 
+import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIntIterator;
@@ -229,8 +230,13 @@ public abstract class TransitionListBuffer
   }
 
   /**
-   * Adds a transition to this buffer. The new transition is inserted in
-   * front of any other transitions with the same from-state and event.
+   * <P>Adds a transition to this buffer.</P>
+   * <P>The new transition is appended after any other transitions with the
+   * same from-state and event.</P>
+   * <P><I>Note.</I> This method checks whether the requested transition
+   * already is present in the buffer using a list search. Its worst-case
+   * complexity is linear in the number of to-states for the given from-state
+   * and event.</P>
    * @param  from   The ID of the from-state of the new transition.
    * @param  event  The ID of the event of the new transition.
    * @param  to     The ID of the to-state of the new transition.
@@ -243,25 +249,95 @@ public abstract class TransitionListBuffer
     if (event == EventEncoding.TAU && from == to) {
       return false;
     }
-    final int list = createList(from, event);
-    final int toCode = (to << mStateShift) | event;
-    if (contains(list, toCode)) {
-      return false;
+    final int newData = (to << mStateShift) | event;
+    int list = createList(from, event);
+    int next = getNext(list);
+    while (next != NULL) {
+      final int[] block = mBlocks.get(next >>> mBlockShift);
+      final int offset = next & mBlockMask;
+      final int data = block[offset + OFFSET_DATA];
+      if (data == newData) {
+        return false;
+      } else if ((data & mEventMask) != event) {
+        break;
+      }
+      list = next;
+      next = block[offset + OFFSET_NEXT];
     }
-    final int nextList = prepend(list, toCode);
-    final int next = getNext(nextList);
+    list = prepend(list, newData);
+    next = getNext(list);
     if (next != NULL) {
       final int nextEvent = getEvent(next);
       if (nextEvent != event) {
-        final int code = (from << mStateShift) | nextEvent;
-        mStateEventTransitions.put(code, nextList);
+        final int key = (from << mStateShift) | nextEvent;
+        mStateEventTransitions.put(key, list);
       }
     }
     return true;
   }
 
   /**
-   * Removes a transition from this buffer.
+   * Adds several transition to this buffer. New transition for the given
+   * from-state and event are inserted after existing transitions with the
+   * same from-state and event. This method checks whether transitions are
+   * already present and suppresses any duplicates. Its worst-case complexity
+   * is linear in the number of transitions for the given from-state and event
+   * <I>after</I> the operation.
+   * @param  from     The ID of the from-state of the new transitions.
+   * @param  event    The ID of the event of the new transitions.
+   * @param  toStates List of target states of the new transitions.
+   * @return <CODE>true</CODE> if at least one transition was added;
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean addTransitions(final int from,
+                                final int event,
+                                final TIntArrayList toStates)
+  {
+    if (toStates.size() == 0) {
+      return false;
+    }
+    final TIntHashSet existing = new TIntHashSet();
+    if (event == EventEncoding.TAU) {
+      existing.add(from);
+    }
+    int list = createList(from, event);
+    int next = getNext(list);
+    while (next != NULL) {
+      final int[] block = mBlocks.get(next >>> mBlockShift);
+      final int offset = next & mBlockMask;
+      final int data = block[offset + OFFSET_DATA];
+      if ((data & mEventMask) != event) {
+        break;
+      }
+      existing.add(data >>> mStateShift);
+      list = next;
+      next = block[offset + OFFSET_NEXT];
+    }
+    boolean added = false;
+    for (int i = 0; i < toStates.size(); i++) {
+      final int to = toStates.get(i);
+      if (existing.add(to)) {
+        final int data = (to << mStateShift) | event;
+        list = prepend(list, data);
+        added = true;
+      }
+    }
+    if (added) {
+      next = getNext(list);
+      if (next != NULL) {
+        final int nextEvent = getEvent(next);
+        final int key = (from << mStateShift) | nextEvent;
+        mStateEventTransitions.put(key, list);
+      }
+    }
+    return added;
+  }
+
+  /**
+   * <P>Removes a transition from this buffer.</P>
+   * <P><I>Note.</I> This method locates the specified transition using a list
+   * search. Its worst-case complexity is linear in the number of to-states for
+   * the given from-state and event.</P>
    * @param  from   The ID of the from-state of the transition to be removed.
    * @param  event  The ID of the event of the transition to be removed.
    * @param  to     The ID of the to-state of the transition to be removed.
@@ -335,73 +411,61 @@ public abstract class TransitionListBuffer
     if (source == dest) {
       return false;
     }
-    int list2 = mStateTransitions[dest];
-    if (list2 == NULL) {
+    int list1 = mStateTransitions[source];
+    if (list1 == NULL) {
       return false;
     }
-    list2 = getNext(list2);
-    final int fromShift1 = source << mStateShift;
-    int list1 = mStateTransitions[source];
+    final TIntHashSet existing = new TIntHashSet();
+    boolean result = false;
     list1 = getNext(list1);
-    int end1 = list1;
-    final int tau = EventEncoding.TAU;
-    int list = NULL;
-    final TIntHashSet successors = new TIntHashSet();
-    int e0 = -1;
-    int data1 = 0;
-    int data2 = 0;
-    boolean copied = false;
-    while (list1 != NULL || list2 != NULL) {
-      final int e1;
-      if (list1 == NULL) {
-        e1 = Integer.MAX_VALUE;
-      } else {
-        data1 = getData(list1);
-        e1 = data1 & mEventMask;
-      }
-      final int e2;
-      if (list2 == NULL) {
-        e2 = Integer.MAX_VALUE;
-      } else {
-        data2 = getData(list2);
-        e2 = data2 & mEventMask;
-      }
-      final int e;
-      final int data;
-      if (e1 <= e2) {
-        e = e1;
-        data = data1;
-        end1 = list1;
-        list1 = getNext(list1);
-      } else {
-        e = e2;
-        data = data2;
-        list2 = getNext(list2);
-        copied = true;
-      }
-      final int to = data >> mStateShift;
-      if (e == tau && to == dest) {
-        continue;
-      } else if (e != e0) {
-        successors.clear();
-        successors.add(to);
-        e0 = e;
-      } else if (!successors.add(to)) {
-        continue;
-      }
-      if (list == NULL) {
-        list = createList();
-      }
-      if (successors.size() == 1) {
-        mStateEventTransitions.put(fromShift1 | e, list);
-      }
-      list = prepend(list, data);
+    if (list1 != NULL) {
+      int[] block1 = mBlocks.get(list1 >>> mBlockShift);
+      int offset1 = list1 & mBlockMask;
+      int data1 = block1[offset1 + OFFSET_DATA];
+      final int event = data1 & mEventMask;
+      do {
+        int list2 = createList(dest, event);
+        int next2 = getNext(list2);
+        while (next2 != NULL) {
+          final int[] block2 = mBlocks.get(next2 >>> mBlockShift);
+          final int offset2 = next2 & mBlockMask;
+          final int data2 = block2[offset2 + OFFSET_DATA];
+          if ((data2 & mEventMask) != event) {
+            break;
+          }
+          existing.add(data2 >>> mStateShift);
+          list2 = next2;
+          next2 = block2[offset2 + OFFSET_NEXT];
+        }
+        boolean added = false;
+        do {
+          final int state1 = data1 >>> mStateShift;
+          if (existing.add(state1)) {
+            list2 = prepend(list2, data1);
+            added = true;
+          }
+          list1 = block1[offset1 + OFFSET_NEXT];
+          if (list1 == NULL) {
+            break;
+          }
+          block1 = mBlocks.get(list1 >>> mBlockShift);
+          offset1 = list1 & mBlockMask;
+          data1 = block1[offset1 + OFFSET_DATA];
+        } while ((data1 & mEventMask) == event);
+        existing.clear();
+        if (added) {
+          if (next2 != NULL) {
+            final int nextEvent = getEvent(next2);
+            final int nextCode = (dest << mStateShift) | nextEvent;
+            mStateEventTransitions.put(nextCode, list2);
+          }
+          result = true;
+        }
+      } while (list1 != NULL);
     }
-    setNext(end1, mRecycleStart);
-    mRecycleStart = mStateTransitions[source];
-    mStateTransitions[source] = list;
-    return copied;
+    return result;
   }
+
 
   /**
    * Removes all transitions associated with the given from-state.
@@ -470,7 +534,9 @@ public abstract class TransitionListBuffer
    */
   public void replaceEvent(final int oldID, final int newID)
   {
-    if (newID >= mNumEvents) {
+    if (oldID == newID) {
+      return;
+    } else if (newID < 0 || newID >= mNumEvents) {
       throw new IllegalArgumentException
         ("New event ID " + newID + " out of range in " +
          ProxyTools.getShortClassName(this) +
@@ -1079,24 +1145,6 @@ public abstract class TransitionListBuffer
       }
       return count;
     }
-  }
-
-  private boolean contains(final int list, final int data)
-  {
-    final int event = data & mEventMask;
-    int next = getNext(list);
-    while (next != NULL) {
-      final int[] block = mBlocks.get(next >>> mBlockShift);
-      final int offset = next & mBlockMask;
-      final int found = block[offset + OFFSET_DATA];
-      if (found == data) {
-        return true;
-      } else if ((found & mEventMask) != event) {
-        return false;
-      }
-      next = block[offset + OFFSET_NEXT];
-    }
-    return false;
   }
 
   private void dispose(final int list)

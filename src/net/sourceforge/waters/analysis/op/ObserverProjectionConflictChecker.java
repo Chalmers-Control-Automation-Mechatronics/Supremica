@@ -1280,10 +1280,7 @@ public class ObserverProjectionConflictChecker
           }
           if (!victims.isEmpty()) {
             modified = true;
-            for (int i = 0; i < victims.size(); i++) {
-              final int source = victims.get(i);
-              rel.addTransition(source, vtau, target);
-            }
+            rel.addTransitions(victims, vtau, target);
             victims.clear();
           }
         }

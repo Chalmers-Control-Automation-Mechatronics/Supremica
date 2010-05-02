@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.op;
 
+import gnu.trove.TIntArrayList;
 import gnu.trove.TIntStack;
 import gnu.trove.TLongObjectHashMap;
 import java.util.ArrayList;
@@ -646,6 +647,66 @@ public class ListBufferTransitionRelation
     }
     if (mPredecessorBuffer != null) {
       result = mPredecessorBuffer.addTransition(target, event, source);
+    }
+    return result;
+  }
+
+  /**
+   * Adds several transitions from one source state to this transition
+   * relation. The new transitions are inserted in a defined ordering
+   * in the predecessor and/or successor buffers.
+   * @param  sources The IDs of the source states of the new transitions.
+   * @param  event   The ID of the event of the new transitions.
+   * @param  target  The ID of the target state of the new transitions.
+   * @return <CODE>true</CODE> if at least one transition was added;
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean addTransitions(final TIntArrayList sources,
+                                final int event,
+                                final int target)
+  {
+    boolean result;
+    if (mPredecessorBuffer != null) {
+      result = mPredecessorBuffer.addTransitions(target, event, sources);
+    } else {
+      result = true;
+    }
+    if (mSuccessorBuffer != null && result) {
+      result = false;
+      for (int i = 0; i < sources.size(); i++) {
+        final int source = sources.get(i);
+        result |= mSuccessorBuffer.addTransition(source, event, target);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Adds several transitions to one target state to this transition
+   * relation. The new transitions are inserted in a defined ordering
+   * in the predecessor and/or successor buffers.
+   * @param  source  The ID of the source state of the new transitions.
+   * @param  event   The ID of the event of the new transitions.
+   * @param  target  The IDs of the target states of the new transitions.
+   * @return <CODE>true</CODE> if at least one transition was added;
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean addTransitions(final int source,
+                                final int event,
+                                final TIntArrayList targets)
+  {
+    boolean result;
+    if (mSuccessorBuffer != null) {
+      result = mSuccessorBuffer.addTransitions(source, event, targets);
+    } else {
+      result = true;
+    }
+    if (mPredecessorBuffer != null && result) {
+      result = false;
+      for (int i = 0; i < targets.size(); i++) {
+        final int target = targets.get(i);
+        result |= mPredecessorBuffer.addTransition(target, event, source);
+      }
     }
     return result;
   }
