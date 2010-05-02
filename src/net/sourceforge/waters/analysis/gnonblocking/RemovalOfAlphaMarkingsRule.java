@@ -79,7 +79,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     // performs a backwards search to remove alpha markings from states which
     // satisfy the rule conditions
     for (int stateID = 0; stateID < numStates; stateID++) {
-      if (mTR.isMarked(stateID, alphaID) && !reachableStates.contains(stateID)) {
+      if (mTR.isMarked(stateID, alphaID)) {
         unvisitedStates.push(stateID);
         while (unvisitedStates.size() > 0) {
           final int newState = unvisitedStates.pop();
@@ -90,8 +90,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
             while (iter.hasNext()) {
               final int predID = iter.next();
               if (predID != stateID && predID != newState) {
-                if (!reachableStates.contains(predID)) {
-                  reachableStates.add(predID);
+                if (reachableStates.add(predID)) {
                   unvisitedStates.push(predID);
                 }
                 if (mTR.isMarked(predID, alphaID)) {
@@ -103,6 +102,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
           }
         }
       }
+      reachableStates.clear();
     }
     if (modified) {
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
