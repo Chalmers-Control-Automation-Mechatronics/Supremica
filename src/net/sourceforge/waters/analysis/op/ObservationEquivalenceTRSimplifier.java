@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.op
 //# CLASS:   ObservationEquivalenceTRSimplifier
 //###########################################################################
-//# $Id: ObservationEquivalenceTRSimplifier.java 5595 2010-04-29 20:18:41Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.op;
@@ -87,8 +87,8 @@ public class ObservationEquivalenceTRSimplifier
   /**
    * Gets whether redundant hidden transitions can be suppressed in the
    * output automaton.
-   * @see {@link #setSuppressRedundantHiddenTransitions(boolean)
-   *      setSuppressHiddenEvent()}
+   * @see #setSuppressRedundantHiddenTransitions(boolean)
+   *      setSuppressRedundantHiddenTransitions()
    */
   public boolean getSuppressRedundantHiddenTransitions()
   {
@@ -112,7 +112,7 @@ public class ObservationEquivalenceTRSimplifier
   /**
    * Gets the initial partition, if any was set.
    * @return Initial partition or <CODE>null</CODE>.
-   * @see {@link #setInitialPartition(Collection) setInitialPartition()}
+   * @see #setInitialPartition(Collection) setInitialPartition()
    */
   public Collection<int[]> getInitialPartition()
   {
@@ -134,7 +134,7 @@ public class ObservationEquivalenceTRSimplifier
 
   /**
    * Gets the transition limit.
-   * @see {@link #setTransitionLimit(int) setTransitionLimit()}
+   * @see #setTransitionLimit(int) setTransitionLimit()
    */
   public int getTransitionLimit()
   {

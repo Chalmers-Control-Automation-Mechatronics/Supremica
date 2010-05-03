@@ -45,7 +45,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * if no silent event is used. Multiple silent events can be specified to
  * implement hiding.
  *
- * @see {@link ListBufferTransitionRelation}
+ * @see ListBufferTransitionRelation
  *
  * @author Robi Malik
  */
@@ -378,7 +378,7 @@ public class EventEncoding
    *                  by any procedures creating transition relations using
    *                  the encoding.
    * @return The event (or proposition) code that was assigned to the event.
-   * @see {@link #getExtraSelfloops()}
+   * @see #getExtraSelfloops()
    */
   public int addEvent(final EventProxy event, final boolean selfloop)
   {
@@ -415,7 +415,7 @@ public class EventEncoding
    * @return The list of events and propositions passed into the
    *         {@link #addEvent(EventProxy, boolean) addEvent()} with the
    *         selfloop parameter set to true.
-   * @see {@link #addEvent(EventProxy, boolean) addEvent()}
+   * @see #addEvent(EventProxy, boolean) addEvent()
    */
   public List<EventProxy> getExtraSelfloops()
   {

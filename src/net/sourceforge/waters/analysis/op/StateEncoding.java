@@ -37,8 +37,8 @@ import net.sourceforge.waters.model.des.StateProxy;
  * <P>States in the encoding may be missing, represented by <CODE>null</CODE>.
  * This can be used to represent unreachable states.<P>
  *
- * @see {@link ListBufferTransitionRelation}
- * @see {@link StateBuffer}
+ * @see ListBufferTransitionRelation
+ * @see IntStateBuffer
  *
  * @author Robi Malik
  */

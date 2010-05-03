@@ -100,7 +100,7 @@ public class OPSearchAutomatonSimplifier
 
   /**
    * Gets the set of propositions that distinguish states.
-   * @see {@link #setPropositions(Collection) setPropositions()}
+   * @see #setPropositions(Collection) setPropositions()
    */
   public Collection<EventProxy> getPropositions()
   {

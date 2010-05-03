@@ -14,8 +14,8 @@ package net.sourceforge.waters.analysis.op;
  * This interface provides a basis for iteration over all or subsets of
  * transitions in a transition relation.
  *
- * @see {@link ListBufferTransitionRelation}
- * @see {@link TransitionListBuffer}
+ * @see ListBufferTransitionRelation
+ * @see TransitionListBuffer
  *
  * @author Robi Malik
  */
@@ -60,7 +60,7 @@ public interface TransitionIterator
    * @throws {@link java.util.NoSuchElementException NoSuchElementException}
    *         if there is no more transition in the iteration, or if the method
    *         is called without calling {@link #advance()} first.
-   * @see {@link #getCurrentFromState()}
+   * @see #getCurrentFromState()
    */
   public int getCurrentSourceState();
 
@@ -72,7 +72,7 @@ public interface TransitionIterator
    * @throws {@link java.util.NoSuchElementException NoSuchElementException}
    *         if there is no more transition in the iteration, or if the method
    *         is called without calling {@link #advance()} first.
-   * @see {@link #getCurrentSourceState()}
+   * @see #getCurrentSourceState()
    */
   public int getCurrentFromState();
 
@@ -92,7 +92,7 @@ public interface TransitionIterator
    * @throws {@link java.util.NoSuchElementException NoSuchElementException}
    *         if there is no more transition in the iteration, or if the method
    *         is called without calling {@link #advance()} first.
-   * @see {@link #getCurrentToState()}
+   * @see #getCurrentToState()
    */
   public int getCurrentTargetState();
 
@@ -104,16 +104,16 @@ public interface TransitionIterator
    * @throws {@link java.util.NoSuchElementException NoSuchElementException}
    *         if there is no more transition in the iteration, or if the method
    *         is called without calling {@link #advance()} first.
-   * @see {@link #getCurrentTargetState()}
+   * @see #getCurrentTargetState()
    */
   public int getCurrentToState();
 
   /**
    * Removes the current transition. This method removes the current
    * transition in the iteration from the associated transition buffer.
-   * After removing, the current transition is undefined, and {@link advance()}
-   * needs to be called to access the transition following the removed
-   * transition.
+   * After removing, the current transition is undefined, and {@link
+   * #advance()} needs to be called to access the transition following the
+   * removed transition.
    * @throws {@link java.util.NoSuchElementException NoSuchElementException}
    *         if there is no current transition in the iteration, or if the
    *         method is called without calling {@link #advance()} first.

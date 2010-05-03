@@ -40,7 +40,7 @@ public interface SynchronousProductBuilder extends AutomatonBuilder
 
   /**
    * Gets the set of propositions retained in the synchronous product.
-   * @see {@link #setProposotions(Collection<EventProxy) setPropositions()}
+   * @see #setPropositions(Collection) setPropositions()
    */
   public Collection<EventProxy> getPropositions();
 
@@ -60,7 +60,7 @@ public interface SynchronousProductBuilder extends AutomatonBuilder
 
   /**
    * Resets all event masks. This method clears any masks set by the
-   * {@link addMask(Collection<EventProxy>,EventProxy) addMask()} method,
+   * {@link #addMask(Collection,EventProxy) addMask()} method,
    * so any further computation is done without hiding.
    */
   public void clearMask();

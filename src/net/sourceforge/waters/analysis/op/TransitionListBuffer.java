@@ -13,8 +13,6 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIntIterator;
-import gnu.trove.TObjectIntHashMap;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -529,8 +527,8 @@ public abstract class TransitionListBuffer
    * by transitions with the given new event ID. Any new transitions with the
    * new event ID are inserted after any transitions already present in the
    * lists.
-   * @param  old     The ID of the old event to be replaced.
-   * @param  new     The ID of the new event replacing the old event.
+   * @param  oldID   The ID of the old event to be replaced.
+   * @param  newID   The ID of the new event replacing the old event.
    */
   public void replaceEvent(final int oldID, final int newID)
   {
@@ -841,7 +839,7 @@ public abstract class TransitionListBuffer
 
   /**
    * Gets the from-state for the given transition. This method is used by
-   * {@link #setUpTransitions(List,TObjectIntHashMap,TObjectIntHashMap)
+   * {@link #setUpTransitions(List,EventEncoding,StateEncoding)
    * setUpTransitions()} to interpret transitions. It is overridden by
    * subclasses to handle forward and backward transition buffers uniformly.
    */
@@ -849,7 +847,7 @@ public abstract class TransitionListBuffer
 
   /**
    * Gets the to-state for the given transition. This method is used by
-   * {@link #setUpTransitions(List,TObjectIntHashMap,TObjectIntHashMap)
+   * {@link #setUpTransitions(List,EventEncoding,StateEncoding)
    * setUpTransitions()} to interpret transitions. It is overridden by
    * subclasses to handle forward and backward transition buffers uniformly.
    */
@@ -869,9 +867,6 @@ public abstract class TransitionListBuffer
    * if this is not the case, transitions will be overwritten without
    * releasing all memory. To correctly replace transitions in a used buffer,
    * call {@link #clear()} first.
-   * @param  transitions  List of transitions to populate the new buffer.
-   *                      The list will be reordered to match the order
-   *                      chosen by the buffer.
    */
   public void setUpTransitions(final TransitionListBuffer other)
   {

@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.op;
 
+import gnu.trove.TIntArrayList;
+
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -32,7 +34,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * each state. This allows for the encoding of up to 30 distinct marking
  * propositions.
  *
- * @see {@link StateEncoding}
+ * @see StateEncoding
  *
  * @author Robi Malik
  */
@@ -176,6 +178,7 @@ public class IntStateBuffer
    *         will always have the same marking patterns, and states with
    *         different sets of markings will always have different marking
    *         patterns.
+   * @see #setAllMarkings(int,long) setAllMarkings()
    */
   public long getAllMarkings(final int state)
   {
@@ -202,8 +205,10 @@ public class IntStateBuffer
    * Sets all markings for the given state simultaneously.
    * @param  state    ID of the state to be modified.
    * @param  markings A new marking pattern for the state. This pattern
-   *                  can be obtained through the {@link #getAllMarkings(int)
-   *                  getAllMarkings()} method.
+   *                  can be obtained through the method
+   *                  {@link #getAllMarkings(int) getAllMarkings()},
+   *                  {@link #createMarkings(TIntArrayList) createMarkings()},
+   *                  or {@link #mergeMarkings(long,long) mergeMarkings()}.
    */
   public void setAllMarkings(final int state, final long markings)
   {
@@ -227,6 +232,32 @@ public class IntStateBuffer
   public void copyMarkings(final int source, final int dest)
   {
     mStateInfo[dest] |= (mStateInfo[source] & ~TAG_ALL);
+  }
+
+  /**
+   * Creates markings pattern for the given propositions.
+   * @param  props    Collection of proposition IDs defining a state marking.
+   * @return A number identifying the given combination of propositions.
+   * @see #setAllMarkings(int,long) setAllMarkings()
+   */
+  public long createMarkings(final TIntArrayList props)
+  {
+    int result = 0;
+    for (int i = 0; i < props.size(); i++) {
+      result |= 1 << props.get(i);
+    }
+    return result;
+  }
+
+  /**
+   * Combines two marking patterns.
+   * @return A number identifying a marking consisting of all propositions
+   *         contained in one of the two input marking patterns.
+   * @see #setAllMarkings(int,long) setAllMarkings()
+   */
+  public long mergeMarkings(final long markings1, final long markings2)
+  {
+    return markings1 | markings2;
   }
 
 
