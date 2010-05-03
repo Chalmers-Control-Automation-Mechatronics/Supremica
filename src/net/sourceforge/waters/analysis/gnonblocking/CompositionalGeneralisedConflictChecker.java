@@ -309,6 +309,13 @@ public class CompositionalGeneralisedConflictChecker extends
   protected void setUp() throws AnalysisException
   {
     super.setUp();
+    final int nodeLimit = getNodeLimit();
+    if (nodeLimit == Integer.MAX_VALUE) {
+      setNodeLimit(100000);
+    }
+    if (mSyncProductNodeLimit == Integer.MAX_VALUE) {
+      setNodeLimit(100000);
+    }
     if (mPreselectingHeuristic == null) {
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
