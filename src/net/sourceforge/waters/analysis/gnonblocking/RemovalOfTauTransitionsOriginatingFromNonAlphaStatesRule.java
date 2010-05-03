@@ -136,6 +136,9 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
               modified = true;
             }
             mTR.removeAllIncoming(sourceID);
+            if (mTR.isInitial(sourceID)) {
+              mTR.makeInitialState(sourceID, false);
+            }
           }
         }
       }
@@ -143,8 +146,6 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
     if (modified) {
       mTR.removeTauSelfLoops(tauID);
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
-      // System.out.println(autToAbstract);
-      // System.out.println("CONVERTED--------------" + convertedAut);
       return convertedAut;
     } else {
       return autToAbstract;
