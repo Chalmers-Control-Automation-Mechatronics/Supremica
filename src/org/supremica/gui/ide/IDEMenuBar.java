@@ -26,6 +26,7 @@ import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSCCControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSICPropertyVAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
@@ -312,6 +313,9 @@ public class IDEMenuBar extends JMenuBar
         final Action controlLoop =
             actions.getAction(AnalyzeControlLoopAction.class);
         mNewAnalyzeMenu.add(controlLoop);
+        final Action sccControlLoop =
+            actions.getAction(AnalyzeSCCControlLoopAction.class);
+        mNewAnalyzeMenu.add(sccControlLoop);
         final Action languageInclusion =
             actions.getAction(AnalyzeLanguageInclusionAction.class);
         mNewAnalyzeMenu.add(languageInclusion);
