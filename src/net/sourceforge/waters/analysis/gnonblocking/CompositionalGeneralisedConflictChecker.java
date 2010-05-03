@@ -163,15 +163,7 @@ public class CompositionalGeneralisedConflictChecker extends
       // TODO: candidate selection (i.e. heuristics) still need testing
 
       final AutomatonProxy syncProduct = composeSynchronousProduct(candidate);
-      // TODO: added this next while loop to allow a new candidate to be chosen
-      // if an overflow exception occurs, to get more tests passing. But this
-      // causes tests to take too long to run, and of course the
-      // testOverflowException test can not be run
-      /*
-       * while (syncProduct == null) { candidates.remove(candidate); final
-       * Candidate nextCandidate = evaluateCandidates(candidates); syncProduct =
-       * composeSynchronousProduct(nextCandidate); }
-       */
+
       final AutomatonProxy autToAbstract;
       final EventProxy tau = createTauEvent(syncProduct);
       final Set<EventProxy> candidatesLocalEvents = candidate.getLocalEvents();
@@ -197,7 +189,6 @@ public class CompositionalGeneralisedConflictChecker extends
     final ConflictChecker checker =
         new MonolithicConflictChecker(model, getUsedMarkingProposition(),
             getGeneralisedPrecondition(), getFactory());
-    checker.setNodeLimit(1000000);
     final boolean result = checker.run();
 
     if (result) {
@@ -343,36 +334,35 @@ public class CompositionalGeneralisedConflictChecker extends
     mAbstractionRules.add(oeRule);
 
     /*
-    final RemovalOfAlphaMarkingsRule ramRule =
-        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-    ramRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(ramRule);
-
-    final RemovalOfDefaultMarkingsRule rdmRule =
-        new RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
-    rdmRule.setAlphaMarking(getGeneralisedPrecondition());
-    rdmRule.setDefaultMarking(getMarkingProposition());
-    mAbstractionRules.add(rdmRule);
-
-    final RemovalOfNoncoreachableStatesRule rnsRule =
-        new RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
-    rnsRule.setAlphaMarking(getGeneralisedPrecondition());
-    rnsRule.setDefaultMarking(getMarkingProposition());
-    mAbstractionRules.add(rnsRule);
-
-    final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
-        new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
-            mPropositions);
-    rttlnsRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(rttlnsRule);
-
-    final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule =
-        new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
-            getFactory(), mPropositions);
-    rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
-    rttonsRule.setDefaultMarking(getMarkingProposition());
-    mAbstractionRules.add(rttonsRule);
-    */
+     * final RemovalOfAlphaMarkingsRule ramRule = new
+     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(ramRule);
+     *
+     * final RemovalOfDefaultMarkingsRule rdmRule = new
+     * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
+     * rdmRule.setAlphaMarking(getGeneralisedPrecondition());
+     * rdmRule.setDefaultMarking(getMarkingProposition());
+     * mAbstractionRules.add(rdmRule);
+     *
+     * final RemovalOfNoncoreachableStatesRule rnsRule = new
+     * RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
+     * rnsRule.setAlphaMarking(getGeneralisedPrecondition());
+     * rnsRule.setDefaultMarking(getMarkingProposition());
+     * mAbstractionRules.add(rnsRule);
+     *
+     * final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule = new
+     * RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
+     * mPropositions); rttlnsRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(rttlnsRule);
+     *
+     * final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule
+     * = new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
+     * getFactory(), mPropositions);
+     * rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
+     * rttonsRule.setDefaultMarking(getMarkingProposition());
+     * mAbstractionRules.add(rttonsRule);
+     */
 
   }
 
@@ -412,17 +402,13 @@ public class CompositionalGeneralisedConflictChecker extends
         new MonolithicSynchronousProductBuilder(candidateModel, getFactory());
     composer.setPropositions(mPropositions);
     composer.setTransitionLimit(getTransitionLimit());
-    composer.setNodeLimit(getNodeLimit());
-    // try {
+    composer.setNodeLimit(mSyncProductNodeLimit);
     composer.run();
     final AutomatonProxy syncProduct = composer.getComputedAutomaton();
     final CompositionStep step =
         new CompositionStep(syncProduct, composer.getStateMap());
     mModifyingSteps.add(step);
     return syncProduct;
-    /*
-     * } catch (final OverflowException e) { return null; }
-     */// TODO: see comments in run()
   }
 
   /**
@@ -566,6 +552,29 @@ public class CompositionalGeneralisedConflictChecker extends
   private List<Candidate> findCandidates(final ProductDESProxy model)
   {
     return mPreselectingHeuristic.evaluate(model);
+  }
+
+  /**
+   * Sets the maximum number of states for an automaton being constructed by the
+   * synchronous product.
+   *
+   * @param limit
+   */
+  public void setSynchronousProductNodeLimit(final int limit)
+  {
+    mSyncProductNodeLimit = limit;
+  }
+
+  /**
+   * Sets the maximum number of states for the final composed automaton which is
+   * passed to the monolithic conflict checker.
+   *
+   * @param limit
+   *          Maximum number of states for the automaton.
+   */
+  public void setConflictCheckerNodeLimit(final int limit)
+  {
+    setNodeLimit(limit);
   }
 
   public HeuristicMinT createHeuristicMinT()
@@ -938,27 +947,27 @@ public class CompositionalGeneralisedConflictChecker extends
     }
   }
 
-  public ObservationEquivalenceStep createObservationEquivalenceStep
-    (final AutomatonProxy abstractedAut,
-     final AutomatonProxy autToAbstract,
-     final EventProxy tau,
-     final StateEncoding inputEnc,
-     final List<int[]> partition,
-     final StateEncoding outputEnc)
+  public ObservationEquivalenceStep createObservationEquivalenceStep(
+                                                                     final AutomatonProxy abstractedAut,
+                                                                     final AutomatonProxy autToAbstract,
+                                                                     final EventProxy tau,
+                                                                     final StateEncoding inputEnc,
+                                                                     final List<int[]> partition,
+                                                                     final StateEncoding outputEnc)
   {
     return new ObservationEquivalenceStep(abstractedAut, autToAbstract, tau,
-                                          inputEnc, partition, outputEnc);
+        inputEnc, partition, outputEnc);
   }
 
-  public ObservationEquivalenceStep createObservationEquivalenceStep
-    (final AutomatonProxy abstractedAut,
-     final AutomatonProxy autToAbstract,
-     final EventProxy tau,
-     final ObserverProjectionTransitionRelation tr,
-     final TIntObjectHashMap<int[]> classMap)
+  public ObservationEquivalenceStep createObservationEquivalenceStep(
+                                                                     final AutomatonProxy abstractedAut,
+                                                                     final AutomatonProxy autToAbstract,
+                                                                     final EventProxy tau,
+                                                                     final ObserverProjectionTransitionRelation tr,
+                                                                     final TIntObjectHashMap<int[]> classMap)
   {
     return new ObservationEquivalenceStep(abstractedAut, autToAbstract, tau,
-                                          tr, classMap);
+        tr, classMap);
   }
 
   public RemovalOfMarkingsOrNoncoreachableStatesStep createRemovalOfMarkingsStep(
@@ -2057,5 +2066,6 @@ public class CompositionalGeneralisedConflictChecker extends
   private List<SelectingHeuristic> mSelectingHeuristics;
   private List<AbstractionRule> mAbstractionRules;
   private Collection<EventProxy> mPropositions;
+  private int mSyncProductNodeLimit = getNodeLimit();
 
 }
