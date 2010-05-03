@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="IMS" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="ims" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Integrated manufacturing system [Pena, Cury, Lafortune].
 This is a model with handcrafted controllable specifications that are likely to be equivalent to those in the paper, but not least restrictive.</ns2:Comment>
     <EventDeclList>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="parManEg_I_mfb_middlelevel_multiAnswers" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="parManEg_I_mfb_middlelevel" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A modified middle level of Parallel Manufacturing Example of Ryan Leduc's PhD thesis.
 Has a lower level and a higher level. Lower level contains multiple request/answer events.</ns2:Comment>
     <EventDeclList>

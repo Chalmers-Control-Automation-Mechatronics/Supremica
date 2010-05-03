@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="jpt10" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="jpt10counter" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment></ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="req_stop"/>
         <EventDecl Kind="CONTROLLABLE" Name="close_in"/>
@@ -18,8 +19,7 @@
         <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="SPEC">
-            <SimpleIdentifier Name="Discharging"/>
+        <SimpleComponent Kind="SPEC" Name="Discharging">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="open_out"/>
@@ -250,8 +250,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="sensors"/>
+        <SimpleComponent Kind="PLANT" Name="sensors">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="jelly"/>
@@ -359,8 +358,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="valve_in"/>
+        <SimpleComponent Kind="PLANT" Name="valve_in">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="close_in"/>
@@ -441,4 +439,3 @@
         </SimpleComponent>
     </ComponentList>
 </Module>
-

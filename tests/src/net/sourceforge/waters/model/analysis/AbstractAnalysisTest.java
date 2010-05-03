@@ -18,6 +18,7 @@ import java.util.List;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.NameNotFoundException;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -80,11 +81,19 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
   }
 
   protected ProductDESProxy getCompiledDES
-    (final File filename,
+    (final File pathName,
      final List<ParameterBindingProxy> bindings)
     throws Exception
   {
-    final DocumentProxy doc = mDocumentManager.load(filename);
+    final DocumentProxy doc = mDocumentManager.load(pathName);
+    final String docName = doc.getName();
+    final String fileName = pathName.getName();
+    final int dotPos = fileName.lastIndexOf('.');
+    final String expectedName =
+      (dotPos >= 0 ? fileName.substring(0, dotPos) : fileName);
+    assertEquals("Name of " + ProxyTools.getShortClassName(doc) +
+                 " does not match file name " + pathName + "!",
+                 expectedName, docName);
     if (doc instanceof ProductDESProxy) {
       assertTrue("Can't apply bindings to ProductDES!",
                  bindings == null || bindings.isEmpty());
