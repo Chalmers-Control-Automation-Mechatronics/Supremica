@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.op
 //# CLASS:   ObservationEquivalenceTRSimplifier
 //###########################################################################
-//# $Id$
+//# $Id: ObservationEquivalenceTRSimplifier.java 5606 2010-05-03 03:02:04Z robi $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.op;
@@ -243,7 +243,6 @@ public class ObservationEquivalenceTRSimplifier
         stack.push(s);
         while (stack.size() > 0) {
           final int taupred = stack.pop();
-          mTransitionRelation.copyMarkings(s, taupred);
           iter.reset(taupred, tau);
           while (iter.advance()) {
             final int pred = iter.getCurrentSourceState();
@@ -310,15 +309,30 @@ public class ObservationEquivalenceTRSimplifier
   private Collection<int[]> createInitialPartition()
   {
     if (mInitialPartition == null) {
+      final long[] markings = new long[mNumStates];
+      for (int state = 0; state < mNumStates; state++) {
+        if (mTransitionRelation.isReachable(state)) {
+          markings[state] = mTransitionRelation.getAllMarkings(state);
+        }
+      }
+      for (int state = 0; state < mNumStates; state++) {
+        if (mTransitionRelation.isReachable(state)) {
+          final long marking = markings[state];
+          for (final int taupred : mTauPreds[state]) {
+            markings[taupred] =
+              mTransitionRelation.mergeMarkings(marking, markings[taupred]);
+          }
+        }
+      }
       final TLongObjectHashMap<TIntArrayList> prepartition =
         new TLongObjectHashMap<TIntArrayList>();
       for (int state = 0; state < mNumStates; state++) {
         if (mTransitionRelation.isReachable(state)) {
-          final long m = mTransitionRelation.getAllMarkings(state);
-          TIntArrayList list = prepartition.get(m);
+          final long marking = markings[state];
+          TIntArrayList list = prepartition.get(marking);
           if (list == null) {
             list = new TIntArrayList();
-            prepartition.put(m, list);
+            prepartition.put(marking, list);
           }
           list.add(state);
         }

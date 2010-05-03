@@ -120,9 +120,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="S0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="48" X="48"/>
                         </PointGeometry>

@@ -89,9 +89,6 @@
             <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Name="S1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="128" X="144"/>
                         </PointGeometry>
@@ -111,9 +108,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="S0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="128" X="48"/>
                         </PointGeometry>

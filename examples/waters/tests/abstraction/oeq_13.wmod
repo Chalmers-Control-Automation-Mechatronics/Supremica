@@ -339,9 +339,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="OUT_OPEN.FULL.CLOSED.OPEN">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="305" X="172"/>
                         </PointGeometry>
