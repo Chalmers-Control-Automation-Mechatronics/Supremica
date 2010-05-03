@@ -9,6 +9,9 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.util.Collection;
+
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
 
 
@@ -30,4 +33,13 @@ public interface ControlLoopChecker extends ModelVerifier
   //# More Specific Access to the Results
   public LoopTraceProxy getCounterExample();
 
+  /**
+   * Gets a collection of events that are guaranteed not to be
+   * contained in any control-loop after a failed call to
+   * {@link #run()}. This is an optional method.
+   * @throws IllegalStateException if this method is called before
+   *         {@link #run()}, or if the last call to to {@link #run()}
+   *         returned true.
+   */
+  public Collection<EventProxy> getNonLoopEvents();
 }

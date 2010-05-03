@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -147,6 +149,12 @@ public class MonolithicControlLoopChecker
   public LoopTraceProxy getCounterExample()
   {
     return (LoopTraceProxy) super.getCounterExample();
+  }
+
+  @SuppressWarnings("unchecked")
+  public Collection<EventProxy> getNonLoopEvents()
+  {
+    return Collections.EMPTY_LIST;
   }
 
 
