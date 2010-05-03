@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.op.EventEncoding;
@@ -112,13 +113,15 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     mInputEncoding = new StateEncoding(autToAbstract);
     mTr =
         new ListBufferTransitionRelation(autToAbstract, eventEnc,
-            mInputEncoding, ListBufferTransitionRelation.CONFIG_ALL);
+            mInputEncoding, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     mTr.reverse();
     final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier(mTr);
     bisimulator
         .setSuppressRedundantHiddenTransitions(mSuppressRedundantHiddenTransitions);
     bisimulator.setTransitionLimit(mTransitionLimit);
+    final Collection<int[]> initPartition = createInitialPartition();
+    bisimulator.setInitialPartition(initPartition);
     final boolean modified = bisimulator.run();
     if (modified) {
       mPartition = bisimulator.getResultPartition();
@@ -127,6 +130,7 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
       mTr.removeProperSelfLoopEvents();
       final ProductDESProxyFactory factory = getFactory();
       mOutputEncoding = new StateEncoding();
+      mTr.reverse();
       return mTr.createAutomaton(factory, eventEnc, mOutputEncoding);
     } else {
       return autToAbstract;
@@ -143,6 +147,19 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
                                                     mOutputEncoding);
   }
 
+  private Collection<int[]> createInitialPartition()
+  {
+    final Collection<int[]> initialPartition = new HashSet<int[]>();
+    // final int tauCode = mTr.
+    /*
+     * for (final int alphaState : mInputEncoding.getStateCodeMap().getValues())
+     * { if (mTr.isMarked(alphaState, tauCode)) {
+     *
+     * } }
+     */
+    return initialPartition;
+  }
+
   // #######################################################################
   // # Data Members
   private boolean mSuppressRedundantHiddenTransitions;
@@ -154,5 +171,4 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
   private StateEncoding mInputEncoding;
   private List<int[]> mPartition;
   private StateEncoding mOutputEncoding;
-
 }
