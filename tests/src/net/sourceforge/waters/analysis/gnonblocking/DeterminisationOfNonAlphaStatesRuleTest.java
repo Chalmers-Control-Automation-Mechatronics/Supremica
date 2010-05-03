@@ -86,7 +86,6 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     final String subdir = "abstraction";
     final String name = "determinisation_3.wmod";
     runAbstractionRule(group, subdir, name);
-    //TODO:unsure about this test case.
   }
 
   public void test_determinisation_4() throws Exception
@@ -131,19 +130,122 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     runAbstractionRule(group, subdir, name);
   }
 
+  public void test_determinisation_9() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_9.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_determinisation_10() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_10.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_determinisation_11() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_11.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_determinisation_12() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_12.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_determinisation_13() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_13.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_determinisation_14() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_14.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_determinisation_15() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_15.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_determinisation_16() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_16.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_determinisation_17() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_17.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_determinisation_18() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_18.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_determinisation_19() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_19.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_determinisation_20() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_20.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
    */
   public void testReentrant() throws Exception
   {
+    test_determinisation_12();
     test_determinisation_1();
     test_determinisation_2();
     test_determinisation_3();
+    test_determinisation_11();
+    test_determinisation_13();
     test_determinisation_4();
+    test_determinisation_20();
     test_determinisation_8();
+    test_determinisation_14();
     test_determinisation_1();
+    test_determinisation_10();
     test_determinisation_2();
+    test_determinisation_9();
   }
 
 }
