@@ -9,10 +9,17 @@
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="e1"/>
         <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>
+        <EventDecl Kind="PROPOSITION" Name=":alpha"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="before">
             <Graph Deterministic="false">
+                <LabelBlock>
+                    <SimpleIdentifier Name=":alpha"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="183" X="61"/>
+                    </LabelGeometry>
+                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="S2">
                         <EventList>
@@ -107,6 +114,12 @@
         </SimpleComponent>
         <SimpleComponent Kind="SPEC" Name="after">
             <Graph Deterministic="false">
+                <LabelBlock>
+                    <SimpleIdentifier Name=":alpha"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="206" X="8"/>
+                    </LabelGeometry>
+                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="S2">
                         <EventList>

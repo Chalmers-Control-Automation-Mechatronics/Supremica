@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="determinisation_9" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>This test checks whether initila states with outgoing tau transitions can be handled correctly by the determinsation of non alpha states algorithm.</ns2:Comment>
+    <ns2:Comment>This test checks whether initial states with outgoing tau transitions can be handled correctly by the determinsation of non alpha states algorithm.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
             <ColorGeometry>
@@ -16,6 +16,12 @@
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="before">
             <Graph Deterministic="false">
+                <LabelBlock>
+                    <SimpleIdentifier Name=":alpha"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="232" X="45"/>
+                    </LabelGeometry>
+                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="S2">
                         <PointGeometry>
@@ -109,6 +115,12 @@
         </SimpleComponent>
         <SimpleComponent Kind="SPEC" Name="after">
             <Graph Deterministic="false">
+                <LabelBlock>
+                    <SimpleIdentifier Name=":alpha"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="229" X="86"/>
+                    </LabelGeometry>
+                </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
@@ -151,14 +163,6 @@
                             <Point Y="10" X="0"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="true" Name="S1">
-                        <PointGeometry>
-                            <Point Y="160" X="48"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
-                        </LabelGeometry>
-                    </SimpleNode>
                 </NodeList>
                 <EdgeList>
                     <Edge Target="S3" Source="S0">
@@ -174,11 +178,6 @@
                     <Edge Target="S5" Source="S3">
                         <LabelBlock>
                             <SimpleIdentifier Name="e3"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="S0" Source="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>

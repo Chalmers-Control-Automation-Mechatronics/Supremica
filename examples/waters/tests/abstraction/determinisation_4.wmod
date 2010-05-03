@@ -10,10 +10,17 @@
         <EventDecl Kind="CONTROLLABLE" Name="e1"/>
         <EventDecl Kind="CONTROLLABLE" Name="e2"/>
         <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>
+        <EventDecl Kind="PROPOSITION" Name=":alpha"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="before">
             <Graph Deterministic="false">
+                <LabelBlock>
+                    <SimpleIdentifier Name=":alpha"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="205" X="33"/>
+                    </LabelGeometry>
+                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="S2">
                         <EventList>
@@ -50,6 +57,7 @@
                     <Edge Target="S1" Source="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="e1"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-21" X="-9"/>
                             </LabelGeometry>
@@ -57,7 +65,6 @@
                     </Edge>
                     <Edge Target="S2" Source="S1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-37" X="-12"/>
@@ -87,11 +94,14 @@
         </SimpleComponent>
         <SimpleComponent Kind="SPEC" Name="after">
             <Graph Deterministic="false">
+                <LabelBlock>
+                    <SimpleIdentifier Name=":alpha"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="200" X="44"/>
+                    </LabelGeometry>
+                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="S1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="128" X="144"/>
                         </PointGeometry>
@@ -111,9 +121,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="S0">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point Y="128" X="48"/>
                         </PointGeometry>
@@ -129,6 +136,7 @@
                     <Edge Target="S1" Source="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="e1"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-21" X="-9"/>
                             </LabelGeometry>
@@ -136,10 +144,9 @@
                     </Edge>
                     <Edge Target="S2" Source="S1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="e1"/>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-37" X="-12"/>
+                                <Point Y="-18" X="-17"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
