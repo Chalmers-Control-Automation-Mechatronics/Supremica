@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="transferline_1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="transferline-1-sync" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>The expected synchronous product of the transferline model with parameter N=1.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">

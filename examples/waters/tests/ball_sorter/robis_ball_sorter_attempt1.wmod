@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="Robis_Ball_Sorter_Attempt1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="robis_ball_sorter_attempt1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <ns2:Comment></ns2:Comment>
 <EventDeclList>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
