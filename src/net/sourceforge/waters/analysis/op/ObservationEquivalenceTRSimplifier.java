@@ -394,28 +394,24 @@ public class ObservationEquivalenceTRSimplifier implements
             initialCount++;
           }
         }
-        if (initialCount > 0) {
-          final int classSize = equivClass.length;
-          if (classSize > initialCount) {
-            final int[] initialStatesClass = new int[initialCount];
-            final int[] otherStatesClass = new int[classSize - initialCount];
+        final int classSize = equivClass.length;
+        if (initialCount > 0 && classSize > initialCount) {
+          final int[] initialStatesClass = new int[initialCount];
+          final int[] otherStatesClass = new int[classSize - initialCount];
 
-            int initIndex = 0;
-            int otherIndex = 0;
-            for (final int stateCode : equivClass) {
-              if (initialStates.contains(stateCode)) {
-                initialStatesClass[initIndex] = stateCode;
-                initIndex++;
-              } else {
-                otherStatesClass[otherIndex] = stateCode;
-                otherIndex++;
-              }
+          int initIndex = 0;
+          int otherIndex = 0;
+          for (final int stateCode : equivClass) {
+            if (initialStates.contains(stateCode)) {
+              initialStatesClass[initIndex] = stateCode;
+              initIndex++;
+            } else {
+              otherStatesClass[otherIndex] = stateCode;
+              otherIndex++;
             }
-            refinedPartition.add(initialStatesClass);
-            refinedPartition.add(otherStatesClass);
-          } else {
-            refinedPartition.add(equivClass);
           }
+          refinedPartition.add(initialStatesClass);
+          refinedPartition.add(otherStatesClass);
         } else {
           refinedPartition.add(equivClass);
         }
