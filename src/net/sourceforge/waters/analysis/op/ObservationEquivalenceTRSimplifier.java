@@ -383,6 +383,8 @@ public class ObservationEquivalenceTRSimplifier implements
             for (final int pred : tauPreds) {
               initialStates.add(pred);
             }
+          } else if (tr.isMarked(stateCode, alphaCode)) {
+            refinedPartition.add(equivClass);
           } else {
             // skip over equivalence class of "remaining" states (which cannot
             // possibly contain initial states)
@@ -391,19 +393,20 @@ public class ObservationEquivalenceTRSimplifier implements
           }
         }
       }
-      final int[] initialStatesArray = new int[initialStates.size()];
-      for (int i = 0; i < initialStatesArray.length; i++) {
-        final int stateCode = initialStatesArray[i];
+      final Iterator<Integer> iter = initialStates.iterator();
+      final TIntArrayList initialStatesList = new TIntArrayList();
+      while (iter.hasNext()) {
+        final int stateCode = iter.next();
         if (tr.isMarked(stateCode, alphaCode)) {
           // creates a separate equivalence class for every state marked alpha
           final int[] alphaClass = new int[1];
           alphaClass[0] = stateCode;
           refinedPartition.add(alphaClass);
-          initialStatesArray[i] = -1;
         } else {
-          initialStatesArray[i] = stateCode;
+          initialStatesList.add(stateCode);
         }
       }
+      final int[] initialStatesArray = initialStatesList.toNativeArray();
       refinedPartition.add(initialStatesArray);
       setInitialPartition(refinedPartition);
     } else {
