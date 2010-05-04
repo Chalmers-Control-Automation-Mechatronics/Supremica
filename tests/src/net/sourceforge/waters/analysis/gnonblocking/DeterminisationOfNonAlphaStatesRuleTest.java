@@ -226,6 +226,22 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
     runAbstractionRule(group, subdir, name);
   }
 
+  public void test_determinisation_21() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_21.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_determinisation_22() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "determinisation_22.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
   /**
    * A test to see whether a single abstraction rule object can perform multiple
    * abstractions in sequence.
