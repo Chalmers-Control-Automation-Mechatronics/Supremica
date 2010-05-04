@@ -136,9 +136,7 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     final Collection<int[]> initPartition = createInitialPartition(eventEnc);
     bisimulator.setInitialPartition(initPartition);
     final int alphaCode = eventEnc.getEventCode(mAlphaMarking);
-    bisimulator.setUp();
     bisimulator.refineInitialPartition(mTr, alphaCode);
-    bisimulator.setUp();
     final boolean modified = bisimulator.run();
     if (modified) {
       mPartition = bisimulator.getResultPartition();

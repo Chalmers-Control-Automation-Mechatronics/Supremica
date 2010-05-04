@@ -217,12 +217,11 @@ public class ObservationEquivalenceTRSimplifier implements
 
   // #########################################################################
   // # Auxiliary Methods
-  public void setUp() throws OverflowException
-  {// TODO: should be private
+  private void setUp() throws OverflowException
+  {
     mNumStates = mTransitionRelation.getNumberOfStates();
     mNumEvents = mTransitionRelation.getNumberOfProperEvents();
     mHasModifications = false;
-    setUpTauPredecessors();
     removeRedundantTransitions();
     final Collection<int[]> partition = createInitialPartition();
     setUpInitialPartition(partition);
@@ -268,8 +267,9 @@ public class ObservationEquivalenceTRSimplifier implements
     }
   }
 
-  private void removeRedundantTransitions()
+  private void removeRedundantTransitions() throws OverflowException
   {
+    setUpTauPredecessors();
     final int tau = EventEncoding.TAU;
     final TransitionIterator iter0 =
         mTransitionRelation.createAllTransitionsModifyingIterator();
@@ -308,8 +308,9 @@ public class ObservationEquivalenceTRSimplifier implements
     }
   }
 
-  private Collection<int[]> createInitialPartition()
+  private Collection<int[]> createInitialPartition() throws OverflowException
   {
+    setUpTauPredecessors();
     if (mInitialPartition == null) {
       final long[] markings = new long[mNumStates];
       for (int state = 0; state < mNumStates; state++) {
@@ -371,7 +372,9 @@ public class ObservationEquivalenceTRSimplifier implements
 
   public void refineInitialPartition(final ListBufferTransitionRelation tr,
                                      final int alphaCode)
+      throws OverflowException
   {
+    setUpTauPredecessors();
     if (mTauPreds != null) {
       final Collection<int[]> refinedPartition = new HashSet<int[]>();
       final Set<Integer> initialStates = new HashSet<Integer>();
