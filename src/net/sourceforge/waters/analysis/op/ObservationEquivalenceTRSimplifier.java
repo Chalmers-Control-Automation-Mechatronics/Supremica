@@ -230,38 +230,40 @@ public class ObservationEquivalenceTRSimplifier implements
 
   private void setUpTauPredecessors() throws OverflowException
   {
-    final int tau = EventEncoding.TAU;
-    final TransitionIterator iter =
-        mTransitionRelation.createPredecessorsReadOnlyIterator();
-    int numtrans = mTransitionRelation.getNumberOfTransitions();
-    final TIntHashSet hashTauPreds = new TIntHashSet();
-    final TIntArrayList listTauPreds = new TIntArrayList();
-    final TIntStack stack = new TIntStack();
-    mTauPreds = new int[mNumStates][];
-    for (int s = 0; s < mNumStates; s++) {
-      if (mTransitionRelation.isReachable(s)) {
-        hashTauPreds.add(s);
-        listTauPreds.add(s);
-        stack.push(s);
-        while (stack.size() > 0) {
-          final int taupred = stack.pop();
-          iter.reset(taupred, tau);
-          while (iter.advance()) {
-            final int pred = iter.getCurrentSourceState();
-            if (hashTauPreds.add(pred)) {
-              listTauPreds.add(pred);
-              stack.push(pred);
+    if (mTauPreds == null) {
+      final int tau = EventEncoding.TAU;
+      final TransitionIterator iter =
+          mTransitionRelation.createPredecessorsReadOnlyIterator();
+      int numtrans = mTransitionRelation.getNumberOfTransitions();
+      final TIntHashSet hashTauPreds = new TIntHashSet();
+      final TIntArrayList listTauPreds = new TIntArrayList();
+      final TIntStack stack = new TIntStack();
+      mTauPreds = new int[mNumStates][];
+      for (int s = 0; s < mNumStates; s++) {
+        if (mTransitionRelation.isReachable(s)) {
+          hashTauPreds.add(s);
+          listTauPreds.add(s);
+          stack.push(s);
+          while (stack.size() > 0) {
+            final int taupred = stack.pop();
+            iter.reset(taupred, tau);
+            while (iter.advance()) {
+              final int pred = iter.getCurrentSourceState();
+              if (hashTauPreds.add(pred)) {
+                listTauPreds.add(pred);
+                stack.push(pred);
+              }
             }
           }
+          mTauPreds[s] = listTauPreds.toNativeArray();
+          numtrans += listTauPreds.size();
+          if (numtrans > mTransitionLimit) {
+            throw new OverflowException(OverflowException.Kind.TRANSITION,
+                mTransitionLimit);
+          }
+          hashTauPreds.clear();
+          listTauPreds.clear();
         }
-        mTauPreds[s] = listTauPreds.toNativeArray();
-        numtrans += listTauPreds.size();
-        if (numtrans > mTransitionLimit) {
-          throw new OverflowException(OverflowException.Kind.TRANSITION,
-              mTransitionLimit);
-        }
-        hashTauPreds.clear();
-        listTauPreds.clear();
       }
     }
   }
@@ -412,6 +414,7 @@ public class ObservationEquivalenceTRSimplifier implements
     } else {
       // TODO: throw some kind of exception to say setUpTauPredecessors must be
       // called first
+      System.out.println("ERROR: setUpTauPredecessors() must be called first");
     }
 
   }
