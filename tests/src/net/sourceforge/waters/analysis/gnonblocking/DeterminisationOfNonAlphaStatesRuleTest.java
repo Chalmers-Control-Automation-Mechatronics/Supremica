@@ -12,6 +12,8 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -55,6 +57,14 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
                                                                       final ProductDESProxyFactory factory)
   {
     return new DeterminisationOfNonAlphaStatesRule(factory);
+  }
+
+  protected void configureAbstractionRule(final ProductDESProxy des)
+  {
+    super.configureAbstractionRule(des);
+    final DeterminisationOfNonAlphaStatesRule rule = getAbstractionRule();
+    final EventProxy alphaMarking = findEvent(des, ALPHA);
+    rule.setAlphaMarking(alphaMarking);
   }
 
   protected DeterminisationOfNonAlphaStatesRule getAbstractionRule()
