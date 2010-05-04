@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import gnu.trove.TIntArrayList;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -134,6 +136,7 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     final Collection<int[]> initPartition = createInitialPartition(eventEnc);
     bisimulator.setInitialPartition(initPartition);
     final int alphaCode = eventEnc.getEventCode(mAlphaMarking);
+    bisimulator.setUp();
     bisimulator.refineInitialPartition(mTr, alphaCode);
     final boolean modified = bisimulator.run();
     if (modified) {
@@ -173,14 +176,11 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     final Collection<int[]> initialPartition = new HashSet<int[]>();
     final int[] stateCodes = mInputEncoding.getStateCodeMap().getValues();
 
-    final int[] initialStates = new int[stateCodes.length];
-    final int[] remainingStates = new int[stateCodes.length];
+    final TIntArrayList initialStates = new TIntArrayList();
+    final TIntArrayList remainingStates = new TIntArrayList();
     final int alphaCode = eventEnc.getEventCode(mAlphaMarking);
 
     for (int i = 0; i < stateCodes.length; i++) {
-      // sets value in arrays as -1 initially
-      initialStates[i] = -1;
-      remainingStates[i] = -1;
       final int stateCode = stateCodes[i];
       if (mTr.isMarked(stateCode, alphaCode)) {
         // creates a separate equivalence class for every state marked alpha
@@ -189,15 +189,18 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
         initialPartition.add(alphaClass);
       } else if (mTr.isInitial(stateCode)) {
         // creates an equivalence class for all initial states
-        initialStates[i] = stateCode;
+        initialStates.add(stateCode);
       } else {
         // creates an equivalence class for all states which don't fit into the
         // above two categories
-        remainingStates[i] = stateCode;
+        remainingStates.add(stateCode);
       }
     }
-    initialPartition.add(initialStates);
-    initialPartition.add(remainingStates);
+    final int[] initialStatesArray = initialStates.toNativeArray();
+    final int[] remainingStatesArray = remainingStates.toNativeArray();
+
+    initialPartition.add(initialStatesArray);
+    initialPartition.add(remainingStatesArray);
 
     return initialPartition;
   }

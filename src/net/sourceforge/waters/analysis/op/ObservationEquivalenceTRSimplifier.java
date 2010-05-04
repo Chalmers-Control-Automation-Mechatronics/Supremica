@@ -161,7 +161,7 @@ public class ObservationEquivalenceTRSimplifier implements
       logger.debug(msg);
     }
 
-    setUp();
+    // setUp();
 
     while (true) {
       final Iterator<? extends EquivalenceClass> it;
@@ -217,8 +217,8 @@ public class ObservationEquivalenceTRSimplifier implements
 
   // #########################################################################
   // # Auxiliary Methods
-  private void setUp() throws OverflowException
-  {
+  public void setUp() throws OverflowException
+  {// TODO: should be private
     mNumStates = mTransitionRelation.getNumberOfStates();
     mNumEvents = mTransitionRelation.getNumberOfProperEvents();
     mHasModifications = false;
