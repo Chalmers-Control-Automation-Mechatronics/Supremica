@@ -161,7 +161,7 @@ public class ObservationEquivalenceTRSimplifier implements
       logger.debug(msg);
     }
 
-    // setUp();
+    setUp();
 
     while (true) {
       final Iterator<? extends EquivalenceClass> it;

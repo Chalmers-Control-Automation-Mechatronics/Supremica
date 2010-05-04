@@ -394,7 +394,15 @@
                     </SimpleNode>
                     <SimpleNode Name="S4">
                         <PointGeometry>
-                            <Point Y="64" X="368"/>
+                            <Point Y="32" X="368"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S6">
+                        <PointGeometry>
+                            <Point Y="96" X="368"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="10" X="0"/>
@@ -479,20 +487,32 @@
                             <SimpleIdentifier Name="e1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S4" Source="S7">
+                    <Edge Target="S6" Source="S7">
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-7"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <EndPointGeometry>
+                            <Point Y="96" X="368"/>
+                        </EndPointGeometry>
                     </Edge>
                     <Edge Target="S10" Source="S4">
                         <LabelBlock>
                             <SimpleIdentifier Name="e3"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S11" Source="S4">
+                    <Edge Target="S11" Source="S6">
                         <LabelBlock>
                             <SimpleIdentifier Name="e3"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="5" X="-9"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="96" X="368"/>
+                        </StartPointGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

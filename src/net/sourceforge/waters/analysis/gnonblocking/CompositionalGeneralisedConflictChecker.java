@@ -1325,9 +1325,6 @@ public class CompositionalGeneralisedConflictChecker extends
     // #######################################################################
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
-      // TODO Need to consider specially the case that the
-      // simplified automaton does not contain any tau event, and only
-      // bisimulation was used.
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();

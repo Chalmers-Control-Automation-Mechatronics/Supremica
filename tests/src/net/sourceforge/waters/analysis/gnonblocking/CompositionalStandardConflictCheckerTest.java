@@ -43,7 +43,8 @@ public class CompositionalStandardConflictCheckerTest extends
   {
     final CompositionalGeneralisedConflictChecker checker =
       new CompositionalGeneralisedConflictChecker(factory);
-    // TODO Configure state limits here.
+    checker.setInternalStepNodeLimit(10000);
+    checker.setFinalStepNodeLimit(1000000);
     checker.setTransitionLimit(1000000);
     return checker;
   }
