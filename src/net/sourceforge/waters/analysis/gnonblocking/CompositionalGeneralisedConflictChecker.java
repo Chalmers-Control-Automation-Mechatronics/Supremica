@@ -566,9 +566,14 @@ public class CompositionalGeneralisedConflictChecker extends
    *
    * @param limit
    */
-  public void setSynchronousProductNodeLimit(final int limit)
+  public void setInternalStepNodeLimit(final int limit)
   {
     mSyncProductNodeLimit = limit;
+  }
+
+  public int getInternalStepNodeLimit()
+  {
+    return mSyncProductNodeLimit;
   }
 
   /**
@@ -578,9 +583,32 @@ public class CompositionalGeneralisedConflictChecker extends
    * @param limit
    *          Maximum number of states for the automaton.
    */
-  public void setConflictCheckerNodeLimit(final int limit)
+  public void setFinalStepNodeLimit(final int limit)
   {
-    setNodeLimit(limit);
+    mFinalStepNodeLimit = limit;
+  }
+
+  public int getFinalStepNodeLimit()
+  {
+    getNodeLimit();
+    return mFinalStepNodeLimit;
+  }
+
+  @Override
+  public int getNodeLimit()
+  {
+    if (mFinalStepNodeLimit < mSyncProductNodeLimit) {
+      return mFinalStepNodeLimit;
+    } else {
+      return mFinalStepNodeLimit;
+    }
+  }
+
+  @Override
+  public void setNodeLimit(final int limit)
+  {
+    mFinalStepNodeLimit = limit;
+    mSyncProductNodeLimit = limit;
   }
 
   public HeuristicMinT createHeuristicMinT()
@@ -2073,5 +2101,6 @@ public class CompositionalGeneralisedConflictChecker extends
   private List<AbstractionRule> mAbstractionRules;
   private Collection<EventProxy> mPropositions;
   private int mSyncProductNodeLimit = Integer.MAX_VALUE;
+  private int mFinalStepNodeLimit = Integer.MAX_VALUE;
 
 }
