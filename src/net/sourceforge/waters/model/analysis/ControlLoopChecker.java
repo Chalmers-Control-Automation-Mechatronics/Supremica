@@ -31,6 +31,20 @@ public interface ControlLoopChecker extends ModelVerifier
 
   //#########################################################################
   //# More Specific Access to the Results
+  /**
+   * Gets a counterexample if the model was found to be not control-loop free.
+   * representing a control-loop error trace. A control-loop error
+   * trace is a nonempty sequence of events that ends in a loop consisting of
+   * controllable events only.
+   * @return A trace object representing the counterexample.
+   *         The returned trace is constructed for the input product DES
+   *         of this control-loop checker and shares its automata and
+   *         event objects.
+   * @throws IllegalStateException if this method is called before
+   *         model checking has completed, i.e., before {@link #run()}
+   *         has been called, or model checking has found that the
+   *         property is satisfied and there is no counterexample.
+   */
   public LoopTraceProxy getCounterExample();
 
   /**

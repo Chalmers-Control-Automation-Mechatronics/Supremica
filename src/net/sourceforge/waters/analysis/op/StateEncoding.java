@@ -27,6 +27,10 @@ import net.sourceforge.waters.model.des.StateProxy;
  * methods to find the state codes for given {@link StateProxy} objects
  * and versa.</P>
  *
+ * <P>State codes start at&nbsp;0, and each state is assigned the next
+ * available number, so the range of state codes always is from&nbsp;0
+ * up to one less than the number of states in the encoding.</P>
+ *
  * <P>State codes are assigned in a deterministic manner depending only on
  * the order in which they are found in the input. There is support to modify
  * an encoding after it has been created. However, transition relations are
@@ -159,11 +163,25 @@ public class StateEncoding
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Gets the number of states in this encoding.
+   * State codes start at zero and run up to one less than the number of
+   * states, so this method can also be used to determine the range of valid
+   * state codes.
+   * Unreachable states (marked with a <CODE>null</CODE> state object) are
+   * included in the state count.
+   */
   public int getNumberOfStates()
   {
     return mStates.length;
   }
 
+  /**
+   * Gets the code for the given state.
+   * @param  state    State object to be looked up.
+   * @return Code of state, or <CODE>-1</CODE> if the state does not appear
+   *         in the encoding.
+   */
   public int getStateCode(final StateProxy state)
   {
     if (mStateCodeMap.containsKey(state)) {
@@ -173,21 +191,43 @@ public class StateEncoding
     }
   }
 
+  /**
+   * Gets the state object encoded by the given code.
+   * @param  code    State code to be looked up. Should be in the range
+   *                 from 0 to {@link #getNumberOfStates()}-1.
+   * @return State object encoded by the given code, or <CODE>null</CODE>
+   *         if the state is missing (marked as unreachable) in the
+   *         encoding.
+   * @throws IndexOutOfBoundsException to indicate that the given code
+   *         is not within the range of valid state codes for the encoding.
+   */
   public StateProxy getState(final int code)
   {
     return mStates[code];
   }
 
+  /**
+   * Gets an array containing all states in the encoding, indexed by their
+   * codes.
+   */
   public StateProxy[] getStatesArray()
   {
     return mStates;
   }
 
+  /**
+   * Gets a list containing all states in the encoding, indexed by their
+   * codes.
+   */
   public List<StateProxy> getStates()
   {
     return Arrays.asList(mStates);
   }
 
+  /**
+   * Gets an encoding map that maps all all states in the encoding
+   * to their integer codes.
+   */
   public TObjectIntHashMap<StateProxy> getStateCodeMap()
   {
     return mStateCodeMap;
