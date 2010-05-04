@@ -11,8 +11,8 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import gnu.trove.TIntArrayList;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import net.sourceforge.waters.analysis.op.EventEncoding;
 import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
@@ -135,8 +135,7 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     bisimulator.setTransitionLimit(mTransitionLimit);
     final Collection<int[]> initPartition = createInitialPartition(eventEnc);
     bisimulator.setInitialPartition(initPartition);
-    final int alphaCode = eventEnc.getEventCode(mAlphaMarking);
-    bisimulator.refineInitialPartition(mTr, alphaCode);
+    bisimulator.refineInitialPartitionBasedOnInitialStates();
     final boolean modified = bisimulator.run();
     if (modified) {
       mPartition = bisimulator.getResultPartition();
@@ -163,42 +162,34 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
   }
 
   /**
-   * Creates an initial partition. This includes a separate equivalence state
-   * for every state marked alpha, an equivalence class for all initial states
-   * and an equivalence class for the remaining states.
+   * Creates an initial partition. This includes a separate equivalence class
+   * for every state marked alpha, and an equivalence class which contains all
+   * the remaining states.
    *
    * @param eventEnc
    * @return A collection containing int[] of equivalence classes.
    */
   private Collection<int[]> createInitialPartition(final EventEncoding eventEnc)
   {
-    final Collection<int[]> initialPartition = new HashSet<int[]>();
-    final int[] stateCodes = mInputEncoding.getStateCodeMap().getValues();
+    final List<int[]> initialPartition = new ArrayList<int[]>();
+    final int numStates = mTr.getNumberOfStates();
 
-    final TIntArrayList initialStates = new TIntArrayList();
     final TIntArrayList remainingStates = new TIntArrayList();
     final int alphaCode = eventEnc.getEventCode(mAlphaMarking);
 
-    for (int i = 0; i < stateCodes.length; i++) {
-      final int stateCode = stateCodes[i];
+    for (int stateCode = 0; stateCode < numStates; stateCode++) {
       if (mTr.isMarked(stateCode, alphaCode)) {
         // creates a separate equivalence class for every state marked alpha
         final int[] alphaClass = new int[1];
         alphaClass[0] = stateCode;
         initialPartition.add(alphaClass);
-      } else if (mTr.isInitial(stateCode)) {
-        // creates an equivalence class for all initial states
-        initialStates.add(stateCode);
       } else {
         // creates an equivalence class for all states which don't fit into the
         // above two categories
         remainingStates.add(stateCode);
       }
     }
-    final int[] initialStatesArray = initialStates.toNativeArray();
     final int[] remainingStatesArray = remainingStates.toNativeArray();
-
-    initialPartition.add(initialStatesArray);
     initialPartition.add(remainingStatesArray);
 
     return initialPartition;
