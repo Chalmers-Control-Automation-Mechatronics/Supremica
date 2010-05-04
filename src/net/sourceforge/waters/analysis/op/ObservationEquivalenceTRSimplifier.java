@@ -21,12 +21,9 @@ import gnu.trove.TLongObjectIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
-
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -50,6 +47,8 @@ public class ObservationEquivalenceTRSimplifier implements
                                             final ListBufferTransitionRelation rel)
   {
     mTransitionRelation = rel;
+    mNumStates = mTransitionRelation.getNumberOfStates();
+    mNumEvents = mTransitionRelation.getNumberOfProperEvents();
     mSuppressRedundantHiddenTransitions = false;
     mTransitionLimit = Integer.MAX_VALUE;
   }
@@ -219,8 +218,6 @@ public class ObservationEquivalenceTRSimplifier implements
   // # Auxiliary Methods
   private void setUp() throws OverflowException
   {
-    mNumStates = mTransitionRelation.getNumberOfStates();
-    mNumEvents = mTransitionRelation.getNumberOfProperEvents();
     mHasModifications = false;
     removeRedundantTransitions();
     final Collection<int[]> partition = createInitialPartition();
@@ -370,56 +367,63 @@ public class ObservationEquivalenceTRSimplifier implements
     }
   }
 
-  public void refineInitialPartition(final ListBufferTransitionRelation tr,
-                                     final int alphaCode)
+  public void refineInitialPartitionBasedOnInitialStates()
       throws OverflowException
   {
     setUpTauPredecessors();
-    if (mTauPreds != null) {
-      final Collection<int[]> refinedPartition = new HashSet<int[]>();
-      final Set<Integer> initialStates = new HashSet<Integer>();
+    final List<int[]> refinedPartition = new ArrayList<int[]>();
 
-      for (final int[] equivClass : getInitialPartition()) {
-        for (int i = 0; i < equivClass.length; i++) {
-          final int stateCode = equivClass[i];
-          if (tr.isInitial(stateCode)) {
-            initialStates.add(stateCode);
-            final int[] tauPreds = mTauPreds[stateCode];
-            for (final int pred : tauPreds) {
-              initialStates.add(pred);
-            }
-          } else if (tr.isMarked(stateCode, alphaCode)) {
-            refinedPartition.add(equivClass);
-          } else {
-            // skip over equivalence class of "remaining" states (which cannot
-            // possibly contain initial states)
-            refinedPartition.add(equivClass);
-            break;
-          }
+    // builds set of initial states (includes states reachable via tau
+    // transitions from an initial state)
+    final TIntHashSet initialStates = new TIntHashSet();
+    for (int stateCode = 0; stateCode < mNumStates; stateCode++) {
+      if (mTransitionRelation.isInitial(stateCode)) {
+        initialStates.add(stateCode);
+        for (final int pred : mTauPreds[stateCode]) {
+          initialStates.add(pred);
         }
       }
-      final Iterator<Integer> iter = initialStates.iterator();
-      final TIntArrayList initialStatesList = new TIntArrayList();
-      while (iter.hasNext()) {
-        final int stateCode = iter.next();
-        if (tr.isMarked(stateCode, alphaCode)) {
-          // creates a separate equivalence class for every state marked alpha
-          final int[] alphaClass = new int[1];
-          alphaClass[0] = stateCode;
-          refinedPartition.add(alphaClass);
-        } else {
-          initialStatesList.add(stateCode);
-        }
-      }
-      final int[] initialStatesArray = initialStatesList.toNativeArray();
-      refinedPartition.add(initialStatesArray);
-      setInitialPartition(refinedPartition);
-    } else {
-      // TODO: throw some kind of exception to say setUpTauPredecessors must be
-      // called first
-      System.out.println("ERROR: setUpTauPredecessors() must be called first");
     }
 
+    // try to split each equivalence class
+    for (final int[] equivClass : mInitialPartition) {
+      if (equivClass.length > 1) {
+        int initialCount = 0;
+        for (final int stateCode : equivClass) {
+          if (initialStates.contains(stateCode)) {
+            initialCount++;
+          }
+        }
+        if (initialCount > 0) {
+          final int classSize = equivClass.length;
+          if (classSize > initialCount) {
+            final int[] initialStatesClass = new int[initialCount];
+            final int[] otherStatesClass = new int[classSize - initialCount];
+
+            int initIndex = 0;
+            int otherIndex = 0;
+            for (final int stateCode : equivClass) {
+              if (initialStates.contains(stateCode)) {
+                initialStatesClass[initIndex] = stateCode;
+                initIndex++;
+              } else {
+                otherStatesClass[otherIndex] = stateCode;
+                otherIndex++;
+              }
+            }
+            refinedPartition.add(initialStatesClass);
+            refinedPartition.add(otherStatesClass);
+          } else {
+            refinedPartition.add(equivClass);
+          }
+        } else {
+          refinedPartition.add(equivClass);
+        }
+      } else {
+        refinedPartition.add(equivClass);
+      }
+    }
+    setInitialPartition(refinedPartition);
   }
 
   private TransitionIterator getPredecessorIterator(final int state,
@@ -1050,8 +1054,8 @@ public class ObservationEquivalenceTRSimplifier implements
   private boolean mSuppressRedundantHiddenTransitions;
   private int mTransitionLimit;
 
-  private int mNumStates;
-  private int mNumEvents;
+  private final int mNumStates;
+  private final int mNumEvents;
 
   private int[][] mTauPreds;
   private THashSet<SimpleEquivalenceClass> mWS;
