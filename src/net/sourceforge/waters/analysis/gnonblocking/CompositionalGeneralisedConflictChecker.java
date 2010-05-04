@@ -333,36 +333,42 @@ public class CompositionalGeneralisedConflictChecker extends
     oeRule.setTransitionLimit(getTransitionLimit());
     mAbstractionRules.add(oeRule);
 
+    final RemovalOfAlphaMarkingsRule ramRule =
+        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+    ramRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(ramRule);
+
+    final RemovalOfDefaultMarkingsRule rdmRule =
+        new RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
+    rdmRule.setAlphaMarking(getGeneralisedPrecondition());
+    rdmRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rdmRule);
+
+    final RemovalOfNoncoreachableStatesRule rnsRule =
+        new RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
+    rnsRule.setAlphaMarking(getGeneralisedPrecondition());
+    rnsRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rnsRule);
+
     /*
-     * final RemovalOfAlphaMarkingsRule ramRule = new
-     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(ramRule);
-     *
-     * final RemovalOfDefaultMarkingsRule rdmRule = new
-     * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
-     * rdmRule.setAlphaMarking(getGeneralisedPrecondition());
-     * rdmRule.setDefaultMarking(getMarkingProposition());
-     * mAbstractionRules.add(rdmRule);
-     *
-     * final RemovalOfNoncoreachableStatesRule rnsRule = new
-     * RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
-     * rnsRule.setAlphaMarking(getGeneralisedPrecondition());
-     * rnsRule.setDefaultMarking(getMarkingProposition());
-     * mAbstractionRules.add(rnsRule);
-     *
-     * final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule = new
-     * RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
-     * mPropositions); rttlnsRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(rttlnsRule);
-     *
-     * final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule
-     * = new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
-     * getFactory(), mPropositions);
-     * rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
-     * rttonsRule.setDefaultMarking(getMarkingProposition());
-     * mAbstractionRules.add(rttonsRule);
+     * final DeterminisationOfNonAlphaStatesRule dnasRule = new
+     * DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
+     * dnasRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(dnasRule);
      */
+
+    final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
+        new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
+            mPropositions);
+    rttlnsRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(rttlnsRule);
+
+    final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule =
+        new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
+            getFactory(), mPropositions);
+    rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
+    rttonsRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rttonsRule);
 
   }
 
