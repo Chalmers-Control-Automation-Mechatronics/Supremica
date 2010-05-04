@@ -12,7 +12,6 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-
 import net.sourceforge.waters.analysis.op.EventEncoding;
 import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
@@ -101,6 +100,18 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
   }
 
   // #######################################################################
+  // # Configuration
+  EventProxy getAlphaMarking()
+  {
+    return mAlphaMarking;
+  }
+
+  void setAlphaMarking(final EventProxy alphaMarking)
+  {
+    mAlphaMarking = alphaMarking;
+  }
+
+  // #######################################################################
   // # Rule Application
   AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
                            final EventProxy tau) throws AnalysisException
@@ -120,7 +131,7 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     bisimulator
         .setSuppressRedundantHiddenTransitions(mSuppressRedundantHiddenTransitions);
     bisimulator.setTransitionLimit(mTransitionLimit);
-    final Collection<int[]> initPartition = createInitialPartition();
+    final Collection<int[]> initPartition = createInitialPartition(eventEnc);
     bisimulator.setInitialPartition(initPartition);
     final boolean modified = bisimulator.run();
     if (modified) {
@@ -147,16 +158,45 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
                                                     mOutputEncoding);
   }
 
-  private Collection<int[]> createInitialPartition()
+  /**
+   * Creates an initial partition. This includes a separate equivalence state
+   * for every state marked alpha, an equivalence class for all initial states
+   * and an equivalence class for the remaining states.
+   *
+   * @param eventEnc
+   * @return A collection containing int[] of equivalence classes.
+   */
+  private Collection<int[]> createInitialPartition(final EventEncoding eventEnc)
   {
     final Collection<int[]> initialPartition = new HashSet<int[]>();
-    // final int tauCode = mTr.
-    /*
-     * for (final int alphaState : mInputEncoding.getStateCodeMap().getValues())
-     * { if (mTr.isMarked(alphaState, tauCode)) {
-     *
-     * } }
-     */
+    final int[] stateCodes = mInputEncoding.getStateCodeMap().getValues();
+
+    final int[] initialStates = new int[stateCodes.length];
+    final int[] remainingStates = new int[stateCodes.length];
+    final int alphaCode = eventEnc.getEventCode(mAlphaMarking);
+
+    for (int i = 0; i < stateCodes.length; i++) {
+      // sets value in arrays as -1 initially
+      initialStates[i] = -1;
+      remainingStates[i] = -1;
+      final int stateCode = stateCodes[i];
+      if (mTr.isMarked(stateCode, alphaCode)) {
+        // creates a separate equivalence class for every state marked alpha
+        final int[] alphaClass = new int[1];
+        alphaClass[0] = stateCode;
+        initialPartition.add(alphaClass);
+      } else if (mTr.isInitial(stateCode)) {
+        // creates an equivalence class for all initial states
+        initialStates[i] = stateCode;
+      } else {
+        // creates an equivalence class for all states which don't fit into the
+        // above two categories
+        remainingStates[i] = stateCode;
+      }
+    }
+    initialPartition.add(initialStates);
+    initialPartition.add(remainingStates);
+
     return initialPartition;
   }
 
@@ -166,6 +206,7 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
   private int mTransitionLimit;
 
   private AutomatonProxy mAutToAbstract;
+  private EventProxy mAlphaMarking;
   private EventProxy mTau;
   private ListBufferTransitionRelation mTr;
   private StateEncoding mInputEncoding;
