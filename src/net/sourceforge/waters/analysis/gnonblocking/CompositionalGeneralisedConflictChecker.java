@@ -147,6 +147,7 @@ public class CompositionalGeneralisedConflictChecker extends
     // performs hiding and abstraction for each automaton individually
     final List<AutomatonProxy> remainingAut =
         new ArrayList<AutomatonProxy>(model.getAutomata().size());
+    boolean modified = false;
     for (final AutomatonProxy aut : model.getAutomata()) {
       final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
       final Set<EventProxy> localEvents =
@@ -154,13 +155,16 @@ public class CompositionalGeneralisedConflictChecker extends
       if (localEvents.size() > 0) {
         final AutomatonProxy abstractedAut = hideAndAbstract(aut, localEvents);
         remainingAut.add(abstractedAut);
+        modified = true;
       } else {
         remainingAut.add(aut);
       }
     }
-    final Candidate modifiedModel = new Candidate(remainingAut, null);
-    model = modifiedModel.createProductDESProxy(getFactory());
-    mapEventsToAutomata(model);
+    if (modified) {
+      final Candidate modifiedModel = new Candidate(remainingAut, null);
+      model = modifiedModel.createProductDESProxy(getFactory());
+      mapEventsToAutomata(model);
+    }
 
     // TODO: later, need to consider when an automaton is too large to be a
     // candidate and so may not always be left with only one automaton
@@ -207,12 +211,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final ListIterator<Step> iter = mModifyingSteps.listIterator(size);
       while (iter.hasPrevious()) {
         final Step step = iter.previous();
-        // You can use this new tool to check whether your counterexample
-        // works in the intermediate steps. Throws exceptions if something
-        // is wrong.
-        // TraceChecker.checkCounterExample(convertedTrace);
         convertedTrace = step.convertTrace(convertedTrace);
-        // TraceChecker.checkCounterExample(convertedTrace);
       }
       setFailedResult(convertedTrace);
     }
