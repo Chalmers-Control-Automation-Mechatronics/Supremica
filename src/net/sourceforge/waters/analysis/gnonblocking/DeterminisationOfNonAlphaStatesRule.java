@@ -118,6 +118,9 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
   AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
                            final EventProxy tau) throws AnalysisException
   {
+    if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
+      return autToAbstract;
+    }
     mTau = tau;
     mAutToAbstract = autToAbstract;
     final EventEncoding eventEnc =
