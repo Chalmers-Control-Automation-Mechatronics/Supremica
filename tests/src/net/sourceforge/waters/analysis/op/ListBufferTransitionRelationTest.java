@@ -367,24 +367,47 @@ public class ListBufferTransitionRelationTest extends
   }
 
 
-  public void testTransitionRemoval_SUCC_alpharemoval_18() throws Exception
+  public void testDirectTransitionRemoval_SUCC_alpharemoval_18()
+    throws Exception
   {
     final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "alpharemoval_18.wmod";
     final String autname = "before";
-    testTransitionRemoval(group, subdir, name, autname, config);
+    testDirectTransitionRemoval(group, subdir, name, autname, config);
   }
 
-  public void testTransitionRemoval_PRED_koordwsp() throws Exception
+  public void testDirectTransitionRemoval_PRED_koordwsp() throws Exception
   {
     final int config = ListBufferTransitionRelation.CONFIG_PREDECESSORS;
     final String group = "valid";
     final String subdir = "central_locking";
     final String name = "koordwsp.wmod";
     final String autname = "decoder";
-    testTransitionRemoval(group, subdir, name, autname, config);
+    testDirectTransitionRemoval(group, subdir, name, autname, config);
+  }
+
+
+  public void testIteratorTransitionRemoval_SUCC_alpharemoval_18()
+    throws Exception
+  {
+    final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alpharemoval_18.wmod";
+    final String autname = "before";
+    testIteratorTransitionRemoval(group, subdir, name, autname, config);
+  }
+
+  public void testIteratorTransitionRemoval_PRED_koordwsp() throws Exception
+  {
+    final int config = ListBufferTransitionRelation.CONFIG_PREDECESSORS;
+    final String group = "valid";
+    final String subdir = "central_locking";
+    final String name = "koordwsp.wmod";
+    final String autname = "decoder";
+    testIteratorTransitionRemoval(group, subdir, name, autname, config);
   }
 
 
@@ -430,21 +453,21 @@ public class ListBufferTransitionRelationTest extends
   }
 
 
-  private void testTransitionRemoval(final String group,
-                                     final String subdir,
-                                     final String desname,
-                                     final String autname,
-                                     final int config)
+  private void testDirectTransitionRemoval(final String group,
+                                           final String subdir,
+                                           final String desname,
+                                           final String autname,
+                                           final int config)
     throws Exception
   {
     final AutomatonProxy aut =
       getCompiledAutomaton(group, subdir, desname, autname);
-    testTransitionRemoval(desname, aut, config);
+    testDirectTransitionRemoval(desname, aut, config);
   }
 
-  private void testTransitionRemoval(final String desname,
-                                     final AutomatonProxy aut,
-                                     final int config)
+  private void testDirectTransitionRemoval(final String desname,
+                                           final AutomatonProxy aut,
+                                           final int config)
     throws Exception
   {
     final StateEncoding stateEnc = new StateEncoding(aut);
@@ -480,7 +503,77 @@ public class ListBufferTransitionRelationTest extends
       final AutomatonProxy aut1 = factory.createAutomatonProxy
         (autname, kind, events, states, transitions1);
       checker.checkIsomorphism(result1, aut1);
-      rel.addTransition(sourceId, eventId, targetId);
+      final boolean added = rel.addTransition(sourceId, eventId, targetId);
+      assertTrue("Unexpected result reporting failure to add transition!",
+                 added);
+      rel.checkIntegrity();
+      final AutomatonProxy result2 = rel.createAutomaton(factory, eventEnc);
+      checker.checkIsomorphism(result2, aut);
+    }
+  }
+
+  private void testIteratorTransitionRemoval(final String group,
+                                             final String subdir,
+                                             final String desname,
+                                             final String autname,
+                                             final int config)
+    throws Exception
+  {
+    final AutomatonProxy aut =
+      getCompiledAutomaton(group, subdir, desname, autname);
+    testIteratorTransitionRemoval(desname, aut, config);
+  }
+
+  private void testIteratorTransitionRemoval(final String desname,
+                                             final AutomatonProxy aut,
+                                             final int config)
+    throws Exception
+  {
+    final StateEncoding stateEnc = new StateEncoding(aut);
+    final EventEncoding eventEnc = new EventEncoding(aut);
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final IsomorphismChecker checker = new IsomorphismChecker(factory, false);
+    final String autname = aut.getName();
+    final ComponentKind kind = aut.getKind();
+    final Collection<EventProxy> events = aut.getEvents();
+    final Collection<StateProxy> states = aut.getStates();
+    final Collection<TransitionProxy> transitions = aut.getTransitions();
+    final int numTrans = transitions.size();
+    final int numTrans1 = numTrans - 1;
+    for (int t = 0; t < numTrans; t++) {
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
+      rel.checkIntegrity();
+      final TransitionIterator iter =
+        rel.createAllTransitionsModifyingIterator();
+      for (int i = 0; i <= t; i++) {
+        final boolean more = iter.advance();
+        assertTrue("Unexpected end of iteration!", more);
+      }
+      final int sourceId = iter.getCurrentSourceState();
+      final StateProxy source = stateEnc.getState(sourceId);
+      final int eventId = iter.getCurrentEvent();
+      final EventProxy event = eventEnc.getProperEvent(eventId);
+      final int targetId = iter.getCurrentTargetState();
+      final StateProxy target = stateEnc.getState(targetId);
+      iter.remove();
+      rel.checkIntegrity();
+      final AutomatonProxy result1 = rel.createAutomaton(factory, eventEnc);
+      final Collection<TransitionProxy> transitions1 =
+        new ArrayList<TransitionProxy>(numTrans1);
+      for (final TransitionProxy trans : transitions) {
+        if (trans.getSource() != source ||
+            trans.getEvent() != event ||
+            trans.getTarget() != target) {
+          transitions1.add(trans);
+        }
+      }
+      final AutomatonProxy aut1 = factory.createAutomatonProxy
+        (autname, kind, events, states, transitions1);
+      checker.checkIsomorphism(result1, aut1);
+      final boolean added = rel.addTransition(sourceId, eventId, targetId);
+      assertTrue("Unexpected result reporting failure to add transition!",
+                 added);
       rel.checkIntegrity();
       final AutomatonProxy result2 = rel.createAutomaton(factory, eventEnc);
       checker.checkIsomorphism(result2, aut);
