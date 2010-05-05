@@ -350,12 +350,10 @@ public class CompositionalGeneralisedConflictChecker extends
     rnsRule.setDefaultMarking(getMarkingProposition());
     mAbstractionRules.add(rnsRule);
 
-    /*
-     * final DeterminisationOfNonAlphaStatesRule dnasRule = new
-     * DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
-     * dnasRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(dnasRule);
-     */
+    final DeterminisationOfNonAlphaStatesRule dnasRule =
+        new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
+    dnasRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(dnasRule);
 
     final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
         new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
