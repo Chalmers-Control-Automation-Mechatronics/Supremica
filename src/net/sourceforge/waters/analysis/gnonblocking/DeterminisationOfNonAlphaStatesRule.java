@@ -137,6 +137,9 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
         .setSuppressRedundantHiddenTransitions(mSuppressRedundantHiddenTransitions);
     bisimulator.setTransitionLimit(mTransitionLimit);
     final Collection<int[]> initPartition = createInitialPartition(eventEnc);
+    if (initPartition == null) {
+      return autToAbstract;
+    }
     bisimulator.setInitialPartition(initPartition);
     bisimulator.refineInitialPartitionBasedOnInitialStates();
     final boolean modified = bisimulator.run();
@@ -191,6 +194,9 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
         // above two categories
         remainingStates.add(stateCode);
       }
+    }
+    if (remainingStates.size() == 0) {
+      return null;
     }
     final int[] remainingStatesArray = remainingStates.toNativeArray();
     initialPartition.add(remainingStatesArray);
