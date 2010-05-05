@@ -143,8 +143,24 @@ public class CompositionalGeneralisedConflictChecker extends
     setUp();
     ProductDESProxy model = getModel();
     mapEventsToAutomata(model);
+
+    // performs hiding and abstraction for each automaton individually
     final List<AutomatonProxy> remainingAut =
-        new ArrayList<AutomatonProxy>(model.getAutomata());
+        new ArrayList<AutomatonProxy>(model.getAutomata().size());
+    for (final AutomatonProxy aut : model.getAutomata()) {
+      final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
+      final Set<EventProxy> localEvents =
+          identifyLocalEvents(mEventsToAutomata, autAsList);
+      if (localEvents.size() > 0) {
+        final AutomatonProxy abstractedAut = hideAndAbstract(aut, localEvents);
+        remainingAut.add(abstractedAut);
+      } else {
+        remainingAut.add(aut);
+      }
+    }
+    final Candidate modifiedModel = new Candidate(remainingAut, null);
+    model = modifiedModel.createProductDESProxy(getFactory());
+    mapEventsToAutomata(model);
 
     // TODO: later, need to consider when an automaton is too large to be a
     // candidate and so may not always be left with only one automaton
@@ -163,18 +179,8 @@ public class CompositionalGeneralisedConflictChecker extends
       // TODO: candidate selection (i.e. heuristics) still need testing
 
       final AutomatonProxy syncProduct = composeSynchronousProduct(candidate);
-
-      final AutomatonProxy autToAbstract;
-      final EventProxy tau = createTauEvent(syncProduct);
-      final Set<EventProxy> candidatesLocalEvents = candidate.getLocalEvents();
-      if (candidatesLocalEvents != null && candidatesLocalEvents.size() > 0) {
-        autToAbstract =
-            hideLocalEvents(syncProduct, candidatesLocalEvents, tau);
-      } else {
-        autToAbstract = syncProduct;
-      }
       final AutomatonProxy abstractedAut =
-          applyAbstractionRules(autToAbstract, tau);
+          hideAndAbstract(syncProduct, candidate.getLocalEvents());
 
       // removes the composed automata for this candidate from the set of
       // remaining automata and adds the newly composed candidate
@@ -212,6 +218,22 @@ public class CompositionalGeneralisedConflictChecker extends
     }
     tearDown();
     return result;
+  }
+
+  private AutomatonProxy hideAndAbstract(final AutomatonProxy aut,
+                                         final Set<EventProxy> localEvents)
+      throws AnalysisException
+  {
+    final AutomatonProxy autToAbstract;
+    final EventProxy tau = createTauEvent(aut);
+    if (localEvents != null && localEvents.size() > 0) {
+      autToAbstract = hideLocalEvents(aut, localEvents, tau);
+    } else {
+      autToAbstract = aut;
+    }
+    final AutomatonProxy abstractedAut =
+        applyAbstractionRules(autToAbstract, tau);
+    return abstractedAut;
   }
 
   /**
