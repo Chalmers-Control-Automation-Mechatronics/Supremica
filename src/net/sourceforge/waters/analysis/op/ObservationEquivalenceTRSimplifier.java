@@ -47,8 +47,10 @@ public class ObservationEquivalenceTRSimplifier implements
                                             final ListBufferTransitionRelation rel)
   {
     mTransitionRelation = rel;
-    mNumStates = mTransitionRelation.getNumberOfStates();
-    mNumEvents = mTransitionRelation.getNumberOfProperEvents();
+    if (rel != null) {
+      mNumStates = mTransitionRelation.getNumberOfStates();
+      mNumEvents = mTransitionRelation.getNumberOfProperEvents();
+    }
     mSuppressRedundantHiddenTransitions = false;
     mTransitionLimit = Integer.MAX_VALUE;
   }
@@ -63,6 +65,8 @@ public class ObservationEquivalenceTRSimplifier implements
   public void setTransitionRelation(final ListBufferTransitionRelation rel)
   {
     mTransitionRelation = rel;
+    mNumStates = mTransitionRelation.getNumberOfStates();
+    mNumEvents = mTransitionRelation.getNumberOfProperEvents();
   }
 
   // #########################################################################
@@ -1050,8 +1054,8 @@ public class ObservationEquivalenceTRSimplifier implements
   private boolean mSuppressRedundantHiddenTransitions;
   private int mTransitionLimit;
 
-  private final int mNumStates;
-  private final int mNumEvents;
+  private int mNumStates;
+  private int mNumEvents;
 
   private int[][] mTauPreds;
   private THashSet<SimpleEquivalenceClass> mWS;
