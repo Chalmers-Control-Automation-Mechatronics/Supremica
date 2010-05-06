@@ -157,6 +157,8 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     }
   }
 
+  // TODO Trace expansion for this rule must be done differently
+  // from observation equivalence.
   CompositionalGeneralisedConflictChecker.Step createStep(
                                                           final CompositionalGeneralisedConflictChecker checker,
                                                           final AutomatonProxy abstractedAut)

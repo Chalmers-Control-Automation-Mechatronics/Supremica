@@ -169,6 +169,8 @@ public class CompositionalGeneralisedConflictChecker extends
     while (remainingAut.size() > 1) {
       final List<Candidate> candidates = findCandidates(model);
       Candidate candidate = null;
+      // TODO The following if-block looks very similar to the one in the
+      // loop. Can the loop be extended to include the first step?
       int numCandidates = candidates.size();
       if (numCandidates > 1) {
         candidate = evaluateCandidates(candidates);
@@ -186,9 +188,12 @@ public class CompositionalGeneralisedConflictChecker extends
           numCandidates = candidates.size();
           if (numCandidates > 1) {
             candidate = evaluateCandidates(candidates);
+            // TODO Should the following line be numCandidates == 1?
           } else if (numCandidates == 0) {
             candidate = candidates.get(0);
           } else {
+            // TODO Do not throw exception when running out of candidates.
+            // Instead, give the model to the monolithic conflict checker.
             final int limit = getNodeLimit();
             throw new OverflowException(limit);
           }
@@ -406,6 +411,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
   // #########################################################################
   // # Auxiliary Methods
+  // TODO Abstraction rules also may throw overflow exception.
   private AutomatonProxy applyAbstractionRules(AutomatonProxy autToAbstract,
                                                final EventProxy tau)
       throws AnalysisException
@@ -427,12 +433,9 @@ public class CompositionalGeneralisedConflictChecker extends
 
   /**
    * Builds the synchronous product for a given candidate. Returns null if
-   * building the synchronous product causes an overflow exception. F
-   *
-   * @param candidate
-   * @return
-   * @throws AnalysisException
+   * building the synchronous product causes an overflow exception.
    */
+  // TODO Perhaps better to throw exception instead of returning null?
   private AutomatonProxy composeSynchronousProduct(final Candidate candidate)
       throws AnalysisException
   {
