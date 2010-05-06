@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   TraceChecker
 //###########################################################################
@@ -22,7 +22,7 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
 /**
- * A debugging aid.
+ * A debugging tool.
  * This class contains static methods to check whether a counterexample
  * (for a deterministic or nondeterministic model) is accepted by its
  * automata.
@@ -42,8 +42,24 @@ public class TraceChecker
    */
   public static void checkCounterExample(final TraceProxy trace)
   {
+    checkCounterExample(trace, false);
+  }
+
+  /**
+   * Checks whether the given trace is accepted by all its automata.
+   * @param  trace    The trace to be checked.
+   * @param  sat      A flag, indicating that the trace is expected to be
+   *                  saturated. If true, any missing step entry for
+   *                  an automaton of the trace will also lead to an
+   *                  exception.
+   * @throws AssertionError to indicate that something is wrong with the
+   *                        trace.
+   */
+  public static void checkCounterExample(final TraceProxy trace,
+                                         final boolean sat)
+  {
     for (final AutomatonProxy aut : trace.getAutomata()) {
-      checkCounterExample(trace, aut);
+      checkCounterExample(trace, aut, sat);
     }
   }
 
@@ -56,8 +72,27 @@ public class TraceChecker
     (final TraceProxy trace,
      final Collection<AutomatonProxy> automata)
   {
+    checkCounterExample(trace, automata, false);
+  }
+
+  /**
+   * Checks whether the given trace is accepted by the given automata.
+   * @param  trace    The trace to be checked.
+   * @param  automata Collection of automata for which the trace is to be
+   *                  checked.
+   * @param  sat      A flag, indicating that the trace is expected to be
+   *                  saturated. If true, any missing step entry for the
+   *                  any of the given automata will also lead to an exception.
+   * @throws AssertionError to indicate that something is wrong with the
+   *                        trace.
+   */
+  public static void checkCounterExample
+    (final TraceProxy trace,
+     final Collection<AutomatonProxy> automata,
+     final boolean sat)
+  {
     for (final AutomatonProxy aut : automata) {
-      checkCounterExample(trace, aut);
+      checkCounterExample(trace, aut, sat);
     }
   }
 
@@ -71,10 +106,29 @@ public class TraceChecker
   public static StateProxy checkCounterExample(final TraceProxy trace,
                                                final AutomatonProxy aut)
   {
+    return checkCounterExample(trace, aut, false);
+  }
+
+  /**
+   * Checks whether the given trace is accepted by the given automaton.
+   * @param  trace    The trace to be checked.
+   * @param  aut      The automaton for which the trace is to be checked.
+   * @param  sat      A flag, indicating that the trace is expected to be
+   *                  saturated. If true, any missing step entry for the
+   *                  given automaton will also lead to an exception.
+   * @return Predicted end state of the automaton after execution of the
+   *         trace.
+   * @throws AssertionError to indicate that something is wrong with the
+   *                        trace.
+   */
+  public static StateProxy checkCounterExample(final TraceProxy trace,
+                                               final AutomatonProxy aut,
+                                               final boolean sat)
+  {
     assertTrue(trace.getAutomata().contains(aut),
                "Automaton " + aut.getName() + " is not mentioned in trace!");
     final List<TraceStepProxy> steps = trace.getTraceSteps();
-    return checkCounterExample(steps, aut);
+    return checkCounterExample(steps, aut, sat);
   }
 
   /**
@@ -87,8 +141,28 @@ public class TraceChecker
     (final List<TraceStepProxy> steps,
      final Collection<AutomatonProxy> automata)
   {
+    checkCounterExample(steps, automata, false);
+  }
+
+  /**
+   * Checks whether the given list of trace steps is accepted by each of
+   * the given automata.
+   * @param  steps    List of trace steps to be checked.
+   * @param  automata Collection of automata for which the trace steps are to
+   *                  be checked.
+   * @param  sat      A flag, indicating that the trace is expected to be
+   *                  saturated. If true, any missing step entry for the
+   *                  any of the given automata will also lead to an exception.
+   * @throws AssertionError to indicate that something is wrong with the
+   *                        trace.
+   */
+  public static void checkCounterExample
+    (final List<TraceStepProxy> steps,
+     final Collection<AutomatonProxy> automata,
+     final boolean sat)
+  {
     for (final AutomatonProxy aut : automata) {
-      checkCounterExample(steps, aut);
+      checkCounterExample(steps, aut, sat);
     }
   }
 
@@ -103,6 +177,26 @@ public class TraceChecker
   public static StateProxy checkCounterExample(final List<TraceStepProxy> steps,
                                                final AutomatonProxy aut)
   {
+    return checkCounterExample(steps, aut, false);
+  }
+
+  /**
+   * Checks whether the given list of trace steps is accepted by the given
+   * automaton.
+   * @param  steps    List of trace steps to be checked.
+   * @param  aut      The automaton for which the trace is to be checked.
+   * @param  sat      A flag, indicating that the trace is expected to be
+   *                  saturated. If true, any missing step entry for the
+   *                  given automaton will also lead to an exception.
+   * @return Predicted end state of the automaton after execution of the
+   *         trace steps.
+   * @throws AssertionError to indicate that something is wrong with the
+   *                        trace.
+   */
+  public static StateProxy checkCounterExample(final List<TraceStepProxy> steps,
+                                               final AutomatonProxy aut,
+                                               final boolean sat)
+  {
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
@@ -111,6 +205,9 @@ public class TraceChecker
     final Map<AutomatonProxy,StateProxy> initMap = initStep.getStateMap();
     StateProxy current = initMap.get(aut);
     if (current == null) {
+      assertTrue(!sat,
+                 "Missing entry for automaton " + aut.getName() +
+                 " in initial step!");
       for (final StateProxy state : states) {
         if (state.isInitial()) {
           assertTrue(current == null,
@@ -132,6 +229,9 @@ public class TraceChecker
       final Map<AutomatonProxy,StateProxy> stepMap = traceStep.getStateMap();
       final StateProxy target = stepMap.get(aut);
       if (target == null) {
+        assertTrue(!sat,
+                   "Missing entry for automaton " + aut.getName() +
+                   " in trace step!");
         if (events.contains(event)) {
           StateProxy next = null;
           for (final TransitionProxy trans : transitions) {
