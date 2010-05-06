@@ -127,6 +127,16 @@ public class Candidate implements Comparable<Candidate>
     return getCompositionName(mAutomata).replaceAll(":", "-");
   }
 
+  /**
+   *Two candidates are equal if they have the same list of automata.
+   */
+  @Override
+  public boolean equals(final Object obj)
+  {
+    final Candidate other = (Candidate) obj;
+    return getAutomata().equals(other.getAutomata());
+  }
+
   // #########################################################################
   // # Model Creation
   /**
