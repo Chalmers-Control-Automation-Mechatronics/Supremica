@@ -94,6 +94,18 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     runModelVerifier(group, dir, name, false);
   }
 
+
+  // #########################################################################
+  // # Test Cases --- Nasty
+  public void testDeterminisation26Counter() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "determinisation_26_counter.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
+
   // #########################################################################
   // # Test Cases --- SIC Property V
   public void testSIC5__hisc8_low2__a1() throws Exception
@@ -112,8 +124,6 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
                      "fin_exit", true);
   }
 
-  // TODO: i have added these test and by default said true is expected, i have
-  // not checked if this is the actual expected result
   public void testSIC5__parManEg_I_mfb_lowlevel_multiAnswers__compl_pol()
       throws Exception
   {
