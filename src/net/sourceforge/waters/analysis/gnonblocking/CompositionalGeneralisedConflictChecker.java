@@ -29,7 +29,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
@@ -37,6 +36,7 @@ import net.sourceforge.waters.analysis.op.StateEncoding;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -166,12 +166,10 @@ public class CompositionalGeneralisedConflictChecker extends
       mapEventsToAutomata(model);
     }
 
-    // TODO: later, need to consider when an automaton is too large to be a
-    // candidate and so may not always be left with only one automaton
     while (remainingAut.size() > 1) {
       final List<Candidate> candidates = findCandidates(model);
       Candidate candidate = null;
-      final int numCandidates = candidates.size();
+      int numCandidates = candidates.size();
       if (numCandidates > 1) {
         candidate = evaluateCandidates(candidates);
       } else if (numCandidates == 1) {
@@ -180,21 +178,36 @@ public class CompositionalGeneralisedConflictChecker extends
       } else {
         break;
       }
-      // TODO: candidate selection (i.e. heuristics) still need testing
+      AutomatonProxy syncProduct = null;
+      while (syncProduct == null) {
+        syncProduct = composeSynchronousProduct(candidate);
+        if (syncProduct == null) {
+          candidates.remove(candidate);
+          numCandidates = candidates.size();
+          if (numCandidates > 1) {
+            candidate = evaluateCandidates(candidates);
+          } else if (numCandidates == 0) {
+            candidate = candidates.get(0);
+          } else {
+            final int limit = getNodeLimit();
+            throw new OverflowException(limit);
+          }
+        }
+      }
+      if (syncProduct != null) {
+        final AutomatonProxy abstractedAut =
+            hideAndAbstract(syncProduct, candidate.getLocalEvents());
 
-      final AutomatonProxy syncProduct = composeSynchronousProduct(candidate);
-      final AutomatonProxy abstractedAut =
-          hideAndAbstract(syncProduct, candidate.getLocalEvents());
+        // removes the composed automata for this candidate from the set of
+        // remaining automata and adds the newly composed candidate
+        remainingAut.removeAll(candidate.getAutomata());
+        remainingAut.add(abstractedAut);
+        updateEventsToAutomata(abstractedAut, candidate.getAutomata());
 
-      // removes the composed automata for this candidate from the set of
-      // remaining automata and adds the newly composed candidate
-      remainingAut.removeAll(candidate.getAutomata());
-      remainingAut.add(abstractedAut);
-      updateEventsToAutomata(abstractedAut, candidate.getAutomata());
-
-      // updates the current model to find candidates from
-      final Candidate newModel = new Candidate(remainingAut, null);
-      model = newModel.createProductDESProxy(getFactory());
+        // updates the current model to find candidates from
+        final Candidate newModel = new Candidate(remainingAut, null);
+        model = newModel.createProductDESProxy(getFactory());
+      }
     }
     final ConflictChecker checker =
         new MonolithicConflictChecker(model, getUsedMarkingProposition(),
@@ -413,7 +426,12 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
   /**
-   * Builds the synchronous product for a given candidate.
+   * Builds the synchronous product for a given candidate. Returns null if
+   * building the synchronous product causes an overflow exception. F
+   *
+   * @param candidate
+   * @return
+   * @throws AnalysisException
    */
   private AutomatonProxy composeSynchronousProduct(final Candidate candidate)
       throws AnalysisException
@@ -428,7 +446,12 @@ public class CompositionalGeneralisedConflictChecker extends
     composer.setPropositions(mPropositions);
     composer.setTransitionLimit(getTransitionLimit());
     composer.setNodeLimit(mSyncProductNodeLimit);
-    composer.run();
+    try {
+      composer.run();
+    } catch (final OverflowException e) {
+      unsuccessfulCandidates.add(candidate);
+      return null;
+    }
     final AutomatonProxy syncProduct = composer.getComputedAutomaton();
     final CompositionStep step =
         new CompositionStep(syncProduct, composer.getStateMap());
@@ -556,6 +579,9 @@ public class CompositionalGeneralisedConflictChecker extends
   /**
    * Uses a heuristic to evaluate the set of candidates to select a suitable
    * candidate to compose next.
+   *
+   * @param candidates
+   * @return
    */
   private Candidate evaluateCandidates(List<Candidate> candidates)
   {
@@ -739,7 +765,9 @@ public class CompositionalGeneralisedConflictChecker extends
 
           if (localEvents.size() > 0) {
             final Candidate candidate = new Candidate(pair, localEvents);
-            candidates.add(candidate);
+            if (!unsuccessfulCandidates.contains(candidate)) {
+              candidates.add(candidate);
+            }
           }
         }
       }
@@ -821,7 +849,9 @@ public class CompositionalGeneralisedConflictChecker extends
           final Set<EventProxy> localEvents =
               identifyLocalEvents(mEventsToAutomata, automata);
           final Candidate candidate = new Candidate(automata, localEvents);
-          candidates.add(candidate);
+          if (!unsuccessfulCandidates.contains(candidate)) {
+            candidates.add(candidate);
+          }
         }
       }
       return candidates;
@@ -2111,6 +2141,8 @@ public class CompositionalGeneralisedConflictChecker extends
   // # Data Members
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =
       new HashMap<EventProxy,Set<AutomatonProxy>>();
+  private final Set<Candidate> unsuccessfulCandidates =
+      new HashSet<Candidate>();
   private List<Step> mModifyingSteps;
   private PreselectingHeuristic mPreselectingHeuristic;
   private List<SelectingHeuristic> mSelectingHeuristics;
