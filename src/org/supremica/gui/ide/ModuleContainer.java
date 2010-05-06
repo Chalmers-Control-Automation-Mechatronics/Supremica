@@ -1,4 +1,4 @@
-//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: org.supremica.gui.ide
@@ -75,479 +75,460 @@ public class ModuleContainer
     implements UndoInterface, Subject, ChangeListener, ModelObserver
 {
 
-    //#######################################################################
-    //# Constructor
-    public ModuleContainer(final IDE ide, final ModuleSubject module)
+  //#########################################################################
+  //# Constructor
+  public ModuleContainer(final IDE ide, final ModuleSubject module)
+  {
+    super(ide, module);
+
+    mModuleContext = new ModuleContext(module);
+    final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+    final OperatorTable optable = CompilerOperatorTable.getInstance();
+    mExpressionParser = new ExpressionParser(factory, optable);
+    mPrinter = new HTMLPrinter();
+    final DocumentManager manager = ide.getDocumentManager();
+    final ProductDESProxyFactory desfactory =
+      ProductDESElementFactory.getInstance();
+    mCompiler = new ModuleCompiler(manager, desfactory, module);
+    mCompiler.setSourceInfoEnabled(true);
+    mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
+    mCompilerPropertyChangeListener =
+      new CompilerPropertyChangeListener();
+    Config.OPTIMIZING_COMPILER.addPropertyChangeListener
+      (mCompilerPropertyChangeListener);
+
+    mTabPanel = new JTabbedPane();
+    mEditorPanel = new EditorPanel(this, "Editor");
+    mSimulatorPanel = new SimulatorPanel(this, "Simulator");
+    mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
+    mTabPanel.add(mEditorPanel);
+    mSimulatorPropertyChangeListener =
+      new SimulatorPropertyChangeListener();
+    Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener
+    (mSimulatorPropertyChangeListener);
+    if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
+      mTabPanel.add(mSimulatorPanel);
+    }
+    mTabPanel.add(mAnalyzerPanel);
+    mTabPanel.addChangeListener(this);
+    mEditorPanel.showComment();
+
+    final ListSubject<AbstractSubject> comps =
+      module.getComponentListModifiable();
+    comps.addModelObserver(this);
+
+    mTabPanel.addMouseListener(new java.awt.event.MouseAdapter()
     {
-        super(ide, module);
-
-        mModuleContext = new ModuleContext(module);
-        final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
-        final OperatorTable optable = CompilerOperatorTable.getInstance();
-        mExpressionParser = new ExpressionParser(factory, optable);
-        mPrinter = new HTMLPrinter();
-        final DocumentManager manager = ide.getDocumentManager();
-        final ProductDESProxyFactory desfactory =
-          ProductDESElementFactory.getInstance();
-        mCompiler = new ModuleCompiler(manager, desfactory, module);
-        mCompiler.setSourceInfoEnabled(true);
-        mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
-        mCompilerPropertyChangeListener =
-          new CompilerPropertyChangeListener();
-        Config.OPTIMIZING_COMPILER.addPropertyChangeListener
-          (mCompilerPropertyChangeListener);
-
-        mTabPanel = new JTabbedPane();
-        mEditorPanel = new EditorPanel(this, "Editor");
-        mSimulatorPanel = new SimulatorPanel(this, "Simulator");
-        mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
-        mTabPanel.add(mEditorPanel);
-        mSimulatorPropertyChangeListener =
-          new SimulatorPropertyChangeListener();
-        Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener
-          (mSimulatorPropertyChangeListener);
-        if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
-          mTabPanel.add(mSimulatorPanel);
+      public void mouseClicked(final java.awt.event.MouseEvent e)
+      {
+        if (mTabPanel.getSelectedComponent().getName().equals
+              (mAnalyzerPanel.getName())) {
+          mAnalyzerPanel.sortAutomataByName();
         }
-        mTabPanel.add(mAnalyzerPanel);
-        mTabPanel.addChangeListener(this);
-        mEditorPanel.showComment();
+      }
+    });
+  }
 
-        final ListSubject<AbstractSubject> comps =
-            module.getComponentListModifiable();
-        comps.addModelObserver(this);
 
-        mTabPanel.addMouseListener(new java.awt.event.MouseAdapter()
-        {
-            public void mouseClicked(final java.awt.event.MouseEvent e)
-            {
-                if (mTabPanel.getSelectedComponent().getName().equals(mAnalyzerPanel.getName()))
-                {
-                    mAnalyzerPanel.sortAutomataByName();
-                }
-            }
-        });
+  //#########################################################################
+  //# Overrides for Abstract Base Class
+  //# org.supremica.gui.ide.DocumentContainer
+  public boolean hasUnsavedChanges()
+  {
+    return mUndoIndex != mUndoCheckPoint;
+  }
+
+  public void setCheckPoint()
+  {
+    mUndoCheckPoint = mUndoIndex;
+  }
+
+  public void close()
+  {
+    mEditorPanel.close();
+    Config.OPTIMIZING_COMPILER.removePropertyChangeListener
+      (mCompilerPropertyChangeListener);
+    Config.INCLUDE_WATERS_SIMULATOR.removePropertyChangeListener
+      (mSimulatorPropertyChangeListener);
+  }
+
+  public Component getPanel()
+  {
+    return mTabPanel;
+  }
+
+  public EditorPanel getEditorPanel()
+  {
+    return mEditorPanel;
+  }
+
+  public AnalyzerPanel getAnalyzerPanel()
+  {
+    return mAnalyzerPanel;
+  }
+
+  public Component getActivePanel()
+  {
+    return mTabPanel.getSelectedComponent();
+  }
+
+  public String getTypeString()
+  {
+    return TYPE_STRING;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Subject
+  public void attach(final Observer o)
+  {
+    mObservers.add(o);
+  }
+
+  public void detach(final Observer o)
+  {
+    mObservers.remove(o);
+  }
+
+  public void fireEditorChangedEvent(final EditorChangedEvent event)
+  {
+    // Just in case they try to register or unregister observers
+    // in response to the update ...
+    final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
+    for (final Observer observer : copy) {
+      observer.update(event);
     }
+    getIDE().fireEditorChangedEvent(event);
+  }
 
 
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# org.supremica.gui.ide.DocumentContainer
-    public boolean hasUnsavedChanges()
-    {
-            return mUndoIndex != mUndoCheckPoint;
-    }
-
-    public void setCheckPoint()
-    {
-            mUndoCheckPoint = mUndoIndex;
-    }
-
-    public void close()
-    {
-      mEditorPanel.close();
-      Config.OPTIMIZING_COMPILER.removePropertyChangeListener
-        (mCompilerPropertyChangeListener);
-      Config.INCLUDE_WATERS_SIMULATOR.removePropertyChangeListener
-        (mSimulatorPropertyChangeListener);
-    }
-
-    public Component getPanel()
-    {
-        return mTabPanel;
-    }
-
-    public EditorPanel getEditorPanel()
-    {
-        return mEditorPanel;
-    }
-
-    public AnalyzerPanel getAnalyzerPanel()
-    {
-        return mAnalyzerPanel;
-    }
-
-    public Component getActivePanel()
-    {
-      return mTabPanel.getSelectedComponent();
-    }
-
-    public String getTypeString()
-    {
-        return TYPE_STRING;
-    }
-
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.gui.observer.Subject
-    public void attach(final Observer o)
-    {
-        mObservers.add(o);
-    }
-
-    public void detach(final Observer o)
-    {
-        mObservers.remove(o);
-    }
-
-    public void fireEditorChangedEvent(final EditorChangedEvent event)
-    {
-        // Just in case they try to register or unregister observers
-        // in response to the update ...
-        final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
-        for (final Observer observer : copy) {
-            observer.update(event);
+  //#########################################################################
+  //# Interface net.sourceforge.waters.subject.base.ModelObserver
+  /**
+   * Implementation of {@link ModelObserver} interface.
+   * If a component is removed from the module, and its automaton
+   * is currently displayed, show the comment editor instead.
+   */
+  public void modelChanged(final ModelChangeEvent event)
+  {
+    final int kind = event.getKind();
+    if (kind == ModelChangeEvent.ITEM_REMOVED) {
+      final Object value = event.getValue();
+      if (value instanceof SimpleComponentSubject) {
+        final ComponentEditorPanel panel =
+          mEditorPanel.getActiveEditorWindowInterface();
+        if (panel != null && panel.getComponent() == value) {
+          mEditorPanel.showComment();
+          // Do not even try to close or dispose the graph panel:
+          // deletions can be undone!
         }
-        getIDE().fireEditorChangedEvent(event);
+      }
     }
+    if (kind != ModelChangeEvent.GEOMETRY_CHANGED) {
+      mCompiledDES = null;
+    }
+  }
 
 
-    //#######################################################################
-    //# Interface net.sourceforge.waters.subject.base.ModelObserver
-    /**
-     * Implementation of {@link ModelObserver} interface.
-     * If a component is removed from the module, and its automaton
-     * is currently displayed, show the comment editor instead.
-     */
-    public void modelChanged(final ModelChangeEvent event)
-    {
-      final int kind = event.getKind();
-      if (kind == ModelChangeEvent.ITEM_REMOVED) {
-        final Object value = event.getValue();
-        if (value instanceof SimpleComponentSubject) {
-          final ComponentEditorPanel panel =
-            mEditorPanel.getActiveEditorWindowInterface();
-          if (panel != null && panel.getComponent() == value) {
-            mEditorPanel.showComment();
-            // Do not even try to close or dispose the graph panel:
-            // deletions can be undone!
+  //#########################################################################
+  //# Simple Access
+  public SimulatorPanel getSimulatorPanel()
+  {
+    return mSimulatorPanel;
+  }
+
+  public JTabbedPane getTabPane()
+  {
+    return mTabPanel;
+  }
+
+  public ModuleSubject getModule()
+  {
+    return (ModuleSubject) getDocument();
+  }
+
+  public ModuleContext getModuleContext()
+  {
+    return mModuleContext;
+  }
+
+  public ProductDESProxy getCompiledDES()
+  {
+    return mCompiledDES;
+  }
+
+  public Map<Proxy,SourceInfo> getSourceInfoMap()
+  {
+    if (mCompiledDES == null) {
+      return null;
+    } else {
+      return mCompiler.getSourceInfoMap();
+    }
+  }
+
+  public ExpressionParser getExpressionParser()
+  {
+    return mExpressionParser;
+  }
+
+  public ProxyPrinter getPrinter()
+  {
+    return mPrinter;
+  }
+
+  ComponentEditorPanel createComponentEditorPanel
+    (final SimpleComponentSubject comp)
+  {
+    ComponentEditorPanel panel = getComponentEditorPanel(comp);
+    if (panel == null) {
+      final EditorPanel editorPanel = getEditorPanel();
+      final JComponent right = editorPanel.getRightComponent();
+      final Dimension oldsize = right.getSize();
+      try {
+        panel = new ComponentEditorPanel(this, comp, oldsize);
+        mComponentToPanelMap.put(comp, panel);
+      } catch (final GeometryAbsentException exception) {
+        JOptionPane.showMessageDialog(getIDE(), exception.getMessage());
+      }
+    }
+    return panel;
+  }
+
+  ComponentEditorPanel getComponentEditorPanel
+    (final SimpleComponentSubject comp)
+  {
+    return mComponentToPanelMap.get(comp);
+  }
+
+  public ComponentViewPanel getComponentViewPanel
+    (final SimpleComponentSubject comp)
+  {
+    ComponentViewPanel panel = mComponentToViewPanelMap.get(comp);
+    if (panel == null) {
+      final AnalyzerPanel analyzerPanel = getAnalyzerPanel();
+      final JComponent right = analyzerPanel.getRightComponent();
+      final Dimension oldsize = right.getSize();
+      try {
+        panel = new ComponentViewPanel(this, comp, oldsize);
+        mComponentToViewPanelMap.put(comp, panel);
+      } catch (final GeometryAbsentException exception) {
+        JOptionPane.showMessageDialog(getIDE(), exception.getMessage());
+      }
+    }
+    return panel;
+  }
+
+  public ComponentViewPanel getComponentViewPanel(final String name)
+  {
+    final List<Proxy> components = getModule().getComponentList();
+    for (final Proxy proxy : components) {
+      if (proxy instanceof NamedProxy) {
+        final NamedProxy namedProxy = (NamedProxy) proxy;
+        if (name.equals(namedProxy.getName())) {
+          if (proxy instanceof SimpleComponentSubject) {
+            return getComponentViewPanel(((SimpleComponentSubject)proxy));
+          } else {
+            return null;
           }
         }
       }
-      if (kind != ModelChangeEvent.GEOMETRY_CHANGED) {
-        mCompiledDES = null;
+    }
+    return null;
+  }
+
+  public JFrame getFrame()
+  {
+    return getIDE().getFrame();
+  }
+
+  public EditorWindowInterface getActiveEditorWindowInterface()
+  {
+    return getEditorPanel().getActiveEditorWindowInterface();
+  }
+
+
+  //#######################################################################
+  //# Interface net.sourceforge.waters.gui.command.UndoInterface
+  public void executeCommand(final Command c)
+  {
+    c.execute();
+    addUndoable(new UndoableCommand(c));
+  }
+
+  public void addUndoable(final UndoableEdit event)
+  {
+    if (event.isSignificant()) {
+      mInsignificant.end();
+      mUndoManager.addEdit(mInsignificant);
+      mInsignificant = new CompoundEdit();
+      mUndoManager.addEdit(event);
+      if (mUndoIndex++ < mUndoCheckPoint) {
+        mUndoCheckPoint = -1;
       }
+      fireUndoRedoEvent();
+    } else {
+      mInsignificant.addEdit(event);
+    }
+  }
+
+  public boolean canRedo()
+  {
+    return mUndoManager.canRedo();
+  }
+
+  public boolean canUndo()
+  {
+    return mUndoManager.canUndo();
+  }
+
+  public void clearList()
+  {
+    mUndoManager.discardAllEdits();
+    mUndoIndex = 0;
+    fireUndoRedoEvent();
+  }
+
+  public String getRedoPresentationName()
+  {
+    return mUndoManager.getRedoPresentationName();
+  }
+
+  public String getUndoPresentationName()
+  {
+    return mUndoManager.getUndoPresentationName();
+  }
+
+  public void redo() throws CannotRedoException
+  {
+    mInsignificant.end();
+    mInsignificant.undo();
+    mInsignificant = new CompoundEdit();
+    mUndoManager.redo();
+    mUndoIndex++;
+    fireUndoRedoEvent();
+  }
+
+  public void undo() throws CannotUndoException
+  {
+    mInsignificant.end();
+    mInsignificant.undo();
+    mInsignificant = new CompoundEdit();
+    mUndoManager.undo();
+    mUndoIndex--;
+    fireUndoRedoEvent();
+  }
+
+
+  //#######################################################################
+  //# Interface javax.swing.event.ChangeListener
+  public void stateChanged(final ChangeEvent event)
+  {
+    final Component selected = mTabPanel.getSelectedComponent();
+    try {
+      if (selected == mSimulatorPanel) {
+        recompile();
+      } else if (selected == mAnalyzerPanel) {
+        recompile();
+        mAnalyzerPanel.updateAutomata();
+      }
+      final EditorChangedEvent eevent = new MainPanelSwitchEvent(this);
+      // This line of code fires whenever a tab is changed.
+      fireEditorChangedEvent(eevent);
+    } catch (final EvalException exception) {
+      final String msg = exception.getMessage();
+      final IDE ide = getIDE();
+      ide.error(msg);
+      mTabPanel.setSelectedComponent(mEditorPanel);
+    }
+  }
+
+
+  //#######################################################################
+  //# Compilation
+  public ProductDESProxy recompile()
+    throws EvalException
+  {
+    if (mCompiledDES == null) {
+      mCompiledDES = mCompiler.compile();
+    }
+    return mCompiledDES;
+  }
+
+
+  //#######################################################################
+  //# Auxiliary Methods
+  private void fireUndoRedoEvent()
+  {
+    final EditorChangedEvent event = new UndoRedoEvent(this);
+    fireEditorChangedEvent(event);
+  }
+
+
+  //#######################################################################
+  //# Inner Class CompilerPropertyChangeListener
+  private class CompilerPropertyChangeListener
+      implements SupremicaPropertyChangeListener
+  {
+
+    public void propertyChanged(final SupremicaPropertyChangeEvent event)
+    {
+      mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
+      mCompiledDES = null;
     }
 
+  }
 
-    //#######################################################################
-    //# Simple Access
-    public SimulatorPanel getSimulatorPanel()
-    {
-      return mSimulatorPanel;
-    }
 
-    public JTabbedPane getTabPane()
-    {
-      return mTabPanel;
-    }
+  //#######################################################################
+  //# Inner Class SimulatorPropertyChangeListener
+  private class SimulatorPropertyChangeListener
+      implements SupremicaPropertyChangeListener
+  {
 
-    public ModuleSubject getModule()
+    public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
-        return (ModuleSubject) getDocument();
-    }
-
-    public ModuleContext getModuleContext()
-    {
-        return mModuleContext;
-    }
-
-    public ProductDESProxy getCompiledDES()
-    {
-      return mCompiledDES;
-    }
-
-    public Map<Proxy,SourceInfo> getSourceInfoMap()
-    {
-      if (mCompiledDES == null) {
-        return null;
+      if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
+        mTabPanel.add(mSimulatorPanel, 1);
       } else {
-        return mCompiler.getSourceInfoMap();
+        mTabPanel.remove(mSimulatorPanel);
       }
     }
-
-    public ExpressionParser getExpressionParser()
-    {
-        return mExpressionParser;
-    }
-
-    public ProxyPrinter getPrinter()
-    {
-        return mPrinter;
-    }
-
-    ComponentEditorPanel createComponentEditorPanel
-        (final SimpleComponentSubject comp)
-    {
-        ComponentEditorPanel panel = getComponentEditorPanel(comp);
-        if (panel == null)
-        {
-            final EditorPanel editorPanel = getEditorPanel();
-            final JComponent right = editorPanel.getRightComponent();
-            final Dimension oldsize = right.getSize();
-            try
-            {
-                panel = new ComponentEditorPanel(this, comp, oldsize);
-                mComponentToPanelMap.put(comp, panel);
-            }
-            catch (final GeometryAbsentException g)
-            {
-                JOptionPane.showMessageDialog(getIDE(), g.getMessage());
-            }
-        }
-        return panel;
-    }
-
-    ComponentEditorPanel getComponentEditorPanel
-        (final SimpleComponentSubject comp)
-    {
-        return mComponentToPanelMap.get(comp);
-    }
-
-    public ComponentViewPanel getComponentViewPanel
-        (final SimpleComponentSubject comp)
-    {
-        ComponentViewPanel panel = mComponentToViewPanelMap.get(comp);
-        if (panel == null)
-        {
-            final AnalyzerPanel analyzerPanel = getAnalyzerPanel();
-            final JComponent right = analyzerPanel.getRightComponent();
-            final Dimension oldsize = right.getSize();
-            try
-            {
-                panel = new ComponentViewPanel(this, comp, oldsize);
-                mComponentToViewPanelMap.put(comp, panel);
-            }
-            catch (final GeometryAbsentException g)
-            {
-                JOptionPane.showMessageDialog(getIDE(), g.getMessage());
-            }
-        }
-        return panel;
-    }
-
-    public ComponentViewPanel getComponentViewPanel(final String name)
-    {
-        final List<Proxy> components = getModule().getComponentList();
-        for (final Proxy proxy : components)
-        {
-            if (proxy instanceof NamedProxy)
-            {
-                final NamedProxy namedProxy = (NamedProxy)proxy;
-                if (name.equals(namedProxy.getName()))
-                {
-                    if (proxy instanceof SimpleComponentSubject)
-                    {
-                        return getComponentViewPanel(((SimpleComponentSubject)proxy));
-                    }
-                    else
-                    {
-                        System.err.println("ModuleContainer.getComponentViewPanel proxy: " + name + " not a SimpleComponentSubject");
-                        return null;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public JFrame getFrame()
-    {
-        return getIDE().getFrame();
-    }
-
-    public EditorWindowInterface getActiveEditorWindowInterface()
-    {
-        return getEditorPanel().getActiveEditorWindowInterface();
-    }
+  }
 
 
-    //#######################################################################
-    //# Interface net.sourceforge.waters.gui.command.UndoInterface
-    public void executeCommand(final Command c)
-    {
-        c.execute();
-        addUndoable(new UndoableCommand(c));
-    }
+  //#######################################################################
+  //# Data Members
+  private final JTabbedPane mTabPanel;
+  private final EditorPanel mEditorPanel;
+  private final SimulatorPanel mSimulatorPanel;
+  private final AnalyzerPanel mAnalyzerPanel;
 
-    public void addUndoable(final UndoableEdit e)
-    {
-        if (e.isSignificant()) {
-            mInsignificant.end();
-            mUndoManager.addEdit(mInsignificant);
-            mInsignificant = new CompoundEdit();
-            mUndoManager.addEdit(e);
-			if (mUndoIndex++ < mUndoCheckPoint) {
-				mUndoCheckPoint = -1;
-			}
-            fireUndoRedoEvent();
-        } else {
-            mInsignificant.addEdit(e);
-        }
-    }
+  private final Map<SimpleComponentSubject,ComponentEditorPanel>
+    mComponentToPanelMap =
+    new HashMap<SimpleComponentSubject,ComponentEditorPanel>();
+  private final Map<SimpleComponentSubject,ComponentViewPanel>
+    mComponentToViewPanelMap =
+    new HashMap<SimpleComponentSubject,ComponentViewPanel>();
 
-    public boolean canRedo()
-    {
-        return mUndoManager.canRedo();
-    }
+  private final ModuleContext mModuleContext;
+  private final ModuleCompiler mCompiler;
+  private final ExpressionParser mExpressionParser;
+  private final ProxyPrinter mPrinter;
+  private ProductDESProxy mCompiledDES;
 
-    public boolean canUndo()
-    {
-        return mUndoManager.canUndo();
-    }
-
-    public void clearList()
-    {
-        mUndoManager.discardAllEdits();
-		mUndoIndex = 0;
-        fireUndoRedoEvent();
-    }
-
-    public String getRedoPresentationName()
-    {
-        return mUndoManager.getRedoPresentationName();
-    }
-
-    public String getUndoPresentationName()
-    {
-        return mUndoManager.getUndoPresentationName();
-    }
-
-    public void redo() throws CannotRedoException
-    {
-        mInsignificant.end();
-        mInsignificant.undo();
-        mInsignificant = new CompoundEdit();
-        mUndoManager.redo();
-		mUndoIndex++;
-        fireUndoRedoEvent();
-   }
-
-    public void undo() throws CannotUndoException
-    {
-        mInsignificant.end();
-        mInsignificant.undo();
-        mInsignificant = new CompoundEdit();
-        mUndoManager.undo();
-		mUndoIndex--;
-        fireUndoRedoEvent();
-    }
+  private final CompilerPropertyChangeListener
+  mCompilerPropertyChangeListener;
+  private final SupremicaPropertyChangeListener
+  mSimulatorPropertyChangeListener;
+  private final UndoManager mUndoManager = new UndoManager();
+  private CompoundEdit mInsignificant = new CompoundEdit();
+  private int mUndoIndex = 0;
+  private int mUndoCheckPoint = 0;
+  private final Collection<Observer> mObservers = new LinkedList<Observer>();
 
 
-    //#######################################################################
-    //# Interface javax.swing.event.ChangeListener
-    public void stateChanged(final ChangeEvent event)
-    {
-      final Component selected = mTabPanel.getSelectedComponent();
-      try {
-        if (selected == mSimulatorPanel) {
-          recompile();
-        } else if (selected == mAnalyzerPanel) {
-          recompile();
-          mAnalyzerPanel.updateAutomata();
-        }
-        final EditorChangedEvent eevent = new MainPanelSwitchEvent(this);
-        // This line of code fires whenever a tab is changed.
-        fireEditorChangedEvent(eevent);
-      } catch (final EvalException exception) {
-        final String msg = exception.getMessage();
-        final IDE ide = getIDE();
-        ide.error(msg);
-        mTabPanel.setSelectedComponent(mEditorPanel);
-      }
-    }
-
-
-    //#######################################################################
-    //# Compilation
-    public ProductDESProxy recompile()
-      throws EvalException
-    {
-      if (mCompiledDES == null) {
-        mCompiledDES = mCompiler.compile();
-      }
-      return mCompiledDES;
-    }
-
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private void fireUndoRedoEvent()
-    {
-        final EditorChangedEvent event = new UndoRedoEvent(this);
-        fireEditorChangedEvent(event);
-    }
-
-
-    //#######################################################################
-    //# Inner Class CompilerPropertyChangeListener
-    private class CompilerPropertyChangeListener
-      implements SupremicaPropertyChangeListener
-    {
-
-      public void propertyChanged(final SupremicaPropertyChangeEvent event)
-      {
-        mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
-        mCompiledDES = null;
-      }
-
-    }
-
-
-    //#######################################################################
-    //# Inner Class SimulatorPropertyChangeListener
-    private class SimulatorPropertyChangeListener
-      implements SupremicaPropertyChangeListener
-    {
-
-      public void propertyChanged(final SupremicaPropertyChangeEvent event)
-      {
-        if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
-          mTabPanel.add(mSimulatorPanel, 1);
-        } else {
-          mTabPanel.remove(mSimulatorPanel);
-        }
-      }
-    }
-
-
-    //#######################################################################
-    //# Data Members
-    private final JTabbedPane mTabPanel;
-    private final EditorPanel mEditorPanel;
-    private final SimulatorPanel mSimulatorPanel;
-    private final AnalyzerPanel mAnalyzerPanel;
-
-    private final Map<SimpleComponentSubject,ComponentEditorPanel>
-        mComponentToPanelMap =
-        new HashMap<SimpleComponentSubject,ComponentEditorPanel>();
-    private final Map<SimpleComponentSubject,ComponentViewPanel>
-        mComponentToViewPanelMap =
-        new HashMap<SimpleComponentSubject,ComponentViewPanel>();
-
-    private final ModuleContext mModuleContext;
-    private final ModuleCompiler mCompiler;
-    private final ExpressionParser mExpressionParser;
-    private final ProxyPrinter mPrinter;
-    private ProductDESProxy mCompiledDES;
-
-    private final CompilerPropertyChangeListener
-      mCompilerPropertyChangeListener;
-    private final SupremicaPropertyChangeListener
-      mSimulatorPropertyChangeListener;
-    private final UndoManager mUndoManager = new UndoManager();
-    private CompoundEdit mInsignificant = new CompoundEdit();
-	private int mUndoIndex = 0;
-	private int mUndoCheckPoint = 0;
-    private final Collection<Observer> mObservers = new LinkedList<Observer>();
-
-
-    //#######################################################################
-    //# Class Constants
-    static final String TYPE_STRING = "Waters module";
-
-
-
+  //#######################################################################
+  //# Class Constants
+  static final String TYPE_STRING = "Waters module";
 
 }

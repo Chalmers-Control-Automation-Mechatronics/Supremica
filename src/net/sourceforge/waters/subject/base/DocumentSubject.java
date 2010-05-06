@@ -15,14 +15,15 @@ import java.net.URI;
 import java.net.URL;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 
 
 /**
  * <P>The subject implementation of the {@link DocumentProxy} interface.</P>
  *
  * <P>This abstract extends the behaviour of a {@link NamedSubject} by
- * adding a settable member reprenting the document's file name.
- * In this implementation, changes to the file location do not produce
+ * adding a settable member representing the document's file name and a comment
+ * string. In this implementation, changes to the file location do not produce
  * any change events.</P>
  *
  * @author Robi Malik
@@ -98,7 +99,11 @@ public abstract class DocumentSubject
    */
   public void setComment(final String comment)
   {
-    mComment = comment;
+    if (!ProxyTools.equals(mComment, comment)) {
+      mComment = comment;
+      final ModelChangeEvent event = ModelChangeEvent.createStateChanged(this);
+      fireModelChanged(event);
+    }
   }
 
   public URI getLocation()

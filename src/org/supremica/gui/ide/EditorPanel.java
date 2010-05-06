@@ -81,8 +81,7 @@ public class EditorPanel
         // aliasesPanel = new EditorAliasesPanel(moduleContainer, "Aliases");
         mComponentsTab.activate();
 
-        final ModuleSubject module = getModuleSubject();
-        mCommentPanel = new CommentPanel(module);
+        mCommentPanel = new CommentPanel(moduleContainer);
         setRightComponent(mCommentPanel);
     }
 
@@ -219,7 +218,7 @@ public class EditorPanel
 
     //######################################################################
     //#
-    protected boolean setRightComponent(JComponent newComponent)
+    protected boolean setRightComponent(final JComponent newComponent)
     {
         if (super.setRightComponent(newComponent)) {
             final EditorChangedEvent event = new SubPanelSwitchEvent(this);

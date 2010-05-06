@@ -28,7 +28,7 @@ import java.util.EventObject;
  * file.</TD></TR>
  * <TR><TD>MAINPANEL_SWITCH</TD> <TD>{@link MainPanelSwitchEvent}</TD>
  * <TD>The user has switched main panels, e.g., changed from editor
- * to analyzer or vice versa.</TD></TR>
+ * to analyser or vice versa.</TD></TR>
  * <TR><TD>SUBPANEL_SWITCH</TD> <TD>{@link SubPanelSwitchEvent}</TD>
  * <TD>The user has switched panels in the module editor, e.g.,
  * displayed a new graph, or transferred focus from the graph panel
@@ -41,6 +41,9 @@ import java.util.EventObject;
  * <TD>The system clipboard contents have changed.</TD></TR>
  * <TR><TD>UNDOREDO</TD> <TD>{@link UndoRedoEvent}</TD>
  * <TD>The state of the undo manager has changed.</TD></TR>
+ * <TR><TD>PENDING_SAVE</TD> <TD>{@link PendingSaveEvent}</TD>
+ * <TD>The contents of the current container (module) are about to be
+ * saved to a file.</TD></TR>
  * </TABLE>
  *
  * @author Simon Ware, Robi Malik
@@ -71,7 +74,8 @@ public abstract class EditorChangedEvent extends EventObject
     TOOL_SWITCH,
     SELECTION_CHANGED,
     CLIPBOARD_CHANGED,
-    UNDOREDO;
+    UNDOREDO,
+    PENDING_SAVE;
   }
 
 
