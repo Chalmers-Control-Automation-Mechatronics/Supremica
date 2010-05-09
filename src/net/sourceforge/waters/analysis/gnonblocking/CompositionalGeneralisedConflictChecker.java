@@ -188,14 +188,13 @@ public class CompositionalGeneralisedConflictChecker extends
           numCandidates = candidates.size();
           if (numCandidates > 1) {
             candidate = evaluateCandidates(candidates);
-            // TODO Should the following line be numCandidates == 1?
-          } else if (numCandidates == 0) {
+          } else if (numCandidates == 1) {
             candidate = candidates.get(0);
           } else {
-            // TODO Do not throw exception when running out of candidates.
-            // Instead, give the model to the monolithic conflict checker.
-            final int limit = getNodeLimit();
-            throw new OverflowException(limit);
+            // when running out of candidates, give the model to the monolithic
+            // conflict checker.
+            syncProduct = null;
+            break;
           }
         }
       }
