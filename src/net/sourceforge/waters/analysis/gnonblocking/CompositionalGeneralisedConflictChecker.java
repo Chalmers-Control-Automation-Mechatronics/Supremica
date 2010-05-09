@@ -145,7 +145,7 @@ public class CompositionalGeneralisedConflictChecker extends
     mapEventsToAutomata(model);
 
     // performs hiding and abstraction for each automaton individually
-    final List<AutomatonProxy> remainingAut =
+    List<AutomatonProxy> remainingAut =
         new ArrayList<AutomatonProxy>(model.getAutomata().size());
     boolean modified = false;
     for (final AutomatonProxy aut : model.getAutomata()) {
@@ -168,34 +168,18 @@ public class CompositionalGeneralisedConflictChecker extends
 
     while (remainingAut.size() > 1) {
       final List<Candidate> candidates = findCandidates(model);
-      Candidate candidate = null;
-      // TODO The following if-block looks very similar to the one in the
-      // loop. Can the loop be extended to include the first step?
-      int numCandidates = candidates.size();
-      if (numCandidates > 1) {
-        candidate = evaluateCandidates(candidates);
-      } else if (numCandidates == 1) {
-        final Iterator<Candidate> it = candidates.iterator();
-        candidate = it.next();
-      } else {
-        break;
-      }
+      Candidate candidate = evaluateCandidates(candidates);
       AutomatonProxy syncProduct = null;
       while (syncProduct == null) {
+        if (candidate == null) {
+          remainingAut = new ArrayList<AutomatonProxy>(0);
+          syncProduct = null;
+          break;
+        }
         syncProduct = composeSynchronousProduct(candidate);
         if (syncProduct == null) {
           candidates.remove(candidate);
-          numCandidates = candidates.size();
-          if (numCandidates > 1) {
-            candidate = evaluateCandidates(candidates);
-          } else if (numCandidates == 1) {
-            candidate = candidates.get(0);
-          } else {
-            // when running out of candidates, give the model to the monolithic
-            // conflict checker.
-            syncProduct = null;
-            break;
-          }
+          candidate = evaluateCandidates(candidates);
         }
       }
       if (syncProduct != null) {
@@ -413,7 +397,7 @@ public class CompositionalGeneralisedConflictChecker extends
   // TODO Abstraction rules also may throw overflow exception.
   private AutomatonProxy applyAbstractionRules(AutomatonProxy autToAbstract,
                                                final EventProxy tau)
-      throws AnalysisException
+      throws AnalysisException, OverflowException
   {
 
     final ListIterator<AbstractionRule> iter = mAbstractionRules.listIterator();
@@ -587,14 +571,19 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private Candidate evaluateCandidates(List<Candidate> candidates)
   {
-    final ListIterator<SelectingHeuristic> iter =
-        mSelectingHeuristics.listIterator();
-    while (iter.hasNext()) {
-      final SelectingHeuristic heuristic = iter.next();
-      candidates = heuristic.evaluate(candidates);
-      if (candidates.size() == 1) {
-        break;
+    if (candidates.size() > 1) {
+      final ListIterator<SelectingHeuristic> iter =
+          mSelectingHeuristics.listIterator();
+      while (iter.hasNext()) {
+        final SelectingHeuristic heuristic = iter.next();
+        candidates = heuristic.evaluate(candidates);
+        if (candidates.size() == 1) {
+          break;
+        }
       }
+    }
+    if (candidates.size() == 0) {
+      return null;
     }
     return candidates.get(0);
   }
