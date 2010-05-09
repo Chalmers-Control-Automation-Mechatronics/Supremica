@@ -200,6 +200,7 @@ public class CompositionalGeneralisedConflictChecker extends
     final ConflictChecker checker =
         new MonolithicConflictChecker(model, getUsedMarkingProposition(),
             getGeneralisedPrecondition(), getFactory());
+    checker.setNodeLimit(mFinalStepNodeLimit);
     final boolean result = checker.run();
 
     if (result) {
