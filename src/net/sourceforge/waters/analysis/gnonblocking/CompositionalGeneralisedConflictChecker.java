@@ -210,10 +210,13 @@ public class CompositionalGeneralisedConflictChecker extends
       final int size = mModifyingSteps.size();
       ConflictTraceProxy convertedTrace = counterexample;
       convertedTrace = saturateTrace(counterexample);
+      // TraceChecker.checkCounterExample(convertedTrace, true);
       final ListIterator<Step> iter = mModifyingSteps.listIterator(size);
       while (iter.hasPrevious()) {
         final Step step = iter.previous();
         convertedTrace = step.convertTrace(convertedTrace);
+        // TraceChecker.checkCounterExample(convertedTrace, true);
+
       }
       setFailedResult(convertedTrace);
     }
@@ -1839,23 +1842,16 @@ public class CompositionalGeneralisedConflictChecker extends
         final EventProxy stepEvent = step.getEvent();
         final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
             new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
-        if (stepEvent != null) {
-          final StateProxy targetState =
-              stepsNewStateMap.get(getResultAutomaton());
+        final StateProxy targetState =
+            stepsNewStateMap.get(getResultAutomaton());
 
-          stepsNewStateMap.remove(getResultAutomaton());
-          final int stateID = mResultingStates.get(targetState);
-          final StateProxy replacementState = mOriginalStates[stateID];
-          stepsNewStateMap.put(getOriginalAutomaton(), replacementState);
-          final TraceStepProxy convertedStep =
-              getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
-          convertedSteps.add(convertedStep);
-        } else {
-          stepsNewStateMap.remove(getResultAutomaton());
-          final TraceStepProxy convertedStep =
-              getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
-          convertedSteps.add(convertedStep);
-        }
+        stepsNewStateMap.remove(getResultAutomaton());
+        final int stateID = mResultingStates.get(targetState);
+        final StateProxy replacementState = mOriginalStates[stateID];
+        stepsNewStateMap.put(getOriginalAutomaton(), replacementState);
+        final TraceStepProxy convertedStep =
+            getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
+        convertedSteps.add(convertedStep);
       }
       final List<AutomatonProxy> traceAutomata =
           new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size());
