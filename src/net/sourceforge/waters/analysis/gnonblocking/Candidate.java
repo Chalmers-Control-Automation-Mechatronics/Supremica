@@ -156,7 +156,7 @@ public class Candidate implements Comparable<Candidate>
   public boolean equals(final Object obj)
   {
     final Candidate other = (Candidate) obj;
-    return getAutomata().equals(other.getAutomata());
+    return toString().equals(other.toString());
   }
 
   // #########################################################################

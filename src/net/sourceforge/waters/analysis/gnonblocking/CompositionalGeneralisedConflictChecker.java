@@ -855,6 +855,11 @@ public class CompositionalGeneralisedConflictChecker extends
           final Candidate candidate = new Candidate(automata);
           if (!candidates.contains(candidate)
               && !mUnsuccessfulCandidates.contains(candidate)) {
+            // TODO: the above check isn't working as i expect -
+            // testOrphanEvents repeatedly
+            // receives a list of the same 5 candidates (this keeps happening
+            // after overflows occur during abstraction and this is caught and
+            // the candidate added to mUnsuccessfulCandidates in run())
             final Set<EventProxy> localEvents =
                 identifyLocalEvents(mEventsToAutomata, automata);
             candidate.setLocalEvents(localEvents);
