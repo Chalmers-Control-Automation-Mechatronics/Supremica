@@ -222,11 +222,14 @@ public abstract class AbstractStandardConflictCheckerTest extends
   }
 
   /*
-   * public void test_BallTSorter1() throws Exception { final String group =
-   * "tests"; final String dir = "ball_sorter"; final String name =
-   * "robis_ball_sorter_attempt1.wmod"; runModelVerifier(group, dir, name,
-   * false); }
-   */
+  public void test_BallTSorter1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "ball_sorter";
+    final String name = "robis_ball_sorter_attempt1.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+  */
 
   public void test_Batchtank2005_amk14() throws Exception
   {
@@ -445,13 +448,18 @@ public abstract class AbstractStandardConflictCheckerTest extends
   }
 
   /*
-   * This test seems to be too much for compositional methods in Eclipse. Move
-   * to 'large' test suite? public void testProfisafeI3HostEFA() throws
-   * Exception { final String group = "tests"; final String dir = "profisafe";
-   * final String name = "profisafe_ihost_efa.wmod"; final ParameterBindingProxy
-   * binding = createBinding("MAXSEQNO", 3); final List<ParameterBindingProxy>
-   * bindings = Collections.singletonList(binding); runModelVerifier(group, dir,
-   * name, bindings, true); }
+   * This test seems to be too much for compositional methods in Eclipse.
+   * Move to 'large' test suite?
+  public void testProfisafeI3HostEFA() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_ihost_efa.wmod";
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
+    final List<ParameterBindingProxy> bindings =
+        Collections.singletonList(binding);
+    runModelVerifier(group, dir, name, bindings, true);
+  }
    */
 
   public void testProfisafeI3HostEFABlock() throws Exception
@@ -466,10 +474,14 @@ public abstract class AbstractStandardConflictCheckerTest extends
   }
 
   /*
-   * public void testProfisafeI4Host() throws Exception { final String group =
-   * "tests"; final String dir = "profisafe"; final String name =
-   * "profisafe_i4_host.wmod"; runModelVerifier(group, dir, name, true); }
-   */
+  public void testProfisafeI4Host() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i4_host.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+  */
 
   public void testProfisafeI4Slave() throws Exception
   {
