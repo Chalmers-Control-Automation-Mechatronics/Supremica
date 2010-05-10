@@ -436,16 +436,14 @@ public class ObserverProjectionConflictChecker
     final int numAutomata = automata.size();
     final KindTranslator translator = getKindTranslator();
     mCurrentAutomata = new ArrayList<AutomatonProxy>(numAutomata);
-    for (final AutomatonProxy aut : automata) {
-      if (translator.getComponentKind(aut) != ComponentKind.PROPERTY) {
-        mCurrentAutomata.add(aut);
-      }
-    }
     final int numEvents = model.getEvents().size();
     mCurrentEvents = new THashSet<EventProxy>(numEvents);
     mEventInfoMap = new HashMap<EventProxy,EventInfo>(numEvents);
-    for (final AutomatonProxy aut : mCurrentAutomata) {
-      addEventsToAutomata(aut);
+    for (final AutomatonProxy aut : automata) {
+      if (translator.getComponentKind(aut) != ComponentKind.PROPERTY) {
+        mCurrentAutomata.add(aut);
+        addEventsToAutomata(aut);
+      }
     }
     mSelfloopOnlyEvents = new LinkedList<EventProxy>();
     for (final Map.Entry<EventProxy,EventInfo> entry :
@@ -543,9 +541,10 @@ public class ObserverProjectionConflictChecker
     if (mSelfloopOnlyEvents.isEmpty()) {
       return false;
     } else {
-      final Set<EventProxy> selflooped =
-        new THashSet<EventProxy>(mSelfloopOnlyEvents);
-      for (final EventProxy event : selflooped) {
+      final int numSelfloops = mSelfloopOnlyEvents.size();
+      final Set<EventProxy> selflooped = new THashSet<EventProxy>(numSelfloops);
+      for (final EventProxy event : mSelfloopOnlyEvents) {
+        selflooped.add(event);
         mCurrentEvents.remove(event);
         mEventInfoMap.remove(event);
       }
@@ -559,16 +558,23 @@ public class ObserverProjectionConflictChecker
       for (int i = 0; i < numAutomata; i++) {
         final AutomatonProxy aut = mCurrentAutomata.get(i);
         final Collection<EventProxy> events = aut.getEvents();
+        boolean found = false;
+        for (final EventProxy event : events) {
+          if (selflooped.contains(event)) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          continue;
+        }
         final int numEvents = events.size();
         final Collection<EventProxy> newEvents =
-          new ArrayList<EventProxy>(numEvents);
+          new ArrayList<EventProxy>(numEvents - 1);
         for (final EventProxy event : events) {
           if (!selflooped.contains(event)) {
             newEvents.add(event);
           }
-        }
-        if (newEvents.size() == numEvents) {
-          continue;
         }
         final Collection<TransitionProxy> transitions = aut.getTransitions();
         final int numTrans = transitions.size();
@@ -720,12 +726,10 @@ public class ObserverProjectionConflictChecker
     final List<EventProxy> events = new ArrayList<EventProxy>(numEvents);
     events.addAll(mCurrentEvents);
     events.add(marking);
-    final List<AutomatonProxy> automata =
-      new ArrayList<AutomatonProxy>(mCurrentAutomata);
-    removeEventsToAutomata(automata);
-    Collections.sort(automata);
-    final ProductDESProxy des = createDES(events, automata);
+    Collections.sort(events);
+    final ProductDESProxy des = createDES(events, mCurrentAutomata);
     mCurrentMonolithicConflictChecker.setModel(des);
+    removeEventsToAutomata(mCurrentAutomata);
     return mCurrentMonolithicConflictChecker.run();
   }
 
