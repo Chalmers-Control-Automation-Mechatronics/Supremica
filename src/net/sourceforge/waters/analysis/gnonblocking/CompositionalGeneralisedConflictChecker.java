@@ -145,7 +145,7 @@ public class CompositionalGeneralisedConflictChecker extends
     mapEventsToAutomata(model);
 
     // performs hiding and abstraction for each automaton individually
-    List<AutomatonProxy> remainingAut =
+    final List<AutomatonProxy> remainingAut =
         new ArrayList<AutomatonProxy>(model.getAutomata().size());
     boolean modified = false;
     for (final AutomatonProxy aut : model.getAutomata()) {
@@ -165,36 +165,43 @@ public class CompositionalGeneralisedConflictChecker extends
       model = modifiedModel.createProductDESProxy(getFactory());
       mapEventsToAutomata(model);
     }
-
-    while (remainingAut.size() > 1) {
+    outer: while (remainingAut.size() > 1) {
       final List<Candidate> candidates = findCandidates(model);
-      Candidate candidate = evaluateCandidates(candidates);
+      Candidate candidate;
       AutomatonProxy syncProduct = null;
-      while (syncProduct == null) {
+      while (true) {
+        candidate = evaluateCandidates(candidates);
         if (candidate == null) {
-          remainingAut = new ArrayList<AutomatonProxy>(0);
-          syncProduct = null;
-          break;
+          break outer;
         }
-        syncProduct = composeSynchronousProduct(candidate);
-        if (syncProduct == null) {
+        try {
+          syncProduct = composeSynchronousProduct(candidate);
+          break;
+        } catch (final OverflowException e) {
           candidates.remove(candidate);
-          candidate = evaluateCandidates(candidates);
+          // TODO: see below, re-evaluating doesn't seem necessary
         }
       }
       if (syncProduct != null) {
-        final AutomatonProxy abstractedAut =
-            hideAndAbstract(syncProduct, candidate.getLocalEvents());
+        try {
+          final AutomatonProxy abstractedAut =
+              hideAndAbstract(syncProduct, candidate.getLocalEvents());
 
-        // removes the composed automata for this candidate from the set of
-        // remaining automata and adds the newly composed candidate
-        remainingAut.removeAll(candidate.getAutomata());
-        remainingAut.add(abstractedAut);
-        updateEventsToAutomata(abstractedAut, candidate.getAutomata());
+          // removes the composed automata for this candidate from the set of
+          // remaining automata and adds the newly composed candidate
+          remainingAut.removeAll(candidate.getAutomata());
+          remainingAut.add(abstractedAut);
+          updateEventsToAutomata(abstractedAut, candidate.getAutomata());
 
-        // updates the current model to find candidates from
-        final Candidate newModel = new Candidate(remainingAut, null);
-        model = newModel.createProductDESProxy(getFactory());
+          // updates the current model to find candidates from
+          final Candidate newModel = new Candidate(remainingAut, null);
+          model = newModel.createProductDESProxy(getFactory());
+        } catch (final OverflowException e) {
+          mUnsuccessfulCandidates.add(candidate);
+          // TODO: this isn't the best solution (same as above), candidates are
+          // unnecessarily found and evaluated again, even though we already
+          // knew the results of applying the heuristics...
+        }
       }
     }
     final ConflictChecker checker =
@@ -235,9 +242,13 @@ public class CompositionalGeneralisedConflictChecker extends
     } else {
       autToAbstract = aut;
     }
-    final AutomatonProxy abstractedAut =
-        applyAbstractionRules(autToAbstract, tau);
-    return abstractedAut;
+    try {
+      final AutomatonProxy abstractedAut =
+          applyAbstractionRules(autToAbstract, tau);
+      return abstractedAut;
+    } catch (final OverflowException e) {
+      throw new OverflowException();
+    }
   }
 
   /**
@@ -398,17 +409,20 @@ public class CompositionalGeneralisedConflictChecker extends
 
   // #########################################################################
   // # Auxiliary Methods
-  // TODO Abstraction rules also may throw overflow exception.
   private AutomatonProxy applyAbstractionRules(AutomatonProxy autToAbstract,
                                                final EventProxy tau)
-      throws AnalysisException, OverflowException
+      throws AnalysisException
   {
 
     final ListIterator<AbstractionRule> iter = mAbstractionRules.listIterator();
     AutomatonProxy abstractedAut = autToAbstract;
     while (iter.hasNext()) {
       final AbstractionRule rule = iter.next();
-      abstractedAut = rule.applyRule(autToAbstract, tau);
+      try {
+        abstractedAut = rule.applyRule(autToAbstract, tau);
+      } catch (final OverflowException e) {
+        throw new OverflowException();
+      }
       if (autToAbstract != abstractedAut) {
         final Step step = rule.createStep(this, abstractedAut);
         mModifyingSteps.add(step);
@@ -422,7 +436,6 @@ public class CompositionalGeneralisedConflictChecker extends
    * Builds the synchronous product for a given candidate. Returns null if
    * building the synchronous product causes an overflow exception.
    */
-  // TODO Perhaps better to throw exception instead of returning null?
   private AutomatonProxy composeSynchronousProduct(final Candidate candidate)
       throws AnalysisException
   {
@@ -439,8 +452,8 @@ public class CompositionalGeneralisedConflictChecker extends
     try {
       composer.run();
     } catch (final OverflowException e) {
-      unsuccessfulCandidates.add(candidate);
-      return null;
+      mUnsuccessfulCandidates.add(candidate);
+      throw new OverflowException();
     }
     final AutomatonProxy syncProduct = composer.getComputedAutomaton();
     final CompositionStep step =
@@ -571,10 +584,13 @@ public class CompositionalGeneralisedConflictChecker extends
    * candidate to compose next.
    *
    * @param candidates
-   * @return
+   * @return null when there are no candidates, or else the selected candidate.
    */
   private Candidate evaluateCandidates(List<Candidate> candidates)
   {
+    if (candidates.size() == 0) {
+      return null;
+    }
     if (candidates.size() > 1) {
       final ListIterator<SelectingHeuristic> iter =
           mSelectingHeuristics.listIterator();
@@ -585,9 +601,6 @@ public class CompositionalGeneralisedConflictChecker extends
           break;
         }
       }
-    }
-    if (candidates.size() == 0) {
-      return null;
     }
     return candidates.get(0);
   }
@@ -747,7 +760,6 @@ public class CompositionalGeneralisedConflictChecker extends
         if (a != chosenAut) {
           final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
           // Bring pair into defined ordering.
-          // (Better do this here than as side effect of constructor.)
           if (chosenAut.compareTo(a) < 0) {
             pair.add(chosenAut);
             pair.add(a);
@@ -760,7 +772,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
           if (localEvents.size() > 0) {
             final Candidate candidate = new Candidate(pair, localEvents);
-            if (!unsuccessfulCandidates.contains(candidate)) {
+            if (!mUnsuccessfulCandidates.contains(candidate)) {
               candidates.add(candidate);
             }
           }
@@ -844,7 +856,7 @@ public class CompositionalGeneralisedConflictChecker extends
           final Set<EventProxy> localEvents =
               identifyLocalEvents(mEventsToAutomata, automata);
           final Candidate candidate = new Candidate(automata, localEvents);
-          if (!unsuccessfulCandidates.contains(candidate)) {
+          if (!mUnsuccessfulCandidates.contains(candidate)) {
             candidates.add(candidate);
           }
         }
@@ -2129,7 +2141,7 @@ public class CompositionalGeneralisedConflictChecker extends
   // # Data Members
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata =
       new HashMap<EventProxy,Set<AutomatonProxy>>();
-  private final Set<Candidate> unsuccessfulCandidates =
+  private final Set<Candidate> mUnsuccessfulCandidates =
       new HashSet<Candidate>();
   private List<Step> mModifyingSteps;
   private PreselectingHeuristic mPreselectingHeuristic;
