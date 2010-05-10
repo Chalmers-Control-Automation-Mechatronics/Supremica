@@ -365,6 +365,10 @@ public class CompositionalGeneralisedConflictChecker extends
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
+    final TauLoopRemovalRule tlrRule =
+        new TauLoopRemovalRule(getFactory(), mPropositions);
+    mAbstractionRules.add(tlrRule);
+
     final ObservationEquivalenceRule oeRule =
         new ObservationEquivalenceRule(getFactory(), mPropositions);
     oeRule.setTransitionLimit(getTransitionLimit());
