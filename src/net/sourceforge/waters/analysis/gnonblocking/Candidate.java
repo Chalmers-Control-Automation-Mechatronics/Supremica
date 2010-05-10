@@ -33,6 +33,18 @@ public class Candidate implements Comparable<Candidate>
 
   // #########################################################################
   // # Constructor
+
+  /**
+   * Creates a new candidate.
+   *
+   * @param autList
+   *          List of automata in candidate in defined order.
+   */
+  public Candidate(final List<AutomatonProxy> autList)
+  {
+    this(autList, null);
+  }
+
   /**
    * Creates a new candidate.
    *
@@ -69,6 +81,16 @@ public class Candidate implements Comparable<Candidate>
   public Set<EventProxy> getLocalEvents()
   {
     return mLocalEvents;
+  }
+
+  /**
+   * Sets the local events for this candidate.
+   *
+   * @param localEvents
+   */
+  public void setLocalEvents(final Set<EventProxy> localEvents)
+  {
+    mLocalEvents = localEvents;
   }
 
   /**
@@ -214,7 +236,7 @@ public class Candidate implements Comparable<Candidate>
   // #########################################################################
   // # Invocation
   private final List<AutomatonProxy> mAutomata;
-  private final Set<EventProxy> mLocalEvents;
+  private Set<EventProxy> mLocalEvents;
   private int mEventCount;
 
 }

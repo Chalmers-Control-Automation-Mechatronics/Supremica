@@ -767,12 +767,12 @@ public class CompositionalGeneralisedConflictChecker extends
             pair.add(a);
             pair.add(chosenAut);
           }
-          final Set<EventProxy> localEvents =
-              identifyLocalEvents(mEventsToAutomata, pair);
-
-          if (localEvents.size() > 0) {
-            final Candidate candidate = new Candidate(pair, localEvents);
-            if (!mUnsuccessfulCandidates.contains(candidate)) {
+          final Candidate candidate = new Candidate(pair);
+          if (!mUnsuccessfulCandidates.contains(candidate)) {
+            final Set<EventProxy> localEvents =
+                identifyLocalEvents(mEventsToAutomata, pair);
+            if (localEvents.size() > 0) {
+              candidate.setLocalEvents(localEvents);
               candidates.add(candidate);
             }
           }
@@ -851,12 +851,13 @@ public class CompositionalGeneralisedConflictChecker extends
         assert automata.size() > 0;
         if (automata.size() > 1 && automata.size() < model.getAutomata().size()) {
           // Bring automata into defined ordering.
-          // (Better do this here than as side effect of constructor.)
           Collections.sort(automata);
-          final Set<EventProxy> localEvents =
-              identifyLocalEvents(mEventsToAutomata, automata);
-          final Candidate candidate = new Candidate(automata, localEvents);
-          if (!mUnsuccessfulCandidates.contains(candidate)) {
+          final Candidate candidate = new Candidate(automata);
+          if (!candidates.contains(candidate)
+              && !mUnsuccessfulCandidates.contains(candidate)) {
+            final Set<EventProxy> localEvents =
+                identifyLocalEvents(mEventsToAutomata, automata);
+            candidate.setLocalEvents(localEvents);
             candidates.add(candidate);
           }
         }
