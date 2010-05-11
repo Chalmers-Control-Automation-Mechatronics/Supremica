@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Stack;
 
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
@@ -152,10 +153,10 @@ public class MonolithicSCCControlLoopChecker
 
   public Collection<EventProxy> getNonLoopEvents()
   {
-    final ArrayList<EventProxy> output = new ArrayList<EventProxy>();
+    final HashSet<EventProxy> output = new HashSet<EventProxy>();
     for (final EventProxy event : mEventList)
     {
-      if (!loopEvents.contains(event))
+      if (!mLoopEvents.contains(event))
         output.add(event);
     }
     return output;
@@ -371,6 +372,8 @@ public class MonolithicSCCControlLoopChecker
     // new memory allocation to store current state tuple
     final int currTuple[] = new int[mNumAutomata];
     encodedCurrTuple.setVisited(true);
+    numStates++;
+    encodedCurrTuple.visit(numStates);
     // current state tuple now in currTuple
     decode(encodedCurrTuple.getCodes(), currTuple);
     for (int i = 0; i < mNumEvent; i++) { // for all events
@@ -380,20 +383,13 @@ public class MonolithicSCCControlLoopChecker
             new EncodedStateTuple(encode(mNextTuple));
           if (addState(encodedNextTuple)) {
             visit(encodedNextTuple);
-            if (!mControlLoopFree) {
-              return;
-            }
           }
           else {
             encodedNextTuple = mGlobalStateSet.get(encodedNextTuple);
             if (encodedNextTuple.getVisited() == false) {
               visit(encodedNextTuple);
-              if (!mControlLoopFree) {
-                return;
-              }
             }
           }
-
           if (encodedNextTuple.getInComponent() == false) {
             if (encodedNextTuple.getVisited() == true) {
               // control loop detected here
@@ -401,9 +397,32 @@ public class MonolithicSCCControlLoopChecker
                 mControlLoopFree = false;
                 mEncodedRootStateTuple = encodedCurrTuple;
               }
-              return;
+            }
+            if (encodedNextTuple.getRoot().getOrder() < encodedCurrTuple.getRoot().getOrder())
+            {
+              encodedCurrTuple.setRoot(encodedNextTuple.getRoot());
             }
           }
+          if (encodedCurrTuple.getRoot() == encodedCurrTuple)
+          {
+            encodedCurrTuple.setInComponent(true);
+            if (stack.size() != 0)
+            {
+              final ArrayList<EncodedStateTuple> temp = new ArrayList<EncodedStateTuple>();
+              temp.add(encodedCurrTuple);
+              while (stack.peek().getOrder() > encodedCurrTuple.getOrder())
+              {
+                final EncodedStateTuple popped = stack.pop();
+                popped.setInComponent(true);
+                temp.add(popped);
+                if (stack.size() == 0)
+                  break;
+              }
+              mLoopEvents.addAll(getLoopEvents(temp));
+            }
+          }
+          else
+            stack.push(encodedCurrTuple);
         }
         else { // UNCONTROLLABLE
           final EncodedStateTuple encodedNextTuple =
@@ -679,6 +698,28 @@ public class MonolithicSCCControlLoopChecker
   }
 
   /**
+   * Looks for loop events
+   * @param states All states in the strongly connected component
+   * @return All events that connect all the states in the strongly connected component
+   */
+  private HashSet<EventProxy> getLoopEvents(final ArrayList<EncodedStateTuple> states)
+  {
+    final HashSet<EventProxy> output = new HashSet<EventProxy>();
+    for (final EncodedStateTuple source : states)
+    {
+      final int[] currState = new int[mNumAutomata];
+      decode(source.getCodes(), currState);
+      for (int i = 0; i < mNumEvent; i++) { // for all events
+        if (eventAvailable(currState, i)) {
+          if (states.contains(encode(mNextTuple)))
+            output.add(mEventList.get(i));
+        }
+      }
+    }
+    return output;
+  }
+
+  /**
    * It compares two state tuples.
    * @param tuple1 first tuple that will be compared with second tuple
    * @param tuple2 second tuple
@@ -806,7 +847,13 @@ public class MonolithicSCCControlLoopChecker
   private int mNextTuple[];
 
   /** a list of all the events which occur in all control loops */
-  private ArrayList<EventProxy> loopEvents;
+  private final HashSet<EventProxy> mLoopEvents = new HashSet<EventProxy>();
+
+  /** the number of states which have been visited */
+  private int numStates = 0;
+
+  /** used for the visit procedure */
+  private final Stack<EncodedStateTuple> stack = new Stack<EncodedStateTuple>();
 
   //#########################################################################
   //# Variables used for encoding/decoding
