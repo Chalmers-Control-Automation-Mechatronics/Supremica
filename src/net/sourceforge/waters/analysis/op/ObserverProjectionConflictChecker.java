@@ -323,9 +323,9 @@ public class ObserverProjectionConflictChecker
   {
     setUp();
     initialiseEventsToAutomata();
-    removeSelfloopOnlyEvents();
+    removeRedundantEvents();
     simplifyInitialAutomata();
-    removeSelfloopOnlyEvents();
+    removeRedundantEvents();
     findEventDisjointSubsystems();
 
     Collection<Candidate> candidates;
@@ -414,7 +414,7 @@ public class ObserverProjectionConflictChecker
     mCurrentAutomata = null;
     mCurrentEvents = null;
     mEventInfoMap = null;
-    mSelfloopOnlyEvents = null;
+    mRedundantEvents = null;
     mPostponedSubsystems = null;
     mProcessedAutomata = null;
     mModifyingSteps = null;
@@ -445,13 +445,13 @@ public class ObserverProjectionConflictChecker
         addEventsToAutomata(aut);
       }
     }
-    mSelfloopOnlyEvents = new LinkedList<EventProxy>();
+    mRedundantEvents = new LinkedList<EventProxy>();
     for (final Map.Entry<EventProxy,EventInfo> entry :
          mEventInfoMap.entrySet()) {
       final EventInfo info = entry.getValue();
-      if (info.isOnlySelflooped()) {
+      if (info.isRemovable()) {
         final EventProxy event = entry.getKey();
-        mSelfloopOnlyEvents.add(event);
+        mRedundantEvents.add(event);
       }
     }
     mPostponedSubsystems = new LinkedList<SubSystem>();
@@ -471,11 +471,14 @@ public class ObserverProjectionConflictChecker
   {
     final Collection<EventProxy> events = aut.getEvents();
     final int numEvents = events.size();
-    final Set<EventProxy> nonSelfloops = new THashSet<EventProxy>(numEvents);
+    final TObjectByteHashMap<EventProxy> statusMap =
+      new TObjectByteHashMap<EventProxy>(numEvents);
     for (final TransitionProxy trans : aut.getTransitions()) {
+      final EventProxy event = trans.getEvent();
       if (trans.getSource() != trans.getTarget()) {
-        final EventProxy event = trans.getEvent();
-        nonSelfloops.add(event);
+        statusMap.put(event, NOT_ONLY_SELFLOOP);
+      } else if (!statusMap.containsKey(event)) {
+        statusMap.put(event, ONLY_SELFLOOP);
       }
     }
     final KindTranslator translator = getKindTranslator();
@@ -487,23 +490,24 @@ public class ObserverProjectionConflictChecker
           mEventInfoMap.put(event, info);
           mCurrentEvents.add(event);
         }
-        final boolean selfloop = !nonSelfloops.contains(event);
-        info.addAutomaton(aut, selfloop);
+        final byte lookup = statusMap.get(event);
+        final byte status = lookup == UNKNOWN_SELFLOOP ? BLOCKED : lookup;
+        info.addAutomaton(aut, status);
       }
     }
   }
 
   private void removeEventsToAutomata(final Collection<AutomatonProxy> victims)
   {
-    mSelfloopOnlyEvents.clear();
+    mRedundantEvents.clear();
     final Set<EventProxy> eventsToRemove = new THashSet<EventProxy>();
     for (final EventProxy event : mCurrentEvents) {
       final EventInfo info = mEventInfoMap.get(event);
       info.removeAutomata(victims);
       if (info.isEmpty()) {
         eventsToRemove.add(event);
-      } else if (info.isOnlySelflooped()) {
-        mSelfloopOnlyEvents.add(event);
+      } else if (info.isRemovable()) {
+        mRedundantEvents.add(event);
       }
     }
     for (final EventProxy event : eventsToRemove) {
@@ -536,19 +540,19 @@ public class ObserverProjectionConflictChecker
       !mOverflowCandidates.contains(automata);
   }
 
-  private boolean removeSelfloopOnlyEvents()
+  private boolean removeRedundantEvents()
   {
-    if (mSelfloopOnlyEvents.isEmpty()) {
+    if (mRedundantEvents.isEmpty()) {
       return false;
     } else {
-      final int numSelfloops = mSelfloopOnlyEvents.size();
+      final int numSelfloops = mRedundantEvents.size();
       final Set<EventProxy> selflooped = new THashSet<EventProxy>(numSelfloops);
-      for (final EventProxy event : mSelfloopOnlyEvents) {
+      for (final EventProxy event : mRedundantEvents) {
         selflooped.add(event);
         mCurrentEvents.remove(event);
         mEventInfoMap.remove(event);
       }
-      mSelfloopOnlyEvents.clear();
+      mRedundantEvents.clear();
       final ProductDESProxyFactory factory = getFactory();
       final int numAutomata = mCurrentAutomata.size();
       final List<AutomatonProxy> originals =
@@ -793,7 +797,7 @@ public class ObserverProjectionConflictChecker
     }
     updateEventsToAutomata(autToAbstract, candidate.getAutomata());
     final int numLocalEvents = candidate.getLocalEventCount();
-    if (removeSelfloopOnlyEvents()) {
+    if (removeRedundantEvents()) {
       findEventDisjointSubsystems();
     } else if (mCurrentEvents.size() < numEventsBefore - numLocalEvents) {
       findEventDisjointSubsystems();
@@ -1058,6 +1062,7 @@ public class ObserverProjectionConflictChecker
     {
       mAutomataMap = new TObjectByteHashMap<AutomatonProxy>();
       mNumNonSelfloopAutomata = 0;
+      mIsBlocked = false;
     }
 
     //#######################################################################
@@ -1074,18 +1079,18 @@ public class ObserverProjectionConflictChecker
       return added;
     }
 
-    private void addAutomaton(final AutomatonProxy aut, final boolean selfloop)
+    private void addAutomaton(final AutomatonProxy aut, final byte status)
     {
       final byte present = mAutomataMap.get(aut);
-      final byte code = selfloop ? ONLY_SELFLOOP : NOT_ONLY_SELFLOOP;
-      if (present != code) {
-        mAutomataMap.put(aut, code);
+      if (present != status) {
+        mAutomataMap.put(aut, status);
         if (present == NOT_ONLY_SELFLOOP) {
           mNumNonSelfloopAutomata--;
         }
-        if (code == NOT_ONLY_SELFLOOP) {
+        if (status == NOT_ONLY_SELFLOOP) {
           mNumNonSelfloopAutomata++;
         }
+        mIsBlocked |= status == BLOCKED;
       }
     }
 
@@ -1143,9 +1148,9 @@ public class ObserverProjectionConflictChecker
       return mAutomataMap.isEmpty();
     }
 
-    private boolean isOnlySelflooped()
+    private boolean isRemovable()
     {
-      return mNumNonSelfloopAutomata == 0;
+      return mIsBlocked || mNumNonSelfloopAutomata == 0;
     }
 
     private void removeAutomata(final Collection<AutomatonProxy> victims)
@@ -1174,6 +1179,7 @@ public class ObserverProjectionConflictChecker
     //# Data Members
     private final TObjectByteHashMap<AutomatonProxy> mAutomataMap;
     private int mNumNonSelfloopAutomata;
+    private boolean mIsBlocked;
 
   }
 
@@ -2335,7 +2341,7 @@ public class ObserverProjectionConflictChecker
   private Collection<EventProxy> mCurrentEvents;
   private Map<EventProxy,EventInfo> mEventInfoMap =
       new HashMap<EventProxy,EventInfo>();
-  private Collection<EventProxy> mSelfloopOnlyEvents;
+  private Collection<EventProxy> mRedundantEvents;
   private Collection<SubSystem> mPostponedSubsystems;
   private Collection<AutomatonProxy> mProcessedAutomata;
   private List<AbstractionStep> mModifyingSteps;
@@ -2353,5 +2359,6 @@ public class ObserverProjectionConflictChecker
   private static final byte UNKNOWN_SELFLOOP = 0;
   private static final byte ONLY_SELFLOOP = 1;
   private static final byte NOT_ONLY_SELFLOOP = 2;
+  private static final byte BLOCKED = 3;
 
 }
