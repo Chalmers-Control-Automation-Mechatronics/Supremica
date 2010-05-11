@@ -391,12 +391,10 @@ public class CompositionalGeneralisedConflictChecker extends
     rnsRule.setDefaultMarking(getMarkingProposition());
     mAbstractionRules.add(rnsRule);
 
-    /*
-     * final DeterminisationOfNonAlphaStatesRule dnasRule = new
-     * DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
-     * dnasRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(dnasRule);
-     */
+    final DeterminisationOfNonAlphaStatesRule dnasRule =
+        new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
+    dnasRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(dnasRule);
 
     final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
         new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
@@ -1421,6 +1419,13 @@ public class CompositionalGeneralisedConflictChecker extends
             new HashMap<AutomatonProxy,StateProxy>(traceSteps
                 .get(lastStepIndex).getStateMap());
         stepsPrevStateMap.remove(getResultAutomaton());
+
+        final StateProxy tracesEndState =
+            traceSteps.get(lastStepIndex).getStateMap()
+                .get(getResultAutomaton());
+        originalAutSource =
+            mOriginalStates[mReverseOutputStateMap.get(tracesEndState)];
+
         for (int i = lastStepIndex; i > 0; i--) {
           final TraceStepProxy step = traceSteps.get(i);
           expandStep(step, originalAutSource, stepsPrevStateMap, convertedSteps);
@@ -2011,7 +2016,8 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     /**
-     * Completes a trace.
+     * Completes a trace. No further steps are needed from the end trace given
+     * by the trace for the composed model.
      *
      * @param originalSource
      *          The original end state.
@@ -2072,10 +2078,10 @@ public class CompositionalGeneralisedConflictChecker extends
         final int source = current.getState();
         final boolean hasEvent = current.hasProperEvent();
         final TIntHashSet visited = hasEvent ? visited1 : visited0;
-        TIntHashSet successors =
-            getTransitionRelation().getSuccessors(source, getTauCode());
-        if (successors != null) {
-          final TIntIterator iter = successors.iterator();
+        TIntHashSet predecessors =
+            getTransitionRelation().getPredecessors(source, getTauCode());
+        if (predecessors != null) {
+          final TIntIterator iter = predecessors.iterator();
           while (iter.hasNext()) {
             final int target = iter.next();
             if (!visited.contains(target)) {
@@ -2090,9 +2096,9 @@ public class CompositionalGeneralisedConflictChecker extends
           }
         }
         if (!hasEvent) {
-          successors = getTransitionRelation().getSuccessors(source, event);
-          if (successors != null) {
-            final TIntIterator iter = successors.iterator();
+          predecessors = getTransitionRelation().getSuccessors(source, event);
+          if (predecessors != null) {
+            final TIntIterator iter = predecessors.iterator();
             while (iter.hasNext()) {
               final int target = iter.next();
               if (!visited1.contains(target)) {
