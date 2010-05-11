@@ -1341,7 +1341,6 @@ public class CompositionalGeneralisedConflictChecker extends
           new ObserverProjectionTransitionRelation(originalAut, mPropositions);
       mCodeOfTau = mTransitionRelation.getEventInt(tau);
       mOriginalStatesMap = mTransitionRelation.getOriginalStateToIntMap();
-      ;
     }
 
     RemovalOfTransitionsStep(final AutomatonProxy resultAut,
@@ -1399,7 +1398,7 @@ public class CompositionalGeneralisedConflictChecker extends
       // makes the trace begin in the correct initial state
       StateProxy originalAutSource = beginTrace(traceSteps, convertedSteps);
 
-      final Map<AutomatonProxy,StateProxy> stepsPrevStateMap =
+      Map<AutomatonProxy,StateProxy> stepsPrevStateMap =
           new HashMap<AutomatonProxy,StateProxy>(traceSteps.get(0)
               .getStateMap());
       stepsPrevStateMap.remove(getResultAutomaton());
@@ -1407,9 +1406,13 @@ public class CompositionalGeneralisedConflictChecker extends
         originalAutSource =
             expandStep(step, originalAutSource, stepsPrevStateMap,
                        convertedSteps);
+        stepsPrevStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
+        stepsPrevStateMap.remove(getResultAutomaton());
       }
       // makes the trace end in the correct state
-      return endTrace(conflictTrace, originalAutSource, convertedSteps);
+      endTrace(conflictTrace, originalAutSource, convertedSteps);
+      return buildTrace(conflictTrace, convertedSteps);
     }
 
     /**
@@ -1431,10 +1434,9 @@ public class CompositionalGeneralisedConflictChecker extends
     protected StateProxy expandStep(
                                     final TraceStepProxy traceStep,
                                     StateProxy originalAutSource,
-                                    Map<AutomatonProxy,StateProxy> stepsPrevStateMap,
+                                    final Map<AutomatonProxy,StateProxy> stepsPrevStateMap,
                                     final List<TraceStepProxy> convertedSteps)
     {
-
       final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
           new HashMap<AutomatonProxy,StateProxy>(traceStep.getStateMap());
 
@@ -1467,9 +1469,6 @@ public class CompositionalGeneralisedConflictChecker extends
               getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
           convertedSteps.add(convertedStep);
         }
-        stepsPrevStateMap =
-            new HashMap<AutomatonProxy,StateProxy>(stepsNewStateMap);
-        stepsPrevStateMap.remove(getResultAutomaton());
       }
       return originalAutSource;
     }
@@ -1478,19 +1477,15 @@ public class CompositionalGeneralisedConflictChecker extends
      * Uses the state in the original automaton which is found to be in the last
      * step of the trace, calls completeEndOfTrace to find any steps needed to
      * reach the actual end state of the trace according to the subclasses
-     * requirements. Steps are then created for these final steps, the list of
-     * automata that are part of the trace is built and the finished trace is
-     * created.
+     * requirements. Steps are then created for these final steps.
      *
      * @param conflictTrace
      * @param originalAutSource
      * @param convertedSteps
-     * @return The final converted conflict trace.
      */
-    protected ConflictTraceProxy endTrace(
-                                          final ConflictTraceProxy conflictTrace,
-                                          final StateProxy originalAutSource,
-                                          final List<TraceStepProxy> convertedSteps)
+    protected void endTrace(final ConflictTraceProxy conflictTrace,
+                            final StateProxy originalAutSource,
+                            final List<TraceStepProxy> convertedSteps)
     {
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
       final List<SearchRecord> finalSteps =
@@ -1503,6 +1498,19 @@ public class CompositionalGeneralisedConflictChecker extends
             createTraceSteps(finalStepsStateMap, finalSteps);
         convertedSteps.addAll(substeps);
       }
+    }
+
+    /**
+     * Creates the list of automata that are part of the trace and the finished
+     * trace is created.
+     *
+     * @param conflictTrace
+     * @return Converted conflict trace.
+     */
+    protected ConflictTraceProxy buildTrace(
+                                            final ConflictTraceProxy conflictTrace,
+                                            final List<TraceStepProxy> convertedSteps)
+    {
       final List<AutomatonProxy> traceAutomata =
           new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size());
       for (final AutomatonProxy aut : conflictTrace.getAutomata()) {
@@ -1946,27 +1954,32 @@ public class CompositionalGeneralisedConflictChecker extends
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
 
-      // makes the trace begin in the correct initial state
-      StateProxy originalAutSource = beginTrace(traceSteps, convertedSteps);
-
       final int lastStepIndex = traceSteps.size() - 1;
-      final Map<AutomatonProxy,StateProxy> stepsPrevStateMap =
+      Map<AutomatonProxy,StateProxy> stepsPrevStateMap =
           new HashMap<AutomatonProxy,StateProxy>(traceSteps.get(lastStepIndex)
               .getStateMap());
       stepsPrevStateMap.remove(getResultAutomaton());
 
       final StateProxy tracesEndState =
           traceSteps.get(lastStepIndex).getStateMap().get(getResultAutomaton());
-      originalAutSource =
+      StateProxy originalAutSource =
           getOriginalStates()[getReverseOutputStateMap().get(tracesEndState)];
 
       for (int i = lastStepIndex; i > 0; i--) {
         final TraceStepProxy step = traceSteps.get(i);
-        expandStep(step, originalAutSource, stepsPrevStateMap, convertedSteps);
+        originalAutSource =
+            expandStep(step, originalAutSource, stepsPrevStateMap,
+                       convertedSteps);
+        stepsPrevStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
+        stepsPrevStateMap.remove(getResultAutomaton());
       }
 
-      // makes the trace end in the correct state
-      return endTrace(conflictTrace, originalAutSource, convertedSteps);
+      // makes the trace begin in the correct initial state
+      // final StateProxy originalAutSource = beginTrace(traceSteps,
+      // convertedSteps);
+
+      return buildTrace(conflictTrace, convertedSteps);
     }
 
     /**
@@ -2089,6 +2102,7 @@ public class CompositionalGeneralisedConflictChecker extends
         final TIntHashSet visited = hasEvent ? visited1 : visited0;
         TIntHashSet predecessors =
             getTransitionRelation().getPredecessors(source, getTauCode());
+
         if (predecessors != null) {
           final TIntIterator iter = predecessors.iterator();
           while (iter.hasNext()) {
