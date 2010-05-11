@@ -805,6 +805,7 @@ public class MonolithicSCCControlLoopChecker
   /** a global state tuple for storing next state tuple */
   private int mNextTuple[];
 
+  /** a list of all the events which occur in all control loops */
   private ArrayList<EventProxy> loopEvents;
 
   //#########################################################################

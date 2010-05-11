@@ -20,38 +20,52 @@ class EncodedStateTuple
 {
     /** Encoded state tuple */
     private int mEncodedStateCodes[];
-    
+
     /** Check if current state tuple has been already visited */
     private boolean mVisited;
-    
+
     /** Check if current state tuple is already in some component */
     private boolean mInComponent;
-    
-    
+
+    /** Represents the order which each state is visited. The first state which
+     * is visited has mVisitOrder == 1. Unvisited states have mVisitOrder == Integer.MAXVALUE*/
+    private int mVisitOrder;
+
+    /** The root of the Strongly Connected Component this state belongs to */
+    private EncodedStateTuple mRoot;
+
+
     //#########################################################################
     //# Constructor
     /**
      * It creates an empty state tuple.
      */
-    EncodedStateTuple(){}
+    EncodedStateTuple(){
+      mVisitOrder = Integer.MAX_VALUE;
+      mRoot = this;
+    }
 
     /**
      * It creates an empty state tuple.
      * @param size number of integers used to store encoded state
      */
-    EncodedStateTuple(int size)
+    EncodedStateTuple(final int size)
     {
 	mEncodedStateCodes = new int[size];
+    mVisitOrder = Integer.MAX_VALUE;
+    mRoot = this;
     }
 
     /**
      * Creates a state tuple with given encoded state tuple (integer array).
      */
-    EncodedStateTuple(int[] encodedStateCodes)
+    EncodedStateTuple(final int[] encodedStateCodes)
     {
 	mEncodedStateCodes = encodedStateCodes;
+    mVisitOrder = Integer.MAX_VALUE;
+    mRoot = this;
     }
-    
+
 
     /**
      * It returns current encoded state tuple codes.
@@ -75,7 +89,7 @@ class EncodedStateTuple
      * It sets the state is visited or not visited.
      * @param visited true if it needs to be set to visited, false otherwise
      */
-    void setVisited(boolean visited)
+    void setVisited(final boolean visited)
     {
 	mVisited = visited;
     }
@@ -93,7 +107,7 @@ class EncodedStateTuple
      * It sets the state is in component or not in component.
      * @param inComponent true if it needs to be set to in component, false otherwise
      */
-    void setInComponent(boolean inComponent)
+    void setInComponent(final boolean inComponent)
     {
 	mInComponent = inComponent;
     }
@@ -103,9 +117,27 @@ class EncodedStateTuple
      * @param index index of state in the automata
      * @return index of state
      */
-    int get(int index)
+    int get(final int index)
     {
 	return mEncodedStateCodes[index];
+    }
+
+    public void visit(final int order)
+    {
+      mVisitOrder = order;
+    }
+    public int getOrder()
+    {
+      return mVisitOrder;
+    }
+
+    public void setRoot(final EncodedStateTuple root)
+    {
+      mRoot = root;
+    }
+    public EncodedStateTuple getRoot()
+    {
+      return mRoot;
     }
 
     /**
@@ -121,16 +153,16 @@ class EncodedStateTuple
 	}
 	return result;
     }
-    
+
     /**
      * Check if passed object is same as current encoded state tuple
      * @param other other object that will be compared with current EncodedStateTuple
      * @return true if passed object is same as current, false otherwise
      */
-    public boolean equals(Object other)
+    public boolean equals(final Object other)
     {
 	if(other != null && getClass() == other.getClass()){
-	    EncodedStateTuple tuple = (EncodedStateTuple)other;
+	    final EncodedStateTuple tuple = (EncodedStateTuple)other;
 	    for(int i = 0; i < mEncodedStateCodes.length; i++){
 		if(mEncodedStateCodes[i] != tuple.get(i)){
 		    return false;
