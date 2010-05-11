@@ -859,11 +859,6 @@ public class CompositionalGeneralisedConflictChecker extends
           final Candidate candidate = new Candidate(automata);
           if (!candidates.contains(candidate)
               && !mUnsuccessfulCandidates.contains(candidate)) {
-            // TODO: the above check isn't working as i expect -
-            // testOrphanEvents repeatedly
-            // receives a list of the same 5 candidates (this keeps happening
-            // after overflows occur during abstraction and this is caught and
-            // the candidate added to mUnsuccessfulCandidates in run())
             final Set<EventProxy> localEvents =
                 identifyLocalEvents(mEventsToAutomata, automata);
             candidate.setLocalEvents(localEvents);
@@ -1059,15 +1054,16 @@ public class CompositionalGeneralisedConflictChecker extends
         inputEnc, partition, outputEnc);
   }
 
-  public ObservationEquivalenceStep createObservationEquivalenceStep(
-                                                                     final AutomatonProxy abstractedAut,
-                                                                     final AutomatonProxy autToAbstract,
-                                                                     final EventProxy tau,
-                                                                     final ObserverProjectionTransitionRelation tr,
-                                                                     final TIntObjectHashMap<int[]> classMap)
+  public DeterminisationOfNonAlphaStatesStep createDeterminisationOfNonAlphaStatesStep(
+                                                                                       final AutomatonProxy abstractedAut,
+                                                                                       final AutomatonProxy autToAbstract,
+                                                                                       final EventProxy tau,
+                                                                                       final StateEncoding inputEnc,
+                                                                                       final List<int[]> partition,
+                                                                                       final StateEncoding outputEnc)
   {
-    return new ObservationEquivalenceStep(abstractedAut, autToAbstract, tau,
-        tr, classMap);
+    return new DeterminisationOfNonAlphaStatesStep(abstractedAut,
+        autToAbstract, tau, inputEnc, partition, outputEnc);
   }
 
   public RemovalOfMarkingsOrNoncoreachableStatesStep createRemovalOfMarkingsStep(
@@ -1457,10 +1453,10 @@ public class CompositionalGeneralisedConflictChecker extends
           stepsPrevStateMap.remove(getResultAutomaton());
         }
       }
-      // makes the trace end in an alpha state
+      // makes the trace end in the correct state
       final List<SearchRecord> finalSteps =
           completeTrace(mOriginalStatesMap.get(originalSource));
-      if (finalSteps.size() > 0) {
+      if (finalSteps != null && finalSteps.size() > 0) {
         final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
             new HashMap<AutomatonProxy,StateProxy>(traceSteps
                 .get(traceSteps.size() - 1).getStateMap());
@@ -1834,6 +1830,202 @@ public class CompositionalGeneralisedConflictChecker extends
 
 
   // #########################################################################
+  // # Inner Class DeterminisationOfNonAlphaStatesStep
+  private class DeterminisationOfNonAlphaStatesStep extends
+      RemovalOfTransitionsStep
+  {
+    DeterminisationOfNonAlphaStatesStep(final AutomatonProxy resultAut,
+                                        final AutomatonProxy originalAut,
+                                        final EventProxy tau,
+                                        final StateEncoding inputEnc,
+                                        final List<int[]> partition,
+                                        final StateEncoding outputEnc)
+    {
+      super(resultAut, originalAut, tau, inputEnc, outputEnc);
+      if (partition == null) {
+        final int size = originalAut.getStates().size();
+        mClasMap = new TIntObjectHashMap<int[]>(size);
+        for (int i = 0; i < size; i++) {
+          final int[] clazz = new int[] {i};
+          mClasMap.put(i, clazz);
+        }
+      } else {
+        final int size = partition.size();
+        mClasMap = new TIntObjectHashMap<int[]>(size);
+        int i = 0;
+        for (final int[] clazz : partition) {
+          mClasMap.put(i++, clazz);
+        }
+      }
+    }
+
+    /**
+     * Creates the beginning of a trace by doing a breadth-first search to find
+     * the correct initial state of the original automaton. Steps are added for
+     * tau transitions (if necessary) until the initial state of the result
+     * automaton is reached.
+     *
+     * @return A list of SearchRecords that represent each extra step needed for
+     *         the start of the trace. (The first item being the very first
+     *         state of the trace).
+     */
+    protected List<SearchRecord> beginTrace(
+                                            final TIntArrayList initialStateIDs,
+                                            final int resultAutInitialStateClass)
+    {
+      final int[] targetArray = mClasMap.get(resultAutInitialStateClass);
+      final TIntHashSet targetSet = new TIntHashSet(targetArray);
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      final TIntHashSet visited = new TIntHashSet();
+      // The dummy record ensures that the first real search record will
+      // later be included in the trace.
+      final SearchRecord dummy = new SearchRecord(-1);
+      final int numInit = initialStateIDs.size();
+      for (int i = 0; i < numInit; i++) {
+        final int initStateID = initialStateIDs.get(i);
+        final SearchRecord record =
+            new SearchRecord(initStateID, false, -1, dummy);
+        if (targetSet.contains(initStateID)) {
+          return Collections.singletonList(record);
+        }
+        open.add(record);
+        visited.add(initStateID);
+      }
+      while (true) {
+        final SearchRecord current = open.remove();
+        final int source = current.getState();
+        final TIntHashSet successors =
+            getTransitionRelation().getSuccessors(source, getTauCode());
+        if (successors != null) {
+          final TIntIterator iter = successors.iterator();
+          while (iter.hasNext()) {
+            final int target = iter.next();
+            if (!visited.contains(target)) {
+              final SearchRecord record =
+                  new SearchRecord(target, false, getTauCode(), current);
+              if (targetSet.contains(target)) {
+                return buildSearchRecordTrace(record);
+              }
+              open.add(record);
+              visited.add(target);
+            }
+          }
+        }
+      }
+    }
+
+    /**
+     * Completes a trace.
+     *
+     * @param originalSource
+     *          The original end state.
+     * @return Null, the trace already contains the correct end state for this
+     *         rule.
+     */
+    protected List<SearchRecord> completeTrace(final int originalSource)
+    {
+      return null;
+    }
+
+    /**
+     * Finds a partial trace in the original automaton before determinisation of
+     * non alpha states. This method computes a sequence of tau transitions,
+     * followed by a transition with the given event, followed by another
+     * sequence of tau transitions linking the source state to some state in the
+     * class of the target state in the simplified automaton.
+     *
+     * @param originalSource
+     *          State number of the source state in the original automaton.
+     * @param event
+     *          Integer code of the event to be included in the trace.
+     * @param targetClass
+     *          State number of the state in the simplified automaton (code of
+     *          state class).
+     * @return List of search records describing the trace from source to
+     *         target. The first entry in the list represents the first step
+     *         after the source state, with its event and target state. The
+     *         final step has a target state in the given target class. Events
+     *         in the list can only be tau or the given event.
+     */
+    protected List<SearchRecord> findSubTrace(final int originalSource,
+                                              final int event,
+                                              final int targetClass)
+    {
+      final int[] targetArray = mClasMap.get(targetClass);
+      final TIntHashSet targetSet = new TIntHashSet(targetArray);
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      final TIntHashSet visited0 = new TIntHashSet(); // event not in trace
+      final TIntHashSet visited1 = new TIntHashSet(); // event in trace
+      // The given event may be tau. In this case, we must search for a
+      // (possibly empty) string of tau events. This is achieved here by
+      // by creating a first search record with the 'hasevent' property,
+      // i.e., pretending the trace already has an event.
+      SearchRecord record;
+      if (event != getTauCode()) {
+        record = new SearchRecord(originalSource);
+        visited0.add(originalSource);
+      } else if (!targetSet.contains(originalSource)) {
+        record = new SearchRecord(originalSource, true, -1, null);
+        visited1.add(originalSource);
+      } else {
+        return Collections.emptyList();
+      }
+      open.add(record);
+      while (true) {
+        final SearchRecord current = open.remove();
+        final int source = current.getState();
+        final boolean hasEvent = current.hasProperEvent();
+        final TIntHashSet visited = hasEvent ? visited1 : visited0;
+        TIntHashSet successors =
+            getTransitionRelation().getSuccessors(source, getTauCode());
+        if (successors != null) {
+          final TIntIterator iter = successors.iterator();
+          while (iter.hasNext()) {
+            final int target = iter.next();
+            if (!visited.contains(target)) {
+              record =
+                  new SearchRecord(target, hasEvent, getTauCode(), current);
+              if (hasEvent && targetSet.contains(target)) {
+                return buildSearchRecordTrace(record);
+              }
+              open.add(record);
+              visited.add(target);
+            }
+          }
+        }
+        if (!hasEvent) {
+          successors = getTransitionRelation().getSuccessors(source, event);
+          if (successors != null) {
+            final TIntIterator iter = successors.iterator();
+            while (iter.hasNext()) {
+              final int target = iter.next();
+              if (!visited1.contains(target)) {
+                record = new SearchRecord(target, true, event, current);
+                if (targetSet.contains(target)) {
+                  return buildSearchRecordTrace(record);
+                }
+                open.add(record);
+                visited1.add(target);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // #######################################################################
+    // # Data Members
+    /**
+     * Maps state codes of the output TransitionRelation to list of state codes
+     * in input TransitionRelation. This gives the class of states merged to
+     * form the given state in the simplified automaton. Obtained from
+     * TransBiSimulator.
+     */
+    private final TIntObjectHashMap<int[]> mClasMap;
+  }
+
+
+  // #########################################################################
   // # Inner Class RemovalOfMarkingsStep
   /**
    * This step class performs correct counterexample trace conversion for both
@@ -2011,11 +2203,11 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     /**
-     * Finds a partial trace in the original automaton before observation
-     * equivalence. This method computes a sequence of tau transitions, followed
-     * by a transition with the given event, followed by another sequence of tau
-     * transitions linking the source state to some state in the class of the
-     * target state in the simplified automaton.
+     * Finds a partial trace in the original automaton. This method computes a
+     * sequence of tau transitions, followed by a transition with the given
+     * event, followed by another sequence of tau transitions linking the source
+     * state to some state in the class of the target state in the simplified
+     * automaton.
      *
      * @param originalSource
      *          State number of the source state in the original automaton.
