@@ -10,7 +10,6 @@
 package net.sourceforge.waters.despot;
 
 import net.sourceforge.waters.analysis.gnonblocking.CompositionalGeneralisedConflictChecker;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -22,8 +21,11 @@ public class LargeCompositionalSICPropertyVVerifierTest extends
   protected ModelVerifier createModelVerifier(
                                               final ProductDESProxyFactory factory)
   {
-    final ConflictChecker checker =
+    final CompositionalGeneralisedConflictChecker checker =
         new CompositionalGeneralisedConflictChecker(factory);
+    checker.setInternalStepNodeLimit(10000);
+    checker.setFinalStepNodeLimit(1000000);
+    checker.setTransitionLimit(1000000);
     return new SICPropertyVVerifier(checker, factory);
   }
 }
