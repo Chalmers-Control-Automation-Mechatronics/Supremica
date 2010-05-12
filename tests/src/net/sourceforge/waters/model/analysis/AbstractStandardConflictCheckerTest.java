@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   AbstractGeneralisedConflictCheckerTest
+//# CLASS:   AbstractStandardConflictCheckerTest
 //###########################################################################
-//# $Id: AbstractGeneralisedConflictCheckerTest.java 4768 2009-10-09 03:16:33Z robi $
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -22,12 +22,12 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public abstract class AbstractStandardConflictCheckerTest extends
-    AbstractConflictCheckerTest
+public abstract class AbstractStandardConflictCheckerTest
+  extends AbstractConflictCheckerTest
 {
 
-  // #########################################################################
-  // # Entry points in junit.framework.TestCase
+  //#########################################################################
+  //# Entry points in junit.framework.TestCase
   public AbstractStandardConflictCheckerTest()
   {
   }
@@ -37,8 +37,9 @@ public abstract class AbstractStandardConflictCheckerTest extends
     super(name);
   }
 
-  // #########################################################################
-  // # Test Cases --- handcrafted
+
+  //#########################################################################
+  //# Test Cases --- handcrafted
   public void testEmpty() throws Exception
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
@@ -73,8 +74,8 @@ public abstract class AbstractStandardConflictCheckerTest extends
     }
   }
 
-  // #########################################################################
-  // # Test Cases --- nondeterministic
+  //#########################################################################
+  //# Test Cases --- nondeterministic
 
   public void testNondeterministicCombiniations() throws Exception
   {
@@ -113,15 +114,16 @@ public abstract class AbstractStandardConflictCheckerTest extends
 
   public void testMultiNondeterministicSepPlacesConflicting() throws Exception
   {
-    // the two deterministic automata don't have non determinism at the same
-    // time
+    // The two deterministic automata don't have nondeterminism at the same
+    // time.
     final String group = "tests/nondeterministic";
     final String name = "multiNondeterministicSepPlacesConflicting.wmod";
     runModelVerifier(group, name, false);
   }
 
-  // #########################################################################
-  // # Test Cases --- handwritten
+
+  //#########################################################################
+  //# Test Cases --- handwritten
   public void testDosingTankWithJellyEFA1() throws Exception
   {
     final String group = "handwritten";
@@ -143,8 +145,9 @@ public abstract class AbstractStandardConflictCheckerTest extends
     runModelVerifier(group, name, true);
   }
 
-  // #########################################################################
-  // # Test Cases --- hisc
+
+  //#########################################################################
+  //# Test Cases --- hisc
   public void testHISCRhoneSubsystem1Patch0() throws Exception
   {
     final String group = "tests";
@@ -169,8 +172,9 @@ public abstract class AbstractStandardConflictCheckerTest extends
     runModelVerifier(group, dir, name, true);
   }
 
-  // #########################################################################
-  // # Test Cases --- nasty
+
+  //#########################################################################
+  //# Test Cases --- nasty
   public void testJpt10Counter() throws Exception
   {
     final String group = "tests";
@@ -203,8 +207,9 @@ public abstract class AbstractStandardConflictCheckerTest extends
     runModelVerifier(group, dir, name, false);
   }
 
-  // #########################################################################
-  // # Test Cases --- tests
+
+  //#########################################################################
+  //# Test Cases --- tests
   public void test_BallTimer() throws Exception
   {
     final String group = "tests";
@@ -221,7 +226,6 @@ public abstract class AbstractStandardConflictCheckerTest extends
     runModelVerifier(group, dir, name, true);
   }
 
-  /*
   public void test_BallTSorter1() throws Exception
   {
     final String group = "tests";
@@ -229,7 +233,6 @@ public abstract class AbstractStandardConflictCheckerTest extends
     final String name = "robis_ball_sorter_attempt1.wmod";
     runModelVerifier(group, dir, name, false);
   }
-  */
 
   public void test_Batchtank2005_amk14() throws Exception
   {
@@ -447,21 +450,6 @@ public abstract class AbstractStandardConflictCheckerTest extends
     runModelVerifier(group, dir, name, true);
   }
 
-  /*
-   * This test seems to be too much for compositional methods in Eclipse.
-   * Move to 'large' test suite?
-  public void testProfisafeI3HostEFA() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "profisafe";
-    final String name = "profisafe_ihost_efa.wmod";
-    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
-    final List<ParameterBindingProxy> bindings =
-        Collections.singletonList(binding);
-    runModelVerifier(group, dir, name, bindings, true);
-  }
-   */
-
   public void testProfisafeI3HostEFABlock() throws Exception
   {
     final String group = "tests";
@@ -472,16 +460,6 @@ public abstract class AbstractStandardConflictCheckerTest extends
         Collections.singletonList(binding);
     runModelVerifier(group, dir, name, bindings, false);
   }
-
-  /*
-  public void testProfisafeI4Host() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "profisafe";
-    final String name = "profisafe_i4_host.wmod";
-    runModelVerifier(group, dir, name, true);
-  }
-  */
 
   public void testProfisafeI4Slave() throws Exception
   {
@@ -702,8 +680,9 @@ public abstract class AbstractStandardConflictCheckerTest extends
     runModelVerifier(group, dir, name, true);
   }
 
-  // #########################################################################
-  // # Test Cases --- valid
+
+  //#########################################################################
+  //# Test Cases --- valid
   public void testBigFactory() throws Exception
   {
     final String group = "valid";
@@ -735,12 +714,6 @@ public abstract class AbstractStandardConflictCheckerTest extends
     final String name = "falko.wdes";
     runModelVerifier(group, dir, name, true);
   }
-
-  /*
-   * public void testFischertechnik() throws Exception { final String group =
-   * "tests"; final String dir = "incremental_suite"; final String name =
-   * "ftechnik.wmod"; runModelVerifier(group, dir, name, false); }
-   */
 
   public void testFtuer() throws Exception
   {
@@ -822,8 +795,9 @@ public abstract class AbstractStandardConflictCheckerTest extends
     runModelVerifier(group, dir, name, true);
   }
 
-  // #########################################################################
-  // # Test Cases -- Parameterised
+
+  //#########################################################################
+  //# Test Cases -- Parameterised
   public void testTransferline__1() throws Exception
   {
     checkTransferline(1);
@@ -843,11 +817,6 @@ public abstract class AbstractStandardConflictCheckerTest extends
   {
     checkTransferline(4);
   }
-
-  /*
-   * public void testTransferline__5() throws Exception { checkTransferline(5);
-   * }
-   */
 
   public void checkTransferline(final int n) throws Exception
   {
