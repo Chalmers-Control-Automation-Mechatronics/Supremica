@@ -136,10 +136,10 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   protected void tearDown()
   {
     mIsAborting = false;
-    final long runTime = System.currentTimeMillis() - mStartTime;
+    final long current = System.currentTimeMillis();
     final AnalysisResult result = getAnalysisResult();
     if (result != null) {
-      result.setRuntime(runTime);
+      result.setRuntime(current - mStartTime);
     }
   }
 
@@ -178,6 +178,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
          ProxyTools.getShortClassName(this) + "!");
     }
   }
+
 
   //#########################################################################
   //# Logging

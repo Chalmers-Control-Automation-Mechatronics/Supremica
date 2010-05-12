@@ -81,8 +81,11 @@ public abstract class NativeModelVerifier
     if (getModel() == null) {
       throw new NullPointerException("No model given!");
     } else {
+      final long start = System.currentTimeMillis();
       mResult = null;
       mResult = runNativeAlgorithm();
+      final long stop = System.currentTimeMillis();
+      mResult.setRuntime(stop - start);
       return mResult.isSatisfied();
     }
   }

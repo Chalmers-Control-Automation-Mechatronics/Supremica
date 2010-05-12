@@ -9,6 +9,8 @@
 package net.sourceforge.waters.model.analysis;
 
 import java.io.PrintStream;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 
 public class AnalysisResult
@@ -19,6 +21,7 @@ public class AnalysisResult
   public AnalysisResult(final boolean satisfied)
   {
     mSatisfied = satisfied;
+    mRunTime = -1;
   }
 
 
@@ -45,6 +48,11 @@ public class AnalysisResult
   public void print(final PrintStream stream)
   {
     stream.println("Verification result: " + mSatisfied);
+    if (mRunTime >= 0) {
+      final double seconds = 0.001 * mRunTime;
+      final NumberFormat formatter = new DecimalFormat("0.00");
+      stream.println("Total runtime: " + formatter.format(seconds) + "s");
+    }
   }
 
 
