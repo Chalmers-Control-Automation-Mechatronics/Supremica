@@ -2,6 +2,9 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.io.PrintStream;
 import java.util.Formatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -47,14 +50,98 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
                                                                               final boolean satisfied,
                                                                               final TraceProxy counterexample)
   {
-    super(satisfied, counterexample);
+    this(satisfied, counterexample, null);
+  }
 
+  /**
+   * Creates a verification result with parameters as given.
+   */
+  public CompositionalGeneralisedNonblockingConflictCheckerVerificationResult(
+                                                                              final boolean satisfied,
+                                                                              final TraceProxy counterexample,
+                                                                              final List<AbstractionRule> abstractionRules)
+  {
+    super(satisfied, counterexample);
+    mAbstractionRules = null;
+    mUnsuccessfulCompositionCount = 0;
+    mSuccessfulCompositionCount = 0;
+    if (abstractionRules != null) {
+      createAbstractionRuleStats(abstractionRules);
+    }
   }
 
   // #########################################################################
   // # Simple Access Methods
+  /**
+   * Gets the number of times a successful candidate is chosen, composed and
+   * abstracted.
+   */
+  public int getCompositionCount()
+  {
+    return mSuccessfulCompositionCount;
+  }
+
+  /**
+   * Gets the number of times an unsuccessful candidate is chosen and an
+   * overflow exception occurs during composition or abstraction.
+   */
+  public int getUnsuccessfulCompositionCount()
+  {
+    return mUnsuccessfulCompositionCount;
+  }
+
+  /**
+   * Gets the total number of times a candidate is chosen and composition and
+   * abstraction is attempted. The attempts may or may not have been successful
+   * in producing a reduced size model with no overflow exceptions occurring.
+   */
+  public int getTotalCompositionCount()
+  {
+    return mSuccessfulCompositionCount + mUnsuccessfulCompositionCount;
+  }
+
+  /**
+   * Gets the statistics that apply to a given abstraction rule.
+   */
+  public AbstractionRuleStatistics getStatistics(final AbstractionRule rule)
+  {
+    return mAbstractionRules.get(rule);
+  }
+
   // #########################################################################
   // # Providing Statistics
+  /**
+   * Creates an AbstractionRuleStatistic for each rule in the list and maps the
+   * statistics to the rule for easy updating later.
+   */
+  public void createAbstractionRuleStats(final List<AbstractionRule> rules)
+  {
+    mAbstractionRules =
+        new HashMap<AbstractionRule,AbstractionRuleStatistics>();
+    for (final AbstractionRule rule : rules) {
+      final AbstractionRuleStatistics stats =
+          new AbstractionRuleStatistics(rule.toString());
+      mAbstractionRules.put(rule, stats);
+    }
+  }
+
+  /**
+   * Sets the number of times a successful candidate is chosen, composed and
+   * abstracted.
+   */
+  public void setSuccessfulCompositionCount(final int count)
+  {
+    mSuccessfulCompositionCount = count;
+  }
+
+  /**
+   * Sets the number of times a candidate is chosen and an overflow exception
+   * occurs during composition or abstraction.
+   */
+  public void setUnsuccessfulCompositionCount(final int count)
+  {
+    mUnsuccessfulCompositionCount = count;
+  }
 
   // #########################################################################
   // # Printing
@@ -66,5 +153,9 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
     final Formatter formatter = new Formatter(stream);
     // TODO:add stats to print
   }
+
+  private Map<AbstractionRule,AbstractionRuleStatistics> mAbstractionRules;
+  private int mSuccessfulCompositionCount;
+  private int mUnsuccessfulCompositionCount;
 
 }
