@@ -2173,7 +2173,11 @@ public class CompositionalGeneralisedConflictChecker extends
     protected boolean isTargetState(final int stateFound,
                                     final int resultAutTarget)
     {
-      return stateFound == resultAutTarget;
+      final int[] targetArray = mClasMap.get(resultAutTarget);
+      final TIntHashSet targetSet = new TIntHashSet(targetArray);
+      // TODO: don't want to get hashset every time
+      return targetSet.contains(stateFound);
+
     }
   }
 
