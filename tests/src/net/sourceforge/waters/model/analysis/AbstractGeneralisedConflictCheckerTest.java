@@ -94,17 +94,23 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     runModelVerifier(group, dir, name, false);
   }
 
-
   // #########################################################################
   // # Test Cases --- Nasty
-  public void testDeterminisation26Counter() throws Exception
+  public void testDeterminisation26Counter1() throws Exception
   {
     final String group = "tests";
     final String dir = "nasty";
-    final String name = "determinisation_26_counter.wmod";
+    final String name = "determinisation_26_counter1.wmod";
     runModelVerifier(group, dir, name, false);
   }
 
+  public void testDeterminisation26Counter2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "determinisation_26_counter2.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
 
   // #########################################################################
   // # Test Cases --- SIC Property V
