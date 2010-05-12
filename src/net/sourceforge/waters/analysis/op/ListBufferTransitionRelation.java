@@ -1209,7 +1209,7 @@ public class ListBufferTransitionRelation
   //# Automaton Simplification
   /**
    * Attempts to simplify the automaton by removing all tau selfloops.
-   * If this results in the tau being disabled in, the tau event is
+   * If this results in the tau event being disabled, the tau event is
    * marked as unused. Tau events are recognised by their standard
    * code {@link EventEncoding#TAU}.
    * @return <CODE>true</CODE> if all transitions with the tau event
@@ -1375,10 +1375,16 @@ public class ListBufferTransitionRelation
    * @param factory  Factory used from proxy creation.
    * @param eventEnc Event encoding defining what events are to be used
    *                 for the integer codes in the transition relation.
-   * @param stateEnc State encoding to be created. If non-null, the
-   *                 method will add to the state encoding the states
-   *                 created for the output automaton and their assignment
-   *                 to state codes in the transition relation.
+   * @param stateEnc State encoding to be used.
+   *                 If non-null and non-empty, the encoding must define state
+   *                 objects for the codes of all reachable states with the
+   *                 desired initial state attributes and markings. Any
+   *                 reachable states defined in the encoding will be used
+   *                 in the output automaton.
+   *                 If non-null and empty, the method will add to the state
+   *                 encoding the states created for the output automaton and
+   *                 their assignment to state codes in the transition
+   *                 relation.
    */
   public AutomatonProxy createAutomaton
     (final ProductDESProxyFactory factory,
@@ -1406,30 +1412,37 @@ public class ListBufferTransitionRelation
     final List<StateProxy> reachable = new ArrayList<StateProxy>(numStates);
     final TLongObjectHashMap<Collection<EventProxy>> markingsMap =
       new TLongObjectHashMap<Collection<EventProxy>>();
+    final boolean useStateEnc =
+      stateEnc != null && stateEnc.getNumberOfStates() > 0;
     int code = 0;
     for (int s = 0; s < numStates; s++) {
       if (isReachable(s)) {
-        final boolean init = isInitial(s);
-        final long markings = mStateBuffer.getAllMarkings(s);
-        Collection<EventProxy> props = markingsMap.get(markings);
-        if (props == null) {
-          props = new ArrayList<EventProxy>(numProps);
-          for (int p = 0; p < numProps; p++) {
-            if (isMarked(s, p)) {
-              final EventProxy prop = eventEnc.getProposition(p);
-              props.add(prop);
+        final StateProxy state;
+        if (useStateEnc) {
+          state = stateEnc.getState(s);
+        } else {
+          final boolean init = isInitial(s);
+          final long markings = mStateBuffer.getAllMarkings(s);
+          Collection<EventProxy> props = markingsMap.get(markings);
+          if (props == null) {
+            props = new ArrayList<EventProxy>(numProps);
+            for (int p = 0; p < numProps; p++) {
+              if (isMarked(s, p)) {
+                final EventProxy prop = eventEnc.getProposition(p);
+                props.add(prop);
+              }
             }
+            markingsMap.put(markings, props);
           }
-          markingsMap.put(markings, props);
+          state = new MemStateProxy(code++, init, props);
         }
-        final StateProxy state = new MemStateProxy(code++, init, props);
         states[s] = state;
         reachable.add(state);
       }
     }
     if (stateEnc == null) {
       stateEnc = new StateEncoding(states);
-    } else {
+    } else if (stateEnc.getNumberOfStates() == 0) {
       stateEnc.init(states);
     }
 

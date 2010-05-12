@@ -143,6 +143,7 @@ class AltRemovalOfNoncoreachableStatesRule extends AbstractionRule
     tr.removeTauSelfLoops();
     tr.removeProperSelfLoopEvents();
     mOriginalIntToStateMap = stateEnc.getStatesArray();
+    stateEnc.clear();
     final ProductDESProxyFactory factory = getFactory();
     final AutomatonProxy convertedAut =
       tr.createAutomaton(factory, eventEnc, stateEnc);

@@ -64,6 +64,14 @@ public class Candidate implements Comparable<Candidate>
   // #########################################################################
   // # Simple Access
   /**
+   * Gets the number of automata in this candidate.
+   */
+  public int getNumberOfAutomata()
+  {
+    return mAutomata.size();
+  }
+
+  /**
    * Gets the list of automata in this candidate.
    *
    * @return List of automata in defined order as passed to constructor.
@@ -155,17 +163,20 @@ public class Candidate implements Comparable<Candidate>
   @Override
   public boolean equals(final Object obj)
   {
-    final Candidate other = (Candidate) obj;
-    return toString().equals(other.toString());
+    if (getClass() == obj.getClass()) {
+      final Candidate other = (Candidate) obj;
+      return mAutomata.equals(other.mAutomata);
+    } else {
+      return false;
+    }
   }
 
   @Override
   public int hashCode()
   {
-    int hash = 1;
-    hash = hash * 31 + toString().hashCode();
-    return hash;
+    return mAutomata.hashCode();
   }
+
 
   // #########################################################################
   // # Model Creation
@@ -176,8 +187,8 @@ public class Candidate implements Comparable<Candidate>
    * @param factory
    *          The factory to be used to create the proxies.
    */
-  public ProductDESProxy createProductDESProxy(
-                                               final ProductDESProxyFactory factory)
+  public ProductDESProxy createProductDESProxy
+    (final ProductDESProxyFactory factory)
   {
     final String name = toString();
     final Collection<EventProxy> events = getAllEvents();
@@ -185,6 +196,24 @@ public class Candidate implements Comparable<Candidate>
         .createProductDESProxy(name, "Automatically created from candidate.",
                                null, events, mAutomata);
   }
+
+  /**
+   * Creates a silent event for hiding by this candidate.
+   * @param  factory    The factory to be used to create the proxies.
+   * @return A new event named according to the candidate's automata,
+   *         or <CODE>null</CODE> if the candidate does not have any local
+   *         events.
+   */
+  public EventProxy createSilentEvent(final ProductDESProxyFactory factory)
+  {
+    if (mLocalEvents.isEmpty()) {
+      return null;
+    } else {
+      final String name = getCompositionName("tau:", mAutomata);
+      return factory.createEventProxy(name, EventKind.UNCONTROLLABLE, false);
+    }
+  }
+
 
   // #########################################################################
   // # Auxiliary Methods
@@ -224,10 +253,27 @@ public class Candidate implements Comparable<Candidate>
   // # Static Methods
   /**
    * Calculates a name that can be given to a synchronous product automaton.
+   * @param  automata List of automata constituting synchronous product.
+   * @return A string consisting of the names of the given automata,
+   *         with appropriate separators between them.
    */
   public static String getCompositionName(final List<AutomatonProxy> automata)
   {
-    final StringBuffer buffer = new StringBuffer("{");
+    return getCompositionName("", automata);
+  }
+
+  /**
+   * Calculates a name that can be given to a synchronous product automaton.
+   * @param  prefix   A string to be prepended to the result.
+   * @param  automata List of automata constituting synchronous product.
+   * @return A string consisting of the prefix followed by the names of
+   *         the given automata, with appropriate separators between them.
+   */
+  public static String getCompositionName(final String prefix,
+                                          final List<AutomatonProxy> automata)
+  {
+    final StringBuffer buffer = new StringBuffer(prefix);
+    buffer.append('{');
     boolean first = true;
     for (final AutomatonProxy aut : automata) {
       if (first) {
@@ -240,6 +286,7 @@ public class Candidate implements Comparable<Candidate>
     buffer.append('}');
     return buffer.toString();
   }
+
 
   // #########################################################################
   // # Invocation

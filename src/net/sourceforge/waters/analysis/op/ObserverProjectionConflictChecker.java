@@ -338,7 +338,13 @@ public class ObserverProjectionConflictChecker
           final Candidate candidate =
             Collections.min(candidates, mSelectingHeuristics);
           try {
+            final int numEventsBefore = mCurrentEvents.size();
             applyCandidate(candidate);
+            if (removeRedundantEvents() ||
+                mCurrentEvents.size() <
+                numEventsBefore - candidate.getLocalEventCount()) {
+              findEventDisjointSubsystems();
+            }
             break;
           } catch (final OverflowException overflow) {
             if (mNumOverflows++ >= MAX_OVERFLOWS) {
@@ -784,8 +790,7 @@ public class ObserverProjectionConflictChecker
   private void applyCandidate(final Candidate candidate)
     throws AnalysisException
   {
-    final int numEventsBefore = mCurrentEvents.size();
-    final CompositionStep syncStep = composeSynchronousProduct(candidate);
+    final HidingStep syncStep = composeSynchronousProduct(candidate);
     final EventProxy tau = syncStep.getHiddenEvent();
     AutomatonProxy autToAbstract = syncStep.getResultAutomaton();
     final ObservationEquivalenceStep oeStep =
@@ -796,30 +801,62 @@ public class ObserverProjectionConflictChecker
       mModifyingSteps.add(oeStep);
     }
     updateEventsToAutomata(autToAbstract, candidate.getAutomata());
-    final int numLocalEvents = candidate.getLocalEventCount();
-    if (removeRedundantEvents()) {
-      findEventDisjointSubsystems();
-    } else if (mCurrentEvents.size() < numEventsBefore - numLocalEvents) {
-      findEventDisjointSubsystems();
-    }
   }
+
 
   /**
    * Builds the synchronous product for a given candidate.
    */
-  private CompositionStep composeSynchronousProduct(final Candidate candidate)
+  private HidingStep composeSynchronousProduct(final Candidate candidate)
+    throws AnalysisException
+  {
+    if (candidate.getNumberOfAutomata() > 1) {
+      return composeSeveralAutomata(candidate);
+    } else {
+      return composeOneAutomaton(candidate);
+    }
+  }
+
+  private HidingStep composeOneAutomaton(final Candidate candidate)
+    throws OverflowException
+  {
+    final List<AutomatonProxy> automata = candidate.getAutomata();
+    assert automata.size() == 1 :
+      "Candidate for hiding has more than one automaton!";
+    final AutomatonProxy aut = automata.iterator().next();
+    final ProductDESProxyFactory factory = getFactory();
+    final EventProxy tau = candidate.createSilentEvent(factory);
+    final EventEncoding eventEnc = new EventEncoding(aut, tau);
+    final Collection<EventProxy> local = candidate.getLocalEvents();
+    for (final EventProxy event : local) {
+      eventEnc.addSilentEvent(event);
+    }
+    final StateEncoding stateEnc = new StateEncoding(aut);
+    final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
+      (aut, eventEnc, stateEnc,
+       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    final boolean change1 = rel.checkReachability();
+    final boolean change2 = rel.removeTauSelfLoops();
+    final boolean change3 = rel.removeProperSelfLoopEvents();
+    if (tau != null || change1 || change2 || change3) {
+      final EventProxy trueTau = change2 ? null : tau;
+      final AutomatonProxy abstracted =
+        rel.createAutomaton(factory, eventEnc, stateEnc);
+      return new HidingStep(abstracted, aut, local, trueTau);
+    } else {
+      return null;
+    }
+  }
+
+  private HidingStep composeSeveralAutomata(final Candidate candidate)
     throws AnalysisException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = candidate.createProductDESProxy(factory);
     mCurrentSynchronousProductBuilder.setModel(des);
     final Collection<EventProxy> local = candidate.getLocalEvents();
-    final EventProxy tau;
-    if (local.isEmpty()) {
-      tau = null;
-    } else {
-      final String tauname = "tau:" + des.getName();
-      tau = factory.createEventProxy(tauname, EventKind.UNCONTROLLABLE, false);
+    final EventProxy tau = candidate.createSilentEvent(factory);
+    if (tau != null) {
       mCurrentSynchronousProductBuilder.addMask(local, tau);
     }
     try {
@@ -828,11 +865,12 @@ public class ObserverProjectionConflictChecker
         mCurrentSynchronousProductBuilder.getComputedAutomaton();
       final SynchronousProductStateMap stateMap =
         mCurrentSynchronousProductBuilder.getStateMap();
-      return new CompositionStep(sync, local, tau, stateMap);
+      return new HidingStep(sync, local, tau, stateMap);
     } finally {
       mCurrentSynchronousProductBuilder.clearMask();
     }
   }
+
 
   //#########################################################################
   //# Trace Computation
@@ -844,13 +882,13 @@ public class ObserverProjectionConflictChecker
       mModifyingSteps.listIterator(size);
     /*
     final Collection<AutomatonProxy> check =
-      new LinkedList<AutomatonProxy>(trace.getAutomata());
+      new THashSet<AutomatonProxy>(trace.getAutomata());
     */
     while (iter.hasPrevious()) {
       final AbstractionStep step = iter.previous();
       traceSteps = step.convertTraceSteps(traceSteps);
       /*
-      check.remove(step.getResultAutomaton());
+      check.removeAll(step.getResultAutomata());
       check.addAll(step.getOriginalAutomata());
       TraceChecker.checkCounterExample(traceSteps, check, true);
       */
@@ -1821,12 +1859,23 @@ public class ObserverProjectionConflictChecker
 
   //#########################################################################
   //# Inner Class CompositionStep
-  private class CompositionStep extends AbstractionStep
+  private class HidingStep extends AbstractionStep
   {
 
     //#######################################################################
     //# Constructor
-    private CompositionStep(final AutomatonProxy composedAut,
+    private HidingStep(final AutomatonProxy composedAut,
+                            final AutomatonProxy originalAut,
+                            final Collection<EventProxy> localEvents,
+                            final EventProxy tau)
+    {
+      super(composedAut, originalAut);
+      mLocalEvents = localEvents;
+      mHiddenEvent = tau;
+      mStateMap = null;
+    }
+
+    private HidingStep(final AutomatonProxy composedAut,
                             final Collection<EventProxy> localEvents,
                             final EventProxy tau,
                             final SynchronousProductStateMap stateMap)
@@ -1867,7 +1916,7 @@ public class ObserverProjectionConflictChecker
           convertedStepMap.remove(resultAutomaton);
         for (final AutomatonProxy aut : originalAutomata) {
           final StateProxy originalState =
-            mStateMap.getOriginalState(convertedState, aut);
+            getOriginalState(convertedState, aut);
           convertedStepMap.put(aut, originalState);
         }
         EventProxy event = step.getEvent();
@@ -1918,6 +1967,16 @@ public class ObserverProjectionConflictChecker
         }
       }
       return possible.iterator().next();
+    }
+
+    final StateProxy getOriginalState(final StateProxy convertedState,
+                                      final AutomatonProxy aut)
+    {
+      if (mStateMap == null) {
+        return convertedState;
+      } else {
+        return mStateMap.getOriginalState(convertedState, aut);
+      }
     }
 
     //#######################################################################

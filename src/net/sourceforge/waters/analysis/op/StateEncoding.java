@@ -160,6 +160,17 @@ public class StateEncoding
     }
   }
 
+  /**
+   * Clears this state encoding.
+   * This method deletes all states from this encoding and resets it
+   * to be an empty encoding.
+   */
+  public void clear()
+  {
+    mStates = null;
+    mStateCodeMap = null;
+  }
+
 
   //#########################################################################
   //# Simple Access
@@ -173,7 +184,7 @@ public class StateEncoding
    */
   public int getNumberOfStates()
   {
-    return mStates.length;
+    return mStates == null ? 0 : mStates.length;
   }
 
   /**
