@@ -391,10 +391,12 @@ public class CompositionalGeneralisedConflictChecker extends
     rnsRule.setDefaultMarking(getMarkingProposition());
     mAbstractionRules.add(rnsRule);
 
-    final DeterminisationOfNonAlphaStatesRule dnasRule =
-        new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
-    dnasRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(dnasRule);
+    /*
+     * final DeterminisationOfNonAlphaStatesRule dnasRule = new
+     * DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
+     * dnasRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(dnasRule);
+     */
 
     final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
         new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
@@ -1639,19 +1641,104 @@ public class CompositionalGeneralisedConflictChecker extends
       return trace;
     }
 
+    /**
+     * Finds a partial trace in the original automaton. This method computes a
+     * sequence of tau transitions, followed by a transition with the given
+     * event, followed by another sequence of tau transitions linking the source
+     * state to some state in the class of the target state in the simplified
+     * automaton.
+     *
+     * @param originalSource
+     *          State number of the source state in the original automaton.
+     * @param event
+     *          Integer code of the event to be included in the trace.
+     * @param targetClass
+     *          State number of the state in the simplified automaton (code of
+     *          state class).
+     * @return List of search records describing the trace from source to
+     *         target. The first entry in the list represents the first step
+     *         after the source state, with its event and target state. The
+     *         final step has a target state in the given target class. Events
+     *         in the list can only be tau or the given event.
+     */
+    protected List<SearchRecord> findSubTrace(final int originalSource,
+                                              final int event,
+                                              final int resultAutTarget)
+    {
+
+      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+      final TIntHashSet visited0 = new TIntHashSet(); // event not in trace
+      final TIntHashSet visited1 = new TIntHashSet(); // event in trace
+      // The given event may be tau. In this case, we must search for a
+      // (possibly empty) string of tau events. This is achieved here by
+      // by creating a first search record with the 'hasevent' property,
+      // i.e., pretending the trace already has an event.
+      SearchRecord record;
+      if (event != getTauCode()) {
+        record = new SearchRecord(originalSource);
+        visited0.add(originalSource);
+      } else if (!isTargetState(originalSource, resultAutTarget)) {
+        record = new SearchRecord(originalSource, true, -1, null);
+        visited1.add(originalSource);
+      } else {
+        return Collections.emptyList();
+      }
+      open.add(record);
+      while (true) {
+        final SearchRecord current = open.remove();
+        final int source = current.getState();
+        final boolean hasEvent = current.hasProperEvent();
+        final TIntHashSet visited = hasEvent ? visited1 : visited0;
+        TIntHashSet successors =
+            getSuccessorsOrPredecessors(source, getTauCode());
+        if (successors != null) {
+          final TIntIterator iter = successors.iterator();
+          while (iter.hasNext()) {
+            final int target = iter.next();
+            if (!visited.contains(target)) {
+              record =
+                  new SearchRecord(target, hasEvent, getTauCode(), current);
+              if (hasEvent && isTargetState(target, resultAutTarget)) {
+                return buildSearchRecordTrace(record);
+              }
+              open.add(record);
+              visited.add(target);
+            }
+          }
+        }
+        if (!hasEvent) {
+          successors = getSuccessorsOrPredecessors(source, event);
+          if (successors != null) {
+            final TIntIterator iter = successors.iterator();
+            while (iter.hasNext()) {
+              final int target = iter.next();
+              if (!visited1.contains(target)) {
+                record = new SearchRecord(target, true, event, current);
+                if (isTargetState(target, resultAutTarget)) {
+                  return buildSearchRecordTrace(record);
+                }
+                open.add(record);
+                visited1.add(target);
+              }
+            }
+          }
+        }
+      }
+    }
+
     // #######################################################################
     // # Trace Computation
+    protected abstract TIntHashSet getSuccessorsOrPredecessors(int stateID,
+                                                               int event);
+
+    protected abstract boolean isTargetState(int stateFound, int resultAutTarget);
+
     protected abstract List<SearchRecord> completeStartOfTrace(
                                                                final TIntArrayList originalInitialStateIDs,
                                                                final int resultAutInitialState);
 
     protected abstract List<SearchRecord> completeEndOfTrace(
                                                              final int originalSource);
-
-    protected abstract List<SearchRecord> findSubTrace(
-                                                       final int originalSource,
-                                                       final int event,
-                                                       final int resultTarget);
 
     // #######################################################################
     // # Data Members
@@ -1815,90 +1902,10 @@ public class CompositionalGeneralisedConflictChecker extends
       }
     }
 
-    /**
-     * Finds a partial trace in the original automaton before observation
-     * equivalence. This method computes a sequence of tau transitions, followed
-     * by a transition with the given event, followed by another sequence of tau
-     * transitions linking the source state to some state in the class of the
-     * target state in the simplified automaton.
-     *
-     * @param originalSource
-     *          State number of the source state in the original automaton.
-     * @param event
-     *          Integer code of the event to be included in the trace.
-     * @param targetClass
-     *          State number of the state in the simplified automaton (code of
-     *          state class).
-     * @return List of search records describing the trace from source to
-     *         target. The first entry in the list represents the first step
-     *         after the source state, with its event and target state. The
-     *         final step has a target state in the given target class. Events
-     *         in the list can only be tau or the given event.
-     */
-    protected List<SearchRecord> findSubTrace(final int originalSource,
-                                              final int event,
-                                              final int targetClass)
+    protected TIntHashSet getSuccessorsOrPredecessors(final int source,
+                                                      final int event)
     {
-      final int[] targetArray = mClasMap.get(targetClass);
-      final TIntHashSet targetSet = new TIntHashSet(targetArray);
-      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
-      final TIntHashSet visited0 = new TIntHashSet(); // event not in trace
-      final TIntHashSet visited1 = new TIntHashSet(); // event in trace
-      // The given event may be tau. In this case, we must search for a
-      // (possibly empty) string of tau events. This is achieved here by
-      // by creating a first search record with the 'hasevent' property,
-      // i.e., pretending the trace already has an event.
-      SearchRecord record;
-      if (event != getTauCode()) {
-        record = new SearchRecord(originalSource);
-        visited0.add(originalSource);
-      } else if (!targetSet.contains(originalSource)) {
-        record = new SearchRecord(originalSource, true, -1, null);
-        visited1.add(originalSource);
-      } else {
-        return Collections.emptyList();
-      }
-      open.add(record);
-      while (true) {
-        final SearchRecord current = open.remove();
-        final int source = current.getState();
-        final boolean hasEvent = current.hasProperEvent();
-        final TIntHashSet visited = hasEvent ? visited1 : visited0;
-        TIntHashSet successors =
-            getTransitionRelation().getSuccessors(source, getTauCode());
-        if (successors != null) {
-          final TIntIterator iter = successors.iterator();
-          while (iter.hasNext()) {
-            final int target = iter.next();
-            if (!visited.contains(target)) {
-              record =
-                  new SearchRecord(target, hasEvent, getTauCode(), current);
-              if (hasEvent && targetSet.contains(target)) {
-                return buildSearchRecordTrace(record);
-              }
-              open.add(record);
-              visited.add(target);
-            }
-          }
-        }
-        if (!hasEvent) {
-          successors = getTransitionRelation().getSuccessors(source, event);
-          if (successors != null) {
-            final TIntIterator iter = successors.iterator();
-            while (iter.hasNext()) {
-              final int target = iter.next();
-              if (!visited1.contains(target)) {
-                record = new SearchRecord(target, true, event, current);
-                if (targetSet.contains(target)) {
-                  return buildSearchRecordTrace(record);
-                }
-                open.add(record);
-                visited1.add(target);
-              }
-            }
-          }
-        }
-      }
+      return getTransitionRelation().getSuccessors(source, event);
     }
 
     // #######################################################################
@@ -1910,6 +1917,15 @@ public class CompositionalGeneralisedConflictChecker extends
      * TransBiSimulator.
      */
     private final TIntObjectHashMap<int[]> mClasMap;
+
+    protected boolean isTargetState(final int stateFound,
+                                    final int resultAutTarget)
+    {
+      final int[] targetArray = mClasMap.get(resultAutTarget);
+      final TIntHashSet targetSet = new TIntHashSet(targetArray);
+      // TODO: don't want to get hashset every time
+      return targetSet.contains(stateFound);
+    }
   }
 
 
@@ -2138,6 +2154,12 @@ public class CompositionalGeneralisedConflictChecker extends
       }
     }
 
+    protected TIntHashSet getSuccessorsOrPredecessors(final int source,
+                                                      final int event)
+    {
+      return getTransitionRelation().getPredecessors(source, event);
+    }
+
     // #######################################################################
     // # Data Members
     /**
@@ -2147,6 +2169,12 @@ public class CompositionalGeneralisedConflictChecker extends
      * TransBiSimulator.
      */
     private final TIntObjectHashMap<int[]> mClasMap;
+
+    protected boolean isTargetState(final int stateFound,
+                                    final int resultAutTarget)
+    {
+      return stateFound == resultAutTarget;
+    }
   }
 
 
@@ -2347,68 +2375,50 @@ public class CompositionalGeneralisedConflictChecker extends
      *         final step has a target state in the given target class. Events
      *         in the list can only be tau or the given event.
      */
-    protected List<SearchRecord> findSubTrace(final int originalSource,
-                                              final int event,
-                                              final int resultTargetState)
+    /*
+     * protected List<SearchRecord> findSubTrace(final int originalSource, final
+     * int event, final int resultTargetState) { final Queue<SearchRecord> open
+     * = new ArrayDeque<SearchRecord>(); final TIntHashSet visited0 = new
+     * TIntHashSet(); // event not in trace final TIntHashSet visited1 = new
+     * TIntHashSet(); // event in trace // The given event may be tau. In this
+     * case, we must search for a // (possibly empty) string of tau events. This
+     * is achieved here by // by creating a first search record with the
+     * 'hasevent' property, // i.e., pretending the trace already has an event.
+     * SearchRecord record; if (event != getTauCode()) { record = new
+     * SearchRecord(originalSource); visited0.add(originalSource); } else if
+     * (resultTargetState != originalSource) { record = new
+     * SearchRecord(originalSource, true, -1, null);
+     * visited1.add(originalSource); } else { return Collections.emptyList(); }
+     * open.add(record); while (true) { final SearchRecord current =
+     * open.remove(); final int source = current.getState(); final boolean
+     * hasEvent = current.hasProperEvent(); final TIntHashSet visited = hasEvent
+     * ? visited1 : visited0; TIntHashSet successors =
+     * getTransitionRelation().getSuccessors(source, getTauCode()); if
+     * (successors != null) { final TIntIterator iter = successors.iterator();
+     * while (iter.hasNext()) { final int target = iter.next(); if
+     * (!visited.contains(target)) { record = new SearchRecord(target, hasEvent,
+     * getTauCode(), current); if (hasEvent && resultTargetState == target) {
+     * return buildSearchRecordTrace(record); } open.add(record);
+     * visited.add(target); } } } if (!hasEvent) { successors =
+     * getTransitionRelation().getSuccessors(source, event); if (successors !=
+     * null) { final TIntIterator iter = successors.iterator(); while
+     * (iter.hasNext()) { final int target = iter.next(); if
+     * (!visited1.contains(target)) { record = new SearchRecord(target, true,
+     * event, current); if (resultTargetState == target) { return
+     * buildSearchRecordTrace(record); } open.add(record); visited1.add(target);
+     * } } } } } }
+     */
+
+    protected TIntHashSet getSuccessorsOrPredecessors(final int source,
+                                                      final int event)
     {
-      final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
-      final TIntHashSet visited0 = new TIntHashSet(); // event not in trace
-      final TIntHashSet visited1 = new TIntHashSet(); // event in trace
-      // The given event may be tau. In this case, we must search for a
-      // (possibly empty) string of tau events. This is achieved here by
-      // by creating a first search record with the 'hasevent' property,
-      // i.e., pretending the trace already has an event.
-      SearchRecord record;
-      if (event != getTauCode()) {
-        record = new SearchRecord(originalSource);
-        visited0.add(originalSource);
-      } else if (resultTargetState != originalSource) {
-        record = new SearchRecord(originalSource, true, -1, null);
-        visited1.add(originalSource);
-      } else {
-        return Collections.emptyList();
-      }
-      open.add(record);
-      while (true) {
-        final SearchRecord current = open.remove();
-        final int source = current.getState();
-        final boolean hasEvent = current.hasProperEvent();
-        final TIntHashSet visited = hasEvent ? visited1 : visited0;
-        TIntHashSet successors =
-            getTransitionRelation().getSuccessors(source, getTauCode());
-        if (successors != null) {
-          final TIntIterator iter = successors.iterator();
-          while (iter.hasNext()) {
-            final int target = iter.next();
-            if (!visited.contains(target)) {
-              record =
-                  new SearchRecord(target, hasEvent, getTauCode(), current);
-              if (hasEvent && resultTargetState == target) {
-                return buildSearchRecordTrace(record);
-              }
-              open.add(record);
-              visited.add(target);
-            }
-          }
-        }
-        if (!hasEvent) {
-          successors = getTransitionRelation().getSuccessors(source, event);
-          if (successors != null) {
-            final TIntIterator iter = successors.iterator();
-            while (iter.hasNext()) {
-              final int target = iter.next();
-              if (!visited1.contains(target)) {
-                record = new SearchRecord(target, true, event, current);
-                if (resultTargetState == target) {
-                  return buildSearchRecordTrace(record);
-                }
-                open.add(record);
-                visited1.add(target);
-              }
-            }
-          }
-        }
-      }
+      return getTransitionRelation().getSuccessors(source, event);
+    }
+
+    protected boolean isTargetState(final int stateFound,
+                                    final int resultAutTarget)
+    {
+      return stateFound == resultAutTarget;
     }
   }
 
