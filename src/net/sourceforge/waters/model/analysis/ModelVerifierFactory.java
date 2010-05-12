@@ -44,6 +44,12 @@ public interface ModelVerifierFactory
                                                      ProductDESProxyFactory factory);
 
   /**
+   * Creates a new SCC Control Loop Checker
+   */
+  public ControlLoopChecker createSCCControlLoopChecker(
+                                                        ProductDESProxyFactory factory);
+
+  /**
    * Creates a language inclusion checker.
    */
   public LanguageInclusionChecker createLanguageInclusionChecker(

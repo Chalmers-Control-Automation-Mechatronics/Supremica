@@ -98,6 +98,12 @@ public abstract class AbstractModelVerifierFactory
     throw createUnsupportedOperationException("control-loop");
   }
 
+  public ControlLoopChecker createSCCControlLoopChecker
+    (final ProductDESProxyFactory factory)
+  {
+    throw createUnsupportedOperationException("SCC control-loop");
+  }
+
   public LanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {

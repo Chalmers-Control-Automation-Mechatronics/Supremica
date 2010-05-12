@@ -26,7 +26,7 @@ public class AnalyzeSCCControlLoopAction extends WatersAnalyzeAction
   protected ModelVerifier getModelVerifier(final ModelVerifierFactory factory,
                                            final ProductDESProxyFactory desFactory)
   {
-    return factory.createControlLoopChecker(desFactory);
+    return factory.createSCCControlLoopChecker(desFactory);
   }
 
   protected String getSuccessDescription()

@@ -91,7 +91,7 @@ public class NativeModelVerifierFactory
 
     protected void configure(final ModelVerifier verifier)
     {
-      NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
+      final NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
       nverifier.setExplorerMode(ExplorerMode.BROAD);
     }
   }
@@ -109,7 +109,7 @@ public class NativeModelVerifierFactory
 
     protected void configure(final ModelVerifier verifier)
     {
-      NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
+      final NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
       nverifier.setExplorerMode(ExplorerMode.NARROW);
     }
   }

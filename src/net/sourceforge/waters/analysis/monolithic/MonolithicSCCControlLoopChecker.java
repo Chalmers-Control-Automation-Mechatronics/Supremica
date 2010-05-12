@@ -156,8 +156,11 @@ public class MonolithicSCCControlLoopChecker
     final HashSet<EventProxy> output = new HashSet<EventProxy>();
     for (final EventProxy event : mEventList)
     {
-      if (!mLoopEvents.contains(event))
-        output.add(event);
+      if (event.getKind() == EventKind.CONTROLLABLE)
+      {
+        if (!mLoopEvents.contains(event))
+          output.add(event);
+      }
     }
     return output;
   }
@@ -428,10 +431,10 @@ public class MonolithicSCCControlLoopChecker
           final EncodedStateTuple encodedNextTuple =
             new EncodedStateTuple(encode(mNextTuple));
           addState(encodedNextTuple);
+          encodedCurrTuple.setInComponent(true);
         }
       }
     }
-    encodedCurrTuple.setInComponent(true);
   }
 
   /**
@@ -711,8 +714,20 @@ public class MonolithicSCCControlLoopChecker
       decode(source.getCodes(), currState);
       for (int i = 0; i < mNumEvent; i++) { // for all events
         if (eventAvailable(currState, i)) {
-          if (states.contains(encode(mNextTuple)))
-            output.add(mEventList.get(i));
+          for (final EncodedStateTuple dest : states)
+          {
+            boolean match = true;
+            for (int j = 0; j < mNumAutomata; j++)
+            {
+              if (dest.getCodes()[j] != mNextTuple[j])
+              {
+                match = false;
+                break;
+              }
+            }
+            if (match)
+              output.add(mEventList.get(i));
+          }
         }
       }
     }
