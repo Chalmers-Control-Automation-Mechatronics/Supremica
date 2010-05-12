@@ -176,14 +176,6 @@ public class CompositionalGeneralisedConflictChecker extends
         }
         try {
           syncProduct = composeSynchronousProduct(candidate);
-          break;
-        } catch (final OverflowException e) {
-          candidates.remove(candidate);
-          // TODO: see below, re-evaluating doesn't seem necessary
-        }
-      }
-      if (syncProduct != null) {
-        try {
           final AutomatonProxy abstractedAut =
               hideAndAbstract(syncProduct, candidate.getLocalEvents());
 
@@ -196,11 +188,10 @@ public class CompositionalGeneralisedConflictChecker extends
           // updates the current model to find candidates from
           final Candidate newModel = new Candidate(remainingAut, null);
           model = newModel.createProductDESProxy(getFactory());
+          break;
         } catch (final OverflowException e) {
+          candidates.remove(candidate);
           mUnsuccessfulCandidates.add(candidate);
-          // TODO: this isn't the best solution (same as above), candidates are
-          // unnecessarily found and evaluated again, even though we already
-          // knew the results of applying the heuristics...
         }
       }
     }
