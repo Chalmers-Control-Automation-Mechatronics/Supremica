@@ -38,6 +38,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -45,6 +46,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -134,6 +136,44 @@ public class CompositionalGeneralisedConflictChecker extends
                                                  final ProductDESProxyFactory factory)
   {
     super(model, marking, preMarking, factory);
+  }
+
+  /**
+   * Stores any available statistics on this verifier's last run in the given
+   * verification result.
+   */
+  @Override
+  protected void addStatistics(final VerificationResult result)
+  {
+    super.addStatistics(result);
+    // TODO:add statistics
+  }
+
+  /**
+   * Creates a verification result indicating that the property checked is
+   * satisfied. This method is used by {@link #setSatisfiedResult()} to create a
+   * verification result.
+   */
+  @Override
+  protected VerificationResult createSatisfiedResult()
+  {
+    return new CompositionalGeneralisedNonblockingConflictCheckerVerificationResult();
+  }
+
+  /**
+   * Creates a verification result indicating that the property checked is not
+   * satisfied. This method is used by {@link #setFailedResult(TraceProxy)
+   * setFailedResult()} to create a verification result.
+   *
+   * @param counterexample
+   *          The counterexample to be stored on the result.
+   */
+  @Override
+  protected VerificationResult createFailedResult(
+                                                  final TraceProxy counterexample)
+  {
+    return new CompositionalGeneralisedNonblockingConflictCheckerVerificationResult(
+        counterexample);
   }
 
   // #########################################################################
