@@ -29,10 +29,20 @@ public class AnalysisResult
     return mSatisfied;
   }
 
+  public long getRunTime()
+  {
+    return mRunTime;
+  }
+
+  public void setRuntime(final long time)
+  {
+    mRunTime = time;
+  }
+
 
   //#########################################################################
   //# Printing
-  public void print(PrintStream stream)
+  public void print(final PrintStream stream)
   {
     stream.println("Verification result: " + mSatisfied);
   }
@@ -41,5 +51,6 @@ public class AnalysisResult
   //#########################################################################
   //# Data Members
   private final boolean mSatisfied;
+  private long mRunTime;
 
 }

@@ -122,6 +122,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   protected void setUp()
     throws AnalysisException
   {
+    mStartTime = System.currentTimeMillis();
     mIsAborting = false;
   }
 
@@ -135,6 +136,11 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   protected void tearDown()
   {
     mIsAborting = false;
+    final long runTime = System.currentTimeMillis() - mStartTime;
+    final AnalysisResult result = getAnalysisResult();
+    if (result != null) {
+      result.setRuntime(runTime);
+    }
   }
 
   /**
@@ -188,6 +194,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   private ProductDESProxy mModel;
   private int mNodeLimit;
   private int mTransitionLimit;
+  private long mStartTime;
   private boolean mIsAborting;
 
 }

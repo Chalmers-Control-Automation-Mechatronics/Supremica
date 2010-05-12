@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.THashSet;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
@@ -861,8 +863,8 @@ public class MonolithicSCCControlLoopChecker
   /** a global state tuple for storing next state tuple */
   private int mNextTuple[];
 
-  /** a list of all the events which occur in all control loops */
-  private final HashSet<EventProxy> mLoopEvents = new HashSet<EventProxy>();
+  /** a set of all the events which occur in all control loops */
+  private final Set<EventProxy> mLoopEvents = new THashSet<EventProxy>();
 
   /** the number of states which have been visited */
   private int numStates = 0;

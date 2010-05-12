@@ -97,7 +97,7 @@ public abstract class AbstractModelVerifier
    */
   protected boolean setSatisfiedResult()
   {
-    mResult = new VerificationResult();
+    mResult = createSatisfiedResult();
     addStatistics(mResult);
     return true;
   }
@@ -110,9 +110,34 @@ public abstract class AbstractModelVerifier
    */
   protected boolean setFailedResult(final TraceProxy counterexample)
   {
-    mResult = new VerificationResult(counterexample);
+    mResult = createFailedResult(counterexample);
     addStatistics(mResult);
     return false;
+  }
+
+  /**
+   * Creates a verification result indicating that the property checked
+   * is satisfied. This method is used by {@link #setSatisfiedResult()}
+   * to create a verification result; it is overridden by subclasses that
+   * require more specific verification result types.
+   */
+  protected VerificationResult createSatisfiedResult()
+  {
+    return new VerificationResult();
+  }
+
+  /**
+   * Creates a verification result indicating that the property checked
+   * is not satisfied. This method is used by
+   * {@link #setFailedResult(TraceProxy) setFailedResult()}
+   * to create a verification result; it is overridden by subclasses that
+   * require more specific verification result types.
+   * @param  counterexample The counterexample to be stored on the result.
+   */
+  protected VerificationResult createFailedResult
+    (final TraceProxy counterexample)
+  {
+    return new VerificationResult(counterexample);
   }
 
   /**
