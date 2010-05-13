@@ -146,6 +146,11 @@ public class CompositionalGeneralisedConflictChecker extends
   protected void addStatistics(final VerificationResult result)
   {
     super.addStatistics(result);
+    final CompositionalGeneralisedNonblockingConflictCheckerVerificationResult stats =
+        (CompositionalGeneralisedNonblockingConflictCheckerVerificationResult) result;
+    stats.setSuccessfulCompositionCount(mSuccessfulCompositionCount);
+    stats.setUnsuccessfulCompositionCount(mUnsuccessfulCompositionCount);
+    stats.setAbstractionRuleStats(mAbstractionRules);
     // TODO:add statistics
   }
 
@@ -228,8 +233,11 @@ public class CompositionalGeneralisedConflictChecker extends
           // updates the current model to find candidates from
           final Candidate newModel = new Candidate(remainingAut, null);
           model = newModel.createProductDESProxy(getFactory());
+          mSuccessfulCompositionCount++;
           break;
         } catch (final OverflowException e) {
+          mUnsuccessfulCompositionCount++;
+
           candidates.remove(candidate);
           mUnsuccessfulCandidates.add(candidate);
         }
@@ -387,6 +395,9 @@ public class CompositionalGeneralisedConflictChecker extends
       final SelectingHeuristic defaultHeuristic = new HeuristicMinS();
       setSelectingHeuristic(defaultHeuristic);
     }
+    mSuccessfulCompositionCount = 0;
+    mUnsuccessfulCompositionCount = 0;
+
     mModifyingSteps = new ArrayList<Step>();
     mPropositions = new ArrayList<EventProxy>(2);
     if (getGeneralisedPrecondition() != null) {
@@ -2522,5 +2533,6 @@ public class CompositionalGeneralisedConflictChecker extends
   private Collection<EventProxy> mPropositions;
   private int mSyncProductNodeLimit = Integer.MAX_VALUE;
   private int mFinalStepNodeLimit = Integer.MAX_VALUE;
-
+  private int mSuccessfulCompositionCount;
+  private int mUnsuccessfulCompositionCount;
 }

@@ -50,24 +50,10 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
                                                                               final boolean satisfied,
                                                                               final TraceProxy counterexample)
   {
-    this(satisfied, counterexample, null);
-  }
-
-  /**
-   * Creates a verification result with parameters as given.
-   */
-  public CompositionalGeneralisedNonblockingConflictCheckerVerificationResult(
-                                                                              final boolean satisfied,
-                                                                              final TraceProxy counterexample,
-                                                                              final List<AbstractionRule> abstractionRules)
-  {
     super(satisfied, counterexample);
-    mAbstractionRules = null;
     mUnsuccessfulCompositionCount = 0;
     mSuccessfulCompositionCount = 0;
-    if (abstractionRules != null) {
-      createAbstractionRuleStats(abstractionRules);
-    }
+    mAbstractionRuleStats = null;
   }
 
   // #########################################################################
@@ -105,23 +91,22 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
    */
   public AbstractionRuleStatistics getStatistics(final AbstractionRule rule)
   {
-    return mAbstractionRules.get(rule);
+    return mAbstractionRuleStats.get(rule);
   }
 
   // #########################################################################
   // # Providing Statistics
   /**
-   * Creates an AbstractionRuleStatistic for each rule in the list and maps the
-   * statistics to the rule for easy updating later.
+   * Maps a list of AbstractionRuleStatistics which represent the statistics for
+   * the abstraction rules used during the composition of the model.
    */
-  public void createAbstractionRuleStats(final List<AbstractionRule> rules)
+  public void setAbstractionRuleStats(final List<AbstractionRule> rules)
   {
-    mAbstractionRules =
+    mAbstractionRuleStats =
         new HashMap<AbstractionRule,AbstractionRuleStatistics>();
     for (final AbstractionRule rule : rules) {
-      final AbstractionRuleStatistics stats =
-          new AbstractionRuleStatistics(rule.toString());
-      mAbstractionRules.put(rule, stats);
+      final AbstractionRuleStatistics stats = rule.getStatistics();
+      mAbstractionRuleStats.put(rule, stats);
     }
   }
 
@@ -154,7 +139,7 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
     // TODO:add stats to print
   }
 
-  private Map<AbstractionRule,AbstractionRuleStatistics> mAbstractionRules;
+  private Map<AbstractionRule,AbstractionRuleStatistics> mAbstractionRuleStats;
   private int mSuccessfulCompositionCount;
   private int mUnsuccessfulCompositionCount;
 

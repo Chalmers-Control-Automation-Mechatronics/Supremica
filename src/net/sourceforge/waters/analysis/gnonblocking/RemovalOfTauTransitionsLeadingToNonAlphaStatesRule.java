@@ -64,7 +64,7 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
 
   // #######################################################################
   // # Rule Application
-  AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
+  AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                            final EventProxy tau)
   {
     mAutToAbstract = autToAbstract;

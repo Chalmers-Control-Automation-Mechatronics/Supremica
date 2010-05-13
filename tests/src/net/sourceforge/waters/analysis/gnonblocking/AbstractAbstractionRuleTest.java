@@ -154,7 +154,7 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
     configureAbstractionRule(des);
     final EventProxy tau = getEvent(des, TAU);
     final AutomatonProxy before = findAutomaton(des, BEFORE);
-    final AutomatonProxy result = mAbstractionRule.applyRule(before, tau);
+    final AutomatonProxy result = mAbstractionRule.applyRuleToAutomaton(before, tau);
     checkResult(des, before, result);
     getLogger().info("Done " + des.getName());
   }

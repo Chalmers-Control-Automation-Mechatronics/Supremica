@@ -47,7 +47,7 @@ class TauLoopRemovalRule extends AbstractionRule
 
   // #######################################################################
   // # Rule Application
-  AutomatonProxy applyRule(final AutomatonProxy autToAbstract,
+  AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                            final EventProxy tau) throws AnalysisException
   {
     mTau = tau;

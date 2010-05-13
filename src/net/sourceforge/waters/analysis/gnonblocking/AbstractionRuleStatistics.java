@@ -163,82 +163,82 @@ public class AbstractionRuleStatistics
   // #########################################################################
   // # Providing Statistics
   /**
-   * Adds to the number of times this abstraction rule reduced the size of the
+   * Sets the number of times this abstraction rule reduced the size of the
    * model it was applied to.
    */
-  public void addToReductionCount(final int reduced)
+  public void setReductionCount(final int reduced)
   {
-    mReductionCount += reduced;
+    mReductionCount = reduced;
   }
 
   /**
-   * Adds to the time taken for the abstraction rule to run.
+   * Sets the time taken for the abstraction rule to run.
    */
-  public void addToRunTime(final long runTime)
+  public void setRunTime(final long runTime)
   {
-    mRunTime += runTime;
+    mRunTime = runTime;
   }
 
   /**
-   * Adds to the number of times this abstraction rule is applied to the model.
+   * Sets the number of times this abstraction rule is applied to the model.
    */
-  public void addToApplicationCount(final int count)
+  public void setApplicationCount(final int count)
   {
-    mAppliedCount += count;
+    mAppliedCount = count;
   }
 
   /**
-   * Adds to the sum of the number of input states for this rule when a
+   * Sets the sum of the number of input states for this rule when a reduction
+   * occurred.
+   */
+  public void setInputStates(final int sum)
+  {
+    mInputStates = sum;
+  }
+
+  /**
+   * Sets the sum of the number of output states for this rule when a reduction
+   * occurred.
+   */
+  public void setOutputStates(final int sum)
+  {
+    mOutputStates = sum;
+  }
+
+  /**
+   * Sets the sum of the number of input transitions for this rule when a
    * reduction occurred.
    */
-  public void addToInputStates(final int countToAdd)
+  public void setInputTransitions(final int sum)
   {
-    mInputStates += countToAdd;
+    mInputTransitions = sum;
   }
 
   /**
-   * Adds to the sum of the number of output states for this rule when a
+   * Sets the sum of the number of output transitions for this rule when a
    * reduction occurred.
    */
-  public void addToOutputStates(final int countToAdd)
+  public void setOutputTransitions(final int sum)
   {
-    mOutputStates += countToAdd;
+    mOutputTransitions = sum;
   }
 
   /**
-   * Adds to the sum of the number of input transitions for this rule when a
-   * reduction occurred.
+   * Sets the sum of the number of input states for this rule when a reduction
+   * didn't occur.
    */
-  public void addToInputTransitions(final int countToAdd)
+  public void setUnchangedStates(final int sum)
   {
-    mInputTransitions += countToAdd;
+    mUnchangedStates = sum;
   }
 
   /**
-   * Adds to the sum of the number of output transitions for this rule when a
-   * reduction occurred.
-   */
-  public void addToOutputTransitions(final int countToAdd)
-  {
-    mOutputTransitions += countToAdd;
-  }
-
-  /**
-   * Adds to the sum of the number of input states for this rule when a
+   * Sets the sum of the number of input transitions for this rule when a
    * reduction didn't occur.
    */
-  public void addToUnchangedStates(final int countToAdd)
+  public void setUnchangedTransitions(final int sum)
   {
-    mUnchangedStates += countToAdd;
-  }
-
-  /**
-   * Adds to the sum of the number of input transitions for this rule when a
-   * reduction didn't occur.
-   */
-  public void addToUnchangedTransitions(final int countToAdd)
-  {
-    mUnchangedTransitions += countToAdd;
+    mUnchangedTransitions = sum;
   }
 
   // #########################################################################
