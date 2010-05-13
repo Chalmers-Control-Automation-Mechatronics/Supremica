@@ -1,11 +1,9 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.TraceProxy;
 
@@ -87,11 +85,11 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
   }
 
   /**
-   * Gets the statistics that apply to a given abstraction rule.
+   * Gets the statistics that apply to the abstraction rules used.
    */
-  public AbstractionRuleStatistics getStatistics(final AbstractionRule rule)
+  public List<AbstractionRuleStatistics> getAbstractionRuleStatistics()
   {
-    return mAbstractionRuleStats.get(rule);
+    return mAbstractionRuleStats;
   }
 
   // #########################################################################
@@ -103,10 +101,10 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
   public void setAbstractionRuleStats(final List<AbstractionRule> rules)
   {
     mAbstractionRuleStats =
-        new HashMap<AbstractionRule,AbstractionRuleStatistics>();
+        new ArrayList<AbstractionRuleStatistics>(rules.size());
     for (final AbstractionRule rule : rules) {
       final AbstractionRuleStatistics stats = rule.getStatistics();
-      mAbstractionRuleStats.put(rule, stats);
+      mAbstractionRuleStats.add(stats);
     }
   }
 
@@ -139,7 +137,7 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
     // TODO:add stats to print
   }
 
-  private Map<AbstractionRule,AbstractionRuleStatistics> mAbstractionRuleStats;
+  private List<AbstractionRuleStatistics> mAbstractionRuleStats;
   private int mSuccessfulCompositionCount;
   private int mUnsuccessfulCompositionCount;
 

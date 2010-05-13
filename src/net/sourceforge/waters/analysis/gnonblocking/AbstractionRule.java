@@ -56,6 +56,15 @@ abstract class AbstractionRule
     mPropositions = props;
   }
 
+  @Override
+  public String toString()
+  {
+    final String className = getClass().getName();
+    final String[] splitName = className.split("\\.");
+    final String name = splitName[splitName.length - 1];
+    return name;
+  }
+
   // #########################################################################
   // # Simple Access Methods
   /**
@@ -65,7 +74,7 @@ abstract class AbstractionRule
   public AbstractionRuleStatistics getStatistics()
   {
     final AbstractionRuleStatistics stats =
-        new AbstractionRuleStatistics(this.toString());
+        new AbstractionRuleStatistics(toString());
     stats.setApplicationCount(mAppliedCount);
     stats.setInputStates(mInputStates);
     stats.setInputTransitions(mInputTransitions);
