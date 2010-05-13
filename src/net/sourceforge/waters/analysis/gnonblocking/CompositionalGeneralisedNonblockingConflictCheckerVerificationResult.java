@@ -12,9 +12,9 @@ import net.sourceforge.waters.model.des.TraceProxy;
 
 /**
  * A result record returned by a {@link CompositionalGeneralisedConflictChecker}
- * . A verification result contains the information on whether a property
- * checked is true or false, and in the latter case, it also contains a
- * counterexample. In addition, it contains statistics about the analysis run.
+ * A verification result contains the information on whether a property checked
+ * is true or false, and in the latter case, it also contains a counterexample.
+ * In addition, it contains statistics about the analysis run.
  *
  * @author Rachel Francis
  */
