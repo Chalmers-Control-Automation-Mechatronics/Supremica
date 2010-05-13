@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import java.util.Collection;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -59,11 +60,9 @@ abstract class AbstractionRule
   @Override
   public String toString()
   {
-    final String className = getClass().getName();
-    final String[] splitName = className.split("\\.");
-    final String name = splitName[splitName.length - 1];
-    return name;
+    return ProxyTools.getShortClassName(this);
   }
+
 
   // #########################################################################
   // # Simple Access Methods
