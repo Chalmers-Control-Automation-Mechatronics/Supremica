@@ -87,8 +87,7 @@ abstract class AbstractionRule
                                                                       final EventProxy tau)
       throws AnalysisException
   {
-    final AutomatonProxy abstractedAut =
-        applyRuleToAutomaton(autToAbstract, tau);
+    final AutomatonProxy abstractedAut = applyRule(autToAbstract, tau);
     if (abstractedAut != autToAbstract) {
       return createStep(checker, abstractedAut);
     } else {
