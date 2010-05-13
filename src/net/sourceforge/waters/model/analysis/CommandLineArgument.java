@@ -156,7 +156,7 @@ public abstract class CommandLineArgument
 
   //#########################################################################
   //# Exception Handling
-  protected void fail(final String msg)
+  protected static void fail(final String msg)
   {
     System.err.println(msg);
     System.exit(1);

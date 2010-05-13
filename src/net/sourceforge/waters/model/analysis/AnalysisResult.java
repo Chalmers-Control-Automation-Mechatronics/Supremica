@@ -9,8 +9,7 @@
 package net.sourceforge.waters.model.analysis;
 
 import java.io.PrintStream;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.util.Formatter;
 
 
 /**
@@ -78,9 +77,9 @@ public class AnalysisResult
   {
     stream.println("Verification result: " + mSatisfied);
     if (mRunTime >= 0) {
-      final double seconds = 0.001 * mRunTime;
-      final NumberFormat formatter = new DecimalFormat("0.00");
-      stream.println("Total runtime: " + formatter.format(seconds) + "s");
+      final Formatter formatter = new Formatter(stream);
+      final float seconds = 0.001f * mRunTime;
+      formatter.format("Total runtime: %.3fs\n", seconds);
     }
   }
 

@@ -206,7 +206,7 @@ public abstract class AbstractModelVerifierFactory
         final String msg =
           "Required argument " + arg.getName() + " for " +
           clsname.substring(dotpos + 1) + " not specified!";
-        arg.fail(msg);
+        CommandLineArgument.fail(msg);
       }
     }
   }

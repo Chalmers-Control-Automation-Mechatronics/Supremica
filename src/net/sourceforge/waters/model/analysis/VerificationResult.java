@@ -50,7 +50,7 @@ public class VerificationResult extends AnalysisResult
   {
     this(false, counterexample);
   }
-  
+
   /**
    * Creates a verification result with parameters as given.
    */
@@ -78,7 +78,7 @@ public class VerificationResult extends AnalysisResult
   {
     return mCounterExample;
   }
-  
+
   /**
    * Gets the total number of automata used by the analysis.
    * @return The number of automata, or <CODE>-1</CODE> if unknown.
@@ -124,7 +124,7 @@ public class VerificationResult extends AnalysisResult
   {
     return mPeakNumberOfNodes;
   }
-  
+
   /**
    * Gets the total number of transitions constructed by the analysis.
    * @return The total number of transitions, or <CODE>-1</CODE> if unknown.
@@ -272,15 +272,15 @@ public class VerificationResult extends AnalysisResult
       mPeakNumberOfNodes = numnodes;
     } else {
       throw new IllegalStateException
-	("Trying to overwrite previously set peak number of nodes " +
-	 "in verification result!");
+        ("Trying to overwrite previously set peak number of nodes " +
+         "in verification result!");
     }
   }
 
 
   //#########################################################################
   //# Printing
-  public void print(PrintStream stream)
+  public void print(final PrintStream stream)
   {
     super.print(stream);
     final Formatter formatter = new Formatter(stream);
@@ -288,7 +288,7 @@ public class VerificationResult extends AnalysisResult
       stream.println("Total number of automata: " + mTotalNumberOfAutomata);
     }
     if (mTotalNumberOfStates >= 0) {
-      formatter.format("Total number of states/nodes: %.0f\n",
+      formatter.format("Total number of states: %.0f\n",
                        mTotalNumberOfStates);
     }
     if (mTotalNumberOfTransitions >= 0) {
@@ -296,12 +296,15 @@ public class VerificationResult extends AnalysisResult
                        mTotalNumberOfTransitions);
     }
     if (mPeakNumberOfStates >= 0) {
-      formatter.format("Peak number of states/nodes: %.0f\n",
+      formatter.format("Peak number of states: %.0f\n",
                        mPeakNumberOfStates);
     }
     if (mPeakNumberOfTransitions >= 0) {
       formatter.format("Peak number of transitions: %.0f\n",
                        mPeakNumberOfTransitions);
+    }
+    if (mPeakNumberOfNodes >= 0) {
+      stream.println("Peak number of nodes: " + mPeakNumberOfNodes);
     }
   }
 

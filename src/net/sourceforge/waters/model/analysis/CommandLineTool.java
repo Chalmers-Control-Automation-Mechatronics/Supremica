@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.despot.SICPropertyVVerifier;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -83,6 +84,7 @@ public class CommandLineTool
       final ExpressionParser parser =
         new ExpressionParser(moduleFactory, optable);
       List<ParameterBindingProxy> bindings = null;
+      ModelVerifier wrapper = null;
 
       boolean verbose = true;
       boolean stats = false;
@@ -96,6 +98,8 @@ public class CommandLineTool
           arglist.add(arg);
         } else if (arg.equals("-q") || arg.equals("-quiet")) {
           verbose = false;
+        } else if (arg.equals("-sic5")) {
+          wrapper = new SICPropertyVVerifier(desFactory);
         } else if (arg.equals("-stats")) {
           stats = true;
         } else if (arg.equals("-noopt")) {
@@ -168,6 +172,17 @@ public class CommandLineTool
         !(checker instanceof LanguageInclusionChecker);
       final boolean noPropositions =
         !(checker instanceof ConflictChecker);
+      if (wrapper == null) {
+        wrapper = checker;
+      } else if (checker instanceof ConflictChecker) {
+        final SICPropertyVVerifier wwrapper = (SICPropertyVVerifier) wrapper;
+        final ConflictChecker cchecker = (ConflictChecker) checker;
+        wwrapper.setConflictChecker(cchecker);
+      } else {
+        CommandLineArgument.fail
+          ("SIC property check requires a conflict checker, " +
+           "but none was configured.");
+      }
       final Collection<String> empty = Collections.emptyList();
       final List<String> filenames = factory.configure(checker);
 
@@ -196,11 +211,11 @@ public class CommandLineTool
         System.out.flush();
 
         final long start = System.currentTimeMillis();
-        checker.setModel(des);
+        wrapper.setModel(des);
         factory.postConfigure(checker);
         try {
-          checker.run();
-          final VerificationResult result = checker.getAnalysisResult();
+          wrapper.run();
+          final VerificationResult result = wrapper.getAnalysisResult();
           final long stop = System.currentTimeMillis();
           final boolean satisfied = result.isSatisfied();
           final double numstates = result.getTotalNumberOfStates();

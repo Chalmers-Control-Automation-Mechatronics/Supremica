@@ -7,6 +7,7 @@ export LD_LIBRARY_PATH=$DIR
 
 WPACK="net.sourceforge.waters"
 FACTORY="$WPACK.cpp.analysis.NativeModelVerifierFactory"
+MEM="-Xmx512m"
 ARGS=
 
 for F in "$@"; do
@@ -41,9 +42,16 @@ for F in "$@"; do
 	-lang)
 	    CHECK="LanguageInclusion"
 	    ;;
-	-loop)
-	    CHECK="ControlLoop"
-	    ;;
+    -loop)
+        CHECK="ControlLoop"
+        ;;
+    -sic5)
+        CHECK="Conflict"
+        ARGS="$ARGS \"$F\""
+        ;;
+    -Xmx*)
+        MEM="$F"
+        ;;
 	*)
 	    ARGS="$ARGS \"$F\""
 	    ;;
@@ -53,11 +61,11 @@ done
 OK=1
 if [ "" = "$CHECK" ]; then
     echo "No check specified!"
-    echo "Available options are: -conf -cont -lang -loop"
+    echo "Available options are: -conf -cont -lang -loop -sic5"
     OK=0
 fi
 
 if [ $OK = 1 ]; then
-    eval java -cp "$DIR/Supremica.jar" -enableassertions -Xmx512m \
+    eval java -cp "$DIR/Supremica.jar" -enableassertions $MEM \
         $WPACK.model.analysis.CommandLineTool $FACTORY $CHECK "$ARGS"
 fi
