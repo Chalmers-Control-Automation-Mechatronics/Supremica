@@ -63,7 +63,6 @@ abstract class AbstractionRule
     return ProxyTools.getShortClassName(this);
   }
 
-
   // #########################################################################
   // # Simple Access Methods
   /**
