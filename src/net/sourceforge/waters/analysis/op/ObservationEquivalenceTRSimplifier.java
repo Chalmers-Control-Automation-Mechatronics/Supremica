@@ -196,10 +196,8 @@ public class ObservationEquivalenceTRSimplifier implements
 
     if (logger.isDebugEnabled()) {
       final String msg =
-          "EXIT " + ProxyTools.getShortClassName(this) + ".run(): "
-              + mTransitionRelation.getNumberOfReachableStates()
-              + " states and " + mTransitionRelation.getNumberOfTransitions()
-              + " transitions ...";
+          "EXIT " + ProxyTools.getShortClassName(this) + ".run(): " +
+          numClasses + " equivalence classes found.";
       logger.debug(msg);
     }
     return true;
@@ -276,7 +274,8 @@ public class ObservationEquivalenceTRSimplifier implements
         mTransitionRelation.createAllTransitionsModifyingIterator();
     final TransitionIterator iter2 =
         mTransitionRelation.createPredecessorsReadOnlyIterator();
-    trans: while (iter0.advance()) {
+    trans:
+    while (iter0.advance()) {
       final int e = iter0.getCurrentEvent();
       if (e == tau && !mSuppressRedundantHiddenTransitions) {
         continue;
