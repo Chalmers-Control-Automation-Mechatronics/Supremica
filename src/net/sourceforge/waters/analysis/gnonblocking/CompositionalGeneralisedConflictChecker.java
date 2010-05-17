@@ -210,6 +210,7 @@ public class CompositionalGeneralisedConflictChecker extends
       model = modifiedModel.createProductDESProxy(getFactory());
       mapEventsToAutomata(model);
     }
+
     outer: while (remainingAut.size() > 1) {
       final List<Candidate> candidates = findCandidates(model);
       Candidate candidate;
@@ -407,49 +408,49 @@ public class CompositionalGeneralisedConflictChecker extends
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
-    final TauLoopRemovalRule tlrRule =
-        new TauLoopRemovalRule(getFactory(), mPropositions);
-    mAbstractionRules.add(tlrRule);
-
-    final ObservationEquivalenceRule oeRule =
-        new ObservationEquivalenceRule(getFactory(), mPropositions);
-    oeRule.setTransitionLimit(getTransitionLimit());
-    mAbstractionRules.add(oeRule);
-
-    final RemovalOfAlphaMarkingsRule ramRule =
-        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-    ramRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(ramRule);
-
-    final RemovalOfDefaultMarkingsRule rdmRule =
-        new RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
-    rdmRule.setAlphaMarking(getGeneralisedPrecondition());
-    rdmRule.setDefaultMarking(getMarkingProposition());
-    mAbstractionRules.add(rdmRule);
-
-    final RemovalOfNoncoreachableStatesRule rnsRule =
-        new RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
-    rnsRule.setAlphaMarking(getGeneralisedPrecondition());
-    rnsRule.setDefaultMarking(getMarkingProposition());
-    mAbstractionRules.add(rnsRule);
-
+    /*
+     * final TauLoopRemovalRule tlrRule = new TauLoopRemovalRule(getFactory(),
+     * mPropositions); mAbstractionRules.add(tlrRule);
+     *
+     * final ObservationEquivalenceRule oeRule = new
+     * ObservationEquivalenceRule(getFactory(), mPropositions);
+     * oeRule.setTransitionLimit(getTransitionLimit());
+     * mAbstractionRules.add(oeRule);
+     *
+     * final RemovalOfAlphaMarkingsRule ramRule = new
+     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(ramRule);
+     *
+     * final RemovalOfDefaultMarkingsRule rdmRule = new
+     * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
+     * rdmRule.setAlphaMarking(getGeneralisedPrecondition());
+     * rdmRule.setDefaultMarking(getMarkingProposition());
+     * mAbstractionRules.add(rdmRule);
+     *
+     * final RemovalOfNoncoreachableStatesRule rnsRule = new
+     * RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
+     * rnsRule.setAlphaMarking(getGeneralisedPrecondition());
+     * rnsRule.setDefaultMarking(getMarkingProposition());
+     * mAbstractionRules.add(rnsRule);
+     */
     final DeterminisationOfNonAlphaStatesRule dnasRule =
         new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
     dnasRule.setAlphaMarking(getGeneralisedPrecondition());
     mAbstractionRules.add(dnasRule);
-
-    final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
-        new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
-            mPropositions);
-    rttlnsRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(rttlnsRule);
-
-    final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule =
-        new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
-            getFactory(), mPropositions);
-    rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
-    rttonsRule.setDefaultMarking(getMarkingProposition());
-    mAbstractionRules.add(rttonsRule);
+    /*
+     * final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule = new
+     * RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
+     * mPropositions); rttlnsRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(rttlnsRule);
+     *
+     * final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule
+     * = new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
+     * getFactory(), mPropositions);
+     * rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
+     * rttonsRule.setDefaultMarking(getMarkingProposition());
+     * mAbstractionRules.add(rttonsRule);
+     */
 
   }
 
@@ -1645,9 +1646,9 @@ public class CompositionalGeneralisedConflictChecker extends
       return substeps;
     }
 
-    private List<TraceStepProxy> createTraceSteps(
-                                                  final Map<AutomatonProxy,StateProxy> stepsStateMap,
-                                                  final List<SearchRecord> subtrace)
+    protected List<TraceStepProxy> createTraceSteps(
+                                                    final Map<AutomatonProxy,StateProxy> stepsStateMap,
+                                                    final List<SearchRecord> subtrace)
     {
       stepsStateMap.remove(getResultAutomaton());
       final ProductDESProxyFactory factory = getFactory();
@@ -2017,21 +2018,26 @@ public class CompositionalGeneralisedConflictChecker extends
       StateProxy originalAutSource =
           getOriginalStates()[getReverseOutputStateMap().get(tracesEndState)];
 
-      for (int i = lastStepIndex; i > 1; i--) {// i>=0?
+      for (int i = lastStepIndex; i > 0; i--) {// i>=0?
         final TraceStepProxy step = traceSteps.get(i);
         originalAutSource =
             expandStep(step, originalAutSource, stepsPredecessorStateMap,
                        convertedSteps);
-        final TraceStepProxy pred = traceSteps.get(i - 2);
-        stepsPredecessorStateMap =
-            new HashMap<AutomatonProxy,StateProxy>(pred.getStateMap());
-        // stepsPredecessorStateMap.remove(getResultAutomaton());
+        if (i > 1) {
+          final TraceStepProxy pred = traceSteps.get(i - 2);
+          stepsPredecessorStateMap =
+              new HashMap<AutomatonProxy,StateProxy>(pred.getStateMap());
+          // stepsPredecessorStateMap.remove(getResultAutomaton());
+        }
       }
 
       // makes the trace begin in the correct initial state
-      originalAutSource = beginTrace(traceSteps, convertedSteps);
+      createInitialStep(traceSteps, convertedSteps);
 
-      return buildTrace(conflictTrace, convertedSteps);
+      final ConflictTraceProxy trace =
+          buildTrace(conflictTrace, convertedSteps);
+      System.out.println(trace);
+      return trace;
     }
 
     protected StateProxy expandStep(
@@ -2240,6 +2246,60 @@ public class CompositionalGeneralisedConflictChecker extends
           }
         }
       }
+    }
+
+    protected void createInitialStep(final List<TraceStepProxy> traceSteps,
+                                     final List<TraceStepProxy> convertedSteps)
+    {
+      // final TIntArrayList initialStates =
+      // getTransitionRelation().getAllInitialStates();
+      final StateProxy tracesInitialState =
+          getInitialState(getResultAutomaton(), traceSteps.get(0));
+      final Map<AutomatonProxy,StateProxy> initialStepsStateMap =
+          new HashMap<AutomatonProxy,StateProxy>(traceSteps.get(0)
+              .getStateMap());
+      initialStepsStateMap.remove(getResultAutomaton());
+      final ProductDESProxyFactory factory = getFactory();
+
+      initialStepsStateMap.put(getOriginalAutomaton(), tracesInitialState);
+      final TraceStepProxy convertedStep =
+          factory.createTraceStepProxy(null, initialStepsStateMap);
+
+      convertedSteps.add(0, convertedStep);
+
+    }
+
+    protected List<TraceStepProxy> createTraceSteps(
+                                                    final Map<AutomatonProxy,StateProxy> stepsPrevStateMap,
+                                                    final Map<AutomatonProxy,StateProxy> stepsNewStateMap,
+                                                    final List<SearchRecord> subtrace,
+                                                    final EventProxy stepEvent)
+    {
+      Map<AutomatonProxy,StateProxy> stepStateMap = null;
+      boolean eventFound = false;
+      final ProductDESProxyFactory factory = getFactory();
+      final List<TraceStepProxy> substeps = new LinkedList<TraceStepProxy>();
+      for (final SearchRecord subStep : subtrace) {
+        final int subStepTargetStateID = subStep.getPredecessor().getState();
+        final int subStepEventID = subStep.getEvent();
+        final EventProxy event =
+            subStepEventID >= 0 ? getTransitionRelation()
+                .getEvent(subStepEventID) : null;
+        if (event != stepEvent && !eventFound) {
+          stepStateMap = stepsPrevStateMap;
+        } else if (event != stepEvent && eventFound) {
+          stepStateMap = stepsNewStateMap;
+        } else if (event == stepEvent) {
+          eventFound = true;
+          stepStateMap = stepsNewStateMap;
+        }
+        stepStateMap.put(getOriginalAutomaton(),
+                         getOriginalStates()[subStepTargetStateID]);
+        final TraceStepProxy convertedStep =
+            factory.createTraceStepProxy(event, stepStateMap);
+        substeps.add(convertedStep);
+      }
+      return substeps;
     }
 
     protected List<SearchRecord> buildSearchRecordTrace(SearchRecord record)
