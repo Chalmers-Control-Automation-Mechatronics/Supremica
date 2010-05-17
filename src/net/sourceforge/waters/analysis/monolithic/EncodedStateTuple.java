@@ -32,7 +32,7 @@ class EncodedStateTuple
     private int mVisitOrder;
 
     /** The root of the Strongly Connected Component this state belongs to */
-    private EncodedStateTuple mRoot;
+    private int mRoot;
 
 
     //#########################################################################
@@ -42,7 +42,7 @@ class EncodedStateTuple
      */
     EncodedStateTuple(){
       mVisitOrder = Integer.MAX_VALUE;
-      mRoot = this;
+      mRoot = Integer.MAX_VALUE;
     }
 
     /**
@@ -53,7 +53,7 @@ class EncodedStateTuple
     {
 	mEncodedStateCodes = new int[size];
     mVisitOrder = Integer.MAX_VALUE;
-    mRoot = this;
+    mRoot = Integer.MAX_VALUE;
     }
 
     /**
@@ -63,7 +63,7 @@ class EncodedStateTuple
     {
 	mEncodedStateCodes = encodedStateCodes;
     mVisitOrder = Integer.MAX_VALUE;
-    mRoot = this;
+    mRoot = Integer.MAX_VALUE;
     }
 
 
@@ -122,8 +122,15 @@ class EncodedStateTuple
 	return mEncodedStateCodes[index];
     }
 
+    /**
+     * Sets the visit order of this state to the int argumnet. If the root was the same as the old visit order, then it is assumed
+     * that the root is this state, and thus the root is changed as well.
+     * @param order The integer value of the order that the state has been visited in.
+     */
     public void visit(final int order)
     {
+      if (mVisitOrder == mRoot)
+        mRoot = order;
       mVisitOrder = order;
     }
     public int getOrder()
@@ -131,11 +138,11 @@ class EncodedStateTuple
       return mVisitOrder;
     }
 
-    public void setRoot(final EncodedStateTuple root)
+    public void setRoot(final int root)
     {
       mRoot = root;
     }
-    public EncodedStateTuple getRoot()
+    public int getRoot()
     {
       return mRoot;
     }

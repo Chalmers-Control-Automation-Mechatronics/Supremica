@@ -356,8 +356,8 @@ public class MonolithicControlLoopChecker
     // current state tuple now in currTuple
     decode(encodedCurrTuple.getCodes(), currTuple);
     for (int i = 0; i < mNumEvent; i++) { // for all events
-      if (eventAvailable(currTuple, i)) {
-        if (mGlobalEventMap[i]) { // CONTROLLABLE
+      if (mGlobalEventMap[i]) { // CONTROLLABLE
+        if (eventAvailable(currTuple, i)) {
           EncodedStateTuple encodedNextTuple =
             new EncodedStateTuple(encode(mNextTuple));
           if (addState(encodedNextTuple)) {
@@ -387,11 +387,11 @@ public class MonolithicControlLoopChecker
             }
           }
         }
-        else { // UNCONTROLLABLE
+      }
+      else { // UNCONTROLLABLE
           final EncodedStateTuple encodedNextTuple =
             new EncodedStateTuple(encode(mNextTuple));
           addState(encodedNextTuple);
-        }
       }
     }
     encodedCurrTuple.setInComponent(true);
