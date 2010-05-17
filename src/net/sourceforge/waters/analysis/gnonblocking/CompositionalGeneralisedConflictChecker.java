@@ -433,12 +433,10 @@ public class CompositionalGeneralisedConflictChecker extends
     rnsRule.setDefaultMarking(getMarkingProposition());
     mAbstractionRules.add(rnsRule);
 
-    /*
-     * final DeterminisationOfNonAlphaStatesRule dnasRule = new
-     * DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
-     * dnasRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(dnasRule);
-     */
+    final DeterminisationOfNonAlphaStatesRule dnasRule =
+        new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
+    dnasRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(dnasRule);
 
     final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
         new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
@@ -1614,11 +1612,11 @@ public class CompositionalGeneralisedConflictChecker extends
      *          The list of search records to convert into steps of a trace.
      * @return A list of steps for a trace.
      */
-    private List<TraceStepProxy> createTraceSteps(
-                                                  final Map<AutomatonProxy,StateProxy> stepsPrevStateMap,
-                                                  final Map<AutomatonProxy,StateProxy> stepsNewStateMap,
-                                                  final List<SearchRecord> subtrace,
-                                                  final EventProxy stepEvent)
+    protected List<TraceStepProxy> createTraceSteps(
+                                                    final Map<AutomatonProxy,StateProxy> stepsPrevStateMap,
+                                                    final Map<AutomatonProxy,StateProxy> stepsNewStateMap,
+                                                    final List<SearchRecord> subtrace,
+                                                    final EventProxy stepEvent)
     {
       Map<AutomatonProxy,StateProxy> stepStateMap = null;
       boolean eventFound = false;
@@ -1632,18 +1630,14 @@ public class CompositionalGeneralisedConflictChecker extends
                 : null;
         if (event != stepEvent && !eventFound) {
           stepStateMap = stepsPrevStateMap;
-          stepStateMap.put(getOriginalAutomaton(),
-                           mOriginalStates[subStepTargetStateID]);
         } else if (event != stepEvent && eventFound) {
           stepStateMap = stepsNewStateMap;
-          stepStateMap.put(getOriginalAutomaton(),
-                           mOriginalStates[subStepTargetStateID]);
         } else if (event == stepEvent) {
           eventFound = true;
           stepStateMap = stepsNewStateMap;
-          stepStateMap.put(getOriginalAutomaton(),
-                           mOriginalStates[subStepTargetStateID]);
         }
+        stepStateMap.put(getOriginalAutomaton(),
+                         mOriginalStates[subStepTargetStateID]);
         final TraceStepProxy convertedStep =
             factory.createTraceStepProxy(event, stepStateMap);
         substeps.add(convertedStep);
@@ -2013,31 +2007,79 @@ public class CompositionalGeneralisedConflictChecker extends
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
 
       final int lastStepIndex = traceSteps.size() - 1;
-      Map<AutomatonProxy,StateProxy> stepsPrevStateMap =
-          new HashMap<AutomatonProxy,StateProxy>(traceSteps.get(lastStepIndex)
-              .getStateMap());
-      stepsPrevStateMap.remove(getResultAutomaton());
+      Map<AutomatonProxy,StateProxy> stepsPredecessorStateMap =
+          new HashMap<AutomatonProxy,StateProxy>(traceSteps
+              .get(lastStepIndex - 1).getStateMap());
+      // stepsPredecessorStateMap.remove(getResultAutomaton());
 
       final StateProxy tracesEndState =
           traceSteps.get(lastStepIndex).getStateMap().get(getResultAutomaton());
       StateProxy originalAutSource =
           getOriginalStates()[getReverseOutputStateMap().get(tracesEndState)];
 
-      for (int i = lastStepIndex; i > 0; i--) {
+      for (int i = lastStepIndex; i > 1; i--) {// i>=0?
         final TraceStepProxy step = traceSteps.get(i);
         originalAutSource =
-            expandStep(step, originalAutSource, stepsPrevStateMap,
+            expandStep(step, originalAutSource, stepsPredecessorStateMap,
                        convertedSteps);
-        stepsPrevStateMap =
-            new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
-        stepsPrevStateMap.remove(getResultAutomaton());
+        final TraceStepProxy pred = traceSteps.get(i - 2);
+        stepsPredecessorStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(pred.getStateMap());
+        // stepsPredecessorStateMap.remove(getResultAutomaton());
       }
 
       // makes the trace begin in the correct initial state
-      // final StateProxy originalAutSource = beginTrace(traceSteps,
-      // convertedSteps);
+      originalAutSource = beginTrace(traceSteps, convertedSteps);
 
       return buildTrace(conflictTrace, convertedSteps);
+    }
+
+    protected StateProxy expandStep(
+                                    final TraceStepProxy traceStep,
+                                    StateProxy originalAutSource,
+                                    final Map<AutomatonProxy,StateProxy> stepsPrevStateMap,
+                                    final List<TraceStepProxy> convertedSteps)
+    {
+      final Map<AutomatonProxy,StateProxy> stepsNewStateMap =
+          new HashMap<AutomatonProxy,StateProxy>(traceStep.getStateMap());
+
+      final EventProxy stepEvent = traceStep.getEvent();
+      if (stepEvent != null) {
+        if (getResultAutomaton().getEvents().contains(stepEvent)
+            || getOriginalAutomaton().getEvents().contains(stepEvent)) {
+          final int eventID = getTransitionRelation().getEventInt(stepEvent);
+
+          final StateProxy resultTargetState =
+              stepsPrevStateMap.get(getResultAutomaton());
+          assert resultTargetState != null;
+          stepsNewStateMap.remove(getResultAutomaton());
+          stepsPrevStateMap.remove(getResultAutomaton());
+          final List<SearchRecord> subtrace =
+              findSubTrace(getOriginalStateToIntMap().get(originalAutSource),
+                           eventID, getReverseOutputStateMap()
+                               .get(resultTargetState));
+          final List<TraceStepProxy> substeps =
+              createTraceSteps(stepsPrevStateMap, stepsNewStateMap, subtrace,
+                               stepEvent);
+          int pos = 0;
+          for (final TraceStepProxy step : substeps) {
+            convertedSteps.add(pos, step);
+            pos++;
+          }
+          final int subsize = subtrace.size();
+          if (subsize > 0) {
+            final int originalTargetID = subtrace.get(0).getState();
+            originalAutSource = getOriginalStates()[originalTargetID];
+          }
+        } else {
+          stepsNewStateMap.remove(getResultAutomaton());
+          stepsNewStateMap.put(getOriginalAutomaton(), originalAutSource);
+          final TraceStepProxy convertedStep =
+              getFactory().createTraceStepProxy(stepEvent, stepsNewStateMap);
+          convertedSteps.add(convertedStep);
+        }
+      }
+      return originalAutSource;
     }
 
     /**
@@ -2158,9 +2200,13 @@ public class CompositionalGeneralisedConflictChecker extends
         final int source = current.getState();
         final boolean hasEvent = current.hasProperEvent();
         final TIntHashSet visited = hasEvent ? visited1 : visited0;
-        TIntHashSet predecessors =
-            getTransitionRelation().getPredecessors(source, getTauCode());
-
+        TIntHashSet predecessors;
+        if (getTauCode() > -1) {
+          predecessors =
+              getTransitionRelation().getPredecessors(source, getTauCode());
+        } else {
+          predecessors = null;
+        }
         if (predecessors != null) {
           final TIntIterator iter = predecessors.iterator();
           while (iter.hasNext()) {
@@ -2177,7 +2223,7 @@ public class CompositionalGeneralisedConflictChecker extends
           }
         }
         if (!hasEvent) {
-          predecessors = getTransitionRelation().getSuccessors(source, event);
+          predecessors = getTransitionRelation().getPredecessors(source, event);
           if (predecessors != null) {
             final TIntIterator iter = predecessors.iterator();
             while (iter.hasNext()) {
@@ -2194,6 +2240,16 @@ public class CompositionalGeneralisedConflictChecker extends
           }
         }
       }
+    }
+
+    protected List<SearchRecord> buildSearchRecordTrace(SearchRecord record)
+    {
+      final List<SearchRecord> trace = new LinkedList<SearchRecord>();
+      do {
+        trace.add(record);
+        record = record.getPredecessor();
+      } while (record.getPredecessor() != null);
+      return trace;
     }
 
     protected TIntHashSet getSuccessorsOrPredecessors(final int source,
