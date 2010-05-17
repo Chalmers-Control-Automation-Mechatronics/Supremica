@@ -263,8 +263,9 @@ public class CompositionalGeneralisedConflictChecker extends
       // TraceChecker.checkCounterExample(convertedTrace, true);
       final ListIterator<Step> iter = mModifyingSteps.listIterator(size);
       while (iter.hasPrevious()) {
-        final Step step = iter.previous();
+        Step step = iter.previous();
         convertedTrace = step.convertTrace(convertedTrace);
+        step = null;
         // TraceChecker.checkCounterExample(convertedTrace, true);
 
       }
@@ -1433,11 +1434,11 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       super(resultAut, originalAut);
       mOriginalStates = inputEnc.getStatesArray();
+      mTau = tau;
       mReverseOutputStateMap = outputEnc.getStateCodeMap();
-      mTransitionRelation =
-          new ObserverProjectionTransitionRelation(originalAut, mPropositions);
-      mCodeOfTau = mTransitionRelation.getEventInt(tau);
-      mOriginalStatesMap = mTransitionRelation.getOriginalStateToIntMap();
+      mTransitionRelation = null;
+      mOriginalStatesMap = null;
+      mCodeOfTau = -1;
     }
 
     RemovalOfTransitionsStep(final AutomatonProxy resultAut,
@@ -1448,11 +1449,12 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       super(resultAut, originalAut);
       mOriginalStates = tr.getOriginalIntToStateMap();
+      mTau = tau;
+
       mReverseOutputStateMap = tr.getResultingStateToIntMap();
-      mTransitionRelation =
-          new ObserverProjectionTransitionRelation(originalAut, mPropositions);
-      mCodeOfTau = mTransitionRelation.getEventInt(tau);
-      mOriginalStatesMap = mTransitionRelation.getOriginalStateToIntMap();
+      mTransitionRelation = null;
+      mOriginalStatesMap = null;
+      mCodeOfTau = -1;
     }
 
     // #######################################################################
@@ -1488,6 +1490,12 @@ public class CompositionalGeneralisedConflictChecker extends
      */
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
+      mTransitionRelation =
+          new ObserverProjectionTransitionRelation(getOriginalAutomaton(),
+              mPropositions);
+      mCodeOfTau = mTransitionRelation.getEventInt(mTau);
+      mTau = null;
+      mOriginalStatesMap = mTransitionRelation.getOriginalStateToIntMap();
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>();
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
@@ -1846,9 +1854,10 @@ public class CompositionalGeneralisedConflictChecker extends
      */
     private final TObjectIntHashMap<StateProxy> mReverseOutputStateMap;
 
-    private final ObserverProjectionTransitionRelation mTransitionRelation;
-    private final int mCodeOfTau;
-    private final Map<StateProxy,Integer> mOriginalStatesMap;
+    private ObserverProjectionTransitionRelation mTransitionRelation;
+    private int mCodeOfTau;
+    private EventProxy mTau;
+    private Map<StateProxy,Integer> mOriginalStatesMap;
   }
 
 
