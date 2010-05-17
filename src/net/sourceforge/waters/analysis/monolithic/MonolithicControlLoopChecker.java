@@ -9,14 +9,14 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.THashSet;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.HashSet;
-
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -466,9 +466,9 @@ public class MonolithicControlLoopChecker
     // find a shortest path from mRootStateTuple to mRootStateTuple:
     // only for controllable events
     final Set<TransitionProperty> loopStates =
-      new HashSet<TransitionProperty>();
-    List<EncodedStateTuple> list = new LinkedList<EncodedStateTuple>();
-    Set<EncodedStateTuple> set = new HashSet<EncodedStateTuple>();
+      new THashSet<TransitionProperty>();
+    List<EncodedStateTuple> list = new ArrayList<EncodedStateTuple>();
+    Set<EncodedStateTuple> set = new THashSet<EncodedStateTuple>();
     ArrayList<Integer> indexList = new ArrayList<Integer>();
     EncodedStateTuple encodedCurrTuple = new EncodedStateTuple(mNumInts);
     int lastEvent = -1;
@@ -557,8 +557,8 @@ public class MonolithicControlLoopChecker
     // for both controllable events and uncontrollable events
     // if mInitialStateTuple != mRootStateTuple
     if (!mEncodedInitialStateTuple.equals(mEncodedRootStateTuple)) {
-      list = new LinkedList<EncodedStateTuple>();
-      set = new HashSet<EncodedStateTuple>();
+      list = new ArrayList<EncodedStateTuple>();
+      set = new THashSet<EncodedStateTuple>();
       indexList = new ArrayList<Integer>();
       lastEvent = -1;
       list.add(mEncodedInitialStateTuple);
