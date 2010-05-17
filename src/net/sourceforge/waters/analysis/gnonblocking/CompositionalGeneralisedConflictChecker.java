@@ -246,9 +246,10 @@ public class CompositionalGeneralisedConflictChecker extends
     }
     final ConflictChecker checker =
         new NativeConflictChecker(model, getUsedMarkingProposition(),
-                                  getFactory());
+            getFactory());
     checker.setGeneralisedPrecondition(getGeneralisedPrecondition());
     checker.setNodeLimit(mFinalStepNodeLimit);
+    checker.setTransitionLimit(mFinalStepTransitionLimit);
     final boolean result = checker.run();
 
     if (result) {
@@ -409,49 +410,49 @@ public class CompositionalGeneralisedConflictChecker extends
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
+    final TauLoopRemovalRule tlrRule =
+        new TauLoopRemovalRule(getFactory(), mPropositions);
+    mAbstractionRules.add(tlrRule);
+
+    final ObservationEquivalenceRule oeRule =
+        new ObservationEquivalenceRule(getFactory(), mPropositions);
+    oeRule.setTransitionLimit(getTransitionLimit());
+    mAbstractionRules.add(oeRule);
+
+    final RemovalOfAlphaMarkingsRule ramRule =
+        new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
+    ramRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(ramRule);
+
+    final RemovalOfDefaultMarkingsRule rdmRule =
+        new RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
+    rdmRule.setAlphaMarking(getGeneralisedPrecondition());
+    rdmRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rdmRule);
+
+    final RemovalOfNoncoreachableStatesRule rnsRule =
+        new RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
+    rnsRule.setAlphaMarking(getGeneralisedPrecondition());
+    rnsRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rnsRule);
     /*
-     * final TauLoopRemovalRule tlrRule = new TauLoopRemovalRule(getFactory(),
-     * mPropositions); mAbstractionRules.add(tlrRule);
-     *
-     * final ObservationEquivalenceRule oeRule = new
-     * ObservationEquivalenceRule(getFactory(), mPropositions);
-     * oeRule.setTransitionLimit(getTransitionLimit());
-     * mAbstractionRules.add(oeRule);
-     *
-     * final RemovalOfAlphaMarkingsRule ramRule = new
-     * RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-     * ramRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(ramRule);
-     *
-     * final RemovalOfDefaultMarkingsRule rdmRule = new
-     * RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
-     * rdmRule.setAlphaMarking(getGeneralisedPrecondition());
-     * rdmRule.setDefaultMarking(getMarkingProposition());
-     * mAbstractionRules.add(rdmRule);
-     *
-     * final RemovalOfNoncoreachableStatesRule rnsRule = new
-     * RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
-     * rnsRule.setAlphaMarking(getGeneralisedPrecondition());
-     * rnsRule.setDefaultMarking(getMarkingProposition());
-     * mAbstractionRules.add(rnsRule);
+     * final DeterminisationOfNonAlphaStatesRule dnasRule = new
+     * DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
+     * dnasRule.setAlphaMarking(getGeneralisedPrecondition());
+     * mAbstractionRules.add(dnasRule);
      */
-    final DeterminisationOfNonAlphaStatesRule dnasRule =
-        new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
-    dnasRule.setAlphaMarking(getGeneralisedPrecondition());
-    mAbstractionRules.add(dnasRule);
-    /*
-     * final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule = new
-     * RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
-     * mPropositions); rttlnsRule.setAlphaMarking(getGeneralisedPrecondition());
-     * mAbstractionRules.add(rttlnsRule);
-     *
-     * final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule
-     * = new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
-     * getFactory(), mPropositions);
-     * rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
-     * rttonsRule.setDefaultMarking(getMarkingProposition());
-     * mAbstractionRules.add(rttonsRule);
-     */
+    final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
+        new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
+            mPropositions);
+    rttlnsRule.setAlphaMarking(getGeneralisedPrecondition());
+    mAbstractionRules.add(rttlnsRule);
+
+    final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule =
+        new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
+            getFactory(), mPropositions);
+    rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
+    rttonsRule.setDefaultMarking(getMarkingProposition());
+    mAbstractionRules.add(rttonsRule);
 
   }
 
@@ -495,7 +496,7 @@ public class CompositionalGeneralisedConflictChecker extends
     final MonolithicSynchronousProductBuilder composer =
         new MonolithicSynchronousProductBuilder(candidateModel, getFactory());
     composer.setPropositions(mPropositions);
-    composer.setTransitionLimit(getTransitionLimit());
+    composer.setTransitionLimit(mSyncProductTransitionLimit);
     composer.setNodeLimit(mSyncProductNodeLimit);
     try {
       composer.run();
@@ -691,7 +692,6 @@ public class CompositionalGeneralisedConflictChecker extends
 
   public int getFinalStepNodeLimit()
   {
-    getNodeLimit();
     return mFinalStepNodeLimit;
   }
 
@@ -710,6 +710,56 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     mFinalStepNodeLimit = limit;
     mSyncProductNodeLimit = limit;
+  }
+
+  /**
+   * Sets the maximum number of Transition for an automaton being constructed by
+   * the synchronous product.
+   *
+   * @param limit
+   */
+  public void setInternalStepTransitionLimit(final int limit)
+  {
+    mSyncProductTransitionLimit = limit;
+  }
+
+  public int getInternalStepTransitionLimit()
+  {
+    return mSyncProductTransitionLimit;
+  }
+
+  /**
+   * Sets the maximum number of Transition for the final composed automaton
+   * which is passed to another conflict checker.
+   *
+   * @param limit
+   *          Maximum number of Transitions for the automaton.
+   */
+  public void setFinalStepTransitionLimit(final int limit)
+  {
+    mFinalStepTransitionLimit = limit;
+  }
+
+  public int getFinalStepTransitionLimit()
+  {
+    return mFinalStepTransitionLimit;
+  }
+
+  @Override
+  public int getTransitionLimit()
+  {
+    if (mFinalStepTransitionLimit < mSyncProductTransitionLimit) {
+      return mFinalStepTransitionLimit;
+    } else {
+      return mFinalStepTransitionLimit;
+    }
+  }
+
+  @Override
+  public void setTransitionLimit(final int limit)
+  {
+    mFinalStepTransitionLimit = limit;
+    mSyncProductTransitionLimit = limit;
   }
 
   public HeuristicMinT createHeuristicMinT()
@@ -2650,6 +2700,8 @@ public class CompositionalGeneralisedConflictChecker extends
   private Collection<EventProxy> mPropositions;
   private int mSyncProductNodeLimit = Integer.MAX_VALUE;
   private int mFinalStepNodeLimit = Integer.MAX_VALUE;
+  private int mSyncProductTransitionLimit = Integer.MAX_VALUE;
+  private int mFinalStepTransitionLimit = Integer.MAX_VALUE;
   private int mSuccessfulCompositionCount;
   private int mUnsuccessfulCompositionCount;
 }
