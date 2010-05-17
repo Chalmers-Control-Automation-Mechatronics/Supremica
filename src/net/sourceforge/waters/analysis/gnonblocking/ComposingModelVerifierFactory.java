@@ -7,11 +7,13 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.composing;
+package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.gnonblocking.CompositionalGeneralisedConflictChecker;
+import net.sourceforge.waters.analysis.composing.ComposingControllabilityChecker;
+import net.sourceforge.waters.analysis.composing.ComposingLanguageInclusionChecker;
+import net.sourceforge.waters.analysis.composing.ComposingSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;

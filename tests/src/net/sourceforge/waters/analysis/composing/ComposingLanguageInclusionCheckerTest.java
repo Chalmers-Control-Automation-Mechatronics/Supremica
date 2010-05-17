@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.composing;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.gnonblocking.ComposingModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.AbstractLanguageInclusionCheckerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

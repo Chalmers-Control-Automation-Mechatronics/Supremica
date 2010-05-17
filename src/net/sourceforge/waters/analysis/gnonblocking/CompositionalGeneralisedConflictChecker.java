@@ -29,10 +29,10 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.analysis.op.StateEncoding;
+import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
@@ -245,8 +245,9 @@ public class CompositionalGeneralisedConflictChecker extends
       }
     }
     final ConflictChecker checker =
-        new MonolithicConflictChecker(model, getUsedMarkingProposition(),
-            getGeneralisedPrecondition(), getFactory());
+        new NativeConflictChecker(model, getUsedMarkingProposition(),
+                                  getFactory());
+    checker.setGeneralisedPrecondition(getGeneralisedPrecondition());
     checker.setNodeLimit(mFinalStepNodeLimit);
     final boolean result = checker.run();
 
