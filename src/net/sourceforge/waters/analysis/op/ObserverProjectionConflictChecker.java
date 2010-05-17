@@ -323,10 +323,7 @@ public class ObserverProjectionConflictChecker
   {
     setUp();
     initialiseEventsToAutomata();
-    removeRedundantEvents();
-    simplifyInitialAutomata();
-    removeRedundantEvents();
-    findEventDisjointSubsystems();
+    simplify(true);
 
     Collection<Candidate> candidates;
     boolean nonblocking = true;
@@ -340,11 +337,10 @@ public class ObserverProjectionConflictChecker
           try {
             final int numEventsBefore = mCurrentEvents.size();
             applyCandidate(candidate);
-            if (removeRedundantEvents() ||
-                mCurrentEvents.size() <
-                numEventsBefore - candidate.getLocalEventCount()) {
-              findEventDisjointSubsystems();
-            }
+            final boolean shrunk =
+              mCurrentEvents.size() <
+              numEventsBefore - candidate.getLocalEventCount();
+            simplify(shrunk);
             break;
           } catch (final OverflowException overflow) {
             if (mNumOverflows++ >= MAX_OVERFLOWS) {
@@ -420,10 +416,12 @@ public class ObserverProjectionConflictChecker
     mCurrentAutomata = null;
     mCurrentEvents = null;
     mEventInfoMap = null;
+    mDirtyAutomata = null;
     mRedundantEvents = null;
     mPostponedSubsystems = null;
     mProcessedAutomata = null;
     mModifyingSteps = null;
+    mUsedEventNames = null;
     mOverflowCandidates = null;
     super.tearDown();
   }
@@ -445,11 +443,18 @@ public class ObserverProjectionConflictChecker
     final int numEvents = model.getEvents().size();
     mCurrentEvents = new THashSet<EventProxy>(numEvents);
     mEventInfoMap = new HashMap<EventProxy,EventInfo>(numEvents);
+    mDirtyAutomata = new LinkedList<AutomatonProxy>();
     for (final AutomatonProxy aut : automata) {
       if (translator.getComponentKind(aut) != ComponentKind.PROPERTY) {
         mCurrentAutomata.add(aut);
         addEventsToAutomata(aut);
+        mDirtyAutomata.add(aut);
       }
+    }
+    mUsedEventNames = new THashSet<String>(numEvents + numAutomata);
+    for (final EventProxy event : mCurrentEvents) {
+      final String name = event.getName();
+      mUsedEventNames.add(name);
     }
     mRedundantEvents = new LinkedList<EventProxy>();
     for (final Map.Entry<EventProxy,EventInfo> entry :
@@ -551,10 +556,10 @@ public class ObserverProjectionConflictChecker
     if (mRedundantEvents.isEmpty()) {
       return false;
     } else {
-      final int numSelfloops = mRedundantEvents.size();
-      final Set<EventProxy> selflooped = new THashSet<EventProxy>(numSelfloops);
+      final int numRedundant = mRedundantEvents.size();
+      final Set<EventProxy> redundant = new THashSet<EventProxy>(numRedundant);
       for (final EventProxy event : mRedundantEvents) {
-        selflooped.add(event);
+        redundant.add(event);
         mCurrentEvents.remove(event);
         mEventInfoMap.remove(event);
       }
@@ -570,7 +575,7 @@ public class ObserverProjectionConflictChecker
         final Collection<EventProxy> events = aut.getEvents();
         boolean found = false;
         for (final EventProxy event : events) {
-          if (selflooped.contains(event)) {
+          if (redundant.contains(event)) {
             found = true;
             break;
           }
@@ -582,7 +587,7 @@ public class ObserverProjectionConflictChecker
         final Collection<EventProxy> newEvents =
           new ArrayList<EventProxy>(numEvents - 1);
         for (final EventProxy event : events) {
-          if (!selflooped.contains(event)) {
+          if (!redundant.contains(event)) {
             newEvents.add(event);
           }
         }
@@ -590,10 +595,13 @@ public class ObserverProjectionConflictChecker
         final int numTrans = transitions.size();
         final Collection<TransitionProxy> newTransitions =
           new ArrayList<TransitionProxy>(numTrans);
+        boolean dirty = false;
         for (final TransitionProxy trans : transitions) {
           final EventProxy event = trans.getEvent();
-          if (!selflooped.contains(event)) {
+          if (!redundant.contains(event)) {
             newTransitions.add(trans);
+          } else if (trans.getSource() != trans.getTarget()) {
+            dirty = true;
           }
         }
         final String name = aut.getName();
@@ -610,6 +618,9 @@ public class ObserverProjectionConflictChecker
             info.replaceAutomaton(aut, newAut);
           }
         }
+        if (dirty) {
+          mDirtyAutomata.add(newAut);
+        }
       }
       final AbstractionStep step = new EventRemovalStep(results, originals);
       mModifyingSteps.add(step);
@@ -617,11 +628,11 @@ public class ObserverProjectionConflictChecker
     }
   }
 
-  private void findEventDisjointSubsystems()
+  private boolean findEventDisjointSubsystems()
     throws AnalysisException
   {
     if (mCurrentEvents.isEmpty()) {
-      return;
+      return false;
     }
     final Collection<AutomatonProxy> remainingAutomata =
       new THashSet<AutomatonProxy>(mCurrentAutomata);
@@ -671,7 +682,7 @@ public class ObserverProjectionConflictChecker
       if (subSystemAutomata.size() < numAutomata) {
         remainingAutomata.removeAll(subSystemAutomata);
       } else if (tasks.isEmpty()) {
-        return;
+        return false;
       } else {
         remainingAutomata.clear();
       }
@@ -698,6 +709,7 @@ public class ObserverProjectionConflictChecker
       }
     }
     loadSubSystem(task0);
+    return tasks.size() > 1;
   }
 
   private boolean popEventDisjointSubsystem()
@@ -754,53 +766,70 @@ public class ObserverProjectionConflictChecker
 
   //#########################################################################
   //# Abstraction Steps
-  private void simplifyInitialAutomata()
+  private void simplify(final boolean eventsChanged)
     throws AnalysisException
   {
-    if (mCurrentAutomata.size() > 1) {
-      final List<AutomatonProxy> automata = new LinkedList<AutomatonProxy>();
-      final Map<AutomatonProxy,Set<EventProxy>> autToLocalEvents =
-        new HashMap<AutomatonProxy,Set<EventProxy>>();
-      for (final Map.Entry<EventProxy,EventInfo> entry :
-           mEventInfoMap.entrySet()) {
-        final EventInfo info = entry.getValue();
-        if (info.getNumberOfAutomata() == 1) {
-          final List<AutomatonProxy> list = info.getAutomataList();
-          final AutomatonProxy aut = list.get(0);
-          Set<EventProxy> localEvents = autToLocalEvents.get(aut);
-          if (localEvents == null) {
-            localEvents = new THashSet<EventProxy>();
-            autToLocalEvents.put(aut, localEvents);
-            automata.add(aut);
-          }
-          final EventProxy event = entry.getKey();
-          localEvents.add(event);
-        }
-      }
-      Collections.sort(automata);
-      for (final AutomatonProxy aut : automata) {
-        final List<AutomatonProxy> singleton = Collections.singletonList(aut);
-        final Set<EventProxy> localEvents = autToLocalEvents.get(aut);
-        final Candidate candidate = new Candidate(singleton, localEvents);
-        applyCandidate(candidate);
-      }
+    final boolean change1 = simplifyDirtyAutomata();
+    final boolean change2 = removeRedundantEvents();
+    if (change1 || change2 || eventsChanged) {
+      boolean change;
+      do {
+        change = simplifyDirtyAutomata() && removeRedundantEvents();
+      } while (change);
+      findEventDisjointSubsystems();
     }
   }
 
-  private void applyCandidate(final Candidate candidate)
+  private boolean simplifyDirtyAutomata()
+    throws AnalysisException
+  {
+    boolean result = false;
+    while (!mDirtyAutomata.isEmpty()) {
+      final AutomatonProxy aut = mDirtyAutomata.remove();
+      final Collection<EventProxy> events = aut.getEvents();
+      final int numEvents = events.size();
+      final Set<EventProxy> local = new THashSet<EventProxy>(numEvents);
+      for (final EventProxy event : events) {
+        final EventInfo info = mEventInfoMap.get(event);
+        if (info != null && info.getNumberOfAutomata() == 1) {
+          local.add(event);
+        }
+      }
+      final List<AutomatonProxy> singleton = Collections.singletonList(aut);
+      final Candidate candidate = new Candidate(singleton, local);
+      result |= applyCandidate(candidate);
+    }
+    return result;
+  }
+
+  private boolean applyCandidate(final Candidate candidate)
     throws AnalysisException
   {
     final HidingStep syncStep = composeSynchronousProduct(candidate);
-    final EventProxy tau = syncStep.getHiddenEvent();
-    AutomatonProxy autToAbstract = syncStep.getResultAutomaton();
-    final ObservationEquivalenceStep oeStep =
-      mAbstractionRule.applyRule(autToAbstract, tau);
-    mModifyingSteps.add(syncStep);
-    if (oeStep != null) {
-      autToAbstract = oeStep.getResultAutomaton();
-      mModifyingSteps.add(oeStep);
+    final EventProxy tau;
+    AutomatonProxy aut;
+    if (syncStep == null) {
+      aut = candidate.getAutomata().iterator().next();
+      tau = null;
+    } else {
+      aut = syncStep.getResultAutomaton();
+      tau = syncStep.getHiddenEvent();
     }
-    updateEventsToAutomata(autToAbstract, candidate.getAutomata());
+    final ObservationEquivalenceStep oeStep =
+      mAbstractionRule.applyRule(aut, tau);
+    if (syncStep != null || oeStep != null) {
+      if (syncStep != null) {
+        mModifyingSteps.add(syncStep);
+      }
+      if (oeStep != null) {
+        aut = oeStep.getResultAutomaton();
+        mModifyingSteps.add(oeStep);
+      }
+      updateEventsToAutomata(aut, candidate.getAutomata());
+      return true;
+    } else {
+      return false;
+    }
   }
 
 
@@ -825,7 +854,7 @@ public class ObserverProjectionConflictChecker
       "Candidate for hiding has more than one automaton!";
     final AutomatonProxy aut = automata.iterator().next();
     final ProductDESProxyFactory factory = getFactory();
-    final EventProxy tau = candidate.createSilentEvent(factory);
+    final EventProxy tau = createSilentEvent(candidate, factory);
     final EventEncoding eventEnc = new EventEncoding(aut, tau);
     final Collection<EventProxy> local = candidate.getLocalEvents();
     for (final EventProxy event : local) {
@@ -855,7 +884,7 @@ public class ObserverProjectionConflictChecker
     final ProductDESProxy des = candidate.createProductDESProxy(factory);
     mCurrentSynchronousProductBuilder.setModel(des);
     final Collection<EventProxy> local = candidate.getLocalEvents();
-    final EventProxy tau = candidate.createSilentEvent(factory);
+    final EventProxy tau = createSilentEvent(candidate, factory);
     if (tau != null) {
       mCurrentSynchronousProductBuilder.addMask(local, tau);
     }
@@ -868,6 +897,30 @@ public class ObserverProjectionConflictChecker
       return new HidingStep(sync, local, tau, stateMap);
     } finally {
       mCurrentSynchronousProductBuilder.clearMask();
+    }
+  }
+
+  /**
+   * Creates a silent event for hiding using the given candidate.
+   * @return A new event named according to the candidate's automata,
+   *         or <CODE>null</CODE> if the candidate does not have any local
+   *         events.
+   */
+  public EventProxy createSilentEvent(final Candidate candidate,
+                                      final ProductDESProxyFactory factory)
+  {
+    final Collection<EventProxy> local = candidate.getLocalEvents();
+    if (local.isEmpty()) {
+      return null;
+    } else {
+      final List<AutomatonProxy> automata = candidate.getAutomata();
+      String name = Candidate.getCompositionName("tau:", automata);
+      int prefix = 0;
+      while (!mUsedEventNames.add(name)) {
+        prefix++;
+        name = Candidate.getCompositionName("tau:" + prefix, automata);
+      }
+      return factory.createEventProxy(name, EventKind.UNCONTROLLABLE, false);
     }
   }
 
@@ -2400,10 +2453,12 @@ public class ObserverProjectionConflictChecker
   private Collection<EventProxy> mCurrentEvents;
   private Map<EventProxy,EventInfo> mEventInfoMap =
       new HashMap<EventProxy,EventInfo>();
+  private Queue<AutomatonProxy> mDirtyAutomata;
   private Collection<EventProxy> mRedundantEvents;
   private Collection<SubSystem> mPostponedSubsystems;
   private Collection<AutomatonProxy> mProcessedAutomata;
   private List<AbstractionStep> mModifyingSteps;
+  private Set<String> mUsedEventNames;
   private Set<List<AutomatonProxy>> mOverflowCandidates;
   private int mNumOverflows;
   private AbstractionRule mAbstractionRule;

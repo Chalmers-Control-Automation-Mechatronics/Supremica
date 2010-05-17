@@ -197,23 +197,6 @@ public class Candidate implements Comparable<Candidate>
                                null, events, mAutomata);
   }
 
-  /**
-   * Creates a silent event for hiding by this candidate.
-   * @param  factory    The factory to be used to create the proxies.
-   * @return A new event named according to the candidate's automata,
-   *         or <CODE>null</CODE> if the candidate does not have any local
-   *         events.
-   */
-  public EventProxy createSilentEvent(final ProductDESProxyFactory factory)
-  {
-    if (mLocalEvents.isEmpty()) {
-      return null;
-    } else {
-      final String name = getCompositionName("tau:", mAutomata);
-      return factory.createEventProxy(name, EventKind.UNCONTROLLABLE, false);
-    }
-  }
-
 
   // #########################################################################
   // # Auxiliary Methods
