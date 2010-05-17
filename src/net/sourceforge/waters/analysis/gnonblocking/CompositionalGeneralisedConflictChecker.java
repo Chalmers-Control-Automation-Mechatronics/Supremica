@@ -29,10 +29,11 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+
+import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.analysis.op.StateEncoding;
-import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
@@ -245,9 +246,9 @@ public class CompositionalGeneralisedConflictChecker extends
       }
     }
     final ConflictChecker checker =
-        new NativeConflictChecker(model, getUsedMarkingProposition(),
-            getFactory());
-    checker.setGeneralisedPrecondition(getGeneralisedPrecondition());
+        new MonolithicConflictChecker(model, getUsedMarkingProposition(),
+            getGeneralisedPrecondition(), getFactory());
+    // checker.setGeneralisedPrecondition(getGeneralisedPrecondition());
     checker.setNodeLimit(mFinalStepNodeLimit);
     checker.setTransitionLimit(mFinalStepTransitionLimit);
     final boolean result = checker.run();
@@ -462,7 +463,7 @@ public class CompositionalGeneralisedConflictChecker extends
                                                final EventProxy tau)
       throws AnalysisException
   {
-
+    final int successfulModifications = mModifyingSteps.size();
     final ListIterator<AbstractionRule> iter = mAbstractionRules.listIterator();
     AutomatonProxy abstractedAut = autToAbstract;
     while (iter.hasNext()) {
@@ -470,6 +471,8 @@ public class CompositionalGeneralisedConflictChecker extends
       try {
         abstractedAut = rule.applyRule(autToAbstract, tau);
       } catch (final OverflowException e) {
+        mModifyingSteps =
+            mModifyingSteps.subList(0, successfulModifications - 1);
         throw new OverflowException();
       }
       if (autToAbstract != abstractedAut) {
