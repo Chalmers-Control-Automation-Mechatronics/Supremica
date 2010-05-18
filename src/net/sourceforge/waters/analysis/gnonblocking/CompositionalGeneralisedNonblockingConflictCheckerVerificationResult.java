@@ -131,21 +131,23 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
   public void print(final PrintStream stream)
   {
     super.print(stream);
-    stream.println("Number of times a model is successfully composed: "
-        + mSuccessfulCompositionCount);
-    stream.println("Number of times a model is unsuccessfully composed: "
-        + mUnsuccessfulCompositionCount);
-    final double probability =
-        (double) mUnsuccessfulCompositionCount
-            / (double) getTotalCompositionCount();
-    stream.println("Probability of a candidate selection being unsuccessful: "
-        + probability);
-    stream
-        .println("-----------------------Rule Results ----------------------");
-    for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
-      ruleStats.print(stream);
-      stream.println();
-    }
+    /*
+     * stream.println("Number of times a model is successfully composed: " +
+     * mSuccessfulCompositionCount);
+     * stream.println("Number of times a model is unsuccessfully composed: " +
+     * mUnsuccessfulCompositionCount);
+     *
+     * final double probability = (double) mUnsuccessfulCompositionCount /
+     * (double) getTotalCompositionCount();
+     *
+     *
+     *
+     * stream.println("Probability of a candidate selection being unsuccessful: "
+     * + probability); stream
+     * .println("-----------------------Rule Results ----------------------");
+     * for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
+     * ruleStats.print(stream); stream.println(); }
+     */
   }
 
   private List<AbstractionRuleStatistics> mAbstractionRuleStats;
