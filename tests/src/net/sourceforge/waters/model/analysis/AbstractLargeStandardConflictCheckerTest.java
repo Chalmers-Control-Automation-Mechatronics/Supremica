@@ -202,7 +202,7 @@ public abstract class AbstractLargeStandardConflictCheckerTest
   {
     final String group = "tip";
     final String dir = "acsw2006";
-    final String name = "tip3bad.wmod";
+    final String name = "tip3_bad.wmod";
     runModelVerifier(group, dir, name, false);
   }
 
