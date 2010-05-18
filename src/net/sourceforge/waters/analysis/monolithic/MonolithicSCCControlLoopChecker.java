@@ -626,6 +626,7 @@ public class MonolithicSCCControlLoopChecker
    * @param loopStates transitions in the control loop
    * @return return true if state tuple is in the loop, false otherwise
    */
+  @SuppressWarnings("unused")
   private boolean isInLoop(final EncodedStateTuple encodedCurrTuple,
                            final Set<TransitionProperty> loopStates)
   {
@@ -672,6 +673,7 @@ public class MonolithicSCCControlLoopChecker
    * @param tuple2 second tuple
    * @return true if two tuple are equivalent, false otherwise.
    */
+  @SuppressWarnings("unused")
   private boolean compare(final int[] tuple1, final int[] tuple2)
   {
     for (int i = 0; i < tuple1.length; i++) {
@@ -781,6 +783,7 @@ public class MonolithicSCCControlLoopChecker
   private static int[][][] mMap;
 
   /** a global integer array to store current decoded integer state tuple */
+  @SuppressWarnings("unused")
   private int mCurrTuple[];
 
   /** a global encoded state tuple for storing current state tuple */
