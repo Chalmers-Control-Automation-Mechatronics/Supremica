@@ -2,7 +2,6 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Formatter;
 import java.util.List;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -132,9 +131,21 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
   public void print(final PrintStream stream)
   {
     super.print(stream);
-    @SuppressWarnings("unused")
-    final Formatter formatter = new Formatter(stream);
-    // TODO:add stats to print
+    stream.println("Number of times a model is successfully composed: "
+        + mSuccessfulCompositionCount);
+    stream.println("Number of times a model is unsuccessfully composed: "
+        + mUnsuccessfulCompositionCount);
+    final double probability =
+        (double) mUnsuccessfulCompositionCount
+            / (double) getTotalCompositionCount();
+    stream.println("Probability of a candidate selection being unsuccessful: "
+        + probability);
+    stream
+        .println("-----------------------Rule Results ----------------------");
+    for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
+      ruleStats.print(stream);
+      stream.println();
+    }
   }
 
   private List<AbstractionRuleStatistics> mAbstractionRuleStats;

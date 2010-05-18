@@ -153,7 +153,6 @@ public class CompositionalGeneralisedConflictChecker extends
     stats.setSuccessfulCompositionCount(mSuccessfulCompositionCount);
     stats.setUnsuccessfulCompositionCount(mUnsuccessfulCompositionCount);
     stats.setAbstractionRuleStats(mAbstractionRules);
-    // TODO:add statistics
   }
 
   /**

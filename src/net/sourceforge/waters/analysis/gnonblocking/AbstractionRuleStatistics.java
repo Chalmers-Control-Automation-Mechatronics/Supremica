@@ -248,29 +248,32 @@ public class AbstractionRuleStatistics
     @SuppressWarnings("unused")
     final Formatter formatter = new Formatter(stream);
     stream.println("Name of rule: " + mName);
-    stream.println("Total run time: " + mRunTime);
     stream.println("Total number of times applied: " + mAppliedCount);
-    stream.println("Total number of times a reduction occurred: "
-        + mReductionCount);
-    final double probability =
-        (double) mReductionCount / (double) mAppliedCount;
-    stream.println("Probability of a reduction occurring: " + probability);
-    stream.println("Total number of input states: " + getTotalInputStates());
-    stream.println("Total number of input transitions: "
-        + getTotalInputTransitions());
-    stream.println("Total number of output states: " + getTotalOutputStates());
-    stream.println("Total number of output transitions: "
-        + getTotalOutputTransitions());
-    stream.println("Sum of input states with a reduction: " + mInputStates);
-    stream.println("Sum of input transitions with a reduction: "
-        + mInputTransitions);
-    stream.println("Sum of output states with a reduction: " + mOutputStates);
-    stream.println("Sum of output transitions with a reduction: "
-        + mOutputTransitions);
-    stream
-        .println("Sum of input states with no reduction: " + mUnchangedStates);
-    stream.println("Sum of input transitions with no reduction: "
-        + mUnchangedTransitions);
+    if (mAppliedCount > 0) {
+      stream.println("Total run time: " + mRunTime);
+      stream.println("Total number of times a reduction occurred: "
+          + mReductionCount);
+      final double probability =
+          (double) mReductionCount / (double) mAppliedCount;
+      stream.println("Probability of a reduction occurring: " + probability);
+      stream.println("Total number of input states: " + getTotalInputStates());
+      stream.println("Total number of input transitions: "
+          + getTotalInputTransitions());
+      stream
+          .println("Total number of output states: " + getTotalOutputStates());
+      stream.println("Total number of output transitions: "
+          + getTotalOutputTransitions());
+      stream.println("Sum of input states with a reduction: " + mInputStates);
+      stream.println("Sum of input transitions with a reduction: "
+          + mInputTransitions);
+      stream.println("Sum of output states with a reduction: " + mOutputStates);
+      stream.println("Sum of output transitions with a reduction: "
+          + mOutputTransitions);
+      stream.println("Sum of input states with no reduction: "
+          + mUnchangedStates);
+      stream.println("Sum of input transitions with no reduction: "
+          + mUnchangedTransitions);
+    }
   }
 
   // #########################################################################
