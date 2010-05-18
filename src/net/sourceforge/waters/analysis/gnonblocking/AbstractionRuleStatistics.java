@@ -249,7 +249,7 @@ public class AbstractionRuleStatistics
     final Formatter formatter = new Formatter(stream);
     stream.println("Name of rule: " + mName);
     stream.println("Total number of times applied: " + mAppliedCount);
-    if (mAppliedCount > 0) {
+    if (mAppliedCount > 0 && mReductionCount > 0) {
       stream.println("Total run time: " + mRunTime);
       stream.println("Total number of times a reduction occurred: "
           + mReductionCount);
