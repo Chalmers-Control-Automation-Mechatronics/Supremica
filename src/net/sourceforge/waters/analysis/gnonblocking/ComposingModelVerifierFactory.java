@@ -27,12 +27,11 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Jinjian Shi, Robi Malik
  */
 
-public class ComposingModelVerifierFactory
-  extends AbstractModelVerifierFactory
+public class ComposingModelVerifierFactory extends AbstractModelVerifierFactory
 {
 
-  //#########################################################################
-  //# Constructors
+  // #########################################################################
+  // # Constructors
   private ComposingModelVerifierFactory()
   {
   }
@@ -40,35 +39,35 @@ public class ComposingModelVerifierFactory
   private ComposingModelVerifierFactory(final List<String> arglist)
   {
     super(arglist);
-    addArgument(new FinalLimitArgument());
-    addArgument(new InternalLimitArgument());
+    addArgument(new FinalStateLimitArgument());
+    addArgument(new InternalStateLimitArgument());
+    addArgument(new FinalTransitionLimitArgument());
+    addArgument(new InternalTransitionLimitArgument());
     addArgument(new HeuristicArgument());
   }
 
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
-  public ComposingControllabilityChecker createControllabilityChecker
-    (final ProductDESProxyFactory factory)
+  // #########################################################################
+  // # Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  public ComposingControllabilityChecker createControllabilityChecker(
+                                                                      final ProductDESProxyFactory factory)
   {
     return new ComposingControllabilityChecker(factory);
   }
 
-  public CompositionalGeneralisedConflictChecker createConflictChecker
-    (final ProductDESProxyFactory factory)
+  public CompositionalGeneralisedConflictChecker createConflictChecker(
+                                                                       final ProductDESProxyFactory factory)
   {
     return new CompositionalGeneralisedConflictChecker(null, factory);
   }
 
-  public ComposingLanguageInclusionChecker createLanguageInclusionChecker
-    (final ProductDESProxyFactory factory)
+  public ComposingLanguageInclusionChecker createLanguageInclusionChecker(
+                                                                          final ProductDESProxyFactory factory)
   {
     return new ComposingLanguageInclusionChecker(factory);
   }
 
-
-  //#########################################################################
-  //# Factory Instantiation
+  // #########################################################################
+  // # Factory Instantiation
   public static ComposingModelVerifierFactory getInstance()
   {
     if (theInstance == null) {
@@ -77,40 +76,40 @@ public class ComposingModelVerifierFactory
     return theInstance;
   }
 
-  public static ComposingModelVerifierFactory
-    getInstance(final List<String> cmdline)
+  public static ComposingModelVerifierFactory getInstance(
+                                                          final List<String> cmdline)
   {
     return new ComposingModelVerifierFactory(cmdline);
   }
 
 
-  //#########################################################################
-  //# Inner Class InternalLimitArgument
-  private static class FinalLimitArgument
-    extends CommandLineArgumentInteger
+  // #########################################################################
+  // # Inner Class FinalStateLimitArgument
+  private static class FinalStateLimitArgument extends
+      CommandLineArgumentInteger
   {
 
-    //#######################################################################
-    //# Constructors
-    private FinalLimitArgument()
+    // #######################################################################
+    // # Constructors
+    private FinalStateLimitArgument()
     {
-      super("-flimit",
-            "Maximum number of states constructed in final composition");
+      super("-fslimit",
+          "Maximum number of states constructed in final composition");
     }
 
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    // #######################################################################
+    // # Overrides for Abstract Base Class
+    // # net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       if (verifier instanceof ComposingSafetyVerifier) {
         final ComposingSafetyVerifier composer =
-          (ComposingSafetyVerifier) verifier;
+            (ComposingSafetyVerifier) verifier;
         composer.setNodeLimit(limit);
       } else if (verifier instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
-          (CompositionalGeneralisedConflictChecker) verifier;
+            (CompositionalGeneralisedConflictChecker) verifier;
         composer.setFinalStepNodeLimit(limit);
       }
     }
@@ -118,33 +117,33 @@ public class ComposingModelVerifierFactory
   }
 
 
-  //#########################################################################
-  //# Inner Class InternalLimitArgument
-  private static class InternalLimitArgument
-    extends CommandLineArgumentInteger
+  // #########################################################################
+  // # Inner Class InternalStateLimitArgument
+  private static class InternalStateLimitArgument extends
+      CommandLineArgumentInteger
   {
 
-    //#######################################################################
-    //# Constructors
-    private InternalLimitArgument()
+    // #######################################################################
+    // # Constructors
+    private InternalStateLimitArgument()
     {
-      super("-ilimit",
-            "Maximum number of states constructed in abstraction attempts");
+      super("-islimit",
+          "Maximum number of states constructed in abstraction attempts");
     }
 
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    // #######################################################################
+    // # Overrides for Abstract Base Class
+    // # net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       if (verifier instanceof ComposingSafetyVerifier) {
         final ComposingSafetyVerifier composer =
-          (ComposingSafetyVerifier) verifier;
+            (ComposingSafetyVerifier) verifier;
         composer.setProjectionNodeLimit(limit);
       } else if (verifier instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
-          (CompositionalGeneralisedConflictChecker) verifier;
+            (CompositionalGeneralisedConflictChecker) verifier;
         composer.setInternalStepNodeLimit(limit);
       }
     }
@@ -152,34 +151,100 @@ public class ComposingModelVerifierFactory
   }
 
 
-  //#########################################################################
-  //# Inner Class HeuristicArgument
-  private static class HeuristicArgument extends CommandLineArgumentString
+  // #########################################################################
+  // # Inner Class FinalTransitionLimitArgument
+  private static class FinalTransitionLimitArgument extends
+      CommandLineArgumentInteger
   {
-    //#######################################################################
-    //# Constructors
-    private HeuristicArgument()
+
+    // #######################################################################
+    // # Constructors
+    private FinalTransitionLimitArgument()
     {
-      super("-heur",
-            "Heuristic adopted in composing candidate selection");
+      super("-ftlimit",
+          "Maximum number of states constructed in final composition");
     }
 
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    // #######################################################################
+    // # Overrides for Abstract Base Class
+    // # net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final int limit = getValue();
+      if (verifier instanceof ComposingSafetyVerifier) {
+        final ComposingSafetyVerifier composer =
+            (ComposingSafetyVerifier) verifier;
+        composer.setTransitionLimit(limit);
+      } else if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+        final CompositionalGeneralisedConflictChecker composer =
+            (CompositionalGeneralisedConflictChecker) verifier;
+        composer.setFinalStepTransitionLimit(limit);
+      }
+    }
+
+  }
+
+
+  // #########################################################################
+  // # Inner Class InternalTransitionLimitArgument
+  private static class InternalTransitionLimitArgument extends
+      CommandLineArgumentInteger
+  {
+
+    // #######################################################################
+    // # Constructors
+    private InternalTransitionLimitArgument()
+    {
+      super("-itlimit",
+          "Maximum number of states constructed in abstraction attempts");
+    }
+
+    // #######################################################################
+    // # Overrides for Abstract Base Class
+    // # net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final int limit = getValue();
+      if (verifier instanceof ComposingSafetyVerifier) {
+        final ComposingSafetyVerifier composer =
+            (ComposingSafetyVerifier) verifier;
+        composer.setTransitionLimit(limit);
+      } else if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+        final CompositionalGeneralisedConflictChecker composer =
+            (CompositionalGeneralisedConflictChecker) verifier;
+        composer.setInternalStepTransitionLimit(limit);
+      }
+    }
+
+  }
+
+
+  // #########################################################################
+  // # Inner Class HeuristicArgument
+  private static class HeuristicArgument extends CommandLineArgumentString
+  {
+    // #######################################################################
+    // # Constructors
+    private HeuristicArgument()
+    {
+      super("-heur", "Heuristic adopted in composing candidate selection");
+    }
+
+    // #######################################################################
+    // # Overrides for Abstract Base Class
+    // # net.sourceforge.waters.model.analysis.CommandLineArgument
     protected void configure(final ModelVerifier verifier)
     {
       final ComposingSafetyVerifier composing =
-        (ComposingSafetyVerifier) verifier;
+          (ComposingSafetyVerifier) verifier;
       final String heuristic = getValue();
       composing.setHeuristic(heuristic);
     }
 
   }
 
-
-  //#########################################################################
-  //# Class Variables
+  // #########################################################################
+  // # Class Variables
   private static ComposingModelVerifierFactory theInstance = null;
 
 }
