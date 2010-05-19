@@ -327,9 +327,13 @@ public class ObserverProjectionConflictChecker
 
     Collection<Candidate> candidates;
     boolean nonblocking = true;
+    outer:
     do {
       subsystem:
       do {
+        if (isTriviallyNonblockingSubsystem()) {
+          continue outer;
+        }
         candidates = mPreselectingHeuristic.findCandidates();
         while (!candidates.isEmpty()) {
           final Candidate candidate =
@@ -738,6 +742,19 @@ public class ObserverProjectionConflictChecker
       final Collection<AutomatonProxy> automata = task.getAutomata();
       mCurrentAutomata.addAll(automata);
     }
+  }
+
+  private boolean isTriviallyNonblockingSubsystem()
+    throws EventNotFoundException
+  {
+    final EventProxy marking = getUsedMarkingProposition();
+    for (final AutomatonProxy aut : mCurrentAutomata) {
+      final Collection<EventProxy> alphabet = aut.getEvents();
+      if (alphabet.contains(marking)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private boolean runMonolithicConflictCheck()
