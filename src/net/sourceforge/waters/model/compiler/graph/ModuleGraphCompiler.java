@@ -208,9 +208,6 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
       mGlobalEventsMap =
         new ProxyAccessorHashMap<IdentifierProxy,EventProxy>(eq, numevents);
       mGlobalEventsList = new ArrayList<EventProxy>(numevents);
-      if (mIsOptimizationEnabled) {
-        mGloballyUsedEvents = new HashSet<EventProxy>(numevents);
-      }
       visitCollection(decls);
       final List<Proxy> components = mInputModule.getComponentList();
       final int numaut = components.size();
@@ -218,15 +215,11 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
         new ProxyAccessorHashMap<IdentifierProxy,AutomatonProxy>(eq, numaut);
       mAutomataList = new ArrayList<AutomatonProxy>(numaut);
       visitCollection(components);
-      if (mIsOptimizationEnabled) {
-        mGlobalEventsList.retainAll(mGloballyUsedEvents);
-      }
       return mFactory.createProductDESProxy
         (name, comment, null, mGlobalEventsList, mAutomataList);
     } finally {
       mGlobalEventsMap = null;
       mGlobalEventsList = null;
-      mGloballyUsedEvents = null;
       mAutomataMap = null;
       mAutomataList = null;
     }
@@ -277,7 +270,6 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
         if (mLocalEventsList.isEmpty()) {
           return null;
         }
-        mGloballyUsedEvents.addAll(mLocalEventsList);
       } else {
         mNumReachableStates = nodes.size();
         mNumReachableTransitions = mLocalTransitionsList.size();
@@ -862,7 +854,6 @@ public class ModuleGraphCompiler extends AbstractModuleProxyVisitor
 
   private ProxyAccessorMap<IdentifierProxy,EventProxy> mGlobalEventsMap;
   private List<EventProxy> mGlobalEventsList;
-  private Set<EventProxy> mGloballyUsedEvents;
   private ProxyAccessorMap<IdentifierProxy,AutomatonProxy> mAutomataMap;
   private List<AutomatonProxy> mAutomataList;
 
