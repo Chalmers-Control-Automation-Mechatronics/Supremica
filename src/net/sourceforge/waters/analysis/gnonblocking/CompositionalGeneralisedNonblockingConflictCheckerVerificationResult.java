@@ -143,12 +143,12 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
 
     stream.println("Probability of a candidate selection being unsuccessful: "
         + probability);
-    stream
-        .println("-----------------------Rule Results ----------------------");
-    for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
-      ruleStats.print(stream);
-      stream.println();
-    }
+    /*
+     * stream
+     * .println("-----------------------Rule Results ----------------------");
+     * for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
+     * ruleStats.print(stream); stream.println(); }
+     */
 
   }
 
