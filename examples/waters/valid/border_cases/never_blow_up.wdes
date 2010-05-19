@@ -2,6 +2,7 @@
 <ProductDES Name="never_blow_up" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
 <Event Kind="UNCONTROLLABLE" Name="blow_up"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 </EventList>
 <AutomataList>
 <Automaton Kind="SPEC" Name="never_blow_up">

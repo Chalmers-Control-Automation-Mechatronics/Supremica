@@ -460,7 +460,7 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
                   jni::ClassCache* cache,
                   int numtags)
   : mNumTags(numtags),
-    mIsTriviallyNonblocking(false),
+    mIsTriviallyNonblocking(true),
     mIsTriviallyBlocking(false),
     mMarkingTestRecords(0),
     mNumMarkingTestRecords(0),

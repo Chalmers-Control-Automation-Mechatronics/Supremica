@@ -12,8 +12,6 @@ package net.sourceforge.waters.valid;
 import java.io.File;
 import java.io.IOException;
 
-import javax.xml.bind.JAXBException;
-
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -33,8 +31,6 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-
-import org.xml.sax.SAXException;
 
 
 public class ValidTest extends AbstractWatersTest
@@ -268,8 +264,9 @@ public class ValidTest extends AbstractWatersTest
   //#########################################################################
   //# Overrides for junit.framework.TestCase
   protected void setUp()
-    throws JAXBException, SAXException
+    throws Exception
   {
+    super.setUp();
     mInputDirectory = new File(getWatersInputRoot(), "valid");
     mOutputDirectory = getOutputDirectory();
     final ModuleProxyFactory moduleFactory =
@@ -289,6 +286,7 @@ public class ValidTest extends AbstractWatersTest
   }
 
   protected void tearDown()
+    throws Exception
   {
     mInputDirectory = null;
     mOutputDirectory = null;
@@ -296,6 +294,7 @@ public class ValidTest extends AbstractWatersTest
     mModuleMarshaller = null;
     mProductDESMarshaller = null;
     mDocumentManager = null;
+    super.tearDown();
   }
 
 
