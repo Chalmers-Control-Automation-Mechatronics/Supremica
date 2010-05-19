@@ -57,13 +57,7 @@ public class IntStateBuffer
                         final StateEncoding stateEnc)
     throws OverflowException
   {
-    final int numProps = eventEnc.getNumberOfPropositions();
-    if (numProps > MAX_PROPOSITIONS) {
-      throw new OverflowException
-        ("Encoding has " + numProps + " propositions, but " +
-         ProxyTools.getShortClassName(this) + " can only handle up to " +
-         MAX_PROPOSITIONS + " different propositions!");
-    }
+    this(stateEnc.getNumberOfStates(), eventEnc.getNumberOfPropositions());
     int tags0 = TAG_REACHABLE;
     final List<EventProxy> extra = eventEnc.getExtraSelfloops();
     if (extra != null) {
@@ -74,8 +68,6 @@ public class IntStateBuffer
         }
       }
     }
-    final int numStates = stateEnc.getNumberOfStates();
-    mStateInfo = new int[numStates];
     int i = 0;
     for (final StateProxy state : stateEnc.getStates()) {
       int tags = tags0;
@@ -98,9 +90,19 @@ public class IntStateBuffer
    * of states. All attributes and markings of the states are initialised
    * to be <CODE>false</CODE>.
    * @param  size       The number of states in the new buffer.
+   * @throws OverflowException
    */
-  public IntStateBuffer(final int size)
+  public IntStateBuffer(final int size, final int numProps)
+    throws OverflowException
   {
+    mNumPropositions = numProps;
+    if (numProps > MAX_PROPOSITIONS) {
+      throw new OverflowException
+        ("Encoding has " + numProps + " propositions, but " +
+         ProxyTools.getShortClassName(this) + " can only handle up to " +
+         MAX_PROPOSITIONS + " different propositions!");
+    }
+    mUsedPropositions = (1 << numProps) - 1;
     mStateInfo = new int[size];
   }
 
@@ -160,6 +162,30 @@ public class IntStateBuffer
   }
 
   /**
+   * Gets the total number of propositions known to this state buffer.
+   * @return Number of propositions, including propositions marked as unused.
+   * @see #isUsedProposition(int) isUsedProposition()
+   */
+  public int getNumberOfPropositions()
+  {
+    return mNumPropositions;
+  }
+
+  /**
+   * Checks whether the given proposition is marked as used.
+   * Propositions can be marked as unused to indicate that all states are
+   * marked, so the proposition does not need to be included in the alphabet
+   * when constructing an automaton.
+   * @param  prop    ID of the marking proposition to be tested.
+   * @see #removeRedundantPropositions()
+   */
+  public boolean isUsedProposition(final int prop)
+  {
+    final int code = 1 << prop;
+    return (mUsedPropositions & code) != 0;
+  }
+
+  /**
    * Checks whether a state is marked.
    * @param  state   ID of the state to be tested.
    * @param  prop    ID of the marking proposition to be tested.
@@ -177,12 +203,13 @@ public class IntStateBuffer
    *         number returned is that two states with the same set of markings
    *         will always have the same marking patterns, and states with
    *         different sets of markings will always have different marking
-   *         patterns.
+   *         patterns. Only propositions marked as used are considered.
    * @see #setAllMarkings(int,long) setAllMarkings()
+   * @see #isUsedProposition(int) isUsedProposition()
    */
   public long getAllMarkings(final int state)
   {
-    return mStateInfo[state] & ~TAG_ALL;
+    return mStateInfo[state] & mUsedPropositions;
   }
 
   /**
@@ -243,8 +270,8 @@ public class IntStateBuffer
   public long createMarkings(final TIntArrayList props)
   {
     int result = 0;
-    for (int i = 0; i < props.size(); i++) {
-      result |= 1 << props.get(i);
+    for (int p = 0; p < props.size(); p++) {
+      result |= 1 << props.get(p);
     }
     return result;
   }
@@ -258,6 +285,40 @@ public class IntStateBuffer
   public long mergeMarkings(final long markings1, final long markings2)
   {
     return markings1 | markings2;
+  }
+
+  /**
+   * Checks for each proposition whether is appears on all reachable states,
+   * and if so, removes the proposition by marking it as unused.
+   * @return <CODE>true</CODE> if at least one proposition was removed,
+   *         <CODE>false</CODE> otherwise.
+   * @see #isUsedProposition(int) isUsedProposition()
+   */
+  public boolean removeRedundantPropositions()
+  {
+    int used = mUsedPropositions;
+    for (int p = 0; p < mNumPropositions; p++) {
+      int code = 1 << p;
+      if ((used & code) != 0) {
+        code |= TAG_REACHABLE;
+        boolean redundant = true;
+        for (int state = 0; state < mStateInfo.length; state++) {
+          if ((mStateInfo[state] & code) == TAG_REACHABLE) {
+            redundant = false;
+            break;
+          }
+        }
+        if (redundant) {
+          used &= ~code;
+        }
+      }
+    }
+    if (mUsedPropositions != used) {
+      mUsedPropositions = used;
+      return true;
+    } else {
+      return false;
+    }
   }
 
 
@@ -281,7 +342,9 @@ public class IntStateBuffer
 
   //#########################################################################
   //# Data Members
+  private final int mNumPropositions;
   private final int[] mStateInfo;
+  private int mUsedPropositions;
 
 
   //#########################################################################

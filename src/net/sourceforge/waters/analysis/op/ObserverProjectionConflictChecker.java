@@ -867,7 +867,8 @@ public class ObserverProjectionConflictChecker
     final boolean change1 = rel.checkReachability();
     final boolean change2 = rel.removeTauSelfLoops();
     final boolean change3 = rel.removeProperSelfLoopEvents();
-    if (tau != null || change1 || change2 || change3) {
+    final boolean change4 = rel.removeRedundantPropositions();
+    if (tau != null || change1 || change2 || change3 || change4) {
       final EventProxy trueTau = change2 ? null : tau;
       final AutomatonProxy abstracted =
         rel.createAutomaton(factory, eventEnc, stateEnc);
@@ -1572,6 +1573,7 @@ public class ObserverProjectionConflictChecker
         rel.merge(partition);
         rel.removeTauSelfLoops();
         rel.removeProperSelfLoopEvents();
+        rel.removeRedundantPropositions();
         return partition;
       } else {
         return null;

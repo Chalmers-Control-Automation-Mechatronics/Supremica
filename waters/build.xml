@@ -330,8 +330,8 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="**/gnonblocking/*.java"/>
-          <include name="**/despot/*.java"/>
+          <include name="**/gnonblocking/*Test.java"/>
+          <include name="**/despot/*Test.java"/>
           <exclude name="**/Abstract*.java"/>
           <exclude name="**/Large*.java"/>
           <exclude name="**/Native*.java"/>

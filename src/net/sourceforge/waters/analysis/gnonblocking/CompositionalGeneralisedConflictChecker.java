@@ -148,8 +148,8 @@ public class CompositionalGeneralisedConflictChecker extends
   protected void addStatistics(final VerificationResult result)
   {
     super.addStatistics(result);
-    final CompositionalGeneralisedNonblockingConflictCheckerVerificationResult stats =
-        (CompositionalGeneralisedNonblockingConflictCheckerVerificationResult) result;
+    final CompositionalGeneralisedConflictCheckerVerificationResult stats =
+        (CompositionalGeneralisedConflictCheckerVerificationResult) result;
     stats.setSuccessfulCompositionCount(mSuccessfulCompositionCount);
     stats.setUnsuccessfulCompositionCount(mUnsuccessfulCompositionCount);
     stats.setAbstractionRuleStats(mAbstractionRules);
@@ -163,7 +163,7 @@ public class CompositionalGeneralisedConflictChecker extends
   @Override
   protected VerificationResult createSatisfiedResult()
   {
-    return new CompositionalGeneralisedNonblockingConflictCheckerVerificationResult();
+    return new CompositionalGeneralisedConflictCheckerVerificationResult();
   }
 
   /**
@@ -175,11 +175,13 @@ public class CompositionalGeneralisedConflictChecker extends
    *          The counterexample to be stored on the result.
    */
   @Override
-  protected VerificationResult createFailedResult(
-                                                  final TraceProxy counterexample)
+  protected VerificationResult createFailedResult
+    (final TraceProxy counterexample)
   {
-    return new CompositionalGeneralisedNonblockingConflictCheckerVerificationResult(
-        counterexample);
+    final ConflictTraceProxy conflictCounterExample =
+      (ConflictTraceProxy) counterexample;
+    return new CompositionalGeneralisedConflictCheckerVerificationResult
+      (conflictCounterExample);
   }
 
   // #########################################################################
@@ -465,10 +467,8 @@ public class CompositionalGeneralisedConflictChecker extends
                                                final EventProxy tau)
       throws AnalysisException
   {
-    final ListIterator<AbstractionRule> iter = mAbstractionRules.listIterator();
     AutomatonProxy abstractedAut = autToAbstract;
-    while (iter.hasNext()) {
-      final AbstractionRule rule = iter.next();
+    for (final AbstractionRule rule : mAbstractionRules) {
       abstractedAut = rule.applyRule(autToAbstract, tau);
       if (autToAbstract != abstractedAut) {
         final Step step = rule.createStep(this, abstractedAut);

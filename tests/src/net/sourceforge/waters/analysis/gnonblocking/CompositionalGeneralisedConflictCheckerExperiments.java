@@ -64,8 +64,8 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     verify_rhone_alps();
     verify_rhone_tough();
     // TODO: need to process stats in some way after verifying each model
-    final CompositionalGeneralisedNonblockingConflictCheckerVerificationResult stats =
-        (CompositionalGeneralisedNonblockingConflictCheckerVerificationResult) mVerifier
+    final CompositionalGeneralisedConflictCheckerVerificationResult stats =
+        (CompositionalGeneralisedConflictCheckerVerificationResult) mVerifier
             .getAnalysisResult();
     final FileOutputStream out = new FileOutputStream(outputFilename);
     final PrintStream printStream = new PrintStream(out, true);

@@ -170,7 +170,8 @@ public class ListBufferTransitionRelation
     } else if (mPredecessorBuffer != null) {
       return mPredecessorBuffer.toString();
     } else {
-      return "{ListBufferTransitionRelation: no buffer configured.}";
+      return
+        "{" + ProxyTools.getShortClassName(this) + ": no buffer configured.}";
     }
   }
 
@@ -1257,6 +1258,17 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Checks for each proposition whether is appears on all reachable states,
+   * and if so, removes the proposition by marking it as unused.
+   * @return <CODE>true</CODE> if at least one proposition was removed,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean removeRedundantPropositions()
+  {
+    return mStateBuffer.removeRedundantPropositions();
+  }
+
+  /**
    * Repartitions the states of this transition relation. This method is used to
    * merge states after a partition has been obtained through a
    * {@link TransitionRelationSimplifier}.
@@ -1272,28 +1284,34 @@ public class ListBufferTransitionRelation
   public void merge(final List<int[]> partition)
   {
     if (partition != null) {
-      final int newSize = partition.size();
-      if (mSuccessorBuffer != null) {
-        mSuccessorBuffer.merge(partition);
-      }
-      if (mPredecessorBuffer != null) {
-        mPredecessorBuffer.merge(partition);
-      }
-      final IntStateBuffer newStateBuffer = new IntStateBuffer(newSize);
-      int c = 0;
-      for (final int[] clazz : partition) {
-        boolean init = false;
-        long markings = 0;
-        for (final int state : clazz) {
-          init |= mStateBuffer.isInitial(state);
-          markings |= mStateBuffer.getAllMarkings(state);
+      try {
+        final int newSize = partition.size();
+        if (mSuccessorBuffer != null) {
+          mSuccessorBuffer.merge(partition);
         }
-        newStateBuffer.setInitial(c, init);
-        newStateBuffer.setReachable(c, true);
-        newStateBuffer.setAllMarkings(c, markings);
-        c++;
+        if (mPredecessorBuffer != null) {
+          mPredecessorBuffer.merge(partition);
+        }
+        final int numProps = mStateBuffer.getNumberOfPropositions();
+        final IntStateBuffer newStateBuffer =
+          new IntStateBuffer(newSize, numProps);
+        int c = 0;
+        for (final int[] clazz : partition) {
+          boolean init = false;
+          long markings = 0;
+          for (final int state : clazz) {
+            init |= mStateBuffer.isInitial(state);
+            markings |= mStateBuffer.getAllMarkings(state);
+          }
+          newStateBuffer.setInitial(c, init);
+          newStateBuffer.setReachable(c, true);
+          newStateBuffer.setAllMarkings(c, markings);
+          c++;
+        }
+        mStateBuffer = newStateBuffer;
+      } catch (final OverflowException exception) {
+        throw new WatersRuntimeException(exception);
       }
-      mStateBuffer = newStateBuffer;
     }
   }
 
@@ -1403,8 +1421,10 @@ public class ListBufferTransitionRelation
       }
     }
     for (int p = 0; p < numProps; p++) {
-      final EventProxy event = eventEnc.getProposition(p);
-      events.add(event);
+      if (mStateBuffer.isUsedProposition(p)) {
+        final EventProxy event = eventEnc.getProposition(p);
+        events.add(event);
+      }
     }
 
     final int numStates = getNumberOfStates();

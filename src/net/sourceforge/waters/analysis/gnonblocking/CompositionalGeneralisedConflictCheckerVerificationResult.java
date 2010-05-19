@@ -15,7 +15,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  *
  * @author Rachel Francis
  */
-public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResult
+public class CompositionalGeneralisedConflictCheckerVerificationResult
     extends VerificationResult
 {
   // #########################################################################
@@ -24,7 +24,7 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
    * Creates a <I>true</I> verification result. This constructor creates a
    * verification result which indicates that the property checked is true.
    */
-  public CompositionalGeneralisedNonblockingConflictCheckerVerificationResult()
+  public CompositionalGeneralisedConflictCheckerVerificationResult()
   {
     this(true, null);
   }
@@ -34,8 +34,8 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
    * verification result which indicates that the property checked is false,
    * because of the given counterexample.
    */
-  public CompositionalGeneralisedNonblockingConflictCheckerVerificationResult(
-                                                                              final TraceProxy counterexample)
+  public CompositionalGeneralisedConflictCheckerVerificationResult
+    (final TraceProxy counterexample)
   {
     this(false, counterexample);
   }
@@ -43,9 +43,8 @@ public class CompositionalGeneralisedNonblockingConflictCheckerVerificationResul
   /**
    * Creates a verification result with parameters as given.
    */
-  public CompositionalGeneralisedNonblockingConflictCheckerVerificationResult(
-                                                                              final boolean satisfied,
-                                                                              final TraceProxy counterexample)
+  public CompositionalGeneralisedConflictCheckerVerificationResult
+    (final boolean satisfied, final TraceProxy counterexample)
   {
     super(satisfied, counterexample);
     mUnsuccessfulCompositionCount = 0;
