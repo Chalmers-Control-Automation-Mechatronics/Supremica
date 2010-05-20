@@ -15,8 +15,8 @@ import net.sourceforge.waters.model.des.TraceProxy;
  *
  * @author Rachel Francis
  */
-public class CompositionalGeneralisedConflictCheckerVerificationResult
-    extends VerificationResult
+public class CompositionalGeneralisedConflictCheckerVerificationResult extends
+    VerificationResult
 {
   // #########################################################################
   // # Constructors
@@ -34,8 +34,8 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult
    * verification result which indicates that the property checked is false,
    * because of the given counterexample.
    */
-  public CompositionalGeneralisedConflictCheckerVerificationResult
-    (final TraceProxy counterexample)
+  public CompositionalGeneralisedConflictCheckerVerificationResult(
+                                                                   final TraceProxy counterexample)
   {
     this(false, counterexample);
   }
@@ -43,17 +43,36 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult
   /**
    * Creates a verification result with parameters as given.
    */
-  public CompositionalGeneralisedConflictCheckerVerificationResult
-    (final boolean satisfied, final TraceProxy counterexample)
+  public CompositionalGeneralisedConflictCheckerVerificationResult(
+                                                                   final boolean satisfied,
+                                                                   final TraceProxy counterexample)
   {
     super(satisfied, counterexample);
     mUnsuccessfulCompositionCount = 0;
     mSuccessfulCompositionCount = 0;
+    mComposedModelNumberOfStates = 0;
+    mComposedModelNumberOfTransitions = 0;
     mAbstractionRuleStats = null;
   }
 
   // #########################################################################
   // # Simple Access Methods
+  /**
+   * Gets the number of states in the final composed model.
+   */
+  public int getComposedModelStateCount()
+  {
+    return mComposedModelNumberOfStates;
+  }
+
+  /**
+   * Gets the number of transitions in the final composed model.
+   */
+  public int getComposedModelTransitionCount()
+  {
+    return mComposedModelNumberOfTransitions;
+  }
+
   /**
    * Gets the number of times a successful candidate is chosen, composed and
    * abstracted.
@@ -92,6 +111,23 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult
 
   // #########################################################################
   // # Providing Statistics
+
+  /**
+   * Sets the number of states in the final composed model.
+   */
+  public void setComposedModelStateCount(final int stateCount)
+  {
+    mComposedModelNumberOfStates = stateCount;
+  }
+
+  /**
+   * Sets the number of transitions in the final composed model.
+   */
+  public void setComposedModelTransitionCount(final int transitionCount)
+  {
+    mComposedModelNumberOfTransitions = transitionCount;
+  }
+
   /**
    * Maps a list of AbstractionRuleStatistics which represent the statistics for
    * the abstraction rules used during the composition of the model.
@@ -142,6 +178,11 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult
 
     stream.println("Probability of a candidate selection being unsuccessful: "
         + probability);
+
+    stream.println("Number of states in final composed model: "
+        + mComposedModelNumberOfStates);
+    stream.println("Number of transitions in final composed model: "
+        + mComposedModelNumberOfTransitions);
     /*
      * stream
      * .println("-----------------------Rule Results ----------------------");
@@ -154,5 +195,6 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult
   private List<AbstractionRuleStatistics> mAbstractionRuleStats;
   private int mSuccessfulCompositionCount;
   private int mUnsuccessfulCompositionCount;
-
+  private int mComposedModelNumberOfStates;
+  private int mComposedModelNumberOfTransitions;
 }

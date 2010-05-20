@@ -42,6 +42,7 @@ public abstract class AbstractConflictCheckerCounterexampleTest extends
     if (!result) {
       counterexample = getModelVerifier().getCounterExample();
       TraceChecker.checkCounterExample(counterexample, true);
+      // TODO:this doesnt actually verify the counterexample is correct
       saveCounterExample(counterexample);
     }
     assertEquals("Wrong result from model checker: got " + result

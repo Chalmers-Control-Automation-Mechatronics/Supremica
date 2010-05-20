@@ -153,6 +153,12 @@ public class CompositionalGeneralisedConflictChecker extends
     stats.setSuccessfulCompositionCount(mSuccessfulCompositionCount);
     stats.setUnsuccessfulCompositionCount(mUnsuccessfulCompositionCount);
     stats.setAbstractionRuleStats(mAbstractionRules);
+    stats.setPeakNumberOfStates(mPeakNumberOfStates);
+    stats.setTotalNumberOfStates(mTotalNumberOfStates);
+    stats.setPeakNumberOfTransitions(mPeakNumberOfTransitions);
+    stats.setTotalNumberOfTransitions(mTotalNumberOfTransitions);
+    stats.setComposedModelStateCount(mComposedModelNumberOfStates);
+    stats.setComposedModelTransitionCount(mComposedModelNumberOfTransitions);
   }
 
   /**
@@ -175,13 +181,13 @@ public class CompositionalGeneralisedConflictChecker extends
    *          The counterexample to be stored on the result.
    */
   @Override
-  protected VerificationResult createFailedResult
-    (final TraceProxy counterexample)
+  protected VerificationResult createFailedResult(
+                                                  final TraceProxy counterexample)
   {
     final ConflictTraceProxy conflictCounterExample =
-      (ConflictTraceProxy) counterexample;
-    return new CompositionalGeneralisedConflictCheckerVerificationResult
-      (conflictCounterExample);
+        (ConflictTraceProxy) counterexample;
+    return new CompositionalGeneralisedConflictCheckerVerificationResult(
+        conflictCounterExample);
   }
 
   // #########################################################################
@@ -249,6 +255,16 @@ public class CompositionalGeneralisedConflictChecker extends
           mUnsuccessfulCandidates.add(candidate);
         }
       }
+    }
+    for (final AutomatonProxy aut : model.getAutomata()) {
+      mComposedModelNumberOfStates =
+          mComposedModelNumberOfStates * aut.getStates().size();
+      mComposedModelNumberOfTransitions =
+          mComposedModelNumberOfTransitions * aut.getTransitions().size(); // TODO:is
+      // this
+      // correct
+      // for
+      // transitions
     }
     final ConflictChecker checker =
         new NativeConflictChecker(model, getUsedMarkingProposition(),
@@ -402,8 +418,15 @@ public class CompositionalGeneralisedConflictChecker extends
       final SelectingHeuristic defaultHeuristic = new HeuristicMinS();
       setSelectingHeuristic(defaultHeuristic);
     }
+    // reset statistics
     mSuccessfulCompositionCount = 0;
     mUnsuccessfulCompositionCount = 0;
+    mTotalNumberOfStates = 0;
+    mPeakNumberOfStates = 0;
+    mTotalNumberOfTransitions = 0;
+    mPeakNumberOfTransitions = 0;
+    mComposedModelNumberOfStates = 1;
+    mComposedModelNumberOfTransitions = 1;
 
     mTemporaryModifyingSteps = new ArrayList<Step>();
     mPropositions = new ArrayList<EventProxy>(2);
@@ -500,6 +523,19 @@ public class CompositionalGeneralisedConflictChecker extends
     composer.run();
 
     final AutomatonProxy syncProduct = composer.getComputedAutomaton();
+
+    // records statistics
+    final double numberOfStates = syncProduct.getStates().size();
+    final double numberOfTransitions = syncProduct.getTransitions().size();
+    mTotalNumberOfStates += numberOfStates;
+    mTotalNumberOfTransitions += numberOfTransitions;
+    if (numberOfStates > mPeakNumberOfStates) {
+      mPeakNumberOfStates = numberOfStates;
+    }
+    if (numberOfTransitions > mPeakNumberOfTransitions) {
+      mPeakNumberOfTransitions = numberOfTransitions;
+    }
+
     final CompositionStep step =
         new CompositionStep(syncProduct, composer.getStateMap());
     mTemporaryModifyingSteps.add(step);
@@ -2576,14 +2612,24 @@ public class CompositionalGeneralisedConflictChecker extends
   private final Set<Candidate> mUnsuccessfulCandidates =
       new HashSet<Candidate>();
   private List<Step> mTemporaryModifyingSteps;
+  private Collection<EventProxy> mPropositions;
+
+  // configuration
   private PreselectingHeuristic mPreselectingHeuristic;
   private List<SelectingHeuristic> mSelectingHeuristics;
   private List<AbstractionRule> mAbstractionRules;
-  private Collection<EventProxy> mPropositions;
   private int mSyncProductNodeLimit = Integer.MAX_VALUE;
   private int mFinalStepNodeLimit = Integer.MAX_VALUE;
   private int mSyncProductTransitionLimit = Integer.MAX_VALUE;
   private int mFinalStepTransitionLimit = Integer.MAX_VALUE;
+
+  // statistics
   private int mSuccessfulCompositionCount;
   private int mUnsuccessfulCompositionCount;
+  private double mTotalNumberOfStates;
+  private double mPeakNumberOfStates;
+  private double mTotalNumberOfTransitions;
+  private double mPeakNumberOfTransitions;
+  private int mComposedModelNumberOfStates;
+  private int mComposedModelNumberOfTransitions;
 }
