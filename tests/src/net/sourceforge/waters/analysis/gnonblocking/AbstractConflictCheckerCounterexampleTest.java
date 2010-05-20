@@ -9,10 +9,11 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import net.sourceforge.waters.analysis.modular.ProjectingLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
-import net.sourceforge.waters.model.analysis.TraceChecker;
+import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 public abstract class AbstractConflictCheckerCounterexampleTest extends
@@ -30,27 +31,19 @@ public abstract class AbstractConflictCheckerCounterexampleTest extends
     super(name);
   }
 
-  // # Auxiliary Methods
-  @Override
-  protected void runModelVerifierWithBindings(final ProductDESProxy des,
-                                              final boolean expect)
-      throws Exception
+  // #########################################################################
+  // # Overrides for
+  // # net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest
+  protected LanguageInclusionChecker createLanguageInclusionChecker
+    (final ProductDESProxy des, final ProductDESProxyFactory factory)
   {
-    configureModelVerifier(des);
-    final boolean result = getModelVerifier().run();
-    TraceProxy counterexample = null;
-    if (!result) {
-      counterexample = getModelVerifier().getCounterExample();
-      TraceChecker.checkCounterExample(counterexample, true);
-      // TODO:this doesnt actually verify the counterexample is correct
-      saveCounterExample(counterexample);
-    }
-    assertEquals("Wrong result from model checker: got " + result
-        + " but should have been " + expect + "!", expect, result);
-
+    final LanguageInclusionChecker checker =
+      super.createLanguageInclusionChecker(des, factory);
+    return new ProjectingLanguageInclusionChecker(des, factory, checker);
   }
 
   // #########################################################################
+  // # Auxiliary Methods
   private void setConfiguration(final int islimit, final int fslimit,
                                 final int itlimit, final int ftlimit)
   {
@@ -61,6 +54,7 @@ public abstract class AbstractConflictCheckerCounterexampleTest extends
     checker.setInternalStepTransitionLimit(itlimit);
     checker.setFinalStepTransitionLimit(ftlimit);
   }
+
 
   // #########################################################################
   // # Test Cases
@@ -99,25 +93,13 @@ public abstract class AbstractConflictCheckerCounterexampleTest extends
     runModelVerifier(group, dir, name, false);
   }
 
-  public void testTbedUncont() throws Exception
-  {
-    setConfiguration(10000, 10000, 1000000, 1000000);
-
-    final String group = "tests";
-    final String dir = "incremental_suite";
-    final String name = "tbed_uncont.wmod";
-    runModelVerifier(group, dir, name, false); // not sure about result ...
-  }
-
   public void testTbedValid() throws Exception
-
   {
     setConfiguration(10000, 10000, 1000000, 1000000);
-
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "tbed_noderail.wmod";
-    runModelVerifier(group, dir, name, true);
+    runModelVerifier(group, dir, name, false);  // ???
   }
 
   public void testVerriegel4B() throws Exception

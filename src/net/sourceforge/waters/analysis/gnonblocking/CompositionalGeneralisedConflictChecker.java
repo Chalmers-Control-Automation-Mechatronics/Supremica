@@ -37,6 +37,7 @@ import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.TraceChecker;
@@ -51,6 +52,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
@@ -200,26 +202,37 @@ public class CompositionalGeneralisedConflictChecker extends
     final List<Step> modifyingSteps = new ArrayList<Step>();
 
     // performs hiding and abstraction for each automaton individually
+    final KindTranslator translator = getKindTranslator();
     final List<AutomatonProxy> remainingAut =
         new ArrayList<AutomatonProxy>(model.getAutomata().size());
     boolean modified = false;
     for (final AutomatonProxy aut : model.getAutomata()) {
-      final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
-      final Set<EventProxy> localEvents =
-          identifyLocalEvents(mEventsToAutomata, autAsList);
-      if (localEvents.size() > 0) {
-        final AutomatonProxy abstractedAut = hideAndAbstract(aut, localEvents);
-        remainingAut.add(abstractedAut);
+      if (translator.getComponentKind(aut) == ComponentKind.PROPERTY) {
         modified = true;
       } else {
-        remainingAut.add(aut);
+        final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
+        final Set<EventProxy> localEvents =
+          identifyLocalEvents(mEventsToAutomata, autAsList);
+        if (localEvents.size() > 0) {
+          try {
+            final AutomatonProxy abstractedAut =
+              hideAndAbstract(aut, localEvents);
+            remainingAut.add(abstractedAut);
+            modified = true;
+            modifyingSteps.addAll(mTemporaryModifyingSteps);
+          } catch (final OverflowException exception) {
+            remainingAut.add(aut);
+          }
+          mTemporaryModifyingSteps.clear();
+        } else {
+          remainingAut.add(aut);
+        }
       }
     }
     if (modified) {
-      final Candidate modifiedModel = new Candidate(remainingAut, null);
-      model = modifiedModel.createProductDESProxy(getFactory());
+      final Candidate candidate = new Candidate(remainingAut, null);
+      model = candidate.createProductDESProxy(getFactory());
       mapEventsToAutomata(model);
-      modifyingSteps.addAll(mTemporaryModifyingSteps);
     }
 
     outer: while (remainingAut.size() > 1) {
