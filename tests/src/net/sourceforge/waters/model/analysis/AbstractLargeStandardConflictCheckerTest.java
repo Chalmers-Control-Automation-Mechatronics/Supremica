@@ -15,12 +15,12 @@ import java.util.List;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
-public abstract class AbstractLargeStandardConflictCheckerTest
-  extends AbstractStandardConflictCheckerTest
+public abstract class AbstractLargeStandardConflictCheckerTest extends
+    AbstractStandardConflictCheckerTest
 {
 
-  //#########################################################################
-  //# Test Cases --- incremental suite
+  // #########################################################################
+  // # Test Cases --- incremental suite
   public void testBigBmw() throws Exception
   {
     final String group = "tests";
@@ -74,7 +74,7 @@ public abstract class AbstractLargeStandardConflictCheckerTest
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "rhone_tough.wmod";
-    runModelVerifier(group, dir, name, false); //not sure about result ...
+    runModelVerifier(group, dir, name, false); // not sure about result ...
   }
 
   public void testTbedCTCT() throws Exception
@@ -90,7 +90,7 @@ public abstract class AbstractLargeStandardConflictCheckerTest
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "tbed_uncont.wmod";
-    runModelVerifier(group, dir, name, false); // not sure about result ...
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testTbedValid() throws Exception
@@ -117,9 +117,8 @@ public abstract class AbstractLargeStandardConflictCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
-
-  //#########################################################################
-  //# Test Cases --- profisafe
+  // #########################################################################
+  // # Test Cases --- profisafe
   public void testProfisafeI3HostEFA() throws Exception
   {
     final String group = "tests";
@@ -187,9 +186,8 @@ public abstract class AbstractLargeStandardConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
-
-  //#########################################################################
-  //# Test Cases -- Tip
+  // #########################################################################
+  // # Test Cases -- Tip
   public void testTip3() throws Exception
   {
     final String group = "tip";
@@ -206,9 +204,8 @@ public abstract class AbstractLargeStandardConflictCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
-
-  //#########################################################################
-  //# Test Cases -- Parameterised
+  // #########################################################################
+  // # Test Cases -- Parameterised
   public void testTransferline__5() throws Exception
   {
     checkTransferline(5);
