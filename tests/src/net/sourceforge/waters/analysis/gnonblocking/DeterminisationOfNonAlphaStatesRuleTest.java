@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -101,7 +102,8 @@ public class DeterminisationOfNonAlphaStatesRuleTest extends
   public void test_determinisation_4() throws Exception
   {
     final DeterminisationOfNonAlphaStatesRule rule = getAbstractionRule();
-    rule.setSuppressRedundantHiddenTransitions(true);
+    rule.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "determinisation_4.wmod";

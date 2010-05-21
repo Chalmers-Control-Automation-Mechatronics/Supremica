@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -92,7 +93,8 @@ public class ObservationEquivalenceRuleTest
   public void test_oeq_4() throws Exception
   {
     final ObservationEquivalenceRule rule = getAbstractionRule();
-    rule.setSuppressRedundantHiddenTransitions(true);
+    rule.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_4.wmod";
@@ -150,7 +152,8 @@ public class ObservationEquivalenceRuleTest
   public void test_oeq_11() throws Exception
   {
     final ObservationEquivalenceRule rule = getAbstractionRule();
-    rule.setSuppressRedundantHiddenTransitions(true);
+    rule.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_11.wmod";
@@ -160,7 +163,8 @@ public class ObservationEquivalenceRuleTest
   public void test_oeq_12() throws Exception
   {
     final ObservationEquivalenceRule rule = getAbstractionRule();
-    rule.setSuppressRedundantHiddenTransitions(true);
+    rule.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_12.wmod";

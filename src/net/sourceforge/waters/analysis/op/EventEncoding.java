@@ -459,6 +459,10 @@ public class EventEncoding
    * first in every encoding.
    */
   public static final int TAU = 0;
+  /**
+   * The code of the first non-silent event.
+   */
+  public static final int NONTAU = TAU + 1;
 
   /**
    * Filter mode defining that the filter list should be ignored.

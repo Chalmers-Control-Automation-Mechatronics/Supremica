@@ -1643,7 +1643,8 @@ public class ObserverProjectionConflictChecker
       final List<int[]> loopPartition = applySimplifier(loopRemover, rel);
       final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier(rel);
-      bisimulator.setSuppressRedundantHiddenTransitions(true);
+      bisimulator.setTransitionRemovalMode
+        (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
       final List<int[]> bisimPartition = applySimplifier(bisimulator, rel);
       if (loopPartition != null || bisimPartition != null) {
         final ProductDESProxyFactory factory = getFactory();

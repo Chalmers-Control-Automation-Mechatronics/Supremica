@@ -18,6 +18,7 @@ import net.sourceforge.waters.analysis.op.EventEncoding;
 import net.sourceforge.waters.analysis.op.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.op.StateEncoding;
+import net.sourceforge.waters.analysis.op.ObservationEquivalenceTRSimplifier.TransitionRemoval;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -42,36 +43,29 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
                                       final Collection<EventProxy> propositions)
   {
     super(factory, propositions);
-    mSuppressRedundantHiddenTransitions = false;
+    mTransitionRemovalMode =
+      ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
     mTransitionLimit = Integer.MAX_VALUE;
   }
 
   // #######################################################################
   // # Rule Application
   /**
-   * Sets whether redundant hidden transitions can be suppressed in the output
-   * automaton. If this is set to <CODE>true</CODE>, the transition minimisation
-   * algorithm will attempt to remove tau-transitions that can be replaced by a
-   * sequence of two or more other tau-transitions. This only works if the input
-   * automaton is already tau-loop free, so it should only be set in this case.
-   * The default is <CODE>false</CODE>, which guarantees a correct but not
-   * necessarily minimal result for all inputs.
+   * Sets the mode which redundant transitions are to be removed.
+   * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
-  public void setSuppressRedundantHiddenTransitions(final boolean suppress)
+  public void setTransitionRemovalMode(final TransitionRemoval mode)
   {
-    mSuppressRedundantHiddenTransitions = suppress;
+    mTransitionRemovalMode = mode;
   }
 
   /**
-   * Gets whether redundant hidden transitions can be suppressed in the output
-   * automaton.
-   *
-   * @see {@link #setSuppressRedundantHiddenTransitions(boolean)
-   *      setSuppressHiddenEvent()}
+   * Gets the mode which redundant transitions are to be removed.
+   * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
-  public boolean getSuppressRedundantHiddenTransitions()
+  public TransitionRemoval getTransitionRemovalMode()
   {
-    return mSuppressRedundantHiddenTransitions;
+    return mTransitionRemovalMode;
   }
 
   /**
@@ -134,8 +128,7 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     mTr.reverse();
     final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier(mTr);
-    bisimulator
-        .setSuppressRedundantHiddenTransitions(mSuppressRedundantHiddenTransitions);
+    bisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
     bisimulator.setTransitionLimit(mTransitionLimit);
     final Collection<int[]> initPartition = createInitialPartition(eventEnc);
     if (initPartition == null) {
@@ -209,7 +202,8 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
 
   // #######################################################################
   // # Data Members
-  private boolean mSuppressRedundantHiddenTransitions;
+  private ObservationEquivalenceTRSimplifier.TransitionRemoval
+    mTransitionRemovalMode;
   private int mTransitionLimit;
 
   private AutomatonProxy mAutToAbstract;
