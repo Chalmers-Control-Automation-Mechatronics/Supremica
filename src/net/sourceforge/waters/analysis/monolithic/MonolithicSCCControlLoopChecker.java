@@ -12,11 +12,9 @@ package net.sourceforge.waters.analysis.monolithic;
 import gnu.trove.THashSet;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Stack;
@@ -443,7 +441,6 @@ public class MonolithicSCCControlLoopChecker
               if (encodedNextTuple == encodedCurrTuple) // Self-loop
               {
                 mControlLoopFree = false;
-                mSelfLoopStates.add(encodedCurrTuple);
                 System.out.println("DEBUG: Self-loop detected");
               }
             }
@@ -507,107 +504,213 @@ public class MonolithicSCCControlLoopChecker
   }
 
   private LoopTraceProxy computeCounterExample()
-    throws AbortException
+  throws AbortException
+{
+  final ProductDESProxyFactory factory = getFactory();
+  final ProductDESProxy des = getModel();
+  final String desname = des.getName();
+  final String tracename = desname + "-loop";
+  final List<EventProxy> tracelist = new LinkedList<EventProxy>();
+
+  /* FIND COUNTEREXAMPLE TRACE HERE */
+  /* Counterexample = The shortest path from mInitialStateTuple to
+   *                  mRootStateTuple
+   *                  +
+   *                  The shortest path from mRootStateTuple
+   *                  to mRootStateTuple
+   */
+
+  final Set<TransitionProperty> loopStates =
+    new THashSet<TransitionProperty>();
+  List<EncodedStateTuple> list = new ArrayList<EncodedStateTuple>();
+  Set<EncodedStateTuple> set = new THashSet<EncodedStateTuple>();
+  ArrayList<Integer> indexList = new ArrayList<Integer>();
+  EncodedStateTuple encodedCurrTuple = new EncodedStateTuple(mNumInts);
+  EncodedStateTuple encodedRootStateTuple = null;
+  int lastEvent = -1;
+
+  // find a shortest path from mInitialStateTuple to mRootStateTuple:
+  // for both controllable events and uncontrollable events
+  // if mInitialStateTuple != mRootStateTuple
+  list = new ArrayList<EncodedStateTuple>();
+  set = new THashSet<EncodedStateTuple>();
+  indexList = new ArrayList<Integer>();
+  indexList.add(0);
+  int indexSize = 0;
+  lastEvent = -1;
+  list.add(mEncodedInitialStateTuple);
+  int[] target = null;
+  final List<EventProxy> fakeTraceList = new ArrayList<EventProxy>();
+
+  loop2:
+  while (true) {
+    indexSize = indexList.size();
+    for (int i = (indexSize==1) ? 0 : (indexList.get(indexSize-2)+1);
+         i <= indexList.get(indexSize-1); i++) {
+      encodedCurrTuple = list.get(i);
+      encodedCurrTuple = mGlobalStateSet.get(encodedCurrTuple);
+      decode(encodedCurrTuple.getCodes(), mCurrTuple);
+      for (int j = 0; j < mNumEvent; j++) {
+        if (eventAvailable(mCurrTuple, j)) {
+          EncodedStateTuple encodedNextTuple =
+            new EncodedStateTuple(encode(mNextTuple));
+          encodedNextTuple = mGlobalStateSet.get(encodedNextTuple);
+          if (encodedCurrTuple.getRoot() == encodedNextTuple.getRoot()) {
+            fakeTraceList.add(mEventList.get(j));
+            target = mCurrTuple;
+            mCurrTuple = mNextTuple;
+            encodedRootStateTuple = encodedNextTuple;
+            // now change the root of the loop
+            break loop2;
+          }
+          if (set.add(encodedNextTuple)) {
+            list.add(encodedNextTuple);
+          }
+        }
+      }
+    }
+
+    if (list.size() != (indexList.get(indexSize-1)+1)) {
+      indexList.add(list.size()-1);
+    } else {
+      break;
+    }
+  }
+
+  // Add to tracelist here
+  for (int i = indexList.size()-2; i >= 0; i--) {
+    final int start = (indexList.get(i)==0)?0:indexList.get(i-1)+1;
+    final int end = indexList.get(i);
+     next2:
+    for (int j = start; j <= end; j++) {
+      final EncodedStateTuple encodedCurr = list.get(j);
+      decode(encodedCurr.getCodes(), mCurrTuple);
+      for (int k = 0; k < mNumEvent; k++) {
+        if (eventAvailable(mCurrTuple, k)) {
+          if (compare(mNextTuple, target)) {
+            fakeTraceList.add(mEventList.get(k));
+            // swap memory location: mCurrTuple <-> target
+            final int tmp[] = mCurrTuple;
+            mCurrTuple = target;
+            target = tmp;
+            break next2;
+          }
+        }
+      }
+    }
+  }
+
+  // Invert tracelist
+  for (int looper = 0; looper < fakeTraceList.size(); looper++)
   {
-    final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy des = getModel();
-    final String desname = des.getName();
-    final String tracename = desname + "-loop";
-    List<EventProxy> tracelist = new LinkedList<EventProxy>();
+    tracelist.add(fakeTraceList.get(fakeTraceList.size() - looper - 1));
+  }
 
-    /* FIND COUNTEREXAMPLE TRACE HERE */
-    /* Counterexample = The shortest path from mInitialStateTuple to
-     *                  a state with mState.getRoot != mState.getOrder
-     *                  OR a state with a self-loop
-     *                  +
-     *                  The shortest path from the state in the previous step
-     *                  to the same state
-     */
+  //find a shortest path from mRootStateTuple to mRootStateTuple:
+  // only for controllable events
 
-    // find the shortest path from mInitialStateTuple to a root node
+  list = new ArrayList<EncodedStateTuple>();
+  set = new HashSet<EncodedStateTuple>();
+  indexList = new ArrayList<Integer>();
+  indexList.add(0);
+  indexSize = 0;
+  list.add(encodedRootStateTuple);
+  decode(encodedRootStateTuple.getCodes(), mCurrTuple);
+  target = mCurrTuple; // target is mEncodedRootStateTuple (decoded)
+  mCurrTuple = new int[mNumAutomata];
 
-    Map<EncodedStateTuple, List<EventProxy>> unvisitedStates = new HashMap<EncodedStateTuple, List<EventProxy>>();
-    final EncodedStateTuple initial = mGlobalStateSet.get(mEncodedInitialStateTuple);
-    unvisitedStates.put(initial, new LinkedList<EventProxy>());
-    EncodedStateTuple rootStateTuple = null;
-    do
-    {
-      final Map<EncodedStateTuple, List<EventProxy>> temp = new HashMap<EncodedStateTuple, List<EventProxy>>();
-      for (final EncodedStateTuple val : unvisitedStates.keySet())
-      {
-        if (mSelfLoopStates.contains(val))
-        {
-          rootStateTuple = val;
-          tracelist = unvisitedStates.get(val);
-          break;
-        }
-        else if (val.getRoot() != val.getOrder())
-        {
-          rootStateTuple = val;
-          tracelist = unvisitedStates.get(val);
-          break;
-        }
-        else
-        {
-          final int currTuple[] = new int[mNumAutomata];
-          decode(val.getCodes(), currTuple);
-          for (int i = 0; i < mNumEvent; i++) { // for all events
-            if (eventAvailable(currTuple, i)) {
-              EncodedStateTuple encodedNextTuple =
-                new EncodedStateTuple(encode(mNextTuple));
-              encodedNextTuple = mGlobalStateSet.get(encodedNextTuple);
-              final List<EventProxy> oldTrace = unvisitedStates.get(val);
-              oldTrace.add(mEventList.get(i));
-              temp.put(encodedNextTuple, oldTrace);
+  loop:
+  while (true) {
+    indexSize = indexList.size();
+    for (int i = (indexSize==1) ? 0 : (indexList.get(indexSize-2)+1);
+         i <= indexList.get(indexSize-1); i++) {
+      checkAbort();
+      encodedCurrTuple = list.get(i);
+      decode(encodedCurrTuple.getCodes(), mCurrTuple);
+      for (int j = 0; j < mNumConEvent; j++) {
+        if (mGlobalEventMap[j]) {
+          if (eventAvailable(mCurrTuple, j)) {
+            if (compare(mNextTuple, target)) {
+              lastEvent = j;
+              break loop;
+            }
+            final EncodedStateTuple encodedNextTuple =
+              new EncodedStateTuple(encode(mNextTuple));
+            if (set.add(encodedNextTuple)) {
+              list.add(encodedNextTuple);
             }
           }
         }
       }
-      unvisitedStates = temp;
     }
-    while (rootStateTuple == null);
-    final int loopIndex = tracelist.size();
+    if (list.size() != (indexList.get(indexSize-1)+1)) {
+      indexList.add(list.size()-1);
+    } else {
+      break;
+    }
+  }
+  if (indexList.size() == 1) { // single cycle loop
+    loopStates.add(new TransitionProperty(encodedRootStateTuple,
+                                          encodedRootStateTuple,
+                                          lastEvent));
+  } else {
+    loopStates.add(new TransitionProperty(encodedCurrTuple,
+                                          encodedRootStateTuple,
+                                          lastEvent));
+    // swap memory location: mCurrTuple <-> target
+    int tmp[] = mCurrTuple;
+    mCurrTuple = target;
+    target = tmp;
 
-    // find the shortest path from rootStateTuple to rootStateTuple
+    for (int i = indexList.size()-2; i >= 0; i--) {
+      checkAbort();
+      final int start =
+          (indexList.get(i) == 0) ? 0 : indexList.get(i - 1) + 1;
+      final int end = indexList.get(i);
+      next:
+      for (int j = start; j <= end; j++) {
+        final EncodedStateTuple encodedCurr = list.get(j);
+        decode(encodedCurr.getCodes(), mCurrTuple);
 
-    Map<int[], List<EventProxy>> unvisitedEncodedStates = new HashMap<int[], List<EventProxy>>();
-    final int[] currTuple = new int[mNumAutomata];
-    decode(rootStateTuple.getCodes(), currTuple);
-    unvisitedEncodedStates.put(currTuple, new LinkedList<EventProxy>());
-    boolean first = true;
-    boolean found = false;
-    do
-    {
-      final Map<int[], List<EventProxy>> temp = new HashMap<int[], List<EventProxy>>();
-      for (final int[] val : unvisitedEncodedStates.keySet())
-      {
-        if (first) // To prevent zero-sized 'loops'
-          first = false;
-        else if (arrayEqual(val, currTuple))
-        {
-          found = true;
-          tracelist.addAll(unvisitedEncodedStates.get(val));
-          break;
-        }
-        for (int i = 0; i < mNumEvent; i++) { // for all events
-          if (mGlobalEventMap[i] == true)
-          {
-            if (eventAvailable(val, i)) {
-              final List<EventProxy> oldTrace = unvisitedEncodedStates.get(val);
-              oldTrace.add(mEventList.get(i));
-              temp.put(mNextTuple, oldTrace);
+        for (int k = 0; k < mNumConEvent; k++) {
+          if (mGlobalEventMap[k]) {
+            if (eventAvailable(mCurrTuple, k)) {
+              final EncodedStateTuple encodedNext =
+                  new EncodedStateTuple(encode(mNextTuple));
+              if (compare(mNextTuple, target)) {
+                loopStates.add(new TransitionProperty(encodedCurr,
+                    encodedNext, k));
+                // swap memory location: mCurrTuple <-> target
+                tmp = mCurrTuple;
+                mCurrTuple = target;
+                target = tmp;
+                break next;
+              }
             }
-         }
+          }
         }
       }
-      unvisitedEncodedStates = temp;
     }
-    while (!found);
-    final LoopTraceProxy trace =
-      factory.createLoopTraceProxy(tracename, des, tracelist, loopIndex);
-    return trace;
   }
 
+  final int loopIndex = tracelist.size();
+  while (loopStates.size() > 0) {
+    for (final TransitionProperty tp: loopStates) {
+      if (compare(encodedRootStateTuple.getCodes(),
+          tp.getSourceTuple().getCodes())) {
+        tracelist.add(mEventList.get(tp.getEvent()));
+        encodedRootStateTuple = tp.getTargetTuple();
+        loopStates.remove(tp);
+        break;
+      }
+    }
+  }
+  final LoopTraceProxy trace =
+    factory.createLoopTraceProxy(tracename, des, tracelist, loopIndex);
+  return trace;
+}
+
+  @SuppressWarnings("unused")
   private boolean arrayEqual(final int[] scan, final int[] val)
   {
     if (scan.length != val.length)
@@ -667,13 +770,6 @@ public class MonolithicSCCControlLoopChecker
     return output;
   }
 
-  /**
-   * It compares two state tuples.
-   * @param tuple1 first tuple that will be compared with second tuple
-   * @param tuple2 second tuple
-   * @return true if two tuple are equivalent, false otherwise.
-   */
-  @SuppressWarnings("unused")
   private boolean compare(final int[] tuple1, final int[] tuple2)
   {
     for (int i = 0; i < tuple1.length; i++) {
@@ -783,7 +879,6 @@ public class MonolithicSCCControlLoopChecker
   private static int[][][] mMap;
 
   /** a global integer array to store current decoded integer state tuple */
-  @SuppressWarnings("unused")
   private int mCurrTuple[];
 
   /** a global encoded state tuple for storing current state tuple */
@@ -797,9 +892,6 @@ public class MonolithicSCCControlLoopChecker
 
   /** the number of states which have been visited */
   private int numStates = 0;
-
-  /** the set of states with self-loops */
-  private final Set<EncodedStateTuple> mSelfLoopStates = new THashSet<EncodedStateTuple>();
 
   /** used for the visit procedure */
   private final Stack<EncodedStateTuple> stack = new Stack<EncodedStateTuple>();
