@@ -693,7 +693,7 @@ public class MonolithicSCCControlLoopChecker
     }
   }
 
-  final int loopIndex = tracelist.size();
+  final int loopIndex = tracelist.size() - 1;
   while (loopStates.size() > 0) {
     for (final TransitionProperty tp: loopStates) {
       if (compare(encodedRootStateTuple.getCodes(),
