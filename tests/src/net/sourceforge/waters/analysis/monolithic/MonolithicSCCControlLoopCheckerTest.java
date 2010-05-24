@@ -9,11 +9,18 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.THashSet;
+
+import java.util.Collection;
+import java.util.Set;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractControlLoopCheckerTest;
 import net.sourceforge.waters.model.analysis.ControlLoopChecker;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -42,6 +49,25 @@ public class MonolithicSCCControlLoopCheckerTest
     createModelVerifier(final ProductDESProxyFactory factory)
   {
     return new MonolithicSCCControlLoopChecker(factory);
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  @SuppressWarnings("unused")
+  private void checkNonLoopEvents(final String[] expectedNames)
+  {
+    final ControlLoopChecker checker = (ControlLoopChecker) getModelVerifier();
+    final ProductDESProxy model = checker.getModel();
+    final Set<EventProxy> expectedEvents =
+      new THashSet<EventProxy>(expectedNames.length);
+    for (final String name : expectedNames) {
+      final EventProxy event = findEvent(model, name);
+      expectedEvents.add(event);
+    }
+    final Collection<EventProxy> nonLoopEvents = checker.getNonLoopEvents();
+    assertEquals("Incorrect set of non-loop events!",
+                 expectedEvents, nonLoopEvents);
   }
 
 }
