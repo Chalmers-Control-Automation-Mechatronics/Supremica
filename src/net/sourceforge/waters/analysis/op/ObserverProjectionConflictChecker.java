@@ -339,12 +339,9 @@ public class ObserverProjectionConflictChecker
           final Candidate candidate =
             Collections.min(candidates, mSelectingHeuristics);
           try {
-            final int numEventsBefore = mCurrentEvents.size();
+            mEventHasDisappeared = false;
             applyCandidate(candidate);
-            final boolean shrunk =
-              mCurrentEvents.size() <
-              numEventsBefore - candidate.getLocalEventCount();
-            simplify(shrunk);
+            simplify(mEventHasDisappeared);
             break;
           } catch (final OverflowException overflow) {
             if (mNumOverflows++ >= MAX_OVERFLOWS) {
@@ -769,7 +766,8 @@ public class ObserverProjectionConflictChecker
     final ProductDESProxy des = createDES(events, mCurrentAutomata);
     mCurrentMonolithicConflictChecker.setModel(des);
     removeEventsToAutomata(mCurrentAutomata);
-    return mCurrentMonolithicConflictChecker.run();
+    final boolean result = mCurrentMonolithicConflictChecker.run();
+    return result;
   }
 
   private ProductDESProxy createDES(final List<EventProxy> events,
@@ -839,7 +837,13 @@ public class ObserverProjectionConflictChecker
         mModifyingSteps.add(syncStep);
       }
       if (oeStep != null) {
+        int expectedNumberOfEvents = aut.getEvents().size();
         aut = oeStep.getResultAutomaton();
+        final Collection<EventProxy> newEvents = aut.getEvents();
+        if (tau != null && !newEvents.contains(tau)) {
+          expectedNumberOfEvents--;
+        }
+        mEventHasDisappeared |= newEvents.size() < expectedNumberOfEvents;
         mModifyingSteps.add(oeStep);
       }
       updateEventsToAutomata(aut, candidate.getAutomata());
@@ -885,8 +889,16 @@ public class ObserverProjectionConflictChecker
     final boolean change2 = rel.removeTauSelfLoops();
     final boolean change3 = rel.removeProperSelfLoopEvents();
     final boolean change4 = rel.removeRedundantPropositions();
-    if (tau != null || change1 || change2 || change3 || change4) {
-      final EventProxy trueTau = change2 ? null : tau;
+    final EventProxy trueTau = change2 ? null : tau;
+    mEventHasDisappeared |= change3;
+    if (change4) {
+      final StateEncoding newStateEnc = new StateEncoding();
+      final AutomatonProxy abstracted =
+        rel.createAutomaton(factory, eventEnc, newStateEnc);
+      final SynchronousProductStateMap stateMap =
+        new OneAutomatonStateMap(aut, stateEnc, newStateEnc);
+      return new HidingStep(abstracted, local, trueTau, stateMap);
+    } else if (tau != null || change1 || change2 || change3) {
       final AutomatonProxy abstracted =
         rel.createAutomaton(factory, eventEnc, stateEnc);
       return new HidingStep(abstracted, aut, local, trueTau);
@@ -901,15 +913,19 @@ public class ObserverProjectionConflictChecker
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = candidate.createProductDESProxy(factory);
     mCurrentSynchronousProductBuilder.setModel(des);
+    final Collection<EventProxy> events = des.getEvents();
     final Collection<EventProxy> local = candidate.getLocalEvents();
     final EventProxy tau = createSilentEvent(candidate, factory);
+    int expectedNumberOfEvents = events.size() - local.size();
     if (tau != null) {
       mCurrentSynchronousProductBuilder.addMask(local, tau);
+      expectedNumberOfEvents++;
     }
     try {
       mCurrentSynchronousProductBuilder.run();
       final AutomatonProxy sync =
         mCurrentSynchronousProductBuilder.getComputedAutomaton();
+      mEventHasDisappeared |= sync.getEvents().size() < expectedNumberOfEvents;
       final SynchronousProductStateMap stateMap =
         mCurrentSynchronousProductBuilder.getStateMap();
       return new HidingStep(sync, local, tau, stateMap);
@@ -1645,6 +1661,8 @@ public class ObserverProjectionConflictChecker
         new ObservationEquivalenceTRSimplifier(rel);
       bisimulator.setTransitionRemovalMode
         (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      bisimulator.setMarkingMode
+        (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
       final List<int[]> bisimPartition = applySimplifier(bisimulator, rel);
       if (loopPartition != null || bisimPartition != null) {
         final ProductDESProxyFactory factory = getFactory();
@@ -1745,6 +1763,7 @@ public class ObserverProjectionConflictChecker
       rel.removeEvent(vtau);
       rel.removeTauSelfLoops();
       rel.removeProperSelfLoopEvents();
+      rel.removeRedundantPropositions();
       return partition;
     }
 
@@ -1938,9 +1957,9 @@ public class ObserverProjectionConflictChecker
     //#######################################################################
     //# Constructor
     private HidingStep(final AutomatonProxy composedAut,
-                            final AutomatonProxy originalAut,
-                            final Collection<EventProxy> localEvents,
-                            final EventProxy tau)
+                       final AutomatonProxy originalAut,
+                       final Collection<EventProxy> localEvents,
+                       final EventProxy tau)
     {
       super(composedAut, originalAut);
       mLocalEvents = localEvents;
@@ -1949,9 +1968,9 @@ public class ObserverProjectionConflictChecker
     }
 
     private HidingStep(final AutomatonProxy composedAut,
-                            final Collection<EventProxy> localEvents,
-                            final EventProxy tau,
-                            final SynchronousProductStateMap stateMap)
+                       final Collection<EventProxy> localEvents,
+                       final EventProxy tau,
+                       final SynchronousProductStateMap stateMap)
     {
       super(composedAut, stateMap.getInputAutomata());
       mLocalEvents = localEvents;
@@ -2402,6 +2421,55 @@ public class ObserverProjectionConflictChecker
 
 
   //#########################################################################
+  //# Inner Class OneAutomatonStateMap
+  private class OneAutomatonStateMap
+    implements SynchronousProductStateMap
+  {
+    //#######################################################################
+    //# Constructor
+    private OneAutomatonStateMap(final AutomatonProxy inputAut,
+                                 final StateEncoding inputEnc,
+                                 final StateEncoding outputEnc)
+    {
+      mOriginalAutomaton = inputAut;
+      final int numStates = inputEnc.getNumberOfStates();
+      mStateMap = new HashMap<StateProxy,StateProxy>(numStates);
+      for (int s = 0; s < numStates; s++) {
+        final StateProxy inputState = inputEnc.getState(s);
+        final StateProxy outputState = outputEnc.getState(s);
+        mStateMap.put(outputState, inputState);
+      }
+    }
+
+
+    //#######################################################################
+    //# Interface
+    //# net.sourceforge.waters.model.analysis.SynchronousProductStateMap
+    public Collection<AutomatonProxy> getInputAutomata()
+    {
+      return Collections.singletonList(mOriginalAutomaton);
+    }
+
+    public StateProxy getOriginalState(final StateProxy tuple,
+                                       final AutomatonProxy aut)
+    {
+      if (aut == mOriginalAutomaton) {
+        return mStateMap.get(tuple);
+      } else {
+        throw new IllegalArgumentException
+          ("Unexpected original automaton '" + aut.getName() + "' in " +
+           ProxyTools.getShortClassName(this) + "!");
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final AutomatonProxy mOriginalAutomaton;
+    private final Map<StateProxy,StateProxy> mStateMap;
+  }
+
+
+  //#########################################################################
   //# Inner Class SearchRecord
   /**
    * A record to store information about a visited state while searching
@@ -2475,6 +2543,7 @@ public class ObserverProjectionConflictChecker
       new HashMap<EventProxy,EventInfo>();
   private Queue<AutomatonProxy> mDirtyAutomata;
   private Collection<EventProxy> mRedundantEvents;
+  private boolean mEventHasDisappeared;
   private Collection<SubSystem> mPostponedSubsystems;
   private Collection<AutomatonProxy> mProcessedAutomata;
   private List<AbstractionStep> mModifyingSteps;

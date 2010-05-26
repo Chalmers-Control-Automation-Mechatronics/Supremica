@@ -53,6 +53,7 @@ public class ObservationEquivalenceTRSimplifier implements
     }
     mEquivalence = Equivalence.OBSERVATION_EQUIVALENCE;
     mTransitionRemovalMode = TransitionRemoval.NONTAU;
+    mMarkingMode = MarkingMode.UNCHANGED;
     mTransitionLimit = Integer.MAX_VALUE;
   }
 
@@ -111,6 +112,24 @@ public class ObservationEquivalenceTRSimplifier implements
   public TransitionRemoval getTransitionRemovalMode()
   {
     return mTransitionRemovalMode;
+  }
+
+  /**
+   * Sets the mode how implicit markings are handled.
+   * @see MarkingMode
+   */
+  public void setMarkingMode(final MarkingMode mode)
+  {
+    mMarkingMode = mode;
+  }
+
+  /**
+   * Gets the mode how implicit markings are handled.
+   * @see MarkingMode
+   */
+  public MarkingMode getMarkingMode()
+  {
+    return mMarkingMode;
   }
 
   /**
@@ -337,22 +356,46 @@ public class ObservationEquivalenceTRSimplifier implements
   {
     setUpTauPredecessors();
     if (mInitialPartition == null) {
-      final long[] markings = new long[mNumStates];
-      for (int state = 0; state < mNumStates; state++) {
-        if (mTransitionRelation.isReachable(state)) {
-          markings[state] = mTransitionRelation.getAllMarkings(state);
+      final long[] markings;
+      if (mMarkingMode == MarkingMode.SATURATE) {
+        markings = null;
+      } else {
+        markings = new long[mNumStates];
+        for (int state = 0; state < mNumStates; state++) {
+          if (mTransitionRelation.isReachable(state)) {
+            markings[state] = mTransitionRelation.getAllMarkings(state);
+          }
         }
       }
       final TransitionIterator transIter =
         getPredecessorIterator(0, EventEncoding.TAU);
       for (int state = 0; state < mNumStates; state++) {
         if (mTransitionRelation.isReachable(state)) {
-          final long marking = markings[state];
+          final long marking;
+          if (markings == null) {
+            marking = mTransitionRelation.getAllMarkings(state);
+          } else {
+            marking = markings[state];
+          }
           transIter.reset(state);
           while (transIter.advance()) {
             final int pred = transIter.getCurrentSourceState();
-            markings[pred] =
-                mTransitionRelation.mergeMarkings(marking, markings[pred]);
+            if (pred != state) {
+              switch (mMarkingMode) {
+              case MINIMIZE:
+                mHasModifications |=
+                  mTransitionRelation.removeMarkings(pred, marking);
+                // fall through ...
+              case UNCHANGED:
+                markings[pred] =
+                  mTransitionRelation.mergeMarkings(marking, markings[pred]);
+                break;
+              case SATURATE:
+                mHasModifications |=
+                  mTransitionRelation.addMarkings(pred, marking);
+                break;
+              }
+            }
           }
         }
       }
@@ -360,7 +403,12 @@ public class ObservationEquivalenceTRSimplifier implements
           new TLongObjectHashMap<TIntArrayList>();
       for (int state = 0; state < mNumStates; state++) {
         if (mTransitionRelation.isReachable(state)) {
-          final long marking = markings[state];
+          final long marking;
+          if (markings == null) {
+            marking = mTransitionRelation.getAllMarkings(state);
+          } else {
+            marking = markings[state];
+          }
           TIntArrayList list = prepartition.get(marking);
           if (list == null) {
             list = new TIntArrayList();
@@ -1157,11 +1205,54 @@ public class ObservationEquivalenceTRSimplifier implements
 
 
   //#########################################################################
+  //# Inner Enumeration MarkingMode
+  /**
+   * <P>Possible settings to control how an
+   * {@link ObservationEquivalenceTRSimplifier} handles implicit markings.</P>
+   *
+   * <P>When minimising for observation equivalence, states that have a string
+   * of silent events leading to a marked states can be considered as marked
+   * themselves. The marking method controls whether or not such states such
+   * receive a marking in the output automaton.</P>
+   *
+   * <P>This setting only takes effect if the initial partition is set up
+   * based on markings, i.e., if method {@link #createInitialPartition()}
+   * is used.</P>
+   */
+  public enum MarkingMode
+  {
+    /**
+     * Leaves markings unchanged. A state in the output automaton will be
+     * marked with a given proposition if and only if at least one state
+     * in its equivalence class is marked with that proposition. This is
+     * the default setting.
+     */
+    UNCHANGED,
+    /**
+     * Adds markings to all states that are implicitly marked. A state is
+     * marked by a given proposition, if there is a trace of silent
+     * transitions leading to a state marked by that proposition.
+     */
+    SATURATE,
+    /**
+     * Tries to minimise the number of markings by removing implicit markings.
+     * If, for some state&nbsp;<I>s</I> marked by a given proposition, there is
+     * another silently reachable state marked by that proposition, the marking
+     * will be removed from&nbsp;<I>s</I>. This option only is guaranteed to
+     * work correctly if the input automaton does not contain any loops of
+     * silent events.
+     */
+    MINIMIZE
+  }
+
+
+  //#########################################################################
   //# Data Members
   private ListBufferTransitionRelation mTransitionRelation;
   private Collection<int[]> mInitialPartition;
   private Equivalence mEquivalence;
   private TransitionRemoval mTransitionRemovalMode;
+  private MarkingMode mMarkingMode;
   private int mTransitionLimit;
 
   private int mNumStates;

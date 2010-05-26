@@ -615,7 +615,7 @@ public abstract class TransitionListBuffer
    * the event being redundant. Tau events are recognised by their standard
    * code {@link EventEncoding#TAU}.
    * @return <CODE>true</CODE> if all transitions with the tau event
-   *         were selfloops and have been removed, <CODE>false</CODE>
+   *         were selfloops and have been removed, and at least one<CODE>false</CODE>
    *         otherwise.
    */
   public boolean removeTauSelfloops()

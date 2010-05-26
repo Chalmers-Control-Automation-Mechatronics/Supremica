@@ -90,9 +90,27 @@ public class IntStateBuffer
    * of states. All attributes and markings of the states are initialised
    * to be <CODE>false</CODE>.
    * @param  size       The number of states in the new buffer.
+   * @param  numProps   The number of propositions in the new buffer.
    * @throws OverflowException
    */
   public IntStateBuffer(final int size, final int numProps)
+    throws OverflowException
+  {
+    this(size, numProps, (1 << numProps) - 1);
+  }
+
+  /**
+   * Creates a new empty state buffer.
+   * This constructor allocates a new state buffer with the given number
+   * of states. All attributes and markings of the states are initialised
+   * to be <CODE>false</CODE>.
+   * @param  size       The number of states in the new buffer.
+   * @param  numProps   The number of propositions in the new buffer.
+   * @param  used       Marking pattern identifying propositions to be
+   *                    marked as used.
+   * @throws OverflowException
+   */
+  public IntStateBuffer(final int size, final int numProps, final long used)
     throws OverflowException
   {
     mNumPropositions = numProps;
@@ -102,7 +120,7 @@ public class IntStateBuffer
          ProxyTools.getShortClassName(this) + " can only handle up to " +
          MAX_PROPOSITIONS + " different propositions!");
     }
-    mUsedPropositions = (1 << numProps) - 1;
+    mUsedPropositions = (int) used;
     mStateInfo = new int[size];
   }
 
@@ -186,6 +204,15 @@ public class IntStateBuffer
   }
 
   /**
+   * Gets a marking pattern containing all propositions currently marked
+   * as used.
+   */
+  public long getUsedPropositions()
+  {
+    return mUsedPropositions;
+  }
+
+  /**
    * Checks whether a state is marked.
    * @param  state   ID of the state to be tested.
    * @param  prop    ID of the marking proposition to be tested.
@@ -209,7 +236,7 @@ public class IntStateBuffer
    */
   public long getAllMarkings(final int state)
   {
-    return mStateInfo[state] & mUsedPropositions;
+    return mStateInfo[state] & ~TAG_ALL;
   }
 
   /**
@@ -240,6 +267,50 @@ public class IntStateBuffer
   public void setAllMarkings(final int state, final long markings)
   {
     mStateInfo[state] = (mStateInfo[state] & TAG_ALL) | (int) markings;
+  }
+
+  /**
+   * Adds several markings to a given state simultaneously.
+   * @param  state    ID of the state to be modified.
+   * @param  markings A pattern of additional markings for the state. This
+   *                  pattern can be obtained through the method
+   *                  {@link #getAllMarkings(int) getAllMarkings()},
+   *                  {@link #createMarkings(TIntArrayList) createMarkings()},
+   *                  or {@link #mergeMarkings(long,long) mergeMarkings()}.
+   * @return <CODE>true</CODE> if the call resulted in markings being changed,
+   *         i.e., if the pattern contained a marking not already present
+   *         on the state.
+   */
+  public boolean addMarkings(final int state, final long markings)
+  {
+    if ((mStateInfo[state] & markings) != markings) {
+      mStateInfo[state] |= markings;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Removes several markings from a given state simultaneously.
+   * @param  state    ID of the state to be modified.
+   * @param  markings A pattern of markings to be removed from the state.
+   *                  This pattern can be obtained through the method
+   *                  {@link #getAllMarkings(int) getAllMarkings()},
+   *                  {@link #createMarkings(TIntArrayList) createMarkings()},
+   *                  or {@link #mergeMarkings(long,long) mergeMarkings()}.
+   * @return <CODE>true</CODE> if the call resulted in markings being changed,
+   *         i.e., if the pattern contained a marking actually present
+   *         on the state.
+   */
+  public boolean removeMarkings(final int state, final long markings)
+  {
+    if ((mStateInfo[state] & markings) != 0) {
+      mStateInfo[state] &= ~markings;
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -315,6 +386,10 @@ public class IntStateBuffer
     }
     if (mUsedPropositions != used) {
       mUsedPropositions = used;
+      used |= TAG_ALL;
+      for (int state = 0; state < mStateInfo.length; state++) {
+        mStateInfo[state] &= used;
+      }
       return true;
     } else {
       return false;

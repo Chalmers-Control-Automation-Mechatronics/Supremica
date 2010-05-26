@@ -157,7 +157,9 @@ public class ListBufferTransitionRelation
       mPredecessorBuffer.setUpTransitions(list, eventEnc, stateEnc);
     }
     mUsedEvents = new BitSet(numEvents);
-    mUsedEvents.set(0, numEvents, true);
+    final int tau = EventEncoding.TAU;
+    final int first = eventEnc.getProperEvent(tau) == null ? tau + 1 : tau;
+    mUsedEvents.set(first, numEvents, true);
   }
 
 
@@ -372,6 +374,40 @@ public class ListBufferTransitionRelation
   public void setAllMarkings(final int state, final long markings)
   {
     mStateBuffer.setAllMarkings(state, markings);
+  }
+
+  /**
+   * Adds several markings to a given state simultaneously.
+   * @param  state    ID of the state to be modified.
+   * @param  markings A pattern of additional markings for the state. This
+   *                  pattern can be obtained through the method
+   *                  {@link #getAllMarkings(int) getAllMarkings()},
+   *                  {@link #createMarkings(TIntArrayList) createMarkings()},
+   *                  or {@link #mergeMarkings(long,long) mergeMarkings()}.
+   * @return <CODE>true</CODE> if the call resulted in markings being changed,
+   *         i.e., if the pattern contained a marking not already present
+   *         on the state.
+   */
+  public boolean addMarkings(final int state, final long markings)
+  {
+    return mStateBuffer.addMarkings(state, markings);
+  }
+
+  /**
+   * Removes several markings from a given state simultaneously.
+   * @param  state    ID of the state to be modified.
+   * @param  markings A pattern of markings to be removed from the state.
+   *                  This pattern can be obtained through the method
+   *                  {@link #getAllMarkings(int) getAllMarkings()},
+   *                  {@link #createMarkings(TIntArrayList) createMarkings()},
+   *                  or {@link #mergeMarkings(long,long) mergeMarkings()}.
+   * @return <CODE>true</CODE> if the call resulted in markings being changed,
+   *         i.e., if the pattern contained a marking actually present
+   *         on the state.
+   */
+  public boolean removeMarkings(final int state, final long markings)
+  {
+    return mStateBuffer.removeMarkings(state, markings);
   }
 
   /**
@@ -1293,8 +1329,9 @@ public class ListBufferTransitionRelation
           mPredecessorBuffer.merge(partition);
         }
         final int numProps = mStateBuffer.getNumberOfPropositions();
+        final long used = mStateBuffer.getUsedPropositions();
         final IntStateBuffer newStateBuffer =
-          new IntStateBuffer(newSize, numProps);
+          new IntStateBuffer(newSize, numProps, used);
         int c = 0;
         for (final int[] clazz : partition) {
           boolean init = false;
