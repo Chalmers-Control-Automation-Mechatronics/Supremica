@@ -1315,7 +1315,7 @@ public class ListBufferTransitionRelation
    *          position in the list identifies the state code to be given to
    *          the new merged state.
    *          An argument of <CODE>null</CODE> indicates a trivial partition,
-   *          and has no effect,
+   *          and has no effect.
    */
   public void merge(final List<int[]> partition)
   {

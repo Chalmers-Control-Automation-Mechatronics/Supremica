@@ -23,13 +23,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.ProxyVisitor;
-import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
@@ -935,7 +931,7 @@ public class ObserverProjectionTransitionRelation
       }
     }
     for (final MemStateProxy source : reachable) {
-      final int s = source.getCode();
+      final int s = source.getStateCode();
       for (int e = 0; e < mNumProperEvents; e++) {
         final TIntHashSet succs = mSuccessors[s][e];
         if (succs == null) {
@@ -1026,99 +1022,6 @@ public class ObserverProjectionTransitionRelation
     return intset;
   }
 
-
-  // #########################################################################
-  // # Inner Class MemStateProxy
-  /**
-   * Stores states, encoding the name as an int rather than a long string value.
-   */
-  private static class MemStateProxy implements StateProxy
-  {
-    // #######################################################################
-    // # Constructor
-    private MemStateProxy(final int code, final boolean init,
-                          final Collection<EventProxy> props)
-    {
-      mCode = code;
-      mIsInitial = init;
-      mProps = props;
-    }
-
-    // #######################################################################
-    // # Simple Access
-    int getCode()
-    {
-      return mCode;
-    }
-
-    // #######################################################################
-    // # Interface net.sourceforge.waters.model.des.StateProxy
-    public String getName()
-    {
-      return "S:" + mCode;
-    }
-
-    public boolean isInitial()
-    {
-      return mIsInitial;
-    }
-
-    public Collection<EventProxy> getPropositions()
-    {
-      return mProps;
-    }
-
-    public MemStateProxy clone()
-    {
-      return new MemStateProxy(mCode, mIsInitial, mProps);
-    }
-
-    public boolean refequals(final NamedProxy o)
-    {
-      if (o instanceof MemStateProxy) {
-        final MemStateProxy s = (MemStateProxy) o;
-        return s.mCode == mCode;
-      } else {
-        return false;
-      }
-    }
-
-    public int refHashCode()
-    {
-      return mCode;
-    }
-
-    public Object acceptVisitor(final ProxyVisitor visitor)
-        throws VisitorException
-    {
-      final ProductDESProxyVisitor desvisitor =
-          (ProductDESProxyVisitor) visitor;
-      return desvisitor.visitStateProxy(this);
-    }
-
-    public Class<StateProxy> getProxyInterface()
-    {
-      return StateProxy.class;
-    }
-
-    public int compareTo(final NamedProxy n)
-    {
-      return n.getName().compareTo(getName());
-    }
-
-    // #######################################################################
-    // # Overrides for java.lang.Object
-    public String toString()
-    {
-      return getName();
-    }
-
-    // #######################################################################
-    // # Data Members
-    private final int mCode;
-    private final boolean mIsInitial;
-    private final Collection<EventProxy> mProps;
-  }
 
   // #########################################################################
   // # Data Members

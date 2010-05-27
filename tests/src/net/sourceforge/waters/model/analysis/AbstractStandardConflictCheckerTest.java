@@ -199,6 +199,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void testSilentContinuation() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "silent_continuation.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void testVerriegel4Counter2() throws Exception
   {
     final String group = "tests";
