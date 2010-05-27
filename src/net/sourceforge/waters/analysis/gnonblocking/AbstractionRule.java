@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
  * @author Rachel Francis
  */
 
-abstract class AbstractionRule
+public abstract class AbstractionRule
 {
   // #######################################################################
   // # Constructor

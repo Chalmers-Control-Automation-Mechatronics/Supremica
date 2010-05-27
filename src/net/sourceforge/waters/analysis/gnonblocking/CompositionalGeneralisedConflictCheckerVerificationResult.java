@@ -60,7 +60,7 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
   /**
    * Gets the number of states in the final composed model.
    */
-  public int getComposedModelStateCount()
+  public double getComposedModelStateCount()
   {
     return mComposedModelNumberOfStates;
   }
@@ -68,7 +68,7 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
   /**
    * Gets the number of transitions in the final composed model.
    */
-  public int getComposedModelTransitionCount()
+  public double getComposedModelTransitionCount()
   {
     return mComposedModelNumberOfTransitions;
   }
@@ -115,7 +115,7 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
   /**
    * Sets the number of states in the final composed model.
    */
-  public void setComposedModelStateCount(final int stateCount)
+  public void setComposedModelStateCount(final double stateCount)
   {
     mComposedModelNumberOfStates = stateCount;
   }
@@ -123,7 +123,7 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
   /**
    * Sets the number of transitions in the final composed model.
    */
-  public void setComposedModelTransitionCount(final int transitionCount)
+  public void setComposedModelTransitionCount(final double transitionCount)
   {
     mComposedModelNumberOfTransitions = transitionCount;
   }
@@ -183,18 +183,19 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
         + mComposedModelNumberOfStates);
     stream.println("Number of transitions in final composed model: "
         + mComposedModelNumberOfTransitions);
-    /*
-     * stream
-     * .println("-----------------------Rule Results ----------------------");
-     * for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
-     * ruleStats.print(stream); stream.println(); }
-     */
+
+    stream
+        .println("-----------------------Rule Results ----------------------");
+    for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
+      ruleStats.print(stream);
+      stream.println();
+    }
 
   }
 
   private List<AbstractionRuleStatistics> mAbstractionRuleStats;
   private int mSuccessfulCompositionCount;
   private int mUnsuccessfulCompositionCount;
-  private int mComposedModelNumberOfStates;
-  private int mComposedModelNumberOfTransitions;
+  private double mComposedModelNumberOfStates;
+  private double mComposedModelNumberOfTransitions;
 }
