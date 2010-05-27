@@ -83,9 +83,9 @@ public class RemovalOfDefaultMarkingsRuleTest extends
    *
    * <P>
    * After running the test, any automaton created by the rule is saved in
-   * {supremica
-   * }/logs/results/analysis/gnonblocking/RemovalOfDefaultMarkingsRuleTest as a
-   * .des file (for text viewing) and as a .wmod file (to load into the IDE).
+   * {supremica}/logs/results/analysis/gnonblocking/RemovalOfDefaultMarkingsRuleTest
+   * as a .des file (for text viewing) and as a .wmod file (to load into the
+   * IDE).
    * </P>
    */
   public void test_defaultremoval_1() throws Exception
@@ -173,6 +173,14 @@ public class RemovalOfDefaultMarkingsRuleTest extends
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "defaultremoval_11.wmod";
+    runAbstractionRule(group, subdir, name);
+  }
+
+  public void test_noncoreachableUnmarkedStates() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "defaultremoval_12.wmod";
     runAbstractionRule(group, subdir, name);
   }
 

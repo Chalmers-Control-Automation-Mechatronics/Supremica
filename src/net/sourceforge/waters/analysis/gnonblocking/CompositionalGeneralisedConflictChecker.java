@@ -13,7 +13,6 @@ import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
-import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayDeque;
@@ -290,11 +289,10 @@ public class CompositionalGeneralisedConflictChecker extends
       TraceChecker.checkCounterExample(convertedTrace, true);
       final ListIterator<Step> iter = modifyingSteps.listIterator(size);
       while (iter.hasPrevious()) {
-        Step step = iter.previous();
+        final Step step = iter.previous();
+        // final ConflictTraceProxy prevTrace = convertedTrace;
         convertedTrace = step.convertTrace(convertedTrace);
-        step = null;
         TraceChecker.checkCounterExample(convertedTrace, true);
-
       }
       setFailedResult(convertedTrace);
     }
@@ -435,11 +433,14 @@ public class CompositionalGeneralisedConflictChecker extends
     mComposedModelNumberOfTransitions = 1;
 
     mTemporaryModifyingSteps = new ArrayList<Step>();
+    // TODO Make sure alpha is non-null in all cases
+    final EventProxy alpha = getGeneralisedPrecondition();
+    final EventProxy omega = getUsedMarkingProposition();
     mPropositions = new ArrayList<EventProxy>(2);
-    if (getGeneralisedPrecondition() != null) {
-      mPropositions.add(getGeneralisedPrecondition());
+    if (alpha != null) { // This if should go away, always include alpha ...
+      mPropositions.add(alpha);
     }
-    mPropositions.add(getMarkingProposition(getModel()));
+    mPropositions.add(omega);
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
@@ -449,38 +450,38 @@ public class CompositionalGeneralisedConflictChecker extends
 
     final RemovalOfAlphaMarkingsRule ramRule =
         new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
-    ramRule.setAlphaMarking(getGeneralisedPrecondition());
+    ramRule.setAlphaMarking(alpha);
     mAbstractionRules.add(ramRule);
 
     final RemovalOfDefaultMarkingsRule rdmRule =
         new RemovalOfDefaultMarkingsRule(getFactory(), mPropositions);
-    rdmRule.setAlphaMarking(getGeneralisedPrecondition());
-    rdmRule.setDefaultMarking(getMarkingProposition());
+    rdmRule.setAlphaMarking(alpha);
+    rdmRule.setDefaultMarking(omega);
     mAbstractionRules.add(rdmRule);
 
     final RemovalOfNoncoreachableStatesRule rnsRule =
         new RemovalOfNoncoreachableStatesRule(getFactory(), mPropositions);
-    rnsRule.setAlphaMarking(getGeneralisedPrecondition());
-    rnsRule.setDefaultMarking(getMarkingProposition());
+    rnsRule.setAlphaMarking(alpha);
+    rnsRule.setDefaultMarking(omega);
     mAbstractionRules.add(rnsRule);
 
     final DeterminisationOfNonAlphaStatesRule dnasRule =
         new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
-    dnasRule.setAlphaMarking(getGeneralisedPrecondition());
+    dnasRule.setAlphaMarking(alpha);
     dnasRule.setTransitionLimit(getInternalStepTransitionLimit());
     mAbstractionRules.add(dnasRule);
 
     final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
         new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
             mPropositions);
-    rttlnsRule.setAlphaMarking(getGeneralisedPrecondition());
+    rttlnsRule.setAlphaMarking(alpha);
     mAbstractionRules.add(rttlnsRule);
 
     final RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule rttonsRule =
         new RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule(
             getFactory(), mPropositions);
-    rttonsRule.setAlphaMarking(getGeneralisedPrecondition());
-    rttonsRule.setDefaultMarking(getMarkingProposition());
+    rttonsRule.setAlphaMarking(alpha);
+    rttonsRule.setDefaultMarking(omega);
     mAbstractionRules.add(rttonsRule);
 
     final ObservationEquivalenceRule oeRule =
@@ -1521,7 +1522,7 @@ public class CompositionalGeneralisedConflictChecker extends
       return mTransitionRelation;
     }
 
-    protected void createTransitionRelation()
+    void createTransitionRelation()
     {
       mTransitionRelation =
           new ObserverProjectionTransitionRelation(getOriginalAutomaton(),
@@ -1532,10 +1533,31 @@ public class CompositionalGeneralisedConflictChecker extends
       mOriginalStatesMap = mTransitionRelation.getOriginalStateToIntMap();
     }
 
-    protected void clearTransitionRelation()
+    void clearTransitionRelation()
     {
       mTransitionRelation = null;
       mOriginalStatesMap = null;
+    }
+
+    int[] createClassMap(final Collection<int[]> partition)
+    {
+      final AutomatonProxy aut = getOriginalAutomaton();
+      final int size = aut.getStates().size();
+      final int[] result = new int[size];
+      if (partition == null) {
+        for (int s = 0; s < size; s++) {
+          result[s] = s;
+        }
+      } else {
+        int c = 0;
+        for (final int[] clazz : partition) {
+          for (final int s : clazz) {
+            result[s] = c;
+          }
+          c++;
+        }
+      }
+      return result;
     }
 
     // #######################################################################
@@ -1646,8 +1668,10 @@ public class CompositionalGeneralisedConflictChecker extends
         final Map<AutomatonProxy,StateProxy> finalStepsStateMap =
             new HashMap<AutomatonProxy,StateProxy>(traceSteps
                 .get(traceSteps.size() - 1).getStateMap());
+        finalStepsStateMap.remove(getResultAutomaton());
         final List<TraceStepProxy> substeps =
-            createTraceSteps(finalStepsStateMap, finalSteps);
+          createTraceSteps(finalStepsStateMap, finalStepsStateMap,
+                           finalSteps, null);
         convertedSteps.addAll(substeps);
       }
     }
@@ -1655,8 +1679,6 @@ public class CompositionalGeneralisedConflictChecker extends
     /**
      * Creates the list of automata that are part of the trace and the finished
      * trace is created.
-     *
-     * @param conflictTrace
      * @return Converted conflict trace.
      */
     protected ConflictTraceProxy buildTrace(
@@ -1701,36 +1723,16 @@ public class CompositionalGeneralisedConflictChecker extends
       final Map<AutomatonProxy,StateProxy> initialStepsStateMap =
           new HashMap<AutomatonProxy,StateProxy>(traceSteps.get(0)
               .getStateMap());
+      initialStepsStateMap.remove(getResultAutomaton());
       final List<TraceStepProxy> initialSteps =
-          createTraceSteps(initialStepsStateMap, initialRecords);
+        createTraceSteps(initialStepsStateMap, initialStepsStateMap,
+                         initialRecords, null);
       convertedSteps.addAll(initialSteps);
       final int originalInitialStateID =
           initialRecords.get(initialRecords.size() - 1).getState();
       final StateProxy originalInitialState =
           mOriginalStates[originalInitialStateID];
       return originalInitialState;
-    }
-
-    protected List<TraceStepProxy> createTraceSteps(
-                                                    final Map<AutomatonProxy,StateProxy> stepsStateMap,
-                                                    final List<SearchRecord> subtrace)
-    {
-      stepsStateMap.remove(getResultAutomaton());
-      final ProductDESProxyFactory factory = getFactory();
-      final List<TraceStepProxy> substeps = new LinkedList<TraceStepProxy>();
-      for (final SearchRecord subStep : subtrace) {
-        final int subStepTargetStateID = subStep.getState();
-        stepsStateMap.put(getOriginalAutomaton(),
-                          mOriginalStates[subStepTargetStateID]);
-        final int subStepEventID = subStep.getEvent();
-        final EventProxy event =
-            subStepEventID >= 0 ? mTransitionRelation.getEvent(subStepEventID)
-                : null;
-        final TraceStepProxy convertedStep =
-            factory.createTraceStepProxy(event, stepsStateMap);
-        substeps.add(convertedStep);
-      }
-      return substeps;
     }
 
     protected List<SearchRecord> buildSearchRecordTrace(SearchRecord record)
@@ -1970,41 +1972,21 @@ public class CompositionalGeneralisedConflictChecker extends
   private class ObservationEquivalenceStep extends RemovalOfTransitionsStep
   {
 
-    ObservationEquivalenceStep(final AutomatonProxy resultAut,
-                               final AutomatonProxy originalAut,
-                               final EventProxy tau,
-                               final ObserverProjectionTransitionRelation tr,
-                               final TIntObjectHashMap<int[]> classMap)
-    {
-      super(resultAut, originalAut, tau, tr);
-      mClassMap = classMap;
-    }
-
-    ObservationEquivalenceStep(final AutomatonProxy resultAut,
-                               final AutomatonProxy originalAut,
-                               final EventProxy tau,
-                               final StateEncoding inputEnc,
-                               final List<int[]> partition,
-                               final StateEncoding outputEnc)
+    // #########################################################################
+    // # Constructor
+    private ObservationEquivalenceStep(final AutomatonProxy resultAut,
+                                       final AutomatonProxy originalAut,
+                                       final EventProxy tau,
+                                       final StateEncoding inputEnc,
+                                       final List<int[]> partition,
+                                       final StateEncoding outputEnc)
     {
       super(resultAut, originalAut, tau, inputEnc, outputEnc);
-      if (partition == null) {
-        final int size = originalAut.getStates().size();
-        mClassMap = new TIntObjectHashMap<int[]>(size);
-        for (int i = 0; i < size; i++) {
-          final int[] clazz = new int[] {i};
-          mClassMap.put(i, clazz);
-        }
-      } else {
-        final int size = partition.size();
-        mClassMap = new TIntObjectHashMap<int[]>(size);
-        int i = 0;
-        for (final int[] clazz : partition) {
-          mClassMap.put(i++, clazz);
-        }
-      }
+      mClassMap = createClassMap(partition);
     }
 
+    // #########################################################################
+    // # Overrides for RemovalOfTransitionsStep
     /**
      * Creates the beginning of a trace by doing a breadth-first search to find
      * the correct initial state of the original automaton. Steps are added for
@@ -2019,8 +2001,12 @@ public class CompositionalGeneralisedConflictChecker extends
                                                       final TIntArrayList initialStateIDs,
                                                       final int resultAutInitialStateClass)
     {
-      final int[] targetArray = mClassMap.get(resultAutInitialStateClass);
-      final TIntHashSet targetSet = new TIntHashSet(targetArray);
+      final TIntHashSet targetSet = new TIntHashSet();
+      for (int s = 0; s < mClassMap.length; s++) {
+        if (mClassMap[s] == resultAutInitialStateClass) {
+          targetSet.add(s);
+        }
+      }
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
       final TIntHashSet visited = new TIntHashSet();
       // The dummy record ensures that the first real search record will
@@ -2069,10 +2055,7 @@ public class CompositionalGeneralisedConflictChecker extends
     protected boolean isTargetState(final int stateFound,
                                     final int resultAutTarget)
     {
-      final int[] targetArray = mClassMap.get(resultAutTarget);
-      final TIntHashSet targetSet = new TIntHashSet(targetArray);
-      // TODO: don't want to get hashset every time
-      return targetSet.contains(stateFound);
+      return mClassMap[stateFound] == resultAutTarget;
     }
 
     protected boolean isTraceEndState(final int stateFound)
@@ -2085,12 +2068,11 @@ public class CompositionalGeneralisedConflictChecker extends
     // #######################################################################
     // # Data Members
     /**
-     * Maps state codes of the output TransitionRelation to list of state codes
-     * in input TransitionRelation. This gives the class of states merged to
-     * form the given state in the simplified automaton. Obtained from
-     * TransBiSimulator.
+     * Maps state codes of the input transition relation to state codes (i.e.,
+     * class numbers) in the output transition relation. Obtained from
+     * observation equivalence minimiser.
      */
-    private final TIntObjectHashMap<int[]> mClassMap;
+    private final int[] mClassMap;
 
   }
 
@@ -2108,21 +2090,7 @@ public class CompositionalGeneralisedConflictChecker extends
                                         final StateEncoding outputEnc)
     {
       super(resultAut, originalAut, tau, inputEnc, outputEnc);
-      if (partition == null) {
-        final int size = originalAut.getStates().size();
-        mClassMap = new TIntObjectHashMap<int[]>(size);
-        for (int i = 0; i < size; i++) {
-          final int[] clazz = new int[] {i};
-          mClassMap.put(i, clazz);
-        }
-      } else {
-        final int size = partition.size();
-        mClassMap = new TIntObjectHashMap<int[]>(size);
-        int i = 0;
-        for (final int[] clazz : partition) {
-          mClassMap.put(i++, clazz);
-        }
-      }
+      mClassMap = createClassMap(partition);
     }
 
     /**
@@ -2137,15 +2105,27 @@ public class CompositionalGeneralisedConflictChecker extends
       final int stepCount = traceSteps.size();
       final ListIterator<TraceStepProxy> iter =
           traceSteps.listIterator(stepCount);
-      // To start the trace, we create a step containing the known end state
-      // of the trace and a null event. This step will be replaced by a step
-      // with event information as soon as a proper step is discovered.
       TraceStepProxy step = iter.previous();
       final Map<AutomatonProxy,StateProxy> endMap =
           new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
       final StateProxy tracesEndState = endMap.remove(getResultAutomaton());
-      StateProxy originalAutState =
-          getOriginalStates()[getReverseOutputStateMap().get(tracesEndState)];
+      final int tracesEndStateCode =
+        getReverseOutputStateMap().get(tracesEndState);
+      int originialEndStateCode = -1;
+      for (int s = 0; s < mClassMap.length; s++) {
+        if (mClassMap[s] == tracesEndStateCode) {
+          // There must be exactly only one state in the class of the trace's
+          // end state, because that state has to be marked alpha, and non-alpha
+          // determinisation never merges alpha-marked states.
+          originialEndStateCode = s;
+          break;
+        }
+      }
+      // To start the process of building the from the end, we create a step
+      // containing the known end state of the trace and a null event. This
+      // step will be replaced by a step with event information as soon as a
+      // proper step is discovered.
+      StateProxy originalAutState = getOriginalStates()[originialEndStateCode];
       endMap.put(getOriginalAutomaton(), originalAutState);
       final ProductDESProxyFactory factory = getFactory();
       final TraceStepProxy newEndStep =
@@ -2232,11 +2212,7 @@ public class CompositionalGeneralisedConflictChecker extends
     protected boolean isTargetState(final int stateFound,
                                     final int resultAutTarget)
     {
-      final int[] targetArray = mClassMap.get(resultAutTarget);
-      final TIntHashSet targetSet = new TIntHashSet(targetArray);
-      // TODO: don't want to get hash set every time
-      return targetSet.contains(stateFound);
-
+      return mClassMap[stateFound] == resultAutTarget;
     }
 
     protected boolean isTraceEndState(final int stateFound)
@@ -2260,11 +2236,12 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       final List<SearchRecord> initSteps =
           completeEndOfTrace(getOriginalStateToIntMap().get(originalAutState));
-      final Map<AutomatonProxy,StateProxy> stepMap =
-          new HashMap<AutomatonProxy,StateProxy>(step0.getStateMap());
       if (initSteps.size() > 0) {
+        final Map<AutomatonProxy,StateProxy> stepMap =
+          new HashMap<AutomatonProxy,StateProxy>(step0.getStateMap());
+        stepMap.remove(getResultAutomaton());
         final List<TraceStepProxy> substeps =
-            createTraceSteps(stepMap, initSteps);
+          createTraceSteps(stepMap, stepMap, initSteps, null);
         prependSteps(substeps, convertedSteps);
       }
     }
@@ -2350,12 +2327,11 @@ public class CompositionalGeneralisedConflictChecker extends
     // #######################################################################
     // # Data Members
     /**
-     * Maps state codes of the output TransitionRelation to list of state codes
-     * in input TransitionRelation. This gives the class of states merged to
-     * form the given state in the simplified automaton. Obtained from
-     * TransBiSimulator.
+     * Maps state codes of the input transition relation to state codes (i.e.,
+     * class numbers) in the output transition relation. Obtained from
+     * observation equivalence minimiser.
      */
-    private final TIntObjectHashMap<int[]> mClassMap;
+    private final int[] mClassMap;
 
   }
 
