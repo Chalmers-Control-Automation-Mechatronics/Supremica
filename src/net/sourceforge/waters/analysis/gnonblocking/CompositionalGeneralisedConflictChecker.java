@@ -212,11 +212,11 @@ public class CompositionalGeneralisedConflictChecker extends
       } else {
         final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
         final Set<EventProxy> localEvents =
-          identifyLocalEvents(mEventsToAutomata, autAsList);
+            identifyLocalEvents(mEventsToAutomata, autAsList);
         if (localEvents.size() > 0) {
           try {
             final AutomatonProxy abstractedAut =
-              hideAndAbstract(aut, localEvents);
+                hideAndAbstract(aut, localEvents);
             remainingAut.add(abstractedAut);
             modified = true;
             modifyingSteps.addAll(mTemporaryModifyingSteps);
@@ -269,16 +269,6 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
     }
-    for (final AutomatonProxy aut : model.getAutomata()) {
-      mComposedModelNumberOfStates =
-          mComposedModelNumberOfStates * aut.getStates().size();
-      mComposedModelNumberOfTransitions =
-          mComposedModelNumberOfTransitions * aut.getTransitions().size(); // TODO:is
-      // this
-      // correct
-      // for
-      // transitions
-    }
     final ConflictChecker checker =
         new NativeConflictChecker(model, getUsedMarkingProposition(),
             getFactory());
@@ -286,7 +276,10 @@ public class CompositionalGeneralisedConflictChecker extends
     checker.setNodeLimit(mFinalStepNodeLimit);
     checker.setTransitionLimit(mFinalStepTransitionLimit);
     final boolean result = checker.run();
-
+    mComposedModelNumberOfStates =
+        checker.getAnalysisResult().getTotalNumberOfStates();
+    mComposedModelNumberOfTransitions =
+        checker.getAnalysisResult().getTotalNumberOfTransitions();
     if (result) {
       setSatisfiedResult();
     } else {
@@ -454,11 +447,6 @@ public class CompositionalGeneralisedConflictChecker extends
         new TauLoopRemovalRule(getFactory(), mPropositions);
     mAbstractionRules.add(tlrRule);
 
-    final ObservationEquivalenceRule oeRule =
-        new ObservationEquivalenceRule(getFactory(), mPropositions);
-    oeRule.setTransitionLimit(getInternalStepTransitionLimit());
-    mAbstractionRules.add(oeRule);
-
     final RemovalOfAlphaMarkingsRule ramRule =
         new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
     ramRule.setAlphaMarking(getGeneralisedPrecondition());
@@ -495,6 +483,10 @@ public class CompositionalGeneralisedConflictChecker extends
     rttonsRule.setDefaultMarking(getMarkingProposition());
     mAbstractionRules.add(rttonsRule);
 
+    final ObservationEquivalenceRule oeRule =
+        new ObservationEquivalenceRule(getFactory(), mPropositions);
+    oeRule.setTransitionLimit(getInternalStepTransitionLimit());
+    mAbstractionRules.add(oeRule);
   }
 
   // #########################################################################
@@ -2643,6 +2635,6 @@ public class CompositionalGeneralisedConflictChecker extends
   private double mPeakNumberOfStates;
   private double mTotalNumberOfTransitions;
   private double mPeakNumberOfTransitions;
-  private int mComposedModelNumberOfStates;
-  private int mComposedModelNumberOfTransitions;
+  private double mComposedModelNumberOfStates;
+  private double mComposedModelNumberOfTransitions;
 }
