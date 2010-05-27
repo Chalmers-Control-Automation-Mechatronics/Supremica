@@ -10,7 +10,8 @@
 
 package net.sourceforge.waters.model.des;
 
-import java.util.HashSet;
+import gnu.trove.THashSet;
+
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -52,6 +53,20 @@ public class ProductDESIntegrityChecker
     checkProductDESIntegrity(des);
   }
 
+  public void check(final AutomatonProxy aut, final ProductDESProxy des)
+    throws Exception
+  {
+    try {
+      mProductDES = des;
+      final Set<EventProxy> events = des.getEvents();
+      mProductDESEventSet = new THashSet<EventProxy>(events);
+      checkAutomatonIntegrity(aut);
+    } finally {
+      mProductDES = null;
+      mProductDESEventSet = null;
+    }
+  }
+
 
   //#########################################################################
   //# Integrity Checking
@@ -61,8 +76,8 @@ public class ProductDESIntegrityChecker
       mProductDES = des;
       final Set<EventProxy> events = des.getEvents();
       final int numevents = events.size();
-      final Set<String> names = new HashSet<String>(numevents);
-      mProductDESEventSet = new HashSet<EventProxy>(numevents);
+      final Set<String> names = new THashSet<String>(numevents);
+      mProductDESEventSet = new THashSet<EventProxy>(numevents);
       for (final EventProxy event : events) {
         final String name = event.getName();
         if (names.add(name)) {
@@ -94,11 +109,11 @@ public class ProductDESIntegrityChecker
                       mProductDES.getName() + "'!");
         }
       }
-      mAutomatonEventSet = new HashSet<EventProxy>(aut.getEvents());
+      mAutomatonEventSet = new THashSet<EventProxy>(aut.getEvents());
       final Set<StateProxy> states = aut.getStates();
       final int numstates = states.size();
-      final Set<String> names = new HashSet<String>(numstates);
-      mAutomatonStateSet = new HashSet<StateProxy>(numstates);
+      final Set<String> names = new THashSet<String>(numstates);
+      mAutomatonStateSet = new THashSet<StateProxy>(numstates);
       for (final StateProxy state : states) {
         final String name = state.getName();
         if (names.add(name)) {

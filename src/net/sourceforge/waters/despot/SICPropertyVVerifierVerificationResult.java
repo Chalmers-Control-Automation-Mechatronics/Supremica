@@ -4,7 +4,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.gnonblocking.CompositionalGeneralisedConflictCheckerVerificationResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.TraceProxy;
 
@@ -48,17 +47,16 @@ public class SICPropertyVVerifierVerificationResult extends VerificationResult
                                                 final TraceProxy counterexample)
   {
     super(satisfied, counterexample);
-    mConflictCheckerStats =
-        new ArrayList<CompositionalGeneralisedConflictCheckerVerificationResult>();
+    mConflictCheckerStats = new ArrayList<VerificationResult>();
   }
 
   // #########################################################################
   // # Simple Access Methods
   /**
-   * Get all results from conflict checker runs (fone result for each answer
+   * Get all results from conflict checker runs (one result for each answer
    * event).
    */
-  public List<CompositionalGeneralisedConflictCheckerVerificationResult> getConflictCheckerResults()
+  public List<? extends VerificationResult> getConflictCheckerResults()
   {
     return mConflictCheckerStats;
   }
@@ -70,8 +68,8 @@ public class SICPropertyVVerifierVerificationResult extends VerificationResult
    * Sets all the conflict checker results for this SIC property V verification
    * (one result for each answer event).
    */
-  public void setConflictCheckerResult(
-                                       final List<CompositionalGeneralisedConflictCheckerVerificationResult> results)
+  public void setConflictCheckerResult
+    (final List<? extends VerificationResult> results)
   {
     mConflictCheckerStats = results;
   }
@@ -82,11 +80,14 @@ public class SICPropertyVVerifierVerificationResult extends VerificationResult
   public void print(final PrintStream stream)
   {
     super.print(stream);
-    for (final CompositionalGeneralisedConflictCheckerVerificationResult result : mConflictCheckerStats) {
+    for (final VerificationResult result : mConflictCheckerStats) {
       result.print(stream);
     }
-
   }
 
-  private List<CompositionalGeneralisedConflictCheckerVerificationResult> mConflictCheckerStats;
+
+  //#########################################################################
+  //# Data Members
+  private List<? extends VerificationResult> mConflictCheckerStats;
+
 }

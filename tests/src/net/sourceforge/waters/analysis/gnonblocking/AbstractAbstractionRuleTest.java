@@ -10,20 +10,18 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
-import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IsomorphismChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
@@ -51,12 +49,14 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mAbstractionRule = createAbstractionRule(factory);
+    mIntegrityChecker = ProductDESIntegrityChecker.getInstance();
     mIsomorphismChecker = new IsomorphismChecker(factory, false);
   }
 
   protected void tearDown() throws Exception
   {
     mAbstractionRule = null;
+    mIntegrityChecker = null;
     mIsomorphismChecker = null;
     mBindings = null;
     super.tearDown();
@@ -162,7 +162,7 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
   private void checkResult(final ProductDESProxy des,
                            final AutomatonProxy before,
                            final AutomatonProxy result)
-      throws WatersMarshalException, IOException, AnalysisException
+      throws Exception
   {
     final String name = des.getName();
     final String basename = appendSuffixes(name, mBindings);
@@ -170,6 +170,7 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
         "Test output from " + ProxyTools.getShortClassName(mAbstractionRule)
             + '.';
     saveAutomaton(result, basename, comment);
+    mIntegrityChecker.check(result, des);
     final AutomatonProxy expected = getAutomaton(des, AFTER);
     if (expected == null) {
       assertSame("Test expects no change, "
@@ -236,6 +237,7 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
   // #########################################################################
   // # Data Members
   private AbstractionRule mAbstractionRule;
+  private ProductDESIntegrityChecker mIntegrityChecker;
   private IsomorphismChecker mIsomorphismChecker;
   private List<ParameterBindingProxy> mBindings;
 

@@ -12,7 +12,6 @@ package net.sourceforge.waters.despot;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.gnonblocking.CompositionalGeneralisedConflictCheckerVerificationResult;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
@@ -46,8 +45,7 @@ public class SICPropertyVVerifier extends AbstractConflictChecker
   {
     super(model, factory);
     mChecker = checker;
-    mConflictCheckerStats =
-        new ArrayList<CompositionalGeneralisedConflictCheckerVerificationResult>();
+    mConflictCheckerStats = new ArrayList<VerificationResult>();
   }
 
   // #########################################################################
@@ -168,8 +166,7 @@ public class SICPropertyVVerifier extends AbstractConflictChecker
     mTotalNumberOfTransitions += result.getPeakNumberOfTransitions();
     mPeakNumberOfTransitions =
         Math.max(mPeakNumberOfTransitions, result.getPeakNumberOfTransitions());
-    mConflictCheckerStats
-        .add((CompositionalGeneralisedConflictCheckerVerificationResult) result);
+    mConflictCheckerStats.add(result);
   }
 
   // #########################################################################
@@ -183,6 +180,6 @@ public class SICPropertyVVerifier extends AbstractConflictChecker
   private double mPeakNumberOfStates;
   private double mTotalNumberOfTransitions;
   private double mPeakNumberOfTransitions;
-  private final List<CompositionalGeneralisedConflictCheckerVerificationResult> mConflictCheckerStats;
+  private final List<VerificationResult> mConflictCheckerStats;
 
 }
