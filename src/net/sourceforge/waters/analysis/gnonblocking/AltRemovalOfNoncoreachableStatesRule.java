@@ -116,7 +116,7 @@ class AltRemovalOfNoncoreachableStatesRule extends AbstractionRule
         coreachableStates.set(sourceID);
         while (unvisitedStates.size() > 0) {
           final int stateID = unvisitedStates.pop();
-          iter.reset(stateID);
+          iter.resetState(stateID);
           while (iter.advance()) {
             final int predID = iter.getCurrentSourceState();
             if (!coreachableStates.get(predID)) {

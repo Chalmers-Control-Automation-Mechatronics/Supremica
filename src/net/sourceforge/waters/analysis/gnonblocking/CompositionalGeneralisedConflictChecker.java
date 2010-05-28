@@ -465,12 +465,6 @@ public class CompositionalGeneralisedConflictChecker extends
     rnsRule.setDefaultMarking(omega);
     mAbstractionRules.add(rnsRule);
 
-    final DeterminisationOfNonAlphaStatesRule dnasRule =
-        new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
-    dnasRule.setAlphaMarking(alpha);
-    dnasRule.setTransitionLimit(getInternalStepTransitionLimit());
-    mAbstractionRules.add(dnasRule);
-
     final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
         new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(getFactory(),
             mPropositions);
@@ -488,6 +482,12 @@ public class CompositionalGeneralisedConflictChecker extends
         new ObservationEquivalenceRule(getFactory(), mPropositions);
     oeRule.setTransitionLimit(getInternalStepTransitionLimit());
     mAbstractionRules.add(oeRule);
+
+    final DeterminisationOfNonAlphaStatesRule dnasRule =
+        new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
+    dnasRule.setAlphaMarking(alpha);
+    dnasRule.setTransitionLimit(getInternalStepTransitionLimit());
+    mAbstractionRules.add(dnasRule);
   }
 
   // #########################################################################

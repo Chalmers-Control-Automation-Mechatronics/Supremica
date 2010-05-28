@@ -30,13 +30,19 @@ public interface TransitionIterator
   public void reset();
 
   /**
-   * Restarts this iterator to iterate over all transitions associated with
-   * the given from-state.
+   * Restarts this iterator to iterate over transitions associated with
+   * the given event.
    */
-  public void reset(int from);
+  public void resetEvent(int event);
 
   /**
-   * Restarts this iterator to iterate over all transitions associated with
+   * Restarts this iterator to iterate over transitions associated with
+   * the given from-state.
+   */
+  public void resetState(int from);
+
+  /**
+   * Restarts this iterator to iterate over transitions associated with
    * the given from-state and event.
    */
   public void reset(int from, int event);

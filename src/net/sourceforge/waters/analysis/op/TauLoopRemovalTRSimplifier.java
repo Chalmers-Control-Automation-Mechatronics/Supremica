@@ -101,7 +101,7 @@ public class TauLoopRemovalTRSimplifier
     mOnstack[state] = true;
     mStack.push(state);
     final TransitionIterator iter =
-      mTransitionRelation.createAnyIterator(state, EventEncoding.TAU);
+      mTransitionRelation.createAnyReadOnlyIterator(state, EventEncoding.TAU);
     while (iter.advance()) {
       final int suc = iter.getCurrentToState();
       if(mOnstack[suc]) {

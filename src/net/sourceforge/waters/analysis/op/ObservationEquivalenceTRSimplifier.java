@@ -443,7 +443,7 @@ public class ObservationEquivalenceTRSimplifier implements
           } else {
             marking = markings[state];
           }
-          transIter.reset(state);
+          transIter.resetState(state);
           while (transIter.advance()) {
             final int pred = transIter.getCurrentSourceState();
             if (pred != state) {
@@ -527,7 +527,7 @@ public class ObservationEquivalenceTRSimplifier implements
     for (int stateCode = 0; stateCode < mNumStates; stateCode++) {
       if (mTransitionRelation.isInitial(stateCode)) {
         initialStates.add(stateCode);
-        iter.reset(stateCode);
+        iter.resetState(stateCode);
         while (iter.advance()) {
           final int pred = iter.getCurrentSourceState();
           initialStates.add(pred);
@@ -576,7 +576,7 @@ public class ObservationEquivalenceTRSimplifier implements
                                                     final int event)
   {
     if (mEquivalence == Equivalence.BISIMULATION) {
-      return mTransitionRelation.createPredecessorsIterator(state, event);
+      return mTransitionRelation.createPredecessorsReadOnlyIterator(state, event);
     } else if (event == EventEncoding.TAU) {
       return new TauClosureTransitionIterator(state);
     } else {
@@ -979,7 +979,7 @@ public class ObservationEquivalenceTRSimplifier implements
 
     private TauClosureTransitionIterator(final int target)
     {
-      reset(target);
+      resetState(target);
     }
 
     // #######################################################################
@@ -990,7 +990,18 @@ public class ObservationEquivalenceTRSimplifier implements
       mIndex = -1;
     }
 
-    public void reset(final int from)
+    public void resetEvent(final int event)
+    {
+      if (event == EventEncoding.TAU) {
+        reset();
+      } else {
+        throw new UnsupportedOperationException
+          (ProxyTools.getShortClassName(this) +
+           " only iterates with tau event!");
+      }
+    }
+
+    public void resetState(final int from)
     {
       mTarget = from;
       reset();
@@ -999,7 +1010,7 @@ public class ObservationEquivalenceTRSimplifier implements
     public void reset(final int from, final int event)
     {
       if (event == EventEncoding.TAU) {
-        reset(from);
+        resetState(from);
       } else {
         throw new UnsupportedOperationException
           (ProxyTools.getShortClassName(this) +
@@ -1091,7 +1102,13 @@ public class ObservationEquivalenceTRSimplifier implements
       mVisited.clear();
     }
 
-    public void reset(final int from)
+    public void resetEvent(final int event)
+    {
+      mEvent = event;
+      reset();
+    }
+
+    public void resetState(final int from)
     {
       mTarget = from;
       reset();
@@ -1100,7 +1117,7 @@ public class ObservationEquivalenceTRSimplifier implements
     public void reset(final int from, final int event)
     {
       mEvent = event;
-      reset(from);
+      resetState(from);
     }
 
     public boolean advance()

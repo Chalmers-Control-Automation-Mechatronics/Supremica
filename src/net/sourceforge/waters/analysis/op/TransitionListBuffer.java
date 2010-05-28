@@ -642,7 +642,7 @@ public abstract class TransitionListBuffer
   /**
    * Creates a read-only iterator for this buffer.
    * The iterator returned is not initialised, so one of the methods
-   * {@link TransitionIterator#reset(int)} or
+   * {@link TransitionIterator#resetState(int)} or
    * {@link TransitionIterator#reset(int, int)} before it can be used.
    * Being a read-only iterator, it does not implement the
    * {@link TransitionIterator#remove()} method.
@@ -663,7 +663,7 @@ public abstract class TransitionListBuffer
   public TransitionIterator createReadOnlyIterator(final int state)
   {
     final TransitionIterator iter = new ReadOnlyIterator();
-    iter.reset(state);
+    iter.resetState(state);
     return iter;
   }
 
@@ -686,7 +686,7 @@ public abstract class TransitionListBuffer
   /**
    * Creates a read/write iterator for this buffer.
    * The iterator returned is not initialised, so one of the methods
-   * {@link TransitionIterator#reset(int)} or
+   * {@link TransitionIterator#resetState(int)} or
    * {@link TransitionIterator#reset(int, int)} before it can be used.
    */
   public TransitionIterator createModifyingIterator()
@@ -703,7 +703,7 @@ public abstract class TransitionListBuffer
   public TransitionIterator createModifyingIterator(final int state)
   {
     final TransitionIterator iter = new ModifyingIterator();
-    iter.reset(state);
+    iter.resetState(state);
     return iter;
   }
 
@@ -724,8 +724,8 @@ public abstract class TransitionListBuffer
   /**
    * Creates a read-only iterator over all transitions in this buffer.
    * The iterator returned is set up to return the first transition in
-   * this buffer after calling {@link TransitionIterator#advance()}.
-   * It does not implement the methods {@link TransitionIterator#reset(int)}
+   * this buffer after calling {@link TransitionIterator#advance()}. It does
+   * not implement the methods {@link TransitionIterator#resetState(int)}
    * or {@link TransitionIterator#reset(int,int)}, and
    * being a read-only iterator, it also does not implement the
    * {@link TransitionIterator#remove()} method.
@@ -737,15 +737,45 @@ public abstract class TransitionListBuffer
   }
 
   /**
+   * Creates a read-only iterator over all transitions with the given event.
+   * The iterator returned is set up to return the first transition in
+   * this buffer after calling {@link TransitionIterator#advance()}. It does
+   * not implement the methods {@link TransitionIterator#resetState(int)}
+   * or {@link TransitionIterator#reset(int,int)}, and
+   * being a read-only iterator, it also does not implement the
+   * {@link TransitionIterator#remove()} method.
+   */
+  public TransitionIterator createAllTransitionsReadOnlyIterator
+    (final int event)
+  {
+    final TransitionIterator inner = createReadOnlyIterator(event);
+    return new AllTransitionsIterator(inner);
+  }
+
+  /**
    * Creates a read/write iterator over all transitions in this buffer.
    * The iterator returned is set up to return the first transition in
-   * this buffer after calling {@link TransitionIterator#advance()}.
-   * It does not implement the methods {@link TransitionIterator#reset(int)}
+   * this buffer after calling {@link TransitionIterator#advance()}. It does
+   * not implement the methods {@link TransitionIterator#resetState(int)}
    * or {@link TransitionIterator#reset(int,int)}.
    */
   public TransitionIterator createAllTransitionsModifyingIterator()
   {
     final TransitionIterator inner = createModifyingIterator();
+    return new AllTransitionsIterator(inner);
+  }
+
+  /**
+   * Creates a read/write iterator over all transitions with the given event
+   * The iterator returned is set up to return the first transition in
+   * this buffer after calling {@link TransitionIterator#advance()}. It does
+   * not implement the methods {@link TransitionIterator#resetState(int)}
+   * or {@link TransitionIterator#reset(int,int)}.
+   */
+  public TransitionIterator createAllTransitionsModifyingIterator
+    (final int event)
+  {
+    final TransitionIterator inner = createModifyingIterator(event);
     return new AllTransitionsIterator(inner);
   }
 
@@ -1279,23 +1309,30 @@ public abstract class TransitionListBuffer
     {
       if (mState < 0) {
         throw new IllegalStateException("From-state not defined for reset!");
-      } else if (mEvent < 0) {
-        reset(mState);
       } else {
         reset(mState, mEvent);
       }
     }
 
-    public void reset(final int state)
+    public void resetEvent(final int event)
     {
-      resetRaw(state, -1, mStateTransitions[state]);
+      reset(mState, event);
+    }
+
+    public void resetState(final int state)
+    {
+      reset(state, mEvent);
     }
 
     public void reset(final int state, final int event)
     {
-      final int code = (state << mStateShift) | event;
-      final int list = mStateEventTransitions.get(code);
-      resetRaw(state, event, list);
+      if (event < 0) {
+        resetRaw(state, -1, mStateTransitions[state]);
+      } else {
+        final int code = (state << mStateShift) | event;
+        final int list = mStateEventTransitions.get(code);
+        resetRaw(state, event, list);
+      }
     }
 
     public boolean advance()
@@ -1471,7 +1508,14 @@ public abstract class TransitionListBuffer
     //# Constructor
     private AllTransitionsIterator(final TransitionIterator inner)
     {
+      this(inner, -1);
+    }
+
+    private AllTransitionsIterator(final TransitionIterator inner,
+                                   final int event)
+    {
       mInnerIterator = inner;
+      mEvent = event;
       mCurrentFromState = -1;
     }
 
@@ -1482,16 +1526,22 @@ public abstract class TransitionListBuffer
       mCurrentFromState = -1;
     }
 
-    public void reset(final int from)
+    public void resetEvent(final int event)
+    {
+      mEvent = event;
+      reset();
+    }
+
+    public void resetState(final int from)
     {
       throw new UnsupportedOperationException
         ("All-transitions iterator cannot be reset to iterate " +
-         "over only a part of the transitions!");
+         "over only a part of the states!");
     }
 
     public void reset(final int from, final int event)
     {
-      reset(from);
+      resetState(from);
     }
 
     public boolean advance()
@@ -1505,7 +1555,7 @@ public abstract class TransitionListBuffer
             return false;
           }
         } while (mStateTransitions[mCurrentFromState] == NULL);
-        mInnerIterator.reset(mCurrentFromState);
+        mInnerIterator.reset(mCurrentFromState, mEvent);
         return mInnerIterator.advance();
       }
     }
@@ -1552,6 +1602,7 @@ public abstract class TransitionListBuffer
     //#########################################################################
     //# Data Members
     private final TransitionIterator mInnerIterator;
+    private int mEvent;
     private int mCurrentFromState;
 
   }

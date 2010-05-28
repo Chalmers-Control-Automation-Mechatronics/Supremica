@@ -2224,7 +2224,7 @@ public class ObserverProjectionConflictChecker
       }
       final int tau = EventEncoding.TAU;
       final TransitionIterator iter =
-        mTransitionRelation.createSuccessorsIterator();
+        mTransitionRelation.createSuccessorsReadOnlyIterator();
       while (true) {
         final SearchRecord current = open.remove();
         final int source = current.getState();
@@ -2289,7 +2289,7 @@ public class ObserverProjectionConflictChecker
         return Collections.emptyList();
       }
       final TransitionIterator iter =
-        mTransitionRelation.createSuccessorsIterator();
+        mTransitionRelation.createSuccessorsReadOnlyIterator();
       open.add(record);
       while (true) {
         final SearchRecord current = open.remove();
