@@ -1601,13 +1601,12 @@ public class ObserverProjectionConflictChecker
        final ListBufferTransitionRelation rel)
     throws AnalysisException
     {
-      if (simplifier.run()) {
-        final List<int[]> partition = simplifier.getResultPartition();
-        rel.merge(partition);
+      simplifier.run();
+      if (simplifier.applyResultPartition()) {
         rel.removeTauSelfLoops();
         rel.removeProperSelfLoopEvents();
         rel.removeRedundantPropositions();
-        return partition;
+        return simplifier.getResultPartition();
       } else {
         return null;
       }
@@ -1758,7 +1757,7 @@ public class ObserverProjectionConflictChecker
         }
         simplifier.setInitialPartition(partition);
       }
-      rel.merge(partition);
+      simplifier.applyResultPartition();
       rel.replaceEvent(vtau, tau);
       rel.removeEvent(vtau);
       rel.removeTauSelfLoops();

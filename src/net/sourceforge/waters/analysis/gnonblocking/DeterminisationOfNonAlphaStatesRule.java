@@ -136,10 +136,10 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     }
     bisimulator.setInitialPartition(initPartition);
     bisimulator.refineInitialPartitionBasedOnInitialStates();
-    final boolean modified = bisimulator.run();
+    bisimulator.run();
+    final boolean modified = bisimulator.applyResultPartition();
     if (modified) {
       mPartition = bisimulator.getResultPartition();
-      mTr.merge(mPartition);
       mTr.removeTauSelfLoops();
       mTr.removeProperSelfLoopEvents();
       final ProductDESProxyFactory factory = getFactory();

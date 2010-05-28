@@ -2121,8 +2121,8 @@ public class CompositionalGeneralisedConflictChecker extends
           break;
         }
       }
-      // To start the process of building the from the end, we create a step
-      // containing the known end state of the trace and a null event. This
+      // To start the process of building the trace from the end, we create a
+      // step containing the known end state of the trace and a null event. This
       // step will be replaced by a step with event information as soon as a
       // proper step is discovered.
       StateProxy originalAutState = getOriginalStates()[originialEndStateCode];

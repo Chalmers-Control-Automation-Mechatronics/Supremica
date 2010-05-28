@@ -68,6 +68,12 @@ public class TauLoopRemovalTRSimplifier
     return modified;
   }
 
+  public boolean applyResultPartition()
+  {
+    mTransitionRelation.merge(mResultPartition);
+    return mResultPartition != null;
+  }
+
   public List<int[]> getResultPartition()
   {
     return mResultPartition;

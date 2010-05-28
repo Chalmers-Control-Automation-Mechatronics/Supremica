@@ -37,12 +37,20 @@ public interface TransitionRelationSimplifier
 
   /**
    * Runs this simplifier.
-   * When run, the simplifier will destructively modify its transition
+   * When run, the simplifier may destructively modify its transition
    * relation.
    * @return <CODE>true</CODE> if the transition relation was changed,
    *         <CODE>false</CODE> if no simplification was possible.
    */
   public boolean run() throws AnalysisException;
+
+  /**
+   * Destructively applies the computed partitioning to the simplifier's
+   * transition relation.
+   * @return <CODE>true</CODE> if the transition relation has been modified in
+   *         any way.
+   */
+  public boolean applyResultPartition() throws AnalysisException;
 
   /**
    * Gets the partition produced by the last {@link #run()}.

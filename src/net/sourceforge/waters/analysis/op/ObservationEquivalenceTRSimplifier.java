@@ -240,8 +240,36 @@ public class ObservationEquivalenceTRSimplifier implements
   }
 
   /**
+   * Destructively applies the computed partitioning to the simplifier's
+   * transition relation. This method merges any states found to be equivalent
+   * during the last call to {@link #run()}, and depending on configuration,
+   * performs a second pass to remove redundant transitions.
+   * @return <CODE>true</CODE> if the transition relation has been modified in
+   *         any way. Note that the transition relation may also be modified
+   *         in case of a trivial partition, due to removal of redundant
+   *         transitions or markings.
+   * @see TransitionRemoval
+   */
+  public boolean applyResultPartition() throws OverflowException
+  {
+    final boolean doTau;
+    final boolean doNonTau;
+    if (mResultPartition != null) {
+      mTransitionRelation.merge(mResultPartition);
+      doTau = doNonTau = mTransitionRemovalMode != TransitionRemoval.NONE;
+    } else {
+      doNonTau = mTransitionRemovalMode == TransitionRemoval.AFTER;
+      doTau = doNonTau || mTransitionRemovalMode == TransitionRemoval.NONTAU;
+    }
+    if (doTau || doNonTau) {
+      mergeTauPredecessors();
+      removeRedundantTransitions(doTau, doNonTau);
+    }
+    return mHasModifications;
+  }
+
+  /**
    * Gets the partition resulting from the last call to {@link #run()}.
-   *
    * @return A list of classes constituting the partition, or <CODE>null</CODE>.
    *         <CODE>null</CODE> may be returned to indicate a trivial partition,
    *         i.e., no states are merged. Otherwise each array in the returned
@@ -263,7 +291,10 @@ public class ObservationEquivalenceTRSimplifier implements
       mFirstSplitEvent = EventEncoding.TAU;
     }
     mHasModifications = false;
-    removeRedundantTransitions();
+    final boolean doTau = mTransitionRemovalMode == TransitionRemoval.ALL;
+    final boolean doNonTau =
+      doTau || mTransitionRemovalMode == TransitionRemoval.NONTAU;
+    removeRedundantTransitions(doTau, doNonTau);
     final Collection<int[]> partition = createInitialPartition();
     setUpInitialPartition(partition);
   }
@@ -308,9 +339,44 @@ public class ObservationEquivalenceTRSimplifier implements
     }
   }
 
-  private void removeRedundantTransitions() throws OverflowException
+  private void mergeTauPredecessors() throws OverflowException
   {
-    if (mTransitionRemovalMode != TransitionRemoval.NONE) {
+    if (mTauPreds == null) {
+      setUpTauPredecessors();
+    } else if (mResultPartition != null &&
+               mEquivalence != Equivalence.BISIMULATION) {
+      final int[] classMap = new int[mNumStates];
+      int c = 0;
+      for (final int[] clazz : mResultPartition) {
+        for (final int s : clazz) {
+          classMap[s] = c;
+        }
+        c++;
+      }
+      final int numClasses = mResultPartition.size();
+      final int[][] newTauPreds = new int[numClasses][];
+      final TIntHashSet set = new TIntHashSet();
+      c = 0;
+      for (final int[] clazz : mResultPartition) {
+        for (final int s : clazz) {
+          for (final int pred : mTauPreds[s]) {
+            final int predClass = classMap[pred];
+            set.add(predClass);
+          }
+          mTauPreds[s] = null;
+        }
+        newTauPreds[c++] = set.toArray();
+        set.clear();
+      }
+      mTauPreds = newTauPreds;
+    }
+  }
+
+  private void removeRedundantTransitions(final boolean doTau,
+                                          final boolean doNonTau)
+    throws OverflowException
+  {
+    if (doTau || doNonTau) {
       setUpTauPredecessors();
       final int tau = EventEncoding.TAU;
       final TransitionIterator iter0 =
@@ -330,13 +396,13 @@ public class ObservationEquivalenceTRSimplifier implements
           while (iter2.advance()) {
             final int p2 = iter2.getCurrentSourceState();
             if (e == tau) {
-              if (p1 != target0 && p2 == source0) {
+              if (doTau && p1 != target0 && p2 == source0) {
                 iter0.remove();
                 mHasModifications = true;
                 continue trans;
               }
             } else {
-              if (p1 != target0 || p2 != source0) {
+              if (doNonTau && (p1 != target0 || p2 != source0)) {
                 for (final int p3 : mTauPreds[p2]) {
                   if (p3 == source0) {
                     iter0.remove();
@@ -1162,22 +1228,29 @@ public class ObservationEquivalenceTRSimplifier implements
   //#########################################################################
   //# Inner Enumeration TransitionRemoval
   /**
-   * <P>
-   * Possible settings to control how an
+   * <P>Possible settings to control how an
    * {@link ObservationEquivalenceTRSimplifier} handles the removal of redundant
-   * transitions.
-   * </P>
+   * transitions.</P>
    *
-   * <P>
-   * A transition is redundant according to observation equivalence, if the
+   * <P>A transition is redundant according to observation equivalence, if the
    * automaton contains other transitions such that the same target state can be
    * reached without the transition, using the same sequence of observable
-   * events.
-   * </P>
-   *
-   * <P>For more details see the following paper: <I>Jaana Eloranta: Minimizing
+   * events. For more details on redundant transitions see the following paper: <I>Jaana Eloranta: Minimizing
    * the number of transitions with respect to observation equivalence, BIT
    * <STRONG>31</STRONG>(4), 397-419, 1991</I>.</P>
+   *
+   * <P>This simplifier can perform two passes of redundant transition
+   * removal.</P>
+   *
+   * <P>The first pass is performed before computing the state state partition.
+   * This optional step may improve performance, but fails to remove all
+   * redundant transitions if a non-trivial partition is found. Furthermore,
+   * it cannot remove tau-transitions correctly if the input transition
+   * relation contains tau-loops.</P>
+   *
+   * <P>The second pass is performed after computation of the partition, when
+   * building the output transition relation. Only this pass can guarantee a
+   * minimal result.</P>
    */
   public enum TransitionRemoval
   {
@@ -1189,18 +1262,26 @@ public class ObservationEquivalenceTRSimplifier implements
      */
     NONE,
     /**
-     * Enables removal of redundant transitions for all events except the
-     * silent event with code {@link EventEncoding#TAU}. This option is
-     * safe for all automata, and is used as the default.
+     * Enables the first pass to remove of redundant transitions for all events
+     * except the silent event with code {@link EventEncoding#TAU}. This option
+     * is safe for all automata, and is used as the default. The second pass is
+     * performed in addition (even in case of trivial partition, to remove
+     * tau-transitions).
      */
     NONTAU,
     /**
-     * Enables removal of all redundant transitions, including silent
-     * transitions. This option only is guaranteed to work correctly if the
-     * input automaton does not contain any loops of silent events. If this
-     * cannot be guaranteed, consider using {@link #NONTAU} instead.
+     * Enables the first pass to remove all redundant transitions, including
+     * silent transitions. This option only is guaranteed to work correctly if
+     * the input automaton does not contain any loops of silent events. If this
+     * cannot be guaranteed, consider using {@link #NONTAU} instead. The second
+     * pass is performed in addition, if a non-trivial has been found.
      */
-    ALL
+    ALL,
+    /**
+     * Disables the first pass. Redundant transitions are removed only in the
+     * second pass, which is performed even in case of a trivial partition.
+     */
+    AFTER
   }
 
 

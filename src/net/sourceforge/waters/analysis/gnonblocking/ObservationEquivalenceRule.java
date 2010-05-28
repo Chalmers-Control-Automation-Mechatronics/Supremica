@@ -112,10 +112,10 @@ class ObservationEquivalenceRule extends AbstractionRule
       new ObservationEquivalenceTRSimplifier(mTr);
     bisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
     bisimulator.setTransitionLimit(mTransitionLimit);
-    final boolean modified = bisimulator.run();
+    bisimulator.run();
+    final boolean modified = bisimulator.applyResultPartition();
     if (modified) {
       mPartition = bisimulator.getResultPartition();
-      mTr.merge(mPartition);
       mTr.removeTauSelfLoops();
       mTr.removeProperSelfLoopEvents();
       final ProductDESProxyFactory factory = getFactory();
