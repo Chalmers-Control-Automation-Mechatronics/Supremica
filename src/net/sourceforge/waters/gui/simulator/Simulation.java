@@ -18,6 +18,7 @@ import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.model.base.Pair;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;

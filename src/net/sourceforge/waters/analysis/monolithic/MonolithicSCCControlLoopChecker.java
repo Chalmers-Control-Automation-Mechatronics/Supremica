@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Stack;
 
-import net.sourceforge.waters.gui.simulator.Pair;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -28,6 +27,7 @@ import net.sourceforge.waters.model.analysis.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.base.Pair;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -45,7 +45,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * <P>The {@link #run()} method of this model checker does a control-loop
  * check, and finds whether the given model is control-loop free.</P>
  *
- * @author Peter Yunil Park
+ * @author Andrew Holland, Peter Yunil Park
  */
 
 public class MonolithicSCCControlLoopChecker

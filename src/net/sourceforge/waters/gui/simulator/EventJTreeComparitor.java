@@ -3,6 +3,7 @@ package net.sourceforge.waters.gui.simulator;
 import java.util.Comparator;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.Pair;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 

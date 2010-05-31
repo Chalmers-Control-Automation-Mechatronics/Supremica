@@ -142,6 +142,7 @@ class AltRemovalOfNoncoreachableStatesRule extends AbstractionRule
     // so let us try to clean up.
     tr.removeTauSelfLoops();
     tr.removeProperSelfLoopEvents();
+    tr.removeRedundantPropositions();
     mOriginalIntToStateMap = stateEnc.getStatesArray();
     stateEnc.clear();
     final ProductDESProxyFactory factory = getFactory();

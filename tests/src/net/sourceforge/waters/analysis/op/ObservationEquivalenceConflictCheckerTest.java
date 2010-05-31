@@ -45,7 +45,7 @@ public class ObservationEquivalenceConflictCheckerTest extends
     final ObserverProjectionConflictChecker checker =
       new ObserverProjectionConflictChecker(factory);
     checker.setMethod
-      (ObserverProjectionConflictChecker.Method.OBSERVATION_EQUIVALENCE);
+      (ObserverProjectionConflictChecker.Method.OEQ);
     checker.setInternalStepNodeLimit(5000);
     checker.setFinalStepNodeLimit(100000);
     checker.setInternalStepTransitionLimit(500000);

@@ -114,7 +114,7 @@ public class ObserverProjectionConflictChecker
      final ProductDESProxyFactory factory)
   {
     super(model, marking, factory);
-    mMethod = Method.OBSERVATION_EQUIVALENCE;
+    mMethod = Method.OEQ;
     mInternalStepNodeLimit = super.getNodeLimit();
     mInternalStepTransitionLimit = super.getTransitionLimit();
   }
@@ -321,53 +321,54 @@ public class ObserverProjectionConflictChecker
   //# Invocation
   public boolean run() throws AnalysisException
   {
-    setUp();
-    initialiseEventsToAutomata();
-    simplify(true);
+    try {
+      setUp();
+      initialiseEventsToAutomata();
+      simplify(true);
 
-    Collection<Candidate> candidates;
-    boolean nonblocking = true;
-    outer:
-    do {
-      subsystem:
+      Collection<Candidate> candidates;
+      boolean nonblocking = true;
+      outer:
       do {
-        if (isTriviallyNonblockingSubsystem()) {
-          continue outer;
-        }
-        candidates = mPreselectingHeuristic.findCandidates();
-        while (!candidates.isEmpty()) {
-          final Candidate candidate =
-            Collections.min(candidates, mSelectingHeuristics);
-          try {
-            mEventHasDisappeared = false;
-            applyCandidate(candidate);
-            simplify(mEventHasDisappeared);
-            break;
-          } catch (final OverflowException overflow) {
-            if (mNumOverflows++ >= MAX_OVERFLOWS) {
-              break subsystem;
-            }
-            final List<AutomatonProxy> automata = candidate.getAutomata();
-            mOverflowCandidates.add(automata);
-            candidates.remove(candidate);
+        subsystem:
+        do {
+          if (isTriviallyNonblockingSubsystem()) {
+            continue outer;
           }
-        }
-      } while (!candidates.isEmpty());
-      nonblocking = runMonolithicConflictCheck();
-    } while (nonblocking && popEventDisjointSubsystem());
+          candidates = mPreselectingHeuristic.findCandidates();
+          while (!candidates.isEmpty()) {
+            final Candidate candidate =
+              Collections.min(candidates, mSelectingHeuristics);
+            try {
+              mEventHasDisappeared = false;
+              applyCandidate(candidate);
+              simplify(mEventHasDisappeared);
+              break;
+            } catch (final OverflowException overflow) {
+              if (mNumOverflows++ >= MAX_OVERFLOWS) {
+                break subsystem;
+              }
+              final List<AutomatonProxy> automata = candidate.getAutomata();
+              mOverflowCandidates.add(automata);
+              candidates.remove(candidate);
+            }
+          }
+        } while (!candidates.isEmpty());
+        nonblocking = runMonolithicConflictCheck();
+      } while (nonblocking && popEventDisjointSubsystem());
 
-    if (nonblocking) {
-      setSatisfiedResult();
-    } else {
-      popPostponedAutomata();
-      final ConflictTraceProxy trace0 =
-        mCurrentMonolithicConflictChecker.getCounterExample();
-      final ConflictTraceProxy trace1 = expandTrace(trace0);
-      setFailedResult(trace1);
+      if (nonblocking) {
+        return setSatisfiedResult();
+      } else {
+        restoreAutomata();
+        final ConflictTraceProxy trace0 =
+          mCurrentMonolithicConflictChecker.getCounterExample();
+        final ConflictTraceProxy trace1 = expandTrace(trace0);
+        return setFailedResult(trace1);
+      }
+    } finally {
+      tearDown();
     }
-
-    tearDown();
-    return nonblocking;
   }
 
 
@@ -392,11 +393,18 @@ public class ObserverProjectionConflictChecker
       setSelectingHeuristic(defaultHeuristic);
     }
     switch (mMethod) {
-    case OBSERVATION_EQUIVALENCE:
-      mAbstractionRule = new ObservationEquivalenceAbstractionRule();
+    case OEQ:
+      mAbstractionRule = new ObservationEquivalenceAbstractionRule
+        (ObservationEquivalenceTRSimplifier.Equivalence.
+         OBSERVATION_EQUIVALENCE);
       break;
-    case OBSERVER_PROJECTION:
+    case OP:
       mAbstractionRule = new ObserverProjectionAbstractionRule();
+      break;
+    case WOEQ:
+      mAbstractionRule = new ObservationEquivalenceAbstractionRule
+        (ObservationEquivalenceTRSimplifier.Equivalence.
+         WEAK_OBSERVATION_EQUIVALENCE);
       break;
     default:
       throw new IllegalStateException("Unknown method " + mMethod + " in " +
@@ -732,7 +740,7 @@ public class ObserverProjectionConflictChecker
     mCurrentEvents = task.getEvents();
   }
 
-  private void popPostponedAutomata()
+  private void restoreAutomata()
   {
     mCurrentAutomata.addAll(mProcessedAutomata);
     for (final SubSystem task : mPostponedSubsystems) {
@@ -1089,10 +1097,30 @@ public class ObserverProjectionConflictChecker
 
   //#########################################################################
   //# Inner Enumeration Method
+  /**
+   * The configuration setting to determine the abstraction method applied
+   * to intermediate automata during compositional nonblocking verification.
+   */
   public enum Method
   {
-    OBSERVATION_EQUIVALENCE,
-    OBSERVER_PROJECTION
+    /**
+     * Automata are minimised according to <I>observation equivalence</I>.
+     */
+    OEQ,
+    /**
+     * Automata are minimised according using <I>observer projection</I>.
+     * The present implementation determines a coarsest causal reporter
+     * map satisfying the observer property. Nondeterminism in the projected
+     * automata is not resolved, nondeterministic abstraction are used instead.
+     */
+    OP,
+    /**
+     * Automata are minimised according to <I>weak observation equivalence</I>.
+     * Initial states and markings are not saturated, silent transitions
+     * are retained instead in a bid to reduce the overall number of
+     * transitions.
+     */
+    WOEQ
   }
 
 
@@ -1293,6 +1321,7 @@ public class ObserverProjectionConflictChecker
     {
       final byte code = mAutomataMap.remove(oldAut);
       if (code == UNKNOWN_SELFLOOP) {
+        // not found in map ...
         return false;
       } else {
         mAutomataMap.put(newAut, code);
@@ -1641,9 +1670,18 @@ public class ObserverProjectionConflictChecker
   {
 
     //#######################################################################
+    //# Constructor
+    private ObservationEquivalenceAbstractionRule
+      (final ObservationEquivalenceTRSimplifier.Equivalence eq)
+    {
+      mEquivalence = eq;
+    }
+
+    //#######################################################################
     //# Rule Application
-    ObservationEquivalenceStep applyRule(final AutomatonProxy aut,
-                                         final EventProxy tau)
+    ObservationEquivalenceStep applyRule
+      (final AutomatonProxy aut,
+       final EventProxy tau)
     throws AnalysisException
     {
       final EventEncoding eventEnc =
@@ -1658,6 +1696,7 @@ public class ObserverProjectionConflictChecker
       final List<int[]> loopPartition = applySimplifier(loopRemover, rel);
       final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier(rel);
+      bisimulator.setEquivalence(mEquivalence);
       bisimulator.setTransitionRemovalMode
         (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
       bisimulator.setMarkingMode
@@ -1684,6 +1723,9 @@ public class ObserverProjectionConflictChecker
       }
     }
 
+    //#######################################################################
+    //# Data Members
+    private final ObservationEquivalenceTRSimplifier.Equivalence mEquivalence;
   }
 
 

@@ -7,6 +7,7 @@ import java.util.List;
 import javax.swing.ImageIcon;
 
 import net.sourceforge.waters.gui.PropositionIcon;
+import net.sourceforge.waters.model.base.Pair;
 
 import java.lang.Comparable;
 
