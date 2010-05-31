@@ -27,10 +27,6 @@ class EncodedStateTuple
     /** Check if current state tuple is already in some component */
     private boolean mInComponent;
 
-    /** Represents the order which each state is visited. The first state which
-     * is visited has mVisitOrder == 1. Unvisited states have mVisitOrder == Integer.MAXVALUE*/
-    private int mVisitOrder;
-
     /** The root of the Strongly Connected Component this state belongs to */
     private int mRoot;
 
@@ -41,7 +37,6 @@ class EncodedStateTuple
      * It creates an empty state tuple.
      */
     EncodedStateTuple(){
-      mVisitOrder = Integer.MAX_VALUE;
       mRoot = Integer.MAX_VALUE;
     }
 
@@ -52,7 +47,6 @@ class EncodedStateTuple
     EncodedStateTuple(final int size)
     {
 	mEncodedStateCodes = new int[size];
-    mVisitOrder = Integer.MAX_VALUE;
     mRoot = Integer.MAX_VALUE;
     }
 
@@ -62,7 +56,6 @@ class EncodedStateTuple
     EncodedStateTuple(final int[] encodedStateCodes)
     {
 	mEncodedStateCodes = encodedStateCodes;
-    mVisitOrder = Integer.MAX_VALUE;
     mRoot = Integer.MAX_VALUE;
     }
 
@@ -120,22 +113,6 @@ class EncodedStateTuple
     int get(final int index)
     {
 	return mEncodedStateCodes[index];
-    }
-
-    /**
-     * Sets the visit order of this state to the int argumnet. If the root was the same as the old visit order, then it is assumed
-     * that the root is this state, and thus the root is changed as well.
-     * @param order The integer value of the order that the state has been visited in.
-     */
-    public void visit(final int order)
-    {
-      if (mVisitOrder == mRoot)
-        mRoot = order;
-      mVisitOrder = order;
-    }
-    public int getOrder()
-    {
-      return mVisitOrder;
     }
 
     public void setRoot(final int root)
