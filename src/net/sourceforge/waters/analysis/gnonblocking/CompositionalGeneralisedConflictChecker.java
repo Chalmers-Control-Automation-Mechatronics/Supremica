@@ -139,20 +139,17 @@ public class CompositionalGeneralisedConflictChecker extends
     super(model, marking, preMarking, factory);
   }
 
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
+  // #########################################################################
+  // # Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   @Override
-  public CompositionalGeneralisedConflictCheckerVerificationResult
-    getAnalysisResult()
+  public CompositionalGeneralisedConflictCheckerVerificationResult getAnalysisResult()
   {
-    return (CompositionalGeneralisedConflictCheckerVerificationResult)
-      super.getAnalysisResult();
+    return (CompositionalGeneralisedConflictCheckerVerificationResult) super
+        .getAnalysisResult();
   }
 
   @Override
-  protected CompositionalGeneralisedConflictCheckerVerificationResult
-    createAnalysisResult()
+  protected CompositionalGeneralisedConflictCheckerVerificationResult createAnalysisResult()
   {
     return new CompositionalGeneralisedConflictCheckerVerificationResult();
   }
@@ -173,7 +170,6 @@ public class CompositionalGeneralisedConflictChecker extends
     stats.setComposedModelStateCount(mComposedModelNumberOfStates);
     stats.setComposedModelTransitionCount(mComposedModelNumberOfTransitions);
   }
-
 
   // #########################################################################
   // # Invocation
@@ -428,10 +424,6 @@ public class CompositionalGeneralisedConflictChecker extends
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
 
-    final TauLoopRemovalRule tlrRule =
-        new TauLoopRemovalRule(getFactory(), mPropositions);
-    mAbstractionRules.add(tlrRule);
-
     final RemovalOfAlphaMarkingsRule ramRule =
         new RemovalOfAlphaMarkingsRule(getFactory(), mPropositions);
     ramRule.setAlphaMarking(alpha);
@@ -462,16 +454,21 @@ public class CompositionalGeneralisedConflictChecker extends
     rttonsRule.setDefaultMarking(omega);
     mAbstractionRules.add(rttonsRule);
 
+    final DeterminisationOfNonAlphaStatesRule dnasRule =
+        new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
+    dnasRule.setAlphaMarking(getGeneralisedPrecondition());
+    dnasRule.setTransitionLimit(getInternalStepTransitionLimit());
+    mAbstractionRules.add(dnasRule);
+
+    final TauLoopRemovalRule tlrRule =
+        new TauLoopRemovalRule(getFactory(), mPropositions);
+    mAbstractionRules.add(tlrRule);
+
     final ObservationEquivalenceRule oeRule =
         new ObservationEquivalenceRule(getFactory(), mPropositions);
     oeRule.setTransitionLimit(getInternalStepTransitionLimit());
     mAbstractionRules.add(oeRule);
 
-    final DeterminisationOfNonAlphaStatesRule dnasRule =
-        new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
-    dnasRule.setAlphaMarking(alpha);
-    dnasRule.setTransitionLimit(getInternalStepTransitionLimit());
-    mAbstractionRules.add(dnasRule);
   }
 
   // #########################################################################
@@ -1654,8 +1651,8 @@ public class CompositionalGeneralisedConflictChecker extends
                 .get(traceSteps.size() - 1).getStateMap());
         finalStepsStateMap.remove(getResultAutomaton());
         final List<TraceStepProxy> substeps =
-          createTraceSteps(finalStepsStateMap, finalStepsStateMap,
-                           finalSteps, null);
+            createTraceSteps(finalStepsStateMap, finalStepsStateMap,
+                             finalSteps, null);
         convertedSteps.addAll(substeps);
       }
     }
@@ -1663,6 +1660,7 @@ public class CompositionalGeneralisedConflictChecker extends
     /**
      * Creates the list of automata that are part of the trace and the finished
      * trace is created.
+     *
      * @return Converted conflict trace.
      */
     protected ConflictTraceProxy buildTrace(
@@ -1709,8 +1707,8 @@ public class CompositionalGeneralisedConflictChecker extends
               .getStateMap());
       initialStepsStateMap.remove(getResultAutomaton());
       final List<TraceStepProxy> initialSteps =
-        createTraceSteps(initialStepsStateMap, initialStepsStateMap,
-                         initialRecords, null);
+          createTraceSteps(initialStepsStateMap, initialStepsStateMap,
+                           initialRecords, null);
       convertedSteps.addAll(initialSteps);
       final int originalInitialStateID =
           initialRecords.get(initialRecords.size() - 1).getState();
@@ -2094,7 +2092,7 @@ public class CompositionalGeneralisedConflictChecker extends
           new HashMap<AutomatonProxy,StateProxy>(step.getStateMap());
       final StateProxy tracesEndState = endMap.remove(getResultAutomaton());
       final int tracesEndStateCode =
-        getReverseOutputStateMap().get(tracesEndState);
+          getReverseOutputStateMap().get(tracesEndState);
       int originialEndStateCode = -1;
       for (int s = 0; s < mClassMap.length; s++) {
         if (mClassMap[s] == tracesEndStateCode) {
@@ -2222,10 +2220,10 @@ public class CompositionalGeneralisedConflictChecker extends
           completeEndOfTrace(getOriginalStateToIntMap().get(originalAutState));
       if (initSteps.size() > 0) {
         final Map<AutomatonProxy,StateProxy> stepMap =
-          new HashMap<AutomatonProxy,StateProxy>(step0.getStateMap());
+            new HashMap<AutomatonProxy,StateProxy>(step0.getStateMap());
         stepMap.remove(getResultAutomaton());
         final List<TraceStepProxy> substeps =
-          createTraceSteps(stepMap, stepMap, initSteps, null);
+            createTraceSteps(stepMap, stepMap, initSteps, null);
         prependSteps(substeps, convertedSteps);
       }
     }
