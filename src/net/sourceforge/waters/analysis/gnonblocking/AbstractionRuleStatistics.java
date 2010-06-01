@@ -3,6 +3,8 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import java.io.PrintStream;
 import java.util.Formatter;
 
+import net.sourceforge.waters.model.base.ProxyTools;
+
 
 /**
  * Contains statistics about the application of an abstraction rule to one
@@ -17,9 +19,9 @@ public class AbstractionRuleStatistics
   // #########################################################################
   // # Constructors
 
-  public AbstractionRuleStatistics(final String ruleName)
+  public AbstractionRuleStatistics(final Class<? extends AbstractionRule> clazz)
   {
-    mName = ruleName;
+    mRuleClass = clazz;
     mRunTime = 0;
     mAppliedCount = 0;
     mReductionCount = 0;
@@ -34,11 +36,11 @@ public class AbstractionRuleStatistics
   // #########################################################################
   // # Simple Access Methods
   /**
-   * Gets the name of the abstraction rule these statistics are for.
+   * Gets the class of the abstraction rule these statistics are for.
    */
-  public String getRuleName()
+  public Class<? extends AbstractionRule> getRuleClass()
   {
-    return mName;
+    return mRuleClass;
   }
 
   /**
@@ -247,7 +249,7 @@ public class AbstractionRuleStatistics
   {
     @SuppressWarnings("unused")
     final Formatter formatter = new Formatter(stream);
-    stream.println("Name of rule: " + mName);
+    stream.println("Name of rule: " + ProxyTools.getShortClassName(mRuleClass));
     stream.println("Total number of times applied: " + mAppliedCount);
 
     stream.println("Total run time: " + mRunTime);
@@ -277,7 +279,7 @@ public class AbstractionRuleStatistics
 
   // #########################################################################
   // # Data Members
-  private final String mName;
+  private final Class<? extends AbstractionRule> mRuleClass;
   private long mRunTime;
   private int mAppliedCount;
   private int mReductionCount;

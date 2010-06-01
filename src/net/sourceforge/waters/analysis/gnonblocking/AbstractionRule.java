@@ -72,7 +72,7 @@ public abstract class AbstractionRule
   public AbstractionRuleStatistics getStatistics()
   {
     final AbstractionRuleStatistics stats =
-        new AbstractionRuleStatistics(toString());
+        new AbstractionRuleStatistics(getClass());
     stats.setApplicationCount(mAppliedCount);
     stats.setInputStates(mInputStates);
     stats.setInputTransitions(mInputTransitions);
