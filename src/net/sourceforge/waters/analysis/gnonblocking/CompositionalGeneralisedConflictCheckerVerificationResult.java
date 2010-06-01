@@ -4,7 +4,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
@@ -21,33 +20,10 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
   // #########################################################################
   // # Constructors
   /**
-   * Creates a <I>true</I> verification result. This constructor creates a
-   * verification result which indicates that the property checked is true.
+   * Creates a verification result representing an incomplete verification run.
    */
   public CompositionalGeneralisedConflictCheckerVerificationResult()
   {
-    this(true, null);
-  }
-
-  /**
-   * Creates a <I>false</I> verification result. This constructor creates a
-   * verification result which indicates that the property checked is false,
-   * because of the given counterexample.
-   */
-  public CompositionalGeneralisedConflictCheckerVerificationResult(
-                                                                   final TraceProxy counterexample)
-  {
-    this(false, counterexample);
-  }
-
-  /**
-   * Creates a verification result with parameters as given.
-   */
-  public CompositionalGeneralisedConflictCheckerVerificationResult(
-                                                                   final boolean satisfied,
-                                                                   final TraceProxy counterexample)
-  {
-    super(satisfied, counterexample);
     mUnsuccessfulCompositionCount = 0;
     mSuccessfulCompositionCount = 0;
     mComposedModelNumberOfStates = 0;
@@ -193,6 +169,8 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
 
   }
 
+  // #########################################################################
+  // # Data Members
   private List<AbstractionRuleStatistics> mAbstractionRuleStats;
   private int mSuccessfulCompositionCount;
   private int mUnsuccessfulCompositionCount;

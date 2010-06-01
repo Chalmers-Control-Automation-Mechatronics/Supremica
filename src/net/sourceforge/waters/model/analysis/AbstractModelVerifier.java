@@ -43,7 +43,6 @@ public abstract class AbstractModelVerifier
   {
     super(model, factory);
     mKindTranslator = translator;
-    mResult = null;
   }
 
 
@@ -61,8 +60,9 @@ public abstract class AbstractModelVerifier
 
   public boolean isSatisfied()
   {
-    if (mResult != null) {
-      return mResult.isSatisfied();
+    final VerificationResult result = getAnalysisResult();
+    if (result != null) {
+      return result.isSatisfied();
     } else {
       throw new IllegalStateException("Call run() first!");
     }
@@ -73,18 +73,22 @@ public abstract class AbstractModelVerifier
     if (isSatisfied()) {
       throw new IllegalStateException("No trace for satisfied property!");
     } else {
-      return mResult.getCounterExample();
+      final VerificationResult result = getAnalysisResult();
+      return result.getCounterExample();
     }
   }
 
   public VerificationResult getAnalysisResult()
   {
-    return mResult;
+    return (VerificationResult) super.getAnalysisResult();
   }
 
-  public void clearAnalysisResult()
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
+  protected VerificationResult createAnalysisResult()
   {
-    mResult = null;
+    return new VerificationResult();
   }
 
 
@@ -92,67 +96,30 @@ public abstract class AbstractModelVerifier
   //# Setting the Result
   /**
    * Stores a verification result indicating that the property checked
-   * is satisfied.
+   * is satisfied and marks the run as completed.
    * @return <CODE>true</CODE>
    */
   protected boolean setSatisfiedResult()
   {
-    mResult = createSatisfiedResult();
-    addStatistics(mResult);
-    return true;
+    return setBooleanResult(true);
   }
 
   /**
    * Stores a verification result indicating that the property checked
-   * is not satisfied.
+   * is not satisfied and marks the run as completed.
    * @param  counterexample The counterexample obtained by verification.
    * @return <CODE>false</CODE>
    */
   protected boolean setFailedResult(final TraceProxy counterexample)
   {
-    mResult = createFailedResult(counterexample);
-    addStatistics(mResult);
-    return false;
-  }
-
-  /**
-   * Creates a verification result indicating that the property checked
-   * is satisfied. This method is used by {@link #setSatisfiedResult()}
-   * to create a verification result; it is overridden by subclasses that
-   * require more specific verification result types.
-   */
-  protected VerificationResult createSatisfiedResult()
-  {
-    return new VerificationResult();
-  }
-
-  /**
-   * Creates a verification result indicating that the property checked
-   * is not satisfied. This method is used by
-   * {@link #setFailedResult(TraceProxy) setFailedResult()}
-   * to create a verification result; it is overridden by subclasses that
-   * require more specific verification result types.
-   * @param  counterexample The counterexample to be stored on the result.
-   */
-  protected VerificationResult createFailedResult
-    (final TraceProxy counterexample)
-  {
-    return new VerificationResult(counterexample);
-  }
-
-  /**
-   * Stores any available statistics on this verifier's last run in the
-   * given verification result. This default implementation does nothing,
-   * it needs to be overridden by subclasses.
-   */
-  protected void addStatistics(final VerificationResult result)
-  {
+    final VerificationResult result = getAnalysisResult();
+    result.setCounterExample(counterexample);
+    return setBooleanResult(false);
   }
 
 
   //#########################################################################
   //# Data Members
   private KindTranslator mKindTranslator;
-  private VerificationResult mResult;
 
 }

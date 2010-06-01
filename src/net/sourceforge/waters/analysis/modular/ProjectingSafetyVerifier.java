@@ -241,14 +241,15 @@ public class ProjectingSafetyVerifier
   public boolean run()
     throws AnalysisException
   {
+    setUp();
     Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> specs = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> origspecs = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
     final Set<EventProxy> forbiddenEvents = new HashSet<EventProxy>();
     final Set<EventProxy> events = new HashSet<EventProxy>(getModel().getEvents());
-    Map<EventProxy, EventProxy> forbtouncont = new HashMap<EventProxy, EventProxy>();
-    for (AutomatonProxy automaton : getModel().getAutomata()) {
+    final Map<EventProxy, EventProxy> forbtouncont = new HashMap<EventProxy, EventProxy>();
+    for (final AutomatonProxy automaton : getModel().getAutomata()) {
       switch (getKindTranslator().getComponentKind(automaton)) {
         case PLANT :  plants.add(automaton);
                       break;
@@ -258,24 +259,24 @@ public class ProjectingSafetyVerifier
       }
     }
     int l = 0;
-    for (AutomatonProxy s : origspecs) {
-      Object[] array = convertSpec(s, l, forbtouncont);
+    for (final AutomatonProxy s : origspecs) {
+      final Object[] array = convertSpec(s, l, forbtouncont);
       l++;
-      AutomatonProxy spec = (AutomatonProxy) array[1];
+      final AutomatonProxy spec = (AutomatonProxy) array[1];
       specs.add(spec);
       forbiddenEvents.addAll(spec.getEvents());
-      AutomatonProxy plant = (AutomatonProxy) array[0];
+      final AutomatonProxy plant = (AutomatonProxy) array[0];
       automata.add(plant);
       final Map<EventProxy,EventProxy> uncont = Casting.toMap((Map<?,?>) array[2]);
-      Set<AutomatonProxy> newplants = new HashSet<AutomatonProxy>(plants.size());
-      for (AutomatonProxy p : plants) {
+      final Set<AutomatonProxy> newplants = new HashSet<AutomatonProxy>(plants.size());
+      for (final AutomatonProxy p : plants) {
         newplants.add(convertPlant(p, uncont));
       }
       plants = newplants;
     }
     automata.addAll(plants);
     automata.addAll(specs);
-    for (AutomatonProxy a : automata) {
+    for (final AutomatonProxy a : automata) {
       events.addAll(a.getEvents());
     }
     final ProductDESProxy model =
@@ -286,12 +287,12 @@ public class ProjectingSafetyVerifier
     mChecker.setNodeLimit(getNodeLimit());
     mChecker.setKindTranslator(new KindTranslator()
     {
-      public EventKind getEventKind(EventProxy e)
+      public EventKind getEventKind(final EventProxy e)
       {
         return getKindTranslator().getEventKind(e);
       }
 
-      public ComponentKind getComponentKind(AutomatonProxy a)
+      public ComponentKind getComponentKind(final AutomatonProxy a)
       {
         return specs.contains(a) ? ComponentKind.SPEC : ComponentKind.PLANT;
       }
@@ -306,7 +307,7 @@ public class ProjectingSafetyVerifier
       mStates = (int) mChecker.getAnalysisResult().getTotalNumberOfStates();
       TraceProxy counter = mChecker.getCounterExample();
       counter = list.getTrace(counter, model);
-      List<EventProxy> e = new ArrayList<EventProxy>(counter.getEvents());
+      final List<EventProxy> e = new ArrayList<EventProxy>(counter.getEvents());
       e.set(e.size() - 1, forbtouncont.get(e.get(e.size() - 1)));
       counter = getFactory().createSafetyTraceProxy(getModel().getName(),
                                                     getModel(), e);
@@ -316,58 +317,60 @@ public class ProjectingSafetyVerifier
 
 
   //#########################################################################
-  //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
-  protected void addStatistics(final VerificationResult result)
+  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
+  @Override
+  protected void addStatistics()
   {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     result.setNumberOfStates(mStates);
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private Object[] convertSpec(AutomatonProxy a, int num,
-                               Map<EventProxy, EventProxy> forbtouncont)
+  private Object[] convertSpec(final AutomatonProxy a, final int num,
+                               final Map<EventProxy, EventProxy> forbtouncont)
   {
-    Map<EventProxy, EventProxy> uncont = new HashMap<EventProxy, EventProxy>();
-    for (EventProxy e : a.getEvents()) {
+    final Map<EventProxy, EventProxy> uncont = new HashMap<EventProxy, EventProxy>();
+    for (final EventProxy e : a.getEvents()) {
       if (getKindTranslator().getEventKind(e) == EventKind.UNCONTROLLABLE) {
         uncont.put(e, getFactory().createEventProxy(e.getName() + ":" + num,
                                                     EventKind.UNCONTROLLABLE));
         forbtouncont.put(uncont.get(e), e);
       }
     }
-    Map<StateProxy, Set<EventProxy>> stateevents =
+    final Map<StateProxy, Set<EventProxy>> stateevents =
       new HashMap<StateProxy, Set<EventProxy>>();
-    for (StateProxy s : a.getStates()) {
+    for (final StateProxy s : a.getStates()) {
       stateevents.put(s, new HashSet<EventProxy>());
     }
-    for (TransitionProxy t : a.getTransitions()) {
+    for (final TransitionProxy t : a.getTransitions()) {
       if (getKindTranslator().getEventKind(t.getEvent()) ==
           EventKind.UNCONTROLLABLE) {
         stateevents.get(t.getSource()).add(t.getEvent());
       }
     }
-    Set<StateProxy> states = new HashSet<StateProxy>(a.getStates());
-    Set<TransitionProxy> transitions =
+    final Set<StateProxy> states = new HashSet<StateProxy>(a.getStates());
+    final Set<TransitionProxy> transitions =
       new HashSet<TransitionProxy>(a.getTransitions());
-    Set<EventProxy> events = new HashSet<EventProxy>(a.getEvents());
+    final Set<EventProxy> events = new HashSet<EventProxy>(a.getEvents());
     events.addAll(uncont.values());
-    for (StateProxy s : states) {
-      for (EventProxy e: uncont.keySet()) {
+    for (final StateProxy s : states) {
+      for (final EventProxy e: uncont.keySet()) {
         if (!stateevents.get(s).contains(e)) {
           transitions.add
             (getFactory().createTransitionProxy(s, uncont.get(e), s));
         }
       }
     }
-    StateProxy onestate =
+    final StateProxy onestate =
       getFactory().createStateProxy("one", true, new HashSet<EventProxy>());
-    AutomatonProxy plant =
+    final AutomatonProxy plant =
       getFactory().createAutomatonProxy(a.getName() + ":plant",
                                         ComponentKind.PLANT,
                                         events, states, transitions);
-    AutomatonProxy spec =
+    final AutomatonProxy spec =
       getFactory().createAutomatonProxy(a.getName() + ":spec",
                                         ComponentKind.SPEC,
                                         uncont.values(),
@@ -376,21 +379,21 @@ public class ProjectingSafetyVerifier
     return new Object[] {plant, spec, uncont};
   }
 
-  private AutomatonProxy convertPlant(AutomatonProxy a,
-                                      Map<EventProxy, EventProxy> uncont)
+  private AutomatonProxy convertPlant(final AutomatonProxy a,
+                                      final Map<EventProxy, EventProxy> uncont)
   {
-    Set<EventProxy> same = new HashSet<EventProxy>(a.getEvents());
+    final Set<EventProxy> same = new HashSet<EventProxy>(a.getEvents());
     same.retainAll(uncont.keySet());
     if (same.isEmpty()) {
       return a;
     }
-    Collection<TransitionProxy> trans =
+    final Collection<TransitionProxy> trans =
       new ArrayList<TransitionProxy>(a.getTransitions());
-    Collection<EventProxy> events = new ArrayList<EventProxy>(a.getEvents());
-    for(EventProxy e : same) {
+    final Collection<EventProxy> events = new ArrayList<EventProxy>(a.getEvents());
+    for(final EventProxy e : same) {
       events.add(uncont.get(e));
     }
-    for (TransitionProxy t : a.getTransitions()) {
+    for (final TransitionProxy t : a.getTransitions()) {
       if (uncont.containsKey(t.getEvent())) {
         trans.add(getFactory().createTransitionProxy(t.getSource(),
                                                      uncont.get(t.getEvent()),
@@ -402,8 +405,8 @@ public class ProjectingSafetyVerifier
        events, a.getStates(), trans);
   }
 
-  private ProjectionList project(ProductDESProxy model,
-                                 Set<EventProxy> forbiddenEvents)
+  private ProjectionList project(final ProductDESProxy model,
+                                 final Set<EventProxy> forbiddenEvents)
     throws AnalysisException
   {
     mChecked.clear();
@@ -411,13 +414,13 @@ public class ProjectingSafetyVerifier
       new TreeSet<AutomatonProxy>(model.getAutomata());
     ProjectionList p = null;
     while (true) {
-      SortedMap<SortedSet<AutomatonProxy>, Integer> numoccuring =
+      final SortedMap<SortedSet<AutomatonProxy>, Integer> numoccuring =
         new TreeMap<SortedSet<AutomatonProxy>,Integer>
         (new AutomataComparator());
-      for (EventProxy e : model.getEvents()) {
+      for (final EventProxy e : model.getEvents()) {
         if (!forbiddenEvents.contains(e)) {
-          SortedSet<AutomatonProxy> possess = new TreeSet<AutomatonProxy>();
-          for (AutomatonProxy a : automata) {
+          final SortedSet<AutomatonProxy> possess = new TreeSet<AutomatonProxy>();
+          for (final AutomatonProxy a : automata) {
             if (a.getEvents().contains(e)) {
               possess.add(a);
             }
@@ -430,31 +433,31 @@ public class ProjectingSafetyVerifier
           }
         }
       }
-      Set<Tuple> possible = new TreeSet<Tuple>();
+      final Set<Tuple> possible = new TreeSet<Tuple>();
       boolean stop = true;
-      for (SortedSet<AutomatonProxy> s : numoccuring.keySet()) {
+      for (final SortedSet<AutomatonProxy> s : numoccuring.keySet()) {
         if (s.size() > 4 && s.size() != automata.size()) {
           continue;
         }
         double size = 0;
-        Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
-        Set<EventProxy> total = new HashSet<EventProxy>();
-        for (AutomatonProxy a : s) {
+        final Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
+        final Set<EventProxy> total = new HashSet<EventProxy>();
+        for (final AutomatonProxy a : s) {
           size += Math.log(a.getStates().size());
           total.addAll(a.getEvents());
           common.retainAll(a.getEvents());
         }
-        double tot = total.size();
-        double uncom = tot - common.size();
+        final double tot = total.size();
+        final double uncom = tot - common.size();
         size *= uncom;
         possible.add(new Tuple(s, size));
       }
       int overflows = 0;
       ProjectionList minlist = null;
       minSize = Integer.MAX_VALUE / 4;
-      for (Tuple tup : possible) {
+      for (final Tuple tup : possible) {
         try {
-          ProjectionList t =
+          final ProjectionList t =
             new ProjectionList(p, automata, tup.mSet, forbiddenEvents);
           if (minSize >= t.getNew().getStates().size()) {
             minlist = t;
@@ -477,9 +480,9 @@ public class ProjectingSafetyVerifier
         break;
       }
     }
-    Iterator<AutomataHidden> it = mMinAutMap.keySet().iterator();
+    final Iterator<AutomataHidden> it = mMinAutMap.keySet().iterator();
     while (it.hasNext()) {
-      AutomataHidden ah = it.next();
+      final AutomataHidden ah = it.next();
       if (!mChecked.contains(ah)) {
         it.remove();
       }
@@ -529,31 +532,31 @@ public class ProjectingSafetyVerifier
     final ProductDESProxy mModel;
     final AutomatonProxy mNew;
 
-    public ProjectionList(ProjectionList parent,
-                          Set<AutomatonProxy> automata,
-                          Set<AutomatonProxy> compAutomata,
-                          Set<EventProxy> forbiddenEvents)
+    public ProjectionList(final ProjectionList parent,
+                          final Set<AutomatonProxy> automata,
+                          final Set<AutomatonProxy> compAutomata,
+                          final Set<EventProxy> forbiddenEvents)
       throws AnalysisException
     {
-      Set<EventProxy> localforbiddenEvents =
+      final Set<EventProxy> localforbiddenEvents =
         new HashSet<EventProxy>(forbiddenEvents);
       mParent = parent;
       mCompautomata = compAutomata;
       mAutomata = new HashSet<AutomatonProxy>(automata);
       mAutomata.removeAll(compAutomata);
-      Set<EventProxy> events = new HashSet<EventProxy>();
-      for (AutomatonProxy a : compAutomata) {
+      final Set<EventProxy> events = new HashSet<EventProxy>();
+      for (final AutomatonProxy a : compAutomata) {
         events.addAll(a.getEvents());
       }
       mOriginalAlphabet = events;
       mHidden = new HashSet<EventProxy>(events);
-      for (AutomatonProxy a : mAutomata) {
+      for (final AutomatonProxy a : mAutomata) {
         if (a != mSpec) {
           mHidden.removeAll(a.getEvents());
         }
       }
       localforbiddenEvents.retainAll(mHidden);
-      AutomataHidden ah =
+      final AutomataHidden ah =
         new AutomataHidden(compAutomata, new HashSet<EventProxy>(mHidden));
       mHidden.removeAll(forbiddenEvents);
       mChecked.add(ah);
@@ -564,18 +567,18 @@ public class ProjectingSafetyVerifier
           throw new OverflowException();
         }
       } else {
-        ProductDESProxy comp =
+        final ProductDESProxy comp =
           getFactory().createProductDESProxy("comp", events, compAutomata);
-        Projection2 proj =
+        final Projection2 proj =
           new Projection2(comp, getFactory(), mHidden, localforbiddenEvents);
         try {
           proj.setNodeLimit(mMaxProjStates);
           minAutomaton = proj.project();
           if (mOriginalAlphabet.containsAll(forbiddenEvents)) {
-            TransitionRelation tr = new TransitionRelation(minAutomaton, null);
+            final TransitionRelation tr = new TransitionRelation(minAutomaton, null);
             int states = tr.getAutomaton(getFactory()).getStates().size();
             tr.setMarkingToStatesWithOutgoing(forbiddenEvents);
-            CertainDeath con = new CertainDeath(tr); con.run();
+            final CertainDeath con = new CertainDeath(tr); con.run();
             minAutomaton = tr.getAutomaton(getFactory());
             states -= tr.getAutomaton(getFactory()).getStates().size();
           }
@@ -589,8 +592,8 @@ public class ProjectingSafetyVerifier
       }
       mAutomata.add(minAutomaton);
       mNew = minAutomaton;
-      Set<EventProxy> targ = new HashSet<EventProxy>();
-      for (AutomatonProxy a : mAutomata) {
+      final Set<EventProxy> targ = new HashSet<EventProxy>();
+      for (final AutomatonProxy a : mAutomata) {
         targ.addAll(a.getEvents());
       }
       mModel = getFactory().createProductDESProxy("model", targ, mAutomata);
@@ -606,24 +609,24 @@ public class ProjectingSafetyVerifier
       return mNew;
     }
 
-    public TraceProxy getTrace(TraceProxy trace, ProductDESProxy model)
+    public TraceProxy getTrace(TraceProxy trace, final ProductDESProxy model)
     {
-      List<Map<StateProxy, Set<EventProxy>>> events =
+      final List<Map<StateProxy, Set<EventProxy>>> events =
         new ArrayList<Map<StateProxy, Set<EventProxy>>>(mCompautomata.size());
-      List<Map<Key, StateProxy>> automata =
+      final List<Map<Key, StateProxy>> automata =
         new ArrayList<Map<Key, StateProxy>>(mCompautomata.size());
       List<StateProxy> currstate = new ArrayList<StateProxy>(mCompautomata.size());
-      AutomatonProxy[] aut = new AutomatonProxy[mCompautomata.size()];
+      final AutomatonProxy[] aut = new AutomatonProxy[mCompautomata.size()];
       int i = 0;
-      for (AutomatonProxy proxy : mCompautomata) {
+      for (final AutomatonProxy proxy : mCompautomata) {
         events.add(new HashMap<StateProxy, Set<EventProxy>>(proxy.getStates().size()));
         automata.add(new HashMap<Key, StateProxy>(proxy.getTransitions().size()));
-        Set<EventProxy> autevents = new HashSet<EventProxy>(mOriginalAlphabet);
+        final Set<EventProxy> autevents = new HashSet<EventProxy>(mOriginalAlphabet);
         //System.out.println(autevents);
         autevents.removeAll(proxy.getEvents());
         //System.out.println(autevents);
         int init = 0;
-        for (StateProxy s : proxy.getStates()) {
+        for (final StateProxy s : proxy.getStates()) {
           if (s.isInitial()) {
             init++;
             currstate.add(s);
@@ -631,7 +634,7 @@ public class ProjectingSafetyVerifier
           events.get(i).put(s, new HashSet<EventProxy>(autevents));
         }
         assert(init == 1);
-        for (TransitionProxy t : proxy.getTransitions()) {
+        for (final TransitionProxy t : proxy.getTransitions()) {
           events.get(i).get(t.getSource()).add(t.getEvent());
           automata.get(i).put(new Key(t.getSource(), t.getEvent()), t.getTarget());
         }
@@ -641,10 +644,10 @@ public class ProjectingSafetyVerifier
       Queue<Place> stateList = new PriorityQueue<Place>();
       Place place = new Place(currstate, null, 0, null);
       stateList.offer(place);
-      List<EventProxy> oldevents = trace.getEvents();
+      final List<EventProxy> oldevents = trace.getEvents();
       //System.out.println(oldevents);
 
-      Set<Place> visited = new HashSet<Place>();
+      final Set<Place> visited = new HashSet<Place>();
       visited.add(place);
       while (true) {
         place = stateList.poll();
@@ -653,15 +656,15 @@ public class ProjectingSafetyVerifier
           break;
         }
         currstate = place.mCurrState;
-        Set<EventProxy> possevents = new HashSet<EventProxy>(mHidden);
+        final Set<EventProxy> possevents = new HashSet<EventProxy>(mHidden);
         //System.out.println(mHidden);
         hidden:
-        for (EventProxy pe : possevents) {
+        for (final EventProxy pe : possevents) {
           //System.out.println(pe);
-          List<StateProxy> newstate = new ArrayList<StateProxy>(currstate.size());
+          final List<StateProxy> newstate = new ArrayList<StateProxy>(currstate.size());
           for (i = 0; i < currstate.size(); i++) {
             if (aut[i].getEvents().contains(pe)) {
-              StateProxy t = automata.get(i).get(new Key(currstate.get(i), pe));
+              final StateProxy t = automata.get(i).get(new Key(currstate.get(i), pe));
               //System.out.println(t);
               if (t == null) {
                 continue hidden;
@@ -672,17 +675,17 @@ public class ProjectingSafetyVerifier
             }
           }
           //System.out.println(newstate);
-          Place newPlace = new Place(newstate, pe, place.mIndex, place);
+          final Place newPlace = new Place(newstate, pe, place.mIndex, place);
           if (visited.add(newPlace)) {
             stateList.offer(newPlace);
           }
         }
-        EventProxy currevent = oldevents.get(place.mIndex);
-        List<StateProxy> newstate = new ArrayList<StateProxy>(currstate.size());
+        final EventProxy currevent = oldevents.get(place.mIndex);
+        final List<StateProxy> newstate = new ArrayList<StateProxy>(currstate.size());
         boolean contains = true;
         for (i = 0; i < currstate.size(); i++) {
           if (aut[i].getEvents().contains(currevent)) {
-            StateProxy t = automata.get(i).get(new Key(currstate.get(i), currevent));
+            final StateProxy t = automata.get(i).get(new Key(currstate.get(i), currevent));
             if (t == null) {
               contains = false;
             }
@@ -691,14 +694,14 @@ public class ProjectingSafetyVerifier
             newstate.add(currstate.get(i));
           }
         }
-        Place newPlace = new Place(newstate, currevent, place.mIndex + 1, place);
+        final Place newPlace = new Place(newstate, currevent, place.mIndex + 1, place);
         if (contains && visited.add(newPlace)) {
           stateList.offer(newPlace);
         }
         assert(!stateList.isEmpty());
       }
       stateList = null;
-      ProductDESProxy mod = mParent == null ? model : mParent.getModel();
+      final ProductDESProxy mod = mParent == null ? model : mParent.getModel();
       trace = getFactory().createSafetyTraceProxy(mod, place.getTrace());
       return mParent == null ? trace : mParent.getTrace(trace, model);
     }
@@ -711,8 +714,8 @@ public class ProjectingSafetyVerifier
       public final int mIndex;
       public final Place mParent;
 
-      public Place(List<StateProxy> currState, EventProxy event,
-                   int index, Place parent)
+      public Place(final List<StateProxy> currState, final EventProxy event,
+                   final int index, final Place parent)
       {
         mCurrState = currState;
         mEvent = event;
@@ -725,12 +728,12 @@ public class ProjectingSafetyVerifier
         if (mParent == null) {
           return new LinkedList<EventProxy>();
         }
-        List<EventProxy> events = mParent.getTrace();
+        final List<EventProxy> events = mParent.getTrace();
         events.add(mEvent);
         return events;
       }
 
-      public int compareTo(Place other)
+      public int compareTo(final Place other)
       {
         return other.mIndex - mIndex;
       }
@@ -743,9 +746,9 @@ public class ProjectingSafetyVerifier
         return hash;
       }
 
-      public boolean equals(Object o)
+      public boolean equals(final Object o)
       {
-        Place p = (Place) o;
+        final Place p = (Place) o;
         return p.mIndex == mIndex && p.mCurrState.equals(mCurrState);
       }
     }
@@ -756,7 +759,7 @@ public class ProjectingSafetyVerifier
       private final EventProxy mEvent;
       private final int mHash;
 
-      public Key(StateProxy state, EventProxy event)
+      public Key(final StateProxy state, final EventProxy event)
       {
         int hash = 7;
         hash += state.hashCode() * 31;
@@ -788,7 +791,7 @@ public class ProjectingSafetyVerifier
     public final Set<AutomatonProxy> mAutomata;
     public final Set<EventProxy> mHidden;
 
-    public AutomataHidden(Set<AutomatonProxy> automata, Set<EventProxy> hidden)
+    public AutomataHidden(final Set<AutomatonProxy> automata, final Set<EventProxy> hidden)
     {
       mAutomata = automata;
       mHidden = hidden;
@@ -801,10 +804,10 @@ public class ProjectingSafetyVerifier
       return code;
     }
 
-    public boolean equals(Object o)
+    public boolean equals(final Object o)
     {
       if (o instanceof AutomataHidden) {
-        AutomataHidden a = (AutomataHidden) o;
+        final AutomataHidden a = (AutomataHidden) o;
         return mAutomata.equals(a.mAutomata) && mHidden.equals(a.mHidden);
       }
       return false;
@@ -814,19 +817,19 @@ public class ProjectingSafetyVerifier
   private static class AutomataComparator
     implements Comparator<SortedSet<AutomatonProxy>>
   {
-    public int compare(SortedSet<AutomatonProxy> s1, SortedSet<AutomatonProxy> s2)
+    public int compare(final SortedSet<AutomatonProxy> s1, final SortedSet<AutomatonProxy> s2)
     {
       if (s1.size() < s2.size()) {
         return -1;
       } else if (s1.size() > s2.size()) {
         return 1;
       }
-      Iterator<AutomatonProxy> i1 = s1.iterator();
-      Iterator<AutomatonProxy> i2 = s2.iterator();
+      final Iterator<AutomatonProxy> i1 = s1.iterator();
+      final Iterator<AutomatonProxy> i2 = s2.iterator();
       while (i1.hasNext()) {
-        AutomatonProxy a1 = i1.next();
-        AutomatonProxy a2 = i2.next();
-        int res = a1.compareTo(a2);
+        final AutomatonProxy a1 = i1.next();
+        final AutomatonProxy a2 = i2.next();
+        final int res = a1.compareTo(a2);
         if (res != 0) {
           return res;
         }
@@ -841,13 +844,13 @@ public class ProjectingSafetyVerifier
     public final Set<AutomatonProxy> mSet;
     public final double mSize;
 
-    public Tuple(Set<AutomatonProxy> set, double size)
+    public Tuple(final Set<AutomatonProxy> set, final double size)
     {
       mSet = set;
       mSize = size;
     }
 
-    public int compareTo(Tuple t)
+    public int compareTo(final Tuple t)
     {
       if (mSize < t.mSize) {
         return -1;
@@ -864,12 +867,12 @@ public class ProjectingSafetyVerifier
   //# Data Members
   private int minSize = 1000;
   private final SafetyVerifier mChecker;
-  private AutomatonProxy mSpec = null;
+  private final AutomatonProxy mSpec = null;
   private int mStates;
   private int mMaxProjStates;
-  private Map<AutomataHidden, AutomatonProxy> mMinAutMap =
+  private final Map<AutomataHidden, AutomatonProxy> mMinAutMap =
     new HashMap<AutomataHidden, AutomatonProxy>();
-  private Set<AutomataHidden> mChecked = new HashSet<AutomataHidden>();
+  private final Set<AutomataHidden> mChecked = new HashSet<AutomataHidden>();
 
 
   //#########################################################################

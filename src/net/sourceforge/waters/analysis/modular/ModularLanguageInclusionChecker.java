@@ -66,6 +66,7 @@ public class ModularLanguageInclusionChecker
   public boolean run()
     throws AnalysisException
   {
+    setUp();
     mStates = 0;
     final List<AutomatonProxy> properties = new ArrayList<AutomatonProxy>();
     final Set<AutomatonProxy> automata =
@@ -114,8 +115,11 @@ public class ModularLanguageInclusionChecker
     return true;
   }
 
-  protected void addStatistics(final VerificationResult result)
+  @Override
+  protected void addStatistics()
   {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     result.setNumberOfStates(mStates);
   }
 

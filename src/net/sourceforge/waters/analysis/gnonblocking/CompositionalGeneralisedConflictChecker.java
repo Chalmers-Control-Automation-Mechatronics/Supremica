@@ -40,7 +40,6 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.TraceChecker;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -48,7 +47,6 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -141,16 +139,30 @@ public class CompositionalGeneralisedConflictChecker extends
     super(model, marking, preMarking, factory);
   }
 
-  /**
-   * Stores any available statistics on this verifier's last run in the given
-   * verification result.
-   */
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   @Override
-  protected void addStatistics(final VerificationResult result)
+  public CompositionalGeneralisedConflictCheckerVerificationResult
+    getAnalysisResult()
   {
-    super.addStatistics(result);
+    return (CompositionalGeneralisedConflictCheckerVerificationResult)
+      super.getAnalysisResult();
+  }
+
+  @Override
+  protected CompositionalGeneralisedConflictCheckerVerificationResult
+    createAnalysisResult()
+  {
+    return new CompositionalGeneralisedConflictCheckerVerificationResult();
+  }
+
+  @Override
+  protected void addStatistics()
+  {
+    super.addStatistics();
     final CompositionalGeneralisedConflictCheckerVerificationResult stats =
-        (CompositionalGeneralisedConflictCheckerVerificationResult) result;
+        getAnalysisResult();
     stats.setSuccessfulCompositionCount(mSuccessfulCompositionCount);
     stats.setUnsuccessfulCompositionCount(mUnsuccessfulCompositionCount);
     stats.setAbstractionRuleStats(mAbstractionRules);
@@ -162,34 +174,6 @@ public class CompositionalGeneralisedConflictChecker extends
     stats.setComposedModelTransitionCount(mComposedModelNumberOfTransitions);
   }
 
-  /**
-   * Creates a verification result indicating that the property checked is
-   * satisfied. This method is used by {@link #setSatisfiedResult()} to create a
-   * verification result.
-   */
-  @Override
-  protected VerificationResult createSatisfiedResult()
-  {
-    return new CompositionalGeneralisedConflictCheckerVerificationResult();
-  }
-
-  /**
-   * Creates a verification result indicating that the property checked is not
-   * satisfied. This method is used by {@link #setFailedResult(TraceProxy)
-   * setFailedResult()} to create a verification result.
-   *
-   * @param counterexample
-   *          The counterexample to be stored on the result.
-   */
-  @Override
-  protected VerificationResult createFailedResult(
-                                                  final TraceProxy counterexample)
-  {
-    final ConflictTraceProxy conflictCounterExample =
-        (ConflictTraceProxy) counterexample;
-    return new CompositionalGeneralisedConflictCheckerVerificationResult(
-        conflictCounterExample);
-  }
 
   // #########################################################################
   // # Invocation

@@ -34,21 +34,18 @@ public abstract class AbstractAutomatonBuilder
   public AbstractAutomatonBuilder(final ProductDESProxyFactory factory)
   {
     super(factory);
-    mResult = null;
   }
 
   public AbstractAutomatonBuilder(final ProductDESProxy model,
                                   final ProductDESProxyFactory factory)
   {
     super(model, factory);
-    mResult = null;
   }
 
   public AbstractAutomatonBuilder(final AutomatonProxy aut,
                                   final ProductDESProxyFactory factory)
   {
     super(aut, factory);
-    mResult = null;
   }
 
 
@@ -56,8 +53,9 @@ public abstract class AbstractAutomatonBuilder
   //# Interface net.sourceforge.waters.model.analysis.AutomatonBuilder
   public AutomatonProxy getComputedAutomaton()
   {
-    if (mResult != null) {
-      return mResult.getAutomaton();
+    final AutomatonResult result = getAnalysisResult();
+    if (result != null) {
+      return result.getAutomaton();
     } else {
       throw new IllegalStateException("Call run() first!");
     }
@@ -65,12 +63,15 @@ public abstract class AbstractAutomatonBuilder
 
   public AutomatonResult getAnalysisResult()
   {
-    return mResult;
+    return (AutomatonResult) super.getAnalysisResult();
   }
 
-  public void clearAnalysisResult()
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
+  protected AutomatonResult createAnalysisResult()
   {
-    mResult = null;
+    return new AutomatonResult();
   }
 
 
@@ -78,39 +79,18 @@ public abstract class AbstractAutomatonBuilder
   //# Setting the Result
   /**
    * Stores an automaton result indicating successful computation.
-   * @param  aut     The automaton to be stored in the result.
-   * @return <CODE>true</CODE>
+   * Setting the automaton also marks the analysis run as completed and
+   * sets the Boolean result.
+   * @param  aut    The computed automaton, or <CODE>null</CODE> to
+   *                indicate an unsuccessful computation. The Boolean analysis
+   *                result is set to <CODE>false</CODE> if and only if this
+   *                parameter is <CODE>null</CODE>.
    */
   protected boolean setAutomatonResult(final AutomatonProxy aut)
   {
-    mResult = new AutomatonResult(aut);
-    addStatistics(mResult);
-    return true;
+    final AutomatonResult result = getAnalysisResult();
+    result.setAutomaton(aut);
+    return result.isSatisfied();
   }
-
-  /**
-   * Stores a verification result indicating unsuccessful computation.
-   * @return <CODE>false</CODE>
-   */
-  protected boolean setFailedResult(final AutomatonProxy counterexample)
-  {
-    mResult = new AutomatonResult();
-    addStatistics(mResult);
-    return false;
-  }
-
-  /**
-   * Stores any available statistics on this automaton builder's last run
-   * in the given automaton result. This default implementation does
-   * nothing, it needs to be overridden by subclasses.
-   */
-  protected void addStatistics(final AutomatonResult result)
-  {
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private AutomatonResult mResult;
 
 }

@@ -145,8 +145,11 @@ public class MonolithicControlLoopChecker
 
   //#########################################################################
   //# Setting the Result
-  protected void addStatistics(final VerificationResult result)
+  @Override
+  protected void addStatistics()
   {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     final int numstates = mGlobalStateSet.size();
     result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(numstates);

@@ -70,6 +70,7 @@ public class ParallelModularControllabilityChecker
   public boolean run()
     throws AnalysisException
   {
+    setUp();
     mStates = 0;
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
@@ -280,8 +281,11 @@ public class ParallelModularControllabilityChecker
     return null;
   }
 
-  protected void addStatistics(final VerificationResult result)
+  @Override
+  protected void addStatistics()
   {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     result.setNumberOfStates(mStates);
   }
 

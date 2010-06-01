@@ -23,7 +23,6 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -341,13 +340,6 @@ public class MonolithicSynchronousProductBuilder
     mCurrentSuccessors = null;
 
     super.tearDown();
-  }
-
-  protected void addStatistics(final VerificationResult result)
-  {
-    result.setNumberOfAutomata(mNumAutomata);
-    result.setNumberOfStates(mNumStates);
-    result.setNumberOfTransitions(mTransitionBuffer.size() / 3);
   }
 
 

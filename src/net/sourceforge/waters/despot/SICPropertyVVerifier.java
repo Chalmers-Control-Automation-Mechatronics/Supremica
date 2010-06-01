@@ -20,7 +20,6 @@ import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
 
 
 public class SICPropertyVVerifier extends AbstractConflictChecker
@@ -94,8 +93,19 @@ public class SICPropertyVVerifier extends AbstractConflictChecker
     return mFailedAnswer;
   }
 
+
+  // #########################################################################
+  // # Interface net.sourceforge.waters.model.ModelAnalyser
+  @Override
+  public SICPropertyVVerifierVerificationResult getAnalysisResult()
+  {
+    return (SICPropertyVVerifierVerificationResult) super.getAnalysisResult();
+  }
+
+
   // #########################################################################
   // # Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
+  @Override
   protected void setUp() throws AnalysisException
   {
     super.setUp();
@@ -104,46 +114,25 @@ public class SICPropertyVVerifier extends AbstractConflictChecker
     mPeakNumberOfStates = mPeakNumberOfTransitions = -1.0;
   }
 
-  protected void addStatistics(final VerificationResult result)
-  {
-    super.addStatistics(result);
-    result.setPeakNumberOfNodes(mPeakNumberOfNodes);
-    result.setTotalNumberOfStates(mTotalNumberOfStates);
-    result.setPeakNumberOfStates(mPeakNumberOfStates);
-    result.setTotalNumberOfTransitions(mTotalNumberOfTransitions);
-    result.setPeakNumberOfTransitions(mPeakNumberOfTransitions);
-    final SICPropertyVVerifierVerificationResult stats =
-        (SICPropertyVVerifierVerificationResult) result;
-    stats.setConflictCheckerResult(mConflictCheckerStats);
-  }
-
-  /**
-   * Creates a verification result indicating that the property checked is
-   * satisfied. This method is used by {@link #setSatisfiedResult()} to create a
-   * verification result.
-   */
   @Override
-  protected VerificationResult createSatisfiedResult()
+  protected SICPropertyVVerifierVerificationResult createAnalysisResult()
   {
     return new SICPropertyVVerifierVerificationResult();
   }
 
-  /**
-   * Creates a verification result indicating that the property checked is not
-   * satisfied. This method is used by {@link #setFailedResult(TraceProxy)
-   * setFailedResult()} to create a verification result.
-   *
-   * @param counterexample
-   *          The counterexample to be stored on the result.
-   */
   @Override
-  protected VerificationResult createFailedResult(
-                                                  final TraceProxy counterexample)
+  protected void addStatistics()
   {
-    final ConflictTraceProxy conflictCounterExample =
-        (ConflictTraceProxy) counterexample;
-    return new SICPropertyVVerifierVerificationResult(conflictCounterExample);
+    super.addStatistics();
+    final SICPropertyVVerifierVerificationResult stats = getAnalysisResult();
+    stats.setPeakNumberOfNodes(mPeakNumberOfNodes);
+    stats.setTotalNumberOfStates(mTotalNumberOfStates);
+    stats.setPeakNumberOfStates(mPeakNumberOfStates);
+    stats.setTotalNumberOfTransitions(mTotalNumberOfTransitions);
+    stats.setPeakNumberOfTransitions(mPeakNumberOfTransitions);
+    stats.setConflictCheckerResult(mConflictCheckerStats);
   }
+
 
   // #########################################################################
   // # Auxiliary Methods

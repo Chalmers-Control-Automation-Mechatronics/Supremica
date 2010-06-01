@@ -24,6 +24,7 @@ import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
@@ -114,18 +115,20 @@ public class BDDSafetyVerifier
   //#########################################################################
   //# Invocation
   public boolean run()
-    throws OverflowException
+    throws AnalysisException
   {
     LOGGER.debug("BDDSafetyVerifier.run(): " +
                  getModel().getName() + " ...");
     try {
+      setUp();
       cleanup();
       createAutomatonBDDs();
-      if (getAnalysisResult() != null) {
+      final VerificationResult result = getAnalysisResult();
+      if (result.isFinished()) {
         return isSatisfied();
       }
       createEventBDDs();
-      if (getAnalysisResult() != null) {
+      if (result.isFinished()) {
         return isSatisfied();
       }
       final boolean controllable = computeFixedPoint();
@@ -134,7 +137,6 @@ public class BDDSafetyVerifier
       } else {
         computeCounterExample();
       }
-      LOGGER.debug("result=" + controllable);
       return controllable;
     } finally {
       cleanup();
@@ -173,8 +175,11 @@ public class BDDSafetyVerifier
 
   //#########################################################################
   //# Setting the Result
-  protected void addStatistics(final VerificationResult result)
+  @Override
+  protected void addStatistics()
   {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     result.setNumberOfAutomata(mNumAutomata);
     result.setPeakNumberOfNodes(mPeakNodes);
   }

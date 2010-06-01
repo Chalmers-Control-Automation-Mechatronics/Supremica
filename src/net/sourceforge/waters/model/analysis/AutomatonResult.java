@@ -27,27 +27,10 @@ public class AutomatonResult extends AnalysisResult
   //#########################################################################
   //# Constructors
   /**
-   * Creates an unsuccessful automaton result.
-   * This constructor creates an automaton result with a <CODE>false</CODE>
-   * analysis result, and a <CODE>null</CODE> automaton.
+   * Creates an automaton result representing an incomplete run.
    */
   public AutomatonResult()
   {
-    super(false);
-    mAutomaton = null;
-  }
-
-  /**
-   * Creates an automaton result.
-   * @param  aut    The computed automaton, or <CODE>null</CODE> to
-   *                indicate an unsuccessful computation. The analysis
-   *                result is set to <CODE>false</CODE> if and only if this
-   *                parameter is <CODE>null</CODE>.
-   */
-  public AutomatonResult(final AutomatonProxy aut)
-  {
-    super(aut != null);
-    mAutomaton = aut;
   }
 
 
@@ -62,9 +45,24 @@ public class AutomatonResult extends AnalysisResult
     return mAutomaton;
   }
 
+  /**
+   * Sets the computed automaton for this result.
+   * Setting the automaton also marks the analysis run as completed and
+   * sets the Boolean result.
+   * @param  aut    The computed automaton, or <CODE>null</CODE> to
+   *                indicate an unsuccessful computation. The Boolean analysis
+   *                result is set to <CODE>false</CODE> if and only if this
+   *                parameter is <CODE>null</CODE>.
+   */
+  public void setAutomaton(final AutomatonProxy aut)
+  {
+    setSatisfied(aut != null);
+    mAutomaton = aut;
+  }
+
 
   //#########################################################################
   //# Data Members
-  private final AutomatonProxy mAutomaton;
+  private AutomatonProxy mAutomaton;
 
 }

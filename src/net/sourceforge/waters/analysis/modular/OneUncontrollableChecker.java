@@ -60,6 +60,7 @@ public class OneUncontrollableChecker
   public boolean run()
     throws AnalysisException
   {
+    setUp();
     mStates = 0;
     final List<EventProxy> uncontrollables = new ArrayList<EventProxy>();
     for (final EventProxy event : getModel().getEvents()) {
@@ -108,8 +109,11 @@ public class OneUncontrollableChecker
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelVerifier
-  protected void addStatistics(final VerificationResult result)
+  @Override
+  protected void addStatistics()
   {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     result.setNumberOfStates(mStates);
   }
 

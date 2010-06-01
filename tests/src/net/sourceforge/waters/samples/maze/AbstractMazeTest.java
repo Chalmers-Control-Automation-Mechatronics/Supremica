@@ -446,9 +446,8 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
   {
     final LanguageInclusionChecker checker =
       getLanguageInclusionChecker(des, factory);
-    final boolean result = checker.run();
-    final SafetyTraceProxy trace = result ? null : checker.getCounterExample();
-    return new VerificationResult(result, trace);
+    checker.run();
+    return checker.getAnalysisResult();
   }
 
   private List<Point> extractMoves(final SafetyTraceProxy counterexample)

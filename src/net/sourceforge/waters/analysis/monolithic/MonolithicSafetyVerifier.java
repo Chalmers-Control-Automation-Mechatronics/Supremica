@@ -247,8 +247,11 @@ public class MonolithicSafetyVerifier
 
   //#########################################################################
   //# Setting the Result
-  protected void addStatistics(final VerificationResult result)
+  @Override
+  protected void addStatistics()
   {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     final int numstates = mStateSpace.size();
     result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(numstates);

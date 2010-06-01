@@ -284,8 +284,11 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
 
   // #########################################################################
   // # Setting the Result
-  protected void addStatistics(final VerificationResult result)
+  @Override
+  protected void addStatistics()
   {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     final int numaut = mSyncProduct.getNumberOfAutomata();
     final int numstates = mSyncProduct.getNumberOfStates();
     result.setNumberOfAutomata(numaut);

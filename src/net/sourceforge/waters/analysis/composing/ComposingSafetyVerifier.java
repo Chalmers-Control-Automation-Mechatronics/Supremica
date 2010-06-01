@@ -528,10 +528,13 @@ public class ComposingSafetyVerifier
 
   }
 
-  protected void addStatistics(final VerificationResult result) {
+  @Override
+  protected void addStatistics()
+  {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     result.setNumberOfStates(mStates);
     result.setPeakNumberOfNodes(mNodes);
-    System.out.println("( "+mNodes+" nodes )");
   }
 
   public ProductDESProxy getConvertedModel() {

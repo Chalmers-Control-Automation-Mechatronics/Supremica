@@ -99,6 +99,16 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     return mTransitionLimit;
   }
 
+  public AnalysisResult getAnalysisResult()
+  {
+    return mAnalysisResult;
+  }
+
+  public void clearAnalysisResult()
+  {
+    mAnalysisResult = null;
+  }
+
   public void requestAbort()
   {
     mIsAborting = true;
@@ -124,6 +134,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   {
     mStartTime = System.currentTimeMillis();
     mIsAborting = false;
+    mAnalysisResult = createAnalysisResult();
   }
 
   /**
@@ -137,10 +148,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   {
     mIsAborting = false;
     final long current = System.currentTimeMillis();
-    final AnalysisResult result = getAnalysisResult();
-    if (result != null) {
-      result.setRuntime(current - mStartTime);
-    }
+    mAnalysisResult.setRuntime(current - mStartTime);
   }
 
   /**
@@ -153,7 +161,9 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     throws AbortException
   {
     if (mIsAborting) {
-      throw new AbortException();
+      final AbortException exception = new AbortException();
+      setExceptionResult(exception);
+      throw exception;
     }
   }
 
@@ -179,6 +189,54 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     }
   }
 
+  /**
+   * Creates an analysis result object to store the model analyser's results.
+   * This method is called is in {@link #setUp()} to ensure that the
+   * analysis result is available throughout the analysis run. It is
+   * overridden by subclasses the require a more specific analysis result
+   * type.
+   */
+  protected AnalysisResult createAnalysisResult()
+  {
+    return new AnalysisResult();
+  }
+
+  /**
+   * Stores the given Boolean value on the analysis result and marks the run
+   * as completed.
+   * @return The given Boolean value.
+   */
+  protected boolean setBooleanResult(final boolean value)
+  {
+    mAnalysisResult.setSatisfied(value);
+    addStatistics();
+    return value;
+  }
+
+  /**
+   * Stores the given exception on the analysis result and marks the run
+   * as completed.
+   * @return The given exception.
+   */
+  protected AnalysisException setExceptionResult
+    (final AnalysisException exception)
+  {
+    mAnalysisResult.setException(exception);
+    addStatistics();
+    return exception;
+  }
+
+
+  /**
+   * Stores any available statistics on this analyser's last run in the
+   * analysis result. This default implementation presently does nothing.
+   * It needs to be overridden by subclasses, who should always call the
+   * superclass method first.
+   */
+  protected void addStatistics()
+  {
+  }
+
 
   //#########################################################################
   //# Logging
@@ -193,6 +251,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   //# Data Members
   private final ProductDESProxyFactory mFactory;
   private ProductDESProxy mModel;
+  private AnalysisResult mAnalysisResult;
   private int mNodeLimit;
   private int mTransitionLimit;
   private long mStartTime;

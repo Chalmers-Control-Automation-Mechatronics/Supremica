@@ -21,6 +21,7 @@ import java.util.List;
 
 import net.sourceforge.waters.despot.SICPropertyVVerifier;
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -213,6 +214,7 @@ public class CommandLineTool
         final long start = System.currentTimeMillis();
         wrapper.setModel(des);
         factory.postConfigure(checker);
+        boolean additions = false;
         try {
           wrapper.run();
           final VerificationResult result = wrapper.getAnalysisResult();
@@ -233,7 +235,6 @@ public class CommandLineTool
             formatter.format("%b (%.0f states, %d nodes, %.3f s)\n",
                              satisfied, numstates, numnodes, difftime);
           }
-          boolean additions = false;
           if (verbose && !satisfied) {
             final TraceProxy counterex = result.getCounterExample();
             if (counterex != null) {
@@ -243,7 +244,14 @@ public class CommandLineTool
               additions = true;
             }
           }
-          if (stats) {
+        } catch (final OverflowException overflow) {
+          final long stop = System.currentTimeMillis();
+          final float difftime = 0.001f * (stop - start);
+          formatter.format("OVERFLOW (%.3f s)\n", difftime);
+        }
+        if (stats) {
+          final VerificationResult result = wrapper.getAnalysisResult();
+          if (result != null) {
             System.out.println(SEPARATOR);
             System.out.println("Statistics:");
             System.out.println("Automata in model: " +
@@ -253,19 +261,15 @@ public class CommandLineTool
             result.print(System.out);
             additions = true;
           }
-          if (additions) {
-            System.out.println(SEPARATOR);
-          }
-        } catch (final OverflowException overflow) {
-          final long stop = System.currentTimeMillis();
-          final float difftime = 0.001f * (stop - start);
-          formatter.format("OVERFLOW (%.3f s)\n", difftime);
+        }
+        if (additions) {
+          System.out.println(SEPARATOR);
         }
       }
 
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR !!!");
-      System.err.println(exception.getClass().getName() +
+      System.err.println(ProxyTools.getShortClassName(exception) +
                          " caught in main()!");
       exception.printStackTrace(System.err);
     }

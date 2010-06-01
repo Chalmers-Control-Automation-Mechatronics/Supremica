@@ -16,11 +16,11 @@ import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
- * A result record returned by a {@link ModelAnalyser}.
+ * A result record returned by a {@link ModelVerifier}.
  * A verification result contains the information on whether a property
  * checked is true or false, and in the latter case, it also contains
  * a counterexample. In addition, it may contain some statistics about
- * the analysis run.
+ * the verification run.
  *
  * @author Robi Malik
  */
@@ -31,34 +31,10 @@ public class VerificationResult extends AnalysisResult
   //#########################################################################
   //# Constructors
   /**
-   * Creates a <I>true</I> verification result.
-   * This constructor creates a verification result which indicates
-   * that the property checked is true.
+   * Creates a new verification result representing an incomplete run.
    */
   public VerificationResult()
   {
-    this(true, null);
-  }
-
-  /**
-   * Creates a <I>false</I> verification result.
-   * This constructor creates a verification result which indicates
-   * that the property checked is false, because of the given
-   * counterexample.
-   */
-  public VerificationResult(final TraceProxy counterexample)
-  {
-    this(false, counterexample);
-  }
-
-  /**
-   * Creates a verification result with parameters as given.
-   */
-  public VerificationResult(final boolean satisfied,
-                            final TraceProxy counterexample)
-  {
-    super(satisfied);
-    mCounterExample = counterexample;
     mTotalNumberOfAutomata = -1;
     mTotalNumberOfStates = -1.0;
     mPeakNumberOfStates = -1.0;
@@ -149,29 +125,30 @@ public class VerificationResult extends AnalysisResult
 
 
   //#########################################################################
-  //# Providing Statistics
+  //# Providing Result Data
+  /**
+   * Sets the counterexample obtained from verification.
+   * Setting the counterexample also marks the verification result as
+   * completed and sets the Boolean result to <CODE>false</CODE>.
+   */
+  public void setCounterExample(final TraceProxy counterexample)
+  {
+    setSatisfied(false);
+    mCounterExample = counterexample;
+  }
+
   /**
    * Specifies a value for the total number of automata used by the
    * analysis.
-   * @throws IllegalStateException if the total number of automata has been
-   *         set by a previous call to this method.
    */
   public void setNumberOfAutomata(final int numaut)
   {
-    if (mTotalNumberOfAutomata < 0) {
-      mTotalNumberOfAutomata = numaut;
-    } else {
-      throw new IllegalStateException
-	("Trying to overwrite previously set total number of automata " +
-	 "in verification result!");
-    }
+    mTotalNumberOfAutomata = numaut;
   }
 
   /**
    * Specifies a value for both the peak and total number of states constructed
    * by the analysis.
-   * @throws IllegalStateException if the total number of states has been
-   *         set by a previous call to this method.
    */
   public void setNumberOfStates(final double numstates)
   {
@@ -182,42 +159,24 @@ public class VerificationResult extends AnalysisResult
   /**
    * Specifies a value for the total number of states constructed by the
    * analysis.
-   * @throws IllegalStateException if the total number of states has been
-   *         set by a previous call to this method.
    */
   public void setTotalNumberOfStates(final double numstates)
   {
-    if (mTotalNumberOfStates < 0) {
-      mTotalNumberOfStates = numstates;
-    } else {
-      throw new IllegalStateException
-	("Trying to overwrite previously set total number of states " +
-	 "in verification result!");
-    }
+    mTotalNumberOfStates = numstates;
   }
 
   /**
    * Specifies a value for the peak number of states constructed by the
    * analysis.
-   * @throws IllegalStateException if the total number of states has been
-   *         set by a previous call to this method.
    */
   public void setPeakNumberOfStates(final double numstates)
   {
-    if (mPeakNumberOfStates < 0) {
-      mPeakNumberOfStates = numstates;
-    } else {
-      throw new IllegalStateException
-	("Trying to overwrite previously set peak number of states " +
-	 "in verification result!");
-    }
+    mPeakNumberOfStates = numstates;
   }
 
   /**
    * Specifies a value for both the peak and total number of transitions
    * constructed by the analysis.
-   * @throws IllegalStateException if the total number of transitions has been
-   *         set by a previous call to this method.
    */
   public void setNumberOfTransitions(final double numtrans)
   {
@@ -228,53 +187,29 @@ public class VerificationResult extends AnalysisResult
   /**
    * Specifies a value for the total number of transitions constructed by the
    * analysis.
-   * @throws IllegalStateException if the total number of transitions has been
-   *         set by a previous call to this method.
    */
   public void setTotalNumberOfTransitions(final double numtrans)
   {
-    if (mTotalNumberOfTransitions < 0) {
-      mTotalNumberOfTransitions = numtrans;
-    } else {
-      throw new IllegalStateException
-	("Trying to overwrite previously set total number of transitions " +
-	 "in verification result!");
-    }
+    mTotalNumberOfTransitions = numtrans;
   }
 
   /**
    * Specifies a value for the peak number of transitions constructed by the
    * analysis.
-   * @throws IllegalStateException if the total number of transitions has been
-   *         set by a previous call to this method.
    */
   public void setPeakNumberOfTransitions(final double numtrans)
   {
-    if (mPeakNumberOfTransitions < 0) {
-      mPeakNumberOfTransitions = numtrans;
-    } else {
-      throw new IllegalStateException
-	("Trying to overwrite previously set peak number of transitions " +
-	 "in verification result!");
-    }
+    mPeakNumberOfTransitions = numtrans;
   }
 
   /**
    * Specifies the maximum number of nodes used during analysis.
    * A 'node' here represents a basic unit of memory such as a state
    * in a synchronous product or a BDD node.
-   * @throws IllegalStateException if the peak number of nodes has been
-   *         set by a previous call to this method.
    */
   public void setPeakNumberOfNodes(final int numnodes)
   {
-    if (mPeakNumberOfNodes < 0) {
-      mPeakNumberOfNodes = numnodes;
-    } else {
-      throw new IllegalStateException
-        ("Trying to overwrite previously set peak number of nodes " +
-         "in verification result!");
-    }
+    mPeakNumberOfNodes = numnodes;
   }
 
 
@@ -311,8 +246,7 @@ public class VerificationResult extends AnalysisResult
 
   //#########################################################################
   //# Data Members
-  private final TraceProxy mCounterExample;
-
+  private TraceProxy mCounterExample;
   private int mTotalNumberOfAutomata;
   private double mTotalNumberOfStates;
   private double mPeakNumberOfStates;

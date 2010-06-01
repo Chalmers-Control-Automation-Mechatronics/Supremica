@@ -212,6 +212,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
   // #########################################################################
   // # Overrides for Abstract Base Class
   // # net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  @Override
   public void setNodeLimit(final int limit)
   {
     super.setNodeLimit(limit);
@@ -222,8 +223,11 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
     }
   }
 
-  protected void addStatistics(final VerificationResult result)
+  @Override
+  protected void addStatistics()
   {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     result.setNumberOfStates(mStates);
   }
 

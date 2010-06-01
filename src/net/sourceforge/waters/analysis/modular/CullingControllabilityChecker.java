@@ -45,7 +45,7 @@ public class CullingControllabilityChecker
   extends AbstractModularSafetyVerifier
   implements ControllabilityChecker
 {
- 
+
   //#########################################################################
   //# Constructor
   public CullingControllabilityChecker(final ProductDESProxy model,
@@ -61,20 +61,21 @@ public class CullingControllabilityChecker
     mLeast = least;
     setNodeLimit(2000000);
   }
-  
-  
+
+
   //#########################################################################
   //# Invocation
   public boolean run()
     throws AnalysisException
   {
+    setUp();
     mStates = 0;
     mChecker.setNodeLimit(getNodeLimit());
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
-    final SortedSet<AutomatonProxy> specs = 
+    final SortedSet<AutomatonProxy> specs =
       new TreeSet<AutomatonProxy>(new Comparator<AutomatonProxy>() {
-      public int compare(AutomatonProxy a1, AutomatonProxy a2)
+      public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
       {
         if (a1.getStates().size() < a2.getStates().size()) {
           return -1;
@@ -94,7 +95,7 @@ public class CullingControllabilityChecker
         return a1.getName().compareTo(a2.getName());
       }
     });
-    for (AutomatonProxy automaton : getModel().getAutomata()) {
+    for (final AutomatonProxy automaton : getModel().getAutomata()) {
       switch (getKindTranslator().getComponentKind(automaton)) {
         case PLANT :  plants.add(automaton);
                       break;
@@ -104,16 +105,16 @@ public class CullingControllabilityChecker
       }
     }
     while (!specs.isEmpty()) {
-      List<Op> oportunitys = new LinkedList<Op>();
-      Collection<AutomatonProxy> composition = new ArrayList<AutomatonProxy>();
-      Set<EventProxy> events = new HashSet<EventProxy>();
-      SortedSet<AutomatonProxy> uncomposedplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());
-      SortedSet<AutomatonProxy> uncomposedspecplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());
-      SortedSet<AutomatonProxy> uncomposedspecs = new TreeSet<AutomatonProxy>(new AutomatonComparator());
+      final List<Op> oportunitys = new LinkedList<Op>();
+      final Collection<AutomatonProxy> composition = new ArrayList<AutomatonProxy>();
+      final Set<EventProxy> events = new HashSet<EventProxy>();
+      final SortedSet<AutomatonProxy> uncomposedplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());
+      final SortedSet<AutomatonProxy> uncomposedspecplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());
+      final SortedSet<AutomatonProxy> uncomposedspecs = new TreeSet<AutomatonProxy>(new AutomatonComparator());
       uncomposedplants.addAll(plants);
       uncomposedspecplants.addAll(specplants);
       uncomposedspecs.addAll(specs);
-      AutomatonProxy spec = mLeast ? specs.first() : specs.last();
+      final AutomatonProxy spec = mLeast ? specs.first() : specs.last();
       composition.add(spec);
       events.addAll(spec.getEvents());
       uncomposedspecs.remove(spec);
@@ -121,12 +122,12 @@ public class CullingControllabilityChecker
       mChecker.setModel(comp);
       mChecker.setKindTranslator(new KindTranslator()
       {
-        public EventKind getEventKind(EventProxy e)
+        public EventKind getEventKind(final EventProxy e)
         {
           return getKindTranslator().getEventKind(e);
         }
-        
-        public ComponentKind getComponentKind(AutomatonProxy a)
+
+        public ComponentKind getComponentKind(final AutomatonProxy a)
         {
           return specs.contains(a) ? ComponentKind.SPEC
                                    : ComponentKind.PLANT;
@@ -140,9 +141,9 @@ public class CullingControllabilityChecker
         mChecker.setNodeLimit(getNodeLimit());
         final ModularHeuristic heuristic = getHeuristic();
         while (newcounter != null) {
-          TraceProxy counter = newcounter;
+          final TraceProxy counter = newcounter;
           newcounter = null;
-          Collection<AutomatonProxy> newComp =
+          final Collection<AutomatonProxy> newComp =
             heuristic.heur(comp,
                            uncomposedplants,
                            uncomposedspecplants,
@@ -153,13 +154,13 @@ public class CullingControllabilityChecker
             setFailedResult(mChecker.getCounterExample());
             return false;
           }
-          Op op = new Op(ALL.heur(comp,
+          final Op op = new Op(ALL.heur(comp,
                                   uncomposedplants,
                                   uncomposedspecplants,
                                   uncomposedspecs,
                                   counter,
                                   getKindTranslator()), newComp.iterator().next());
-          Set<AutomatonProxy> possible = new HashSet<AutomatonProxy>(op.others);
+          final Set<AutomatonProxy> possible = new HashSet<AutomatonProxy>(op.others);
           possible.add(op.added);
           //CheckSuffix.checkSuffix(counter, possible, null);
           double prevstates = mChecker.getAnalysisResult().getTotalNumberOfStates();
@@ -168,9 +169,9 @@ public class CullingControllabilityChecker
           uncomposedspecplants.remove(op.added);
           uncomposedspecs.remove(op.added);
           events.addAll(op.added.getEvents());
-          Iterator<Op> it = oportunitys.iterator();
+          final Iterator<Op> it = oportunitys.iterator();
           while (it.hasNext()) {
-            Op oportunity = it.next();
+            final Op oportunity = it.next();
             if (oportunity.others.contains(op.added)) {
               composition.remove(oportunity.added);
               comp = getFactory().createProductDESProxy("comp", events, composition);
@@ -213,7 +214,7 @@ public class CullingControllabilityChecker
       mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
       /*specs.removeAll(composition);
       plants.addAll(composition);*/
-      for (AutomatonProxy automaton : composition) {
+      for (final AutomatonProxy automaton : composition) {
         if (specs.contains(automaton)) {
           //System.out.println(mChecker.getAnalysisResult().getTotalNumberOfStates() + " " + automaton.getName() + " size " + automaton.getStates().size());
           specs.remove(automaton);
@@ -229,29 +230,32 @@ public class CullingControllabilityChecker
     setSatisfiedResult();
     return true;
   }
-  
-  protected void addStatistics(VerificationResult result)
+
+  @Override
+  protected void addStatistics()
   {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     result.setNumberOfStates(mStates);
   }
-  
+
   private static class Op
   {
     public final AutomatonProxy added;
     public final Set<AutomatonProxy> others;
-    
-    public Op(Collection<AutomatonProxy> possible, AutomatonProxy add)
+
+    public Op(final Collection<AutomatonProxy> possible, final AutomatonProxy add)
     {
       added = add;
       others = new HashSet<AutomatonProxy>(possible);
       others.remove(added);
     }
   }
-  
+
   private final static class AutomatonComparator
     implements Comparator<AutomatonProxy>
   {
-    public int compare(AutomatonProxy a1, AutomatonProxy a2)
+    public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       return a1.getName().compareTo(a2.getName());
     }

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
@@ -22,31 +21,10 @@ public class SICPropertyVVerifierVerificationResult extends VerificationResult
   // #########################################################################
   // # Constructors
   /**
-   * Creates a <I>true</I> verification result. This constructor creates a
-   * verification result which indicates that the property checked is true.
+   * Creates a verification result representing an incomplete run.
    */
   public SICPropertyVVerifierVerificationResult()
   {
-    this(true, null);
-  }
-
-  /**
-   * Creates a <I>false</I> verification result. This constructor creates a
-   * verification result which indicates that the property checked is false,
-   * because of the given counterexample.
-   */
-  public SICPropertyVVerifierVerificationResult(final TraceProxy counterexample)
-  {
-    this(false, counterexample);
-  }
-
-  /**
-   * Creates a verification result with parameters as given.
-   */
-  public SICPropertyVVerifierVerificationResult(final boolean satisfied,
-                                                final TraceProxy counterexample)
-  {
-    super(satisfied, counterexample);
     mConflictCheckerStats = new ArrayList<VerificationResult>();
   }
 

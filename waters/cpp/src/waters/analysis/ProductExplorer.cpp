@@ -82,6 +82,8 @@ ProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mIsTrivial(false),
     mNumAutomata(0),
     mNumStates(0),
+    mNumCoreachableStates(0),
+    mNumTransitions(0),
     mDFSStack(0),
     mDFSStackSize(0),
     mTraceList(0),
@@ -260,7 +262,7 @@ setup()
                           mPreMarking, mMarking, mCache, numtags);
   // mEncoding->dump();
   mNumAutomata = mEncoding->getNumberOfRecords();
-  mNumStates = 0;
+  mNumStates = mNumCoreachableStates = mNumTransitions = 0;
   mTraceEvent = 0;
   mTraceAutomaton = 0;
   mTraceState = UNDEF_UINT32;
@@ -745,14 +747,15 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
         finalizer.createProductExplorer(translator, nomarking,
                                         nomarking, cache);
       bool result = checker->runSafetyCheck();
+      jni::VerificationResultGlue vresult(&cache);
       if (result) {
-        jni::VerificationResultGlue vresult(result, 0, &cache);
+        vresult.setSatisfied(true);
         checker->addStatistics(vresult);
         return vresult.returnJavaObject();
       } else {
         jni::SafetyTraceGlue trace =
           checker->getSafetyCounterExample(gchecker);
-        jni::VerificationResultGlue vresult(result, &trace, &cache);
+        vresult.setCounterExample(&trace);
         checker->addStatistics(vresult);
         return vresult.returnJavaObject();
       }
@@ -784,14 +787,15 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
         finalizer.createProductExplorer(translator, premarking,
                                         marking, cache);
       bool result = checker->runNonblockingCheck();
+      jni::VerificationResultGlue vresult(&cache);
       if (result) {
-        jni::VerificationResultGlue vresult(result, 0, &cache);
+        vresult.setSatisfied(true);
         checker->addStatistics(vresult);
         return vresult.returnJavaObject();
       } else {
         jni::ConflictTraceGlue trace =
           checker->getConflictCounterExample(gchecker);
-        jni::VerificationResultGlue vresult(result, &trace, &cache);
+        vresult.setCounterExample(&trace);
         checker->addStatistics(vresult);
         return vresult.returnJavaObject();
       }

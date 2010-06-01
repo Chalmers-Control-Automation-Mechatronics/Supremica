@@ -68,6 +68,7 @@ public class ModularControllabilityChecker
   public boolean run()
     throws AnalysisException
   {
+    setUp();
     mStates = 0;
     mChecker.setNodeLimit(getNodeLimit());
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
@@ -186,8 +187,11 @@ public class ModularControllabilityChecker
     return super.setFailedResult(wrapper);
   }
 
-  protected void addStatistics(final VerificationResult result)
+  @Override
+  protected void addStatistics()
   {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     result.setNumberOfStates(mStates);
   }
 

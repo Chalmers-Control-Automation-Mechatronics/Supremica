@@ -45,8 +45,8 @@ public class ComposingLanguageInclusionChecker
   public ComposingLanguageInclusionChecker
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory)
-  {    
-    super(model, LanguageInclusionKindTranslator.getInstance(), factory);   
+  {
+    super(model, LanguageInclusionKindTranslator.getInstance(), factory);
   }
 
 
@@ -95,8 +95,11 @@ public class ComposingLanguageInclusionChecker
   //#########################################################################
   //# Overrides for Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
-  protected void addStatistics(final VerificationResult result)
+  @Override
+  protected void addStatistics()
   {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
     result.setNumberOfAutomata(mTotalNumberOfAutomata);
     result.setTotalNumberOfStates(mTotalNumberOfStates);
     result.setPeakNumberOfStates(mPeakNumberOfStates);
@@ -171,7 +174,7 @@ public class ComposingLanguageInclusionChecker
     }
 
     public EventKind getEventKind(final EventProxy event)
-    { 
+    {
       return mMaster.getEventKind(event);
     }
 

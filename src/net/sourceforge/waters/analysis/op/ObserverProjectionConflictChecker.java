@@ -43,6 +43,7 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -366,6 +367,8 @@ public class ObserverProjectionConflictChecker
         final ConflictTraceProxy trace1 = expandTrace(trace0);
         return setFailedResult(trace1);
       }
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
     } finally {
       tearDown();
     }
@@ -382,6 +385,9 @@ public class ObserverProjectionConflictChecker
     throws AnalysisException
   {
     super.setUp();
+    final VerificationResult result = getAnalysisResult();
+    result.setNumberOfStates(0.0);
+    result.setNumberOfStates(0.0);
     final EventProxy marking = getUsedMarkingProposition();
     mPropositions = Collections.singletonList(marking);
     if (mPreselectingHeuristic == null) {
@@ -774,8 +780,11 @@ public class ObserverProjectionConflictChecker
     final ProductDESProxy des = createDES(events, mCurrentAutomata);
     mCurrentMonolithicConflictChecker.setModel(des);
     removeEventsToAutomata(mCurrentAutomata);
-    final boolean result = mCurrentMonolithicConflictChecker.run();
-    return result;
+    mCurrentMonolithicConflictChecker.run();
+    final VerificationResult result =
+      mCurrentMonolithicConflictChecker.getAnalysisResult();
+    recordStatistics(result);
+    return result.isSatisfied();
   }
 
   private ProductDESProxy createDES(final List<EventProxy> events,
@@ -838,6 +847,7 @@ public class ObserverProjectionConflictChecker
       aut = syncStep.getResultAutomaton();
       tau = syncStep.getHiddenEvent();
     }
+    recordStatistics(aut);
     final ObservationEquivalenceStep oeStep =
       mAbstractionRule.applyRule(aut, tau);
     if (syncStep != null || oeStep != null) {
@@ -1092,6 +1102,38 @@ public class ObserverProjectionConflictChecker
       }
     }
     return targetState;
+  }
+
+
+  //#########################################################################
+  //# Statistics
+  private void recordStatistics(final AutomatonProxy aut)
+  {
+    final int numStates = aut.getStates().size();
+    final int numTrans = aut.getTransitions().size();
+    recordStatistics(numStates, numTrans);
+  }
+
+  private void recordStatistics(final VerificationResult result)
+  {
+    final double numStates = result.getTotalNumberOfStates();
+    final double numTrans = result.getTotalNumberOfTransitions();
+    recordStatistics(numStates, numTrans);
+  }
+
+  private void recordStatistics(final double numStates, final double numTrans)
+  {
+    final VerificationResult result = getAnalysisResult();
+    final double totalStates = result.getTotalNumberOfStates() + numStates;
+    result.setTotalNumberOfStates(totalStates);
+    final double peakStates =
+      Math.max(result.getPeakNumberOfStates(), numStates);
+    result.setPeakNumberOfStates(peakStates);
+    final double totalTrans = result.getTotalNumberOfTransitions() + numTrans;
+    result.setTotalNumberOfTransitions(totalTrans);
+    final double peakTrans =
+      Math.max(result.getPeakNumberOfTransitions(), numTrans);
+    result.setPeakNumberOfTransitions(peakTrans);
   }
 
 
