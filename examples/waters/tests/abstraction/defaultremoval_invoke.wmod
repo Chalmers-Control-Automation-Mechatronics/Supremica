@@ -6,21 +6,23 @@
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="c"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="reducible">
             <Graph Deterministic="false">
                 <NodeList>
-                    <SimpleNode Name="S1">
+                    <SimpleNode Initial="true" Name="S0">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
                             <Point Y="96" X="112"/>
                         </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="1" X="-31"/>
+                        </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="-6"/>
+                            <Point Y="-22" X="3"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2">
@@ -31,20 +33,20 @@
                             <Point Y="9" X="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="true" Name="S0">
+                    <SimpleNode Name="S1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
-                            <Point Y="96" X="48"/>
+                            <Point Y="160" X="112"/>
                         </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point Y="0" X="-27"/>
-                        </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="-9"/>
+                            <Point Y="4" X="6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S2" Source="S1">
+                    <Edge Target="S2" Source="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
@@ -55,45 +57,9 @@
                             <Point Y="96" X="112"/>
                         </StartPointGeometry>
                     </Edge>
-                    <Edge Target="S0" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="a"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="-15"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="48" X="49"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point Y="96" X="48"/>
-                        </EndPointGeometry>
-                    </Edge>
-                    <Edge Target="S1" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-13"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <EndPointGeometry>
-                            <Point Y="96" X="112"/>
-                        </EndPointGeometry>
-                    </Edge>
-                    <Edge Target="S1" Source="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="b"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-7"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="48" X="113"/>
-                        </SplineGeometry>
-                    </Edge>
                     <Edge Target="S2" Source="S2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="c"/>
+                            <SimpleIdentifier Name="a"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-20" X="-5"/>
                             </LabelGeometry>
@@ -101,6 +67,17 @@
                         <SplineGeometry>
                             <Point Y="48" X="179"/>
                         </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S1" Source="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-4" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <EndPointGeometry>
+                            <Point Y="160" X="112"/>
+                        </EndPointGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
@@ -119,20 +96,12 @@
                             <Point Y="8" X="-18"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S2">
-                        <PointGeometry>
-                            <Point Y="96" X="144"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="6" X="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="32" X="96"/>
+                            <Point Y="96" X="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-9" X="-22"/>
+                            <Point Y="5" X="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -144,25 +113,23 @@
                                 <Point Y="-15" X="-17"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="82" X="88"/>
+                        </SplineGeometry>
                         <EndPointGeometry>
-                            <Point Y="32" X="96"/>
+                            <Point Y="96" X="128"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Target="S2" Source="S1">
+                    <Edge Target="S0" Source="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="b"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-17" X="5"/>
+                                <Point Y="2" X="3"/>
                             </LabelGeometry>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Target="S0" Source="S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="c"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="4" X="-6"/>
-                            </LabelGeometry>
-                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="110" X="87"/>
+                        </SplineGeometry>
                         <EndPointGeometry>
                             <Point Y="96" X="48"/>
                         </EndPointGeometry>
