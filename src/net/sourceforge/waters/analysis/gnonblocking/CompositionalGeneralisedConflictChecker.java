@@ -36,6 +36,7 @@ import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
@@ -169,6 +170,41 @@ public class CompositionalGeneralisedConflictChecker extends
     stats.setTotalNumberOfTransitions(mTotalNumberOfTransitions);
     stats.setComposedModelStateCount(mComposedModelNumberOfStates);
     stats.setComposedModelTransitionCount(mComposedModelNumberOfTransitions);
+  }
+
+  /*
+   * @Override public void setGeneralisedPrecondition(final EventProxy marking)
+   * { super.setGeneralisedPrecondition(marking); mUsedPreconditionMarking =
+   * null; }
+   */
+
+  /**
+   * Gets the precondition marking proposition to be used. This method returns
+   * the marking proposition specified by the
+   * {@link #setGeneralisedPrecondition(EventProxy)
+   * setGeneralisedPrecondition()} method, if non-null, or creates an alpha
+   * marking if the model does not contain one.
+   *
+   * @throws IllegalArgumentException
+   *           to indicate that the a <CODE>null</CODE> marking was specified,
+   *           but input model does not contain any proposition with the default
+   *           marking name.
+   */
+  protected EventProxy getUsedPreconditionMarkingProposition()
+      throws EventNotFoundException
+  {
+    if (mUsedPreconditionMarking == null) {
+      if (getGeneralisedPrecondition() == null) {
+        final ProductDESProxyFactory factory = getFactory();
+        final EventProxy alpha =
+            factory.createEventProxy(":alpha", EventKind.PROPOSITION);
+        // setGeneralisedPrecondition(alpha);
+        mUsedPreconditionMarking = alpha;
+      } else {
+        mUsedPreconditionMarking = getGeneralisedPrecondition();
+      }
+    }
+    return mUsedPreconditionMarking;
   }
 
   // #########################################################################
@@ -413,13 +449,11 @@ public class CompositionalGeneralisedConflictChecker extends
     mComposedModelNumberOfTransitions = 1;
 
     mTemporaryModifyingSteps = new ArrayList<Step>();
-    // TODO Make sure alpha is non-null in all cases
-    final EventProxy alpha = getGeneralisedPrecondition();
+    mUsedPreconditionMarking = null;
+    final EventProxy alpha = getUsedPreconditionMarkingProposition();
     final EventProxy omega = getUsedMarkingProposition();
     mPropositions = new ArrayList<EventProxy>(2);
-    if (alpha != null) { // This if should go away, always include alpha ...
-      mPropositions.add(alpha);
-    }
+    mPropositions.add(alpha);
     mPropositions.add(omega);
 
     mAbstractionRules = new LinkedList<AbstractionRule>();
@@ -2576,6 +2610,7 @@ public class CompositionalGeneralisedConflictChecker extends
       new HashSet<Candidate>();
   private List<Step> mTemporaryModifyingSteps;
   private Collection<EventProxy> mPropositions;
+  private EventProxy mUsedPreconditionMarking;
 
   // configuration
   private PreselectingHeuristic mPreselectingHeuristic;
