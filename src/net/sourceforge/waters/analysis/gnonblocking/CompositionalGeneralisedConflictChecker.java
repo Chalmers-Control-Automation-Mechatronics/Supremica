@@ -490,7 +490,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
     final DeterminisationOfNonAlphaStatesRule dnasRule =
         new DeterminisationOfNonAlphaStatesRule(getFactory(), mPropositions);
-    dnasRule.setAlphaMarking(getGeneralisedPrecondition());
+    dnasRule.setAlphaMarking(alpha);
     dnasRule.setTransitionLimit(getInternalStepTransitionLimit());
     mAbstractionRules.add(dnasRule);
 
