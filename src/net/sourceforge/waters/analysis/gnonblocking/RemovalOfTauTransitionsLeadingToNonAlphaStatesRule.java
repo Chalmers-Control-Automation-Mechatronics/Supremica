@@ -100,10 +100,12 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
             }
           }
         }
-        for (int i = 0; i < transToRemove.size(); i++) {
-          final int targetID = transToRemove.get(i);
-          mTR.addAllSuccessors(targetID, sourceID);
-          mTR.removeTransition(sourceID, tauID, targetID);
+        if (!transToRemove.isEmpty()) {
+          for (int i = 0; i < transToRemove.size(); i++) {
+            final int targetID = transToRemove.get(i);
+            mTR.addAllSuccessors(targetID, sourceID);
+            mTR.removeTransition(sourceID, tauID, targetID);
+          }
           visitStates.offer(sourceID);
           modified = true;
         }
