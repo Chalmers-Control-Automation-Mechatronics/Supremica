@@ -36,7 +36,6 @@ import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
@@ -172,11 +171,12 @@ public class CompositionalGeneralisedConflictChecker extends
     stats.setComposedModelTransitionCount(mComposedModelNumberOfTransitions);
   }
 
-  /*
-   * @Override public void setGeneralisedPrecondition(final EventProxy marking)
-   * { super.setGeneralisedPrecondition(marking); mUsedPreconditionMarking =
-   * null; }
-   */
+  @Override
+  public void setGeneralisedPrecondition(final EventProxy marking)
+  {
+    super.setGeneralisedPrecondition(marking);
+    mUsedPreconditionMarking = null;
+  }
 
   /**
    * Gets the precondition marking proposition to be used. This method returns
@@ -184,21 +184,15 @@ public class CompositionalGeneralisedConflictChecker extends
    * {@link #setGeneralisedPrecondition(EventProxy)
    * setGeneralisedPrecondition()} method, if non-null, or creates an alpha
    * marking if the model does not contain one.
-   *
-   * @throws IllegalArgumentException
-   *           to indicate that the a <CODE>null</CODE> marking was specified,
-   *           but input model does not contain any proposition with the default
-   *           marking name.
    */
   protected EventProxy getUsedPreconditionMarkingProposition()
-      throws EventNotFoundException
   {
     if (mUsedPreconditionMarking == null) {
       if (getGeneralisedPrecondition() == null) {
         final ProductDESProxyFactory factory = getFactory();
         final EventProxy alpha =
             factory.createEventProxy(":alpha", EventKind.PROPOSITION);
-        // setGeneralisedPrecondition(alpha);
+
         mUsedPreconditionMarking = alpha;
       } else {
         mUsedPreconditionMarking = getGeneralisedPrecondition();
@@ -287,7 +281,7 @@ public class CompositionalGeneralisedConflictChecker extends
     final ConflictChecker checker =
         new NativeConflictChecker(model, getUsedMarkingProposition(),
             getFactory());
-    checker.setGeneralisedPrecondition(getGeneralisedPrecondition());
+    checker.setGeneralisedPrecondition(getUsedPreconditionMarkingProposition());
     checker.setNodeLimit(mFinalStepNodeLimit);
     checker.setTransitionLimit(mFinalStepTransitionLimit);
     final boolean result = checker.run();
@@ -1543,7 +1537,7 @@ public class CompositionalGeneralisedConflictChecker extends
           new ObserverProjectionTransitionRelation(getOriginalAutomaton(),
               mPropositions);
       mCodeOfTau = mTransitionRelation.getEventInt(mTau);
-      final EventProxy alpha = getGeneralisedPrecondition();
+      final EventProxy alpha = getUsedPreconditionMarkingProposition();
       mCodeOfAlpha = mTransitionRelation.getEventInt(alpha);
       mOriginalStatesMap = mTransitionRelation.getOriginalStateToIntMap();
     }
@@ -1862,7 +1856,7 @@ public class CompositionalGeneralisedConflictChecker extends
      */
     protected List<SearchRecord> completeEndOfTrace(final int originalSource)
     {
-      final EventProxy alpha = getGeneralisedPrecondition();
+      final EventProxy alpha = getUsedPreconditionMarkingProposition();
       if (!getOriginalAutomaton().getEvents().contains(alpha)
           || isTraceEndState(originalSource)) {
         return Collections.emptyList();
@@ -2496,9 +2490,9 @@ public class CompositionalGeneralisedConflictChecker extends
     protected List<SearchRecord> completeEndOfTrace(final int originalSource)
     {
       if (!getOriginalAutomaton().getEvents()
-          .contains(getGeneralisedPrecondition())
+          .contains(getUsedPreconditionMarkingProposition())
           || getOriginalStates()[originalSource].getPropositions()
-              .contains(getGeneralisedPrecondition())) {
+              .contains(getUsedPreconditionMarkingProposition())) {
         return Collections.emptyList();
       }
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
@@ -2518,7 +2512,7 @@ public class CompositionalGeneralisedConflictChecker extends
             if (!visited.contains(target)) {
               record = new SearchRecord(target, false, getTauCode(), current);
               if (getOriginalStates()[target].getPropositions()
-                  .contains(getGeneralisedPrecondition())) {
+                  .contains(getUsedPreconditionMarkingProposition())) {
                 return buildSearchRecordTrace(record);
               }
               open.add(record);
