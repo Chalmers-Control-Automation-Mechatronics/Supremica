@@ -51,7 +51,7 @@ public class RemoveImpossibleTransitions
     return eventRequires;
   }
   
-  private Map<EventProxy, Map<EventProxy, Set<Set<EventProxy>>>> 
+  public Map<EventProxy, Map<EventProxy, Set<Set<EventProxy>>>> 
     findEventsWhichAreImpossibleAfter(Set<EventProxy> events)
   {
     Map<EventProxy, Map<EventProxy, Set<Set<EventProxy>>>> eventRequires =

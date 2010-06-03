@@ -11,12 +11,14 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.ProjectingNonBlockingChecker;
+import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.analysis.ProjectingNonBlockingCheckerB;
+import net.sourceforge.waters.analysis.ProjectingNonBlockingChecker;
+import net.sourceforge.waters.analysis.CompNonBlockingChecker;
+
 
 /**
  * A factory that produces projecting model verifiers.
@@ -24,17 +26,17 @@ import net.sourceforge.waters.analysis.ProjectingNonBlockingCheckerB;
  * @author Robi Malik
  */
 
-public class NDProjectingModelVerifierFactory
+public class CompModelVerifierFactory
   extends AbstractModelVerifierFactory
 {
 
   //#########################################################################
   //# Constructors
-  private NDProjectingModelVerifierFactory()
+  private CompModelVerifierFactory()
   {
   }
 
-  private NDProjectingModelVerifierFactory(final List<String> arglist)
+  private CompModelVerifierFactory(final List<String> arglist)
   {
     super(arglist);
     addArgument(ModularHeuristicFactory.getMethodArgument());
@@ -44,52 +46,31 @@ public class NDProjectingModelVerifierFactory
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
-  public ProjectingNonBlockingChecker createConflictChecker
+  public CompNonBlockingChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
-    return new ProjectingNonBlockingChecker(null, factory);
+    return new CompNonBlockingChecker(null, factory);
   }
   
-  public NDProjectingControllabilityChecker createControllabilityChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new NDProjectingControllabilityChecker
-      (null,
-       factory,
-       new NativeControllabilityChecker(factory),
-       false);
-  }
-
-  public LanguageInclusionChecker createLanguageInclusionChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new ModularLanguageInclusionChecker(
-       null, factory,
-       /*new OneUncontrollableChecker(null, factory,
-                                    createControllabilityChecker(factory)),*/
-       createControllabilityChecker(factory));
-  }
-
-
   //#########################################################################
   //# Factory Instantiation
-  public static NDProjectingModelVerifierFactory getInstance()
+  public static CompModelVerifierFactory getInstance()
   {
     if (theInstance == null) {
-      theInstance = new NDProjectingModelVerifierFactory();
+      theInstance = new CompModelVerifierFactory();
     }
     return theInstance;
   }
 
-  public static NDProjectingModelVerifierFactory
+  public static CompModelVerifierFactory
     getInstance(final List<String> cmdline)
   {
-    return new NDProjectingModelVerifierFactory(cmdline);
+    return new CompModelVerifierFactory(cmdline);
   }
 
 
   //#########################################################################
   //# Class Variables
-  private static NDProjectingModelVerifierFactory theInstance = null;
+  private static CompModelVerifierFactory theInstance = null;
 
 }

@@ -1,6 +1,7 @@
 package net.sourceforge.waters.analysis;
 
 import gnu.trove.TIntHashSet;
+import java.util.Arrays;
 
 
 public class RemoveUnneededTransitions
@@ -30,9 +31,13 @@ public class RemoveUnneededTransitions
     TIntHashSet targets = mTransitionRelation.getSuccessors(state, mTau);
     if (targets == null) {return;}
     int[] targs = targets.toArray();
+    Arrays.sort(targs);
     for (int i = 0; i < targs.length; i++) {
       int target = targs[i];
+      if (target == state) {continue;}
       mTransitionRelation.removeSharedSuccessors(target, state);
+      mTransitionRelation.removeSharedPredeccessors(state, target);
+      mTransitionRelation.addTransition(state, mTau, target);
     }
   }
   

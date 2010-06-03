@@ -1,11 +1,18 @@
 package net.sourceforge.waters.analysis;
 
 import gnu.trove.TIntStack;
+import gnu.trove.TLongHashSet;
+import java.util.Map;
+import gnu.trove.THashMap;
+import java.util.Iterator;
+import gnu.trove.TIntHashSet;
+import java.util.Collection;
 
 
 public class EquivalentIncoming
 {
   private final TransitionRelation mTransitionRelation;
+  private TLongHashSet[] mIncomings = null;
   public static int STATESMERGED = 0;
   public static int ANNOTIONSSUBSET = 0;
   public static int TIME = 0;
@@ -28,7 +35,89 @@ public class EquivalentIncoming
     mTransitionRelation = transitionrelation;
   }
   
+  public long mergeIntoLong(int state, int event)
+  {
+    long merge = state;
+    long ev = event;
+    merge <<= 32;
+    merge |= event;
+    return merge;
+  }
+  
+  public TLongHashSet getIncoming(int state)
+  {
+    if (mIncomings[state] != null) {return mIncomings[state];}
+    TLongHashSet incoming = new TLongHashSet();
+    TIntHashSet[] preds = mTransitionRelation.getAllPredecessors(state);
+    for (int e = 0; e < mTransitionRelation.numberOfEvents(); e++) {
+      if (preds[e] == null) {continue;}
+      int[] predarray = preds[e].toArray();
+      for (int i = 0; i < predarray.length; i++) {
+        int pred = predarray[i];
+        incoming.add(mergeIntoLong(pred, e));
+      }
+    }
+    if (mTransitionRelation.isInitial(state)) {
+      incoming.add(mergeIntoLong(-1, -1));
+    }
+    mIncomings[state] = incoming;
+    return incoming;
+  }
+  
+  public Collection<TIntHashSet> getIncomingEquivalentStates()
+  {
+    Map<TLongHashSet, TIntHashSet> incomingTransitionsMap =
+      new THashMap<TLongHashSet, TIntHashSet>();
+    mIncomings = new TLongHashSet[mTransitionRelation.numberOfStates()];
+    for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
+      TLongHashSet incoming = getIncoming(s);
+      if (!incoming.isEmpty()) {
+        TIntHashSet equiv = incomingTransitionsMap.get(incoming);
+        if (equiv == null) {
+          equiv = new TIntHashSet();
+          incomingTransitionsMap.put(incoming, equiv);
+        }
+        equiv.add(s);
+      }
+    }
+    Iterator<TIntHashSet> it = incomingTransitionsMap.values().iterator();
+    while (it.hasNext()) {
+      if (it.next().size() <= 1) {it.remove();}
+    }
+    return incomingTransitionsMap.values();
+  }
+  
   public void run()
+  {
+    TIME -= System.currentTimeMillis();
+    while(true) {
+      boolean ruleactivated = false;
+      Collection<TIntHashSet> incequiv = getIncomingEquivalentStates();
+      for (TIntHashSet equiv : incequiv) {
+        int[] array = equiv.toArray();
+        for (int i = 0; i < array.length; i++) {
+          int state1 = array[i];
+          if (!equiv.contains(state1)) {continue;}
+          int[] array2 = equiv.toArray();
+          for (int j = 0; j < array.length; j++) {
+            int state2 = array[j];
+            if (state1 == state2) {continue;}
+            ANNOTIONSSUBSET += mTransitionRelation.getAnnotations2(state1).size();
+            ANNOTIONSSUBSET += mTransitionRelation.getAnnotations2(state2).size();
+            mTransitionRelation.mergewithannotations(new int[] {state1, state2}); equiv.remove(state2);
+            ANNOTIONSSUBSET -= mTransitionRelation.getAnnotations2(state1).size();
+            STATESMERGED++;
+            ruleactivated = true;
+          }
+          equiv.remove(state1);
+        }
+      }
+      if (!ruleactivated) {break;}
+    }
+    TIME += System.currentTimeMillis();
+  }
+  
+  /*public void run()
   {
     TIME -= System.currentTimeMillis();
     boolean[] onstack = new boolean[mTransitionRelation.numberOfStates()];
@@ -54,5 +143,5 @@ public class EquivalentIncoming
       }
     }
     TIME += System.currentTimeMillis();
-  }
+  }*/
 }

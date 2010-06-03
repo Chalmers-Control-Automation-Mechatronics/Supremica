@@ -20,7 +20,7 @@ public class AnnotationEvent
 
   public AnnotationEvent(final Set<Set<EventProxy>> annotations, final String name)
   {
-    super(name);
+    super(name + annotations.toString());
     mAnnotations = annotations;
   }
 

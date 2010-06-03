@@ -17,6 +17,7 @@ import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 
 
 public class ProjectingControllabilityCheckerTest
@@ -43,12 +44,12 @@ public class ProjectingControllabilityCheckerTest
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   protected ProjectingControllabilityChecker createModelVerifier
     (final ProductDESProxyFactory factory)
-  {
-    final SafetyVerifier subchecker =
+  {                   
+    final ControllabilityChecker subchecker =
       new NativeControllabilityChecker(factory);
     final ProjectingControllabilityChecker checker =
-      new ProjectingControllabilityChecker(factory, subchecker);
-    checker.setMaxProjStates(2000);
+      new ProjectingControllabilityChecker(null, factory, subchecker, false);
+    //checker.setMaxProjStates(2000);
     return checker;
   }
 

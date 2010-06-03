@@ -3,9 +3,10 @@ package net.sourceforge.waters.analysis;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
 import gnu.trove.TIntStack;
+import gnu.trove.TIntArrayList;
+import java.util.Arrays;
 
-
-public class CertainDeath
+public class RemoveRedundantTransitions
 {
   private final TransitionRelation mTransitionRelation;
   private final boolean[] mReachable;
@@ -25,7 +26,7 @@ public class CertainDeath
             " TIME = " + TIME;
   }
   
-  public CertainDeath(TransitionRelation transitionrelation)
+  public RemoveRedundantTransitions(TransitionRelation transitionrelation)
   {
     mTransitionRelation = transitionrelation;
     mReachable = new boolean[mTransitionRelation.numberOfStates()];

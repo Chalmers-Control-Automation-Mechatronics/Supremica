@@ -7,7 +7,7 @@
 //# $Id: BiSimulator.java 4514 2008-11-11 20:26:15Z js173 $
 //###########################################################################
 
-package net.sourceforge.waters.analysis.modular;
+package net.sourceforge.waters.analysis.annotation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,88 +33,194 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import java.util.HashSet;
+import net.sourceforge.waters.analysis.TransitionRelation;
 import java.util.Set;
+import java.util.HashMap;
 
 
 /**
  * @author Simon Ware
  */
 
-public class BiSimulator
+public class OptimisticBiSimulatorRedundant
 {
-  private AutomatonProxy mAutomaton;
-  private final int mEventNum;
-  private int[][][] mTransitionsPred;
-  private final Set<EventProxy>[] mProps;
-  private final EventProxy[] mEvents;
-  private final boolean[] mIsInitial;
-  @SuppressWarnings("unused")
-  private EventProxy mMark;
   private SimpleEquivalenceClass[] mStateToClass;
   private THashSet<SimpleEquivalenceClass> mWS;
   private THashSet<ComplexEquivalenceClass> mWC;
   private THashSet<SimpleEquivalenceClass> mP;
-  private ProductDESProxyFactory mFactory;
+  private final TIntHashSet[][] mPreds;
+  private TIntHashSet[][] mUSuccs;
+  private boolean[] mMarked;
+  private int[][] mTauPreds;
+  private int mStates;
+  private int mEventNum;
+  private TIntHashSet[][][] mSuccs;
+  private Set<TIntHashSet>[][] mAnn;
+  
+  private final TransitionRelation mTrans;
+  
+  public static int STATESREMOVED = 0;
+  public static int TIME = 0;
+  public static int TRANSITIONSADDED = 0;
+  
+  public static void clearStats()
+  {
+    STATESREMOVED = 0;
+    TIME = 0;
+  }
+  
+  public static String stats()
+  {
+    return "BISIMREDUNDANT: STATESREMOVED = " + STATESREMOVED +
+            " TIME = " + TIME;
+  }
   
   //#########################################################################
   //# Constructor
   @SuppressWarnings("unchecked")
-  public BiSimulator(final AutomatonProxy automaton, final EventProxy mark,
-                     final ProductDESProxyFactory factory)
+  public OptimisticBiSimulatorRedundant(TransitionRelation tr)
     throws OverflowException
   {
-    mAutomaton = automaton;
-    mFactory = factory;
-    mMark = mark;
-    mEventNum = automaton.getEvents().size();
-    mTransitionsPred = new int[automaton.getStates().size()][mEventNum][];
-    TIntArrayList[][] temppred =
-      new TIntArrayList[automaton.getStates().size()][mEventNum];
-    Collection<TransitionProxy> trans = mAutomaton.getTransitions();
-    StateProxy[] states = new StateProxy[automaton.getStates().size()];
-    EventProxy[] events = new EventProxy[automaton.getEvents().size()];
-    states = automaton.getStates().toArray(states);
-    events = automaton.getEvents().toArray(events);
-    Arrays.sort(events);
-    TObjectIntHashMap<StateProxy> sti =
-      new TObjectIntHashMap<StateProxy>(states.length);
-    TObjectIntHashMap<EventProxy> eti =
-      new TObjectIntHashMap<EventProxy>(events.length);
-    mProps = new Set[automaton.getStates().size()];
-    mIsInitial = new boolean[states.length];
-    for (int i = 0; i < states.length; i++) {
-      mIsInitial[i] = states[i].isInitial();
-    }
-    for (int i = 0; i < states.length; i++) {
-      sti.put(states[i], i);
-      mProps[i] = new HashSet<EventProxy>(states[i].getPropositions());
-    }
-    for (int i = 0; i < events.length; i++) {eti.put(events[i], i);}
-    for (TransitionProxy tran : trans) {
-      int t = sti.get(tran.getTarget());
-      int e = eti.get(tran.getEvent());
-      int s = sti.get(tran.getSource());
-      mProps[s].add(tran.getEvent());
-      TIntArrayList preds = temppred[t][e];
-      if (preds == null) {
-        preds = new TIntArrayList();
-        temppred[t][e] = preds;
-      }
-      preds.add(s);
-    }
-    for (int i = 0; i < temppred.length; i++) {
-      for (int j = 0; j < temppred[i].length; j++) {
-        if (temppred[i][j] != null) {
-          mTransitionsPred[i][j] = temppred[i][j].toNativeArray();
-        }
-      }
-    }
-    mEvents = events;
+    mTrans = tr;
     mWS = new THashSet<SimpleEquivalenceClass>();
     mWC = new THashSet<ComplexEquivalenceClass>();
     mP = new THashSet<SimpleEquivalenceClass>();
-    mStateToClass = new SimpleEquivalenceClass[mAutomaton.getStates().size()];
+    mStateToClass = new SimpleEquivalenceClass[mTrans.numberOfStates()];
+    mStates = tr.numberOfStates();
+    mEventNum = tr.numberOfEvents();
+    mMarked = new boolean[mTrans.numberOfStates()];
+    mSuccs = new TIntHashSet[mTrans.numberOfStates()][mTrans.numberOfEvents()][];
+    mAnn = new Set[mTrans.numberOfStates()][mTrans.numberOfEvents()];
+    mPreds = new TIntHashSet[mTrans.numberOfStates()][mTrans.numberOfEvents()];
+    for (int s = 0; s < mPreds.length; s++) {
+      mMarked[s] = mTrans.isMarked(s);
+      for (int e = 0; e < mTrans.numberOfEvents(); e++) {
+        TIntHashSet preds = mTrans.getPredecessors(s, e);
+        if (preds == null) {continue;}
+        mPreds[s][e] = new TIntHashSet(preds.toArray());
+      }
+    }
+    setup4();
+    setup();
+  }
+  
+  /*public AddRedundantTransitions(TransitionRelation transitionrelation)
+  {
+    int events = transitionrelation.numberOfEvents();
+    int states = transitionrelation.numberOfStates();
+    mTransitionRelation = transitionrelation;
+    mSuccs = new TIntHashSet[states][events][];
+    mAnn = new Set[states][events];
+  }*/
+  
+  private void setup()
+  {
+    for (int s = 0; s < mSuccs.length; s++) {
+      for (int e1 = 0; e1 < mSuccs[s].length; e1++) {
+        TIntHashSet succs1 = mUSuccs[s][e1];
+        if (succs1 == null || succs1.isEmpty()) {continue;}
+        mSuccs[s][e1] = new TIntHashSet[mTrans.numberOfEvents()];
+        mAnn[s][e1] = new THashSet<TIntHashSet>();
+        int[] arrsuc = succs1.toArray();
+        for (int si = 0; si < arrsuc.length; si++) {
+          int succ = arrsuc[si];
+          mAnn[s][e1].addAll(mTrans.getAnnotations2(succ));
+          for (int e2 = 0; e2 < mSuccs[succ].length; e2++) {
+            if (mTrans.isMarkingEvent(e2)) {
+              if (mTrans.isMarked(succ)) {
+                mSuccs[s][e1][e2] = new TIntHashSet();
+              }
+              continue;
+            }
+            TIntHashSet succs2 = mUSuccs[succ][e2];
+            if (succs2 == null || succs2.isEmpty()) {continue;}
+            if (mSuccs[s][e1][e2] == null) {mSuccs[s][e1][e2] = new TIntHashSet();}
+            mSuccs[s][e1][e2].addAll(succs2.toArray());
+          }
+        }
+      }
+    }
+  }
+  
+  public void setup4()
+  {
+    TIME -= System.currentTimeMillis();
+    System.out.println("setup 1");
+    //setup();
+    System.out.println("setup 2");
+    boolean changed = true;
+    TIntHashSet[][] builtsuccs = new TIntHashSet[mPreds.length][mEventNum];
+    for (int state = 0; state < mTrans.numberOfStates(); state++) {
+      for (int ei = 0; ei < mTrans.numberOfEvents(); ei++) {
+        TIntHashSet succ = mTrans.getSuccessors(state, ei);
+        if (succ == null) {continue;}
+        builtsuccs[state][ei] = new TIntHashSet(succ.toArray());
+      }
+    }
+    while(changed) {
+      System.out.println("loop");
+      changed = false;
+    for (int sub = 0; sub < mTrans.numberOfStates(); sub++) {
+      if (!mTrans.hasPredecessors(sub)) {continue;}
+      int[] active = mTrans.getActiveEvents(sub).toArray();
+      TIntHashSet poss = null;
+      for (int ei = 0; ei < mTrans.numberOfEvents(); ei++) {
+        TIntHashSet succ = builtsuccs[sub][ei];
+        if (succ == null || succ.isEmpty()) {continue;}
+        poss = mPreds[succ.toArray()[0]][ei];
+      }
+      if (poss == null) {continue;}
+      int[] possarr = poss.toArray();
+      Possible:
+      for (int si = 0; si < possarr.length; si++) {
+        int sup = possarr[si];
+        if (!mTrans.hasPredecessors(sup)) {continue;}
+        if (sup == sub) {continue;}
+        int[] activeorig = mTrans.getActiveEvents(sup).toArray();
+        Annotations:
+        for (TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
+          for (TIntHashSet ann2 : mTrans.getAnnotations2(sup)) {
+            if (ann1.containsAll(ann2.toArray())) {continue Annotations;}
+          }
+          continue Possible;
+        }
+        //if (!mTrans.isSubsetOutgoing(sub, sup)) {continue;}
+        if (mMarked[sub] && mMarked[sup]) {continue;}
+        for (int e = 0; e < builtsuccs[sub].length; e++) {
+          TIntHashSet subsuccs = builtsuccs[sub][e];
+          if (subsuccs == null || subsuccs.isEmpty()) {continue;}
+          if (builtsuccs[sup][e] == null) {continue Possible;}
+          int[] succs = subsuccs.toArray();
+          for (int i = 0; i < succs.length; i++) {
+            int suc = succs[i];
+            if (suc != sub) {
+              if (!builtsuccs[sup][e].contains(suc)) {continue Possible;}
+            } else {
+              if (!builtsuccs[sup][e].contains(suc) && !builtsuccs[sup][e].contains(sup)) {continue Possible;}
+            }
+          }
+        }
+        //System.out.println("Added Transition");
+        //mTransitionRelation.addTransition(stateorig, event, state);
+        for (int pe = 0; pe < mTrans.numberOfEvents(); pe++) {
+          TIntHashSet predevents = mTrans.getPredecessors(sup, pe);
+          if (predevents == null) {continue;}
+          int[] preds = predevents.toArray();
+          for (int pri = 0; pri < preds.length; pri++) {
+            int pr = preds[pri];
+            if (mPreds[sub][pe] == null) {
+              mPreds[sub][pe] = new TIntHashSet();
+            }
+            if (mPreds[sub][pe].add(pr)) {TRANSITIONSADDED++;}
+            if (builtsuccs[pr][pe].add(sub)) {changed = true;}
+          }
+        }
+      }
+    }
+    }
+    mUSuccs = builtsuccs;
+    System.out.println("transitions added: " + TRANSITIONSADDED);
+    TIME += System.currentTimeMillis();
   }
   
   private void setupInitialPartitions()
@@ -122,34 +228,48 @@ public class BiSimulator
     mWS.clear();
     mWC.clear();
     mP.clear();
-    Map<Collection<EventProxy>, TIntArrayList> map =
-      new THashMap<Collection<EventProxy>, TIntArrayList>();
-    for (int i = 0; i < mProps.length; i++) {
-      TIntArrayList p = map.get(mProps[i]);
-      if (p == null) {p = new TIntArrayList(); map.put(mProps[i], p);}
+    Map<Set<TIntHashSet>, TIntArrayList> map =
+      new THashMap<Set<TIntHashSet>, TIntArrayList>();
+    mStates = 0;
+    States:
+    for (int i = 0; i < mTrans.numberOfStates(); i++) {
+      if (!mTrans.hasPredecessors(i)) {continue;}
+      mStates++;
+      Set<TIntHashSet> prop = mTrans.getAnnotations2(i);
+      TIntArrayList p = map.get(prop);
+      if (p == null) {p = new TIntArrayList(); map.put(prop, p);}
       p.add(i);
     }
-    for (Collection<EventProxy> props : map.keySet()) {
-      TIntArrayList p = map.get(props);
-      //System.out.println("props:" + props + "\tp:" +
-      //                   Arrays.toString(p.toNativeArray()));
-      mWS.add(new SimpleEquivalenceClass(p.toNativeArray()));
+    for (TIntArrayList p : map.values()) {
+      TIntArrayList marked = new TIntArrayList();
+      TIntArrayList notmarked = new TIntArrayList();
+      for (int i = 0; i < p.size(); i++) {
+        int s = p.get(i);
+        if (mMarked[s]) {
+          marked.add(s);
+        } else {
+          notmarked.add(s);
+        }
+      }
+      /*if (p.size() == 11 || p.size() == 22) {
+        System.out.println("size:" + p.size());
+        System.out.println(props);
+      }*/
+      if (!marked.isEmpty()) {mWS.add(new SimpleEquivalenceClass(marked.toNativeArray()));}
+      if (!notmarked.isEmpty()) {mWS.add(new SimpleEquivalenceClass(notmarked.toNativeArray()));}
     }
-    /*System.out.println("partitions:" + mWS.size());
-    System.out.println("maut size:" + mAutomaton.getStates().size());
-    int i = 0;
-    for (SimpleEquivalenceClass sec : mWS) {
-      i++;
-      System.out.println(i + ": " + sec.mStates.length);
-    }*/
+    //System.out.println("initial partitions: " + mWS.size());
+    //System.out.println("maut:" + mStates);
   }
 
-  public AutomatonProxy run()
+  public boolean run()
   {
-    int size = -1;
+    TIME -= System.currentTimeMillis();
     setupInitialPartitions();
+    if (mStates == 1) {return false;}
     while (true) {
-      //System.out.println("partitioning");
+      System.out.println("partitioning");
+      int partitions = mP.size();
       while (true) {
         Iterator<? extends EquivalenceClass> it = null;
         if (!mWS.isEmpty()) {it = mWS.iterator();}
@@ -157,103 +277,34 @@ public class BiSimulator
         else {break;}
         EquivalenceClass ec = it.next(); it.remove(); ec.splitOn();
       }
-      if (size == -1) {
-        size = mP.size();
-        mWS.addAll(mP);
-        continue;
-      } else if (size != mP.size()) {
-        System.out.println("didn't fully partition");
-        System.exit(4);
-      } else {
-        break;
-      }
+      if (partitions == mP.size()) {break;}
     }
-    /*while (true) {
-      int size = mP.size();
-      mW.addAll(mP);
-      while (!mW.isEmpty()) {
-        Iterator<EquivalenceClass> it = mW.iterator();
-        EquivalenceClass ec = it.next(); it.remove(); ec.splitOn();
-      }
-      if (size != mP.size()) {
-        System.out.println("didn't fully partition");
-        System.exit(4);
-      } else {
-        break;
-      }
-    }*/
-    if (mP.size() > mAutomaton.getStates().size()) {
+    if (mP.size() > mStates) {
       System.out.println("WTF?");
       System.exit(4);
     }
-    if (mP.size() == mAutomaton.getStates().size()) {
-      return mAutomaton;
+    if (mP.size() == mStates) {
+      return false;
     }
-    //System.out.println("States Removed:" + (mAutomaton.getStates().size() - mP.size()));
-    final THashMap<SimpleEquivalenceClass,StateProxy> classToState =
-      new THashMap<SimpleEquivalenceClass,StateProxy>(mP.size());
-    final Collection<StateProxy> states = new ArrayList<StateProxy>(mP.size());
-    mP.forEach(new TObjectProcedure<SimpleEquivalenceClass>() {
-      int state = 0;
-      
-      public boolean execute(SimpleEquivalenceClass sec) {
-        Collection<EventProxy> mark = mProps[sec.mStates[0]];
-        boolean isInitial = false;
-        for (int i = 0; i < sec.mStates.length; i++) {
-          if (mIsInitial[sec.mStates[i]]) {isInitial = true; break;}
-        }
-        StateProxy st = new AnnotatedMemStateProxy(state, mark, isInitial);
-        state++;
-        classToState.put(sec, st); states.add(st); return true;
-      }
-    });
-    final Collection<TransitionProxy> trans = new ArrayList<TransitionProxy>();
-    final THashSet<StateProxy> preds = new THashSet<StateProxy>();
-    mP.forEach(new TObjectProcedure<SimpleEquivalenceClass>() {
-      public boolean execute(SimpleEquivalenceClass sec) {
-        final StateProxy target = classToState.get(sec);
-        if (sec.mStates.length > 1) {
-          //System.out.println(Arrays.toString(sec.mStates));
-        }
-        for (int i = 0; i < mEventNum; i++) {
-          final EventProxy event = mEvents[i];
-          sec.getInfo(i).forEachEntry(new TIntIntProcedure() {
-            public boolean execute(int s, int v) {
-              if (v == 0) {
-                System.out.println("zero value transitions");
-                return true;
-              }
-              preds.add(classToState.get(mStateToClass[s])); return true;
-            }
-          });
-          preds.forEach(new TObjectProcedure<StateProxy>() {
-            public boolean execute(StateProxy source) {
-              trans.add(mFactory.createTransitionProxy(source, event, target));
-              return true;
-            }
-          });
-          preds.clear();
-        }
-        return true;
-      }
-    });
-    //System.out.println("Partitions:" + mP.size());
-    //System.out.println("BiTransitions:" + trans.size());
+    for (SimpleEquivalenceClass sec : mP) {
+      if (sec.mStates.length == 1) {continue;}     
+      //System.out.println(Arrays.toString(sec.mStates));
+      mTrans.mergewithannotations(sec.mStates);
+      STATESREMOVED += sec.mStates.length -1;
+    }
+    //System.out.println("STATESREMOVED: " + (mStates - mP.size()));
     if (mP.size() == 0) {
       assert(false);
     }
-    AutomatonProxy result = mFactory.createAutomatonProxy(mAutomaton.getName(),
-                                                          ComponentKind.PLANT,
-                                                          mAutomaton.getEvents(),
-                                                          states, trans);
-    /*if (mAutomaton.getStates().size() < 10) {
-      System.out.println("first");
-      System.out.println(mAutomaton);
-      System.out.println("result");
-      System.out.println(result);
-      System.exit(1);
-    }*/
-    return result;
+    TIME += System.currentTimeMillis();
+    return true;
+  }
+  
+  private int[] getPredecessors(int state, int event)
+  {
+    TIntHashSet preds = mPreds[state][event];
+    if (preds == null) {return null;}
+    return preds.toArray();
   }
   
   /*private void partition()
@@ -318,10 +369,10 @@ public class BiSimulator
     SimpleEquivalenceClass child1 = new SimpleEquivalenceClass(X1);
     SimpleEquivalenceClass child2 = new SimpleEquivalenceClass(X2);
     mP.remove(sec);
-    if (mWS.remove(sec)) {
+    //if (mWS.remove(sec)) {
       mWS.add(child1);
       mWS.add(child2);
-    } else {
+    /*} else {
       ComplexEquivalenceClass comp = new ComplexEquivalenceClass(child1, child2);
       comp.mInfo = sec.mInfo;
       if (sec.mParent != null) {
@@ -332,7 +383,7 @@ public class BiSimulator
       } else {
         mWC.add(comp);
       }
-    }
+    }*/
   }
   
   private void addToW(SimpleEquivalenceClass sec, int[] X1, int[] X2, int[] X3)
@@ -398,12 +449,13 @@ public class BiSimulator
       List<SimpleEquivalenceClass> classes =
         new ArrayList<SimpleEquivalenceClass>();
       for (int e = 0; e < mEventNum; e++) {
+        if (mTrans.isMarkingEvent(e)) {continue;}
         mInfo[e] = new TIntIntHashMap();
         TIntIntHashMap map = mInfo[e];
         for (int s = 0; s < mStates.length; s++) {
           int targ = mStates[s];
-          int[] preds = mTransitionsPred[targ][e];
-          if (preds == null || preds.length == 0) {continue;}
+          int[] preds = getPredecessors(targ, e);
+          if (preds == null) {continue;}
           for (int p = 0; p < preds.length; p++) {
             int pred = preds[p];
             SimpleEquivalenceClass ec = mStateToClass[pred];
@@ -420,18 +472,81 @@ public class BiSimulator
         for (int c = 0; c < classes.size(); c++) {
           SimpleEquivalenceClass sec = classes.get(c);
           if (sec.mSplit1.size() != sec.size) {
-            int[] X1 = new int[sec.size - sec.mSplit1.size()];
-            int[] X2 = new int[sec.mSplit1.size()];
+            TIntArrayList tiX1 = new TIntArrayList();
+            TIntArrayList tiX2 = new TIntArrayList();
             int x1 = 0, x2 = 0;
             for (int s = 0; s < sec.mStates.length; s++) {
               int state = sec.mStates[s];
               if (sec.mSplit1.contains(state)) {
-                X2[x2] = state; x2++;
+                tiX2.add(state);
               } else {
-                X1[x1] = state; x1++;
+                boolean covered = true;
+                if (mSuccs[state][e] == null) {covered = false;}
+                if (covered && mTrans.isMarked(mStates[0])) {
+                  for (int ei = 0; ei < mTrans.numberOfEvents(); ei++) {
+                    if (!mTrans.isMarkingEvent(ei)) {continue;}
+                    if (mSuccs[state][e][ei] == null) {covered = false;}
+                    break;
+                  }
+                }
+                if (covered) {
+                  Set<TIntHashSet> anns = mTrans.getAnnotations2(mStates[0]);
+                  Annotations:
+                  for (TIntHashSet ann1 : anns) {
+                    for (TIntHashSet ann2 : mAnn[state][e]) {
+                      if (ann1.containsAll(ann2.toArray())) {continue Annotations;}
+                    }
+                    covered = false;
+                    break;
+                  }
+                }
+                if (covered) {
+                  //System.out.println("covered anns");
+                  covered = false;
+                  Set<SimpleEquivalenceClass>[] succseq = new Set[mTrans.numberOfEvents()];
+                  for (int ei = 0; ei < mTrans.numberOfEvents(); ei++) {
+                    TIntHashSet succs = mSuccs[state][e][ei];
+                    if (succs == null) {continue;}
+                    succseq[ei] = new THashSet<SimpleEquivalenceClass>();
+                    int[] succsarr = succs.toArray();
+                    for (int j = 0; j < succsarr.length; j++) {
+                      int succ = succsarr[j];
+                      succseq[ei].add(mStateToClass[succ]);
+                    }
+                  }
+                  Possstates:
+                  for (int j = 0; j < mStates.length; j++) {
+                    int posstate = mStates[j];
+                    for (int ei = 0; ei < mTrans.numberOfEvents(); ei++) {
+                      if (mTrans.isMarkingEvent(ei)) {continue;}                    
+                      TIntHashSet possstatesuccs = mUSuccs[posstate][ei];
+                      if (possstatesuccs == null) {continue;}
+                      Set<SimpleEquivalenceClass> candidatesuccs = succseq[ei];
+                      if (candidatesuccs == null) {continue Possstates;}
+                      int[] possarr = possstatesuccs.toArray();
+                      for (int k = 0; k < possarr.length; k++) {
+                        int posssucc = possarr[k];
+                        if (!candidatesuccs.contains(mStateToClass[posssucc])) {
+                          continue Possstates;
+                        }
+                      }
+                    }
+                    covered = true; break;
+                  }
+                }
+                if (!covered) {
+                  tiX1.add(state);
+                } else {
+                  System.out.println("could place here");
+                  tiX2.add(state);
+                }
               }
             }
-            addToW(sec, X1, X2);
+            if (tiX2.size() != sec.size) {
+              int[] X1 = tiX1.toNativeArray();
+              int[] X2 = tiX2.toNativeArray();
+              addToW(sec, X1, X2);
+            }
           }
           sec.mSplit1 = null;
         }
@@ -450,9 +565,10 @@ public class BiSimulator
       }
       info = new TIntIntHashMap();
       mInfo[event] = info;
+      if (mTrans.isMarkingEvent(event)) {return info;}
       for (int i = 0; i < mStates.length; i++) {
-        int[] preds = mTransitionsPred[mStates[i]][event];
-        if (preds == null || preds.length == 0) { continue;}
+        int[] preds = getPredecessors(mStates[i], event);
+        if (preds == null) {continue;}
         for (int j = 0; j < preds.length; j++) {
           info.adjustOrPutValue(preds[j], 1, 1);
         }
@@ -490,12 +606,6 @@ public class BiSimulator
       for (int e = 0; e < mEventNum; e++) {
         final TIntIntHashMap info = getInfo(e);
         final TIntIntHashMap process = new TIntIntHashMap();
-        /*info.forEachEntry(new TIntIntProcedure() {
-          public boolean execute(int state, int value) {
-            process.put(state, value);
-            return true;
-          }
-        });*/
         final TIntIntHashMap info1 = mChild1.getInfo(e);
         info.forEachEntry(new TIntIntProcedure() {
           public boolean execute(int state, int value) {

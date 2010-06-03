@@ -1,50 +1,60 @@
-//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
-//###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis
-//# CLASS:   BlockedEvents
-//###########################################################################
-//# $Id$
-//###########################################################################
-
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TObjectIntHashMap;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
-import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntArrayList;
+import net.sourceforge.waters.analysis.LightWeightGraph;
+import java.util.PriorityQueue;
+import gnu.trove.TObjectIntHashMap;
+import java.util.Stack;
+import gnu.trove.THashSet;
+import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
+import java.util.Iterator;
+import net.sourceforge.waters.analysis.AnnotationEvent;
 
 
-public class BlockedEvents
+public class AnnotatedNonDeterministicComposer
 {
-  public BlockedEvents(List<AutomatonProxy> model,
-		       		   ProductDESProxyFactory factory,
-                       EventProxy marked)
+  public AnnotatedNonDeterministicComposer(List<AutomatonProxy> model,
+                                           ProductDESProxyFactory factory,
+                                           EventProxy marked)
   {
     mMarked = marked;
     mModel = model;
     mFactory = factory;
     mNodeLimit = 1000;
     numStates = 1;
-    containsmarked = false;
+    //System.out.println("hide:" + hide);
+    //System.out.println("forbidden;" + forbidden);
   }
 
   public void setNodeLimit(int stateLimit)
@@ -61,121 +71,39 @@ public class BlockedEvents
     return events;
   }
   
-  private Set<EventProxy> getDisabledEvents(Collection<EventProxy> props)
-  {
-    for (EventProxy e : props)
-    {
-      if (e instanceof DisabledEvents) {
-        return new THashSet<EventProxy>(((DisabledEvents) e).getDisabled());
-      }
-    }
-    return new THashSet<EventProxy>();
-  }
-  
-  private int[] geteventnotinautomaton(AutomatonProxy aut)
-  {
-    int size = events.length - aut.getEvents().size();
-    int[] arr = new int[size];
-    int i = 0;
-    for (int e = 0; e < events.length; e++) {
-      if (!aut.getEvents().contains(events[e])) {
-        arr[i] = e; i++;
-      }
-    }
-    return arr;
-  }
-  
-  private AutomatonProxy createAutomaton(boolean[][] eventOccurs,
-                                         int[][][] transitionsrel,
-                                         Set<EventProxy>[] disabled,
-                                         boolean[] initialStates,
-                                         boolean[] markedStates,
-                                         AutomatonProxy automaton)
-  {
-    Collection<TransitionProxy> trans = new ArrayList<TransitionProxy>();
-    List<StateProxy> states = new ArrayList<StateProxy>();
-    int[] eventsnotinaut = geteventnotinautomaton(automaton);
-    for (int s = 0; s < disabled.length; s++) {
-      for (int ei = 0; ei < eventsnotinaut.length; ei++) {
-        int e = eventsnotinaut[ei];
-        if (!eventOccurs[e][s]) {
-          EventProxy ev = events[e];
-          disabled[s].add(ev);
-        }
-      }
-      Collection<EventProxy> props = new THashSet<EventProxy>();
-      if (markedStates[s] && mMarked != null) {props.add(mMarked);}
-      //if (!disabled[s].isEmpty()) {props.add(new DisabledEvents(disabled[s]));}
-      StateProxy ns = new AnnotatedMemStateProxy(s, props, initialStates[s]);
-      states.add(ns);
-    }
-    boolean removed = false;
-    for (int e = 0; e < transitionsrel.length; e++) {
-      int[][] tr = transitionsrel[e];
-      if (tr == null) {continue;}
-      for (int s = 0; s < tr.length; s++) {
-        if (tr[s] != null && eventOccurs[e][s]) {
-          for (int ti = 0; ti < tr[s].length; ti++) {
-            int t = tr[s][ti];
-            trans.add(mFactory.createTransitionProxy(states.get(s), events[e],
-                                                     states.get(t)));
-          }
-        } else if (tr[s] != null && !eventOccurs[e][s]) {
-          //System.out.println(Arrays.toString(tr[s]));
-          removed = true;
-        }
-      }
-    }
-    String name = automaton.getName();
-    ComponentKind ck = automaton.getKind();
-    Collection<EventProxy> ev = automaton.getEvents();
-    AutomatonProxy aut = mFactory.createAutomatonProxy(name, ck, ev,
-                                                       states, trans);
-    if (removed) {
-      System.out.println("removed: " + aut.getName());
-      /*System.out.println("bef");
-      System.out.println(automaton);
-      System.out.println("aft");
-      System.out.println(aut);*/
-    }
-    return aut;
-  }
-  
-  @SuppressWarnings("unchecked")
-  public List<AutomatonProxy> run()
+  public AutomatonProxy run()
     throws AnalysisException
   {
     mNewMarked = new TIntArrayList();
     states = new IntMap(mNodeLimit);
-    TObjectIntHashMap<EventProxy> eventToIndex =
-      new TObjectIntHashMap<EventProxy>();
+    TObjectIntHashMap<EventProxy> eventToIndex = new TObjectIntHashMap<EventProxy>();
     events = unionEvents();
     int numAutomata = mModel.size();
+    for (AutomatonProxy a : mModel) {
+      System.out.println("Automata: " + a.getName());
+      //System.out.println(a);
+    }
     eventAutomaton = new int[events.length][numAutomata];
-    // transitions indexed first by automaton then by event
-    // then by source state
+    int stateLength = numAutomata;
+    // transitions indexed first by automaton then by event then by source state
     transitions = new int[numAutomata][events.length][][];
     for (int i = 0; i < events.length; i++) {
       eventToIndex.put(events[i], i);
     }
-    mEventToIndex = eventToIndex;
     int[][] currentState = new int[numAutomata][];
     mMarkedStates = new boolean[numAutomata][];
-    mDisabled = new Set[numAutomata][];
     mIntDisabled = new TIntHashSet[numAutomata][];
-    mEventActivated = new boolean[numAutomata][events.length][];
-    mInitialStates = new boolean[numAutomata][];
     for (int i = 0; i < mModel.size(); i++) {
       AutomatonProxy a = mModel.get(i);
+      Set<EventProxy> selfloops = new THashSet<EventProxy>(Arrays.asList(events));
+      selfloops.removeAll(a.getEvents());
+      TIntHashSet intselfloops = getIntEvents(selfloops);
       TObjectIntHashMap<StateProxy> statetoindex =
         new TObjectIntHashMap<StateProxy>(a.getStates().size());
       mMarkedStates[i] = new boolean[a.getStates().size()];
-      mInitialStates[i] = new boolean[a.getStates().size()];
-      mDisabled[i] = new Set[a.getStates().size()];
-      mIntDisabled[i] = new TIntHashSet[a.getStates().size()];
       TIntArrayList cs = new TIntArrayList(1);
+      mIntDisabled[i] = new TIntHashSet[a.getStates().size()];
       boolean add = !a.getEvents().contains(mMarked);
-      containsmarked = containsmarked || add;
       // TODO do this smarter
       int snum = 0;
       for (StateProxy s : a.getStates()) {
@@ -183,7 +111,6 @@ public class BlockedEvents
           mMarkedStates[i][snum] = true;
         }
         Set<EventProxy> dis = getDisabledEvents(s.getPropositions());
-        mDisabled[i][snum] = dis;
         mIntDisabled[i][snum] = new TIntHashSet();
         for (EventProxy e : dis) {
           if (eventToIndex.contains(e)) {
@@ -193,22 +120,32 @@ public class BlockedEvents
             mMarkedStates[i][snum] = false;
           }
         }
+        mAnnotations[i][snum] = convertAnnotations(getAnnotations(s.getPropositions()),
+                                                   intselfloops);
         if (s.isInitial()) {
-          cs.add(snum); mInitialStates[i][snum] = true;
+          cs.add(snum);
         }
         statetoindex.put(s, snum); snum++;
       }
       currentState[i] = cs.toNativeArray();
       // TODO do this smarter later
+      TIntHashSet[] tempanns = new TIntHashSet[snum];
+      for (int s = 0; s < tempanns.length; s++) {
+        if (mAnnotations[s] == null) {
+          tempanns[s] = new TIntHashSet(intselfloops.toArray());
+          mAnnotations[i][s] = new THashSet<TIntHashSet>();
+          mAnnotations[i][s].add(tempanns[s]);
+        }
+      }
       TIntArrayList[][] auttransitionslists =
         new TIntArrayList[events.length][a.getStates().size()];
-      for (int e = 0; e < events.length; e++) {
-        mEventActivated[i][e] = new boolean[a.getStates().size()];
-      }
       for (TransitionProxy t : a.getTransitions()) {
         int event = eventToIndex.get(t.getEvent());
         int source = statetoindex.get(t.getSource());
         int target = statetoindex.get(t.getTarget());
+        if (tempanns[source] != null) {
+          tempanns[source].add(event);
+        }
         TIntArrayList list = auttransitionslists[event][source];
         if (list == null) {
           list = new TIntArrayList(1);
@@ -264,13 +201,51 @@ public class BlockedEvents
       //explore(currentState, true);
       explore(cs);
     }
-    List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(numAutomata);
-    for (int a = 0; a < mModel.size(); a++) {
-      automata.add(createAutomaton(mEventActivated[a], transitions[a],
-                                   mDisabled[a], mInitialStates[a],
-                                   mMarkedStates[a], mModel.get(a)));
+    System.out.println("Composition:" + numStates);
+    System.out.println("Transitions:" + newtrans.size());
+    mCompositionSize = numStates;
+    StateProxy[] states = new StateProxy[numStates];
+    for (int i = 0; i < states.length; i++) {
+      EventProxy marked = mNewMarked.contains(i) ? mMarked : null;
+      states[i] = new AnnotatedMemStateProxy(i, marked, mNewInitial.contains(i));
     }
-    return automata;
+    ArrayList<TransitionProxy> trans = new ArrayList<TransitionProxy>();
+    for (int[] tran : newtrans) {
+      StateProxy source = states[tran[0]];
+      StateProxy target = states[tran[2]];
+      EventProxy event = events[tran[1]];
+      trans.add(mFactory.createTransitionProxy(source, event, target));
+    }
+    StringBuffer name = new StringBuffer();
+    for (AutomatonProxy a : mModel) {
+      if (name.length() != 0) {
+        name.append("||");
+      }
+      name.append(a.getName());
+    }
+    String nam = name.toString();
+    ComponentKind ck = ComponentKind.PLANT;
+    THashSet<EventProxy> ev = new THashSet<EventProxy>(Arrays.asList(events));
+    Collection<StateProxy> st = Arrays.asList(states);
+    AutomatonProxy result = mFactory.createAutomatonProxy(nam, ck, ev, st,
+                                                          trans);
+    /*System.out.println("Result");
+    System.out.println(result);
+    if (result.getStates().size() > 4) {
+      System.exit(1);
+    }*/
+    return result;
+  }
+  
+  private Set<EventProxy> getDisabledEvents(Collection<EventProxy> props)
+  {
+    for (EventProxy e : props)
+    {
+      if (e instanceof DisabledEvents) {
+        return ((DisabledEvents) e).getDisabled();
+      }
+    }
+    return new THashSet<EventProxy>();
   }
   
   private void addState(int[] successor, int source,
@@ -282,20 +257,28 @@ public class BlockedEvents
     if (target == null) {
       target = numStates;
       states.put(successor, target);
+      List<Set<TIntHashSet>> anns = new ArrayList<Set<TIntHashSet>>(successor.length);
+      for (int a = 0 ; a < successor.length; a++) {
+        int s = successor[a];
+        anns.add(mAnnotations[a][s]);
+      }
+      mNextAnnotations.add(mergeAnnotations(anns));
       numStates++;
+      assert(numStates == mNextAnnotations.size());
       if (numStates > mNodeLimit) {
         throw new AnalysisException("State Limit Exceeded");
       }
       unvisited.offer(successor);
-      if (containsmarked) {
-        if (determineMarked(successor)) {
-          for (int a = 0; a < successor.length; a++) {
-            int s = successor[a];
-            int e = mEventToIndex.get(mMarked);
-            mEventActivated[a][e][s] = true;
-          }
-        }
+      if (determineMarked(successor)) {
+        mNewMarked.add(target);
       }
+      if (isInitial) {
+        mNewInitial.add(target);
+      }
+    }
+    // only add a transition if not adding in an initial state
+    if (!isInitial) {
+      newtrans.add(new int[] {source, event, target});
     }
   }
   
@@ -345,9 +328,6 @@ public class BlockedEvents
           continue events;
         }
       }
-      for (int a = 0; a < state.length; a++) {
-        int s = state[a]; mEventActivated[a][i][s] = true;
-      }
       int[] perms = new int[numAutomata];
       permutations(suc,perms,0,source,i, false);
     }
@@ -377,14 +357,13 @@ public class BlockedEvents
     public int[] take();
   }
   
-  @SuppressWarnings("unused")
   private static class IntBag
   {
     private int mLength;
     private final int mInitialSize;
     private int[] mValues;
     
-	public IntBag(int initialSize)
+    public IntBag(int initialSize)
     {
       mLength = 0;
       mInitialSize = initialSize;
@@ -479,13 +458,11 @@ public class BlockedEvents
    *  I'll make this encode it properly later on
    *
    */
-  @SuppressWarnings("unused")
   private int[] encode(final int[] sState)
   {
     return sState;
   }
   
-  @SuppressWarnings("unused")
   private int[] decode(final int[] sState)
   {
     return sState;
@@ -512,14 +489,12 @@ public class BlockedEvents
       return mMap.get(new IntArray(a));
     }
     
-    @SuppressWarnings("unused")
-	public Integer get(int[] a)
+    public Integer get(int[] a)
     {
       return mMap.get(new IntArray(a));
     }
     
-    @SuppressWarnings("unused")
-	public Integer put(Object o, Integer s)
+    public Integer put(Object o, Integer s)
     {
       return mMap.put(new IntArray((int[])o), s);
     }
@@ -597,14 +572,13 @@ public class BlockedEvents
     return mDumpState;
   }
   
-  @SuppressWarnings("unused")
   private static class Pointer
     implements Comparable<Pointer>
   {
     EventProxy[] mArray;
     int mIndex;
     
-	public Pointer(EventProxy[] array)
+    public Pointer(EventProxy[] array)
     {
       mArray = array;
       mIndex = 0;
@@ -627,36 +601,114 @@ public class BlockedEvents
     }
   }
   
-  private TIntHashSet[][] mIntDisabled;
-  private Set<EventProxy>[][] mDisabled;
-  private boolean[][][] mEventActivated;
-  @SuppressWarnings("unused")
+  private Set<TIntHashSet> subsetAnnotations(Set<TIntHashSet> anns,
+                                             TIntHashSet ann)
+  {
+    boolean subsetted = false;
+    Iterator<TIntHashSet> it = anns.iterator();
+    int[] annarray = ann.toArray();
+    while (it.hasNext()) {
+      TIntHashSet stuff = it.next();
+      if (stuff.size() >= ann.size()) {
+        if (subsetted) {continue;}
+        if (stuff.containsAll(annarray)) {
+          return anns;
+        }
+      } else {
+        if (ann.containsAll(stuff.toArray())) {
+          subsetted = true;
+          it.remove();
+        }
+      }
+    }
+    anns.add(ann);
+    return anns;
+  }
+  
+  private Set<TIntHashSet> mergeAnnotations(Set<TIntHashSet> anns1,
+                                            Set<TIntHashSet> anns2)
+  {
+    Set<TIntHashSet> result = new THashSet<TIntHashSet>();
+    for (TIntHashSet ann1 : anns1) {
+      int[] annarray = ann1.toArray();
+      for (TIntHashSet ann2 : anns2) {
+        TIntHashSet merge = new TIntHashSet(annarray);
+        merge.retainAll(ann2.toArray());
+        result = subsetAnnotations(result, merge);
+      }
+    }
+    return result;
+  }
+  
+  private Set<TIntHashSet> mergeAnnotations(List<Set<TIntHashSet>> anns)
+  {
+    Set<TIntHashSet> ann1 = new THashSet<TIntHashSet>(anns.get(0));
+    for (int i = 0; i < anns.size(); i++) {
+      Set<TIntHashSet> ann2 = anns.get(i);
+      ann1 = mergeAnnotations(ann1, ann2);
+    }
+    return ann1;
+  }
+  
+  private static Set<Set<EventProxy>> getAnnotations(Collection<EventProxy> props)
+  {
+    Iterator<EventProxy> it = props.iterator();
+    while (it.hasNext()) {
+      EventProxy e = it.next();
+      if (e instanceof AnnotationEvent) {
+        AnnotationEvent a = (AnnotationEvent)e;
+        return a.getAnnotations();
+      }
+    }
+    return null;
+  }
+  
+  private TIntHashSet getIntEvents(Collection<EventProxy> events)
+  {
+    TIntHashSet selfi = new TIntHashSet();
+    for (EventProxy event : events) {
+      selfi.add(mEventToIndex.get(event));
+    }
+    return selfi;
+  }
+  
+  private Set<TIntHashSet> convertAnnotations(Set<Set<EventProxy>> annotations,
+                                              TIntHashSet selfi)
+  {
+    if (annotations != null) {return null;}
+    int[] selfiarray = selfi.toArray();
+    Set<TIntHashSet> result = new THashSet<TIntHashSet>();
+    for (Set<EventProxy> set : annotations) {
+      TIntHashSet ann = new TIntHashSet(selfiarray);
+      for (EventProxy event : set) {
+        ann.add(mEventToIndex.get(event));
+      }
+      result.add(ann);
+    }
+    return result;
+  }
+  
   private int mCompositionSize = 0;
   private int mNodeLimit;
+  private TObjectIntHashMap<EventProxy> mEventToIndex;
   private List<AutomatonProxy> mModel;
   private ProductDESProxyFactory mFactory;
   private Map<int[], Integer> states;
-  @SuppressWarnings("unused")
   private Collection<TransitionProxy> trans;
   private EventProxy[] events;
   private int[][][][] transitions;
-  @SuppressWarnings("unused")
   private TIntArrayList[][] mBackTransitions;
-  private boolean[][] mInitialStates;
   private boolean[][] mMarkedStates;
-  @SuppressWarnings("unused")
   private TIntArrayList mNewMarked;
-  @SuppressWarnings("unused")
   private List<int[]> newtrans = new ArrayList<int[]>();
   private int numStates;
   private Bag unvisited;
   private int[][] eventAutomaton;
   private final EventProxy mMarked;
-  @SuppressWarnings("unused")
   private int mNewDumpState;
   private int mDumpState = -1;
-  @SuppressWarnings("unused")
+  private TIntHashSet[][] mIntDisabled;
+  private List<Set<TIntHashSet>> mNextAnnotations;
+  private Set<TIntHashSet>[][] mAnnotations;
   private TIntHashSet mNewInitial = new TIntHashSet();
-  private boolean containsmarked;
-  private TObjectIntHashMap<EventProxy> mEventToIndex;
 }

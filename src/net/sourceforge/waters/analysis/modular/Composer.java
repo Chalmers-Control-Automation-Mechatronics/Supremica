@@ -25,10 +25,26 @@ import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import gnu.trove.THashSet;
 
 
 public class Composer
 {
+  public static AutomatonProxy removeBlocked(Set<EventProxy> blocked, AutomatonProxy aut,
+                                             ProductDESProxyFactory factory)
+  {
+    Collection<EventProxy> events = new THashSet<EventProxy>(aut.getEvents());
+    if (!events.removeAll(blocked)) {return aut;}
+    Collection<TransitionProxy> trans = new ArrayList<TransitionProxy>();
+    for (TransitionProxy t : aut.getTransitions()) {
+      if (!blocked.contains(t.getEvent())) {trans.add(t);}
+    }
+    final AutomatonProxy result = factory.createAutomatonProxy(aut.getName(), aut.getKind(),
+                                                          events, aut.getStates(),
+                                                          trans);
+    return result;
+  }
+  
   public Composer(final ProductDESProxy model, final ProductDESProxyFactory factory,
                   final EventProxy marked)
   {
@@ -53,6 +69,7 @@ public class Composer
     states = new IntMap(mNodeLimit);
     trans = new ArrayList<TransitionProxy>();
     events = mModel.getEvents().toArray(new EventProxy[mModel.getEvents().size()]);
+    mPossible = new boolean[events.length];
     final int numAutomata = mModel.getAutomata().size();
     AutomatonProxy[] aut = mModel.getAutomata().toArray(new AutomatonProxy[numAutomata]);
     for (int i = 0; i < aut.length; i++) {
@@ -293,6 +310,7 @@ public class Composer
         }
       }
       newtrans.add(new int[] {source, i, target});
+      mPossible[i] = true;
     }
     return result;
   }
@@ -306,6 +324,15 @@ public class Composer
       }
     }
     return true;
+  }
+  
+  public Set<EventProxy> BlockedEvents()
+  {
+    Set<EventProxy> blocked = new THashSet<EventProxy>();
+    for (int e = 0; e < events.length; e++) {
+      if (!mPossible[e]) {blocked.add(events[e]);}
+    }
+    return blocked;
   }
 
   private static class MemStateProxy
@@ -673,6 +700,7 @@ public class Composer
     return mDumpState;
   }
 
+  private boolean[] mPossible;
   private int mCompositionSize = 0;
   private int mNodeLimit;
   private final ProductDESProxy mModel;

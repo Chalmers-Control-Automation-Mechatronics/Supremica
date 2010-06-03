@@ -1,0 +1,488 @@
+package net.sourceforge.waters.analysis.modular;
+
+import java.util.LinkedList;
+import java.util.List;
+import gnu.trove.TLongHashSet;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.StateProxy;
+import gnu.trove.TObjectIntHashMap;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import gnu.trove.TIntArrayList;
+import net.sourceforge.waters.model.des.EventProxy;
+import gnu.trove.THashSet;
+import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Arrays;
+import gnu.trove.TIntObjectHashMap;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.analysis.MemStateProxy;
+import java.util.ArrayList;
+import gnu.trove.TLongArrayList;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import java.util.Comparator;
+import java.util.Collections;
+
+
+public class Splitter
+{
+  private final Set<EventProxy>[] mActive;
+  private final AutomatonProxy mAut;
+  private final Map<EventProxy, Set<EventProxy>> mPossible;
+  private Classes mClasses1;
+  private Classes mClasses2;
+  private final ProductDESProxyFactory mFactory;
+  private EventProxy mHide = null;
+  
+  public Splitter(AutomatonProxy aut, ProductDESProxyFactory factory)
+  {
+    mClasses1 = new Classes(aut);
+    mClasses2 = mClasses1.clone();
+    mActive = mClasses1.getActiveEvents();
+    mAut = aut;
+    mPossible = mClasses1.getPossible(mActive);
+    mFactory = factory;
+  }
+  
+  public EventProxy hidehide()
+  {
+    return mHide;
+  }
+  
+  public AutomatonProxy[] split(Set<EventProxy> hide)
+  {
+    Set<EventProxy> hidden1 = new THashSet<EventProxy>();
+    Set<EventProxy> hidden2 = new THashSet<EventProxy>();
+    boolean simplified = false;
+    Main:
+    for (EventProxy e1 : hide) {
+      if (!mAut.getEvents().contains(e1)) {continue;}
+      Classes class1 = mClasses1.clone();
+      class1.hide(e1);
+      for (EventProxy e2 : mPossible.get(e1)) {
+        Classes class2 = mClasses2.clone();
+        class2.hide(e2);
+        if (!conflicting(class1, class2)) {
+          hidden1.add(e1); hidden2.add(e2); simplified = true;
+          mClasses1 = class1; mClasses2 = class2;
+        }
+        if (e2 != e1) {
+          mPossible.get(e2).remove(e1);
+        }
+      }
+      if (simplified) {
+        mHide = e1;
+        System.out.println("hidden1" + hidden1.size() + "\thidden2" + hidden2.size());
+        AutomatonProxy[] auts = new AutomatonProxy[] {mClasses1.getAutomaton(1),
+                                                      mClasses2.getAutomaton(2)};
+        return auts;
+      }
+      mPossible.get(e1).clear();
+    }
+    return null;
+  }
+  
+  public AutomatonProxy[] split()
+  {
+    Set<EventProxy> hidden1 = new THashSet<EventProxy>();
+    Set<EventProxy> hidden2 = new THashSet<EventProxy>();
+    boolean simplified = false;
+    List<EventProxy> events = new ArrayList<EventProxy>(mAut.getEvents());
+    Collections.sort(events, new Comparator<EventProxy>()
+      {
+        public int compare(EventProxy e1, EventProxy e2)
+        {
+          return mPossible.get(e1).size() - mPossible.get(e2).size();
+        }
+      });
+    Main:
+    for (EventProxy e1 : events) {
+      Classes class1 = mClasses1.clone();
+      class1.hide(e1);
+      for (EventProxy e2 : mPossible.get(e1)) {
+        Classes class2 = mClasses2.clone();
+        class2.hide(e2);
+        if (!conflicting(class1, class2)) {
+          hidden1.add(e1); hidden2.add(e2); simplified = true;
+          mClasses1 = class1; mClasses2 = class2; break Main;
+        }
+        if (e2 != e1) {
+          mPossible.get(e2).remove(e1);
+        }
+      }
+      mPossible.get(e1).clear();
+    }
+    if (!simplified) {System.out.println("not simplified"); return null;}
+    for (EventProxy e : events) {
+      if (hidden1.size() < hidden2.size()) {
+        if (!hidden1.contains(e)) {
+          boolean possible = true;
+          for (EventProxy e2 : hidden2) {
+            if (!mPossible.get(e2).contains(e)) {
+              possible = false; break;
+            }
+            if (!mPossible.get(e).contains(e2)) {
+              possible = false; break;
+            }
+          }
+          if (possible) {
+            Classes classes = mClasses1.clone();
+            classes.hide(e);
+            if (!conflicting(classes, mClasses2)) {
+              hidden1.add(e); mClasses1 = classes; continue;
+            }
+          }
+        }
+        if (!hidden2.contains(e)) {
+          boolean possible = true;
+          for (EventProxy e2 : hidden1) {
+            if (!mPossible.get(e2).contains(e)) {
+              possible = false; break;
+            }
+            if (!mPossible.get(e).contains(e2)) {
+              possible = false; break;
+            }
+          }
+          if (possible) {
+            Classes classes = mClasses2.clone();
+            classes.hide(e);
+            if (!conflicting(classes, mClasses1)) {
+              hidden2.add(e); mClasses2 = classes; continue;
+            }
+          }
+        }
+      } else {
+        if (!hidden2.contains(e)) {
+          boolean possible = true;
+          for (EventProxy e2 : hidden1) {
+            if (!mPossible.get(e2).contains(e)) {
+              possible = false; break;
+            }
+            if (!mPossible.get(e).contains(e2)) {
+              possible = false; break;
+            }
+          }
+          if (possible) {
+            Classes classes = mClasses2.clone();
+            classes.hide(e);
+            if (!conflicting(classes, mClasses1)) {
+              hidden2.add(e); mClasses2 = classes; continue;
+            }
+          }
+        }
+        if (!hidden1.contains(e)) {
+          boolean possible = true;
+          for (EventProxy e2 : hidden2) {
+            if (!mPossible.get(e2).contains(e)) {
+              possible = false; break;
+            }
+            if (!mPossible.get(e).contains(e2)) {
+              possible = false; break;
+            }
+          }
+          if (possible) {
+            Classes classes = mClasses1.clone();
+            classes.hide(e);
+            if (!conflicting(classes, mClasses2)) {
+              hidden1.add(e); mClasses1 = classes; continue;
+            }
+          }
+        }
+      }
+    }
+    System.out.println("hidden1" + hidden1.size() + "\thidden2" + hidden2.size());
+    AutomatonProxy[] auts = new AutomatonProxy[] {mClasses1.getAutomaton(1),
+                                                  mClasses2.getAutomaton(2)};
+    return auts;
+  }
+  
+  
+  
+  private boolean conflicting(Classes c1, Classes c2)
+  {
+    Set<EventProxy>[] active1 = c1.getActiveEvents();
+    Set<EventProxy>[] active2 = c2.getActiveEvents();
+    for (int s = 0; s < active1.length; s++) {
+      Set<EventProxy> temp = new THashSet(active1[s]);
+      temp.retainAll(active2[s]);
+      if (!mActive[s].containsAll(temp)) {return true;}
+    }
+    return false;
+  }
+  
+  private static long longify(int state, int event)
+  {
+    long res = event;
+    res <<= 32;
+    res |= state;
+    return res;
+  }
+  
+  private static int[] split(long comp)
+  {
+    int[] res = new int[2];
+    //long temp = comp % Integer.MAX_VALUE;
+    //res[0] = temp;
+    //temp = comp;
+    //temp >>= 32;
+    //temp %= Integer.MAX_VALUE;
+    //res[1] = temp;
+    res[0] = (int)comp;
+    comp >>= 32;
+    res[1] = (int)comp;
+    return res;
+  }
+  
+  private class Classes
+  {
+    private final List<Integer>[] mClassToStates;
+    private final boolean[] mInitial;
+    private final int[][] mSuccs;
+    private final TLongHashSet[] mPreds;
+    private final EventProxy[] mEvents;
+    private final boolean[] mHidden;
+    
+    private Classes(Classes o)
+    {
+      mClassToStates = new List[o.mClassToStates.length];
+      mInitial = new boolean[o.mInitial.length];
+      mSuccs = new int[o.mSuccs.length][];
+      mPreds = new TLongHashSet[o.mPreds.length];
+      mEvents = new EventProxy[o.mEvents.length];
+      mHidden = new boolean[o.mEvents.length];
+      for (int s = 0; s < o.mClassToStates.length; s++) {
+        if (o.mClassToStates[s] == null) {continue;}
+        mClassToStates[s] = new LinkedList<Integer>(o.mClassToStates[s]);
+        mInitial[s] = o.mInitial[s];
+        mPreds[s] = new TLongHashSet(o.mPreds[s].toArray());
+        mSuccs[s] = new int[o.mEvents.length];
+        for (int e = 0; e < mSuccs[s].length; e++) {
+          mSuccs[s][e] = o.mSuccs[s][e];
+        }
+      }
+      /* System.out.println("size");
+      System.out.println(mEvents.length);
+      System.out.println(o.mEvents.length);
+      System.out.println(mHidden.length);
+      System.out.println(o.mHidden.length); */
+      for (int e = 0; e < o.mEvents.length; e++) {
+        mEvents[e] = o.mEvents[e];
+        mHidden[e] = o.mHidden[e];
+      }
+    }
+    
+    public Classes(AutomatonProxy aut)
+    {
+      mClassToStates = new LinkedList[aut.getStates().size()];
+      mSuccs = new int[aut.getStates().size()][aut.getEvents().size()];
+      mPreds = new TLongHashSet[aut.getStates().size()];
+      mEvents = new EventProxy[aut.getEvents().size()];
+      mInitial = new boolean[aut.getStates().size()];
+      mHidden = new boolean[aut.getEvents().size()];
+      TObjectIntHashMap<StateProxy> statetoint =
+        new TObjectIntHashMap<StateProxy>();
+      TObjectIntHashMap<EventProxy> eventtoint =
+        new TObjectIntHashMap<EventProxy>();
+      int i = 0;
+      for (int s = 0; s < mSuccs.length; s++) {
+        for (int e = 0; e < mSuccs[s].length; e++) {
+          mSuccs[s][e] = -1;
+        }
+      }
+      for (StateProxy state : aut.getStates()) {
+        mPreds[i] = new TLongHashSet();
+        if (state.isInitial()) {
+          mInitial[i] = true;
+        }
+        mClassToStates[i] = new LinkedList<Integer>();
+        mClassToStates[i].add(i);
+        statetoint.put(state, i); i++;
+      }
+      i = 0;
+      for (EventProxy event : aut.getEvents()) {
+        mEvents[i] = event;
+        eventtoint.put(event, i);
+        i++;
+      }
+      for (TransitionProxy tran : aut.getTransitions()) {
+        int source = statetoint.get(tran.getSource());
+        int target = statetoint.get(tran.getTarget());
+        int event = eventtoint.get(tran.getEvent());
+        mSuccs[source][event] = target;
+        mPreds[target].add(longify(source, event));
+      }
+    }
+    
+    public void hide(EventProxy event)
+    {
+      Hide hide = new Hide();
+      hide.hide(event);
+    }
+    
+    public Map<EventProxy, Set<EventProxy>> getPossible(Set<EventProxy>[] act)
+    {
+      Map<EventProxy, Set<EventProxy>> poss =
+        new HashMap<EventProxy, Set<EventProxy>>();
+      for (int e = 0; e < mEvents.length; e++) {
+        EventProxy event = mEvents[e];
+        poss.put(event, new THashSet<EventProxy>(Arrays.asList(mEvents)));
+        for (int s = 0; s < mSuccs.length; s++) {
+          int t = mSuccs[s][e];
+          if (t == -1) {continue;}
+          for (int ei = 0; ei < mEvents.length; ei++) {
+            boolean ev1 = act[s].contains(mEvents[ei]);
+            boolean ev2 = act[t].contains(mEvents[ei]);
+            if ((ev1 && !ev2) || (!ev1 && ev2)) {
+              poss.get(event).remove(mEvents[ei]);
+            }
+          }
+        }
+      }
+      return poss;
+    }
+    
+    public Set<EventProxy>[] getActiveEvents()
+    {
+      Set<EventProxy>[] res = new Set[mSuccs.length];
+      for (int s = 0; s < res.length; s++) {
+        if (mSuccs[s] == null) {continue;}
+        res[s] = new THashSet<EventProxy>();
+        for (int e = 0; e < mSuccs[s].length; e++) {
+          if (mHidden[e] || mSuccs[s][e] != -1) {
+            res[s].add(mEvents[e]);
+          }
+        }
+        for (Integer si : mClassToStates[s]) {res[si] = res[s];}
+      }
+      return res;
+    }
+    
+    public Classes clone()
+    {
+      return new Classes(this);
+    }
+    
+    public AutomatonProxy getAutomaton(int autnum)
+    {
+      List<StateProxy> states = new ArrayList<StateProxy>();
+      List<EventProxy> events = new ArrayList<EventProxy>();
+      List<TransitionProxy> transitions = new ArrayList<TransitionProxy>();
+      TIntObjectHashMap<StateProxy> inttostate =
+        new TIntObjectHashMap<StateProxy>();
+      for (int s = 0; s < mPreds.length; s++) {
+        if (mPreds[s] != null) {
+          int snum = mInitial[s] ? 0 : s + 1;
+          StateProxy state = new MemStateProxy(snum);
+          states.add(state);
+          inttostate.put(s, state);
+        }
+      }
+      for (int e = 0; e < mEvents.length; e++) {
+        if (!mHidden[e]) {
+          //System.out.println("Event: " + mEvents[e]);
+          events.add(mEvents[e]);
+        }
+      }
+      for (int s = 0; s < mSuccs.length; s++) {
+        if (mSuccs[s] == null) {continue;}
+        StateProxy source = inttostate.get(s);
+        for (int e = 0; e < mSuccs[s].length; e++) {
+          if (mHidden[e]) {continue;}
+          int t = mSuccs[s][e];
+          if (t == -1) {continue;}
+          //System.out.println("tEvent: " + mEvents[e]);
+          EventProxy event = mEvents[e];
+          StateProxy target = inttostate.get(t);
+          //System.out.println("target:" + target);
+          //System.out.println(t);
+          transitions.add(mFactory.createTransitionProxy(source, event, target));
+        }
+      }
+      AutomatonProxy result = mFactory.createAutomatonProxy(mAut.getName() + ":"+ autnum,
+                                                            ComponentKind.PLANT,
+                                                            events,
+                                                            states, transitions);
+      return result;
+    }
+    
+    private class Hide
+    {
+      TLongHashSet edges = new TLongHashSet();
+      TLongArrayList merge1 = new TLongArrayList();
+      TLongArrayList merge2 = new TLongArrayList();
+      
+      public void merge(int s1, int s2)
+      {
+        if (s1 == s2) {return;}
+        if (mPreds[s1] == null || mPreds[s2] == null) {return;}
+        for (int e = 0; e < mEvents.length; e++) {
+          if (mEvents[e] == null) {continue;}
+          if (mSuccs[s1][e] == mSuccs[s2][e]) {continue;}
+          if (mSuccs[s2][e] == -1) {continue;}
+          if (mSuccs[s1][e] == -1) {
+            mSuccs[s1][e] = mSuccs[s2][e];
+            mPreds[mSuccs[s1][e]].add(longify(s1, e));
+          }
+          long edge1 = longify(s1, e); long edge2 = longify(s2, e);
+          merge1.add(edge1); merge2.add(edge2);
+          edges.add(edge1); edges.add(edge2);
+        }
+        long[] arrayedges = mPreds[s2].toArray();
+        for (int i = 0; i < arrayedges.length; i++) {
+          int[] edge = split(arrayedges[i]);
+          //System.out.println("edge[0]="+ edge[0]  + " edge[1]="+edge[1] );
+          if (mSuccs[edge[0]] == null) {continue;}
+          mPreds[s1].add(arrayedges[i]);
+          mSuccs[edge[0]][edge[1]] = s1;
+        }
+        mInitial[s1] = mInitial[s1] || mInitial[s2];
+        mInitial[s2] = false;
+        mClassToStates[s1].addAll(mClassToStates[s2]);
+        mClassToStates[s2] = null;
+        mPreds[s2] = null;
+        for (int s = 0; s < mSuccs.length; s++) {
+          if (mSuccs[s] == null) {continue;}
+          for (int e = 0; e < mSuccs[s].length; e++) {
+            if (mSuccs[s][e] == s2) {
+              System.out.println("state:" + s + " event:" + e + " target:" + s2);
+            }
+          }
+        }
+      }
+      
+      public void hide(EventProxy event) 
+      {
+        int e = 0;
+        for (; e < mEvents.length; e++) {
+          if (mEvents[e] == event) {
+            break;
+          }
+        }
+        if (e >= mEvents.length) {return;}
+        for (int s = 0; s < mSuccs.length; s++) {
+          if (mSuccs[s] == null) {continue;}
+          if (mSuccs[s][e] != -1 && mSuccs[s][e] != s) {
+            merge(s, mSuccs[s][e]);
+          }
+        }
+        while (merge1.size() != 0) {
+          int[] edge1 = split(merge1.remove(merge1.size() - 1));
+          int[] edge2 = split(merge2.remove(merge2.size() - 1));
+          merge(mSuccs[edge1[0]][edge1[1]], mSuccs[edge2[0]][edge2[1]]);
+        }
+        mHidden[e] = true;
+        for (int s = 0; s < mSuccs.length; s++) {
+          if (mClassToStates[s] == null) {
+            mPreds[s] = null;
+            mSuccs[s] = null;
+            mClassToStates[s] = null;
+            continue;
+          }
+          if (mSuccs[s][e] == -1) {continue;}
+          mPreds[s].remove(longify(s, e));
+          mSuccs[s][e] = -1;
+        }
+      }
+    }
+  }
+}

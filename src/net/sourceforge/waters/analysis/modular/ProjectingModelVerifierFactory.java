@@ -13,7 +13,6 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.op.ObserverProjectionConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
@@ -76,7 +75,10 @@ public class ProjectingModelVerifierFactory
     (final ProductDESProxyFactory factory)
   {
     return new ProjectingControllabilityChecker
-      (null, factory, new NativeControllabilityChecker(factory));
+      (null,
+       factory,
+       new NativeControllabilityChecker(factory),
+       false);
   }
 
   public ObserverProjectionConflictChecker createConflictChecker
@@ -88,12 +90,11 @@ public class ProjectingModelVerifierFactory
   public LanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
-    return new ProjectingLanguageInclusionChecker
-      (null, factory, new NativeLanguageInclusionChecker(factory));
-    /*
-    return new ModularLanguageInclusionChecker
-      (null, factory, createControllabilityChecker(factory));
-    */
+    return new ModularLanguageInclusionChecker(
+       null, factory,
+       /*new OneUncontrollableChecker(null, factory,
+                                    createControllabilityChecker(factory)),*/
+       createControllabilityChecker(factory));
   }
 
 

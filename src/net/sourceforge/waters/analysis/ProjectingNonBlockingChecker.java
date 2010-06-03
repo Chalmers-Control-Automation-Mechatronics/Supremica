@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.modular.BiSimulator;
+import net.sourceforge.waters.analysis.modular.ConfRevBiSimulator;
 import net.sourceforge.waters.analysis.modular.BlockedEvents;
 import net.sourceforge.waters.analysis.modular.NonDeterministicComposer;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -54,6 +55,22 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
+import gnu.trove.TObjectIntHashMap;
+import java.util.Collections;
+import net.sourceforge.waters.analysis.compnb.IncomingEquivalent;
+import gnu.trove.TObjectDoubleHashMap;
+import java.security.AccessControlException;
+import net.sourceforge.waters.analysis.modular.TransBiSimulator;
+import net.sourceforge.waters.analysis.annotation.SilentOutGoing;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import net.sourceforge.waters.analysis.annotation.MakeBisimiliar;
+import net.sourceforge.waters.analysis.annotation.BiSimulatorRedundant;
+import net.sourceforge.waters.analysis.annotation.RemoveEvents;
+import net.sourceforge.waters.analysis.modular.Composer;
+import net.sourceforge.waters.analysis.annotation.OptimisticBiSimulatorRedundant;
+import org.omg.SendingContext.RunTime;
+import java.lang.Runtime;
 
 
 /**
@@ -115,34 +132,62 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
       setMarkingProposition(getUsedMarkingProposition());
     }
     for (final AutomatonProxy a : getModel().getAutomata()) {
-      System.out.println(a.getName() + " " + a.getStates().size());
+      //System.out.println(a.getName() + " " + a.getStates().size());
     }
-    final ProjectionList list = project(getModel());
-    mMinAutMap.clear();
-    System.out.println(list);
-    if (list == null) {
-      return true;
+    try {
+      mWriter = new BufferedWriter(new FileWriter("/home/darius/supremicastuff/reductions" + getModel().getName()));
+    } catch (Throwable t) {
+      t.printStackTrace();
     }
-    // System.out.println(list.getModel());
-    final ConflictChecker checker =
+    Runtime.getRuntime().traceMethodCalls(true);
+    boolean result = false;
+    double checkerstates = 0;
+    
+    try {
+      ProjectionList list = project(getModel());
+      mMinAutMap.clear();
+      //System.out.println(list);
+      if (list == null) {
+        return true;
+      }
+      //System.out.println(list.getModel());
+      ConflictChecker checker = 
         new NativeConflictChecker(list.getModel(), getMarkingProposition(),
-            getFactory());
-    final boolean result = checker.run();
+                                  getFactory());
+      result = checker.run();
+      checkerstates = checker.getAnalysisResult().getTotalNumberOfStates();
+    } catch (CertainConflictException cce) {
+      //System.out.println("caught:" + cce);
+      result = false;
+    }
+    if (!result) {
+      List<EventProxy> e = new ArrayList<EventProxy>();
+      TraceProxy counter = getFactory().createSafetyTraceProxy(getModel().getName(),
+                                                               getModel(), e);
+      setFailedResult(counter);
+    } else {
+      setSatisfiedResult();
+    }
     System.out.println("result: " + result);
+    System.out.println("checkerstates: " + checkerstates);
     mTime += System.currentTimeMillis();
     try {
-      final BufferedWriter write =
-          new BufferedWriter(new FileWriter("/home/darius/supremica/"
-              + getModel().getName()));
+      BufferedWriter write = new BufferedWriter(new FileWriter("/home/darius/Projects/supr/supremica/mine/" + getModel().getName()));
       write.append(getStats());
-      write.append("states:"
-          + checker.getAnalysisResult().getTotalNumberOfStates() + "\n");
+      write.append("states:" + checkerstates + "\n");
+      write.append("result:" + result);
       write.close();
     } catch (final Throwable t) {
       t.printStackTrace();
     }
-    System.out.println("Total Switched: " + switched);
+    //System.out.println("Total Switched: " + switched);
     clearStats();
+    try {
+      mWriter.flush();
+      mWriter.close();
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
     return result;
     /*
      * if (checker.run()) { mStates +=
@@ -169,9 +214,17 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
     EquivalentIncoming.clearStats();
     RemoveFollowOnTau.clearStats();
     TauLoopRemoval.clearStats();
+    RedundantTransitions.clearStats();
+    AddRedundantTransitions.clearStats();
     UnAnnotateGraph.clearStats();
+    BiSimulatorRedundant.clearStats();
     RemoveImpossibleTransitions.clearStats();
+    RemoveAnnotations.clearStats();
     MergeEvents.clearStats();
+    ConfRevBiSimulator.clearStats();
+    IncomingEquivalent.clearStats();
+    TransBiSimulator.clearStats();
+    SilentOutGoing.clearStats();
     mAnnotatedBISIMulation = 0;
     mBISIMulation = 0;
     mCompTime = 0;
@@ -181,6 +234,9 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
     mLargestDiff = Integer.MIN_VALUE;
     mAggDiff = 0;
     mTime = 0;
+    mLargestTransitions = 0;
+    mAggComposition = 0;
+    mAggTransitions = 0;
   }
 
   public String getStats()
@@ -194,25 +250,27 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
     stats += UnAnnotateGraph.stats() + "\n";
     stats += RemoveImpossibleTransitions.stats() + "\n";
     stats += RemoveSubsetTau.stats() + "\n";
+    stats += RedundantTransitions.stats() + "\n";
+    stats += AddRedundantTransitions.stats() + "\n";
     stats += MergeEvents.stats() + "\n";
-    stats +=
-        "mAggDiff = " + mAggDiff + " mSmallestDiff = " + mSmallestDiff
-            + " mLargestDiff = " + mLargestDiff + "\n";
-    stats +=
-        "Largest Composition: " + mLargestComposition + " COMPTIME: "
-            + mCompTime + "\n";
-    stats +=
-        "Annotated Bisimulation: " + mAnnotatedBISIMulation + " mAnnBITIME: "
-            + mAnnBITIME + "\n";
+    stats += ConfRevBiSimulator.stats() + "\n";
+    stats += IncomingEquivalent.stats() + "\n";
+    stats += TransBiSimulator.stats() + "\n";
+    stats += BiSimulatorRedundant.stats() + "\n";
+    stats += SilentOutGoing.stats() + "\n";
+    stats += RemoveAnnotations.stats() + "\n";
+    stats += "mAggDiff = " + mAggDiff + " mSmallestDiff = " + mSmallestDiff + " mLargestDiff = " + mLargestDiff + "\n";
+    stats += "Largest Composition: " + mLargestComposition + " COMPTIME: " + mCompTime + "\n";
+    stats += "Largest Transitions: " + mLargestTransitions + " aggcomp: " + mAggComposition + " aggtrans: " + mAggTransitions + "\n";
+    stats += "Annotated Bisimulation: " + mAnnotatedBISIMulation + " mAnnBITIME: " + mAnnBITIME + "\n";
     stats += "Bisimulation: " + mBISIMulation + " mBITIME: " + mBITIME + "\n";
     stats += "Time: " + mTime + "\n";
     return stats;
   }
-
-  // #########################################################################
-  // # Overrides for Abstract Base Class
-  // # net.sourceforge.waters.model.analysis.AbstractModelVerifier
-  @Override
+  
+  //#########################################################################
+  //# Overrides for Abstract Base Class
+  //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
   public void setNodeLimit(final int limit)
   {
     super.setNodeLimit(limit);
@@ -221,6 +279,30 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
     } else {
       mMaxProjStates = limit;
     }
+  }
+  
+  public void setuplocal(ProductDESProxy model, Set<AutomatonProxy> automata)
+  {
+    final TObjectIntHashMap<Set<AutomatonProxy>> numoccuring =
+      new TObjectIntHashMap<Set<AutomatonProxy>>();
+    for (EventProxy e : model.getEvents()) {
+      if (e == getMarkingProposition()) {
+        continue;
+      }
+      Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
+      for (AutomatonProxy a : automata) {
+        if (a.getEvents().contains(e)) {
+          possess.add(a);
+        }
+      }
+      if (!possess.isEmpty()) {
+        /*if (numoccuring.get(possess) == null) {
+          numoccuring.put(possess, 0);
+        }*/
+        numoccuring.put(possess, numoccuring.get(possess) + 1);
+      }
+    }
+    mNumOccurinng = numoccuring;
   }
 
   @Override
@@ -292,31 +374,203 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
    * possible; }
    */
 
-  private Set<Tuple> getTuples(final ProductDESProxy model,
-                               final Set<AutomatonProxy> automata)
+  private Set<Set<AutomatonProxy>> getMinTransitions(Set<AutomatonProxy> automata)
   {
-    final SortedMap<SortedSet<AutomatonProxy>,Integer> numoccuring =
-        new TreeMap<SortedSet<AutomatonProxy>,Integer>(new AutomataComparator());
-    for (final EventProxy e : model.getEvents()) {
+    Set<Set<AutomatonProxy>> pairs = new THashSet<Set<AutomatonProxy>>();
+    AutomatonProxy minaut = null;
+    for (AutomatonProxy aut : automata) {
+      minaut = minaut == null ? aut : minaut;
+      minaut = minaut.getTransitions().size() > aut.getStates().size() ? aut : minaut;
+    }
+    for (AutomatonProxy aut : automata) {
+      if (minaut == aut) {continue;}
+      Set<AutomatonProxy> pair = new THashSet<AutomatonProxy>(2);
+      pair.add(minaut);
+      pair.add(aut);
+      pairs.add(pair);
+    }
+    return pairs;
+  }
+  
+  /*private Set<Tuple> getTuples(ProductDESProxy model, Set<AutomatonProxy> automata)
+  {
+    THashMap<AutomatonProxy, PriorityQueue<Tuple>> queues = new THashMap<AutomatonProxy, PriorityQueue<Tuple>>();
+    Set<Tuple> possible = new TreeSet<Tuple>();
+    for (AutomatonProxy a1 : automata) {
+      queues.put(a1, new PriorityQueue<Tuple>());
+      for (AutomatonProxy a2 : automata) {
+        if (a1 == a2) {continue;}
+        Set<AutomatonProxy> auts = new HashSet<AutomatonProxy>(2);
+        auts.add(a1); auts.add(a2);
+        double size = 0;
+        Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
+        Set<EventProxy> total = new HashSet<EventProxy>();
+        boolean contproj = false;
+        int taus = 0;
+        for (AutomatonProxy a : auts) {
+          size += Math.log(a.getStates().size());
+          total.addAll(a.getEvents());
+          common.retainAll(a.getEvents());
+          for (EventProxy e : a.getEvents()) {
+            if (e.getName().startsWith("tau:")) {
+              taus++;
+            }
+          }
+        }
+        double tot = 1;
+        double uncom = 1;
+        for (AutomatonProxy a : auts) {
+          int uncom1 = 0;
+          int tot1 = 0;
+          for (TransitionProxy t : a.getTransitions()) {
+            if (!common.contains(t.getEvent())) {
+              uncom1++;
+            }
+            tot1++;
+          }
+          tot *= tot1;
+          uncom *= uncom1;
+        }
+        size = uncom / tot;
+        queues.get(a1).offer(new Tuple(auts, size));
+      }
+    }
+    for (AutomatonProxy a : queues.keySet()) {
+      PriorityQueue<Tuple> queue = queues.get(a);
+      if (queue.isEmpty()) {continue;}
+      if (queue.size() == 1) {possible.add(queue.poll()); continue;}
+      Tuple tup1 = queue.poll();
+      Tuple tup2 = queue.poll();
+      possible.add(new Tuple(tup1.mSet, tup1.mSize - tup2.mSize));
+    }
+    return possible;
+  }*/
+  
+  
+  /*private Set<Tuple> getTuples(ProductDESProxy model, Set<AutomatonProxy> automata)
+  {
+    Set<Tuple> possible = new TreeSet<Tuple>(); 
+    for (AutomatonProxy a1 : automata) {
+      for (AutomatonProxy a2 : automata) {
+        if (a1 == a2) {continue;}
+        Set<AutomatonProxy> auts = new HashSet<AutomatonProxy>(2);
+        auts.add(a1); auts.add(a2);
+        double size = 0;
+        Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
+        Set<EventProxy> total = new HashSet<EventProxy>();
+        boolean contproj = false;
+        int taus = 0;
+        for (AutomatonProxy a : auts) {
+          size += Math.log(a.getStates().size());
+          total.addAll(a.getEvents());
+          common.retainAll(a.getEvents());
+          for (EventProxy e : a.getEvents()) {
+            if (e.getName().startsWith("tau:")) {
+              taus++;
+            }
+          }
+        }
+        double tot = total.size();
+        double uncom = tot - common.size() - taus;
+        size = uncom/tot;
+        possible.add(new Tuple(auts, size));
+      }
+    }
+    return possible;
+  }*/
+  
+  private List<Set<AutomatonProxy>> getMinTransitions(final ProductDESProxy model, final SortedSet<AutomatonProxy> automata)
+  {
+    final TObjectIntHashMap<Set<AutomatonProxy>> common = 
+      new TObjectIntHashMap<Set<AutomatonProxy>>();
+    List<Set<AutomatonProxy>> pairs = new ArrayList<Set<AutomatonProxy>>();
+    AutomatonProxy minaut = null;
+    for (AutomatonProxy aut : automata) {
+      minaut = minaut == null ? aut : minaut;
+      minaut = minaut.getTransitions().size() > aut.getStates().size() ? aut : minaut;
+    }
+    for (AutomatonProxy aut : automata) {
+      if (minaut == aut) {continue;}
+      Set<AutomatonProxy> pair = new THashSet<AutomatonProxy>(2);
+      Set<EventProxy> events = new THashSet<EventProxy>(aut.getEvents());
+      events.retainAll(minaut.getEvents());
+      pair.add(minaut);
+      pair.add(aut);
+      pairs.add(pair);
+      common.put(pair, events.size());
+    }
+    /*final TObjectIntHashMap<Set<AutomatonProxy>> numoccuring =
+      new TObjectIntHashMap<Set<AutomatonProxy>>();
+    for (EventProxy e : model.getEvents()) {
       if (e == getMarkingProposition()) {
         continue;
       }
-      final SortedSet<AutomatonProxy> possess = new TreeSet<AutomatonProxy>();
-      for (final AutomatonProxy a : automata) {
+      Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
+      for (AutomatonProxy a : automata) {
         if (a.getEvents().contains(e)) {
           possess.add(a);
         }
       }
       if (!possess.isEmpty()) {
-        if (numoccuring.get(possess) == null) {
-          numoccuring.put(possess, 0);
-        }
         numoccuring.put(possess, numoccuring.get(possess) + 1);
       }
+    }*/
+    /*Collections.sort(pairs, new Comparator<Set<AutomatonProxy>>() {
+        public int compare(Set<AutomatonProxy> a1, Set<AutomatonProxy> a2)
+        {
+          int local1 = mNumOccurinng.get(a1);
+          int local2 = mNumOccurinng.get(a2);
+          if (local1 != local2) {return local2 - local1;}
+          Collection<EventProxy> CommonEvents1 = new THashSet<EventProxy>(model.getEvents());
+          Collection<EventProxy> CommonEvents2 = new THashSet<EventProxy>(model.getEvents());
+          for (AutomatonProxy aut : a1) {
+            CommonEvents1.retainAll(aut.getEvents());
+          }
+          for (AutomatonProxy aut : a2) {
+            CommonEvents2.retainAll(aut.getEvents());
+          }
+          return CommonEvents2.size() - CommonEvents1.size();
+        }
+    });*/
+    mCommon = common;
+    //mNumOccurinng = numoccuring;
+    return pairs;
+  }
+  
+  private Set<AutomatonProxy> getMinSet(List<Set<AutomatonProxy>> auts)
+  {
+    int maxlocal = -1;
+    int maxcommon = -1;
+    int i = -1;
+    for (int index = 0; index < auts.size(); index++) {
+      Set<AutomatonProxy> set = auts.get(index);
+      int local = mNumOccurinng.get(set);
+      int common = mCommon.get(set);
+      if (local > maxlocal) {
+        maxlocal = local;
+        maxcommon = common;
+        i = index;
+      } else if (local == maxlocal) {
+        if (common > maxcommon) {
+          maxlocal = local;
+          maxcommon = common;
+          i = index;
+        }
+      }
     }
-    final Set<Tuple> possible = new TreeSet<Tuple>();
-    System.out.println("keyset:" + numoccuring.keySet().size());
-    for (final Set<AutomatonProxy> s : numoccuring.keySet()) {
+    return auts.remove(i);
+  }
+  
+  private List<Set<AutomatonProxy>> getTuples(ProductDESProxy model, Set<AutomatonProxy> automata)
+  {
+    final TObjectIntHashMap<Set<AutomatonProxy>> heur =
+      new TObjectIntHashMap<Set<AutomatonProxy>>();
+    List<Set<AutomatonProxy>> possible =
+      new ArrayList<Set<AutomatonProxy>>();
+    //System.out.println("keyset:" + numoccuring.keySet().size());
+    Set<AutomatonProxy>[] keys = new Set[mNumOccurinng.size()];
+    keys = mNumOccurinng.keys(keys);
+    for (Set<AutomatonProxy> s : Arrays.asList(keys)) {
       if (s.size() > 4 && s.size() != automata.size()) {
         continue;
       }
@@ -331,8 +585,21 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
       final double tot = total.size();
       final double uncom = tot - common.size();
       size = uncom;
-      possible.add(new Tuple(s, size));
+      //possible.add(new Tuple(s, size));
+      possible.add(s);
+      heur.put(s, common.size());
     }
+    mCommon = heur;
+    /*Collections.sort(possible, new Comparator<Set<AutomatonProxy>>() {
+        public int compare(Set<AutomatonProxy> a1, Set<AutomatonProxy> a2)
+        {
+          double heur1 = mNumOccurinng.get(a1);
+          double heur2 = mNumOccurinng.get(a2);
+          if (heur1 < heur2) {return -1;}
+          else if (heur1 == heur2) {return 0;}
+          else {return 1;}
+        }
+    });*/
     return possible;
   }
 
@@ -361,96 +628,338 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
       return 0;
     }
   }
+  
+  private Set<AutomatonProxy> getFromReader(Set<AutomatonProxy> automata,
+                                            BufferedReader reader)
+  {
+    Set<AutomatonProxy> comp = new TreeSet<AutomatonProxy>();
+    try {
+      Reader:
+      while (reader.ready()) {
+        String name = reader.readLine();
+        //System.out.println(name);
+        if (name.equals("")) {return comp;}
+        for (AutomatonProxy aut : automata) {
+          if (aut.getName().equals(name)) {
+            comp.add(aut); continue Reader;
+          }
+        }
+      }
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    return null;
+  }
+  
+  /*private Set<Tuple> getTuples(ProductDESProxy model, Set<AutomatonProxy> automata)
+  {
+    Map<EventProxy, Set<AutomatonProxy>> haveEvent =
+      new THashMap<EventProxy, Set<AutomatonProxy>>();
+    for (EventProxy e : model.getEvents()) {
+      if (e == getMarkingProposition()) {
+        continue;
+      }
+      Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
+      for (AutomatonProxy a : automata) {
+        if (a.getEvents().contains(e)) {
+          possess.add(a);
+        }
+      }
+      haveEvent.put(e, possess);
+    }
+    Set<Tuple> possible = new TreeSet<Tuple>(); 
+    for (AutomatonProxy a1 : automata) {
+      for (AutomatonProxy a2 : automata) {
+        if (a1 == a2) {continue;}
+        Set<AutomatonProxy> auts = new HashSet<AutomatonProxy>(2);
+        auts.add(a1); auts.add(a2);
+        double size = 0;
+        Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
+        Set<EventProxy> total = new HashSet<EventProxy>();
+        Set<AutomatonProxy> cover = new THashSet<AutomatonProxy>();
+        int taus = 0;
+        for (AutomatonProxy a : auts) {
+          total.addAll(a.getEvents());
+          common.retainAll(a.getEvents());
+        }
+        for (EventProxy e : total) {
+          Set<AutomatonProxy> have = haveEvent.get(e);
+          if (have == null) {continue;}
+          cover.addAll(have);
+        }
+        for (AutomatonProxy a : cover) {
+          size += Math.log(a.getStates().size());
+        }
+        possible.add(new Tuple(auts, size));
+      }
+    }
+    return possible;
+  }*/
+  
+  private ProjectionList project(ProductDESProxy model)
+    throws AnalysisException, CertainConflictException
+  {
+    eventscheck(model);
+    //mRIT = new RemoveImpossibleTransitions(getMarkingProposition());
+    //mME = new MergeEvents(getMarkingProposition(), model.getEvents());
+    maxsize = 400000;
+    mChecked.clear();
+    Set<AutomatonProxy> automata = new TreeSet<AutomatonProxy>();
+    Iterator<AutomatonProxy> autit = model.getAutomata().iterator();
+    while (autit.hasNext()) {
+      AutomatonProxy aut = autit.next();
+      //System.out.println(aut.getName() + " " + aut.getKind());
+      if (ComponentKind.PROPERTY != aut.getKind()) {
+        automata.add(aut);
+      }
+    }
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new FileReader("/home/darius/supremicastuff/" + model.getName()));
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    //mRIT.addAutomata(automata);
+    ProjectionList p = null;
+    while (true) {
+      //automata = mME.run(automata, getFactory());
+      //System.out.println("numautomata:" + automata.size());
+      //Set<Tuple> possible = getTuples(model, automata);
+      //Collection<Set<AutomatonProxy>> possible = getMinTransitions(model, automata);
+      Set<AutomatonProxy> set = getFromReader(automata, reader);
+      if (set == null) {break;}
+      boolean stop = true;
+      int overflows = 0;
+      ProjectionList minlist = null;
+      minSize = Integer.MAX_VALUE / 4;
+      int setSize = -1;
+      //System.out.println("possible: " + possible.size());
+      int num = 0;
+      tuples:
+      //for (Tuple tup : possible) {
+      //for (Set<AutomatonProxy> set : possible) {
+        //if (num > 3) {break;}
+        try {
+          long imaxsize = 1;
+          /*for (AutomatonProxy a : tup.mSet) {
+            if (mDontOnOwn.contains(a) && tup.mSet.size() == 1) {
+              continue tuples;
+            }
+            imaxsize *= a.getStates().size();
+          }
+          System.out.println(imaxsize);*/
+          ProjectionList t =
+            new ProjectionList(p, automata, set);
+          num++;
+          if (minSize >= t.getNew().getStates().size()) {
+            minlist = t;
+            minSize = t.getNew().getStates().size();
+            //break;
+          }
+        } catch (final AnalysisException exception) {
+          //exception.printStackTrace();
+          //System.out.println("over");
+          overflows++;
+        }
+      //}
+      if (minlist != null) {
+        p = minlist;
+        automata = new TreeSet<AutomatonProxy>(p.getAutomata());
+        stop = false;
+        //System.out.println("numcomposed" + p.getComposed().size());
+      }
+      /*else {
+        if (maxsize < 2000000) {
+          maxsize *= 2;
+          stop = false;
+        }
+      }*/
+      if (stop) {
+        break;
+      }
+    }
+    try {
+      reader.close();
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    Iterator<AutomataHidden> it = mMinAutMap.keySet().iterator();
+    while (it.hasNext()) {
+      AutomataHidden ah = it.next();
+      if (!mChecked.contains(ah)) {
+        it.remove();
+      }
+    }
+    return p;
+  }
 
-  /*
-   * private Set<Tuple> getTuples(ProductDESProxy model, Set<AutomatonProxy>
-   * automata) { Map<EventProxy, Set<AutomatonProxy>> haveEvent = new
-   * THashMap<EventProxy, Set<AutomatonProxy>>(); for (EventProxy e :
-   * model.getEvents()) { if (e == getMarkingProposition()) { continue; }
-   * Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>(); for
-   * (AutomatonProxy a : automata) { if (a.getEvents().contains(e)) {
-   * possess.add(a); } } haveEvent.put(e, possess); } Set<Tuple> possible = new
-   * TreeSet<Tuple>(); for (AutomatonProxy a1 : automata) { for (AutomatonProxy
-   * a2 : automata) { if (a1 == a2) {continue;} Set<AutomatonProxy> auts = new
-   * HashSet<AutomatonProxy>(2); auts.add(a1); auts.add(a2); double size = 0;
-   * Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
-   * Set<EventProxy> total = new HashSet<EventProxy>(); Set<AutomatonProxy>
-   * cover = new THashSet<AutomatonProxy>(); int taus = 0; for (AutomatonProxy a
-   * : auts) { total.addAll(a.getEvents()); common.retainAll(a.getEvents()); }
-   * for (EventProxy e : total) { Set<AutomatonProxy> have = haveEvent.get(e);
-   * if (have == null) {continue;} cover.addAll(have); } for (AutomatonProxy a :
-   * cover) { size += Math.log(a.getStates().size()); } possible.add(new
-   * Tuple(auts, size)); } } return possible; }
-   */
-
-  private ProjectionList project(final ProductDESProxy model)
-      throws AnalysisException
+  /*private ProjectionList project(ProductDESProxy model)
+    throws AnalysisException, CertainConflictException
   {
     eventscheck(model);
     // mRIT = new RemoveImpossibleTransitions(getMarkingProposition());
     // mME = new MergeEvents(getMarkingProposition(), model.getEvents());
-    maxsize = 1000;
+    maxsize = 4000000;
     mChecked.clear();
     Set<AutomatonProxy> automata = new TreeSet<AutomatonProxy>();
     final Iterator<AutomatonProxy> autit = model.getAutomata().iterator();
     while (autit.hasNext()) {
       final AutomatonProxy aut = autit.next();
-      System.out.println(aut.getName() + " " + aut.getKind());
+      //System.out.println(aut.getName() + " " + aut.getKind());
       if (ComponentKind.PROPERTY != aut.getKind()) {
         automata.add(aut);
       }
     }
-    // mRIT.addAutomata(automata);
+    ComposeOrder comporder = new ComposeOrder(model, automata);
+    comporder.run();
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new FileReader("/home/darius/supremicastuff/" + model.getName()));
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    //mRIT.addAutomata(automata);
     ProjectionList p = null;
     while (true) {
       // automata = mME.run(automata, getFactory());
-      System.out.println("numautomata:" + automata.size());
-      final Set<Tuple> possible = getTuples(model, automata);
+      //System.out.println("numautomata:" + automata.size());
+      //Set<Tuple> possible = getTuples(model, automata);
+      //Collection<Set<AutomatonProxy>> possible = getMinTransitions(model, automata);
+      Set<AutomatonProxy> set = getFromReader(automata, reader);
+      if (set == null) {break;}
       boolean stop = true;
       int overflows = 0;
       ProjectionList minlist = null;
       minSize = Integer.MAX_VALUE / 4;
-      System.out.println("possible: " + possible.size());
+      int setSize = -1;
+      //System.out.println("possible: " + possible.size());
       int num = 0;
-      tuples: for (final Tuple tup : possible) {
-        if (num > 3) {
-          break;
-        }
+      tuples:
+      //for (Tuple tup : possible) {
+      //for (Set<AutomatonProxy> set : possible) {
+        //if (num > 3) {break;}
         try {
-          long maxsize = 1;
-          for (final AutomatonProxy a : tup.mSet) {
-            if (mDontOnOwn.contains(a) && tup.mSet.size() == 1) {
-              continue tuples;
-            }
-            maxsize *= a.getStates().size();
-          }
-          System.out.println(maxsize);
-          final ProjectionList t = new ProjectionList(p, automata, tup.mSet);
+          long imaxsize = 1;
+          ProjectionList t =
+            new ProjectionList(p, automata, set);
           num++;
           if (minSize >= t.getNew().getStates().size()) {
             minlist = t;
             minSize = t.getNew().getStates().size();
-            break;
+            //break;
           }
         } catch (final AnalysisException exception) {
-          // exception.printStackTrace();
-          System.out.println("over");
+          //exception.printStackTrace();
+          //System.out.println("over");
           overflows++;
         }
-      }
+      //}
       if (minlist != null) {
         p = minlist;
-        automata = new HashSet<AutomatonProxy>(p.getAutomata());
+        automata = new TreeSet<AutomatonProxy>(p.getAutomata());
         stop = false;
-        System.out.println("numcomposed" + p.getComposed().size());
-      } /*
-         * else { if (maxsize < 2000000) { maxsize *= 2; stop = false; } }
-         */
+        //System.out.println("numcomposed" + p.getComposed().size());
+      }
       if (stop) {
         break;
       }
     }
-    final Iterator<AutomataHidden> it = mMinAutMap.keySet().iterator();
+    try {
+      reader.close();
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    Iterator<AutomataHidden> it = mMinAutMap.keySet().iterator();
+    while (it.hasNext()) {
+      AutomataHidden ah = it.next();
+      if (!mChecked.contains(ah)) {
+        it.remove();
+      }
+    }
+    return p;
+  }*/
+  
+  /*private ProjectionList project(ProductDESProxy model)
+    throws AnalysisException, CertainConflictException
+  {
+    eventscheck(model);
+    //mRIT = new RemoveImpossibleTransitions(getMarkingProposition());
+    //mME = new MergeEvents(getMarkingProposition(), model.getEvents());
+    maxsize = 4000000;
+    mChecked.clear();
+    Set<AutomatonProxy> automata = new TreeSet<AutomatonProxy>();
+    Iterator<AutomatonProxy> autit = model.getAutomata().iterator();
+    while (autit.hasNext()) {
+      AutomatonProxy aut = autit.next();
+      //System.out.println(aut.getName() + " " + aut.getKind());
+      if (ComponentKind.PROPERTY != aut.getKind()) {
+        automata.add(aut);
+      }
+    }
+    AntOrder antorder = new AntOrder(model, automata);
+    antorder.run(100);
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new FileReader("/home/darius/supremicastuff/" + model.getName()));
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    //mRIT.addAutomata(automata);
+    ProjectionList p = null;
+    while (true) {
+      //automata = mME.run(automata, getFactory());
+      //System.out.println("numautomata:" + automata.size());
+      //Set<Tuple> possible = getTuples(model, automata);
+      //Collection<Set<AutomatonProxy>> possible = getMinTransitions(model, automata);
+      //Set<AutomatonProxy> set = getFromReader(automata, reader);
+      Set<AutomatonProxy> set = antorder.selectComp(automata);
+      if (set == null) {break;}
+      boolean stop = true;
+      int overflows = 0;
+      ProjectionList minlist = null;
+      minSize = Integer.MAX_VALUE / 4;
+      int setSize = -1;
+      //System.out.println("possible: " + possible.size());
+      int num = 0;
+      tuples:
+      //for (Tuple tup : possible) {
+      //for (Set<AutomatonProxy> set : possible) {
+        //if (num > 3) {break;}
+        try {
+          long imaxsize = 1;
+          ProjectionList t =
+            new ProjectionList(p, automata, set);
+          num++;
+          if (minSize >= t.getNew().getStates().size()) {
+            minlist = t;
+            minSize = t.getNew().getStates().size();
+            //break;
+          }
+        } catch (final AnalysisException exception) {
+          // exception.printStackTrace();
+          //System.out.println("over");
+          overflows++;
+        }
+      //}
+      if (minlist != null) {
+        p = minlist;
+        automata = new TreeSet<AutomatonProxy>(p.getAutomata());
+        stop = false;
+        antorder.setActual(set, p.getNew());
+        //System.out.println("numcomposed" + p.getComposed().size());
+      } else {
+        antorder.setActual(set, null);
+      }
+      if (stop) {
+        break;
+      }
+    }
+    try {
+      reader.close();
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    Iterator<AutomataHidden> it = mMinAutMap.keySet().iterator();
     while (it.hasNext()) {
       final AutomataHidden ah = it.next();
       if (!mChecked.contains(ah)) {
@@ -458,7 +967,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
       }
     }
     return p;
-  }
+  }*/
 
   @SuppressWarnings("unused")
   private boolean setFailedResult(final TraceProxy counterexample,
@@ -494,9 +1003,9 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
   // # Inner Class ProjectionList
   private class ProjectionList
   {
-    final Set<AutomatonProxy> mAutomata;
+    final SortedSet<AutomatonProxy> mAutomata;
     final ProjectionList mParent;
-    final Set<AutomatonProxy> mCompautomata;
+    final SortedSet<AutomatonProxy> mCompautomata;
     final Set<EventProxy> mOriginalAlphabet;
     final Set<EventProxy> mHidden;
     final AutomatonProxy mNew;
@@ -514,12 +1023,11 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
 
     private void blockedEvents()
     {
-      final Set<AutomatonProxy> mTempComp = new THashSet<AutomatonProxy>();
-      final Set<AutomatonProxy> mTempAut = new THashSet<AutomatonProxy>();
-      System.out.println("before");
-      for (final AutomatonProxy aut : mCompautomata) {
-        System.out.println(aut.getName() + " trans:"
-            + aut.getTransitions().size());
+      Set<AutomatonProxy> mTempComp = new TreeSet<AutomatonProxy>();
+      Set<AutomatonProxy> mTempAut = new TreeSet<AutomatonProxy>();
+      //System.out.println("before");
+      for (AutomatonProxy aut : mCompautomata) {
+        //System.out.println(aut.getName() + " trans:" + aut.getTransitions().size());
       }
       for (final AutomatonProxy aut : mCompautomata) {
         AutomatonProxy aut1 = aut;
@@ -546,52 +1054,54 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
         mAutomata.addAll(mTempAut);
         mTempComp.add(aut1);
       }
-      System.out.println("after");
+      //System.out.println("after");
       mCompautomata.clear();
       mCompautomata.addAll(mTempComp);
-      for (final AutomatonProxy aut : mCompautomata) {
-        System.out.println(aut.getName() + " trans:"
-            + aut.getTransitions().size());
+      for (AutomatonProxy aut : mCompautomata) {
+        //System.out.println(aut.getName() + " trans:" + aut.getTransitions().size());
       }
     }
 
-    public ProjectionList(final ProjectionList parent, final Set<AutomatonProxy> automata,
-                          final Set<AutomatonProxy> compAutomata)
-        throws AnalysisException
+    public ProjectionList(ProjectionList parent,
+                          Set<AutomatonProxy> automata,
+                          Set<AutomatonProxy> compAutomata)
+      throws AnalysisException, CertainConflictException
     {
-      mParent = parent;
-      mCompautomata = new THashSet<AutomatonProxy>(compAutomata);
-      mAutomata = new HashSet<AutomatonProxy>(automata);
-      mAutomata.removeAll(compAutomata);
-      final Set<EventProxy> events = new HashSet<EventProxy>();
-      for (final AutomatonProxy a : compAutomata) {
+      mParent = null;// parent;
+      mCompautomata = new TreeSet<AutomatonProxy>(new AutomatonComparator());
+      mCompautomata.addAll(compAutomata);
+      mAutomata = new TreeSet<AutomatonProxy>(automata);
+      Set<EventProxy> events = new TreeSet<EventProxy>();
+      for (AutomatonProxy a : mCompautomata) {
+        System.out.println(a.getName() + ": " + a.getStates().size());
         events.addAll(a.getEvents());
       }
+      mAutomata.removeAll(compAutomata);
       mOriginalAlphabet = events;
       mHidden = new HashSet<EventProxy>(events);
       for (final AutomatonProxy a : mAutomata) {
-        if (a != mSpec) {
+        if (!compAutomata.contains(a)) {
           mHidden.removeAll(a.getEvents());
         }
       }
       if (mHidden.contains(getMarkingProposition())) {
         mHidden.remove(getMarkingProposition());
       }
-      final AutomataHidden ah =
-          new AutomataHidden(compAutomata, new HashSet<EventProxy>(mHidden));
-      mChecked.add(ah);
+      //AutomataHidden ah =
+      //  new AutomataHidden(compAutomata, new HashSet<EventProxy>(mHidden));
+      //mChecked.add(ah);
       AutomatonProxy minAutomaton;
       Collection<EventProxy> allwaysenabled = null;
       Collection<EventProxy> allselflooped = null;
-      mMinAutMap.remove(ah);
-      if (mMinAutMap.containsKey(ah)) {
+      //mMinAutMap.remove(ah);
+      /*if (mMinAutMap.containsKey(ah)) {
         minAutomaton = mMinAutMap.get(ah);
         if (minAutomaton == null) {
           throw new OverflowException();
         }
-      } else {
-        blockedEvents();
-        System.out.println("marking: " + getMarkingProposition());
+      } else {*/
+        //blockedEvents();
+        //System.out.println("marking: " + getMarkingProposition());
         try {
           // removeTransitions
           /*
@@ -607,112 +1117,214 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
               new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
                   mCompautomata), getFactory(), getMarkingProposition());
           final int size = maxsize;
-          System.out.println(size);
+          //System.out.println(size);
           composer.setNodeLimit(size);
           mCompTime -= System.currentTimeMillis();
           minAutomaton = composer.run();
           mCompTime += System.currentTimeMillis();
-          final int compsize = minAutomaton.getStates().size();
-          mLargestComposition =
-              mLargestComposition > minAutomaton.getStates().size() ? mLargestComposition
-                  : minAutomaton.getStates().size();
-          AutomatonProxy minAutomaton2 = minAutomaton;
+          int compsize = minAutomaton.getStates().size();
+          int comptransitions = minAutomaton.getTransitions().size();
+          mAggComposition += compsize;
+          mAggTransitions += comptransitions;
+          mLargestTransitions = mLargestTransitions > comptransitions ? mLargestTransitions :
+                                comptransitions;
+          mLargestComposition = mLargestComposition > minAutomaton.getStates().size() ? mLargestComposition :
+                                minAutomaton.getStates().size();
+          int origstates = minAutomaton.getStates().size();
+          int origtrans = minAutomaton.getTransitions().size();
+          System.out.println("compsize:" + minAutomaton.getStates().size());
+          //mRIT.removeAutomata(mCompautomata);
+          /*RemoveEvents rev = new RemoveEvents(minAutomaton, mRIT.findEventsWhichAreImpossibleAfter(minAutomaton.getEvents()),
+                                              getMarkingProposition(), getFactory());
+          rev.run();
+          Set<EventProxy> blocked = rev.getImpossible();
+          if (!blocked.isEmpty()) {
+            minAutomaton = Composer.removeBlocked(blocked, minAutomaton, getFactory());
+            List<AutomatonProxy> temp = new ArrayList<AutomatonProxy>(mAutomata);
+            mAutomata.clear();
+            //mRIT.removeAutomata(mAutomata);
+            for (AutomatonProxy aut : temp) {
+              aut = Composer.removeBlocked(blocked, aut, getFactory());
+              mAutomata.add(aut);
+              //mRIT.addAutomata(Collections.singleton(aut));
+            }
+            mHidden.removeAll(blocked);
+          }*/
           if (!mHidden.isEmpty()) {
-            TransitionRelation tr =
-                new TransitionRelation(minAutomaton, getMarkingProposition());
-            final int tau = tr.mergeEvents(mHidden, getFactory());
-            /*
-             * for (EventProxy event : mOriginalAlphabet) { if
-             * (mAllSelfLoops.containsKey(event) &&
-             * mAllSelfLoops.get(event).isEmpty()) {
-             * System.out.println("self looped");
-             * tr.removeAllSelfLoops(tr.eventToInt(event)); } }
-             */
-            System.out.println("CC");
-            final CertainConflict con = new CertainConflict(tr, tau);
-            con.run();
-            System.out.println("TLR");
+            //System.out.println("hiding:" + mHidden.size());
+            TransitionRelation tr = new TransitionRelation(minAutomaton,
+                                                           getMarkingProposition());
+            /*for (EventProxy event : mOriginalAlphabet) {
+              if (mAllSelfLoops.containsKey(event) && mAllSelfLoops.get(event).isEmpty()) {
+                System.out.println("self looped");
+                tr.removeAllTransitionsWithEvent(tr.eventToInt(event));
+              }
+            }*/
+            int tau = tr.mergeEvents(mHidden, getFactory());
+            EventProxy tauevent = tr.getEvent(tau);
+            //System.out.println("TLR");
+            //tr.makeObservationEquivalent(tau);
             final TauLoopRemoval tlr = new TauLoopRemoval(tr, tau);
             tlr.run();
-            minAutomaton2 = tr.getAutomaton(getFactory());
-            System.out.println("RFT");
-            final RemoveFollowOnTau rft = new RemoveFollowOnTau(tr, tau);
-            rft.run();
-            // System.out.println("before annotation" +
-            // tr.getAutomaton(getFactory()));
-            System.out.println("ANN");
-            final AnnotateGraph an = new AnnotateGraph(tr, tau);
-            an.run();
-            // RemoveSubsetTau rst = new RemoveSubsetTau(tr, tau); rst.run();
-            // EquivalentIncoming eq = new EquivalentIncoming(tr); eq.run();
-            /*
-             * for (EventProxy event : mOriginalAlphabet) { if
-             * (mAllwaysEnabled.containsKey(event)) { Set<AutomatonProxy> auts =
-             * new HashSet<AutomatonProxy>(mAllwaysEnabled.get(event));
-             * auts.removeAll(mAutomata); if (auts.isEmpty()) {
-             * System.out.println("allways enabled");
-             * tr.removeAllAnnotations(tr.eventToInt(event)); } } }
-             */
-            System.out.println("AUT");
+            //System.out.println("CC");
+            //System.out.println(tr.getAutomaton(getFactory()));
+            //System.out.println("before remove:" + tr.getAutomaton(getFactory()));
+            RemoveUnneededTransitions ru = new RemoveUnneededTransitions(tr, tau); ru.run();
+            CertainConflict con = new CertainConflict(tr, tau);
+            if (!con.run()) {throw new CertainConflictException();}
+            //tr.makeObservationEquivalent(tau);
+            //System.out.println("COMP");
+            tr.removeAllUnreachable();
+            //System.out.println("after remove:" + tr.getAutomaton(getFactory()));
+            TransBiSimulator tbs = new TransBiSimulator(tr, tau); tbs.run();
+            //tbs = null;
+            //System.out.println("RFT");
+            RemoveFollowOnTau rft = new RemoveFollowOnTau(tr, tau); rft.run();
+            //System.out.println("ANN");
+            AnnotateGraph an = new AnnotateGraph(tr, tau); an.run();
+            tr.removeAllUnreachable();
+            /*for (EventProxy event : mOriginalAlphabet) {
+              if (mAllwaysEnabled.containsKey(event)) {
+                Set<AutomatonProxy> auts = new HashSet<AutomatonProxy>(mAllwaysEnabled.get(event));
+                auts.removeAll(mCompautomata);
+                if (auts.isEmpty()) {
+                  System.out.println("allways enabled");
+                  tr.removeAllAnnotations(tr.eventToInt(event));
+                }
+              }
+            }*/
+            //RedundantTransitions rt = new RedundantTransitions(tr); rt.run();
+            EquivalentIncoming eq = new EquivalentIncoming(tr); eq.run();
+            //RemoveAnnotations ra = new RemoveAnnotations(tr); ra.run();
+            //ConfRevBiSimulator rbs = new ConfRevBiSimulator(tr); rbs.run();
+            BiSimulatorRedundant bsr = new BiSimulatorRedundant(tr, false); bsr.run();
+            //AddRedundantTransitions ad = new AddRedundantTransitions(tr); ad.run();
+            bsr = new BiSimulatorRedundant(tr, true); bsr.run();
+            //OptimisticBiSimulatorRedundant bsr = new OptimisticBiSimulatorRedundant(tr); bsr.run();
+            //int thing = 4;
+            /*mAnnBITIME -= System.currentTimeMillis();
+            //System.out.println("TLR");
             minAutomaton = tr.getAutomaton(getFactory());
-            // System.out.println("after annotation:" + minAutomaton);
-            System.out.println("minautomaton size:"
-                + minAutomaton.getStates().size());
-            mAnnBITIME -= System.currentTimeMillis();
+            System.out.println("BISIM");
             final BiSimulator sim =
                 new BiSimulator(minAutomaton, getMarkingProposition(),
                     getFactory());
             mAnnotatedBISIMulation += minAutomaton.getStates().size();
             minAutomaton = sim.run();
             mAnnBITIME += System.currentTimeMillis();
-            mAnnotatedBISIMulation -= minAutomaton.getStates().size();
-            tr = new TransitionRelation(minAutomaton, getMarkingProposition());
-            System.out.println("UNA");
+            mAnnotatedBISIMulation -= minAutomaton.getStates().size();                                                        
+            tr = new TransitionRelation(minAutomaton, getMarkingProposition());*/
+            //System.out.println("EI");
+            //System.out.println(tr.getAutomaton(getFactory()));
+            //MakeBisimiliar mb = new MakeBisimiliar(tr); mb.run();
+            //System.out.println(tr.getAutomaton(getFactory()));
+            eq = new EquivalentIncoming(tr); eq.run();
+            //System.out.println("UA");
             final UnAnnotateGraph ua =
                 new UnAnnotateGraph(tr, getMarkingProposition());
             minAutomaton = ua.run(getFactory());
-            final EventProxy taue = ua.getTau();
-            // System.out.println("after unannotation:" + minAutomaton);
-            /*
-             * minAutomaton = TauRemoval.unnanotateAutomaton(minAutomaton,
-             * getMarkingProposition(), getFactory());
-             */
-            /*
-             * mBITIME -= System.currentTimeMillis(); sim = new
-             * BiSimulator(minAutomaton, getMarkingProposition(), getFactory());
-             * mBISIMulation += minAutomaton.getStates().size(); minAutomaton =
-             * sim.run(); mBITIME += System.currentTimeMillis(); mBISIMulation
-             * -= minAutomaton.getStates().size();
-             */
+            tauevent = ua.getTau();
             tr = new TransitionRelation(minAutomaton, getMarkingProposition());
-            final int taunum = tr.eventToInt(taue);
-            final RemoveUnneededTransitions rut =
-                new RemoveUnneededTransitions(tr, taunum);
-            rut.run();
+            tau = tr.getEventInt(tauevent);
+            //System.out.println("IE");
+            //System.out.println("before");
+            //System.out.println(tr.getAutomaton(getFactory()));
+            //System.out.println("make equivalent");
+            //System.out.println("after");
+            //System.out.println(tr.getAutomaton(getFactory()));
+            //SilentOutGoing sog = new SilentOutGoing(tr, tau); sog.run(getFactory());
+            //rt = new RedundantTransitions(tr); rt.run();
+            RemoveUnneededTransitions rut = new RemoveUnneededTransitions(tr, tau); rut.run();
+            IncomingEquivalent ie = new IncomingEquivalent(tr, tau); ie.run();
+            tr.removeAllUnreachable();
+            con = new CertainConflict(tr, tau); con.run();
+            //tr.removeAllUnreachable();
+            //tbs = new TransBiSimulator(tr, tau); tbs.run();
+            tr.removeAllUnreachable();
             minAutomaton = tr.getAutomaton(getFactory());
             mStates += minAutomaton.getStates().size();
-            final int diff = compsize - minAutomaton.getStates().size();
+            System.out.println("minautomaton: " + minAutomaton.getStates().size());
+            int diff = compsize - minAutomaton.getStates().size();
             mAggDiff += diff;
             mSmallestDiff = mSmallestDiff > diff ? diff : mSmallestDiff;
             mLargestDiff = mLargestDiff < diff ? diff : mLargestDiff;
-            // if (diff < 0) {throw new AnalysisException("exception");}
-          } else {
+            try {
+              for (AutomatonProxy a : mCompautomata) {
+                mWriter.write(a.getName());
+                mWriter.newLine();
+              }
+              mWriter.write("compsize: " + compsize);
+              mWriter.newLine();
+              mWriter.write("minsize: " + minAutomaton.getStates().size());
+              mWriter.newLine();
+              mWriter.newLine();
+              mWriter.flush();
+            } catch (Throwable t) {
+              t.printStackTrace();
+            }
+            /*AutomatonProxy minAutomaton2 = minAutomaton;
+            minAutomaton = temp;
+            //System.out.println("half");
             mBITIME -= System.currentTimeMillis();
-            final BiSimulator sim =
-                new BiSimulator(minAutomaton2, getMarkingProposition(),
-                    getFactory());
-            // mBISIMulation += minAutomaton2.getStates().size();
-            minAutomaton2 = sim.run();
+            sim = new BiSimulator(minAutomaton,
+                                              getMarkingProposition(),
+                                              getFactory());
+            mBISIMulation += minAutomaton.getStates().size();
+            minAutomaton = sim.run();
             mBITIME += System.currentTimeMillis();
-            // mBISIMulation -= minAutomaton2.getStates().size();
+            mBISIMulation -= minAutomaton.getStates().size();
+            tr = new TransitionRelation(minAutomaton, getMarkingProposition());
+            tau = tr.getEventInt(tauevent);
+            ie = new IncomingEquivalent(tr, tau); ie.run();
+            //System.out.println("before");
+            //System.out.println(tr.getAutomaton(getFactory()));
+            //System.out.println("make equivalent");
+            //System.out.println("after");
+            //System.out.println(tr.getAutomaton(getFactory()));
+            rut = new RemoveUnneededTransitions(tr, tau); rut.run();
+            ie = new IncomingEquivalent(tr, tau); ie.run();
+            con = new CertainConflict(tr, tau);
+            con.run(); 
+            minAutomaton = tr.getAutomaton(getFactory());
+            if (minAutomaton.getStates().size() > minAutomaton2.getStates().size()) {
+              System.out.println("without ann: " + minAutomaton.getStates().size());
+              System.out.println("with ann: " + minAutomaton2.getStates().size());
+              minAutomaton = minAutomaton2;
+            }*/
+            // if (diff < 0) {throw new AnalysisException("exception");}
+            //System.out.println(minAutomaton.getName());
+            //System.out.println("origstates:" + origstates);
+            //System.out.println("origtrans:" + origtrans);
+            //System.out.println("states:" + minAutomaton.getStates().size());
+            //System.out.println("trans:" + minAutomaton.getTransitions().size());
+            //System.out.println("events:" + minAutomaton.getEvents().size());
+            //System.out.println("hidden: " + mHidden);
+          } else {
+            TransitionRelation tr = new TransitionRelation(minAutomaton, getMarkingProposition());
+            //OptimisticBiSimulatorRedundant obsr = new OptimisticBiSimulatorRedundant(tr); obsr.run();
+            //BiSimulatorRedundant bsr = new BiSimulatorRedundant(tr); bsr.run();
+            minAutomaton = tr.getAutomaton(getFactory());
+            //System.out.println(minAutomaton.getName());
+            //System.out.println("no hide before: " + minAutomaton.getStates().size());
+            mBITIME -= System.currentTimeMillis();
+            mBISIMulation += minAutomaton.getStates().size();
+            BiSimulator sim = new BiSimulator(minAutomaton,
+                                            getMarkingProposition(),
+                                            getFactory());
+            //mBISIMulation += minAutomaton2.getStates().size();
+            minAutomaton = sim.run();
+            mBISIMulation -= minAutomaton.getStates().size();
+            mBITIME += System.currentTimeMillis();
+            //System.out.println("no hide after: " + minAutomaton.getStates().size());
+            //System.out.println("orig: " + mOriginalAlphabet);
+            //System.out.println("hidden: " + mHidden);
+            //mBISIMulation -= minAutomaton2.getStates().size();*/
           }
-          if (minAutomaton.getStates().size() > minAutomaton2.getStates()
-              .size()) {
-            System.out.println("SWITCH");
-            System.out.println("SWITCH");
+          /*if (minAutomaton.getStates().size() > minAutomaton2.getStates().size()) {
+            System.out.println("SWITCH"); System.out.println("SWITCH");
             switched++;
             minAutomaton = minAutomaton2;
-          }
+          }*/
           final TransitionRelation tr =
               new TransitionRelation(minAutomaton, getMarkingProposition());
           allwaysenabled = tr.getAllwaysEnabled();
@@ -721,14 +1333,10 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
         } catch (final AnalysisException exception) {
           mCompTime += System.currentTimeMillis();
           mStates += mMaxProjStates;
-          mMinAutMap.put(ah, null);
+          //mMinAutMap.put(ah, null);
           throw exception;
-        } catch (final Exception exception) {
-          minAutomaton = null;
-          exception.printStackTrace();
-          System.exit(0);
         }
-      }
+      //}
       // RemoveTransitions
       // mRIT.removeAutomata(mCompautomata);
       // mRIT.addAutomata(Collections.singleton(minAutomaton));
@@ -761,6 +1369,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
            */
         }
       }
+      //mRIT.addAutomata(Collections.singleton(minAutomaton));
       mAutomata.add(minAutomaton);
       mDontOnOwn.add(minAutomaton);
       mNew = minAutomaton;
@@ -976,6 +1585,15 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
       }
     }
   }
+  
+  private static class AutomatonComparator
+    implements Comparator<AutomatonProxy>
+  {
+    public int compare(AutomatonProxy a1, AutomatonProxy a2)
+    {
+      return a1.getName().compareTo(a2.getName());
+    }
+  }
 
 
   private static class AutomataHidden
@@ -1030,8 +1648,8 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
     }
   }
 
-  // #########################################################################
-  // # Data Members
+  //#########################################################################
+  //# Data Members
   private int minSize = 10000;
   private final AutomatonProxy mSpec = null;
   private int mStates;
@@ -1045,6 +1663,11 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
   private final Map<EventProxy,Set<AutomatonProxy>> mAllwaysEnabled =
       new THashMap<EventProxy,Set<AutomatonProxy>>();
   private int mLargestComposition = 0;
+  private int mLargestTransitions = 0;
+  private int mAggComposition = 0;
+  private int mAggTransitions = 0;
+  private TObjectIntHashMap<Set<AutomatonProxy>> mNumOccurinng = null;
+  private TObjectIntHashMap<Set<AutomatonProxy>> mCommon = null;
 
   private int mAnnotatedBISIMulation = 0;
   private int mBISIMulation = 0;
@@ -1057,7 +1680,11 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
   private int maxsize = 1000;
   private int switched = 0;
   private int mTime = 0;
-
+  private boolean mSorted = false;
+  
+  private BufferedWriter mWriter = null;
+  
+  
   @SuppressWarnings("unused")
   private final RemoveImpossibleTransitions mRIT = null;
   @SuppressWarnings("unused")

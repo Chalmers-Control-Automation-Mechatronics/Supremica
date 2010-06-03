@@ -51,6 +51,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.analysis.annotation.BiSimulatorLanguage;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -74,7 +75,7 @@ public class NDProjectingControllabilityChecker
                                             final ControllabilityChecker checker,
                                             final boolean least)
   {
-    this(model, factory, checker, least, 16000);
+    this(model, factory, checker, least, 500);
   }
 
   public NDProjectingControllabilityChecker(final ProductDESProxy model,
@@ -90,7 +91,8 @@ public class NDProjectingControllabilityChecker
     mChecker = checker;
     mStates = 0;
     setNodeLimit(10000000);
-    mMaxProjStates = maxsize;
+    maxprojection = maxsize;
+    mMaxProjStates = maxprojection;
   }
 
 
@@ -191,7 +193,7 @@ public class NDProjectingControllabilityChecker
       while (!mChecker.run()) {
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
         final TraceProxy counter =
-          true ? //proj == null ?
+          proj == null ?
           mChecker.getCounterExample() :
           proj.getTrace(mChecker.getCounterExample(), comp);
         Collection<AutomatonProxy> newComp =
@@ -212,6 +214,7 @@ public class NDProjectingControllabilityChecker
           events.addAll(automaton.getEvents());
         }
         comp = getFactory().createProductDESProxy("comp", events, composition);
+        System.out.println("forb1:" + forbiddenEvents);
         proj = project(comp, forbiddenEvents);
         mChecker.setModel(proj == null ? comp : proj.getModel());
       }
@@ -268,14 +271,14 @@ public class NDProjectingControllabilityChecker
       TransitionRelation tr = new TransitionRelation(aut, null, forbiddenEvents);
       automata.add(tr.getAutomaton(getFactory()));
     }*/
-    System.out.println(automata);
-    System.out.println(forbiddenEvents);
+    //System.out.println(automata);
+    //System.out.println(forbiddenEvents);
     automata.addAll(plants);
     automata.addAll(specs);
     final Set<AutomatonProxy> tempautomata = new THashSet<AutomatonProxy>();
     for (final AutomatonProxy a : automata) {
       events.addAll(a.getEvents());
-      tempautomata.add(addSelfLoops(a, forbiddenEvents));
+      tempautomata.add(a);//addSelfLoops(a, forbiddenEvents));
     }
     automata = tempautomata;
     CertainDeath.clearStats();
@@ -283,7 +286,7 @@ public class NDProjectingControllabilityChecker
                                                                events,
                                                                automata);
     final ProjectionList list = project(model, forbiddenEvents);
-    System.out.println(CertainDeath.stats());
+    //System.out.println(CertainDeath.stats());
     /*ControllabilityChecker checker = new ModularControllabilityChecker(
                                            list.getModel(), getFactory(),
                                            mChecker, mHeuristic, mLeast);*/
@@ -312,7 +315,7 @@ public class NDProjectingControllabilityChecker
     } else {
       //mStates += checker.getAnalysisResult().getTotalNumberOfStates();
       mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();
-      System.out.println(checker.getAnalysisResult().getTotalNumberOfStates());
+      //System.out.println(checker.getAnalysisResult().getTotalNumberOfStates());
       TraceProxy counter = checker.getCounterExample();
       //counter = list.getTrace(counter, model);
       final List<EventProxy> e = counter.getEvents();
@@ -468,8 +471,8 @@ public class NDProjectingControllabilityChecker
           }
         }
       }
-      System.out.println("numautomata:" + automata.size());
-      System.out.println(numoccuring.size());
+      //System.out.println("numautomata:" + automata.size());
+      //System.out.println(numoccuring.size());
       final Set<Tuple> possible = new TreeSet<Tuple>();
       boolean stop = true;
       for (final SortedSet<AutomatonProxy> s : numoccuring.keySet()) {
@@ -498,16 +501,17 @@ public class NDProjectingControllabilityChecker
           for (final AutomatonProxy a : tup.mSet) {
             maxsize *= a.getStates().size();
           }
-          final ProjectionList t =
+          //System.out.println("forb2:" + forbiddenEvents);
+          ProjectionList t =
             new ProjectionList(p, automata, tup.mSet, forbiddenEvents);
           if (minSize >= t.getNew().getStates().size()) {
-            minlist = t;
-            minSize = t.getNew().getStates().size();
-            break;
+          minlist = t;
+          minSize = t.getNew().getStates().size();
+          break;
           }
         } catch (final AnalysisException exception) {
           overflows++;
-          System.out.println(overflows);
+         //System.out.println(overflows);
           if (overflows >= 2) {
           //  break;
           }
@@ -586,9 +590,9 @@ public class NDProjectingControllabilityChecker
     {
       final Set<AutomatonProxy> mTempComp = new THashSet<AutomatonProxy>();
       final Set<AutomatonProxy> mTempAut = new THashSet<AutomatonProxy>();
-      System.out.println("before");
+      //System.out.println("before");
       for (final AutomatonProxy aut : mCompautomata) {
-        System.out.println(aut.getName() + " trans:" + aut.getTransitions().size());
+        //System.out.println(aut.getName() + " trans:" + aut.getTransitions().size());
       }
       for (final AutomatonProxy aut : mCompautomata) {
         AutomatonProxy aut1 = aut;
@@ -598,7 +602,7 @@ public class NDProjectingControllabilityChecker
             List<AutomatonProxy> tocomp =
               Arrays.asList(new AutomatonProxy[]{aut1, aut2});
             final BlockedEvents be = new BlockedEvents(tocomp, getFactory(), null);
-            be.setNodeLimit(100000);
+            be.setNodeLimit(10000);
             try {
               tocomp = be.run();
             } catch (final AnalysisException ae) {
@@ -614,11 +618,11 @@ public class NDProjectingControllabilityChecker
         mAutomata.addAll(mTempAut);
         mTempComp.add(aut1);
       }
-      System.out.println("after");
+     //System.out.println("after");
       mCompautomata.clear();
       mCompautomata.addAll(mTempComp);
       for (final AutomatonProxy aut : mCompautomata) {
-        System.out.println(aut.getName() + " trans:" + aut.getTransitions().size());
+       //System.out.println(aut.getName() + " trans:" + aut.getTransitions().size());
       }
     }
 
@@ -659,35 +663,41 @@ public class NDProjectingControllabilityChecker
       } else {
         try {
           final int size = mMaxProjStates;
-          blockedEvents();
+          //blockedEvents();
+          //System.out.println(mCompautomata);
           final NonDeterministicComposer composer =
             new NonDeterministicComposer(
               new ArrayList<AutomatonProxy>(mCompautomata), getFactory(), null);
-          composer.setNodeLimit(size);
+          composer.setNodeLimit(maxprojection);
           minAutomaton = composer.run();
           //System.out.println(minAutomaton);
-          final TransitionRelation tr = new TransitionRelation(minAutomaton,
-                                                         null);
+          TransitionRelation tr = new TransitionRelation(minAutomaton, null);
           final int tau = tr.mergeEvents(mHidden, getFactory());
-          if (mOriginalAlphabet.containsAll(mForbiddenEvents)) {
+          //System.out.println("alph:" + mOriginalAlphabet);
+          //System.out.println("forb:" + forbiddenEvents);
+          TauLoopRemoval tlr = new TauLoopRemoval(tr, tau); tlr.run();
+          RemoveAllTau rat = new RemoveAllTau(tr, tau); rat.run();
+          if (mOriginalAlphabet.containsAll(forbiddenEvents)) {
             System.out.println("con");
             int states = tr.getAutomaton(getFactory()).getStates().size();
-            tr.setMarkingToStatesWithOutgoing(mForbiddenEvents);
+            tr.setMarkingToStatesWithOutgoing(forbiddenEvents);
             final CertainDeath con = new CertainDeath(tr); con.run();
             states -= tr.getAutomaton(getFactory()).getStates().size();
-            System.out.println(states);
+            //System.out.println(states);
           }
-          final TauLoopRemoval tlr = new TauLoopRemoval(tr, tau); tlr.run();
-          final RemoveAllTau rft = new RemoveAllTau(tr, tau); rft.run();
+          tr.removeAllUnreachable();
+          BiSimulatorLanguage tbs = new BiSimulatorLanguage(tr); tbs.run();
+          RevBiSimulator rbs = new RevBiSimulator(tr); rbs.run();
           minAutomaton = tr.getAutomaton(getFactory());
           //System.out.println(minAutomaton);
           //mBITIME -= System.currentTimeMillis();
-          final BiSimulator sim = new BiSimulator(minAutomaton,
-                                            null,
-                                            getFactory());
+          /*BiSimulator sim = new BiSimulator(minAutomaton, null, getFactory());
           //mBISIMulation += minAutomaton.getStates().size();
-          minAutomaton = sim.run();
+          minAutomaton = sim.run();*/
           //mBITIME += System.currentTimeMillis();
+          /*if (minAutomaton.getStates().size() > maxprojection) {
+            throw new AnalysisException("to big");
+          }*/
           //mBISIMulation -= minAutomaton.getStates().size();
           mMinAutMap.put(ah, minAutomaton);
         } catch (final AnalysisException exception) {
@@ -720,14 +730,14 @@ public class NDProjectingControllabilityChecker
     {
       final List<Map<StateProxy, Set<EventProxy>>> events =
         new ArrayList<Map<StateProxy, Set<EventProxy>>>(mCompautomata.size());
-      final List<Map<Key, StateProxy>> automata =
-        new ArrayList<Map<Key, StateProxy>>(mCompautomata.size());
+      List<Map<Key, Set<StateProxy>>> automata =
+        new ArrayList<Map<Key, Set<StateProxy>>>(mCompautomata.size());
       List<StateProxy> currstate = new ArrayList<StateProxy>(mCompautomata.size());
       final AutomatonProxy[] aut = new AutomatonProxy[mCompautomata.size()];
       int i = 0;
       for (final AutomatonProxy proxy : mCompautomata) {
         events.add(new HashMap<StateProxy, Set<EventProxy>>(proxy.getStates().size()));
-        automata.add(new HashMap<Key, StateProxy>(proxy.getTransitions().size()));
+        automata.add(new HashMap<Key, Set<StateProxy>>(proxy.getTransitions().size()));
         final Set<EventProxy> autevents = new HashSet<EventProxy>(mOriginalAlphabet);
         //System.out.println(autevents);
         autevents.removeAll(proxy.getEvents());
@@ -743,7 +753,13 @@ public class NDProjectingControllabilityChecker
         assert(init == 1);
         for (final TransitionProxy t : proxy.getTransitions()) {
           events.get(i).get(t.getSource()).add(t.getEvent());
-          automata.get(i).put(new Key(t.getSource(), t.getEvent()), t.getTarget());
+          Key key = new Key(t.getSource(), t.getEvent());
+          Set<StateProxy> targets = automata.get(i).get(key);
+          if (targets == null) {
+            targets = new THashSet();
+            automata.get(i).put(key, targets);
+          }
+          targets.add(t.getTarget());
         }
         aut[i] = proxy;
         i++;
@@ -768,49 +784,82 @@ public class NDProjectingControllabilityChecker
         hidden:
         for (final EventProxy pe : possevents) {
           //System.out.println(pe);
-          final List<StateProxy> newstate = new ArrayList<StateProxy>(currstate.size());
+          List<Set<StateProxy>> newstate = new ArrayList<Set<StateProxy>>(currstate.size());
           for (i = 0; i < currstate.size(); i++) {
             if (aut[i].getEvents().contains(pe)) {
-              final StateProxy t = automata.get(i).get(new Key(currstate.get(i), pe));
+              Set<StateProxy> t = automata.get(i).get(new Key(currstate.get(i), pe));
               //System.out.println(t);
               if (t == null) {
                 continue hidden;
               }
               newstate.add(t);
             } else {
-              newstate.add(currstate.get(i));
+              newstate.add(Collections.singleton(currstate.get(i)));
             }
           }
           //System.out.println(newstate);
-          final Place newPlace = new Place(newstate, pe, place.mIndex, place);
+          addNewPlace(newstate, pe, place.mIndex, place, visited, stateList);
+          /*Place newPlace = new Place(newstate, pe, place.mIndex, place);
           if (visited.add(newPlace)) {
             stateList.offer(newPlace);
-          }
+          }*/
         }
-        final EventProxy currevent = oldevents.get(place.mIndex);
-        final List<StateProxy> newstate = new ArrayList<StateProxy>(currstate.size());
+        EventProxy currevent = oldevents.get(place.mIndex);
+        List<Set<StateProxy>> newstate = new ArrayList<Set<StateProxy>>(currstate.size());
         boolean contains = true;
         for (i = 0; i < currstate.size(); i++) {
           if (aut[i].getEvents().contains(currevent)) {
-            final StateProxy t = automata.get(i).get(new Key(currstate.get(i), currevent));
+            Set<StateProxy> t = automata.get(i).get(new Key(currstate.get(i), currevent));
             if (t == null) {
               contains = false;
             }
             newstate.add(t);
           } else {
-            newstate.add(currstate.get(i));
+            newstate.add(Collections.singleton(currstate.get(i)));
           }
         }
-        final Place newPlace = new Place(newstate, currevent, place.mIndex + 1, place);
+        if (contains) {
+          addNewPlace(newstate, currevent, place.mIndex + 1, place, visited, stateList);
+        }
+        /*Place newPlace = new Place(newstate, currevent, place.mIndex + 1, place);
         if (contains && visited.add(newPlace)) {
           stateList.offer(newPlace);
-        }
+        }*/
         assert(!stateList.isEmpty());
       }
       stateList = null;
       final ProductDESProxy mod = mParent == null ? model : mParent.getModel();
       trace = getFactory().createSafetyTraceProxy(mod, place.getTrace());
       return mParent == null ? trace : mParent.getTrace(trace, model);
+    }
+    
+    private void addNewPlace(List<Set<StateProxy>> newstate, EventProxy pe,
+                             int index, Place place,  Set<Place> visited,
+                             Queue<Place> stateList)
+    {
+      List<StateProxy> states = new ArrayList<StateProxy>(newstate.size());
+      for (int i = 0; i < newstate.size(); i++) {
+        states.add(null);
+      }
+      addNewPlace(newstate, pe, index, place, visited, stateList, states, 0);
+    }
+    
+    private void addNewPlace(List<Set<StateProxy>> newstate, EventProxy pe,
+                             int index, Place place,  Set<Place> visited,
+                             Queue<Place> stateList,
+                             List<StateProxy> workingstate, int depth)
+    {
+      if (depth == newstate.size()) {
+        Place newPlace = new Place(workingstate, pe, index, place);
+        if (visited.add(newPlace)) {
+          stateList.offer(newPlace);
+        }
+        return;
+      }
+      for (StateProxy s : newstate.get(depth)) {
+        workingstate.set(depth, s);
+        addNewPlace(newstate, pe, index, place, visited, stateList, workingstate, depth + 1);
+      }
     }
 
     private class Place
@@ -973,6 +1022,7 @@ public class NDProjectingControllabilityChecker
   //#########################################################################
   //# Data Members
   private int minSize = 1000;
+  private int maxprojection = 1000;
   private final ControllabilityChecker mChecker;
   private final AutomatonProxy mSpec = null;
   private int mStates;

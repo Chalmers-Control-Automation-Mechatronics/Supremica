@@ -35,10 +35,46 @@ import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import gnu.trove.THashSet;
 
 
 public class Projection2
 {
+  public static AutomatonProxy removeNonLocal(AutomatonProxy aut, ProductDESProxyFactory factory)
+  {
+    System.out.println("rem non local");
+    Map<EventProxy, Set<StateProxy>> loopedstates = new HashMap<EventProxy, Set<StateProxy>>();
+    for (EventProxy e : aut.getEvents()) {
+      loopedstates.put(e, new THashSet<StateProxy>());
+    }
+    for (TransitionProxy t : aut.getTransitions()) {
+      if (!t.getSource().equals(t.getTarget())) {
+        loopedstates.remove(t.getEvent());
+      }
+      if (loopedstates.containsKey(t.getEvent())) {
+        loopedstates.get(t.getEvent()).add(t.getSource());
+      }
+    }
+    Set<EventProxy> temp = new THashSet<EventProxy>(aut.getEvents());
+    for (EventProxy e : loopedstates.keySet()) {
+      if (loopedstates.get(e).size() == aut.getStates().size()) {
+        temp.remove(e);
+      }
+    }
+    if (temp.size() == aut.getEvents().size()) {
+      return aut;
+    }
+    System.out.println("non local: " + (aut.getEvents().size() - temp.size()));
+    List<TransitionProxy> trans = new ArrayList<TransitionProxy>();
+    for (TransitionProxy tran : aut.getTransitions()){
+      if (temp.contains(tran.getEvent())) {trans.add(tran);}
+    }
+    final AutomatonProxy result = factory.createAutomatonProxy(aut.getName(), aut.getKind(),
+                                                               temp, aut.getStates(),
+                                                               trans);
+    return result;
+  }
+  
   public Projection2(final ProductDESProxy model, final ProductDESProxyFactory factory,
                      final Set<EventProxy> hide, final Set<EventProxy> forbidden)
   {
@@ -64,6 +100,7 @@ public class Projection2
     states = new IntMap(mNodeLimit);
     trans = new ArrayList<TransitionProxy>();
     events = mModel.getEvents().toArray(new EventProxy[mModel.getEvents().size()]);
+    mPossible = new boolean[events.length];
     final int numAutomata = mModel.getAutomata().size();
     AutomatonProxy[] aut = mModel.getAutomata().toArray(new AutomatonProxy[numAutomata]);
     eventAutomaton = new int[events.length][numAutomata];
@@ -160,6 +197,7 @@ public class Projection2
         explore(currentState, false);
       }
     }
+    System.out.println("composed");
     mCompositionSize = states.values().size();
     states = null;
     currentState = new int[] {0};
@@ -187,6 +225,7 @@ public class Projection2
     ev.removeAll(mHide);
 
     final StringBuffer name = new StringBuffer();
+    name.append("proj:");
     final ArrayList<String> names = new ArrayList<String>(mModel.getAutomata().size());
     for (final AutomatonProxy a : mModel.getAutomata()) {
       names.add(a.getName());
@@ -205,6 +244,15 @@ public class Projection2
     final Minimizer min = new Minimizer(result, mFactory);
     result = min.run();
     return result;
+  }
+  
+  public Set<EventProxy> BlockedEvents()
+  {
+    Set<EventProxy> blocked = new THashSet<EventProxy>();
+    for (int e = 0; e < events.length; e++) {
+      if (!mPossible[e]) {blocked.add(events[e]);}
+    }
+    return blocked;
   }
 
   public boolean explore(int[] state, final boolean forbidden)
@@ -253,12 +301,13 @@ public class Projection2
         target = numStates;
         states.put(suc, target);
         numStates++;
-        if (numStates > mNodeLimit * 10) {
-          throw new OverflowException(mNodeLimit * 10);
+        if (numStates > mNodeLimit) {
+          throw new OverflowException(mNodeLimit);
         }
         unvisited.offer(suc);
       }
       newtrans.add(new int[] {source, i, target});
+      mPossible[i] = true;
     }
     return result;
   }
@@ -685,6 +734,7 @@ public class Projection2
   }
 
   @SuppressWarnings("unused")
+  private boolean[] mPossible;
   private int mCompositionSize = 0;
   private int mNodeLimit;
   private final ProductDESProxy mModel;

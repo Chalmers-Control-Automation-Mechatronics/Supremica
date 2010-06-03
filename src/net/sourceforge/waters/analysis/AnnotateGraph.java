@@ -47,6 +47,46 @@ public class AnnotateGraph
   {
     TIME -= System.currentTimeMillis();
     STATESREMOVED -= mTransitionRelation.unreachableStates();
+    TIntHashSet tausremoved = new TIntHashSet();
+    for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
+      TIntHashSet taus = mTransitionRelation.getSuccessors(s, mTau);
+      if (taus == null || taus.isEmpty()) {
+        continue;
+      }
+      //System.out.println("taus: + " + Arrays.toString(taus.toArray()));
+      TIntIterator it = taus.iterator();
+      ANNOTATIONSREMOVEDSUBSET += mTransitionRelation.getAnnotations2(s).size();
+      Set<TIntHashSet> anns = new THashSet<TIntHashSet>(mTransitionRelation.getAnnotations2(s));
+      while (it.hasNext()) {
+        ANNOTATIONSADDED++;
+        int target = it.next();
+        tausremoved.add(target);
+        TIntHashSet ae = mTransitionRelation.getActiveEvents(target);
+        if (ae == null) {
+          System.out.println("null ae");
+          ae = new TIntHashSet();
+        }
+        mTransitionRelation.addAllSuccessors(target, s);
+        ANNOTATIONSREMOVEDSUBSET += mTransitionRelation.getAnnotations2(target).size();
+        anns = mTransitionRelation.subsets(mTransitionRelation.getAnnotations2(target),
+                                           anns);
+      }
+      ANNOTATIONSREMOVEDSUBSET -= anns.size();
+      if (!anns.isEmpty()) {
+        mTransitionRelation.setAnnotation(s, anns);
+      }
+    }
+    mTransitionRelation.removeAllAnnotations(mTau);
+    mTransitionRelation.removeEvent(mTau);
+    STATESTAUSREMOVEDFROM += tausremoved.size();
+    STATESREMOVED += mTransitionRelation.unreachableStates();
+    TIME += System.currentTimeMillis();
+  }
+  
+  /*public void run()
+  {
+    TIME -= System.currentTimeMillis();
+    STATESREMOVED -= mTransitionRelation.unreachableStates();
     TIntArrayList stilltau = new TIntArrayList();
     TIntHashSet tausremoved = new TIntHashSet();
     for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
@@ -106,9 +146,10 @@ public class AnnotateGraph
       }
       stilltau.clear();
     }
+    mTransitionRelation.removeAllAnnotations(mTau);
     mTransitionRelation.removeEvent(mTau);
     STATESTAUSREMOVEDFROM += tausremoved.size();
     STATESREMOVED += mTransitionRelation.unreachableStates();
     TIME += System.currentTimeMillis();
-  }
+  }*/
 }

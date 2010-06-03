@@ -97,9 +97,10 @@ public class TauLoopRemoval
     }
     for (TIntHashSet merge : mToBeMerged) {
       STATESMERGED += merge.size() - 1;
-      mTransitionRelation.merge(merge.toArray());
+      mTransitionRelation.mergewithannotations(merge.toArray());
     }
     mTransitionRelation.removeAllSelfLoops(mTau);
+    mTransitionRelation.removeAllAnnotations(mTau);
     TIME += System.currentTimeMillis();
   }
 }

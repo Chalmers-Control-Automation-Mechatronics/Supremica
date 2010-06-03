@@ -3,6 +3,7 @@ package net.sourceforge.waters.analysis;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
 import gnu.trove.TIntStack;
+import java.util.Set;
 
 
 public class CertainConflict
@@ -67,9 +68,18 @@ public class CertainConflict
     }
   }*/
   
-  public void run()
+  public boolean run()
   {
     TIME -= System.currentTimeMillis();
+    TIntHashSet empty = new TIntHashSet();
+    for (int state = 0; state < mTransitionRelation.numberOfStates(); state++) {
+      Set<TIntHashSet> anns = mTransitionRelation.getAnnotation(state);
+      if (anns != null) {
+        if (anns.contains(empty)) {
+          mTransitionRelation.removeAllOutgoing(state);
+        }
+      }
+    }
     for (int state = 0; state < mTransitionRelation.numberOfStates(); state++) {
       if (mTransitionRelation.isMarked(state)) {
         backtrack(state);
@@ -79,8 +89,10 @@ public class CertainConflict
     TIntHashSet redirect = new TIntHashSet();
     TIntStack stack = new TIntStack();
     for (int state = 0; state < mReachable.length; state++) {
+      if (!mTransitionRelation.hasPredecessors(state)) {continue;}
       if (!mReachable[state]) {
         dumpstate = dumpstate == -1 ? state : dumpstate;
+        //System.out.println("dumpstate: " + dumpstate);
         redirect.add(state); // all transitions leading to this state will be redirected here
         stack.push(state);
       }
@@ -89,7 +101,11 @@ public class CertainConflict
       while (stack.size() != 0) {
         int state = stack.pop();
         STATESREMOVED++;
-        mTransitionRelation.removeAllOutgoing(state);
+        TIntHashSet iaoio = mTransitionRelation.removeAllOutgoing(state);
+        if (mTransitionRelation.isInitial(state)) {
+          TIME += System.currentTimeMillis();
+          return false;
+        }
         /*if (mTransitionRelation.isInitial(state)) {
           for (int i = 0; i < mTransitionRelation.numberOfStates(); i++) {
             if (mTransitionRelation.isInitial(i)) {
@@ -117,29 +133,44 @@ public class CertainConflict
             int[] arsuccs = succs.toArray();
             for (int i = 0; i < arsuccs.length; i++) {
               int succ = arsuccs[i];
-              if (succ == state) {continue;};
+              if (succ == state) {continue;}
               mTransitionRelation.removeTransition(pred, e, succ);
             }
           }
         }
         mTransitionRelation.moveAllPredeccessors(state, dumpstate);
       }
+      if (dumpstate == -1) {break;}
       MainLoop:
       for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
         if (mTransitionRelation.isMarked(s)) {continue;}
         for (int e = 0; e < mTransitionRelation.numberOfEvents(); e++) {
           TIntHashSet succs = mTransitionRelation.getSuccessors(s, e);
-          if (succs == null) {continue;}
+          if (succs == null) {continue;}         
           if (succs.size() > 1 || !succs.contains(dumpstate)) {
             continue MainLoop;
           }
         }
         if (redirect.add(s)) {stack.push(s);}
       }
+      MainLoop2:
+      for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
+        for (int e = 0; e < mTransitionRelation.numberOfEvents(); e++) {
+          TIntHashSet succs = mTransitionRelation.getSuccessors(s, e);
+          if (succs == null) {continue;}
+          if (succs.contains(dumpstate)) {
+            if (mTransitionRelation.removeEventFromAnnotations(e, s)) {
+              if (redirect.add(s)) {stack.push(s);}
+              continue MainLoop2;
+            }
+          }
+        }
+      }
       if (stack.size() == 0) {
         break;
       }
     }
     TIME += System.currentTimeMillis();
+    return true;
   }
 }

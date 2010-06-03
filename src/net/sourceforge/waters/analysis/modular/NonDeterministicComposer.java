@@ -22,6 +22,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import java.util.Collections;
 
 
 public class NonDeterministicComposer
@@ -61,7 +62,7 @@ public class NonDeterministicComposer
     events = unionEvents();
     int numAutomata = mModel.size();
     for (AutomatonProxy a : mModel) {
-      System.out.println("Automata: " + a.getName());
+      //System.out.println("Automata: " + a.getName());
       //System.out.println(a);
     }
     eventAutomaton = new int[events.length][numAutomata];
@@ -157,6 +158,7 @@ public class NonDeterministicComposer
     // Time to start building the automaton
     numStates = 0;
     unvisited = new ArrayBag(100);
+    //System.out.println(Arrays.deepToString(currentState));
     permutations(currentState, new int[numAutomata], 0,
                  -1, -1, true);
     while (!unvisited.isEmpty()) {
@@ -165,8 +167,8 @@ public class NonDeterministicComposer
       //explore(currentState, true);
       explore(cs);
     }
-    System.out.println("Composition:" + numStates);
-    System.out.println("Transitions:" + newtrans.size());
+    //System.out.println("Composition:" + numStates);
+    //System.out.println("Transitions:" + newtrans.size());
     mCompositionSize = numStates;
     StateProxy[] states = new StateProxy[numStates];
     for (int i = 0; i < states.length; i++) {
@@ -182,6 +184,9 @@ public class NonDeterministicComposer
     }
     StringBuffer name = new StringBuffer();
     for (AutomatonProxy a : mModel) {
+      if (name.length() != 0) {
+        name.append("||");
+      }
       name.append(a.getName());
     }
     String nam = name.toString();

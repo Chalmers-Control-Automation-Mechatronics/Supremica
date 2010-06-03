@@ -22,6 +22,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import java.util.Collections;
 
 
 public class SpeedComparison3
@@ -71,12 +72,14 @@ public class SpeedComparison3
     ControllabilityChecker nativec = new NativeControllabilityChecker(mProductDESProxyFactory);
     List<File> files = new ArrayList<File>();
     //
-    File dir = new File("examples/waters/tests/incremental_suite/");
+    File dir = new File("/home/darius/Projects/supr/supremica/Supremica/waters/logs/results/samples/maze/NDPRMazeTest/");
     files.addAll(Arrays.asList(dir.listFiles(new WFilter())));
-    dir = new File("examples/waters/tests/profisafe/");
-    files.addAll(Arrays.asList(dir.listFiles(new WFilter())));
-    files = files();
-    files = files2();
+    Collections.sort(files);
+    //dir = new File("examples/waters/tests/profisafe/");
+    //files.addAll(Arrays.asList(dir.listFiles(new WFilter())));
+    //files = files();
+    //files = files2();
+    //files.addAll(files2());
     PrintStream ps = null;
     PrintStream pt = null;
     /*ps = new PrintStream("modstate.txt");
@@ -306,8 +309,8 @@ public class SpeedComparison3
     pt.flush();
     ps.close();
     pt.close();*/
-    ps = new PrintStream("projnatstate.txt");
-    pt = new PrintStream("projnattime.txt");
+    /*ps = new PrintStream("projnatstate.csv");
+    pt = new PrintStream("projnattime.csv");
     for (int i = 100; i <= 3200; i *= 2) {
       ps.print(i);
       ps.print(",");
@@ -322,9 +325,10 @@ public class SpeedComparison3
       ps.print(",");
       pt.print(model.getName());
       pt.print(",");
-      for (int i = 100; i <= 3200; i *= 2) {
+      //for (int i = 100; i <= 3200; i *= 2) {
+      int i = 6000;
         ControllabilityChecker mo = new ProjectingControllabilityChecker
-	  (model, mProductDESProxyFactory, nativec, i);
+          (model, mProductDESProxyFactory, nativec, false, i);
         LanguageInclusionChecker lang = new ModularLanguageInclusionChecker
 	  (model, mProductDESProxyFactory, mo);
         mo.setNodeLimit(2000000);
@@ -333,8 +337,8 @@ public class SpeedComparison3
         long timea = 0;
         try {
           timeb = System.currentTimeMillis();
-          mo.run();
-          //lang.run();
+          //mo.run();
+          lang.run();
           timea = System.currentTimeMillis();
           ps.print(mo.getAnalysisResult().getTotalNumberOfStates());
           ps.print(",");
@@ -344,16 +348,16 @@ public class SpeedComparison3
         }
         pt.print(timea - timeb);
         pt.print(",");
-      }
+      //}
       ps.println();
       pt.println();
     }
     ps.flush();
     pt.flush();
     ps.close();
-    pt.close();
-    ps = new PrintStream("ndprojnatstate.txt");
-    pt = new PrintStream("ndprojnattime.txt");
+    pt.close();*/
+    ps = new PrintStream("ndprojnatstate.csv");
+    pt = new PrintStream("ndprojnattime.csv");
     for (int i = 100; i <= 3200; i *= 2) {
       ps.print(i);
       ps.print(",");
@@ -368,7 +372,9 @@ public class SpeedComparison3
       ps.print(",");
       pt.print(model.getName());
       pt.print(",");
-      for (int i = 100; i <= 3200; i *= 2) {
+      //for (int i = 100; i <= 3200; i *= 2) {
+      int i = 6000;
+      System.out.println(model.getName());
         ControllabilityChecker mo = new NDProjectingControllabilityChecker(model, mProductDESProxyFactory,
                                                                            nativec, false, i);
         LanguageInclusionChecker lang = new ModularLanguageInclusionChecker(model,
@@ -380,8 +386,8 @@ public class SpeedComparison3
         long timea = 0;
         try {
           timeb = System.currentTimeMillis();
-          mo.run();
-          //lang.run();
+          //mo.run();
+          lang.run();
           timea = System.currentTimeMillis();
           ps.print(mo.getAnalysisResult().getTotalNumberOfStates());
           ps.print(",");
@@ -391,7 +397,7 @@ public class SpeedComparison3
         }
         pt.print(timea - timeb);
         pt.print(",");
-      }
+      //}
       ps.println();
       pt.println();
     }

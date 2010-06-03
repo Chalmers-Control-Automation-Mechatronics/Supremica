@@ -49,6 +49,7 @@ public class RemoveFollowOnTau
         mTausRemoved++;
         mTransitionRelation.removeTransition(state, mTau, target);
         mTransitionRelation.addAllSuccessors(target, state);
+        mTransitionRelation.addAnnotations2(target, state);
       }
     }
   }
@@ -87,6 +88,7 @@ public class RemoveFollowOnTau
       removeFollowons(s);
     }
     mStatesRemoved += mTransitionRelation.unreachableStates();
+    mTransitionRelation.removeAllAnnotations(mTau);
     TIME += System.currentTimeMillis();
   }
 }

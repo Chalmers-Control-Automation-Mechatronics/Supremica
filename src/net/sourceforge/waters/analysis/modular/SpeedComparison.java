@@ -20,17 +20,30 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.analysis.CompNonBlockingChecker;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.io.FilenameFilter;
+import java.util.Arrays;
 
 
 public class SpeedComparison
 {
+  public static class WFilter
+    implements FilenameFilter
+  {
+    public boolean accept(File dir, String name)
+    {
+      return name.endsWith(".wmod");
+    }
+  }
   
   public static void main(String[] args) throws Exception
   {
-    JFileChooser chooser = new JFileChooser(new File("/home/darius/waters"));
+    /*JFileChooser chooser = new JFileChooser(new File("/home/darius/waters"));
     FileNameExtensionFilter filter = new FileNameExtensionFilter(
         "wmod", "wmod");
-    chooser.setFileFilter(filter);
+    chooser.setFileFilter(filter);                       
     int returnVal = chooser.showOpenDialog(null);
     if(returnVal == JFileChooser.APPROVE_OPTION) {
        System.out.println("You chose to open this file: " +
@@ -44,6 +57,36 @@ public class SpeedComparison
       System.out.println(pnbc.getCounterExample());
     } catch (AnalysisException a) {
       a.printStackTrace();
+    }*/
+    /* List<File> files = new ArrayList<File>();
+    File dir = new File("/media/DATA/Projects/supr/supremica/Supremica/examples/waters/tests");
+    for (File d : Arrays.asList(dir.listFiles())) {
+      files.addAll(Arrays.asList(d.listFiles(new WFilter())));
+    } */
+    List<File> files = new ArrayList<File>();
+    File dir = new File("/home/darius/HugoExamples/");
+    files.addAll(Arrays.asList(dir.listFiles(new WFilter())));
+    Collections.sort(files);
+    for (File file : files) {
+      ProductDESProxy model = getCompiledDES(file, null);
+      System.out.println(model.getName());
+      ProjectingNonBlockingChecker pnbc = new ProjectingNonBlockingChecker(model, mProductDESProxyFactory);
+      pnbc.setNodeLimit(1000000);
+      try {
+        System.out.println(pnbc.run());
+        //System.out.println(pnbc.getCounterExample());
+      } catch (AnalysisException a) {
+        a.printStackTrace();
+      }
+      pnbc = null;
+      /*CompNonBlockingChecker cnbc = new CompNonBlockingChecker(model, mProductDESProxyFactory);
+      cnbc.setNodeLimit(1000000);
+      try {
+        System.out.println(cnbc.run());
+        //System.out.println(cnbc.getCounterExample());
+      } catch (AnalysisException a) {
+        a.printStackTrace();
+      }*/
     }
   }
   
