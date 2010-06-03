@@ -40,14 +40,14 @@ import gnu.trove.THashSet;
 
 public class Projection2
 {
-  public static AutomatonProxy removeNonLocal(AutomatonProxy aut, ProductDESProxyFactory factory)
+  public static AutomatonProxy removeNonLocal(final AutomatonProxy aut, final ProductDESProxyFactory factory)
   {
     System.out.println("rem non local");
-    Map<EventProxy, Set<StateProxy>> loopedstates = new HashMap<EventProxy, Set<StateProxy>>();
-    for (EventProxy e : aut.getEvents()) {
+    final Map<EventProxy, Set<StateProxy>> loopedstates = new HashMap<EventProxy, Set<StateProxy>>();
+    for (final EventProxy e : aut.getEvents()) {
       loopedstates.put(e, new THashSet<StateProxy>());
     }
-    for (TransitionProxy t : aut.getTransitions()) {
+    for (final TransitionProxy t : aut.getTransitions()) {
       if (!t.getSource().equals(t.getTarget())) {
         loopedstates.remove(t.getEvent());
       }
@@ -55,8 +55,8 @@ public class Projection2
         loopedstates.get(t.getEvent()).add(t.getSource());
       }
     }
-    Set<EventProxy> temp = new THashSet<EventProxy>(aut.getEvents());
-    for (EventProxy e : loopedstates.keySet()) {
+    final Set<EventProxy> temp = new THashSet<EventProxy>(aut.getEvents());
+    for (final EventProxy e : loopedstates.keySet()) {
       if (loopedstates.get(e).size() == aut.getStates().size()) {
         temp.remove(e);
       }
@@ -65,8 +65,8 @@ public class Projection2
       return aut;
     }
     System.out.println("non local: " + (aut.getEvents().size() - temp.size()));
-    List<TransitionProxy> trans = new ArrayList<TransitionProxy>();
-    for (TransitionProxy tran : aut.getTransitions()){
+    final List<TransitionProxy> trans = new ArrayList<TransitionProxy>();
+    for (final TransitionProxy tran : aut.getTransitions()){
       if (temp.contains(tran.getEvent())) {trans.add(tran);}
     }
     final AutomatonProxy result = factory.createAutomatonProxy(aut.getName(), aut.getKind(),
@@ -74,7 +74,7 @@ public class Projection2
                                                                trans);
     return result;
   }
-  
+
   public Projection2(final ProductDESProxy model, final ProductDESProxyFactory factory,
                      final Set<EventProxy> hide, final Set<EventProxy> forbidden)
   {
@@ -198,7 +198,7 @@ public class Projection2
       }
     }
     System.out.println("composed");
-    mCompositionSize = states.values().size();
+    states.values().size();
     states = null;
     currentState = new int[] {0};
     transitions = new int[1][events.length][numStates];
@@ -245,10 +245,10 @@ public class Projection2
     result = min.run();
     return result;
   }
-  
+
   public Set<EventProxy> BlockedEvents()
   {
-    Set<EventProxy> blocked = new THashSet<EventProxy>();
+    final Set<EventProxy> blocked = new THashSet<EventProxy>();
     for (int e = 0; e < events.length; e++) {
       if (!mPossible[e]) {blocked.add(events[e]);}
     }
@@ -733,9 +733,7 @@ public class Projection2
     }
   }
 
-  @SuppressWarnings("unused")
   private boolean[] mPossible;
-  private int mCompositionSize = 0;
   private int mNodeLimit;
   private final ProductDESProxy mModel;
   private final ProductDESProxyFactory mFactory;

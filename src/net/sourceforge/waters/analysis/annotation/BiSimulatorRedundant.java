@@ -9,40 +9,27 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import gnu.trove.THashMap;
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIntProcedure;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectProcedure;
-
-import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
-import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.analysis.TransitionRelation;
-import java.util.Set;
-import java.util.HashMap;
-import gnu.trove.TLongObjectHashMap;
-import gnu.trove.TLongHashSet;
-import gnu.trove.TLongLongHashMap;
 import gnu.trove.TLongArrayList;
-import java.lang.Comparable;
-import org.omg.SendingContext.RunTime;
-import java.util.HashSet;
+import gnu.trove.TLongHashSet;
+import gnu.trove.TLongObjectHashMap;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.sourceforge.waters.analysis.TransitionRelation;
+import net.sourceforge.waters.model.analysis.OverflowException;
 
 
 /**
@@ -51,63 +38,61 @@ import java.util.HashSet;
 
 public class BiSimulatorRedundant
 {
-  private long mTime = 0;
-  private boolean flag = false;
-  private SimpleEquivalenceClass[] mStateToClass;
-  private THashSet<SimpleEquivalenceClass> mWS;
-  private THashSet<ComplexEquivalenceClass> mWC;
-  private THashSet<SimpleEquivalenceClass> mP;
+  private final long mTime = 0;
+  private final SimpleEquivalenceClass[] mStateToClass;
+  private final THashSet<SimpleEquivalenceClass> mWS;
+  private final THashSet<ComplexEquivalenceClass> mWC;
+  private final THashSet<SimpleEquivalenceClass> mP;
   private final TIntHashSet[][] mPreds;
-  private boolean[] mMarked;
-  private int[][] mTauPreds;
+  private final boolean[] mMarked;
   private int mStates;
-  private int mEventNum;
+  private final int mEventNum;
   private TIntHashSet[][][] mSuccs;
   private Set<TIntHashSet>[][] mAnn;
-  
+
   private final TransitionRelation mTrans;
-  
+
   public static int STATESREMOVED = 0;
   public static int TIME = 0;
   public static int TRANSITIONSADDED = 0;
-  
+
   public static void clearStats()
   {
     STATESREMOVED = 0;
     TIME = 0;
   }
-  
+
   public static String stats()
   {
     return "BISIMREDUNDANT: STATESREMOVED = " + STATESREMOVED +
             " TIME = " + TIME;
   }
-  
-  public long longify(int state1, int state2)
+
+  public long longify(final int state1, final int state2)
   {
     long merge = state1;
     merge <<= 32;
     merge |= state2;
     return merge;
   }
-  
+
   public int getSub(long merge)
   {
     merge >>= 32;
     return (int) merge;
   }
-  
+
   public int getSup(long merge)
   {
     merge <<= 32;
     merge >>= 32;
     return (int) merge;
   }
-  
+
   //#########################################################################
   //# Constructor
   @SuppressWarnings("unchecked")
-  public BiSimulatorRedundant(TransitionRelation tr, boolean addedtrans)
+  public BiSimulatorRedundant(final TransitionRelation tr, final boolean addedtrans)
     throws OverflowException
   {
     mTrans = tr;
@@ -124,7 +109,7 @@ public class BiSimulatorRedundant
     for (int s = 0; s < mPreds.length; s++) {
       mMarked[s] = mTrans.isMarked(s);
       for (int e = 0; e < mTrans.numberOfEvents(); e++) {
-        TIntHashSet preds = mTrans.getPredecessors(s, e);
+        final TIntHashSet preds = mTrans.getPredecessors(s, e);
         if (preds == null) {continue;}
         mPreds[s][e] = new TIntHashSet(preds.toArray());
       }
@@ -135,7 +120,7 @@ public class BiSimulatorRedundant
     mSuccs = null;
     mAnn = null;
   }
-  
+
   /*public AddRedundantTransitions(TransitionRelation transitionrelation)
   {
     int events = transitionrelation.numberOfEvents();
@@ -144,18 +129,18 @@ public class BiSimulatorRedundant
     mSuccs = new TIntHashSet[states][events][];
     mAnn = new Set[states][events];
   }*/
-  
+
   private void setup()
   {
     for (int s = 0; s < mSuccs.length; s++) {
       for (int e1 = 0; e1 < mSuccs[s].length; e1++) {
-        TIntHashSet succs1 = mTrans.getSuccessors(s, e1);
+        final TIntHashSet succs1 = mTrans.getSuccessors(s, e1);
         if (succs1 == null || succs1.isEmpty()) {continue;}
         mSuccs[s][e1] = new TIntHashSet[mTrans.numberOfEvents()];
         mAnn[s][e1] = new THashSet<TIntHashSet>();
-        int[] arrsuc = succs1.toArray();
+        final int[] arrsuc = succs1.toArray();
         for (int si = 0; si < arrsuc.length; si++) {
-          int succ = arrsuc[si];
+          final int succ = arrsuc[si];
           mAnn[s][e1].addAll(mTrans.getAnnotations2(succ));
           for (int e2 = 0; e2 < mSuccs[succ].length; e2++) {
             if (mTrans.isMarkingEvent(e2)) {
@@ -164,7 +149,7 @@ public class BiSimulatorRedundant
               }
               continue;
             }
-            TIntHashSet succs2 = mTrans.getSuccessors(succ, e2);
+            final TIntHashSet succs2 = mTrans.getSuccessors(succ, e2);
             if (succs2 == null || succs2.isEmpty()) {continue;}
             if (mSuccs[s][e1][e2] == null) {mSuccs[s][e1][e2] = new TIntHashSet();}
             mSuccs[s][e1][e2].addAll(succs2.toArray());
@@ -173,7 +158,7 @@ public class BiSimulatorRedundant
       }
     }
   }
-  
+
   public void setup2()
   {
     TIME -= System.currentTimeMillis();
@@ -185,29 +170,29 @@ public class BiSimulatorRedundant
       changed = false;
     for (int state = 0; state < mTrans.numberOfStates(); state++) {
       if (!mTrans.hasPredecessors(state)) {continue;}
-      int[] active = mTrans.getActiveEvents(state).toArray();
+      final int[] active = mTrans.getActiveEvents(state).toArray();
       for (int stateorig = 0; stateorig < mTrans.numberOfStates();
            stateorig++) {
         if (!mTrans.hasPredecessors(stateorig)) {continue;}
-        int[] activeorig = mTrans.getActiveEvents(stateorig).toArray();
+        final int[] activeorig = mTrans.getActiveEvents(stateorig).toArray();
         EventOrig:
         for (int ei1 = 0; ei1 < activeorig.length; ei1++) {
-          int event = activeorig[ei1];
+          final int event = activeorig[ei1];
           if (mTrans.isMarkingEvent(event)) {continue;}
           if (mSuccs[stateorig][event] == null) {continue;}
           if (mTrans.getSuccessors(stateorig, event).contains(state)) {
             continue;
           }
           Annotations:
-          for (TIntHashSet ann1 : mTrans.getAnnotations2(state)) {
-            for (TIntHashSet ann2 : mAnn[stateorig][event]) {
+          for (final TIntHashSet ann1 : mTrans.getAnnotations2(state)) {
+            for (final TIntHashSet ann2 : mAnn[stateorig][event]) {
               if (ann1.containsAll(ann2.toArray())) {continue Annotations;}
             }
             continue EventOrig;
           }
           Event:
           for (int ei2 = 0; ei2 < active.length; ei2++) {
-            int e = active[ei2];
+            final int e = active[ei2];
             if (mTrans.isMarkingEvent(e)) {
               if (mSuccs[stateorig][event][e] == null) {continue EventOrig;}
               else {continue Event;}
@@ -231,11 +216,11 @@ public class BiSimulatorRedundant
           }
           mPreds[state][event].add(stateorig);
           for (int pe = 0; pe < mTrans.numberOfEvents(); pe++) {
-            TIntHashSet predevents = mTrans.getPredecessors(stateorig, pe);
+            final TIntHashSet predevents = mTrans.getPredecessors(stateorig, pe);
             if (predevents == null) {continue;}
-            int[] preds = predevents.toArray();
+            final int[] preds = predevents.toArray();
             for (int pri = 0; pri < preds.length; pri++) {
-              int pr = preds[pri];
+              final int pr = preds[pri];
               if (mSuccs[pr][pe][event].add(state)) {changed = true;}
             }
           }
@@ -246,7 +231,7 @@ public class BiSimulatorRedundant
     System.out.println("transitions added: " + TRANSITIONSADDED);
     TIME += System.currentTimeMillis();
   }
-  
+
   public void setup4()
   {
     TIME -= System.currentTimeMillis();
@@ -254,10 +239,10 @@ public class BiSimulatorRedundant
     //setup();
     System.out.println("setup 2");
     boolean changed = true;
-    TIntHashSet[][] builtsuccs = new TIntHashSet[mPreds.length][mEventNum];
+    final TIntHashSet[][] builtsuccs = new TIntHashSet[mPreds.length][mEventNum];
     for (int state = 0; state < mTrans.numberOfStates(); state++) {
       for (int ei = 0; ei < mTrans.numberOfEvents(); ei++) {
-        TIntHashSet succ = mTrans.getSuccessors(state, ei);
+        final TIntHashSet succ = mTrans.getSuccessors(state, ei);
         if (succ == null) {continue;}
         builtsuccs[state][ei] = new TIntHashSet(succ.toArray());
       }
@@ -267,24 +252,22 @@ public class BiSimulatorRedundant
       changed = false;
     for (int sub = 0; sub < mTrans.numberOfStates(); sub++) {
       if (!mTrans.hasPredecessors(sub)) {continue;}
-      int[] active = mTrans.getActiveEvents(sub).toArray();
       TIntHashSet poss = null;
       for (int ei = 0; ei < mTrans.numberOfEvents(); ei++) {
-        TIntHashSet succ = builtsuccs[sub][ei];
+        final TIntHashSet succ = builtsuccs[sub][ei];
         if (succ == null || succ.isEmpty()) {continue;}
         poss = mPreds[succ.toArray()[0]][ei];
       }
       if (poss == null) {continue;}
-      int[] possarr = poss.toArray();
+      final int[] possarr = poss.toArray();
       Possible:
       for (int si = 0; si < possarr.length; si++) {
-        int sup = possarr[si];
+        final int sup = possarr[si];
         if (!mTrans.hasPredecessors(sup)) {continue;}
         if (sup == sub) {continue;}
-        int[] activeorig = mTrans.getActiveEvents(sup).toArray();
         Annotations:
-        for (TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
-          for (TIntHashSet ann2 : mTrans.getAnnotations2(sup)) {
+        for (final TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
+          for (final TIntHashSet ann2 : mTrans.getAnnotations2(sup)) {
             if (ann1.containsAll(ann2.toArray())) {continue Annotations;}
           }
           continue Possible;
@@ -292,12 +275,12 @@ public class BiSimulatorRedundant
         //if (!mTrans.isSubsetOutgoing(sub, sup)) {continue;}
         if (mMarked[sub] && !mMarked[sup]) {continue;}
         for (int e = 0; e < builtsuccs[sub].length; e++) {
-          TIntHashSet subsuccs = builtsuccs[sub][e];
+          final TIntHashSet subsuccs = builtsuccs[sub][e];
           if (subsuccs == null || subsuccs.isEmpty()) {continue;}
           if (builtsuccs[sup][e] == null) {continue Possible;}
-          int[] succs = subsuccs.toArray();
+          final int[] succs = subsuccs.toArray();
           for (int i = 0; i < succs.length; i++) {
-            int suc = succs[i];
+            final int suc = succs[i];
             //if (suc != sub) {
               if (!builtsuccs[sup][e].contains(suc)) {continue Possible;}
             /*} else {
@@ -308,11 +291,11 @@ public class BiSimulatorRedundant
         //System.out.println("Added Transition");
         //mTransitionRelation.addTransition(stateorig, event, state);
         for (int pe = 0; pe < mTrans.numberOfEvents(); pe++) {
-          TIntHashSet predevents = mTrans.getPredecessors(sup, pe);
+          final TIntHashSet predevents = mTrans.getPredecessors(sup, pe);
           if (predevents == null) {continue;}
-          int[] preds = predevents.toArray();
+          final int[] preds = predevents.toArray();
           for (int pri = 0; pri < preds.length; pri++) {
-            int pr = preds[pri];
+            final int pr = preds[pri];
             if (mPreds[sub][pe] == null) {
               mPreds[sub][pe] = new TIntHashSet();
             }
@@ -326,15 +309,15 @@ public class BiSimulatorRedundant
     System.out.println("transitions added: " + TRANSITIONSADDED);
     TIME += System.currentTimeMillis();
   }
-  
+
   public void setup3()
   {
     int addedtrans = 0;
-    Map<TIntHashSet, TIntHashSet> stateswithannotation =
+    final Map<TIntHashSet, TIntHashSet> stateswithannotation =
       new HashMap<TIntHashSet, TIntHashSet>();
     for (int s = 0; s < mTrans.numberOfStates(); s++) {
       if (!mTrans.hasPredecessors(s)) {continue;}
-      for (TIntHashSet ann : mTrans.getAnnotations2(s)) {
+      for (final TIntHashSet ann : mTrans.getAnnotations2(s)) {
         TIntHashSet hasann = stateswithannotation.get(ann);
         if (hasann == null) {
           hasann = new TIntHashSet();
@@ -345,13 +328,13 @@ public class BiSimulatorRedundant
     }
     for (int s = 0; s < mTrans.numberOfStates(); s++) {
       if (!mTrans.hasPredecessors(s)) {continue;}
-      TIntHashSet checked = new TIntHashSet();
-      TIntHashSet tobeadded = new TIntHashSet();
+      final TIntHashSet checked = new TIntHashSet();
+      final TIntHashSet tobeadded = new TIntHashSet();
       checked.add(s);
-      for (TIntHashSet ann : mTrans.getAnnotations2(s)) {
-        int[] possstates = stateswithannotation.get(ann).toArray();
+      for (final TIntHashSet ann : mTrans.getAnnotations2(s)) {
+        final int[] possstates = stateswithannotation.get(ann).toArray();
         for (int i = 0; i < possstates.length; i++) {
-          int pstate = possstates[i];
+          final int pstate = possstates[i];
           if (!checked.add(pstate)) {continue;}
           if (!mTrans.getAnnotations2(s).containsAll(
               mTrans.getAnnotations2(pstate))) {continue;}
@@ -360,15 +343,15 @@ public class BiSimulatorRedundant
         }
       }
       if (tobeadded.isEmpty()) {continue;}
-      int[] arradded = tobeadded.toArray();
+      final int[] arradded = tobeadded.toArray();
       for (int e = 0; e < mTrans.numberOfEvents(); e++) {
-        TIntHashSet preds = mTrans.getPredecessors(s, e);
+        final TIntHashSet preds = mTrans.getPredecessors(s, e);
         if (preds == null) {continue;}
-        int[] predsarr = preds.toArray();
+        final int[] predsarr = preds.toArray();
         for (int i = 0; i < predsarr.length; i++) {
-          int pred = predsarr[i];
+          final int pred = predsarr[i];
           for (int j = 0; j < arradded.length; j++) {
-            int added = arradded[j];
+            final int added = arradded[j];
             if (mPreds[added][e] == null) {
               mPreds[added][e] = new TIntHashSet();
             }
@@ -379,29 +362,28 @@ public class BiSimulatorRedundant
     }
     System.out.println(addedtrans);
   }
-  
+
   private void setupInitialPartitions()
   {
     mWS.clear();
     mWC.clear();
     mP.clear();
-    Map<TIntHashSet, TIntArrayList> map =
+    final Map<TIntHashSet, TIntArrayList> map =
       new THashMap<TIntHashSet, TIntArrayList>();
     mStates = 0;
-    States:
     for (int i = 0; i < mTrans.numberOfStates(); i++) {
       if (!mTrans.hasPredecessors(i)) {continue;}
       mStates++;
-      TIntHashSet prop = mTrans.getActiveEvents(i);
+      final TIntHashSet prop = mTrans.getActiveEvents(i);
       TIntArrayList p = map.get(prop);
       if (p == null) {p = new TIntArrayList(); map.put(prop, p);}
       p.add(i);
     }
-    for (TIntArrayList p : map.values()) {
-      TIntArrayList marked = new TIntArrayList();
-      TIntArrayList notmarked = new TIntArrayList();
+    for (final TIntArrayList p : map.values()) {
+      final TIntArrayList marked = new TIntArrayList();
+      final TIntArrayList notmarked = new TIntArrayList();
       for (int i = 0; i < p.size(); i++) {
-        int s = p.get(i);
+        final int s = p.get(i);
         if (mMarked[s]) {
           marked.add(s);
         } else {
@@ -418,20 +400,20 @@ public class BiSimulatorRedundant
     //System.out.println("initial partitions: " + mWS.size());
     //System.out.println("maut:" + mStates);
   }
-  
+
   public void setup5()
   {
-    TIntHashSet[][] builtsuccs = new TIntHashSet[mPreds.length][mEventNum];
+    final TIntHashSet[][] builtsuccs = new TIntHashSet[mPreds.length][mEventNum];
     for (int state = 0; state < mTrans.numberOfStates(); state++) {
       for (int ei = 0; ei < mTrans.numberOfEvents(); ei++) {
-        TIntHashSet succ = mTrans.getSuccessors(state, ei);
+        final TIntHashSet succ = mTrans.getSuccessors(state, ei);
         if (succ == null) {continue;}
         builtsuccs[state][ei] = new TIntHashSet(succ.toArray());
       }
     }
-    TLongHashSet DoesntSatisfy = new TLongHashSet();
-    TLongObjectHashMap<TLongHashSet> rely = new TLongObjectHashMap<TLongHashSet>();
-    TLongObjectHashMap<Collection<TLongHashSet>> needatleastone =
+    final TLongHashSet DoesntSatisfy = new TLongHashSet();
+    final TLongObjectHashMap<TLongHashSet> rely = new TLongObjectHashMap<TLongHashSet>();
+    final TLongObjectHashMap<Collection<TLongHashSet>> needatleastone =
       new TLongObjectHashMap<Collection<TLongHashSet>>();
     for (int sub = 0; sub < mTrans.numberOfStates(); sub++) {
       if (sub % 100 == 0) {System.out.println(sub);}
@@ -439,11 +421,11 @@ public class BiSimulatorRedundant
       for (int sup = 0; sup < mTrans.numberOfStates(); sup++) {
         if (!mTrans.hasPredecessors(sup)) {continue;}
         if (sup == sub) {continue;}
-        long longed = longify(sub, sup);
+        final long longed = longify(sub, sup);
         boolean covered = true;
         Annotations:
-        for (TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
-          for (TIntHashSet ann2 : mTrans.getAnnotations2(sup)) {
+        for (final TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
+          for (final TIntHashSet ann2 : mTrans.getAnnotations2(sup)) {
             if (ann1.containsAll(ann2.toArray())) {continue Annotations;}
           }
           covered = false; break;
@@ -451,14 +433,14 @@ public class BiSimulatorRedundant
         //if (mMarked[sub] && !mMarked[sup]) {continue;}
         if (covered && !mTrans.getActiveEvents(sup).containsAll(mTrans.getActiveEvents(sub).toArray())) {covered = false;}
         if (covered) {
-          Collection<TLongHashSet> atleastone = new ArrayList<TLongHashSet>();
+          final Collection<TLongHashSet> atleastone = new ArrayList<TLongHashSet>();
           Successors:
           for (int e = 0; e < builtsuccs[sub].length; e++) {
-            TIntHashSet subsuccs = builtsuccs[sub][e];
+            final TIntHashSet subsuccs = builtsuccs[sub][e];
             if (subsuccs == null || subsuccs.isEmpty()) {continue;}
-            int[] succs = subsuccs.toArray();
+            final int[] succs = subsuccs.toArray();
             for (int i = 0; i < succs.length; i++) {
-              int suc = succs[i];
+              final int suc = succs[i];
               boolean tran = true;
               if (suc != sub) {
                 if (!builtsuccs[sup][e].contains(suc)) {tran = false;}
@@ -466,12 +448,12 @@ public class BiSimulatorRedundant
                 if (!builtsuccs[sup][e].contains(suc) && !builtsuccs[sup][e].contains(sup)) {tran = false;}
               }
               if (!tran) {
-                TLongHashSet leastone = new TLongHashSet();
+                final TLongHashSet leastone = new TLongHashSet();
                 atleastone.add(leastone);
-                int[] poss = builtsuccs[sup][e].toArray();
+                final int[] poss = builtsuccs[sup][e].toArray();
                 for (int k = 0; k < poss.length; k++) {
-                  int posssuc = poss[k];
-                  long longed2 = longify(suc, posssuc);
+                  final int posssuc = poss[k];
+                  final long longed2 = longify(suc, posssuc);
                   if (DoesntSatisfy.contains(longed2)) {continue;}
                   leastone.add(longed2);
                   TLongHashSet relies = rely.get(longed2);
@@ -488,20 +470,20 @@ public class BiSimulatorRedundant
           if (covered) {needatleastone.put(longed, atleastone);}
         }
         if (!covered) {
-          TLongArrayList toberemmed = new TLongArrayList();
+          final TLongArrayList toberemmed = new TLongArrayList();
           toberemmed.add(longed);
           DoesntSatisfy.add(longed);
           while (!toberemmed.isEmpty()) {
-            long rem = toberemmed.remove(toberemmed.size() - 1);
+            final long rem = toberemmed.remove(toberemmed.size() - 1);
             needatleastone.remove(rem);
-            TLongHashSet longset = rely.remove(rem);
+            final TLongHashSet longset = rely.remove(rem);
             if (longset == null) {continue;}
-            long[] longarray = longset.toArray();
+            final long[] longarray = longset.toArray();
             for (int i = 0; i < longarray.length; i++) {
-              long reliant = longarray[i];
+              final long reliant = longarray[i];
               if (DoesntSatisfy.contains(reliant)) {continue;}
-              Collection<TLongHashSet> leastone = needatleastone.get(reliant);
-              for (TLongHashSet one : leastone) {
+              final Collection<TLongHashSet> leastone = needatleastone.get(reliant);
+              for (final TLongHashSet one : leastone) {
                 one.remove(rem);
                 if (one.isEmpty()) {
                   DoesntSatisfy.add(reliant);
@@ -518,14 +500,14 @@ public class BiSimulatorRedundant
       for (int sup = 0; sup < mTrans.numberOfStates(); sup++) {
         if (!mTrans.hasPredecessors(sup)) {continue;}
         if (sup == sub) {continue;}
-        long longed = longify(sub, sup);
+        final long longed = longify(sub, sup);
         if (DoesntSatisfy.contains(longed)) {continue;}
         for (int pe = 0; pe < mTrans.numberOfEvents(); pe++) {
-          TIntHashSet predevents = mTrans.getPredecessors(sup, pe);
+          final TIntHashSet predevents = mTrans.getPredecessors(sup, pe);
           if (predevents == null) {continue;}
-          int[] preds = predevents.toArray();
+          final int[] preds = predevents.toArray();
           for (int pri = 0; pri < preds.length; pri++) {
-            int pr = preds[pri];
+            final int pr = preds[pri];
             if (mPreds[sub][pe] == null) {
               mPreds[sub][pe] = new TIntHashSet();
             }
@@ -535,7 +517,7 @@ public class BiSimulatorRedundant
       }
     }
   }
-  
+
   /*public void setup6()
   {
     System.out.println("setup6");
@@ -687,7 +669,7 @@ public class BiSimulatorRedundant
                   DoesntSatisfy.add(longedpred);
                   toberemmed.add(longedpred);
                 }
-              } 
+              }
             }
           }
         }
@@ -713,14 +695,14 @@ public class BiSimulatorRedundant
     }
     System.out.println(TRANSITIONSADDED);
   }*/
-  
+
   public void setup7()
   {
     System.out.println("setup7");
-    TIntHashSet[] activeEvents = new TIntHashSet[mPreds.length];
-    TIntHashSet[][] builtsuccs = new TIntHashSet[mPreds.length][mEventNum];
-    TIntArrayList[] mHas = new TIntArrayList[mTrans.numberOfEvents()];
-    IntInt[] eventorder = new IntInt[mHas.length];
+    final TIntHashSet[] activeEvents = new TIntHashSet[mPreds.length];
+    final TIntHashSet[][] builtsuccs = new TIntHashSet[mPreds.length][mEventNum];
+    final TIntArrayList[] mHas = new TIntArrayList[mTrans.numberOfEvents()];
+    final IntInt[] eventorder = new IntInt[mHas.length];
     for (int e = 0; e < mTrans.numberOfEvents(); e++) {
       mHas[e] = new TIntArrayList();
       eventorder[e] = new IntInt(e, mHas[e]);
@@ -732,7 +714,7 @@ public class BiSimulatorRedundant
         if (mTrans.isMarkingEvent(ei)) {
           if (mTrans.isMarked(state)) {mHas[ei].add(state);}
         } else {
-          TIntHashSet succ = mTrans.getSuccessors(state, ei);
+          final TIntHashSet succ = mTrans.getSuccessors(state, ei);
           if (succ == null || succ.isEmpty()) {continue;}
           builtsuccs[state][ei] = new TIntHashSet(succ.toArray());
           mHas[ei].add(state);
@@ -740,13 +722,12 @@ public class BiSimulatorRedundant
       }
     }
     Arrays.sort(eventorder);
-    Map<TIntHashSet, TIntHashSet> mMap = new THashMap<TIntHashSet, TIntHashSet>();
-    TLongHashSet checked = new TLongHashSet();
+    final TLongHashSet checked = new TLongHashSet();
     Set<ActAct> subsets = new THashSet<ActAct>();
     Set<ActAct> notsubsets = new THashSet<ActAct>();
     Set<AnnAnn> coveredanns = new THashSet<AnnAnn>();
     Set<AnnAnn> notcoveredanns = new THashSet<AnnAnn>();
-    long time = System.currentTimeMillis();
+    // long time = System.currentTimeMillis();
     for (int sub = 0; sub < mTrans.numberOfStates(); sub++) {
       if (sub % 100 == 0) {System.out.println(sub);}
       if (!mTrans.hasPredecessors(sub)) {continue;}
@@ -764,23 +745,23 @@ public class BiSimulatorRedundant
       if (sub % 100 == 0) {System.out.println(memory);}
       TIntArrayList arr = null;
       for (int ei = 0; ei < mTrans.numberOfEvents(); ei++) {
-        int e = eventorder[ei].mInt1;
+        final int e = eventorder[ei].mInt1;
         if (mTrans.isMarkingEvent(e)) {
           if (mTrans.isMarked(sub)) {arr = mHas[e]; break;}
         } else {
-          TIntHashSet succ = mTrans.getSuccessors(sub, e);
+          final TIntHashSet succ = mTrans.getSuccessors(sub, e);
           if (succ == null || succ.isEmpty()) {continue;}
           arr = mHas[e]; break;
         }
       }
       if (arr == null) {continue;}
       for (int supi = 0; supi < arr.size(); supi++) {
-        int sup = arr.get(supi);
+        final int sup = arr.get(supi);
         if (!mTrans.hasPredecessors(sup)) {continue;}
         if (sup == sub) {continue;}
-        long longed = longify(sub, sup);
+        final long longed = longify(sub, sup);
         boolean covered = true;
-        ActAct act = new ActAct(activeEvents[sub], activeEvents[sup]);
+        final ActAct act = new ActAct(activeEvents[sub], activeEvents[sup]);
         if (notsubsets.contains(act)) {covered = false;}
         if (covered && !subsets.contains(act)) {
           if (!activeEvents[sup].containsAll(activeEvents[sub].toArray())) {covered = false;}
@@ -790,12 +771,12 @@ public class BiSimulatorRedundant
             subsets.add(act);
           }
         }
-        AnnAnn tup = new AnnAnn(mTrans.getAnnotations2(sub), mTrans.getAnnotations2(sup));
+        final AnnAnn tup = new AnnAnn(mTrans.getAnnotations2(sub), mTrans.getAnnotations2(sup));
         if (notcoveredanns.contains(tup)) {covered = false;}
         if (covered && !coveredanns.contains(tup)) {
           Annotations:
-          for (TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
-            for (TIntHashSet ann2 : mTrans.getAnnotations2(sup)) {
+          for (final TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
+            for (final TIntHashSet ann2 : mTrans.getAnnotations2(sup)) {
               if (ann1.containsAll(ann2.toArray())) {continue Annotations;}
             }
             covered = false; break;
@@ -815,7 +796,7 @@ public class BiSimulatorRedundant
     notsubsets = null;
     coveredanns = null;
     notcoveredanns = null;
-    TIntHashSet[][][] succswithcovered = new TIntHashSet[mPreds.length][][];
+    final TIntHashSet[][][] succswithcovered = new TIntHashSet[mPreds.length][][];
     TLongHashSet needchecking = checked;
     while (!needchecking.isEmpty()) {
       long memory = Runtime.getRuntime().totalMemory() -
@@ -831,13 +812,13 @@ public class BiSimulatorRedundant
           }
         }
       }
-      long[] arr = needchecking.toArray();
+      final long[] arr = needchecking.toArray();
       needchecking = new TLongHashSet();
-      time = System.currentTimeMillis();
+      // time = System.currentTimeMillis();
       for (int i = 0; i < arr.length; i++) {
         if (i % 100 == 0) {System.out.println(i + "/" + arr.length);}
         //if (System.currentTimeMillis() - time > 10000) {return;}
-        long longed = arr[i];
+        final long longed = arr[i];
         //if (DoesntSatisfy.contains(longed)) {continue;}
         needchecking.remove(longed);
         int sub = getSub(longed);
@@ -848,21 +829,21 @@ public class BiSimulatorRedundant
         }
         Successors:
         for (int e = 0; e < builtsuccs[sub].length; e++) {
-          TIntHashSet subsuccs = builtsuccs[sub][e];
+          final TIntHashSet subsuccs = builtsuccs[sub][e];
           if (subsuccs == null || subsuccs.isEmpty()) {continue;}
-          int[] succs = subsuccs.toArray();
+          final int[] succs = subsuccs.toArray();
           for (int j = 0; j < succs.length; j++) {
-            int suc = succs[j];
+            final int suc = succs[j];
             if (!builtsuccs[sup][e].contains(suc)) {
               if (succswithcovered[sup][e] == null) {
                 succswithcovered[sup][e] = new TIntHashSet[builtsuccs.length];
               }
               if (succswithcovered[sup][e][sub] == null) {
                 succswithcovered[sup][e][sub] = new TIntHashSet();
-                int[] poss = builtsuccs[sup][e].toArray();
+                final int[] poss = builtsuccs[sup][e].toArray();
                 for (int k = 0; k < poss.length; k++) {
-                  int posssuc = poss[k];
-                  long longed2 = longify(suc, posssuc);
+                  final int posssuc = poss[k];
+                  final long longed2 = longify(suc, posssuc);
                   if (checked.contains(longed2)) {
                     succswithcovered[sup][e][sub].add(posssuc);
                   }
@@ -875,21 +856,21 @@ public class BiSimulatorRedundant
         }
         if (!covered) {
           checked.remove(longed);
-          long rem = longed;
+          final long rem = longed;
           sub = getSub(rem);
           sup = getSup(rem);
           //System.out.println("notcovered" + sub + ", " + sup);
           for (int e = 0; e < mTrans.numberOfEvents(); e++) {
-            TIntHashSet subpreds = mPreds[sub][e];
-            TIntHashSet suppreds = mPreds[sup][e];
+            final TIntHashSet subpreds = mPreds[sub][e];
+            final TIntHashSet suppreds = mPreds[sup][e];
             if (subpreds == null || suppreds == null) {continue;}
-            int[] subarr = subpreds.toArray();
-            int[] suparr = suppreds.toArray();
+            final int[] subarr = subpreds.toArray();
+            final int[] suparr = suppreds.toArray();
             for (int k = 0; k < suparr.length; k++) {
-              int suppred = suparr[k];
+              final int suppred = suparr[k];
               for (int j = 0; j < subarr.length; j++) {
-                int subpred = subarr[j];
-                long longedpred = longify(subpred, suppred);
+                final int subpred = subarr[j];
+                final long longedpred = longify(subpred, suppred);
                 if (!checked.contains(longedpred)) {continue;}
                 needchecking.add(longedpred);
                 if (succswithcovered[suppred] != null &&
@@ -903,17 +884,17 @@ public class BiSimulatorRedundant
         }
       }
     }
-    long[] arr = checked.toArray();
+    final long[] arr = checked.toArray();
     for (int i = 0; i < arr.length; i++) {
-      long longed = arr[i];
-      int sub = getSub(longed);
-      int sup = getSup(longed);
+      final long longed = arr[i];
+      final int sub = getSub(longed);
+      final int sup = getSup(longed);
       for (int pe = 0; pe < mTrans.numberOfEvents(); pe++) {
-        TIntHashSet predevents = mTrans.getPredecessors(sup, pe);
-        if (predevents == null) {continue;}                               
-        int[] preds = predevents.toArray();
+        final TIntHashSet predevents = mTrans.getPredecessors(sup, pe);
+        if (predevents == null) {continue;}
+        final int[] preds = predevents.toArray();
         for (int pri = 0; pri < preds.length; pri++) {
-          int pr = preds[pri];
+          final int pr = preds[pri];
           if (mPreds[sub][pe] == null) {
             mPreds[sub][pe] = new TIntHashSet();
           }
@@ -923,12 +904,12 @@ public class BiSimulatorRedundant
     }
     System.out.println(TRANSITIONSADDED);
   }
-  
+
   public void setup8()
   {
     System.out.println("setup8");
-    TIntArrayList[] mHas = new TIntArrayList[mTrans.numberOfEvents()];
-    IntInt[] eventorder = new IntInt[mHas.length];
+    final TIntArrayList[] mHas = new TIntArrayList[mTrans.numberOfEvents()];
+    final IntInt[] eventorder = new IntInt[mHas.length];
     for (int e = 0; e < mTrans.numberOfEvents(); e++) {
       mHas[e] = new TIntArrayList();
       eventorder[e] = new IntInt(e, mHas[e]);
@@ -939,51 +920,51 @@ public class BiSimulatorRedundant
         if (mTrans.isMarkingEvent(ei)) {
           if (mTrans.isMarked(state)) {mHas[ei].add(state);}
         } else {
-          TIntHashSet succ = mTrans.getSuccessors(state, ei);
+          final TIntHashSet succ = mTrans.getSuccessors(state, ei);
           if (succ == null || succ.isEmpty()) {continue;}
           mHas[ei].add(state);
         }
       }
     }
     Arrays.sort(eventorder);
-    Map<TIntHashSet, TIntHashSet> checked = new THashMap<TIntHashSet, TIntHashSet>();
-    Map<TIntHashSet, TIntHashSet> covered = new THashMap<TIntHashSet, TIntHashSet>();
-    Map<TIntHashSet, TIntHashSet> doesnt = new THashMap<TIntHashSet, TIntHashSet>();
-    Map<TIntHashSet, TIntHashSet> stack = new THashMap<TIntHashSet, TIntHashSet>();
-    long time = System.currentTimeMillis();
+    final Map<TIntHashSet, TIntHashSet> checked = new THashMap<TIntHashSet, TIntHashSet>();
+    final Map<TIntHashSet, TIntHashSet> covered = new THashMap<TIntHashSet, TIntHashSet>();
+    final Map<TIntHashSet, TIntHashSet> doesnt = new THashMap<TIntHashSet, TIntHashSet>();
+    final Map<TIntHashSet, TIntHashSet> stack = new THashMap<TIntHashSet, TIntHashSet>();
+    // long time = System.currentTimeMillis();
     for (int sub = 0; sub < mTrans.numberOfStates(); sub++) {
       if (sub % 100 == 0) {System.out.println(sub);}
       if (!mTrans.hasPredecessors(sub)) {continue;}
       TIntArrayList arr = null;
       for (int ei = 0; ei < mTrans.numberOfEvents(); ei++) {
-        int e = eventorder[ei].mInt1;
+        final int e = eventorder[ei].mInt1;
         if (mTrans.isMarkingEvent(e)) {
           if (mTrans.isMarked(sub)) {arr = mHas[e]; break;}
         } else {
-          TIntHashSet succ = mTrans.getSuccessors(sub, e);
+          final TIntHashSet succ = mTrans.getSuccessors(sub, e);
           if (succ == null || succ.isEmpty()) {continue;}
           arr = mHas[e]; break;
         }
       }
       if (arr == null) {continue;}
       for (int supi = 0; supi < arr.size(); supi++) {
-        int sup = arr.get(supi);
+        final int sup = arr.get(supi);
         if (!mTrans.hasPredecessors(sup)) {continue;}
         if (sup == sub) {continue;}
         for (int e = 0; e < mTrans.numberOfEvents(); e++) {
-          TIntHashSet preds = mTrans.getPredecessors(sup, e);
+          final TIntHashSet preds = mTrans.getPredecessors(sup, e);
           if (preds == null) {continue;}
-          int[] predsarr = preds.toArray();
+          final int[] predsarr = preds.toArray();
           for (int pi = 0; pi < predsarr.length; pi++) {
-            int pred = predsarr[pi];
-            TIntHashSet subset = new TIntHashSet(1);
+            final int pred = predsarr[pi];
+            final TIntHashSet subset = new TIntHashSet(1);
             subset.add(sub);
             if (explore(sub, mTrans.getSuccessors(pred, e), checked, covered, doesnt, stack, 0)) {
               if (mPreds[sub][e] == null) {
                 mPreds[sub][e] = new TIntHashSet();
               }
               if (mPreds[sub][e].add(pred)) {TRANSITIONSADDED++;}
-              for (TIntHashSet set : checked.keySet()) {
+              for (final TIntHashSet set : checked.keySet()) {
                 TIntHashSet cov = covered.get(set);
                 if (cov == null) {
                   cov = new TIntHashSet();
@@ -1012,7 +993,7 @@ public class BiSimulatorRedundant
         if (!mWS.isEmpty()) {it = mWS.iterator();}
         else if (!mWC.isEmpty()) {it = mWC.iterator();}
         else {break;}
-        EquivalenceClass ec = it.next(); it.remove(); ec.splitOn();
+        final EquivalenceClass ec = it.next(); it.remove(); ec.splitOn();
       }
       break;
     }
@@ -1023,8 +1004,8 @@ public class BiSimulatorRedundant
     if (mP.size() == mStates) {
       return false;
     }
-    for (SimpleEquivalenceClass sec : mP) {
-      if (sec.mStates.length == 1) {continue;}     
+    for (final SimpleEquivalenceClass sec : mP) {
+      if (sec.mStates.length == 1) {continue;}
       //System.out.println(Arrays.toString(sec.mStates));
       mTrans.mergewithannotations(sec.mStates);
       STATESREMOVED += sec.mStates.length -1;
@@ -1036,7 +1017,7 @@ public class BiSimulatorRedundant
     TIME += System.currentTimeMillis();
     return true;
   }
-  
+
   /*private boolean livelock(int sub, TIntHashSet sup,
                            Map<TIntHashSet, TIntHashSet> notmark,
                            Map<TIntHashSet, TIntHashSet> yesmark,
@@ -1048,19 +1029,19 @@ public class BiSimulatorRedundant
     TIntHashSet does = yesmark.get(sup);
     if (does != null && does.contains(sub)) {return true;}
     if (onstack.contains(new IntHashInt(sub, sup))) {return false;
-    for (TIntHashSet 
+    for (TIntHashSet
   }*/
-  
-  private boolean explore(int sub, TIntHashSet sup,
-                          Map<TIntHashSet, TIntHashSet> checking,
-                          Map<TIntHashSet, TIntHashSet> covered,
-                          Map<TIntHashSet, TIntHashSet> doesnt,
-                          Map<TIntHashSet, TIntHashSet> stack,
+
+  private boolean explore(final int sub, final TIntHashSet sup,
+                          final Map<TIntHashSet, TIntHashSet> checking,
+                          final Map<TIntHashSet, TIntHashSet> covered,
+                          final Map<TIntHashSet, TIntHashSet> doesnt,
+                          final Map<TIntHashSet, TIntHashSet> stack,
                           int depth)
   {
     //System.out.println(time);
     //System.out.println(System.currentTimeMillis() - time);
-    if (System.currentTimeMillis() - mTime > 1000) {System.out.println("too deep"); flag = true; return false;}
+    if (System.currentTimeMillis() - mTime > 1000) {System.out.println("too deep"); return false;}
     //if (depth > 300) {System.out.println("too deep"); flag = true; return false;}
     depth++;
     if (sup.contains(sub)) {return true;}
@@ -1075,19 +1056,19 @@ public class BiSimulatorRedundant
     /*if (depth % 50 == 0) {//System.out.println("depth:  " + depth);
       for(TIntHashSet set: checking.keySet()) {
         if (sup.containsAll(set.toArray())) {
-          if (checking.get(set).contains(sub)) {return true;} 
+          if (checking.get(set).contains(sub)) {return true;}
         }
       }
       for(TIntHashSet set: covered.keySet()) {
         if (sup.containsAll(set.toArray())) {
-          if (covered.get(set).contains(sub)) {return true;} 
+          if (covered.get(set).contains(sub)) {return true;}
         }
       }
     }*/
     boolean coveredbool = true;
-    TIntHashSet supact = new TIntHashSet();
-    int[] suparr = sup.toArray();
-    boolean submarked = mTrans.isMarked(sub);
+    final TIntHashSet supact = new TIntHashSet();
+    final int[] suparr = sup.toArray();
+    final boolean submarked = mTrans.isMarked(sub);
     for (int i = 0; i < suparr.length; i++) {
       supact.addAll(mTrans.getActiveEvents(suparr[i]).toArray());
       if (!submarked && mTrans.isMarked(suparr[i])) {coveredbool = false;}
@@ -1096,13 +1077,13 @@ public class BiSimulatorRedundant
       if (!supact.containsAll(mTrans.getActiveEvents(sub).toArray())) {coveredbool = false;}
     }
     if (coveredbool) {
-      Set<TIntHashSet> supanns = new THashSet<TIntHashSet>();
+      final Set<TIntHashSet> supanns = new THashSet<TIntHashSet>();
       for (int i = 0; i < suparr.length; i++) {
         supanns.addAll(mTrans.getAnnotations2(suparr[i]));
       }
       Annotations:
-      for (TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
-        for (TIntHashSet ann2 : supanns) {
+      for (final TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
+        for (final TIntHashSet ann2 : supanns) {
           if (ann1.containsAll(ann2.toArray())) {continue Annotations;}
         }
         coveredbool = false; break;
@@ -1122,19 +1103,19 @@ public class BiSimulatorRedundant
         checking.put(sup, covs);
       }
       covs.add(sub);
-      int[] act = mTrans.getActiveEvents(sub).toArray();
+      final int[] act = mTrans.getActiveEvents(sub).toArray();
       for (int ei = 0; ei < act.length; ei++) {
-        int e = act[ei];
+        final int e = act[ei];
         if (mTrans.isMarkingEvent(e)) {continue;}
-        TIntHashSet supsuccs = new TIntHashSet();
+        final TIntHashSet supsuccs = new TIntHashSet();
         for (int supi = 0; supi < suparr.length; supi++) {
-          int supstate = suparr[supi];
+          final int supstate = suparr[supi];
           if (mTrans.getSuccessors(supstate, e) == null) {continue;}
           supsuccs.addAll(mTrans.getSuccessors(supstate, e).toArray());
         }
-        int[] subsuccs = mTrans.getSuccessors(sub, e).toArray();
+        final int[] subsuccs = mTrans.getSuccessors(sub, e).toArray();
         for (int subi = 0; subi < subsuccs.length; subi++) {
-          int subsucc = subsuccs[subi];
+          final int subsucc = subsuccs[subi];
           if (!explore(subsucc, supsuccs, checking, covered, doesnt, stack, depth)) {coveredbool = false; break CheckSuccs;}
         }
       }
@@ -1146,16 +1127,16 @@ public class BiSimulatorRedundant
       if (not == null) {
         not = new TIntHashSet();
         doesnt.put(sup, not);
-      } 
+      }
       not.add(sub);
     }
-    TIntHashSet covs = stack.get(sup);
-    if (covs == null) {
+    final TIntHashSet covs = stack.get(sup);
+    if (covs != null) {
       covs.remove(sub);
     }
     return coveredbool;
   }
-  
+
   /*private TIntHashSet explore(TIntHashSet sub, TIntHashSet sup,
                               Map<TIntHashSet, TIntHashSet> checking,
                               Map<TIntHashSet, TIntHashSet> covered,
@@ -1298,14 +1279,14 @@ public class BiSimulatorRedundant
     }
     return not;
   }*/
-  
-  private int[] getPredecessors(int state, int event)
+
+  private int[] getPredecessors(final int state, final int event)
   {
-    TIntHashSet preds = mPreds[state][event];
+    final TIntHashSet preds = mPreds[state][event];
     if (preds == null) {return null;}
     return preds.toArray();
   }
-  
+
   /*private void partition()
   {
     int start = mPartitions.size();
@@ -1340,7 +1321,7 @@ public class BiSimulatorRedundant
       }
     }
   }
-  
+
   private long stateHashCode(int state)
   {
     long hashCode = 1;
@@ -1352,7 +1333,7 @@ public class BiSimulatorRedundant
     }
     return hashCode;
   } */
-  
+
   /*private void addToW(SimpleEquivalenceClass sec, int[] X1, int[] X2)
   {
     SimpleEquivalenceClass child1 = new SimpleEquivalenceClass(X1);
@@ -1362,21 +1343,21 @@ public class BiSimulatorRedundant
       mW.add(child1);
       mW.add(child2);
   }*/
-  
-  private void addToW(SimpleEquivalenceClass sec, int[] X1, int[] X2)
+
+  private void addToW(final SimpleEquivalenceClass sec, final int[] X1, final int[] X2)
   {
-    SimpleEquivalenceClass child1 = new SimpleEquivalenceClass(X1);
-    SimpleEquivalenceClass child2 = new SimpleEquivalenceClass(X2);
+    final SimpleEquivalenceClass child1 = new SimpleEquivalenceClass(X1);
+    final SimpleEquivalenceClass child2 = new SimpleEquivalenceClass(X2);
     mP.remove(sec);
     if (mWS.remove(sec)) {
       mWS.add(child1);
       mWS.add(child2);
     } else {
-      ComplexEquivalenceClass comp = new ComplexEquivalenceClass(child1, child2);
+      final ComplexEquivalenceClass comp = new ComplexEquivalenceClass(child1, child2);
       comp.mInfo = sec.mInfo;
       if (sec.mParent != null) {
         comp.mParent = sec.mParent;
-        ComplexEquivalenceClass p = sec.mParent;
+        final ComplexEquivalenceClass p = sec.mParent;
         p.mChild1 = p.mChild1 == sec ? comp : p.mChild1;
         p.mChild2 = p.mChild2 == sec ? comp : p.mChild2;
       } else {
@@ -1384,43 +1365,43 @@ public class BiSimulatorRedundant
       }
     }
   }
-  
-  private void addToW(SimpleEquivalenceClass sec, int[] X1, int[] X2, int[] X3)
+
+  private void addToW(final SimpleEquivalenceClass sec, int[] X1, int[] X2, int[] X3)
   {
     if (X2.length < X1.length) {
-      int[] t = X1; X1 = X2; X2 = t;
+      final int[] t = X1; X1 = X2; X2 = t;
     }
     if (X3.length < X1.length) {
-      int[] t = X1; X1 = X3; X3 = t;
+      final int[] t = X1; X1 = X3; X3 = t;
     }
-    SimpleEquivalenceClass child1 = new SimpleEquivalenceClass(X1);
-    SimpleEquivalenceClass child2 = new SimpleEquivalenceClass(X2);
-    SimpleEquivalenceClass child3 = new SimpleEquivalenceClass(X3);
+    final SimpleEquivalenceClass child1 = new SimpleEquivalenceClass(X1);
+    final SimpleEquivalenceClass child2 = new SimpleEquivalenceClass(X2);
+    final SimpleEquivalenceClass child3 = new SimpleEquivalenceClass(X3);
     mP.remove(sec);
-    ComplexEquivalenceClass X23 = new ComplexEquivalenceClass(child2, child3);
-    ComplexEquivalenceClass X123 = new ComplexEquivalenceClass(child1, X23);
+    final ComplexEquivalenceClass X23 = new ComplexEquivalenceClass(child2, child3);
+    final ComplexEquivalenceClass X123 = new ComplexEquivalenceClass(child1, X23);
     X123.mInfo = sec.mInfo;
     if (sec.mParent != null) {
       X123.mParent = sec.mParent;
-      ComplexEquivalenceClass p = sec.mParent;
+      final ComplexEquivalenceClass p = sec.mParent;
       p.mChild1 = p.mChild1 == sec ? X123 : p.mChild1;
       p.mChild2 = p.mChild2 == sec ? X123 : p.mChild2;
     } else {
       mWC.add(X123);
     }
   }
-  
+
   private abstract class EquivalenceClass
   {
     ComplexEquivalenceClass mParent = null;
     TIntIntHashMap[] mInfo = null;
     int size;
-    
+
     public abstract TIntIntHashMap getInfo(int event);
-    
+
     public abstract void splitOn();
   }
-  
+
   private class SimpleEquivalenceClass
     extends EquivalenceClass
   {
@@ -1430,8 +1411,8 @@ public class BiSimulatorRedundant
     TIntArrayList X2 = null;
     TIntArrayList X3 = null;
     boolean mSplit = false;
-    
-    public SimpleEquivalenceClass(int[] states)
+
+    public SimpleEquivalenceClass(final int[] states)
     {
       mStates = states;
       size = states.length; //TODO make this into function so less space
@@ -1440,24 +1421,24 @@ public class BiSimulatorRedundant
       }
       mP.add(this);
     }
-    
+
     //TODO maybe keep track of what events an equivalence class has no incoming events from
     public void splitOn()
     {
       mInfo = new TIntIntHashMap[mEventNum];
-      List<SimpleEquivalenceClass> classes =
+      final List<SimpleEquivalenceClass> classes =
         new ArrayList<SimpleEquivalenceClass>();
       for (int e = 0; e < mEventNum; e++) {
         if (mTrans.isMarkingEvent(e)) {continue;}
         mInfo[e] = new TIntIntHashMap();
-        TIntIntHashMap map = mInfo[e];
+        final TIntIntHashMap map = mInfo[e];
         for (int s = 0; s < mStates.length; s++) {
-          int targ = mStates[s];
-          int[] preds = getPredecessors(targ, e);
+          final int targ = mStates[s];
+          final int[] preds = getPredecessors(targ, e);
           if (preds == null) {continue;}
           for (int p = 0; p < preds.length; p++) {
-            int pred = preds[p];
-            SimpleEquivalenceClass ec = mStateToClass[pred];
+            final int pred = preds[p];
+            final SimpleEquivalenceClass ec = mStateToClass[pred];
             TIntHashSet split = ec.mSplit1;
             if (split == null) {
               split = new TIntHashSet(ec.size);
@@ -1469,13 +1450,13 @@ public class BiSimulatorRedundant
           }
         }
         for (int c = 0; c < classes.size(); c++) {
-          SimpleEquivalenceClass sec = classes.get(c);
+          final SimpleEquivalenceClass sec = classes.get(c);
           if (sec.mSplit1.size() != sec.size) {
-            int[] X1 = new int[sec.size - sec.mSplit1.size()];
-            int[] X2 = new int[sec.mSplit1.size()];
+            final int[] X1 = new int[sec.size - sec.mSplit1.size()];
+            final int[] X2 = new int[sec.mSplit1.size()];
             int x1 = 0, x2 = 0;
             for (int s = 0; s < sec.mStates.length; s++) {
-              int state = sec.mStates[s];
+              final int state = sec.mStates[s];
               if (sec.mSplit1.contains(state)) {
                 X2[x2] = state; x2++;
               } else {
@@ -1489,8 +1470,8 @@ public class BiSimulatorRedundant
         classes.clear();
       }
     }
-    
-    public TIntIntHashMap getInfo(int event)
+
+    public TIntIntHashMap getInfo(final int event)
     {
       if (mInfo == null) {
         mInfo = new TIntIntHashMap[mEventNum];
@@ -1503,7 +1484,7 @@ public class BiSimulatorRedundant
       mInfo[event] = info;
       if (mTrans.isMarkingEvent(event)) {return info;}
       for (int i = 0; i < mStates.length; i++) {
-        int[] preds = getPredecessors(mStates[i], event);
+        final int[] preds = getPredecessors(mStates[i], event);
         if (preds == null) {continue;}
         for (int j = 0; j < preds.length; j++) {
           info.adjustOrPutValue(preds[j], 1, 1);
@@ -1512,15 +1493,15 @@ public class BiSimulatorRedundant
       return info;
     }
   }
-  
+
   private class ComplexEquivalenceClass
     extends EquivalenceClass
   {
     EquivalenceClass mChild1;
     EquivalenceClass mChild2;
-    
-    public ComplexEquivalenceClass(EquivalenceClass child1,
-                                   EquivalenceClass child2)
+
+    public ComplexEquivalenceClass(final EquivalenceClass child1,
+                                   final EquivalenceClass child2)
     {
       if (child1.size < child2.size) {
         mChild1 = child1;
@@ -1533,7 +1514,7 @@ public class BiSimulatorRedundant
       mChild2.mParent = this;
       size = child1.size + child2.size;
     }
-    
+
     public void splitOn()
     {
       final ArrayList<SimpleEquivalenceClass> classes =
@@ -1544,13 +1525,13 @@ public class BiSimulatorRedundant
         final TIntIntHashMap process = new TIntIntHashMap();
         final TIntIntHashMap info1 = mChild1.getInfo(e);
         info.forEachEntry(new TIntIntProcedure() {
-          public boolean execute(int state, int value) {
+          public boolean execute(final int state, int value) {
             if (value == 0) {
               System.out.println("zero value split");
               info.remove(state); return true;
             }
-            int value1 = info1.get(state);
-            SimpleEquivalenceClass sec = mStateToClass[state];
+            final int value1 = info1.get(state);
+            final SimpleEquivalenceClass sec = mStateToClass[state];
             if (!sec.mSplit) {
               classes.add(sec); sec.mSplit = true;
             }
@@ -1573,14 +1554,14 @@ public class BiSimulatorRedundant
               }
               X3.add(state);
             }
-            value -= value1; 
+            value -= value1;
             if (value != 0) {process.put(state, value);}
             return true;
           }
         });
         mChild2.mInfo[e] = process;
         for (int c = 0; c < classes.size(); c++) {
-          SimpleEquivalenceClass sec = classes.get(c);
+          final SimpleEquivalenceClass sec = classes.get(c);
           int[] X1, X2, X3;
           int number = sec.X1 != null ? 1 : 0;
           number = sec.X2 != null ? number + 1 : number;
@@ -1619,8 +1600,8 @@ public class BiSimulatorRedundant
       if (mChild1 instanceof ComplexEquivalenceClass) {mWC.add((ComplexEquivalenceClass)mChild1);}
       if (mChild2 instanceof ComplexEquivalenceClass) {mWC.add((ComplexEquivalenceClass)mChild2);}
     }
-    
-    public TIntIntHashMap getInfo(int event)
+
+    public TIntIntHashMap getInfo(final int event)
     {
       if (mInfo == null) {
         mInfo = new TIntIntHashMap[mEventNum];
@@ -1632,16 +1613,16 @@ public class BiSimulatorRedundant
       TIntIntHashMap info1 = mChild1.getInfo(event);
       TIntIntHashMap info2 = mChild2.getInfo(event);
       if (info1.size() < info2.size()) {
-        TIntIntHashMap t = info1; info1 = info2; info2 = t;
+        final TIntIntHashMap t = info1; info1 = info2; info2 = t;
       }
       final TIntIntHashMap info = new TIntIntHashMap(info1.size());
       info1.forEachEntry(new TIntIntProcedure() {
-        public boolean execute(int state, int value) {
+        public boolean execute(final int state, final int value) {
           info.put(state, value); return true;
         }
       });
       info2.forEachEntry(new TIntIntProcedure() {
-        public boolean execute(int state, int value) {
+        public boolean execute(final int state, final int value) {
           info.adjustOrPutValue(state, value, value); return true;
         }
       });
@@ -1650,18 +1631,19 @@ public class BiSimulatorRedundant
       return res;
     }
   }
-  
+
+  @SuppressWarnings("unused")
   private static class IntHashInt
   {
     int mSub;
     TIntHashSet mSup;
-    
-    public IntHashInt(int sub, TIntHashSet sup)
+
+    public IntHashInt(final int sub, final TIntHashSet sup)
     {
       mSub = sub;
       mSup = sup;
     }
-    
+
     public int hashCode()
     {
       int hash = mSub;
@@ -1669,14 +1651,14 @@ public class BiSimulatorRedundant
       hash += mSup.hashCode();
       return hash;
     }
-    
-    public boolean equals(Object o)
+
+    public boolean equals(final Object o)
     {
-      IntHashInt a = (IntHashInt) o;
+      final IntHashInt a = (IntHashInt) o;
       return mSub == a.mSub && mSup.equals(a.mSup);
     }
   }
-  
+
   private static class IntInt
     implements Comparable<IntInt>
   {
@@ -1699,18 +1681,18 @@ public class BiSimulatorRedundant
       return 0;
     }
   }
-  
+
   private static class AnnAnn
   {
     final Set<TIntHashSet> mAnn1;
     final Set<TIntHashSet> mAnn2;
-    
-    public AnnAnn(Set<TIntHashSet> ann1, Set<TIntHashSet> ann2)
+
+    public AnnAnn(final Set<TIntHashSet> ann1, final Set<TIntHashSet> ann2)
     {
       mAnn1 = ann1;
       mAnn2 = ann2;
     }
-    
+
     public int hashCode()
     {
       int hash = mAnn1.hashCode();
@@ -1718,25 +1700,25 @@ public class BiSimulatorRedundant
       hash += mAnn2.hashCode();
       return hash;
     }
-    
-    public boolean equals(Object o)
+
+    public boolean equals(final Object o)
     {
-      AnnAnn a = (AnnAnn) o;
+      final AnnAnn a = (AnnAnn) o;
       return mAnn1.equals(a.mAnn1) && mAnn2.equals(a.mAnn2);
     }
   }
-  
+
   private static class ActAct
   {
     final TIntHashSet mAct1;
     final TIntHashSet mAct2;
-    
-    public ActAct(TIntHashSet act1, TIntHashSet act2)
+
+    public ActAct(final TIntHashSet act1, final TIntHashSet act2)
     {
       mAct1 = act1;
       mAct2 = act2;
     }
-    
+
     public int hashCode()
     {
       int hash = mAct1.hashCode();
@@ -1744,10 +1726,10 @@ public class BiSimulatorRedundant
       hash += mAct2.hashCode();
       return hash;
     }
-    
-    public boolean equals(Object o)
+
+    public boolean equals(final Object o)
     {
-      ActAct a = (ActAct) o;
+      final ActAct a = (ActAct) o;
       return mAct1.equals(a.mAct1) && mAct2.equals(a.mAct2);
     }
   }

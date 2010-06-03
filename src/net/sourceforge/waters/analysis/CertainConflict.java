@@ -11,48 +11,48 @@ public class CertainConflict
   private final TransitionRelation mTransitionRelation;
   private final boolean[] mReachable;
   private final int mTau;
-  
+
   public static int STATESREMOVED = 0;
   public static int TIME = 0;
-  
+
   public static void clearStats()
   {
     STATESREMOVED = 0;
     TIME = 0;
   }
-  
+
   public static String stats()
   {
     return "CERTAINCONFLICT: STATESREMOVED = " + STATESREMOVED +
             " TIME = " + TIME;
   }
-  
-  public CertainConflict(TransitionRelation transitionrelation, int tau)
+
+  public CertainConflict(final TransitionRelation transitionrelation, final int tau)
   {
     mTransitionRelation = transitionrelation;
     mReachable = new boolean[mTransitionRelation.numberOfStates()];
     mTau = tau;
   }
-  
+
   private void backtrack(int state)
   {
-    TIntStack stack = new TIntStack();
+    final TIntStack stack = new TIntStack();
     stack.push(state);
     while (stack.size() != 0) {
       state = stack.pop();
       if (mReachable[state]) {continue;}
       mReachable[state] = true;
       for (int e = 0; e < mTransitionRelation.numberOfEvents(); e++) {
-        TIntHashSet preds = mTransitionRelation.getPredecessors(state, e);
+        final TIntHashSet preds = mTransitionRelation.getPredecessors(state, e);
         if (preds == null) {continue;}
-        TIntIterator it = preds.iterator();
+        final TIntIterator it = preds.iterator();
         while (it.hasNext()) {//mark all state which can reach this state as reachable
-          int pred = it.next(); stack.push(pred);
+          final int pred = it.next(); stack.push(pred);
         }
       }
     }
   }
-  
+
   /*private void backtrack(int state)
   {
     TIntStack stack = new TIntStack
@@ -67,13 +67,13 @@ public class CertainConflict
       }
     }
   }*/
-  
+
   public boolean run()
   {
     TIME -= System.currentTimeMillis();
-    TIntHashSet empty = new TIntHashSet();
+    final TIntHashSet empty = new TIntHashSet();
     for (int state = 0; state < mTransitionRelation.numberOfStates(); state++) {
-      Set<TIntHashSet> anns = mTransitionRelation.getAnnotation(state);
+      final Set<TIntHashSet> anns = mTransitionRelation.getAnnotation(state);
       if (anns != null) {
         if (anns.contains(empty)) {
           mTransitionRelation.removeAllOutgoing(state);
@@ -86,8 +86,8 @@ public class CertainConflict
       }
     }
     int dumpstate = -1;
-    TIntHashSet redirect = new TIntHashSet();
-    TIntStack stack = new TIntStack();
+    final TIntHashSet redirect = new TIntHashSet();
+    final TIntStack stack = new TIntStack();
     for (int state = 0; state < mReachable.length; state++) {
       if (!mTransitionRelation.hasPredecessors(state)) {continue;}
       if (!mReachable[state]) {
@@ -99,9 +99,9 @@ public class CertainConflict
     }
     while (true) {
       while (stack.size() != 0) {
-        int state = stack.pop();
+        final int state = stack.pop();
         STATESREMOVED++;
-        TIntHashSet iaoio = mTransitionRelation.removeAllOutgoing(state);
+        mTransitionRelation.removeAllOutgoing(state);
         if (mTransitionRelation.isInitial(state)) {
           TIME += System.currentTimeMillis();
           return false;
@@ -118,21 +118,21 @@ public class CertainConflict
           mTransitionRelation.makeInitialState(dumpstate, true);
         }*/
         for (int e = 0; e < mTransitionRelation.numberOfEvents(); e++) {
-          TIntHashSet preds = mTransitionRelation.getPredecessors(state, e);
+          final TIntHashSet preds = mTransitionRelation.getPredecessors(state, e);
           if (preds == null) {continue;}
-          TIntIterator it = preds.iterator();
+          final TIntIterator it = preds.iterator();
           while (it.hasNext()) {
-            int pred = it.next();
+            final int pred = it.next();
             if (redirect.contains(pred)) {
               continue; //has or will be nulled;
             }
             if (e == mTau) {
               redirect.add(pred); stack.push(pred); continue; // is another dumpstate
             }
-            TIntHashSet succs = mTransitionRelation.getSuccessors(pred, e);
-            int[] arsuccs = succs.toArray();
+            final TIntHashSet succs = mTransitionRelation.getSuccessors(pred, e);
+            final int[] arsuccs = succs.toArray();
             for (int i = 0; i < arsuccs.length; i++) {
-              int succ = arsuccs[i];
+              final int succ = arsuccs[i];
               if (succ == state) {continue;}
               mTransitionRelation.removeTransition(pred, e, succ);
             }
@@ -145,8 +145,8 @@ public class CertainConflict
       for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
         if (mTransitionRelation.isMarked(s)) {continue;}
         for (int e = 0; e < mTransitionRelation.numberOfEvents(); e++) {
-          TIntHashSet succs = mTransitionRelation.getSuccessors(s, e);
-          if (succs == null) {continue;}         
+          final TIntHashSet succs = mTransitionRelation.getSuccessors(s, e);
+          if (succs == null) {continue;}
           if (succs.size() > 1 || !succs.contains(dumpstate)) {
             continue MainLoop;
           }
@@ -156,7 +156,7 @@ public class CertainConflict
       MainLoop2:
       for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
         for (int e = 0; e < mTransitionRelation.numberOfEvents(); e++) {
-          TIntHashSet succs = mTransitionRelation.getSuccessors(s, e);
+          final TIntHashSet succs = mTransitionRelation.getSuccessors(s, e);
           if (succs == null) {continue;}
           if (succs.contains(dumpstate)) {
             if (mTransitionRelation.removeEventFromAnnotations(e, s)) {

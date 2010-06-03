@@ -2209,7 +2209,7 @@ public class CompositionalGeneralisedConflictChecker extends
       // step containing the known end state of the trace and a null event. This
       // step will be replaced by a step with event information as soon as a
       // proper step is discovered.
-      StateProxy originalAutState = getOriginalStates()[originialEndStateCode];
+      final StateProxy originalAutState = getOriginalStates()[originialEndStateCode];
       endMap.put(getOriginalAutomaton(), originalAutState);
       final ProductDESProxyFactory factory = getFactory();
       final TraceStepProxy newEndStep =
@@ -2221,66 +2221,14 @@ public class CompositionalGeneralisedConflictChecker extends
         final TraceStepProxy pred = iter.previous();
         final Map<AutomatonProxy,StateProxy> stepsPredecessorStateMap =
           pred.getStateMap();
-        originalAutState =
-            expandStep(step, originalAutState, stepsPredecessorStateMap,
-                       convertedSteps);
+        expandStep(step, stepsPredecessorStateMap, convertedSteps);
         step = pred;
       }
-      createInitialSteps(step, originalAutState, convertedSteps);
+      createInitialSteps(step, convertedSteps);
       final ConflictTraceProxy trace =
           buildTrace(conflictTrace, convertedSteps);
       clearTransitionRelation();
       return trace;
-    }
-
-    protected StateProxy expandStep(
-                                    final TraceStepProxy traceStep,
-                                    StateProxy originalAutSource,
-                                    final Map<AutomatonProxy,StateProxy> stepsPrevStateMap,
-                                    final List<TraceStepProxy> convertedSteps)
-    {
-      final Map<AutomatonProxy,StateProxy> newPrevStateMap =
-        new HashMap<AutomatonProxy,StateProxy>(stepsPrevStateMap);
-      final StateProxy resultTargetState =
-        newPrevStateMap.remove(getResultAutomaton());
-      assert resultTargetState != null;
-      final EventProxy stepEvent = traceStep.getEvent();
-      if (stepEvent != null) {
-        if (getResultAutomaton().getEvents().contains(stepEvent)
-            || getOriginalAutomaton().getEvents().contains(stepEvent)) {
-          final Map<AutomatonProxy,StateProxy> newStateMap =
-            new HashMap<AutomatonProxy,StateProxy>(traceStep.getStateMap());
-          final int eventID = getTransitionRelation().getEventInt(stepEvent);
-          newStateMap.remove(getResultAutomaton());
-          final List<SearchRecord> subtrace =
-              findSubTrace(getOriginalStateToIntMap().get(originalAutSource),
-                           eventID, getReverseOutputStateMap()
-                               .get(resultTargetState));
-          final List<TraceStepProxy> substeps =
-              createTraceSteps(newPrevStateMap, newStateMap, subtrace,
-                               stepEvent);
-          prependSteps(substeps, convertedSteps);
-          final int subsize = subtrace.size();
-          if (subsize > 0) {
-            final SearchRecord last = subtrace.get(subsize - 1);
-            final int originalTargetID = last.getState();
-            originalAutSource = getOriginalStates()[originalTargetID];
-          }
-        } else {
-          final ProductDESProxyFactory factory = getFactory();
-          final TraceStepProxy oldConvertedStep2 = convertedSteps.remove(0);
-          final Map<AutomatonProxy,StateProxy> oldConvertedStepMap2 =
-            oldConvertedStep2.getStateMap();
-          final TraceStepProxy newConvertedStep2 =
-            factory.createTraceStepProxy(stepEvent, oldConvertedStepMap2);
-          convertedSteps.add(0, newConvertedStep2);
-          newPrevStateMap.put(getOriginalAutomaton(), originalAutSource);
-          final TraceStepProxy newConvertedStep1 =
-              factory.createTraceStepProxy(null, newPrevStateMap);
-          convertedSteps.add(0, newConvertedStep1);
-        }
-      }
-      return originalAutSource;
     }
 
     /**
@@ -2313,6 +2261,50 @@ public class CompositionalGeneralisedConflictChecker extends
 
     // #######################################################################
     // # Auxiliary Methods
+    private void expandStep(final TraceStepProxy traceStep,
+                            final Map<AutomatonProxy,StateProxy> stepsPrevStateMap,
+                            final List<TraceStepProxy> convertedSteps)
+    {
+      final AutomatonProxy orig = getOriginalAutomaton();
+      final TraceStepProxy first = convertedSteps.iterator().next();
+      final Map<AutomatonProxy,StateProxy> firstMap = first.getStateMap();
+      final StateProxy originalAutState = firstMap.get(orig);
+      final Map<AutomatonProxy,StateProxy> newPrevStateMap =
+        new HashMap<AutomatonProxy,StateProxy>(stepsPrevStateMap);
+      final StateProxy resultTargetState =
+        newPrevStateMap.remove(getResultAutomaton());
+      assert resultTargetState != null;
+      final EventProxy stepEvent = traceStep.getEvent();
+      if (stepEvent != null) {
+        if (orig.getEvents().contains(stepEvent)) {
+          final Map<AutomatonProxy,StateProxy> newStateMap =
+            new HashMap<AutomatonProxy,StateProxy>(traceStep.getStateMap());
+          final int eventID = getTransitionRelation().getEventInt(stepEvent);
+          newStateMap.remove(getResultAutomaton());
+          final List<SearchRecord> subtrace =
+              findSubTrace(getOriginalStateToIntMap().get(originalAutState),
+                           eventID, getReverseOutputStateMap()
+                               .get(resultTargetState));
+          final List<TraceStepProxy> substeps =
+              createTraceSteps(newPrevStateMap, newStateMap, subtrace,
+                               stepEvent);
+          prependSteps(substeps, convertedSteps);
+        } else {
+          final ProductDESProxyFactory factory = getFactory();
+          final TraceStepProxy oldConvertedStep2 = convertedSteps.remove(0);
+          final Map<AutomatonProxy,StateProxy> oldConvertedStepMap2 =
+            oldConvertedStep2.getStateMap();
+          final TraceStepProxy newConvertedStep2 =
+            factory.createTraceStepProxy(stepEvent, oldConvertedStepMap2);
+          convertedSteps.add(0, newConvertedStep2);
+          newPrevStateMap.put(orig, originalAutState);
+          final TraceStepProxy newConvertedStep1 =
+              factory.createTraceStepProxy(null, newPrevStateMap);
+          convertedSteps.add(0, newConvertedStep1);
+        }
+      }
+    }
+
     /**
      * Uses the state in the original automaton which is found to be in the
      * first step of the trace, calls {@link #completeEndOfTrace(int)
@@ -2321,9 +2313,12 @@ public class CompositionalGeneralisedConflictChecker extends
      * converted steps list.
      */
     private void createInitialSteps(final TraceStepProxy step0,
-                                    final StateProxy originalAutState,
                                     final List<TraceStepProxy> convertedSteps)
     {
+      final AutomatonProxy orig = getOriginalAutomaton();
+      final TraceStepProxy first = convertedSteps.iterator().next();
+      final Map<AutomatonProxy,StateProxy> firstMap = first.getStateMap();
+      final StateProxy originalAutState = firstMap.get(orig);
       final List<SearchRecord> initSteps =
           completeEndOfTrace(getOriginalStateToIntMap().get(originalAutState));
       if (initSteps.size() > 0) {

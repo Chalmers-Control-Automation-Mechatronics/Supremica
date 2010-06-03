@@ -1,41 +1,35 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import java.util.Map;
-import net.sourceforge.waters.analysis.TransitionRelation;
-import gnu.trove.TLongHashSet;
-import gnu.trove.THashMap;
-import gnu.trove.TIntHashSet;
-import java.util.Iterator;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
+import gnu.trove.TLongHashSet;
+
+import java.util.Iterator;
 import java.util.Set;
+
+import net.sourceforge.waters.analysis.TransitionRelation;
 
 
 public class MakeBisimiliar
 {
   private final TransitionRelation mTrans;
   private final int[] mInitial;
-  private final int[] mMarked;
-  
+
   public static int SC = 0;
   public static int AE = 0;
   public static int OSO = 0;
   public static int OSI = 0;
   public static int TIME = 0;
-  
+
   public static void clearStats()
   {
     SC = 0;
     AE = 0;
     OSO = 0;
-    OSI = 0; 
+    OSI = 0;
   }
-  
+
   public static String stats()
   {
     return "SC = " + SC +
@@ -44,46 +38,45 @@ public class MakeBisimiliar
            "\nOSI = " + OSI +
            "\nTIME = " + TIME;
   }
-  
-  public MakeBisimiliar(TransitionRelation tr)
+
+  public MakeBisimiliar(final TransitionRelation tr)
   {
     mTrans = tr;
-    TIntArrayList init = new TIntArrayList();
-    TIntArrayList mark = new TIntArrayList();
+    final TIntArrayList init = new TIntArrayList();
+    final TIntArrayList mark = new TIntArrayList();
     for (int s = 0; s < mTrans.numberOfStates(); s++) {
       if (mTrans.isInitial(s)) {init.add(s);}
       if (mTrans.isMarked(s)) {mark.add(s);}
     }
     mInitial = init.toNativeArray();
-    mMarked = mark.toNativeArray();
+    mark.toNativeArray();
   }
-  
-  public long mergeIntoLong(int state, int event)
+
+  public long mergeIntoLong(final int state, final int event)
   {
     long merge = state;
-    long ev = event;
     merge <<= 32;
     merge |= event;
     return merge;
   }
-  
+
   public int getStateFromLong(long merge)
   {
     merge >>= 32;
     return (int) merge;
   }
-  
+
   public int getEventFromLong(long merge)
   {
     merge <<= 32;
     merge >>= 32;
     return (int) merge;
   }
-  
-  private Tuple getSuccessors(int s)
+
+  private Tuple getSuccessors(final int s)
   {
-    TLongHashSet musthavesuccs = new TLongHashSet();
-    TIntHashSet mustSelf = new TIntHashSet();
+    final TLongHashSet musthavesuccs = new TLongHashSet();
+    final TIntHashSet mustSelf = new TIntHashSet();
     for (int e = 0; e < mTrans.numberOfEvents(); e++) {
       if (mTrans.isMarkingEvent(e)) {
         if (mTrans.isMarked(s)) {
@@ -91,11 +84,11 @@ public class MakeBisimiliar
         }
         continue;
       }
-      TIntHashSet succs = mTrans.getSuccessors(s, e);
+      final TIntHashSet succs = mTrans.getSuccessors(s, e);
       if (succs == null) {continue;}
-      int[] arrsuccs = succs.toArray();
+      final int[] arrsuccs = succs.toArray();
       for (int i = 0; i < arrsuccs.length; i++) {
-        int succ = arrsuccs[i];
+        final int succ = arrsuccs[i];
         if (s != succ) {
           musthavesuccs.add(mergeIntoLong(succ, e));
         } else {
@@ -110,7 +103,7 @@ public class MakeBisimiliar
     for (int e = 0; e < mTrans.numberOfEvents() + 1; e++) {
       int[] predsarr = null;
       if (e != mTrans.numberOfEvents()) {
-        TIntHashSet preds = mTrans.getPredecessors(s, e);
+        final TIntHashSet preds = mTrans.getPredecessors(s, e);
         if (preds == null || preds.isEmpty()) {continue;}
         predsarr = preds.toArray();
       } else {
@@ -119,26 +112,26 @@ public class MakeBisimiliar
         predsarr[0] = -1;
       }
       for (int i = 0; i < predsarr.length; i++) {
-        TLongHashSet tsuccs = new TLongHashSet();
-        TIntHashSet tself = new TIntHashSet();
-        Set<TIntHashSet> uncoveredAnns2 = new THashSet<TIntHashSet>(mTrans.getAnnotations2(s));
+        final TLongHashSet tsuccs = new TLongHashSet();
+        final TIntHashSet tself = new TIntHashSet();
+        final Set<TIntHashSet> uncoveredAnns2 = new THashSet<TIntHashSet>(mTrans.getAnnotations2(s));
         if (uncoveredAnns != null) {uncoveredAnns2.removeAll(uncoveredAnns);}
         int[] arrsuccs;
         if (predsarr[0] != -1) {
-          int pred = predsarr[i];
+          final int pred = predsarr[i];
           arrsuccs = mTrans.getSuccessors(pred, e).toArray();
         } else {
           arrsuccs = mInitial;
         }
         for (int j = 0; j < arrsuccs.length; j++) {
-          int succ = arrsuccs[j];
+          final int succ = arrsuccs[j];
           if (succ == s) {continue;}
-          Iterator<TIntHashSet> it = uncoveredAnns2.iterator();
+          final Iterator<TIntHashSet> it = uncoveredAnns2.iterator();
           while (it.hasNext()) {
-            TIntHashSet ann = it.next();
-            Iterator<TIntHashSet> it2 = mTrans.getAnnotations2(succ).iterator();
+            final TIntHashSet ann = it.next();
+            final Iterator<TIntHashSet> it2 = mTrans.getAnnotations2(succ).iterator();
             while (it2.hasNext()) {
-              TIntHashSet ann2 = it2.next();
+              final TIntHashSet ann2 = it2.next();
               if (ann.containsAll(ann2.toArray())) {it.remove();}
             }
           }
@@ -149,11 +142,11 @@ public class MakeBisimiliar
               }
               continue;
             }
-            TIntHashSet succs2 = mTrans.getSuccessors(succ, e2);
+            final TIntHashSet succs2 = mTrans.getSuccessors(succ, e2);
             if (succs2 == null) {continue;}
-            int[] arrsuccs2 = succs2.toArray();
+            final int[] arrsuccs2 = succs2.toArray();
             for (int k = 0; k < arrsuccs2.length; k++) {
-              int succ2 = arrsuccs2[k];
+              final int succ2 = arrsuccs2[k];
               if (succ2 != s) {tsuccs.add(mergeIntoLong(succ2, e2));}
               else {tself.add(e2);}
             }
@@ -182,21 +175,21 @@ public class MakeBisimiliar
     //System.out.println(musthavesuccssize);}
     optionalsuccs.addAll(musthavesuccs.toArray());
     optionalSelf.addAll(mustSelf.toArray());
-    int[] optionalSelfarr = optionalSelf.toArray();
+    final int[] optionalSelfarr = optionalSelf.toArray();
     for (int i = 0; i < optionalSelfarr.length; i++) {
-      int ev = optionalSelfarr[i];
+      final int ev = optionalSelfarr[i];
       optionalsuccs.add(mergeIntoLong(s, ev));
     }
-    Tuple tup = new Tuple(musthavesuccs, optionalsuccs, uncoveredAnns, mustSelf, optionalSelf);
+    final Tuple tup = new Tuple(musthavesuccs, optionalsuccs, uncoveredAnns, mustSelf, optionalSelf);
     return tup;
   }
-  
-  public boolean annotationsCovered(int s, Set<TIntHashSet> annotations)
+
+  public boolean annotationsCovered(final int s, final Set<TIntHashSet> annotations)
   {
     for (int e = 0; e < mTrans.numberOfEvents() + 1; e++) {
       int[] predsarr = null;
       if (e != mTrans.numberOfEvents()) {
-        TIntHashSet preds = mTrans.getPredecessors(s, e);
+        final TIntHashSet preds = mTrans.getPredecessors(s, e);
         if (preds == null || preds.isEmpty()) {continue;}
         predsarr = preds.toArray();
       } else {
@@ -205,22 +198,22 @@ public class MakeBisimiliar
         predsarr[0] = -1;
       }
       for (int i = 0; i < predsarr.length; i++) {
-        Set<TIntHashSet> uncoveredAnns = new THashSet<TIntHashSet>(annotations);
+        final Set<TIntHashSet> uncoveredAnns = new THashSet<TIntHashSet>(annotations);
         int[] arrsuccs;
         if (predsarr[0] != -1) {
-          int pred = predsarr[i];
+          final int pred = predsarr[i];
           arrsuccs = mTrans.getSuccessors(pred, e).toArray();
         } else {
           arrsuccs = mInitial;
         }
         for (int j = 0; j < arrsuccs.length; j++) {
-          int succ = arrsuccs[j];
-          Iterator<TIntHashSet> it = uncoveredAnns.iterator();
+          final int succ = arrsuccs[j];
+          final Iterator<TIntHashSet> it = uncoveredAnns.iterator();
           while (it.hasNext()) {
-            TIntHashSet ann = it.next();
-            Iterator<TIntHashSet> it2 = mTrans.getAnnotations2(succ).iterator();
+            final TIntHashSet ann = it.next();
+            final Iterator<TIntHashSet> it2 = mTrans.getAnnotations2(succ).iterator();
             while (it2.hasNext()) {
-              TIntHashSet ann2 = it2.next();
+              final TIntHashSet ann2 = it2.next();
               if (ann.containsAll(ann2.toArray())) {it.remove();}
             }
           }
@@ -231,8 +224,8 @@ public class MakeBisimiliar
     }
     return true;
   }
-  
-  public boolean canbemadebisimiliar(int state)
+
+  public boolean canbemadebisimiliar(final int state)
   {
     Tuple tup = getSuccessors(state);
     if (tup == null) {return false;}
@@ -248,20 +241,20 @@ public class MakeBisimiliar
     for (int cand = 0; cand < mTrans.numberOfStates(); cand++) {
       //int cand = candidates[i];
       if (cand == state) {continue;}
-      Tuple tup2 = getSuccessors(cand);
+      final Tuple tup2 = getSuccessors(cand);
       if (tup2 == null) {continue;}
       if (!(tup.mOptional.containsAll(tup2.mMust.toArray()) &&
           tup2.mOptional.containsAll(tup.mMust.toArray()))) {continue;}
       int[] mustself = tup.mMustSelfLoops.toArray();
       for (int i = 0; i < mustself.length; i++) {
-        int must = mustself[i];
+        final int must = mustself[i];
         if (tup2.mOptionalSelfLoops.contains(must)) {continue;}
         if (tup2.mOptional.contains(mergeIntoLong(state, must))) {continue;}
         continue Cands;
       }
       mustself = tup2.mMustSelfLoops.toArray();
       for (int i = 0; i < mustself.length; i++) {
-        int must = mustself[i];
+        final int must = mustself[i];
         if (tup.mOptionalSelfLoops.contains(must)) {continue;}
         if (tup.mOptional.contains(mergeIntoLong(state, must))) {continue;}
         continue Cands;
@@ -280,7 +273,7 @@ public class MakeBisimiliar
     //OSI++;
     return true;
   }
-  
+
   public void run()
   {
     TIME -= System.currentTimeMillis();
@@ -290,7 +283,7 @@ public class MakeBisimiliar
     }
     TIME += System.currentTimeMillis();
   }
-  
+
   private class Tuple
   {
     final TLongHashSet mMust;
@@ -298,10 +291,10 @@ public class MakeBisimiliar
     final Set<TIntHashSet> mUncoveredAnns;
     final TIntHashSet mMustSelfLoops;
     final TIntHashSet mOptionalSelfLoops;
-    
-    public Tuple(TLongHashSet must, TLongHashSet optional,
-                 Set<TIntHashSet> uncoveredAnns,
-                 TIntHashSet mustSelf, TIntHashSet optionalSelf)
+
+    public Tuple(final TLongHashSet must, final TLongHashSet optional,
+                 final Set<TIntHashSet> uncoveredAnns,
+                 final TIntHashSet mustSelf, final TIntHashSet optionalSelf)
     {
       mMust = must;
       mOptional = optional;

@@ -1,10 +1,11 @@
 package net.sourceforge.waters.analysis.modular;
 
 import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.sourceforge.waters.analysis.ProjectingNonBlockingChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -20,11 +21,6 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.analysis.CompNonBlockingChecker;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.io.FilenameFilter;
-import java.util.Arrays;
 
 
 public class SpeedComparison
@@ -32,18 +28,18 @@ public class SpeedComparison
   public static class WFilter
     implements FilenameFilter
   {
-    public boolean accept(File dir, String name)
+    public boolean accept(final File dir, final String name)
     {
       return name.endsWith(".wmod");
     }
   }
-  
-  public static void main(String[] args) throws Exception
+
+  public static void main(final String[] args) throws Exception
   {
     /*JFileChooser chooser = new JFileChooser(new File("/home/darius/waters"));
     FileNameExtensionFilter filter = new FileNameExtensionFilter(
         "wmod", "wmod");
-    chooser.setFileFilter(filter);                       
+    chooser.setFileFilter(filter);
     int returnVal = chooser.showOpenDialog(null);
     if(returnVal == JFileChooser.APPROVE_OPTION) {
        System.out.println("You chose to open this file: " +
@@ -63,19 +59,19 @@ public class SpeedComparison
     for (File d : Arrays.asList(dir.listFiles())) {
       files.addAll(Arrays.asList(d.listFiles(new WFilter())));
     } */
-    List<File> files = new ArrayList<File>();
-    File dir = new File("/home/darius/HugoExamples/");
+    final List<File> files = new ArrayList<File>();
+    final File dir = new File("/home/darius/HugoExamples/");
     files.addAll(Arrays.asList(dir.listFiles(new WFilter())));
     Collections.sort(files);
-    for (File file : files) {
-      ProductDESProxy model = getCompiledDES(file, null);
+    for (final File file : files) {
+      final ProductDESProxy model = getCompiledDES(file, null);
       System.out.println(model.getName());
       ProjectingNonBlockingChecker pnbc = new ProjectingNonBlockingChecker(model, mProductDESProxyFactory);
       pnbc.setNodeLimit(1000000);
       try {
         System.out.println(pnbc.run());
         //System.out.println(pnbc.getCounterExample());
-      } catch (AnalysisException a) {
+      } catch (final AnalysisException a) {
         a.printStackTrace();
       }
       pnbc = null;
@@ -89,7 +85,7 @@ public class SpeedComparison
       }*/
     }
   }
-  
+
   private static ProductDESProxy getCompiledDES
     (final File filename,
      final List<ParameterBindingProxy> bindings)
@@ -107,18 +103,18 @@ public class SpeedComparison
       return null;
     }
   }
-  
+
   private static DocumentManager mDocumentManager = new DocumentManager();
   private static ProductDESProxyFactory mProductDESProxyFactory = ProductDESElementFactory.getInstance();
-  
+
   static {
-    ModuleElementFactory mModuleFactory = ModuleElementFactory.getInstance();
+    final ModuleElementFactory mModuleFactory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     try {
       final JAXBModuleMarshaller modmarshaller =
         new JAXBModuleMarshaller(mModuleFactory, optable);
       mDocumentManager.registerUnmarshaller(modmarshaller);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

@@ -1,19 +1,13 @@
 package net.sourceforge.waters.analysis;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntStack;
-import gnu.trove.TIntArrayList;
-import java.util.Arrays;
-import gnu.trove.TLongByteHashMap;
-import java.util.Set;
-import gnu.trove.TLongIntHashMap;
-import gnu.trove.THashSet;
-import gnu.trove.TObjectIntHashMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import gnu.trove.THashMap;
+import gnu.trove.THashSet;
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 
 public class AddRedundantTransitions
 {
@@ -22,41 +16,34 @@ public class AddRedundantTransitions
   private boolean flag = false;
   //private final TIntHashSet[][][] mSuccs;
   //private final Set<TIntHashSet>[][] mAnn;
-  
+
   public static int TRANSITIONSADDED = 0;
   public static int TIME = 0;
-  
-  private static final TIntHashSet EMPTYSET = new TIntHashSet(0);
-  
-  private class Tuple
-  {
-    int state = 0;
-    int event = 0;
-  }
-  
+
+
   public static void clearStats()
   {
     TRANSITIONSADDED = 0;
     TIME = 0;
   }
-  
-  
+
+
   public static String stats()
   {
     return "RedundantTransitions: TRANSITIONSREMOVED = " + TRANSITIONSADDED +
            " TIME = " + TIME;
   }
-  
-  
-  public AddRedundantTransitions(TransitionRelation transitionrelation)
+
+
+  public AddRedundantTransitions(final TransitionRelation transitionrelation)
   {
-    int events = transitionrelation.numberOfEvents();
-    int states = transitionrelation.numberOfStates();
+    // int events = transitionrelation.numberOfEvents();
+    // int states = transitionrelation.numberOfStates();
     mTrans = transitionrelation;
     //mSuccs = new TIntHashSet[states][events][];
     //mAnn = new Set[states][events];
   }
-  
+
   /*private void setup()
   {
     for (int s = 0; s < mSuccs.length; s++) {
@@ -85,7 +72,7 @@ public class AddRedundantTransitions
       }
     }
   }
-  
+
   public void run()
   {
     TIME -= System.currentTimeMillis();
@@ -136,11 +123,11 @@ public class AddRedundantTransitions
     System.out.println("transitions added: " + TRANSITIONSADDED);
     TIME += System.currentTimeMillis();
   }*/
-  
-  private boolean explore(int sub, TIntHashSet sup,
-                          Map<TIntHashSet, TIntHashSet> checking,
-                          Map<TIntHashSet, TIntHashSet> covered,
-                          Map<TIntHashSet, TIntHashSet> doesnt,
+
+  private boolean explore(final int sub, final TIntHashSet sup,
+                          final Map<TIntHashSet, TIntHashSet> checking,
+                          final Map<TIntHashSet, TIntHashSet> covered,
+                          final Map<TIntHashSet, TIntHashSet> doesnt,
                           int depth)
   {
     //System.out.println(time);
@@ -156,20 +143,20 @@ public class AddRedundantTransitions
     does = checking.get(sup);
     if (does != null && does.contains(sub)) {return true;}
     if (depth % 50 == 0) {//System.out.println("depth:  " + depth);
-      for(TIntHashSet set: checking.keySet()) {
+      for(final TIntHashSet set: checking.keySet()) {
         if (sup.containsAll(set.toArray())) {
-          if (checking.get(set).contains(sub)) {/*System.out.println("subset")*/; return true;} 
+          if (checking.get(set).contains(sub)) {/*System.out.println("subset")*/; return true;}
         }
       }
-      for(TIntHashSet set: covered.keySet()) {
+      for(final TIntHashSet set: covered.keySet()) {
         if (sup.containsAll(set.toArray())) {
-          if (covered.get(set).contains(sub)) {/*System.out.println("subset")*/;  return true;} 
+          if (covered.get(set).contains(sub)) {/*System.out.println("subset")*/;  return true;}
         }
       }
     }
     boolean coveredbool = true;
-    TIntHashSet supact = new TIntHashSet();
-    int[] suparr = sup.toArray();
+    final TIntHashSet supact = new TIntHashSet();
+    final int[] suparr = sup.toArray();
     for (int i = 0; i < suparr.length; i++) {
       supact.addAll(mTrans.getActiveEvents(suparr[i]).toArray());
     }
@@ -177,13 +164,13 @@ public class AddRedundantTransitions
       if (!supact.containsAll(mTrans.getActiveEvents(sub).toArray())) {coveredbool = false;}
     }
     if (coveredbool) {
-      Set<TIntHashSet> supanns = new THashSet<TIntHashSet>();
+      final Set<TIntHashSet> supanns = new THashSet<TIntHashSet>();
       for (int i = 0; i < suparr.length; i++) {
         supanns.addAll(mTrans.getAnnotations2(suparr[i]));
       }
       Annotations:
-      for (TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
-        for (TIntHashSet ann2 : supanns) {
+      for (final TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
+        for (final TIntHashSet ann2 : supanns) {
           if (ann1.containsAll(ann2.toArray())) {continue Annotations;}
         }
         coveredbool = false; break;
@@ -197,19 +184,19 @@ public class AddRedundantTransitions
         checking.put(sup, covs);
       }
       covs.add(sub);
-      int[] act = mTrans.getActiveEvents(sub).toArray();
+      final int[] act = mTrans.getActiveEvents(sub).toArray();
       for (int ei = 0; ei < act.length; ei++) {
-        int e = act[ei];
+        final int e = act[ei];
         if (mTrans.isMarkingEvent(e)) {continue;}
-        TIntHashSet supsuccs = new TIntHashSet();
+        final TIntHashSet supsuccs = new TIntHashSet();
         for (int supi = 0; supi < suparr.length; supi++) {
-          int supstate = suparr[supi];
+          final int supstate = suparr[supi];
           if (mTrans.getSuccessors(supstate, e) == null) {continue;}
           supsuccs.addAll(mTrans.getSuccessors(supstate, e).toArray());
         }
-        int[] subsuccs = mTrans.getSuccessors(sub, e).toArray();
+        final int[] subsuccs = mTrans.getSuccessors(sub, e).toArray();
         for (int subi = 0; subi < subsuccs.length; subi++) {
-          int subsucc = subsuccs[subi];
+          final int subsucc = subsuccs[subi];
           if (!explore(subsucc, supsuccs, checking, covered, doesnt, depth)) {coveredbool = false; break CheckSuccs;}
         }
       }
@@ -221,17 +208,17 @@ public class AddRedundantTransitions
       if (not == null) {
         not = new TIntHashSet();
         doesnt.put(sup, not);
-      } 
+      }
       not.add(sub);
     }
     return coveredbool;
   }
-  
+
   public void run()
   {
     System.out.println("setup8");
-    TIntArrayList[] mHas = new TIntArrayList[mTrans.numberOfEvents()];
-    IntInt[] eventorder = new IntInt[mHas.length];
+    final TIntArrayList[] mHas = new TIntArrayList[mTrans.numberOfEvents()];
+    final IntInt[] eventorder = new IntInt[mHas.length];
     for (int e = 0; e < mTrans.numberOfEvents(); e++) {
       mHas[e] = new TIntArrayList();
       eventorder[e] = new IntInt(e, mHas[e]);
@@ -242,27 +229,27 @@ public class AddRedundantTransitions
         if (mTrans.isMarkingEvent(ei)) {
           if (mTrans.isMarked(state)) {mHas[ei].add(state);}
         } else {
-          TIntHashSet succ = mTrans.getSuccessors(state, ei);
+          final TIntHashSet succ = mTrans.getSuccessors(state, ei);
           if (succ == null || succ.isEmpty()) {continue;}
           mHas[ei].add(state);
         }
       }
     }
     Arrays.sort(eventorder);
-    Map<TIntHashSet, TIntHashSet> checked = new THashMap<TIntHashSet, TIntHashSet>();
-    Map<TIntHashSet, TIntHashSet> covered = new THashMap<TIntHashSet, TIntHashSet>();
-    Map<TIntHashSet, TIntHashSet> doesnt = new THashMap<TIntHashSet, TIntHashSet>();
+    final Map<TIntHashSet, TIntHashSet> checked = new THashMap<TIntHashSet, TIntHashSet>();
+    final Map<TIntHashSet, TIntHashSet> covered = new THashMap<TIntHashSet, TIntHashSet>();
+    final Map<TIntHashSet, TIntHashSet> doesnt = new THashMap<TIntHashSet, TIntHashSet>();
     LOOP:
     for (int sub = 0; sub < mTrans.numberOfStates(); sub++) {
       if (sub % 100 == 0) {System.out.println(sub);}
       if (!mTrans.hasPredecessors(sub)) {continue;}
       TIntArrayList arr = null;
       for (int ei = 0; ei < mTrans.numberOfEvents(); ei++) {
-        int e = eventorder[ei].mInt1;
+        final int e = eventorder[ei].mInt1;
         if (mTrans.isMarkingEvent(e)) {
           if (mTrans.isMarked(sub)) {arr = mHas[e]; break;}
         } else {
-          TIntHashSet succ = mTrans.getSuccessors(sub, e);
+          final TIntHashSet succ = mTrans.getSuccessors(sub, e);
           if (succ == null || succ.isEmpty()) {continue;}
           arr = mHas[e]; break;
         }
@@ -270,21 +257,21 @@ public class AddRedundantTransitions
       if (arr == null) {continue;}
       mTime = System.currentTimeMillis();
       for (int supi = 0; supi < arr.size(); supi++) {
-        int sup = arr.get(supi);
+        final int sup = arr.get(supi);
         if (!mTrans.hasPredecessors(sup)) {continue;}
         if (sup == sub) {continue;}
         for (int e = 0; e < mTrans.numberOfEvents(); e++) {
-          TIntHashSet preds = mTrans.getPredecessors(sup, e);
+          final TIntHashSet preds = mTrans.getPredecessors(sup, e);
           if (preds == null) {continue;}
-          int[] predsarr = preds.toArray();
+          final int[] predsarr = preds.toArray();
           for (int pi = 0; pi < predsarr.length; pi++) {
-            int pred = predsarr[pi];
-            TIntHashSet subset = new TIntHashSet(1);
+            final int pred = predsarr[pi];
+            final TIntHashSet subset = new TIntHashSet(1);
             subset.add(sub);
             checked.clear();
             if (explore(sub, new TIntHashSet(mTrans.getSuccessors(pred, e).toArray()), checked, covered, doesnt, 0)) {
               if (mTrans.addTransition(pred, e, sub)) {TRANSITIONSADDED++;}
-              for (TIntHashSet set : checked.keySet()) {
+              for (final TIntHashSet set : checked.keySet()) {
                 TIntHashSet cov = covered.get(set);
                 if (cov == null) {
                   cov = new TIntHashSet();
@@ -302,7 +289,7 @@ public class AddRedundantTransitions
     if (flag) {run2();}
     System.out.println(TRANSITIONSADDED);
   }
-  
+
   public void run2()
   {
     TIME -= System.currentTimeMillis();
@@ -323,24 +310,22 @@ public class AddRedundantTransitions
       changed = false;
     for (int sub = 0; sub < mTrans.numberOfStates(); sub++) {
       if (!mTrans.hasPredecessors(sub)) {continue;}
-      int[] active = mTrans.getActiveEvents(sub).toArray();
       TIntHashSet poss = null;
       for (int ei = 0; ei < mTrans.numberOfEvents(); ei++) {
-        TIntHashSet succ = mTrans.getSuccessors(sub, ei);
+        final TIntHashSet succ = mTrans.getSuccessors(sub, ei);
         if (succ == null || succ.isEmpty()) {continue;}
         poss = mTrans.getPredecessors(succ.toArray()[0], ei);
       }
       if (poss == null) {continue;}
-      int[] possarr = poss.toArray();
+      final int[] possarr = poss.toArray();
       Possible:
       for (int si = 0; si < possarr.length; si++) {
-        int sup = possarr[si];
+        final int sup = possarr[si];
         if (!mTrans.hasPredecessors(sup)) {continue;}
         if (sup == sub) {continue;}
-        int[] activeorig = mTrans.getActiveEvents(sup).toArray();
         Annotations:
-        for (TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
-          for (TIntHashSet ann2 : mTrans.getAnnotations2(sup)) {
+        for (final TIntHashSet ann1 : mTrans.getAnnotations2(sub)) {
+          for (final TIntHashSet ann2 : mTrans.getAnnotations2(sup)) {
             if (ann1.containsAll(ann2.toArray())) {continue Annotations;}
           }
           continue Possible;
@@ -348,12 +333,12 @@ public class AddRedundantTransitions
         //if (!mTrans.isSubsetOutgoing(sub, sup)) {continue;}
         if (mTrans.isMarked(sub) && !mTrans.isMarked(sup)) {continue;}
         for (int e = 0; e < mTrans.numberOfEvents(); e++) {
-          TIntHashSet subsuccs = mTrans.getSuccessors(sub, e);
+          final TIntHashSet subsuccs = mTrans.getSuccessors(sub, e);
           if (subsuccs == null || subsuccs.isEmpty()) {continue;}
           if (mTrans.getSuccessors(sup, e) == null) {continue Possible;}
-          int[] succs = subsuccs.toArray();
+          final int[] succs = subsuccs.toArray();
           for (int i = 0; i < succs.length; i++) {
-            int suc = succs[i];
+            final int suc = succs[i];
             if (suc != sub) {
               if (!mTrans.getSuccessors(sup, e).contains(suc)) {continue Possible;}
             } else {
@@ -365,11 +350,11 @@ public class AddRedundantTransitions
         //System.out.println("Added Transition");
         //mTransitionRelation.addTransition(stateorig, event, state);
         for (int pe = 0; pe < mTrans.numberOfEvents(); pe++) {
-          TIntHashSet predevents = mTrans.getPredecessors(sup, pe);
+          final TIntHashSet predevents = mTrans.getPredecessors(sup, pe);
           if (predevents == null) {continue;}
-          int[] preds = predevents.toArray();
+          final int[] preds = predevents.toArray();
           for (int pri = 0; pri < preds.length; pri++) {
-            int pr = preds[pri];
+            final int pr = preds[pri];
             if (mTrans.addTransition(pr, pe, sub)) {TRANSITIONSADDED++; changed = true;}
             //if (builtsuccs[pr][pe].add(sub)) {}
           }
@@ -380,7 +365,7 @@ public class AddRedundantTransitions
     System.out.println("transitions added: " + TRANSITIONSADDED);
     TIME += System.currentTimeMillis();
   }
-  
+
   private static class IntInt
     implements Comparable<IntInt>
   {

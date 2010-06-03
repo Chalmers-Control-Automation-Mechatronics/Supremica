@@ -1,65 +1,60 @@
 package net.sourceforge.waters.analysis;
 
 import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntStack;
-import gnu.trove.TIntArrayList;
-import java.util.Arrays;
-import gnu.trove.TLongByteHashMap;
-import java.util.Set;
 import gnu.trove.TLongIntHashMap;
+
+import java.util.Set;
+
 
 public class RedundantTransitions
 {
   private final TransitionRelation mTransitionRelation;
-  private final boolean[] mReachable;
   private final TLongIntHashMap mCache;
-  
+
   public static int TRANSITIONSREMOVED = 0;
   public static int STATESREMOVED = 0;
   public static int TIME = 0;
-  
+
   private static final TIntHashSet EMPTYSET = new TIntHashSet(0);
-  
-  private long key(int s1, int s2)
+
+  private long key(int s1, final int s2)
   {
     long l = s1;
     s1 <<= 32;
-    long l2 = s2;
+    final long l2 = s2;
     l |= l2;
     return l;
   }
-  
+
   public static void clearStats()
   {
     TRANSITIONSREMOVED = 0;
     TIME = 0;
     STATESREMOVED = 0;
   }
-  
-  
+
+
   public static String stats()
   {
     return "RedundantTransitions: TRANSITIONSREMOVED = " + TRANSITIONSREMOVED +
             " States Removed" + STATESREMOVED + " TIME = " + TIME;
   }
-  
-  
-  public RedundantTransitions(TransitionRelation transitionrelation)
+
+
+  public RedundantTransitions(final TransitionRelation transitionrelation)
   {
     mTransitionRelation = transitionrelation;
-    mReachable = new boolean[mTransitionRelation.numberOfStates()];
     mCache = new TLongIntHashMap();
   }
-  
-  public boolean coversAnnotations(int s1, int s2)
+
+  public boolean coversAnnotations(final int s1, final int s2)
   {
-    Set<TIntHashSet> ann1 = mTransitionRelation.getAnnotations2(s1);
-    Set<TIntHashSet> ann2 = mTransitionRelation.getAnnotations2(s2);
-    for (TIntHashSet a1 : ann1) {
-      int[] array = a1.toArray();
+    final Set<TIntHashSet> ann1 = mTransitionRelation.getAnnotations2(s1);
+    final Set<TIntHashSet> ann2 = mTransitionRelation.getAnnotations2(s2);
+    for (final TIntHashSet a1 : ann1) {
+      final int[] array = a1.toArray();
       boolean covered = false;
-      for (TIntHashSet a2 : ann2) {
+      for (final TIntHashSet a2 : ann2) {
         if (a2.containsAll(array)) {
           covered = true;
           break;
@@ -69,11 +64,11 @@ public class RedundantTransitions
     }
     return true;
   }
-  
-  public boolean coversOutGoing(int s1, int s2, int state, int event)
+
+  public boolean coversOutGoing(final int s1, final int s2, final int state, final int event)
   {
     if (s2 == state) {
-      TIntHashSet out1 = mTransitionRelation.getSuccessors(s1, event);
+      final TIntHashSet out1 = mTransitionRelation.getSuccessors(s1, event);
       if (out1 != null) {
         if (out1.contains(s1)) {return false;}
       }
@@ -95,8 +90,8 @@ public class RedundantTransitions
     }
     return true;
   }
-  
-  public int redundantState(int s1, int s2, int state, int event)
+
+  public int redundantState(final int s1, final int s2, final int state, final int event)
   {
     //TODO this has significance to do with follow on equivalence
     /*int res1 = mCache.get(key(s1, s2));
@@ -117,7 +112,7 @@ public class RedundantTransitions
     mCache.put(key(s2, s1), -1);
     return -1;
   }
-  
+
   public void run()
   {
     TIME -= System.currentTimeMillis();
@@ -127,20 +122,20 @@ public class RedundantTransitions
       if (!mTransitionRelation.hasPredecessors(state)) {continue;}
       for (int event = 0; event < mTransitionRelation.numberOfEvents(); event++) {
         //System.out.println("(s,e): (" + state + ", " + event + ")");
-        TIntHashSet setsuccs = mTransitionRelation.getSuccessors(state, event);
+        final TIntHashSet setsuccs = mTransitionRelation.getSuccessors(state, event);
         if (setsuccs == null) {continue;}
-        int[] sucs = setsuccs.toArray();
-        TIntHashSet toberemoved = new TIntHashSet();
+        final int[] sucs = setsuccs.toArray();
+        final TIntHashSet toberemoved = new TIntHashSet();
         for (int i = 0; i < sucs.length; i++) {
-          int suc1 = sucs[i];
+          final int suc1 = sucs[i];
           for (int j = i + 1; j < sucs.length; j++) {
-            int suc2 = sucs[j];
-            int torem = redundantState(suc1, suc2, state, event);
+            final int suc2 = sucs[j];
+            final int torem = redundantState(suc1, suc2, state, event);
             if (torem != -1) {toberemoved.add(torem);}
           }
         }
         //System.out.println("toberemmed: " + toberemoved.size());
-        int[] array = toberemoved.toArray();
+        final int[] array = toberemoved.toArray();
         for (int i = 0; i < array.length; i++) {
           mTransitionRelation.removeTransition(state, event, array[i]);
           TRANSITIONSREMOVED++;

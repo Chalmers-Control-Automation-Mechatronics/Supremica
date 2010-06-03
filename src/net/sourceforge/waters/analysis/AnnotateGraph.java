@@ -1,7 +1,6 @@
 package net.sourceforge.waters.analysis;
 
 import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
 
@@ -12,13 +11,13 @@ public class AnnotateGraph
 {
   private final TransitionRelation mTransitionRelation;
   private final int mTau;
-  
+
   public static int ANNOTATIONSADDED = 0;
   public static int ANNOTATIONSREMOVEDSUBSET = 0;
   public static int STATESREMOVED = 0;
   public static int STATESTAUSREMOVEDFROM = 0;
   public static int TIME = 0;
-  
+
   public static void clearStats()
   {
     ANNOTATIONSADDED = 0;
@@ -27,7 +26,7 @@ public class AnnotateGraph
     STATESTAUSREMOVEDFROM = 0;
     TIME = 0;
   }
-  
+
   public static String stats()
   {
     return "ANNOTATEGRAPH: ANNOTATIONSADDED = " + ANNOTATIONSADDED +
@@ -36,30 +35,30 @@ public class AnnotateGraph
             " STATESTAUSREMOVEDFROM = " + STATESTAUSREMOVEDFROM +
             " TIME = " + TIME;
   }
-  
-  public AnnotateGraph(TransitionRelation transitionrelation, int tau)
+
+  public AnnotateGraph(final TransitionRelation transitionrelation, final int tau)
   {
     mTransitionRelation = transitionrelation;
     mTau = tau;
   }
-  
+
   public void run()
   {
     TIME -= System.currentTimeMillis();
     STATESREMOVED -= mTransitionRelation.unreachableStates();
-    TIntHashSet tausremoved = new TIntHashSet();
+    final TIntHashSet tausremoved = new TIntHashSet();
     for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
-      TIntHashSet taus = mTransitionRelation.getSuccessors(s, mTau);
+      final TIntHashSet taus = mTransitionRelation.getSuccessors(s, mTau);
       if (taus == null || taus.isEmpty()) {
         continue;
       }
       //System.out.println("taus: + " + Arrays.toString(taus.toArray()));
-      TIntIterator it = taus.iterator();
+      final TIntIterator it = taus.iterator();
       ANNOTATIONSREMOVEDSUBSET += mTransitionRelation.getAnnotations2(s).size();
       Set<TIntHashSet> anns = new THashSet<TIntHashSet>(mTransitionRelation.getAnnotations2(s));
       while (it.hasNext()) {
         ANNOTATIONSADDED++;
-        int target = it.next();
+        final int target = it.next();
         tausremoved.add(target);
         TIntHashSet ae = mTransitionRelation.getActiveEvents(target);
         if (ae == null) {
@@ -68,7 +67,7 @@ public class AnnotateGraph
         }
         mTransitionRelation.addAllSuccessors(target, s);
         ANNOTATIONSREMOVEDSUBSET += mTransitionRelation.getAnnotations2(target).size();
-        anns = mTransitionRelation.subsets(mTransitionRelation.getAnnotations2(target),
+        anns = TransitionRelation.subsets(mTransitionRelation.getAnnotations2(target),
                                            anns);
       }
       ANNOTATIONSREMOVEDSUBSET -= anns.size();
@@ -82,7 +81,7 @@ public class AnnotateGraph
     STATESREMOVED += mTransitionRelation.unreachableStates();
     TIME += System.currentTimeMillis();
   }
-  
+
   /*public void run()
   {
     TIME -= System.currentTimeMillis();

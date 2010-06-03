@@ -22,13 +22,12 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import java.util.Collections;
 
 
 public class NonDeterministicComposer
 {
-  public NonDeterministicComposer(List<AutomatonProxy> model, ProductDESProxyFactory factory,
-                                  EventProxy marked)
+  public NonDeterministicComposer(final List<AutomatonProxy> model, final ProductDESProxyFactory factory,
+                                  final EventProxy marked)
   {
     mMarked = marked;
     mModel = model;
@@ -39,20 +38,20 @@ public class NonDeterministicComposer
     //System.out.println("forbidden;" + forbidden);
   }
 
-  public void setNodeLimit(int stateLimit)
+  public void setNodeLimit(final int stateLimit)
   {
     mNodeLimit = stateLimit;
   }
-  
+
   private EventProxy[] unionEvents()
   {
-    THashSet<EventProxy> merge = new THashSet<EventProxy>();
-    for (AutomatonProxy a : mModel) {merge.addAll(a.getEvents());}
-    EventProxy[] events = merge.toArray(new EventProxy[merge.size()]);
+    final THashSet<EventProxy> merge = new THashSet<EventProxy>();
+    for (final AutomatonProxy a : mModel) {merge.addAll(a.getEvents());}
+    final EventProxy[] events = merge.toArray(new EventProxy[merge.size()]);
     Arrays.sort(events);
     return events;
   }
-  
+
   public AutomatonProxy run()
     throws AnalysisException
   {
@@ -60,37 +59,33 @@ public class NonDeterministicComposer
     states = new IntMap(mNodeLimit);
     TObjectIntHashMap<EventProxy> eventToIndex = new TObjectIntHashMap<EventProxy>();
     events = unionEvents();
-    int numAutomata = mModel.size();
-    for (AutomatonProxy a : mModel) {
-      //System.out.println("Automata: " + a.getName());
-      //System.out.println(a);
-    }
+    final int numAutomata = mModel.size();
     eventAutomaton = new int[events.length][numAutomata];
     // transitions indexed first by automaton then by event then by source state
     transitions = new int[numAutomata][events.length][][];
     for (int i = 0; i < events.length; i++) {
       eventToIndex.put(events[i], i);
     }
-    int[][] currentState = new int[numAutomata][];
+    final int[][] currentState = new int[numAutomata][];
     mMarkedStates = new boolean[numAutomata][];
     mIntDisabled = new TIntHashSet[numAutomata][];
     for (int i = 0; i < mModel.size(); i++) {
-      AutomatonProxy a = mModel.get(i);
-      TObjectIntHashMap<StateProxy> statetoindex =
+      final AutomatonProxy a = mModel.get(i);
+      final TObjectIntHashMap<StateProxy> statetoindex =
         new TObjectIntHashMap<StateProxy>(a.getStates().size());
       mMarkedStates[i] = new boolean[a.getStates().size()];
-      TIntArrayList cs = new TIntArrayList(1);
+      final TIntArrayList cs = new TIntArrayList(1);
       mIntDisabled[i] = new TIntHashSet[a.getStates().size()];
-      boolean add = !a.getEvents().contains(mMarked);
+      final boolean add = !a.getEvents().contains(mMarked);
       // TODO do this smarter
       int snum = 0;
-      for (StateProxy s : a.getStates()) {
+      for (final StateProxy s : a.getStates()) {
         if (add || s.getPropositions().contains(mMarked)) {
           mMarkedStates[i][snum] = true;
         }
-        Set<EventProxy> dis = getDisabledEvents(s.getPropositions());
+        final Set<EventProxy> dis = getDisabledEvents(s.getPropositions());
         mIntDisabled[i][snum] = new TIntHashSet();
-        for (EventProxy e : dis) {
+        for (final EventProxy e : dis) {
           if (eventToIndex.contains(e)) {
             mIntDisabled[i][snum].add(eventToIndex.get(e));
           }
@@ -105,12 +100,12 @@ public class NonDeterministicComposer
       }
       currentState[i] = cs.toNativeArray();
       // TODO do this smarter later
-      TIntArrayList[][] auttransitionslists =
+      final TIntArrayList[][] auttransitionslists =
         new TIntArrayList[events.length][a.getStates().size()];
-      for (TransitionProxy t : a.getTransitions()) {
-        int event = eventToIndex.get(t.getEvent());
-        int source = statetoindex.get(t.getSource());
-        int target = statetoindex.get(t.getTarget());
+      for (final TransitionProxy t : a.getTransitions()) {
+        final int event = eventToIndex.get(t.getEvent());
+        final int source = statetoindex.get(t.getSource());
+        final int target = statetoindex.get(t.getTarget());
         TIntArrayList list = auttransitionslists[event][source];
         if (list == null) {
           list = new TIntArrayList(1);
@@ -122,9 +117,9 @@ public class NonDeterministicComposer
         if (!a.getEvents().contains(events[j])) {continue;}
         transitions[i][j] = new int[a.getStates().size()][];
         for (int k = 0; k < auttransitionslists[j].length; k++) {
-          TIntArrayList list = auttransitionslists[j][k];
+          final TIntArrayList list = auttransitionslists[j][k];
           if (list != null) {
-            int[] targs = list.toNativeArray(); transitions[i][j][k] = targs;
+            final int[] targs = list.toNativeArray(); transitions[i][j][k] = targs;
           }
         }
       }
@@ -135,7 +130,7 @@ public class NonDeterministicComposer
       //System.out.println("Marked:" + i + " " + Arrays.toString(mMarkedStates[i]));
     //}
     for (int i = 0; i < events.length; i++) {
-      IntDouble[] list = new IntDouble[numAutomata];
+      final IntDouble[] list = new IntDouble[numAutomata];
       for (int j = 0; j < mModel.size(); j++) {
         list[j] = new IntDouble(j, 0);
         if (transitions[j][i] != null) {
@@ -154,7 +149,7 @@ public class NonDeterministicComposer
         eventAutomaton[i][j] = list[j].mInt;
       }
     }
-    
+
     // Time to start building the automaton
     numStates = 0;
     unvisited = new ArrayBag(100);
@@ -162,7 +157,7 @@ public class NonDeterministicComposer
     permutations(currentState, new int[numAutomata], 0,
                  -1, -1, true);
     while (!unvisited.isEmpty()) {
-      int[] cs = unvisited.take();
+      final int[] cs = unvisited.take();
       //System.out.println(Arrays.toString(currentState));
       //explore(currentState, true);
       explore(cs);
@@ -170,30 +165,30 @@ public class NonDeterministicComposer
     //System.out.println("Composition:" + numStates);
     //System.out.println("Transitions:" + newtrans.size());
     mCompositionSize = numStates;
-    StateProxy[] states = new StateProxy[numStates];
+    final StateProxy[] states = new StateProxy[numStates];
     for (int i = 0; i < states.length; i++) {
-      EventProxy marked = mNewMarked.contains(i) ? mMarked : null;
+      final EventProxy marked = mNewMarked.contains(i) ? mMarked : null;
       states[i] = new AnnotatedMemStateProxy(i, marked, mNewInitial.contains(i));
     }
-    ArrayList<TransitionProxy> trans = new ArrayList<TransitionProxy>();
-    for (int[] tran : newtrans) {
-      StateProxy source = states[tran[0]];
-      StateProxy target = states[tran[2]];
-      EventProxy event = events[tran[1]];
+    final ArrayList<TransitionProxy> trans = new ArrayList<TransitionProxy>();
+    for (final int[] tran : newtrans) {
+      final StateProxy source = states[tran[0]];
+      final StateProxy target = states[tran[2]];
+      final EventProxy event = events[tran[1]];
       trans.add(mFactory.createTransitionProxy(source, event, target));
     }
-    StringBuffer name = new StringBuffer();
-    for (AutomatonProxy a : mModel) {
+    final StringBuffer name = new StringBuffer();
+    for (final AutomatonProxy a : mModel) {
       if (name.length() != 0) {
         name.append("||");
       }
       name.append(a.getName());
     }
-    String nam = name.toString();
-    ComponentKind ck = ComponentKind.PLANT;
-    THashSet<EventProxy> ev = new THashSet<EventProxy>(Arrays.asList(events));
-    Collection<StateProxy> st = Arrays.asList(states);
-    AutomatonProxy result = mFactory.createAutomatonProxy(nam, ck, ev, st,
+    final String nam = name.toString();
+    final ComponentKind ck = ComponentKind.PLANT;
+    final THashSet<EventProxy> ev = new THashSet<EventProxy>(Arrays.asList(events));
+    final Collection<StateProxy> st = Arrays.asList(states);
+    final AutomatonProxy result = mFactory.createAutomatonProxy(nam, ck, ev, st,
                                                           trans);
     /*System.out.println("Result");
     System.out.println(result);
@@ -202,10 +197,10 @@ public class NonDeterministicComposer
     }*/
     return result;
   }
-  
-  private Set<EventProxy> getDisabledEvents(Collection<EventProxy> props)
+
+  private Set<EventProxy> getDisabledEvents(final Collection<EventProxy> props)
   {
-    for (EventProxy e : props)
+    for (final EventProxy e : props)
     {
       if (e instanceof DisabledEvents) {
         return ((DisabledEvents) e).getDisabled();
@@ -213,9 +208,9 @@ public class NonDeterministicComposer
     }
     return new THashSet<EventProxy>();
   }
-  
-  private void addState(int[] successor, int source,
-                        int event, boolean isInitial)
+
+  private void addState(final int[] successor, final int source,
+                        final int event, final boolean isInitial)
     throws AnalysisException
   {
     Integer target = states.get(successor);
@@ -240,13 +235,13 @@ public class NonDeterministicComposer
       newtrans.add(new int[] {source, event, target});
     }
   }
-  
-  private void permutations(int[][] suc, int[] perm, int depth,
-                            int source, int event, boolean isInitial)
+
+  private void permutations(final int[][] suc, final int[] perm, final int depth,
+                            final int source, final int event, final boolean isInitial)
     throws AnalysisException
   {
     if (depth== perm.length) {
-      int[] successor = new int[depth];
+      final int[] successor = new int[depth];
       for (int i = 0; i < perm.length; i++) {
         successor[i] = suc[i][perm[i]];
       }
@@ -258,22 +253,22 @@ public class NonDeterministicComposer
       permutations(suc, perm, depth + 1, source, event, isInitial);
     }
   }
-  
-  public boolean explore(int[] state)
+
+  public boolean explore(final int[] state)
     throws AnalysisException
   {
-    boolean result = false;
-    int numAutomata = transitions.length;
-    int source = states.get(state);
+    final boolean result = false;
+    final int numAutomata = transitions.length;
+    final int source = states.get(state);
     events:
     for (int i = 0; i < events.length; i++) {
-      int[][] suc = new int[numAutomata][];
+      final int[][] suc = new int[numAutomata][];
       for (int l = 0; l < numAutomata; l++) {
-        int automaton = eventAutomaton[i][l];
+        final int automaton = eventAutomaton[i][l];
         if (transitions[automaton][i] != null) {
           suc[automaton] = transitions[automaton][i][state[automaton]];
         } else {
-          int s = state[automaton];
+          final int s = state[automaton];
           if (!mIntDisabled[automaton][s].contains(s)) {
             suc[automaton] = new int[]{state[automaton]};
           }
@@ -287,13 +282,13 @@ public class NonDeterministicComposer
           continue events;
         }
       }
-      int[] perms = new int[numAutomata];
+      final int[] perms = new int[numAutomata];
       permutations(suc,perms,0,source,i, false);
     }
     return result;
   }
-  
-  private boolean determineMarked(int[] suc)
+
+  private boolean determineMarked(final int[] suc)
   {
     //System.out.println("state:" + Arrays.toString(suc));
     for (int i = 0; i < suc.length; i++) {
@@ -303,42 +298,42 @@ public class NonDeterministicComposer
     }
     return true;
   }
-  
+
   private static interface Bag
   {
     /** is the bag empty*/
     public boolean isEmpty();
-    
+
     /** add a new item to the bag */
     public void offer(int[] a);
-    
+
     /** remove an arbitrary item from the bag */
     public int[] take();
   }
-  
+
   @SuppressWarnings("unused")
 private static class IntBag
   {
     private int mLength;
     private final int mInitialSize;
     private int[] mValues;
-    
-	public IntBag(int initialSize)
+
+	public IntBag(final int initialSize)
     {
       mLength = 0;
       mInitialSize = initialSize;
       mValues = new int[mInitialSize];
     }
-    
+
     public boolean isEmpty()
     {
       return mLength == 0;
     }
-    
-    public void offer(int a)
+
+    public void offer(final int a)
     {
       if (mLength == mValues.length) {
-        int[] newArray = new int[mValues.length*2];
+        final int[] newArray = new int[mValues.length*2];
         // from memory this is actually faster than using the Arrays method for it
         for (int i = 0; i < mValues.length; i++) {
           newArray[i] = mValues[i];
@@ -348,13 +343,13 @@ private static class IntBag
       mValues[mLength] = a;
       mLength++;
     }
-    
+
     public int take()
     {
       mLength--;
-      int a = mValues[mLength];
+      final int a = mValues[mLength];
       if (mValues.length > mInitialSize && (mLength <= (mValues.length / 4))) {
-        int[] newArray = new int[mValues.length / 2];
+        final int[] newArray = new int[mValues.length / 2];
         for (int i = 0; i < mLength; i++) {
           newArray[i] = mValues[i];
         }
@@ -363,30 +358,30 @@ private static class IntBag
       return a;
     }
   }
-  
+
   private static class ArrayBag
     implements Bag
   {
     private int mLength;
     private final int mInitialSize;
     private int[][] mValues;
-    
-    public ArrayBag(int initialSize)
+
+    public ArrayBag(final int initialSize)
     {
       mLength = 0;
       mInitialSize = initialSize;
       mValues = new int[mInitialSize][];
     }
-    
+
     public boolean isEmpty()
     {
       return mLength == 0;
     }
-    
-    public void offer(int[] a)
+
+    public void offer(final int[] a)
     {
       if (mLength == mValues.length) {
-        int[][] newArray = new int[mValues.length*2][];
+        final int[][] newArray = new int[mValues.length*2][];
         // from memory this is actually faster than using the Arrays method for it
         for (int i = 0; i < mValues.length; i++) {
           newArray[i] = mValues[i];
@@ -396,15 +391,15 @@ private static class IntBag
       mValues[mLength] = a;
       mLength++;
     }
-    
+
     public int[] take()
     {
       mLength--;
-      int[] a = mValues[mLength];
+      final int[] a = mValues[mLength];
       // this shouldn't actually save any memory as the Map will still reference the array but oh well
       mValues[mLength] = null;
       if (mValues.length > mInitialSize && (mLength <= (mValues.length / 4))) {
-        int[][] newArray = new int[mValues.length / 2][];
+        final int[][] newArray = new int[mValues.length / 2][];
         for (int i = 0; i < mLength; i++) {
           newArray[i] = mValues[i];
         }
@@ -413,7 +408,7 @@ private static class IntBag
       return a;
     }
   }
-  
+
   /**
    *  I'll make this encode it properly later on
    *
@@ -423,74 +418,74 @@ private static class IntBag
   {
     return sState;
   }
-  
+
   @SuppressWarnings("unused")
   private int[] decode(final int[] sState)
   {
     return sState;
   }
-  
+
   private static class IntMap
     extends AbstractMap<int[], Integer>
   {
     final Map<IntArray, Integer> mMap;
-    
-    public IntMap(int num)
+
+    public IntMap(final int num)
     {
       mMap = new HashMap<IntArray, Integer>(num);
     }
-    
+
     public Set<Map.Entry<int[],Integer>> entrySet()
     {
       return null; // I don't think i'll be using this method so meh
     }
-    
-    public Integer get(Object o)
+
+    public Integer get(final Object o)
     {
-      int[] a = (int[]) o;
+      final int[] a = (int[]) o;
       return mMap.get(new IntArray(a));
     }
-    
+
     @SuppressWarnings("unused")
-	public Integer get(int[] a)
+	public Integer get(final int[] a)
     {
       return mMap.get(new IntArray(a));
     }
-    
+
     @SuppressWarnings("unused")
-	public Integer put(Object o, Integer s)
+	public Integer put(final Object o, final Integer s)
     {
       return mMap.put(new IntArray((int[])o), s);
     }
-    
-    public Integer put(int[] a, Integer s)
+
+    public Integer put(final int[] a, final Integer s)
     {
       return mMap.put(new IntArray(a), s);
     }
-    
+
     public Collection<Integer> values()
     {
       return mMap.values();
     }
   }
-  
+
   private static class IntArray
   {
     public final int[] mArray;
-    
-    public IntArray(int[] array)
+
+    public IntArray(final int[] array)
     {
       mArray = array;
     }
-    
+
     public int hashCode()
     {
       return Arrays.hashCode(mArray);
     }
-    
-    public boolean equals(Object o)
+
+    public boolean equals(final Object o)
     {
-      IntArray oth = (IntArray)o;
+      final IntArray oth = (IntArray)o;
       if (oth.mArray.length != mArray.length) {
         return false;
       }
@@ -501,26 +496,26 @@ private static class IntBag
       }
       return true;
     }
-    
+
     public String toString()
     {
       return Arrays.toString(mArray);
     }
   }
-  
+
   private static class IntDouble
     implements Comparable<IntDouble>
   {
     final public int mInt;
     public double mDouble;
-    
-    public IntDouble(int i, double d)
+
+    public IntDouble(final int i, final double d)
     {
       mInt = i;
       mDouble = d;
     }
-    
-    public int compareTo(IntDouble id)
+
+    public int compareTo(final IntDouble id)
     {
       if (mDouble < id.mDouble) {
         return -1;
@@ -530,48 +525,48 @@ private static class IntBag
       return 0;
     }
   }
-  
+
   public int getDumpState()
   {
     return mDumpState;
   }
-  
+
   /*
   private static class Pointer
     implements Comparable<Pointer>
   {
     EventProxy[] mArray;
     int mIndex;
-    
+
     public Pointer(EventProxy[] array)
     {
       mArray = array;
       mIndex = 0;
     }
-    
+
     public boolean increment()
     {
       mIndex++;
       return mIndex < mArray.length;
     }
-    
+
     public EventProxy getCurrent()
     {
       return mArray[mIndex];
     }
-    
+
     public int compareTo(Pointer p)
     {
       return mArray[mIndex].compareTo(p.mArray[p.mIndex]);
     }
   }
   */
-  
+
   @SuppressWarnings("unused")
   private int mCompositionSize = 0;
   private int mNodeLimit;
-  private List<AutomatonProxy> mModel;
-  private ProductDESProxyFactory mFactory;
+  private final List<AutomatonProxy> mModel;
+  private final ProductDESProxyFactory mFactory;
   private Map<int[], Integer> states;
   @SuppressWarnings("unused")
   private Collection<TransitionProxy> trans;
@@ -581,14 +576,14 @@ private static class IntBag
   private TIntArrayList[][] mBackTransitions;
   private boolean[][] mMarkedStates;
   private TIntArrayList mNewMarked;
-  private List<int[]> newtrans = new ArrayList<int[]>();
+  private final List<int[]> newtrans = new ArrayList<int[]>();
   private int numStates;
   private Bag unvisited;
   private int[][] eventAutomaton;
   private final EventProxy mMarked;
   @SuppressWarnings("unused")
   private int mNewDumpState;
-  private int mDumpState = -1;
+  private final int mDumpState = -1;
   private TIntHashSet[][] mIntDisabled;
-  private TIntHashSet mNewInitial = new TIntHashSet();
+  private final TIntHashSet mNewInitial = new TIntHashSet();
 }

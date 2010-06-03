@@ -1,27 +1,22 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntStack;
-import gnu.trove.TIntArrayList;
-import java.util.Arrays;
-import gnu.trove.TLongByteHashMap;
-import java.util.Set;
-import gnu.trove.TLongIntHashMap;
-import gnu.trove.TIntProcedure;
 import gnu.trove.THashSet;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.analysis.TransitionRelation;
-import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import java.util.Iterator;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import gnu.trove.TIntHashSet;
 import gnu.trove.TObjectIntHashMap;
-import net.sourceforge.waters.model.des.StateProxy;
-import java.util.Map;
-import java.util.Collection;
+
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+
 
 public class RemoveEvents
 {
@@ -35,12 +30,12 @@ public class RemoveEvents
   final boolean[][] mImPossible;
   final Set<EventProxy> mImpossibleEvent;
   final Set<EventProxy> mNotLocal;
-  
-  public RemoveEvents(AutomatonProxy aut, Map<EventProxy,
+
+  public RemoveEvents(final AutomatonProxy aut, final Map<EventProxy,
                                               Map<EventProxy,
                                                   Set<Set<EventProxy>>>> canthappen,
-                      EventProxy marked,
-                      ProductDESProxyFactory factory)
+                      final EventProxy marked,
+                      final ProductDESProxyFactory factory)
   {
     mMarked = marked;
     mAut = aut;
@@ -52,9 +47,9 @@ public class RemoveEvents
     mNotLocal = new THashSet<EventProxy>();
     mImPossible = new boolean[aut.getStates().size()][aut.getEvents().size()];
     mInitial = new boolean[aut.getStates().size()];
-    TObjectIntHashMap<StateProxy> statetoint =
+    final TObjectIntHashMap<StateProxy> statetoint =
       new TObjectIntHashMap<StateProxy>();
-    TObjectIntHashMap<EventProxy> eventtoint =
+    final TObjectIntHashMap<EventProxy> eventtoint =
       new TObjectIntHashMap<EventProxy>();
     int i = 0;
     for (int s = 0; s < mSuccs.length; s++) {
@@ -63,45 +58,43 @@ public class RemoveEvents
       }
       mActivePreds[s] = new TIntHashSet();
     }
-    for (StateProxy state : aut.getStates()) {
+    for (final StateProxy state : aut.getStates()) {
       if (state.isInitial()) {
         mInitial[i] = true;
       }
       statetoint.put(state, i); i++;
     }
     i = 0;
-    for (EventProxy event : aut.getEvents()) {
+    for (final EventProxy event : aut.getEvents()) {
       mEvents[i] = event;
       eventtoint.put(event, i);
       i++;
     }
-    for (TransitionProxy tran : aut.getTransitions()) {
-      int source = statetoint.get(tran.getSource());
-      int target = statetoint.get(tran.getTarget());
-      int event = eventtoint.get(tran.getEvent());
+    for (final TransitionProxy tran : aut.getTransitions()) {
+      final int source = statetoint.get(tran.getSource());
+      final int target = statetoint.get(tran.getTarget());
+      final int event = eventtoint.get(tran.getEvent());
       mSuccs[source][event].add(target);
       if (source != target) {mActivePreds[target].add(event);}
     }
     //calculatePossible(canthappen);
   }
-  
-  public void calculatePossible(Map<EventProxy,
+
+  public void calculatePossible(final Map<EventProxy,
                                     Map<EventProxy,
                                         Set<Set<EventProxy>>>> eventmap)
   {
-    boolean changed = true;
-    changed = false;
     for (int s = 0; s < mInitial.length; s++) {
       if (mInitial[s]) {continue;}
       ACTIVE:
       for (int ei = 0; ei < mEvents.length; ei++) {
-        EventProxy event = mEvents[ei];
-        Map<EventProxy, Set<Set<EventProxy>>> tups = eventmap.get(event);
+        final EventProxy event = mEvents[ei];
+        final Map<EventProxy, Set<Set<EventProxy>>> tups = eventmap.get(event);
         if (tups == null || tups.isEmpty()) {continue;}
-        Set<EventProxy> selflooped = new THashSet<EventProxy>();
-        Set<EventProxy> incoming = new THashSet<EventProxy>();
+        final Set<EventProxy> selflooped = new THashSet<EventProxy>();
+        final Set<EventProxy> incoming = new THashSet<EventProxy>();
         for (int e = 0; e < mEvents.length; e++) {
-          EventProxy eventpred = mEvents[e];
+          final EventProxy eventpred = mEvents[e];
           if (mSuccs[s][e].contains(s)) {
             selflooped.add(eventpred);
           }
@@ -110,28 +103,27 @@ public class RemoveEvents
           incoming.add(eventpred);
         }
         INCOMING:
-        for (EventProxy e : incoming) {
-          Set<Set<EventProxy>> required = tups.get(e);
+        for (final EventProxy e : incoming) {
+          final Set<Set<EventProxy>> required = tups.get(e);
           REQUIRED:
-          for (Set<EventProxy> req : required) {
+          for (final Set<EventProxy> req : required) {
             //if (!tr.getEvents().containsAll(required)) {continue;}
-            for (EventProxy self : selflooped) {
+            for (final EventProxy self : selflooped) {
               if (req.contains(self)) {continue REQUIRED;}
             }
             // has no selfloops for this requires, next event
             continue INCOMING;
           }
           // failed each requires, can't do
-          continue ACTIVE;                                 
+          continue ACTIVE;
         }
         //System.out.println("removed transitions");
         //tr.removeOutgoing(s, arr[i]);
         mImPossible[s][ei] = true;
-        changed = true;
       }
     }
   }
-  
+
   public void run()
   {
     Events:
@@ -151,26 +143,26 @@ public class RemoveEvents
       if (notlocal) {mNotLocal.add(mEvents[e]); System.out.println("notlocal");}
     }
   }
-  
+
   public AutomatonProxy getAutomaton()
   {
     if (mNotLocal.isEmpty()) {return mAut;}
-    String name = mAut.getName();
-    Collection<EventProxy> mEvents = new THashSet<EventProxy>(mAut.getEvents());
+    final String name = mAut.getName();
+    final Collection<EventProxy> mEvents = new THashSet<EventProxy>(mAut.getEvents());
     mEvents.removeAll(mNotLocal);
-    Collection<TransitionProxy> trans = new ArrayList<TransitionProxy>(mAut.getTransitions());
-    Iterator<TransitionProxy> it = trans.iterator();
+    final Collection<TransitionProxy> trans = new ArrayList<TransitionProxy>(mAut.getTransitions());
+    final Iterator<TransitionProxy> it = trans.iterator();
     while (it.hasNext()) {
-      TransitionProxy tran = it.next();
+      final TransitionProxy tran = it.next();
       if (mNotLocal.contains(tran.getEvent())) {it.remove();}
     }
-    AutomatonProxy result = mFactory.createAutomatonProxy(name,
+    final AutomatonProxy result = mFactory.createAutomatonProxy(name,
                                                           ComponentKind.PLANT,
                                                           mEvents,
                                                           mAut.getStates(), trans);
     return result;
   }
-  
+
   public Set<EventProxy> getImpossible()
   {
     return mImpossibleEvent;

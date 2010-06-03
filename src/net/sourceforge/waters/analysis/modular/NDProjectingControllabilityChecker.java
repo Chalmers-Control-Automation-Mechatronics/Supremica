@@ -262,7 +262,6 @@ public class NDProjectingControllabilityChecker
       }
       plants = newplants;
     }
-    mForbiddenEvents = forbiddenEvents;
     /*for (AutomatonProxy aut : specs) {
       TransitionRelation tr = new TransitionRelation(aut, null, forbiddenEvents);
       automata.add(tr.getAutomaton(getFactory()));
@@ -395,6 +394,7 @@ public class NDProjectingControllabilityChecker
     return new Object[] {plant, spec, uncont};
   }
 
+  @SuppressWarnings("unused")
   private AutomatonProxy addSelfLoops(final AutomatonProxy a,
                                       final Set<EventProxy> selfloop)
   {
@@ -502,7 +502,7 @@ public class NDProjectingControllabilityChecker
             maxsize *= a.getStates().size();
           }
           //System.out.println("forb2:" + forbiddenEvents);
-          ProjectionList t =
+          final ProjectionList t =
             new ProjectionList(p, automata, tup.mSet, forbiddenEvents);
           if (minSize >= t.getNew().getStates().size()) {
           minlist = t;
@@ -586,14 +586,12 @@ public class NDProjectingControllabilityChecker
       return false;
     }
 
+    @SuppressWarnings("unused")
     private void blockedEvents()
     {
       final Set<AutomatonProxy> mTempComp = new THashSet<AutomatonProxy>();
       final Set<AutomatonProxy> mTempAut = new THashSet<AutomatonProxy>();
       //System.out.println("before");
-      for (final AutomatonProxy aut : mCompautomata) {
-        //System.out.println(aut.getName() + " trans:" + aut.getTransitions().size());
-      }
       for (final AutomatonProxy aut : mCompautomata) {
         AutomatonProxy aut1 = aut;
         mTempAut.clear();
@@ -662,7 +660,6 @@ public class NDProjectingControllabilityChecker
         }
       } else {
         try {
-          final int size = mMaxProjStates;
           //blockedEvents();
           //System.out.println(mCompautomata);
           final NonDeterministicComposer composer =
@@ -671,12 +668,12 @@ public class NDProjectingControllabilityChecker
           composer.setNodeLimit(maxprojection);
           minAutomaton = composer.run();
           //System.out.println(minAutomaton);
-          TransitionRelation tr = new TransitionRelation(minAutomaton, null);
+          final TransitionRelation tr = new TransitionRelation(minAutomaton, null);
           final int tau = tr.mergeEvents(mHidden, getFactory());
           //System.out.println("alph:" + mOriginalAlphabet);
           //System.out.println("forb:" + forbiddenEvents);
-          TauLoopRemoval tlr = new TauLoopRemoval(tr, tau); tlr.run();
-          RemoveAllTau rat = new RemoveAllTau(tr, tau); rat.run();
+          final TauLoopRemoval tlr = new TauLoopRemoval(tr, tau); tlr.run();
+          final RemoveAllTau rat = new RemoveAllTau(tr, tau); rat.run();
           if (mOriginalAlphabet.containsAll(forbiddenEvents)) {
             System.out.println("con");
             int states = tr.getAutomaton(getFactory()).getStates().size();
@@ -686,8 +683,8 @@ public class NDProjectingControllabilityChecker
             //System.out.println(states);
           }
           tr.removeAllUnreachable();
-          BiSimulatorLanguage tbs = new BiSimulatorLanguage(tr); tbs.run();
-          RevBiSimulator rbs = new RevBiSimulator(tr); rbs.run();
+          final BiSimulatorLanguage tbs = new BiSimulatorLanguage(tr); tbs.run();
+          final RevBiSimulator rbs = new RevBiSimulator(tr); rbs.run();
           minAutomaton = tr.getAutomaton(getFactory());
           //System.out.println(minAutomaton);
           //mBITIME -= System.currentTimeMillis();
@@ -730,7 +727,7 @@ public class NDProjectingControllabilityChecker
     {
       final List<Map<StateProxy, Set<EventProxy>>> events =
         new ArrayList<Map<StateProxy, Set<EventProxy>>>(mCompautomata.size());
-      List<Map<Key, Set<StateProxy>>> automata =
+      final List<Map<Key, Set<StateProxy>>> automata =
         new ArrayList<Map<Key, Set<StateProxy>>>(mCompautomata.size());
       List<StateProxy> currstate = new ArrayList<StateProxy>(mCompautomata.size());
       final AutomatonProxy[] aut = new AutomatonProxy[mCompautomata.size()];
@@ -753,10 +750,10 @@ public class NDProjectingControllabilityChecker
         assert(init == 1);
         for (final TransitionProxy t : proxy.getTransitions()) {
           events.get(i).get(t.getSource()).add(t.getEvent());
-          Key key = new Key(t.getSource(), t.getEvent());
+          final Key key = new Key(t.getSource(), t.getEvent());
           Set<StateProxy> targets = automata.get(i).get(key);
           if (targets == null) {
-            targets = new THashSet();
+            targets = new THashSet<StateProxy>();
             automata.get(i).put(key, targets);
           }
           targets.add(t.getTarget());
@@ -784,10 +781,10 @@ public class NDProjectingControllabilityChecker
         hidden:
         for (final EventProxy pe : possevents) {
           //System.out.println(pe);
-          List<Set<StateProxy>> newstate = new ArrayList<Set<StateProxy>>(currstate.size());
+          final List<Set<StateProxy>> newstate = new ArrayList<Set<StateProxy>>(currstate.size());
           for (i = 0; i < currstate.size(); i++) {
             if (aut[i].getEvents().contains(pe)) {
-              Set<StateProxy> t = automata.get(i).get(new Key(currstate.get(i), pe));
+              final Set<StateProxy> t = automata.get(i).get(new Key(currstate.get(i), pe));
               //System.out.println(t);
               if (t == null) {
                 continue hidden;
@@ -804,12 +801,12 @@ public class NDProjectingControllabilityChecker
             stateList.offer(newPlace);
           }*/
         }
-        EventProxy currevent = oldevents.get(place.mIndex);
-        List<Set<StateProxy>> newstate = new ArrayList<Set<StateProxy>>(currstate.size());
+        final EventProxy currevent = oldevents.get(place.mIndex);
+        final List<Set<StateProxy>> newstate = new ArrayList<Set<StateProxy>>(currstate.size());
         boolean contains = true;
         for (i = 0; i < currstate.size(); i++) {
           if (aut[i].getEvents().contains(currevent)) {
-            Set<StateProxy> t = automata.get(i).get(new Key(currstate.get(i), currevent));
+            final Set<StateProxy> t = automata.get(i).get(new Key(currstate.get(i), currevent));
             if (t == null) {
               contains = false;
             }
@@ -832,31 +829,31 @@ public class NDProjectingControllabilityChecker
       trace = getFactory().createSafetyTraceProxy(mod, place.getTrace());
       return mParent == null ? trace : mParent.getTrace(trace, model);
     }
-    
-    private void addNewPlace(List<Set<StateProxy>> newstate, EventProxy pe,
-                             int index, Place place,  Set<Place> visited,
-                             Queue<Place> stateList)
+
+    private void addNewPlace(final List<Set<StateProxy>> newstate, final EventProxy pe,
+                             final int index, final Place place,  final Set<Place> visited,
+                             final Queue<Place> stateList)
     {
-      List<StateProxy> states = new ArrayList<StateProxy>(newstate.size());
+      final List<StateProxy> states = new ArrayList<StateProxy>(newstate.size());
       for (int i = 0; i < newstate.size(); i++) {
         states.add(null);
       }
       addNewPlace(newstate, pe, index, place, visited, stateList, states, 0);
     }
-    
-    private void addNewPlace(List<Set<StateProxy>> newstate, EventProxy pe,
-                             int index, Place place,  Set<Place> visited,
-                             Queue<Place> stateList,
-                             List<StateProxy> workingstate, int depth)
+
+    private void addNewPlace(final List<Set<StateProxy>> newstate, final EventProxy pe,
+                             final int index, final Place place,  final Set<Place> visited,
+                             final Queue<Place> stateList,
+                             final List<StateProxy> workingstate, final int depth)
     {
       if (depth == newstate.size()) {
-        Place newPlace = new Place(workingstate, pe, index, place);
+        final Place newPlace = new Place(workingstate, pe, index, place);
         if (visited.add(newPlace)) {
           stateList.offer(newPlace);
         }
         return;
       }
-      for (StateProxy s : newstate.get(depth)) {
+      for (final StateProxy s : newstate.get(depth)) {
         workingstate.set(depth, s);
         addNewPlace(newstate, pe, index, place, visited, stateList, workingstate, depth + 1);
       }
@@ -1030,7 +1027,6 @@ public class NDProjectingControllabilityChecker
   private final Map<AutomataHidden, AutomatonProxy> mMinAutMap =
     new HashMap<AutomataHidden, AutomatonProxy>();
   private final Set<AutomataHidden> mChecked = new HashSet<AutomataHidden>();
-  private Set<EventProxy> mForbiddenEvents = null;
 
 
   //#########################################################################

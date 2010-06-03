@@ -15,7 +15,6 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 
@@ -28,7 +27,7 @@ public class ProjectingControllabilityCheckerTest
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    TestSuite testSuite =
+    final TestSuite testSuite =
       new TestSuite(ProjectingControllabilityCheckerTest.class);
     return testSuite;
   }
@@ -44,11 +43,11 @@ public class ProjectingControllabilityCheckerTest
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   protected ProjectingControllabilityChecker createModelVerifier
     (final ProductDESProxyFactory factory)
-  {                   
+  {
     final ControllabilityChecker subchecker =
       new NativeControllabilityChecker(factory);
     final ProjectingControllabilityChecker checker =
-      new ProjectingControllabilityChecker(null, factory, subchecker, false);
+      new ProjectingControllabilityChecker(factory, subchecker);
     //checker.setMaxProjStates(2000);
     return checker;
   }

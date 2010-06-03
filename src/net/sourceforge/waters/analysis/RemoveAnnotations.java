@@ -1,16 +1,13 @@
 package net.sourceforge.waters.analysis;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntStack;
-import java.util.ArrayList;
-import java.util.Collection;
-import gnu.trove.TIntArrayList;
-import java.util.Arrays;
 import gnu.trove.THashSet;
-import java.util.Set;
+import gnu.trove.TIntHashSet;
+
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
 
 public class RemoveAnnotations
 {
@@ -19,37 +16,37 @@ public class RemoveAnnotations
   public static int REMMEDALLANNOTATIONS = 0;
   public static int ANNOTATIONSREMOVED = 0;
   public static int TIME = 0;
-  
+
   public static void clearStats()
   {
     REMMEDALLANNOTATIONS = 0;
     ANNOTATIONSREMOVED = 0;
     TIME = 0;
-    
+
   }
-  
+
   public static String stats()
   {
     return "REMOVEANNOTATIONS: ALLANNSREMOVED = " + REMMEDALLANNOTATIONS + " Annotations Removed = " + ANNOTATIONSREMOVED +
             " TIME = " + TIME;
   }
-  
-  public RemoveAnnotations(TransitionRelation transitionrelation)
+
+  public RemoveAnnotations(final TransitionRelation transitionrelation)
   {
     mTransitionRelation = transitionrelation;
     mStates = new THashSet<TIntHashSet>();
   }
-  
-  public void addCoveredAnnotations(Set<TIntHashSet> coverers,
-                                    Set<TIntHashSet> tobecovered,
-                                    Set<TIntHashSet> covered)
+
+  public void addCoveredAnnotations(final Set<TIntHashSet> coverers,
+                                    final Set<TIntHashSet> tobecovered,
+                                    final Set<TIntHashSet> covered)
   {
-    Iterator<TIntHashSet> it = tobecovered.iterator();
+    final Iterator<TIntHashSet> it = tobecovered.iterator();
     MainLoop:
     while (it.hasNext()) {
-      TIntHashSet tocov = it.next();
-      int[] tocovarr = tocov.toArray();
-      for (TIntHashSet coverer : coverers) {
+      final TIntHashSet tocov = it.next();
+      final int[] tocovarr = tocov.toArray();
+      for (final TIntHashSet coverer : coverers) {
         if (coverer.size() >= tocov.size()) {
           coverer.containsAll(tocovarr);
           it.remove();
@@ -59,25 +56,25 @@ public class RemoveAnnotations
       }
     }
   }
-  
+
   public void run()
   {
     System.out.println("begin rem anns");
-    List<TIntHashSet> todo = new ArrayList<TIntHashSet>();
-    TIntHashSet initial = new TIntHashSet();
+    final List<TIntHashSet> todo = new ArrayList<TIntHashSet>();
+    final TIntHashSet initial = new TIntHashSet();
     for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
       if (mTransitionRelation.isInitial(s)) {initial.add(s);}
     }
     todo.add(initial);
     mStates.add(initial);
     while (!todo.isEmpty()) {
-      TIntHashSet tistates = todo.remove(todo.size() - 1);
-      int[] states = tistates.toArray();
+      final TIntHashSet tistates = todo.remove(todo.size() - 1);
+      final int[] states = tistates.toArray();
       for (int e = 0; e < mTransitionRelation.numberOfEvents(); e++) {
-        TIntHashSet successor = new TIntHashSet();
+        final TIntHashSet successor = new TIntHashSet();
         for (int i = 0; i < states.length; i++) {
-          int state = states[i];
-          TIntHashSet succs = mTransitionRelation.getSuccessors(state, e);
+          final int state = states[i];
+          final TIntHashSet succs = mTransitionRelation.getSuccessors(state, e);
           if (succs == null) {continue;}
           successor.addAll(succs.toArray());
         }
@@ -91,7 +88,7 @@ public class RemoveAnnotations
       }
     }
     System.out.println("rem anns");
-    List<Set<TIntHashSet>> occurswith =
+    final List<Set<TIntHashSet>> occurswith =
       new ArrayList<Set<TIntHashSet>>(mTransitionRelation.numberOfStates());
     for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
       if (mTransitionRelation.getAnnotations2(s)
@@ -101,10 +98,10 @@ public class RemoveAnnotations
         occurswith.add(null);
       }
     }
-    for (TIntHashSet sub : mStates) {
-      int[] subarray = sub.toArray();
+    for (final TIntHashSet sub : mStates) {
+      final int[] subarray = sub.toArray();
       for (int i = 0; i < subarray.length; i++) {
-        int state = subarray[i];
+        final int state = subarray[i];
         if (sub.size() == 1) {
           occurswith.set(state, null);
         } else {
@@ -118,13 +115,13 @@ public class RemoveAnnotations
       if (occurswith.get(s) == null || occurswith.get(s).isEmpty()) {continue;}
       Set<TIntHashSet> coverann = mTransitionRelation.getAnnotation(s);
       if (coverann == null) {continue;}
-      for (TIntHashSet ostates : occurswith.get(s)) {
-        Set<TIntHashSet> tcoverann = new THashSet<TIntHashSet>();
-        int[] statesarr = ostates.toArray();
+      for (final TIntHashSet ostates : occurswith.get(s)) {
+        final Set<TIntHashSet> tcoverann = new THashSet<TIntHashSet>();
+        final int[] statesarr = ostates.toArray();
         for (int i = 0 ; i < statesarr.length; i++) {
-          int state = statesarr[i];
+          final int state = statesarr[i];
           if (state == s) {continue;}
-          Set<TIntHashSet> oanns = mTransitionRelation.getAnnotations2(state);
+          final Set<TIntHashSet> oanns = mTransitionRelation.getAnnotations2(state);
           addCoveredAnnotations(oanns, coverann, tcoverann);
         }
         coverann = tcoverann;
