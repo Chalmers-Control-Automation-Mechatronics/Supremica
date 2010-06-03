@@ -1,6 +1,7 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
@@ -10,8 +11,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * This class runs experiments with CompositionalGeneralisedConflictChecker with
- * a variety of configurations. The heuristics for choosing candidates are
+ * This class runs experiments using the CompositionalGeneralisedConflictChecker
+ * with a variety of configurations. The heuristics for choosing candidates are
  * varied, as well as the abstraction rules applied and the order of them.
  *
  * @author Rachel Francis
@@ -22,9 +23,13 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
 
   // #######################################################################
   // # Constructor
-  public CompositionalGeneralisedConflictCheckerExperiments(final int repeat)
+
+  public CompositionalGeneralisedConflictCheckerExperiments(
+                                                            final String statsFilename)
+      throws FileNotFoundException
   {
-    mRepeat = repeat;
+    mOut = new FileOutputStream(statsFilename);
+    mPrintStream = null;
   }
 
   // #######################################################################
@@ -32,9 +37,8 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
   public static void main(final String[] args) throws Exception
   {
     final String filename = args[0];
-    final int repeat = Integer.decode(args[1]);
     final CompositionalGeneralisedConflictCheckerExperiments experiment =
-        new CompositionalGeneralisedConflictCheckerExperiments(repeat);
+        new CompositionalGeneralisedConflictCheckerExperiments(filename);
     experiment.setUp();
     experiment.runAllTests(filename);
   }
@@ -43,6 +47,9 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
   protected void setUp() throws Exception
   {
     super.setUp();
+    mPrintStream = new PrintStream(mOut, true);
+    mStats = new CompositionalGeneralisedConflictCheckerVerificationResult();
+    mStats.printCSVHorizontalHeadings(mPrintStream);
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mVerifier = new CompositionalGeneralisedConflictChecker(factory);
   }
@@ -51,27 +58,19 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
   protected void tearDown() throws Exception
   {
     mVerifier = null;
+    mPrintStream.close();
+    mOut.close();
     super.tearDown();
   }
 
   private void runAllTests(final String outputFilename) throws Exception
   {
-
     verifyBig_BMW();
     verify_ftechnik();
     verify_verriegel4();
     verify_verriegel4b();
     verify_rhone_alps();
     verify_rhone_tough();
-    // TODO: need to process stats in some way after verifying each model
-    final CompositionalGeneralisedConflictCheckerVerificationResult stats =
-        (CompositionalGeneralisedConflictCheckerVerificationResult) mVerifier
-            .getAnalysisResult();
-    final FileOutputStream out = new FileOutputStream(outputFilename);
-    final PrintStream printStream = new PrintStream(out, true);
-    stats.print(printStream);
-    printStream.close();
-    out.close();
   }
 
   protected void configureModelVerifier(final ProductDESProxy des)
@@ -80,8 +79,8 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     // TODO: configure other settings here
   }
 
-  private void verifyModel(final String group, final String subdir,
-                           final String name) throws Exception
+  private void runModel(final String group, final String subdir,
+                        final String name) throws Exception
   {
     final String inputprop = System.getProperty("waters.test.inputdir");
     // final String outputprop = System.getProperty("waters.test.outputdir");
@@ -95,6 +94,10 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     configureModelVerifier(des);
     mVerifier.run();
 
+    mStats =
+        (CompositionalGeneralisedConflictCheckerVerificationResult) mVerifier
+            .getAnalysisResult();
+    mStats.printCSVHorizontal(mPrintStream);
   }
 
   // #######################################################################
@@ -104,7 +107,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "big_bmw.wmod";
-    verifyModel(group, dir, name);
+    runModel(group, dir, name);
   }
 
   private void verify_ftechnik() throws Exception
@@ -112,7 +115,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "ftechnik.wmod";
-    verifyModel(group, dir, name);
+    runModel(group, dir, name);
   }
 
   private void verify_verriegel4() throws Exception
@@ -120,7 +123,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "verriegel4.wmod";
-    verifyModel(group, dir, name);
+    runModel(group, dir, name);
   }
 
   private void verify_verriegel4b() throws Exception
@@ -128,7 +131,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "verriegel4b.wmod";
-    verifyModel(group, dir, name);
+    runModel(group, dir, name);
   }
 
   private void verify_rhone_alps() throws Exception
@@ -136,7 +139,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "rhone_alps.wmod";
-    verifyModel(group, dir, name);
+    runModel(group, dir, name);
   }
 
   private void verify_rhone_tough() throws Exception
@@ -144,13 +147,13 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "rhone_tough.wmod";
-    verifyModel(group, dir, name);
+    runModel(group, dir, name);
   }
 
   // #######################################################################
   // # Data Members
-  @SuppressWarnings("unused")
-  private final int mRepeat;
+  CompositionalGeneralisedConflictCheckerVerificationResult mStats;
   private CompositionalGeneralisedConflictChecker mVerifier;
-
+  final FileOutputStream mOut;
+  PrintStream mPrintStream;
 }

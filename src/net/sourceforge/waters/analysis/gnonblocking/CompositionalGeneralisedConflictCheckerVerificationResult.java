@@ -169,6 +169,36 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
 
   }
 
+  public void printCSVHorizontalHeadings(final PrintStream stream)
+  {
+    stream.print("Model name,");
+    stream.print("Succ composed,");
+    stream.print("Unsucc composed,");
+    stream.print("Prob candidate unsucc,");
+    stream.print("States final,");
+    stream.print("Tansitions final,");
+    for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
+      ruleStats.printCSVHorizontalHeadings(stream);
+    }
+  }
+
+  public void printCSVHorizontal(final PrintStream stream)
+  {
+    stream.print(mSuccessfulCompositionCount + ",");
+    stream.print(mUnsuccessfulCompositionCount + ",");
+
+    final double probability =
+        (double) mUnsuccessfulCompositionCount
+            / (double) getTotalCompositionCount();
+    stream.print(probability + ",");
+    stream.print(mComposedModelNumberOfStates + ",");
+    stream.print(mComposedModelNumberOfTransitions + ",");
+    for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
+      ruleStats.printCSVHorizontal(stream);
+    }
+    stream.println();
+  }
+
   // #########################################################################
   // # Data Members
   private List<AbstractionRuleStatistics> mAbstractionRuleStats;

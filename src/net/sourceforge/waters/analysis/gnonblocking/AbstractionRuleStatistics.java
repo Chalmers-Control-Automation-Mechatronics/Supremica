@@ -277,6 +277,46 @@ public class AbstractionRuleStatistics
 
   }
 
+  public void printCSVHorizontalHeadings(final PrintStream stream)
+  {
+    stream.print("Rule Name,");
+    stream.print("Applied,");
+    stream.print("RunTime,");
+    stream.print("Reduction,");
+    stream.print("Prob Reduction,");
+    stream.print("Tot In States,");
+    stream.print("Tot In Trans,");
+    stream.print("Tot Out States,");
+    stream.print("Tot Out Trans,");
+    stream.print("Sum In S Reduction,");
+    stream.print("Sum In T Reduction,");
+    stream.print("Sum Out S Reduction,");
+    stream.print("Sum Out T Reduction,");
+    stream.print("Sum S NoRed,");
+    stream.print("Sum T NoRed,");
+  }
+
+  public void printCSVHorizontal(final PrintStream stream)
+  {
+    stream.print(ProxyTools.getShortClassName(mRuleClass) + ",");
+    stream.print(mAppliedCount + ",");
+    stream.print(mRunTime + ",");
+    stream.print(mReductionCount + ",");
+    final double probability =
+        (double) mReductionCount / (double) mAppliedCount;
+    stream.print(probability + ",");
+    stream.print(getTotalInputStates() + ",");
+    stream.print(getTotalInputTransitions() + ",");
+    stream.print(getTotalOutputStates() + ",");
+    stream.print(getTotalOutputTransitions() + ",");
+    stream.print(mInputStates + ",");
+    stream.print(mInputTransitions + ",");
+    stream.print(mOutputStates + ",");
+    stream.print(mOutputTransitions + ",");
+    stream.print(mUnchangedStates + ",");
+    stream.print(mUnchangedTransitions + ",");
+  }
+
   // #########################################################################
   // # Data Members
   private final Class<? extends AbstractionRule> mRuleClass;
