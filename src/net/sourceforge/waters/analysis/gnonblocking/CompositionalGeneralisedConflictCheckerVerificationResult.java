@@ -169,7 +169,8 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
 
   }
 
-  public void printCSVHorizontalHeadings(final PrintStream stream)
+  public void printCSVHorizontalHeadings(final PrintStream stream,
+                                         final int numRules)
   {
     stream.print("Model name,");
     stream.print("Succ composed,");
@@ -177,9 +178,12 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
     stream.print("Prob candidate unsucc,");
     stream.print("States final,");
     stream.print("Tansitions final,");
-    for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
+    final AbstractionRuleStatistics ruleStats =
+        new AbstractionRuleStatistics(null);
+    for (int i = 0; i < numRules; i++) {
       ruleStats.printCSVHorizontalHeadings(stream);
     }
+    stream.println();
   }
 
   public void printCSVHorizontal(final PrintStream stream)

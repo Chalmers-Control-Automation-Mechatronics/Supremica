@@ -37,10 +37,14 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
   public static void main(final String[] args) throws Exception
   {
     final String filename = args[0];
+    final String outputprop = System.getProperty("waters.test.outputdir");
+
     final CompositionalGeneralisedConflictCheckerExperiments experiment =
-        new CompositionalGeneralisedConflictCheckerExperiments(filename);
+        new CompositionalGeneralisedConflictCheckerExperiments(outputprop
+            + filename);
     experiment.setUp();
-    experiment.runAllTests(filename);
+    experiment.runAllTests();
+    experiment.tearDown();
   }
 
   @Override
@@ -49,7 +53,8 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     super.setUp();
     mPrintStream = new PrintStream(mOut, true);
     mStats = new CompositionalGeneralisedConflictCheckerVerificationResult();
-    mStats.printCSVHorizontalHeadings(mPrintStream);
+    // TODO: add rule count
+    mStats.printCSVHorizontalHeadings(mPrintStream, 7);
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mVerifier = new CompositionalGeneralisedConflictChecker(factory);
   }
@@ -60,44 +65,58 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     mVerifier = null;
     mPrintStream.close();
     mOut.close();
+    System.out.println("All experiments complete");
     super.tearDown();
   }
 
-  private void runAllTests(final String outputFilename) throws Exception
+  private void runAllTests() throws Exception
   {
     verifyBig_BMW();
     verify_ftechnik();
     verify_verriegel4();
     verify_verriegel4b();
     verify_rhone_alps();
-    verify_rhone_tough();
+    verify_tbed_ctct();
+    verify_fzelle();
+    verify_tbed_uncont();
+    verify_tbed_noderail();
+    verify_profisafe_i4_host();
+    verify_profisafe_i5_host();
+
   }
 
   protected void configureModelVerifier(final ProductDESProxy des)
   {
     mVerifier.setModel(des);
+    mVerifier.setInternalStepNodeLimit(1000);
+    mVerifier.setInternalStepTransitionLimit(100000);
+    mVerifier.setFinalStepNodeLimit(100000);
+    mVerifier.setFinalStepTransitionLimit(0);
     // TODO: configure other settings here
   }
 
   private void runModel(final String group, final String subdir,
                         final String name) throws Exception
   {
+    System.out.println("Running " + name + "....");
     final String inputprop = System.getProperty("waters.test.inputdir");
-    // final String outputprop = System.getProperty("waters.test.outputdir");
     final File inputRoot = new File(inputprop);
-    // File mOutputRoot = new File(outputprop);
     final File rootdir = new File(inputRoot, "waters");
     final File groupdir = new File(rootdir, group);
     final File dir = new File(groupdir, subdir);
     final File filename = new File(dir, name);
     final ProductDESProxy des = getCompiledDES(filename, null);
     configureModelVerifier(des);
-    mVerifier.run();
-
-    mStats =
-        (CompositionalGeneralisedConflictCheckerVerificationResult) mVerifier
-            .getAnalysisResult();
-    mStats.printCSVHorizontal(mPrintStream);
+    try {
+      mVerifier.run();
+      mStats =
+          (CompositionalGeneralisedConflictCheckerVerificationResult) mVerifier
+              .getAnalysisResult();
+      mPrintStream.print(name + ",");
+      mStats.printCSVHorizontal(mPrintStream);
+    } catch (final Exception e) {
+      System.out.println(e);
+    }
   }
 
   // #######################################################################
@@ -118,6 +137,46 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     runModel(group, dir, name);
   }
 
+  private void verify_fzelle() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "fzelle.wmod";
+    runModel(group, dir, name);
+  }
+
+  private void verify_rhone_alps() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "rhone_alps.wmod";
+    runModel(group, dir, name);
+  }
+
+  private void verify_tbed_ctct() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "tbed_ctct.wmod";
+    runModel(group, dir, name);
+  }
+
+  private void verify_tbed_uncont() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "tbed_uncont.wmod";
+    runModel(group, dir, name);
+  }
+
+  private void verify_tbed_noderail() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "tbed_noderail.wmod";
+    runModel(group, dir, name);
+  }
+
   private void verify_verriegel4() throws Exception
   {
     final String group = "tests";
@@ -134,19 +193,19 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     runModel(group, dir, name);
   }
 
-  private void verify_rhone_alps() throws Exception
+  private void verify_profisafe_i4_host() throws Exception
   {
     final String group = "tests";
-    final String dir = "incremental_suite";
-    final String name = "rhone_alps.wmod";
+    final String dir = "profisafe";
+    final String name = "profisafe_i4_host.wmod";
     runModel(group, dir, name);
   }
 
-  private void verify_rhone_tough() throws Exception
+  private void verify_profisafe_i5_host() throws Exception
   {
     final String group = "tests";
-    final String dir = "incremental_suite";
-    final String name = "rhone_tough.wmod";
+    final String dir = "profisafe";
+    final String name = "profisafe_i5_host.wmod";
     runModel(group, dir, name);
   }
 
