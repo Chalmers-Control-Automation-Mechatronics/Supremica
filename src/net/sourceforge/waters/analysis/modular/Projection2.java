@@ -42,7 +42,6 @@ public class Projection2
 {
   public static AutomatonProxy removeNonLocal(final AutomatonProxy aut, final ProductDESProxyFactory factory)
   {
-    System.out.println("rem non local");
     final Map<EventProxy, Set<StateProxy>> loopedstates = new HashMap<EventProxy, Set<StateProxy>>();
     for (final EventProxy e : aut.getEvents()) {
       loopedstates.put(e, new THashSet<StateProxy>());
@@ -106,7 +105,7 @@ public class Projection2
     eventAutomaton = new int[events.length][numAutomata];
     int l = 0;
     // transitions indexed first by automaton then by event then by source state
-    transitions = new int[numAutomata][events.length][];
+    mTransitions = new int[numAutomata][events.length][];
     // go through and put all the events to be hidden to the front
     Map<EventProxy, Integer> eventToIndex = new HashMap<EventProxy, Integer>(events.length);
     for (int i = 0; i < events.length; i++) {
@@ -138,9 +137,9 @@ public class Projection2
         if (aut[j].getEvents().contains(events[i])) {
           final int[] states1 = new int[aut[j].getStates().size()];
           Arrays.fill(states1, -1);
-          transitions[j][i] = states1;
+          mTransitions[j][i] = states1;
         } else {
-          transitions[j][i] = null;
+          mTransitions[j][i] = null;
         }
       }
     }
@@ -157,7 +156,7 @@ public class Projection2
       }
       assert(l == aut[i].getStates().size());
       for (final TransitionProxy t : aut[i].getTransitions()) {
-        transitions[i][eventToIndex.get(t.getEvent())]
+        mTransitions[i][eventToIndex.get(t.getEvent())]
                    [stateMap.get(t.getSource())] = stateMap.get(t.getTarget());
       }
     }
@@ -165,13 +164,13 @@ public class Projection2
       final IntDouble[] list = new IntDouble[numAutomata];
       for (int j = 0; j < aut.length; j++) {
         list[j] = new IntDouble(j, 0);
-        if (transitions[j][i] != null) {
-          for (int k = 0; k < transitions[j][i].length; k++) {
-            if (transitions[j][i][k] != -1) {
+        if (mTransitions[j][i] != null) {
+          for (int k = 0; k < mTransitions[j][i].length; k++) {
+            if (mTransitions[j][i][k] != -1) {
               list[j].mDouble++;
             }
           }
-          list[j].mDouble /= (double)transitions[j][i].length;
+          list[j].mDouble /= (double)mTransitions[j][i].length;
         } else {
           list[j].mDouble = Double.POSITIVE_INFINITY;
         }
@@ -197,18 +196,17 @@ public class Projection2
         explore(currentState, false);
       }
     }
-    System.out.println("composed");
     states.values().size();
     states = null;
     currentState = new int[] {0};
-    transitions = new int[1][events.length][numStates];
-    for (int i = 0; i < transitions[0].length; i++) {
-      for (int j = 0; j < transitions[0][i].length; j++) {
-        transitions[0][i][j] = -1;
+    mTransitions = new int[1][events.length][numStates];
+    for (int i = 0; i < mTransitions[0].length; i++) {
+      for (int j = 0; j < mTransitions[0][i].length; j++) {
+        mTransitions[0][i][j] = -1;
       }
     }
     for (final int[] tran : newtrans) {
-      transitions[0][tran[1]][tran[0]] = tran[2];
+      mTransitions[0][tran[1]][tran[0]] = tran[2];
     }
     numStates = 1;
     currentState = actualState(currentState);
@@ -259,7 +257,7 @@ public class Projection2
     throws OverflowException
   {
     boolean result = false;
-    final int numAutomata = transitions.length;
+    final int numAutomata = mTransitions.length;
     final int source = states.get(state);
     state = decode(state);
     int min, max;
@@ -280,8 +278,8 @@ public class Projection2
       final int[] suc = new int[numAutomata];
       for (int l = 0; l < numAutomata; l++) {
         final int automaton = eventAutomaton[i][l];
-        if (transitions[automaton][i] != null) {
-          suc[automaton] = transitions[automaton][i][state[automaton]];
+        if (mTransitions[automaton][i] != null) {
+          suc[automaton] = mTransitions[automaton][i][state[automaton]];
         } else {
           suc[automaton] = state[automaton];
         }
@@ -329,7 +327,7 @@ public class Projection2
     for (int i = min; i < max; i++) {
       final List<Integer> successor = new ArrayList<Integer>(state.length);
       for (int j = 0; j < state.length; j++) {
-        final int s = transitions[0][i][state[j]];
+        final int s = mTransitions[0][i][state[j]];
         if (s == -1) {
           continue;
         }
@@ -374,7 +372,7 @@ public class Projection2
     while (!nextstate.isEmpty()) {
       final int s = nextstate.take();
       for (int i = 0; i < numHidden; i++) {
-        final int newstate = transitions[0][i][s];
+        final int newstate = mTransitions[0][i][s];
         if (newstate == -1) {
           continue;
         }
@@ -743,7 +741,7 @@ public class Projection2
   private Map<int[], Integer> states;
   private Collection<TransitionProxy> trans;
   private EventProxy[] events;
-  private int[][][] transitions;
+  private int[][][] mTransitions;
   private final List<int[]> newtrans = new ArrayList<int[]>();
   private Map<int[], StateProxy> newStates;
   private int numStates;

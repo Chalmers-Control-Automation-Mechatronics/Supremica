@@ -28,7 +28,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.analysis.CertainDeath;
 import net.sourceforge.waters.analysis.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
@@ -578,7 +577,8 @@ public class ProjectingSafetyVerifier
             final TransitionRelation tr = new TransitionRelation(minAutomaton, null);
             int states = tr.getAutomaton(getFactory()).getStates().size();
             tr.setMarkingToStatesWithOutgoing(forbiddenEvents);
-            final CertainDeath con = new CertainDeath(tr); con.run();
+            // BUG? This sometimes produces automata without states
+            // final CertainDeath con = new CertainDeath(tr); con.run();
             minAutomaton = tr.getAutomaton(getFactory());
             states -= tr.getAutomaton(getFactory()).getStates().size();
           }
