@@ -131,11 +131,19 @@ public abstract class AbstractLargeControllabilityCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
-  public void testTbedValid() throws Exception
+  public void testTbedNoderail() throws Exception
   {
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "tbed_noderail.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testTbedValid() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "tbed_valid.wmod";
     runModelVerifier(group, dir, name, true);
   }
 

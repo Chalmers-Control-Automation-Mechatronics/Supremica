@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="tbed_noderail" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="tbed_valid" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <ns2:Comment>Model of a train testbed described in R. J. Leduc, PLC Implementation of a DES Supervisor for a Manufacturing Testbed: An Implementation Perspective, Masters Thesis, Department of Electrical Engineering, University of Toronto, 1996.
-This is not the original model. This model was created according to the original specifications using VALID and later converted to Waters. This version includes modified plants modelling the possibilities of trains derailing, and requirements that trains must not derail were added as properties. The model is controllable and nonblocking, and passes all language inclusion checks.</ns2:Comment>
+This is not the original model. This model was created according to the original specifications using VALID and later converted to Waters. The model is controllable and nonblocking.</ns2:Comment>
 <ConstantAliasList>
 <ConstantAlias Name="CRANES">
 <ConstantAliasExpression>
@@ -69,15 +69,6 @@ This is not the original model. This model was created according to the original
 </EnumSetExpression>
 </ConstantAliasExpression>
 </ConstantAlias>
-<ConstantAlias Name="MERGESWITCHES">
-<ConstantAliasExpression>
-<EnumSetExpression>
-<SimpleIdentifier Name="t5"/>
-<SimpleIdentifier Name="t6"/>
-<SimpleIdentifier Name="t8"/>
-</EnumSetExpression>
-</ConstantAliasExpression>
-</ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="not_at">
@@ -108,12 +99,6 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="SECTIONS"/>
 </RangeList>
 </EventDecl>
-<EventDecl Kind="UNCONTROLLABLE" Name="at">
-<RangeList>
-<SimpleIdentifier Name="TRAINS"/>
-<SimpleIdentifier Name="SECTIONS"/>
-</RangeList>
-</EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="req_sw">
 <RangeList>
 <BinaryExpression Operator="..">
@@ -121,13 +106,19 @@ This is not the original model. This model was created according to the original
 <IntConstant Value="2"/>
 </BinaryExpression>
 <EnumSetExpression>
-<SimpleIdentifier Name="t3"/>
 <SimpleIdentifier Name="t4"/>
 <SimpleIdentifier Name="t5"/>
 <SimpleIdentifier Name="t6"/>
 <SimpleIdentifier Name="t7"/>
+<SimpleIdentifier Name="t3"/>
 <SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
+</RangeList>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="at">
+<RangeList>
+<SimpleIdentifier Name="TRAINS"/>
+<SimpleIdentifier Name="SECTIONS"/>
 </RangeList>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="straight">
@@ -160,19 +151,6 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t5"/>
 <SimpleIdentifier Name="t6"/>
 <SimpleIdentifier Name="t7"/>
-</EnumSetExpression>
-</RangeList>
-</EventDecl>
-<EventDecl Kind="UNCONTROLLABLE" Name="derail">
-<RangeList>
-<BinaryExpression Operator="..">
-<IntConstant Value="1"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-<EnumSetExpression>
-<SimpleIdentifier Name="t5"/>
-<SimpleIdentifier Name="t6"/>
-<SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
 </RangeList>
 </EventDecl>
@@ -254,1488 +232,6 @@ This is not the original model. This model was created according to the original
 </EdgeList>
 </Graph>
 </SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="STRAIGHT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t8"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="CURVE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t7"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="FRONT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t5"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t5"/>
-</EnumSetExpression>
-<ComponentList>
-<SimpleComponent Kind="PLANT">
-<IndexedIdentifier Name="sensor_switch5">
-<SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="CURVE"/>
-<SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Name="str_str">
-<PointGeometry>
-<Point Y="208" X="368"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="5" X="12"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="crv_str">
-<PointGeometry>
-<Point Y="464" X="368"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="-9" X="7"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="str_crv">
-<PointGeometry>
-<Point Y="208" X="240"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="3" X="-48"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="crv_crv">
-<PointGeometry>
-<Point Y="464" X="240"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="-50"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="derail">
-<PointGeometry>
-<Point Y="336" X="496"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="-42"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="str_cross">
-<PointGeometry>
-<Point Y="80" X="368"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="-4" X="-64"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="crv_cross">
-<PointGeometry>
-<Point Y="592" X="240"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="-64"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="away_str">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point Y="336" X="368"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="3" X="11"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Initial="true" Name="away_crv">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point Y="336" X="240"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="7" X="-62"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Target="derail" Source="derail">
-<LabelBlock>
-<IndexedIdentifier Name="derail">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-4" X="-18"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="337" X="528"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="derail" Source="str_cross">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-38" X="-70"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="129" X="483"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_str" Source="str_cross">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="30" X="-44"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="208" X="431"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_cross" Source="str_cross">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-19" X="-66"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="108" X="339"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_crv" Source="str_str">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-14" X="-33"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="192" X="304"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_str" Source="str_str">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-24" X="-31"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="207" X="402"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_cross" Source="str_str">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="4" X="-39"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="away_crv" Source="away_crv">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-48" X="-75"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="336" X="205"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_crv" Source="away_crv">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="CURVE"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-16" X="5"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="401" X="240"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_crv" Source="away_crv">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="STRAIGHT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-19" X="-118"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="away_str" Source="away_crv">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="2" X="-45"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="352" X="304"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="derail" Source="str_crv">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="33" X="-228"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="135" X="441"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_crv" Source="str_crv">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-24" X="-48"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="208" X="208"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_str" Source="str_crv">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="0" X="-43"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="224" X="304"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_str" Source="away_str">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="CURVE"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="0" X="3"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="401" X="368"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_crv" Source="away_str">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-13" X="-33"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="319" X="305"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_str" Source="away_str">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="STRAIGHT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-7" X="-117"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="272" X="368"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_str" Source="away_str">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="9" X="-24"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="336" X="400"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="derail" Source="crv_cross">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="12" X="-88"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="536" X="453"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_crv" Source="crv_cross">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-61" X="-39"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="465" X="174"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_cross" Source="crv_cross">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-2" X="-18"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="565" X="267"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_str" Source="crv_crv">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="1" X="-43"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="480" X="304"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_crv" Source="crv_crv">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="10" X="-54"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="464" X="208"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_cross" Source="crv_crv">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-12" X="-20"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="derail" Source="crv_str">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-2" X="-67"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="427" X="470"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_str" Source="crv_str">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="1" X="-36"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="490" X="393"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_crv" Source="crv_str">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-11" X="-38"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="446" X="305"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="STRAIGHT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t27"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="CURVE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t9"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="FRONT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t11"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t6"/>
-</EnumSetExpression>
-<ComponentList>
-<SimpleComponent Kind="PLANT">
-<IndexedIdentifier Name="sensor_switch6">
-<SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="CURVE"/>
-<SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Name="str_str">
-<PointGeometry>
-<Point Y="208" X="368"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="5" X="12"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="crv_str">
-<PointGeometry>
-<Point Y="464" X="368"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="-9" X="7"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="str_crv">
-<PointGeometry>
-<Point Y="208" X="240"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="3" X="-48"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="crv_crv">
-<PointGeometry>
-<Point Y="464" X="240"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="-50"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="derail">
-<PointGeometry>
-<Point Y="336" X="496"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="-42"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="str_cross">
-<PointGeometry>
-<Point Y="80" X="368"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="-4" X="-64"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="crv_cross">
-<PointGeometry>
-<Point Y="592" X="240"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="-64"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="away_str">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point Y="336" X="368"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="3" X="11"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Initial="true" Name="away_crv">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point Y="336" X="240"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="7" X="-62"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Target="derail" Source="derail">
-<LabelBlock>
-<IndexedIdentifier Name="derail">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-4" X="-18"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="337" X="528"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="derail" Source="str_cross">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-38" X="-70"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="129" X="483"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_str" Source="str_cross">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="30" X="-44"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="208" X="431"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_cross" Source="str_cross">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-19" X="-66"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="108" X="339"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_crv" Source="str_str">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-14" X="-33"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="192" X="304"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_str" Source="str_str">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-24" X="-31"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="207" X="402"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_cross" Source="str_str">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="4" X="-39"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="away_crv" Source="away_crv">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-48" X="-75"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="336" X="205"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_crv" Source="away_crv">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="CURVE"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-16" X="5"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="401" X="240"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_crv" Source="away_crv">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="STRAIGHT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-19" X="-118"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="away_str" Source="away_crv">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="2" X="-45"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="352" X="304"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="derail" Source="str_crv">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="33" X="-228"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="135" X="441"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_crv" Source="str_crv">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-24" X="-48"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="208" X="208"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_str" Source="str_crv">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="0" X="-43"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="224" X="304"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_str" Source="away_str">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="CURVE"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="0" X="3"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="401" X="368"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_crv" Source="away_str">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-13" X="-33"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="319" X="305"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="str_str" Source="away_str">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="STRAIGHT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-7" X="-117"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="272" X="368"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_str" Source="away_str">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="9" X="-24"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="336" X="400"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="derail" Source="crv_cross">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="12" X="-88"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="536" X="453"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_crv" Source="crv_cross">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-61" X="-39"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="465" X="174"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_cross" Source="crv_cross">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-2" X="-18"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="565" X="267"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_str" Source="crv_crv">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="1" X="-43"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="480" X="304"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_crv" Source="crv_crv">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="10" X="-54"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="464" X="208"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_cross" Source="crv_crv">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-12" X="-20"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="derail" Source="crv_str">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-2" X="-67"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="427" X="470"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_str" Source="crv_str">
-<LabelBlock>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="1" X="-36"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="490" X="393"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="crv_crv" Source="crv_str">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-11" X="-38"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="446" X="305"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="RIGHT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t25"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="FRONT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t14"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t8"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="LEFT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t16"/>
-</EnumSetExpression>
-<ComponentList>
-<SimpleComponent Kind="PLANT">
-<IndexedIdentifier Name="sensor_switch8">
-<SimpleIdentifier Name="RIGHT"/>
-<SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="SWITCH"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Initial="true" Name="away_lft">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point Y="304" X="224"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="7" X="-56"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="lft_rgt">
-<PointGeometry>
-<Point Y="432" X="352"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="5" X="11"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="rgt_lft">
-<PointGeometry>
-<Point Y="176" X="224"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="5" X="-40"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="lft_lft">
-<PointGeometry>
-<Point Y="432" X="224"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="-35"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="derail">
-<PointGeometry>
-<Point Y="304" X="480"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="2" X="-41"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="away_rgt">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point Y="304" X="352"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="0" X="11"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="rgt_cross">
-<PointGeometry>
-<Point Y="48" X="352"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="-3" X="-65"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="lft_cross">
-<PointGeometry>
-<Point Y="560" X="224"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="3" X="-57"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="rgt_rgt">
-<PointGeometry>
-<Point Y="176" X="352"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="5" X="13"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Target="lft_cross" Source="lft_lft">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-9" X="2"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="lft_rgt" Source="lft_lft">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="1" X="-45"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="448" X="288"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="lft_lft" Source="lft_lft">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="12" X="-70"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="433" X="192"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_lft" Source="away_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-13" X="-44"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="287" X="289"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="lft_rgt" Source="away_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-9" X="3"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="369" X="352"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="rgt_rgt" Source="away_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="RIGHT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-6" X="-93"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="240" X="352"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_rgt" Source="away_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="7" X="-18"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="304" X="384"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="derail" Source="lft_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-9" X="-78"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="404" X="456"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="lft_rgt" Source="lft_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="2" X="-48"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="460" X="380"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="lft_lft" Source="lft_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-15" X="-48"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="414" X="289"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="rgt_lft" Source="rgt_lft">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-23" X="-64"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="177" X="190"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="derail" Source="rgt_lft">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="2" X="-163"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="102" X="402"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="rgt_rgt" Source="rgt_lft">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="2" X="-46"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="192" X="288"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_lft" Source="lft_cross">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-6" X="-97"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="432" X="158"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="lft_cross" Source="lft_cross">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="3" X="-15"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="533" X="251"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="derail" Source="lft_cross">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-2" X="-104"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="502" X="430"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="rgt_cross" Source="rgt_cross">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-19" X="-61"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="77" X="324"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="derail" Source="rgt_cross">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-62" X="-61"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="111" X="450"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_rgt" Source="rgt_cross">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="27" X="-56"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="177" X="416"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="derail" Source="derail">
-<LabelBlock>
-<IndexedIdentifier Name="derail">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-6" X="-19"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="304" X="512"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_lft" Source="away_lft">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-33" X="-70"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="304" X="189"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="rgt_lft" Source="away_lft">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="RIGHT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-13" X="-94"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="away_rgt" Source="away_lft">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="2" X="-46"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="320" X="288"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="rgt_cross" Source="rgt_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="11" X="-41"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="rgt_lft" Source="rgt_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-15" X="-45"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="160" X="288"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="rgt_rgt" Source="rgt_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-24" X="-17"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="176" X="384"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="lft_lft" Source="away_lft">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-10" X="2"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
 </ComponentList>
 </ForeachComponent>
 <ForeachComponent Name="SWITCH">
@@ -1874,6 +370,1047 @@ This is not the original model. This model was created according to the original
 </EdgeList>
 </Graph>
 </SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="FRONT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t5"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="CURVE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t7"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="STRAIGHT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t8"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t5"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="TRAIN">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="sensor_switch5">
+<SimpleIdentifier Name="FRONT"/>
+<SimpleIdentifier Name="CURVE"/>
+<SimpleIdentifier Name="STRAIGHT"/>
+<SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="TRAIN"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Name="str_str">
+<PointGeometry>
+<Point Y="48" X="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="5" X="12"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="crv_str">
+<PointGeometry>
+<Point Y="304" X="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="str_crv">
+<PointGeometry>
+<Point Y="48" X="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="3" X="-48"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="crv_crv">
+<PointGeometry>
+<Point Y="304" X="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="4" X="-50"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="away_str">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="176" X="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="3" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="away_crv">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="176" X="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="7" X="-62"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="crv_str" Source="crv_str">
+<LabelBlock>
+<IndexedIdentifier Name="straight">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="304" X="305"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="crv_crv" Source="crv_str">
+<LabelBlock>
+<IndexedIdentifier Name="turn">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-38"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="286" X="209"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="str_crv" Source="str_crv">
+<LabelBlock>
+<IndexedIdentifier Name="turn">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-24" X="-48"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="48" X="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="str_str" Source="str_crv">
+<LabelBlock>
+<IndexedIdentifier Name="straight">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="0" X="-43"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="64" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="str_crv" Source="away_crv">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="STRAIGHT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="-118"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="away_crv" Source="away_crv">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="turn">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-31" X="-76"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="176" X="109"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="crv_crv" Source="away_crv">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="CURVE"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-16" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="241" X="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_str" Source="away_crv">
+<LabelBlock>
+<IndexedIdentifier Name="straight">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="-45"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="192" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="crv_str" Source="crv_crv">
+<LabelBlock>
+<IndexedIdentifier Name="straight">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="1" X="-43"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="320" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_crv" Source="crv_crv">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="-101"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="239" X="128"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="crv_crv" Source="crv_crv">
+<LabelBlock>
+<IndexedIdentifier Name="turn">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-54"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="304" X="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="str_crv" Source="str_str">
+<LabelBlock>
+<IndexedIdentifier Name="turn">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-14" X="-33"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="32" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="str_str" Source="str_str">
+<LabelBlock>
+<IndexedIdentifier Name="straight">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-24" X="-31"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="47" X="306"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_str" Source="str_str">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="112" X="288"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="crv_str" Source="away_str">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="CURVE"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="241" X="272"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_crv" Source="away_str">
+<LabelBlock>
+<IndexedIdentifier Name="turn">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-33"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="159" X="209"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="str_str" Source="away_str">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="STRAIGHT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-117"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="112" X="272"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_str" Source="away_str">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="straight">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="9" X="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="176" X="304"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="FRONT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t11"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="CURVE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t9"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="STRAIGHT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t27"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t6"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="TRAIN">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="sensor_switch6">
+<SimpleIdentifier Name="FRONT"/>
+<SimpleIdentifier Name="CURVE"/>
+<SimpleIdentifier Name="STRAIGHT"/>
+<SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="TRAIN"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Name="str_str">
+<PointGeometry>
+<Point Y="48" X="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="5" X="12"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="crv_str">
+<PointGeometry>
+<Point Y="304" X="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="str_crv">
+<PointGeometry>
+<Point Y="48" X="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="3" X="-48"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="crv_crv">
+<PointGeometry>
+<Point Y="304" X="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="4" X="-50"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="away_str">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="176" X="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="3" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="away_crv">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="176" X="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="7" X="-62"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="crv_str" Source="crv_str">
+<LabelBlock>
+<IndexedIdentifier Name="straight">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="304" X="305"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="crv_crv" Source="crv_str">
+<LabelBlock>
+<IndexedIdentifier Name="turn">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-38"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="286" X="209"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="str_crv" Source="str_crv">
+<LabelBlock>
+<IndexedIdentifier Name="turn">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-24" X="-48"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="48" X="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="str_str" Source="str_crv">
+<LabelBlock>
+<IndexedIdentifier Name="straight">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="0" X="-43"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="64" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="str_crv" Source="away_crv">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="STRAIGHT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="-118"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="away_crv" Source="away_crv">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="turn">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-31" X="-76"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="176" X="109"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="crv_crv" Source="away_crv">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="CURVE"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-16" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="241" X="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_str" Source="away_crv">
+<LabelBlock>
+<IndexedIdentifier Name="straight">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="-45"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="192" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="crv_str" Source="crv_crv">
+<LabelBlock>
+<IndexedIdentifier Name="straight">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="1" X="-43"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="320" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_crv" Source="crv_crv">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="-101"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="239" X="128"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="crv_crv" Source="crv_crv">
+<LabelBlock>
+<IndexedIdentifier Name="turn">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-54"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="304" X="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="str_crv" Source="str_str">
+<LabelBlock>
+<IndexedIdentifier Name="turn">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-14" X="-33"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="32" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="str_str" Source="str_str">
+<LabelBlock>
+<IndexedIdentifier Name="straight">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-24" X="-31"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="47" X="306"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_str" Source="str_str">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="112" X="288"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="crv_str" Source="away_str">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="CURVE"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="241" X="272"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_crv" Source="away_str">
+<LabelBlock>
+<IndexedIdentifier Name="turn">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-33"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="159" X="209"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="str_str" Source="away_str">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="STRAIGHT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-117"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="112" X="272"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_str" Source="away_str">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="straight">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="9" X="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="176" X="304"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="RIGHT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t25"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="FRONT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t14"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t8"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="TRAIN">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
+<ForeachComponent Name="LEFT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t16"/>
+</EnumSetExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="sensor_switch8">
+<SimpleIdentifier Name="RIGHT"/>
+<SimpleIdentifier Name="FRONT"/>
+<SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="LEFT"/>
+</IndexedIdentifier>
+<Graph>
+<NodeList>
+<SimpleNode Name="rgt_rgt">
+<PointGeometry>
+<Point Y="48" X="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="5" X="13"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="away_rgt">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="176" X="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="0" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="lft_lft">
+<PointGeometry>
+<Point Y="304" X="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="4" X="-35"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rgt_lft">
+<PointGeometry>
+<Point Y="48" X="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="5" X="-40"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="lft_rgt">
+<PointGeometry>
+<Point Y="304" X="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="away_lft">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="176" X="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="7" X="-56"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="lft_rgt" Source="lft_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_right">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="304" X="305"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="lft_lft" Source="lft_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_left">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="-48"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="286" X="209"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="rgt_rgt" Source="rgt_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_right">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-24" X="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="48" X="304"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="rgt_lft" Source="rgt_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_left">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="-45"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="32" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_rgt" Source="rgt_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="112" X="288"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="lft_rgt" Source="lft_lft">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_right">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="1" X="-45"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="320" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="lft_lft" Source="lft_lft">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_left">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="7" X="-76"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="305" X="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_lft" Source="lft_lft">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="-97"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="239" X="128"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="rgt_rgt" Source="rgt_lft">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_right">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="-46"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="64" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="rgt_lft" Source="rgt_lft">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_left">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-23" X="-64"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="49" X="110"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="lft_rgt" Source="away_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="LEFT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="241" X="272"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="rgt_rgt" Source="away_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="RIGHT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="-93"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="112" X="272"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_rgt" Source="away_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="cpl_right">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="8" X="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="176" X="304"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_lft" Source="away_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_left">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-44"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="159" X="209"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="lft_lft" Source="away_lft">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="LEFT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="241" X="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="rgt_lft" Source="away_lft">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="RIGHT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-94"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="away_rgt" Source="away_lft">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_right">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="-46"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="192" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_lft" Source="away_lft">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="cpl_left">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-33" X="-70"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="176" X="109"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</ForeachComponent>
 </ComponentList>
 </ForeachComponent>
 <ForeachComponent Name="SECT">
@@ -2917,9 +2454,9 @@ This is not the original model. This model was created according to the original
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<ForeachComponent Name="STRAIGHT">
+<ForeachComponent Name="FRONT">
 <EnumSetExpression>
-<SimpleIdentifier Name="t27"/>
+<SimpleIdentifier Name="t4"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="CURVE">
@@ -2927,7 +2464,12 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t6"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="FRONT">
+<ForeachComponent Name="STRAIGHT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t27"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t4"/>
 </EnumSetExpression>
@@ -2935,18 +2477,13 @@ This is not the original model. This model was created according to the original
 <ForeachComponent Name="TRAIN">
 <SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t4"/>
-</EnumSetExpression>
-<ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="sensor_switch4">
-<SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="CURVE"/>
 <SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="CURVE"/>
+<SimpleIdentifier Name="STRAIGHT"/>
 <SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -3179,9 +2716,9 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="STRAIGHT">
+<ForeachComponent Name="FRONT">
 <EnumSetExpression>
-<SimpleIdentifier Name="t8"/>
+<SimpleIdentifier Name="t12"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="CURVE">
@@ -3189,26 +2726,26 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t10"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="FRONT">
+<ForeachComponent Name="STRAIGHT">
 <EnumSetExpression>
-<SimpleIdentifier Name="t12"/>
+<SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t7"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="sensor_switch7">
-<SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="CURVE"/>
 <SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="CURVE"/>
+<SimpleIdentifier Name="STRAIGHT"/>
 <SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -3451,13 +2988,13 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t3"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
-<ComponentList>
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t3"/>
 </EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="TRAIN">
+<SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
 <ForeachComponent Name="LEFT">
 <EnumSetExpression>
@@ -3468,8 +3005,8 @@ This is not the original model. This model was created according to the original
 <IndexedIdentifier Name="sensor_switch3">
 <SimpleIdentifier Name="RIGHT"/>
 <SimpleIdentifier Name="FRONT"/>
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="LEFT"/>
 </IndexedIdentifier>
 <Graph>
@@ -3703,11 +3240,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t20"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER">
 <EnumSetExpression>
 <SimpleIdentifier Name="t23"/>
@@ -3718,11 +3250,16 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t21"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="BEFORE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t20"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_i_21">
-<SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="BEFORE"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -3978,11 +3515,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t22"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER">
 <EnumSetExpression>
 <SimpleIdentifier Name="t26"/>
@@ -3993,11 +3525,16 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t23"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="BEFORE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t22"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_i_23">
-<SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="BEFORE"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -4253,11 +3790,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t24"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER">
 <EnumSetExpression>
 <SimpleIdentifier Name="t14"/>
@@ -4268,11 +3800,16 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t26"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="BEFORE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t24"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_i_26">
-<SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="BEFORE"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -4528,11 +4065,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t4"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER">
 <EnumSetExpression>
 <SimpleIdentifier Name="t11"/>
@@ -4543,11 +4075,16 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t27"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="BEFORE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t4"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_i_27">
-<SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="BEFORE"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -4803,11 +4340,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t12"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER">
 <EnumSetExpression>
 <SimpleIdentifier Name="t5"/>
@@ -4818,11 +4350,16 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="BEFORE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t12"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_i_8">
-<SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="BEFORE"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -5078,11 +4615,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t0"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER2">
 <EnumSetExpression>
 <SimpleIdentifier Name="t27"/>
@@ -5098,12 +4630,17 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t2"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="BEFORE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t0"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_i_2">
-<SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER2"/>
 <SimpleIdentifier Name="AFTER1"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="BEFORE"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -5393,11 +4930,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t13"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER">
 <EnumSetExpression>
 <SimpleIdentifier Name="t14"/>
@@ -5408,11 +4940,16 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t15"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="BEFORE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t13"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_i_15">
-<SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="BEFORE"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -5668,11 +5205,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="BEFORE1">
-<EnumSetExpression>
-<SimpleIdentifier Name="t27"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER">
 <EnumSetExpression>
 <SimpleIdentifier Name="t15"/>
@@ -5683,6 +5215,11 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t6"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="BEFORE1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t27"/>
+</EnumSetExpression>
+<ComponentList>
 <ForeachComponent Name="BEFORE2">
 <EnumSetExpression>
 <SimpleIdentifier Name="t9"/>
@@ -5690,9 +5227,9 @@ This is not the original model. This model was created according to the original
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_ii_11">
-<SimpleIdentifier Name="BEFORE1"/>
 <SimpleIdentifier Name="AFTER"/>
 <SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="BEFORE1"/>
 <SimpleIdentifier Name="BEFORE2"/>
 </IndexedIdentifier>
 <Graph>
@@ -5983,11 +5520,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="BEFORE1">
-<EnumSetExpression>
-<SimpleIdentifier Name="t16"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER2">
 <EnumSetExpression>
 <SimpleIdentifier Name="t10"/>
@@ -6001,6 +5533,11 @@ This is not the original model. This model was created according to the original
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t8"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="BEFORE1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t16"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="BEFORE2">
@@ -6010,10 +5547,10 @@ This is not the original model. This model was created according to the original
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_ii_12">
-<SimpleIdentifier Name="BEFORE1"/>
 <SimpleIdentifier Name="AFTER2"/>
 <SimpleIdentifier Name="AFTER1"/>
 <SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="BEFORE1"/>
 <SimpleIdentifier Name="BEFORE2"/>
 </IndexedIdentifier>
 <Graph>
@@ -6332,11 +5869,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="BEFORE1">
-<EnumSetExpression>
-<SimpleIdentifier Name="t7"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER2">
 <EnumSetExpression>
 <SimpleIdentifier Name="t19"/>
@@ -6352,6 +5884,11 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t5"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="BEFORE1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t7"/>
+</EnumSetExpression>
+<ComponentList>
 <ForeachComponent Name="BEFORE2">
 <EnumSetExpression>
 <SimpleIdentifier Name="t8"/>
@@ -6359,10 +5896,10 @@ This is not the original model. This model was created according to the original
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_ii_5">
-<SimpleIdentifier Name="BEFORE1"/>
 <SimpleIdentifier Name="AFTER2"/>
 <SimpleIdentifier Name="AFTER1"/>
 <SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="BEFORE1"/>
 <SimpleIdentifier Name="BEFORE2"/>
 </IndexedIdentifier>
 <Graph>
@@ -6681,24 +6218,9 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SECT1">
-<EnumSetExpression>
-<SimpleIdentifier Name="t10"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t12"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER2">
 <EnumSetExpression>
 <SimpleIdentifier Name="t11"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SECT2">
-<EnumSetExpression>
-<SimpleIdentifier Name="t9"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="AFTER1">
@@ -6706,13 +6228,28 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="BEFORE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t12"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="SECT1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t10"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="SECT2">
+<EnumSetExpression>
+<SimpleIdentifier Name="t9"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_iii_10">
-<SimpleIdentifier Name="SECT1"/>
-<SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER2"/>
-<SimpleIdentifier Name="SECT2"/>
 <SimpleIdentifier Name="AFTER1"/>
+<SimpleIdentifier Name="BEFORE"/>
+<SimpleIdentifier Name="SECT1"/>
+<SimpleIdentifier Name="SECT2"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -7288,9 +6825,14 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SECT1">
+<ForeachComponent Name="AFTER2">
 <EnumSetExpression>
-<SimpleIdentifier Name="t19"/>
+<SimpleIdentifier Name="t21"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="AFTER1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t1"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="BEFORE">
@@ -7298,9 +6840,9 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t3"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="AFTER2">
+<ForeachComponent Name="SECT1">
 <EnumSetExpression>
-<SimpleIdentifier Name="t21"/>
+<SimpleIdentifier Name="t19"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="SECT2">
@@ -7308,18 +6850,13 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t20"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="AFTER1">
-<EnumSetExpression>
-<SimpleIdentifier Name="t1"/>
-</EnumSetExpression>
-<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_iii_19">
-<SimpleIdentifier Name="SECT1"/>
-<SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER2"/>
-<SimpleIdentifier Name="SECT2"/>
 <SimpleIdentifier Name="AFTER1"/>
+<SimpleIdentifier Name="BEFORE"/>
+<SimpleIdentifier Name="SECT1"/>
+<SimpleIdentifier Name="SECT2"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -7895,24 +7432,9 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SECT1">
-<EnumSetExpression>
-<SimpleIdentifier Name="t6"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t4"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER2">
 <EnumSetExpression>
 <SimpleIdentifier Name="t5"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SECT2">
-<EnumSetExpression>
-<SimpleIdentifier Name="t7"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="AFTER1">
@@ -7920,13 +7442,28 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t27"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="BEFORE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t4"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="SECT1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t6"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="SECT2">
+<EnumSetExpression>
+<SimpleIdentifier Name="t7"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_iii_6">
-<SimpleIdentifier Name="SECT1"/>
-<SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER2"/>
-<SimpleIdentifier Name="SECT2"/>
 <SimpleIdentifier Name="AFTER1"/>
+<SimpleIdentifier Name="BEFORE"/>
+<SimpleIdentifier Name="SECT1"/>
+<SimpleIdentifier Name="SECT2"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -8502,24 +8039,9 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SECT1">
-<EnumSetExpression>
-<SimpleIdentifier Name="t1"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t3"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="AFTER2">
 <EnumSetExpression>
 <SimpleIdentifier Name="t2"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SECT2">
-<EnumSetExpression>
-<SimpleIdentifier Name="t0"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="AFTER1">
@@ -8527,13 +8049,28 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t19"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="BEFORE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t3"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="SECT1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t1"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="SECT2">
+<EnumSetExpression>
+<SimpleIdentifier Name="t0"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_iii_1">
-<SimpleIdentifier Name="SECT1"/>
-<SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER2"/>
-<SimpleIdentifier Name="SECT2"/>
 <SimpleIdentifier Name="AFTER1"/>
+<SimpleIdentifier Name="BEFORE"/>
+<SimpleIdentifier Name="SECT1"/>
+<SimpleIdentifier Name="SECT2"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -9577,12 +9114,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="TRAIN">
-<BinaryExpression Operator="..">
-<IntConstant Value="2"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-<ComponentList>
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t3"/>
@@ -9593,11 +9124,17 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t3"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<BinaryExpression Operator="..">
+<IntConstant Value="2"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_left_right_32">
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -9847,14 +9384,19 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
+<ForeachComponent Name="CURVE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t7"/>
+</EnumSetExpression>
+<ComponentList>
 <ForeachComponent Name="STRAIGHT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="CURVE">
+<ForeachComponent Name="SWITCH">
 <EnumSetExpression>
-<SimpleIdentifier Name="t7"/>
+<SimpleIdentifier Name="t5"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="TRAIN">
@@ -9863,17 +9405,12 @@ This is not the original model. This model was created according to the original
 <IntConstant Value="2"/>
 </BinaryExpression>
 <ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t5"/>
-</EnumSetExpression>
-<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_merge_a_52">
-<SimpleIdentifier Name="STRAIGHT"/>
 <SimpleIdentifier Name="CURVE"/>
-<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="STRAIGHT"/>
 <SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -10059,13 +9596,13 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t25"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
-<ComponentList>
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="TRAIN">
+<SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
 <ForeachComponent Name="LEFT">
 <EnumSetExpression>
@@ -10075,8 +9612,8 @@ This is not the original model. This model was created according to the original
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_merge_b_8">
 <SimpleIdentifier Name="RIGHT"/>
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="LEFT"/>
 </IndexedIdentifier>
 <Graph>
@@ -10302,12 +9839,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="TRAIN">
-<BinaryExpression Operator="..">
-<IntConstant Value="1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-<ComponentList>
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t3"/>
@@ -10318,11 +9849,17 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t3"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_right_left_31">
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -10572,12 +10109,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="TRAIN">
-<BinaryExpression Operator="..">
-<IntConstant Value="1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-<ComponentList>
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t4"/>
@@ -10588,11 +10119,17 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t4"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_straight_41">
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -10704,12 +10241,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="TRAIN">
-<BinaryExpression Operator="..">
-<IntConstant Value="1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-<ComponentList>
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t5"/>
@@ -10720,11 +10251,17 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_straight_51">
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -10836,12 +10373,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="TRAIN">
-<BinaryExpression Operator="..">
-<IntConstant Value="1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-<ComponentList>
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t6"/>
@@ -10852,11 +10383,17 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t27"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_straight_61">
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -10968,12 +10505,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="TRAIN">
-<BinaryExpression Operator="..">
-<IntConstant Value="1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-<ComponentList>
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t7"/>
@@ -10984,11 +10515,17 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t12"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_straight_71">
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -11100,12 +10637,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="TRAIN">
-<BinaryExpression Operator="..">
-<IntConstant Value="2"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-<ComponentList>
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t4"/>
@@ -11116,11 +10647,17 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t4"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<BinaryExpression Operator="..">
+<IntConstant Value="2"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_turn_42">
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -11232,12 +10769,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="TRAIN">
-<BinaryExpression Operator="..">
-<IntConstant Value="2"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-<ComponentList>
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t6"/>
@@ -11248,11 +10779,17 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t9"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<BinaryExpression Operator="..">
+<IntConstant Value="2"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_turn_62">
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -11364,12 +10901,6 @@ This is not the original model. This model was created according to the original
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="TRAIN">
-<BinaryExpression Operator="..">
-<IntConstant Value="2"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-<ComponentList>
 <ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t7"/>
@@ -11380,11 +10911,17 @@ This is not the original model. This model was created according to the original
 <SimpleIdentifier Name="t12"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<BinaryExpression Operator="..">
+<IntConstant Value="2"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_left_right_72">
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <Graph>
 <NodeList>
@@ -11925,532 +11462,6 @@ This is not the original model. This model was created according to the original
 </EdgeList>
 </Graph>
 </SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<SimpleIdentifier Name="MERGESWITCHES"/>
-<ComponentList>
-<SimpleComponent Kind="PROPERTY">
-<IndexedIdentifier Name="noderail_mergeswitch">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<Graph>
-<LabelBlock>
-<IndexedIdentifier Name="derail">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="52" X="15"/>
-</LabelGeometry>
-</LabelBlock>
-<NodeList>
-<SimpleNode Initial="true" Name="s0">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point Y="112" X="80"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="24" X="-8"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t4"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="STRAIGHT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t27"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="CURVE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t6"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t4"/>
-</EnumSetExpression>
-<ComponentList>
-<SimpleComponent Kind="PROPERTY">
-<IndexedIdentifier Name="noderail_4">
-<SimpleIdentifier Name="BEFORE"/>
-<SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="CURVE"/>
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Name="wait">
-<PointGeometry>
-<Point Y="144" X="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="12"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="cross">
-<PointGeometry>
-<Point Y="224" X="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="11"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Initial="true" Name="away">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point Y="64" X="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="5" X="11"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Target="away" Source="away">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-23" X="6"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="64" X="239"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="wait" Source="away">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="BEFORE"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-5" X="4"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="wait" Source="wait">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-14" X="3"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="144" X="241"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="cross" Source="wait">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-5" X="4"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="away" Source="cross">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="CURVE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="STRAIGHT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-16" X="-64"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="144" X="127"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="cross" Source="cross">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-8" X="5"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="225" X="240"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t12"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="STRAIGHT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t8"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="CURVE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t10"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t7"/>
-</EnumSetExpression>
-<ComponentList>
-<SimpleComponent Kind="PROPERTY">
-<IndexedIdentifier Name="noderail_7">
-<SimpleIdentifier Name="BEFORE"/>
-<SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="CURVE"/>
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Name="wait">
-<PointGeometry>
-<Point Y="144" X="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="12"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="cross">
-<PointGeometry>
-<Point Y="224" X="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="11"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Initial="true" Name="away">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point Y="64" X="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="5" X="11"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Target="away" Source="away">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-23" X="6"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="64" X="239"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="wait" Source="away">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="BEFORE"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-5" X="4"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="wait" Source="wait">
-<LabelBlock>
-<IndexedIdentifier Name="turn">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="straight">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-14" X="3"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="144" X="241"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="cross" Source="wait">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-5" X="4"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="away" Source="cross">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="CURVE"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="STRAIGHT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-16" X="-64"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="144" X="127"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="cross" Source="cross">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-8" X="5"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="225" X="240"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-<ForeachComponent Name="BEFORE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t3"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="RIGHT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t19"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t3"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="LEFT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t1"/>
-</EnumSetExpression>
-<ComponentList>
-<SimpleComponent Kind="PROPERTY">
-<IndexedIdentifier Name="noderail_3">
-<SimpleIdentifier Name="BEFORE"/>
-<SimpleIdentifier Name="RIGHT"/>
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="SWITCH"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<Graph>
-<NodeList>
-<SimpleNode Name="wait">
-<PointGeometry>
-<Point Y="144" X="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="12"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="cross">
-<PointGeometry>
-<Point Y="224" X="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="11"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Initial="true" Name="away">
-<EventList>
-<SimpleIdentifier Name=":accepting"/>
-</EventList>
-<PointGeometry>
-<Point Y="64" X="192"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="5" X="11"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Target="away" Source="away">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-22" X="4"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="64" X="239"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="wait" Source="away">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="BEFORE"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-5" X="4"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="wait" Source="wait">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-14" X="3"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="144" X="241"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="cross" Source="wait">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-5" X="4"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="away" Source="cross">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="RIGHT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-16" X="-52"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="144" X="127"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="cross" Source="cross">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-7" X="6"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="225" X="242"/>
-</SplineGeometry>
-</Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
-</ComponentList>
-</ForeachComponent>
 </ComponentList>
 </ForeachComponent>
 </ComponentList>

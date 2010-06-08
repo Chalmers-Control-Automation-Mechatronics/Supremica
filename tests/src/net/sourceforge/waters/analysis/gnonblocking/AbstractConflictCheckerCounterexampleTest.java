@@ -93,13 +93,13 @@ public abstract class AbstractConflictCheckerCounterexampleTest extends
     runModelVerifier(group, dir, name, false);
   }
 
-  public void testTbedValid() throws Exception
+  public void testTbedNoderailBlock() throws Exception
   {
     setConfiguration(10000, 10000, 1000000, 1000000);
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "tbed_noderail.wmod";
-    runModelVerifier(group, dir, name, false);  // ???
+    final String name = "tbed_noderail_block.wmod";
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testVerriegel4B() throws Exception

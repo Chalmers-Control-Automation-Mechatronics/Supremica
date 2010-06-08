@@ -97,8 +97,24 @@ public abstract class AbstractLargeStandardConflictCheckerTest extends
   {
     final String group = "tests";
     final String dir = "incremental_suite";
+    final String name = "tbed_valid.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testTbedNoderail() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
     final String name = "tbed_noderail.wmod";
     runModelVerifier(group, dir, name, true);
+  }
+
+  public void testTbedNoderailBlock() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "tbed_noderail_block.wmod";
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testVerriegel4() throws Exception
