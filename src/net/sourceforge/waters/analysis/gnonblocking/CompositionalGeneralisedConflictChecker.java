@@ -40,6 +40,7 @@ import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
@@ -186,6 +187,14 @@ public class CompositionalGeneralisedConflictChecker extends
     stats.setTotalNumberOfTransitions(mTotalNumberOfTransitions);
     stats.setComposedModelStateCount(mComposedModelNumberOfStates);
     stats.setComposedModelTransitionCount(mComposedModelNumberOfTransitions);
+  }
+
+  // Ugly override to make this method visible within package.
+  @Override
+  protected EventProxy getUsedMarkingProposition()
+    throws EventNotFoundException
+  {
+    return super.getUsedMarkingProposition();
   }
 
   @Override

@@ -19,22 +19,24 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
  * An abstract base class that can be used for all conflict checker
- * implementations. In addition to the model and factory members inherited from
- * {@link AbstractModelVerifier}, this class provides some support to get and
- * set the default marking, and to return an error trace of the appropriate
- * kind.
+ * implementations. In addition to the model and factory members inherited
+ * from {@link AbstractModelVerifier}, this class provides some support to
+ * get and set the default marking, and to return an error trace of the
+ * appropriate kind.
  *
  * @author Robi Malik
  */
 
-public abstract class AbstractConflictChecker extends AbstractModelVerifier
-    implements ConflictChecker
+public abstract class AbstractConflictChecker
+  extends AbstractModelVerifier
+  implements ConflictChecker
 {
 
-  // #########################################################################
-  // # Constructors
+  //#########################################################################
+  //# Constructors
   /**
-   * Creates a new conflict checker without a model or marking proposition.
+   * Creates a new conflict checker without a model or marking
+   * proposition.
    */
   public AbstractConflictChecker(final ProductDESProxyFactory factory)
   {
@@ -44,11 +46,8 @@ public abstract class AbstractConflictChecker extends AbstractModelVerifier
   /**
    * Creates a new conflict checker to check whether the given model
    * nonconflicting with respect to the default marking proposition.
-   *
-   * @param model
-   *          The model to be checked by this conflict checker.
-   * @param factory
-   *          Factory used for trace construction.
+   * @param  model      The model to be checked by this conflict checker.
+   * @param  factory    Factory used for trace construction.
    */
   public AbstractConflictChecker(final ProductDESProxy model,
                                  final ProductDESProxyFactory factory)
@@ -58,17 +57,15 @@ public abstract class AbstractConflictChecker extends AbstractModelVerifier
 
   /**
    * Creates a new conflict checker to check a particular model.
-   *
-   * @param model
-   *          The model to be checked by this conflict checker.
-   * @param marking
-   *          The proposition event that defines which states are marked. Every
-   *          state has a list of propositions attached to it; the conflict
-   *          checker considers only those states as marked that are labelled by
-   *          <CODE>marking</CODE>, i.e., their list of propositions must
-   *          contain this event (exactly the same object).
-   * @param factory
-   *          Factory used for trace construction.
+   * @param  model      The model to be checked by this conflict checker.
+   * @param  marking    The proposition event that defines which states
+   *                    are marked. Every state has a list of propositions
+   *                    attached to it; the conflict checker considers only
+   *                    those states as marked that are labelled by
+   *                    <CODE>marking</CODE>, i.e., their list of
+   *                    propositions must contain this event (exactly the
+   *                    same object).
+   * @param  factory    Factory used for trace construction.
    */
   public AbstractConflictChecker(final ProductDESProxy model,
                                  final EventProxy marking,
@@ -77,44 +74,44 @@ public abstract class AbstractConflictChecker extends AbstractModelVerifier
     this(model, marking, null, factory);
   }
 
-  /**
-   * Creates a new conflict checker to check a particular model.
-   *
-   * @param model
-   *          The model to be checked by this conflict checker.
-   * @param marking
-   *          The proposition event that defines which states are marked. Every
-   *          state has a list of propositions attached to it; the conflict
-   *          checker considers only those states as marked that are labelled by
-   *          <CODE>marking</CODE>, i.e., their list of propositions must
-   *          contain this event (exactly the same object).
-   * @param preMarking
-   *          The proposition event that defines which states have alpha
-   *          (precondition) markings for a generalised nonblocking check.
-   * @param factory
-   *          Factory used for trace construction.
-   */
-  public AbstractConflictChecker(final ProductDESProxy model,
-                                 final EventProxy marking,
-                                 final EventProxy preMarking,
-                                 final ProductDESProxyFactory factory)
-  {
-    super(model, factory, ConflictKindTranslator.getInstance());
-    mMarking = marking;
-    mPreconditionMarking = preMarking;
-    mUsedMarking = null;
+    /**
+     * Creates a new conflict checker to check a particular model.
+     * @param  model      The model to be checked by this conflict checker.
+     * @param  marking    The proposition event that defines which states
+     *                    are marked. Every state has a list of propositions
+     *                    attached to it; the conflict checker considers only
+     *                    those states as marked that are labelled by
+     *                    <CODE>marking</CODE>, i.e., their list of
+     *                    propositions must contain this event (exactly the
+     *                    same object).
+     * @param preMarking  The proposition event that defines which states have
+     *                    alpha (precondition) markings for a generalised
+     *                    nonblocking check.
+     * @param  factory    Factory used for trace construction.
+     */
+    public AbstractConflictChecker(final ProductDESProxy model,
+                                   final EventProxy marking,
+                                   final EventProxy preMarking,
+                                   final ProductDESProxyFactory factory)
+    {
+      super(model, factory, ConflictKindTranslator.getInstance());
+      mMarking = marking;
+      mPreconditionMarking = preMarking;
+      mUsedMarking = null;
   }
 
-  // #########################################################################
-  // # Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   public void setModel(final ProductDESProxy model)
   {
     super.setModel(model);
     mUsedMarking = null;
   }
 
-  // #########################################################################
-  // # Interface net.sourceforge.waters.model.analysis.ConflictChecker
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
   public void setMarkingProposition(final EventProxy marking)
   {
     mMarking = marking;
@@ -126,13 +123,11 @@ public abstract class AbstractConflictChecker extends AbstractModelVerifier
     return mMarking;
   }
 
-  public void setGeneralisedPrecondition(final EventProxy marking)
-  {
+  public void setGeneralisedPrecondition(final EventProxy marking){
     mPreconditionMarking = marking;
   }
 
-  public EventProxy getGeneralisedPrecondition()
-  {
+  public EventProxy getGeneralisedPrecondition(){
     return mPreconditionMarking;
   }
 
@@ -141,28 +136,29 @@ public abstract class AbstractConflictChecker extends AbstractModelVerifier
     return (ConflictTraceProxy) super.getCounterExample();
   }
 
-  // #########################################################################
-  // # Overrides for net.sourceforge.waters.model.ModelAnalyser
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.ModelAnalyser
   protected void tearDown()
   {
     mUsedMarking = null;
     super.tearDown();
   }
 
-  // #########################################################################
-  // # Auxiliary Methods
+
+  //#########################################################################
+  //# Auxiliary Methods
   /**
-   * Gets the marking proposition to be used. This method returns the marking
-   * proposition specified by the {@link #setMarkingProposition(EventProxy)
-   * setMarkingProposition()} method, if non-null, or the default marking
-   * proposition of the input model.
-   *
-   * @throws IllegalArgumentException
-   *           to indicate that the a <CODE>null</CODE> marking was specified,
-   *           but input model does not contain any proposition with the default
-   *           marking name.
+   * Gets the marking proposition to be used.
+   * This method returns the marking proposition specified by the {@link
+   * #setMarkingProposition(EventProxy) setMarkingProposition()} method, if
+   * non-null, or the default marking proposition of the input model.
+   * @throws IllegalArgumentException to indicate that the a
+   *         <CODE>null</CODE> marking was specified, but input model does
+   *         not contain any proposition with the default marking name.
    */
-  public EventProxy getUsedMarkingProposition() throws EventNotFoundException
+  protected EventProxy getUsedMarkingProposition()
+    throws EventNotFoundException
   {
     if (mUsedMarking == null) {
       if (mMarking == null) {
@@ -176,39 +172,38 @@ public abstract class AbstractConflictChecker extends AbstractModelVerifier
   }
 
   /**
-   * Searches the given model for a proposition event with the default marking
-   * name and returns this event.
-   *
-   * @throws EventNotFoundException
-   *           to indicate that the given model does not contain any proposition
-   *           with the default marking name.
+   * Searches the given model for a proposition event with the default
+   * marking name and returns this event.
+   * @throws EventNotFoundException to indicate that the given model
+   *         does not contain any proposition with the default marking
+   *         name.
    */
   public static EventProxy getMarkingProposition(final ProductDESProxy model)
-      throws EventNotFoundException
+    throws EventNotFoundException
   {
     return getMarkingProposition(model, EventDeclProxy.DEFAULT_MARKING_NAME);
   }
 
   /**
-   * Searches the given model for a proposition event with the given name and
-   * returns this event.
-   *
-   * @throws EventNotFoundException
-   *           to indicate that the given model does not contain any proposition
-   *           with the default marking name.
+   * Searches the given model for a proposition event with the given
+   * name and returns this event.
+   * @throws EventNotFoundException to indicate that the given model
+   *         does not contain any proposition with the default marking
+   *         name.
    */
-  public static EventProxy getMarkingProposition(final ProductDESProxy model,
-                                                 final String name)
-      throws EventNotFoundException
+  public static EventProxy getMarkingProposition
+    (final ProductDESProxy model, final String name)
+    throws EventNotFoundException
   {
     for (final EventProxy event : model.getEvents()) {
-      if (event.getKind() == EventKind.PROPOSITION
-          && event.getName().equals(name)) {
+      if (event.getKind() == EventKind.PROPOSITION &&
+          event.getName().equals(name)) {
         return event;
       }
     }
     throw new EventNotFoundException(model, name, EventKind.PROPOSITION, false);
   }
+
 
   /**
    * Gets a name that can be used for a counterexample for the current model.
@@ -220,8 +215,9 @@ public abstract class AbstractConflictChecker extends AbstractModelVerifier
     return modelname + "-conflicting";
   }
 
-  // #########################################################################
-  // # Data Members
+
+  //#########################################################################
+  //# Data Members
   private EventProxy mMarking;
   private EventProxy mUsedMarking;
   private EventProxy mPreconditionMarking;
