@@ -55,16 +55,16 @@ public class EventTreeModel
 
   public int getChildCount(final Object parent)
   {
-    if (Simulation.class.isInstance(parent))
-    {
+    if (parent instanceof Simulation) {
       return sortedEvents.size();
-    }
-    else if (EventProxy.class.isInstance(parent))
-    {
-      return mSim.getAutomataSensitiveToEvent((EventProxy)parent).size();
-    }
-    else
+    } else if (parent instanceof EventProxy) {
+      final EventProxy event = (EventProxy) parent;
+      final List<AutomatonProxy> automata =
+        mSim.getAutomataSensitiveToEvent(event);
+      return automata.size();
+    } else {
       return 0;
+    }
   }
 
   public int getIndexOfChild(final Object parent, final Object child)

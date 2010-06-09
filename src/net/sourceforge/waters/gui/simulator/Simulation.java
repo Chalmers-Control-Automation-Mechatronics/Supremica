@@ -72,7 +72,6 @@ public class Simulation implements ModelObserver, Observer
     final ProductDESProxy des = container.getCompiledDES();
     setCompiledDES(des);
     mTransitionsToEvents = new TransitionEventMap(des);
-    updateAutomataSensitiveToEvent();
     updateControllability(true);
     findEventClassification();
     addNewSimulatorState();
@@ -501,34 +500,23 @@ public class Simulation implements ModelObserver, Observer
       return mTrace;
   }
 
-  public List<AutomatonProxy> getAutomataSensitiveToEvent(final EventProxy event)
+  public List<AutomatonProxy> getAutomataSensitiveToEvent
+    (final EventProxy event)
   {
-    return mAutomataSensitiveToEvent.get(event);
-  }
-
-  private void updateAutomataSensitiveToEvent()
-  {
-    final HashMap<EventProxy, List<AutomatonProxy>> output = new HashMap<EventProxy, List<AutomatonProxy>>();
-    for (final AutomatonProxy search : mAllAutomatons.keySet())
-    {
-      for (final EventProxy event : search.getEvents())
-      {
-        List<AutomatonProxy> temp = output.get(event);
-        if (temp == null)
-        {
-          temp = new ArrayList<AutomatonProxy>();
-        }
-        temp.add(search);
-        output.put(event, temp);
-      }
+    updateAutomataSensitiveToEvent();
+    final List<AutomatonProxy> list = mAutomataSensitiveToEvent.get(event);
+    if (list == null) {
+      return Collections.emptyList();
+    } else {
+      return list;
     }
-    mAutomataSensitiveToEvent = output;
   }
 
   public List<TransitionProxy> getActiveTransitions(final AutomatonProxy auto)
   {
     return mTransitionsToEvents.getTransition(auto, mAllAutomatons.get(auto));
   }
+
 
   //###################################################################################
   // # Control
@@ -875,7 +863,26 @@ public class Simulation implements ModelObserver, Observer
 
 
   //#########################################################################
-  //# Auxiliary Functions
+  //# Auxiliary Methods
+  private void updateAutomataSensitiveToEvent()
+  {
+    if (mAutomataSensitiveToEvent == null) {
+      final int numEvents = mCompiledDES.getEvents().size();
+      mAutomataSensitiveToEvent =
+        new HashMap<EventProxy,List<AutomatonProxy>>(numEvents);
+      for (final AutomatonProxy search : mAllAutomatons.keySet()) {
+        for (final EventProxy event : search.getEvents()) {
+          List<AutomatonProxy> list = mAutomataSensitiveToEvent.get(event);
+          if (list == null) {
+            list = new ArrayList<AutomatonProxy>();
+          }
+          list.add(search);
+          mAutomataSensitiveToEvent.put(event, list);
+        }
+      }
+    }
+  }
+
   /**
    * Finds the new automata and events which are now causing controllability errors.
    * It also finds properties that could possibly fail next step
@@ -1209,9 +1216,9 @@ public class Simulation implements ModelObserver, Observer
   {
     if (des != mCompiledDES) {
       mCompiledDES = des;
+      mAutomataSensitiveToEvent = null;
       mTransitionsToEvents = new TransitionEventMap(des);
       reset(true);
-      updateAutomataSensitiveToEvent();
     }
   }
 
