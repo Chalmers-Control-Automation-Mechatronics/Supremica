@@ -86,6 +86,32 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
         + ",FinalStateLimit," + finalStateLimit + ",FinalTransitionLimit,"
         + finalTransitionLimit);
 
+    // sets correct preselecting heuristic
+    if (mPreselecting.equals("mint")) {
+      mVerifier.setPreselectingHeuristic(mVerifier.createHeuristicMinT());
+    } else if (mPreselecting.equals("maxs")) {
+      mVerifier.setPreselectingHeuristic(mVerifier.createHeuristicMaxS());
+    } else if (mPreselecting.equals("mustl")) {
+      mVerifier.setPreselectingHeuristic(mVerifier.createHeuristicMustL());
+    } else {
+      System.err
+          .println("Error: Preselecting Heuristic not specified correctly, it must be one of: mint, maxs, mustl");
+    }
+
+    // sets correct selecting heuristic
+    if (mSelecting.equals("maxl")) {
+      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxL());
+    } else if (mSelecting.equals("maxc")) {
+      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxC());
+    } else if (mSelecting.equals("mins")) {
+      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMinS());
+    } else {
+      System.err
+          .println("Error: Selecting Heuristic not specified correctly, it must be one of: maxl, maxc, mins");
+    }
+    mPrintStream.println("PreselHeuristic," + mPreselecting
+        + ",SelecHeuristic," + mSelecting);
+
     mStats = new CompositionalGeneralisedConflictCheckerVerificationResult();
     mRuleCount = 8;
     mStats.printCSVHorizontalHeadings(mPrintStream, mRuleCount);
@@ -123,31 +149,6 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
       throws EventNotFoundException
   {
     mVerifier.setModel(des);
-
-    // sets correct preselecting heuristic
-    if (mPreselecting.equals("mint")) {
-      mVerifier.setPreselectingHeuristic(mVerifier.createHeuristicMinT());
-    } else if (mPreselecting.equals("maxs")) {
-      mVerifier.setPreselectingHeuristic(mVerifier.createHeuristicMaxS());
-    } else if (mPreselecting.equals("mustl")) {
-      mVerifier.setPreselectingHeuristic(mVerifier.createHeuristicMustL());
-    } else {
-      System.err
-          .println("Error: Preselecting Heuristic not specified correctly, it must be one of: mint, maxs, mustl");
-    }
-
-    // sets correct selecting heuristic
-    if (mSelecting.equals("maxl")) {
-      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxL());
-    } else if (mSelecting.equals("maxc")) {
-      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxC());
-    } else if (mSelecting.equals("mins")) {
-      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMinS());
-    } else {
-      System.err
-          .println("Error: Selecting Heuristic not specified correctly, it must be one of: maxl, maxc, mins");
-    }
-
     // sets order of abstraction rules
     final List<AbstractionRule> ruleList = new LinkedList<AbstractionRule>();
     final ProductDESProxyFactory factory = mVerifier.getFactory();
