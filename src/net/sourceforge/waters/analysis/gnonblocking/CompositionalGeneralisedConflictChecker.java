@@ -192,7 +192,7 @@ public class CompositionalGeneralisedConflictChecker extends
   // Ugly override to make this method visible within package.
   @Override
   protected EventProxy getUsedMarkingProposition()
-    throws EventNotFoundException
+      throws EventNotFoundException
   {
     return super.getUsedMarkingProposition();
   }

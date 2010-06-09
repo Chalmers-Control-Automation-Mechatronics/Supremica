@@ -41,6 +41,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     mPreselecting = preselectingHeuristic.toLowerCase();
     mSelecting = selectingHeuristic.toLowerCase();
     mRules = rules;
+    mRuleCount = 0;
   }
 
   // #######################################################################
@@ -71,8 +72,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     super.setUp();
     mPrintStream = new PrintStream(mOut, true);
     mStats = new CompositionalGeneralisedConflictCheckerVerificationResult();
-    // TODO: add rule count
-    mStats.printCSVHorizontalHeadings(mPrintStream, 7);
+    mStats.printCSVHorizontalHeadings(mPrintStream, mRuleCount);
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mVerifier = new CompositionalGeneralisedConflictChecker(factory);
   }
@@ -98,6 +98,8 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     verify_fzelle();
     verify_tbed_uncont();
     verify_tbed_noderail();
+    verify_tbed_noderail_block();
+    verify_tbed_valid();
     verify_profisafe_i4_host();
     verify_profisafe_i5_host();
 
@@ -181,6 +183,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
             propositions);
     rttonsRule.setAlphaMarking(alpha);
     rttonsRule.setDefaultMarking(omega);
+    mRuleCount = 8;
     if (mRules == 1) {
       // order the rules are presented in the paper
       ruleList.add(tlrRule);
@@ -284,11 +287,27 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     runModel(group, dir, name);
   }
 
+  private void verify_tbed_noderail_block() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "tbed_noderail_block.wmod";
+    runModel(group, dir, name);
+  }
+
   private void verify_tbed_noderail() throws Exception
   {
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "tbed_noderail.wmod";
+    runModel(group, dir, name);
+  }
+
+  private void verify_tbed_valid() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "tbed_valid.wmod";
     runModel(group, dir, name);
   }
 
@@ -333,4 +352,5 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
   final String mPreselecting;
   final String mSelecting;
   final int mRules;
+  int mRuleCount;
 }
