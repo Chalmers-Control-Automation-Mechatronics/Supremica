@@ -2,6 +2,7 @@ package net.sourceforge.waters.gui.simulator;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class Simulation implements ModelObserver, Observer
 {
 
   //#########################################################################
-  //# Constructors
+  //# Constructor
   public Simulation(final ModuleContainer container)
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
@@ -77,13 +78,14 @@ public class Simulation implements ModelObserver, Observer
     addNewSimulatorState();
   }
 
-  // ########################################################################
-  // # SimulationState Access Methods
 
+  //########################################################################
+  //# SimulationState Access Methods
   public Step getCurrentEvent()
   {
     return mCurrentEvent;
   }
+
   public Collection<? extends Pair<EventProxy,AutomatonProxy>> getAllBlocking()
   {
      return mBlockingEvents;
@@ -96,6 +98,7 @@ public class Simulation implements ModelObserver, Observer
   {
     return mDisabledProperties;
   }
+
   public Map<? extends Step,? extends AutomatonProxy> getWarningProperties()
   {
     return mWarningProperties;
@@ -110,8 +113,9 @@ public class Simulation implements ModelObserver, Observer
   }
 
   /**
-   * This method takes the current time of the simulation, and changes the current states of the simulation to match the correct time
-   * It is used for steping back and forward through the simulation without changing it
+   * This method takes the current time of the simulation, and changes the
+   * current states of the simulation to match the correct time It is used for
+   * stepping back and forward through the simulation without changing it.
    */
   private void loadSimulatorState()
   {
@@ -126,6 +130,7 @@ public class Simulation implements ModelObserver, Observer
     mWarningProperties = new HashMap<Step, AutomatonProxy>(stateToLoad.mWarningProperties);
     updateControllability(false);
   }
+
 
   //#########################################################################
   //# Simple Access
@@ -492,6 +497,7 @@ public class Simulation implements ModelObserver, Observer
     mTrace = trace;
     invalidated = false;
   }
+
   public TraceProxy getTrace()
   {
     if (invalidated)
@@ -520,7 +526,6 @@ public class Simulation implements ModelObserver, Observer
 
   //###################################################################################
   // # Control
-
   public void setState(final AutomatonProxy automaton, final StateProxy state)
   {
     mWarningProperties = new HashMap<Step, AutomatonProxy>();
@@ -716,14 +721,21 @@ public class Simulation implements ModelObserver, Observer
   }
 
   /**
-   * Finds the appropiate next state for the automaton, and sets it, given that the step doesn't contain that information inside it
-   * The Step <STRONG>can</STRONG> be non-deterministic, but what is required is that the step cannot contain 'next-state' information
-   * about the automaton
-   * @param automata The automaton which is finding it's next state
-   * @param step The instruction to follow
-   * @param oldLocation The old previous current state
-   * @throws NonDeterministicException If the automata needs non-deterministic information to fire the event. However, this will still
-   * be thrown if the step contains that information, as it is assumed to NOT possess that information.
+   * Finds the appropriate next state for the automaton, and sets it, given that
+   * the step doesn't contain that information inside it The step
+   * <STRONG>can</STRONG> be non-deterministic, but what is required is that the
+   * step cannot contain 'next-state' information about the automaton
+   * @param automata
+   *          The automaton which is finding it's next state
+   * @param step
+   *          The instruction to follow
+   * @param oldLocation
+   *          The old previous current state
+   * @throws NonDeterministicException
+   *           If the automata needs non-deterministic information to fire the
+   *           event. However, this will still be thrown if the step contains
+   *           that information, as it is assumed to NOT possess that
+   *           information.
    */
   private void moveDeterministicTransition(final AutomatonProxy automata,
                                                  final Step step,
@@ -818,6 +830,7 @@ public class Simulation implements ModelObserver, Observer
       moveSafely(true);
   }
 
+
   //#########################################################################
   //# Class Object
   public String toString()
@@ -870,14 +883,21 @@ public class Simulation implements ModelObserver, Observer
       final int numEvents = mCompiledDES.getEvents().size();
       mAutomataSensitiveToEvent =
         new HashMap<EventProxy,List<AutomatonProxy>>(numEvents);
-      for (final AutomatonProxy search : mAllAutomatons.keySet()) {
-        for (final EventProxy event : search.getEvents()) {
-          List<AutomatonProxy> list = mAutomataSensitiveToEvent.get(event);
-          if (list == null) {
-            list = new ArrayList<AutomatonProxy>();
+      final Collection<AutomatonProxy> automata = mCompiledDES.getAutomata();
+      final int numAutomata = automata.size();
+      final AutomatonProxy[] array = new AutomatonProxy[numAutomata];
+      automata.toArray(array);
+      Arrays.sort(array);
+      for (final AutomatonProxy aut : array) {
+        for (final EventProxy event : aut.getEvents()) {
+          if (event.getKind() != EventKind.PROPOSITION) {
+            List<AutomatonProxy> list = mAutomataSensitiveToEvent.get(event);
+            if (list == null) {
+              list = new ArrayList<AutomatonProxy>();
+              mAutomataSensitiveToEvent.put(event, list);
+            }
+            list.add(aut);
           }
-          list.add(search);
-          mAutomataSensitiveToEvent.put(event, list);
         }
       }
     }
