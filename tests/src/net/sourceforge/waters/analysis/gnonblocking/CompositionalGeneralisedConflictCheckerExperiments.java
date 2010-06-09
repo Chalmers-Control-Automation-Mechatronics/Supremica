@@ -70,11 +70,25 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
   protected void setUp() throws Exception
   {
     super.setUp();
-    mPrintStream = new PrintStream(mOut, true);
-    mStats = new CompositionalGeneralisedConflictCheckerVerificationResult();
-    mStats.printCSVHorizontalHeadings(mPrintStream, mRuleCount);
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mVerifier = new CompositionalGeneralisedConflictChecker(factory);
+    mPrintStream = new PrintStream(mOut, true);
+    final int internalStateLimit = 1000;
+    mVerifier.setInternalStepNodeLimit(internalStateLimit);
+    final int internalTransitionLimit = 100000;
+    mVerifier.setInternalStepTransitionLimit(internalTransitionLimit);
+    final int finalStateLimit = 20000000;
+    mVerifier.setFinalStepNodeLimit(finalStateLimit);
+    final int finalTransitionLimit = 0;
+    mVerifier.setFinalStepTransitionLimit(finalTransitionLimit);
+    mPrintStream.println("InternalStateLimit," + internalStateLimit
+        + ",InternalTransitionLimit," + internalTransitionLimit
+        + ",FinalStateLimit," + finalStateLimit + ",FinalTransitionLimit,"
+        + finalTransitionLimit);
+
+    mStats = new CompositionalGeneralisedConflictCheckerVerificationResult();
+    mRuleCount = 8;
+    mStats.printCSVHorizontalHeadings(mPrintStream, mRuleCount);
   }
 
   @Override
@@ -109,11 +123,6 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
       throws EventNotFoundException
   {
     mVerifier.setModel(des);
-    mVerifier.setInternalStepNodeLimit(1000);
-    final int internalStepTransitionLimit = 100000;
-    mVerifier.setInternalStepTransitionLimit(internalStepTransitionLimit);
-    mVerifier.setFinalStepNodeLimit(20000000);
-    mVerifier.setFinalStepTransitionLimit(0);
 
     // sets correct preselecting heuristic
     if (mPreselecting.equals("mint")) {
@@ -153,7 +162,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
 
     final ObservationEquivalenceRule oeRule =
         new ObservationEquivalenceRule(factory, propositions);
-    oeRule.setTransitionLimit(internalStepTransitionLimit);
+    oeRule.setTransitionLimit(mVerifier.getInternalStepTransitionLimit());
 
     final RemovalOfAlphaMarkingsRule ramRule =
         new RemovalOfAlphaMarkingsRule(factory, propositions);
@@ -172,7 +181,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     final DeterminisationOfNonAlphaStatesRule dnasRule =
         new DeterminisationOfNonAlphaStatesRule(factory, propositions);
     dnasRule.setAlphaMarking(alpha);
-    dnasRule.setTransitionLimit(internalStepTransitionLimit);
+    dnasRule.setTransitionLimit(mVerifier.getInternalStepTransitionLimit());
 
     final RemovalOfTauTransitionsLeadingToNonAlphaStatesRule rttlnsRule =
         new RemovalOfTauTransitionsLeadingToNonAlphaStatesRule(factory,
@@ -184,7 +193,6 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
             propositions);
     rttonsRule.setAlphaMarking(alpha);
     rttonsRule.setDefaultMarking(omega);
-    mRuleCount = 8;
     if (mRules == 1) {
       // order the rules are presented in the paper
       ruleList.add(tlrRule);
