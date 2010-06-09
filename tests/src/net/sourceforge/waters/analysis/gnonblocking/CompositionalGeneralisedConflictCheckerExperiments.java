@@ -112,7 +112,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     mVerifier.setInternalStepNodeLimit(1000);
     final int internalStepTransitionLimit = 100000;
     mVerifier.setInternalStepTransitionLimit(internalStepTransitionLimit);
-    mVerifier.setFinalStepNodeLimit(100000);
+    mVerifier.setFinalStepNodeLimit(20000000);
     mVerifier.setFinalStepTransitionLimit(0);
 
     // sets correct preselecting heuristic
@@ -143,6 +143,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     final List<AbstractionRule> ruleList = new LinkedList<AbstractionRule>();
     final ProductDESProxyFactory factory = mVerifier.getFactory();
     final EventProxy alpha = mVerifier.getUsedPreconditionMarkingProposition();
+    mVerifier.setGeneralisedPrecondition(alpha);
     final EventProxy omega = mVerifier.getUsedMarkingProposition();
     final List<EventProxy> propositions = new ArrayList<EventProxy>(2);
     propositions.add(alpha);
