@@ -73,9 +73,9 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mVerifier = new CompositionalGeneralisedConflictChecker(factory);
     mPrintStream = new PrintStream(mOut, true);
-    final int internalStateLimit = 1000;
+    final int internalStateLimit = 10000;
     mVerifier.setInternalStepNodeLimit(internalStateLimit);
-    final int internalTransitionLimit = 100000;
+    final int internalTransitionLimit = 1000000;
     mVerifier.setInternalStepTransitionLimit(internalTransitionLimit);
     final int finalStateLimit = 20000000;
     mVerifier.setFinalStepNodeLimit(finalStateLimit);
@@ -244,6 +244,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
       mStats.printCSVHorizontal(mPrintStream);
     } catch (final Exception e) {
       System.out.println(e);
+      mPrintStream.println(des.getName() + "," + e);
     }
   }
 
