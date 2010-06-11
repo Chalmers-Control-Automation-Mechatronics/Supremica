@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.despot
-//# CLASS:   SICPropertyVVerifierTest
+//# CLASS:   AbstractSICProperty5VerifierTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,7 +12,6 @@ package net.sourceforge.waters.despot;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
@@ -30,32 +29,32 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public abstract class AbstractSICPropertyVVerifierTest extends
-    AbstractConflictCheckerTest
+public abstract class AbstractSICProperty5VerifierTest
+  extends AbstractConflictCheckerTest
 {
 
   // #########################################################################
   // # Test Cases
-  public void testSICPropertyVVerifier_parManEg_I_mfb_lowlevel()
+  public void testSICProperty5Verifier_parManEg_I_mfb_lowlevel()
       throws Exception
   {
     runModelVerifier("tests", "hisc", "parManEg_I_mfb_lowlevel.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_parManEg_I_mfb_lowlevel_multiAnswers()
+  public void testSICProperty5Verifier_parManEg_I_mfb_lowlevel_multiAnswers()
       throws Exception
   {
     runModelVerifier("tests", "hisc",
                      "parManEg_I_mfb_lowlevel_multiAnswers.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_parManEg_I_mfb_middlelevel()
+  public void testSICProperty5Verifier_parManEg_I_mfb_middlelevel()
       throws Exception
   {
     runModelVerifier("tests", "hisc", "parManEg_I_mfb_middlelevel.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_parManEg_I_mfb_parManEg_I_mfb_lowlevel_multiAnswers_noInterface()
+  public void testSICProperty5Verifier_parManEg_I_mfb_parManEg_I_mfb_lowlevel_multiAnswers_noInterface()
       throws Exception
   {
     runModelVerifier("tests", "hisc",
@@ -64,134 +63,134 @@ public abstract class AbstractSICPropertyVVerifierTest extends
   }
 
   // SimpleManufacturingExample
-  public void testSICPropertyVVerifier_Manuf_Cells() throws Exception
+  public void testSICProperty5Verifier_Manuf_Cells() throws Exception
   {
     runModelVerifier("despot", "simpleManufacturingExample",
                      "Manuf-Cells.wmod", true);
   }
 
   // testHISC
-  public void testSICPropertyVVerifier_hisc0_low1() throws Exception
+  public void testSICProperty5Verifier_hisc0_low1() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc0_low1.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_hisc0_low2() throws Exception
+  public void testSICProperty5Verifier_hisc0_low2() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc0_low2.wmod", true);
   }
 
   // testHISC1
-  public void testSICPropertyVVerifier_hisc1_low1() throws Exception
+  public void testSICProperty5Verifier_hisc1_low1() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc1_low1.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_hisc1_low2() throws Exception
+  public void testSICProperty5Verifier_hisc1_low2() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc1_low2.wmod", true);
   }
 
   // testHISC10
-  public void testSICPropertyVVerifier_hisc10_low1() throws Exception
+  public void testSICProperty5Verifier_hisc10_low1() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc10_low1.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_hisc12_low1() throws Exception
+  public void testSICProperty5Verifier_hisc12_low1() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc12_low1.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_hisc12_low2() throws Exception
+  public void testSICProperty5Verifier_hisc12_low2() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc12_low2.wmod", true);
   }
 
   /*
-   * public void testSICPropertyVVerifier_hisc13_low1() throws Exception {
+   * public void testSICProperty5Verifier_hisc13_low1() throws Exception {
    * runModelVerifier("despot", "testHISC", "hisc13_low1.wmod", false); }
    *
-   * public void testSICPropertyVVerifier_hisc13_low2() throws Exception {
+   * public void testSICProperty5Verifier_hisc13_low2() throws Exception {
    * runModelVerifier("despot", "testHISC", "hisc13_low2.wmod", true); }
    */
 
-  public void testSICPropertyVVerifier_hisc14_low1() throws Exception
+  public void testSICProperty5Verifier_hisc14_low1() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc14_low1.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_hisc14_low2() throws Exception
+  public void testSICProperty5Verifier_hisc14_low2() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc14_low2.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_hisc2_low1() throws Exception
+  public void testSICProperty5Verifier_hisc2_low1() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc2_low1.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_hisc2_low2() throws Exception
+  public void testSICProperty5Verifier_hisc2_low2() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc2_low2.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_hisc3_low2() throws Exception
+  public void testSICProperty5Verifier_hisc3_low2() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc3_low2.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_hisc7_low2() throws Exception
+  public void testSICProperty5Verifier_hisc7_low2() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc7_low2.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_hisc8_low2() throws Exception
+  public void testSICProperty5Verifier_hisc8_low2() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc8_low2.wmod", false);
   }
 
-  public void testSICPropertyVVerifier_hisc9_low2() throws Exception
+  public void testSICProperty5Verifier_hisc9_low2() throws Exception
   {
     runModelVerifier("despot", "testHISC", "hisc9_low2.wmod", false);
   }
 
-  public void testSICPropertyVVerifier_aip3_syn_as1() throws Exception
+  public void testSICProperty5Verifier_aip3_syn_as1() throws Exception
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "as1.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_aip3_syn_as2() throws Exception
+  public void testSICProperty5Verifier_aip3_syn_as2() throws Exception
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "as2.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_aip3_syn_as3() throws Exception
+  public void testSICProperty5Verifier_aip3_syn_as3() throws Exception
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "as3.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_aip3_syn_io() throws Exception
+  public void testSICProperty5Verifier_aip3_syn_io() throws Exception
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "io.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_aip3_syn_tu1() throws Exception
+  public void testSICProperty5Verifier_aip3_syn_tu1() throws Exception
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "tu1.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_aip3_syn_tu2() throws Exception
+  public void testSICProperty5Verifier_aip3_syn_tu2() throws Exception
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "tu2.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_aip3_syn_tu3() throws Exception
+  public void testSICProperty5Verifier_aip3_syn_tu3() throws Exception
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "tu3.wmod", true);
   }
 
-  public void testSICPropertyVVerifier_aip3_syn_tu4() throws Exception
+  public void testSICProperty5Verifier_aip3_syn_tu4() throws Exception
   {
     runModelVerifier("despot", "song_aip/aip3_syn", "tu4.wmod", true);
   }
@@ -261,9 +260,9 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     }
   }
 
-  protected SICPropertyVVerifier getModelVerifier()
+  protected SICProperty5Verifier getModelVerifier()
   {
-    return (SICPropertyVVerifier) super.getModelVerifier();
+    return (SICProperty5Verifier) super.getModelVerifier();
   }
 
   // #########################################################################
@@ -306,7 +305,6 @@ public abstract class AbstractSICPropertyVVerifierTest extends
   private AutomatonProxy createDisabledNonLocalEventsAutomaton
     (final Collection<EventProxy> events, final EventProxy answer)
   {
-    final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final String name = ":disableNonLocalEvents";
     final Collection<EventProxy> disabledevents =
       new ArrayList<EventProxy>(events.size());
@@ -319,10 +317,7 @@ public abstract class AbstractSICPropertyVVerifierTest extends
         }
       }
     }
-    final StateProxy state = factory.createStateProxy("s0", true, null);
-    final Collection<StateProxy> states = Collections.singletonList(state);
-    return factory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                        disabledevents, states, null);
+    return createDisablingAutomaton(name, ComponentKind.PLANT, disabledevents);
   }
 
   private AutomatonProxy createLanguageInclusionAutomaton(
@@ -372,17 +367,6 @@ public abstract class AbstractSICPropertyVVerifierTest extends
     final ComponentKind kind = aut.getKind();
     return factory.createAutomatonProxy(autname, kind, newevents, newstates,
                                         newtransitions);
-  }
-
-  private AutomatonProxy createPropertyAutomaton(final EventProxy answer)
-  {
-    final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    final String name = ":never:" + answer.getName();
-    final Collection<EventProxy> events = Collections.singletonList(answer);
-    final StateProxy state = factory.createStateProxy("s0", true, null);
-    final Collection<StateProxy> states = Collections.singletonList(state);
-    return factory.createAutomatonProxy(name, ComponentKind.PROPERTY, events,
-                                        states, null);
   }
 
 }

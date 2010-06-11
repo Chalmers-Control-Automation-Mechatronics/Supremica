@@ -1,6 +1,6 @@
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.despot.SICPropertyVVerifier;
+import net.sourceforge.waters.despot.SICProperty5Verifier;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
@@ -33,8 +33,8 @@ public class AnalyzeSICPropertyVAction extends WatersAnalyzeAction
   {
     final ConflictChecker conflictChecker =
         factory.createConflictChecker(desFactory);
-    final SICPropertyVVerifier verifier =
-        new SICPropertyVVerifier(conflictChecker, null, desFactory);
+    final SICProperty5Verifier verifier =
+        new SICProperty5Verifier(conflictChecker, null, desFactory);
     return verifier;
   }
 

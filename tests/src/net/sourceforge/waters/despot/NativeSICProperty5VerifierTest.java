@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.despot
-//# CLASS:   SICPropertyVVerifierTest
+//# CLASS:   NativeSICProperty5VerifierTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -15,14 +15,15 @@ import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NativeSICPropertyVVerifierTest extends
-    AbstractSICPropertyVVerifierTest
+public class NativeSICProperty5VerifierTest extends
+    AbstractSICProperty5VerifierTest
 {
 
-  protected ModelVerifier createModelVerifier(
-                                              final ProductDESProxyFactory factory)
+  protected ModelVerifier createModelVerifier
+    (final ProductDESProxyFactory factory)
   {
     final ConflictChecker checker = new NativeConflictChecker(factory);
-    return new SICPropertyVVerifier(checker, factory);
+    return new SICProperty5Verifier(checker, factory);
   }
+
 }

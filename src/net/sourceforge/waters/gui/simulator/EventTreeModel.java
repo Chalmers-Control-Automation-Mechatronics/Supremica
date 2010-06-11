@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -27,14 +28,14 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public class EventTreeModel
+class EventTreeModel
   implements TreeModel, SimulationObserver
 {
 
   //#########################################################################
   //# Constructor
-  public EventTreeModel(final Simulation sim,
-                        final ArrayList<Pair<Boolean, Integer>> sortingEvents)
+  EventTreeModel(final Simulation sim,
+                 final ArrayList<Pair<Boolean, Integer>> sortingEvents)
   {
     sim.attach(this);
     mSim = sim;
@@ -173,7 +174,7 @@ public class EventTreeModel
           throw new UnsupportedOperationException("Unsupported Sort Method!");
         }
         if (compare != 0) {
-          return isAscending ? -compare : compare;
+          return isAscending ? compare : -compare;
         }
       }
       return 0;
@@ -182,91 +183,64 @@ public class EventTreeModel
     //#######################################################################
     //# Auxiliary Methods
     /**
-     * Returns a POSITIVE NUMBER if a comes before b alphabetically,
-     * NEGATIVE number if b comes before a, and ZERO if they are equal.
+     * Returns a negative number if a comes before b alphabetically,
+     * positive number if b comes before a, and zero if they are equal.
      */
     private int sortByName(final EventProxy a, final EventProxy b)
     {
-      return -a.getName().compareTo(b.getName());
+      return a.compareTo(b);
     }
 
     /**
-     * Returns a POSITIVE NUMBER if a is before b in the default setting.
+     * Returns a negative number if a is before b in the default setting.
      * The default order is ENABLED, WARNING, DISABLED, BLOCKING
      */
     private int sortByEnabled(final EventProxy a, final EventProxy b)
     {
+      if (a == b) {
+        return 0;
+      }
+      final Set<EventProxy> enabled = mSim.getActiveEvents();
+      final boolean aIsEnabled = enabled.contains(a);
+      final boolean bIsEnabled = enabled.contains(b);
+      if (aIsEnabled != bIsEnabled) {
+        return aIsEnabled ? -1 : 1;
+      }
       boolean aIsWarning = false;
       boolean bIsWarning = false;
-      for (final Step step : mSim.getWarningProperties().keySet())
-      {
-        if (step.getEvent() == a)
+      for (final Step step : mSim.getWarningProperties().keySet()) {
+        if (step.getEvent() == a) {
           aIsWarning = true;
-
-        if (step.getEvent() == b)
+        } else if (step.getEvent() == b) {
           bIsWarning = true;
+        }
       }
-      final boolean aIsEnabled = mSim.getActiveEvents().contains(a) && !aIsWarning;
-      final boolean bIsEnabled = mSim.getActiveEvents().contains(b) && !bIsWarning;
-      final boolean aIsBlocking = mSim.getNonControllable(a).size() != 0;
-      final boolean bIsBlocking = mSim.getNonControllable(b).size() != 0;
+      if (aIsWarning != bIsWarning) {
+        return aIsWarning ? -1 : 1;
+      }
+      final boolean aIsBlocking = !mSim.getNonControllable(a).isEmpty();
+      final boolean bIsBlocking = !mSim.getNonControllable(b).isEmpty();
       final boolean aIsDisabled = !aIsEnabled && !aIsBlocking && !aIsWarning;
       final boolean bIsDisabled = !bIsEnabled && !bIsBlocking && !bIsWarning;
-      if (aIsEnabled)
-      {
-        if (bIsEnabled)
-          return 0;
-        else if (bIsWarning || bIsDisabled || bIsBlocking)
-          return 1;
+      if (aIsDisabled != bIsDisabled) {
+        return aIsDisabled ? -1 : 1;
+      } else if (aIsBlocking != bIsBlocking) {
+        return aIsBlocking ? -1 : 1;
+      } else {
+        return 0;
       }
-      else if (aIsWarning)
-      {
-        if (bIsEnabled)
-          return -1;
-        else if (bIsWarning)
-          return 0;
-        else if (bIsDisabled || bIsBlocking)
-          return 1;
-      }
-      else if (aIsDisabled)
-      {
-        if (bIsEnabled || bIsWarning)
-          return -1;
-        else if (bIsDisabled)
-          return 0;
-        else if (bIsBlocking)
-          return 1;
-      }
-      else if (aIsBlocking)
-      {
-        if (bIsEnabled || bIsWarning || bIsDisabled)
-          return -1;
-        else if (bIsBlocking)
-          return 0;
-      }
-      throw new IllegalArgumentException("Either a or b is not blocking, warning, disabled, or enabled!");
     }
 
     /**
-     * Returns a POSITIVE NUMBER if a is a controllable and b isn't,
-     * NEGATIVE if b is controllable and a isn't, and ZERO if they are the same
+     * Returns a positive number if a is a controllable and b is not,
+     * negative if b is controllable and a is not, and zero if they are
+     * the same.
      */
      private int sortByType(final EventProxy a, final EventProxy b)
      {
-       if (a.getKind() == EventKind.CONTROLLABLE)
-       {
-         if (b.getKind() == EventKind.CONTROLLABLE)
-           return 0;
-         else
-           return 1;
-       }
-       else
-       {
-         if (b.getKind() == EventKind.CONTROLLABLE)
-           return -1;
-         else
-           return 0;
-       }
+       final EventKind kind1 = a.getKind();
+       final EventKind kind2 = b.getKind();
+       return kind2.compareTo(kind1);
      }
 
      //#######################################################################

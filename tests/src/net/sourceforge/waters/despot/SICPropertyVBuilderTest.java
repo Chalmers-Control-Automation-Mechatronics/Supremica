@@ -258,7 +258,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     final Collection<EventProxy> answerEvents =
         getModelAnswerEvents(group, subdir, name);
     for (final EventProxy answer : answerEvents) {
-      final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
+      final ProductDESProxy modifiedDES = mBuilder.createSIC5Model(answer);
       final File outfilename =
           new File(mOutputDirectory, name.replace(':', '_') + "_"
               + answer.getName().replace(':', '_') + wdesext);
@@ -278,7 +278,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
         getModelAnswerEvents(group, subdir, name);
 
     for (final EventProxy answer : answerEvents) {
-      final ProductDESProxy modifiedDES = mBuilder.createModelForAnswer(answer);
+      final ProductDESProxy modifiedDES = mBuilder.createSIC5Model(answer);
 
       final File outfilename =
           new File(mOutputDirectory, name + "_" + answer.getName() + wdesext);
@@ -350,7 +350,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
-    mBuilder = new SICPropertyVBuilder(mProductDESFactory);
+    mBuilder = new SICPropertyBuilder(mProductDESFactory);
   }
 
   protected void tearDown() throws Exception
@@ -374,5 +374,5 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   private JAXBModuleMarshaller mModuleMarshaller;
   private JAXBProductDESMarshaller mProductDESMarshaller;
   private DocumentManager mDocumentManager;
-  private SICPropertyVBuilder mBuilder;
+  private SICPropertyBuilder mBuilder;
 }

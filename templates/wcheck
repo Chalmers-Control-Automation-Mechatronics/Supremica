@@ -45,7 +45,7 @@ for F in "$@"; do
     -loop)
         CHECK="ControlLoop"
         ;;
-    -sic5)
+    -sic5|-sic6)
         CHECK="Conflict"
         ARGS="$ARGS \"$F\""
         ;;

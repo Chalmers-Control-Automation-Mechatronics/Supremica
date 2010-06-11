@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.despot
-//# CLASS:   SICPropertyVVerifier
+//# CLASS:   SICProperty5Verifier
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,7 +12,6 @@ package net.sourceforge.waters.despot;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -22,60 +21,72 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class SICPropertyVVerifier extends AbstractConflictChecker
+/**
+ * A model verifier to check SIC Property V.
+ *
+ * This wrapper can be used to check whether an HISC low-level model satisfies
+ * Serial Interface Consistency (SIC) Property V or Low-Data Interface
+ * Consistency (LDIC) Property V.
+ *
+ * The check is done by creating a generalised nonblocking verification problem
+ * for each answer event in the model, and passing these models to a generalised
+ * conflict checker.
+ *
+ * @see SICPropertyBuilder
+ * @see ConflictChecker
+ *
+ * @author Rachel Francis
+ */
+
+public class SICProperty5Verifier extends AbstractSICConflictChecker
 {
 
-  // #########################################################################
-  // # Constructors
-  public SICPropertyVVerifier(final ProductDESProxyFactory factory)
+  //#########################################################################
+  //# Constructors
+  public SICProperty5Verifier(final ProductDESProxyFactory factory)
   {
-    this(null, factory);
+    super(factory);
   }
 
-  public SICPropertyVVerifier(final ConflictChecker checker,
+  public SICProperty5Verifier(final ConflictChecker checker,
                               final ProductDESProxyFactory factory)
   {
-    this(checker, null, factory);
+    super(checker, factory);
   }
 
-  public SICPropertyVVerifier(final ConflictChecker checker,
+  public SICProperty5Verifier(final ConflictChecker checker,
                               final ProductDESProxy model,
                               final ProductDESProxyFactory factory)
   {
-    super(model, factory);
-    mChecker = checker;
-    mConflictCheckerStats = new ArrayList<VerificationResult>();
+    super(checker, model, factory);
   }
 
-  // #########################################################################
-  // # Configuration
-  public void setConflictChecker(final ConflictChecker checker)
-  {
-    mChecker = checker;
-  }
 
-  // #########################################################################
-  // # Invocation
+  //#########################################################################
+  //# Invocation
   public boolean run() throws AnalysisException
   {
     setUp();
     try {
       final ProductDESProxy model = getModel();
-      final SICPropertyVBuilder builder =
-          new SICPropertyVBuilder(model, getFactory());
+      final SICPropertyBuilder builder =
+          new SICPropertyBuilder(model, getFactory());
       final List<EventProxy> answers =
           (List<EventProxy>) builder.getAnswerEvents();
+      final int numAnswers = answers.size();
+      mConflictCheckerStats = new ArrayList<VerificationResult>(numAnswers);
       setConflictCheckerMarkings(builder);
+      final ConflictChecker checker = getConflictChecker();
       ProductDESProxy convertedModel = null;
       for (final EventProxy answer : answers) {
-        convertedModel = builder.createModelForAnswer(answer);
-        mChecker.setModel(convertedModel);
-        mChecker.run();
-        final VerificationResult result = mChecker.getAnalysisResult();
+        convertedModel = builder.createSIC5Model(answer);
+        checker.setModel(convertedModel);
+        checker.run();
+        final VerificationResult result = checker.getAnalysisResult();
         recordStatistics(result);
         if (!result.isSatisfied()) {
           final ConflictTraceProxy counterexample =
-              mChecker.getCounterExample();
+              checker.getCounterExample();
           final ConflictTraceProxy convertedTrace =
               builder.convertTraceToOriginalModel(counterexample, answer);
           mFailedAnswer = answer;
@@ -84,6 +95,7 @@ public class SICPropertyVVerifier extends AbstractConflictChecker
       }
       return setSatisfiedResult();
     } finally {
+      mConflictCheckerStats = null;
       tearDown();
     }
   }
@@ -94,17 +106,17 @@ public class SICPropertyVVerifier extends AbstractConflictChecker
   }
 
 
-  // #########################################################################
-  // # Interface net.sourceforge.waters.model.ModelAnalyser
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.ModelAnalyser
   @Override
-  public SICPropertyVVerifierVerificationResult getAnalysisResult()
+  public SICProperty5VerifierVerificationResult getAnalysisResult()
   {
-    return (SICPropertyVVerifierVerificationResult) super.getAnalysisResult();
+    return (SICProperty5VerifierVerificationResult) super.getAnalysisResult();
   }
 
 
-  // #########################################################################
-  // # Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   @Override
   protected void setUp() throws AnalysisException
   {
@@ -115,16 +127,16 @@ public class SICPropertyVVerifier extends AbstractConflictChecker
   }
 
   @Override
-  protected SICPropertyVVerifierVerificationResult createAnalysisResult()
+  protected SICProperty5VerifierVerificationResult createAnalysisResult()
   {
-    return new SICPropertyVVerifierVerificationResult();
+    return new SICProperty5VerifierVerificationResult();
   }
 
   @Override
   protected void addStatistics()
   {
     super.addStatistics();
-    final SICPropertyVVerifierVerificationResult stats = getAnalysisResult();
+    final SICProperty5VerifierVerificationResult stats = getAnalysisResult();
     stats.setPeakNumberOfNodes(mPeakNumberOfNodes);
     stats.setTotalNumberOfStates(mTotalNumberOfStates);
     stats.setPeakNumberOfStates(mPeakNumberOfStates);
@@ -134,15 +146,16 @@ public class SICPropertyVVerifier extends AbstractConflictChecker
   }
 
 
-  // #########################################################################
-  // # Auxiliary Methods
-  private void setConflictCheckerMarkings(final SICPropertyVBuilder builder)
+  //#########################################################################
+  //# Auxiliary Methods
+  private void setConflictCheckerMarkings(final SICPropertyBuilder builder)
   {
     builder.setDefaultMarkings();
     final EventProxy defaultMark = builder.getMarkingProposition();
     final EventProxy preconditionMark = builder.getGeneralisedPrecondition();
-    mChecker.setMarkingProposition(defaultMark);
-    mChecker.setGeneralisedPrecondition(preconditionMark);
+    final ConflictChecker checker = getConflictChecker();
+    checker.setMarkingProposition(defaultMark);
+    checker.setGeneralisedPrecondition(preconditionMark);
   }
 
   private void recordStatistics(final VerificationResult result)
@@ -158,10 +171,9 @@ public class SICPropertyVVerifier extends AbstractConflictChecker
     mConflictCheckerStats.add(result);
   }
 
-  // #########################################################################
-  // # Data Members
-  private ConflictChecker mChecker;
 
+  //#########################################################################
+  //# Data Members
   private EventProxy mFailedAnswer;
 
   private int mPeakNumberOfNodes;
@@ -169,6 +181,6 @@ public class SICPropertyVVerifier extends AbstractConflictChecker
   private double mPeakNumberOfStates;
   private double mTotalNumberOfTransitions;
   private double mPeakNumberOfTransitions;
-  private final List<VerificationResult> mConflictCheckerStats;
+  private List<VerificationResult> mConflictCheckerStats;
 
 }

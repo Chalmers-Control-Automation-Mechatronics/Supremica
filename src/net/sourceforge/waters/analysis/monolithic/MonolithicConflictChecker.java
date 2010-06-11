@@ -33,6 +33,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
 
@@ -816,15 +817,17 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       final Map<Integer,List<Integer>>[] tempTransitionTable =
           new HashMap[numevents];
       for (final EventProxy event : automaton.getEvents()) {
-        final int eventid = eventmap.getId(event);
-        mTransitionTable[eventid] = new int[numstates][];
-        tempTransitionTable[eventid] =
+        if (event.getKind() != EventKind.PROPOSITION) {
+          final int eventid = eventmap.getId(event);
+          mTransitionTable[eventid] = new int[numstates][];
+          tempTransitionTable[eventid] =
             new HashMap<Integer,List<Integer>>(numstates);
-        for (int srcid = 0; srcid < numstates; srcid++) {
-          // final List<Integer> targetlist = new ArrayList<Integer>(1);
-          // targetlist.add(-1);
-          tempTransitionTable[eventid].put(srcid, null);
-          mTransitionTable[eventid][srcid] = null;
+          for (int srcid = 0; srcid < numstates; srcid++) {
+            // final List<Integer> targetlist = new ArrayList<Integer>(1);
+            // targetlist.add(-1);
+            tempTransitionTable[eventid].put(srcid, null);
+            mTransitionTable[eventid][srcid] = null;
+          }
         }
       }
       for (final TransitionProxy trans : automaton.getTransitions()) {

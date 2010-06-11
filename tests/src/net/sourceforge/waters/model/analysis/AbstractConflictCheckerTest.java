@@ -242,11 +242,18 @@ public abstract class AbstractConflictCheckerTest extends
     return current;
   }
 
-  // #########################################################################
-  // # Coreachability Model
-  private ProductDESProxy createLanguageInclusionModel(
-                                                       final ProductDESProxy des,
-                                                       final Map<AutomatonProxy,StateProxy> inittuple)
+  //#########################################################################
+  //# Coreachability Model
+  protected ProductDESProxy createLanguageInclusionModel
+    (final ProductDESProxy des, final Map<AutomatonProxy,StateProxy> inittuple)
+  {
+    return createLanguageInclusionModel(des, inittuple, null);
+  }
+
+  protected ProductDESProxy createLanguageInclusionModel
+    (final ProductDESProxy des,
+     final Map<AutomatonProxy,StateProxy> inittuple,
+     final Collection<EventProxy> disabledEvents)
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final Collection<EventProxy> oldevents = des.getEvents();
@@ -269,8 +276,8 @@ public abstract class AbstractConflictCheckerTest extends
       }
     }
     if (oldmarking == null) {
-      throw new IllegalArgumentException(
-          "Default marking proposition not found in model!");
+      throw new IllegalArgumentException
+        ("Default marking proposition not found in model!");
     }
     final Collection<AutomatonProxy> oldautomata = des.getAutomata();
     final int numaut = oldautomata.size();
@@ -279,8 +286,13 @@ public abstract class AbstractConflictCheckerTest extends
     for (final AutomatonProxy oldaut : oldautomata) {
       final StateProxy init = inittuple.get(oldaut);
       final AutomatonProxy newaut =
-          createLanguageInclusionAutomaton(oldaut, init, oldmarking, newmarking);
+        createLanguageInclusionAutomaton(oldaut, init, oldmarking, newmarking);
       newautomata.add(newaut);
+    }
+    if (disabledEvents != null) {
+      final AutomatonProxy disable = createDisablingAutomaton
+        (":disable", ComponentKind.PLANT, disabledEvents);
+      newautomata.add(disable);
     }
     final AutomatonProxy prop = createPropertyAutomaton(newmarking);
     newautomata.add(prop);
@@ -288,11 +300,11 @@ public abstract class AbstractConflictCheckerTest extends
     return factory.createProductDESProxy(name, newevents, newautomata);
   }
 
-  private AutomatonProxy createLanguageInclusionAutomaton(
-                                                          final AutomatonProxy aut,
-                                                          final StateProxy newinit,
-                                                          final EventProxy oldmarking,
-                                                          final EventProxy newmarking)
+  protected AutomatonProxy createLanguageInclusionAutomaton
+    (final AutomatonProxy aut,
+     final StateProxy newinit,
+     final EventProxy oldmarking,
+     final EventProxy newmarking)
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final Collection<EventProxy> oldevents = aut.getEvents();
@@ -344,20 +356,27 @@ public abstract class AbstractConflictCheckerTest extends
                                         newtransitions);
   }
 
-  private AutomatonProxy createPropertyAutomaton(final EventProxy newmarking)
+  protected AutomatonProxy createPropertyAutomaton(final EventProxy newmarking)
   {
-    final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final String name = ":never:" + newmarking.getName();
     final Collection<EventProxy> events = Collections.singletonList(newmarking);
+    return createDisablingAutomaton(name, ComponentKind.PROPERTY, events);
+  }
+
+  protected AutomatonProxy createDisablingAutomaton
+    (final String name,
+     final ComponentKind kind,
+     final Collection<EventProxy> events)
+  {
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final StateProxy state = factory.createStateProxy("s0", true, null);
     final Collection<StateProxy> states = Collections.singletonList(state);
-    return factory.createAutomatonProxy(name, ComponentKind.PROPERTY, events,
-                                        states, null);
+    return factory.createAutomatonProxy(name, kind, events, states, null);
   }
 
 
-  // #########################################################################
-  // # Data Members
+  //#########################################################################
+  //# Data Members
   private LanguageInclusionChecker mLanguageInclusionChecker;
 
 }

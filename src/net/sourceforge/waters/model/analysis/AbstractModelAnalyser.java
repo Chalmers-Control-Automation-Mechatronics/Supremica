@@ -202,6 +202,14 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   }
 
   /**
+   * Replaces the present result record by the given new result record.
+   */
+  protected void setAnalysisResult(final AnalysisResult result)
+  {
+    mAnalysisResult = result;
+  }
+
+  /**
    * Stores the given Boolean value on the analysis result and marks the run
    * as completed.
    * @return The given Boolean value.

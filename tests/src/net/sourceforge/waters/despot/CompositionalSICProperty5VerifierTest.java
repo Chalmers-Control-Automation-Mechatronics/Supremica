@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.despot
-//# CLASS:   CompositionalSICPropertyVVerifierTest
+//# CLASS:   CompositionalSICProperty5VerifierTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -18,8 +18,8 @@ import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class CompositionalSICPropertyVVerifierTest
-  extends AbstractSICPropertyVVerifierTest
+public class CompositionalSICProperty5VerifierTest
+  extends AbstractSICProperty5VerifierTest
 {
 
   //#########################################################################
@@ -27,7 +27,7 @@ public class CompositionalSICPropertyVVerifierTest
   public static Test suite()
   {
     final TestSuite suite =
-      new TestSuite(CompositionalSICPropertyVVerifierTest.class);
+      new TestSuite(CompositionalSICProperty5VerifierTest.class);
     return suite;
   }
 
@@ -45,7 +45,7 @@ public class CompositionalSICPropertyVVerifierTest
   {
     final ConflictChecker checker =
         new CompositionalGeneralisedConflictChecker(factory);
-    return new SICPropertyVVerifier(checker, factory);
+    return new SICProperty5Verifier(checker, factory);
   }
 
 }

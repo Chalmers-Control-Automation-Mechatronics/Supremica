@@ -8,7 +8,7 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 
 
 /**
- * A result record returned by a {@link SICPropertyVVerifier} A verification
+ * A result record returned by a {@link SICProperty5Verifier} A verification
  * result contains the information on whether the property checked is true or
  * false, and in the latter case, it also contains a counterexample. In
  * addition, it contains individual statistics about the Conflict Checker run
@@ -16,14 +16,14 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
  *
  * @author Rachel Francis
  */
-public class SICPropertyVVerifierVerificationResult extends VerificationResult
+public class SICProperty5VerifierVerificationResult extends VerificationResult
 {
   // #########################################################################
   // # Constructors
   /**
    * Creates a verification result representing an incomplete run.
    */
-  public SICPropertyVVerifierVerificationResult()
+  public SICProperty5VerifierVerificationResult()
   {
     mConflictCheckerStats = new ArrayList<VerificationResult>();
   }

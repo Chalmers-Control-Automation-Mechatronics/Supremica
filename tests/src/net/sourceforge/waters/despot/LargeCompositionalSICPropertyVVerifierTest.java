@@ -26,6 +26,6 @@ public class LargeCompositionalSICPropertyVVerifierTest extends
     checker.setInternalStepNodeLimit(10000);
     checker.setFinalStepNodeLimit(1000000);
     checker.setTransitionLimit(1000000);
-    return new SICPropertyVVerifier(checker, factory);
+    return new SICProperty5Verifier(checker, factory);
   }
 }

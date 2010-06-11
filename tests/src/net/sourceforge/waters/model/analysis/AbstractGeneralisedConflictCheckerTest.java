@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.despot.HISCAttributes;
-import net.sourceforge.waters.despot.SICPropertyVBuilder;
+import net.sourceforge.waters.despot.SICPropertyBuilder;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -51,7 +51,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
   {
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    mBuilder = new SICPropertyVBuilder(factory);
+    mBuilder = new SICPropertyBuilder(factory);
   }
 
   protected void tearDown() throws Exception
@@ -281,7 +281,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     final ProductDESProxy origDES = getCompiledDES(fullName);
     mBuilder.setInputModel(origDES);
     final EventProxy answer = findAnswerEvent(origDES, eventName);
-    final ProductDESProxy answerDES = mBuilder.createModelForAnswer(answer);
+    final ProductDESProxy answerDES = mBuilder.createSIC5Model(answer);
     final DocumentManager docman = getDocumentManager();
     final ProxyMarshaller<ProductDESProxy> marshaller =
         docman.findProxyMarshaller(ProductDESProxy.class);
@@ -324,7 +324,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
 
   // #########################################################################
   // # Data Members
-  private SICPropertyVBuilder mBuilder;
+  private SICPropertyBuilder mBuilder;
   private EventProxy mAlpha = null;
 
 }

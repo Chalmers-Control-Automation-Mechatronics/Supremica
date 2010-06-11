@@ -19,7 +19,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.despot.SICPropertyVVerifier;
+import net.sourceforge.waters.despot.AbstractSICConflictChecker;
+import net.sourceforge.waters.despot.SICProperty5Verifier;
+import net.sourceforge.waters.despot.SICProperty6Verifier;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -100,7 +102,9 @@ public class CommandLineTool
         } else if (arg.equals("-q") || arg.equals("-quiet")) {
           verbose = false;
         } else if (arg.equals("-sic5")) {
-          wrapper = new SICPropertyVVerifier(desFactory);
+          wrapper = new SICProperty5Verifier(desFactory);
+        } else if (arg.equals("-sic6")) {
+          wrapper = new SICProperty6Verifier(desFactory);
         } else if (arg.equals("-stats")) {
           stats = true;
         } else if (arg.equals("-noopt")) {
@@ -176,7 +180,8 @@ public class CommandLineTool
       if (wrapper == null) {
         wrapper = checker;
       } else if (checker instanceof ConflictChecker) {
-        final SICPropertyVVerifier wwrapper = (SICPropertyVVerifier) wrapper;
+        final AbstractSICConflictChecker wwrapper =
+          (AbstractSICConflictChecker) wrapper;
         final ConflictChecker cchecker = (ConflictChecker) checker;
         wwrapper.setConflictChecker(cchecker);
       } else {
