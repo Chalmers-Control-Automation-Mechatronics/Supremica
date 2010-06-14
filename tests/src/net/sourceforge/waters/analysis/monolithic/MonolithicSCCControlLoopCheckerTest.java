@@ -51,6 +51,36 @@ public class MonolithicSCCControlLoopCheckerTest
     return new MonolithicSCCControlLoopChecker(factory);
   }
 
+  public void test_Nasty_TheVicousLoop1() throws Exception
+  {
+    super.test_Nasty_TheVicousLoop1();
+    checkNonLoopEvents(new String[0]);
+  }
+
+  public void test_Nasty_TheVicousLoop2() throws Exception
+  {
+    super.test_Nasty_TheVicousLoop2();
+    checkNonLoopEvents(new String[]{"a", "b", "c"});
+  }
+
+  public void test_Batchtank2005_smr26() throws Exception
+  {
+    super.test_Batchtank2005_smr26();
+    checkNonLoopEvents(new String[]{"open_out", "close_out", "stirrer_on", "stirrer_off"});
+  }
+
+  public void test_Batchtank2005_gjr5() throws Exception
+  {
+    super.test_Batchtank2005_gjr5();
+    checkNonLoopEvents(new String[0]);
+  }
+
+  public void test_Batchtank2005_gb20() throws Exception
+  {
+    super.test_Batchtank2005_gb20();
+    checkNonLoopEvents(new String[]{"open_out", "close_out", "stirrer_on", "stirrer_off"});
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
