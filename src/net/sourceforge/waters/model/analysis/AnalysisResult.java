@@ -22,9 +22,9 @@ import net.sourceforge.waters.model.base.ProxyTools;
  * automata as well as runtime statistics.
  *
  * This base only provides basic information, so it can be determined whether
- * the analysis operation has terminated and if an exception has occurred.
- * It also can store a Boolean result and the time taken. More specific result
- * data can be added by subclasses.
+ * the analysis operation has terminated and if an exception has occurred. It
+ * also can store a Boolean result and the time taken. More specific result data
+ * can be added by subclasses.
  *
  * @author Robi Malik
  */
@@ -32,23 +32,22 @@ import net.sourceforge.waters.model.base.ProxyTools;
 public class AnalysisResult
 {
 
-  //#########################################################################
-  //# Constructors
+  // #########################################################################
+  // # Constructors
   public AnalysisResult()
   {
     mFinished = false;
     mRunTime = -1;
   }
 
-
-  //#########################################################################
-  //# Simple Access Methods
+  // #########################################################################
+  // # Simple Access Methods
   /**
-   * Gets the termination status of this analysis result.
-   * An analysis result may be created while an analysis operation
-   * is in progress.
-   * @return <CODE>true</CODE> to confirm that the result represents a
-   *         completed analysis run, <CODE>false</CODE> otherwise.
+   * Gets the termination status of this analysis result. An analysis result may
+   * be created while an analysis operation is in progress.
+   *
+   * @return <CODE>true</CODE> to confirm that the result represents a completed
+   *         analysis run, <CODE>false</CODE> otherwise.
    */
   public boolean isFinished()
   {
@@ -56,10 +55,9 @@ public class AnalysisResult
   }
 
   /**
-   * Gets the Boolean analysis result.
-   * The Boolean result typically indicates whether model checking has found
-   * a property of interest to be true, or whether synthesis or a similar has
-   * been successful.
+   * Gets the Boolean analysis result. The Boolean result typically indicates
+   * whether model checking has found a property of interest to be true, or
+   * whether synthesis or a similar has been successful.
    */
   public boolean isSatisfied()
   {
@@ -67,10 +65,11 @@ public class AnalysisResult
   }
 
   /**
-   * Gets the exception produced by the analysis run.
-   * If analysis is aborted by an exception, the exception should be stored
-   * on the analysis result. Note, if an exception is set, the Boolean result
-   * and other information may not be accurate.
+   * Gets the exception produced by the analysis run. If analysis is aborted by
+   * an exception, the exception should be stored on the analysis result. Note,
+   * if an exception is set, the Boolean result and other information may not be
+   * accurate.
+   *
    * @see #isSatisfied()
    */
   public AnalysisException getException()
@@ -80,18 +79,19 @@ public class AnalysisResult
 
   /**
    * Gets the runtime of the operation that produced this result.
-   * @return Time taken, in milliseconds. A value of <CODE>-1</CODE>
-   *         indicates that timing information is not available.
+   *
+   * @return Time taken, in milliseconds. A value of <CODE>-1</CODE> indicates
+   *         that timing information is not available.
    */
   public long getRunTime()
   {
     return mRunTime;
   }
 
-
   /**
-   * Sets the Boolean analysis result.
-   * Setting the result also marks the result run as 'finished'.
+   * Sets the Boolean analysis result. Setting the result also marks the result
+   * run as 'finished'.
+   *
    * @see #isSatisfied()
    * @see #isFinished()
    */
@@ -102,8 +102,9 @@ public class AnalysisResult
   }
 
   /**
-   * Stores an exception on this analysis result.
-   * Setting the result also marks the result run as 'finished'.
+   * Stores an exception on this analysis result. Setting the result also marks
+   * the result run as 'finished'.
+   *
    * @see #isFinished()
    */
   public void setException(final AnalysisException exception)
@@ -114,16 +115,17 @@ public class AnalysisResult
 
   /**
    * Sets a runtime for this result.
-   * @param time   Time to be stored, in milliseconds.
+   *
+   * @param time
+   *          Time to be stored, in milliseconds.
    */
   public void setRuntime(final long time)
   {
     mRunTime = time;
   }
 
-
-  //#########################################################################
-  //# Printing
+  // #########################################################################
+  // # Printing
   public void print(final PrintStream stream)
   {
     if (mException != null) {
@@ -142,9 +144,27 @@ public class AnalysisResult
     }
   }
 
+  public void printCSVHorizontal(final PrintStream stream)
+  {
+    if (mException != null) {
+      final String msg = mException.getMessage();
+      stream.print("Exception: " + ProxyTools.getShortClassName(mException)
+          + msg + ",");
+    } else {
+      stream.print(mSatisfied + ",");
+    }
+    final float seconds = 0.001f * mRunTime;
+    stream.print(seconds + "s,");
+  }
 
-  //#########################################################################
-  //# Data Members
+  public void printCSVHorizontalHeadings(final PrintStream stream)
+  {
+    stream.print("Result,");
+    stream.print("Tot RunTime,");
+  }
+
+  // #########################################################################
+  // # Data Members
   private boolean mFinished;
   private boolean mSatisfied;
   private long mRunTime;

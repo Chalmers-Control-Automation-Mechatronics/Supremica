@@ -16,11 +16,10 @@ import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
- * A result record returned by a {@link ModelVerifier}.
- * A verification result contains the information on whether a property
- * checked is true or false, and in the latter case, it also contains
- * a counterexample. In addition, it may contain some statistics about
- * the verification run.
+ * A result record returned by a {@link ModelVerifier}. A verification result
+ * contains the information on whether a property checked is true or false, and
+ * in the latter case, it also contains a counterexample. In addition, it may
+ * contain some statistics about the verification run.
  *
  * @author Robi Malik
  */
@@ -28,8 +27,8 @@ import net.sourceforge.waters.model.des.TraceProxy;
 public class VerificationResult extends AnalysisResult
 {
 
-  //#########################################################################
-  //# Constructors
+  // #########################################################################
+  // # Constructors
   /**
    * Creates a new verification result representing an incomplete run.
    */
@@ -43,12 +42,11 @@ public class VerificationResult extends AnalysisResult
     mPeakNumberOfNodes = -1;
   }
 
-
-  //#########################################################################
-  //# Simple Access Methods
+  // #########################################################################
+  // # Simple Access Methods
   /**
-   * Gets the counter example computed by the model checker,
-   * or <CODE>null</CODE> if the property checked was true.
+   * Gets the counter example computed by the model checker, or
+   * <CODE>null</CODE> if the property checked was true.
    */
   public TraceProxy getCounterExample()
   {
@@ -57,6 +55,7 @@ public class VerificationResult extends AnalysisResult
 
   /**
    * Gets the total number of automata used by the analysis.
+   *
    * @return The number of automata, or <CODE>-1</CODE> if unknown.
    */
   public int getTotalNumberOfAutomata()
@@ -66,6 +65,7 @@ public class VerificationResult extends AnalysisResult
 
   /**
    * Gets the total number of states constructed by the analysis.
+   *
    * @return The total number of states, or <CODE>-1</CODE> if unknown.
    */
   public double getTotalNumberOfStates()
@@ -74,11 +74,11 @@ public class VerificationResult extends AnalysisResult
   }
 
   /**
-   * Gets the maximum number of states constructed by the analysis.
-   * The peak number of states should identify the size of the largest
-   * automaton constructed. For monolithic algorithms, it will be
-   * equal to the total number of states, but for compositional algorithms
-   * it may be different.
+   * Gets the maximum number of states constructed by the analysis. The peak
+   * number of states should identify the size of the largest automaton
+   * constructed. For monolithic algorithms, it will be equal to the total
+   * number of states, but for compositional algorithms it may be different.
+   *
    * @return The peak number of states, or <CODE>-1</CODE> if unknown.
    */
   public double getPeakNumberOfStates()
@@ -87,13 +87,20 @@ public class VerificationResult extends AnalysisResult
   }
 
   /**
-   * <P>Gets the maximum number of nodes used during analysis.</P>
-   * <P>A 'node' here represents a basic unit of memory such as a state
-   * in a synchronous product or a BDD node.</P>
-   * <P><I>Note.</I> It does not make much sense to speak of the total number
-   * of nodes in BDD-based algorithms, as the final number of nodes
-   * often is much smaller than the size of interim BDDs. Therefore,
-   * no total number of nodes will be computed.</P>
+   * <P>
+   * Gets the maximum number of nodes used during analysis.
+   * </P>
+   * <P>
+   * A 'node' here represents a basic unit of memory such as a state in a
+   * synchronous product or a BDD node.
+   * </P>
+   * <P>
+   * <I>Note.</I> It does not make much sense to speak of the total number of
+   * nodes in BDD-based algorithms, as the final number of nodes often is much
+   * smaller than the size of interim BDDs. Therefore, no total number of nodes
+   * will be computed.
+   * </P>
+   *
    * @return The peak number of nodes, or <CODE>-1</CODE> if unknown.
    */
   public int getPeakNumberOfNodes()
@@ -103,6 +110,7 @@ public class VerificationResult extends AnalysisResult
 
   /**
    * Gets the total number of transitions constructed by the analysis.
+   *
    * @return The total number of transitions, or <CODE>-1</CODE> if unknown.
    */
   public double getTotalNumberOfTransitions()
@@ -111,11 +119,12 @@ public class VerificationResult extends AnalysisResult
   }
 
   /**
-   * Gets the maximum number of transitions constructed by the analysis.
-   * The peak number of transitions should identify the size of the largest
-   * automaton constructed. For monolithic algorithms, it will be
-   * equal to the total number of transitions, but for compositional algorithms
-   * it may be different.
+   * Gets the maximum number of transitions constructed by the analysis. The
+   * peak number of transitions should identify the size of the largest
+   * automaton constructed. For monolithic algorithms, it will be equal to the
+   * total number of transitions, but for compositional algorithms it may be
+   * different.
+   *
    * @return The peak number of transitions, or <CODE>-1</CODE> if unknown.
    */
   public double getPeakNumberOfTransitions()
@@ -123,13 +132,12 @@ public class VerificationResult extends AnalysisResult
     return mPeakNumberOfTransitions;
   }
 
-
-  //#########################################################################
-  //# Providing Result Data
+  // #########################################################################
+  // # Providing Result Data
   /**
-   * Sets the counterexample obtained from verification.
-   * Setting the counterexample also marks the verification result as
-   * completed and sets the Boolean result to <CODE>false</CODE>.
+   * Sets the counterexample obtained from verification. Setting the
+   * counterexample also marks the verification result as completed and sets the
+   * Boolean result to <CODE>false</CODE>.
    */
   public void setCounterExample(final TraceProxy counterexample)
   {
@@ -138,8 +146,7 @@ public class VerificationResult extends AnalysisResult
   }
 
   /**
-   * Specifies a value for the total number of automata used by the
-   * analysis.
+   * Specifies a value for the total number of automata used by the analysis.
    */
   public void setNumberOfAutomata(final int numaut)
   {
@@ -203,18 +210,17 @@ public class VerificationResult extends AnalysisResult
   }
 
   /**
-   * Specifies the maximum number of nodes used during analysis.
-   * A 'node' here represents a basic unit of memory such as a state
-   * in a synchronous product or a BDD node.
+   * Specifies the maximum number of nodes used during analysis. A 'node' here
+   * represents a basic unit of memory such as a state in a synchronous product
+   * or a BDD node.
    */
   public void setPeakNumberOfNodes(final int numnodes)
   {
     mPeakNumberOfNodes = numnodes;
   }
 
-
-  //#########################################################################
-  //# Printing
+  // #########################################################################
+  // # Printing
   public void print(final PrintStream stream)
   {
     super.print(stream);
@@ -223,16 +229,14 @@ public class VerificationResult extends AnalysisResult
       stream.println("Total number of automata: " + mTotalNumberOfAutomata);
     }
     if (mTotalNumberOfStates >= 0) {
-      formatter.format("Total number of states: %.0f\n",
-                       mTotalNumberOfStates);
+      formatter.format("Total number of states: %.0f\n", mTotalNumberOfStates);
     }
     if (mTotalNumberOfTransitions >= 0) {
       formatter.format("Total number of transitions: %.0f\n",
                        mTotalNumberOfTransitions);
     }
     if (mPeakNumberOfStates >= 0) {
-      formatter.format("Peak number of states: %.0f\n",
-                       mPeakNumberOfStates);
+      formatter.format("Peak number of states: %.0f\n", mPeakNumberOfStates);
     }
     if (mPeakNumberOfTransitions >= 0) {
       formatter.format("Peak number of transitions: %.0f\n",
@@ -243,9 +247,30 @@ public class VerificationResult extends AnalysisResult
     }
   }
 
+  public void printCSVHorizontal(final PrintStream stream)
+  {
+    super.printCSVHorizontal(stream);
+    stream.print(mTotalNumberOfAutomata + ",");
+    stream.print(mTotalNumberOfStates + ",");
+    stream.print(mTotalNumberOfTransitions + ",");
+    stream.print(mPeakNumberOfStates + ",");
+    stream.print(mPeakNumberOfTransitions + ",");
+    stream.print(mPeakNumberOfNodes + ",");
+  }
 
-  //#########################################################################
-  //# Data Members
+  public void printCSVHorizontalHeadings(final PrintStream stream)
+  {
+    super.printCSVHorizontalHeadings(stream);
+    stream.print("Tot aut,");
+    stream.print("Tot states,");
+    stream.print("Tot trans,");
+    stream.print("Peak states,");
+    stream.print("Peak trans,");
+    stream.print("Peak nodes,");
+  }
+
+  // #########################################################################
+  // # Data Members
   private TraceProxy mCounterExample;
   private int mTotalNumberOfAutomata;
   private double mTotalNumberOfStates;

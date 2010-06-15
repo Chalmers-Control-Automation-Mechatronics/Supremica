@@ -173,6 +173,7 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
                                          final int numRules)
   {
     stream.print("Model name,");
+    super.printCSVHorizontalHeadings(stream);
     stream.print("Succ composed,");
     stream.print("Unsucc composed,");
     stream.print("Prob candidate unsucc,");
@@ -188,6 +189,7 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
 
   public void printCSVHorizontal(final PrintStream stream)
   {
+    super.printCSVHorizontal(stream);
     stream.print(mSuccessfulCompositionCount + ",");
     stream.print(mUnsuccessfulCompositionCount + ",");
 
