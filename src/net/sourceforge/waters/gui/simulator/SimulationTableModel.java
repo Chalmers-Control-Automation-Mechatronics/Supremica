@@ -29,7 +29,7 @@ abstract class SimulationTableModel
     if (mSimulation == null) {
       return null;
     } else {
-      return mSimulation.getContainer();
+      return mSimulation.getModuleContainer();
     }
   }
 

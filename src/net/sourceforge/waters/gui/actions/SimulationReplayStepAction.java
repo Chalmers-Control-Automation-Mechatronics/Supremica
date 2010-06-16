@@ -17,6 +17,7 @@ public class SimulationReplayStepAction
   extends WatersSimulationAction
   implements SimulationObserver
 {
+
   //#########################################################################
   //# Constructor
   SimulationReplayStepAction(final IDE ide)
@@ -29,6 +30,7 @@ public class SimulationReplayStepAction
              KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
   }
 
+
   //#########################################################################
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
@@ -40,6 +42,7 @@ public class SimulationReplayStepAction
     }
   }
 
+
   //#########################################################################
   //# Auxiliary Methods
   void updateEnabledStatus()
@@ -47,19 +50,17 @@ public class SimulationReplayStepAction
     final Simulation sim = getObservedSimulation();
     if (sim == null) {
       setEnabled(false);
+    } else if (sim.getTrace() != null) {
+      setEnabled(sim.getHistorySize() != sim.getCurrentTime() + 1 ||
+                 sim.getTrace() instanceof LoopTraceProxy);
     } else {
-      if (sim.getTrace() != null)
-      {
-        setEnabled(sim.getEventHistory().size() != sim.getCurrentTime() + 1 || LoopTraceProxy.class.isInstance(sim.getTrace()));
-      }
-      else
-      {
-        setEnabled(sim.getEventHistory().size() != sim.getCurrentTime() + 1);
-      }
+      setEnabled(sim.getHistorySize() != sim.getCurrentTime() + 1);
     }
   }
+
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
+
 }

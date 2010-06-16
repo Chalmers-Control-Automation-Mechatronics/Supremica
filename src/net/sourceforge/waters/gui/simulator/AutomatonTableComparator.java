@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.ImageIcon;
-
-import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.model.base.Pair;
 
 import java.lang.Comparable;
@@ -19,8 +16,8 @@ class AutomatonTableComparator implements Comparator<Object>
   //# Constructor
   AutomatonTableComparator()
   {
-    sortingMethods = new ArrayList<Pair<Boolean, Integer>>();
-    sortingMethods.add(new Pair<Boolean, Integer>(true, 1));
+    mSortingMethods = new ArrayList<Pair<Boolean, Integer>>();
+    mSortingMethods.add(new Pair<Boolean, Integer>(true, 1));
   }
 
 
@@ -29,78 +26,61 @@ class AutomatonTableComparator implements Comparator<Object>
   void addNewSortingMethod(final int column)
   {
     Pair<Boolean, Integer> remove = null;
-    for (final Pair<Boolean, Integer> method : sortingMethods)
+    for (final Pair<Boolean, Integer> method : mSortingMethods)
     {
       if (method.getSecond() == column)
         remove = method;
     }
     if (remove != null)
     {
-      sortingMethods.remove(remove);
-      sortingMethods.add(0, new Pair<Boolean, Integer>(!remove.getFirst(), column));
+      mSortingMethods.remove(remove);
+      mSortingMethods.add(0, new Pair<Boolean, Integer>(!remove.getFirst(), column));
     }
     else
-      sortingMethods.add(0, new Pair<Boolean, Integer>(true, column));
+      mSortingMethods.add(0, new Pair<Boolean, Integer>(true, column));
   }
 
   public String toString()
   {
-    return sortingMethods.toString();
+    return mSortingMethods.toString();
   }
 
+
   //#########################################################################
-  //# Interface Comparator
+  //# Interface java.util.Comparator<Object>
   @SuppressWarnings("unchecked")
   public int compare(final Object o1, final Object o2)
   {
-    if (!checkValid(o1) || !checkValid(o2))
-      throw new ClassCastException("Either o1 or o2 do not have the type array, and don't have the types {Icon, String, Icon, Icon, String");
-    for (final Pair<Boolean, Integer> sortingMethod : sortingMethods)
-    {
-      final List arrayO1 = (List)o1;
-      final List arrayO2 = (List)o2;
-      Comparable<Object> compare01;
-      Comparable<Object> compare02;
-      try
-      {
-        compare01 = (Comparable<Object>)arrayO1.get(sortingMethod.getSecond());
-        compare02 = (Comparable<Object>)arrayO2.get(sortingMethod.getSecond());
+    final List<?> list1 = (List<?>) o1;
+    final List<?> list2 = (List<?>) o2;
+    for (final Pair<Boolean,Integer> sortingMethod : mSortingMethods) {
+      final boolean ascending = sortingMethod.getFirst();
+      final int index = sortingMethod.getSecond();
+      final Object item1 = list1.get(index);
+      final Object item2 = list2.get(index);
+      final int comp;
+      if (item1 == null && item2 != null) {
+        return ascending ? 1 : -1;
+      } else if (item2 == null) {
+        return ascending ? -1 : 1;
+      } else if (item1 instanceof Comparable<?>) {
+        final Comparable<Object> comp1 = (Comparable<Object>) item1;
+        comp = comp1.compareTo(item2);
+      } else {
+        final String comp1 = item1.toString();
+        final String comp2 = item2.toString();
+        comp = comp1.compareTo(comp2);
       }
-      catch (final ClassCastException e)
-      {
-        compare01 = (Comparable<Object>)(Object)(arrayO1.get(sortingMethod.getSecond()).toString());
-        compare02 = (Comparable<Object>)(Object)(arrayO2.get(sortingMethod.getSecond()).toString());
+      if (comp != 0) {
+        return ascending ? comp : -comp;
       }
-      final int compared = compare01.compareTo(compare02);
-      if (compared < 0)
-        if (sortingMethod.getFirst())
-          return -1;
-        else return 1;
-      else if (compared > 0)
-        if (sortingMethod.getFirst())
-          return 1;
-        else
-          return -1;
     }
     return 0;
-  }
-
-  //#########################################################################
-  //# Auxiliary Methods
-  @SuppressWarnings("unchecked")
-  private boolean checkValid(final Object object)
-  {
-    final List<Object> array = (List<Object>)object;
-    return (array.get(0).getClass()== ImageIcon.class
-        && array.get(1).getClass() == String.class
-        && array.get(2).getClass() == ImageIcon.class
-        && array.get(3).getClass() == PropositionIcon.class
-        && array.get(4).getClass() == String.class);
   }
 
 
   //#########################################################################
   //# Data Members
-  private final List<Pair<Boolean, Integer>> sortingMethods;
+  private final List<Pair<Boolean,Integer>> mSortingMethods;
 
 }

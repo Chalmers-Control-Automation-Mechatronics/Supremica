@@ -62,7 +62,7 @@ class AutomataTable extends JTable
     listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     getTableHeader().addMouseListener(new TableHeaderMouseListener());
     setShowGrid(!DISABLE_AUTOMATON_GRIDLINES);
-    factory = new AutomatonTablePopupFactory(sim.getContainer().getIDE().getPopupActionManager(), mDesktop);
+    factory = new AutomatonTablePopupFactory(sim.getModuleContainer().getIDE().getPopupActionManager(), mDesktop);
     this.addMouseMotionListener(new MouseMotionListener(){
       public void mouseDragged(final MouseEvent e)
       {
@@ -72,8 +72,11 @@ class AutomataTable extends JTable
       public void mouseMoved(final MouseEvent e)
       {
         final int row = AutomataTable.this.rowAtPoint(e.getPoint());
-        final AutomatonProxy auto = AutomataTable.this.getModel().getAutomaton(row);
-        setToolTipText(AutomatonPopupFactory.getToolTipName(auto, sim, true));
+        final AutomatonProxy aut =
+          AutomataTable.this.getModel().getAutomaton(row);
+        final ToolTipVisitor visitor = sim.getToolTipVisitor();
+        final String tooltip = visitor.getToolTip(aut, true);
+        setToolTipText(tooltip);
       }
     });
   }
@@ -155,7 +158,7 @@ class AutomataTable extends JTable
         if (row >= 0) {
           final AutomataTableModel model = getModel();
           final AutomatonProxy toAdd = model.getAutomaton(row);
-          mDesktop.addAutomaton(toAdd.getName(), mSimulation.getContainer(),
+          mDesktop.addAutomaton(toAdd.getName(), mSimulation.getModuleContainer(),
                                 mSimulation, event.getClickCount());
         }
       }

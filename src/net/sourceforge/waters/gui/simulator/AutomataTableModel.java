@@ -71,7 +71,7 @@ class AutomataTableModel
 
   public int getRowCount()
   {
-    return getSimulation().getAutomata().size();
+    return getSimulation().getOrderedAutomata().size();
   }
 
   public Class<?> getColumnClass(final int column)
@@ -154,7 +154,8 @@ class AutomataTableModel
     final ModuleContainer container = getModuleContainer();
     if (container != null) {
       final List<List<Object>> output = new ArrayList<List<Object>>();
-      final ArrayList<AutomatonProxy> automata = getSimulation().getAutomata();
+      final List<AutomatonProxy> automata =
+        getSimulation().getOrderedAutomata();
       for (final AutomatonProxy aut : automata) {
         final List<Object> row = new ArrayList<Object>();
         if (container.getSourceInfoMap().get(aut).getSourceObject().getClass() == VariableComponentSubject.class)
@@ -163,9 +164,9 @@ class AutomataTableModel
           row.add(ModuleContext.getComponentKindIcon(aut.getKind()));
         row.add(aut.getName());
         row.add(getSimulation().getAutomatonActivityIcon(aut));
-        final StateProxy currentState = getSimulation().getCurrentStates().get(aut);
+        final StateProxy currentState = getSimulation().getCurrentState(aut);
         row.add(getSimulation().getMarkingIcon(currentState, aut, false));
-        row.add(getSimulation().getCurrentStates().get(aut).getName());
+        row.add(currentState.getName());
         output.add(row);
       }
       Collections.sort(output, mComparator);

@@ -30,7 +30,7 @@ public class SimulationResetAction
     final SimulatorPanel panel = getActiveSimulatorPanel();
     if (panel != null) {
       final Simulation sim = getObservedSimulation();
-      sim.reset(false);
+      sim.resetState(false);
     }
   }
 
@@ -44,7 +44,7 @@ public class SimulationResetAction
       putValue(Action.NAME, "Reset");
       putValue(Action.SHORT_DESCRIPTION, "Reset the Simulation");
     } else {
-      setEnabled(sim.getEventHistory().size() != 0);
+      setEnabled(sim.getHistorySize() != 0);
       if (sim.getTrace() != null)
       {
         putValue(Action.NAME, "Restore Trace");

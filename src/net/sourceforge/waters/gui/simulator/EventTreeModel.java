@@ -15,8 +15,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -40,7 +38,7 @@ class EventTreeModel
     sim.attach(this);
     mSim = sim;
     mSortingEvents = sortingEvents;
-    mSortedEvents = sim.getAllEvents();
+    mSortedEvents = sim.getOrderedEvents();
     setupAllEvents(mSim, sortingEvents);
   }
 
@@ -122,7 +120,7 @@ class EventTreeModel
   {
     if (mListeners != null) {
       for (final TreeModelListener l : mListeners)
-        for (final EventProxy selectedEvent : event.getSource().getAllEvents())
+        for (final EventProxy selectedEvent : event.getSource().getOrderedEvents())
           l.treeNodesChanged(new TreeModelEvent(this, new Object[]{event.getSource(), selectedEvent}));
       setupAllEvents(mSim, mSortingEvents);
     }
@@ -199,35 +197,10 @@ class EventTreeModel
     {
       if (a == b) {
         return 0;
-      }
-      final Set<EventProxy> enabled = mSim.getActiveEvents();
-      final boolean aIsEnabled = enabled.contains(a);
-      final boolean bIsEnabled = enabled.contains(b);
-      if (aIsEnabled != bIsEnabled) {
-        return aIsEnabled ? -1 : 1;
-      }
-      boolean aIsWarning = false;
-      boolean bIsWarning = false;
-      for (final Step step : mSim.getWarningProperties().keySet()) {
-        if (step.getEvent() == a) {
-          aIsWarning = true;
-        } else if (step.getEvent() == b) {
-          bIsWarning = true;
-        }
-      }
-      if (aIsWarning != bIsWarning) {
-        return aIsWarning ? -1 : 1;
-      }
-      final boolean aIsBlocking = !mSim.getNonControllable(a).isEmpty();
-      final boolean bIsBlocking = !mSim.getNonControllable(b).isEmpty();
-      final boolean aIsDisabled = !aIsEnabled && !aIsBlocking && !aIsWarning;
-      final boolean bIsDisabled = !bIsEnabled && !bIsBlocking && !bIsWarning;
-      if (aIsDisabled != bIsDisabled) {
-        return aIsDisabled ? -1 : 1;
-      } else if (aIsBlocking != bIsBlocking) {
-        return aIsBlocking ? -1 : 1;
       } else {
-        return 0;
+        final EventStatus status1 = mSim.getEventStatus(a);
+        final EventStatus status2 = mSim.getEventStatus(b);
+        return status2.compareTo(status1);
       }
     }
 

@@ -23,30 +23,29 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
     setupAllEvents(sim, sortingMethods, expandedNodes);
   }
 
-  // #################################################################
-  // # Interface SimulationObserver
 
+  //#########################################################################
+  //# Interface SimulationObserver
   public void simulationChanged(final SimulationChangeEvent event)
   {
     mSim.detach(this);
     // This mutable tree node has now become invalidated
   }
 
-  // ##################################################################
-  // # Auxillary Functions
 
+  //#########################################################################
+  //# Auxiliary Functions
   private void setupAllEvents(final Simulation sim, final List<Pair<Boolean, Integer>> sortingMethods,
       final ArrayList<String> expandedNodes)
   {
-    final ArrayList<Integer> sortedIndexes = sortArrayList(sim.getAllEvents(), sortingMethods);
+    final ArrayList<Integer> sortedIndexes = sortArrayList(sim.getOrderedEvents(), sortingMethods);
+    final int time = mSim.getCurrentTime();
     for (final Integer index : sortedIndexes)
     {
-      final EventProxy event = sim.getAllEvents().get(index);
-      final DefaultMutableTreeNode eventToAdd= new EventBranchNode(event, sim.getCurrentTime());
+      final EventProxy event = sim.getOrderedEvents().get(index);
+      final DefaultMutableTreeNode eventToAdd =
+        TraceStepTreeNode.createEventStepNode(event, time);
       this.add(eventToAdd);
-      eventToAdd.add(new DefaultMutableTreeNode("Placeholder. You shouldn't ever see this"));
-      // To ensure that the events menu can be expanded. This is removed as soon as the menu is expanded however.
-      // It appears as a grey box on the TraceJTree however.
     }
   }
 
@@ -94,7 +93,7 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
       compare = sortByName(a, b);
       break;
     case 2:
-      compare = sortByEnabled(a, b);
+      compare = sortByStatus(a, b);
       break;
     default:
       throw new UnsupportedOperationException("Unsupported Sort Method");
@@ -108,61 +107,30 @@ public class EventMutableTreeNode extends DefaultMutableTreeNode implements Simu
 
   /**
    * Returns a POSITIVE NUMBER if a comes before b alphabetically, NEGATIVE number if b comes before a, and ZERO if they are equal
-   * @param a
-   * @param b
-   * @return
    */
-  public int sortByName(final EventProxy a, final EventProxy b)
+  private int sortByName(final EventProxy a, final EventProxy b)
   {
     return -a.getName().compareTo(b.getName());
   }
 
   /**
    * Returns a POSITIVE NUMBER if a is enabled and b isn't, NEGATIVE if b is enabled and a isn't, and ZERO if they are the same
-   * @param a
-   * @param b
-   * @return
    */
-  public int sortByEnabled(final EventProxy a, final EventProxy b)
+  private int sortByStatus(final EventProxy a, final EventProxy b)
   {
-    if (mSim.getActiveEvents().contains(a))
-    {
-      if (mSim.getValidTransitions().contains(b))
-        return 0;
-      else
-        return 1;
-    }
-    else
-    {
-      if (mSim.getActiveEvents().contains(b))
-        return -1;
-      else
-        return 0;
-    }
+    final EventStatus status1 = mSim.getEventStatus(a);
+    final EventStatus status2 = mSim.getEventStatus(b);
+    return status1.compareTo(status2);
   }
 
   /**
    * Returns a POSITIVE NUMBER if a is a controllable and b isn't, NEGATIVE if b is controllable and a isn't, and ZERO if they are the same
-   * @param a
-   * @param b
-   * @return
    */
-    public int sortByType(final EventProxy a, final EventProxy b)
+   private int sortByType(final EventProxy a, final EventProxy b)
    {
-     if (a.getKind() == EventKind.CONTROLLABLE)
-     {
-       if (b.getKind() == EventKind.CONTROLLABLE)
-         return 0;
-       else
-         return 1;
-     }
-     else
-     {
-       if (b.getKind() == EventKind.CONTROLLABLE)
-         return -1;
-       else
-         return 0;
-     }
+     final EventKind kind1 = a.getKind();
+     final EventKind kind2 = b.getKind();
+     return kind1.compareTo(kind2);
    }
 
 

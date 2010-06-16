@@ -12,8 +12,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.JTableHeader;
 
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.plain.des.ConflictTraceElement;
-import net.sourceforge.waters.plain.des.LoopTraceElement;
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.IDEDimensions;
 import org.supremica.gui.ide.MainPanel;
@@ -23,9 +21,9 @@ import org.supremica.gui.ide.ModuleContainer;
 public class SimulatorPanel
   extends MainPanel
 {
-  // #########################################################################
-  // # Constructor
 
+  //#########################################################################
+  //# Constructor
   public SimulatorPanel(final ModuleContainer moduleContainer,
                         final String name)
   {
@@ -42,22 +40,22 @@ public class SimulatorPanel
     setLeftComponent(mTabbedPane);
   }
 
-  // #########################################################################
-  // # Simple Access
+  //#########################################################################
+  //# Simple Access
   public Simulation getSimulation()
   {
     return mSimulation;
   }
 
-  public void switchToTraceMode(final TraceProxy trace) throws NonDeterministicException
+  public void switchToTraceMode(final TraceProxy trace)
   {
-    mSimulation.run(trace, trace instanceof ConflictTraceElement || trace instanceof LoopTraceElement);
+    mSimulation.switchToTraceMode(trace);
     mTabbedPane.setSelectedIndex(2);
   }
 
 
-  // #########################################################################
-  // # Auxiliary Methods
+  //#########################################################################
+  //# Auxiliary Methods
   private void setupDesktop()
   {
     mDesktop = new AutomatonDesktopPane(mModuleContainer, mSimulation);
@@ -84,7 +82,7 @@ public class SimulatorPanel
 
   private void setupTrace()
   {
-    mTraceTree = new TraceJTree(mSimulation, mDesktop, mModuleContainer);
+    mTraceTree = new TraceJTree(mSimulation, mDesktop);
     final JScrollPane scroll = new JScrollPane(mTraceTree);
     mTraceTree.addScrollPane(scroll);
     mTracePanel.setLayout(new BorderLayout());
@@ -94,7 +92,7 @@ public class SimulatorPanel
 
   private void setupEvents()
   {
-    mEventsTree = new EventJTree(mSimulation, mDesktop, mModuleContainer);
+    mEventsTree = new EventJTree(mSimulation, mDesktop);
     final JScrollPane scroll = new JScrollPane(mEventsTree);
     if (EVENT_VERTICAL_SCROLLBAR_ALWAYS)
       scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);

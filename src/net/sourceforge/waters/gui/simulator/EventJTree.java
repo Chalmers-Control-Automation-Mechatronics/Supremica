@@ -10,7 +10,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,113 +24,56 @@ import javax.swing.tree.TreeSelectionModel;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.IconLoader;
-import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Pair;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
-public class EventJTree extends JTree implements InternalFrameObserver, SimulationObserver, ComponentListener
+public class EventJTree
+  extends JTree
+  implements InternalFrameObserver, SimulationObserver, ComponentListener
 {
 
-  public EventJTree(final Simulation sim, final AutomatonDesktopPane desktop, final ModuleContainer container)
+  //#########################################################################
+  //# Constructor
+  public EventJTree(final Simulation sim,
+                    final AutomatonDesktopPane desktop)
   {
-    super();
-    this.setCellRenderer(new EventTreeCellRenderer());
+    setCellRenderer(new EventTreeCellRenderer());
     mSim = sim;
     mDesktop = desktop;
     mPane = null;
     desktop.attach(this);
     sim.attach(this);
     automatonAreOpen = new ArrayList<String>();
-    mContainer = container;
     mSortingMethods = new ArrayList<Pair<Boolean, Integer>>();
     expandedNodes = new ArrayList<String>();
-    this.setModel(new EventTreeModel(mSim, mSortingMethods));
-    this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    setModel(new EventTreeModel(mSim, mSortingMethods));
+    getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
+    final ModuleContainer container = sim.getModuleContainer();
     factory = new EventTreePopupFactory(container.getIDE().getPopupActionManager(), mDesktop);
-    this.addMouseListener(new MouseListener(){
+    addMouseListener(new MouseListener() {
       public void mouseClicked(final MouseEvent e)
       {
-        if (e.getClickCount() == 2)
-        {
-          final TreePath path = EventJTree.this.getClosestPathForLocation((int)e.getPoint().getX(), (int)e.getPoint().getY());
+        if (e.getClickCount() == 2) {
+          final TreePath path = getClosestPathForLocation((int)e.getPoint().getX(), (int)e.getPoint().getY());
           final Object node = path.getLastPathComponent();
           if (node == null)
             return; // Nothing is selected
-          if (EventProxy.class.isInstance(node))
-          {
-            try {
-              if (eventCanBeFired(mSim, (EventProxy)node))
-                fireEvent((EventProxy)node);
-              else
-                mContainer.getIDE().error("That event is blocked");
-            } catch (final NonDeterministicException exception) {
-              mContainer.getIDE().error("Uncontrollable Event detected: " + exception.getMessage() + ". No event has been fired.");
-            } catch (final IllegalArgumentException exception) {
-              mContainer.getIDE().error(exception.getMessage() + ". No event has been fired");
-            }
-          }
-          else if (AutomatonProxy.class.isInstance(node))
-          {
-            final AutomatonProxy toAdd = (AutomatonProxy)node;
-            mDesktop.addAutomaton(toAdd.getName(), mSim.getContainer(), mSim, 2);
-          }
-        }
-      }
-
-      private boolean eventCanBeFired(final Simulation sim, final EventProxy event)
-      {
-        return sim.getActiveEvents().contains(event);
-      }
-
-      private void fireEvent(final EventProxy node) throws NonDeterministicException
-      {
-
-        final ArrayList<JLabel> labels = new ArrayList<JLabel>();
-        final ArrayList<Step> steps = new ArrayList<Step>();
-        for (final Step step: mSim.getValidTransitions())
-        {
-          if (step.getEvent() == node)
-          {
-            final JLabel toAdd = new JLabel(step.toString());
-            if (node.getKind() == EventKind.CONTROLLABLE)
-              toAdd.setIcon(IconLoader.ICON_CONTROLLABLE);
-            else if (node.getKind() == EventKind.UNCONTROLLABLE)
-              toAdd.setIcon(IconLoader.ICON_UNCONTROLLABLE);
-            else
-              toAdd.setIcon(IconLoader.ICON_PROPOSITION);
-            labels.add(toAdd);
-            steps.add(step);
-          }
-        }
-        if (labels.size() == 0)
-          mContainer.getIDE().error(": That event cannot be fired");
-        else if (labels.size() == 1)
-          mSim.step(steps.get(0));
-        else
-        {
-          final JLabel[] arrayLabels = new JLabel[labels.size()];
-          final Step[] arraySteps = new Step[steps.size()];
-          for (int looper = 0; looper < labels.size(); looper++)
-          {
-            arrayLabels[looper] = labels.get(looper);
-            arraySteps[looper] = steps.get(looper);
-          }
-          final EventChooserDialog dialog = new EventChooserDialog(mContainer.getIDE(), arrayLabels, arraySteps);
-          dialog.setVisible(true);
-          if (!dialog.wasCancelled())
-          {
-            mSim.step(dialog.getSelectedStep());
+          if (node instanceof EventProxy) {
+            final EventProxy event = (EventProxy) node;
+            mSim.step(event);
+          } else if (node instanceof AutomatonProxy) {
+            final AutomatonProxy aut = (AutomatonProxy) node;
+            mDesktop.addAutomaton(aut.getName(), container, mSim, 2);
           }
         }
       }
@@ -164,35 +106,10 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
       {
         final TreePath path = EventJTree.this.getClosestPathForLocation(e.getX(), e.getY());
         final Object comp = path.getLastPathComponent();
-        if (EventProxy.class.isInstance(comp))
-        {
-          String toolTipText = "";
-          final EventProxy event = (EventProxy)comp;
-          if (event.getKind() == EventKind.CONTROLLABLE)
-          {
-            toolTipText += "Controllable";
-          }
-          else
-            toolTipText += "Uncontrollable";
-          toolTipText += " Event " + event.getName();
-          if (mSim.getInvalid(event).size() == 0)
-            toolTipText += " is enabled";
-          else
-            toolTipText += " is disabled";
-          Step warning = null;
-          for (final Step step : mSim.getWarningProperties().keySet())
-          {
-            if (step.getEvent() == event)
-              warning = step;
-          }
-          if (warning != null)
-            toolTipText += ", firing this event will cause the property " + mSim.getWarningProperties().get(warning).getName() + " to be disabled";
-          setToolTipText(toolTipText);
-        }
-        else if (AutomatonProxy.class.isInstance(comp))
-        {
-          setToolTipText(AutomatonPopupFactory.getToolTipName((AutomatonProxy)comp, mSim, true));
-        }
+        final Proxy proxy = (Proxy) comp;
+        final ToolTipVisitor visitor = mSim.getToolTipVisitor();
+        final String tooltip = visitor.getToolTip(proxy, true);
+        setToolTipText(tooltip);
       }
 
       public void mouseDragged(final MouseEvent e)
@@ -227,14 +144,13 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
     });
   }
 
+  //########################################################################
+  //# Access
   public void addPane(final JScrollPane pane)
   {
     mPane = pane;
     mPane.addComponentListener(this);
   }
-
-  // ##################################################################
-  // # Simple Access
 
   public void sortBy(final int index)
   {
@@ -282,11 +198,11 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
     for (int looper = 0; looper < expandedNodes.size(); looper++)
     {
       final String name = expandedNodes.get(looper);
-      for (int nodeIndex = 0; nodeIndex < mSim.getAllEvents().size(); nodeIndex++)
+      for (int nodeIndex = 0; nodeIndex < mSim.getOrderedEvents().size(); nodeIndex++)
       {
-        if (mSim.getAllEvents().get(nodeIndex).getName().compareTo(name) == 0)
+        if (mSim.getOrderedEvents().get(nodeIndex).getName().compareTo(name) == 0)
         {
-          this.expandPath(new TreePath(new Object[]{mSim, mSim.getAllEvents().get(nodeIndex)}));
+          this.expandPath(new TreePath(new Object[]{mSim, mSim.getOrderedEvents().get(nodeIndex)}));
         }
       }
     }
@@ -343,11 +259,11 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
     repaint();
   }
 
-  // ########################################################################
-  // # Inner Classes
 
+  //#########################################################################
+  //# Inner Class EventTreeCellRenderer
   private class EventTreeCellRenderer
-  implements TreeCellRenderer
+    implements TreeCellRenderer
   {
 
     //#######################################################################
@@ -362,14 +278,14 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
       mEventStatusLabel = new JLabel();
       mEventPanel.add(mEventNameLabel);
       mEventPanel.add(mEventStatusLabel);
-      mAutomataPanel = new JPanel();
-      mAutomataPanel.setLayout(layout);
-      mAutomataNameLabel = new JLabel();
-      mAutomataIconLabel = new JLabel();
-      mAutomataStatusLabel = new JLabel();
-      mAutomataPanel.add(mAutomataNameLabel);
-      mAutomataPanel.add(mAutomataIconLabel);
-      mAutomataPanel.add(mAutomataStatusLabel);
+      mAutomatonPanel = new JPanel();
+      mAutomatonPanel.setLayout(layout);
+      mAutomatonNameLabel = new JLabel();
+      mAutomatonIconLabel = new JLabel();
+      mAutomatonStatusLabel = new JLabel();
+      mAutomatonPanel.add(mAutomatonNameLabel);
+      mAutomatonPanel.add(mAutomatonIconLabel);
+      mAutomatonPanel.add(mAutomatonStatusLabel);
     }
 
     //#######################################################################
@@ -379,8 +295,7 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
        final boolean expanded, final boolean leaf,
        final int row, final boolean hasFocus)
     {
-       if (EventProxy.class.isInstance(value))
-       {
+       if (value instanceof EventProxy) {
          if (sel)
            mEventPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
          else
@@ -400,124 +315,98 @@ public class EventJTree extends JTree implements InternalFrameObserver, Simulati
         mEventNameLabel.setPreferredSize(new Dimension(leftWidth, rowHeight));
         mEventStatusLabel.setPreferredSize(new Dimension(rightWidth, rowHeight));
         return mEventPanel;
-      }
-      else if (AutomatonProxy.class.isInstance(value))
-      {
-        if (sel)
-          mAutomataPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
-        else
-          mAutomataPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
-        final AutomatonProxy autoProxy = (AutomatonProxy)value;
-        mAutomataNameLabel.setText(autoProxy.getName());
-        if (mContainer.getSourceInfoMap().get(autoProxy).getSourceObject().getClass() == VariableComponentSubject.class)
-          mAutomataNameLabel.setIcon(IconLoader.ICON_VARIABLE);
-        else
-          mAutomataNameLabel.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
-        final EventProxy parentEvent = getParentEvent(row);
-        if (mSim.getNonControllable(parentEvent) != null)
-        {
-          if (mSim.getNonControllable(parentEvent).contains(autoProxy))
-          {
-            mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_BLOCKING_EVENT);
-          }
-          else
-          {
-            if (mSim.getInvalid(parentEvent).contains(autoProxy))
-              mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_INVALID_EVENT);
-            else
-              mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_VALID_EVENT);
-          }
-          for (final Step step : mSim.getWarningProperties().keySet())
-          {
-            if (step.getEvent() == parentEvent && mSim.getWarningProperties().get(step) == autoProxy)
-              mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_CAUSES_WARNING_EVENT);
-          }
+      } else if (value instanceof AutomatonProxy) {
+        if (sel) {
+          mAutomatonPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
+        } else {
+          mAutomatonPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
         }
-        else
-        {
-          if (mSim.getInvalid(parentEvent).contains(autoProxy))
-            mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_DISABLED_AUTOMATON);
-          else
-            mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_ENABLED_AUTOMATON);
-          for (final Step step : mSim.getWarningProperties().keySet())
-          {
-            if (step.getEvent() == parentEvent && mSim.getWarningProperties().get(step) == autoProxy)
-              mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_CAUSES_WARNING_PROPERTY);
-          }
-        }
-        StateProxy currentState;
-        currentState = mSim.getCurrentStates().get(autoProxy);
-        mAutomataStatusLabel.setText(currentState.getName());
-        mAutomataStatusLabel.setIcon(mSim.getMarkingIcon(currentState, autoProxy, false));
+        final AutomatonProxy aut = (AutomatonProxy) value;
+        mAutomatonNameLabel.setText(aut.getName());
+        final Icon autIcon = AutomatonLeafNode.getAutomatonIcon(mSim, aut);
+        mAutomatonNameLabel.setIcon(autIcon);
+        final EventProxy event = getParentEvent(row);
+        final EventStatus status = mSim.getEventStatus(event, aut);
+        final Icon statusIcon = status.getIcon();
+        mAutomatonIconLabel.setIcon(statusIcon);
+        final StateProxy currentState = mSim.getCurrentState(aut);
+        mAutomatonStatusLabel.setText(currentState.getName());
+        mAutomatonStatusLabel.setIcon(mSim.getMarkingIcon(currentState, aut, false));
         final int width = mPane.getWidth();
         final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));
         final int centerWidth = (width * automataColumnWidth[1] - 2 * noduleWidth * automataColumnWidth[1]) / (sum(automataColumnWidth));
         final int leftWidth = (width * automataColumnWidth[0] - 2 * noduleWidth * automataColumnWidth[0]) / (sum(automataColumnWidth));
-        mAutomataNameLabel.setPreferredSize(new Dimension(leftWidth, rowHeight));
-        mAutomataIconLabel.setPreferredSize(new Dimension(centerWidth, rowHeight));
-        mAutomataStatusLabel.setPreferredSize(new Dimension(rightWidth, rowHeight));
-        if (automatonAreOpen.contains(autoProxy.getName()))
-        {
-          mAutomataNameLabel.setFont(mAutomataNameLabel.getFont().deriveFont(Font.BOLD));
-          mAutomataStatusLabel.setFont(mAutomataStatusLabel.getFont().deriveFont(Font.BOLD));
+        mAutomatonNameLabel.setPreferredSize(new Dimension(leftWidth, rowHeight));
+        mAutomatonIconLabel.setPreferredSize(new Dimension(centerWidth, rowHeight));
+        mAutomatonStatusLabel.setPreferredSize(new Dimension(rightWidth, rowHeight));
+        if (automatonAreOpen.contains(aut.getName())) {
+          mAutomatonNameLabel.setFont(mAutomatonNameLabel.getFont().deriveFont(Font.BOLD));
+          mAutomatonStatusLabel.setFont(mAutomatonStatusLabel.getFont().deriveFont(Font.BOLD));
+        } else {
+          mAutomatonNameLabel.setFont(mAutomatonNameLabel.getFont().deriveFont(Font.PLAIN));
+          mAutomatonStatusLabel.setFont(mAutomatonStatusLabel.getFont().deriveFont(Font.PLAIN));
         }
-        else
-        {
-          mAutomataNameLabel.setFont(mAutomataNameLabel.getFont().deriveFont(Font.PLAIN));
-          mAutomataStatusLabel.setFont(mAutomataStatusLabel.getFont().deriveFont(Font.PLAIN));
-        }
-        return mAutomataPanel;
-      }
-      else
-      {
+        return mAutomatonPanel;
+      } else {
         return new JPanel();
       }
     }
 
-    private int sum (final int[] a)
+    private int sum(final int[] a)
     {
       int o = 0;
-      for (int i = 0; i < a.length; i++)
-        o+=a[i];
+      for (int i = 0; i < a.length; i++) {
+        o += a[i];
+      }
       return o;
     }
 
     private EventProxy getParentEvent(final int row)
     {
-      if (EventJTree.this.getPathForRow(row) == null)
-        return null; // The row is not visible, so it doesn't matter what event has it's parent
-      if (EventJTree.this.getPathForRow(row).getPathCount() == 2)
-        return (EventProxy)EventJTree.this.getPathForRow(row).getLastPathComponent();
-      else
-        return getParentEvent(row-1);
+      final TreePath path = getPathForRow(row);
+      if (path == null) {
+        // The row is not visible, so it does not matter
+        // what event is its parent.
+        return null;
+      } else {
+        return (EventProxy) path.getPathComponent(1);
+      }
     }
 
-    // ###########################################################################
-    // # Data Members
+    //#######################################################################
+    //# Data Members
     private final JPanel mEventPanel;
     private final JLabel mEventNameLabel;
     private final JLabel mEventStatusLabel;
-    private final JPanel mAutomataPanel;
-    private final JLabel mAutomataNameLabel;
-    private final JLabel mAutomataIconLabel;
-    private final JLabel mAutomataStatusLabel;
+    private final JPanel mAutomatonPanel;
+    private final JLabel mAutomatonNameLabel;
+    private final JLabel mAutomatonIconLabel;
+    private final JLabel mAutomatonStatusLabel;
 
-    // ###########################################################################
-    // # Class Constants
+    //#######################################################################
+    //# Class Constants
     private static final long serialVersionUID = 6788022446662090661L;
   }
 
+
+  //#########################################################################
+  //# Data Members
   private final AutomatonDesktopPane mDesktop;
   private final Simulation mSim;
-  private final ModuleContainer mContainer;
   private final ArrayList<String> automatonAreOpen;
   private final ArrayList<Pair<Boolean, Integer>> mSortingMethods;
   private final ArrayList<String> expandedNodes;
   private JScrollPane mPane;
   private final EventTreePopupFactory factory;
+
+
+  //#########################################################################
+  //# Class Constants
+  static final int rowHeight = 20;
+
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};
   private static final int[] eventColumnWidth = {200, 20};
   private static final int noduleWidth = 30;
-  public static final int rowHeight = 20;
+
 }

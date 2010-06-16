@@ -13,12 +13,11 @@ public class TraceMutableTreeNode extends DefaultMutableTreeNode implements Simu
     mSim = sim;
     mParent = parent;
     setupAllEvents(sim);
-    if (mStartTime == 0) mStartTime = System.currentTimeMillis();
   }
 
   // #################################################################
   // # Simple Access
-
+  /*
   public String getData(final int indents)
   {
     String output = getIndents(indents) + this.toString() + "[" + (System.currentTimeMillis() - mStartTime) + "]";
@@ -44,10 +43,11 @@ public class TraceMutableTreeNode extends DefaultMutableTreeNode implements Simu
       output += "-";
     return output;
   }
+  */
 
 
-  // #################################################################
-  // # Interface SimulationObserver
+  //#########################################################################
+  //# Interface SimulationObserver
 
   public void simulationChanged(final SimulationChangeEvent event)
   {
@@ -56,40 +56,28 @@ public class TraceMutableTreeNode extends DefaultMutableTreeNode implements Simu
     mSim.detach(this);
   }
 
-  // ##################################################################
-  // # Auxillary Functions
-
+  //#########################################################################
+  //# Auxiliary Methods
   private void setupAllEvents(final Simulation sim)
   {
-    this.removeAllChildren();
-    if (sim.getAutomatonHistory().size() == 0)
-    {
-      this.add(new InitialState(sim.getCurrentStates()));
-    }
-    else
-      this.add(new InitialState(sim.getAutomatonHistory().get(0)));
-    for (int looper = 1; looper < sim.getEventHistory().size(); looper++)
-    {
-      final Step step = sim.getEventHistory().get(looper);
-      DefaultMutableTreeNode eventToAdd;
-      if (step == null)
-        eventToAdd = new TeleportEventTreeNode(looper);
-      else
-        eventToAdd= new EventBranchNode(step.getEvent(), looper);
-      this.add(eventToAdd);
-      eventToAdd.add(new DefaultMutableTreeNode("Placeholder. You shouldn't ever see this"));
+    removeAllChildren();
+    for (int time = 0; time < sim.getHistorySize(); time++) {
+      final SimulatorState state = sim.getHistoryState(time);
+      final TraceStepTreeNode node =
+        TraceStepTreeNode.createTraceStepNode(state, time);
+      add(node);
     }
   }
 
-  // ##################################################################
-  // # Data Members
 
+  //#########################################################################
+  //# Data Members
   private final TraceJTree mParent;
-  static private long mStartTime = 0;
   private final Simulation mSim;
 
-  // ##################################################################
-  // # Class Constants
 
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = 4899696734198560636L;
+
 }

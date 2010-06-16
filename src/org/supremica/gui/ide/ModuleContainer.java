@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -237,11 +238,6 @@ public class ModuleContainer
     return mSimulatorPanel;
   }
 
-  public JTabbedPane getTabPane()
-  {
-    return mTabPanel;
-  }
-
   public ModuleSubject getModule()
   {
     return (ModuleSubject) getDocument();
@@ -274,6 +270,16 @@ public class ModuleContainer
   public ProxyPrinter getPrinter()
   {
     return mPrinter;
+  }
+
+  public ComponentEditorPanel showEditor(final SimpleComponentSubject comp)
+  {
+    final ComponentEditorPanel panel = createComponentEditorPanel(comp);
+    if (panel != null) {
+      mTabPanel.setSelectedComponent(mEditorPanel);
+      mEditorPanel.setRightComponent(panel);
+    }
+    return panel;
   }
 
   ComponentEditorPanel createComponentEditorPanel
@@ -334,6 +340,12 @@ public class ModuleContainer
       }
     }
     return null;
+  }
+
+  public void switchToTraceMode(final TraceProxy trace)
+  {
+    mTabPanel.setSelectedComponent(mSimulatorPanel);
+    mSimulatorPanel.switchToTraceMode(trace);
   }
 
   public JFrame getFrame()

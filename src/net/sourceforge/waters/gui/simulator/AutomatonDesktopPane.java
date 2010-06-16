@@ -252,7 +252,7 @@ public class AutomatonDesktopPane
 
   public void openOtherAutomaton(final String name)
   {
-    final List<AutomatonProxy> otherAutomata = mSim.getAutomata();
+    final List<AutomatonProxy> otherAutomata = mSim.getOrderedAutomata();
     for (final AutomatonProxy auto : otherAutomata)
       if (name.compareTo(auto.getName()) != 0)
         addAutomaton(auto.getName(), mContainer, mSim, 2);
@@ -260,7 +260,7 @@ public class AutomatonDesktopPane
 
   public void showAllAutomata()
   {
-    for (final AutomatonProxy automata : mSim.getAutomata())
+    for (final AutomatonProxy automata : mSim.getOrderedAutomata())
     {
       addAutomaton(automata.getName(), mContainer, mSim, 2);
     }

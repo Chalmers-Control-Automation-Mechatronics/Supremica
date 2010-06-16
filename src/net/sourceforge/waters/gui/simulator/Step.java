@@ -1,6 +1,7 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -9,7 +10,9 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 
 public class Step implements Comparable<Step>
 {
-  public Step(final EventProxy event, final HashMap<AutomatonProxy, StateProxy> source, final HashMap<AutomatonProxy, StateProxy> dest)
+  public Step(final EventProxy event,
+              final Map<AutomatonProxy,StateProxy> source,
+              final Map<AutomatonProxy, StateProxy> dest)
   {
     mEvent = event;
     mSource = source;
@@ -24,11 +27,12 @@ public class Step implements Comparable<Step>
     determineDeterminism();
   }
 
-  @SuppressWarnings("unchecked")
   public Step addNewTransition(final AutomatonProxy auto, final TransitionProxy trans)
   {
-    final HashMap<AutomatonProxy, StateProxy> newSource = (HashMap<AutomatonProxy, StateProxy>) mSource.clone();
-    final HashMap<AutomatonProxy, StateProxy> newDest = (HashMap<AutomatonProxy, StateProxy>) mDest.clone();
+    final Map<AutomatonProxy, StateProxy> newSource =
+      new HashMap<AutomatonProxy, StateProxy>(mSource);
+    final Map<AutomatonProxy, StateProxy> newDest =
+      new HashMap<AutomatonProxy, StateProxy>(mDest);
     if (mSource.keySet().contains(auto))
     {
       newSource.remove(auto);
@@ -49,11 +53,12 @@ public class Step implements Comparable<Step>
     return mEvent;
   }
 
-  public HashMap<AutomatonProxy, StateProxy> getSource()
+  public Map<AutomatonProxy, StateProxy> getSource()
   {
     return mSource;
   }
-  public HashMap<AutomatonProxy, StateProxy> getDest()
+
+  public Map<AutomatonProxy, StateProxy> getDest()
   {
     return mDest;
   }
@@ -133,7 +138,7 @@ public class Step implements Comparable<Step>
   }
 
   private final EventProxy mEvent;
-  private final HashMap<AutomatonProxy,StateProxy> mSource;
-  private final HashMap<AutomatonProxy,StateProxy> mDest;
+  private final Map<AutomatonProxy,StateProxy> mSource;
+  private final Map<AutomatonProxy,StateProxy> mDest;
   private boolean deterministic;
 }

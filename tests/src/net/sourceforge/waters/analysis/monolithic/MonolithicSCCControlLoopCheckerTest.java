@@ -84,7 +84,6 @@ public class MonolithicSCCControlLoopCheckerTest
 
   //#########################################################################
   //# Auxiliary Methods
-  @SuppressWarnings("unused")
   private void checkNonLoopEvents(final String[] expectedNames)
   {
     final ControlLoopChecker checker = (ControlLoopChecker) getModelVerifier();

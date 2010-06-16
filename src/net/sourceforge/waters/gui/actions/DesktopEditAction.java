@@ -3,6 +3,7 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -24,17 +25,19 @@ public class DesktopEditAction extends WatersDesktopAction
 
   public void actionPerformed(final ActionEvent e)
   {
-    final DocumentContainer docContainer = getIDE().getActiveDocumentContainer();
-    final ModuleContainer modContainer = (ModuleContainer)docContainer;
-    modContainer.getTabPane().setSelectedIndex(0);
-    final SourceInfo sInfo = modContainer.getSourceInfoMap().get(mAutomaton);
-    if (sInfo != null)
-    {
-      if (sInfo.getSourceObject() instanceof SimpleComponentSubject)
-        modContainer.getEditorPanel().showEditor((SimpleComponentSubject)sInfo.getSourceObject()); // TODO: Make this work.
+    final IDE ide = getIDE();
+    final DocumentContainer docContainer = ide.getActiveDocumentContainer();
+    final ModuleContainer modContainer = (ModuleContainer) docContainer;
+    final SourceInfo info = modContainer.getSourceInfoMap().get(mAutomaton);
+    if (info != null) {
+      final Proxy source = info.getSourceObject();
+      if (source instanceof SimpleComponentSubject) {
+        final SimpleComponentSubject comp = (SimpleComponentSubject) source;
+        modContainer.showEditor(comp);
       }
-    else
-      getIDE().error("Source Information is null");
+    } else {
+      ide.error("Source Information is null!");
+    }
   }
 
   private final AutomatonProxy mAutomaton;

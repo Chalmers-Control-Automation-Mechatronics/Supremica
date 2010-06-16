@@ -1,25 +1,27 @@
 package net.sourceforge.waters.gui.simulator;
 
+import gnu.trove.THashSet;
+
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.IconLoader;
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
-import net.sourceforge.waters.model.base.Pair;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
@@ -28,6 +30,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -41,6 +44,8 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 
@@ -49,311 +54,343 @@ public class Simulation implements ModelObserver, Observer
 
   //#########################################################################
   //# Constructor
-  public Simulation(final ModuleContainer container)
+  Simulation(final ModuleContainer container)
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+
+    mModuleContainer = container;
     mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, optable);
     mSimulationObservers = new ArrayList<SimulationObserver>();
-    mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
-    mEnabledSteps = new ArrayList<Step>();
-    mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
-    mModuleContainer = container;
-    mWarningProperties = new HashMap<Step, AutomatonProxy>();
-    mEnabledLastStep = new ArrayList<AutomatonProxy>();
-    previousStates = new ArrayList<SimulatorState>();
-    mBlockingEvents = new ArrayList<Pair<EventProxy, AutomatonProxy>>();
-    mDisabledProperties = new ArrayList<AutomatonProxy>();
-    currentTime = 0;
-    mContainer = container;
-    invalidated = false;
+    mToolTipVisitor = new ToolTipVisitor(this);
+    mStateHistory = new ArrayList<SimulatorState>();
+
     final ModuleSubject module = container.getModule();
     module.addModelObserver(this);
     container.attach(this);
     final ProductDESProxy des = container.getCompiledDES();
     setCompiledDES(des);
+
+    /*
     mTransitionsToEvents = new TransitionEventMap(des);
     updateControllability(true);
     findEventClassification();
     addNewSimulatorState();
-  }
-
-
-  //########################################################################
-  //# SimulationState Access Methods
-  public Step getCurrentEvent()
-  {
-    return mCurrentEvent;
-  }
-
-  public Collection<? extends Pair<EventProxy,AutomatonProxy>> getAllBlocking()
-  {
-     return mBlockingEvents;
-  }
-  public Collection<? extends AutomatonProxy> getAutomatonActivity()
-  {
-    return mEnabledLastStep;
-  }
-  public Collection<? extends AutomatonProxy> getDisabledProperties()
-  {
-    return mDisabledProperties;
-  }
-
-  public Map<? extends Step,? extends AutomatonProxy> getWarningProperties()
-  {
-    return mWarningProperties;
-  }
-
-  /**
-   * This method is used to add a new simulation state to the END of the current list. Thus, it is only used for step methods.
-   */
-  private void addNewSimulatorState()
-  {
-    previousStates.add(new SimulatorState(this));
-  }
-
-  /**
-   * This method takes the current time of the simulation, and changes the
-   * current states of the simulation to match the correct time It is used for
-   * stepping back and forward through the simulation without changing it.
-   */
-  private void loadSimulatorState()
-  {
-    final SimulatorState stateToLoad = previousStates.get(currentTime);
-    mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>(stateToLoad.mCurrentStates);
-    mEnabledSteps = new ArrayList<Step>(stateToLoad.mEnabledEvents);
-    mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>>(stateToLoad.mInvalidEvents);
-    mCurrentEvent = stateToLoad.mCurrentEvent;
-    mBlockingEvents = new ArrayList<Pair<EventProxy, AutomatonProxy>>(stateToLoad.mBlockingEvents);
-    mEnabledLastStep = new ArrayList<AutomatonProxy>(stateToLoad.mEnabledLastStep);
-    mDisabledProperties = new ArrayList<AutomatonProxy>(stateToLoad.mDisabledProperties);
-    mWarningProperties = new HashMap<Step, AutomatonProxy>(stateToLoad.mWarningProperties);
-    updateControllability(false);
+    */
   }
 
 
   //#########################################################################
   //# Simple Access
-  SimpleExpressionCompiler getSimpleExpressionCompiler()
+  public ModuleContainer getModuleContainer()
+  {
+    return mModuleContainer;
+  }
+
+  public SimpleExpressionCompiler getSimpleExpressionCompiler()
   {
     return mSimpleExpressionCompiler;
   }
 
-  /**
-   * Returns a list of Steps which can be fired.
-   * Any other steps outside of this list will not change the simulation state
-   * @return A list of Steps which can be fired.
-   */
-  public List<Step> getValidTransitions()
+  public int getCurrentTime()
   {
-    return Collections.unmodifiableList(mEnabledSteps);
+    return mCurrentTime;
   }
 
-  /**
-   * @return A map. The keys are all Events which cannot be fired, and the values are all the automata
-   * which are blocking the events from being fired
-   */
-  public Map<EventProxy,ArrayList<AutomatonProxy>> getInvalidEvents()
+  public int getHistorySize()
   {
-    return Collections.unmodifiableMap(mInvalidEvents);
+    return mStateHistory.size();
   }
 
-  /**
-   * @return A map, mapping all the automata in the simulation to thier current states
-   */
-  public Map<AutomatonProxy, StateProxy> getCurrentStates()
+  public void setTrace(final TraceProxy trace)
   {
-    return Collections.unmodifiableMap(mAllAutomatons);
+    mTrace = trace;
+    mTraceInvalidated = false;
   }
 
-  public List<EventProxy> getAllEvents()
+  public TraceProxy getTrace()
   {
-    if (mCompiledDES == null) {
-      return Collections.emptyList();
+    if (mTraceInvalidated) {
+      return null;
     } else {
-      final Collection<EventProxy> events = mCompiledDES.getEvents();
-      final ArrayList<EventProxy> output = new ArrayList<EventProxy>();
-      for (final EventProxy event : events)
-        if (event.getKind() != EventKind.PROPOSITION)
-          output.add(event);
-      return output;
+      return mTrace;
     }
   }
 
-  private void updateActiveEvents()
+  public ToolTipVisitor getToolTipVisitor()
   {
-    mEnabledEvents = new HashSet<EventProxy>();
-    for (final Step step : mEnabledSteps)
-    {
-      mEnabledEvents.add(step.getEvent());
-    }
+    return mToolTipVisitor;
   }
 
-  public Set<EventProxy> getActiveEvents()
+
+  //###################################################################################
+  //# Control
+  public void setState(final AutomatonProxy aut, final StateProxy state)
   {
-    return mEnabledEvents;
+    if (!aut.getStates().contains(state)) {
+      throw new IllegalArgumentException
+        ("Automaton " + aut.getName() +
+         " does not contain state " + state.getName() + "!");
+    }
+    final SimulatorState newState = new SimulatorState(null, mCurrentState);
+    newState.setState(aut, state, AutomatonStatus.OK);
+    // This state changes the simulation so it is different from the trace
+    mTraceInvalidated = true;
+    removeFutureSteps();
+    addNewSimulatorState(newState);
+    mCurrentTime++;
+    loadSimulatorState();
+    final SimulationChangeEvent simEvent = new SimulationChangeEvent
+      (this, SimulationChangeEvent.STATE_CHANGED);
+    fireSimulationChangeEvent(simEvent);
   }
 
   /**
-   * @param event The event which is to be drawn
-   * @return An image. A tick if the event can be fired by at least one possible step,
-   * a cross if that event is blocked by some automata,
-   * a yellow flag if firing that event will disable an event, or
-   * a red flag, if that event is causing a controllability problem
+   * Resets the simulation to either its initial state, or if it has a trace,
+   * restores the trace. Note that this method is used to initialise the
+   * simulation as well, so simply setting the current time to 0 and calling
+   * loadSimulatorState() will not work, as it will never be initialised.
+   * @param destroyTrace
+   *          If this is <STRONG>true</STRONG> then it will ALWAYS return to
+   *          its initial state and it will remove the trace
    */
-  public ImageIcon getEventActivityIcon(final EventProxy event)
+  public void resetState(final boolean destroyTrace)
   {
-    for (final Step blockingStep : mWarningProperties.keySet())
-    {
-      if (event == blockingStep.getEvent())
-        return IconLoader.ICON_EVENTTREE_CAUSES_WARNING_EVENT;
+    if (mTrace != null && !destroyTrace) {
+      executeTrace(mTrace, mAllowLastStep);
+    } else {
+      mTrace = null; // If we are to destroy the trace
+      mTraceInvalidated = true;
+      updateAutomata();
+      final SimulatorState state = new SimulatorState(mOrderedAutomata);
+      mStateHistory.clear();
+      mStateHistory.add(state);
+      mCurrentTime = 0;
+      loadSimulatorState();
     }
-    if (mEnabledEvents.contains(event))
-      return IconLoader.ICON_EVENTTREE_VALID_EVENT;
-    if (mInvalidEvents.containsKey(event))
-    {
-      //updateControllability(false);
-      if (mBlockingEvents != null)
-      {
-        for (final Pair<EventProxy, AutomatonProxy> blockingEvent : mBlockingEvents)
-        {
-          if (blockingEvent.getFirst() == event)
-            return IconLoader.ICON_EVENTTREE_BLOCKING_EVENT;
+    final SimulationChangeEvent simEvent = new SimulationChangeEvent
+      (this, SimulationChangeEvent.STATE_CHANGED);
+    fireSimulationChangeEvent(simEvent);
+  }
+
+  /**
+   * Executes an event. This method checks whether the given event is
+   * enabled, and if so determines its possible nondeterministic successor
+   * states. If more than one successor state is found, a dialog is popped
+   * up, so the user can choose one possibility. The chosen step or
+   * the only possible step is then executed. If the event is not enabled,
+   * an error message is printed in the IDE's log panel.
+   * @param event The event to be executed.
+   */
+  public void step(final EventProxy event)
+  {
+    final List<Step> steps = new ArrayList<Step>();
+    for (final Step step: getEnabledSteps()) {
+      if (step.getEvent() == event) {
+        steps.add(step);
+      }
+    }
+    if (steps.isEmpty()) {
+      AutomatonProxy disabling = null;
+      for (final AutomatonProxy aut : getAutomataSensitiveToEvent(event)) {
+        final EventStatus status = getEventStatus(event, aut);
+        if (!status.canBeFired()) {
+          disabling = aut;
+          break;
         }
       }
-      return IconLoader.ICON_EVENTTREE_INVALID_EVENT;
-    }
-    else
-    {
-      throw new UnsupportedOperationException("ERROR: Unknown event status. Event name: "
-                                              + event.getName() + " enabled/invalid size:"
-                                              + mEnabledSteps.size() + " / " + mInvalidEvents.size());
+      assert disabling != null :
+        "Can't find automaton disabling event " + event.getName() + "!";
+      final EventKind ekind = event.getKind();
+      final ComponentKind akind = disabling.getKind();
+      final String msg =
+        ModuleContext.getEventKindToolTip(ekind) + ' ' + event.getName() +
+        " is disabled by " + ModuleContext.getComponentKindToolTip(akind) +
+        ' ' + disabling.getName() + '.';
+      final IDE ide = mModuleContainer.getIDE();
+      ide.error(msg);
+    } else {
+      step(steps);
     }
   }
 
   /**
-   * This method is used for displaying automata in the AutomatonTable.
-   * Similar, but different code is fired in the EventJTree for it's representation of images
-   * of automata
-   * @param aut The automaton which is to be drawn
-   * @return An image. A tick if that automaton was enabled in the last step
-   * a cross if that automaton is disabled
-   * a yellow flag if that automaton is a property which can be disabled if the correct event is fired
-   * a red flag, if that automaton is causing a controllabilty problem
-   * no image, if none of the above are true.
+   * Executes a step from a list of choices.
+   * @param possibleSteps Non-empty list of steps to be offered to the user.
+   *                      If the list contains more than one item, a dialog
+   *                      is popped up.
    */
-  public ImageIcon getAutomatonActivityIcon(final AutomatonProxy aut)
+  public void step(final List<Step> possibleSteps)
   {
-    if (mDisabledProperties.contains(aut))
-      return IconLoader.ICON_TABLE_DISABLED_PROPERTY;
-    if (mWarningProperties.containsValue(aut))
-      return IconLoader.ICON_TABLE_WARNING_PROPERTY;
-    if (mBlockingEvents != null && aut.getKind() == ComponentKind.SPEC)
-    {
-      for (final Pair<EventProxy, AutomatonProxy> blockingEvent : mBlockingEvents)
-      {
-        if (blockingEvent.getSecond() == aut)
-            return IconLoader.ICON_TABLE_BLOCKING_AUTOMATON;
+    final int size = possibleSteps.size();
+    assert size > 0 : "Can't step with empty list of choices!";
+    final Step step;
+    if (size == 1) {
+      step = possibleSteps.get(0);
+    } else {
+      final JLabel[] labels = new JLabel[size];
+      final Step[] steps = new Step[size];
+      for (int looper = 0; looper < size; looper++) {
+        final Step possible = possibleSteps.get(looper);
+        final JLabel label = new JLabel(possible.toString());
+        final EventProxy event = possible.getEvent();
+        final EventKind kind = event.getKind();
+        final Icon icon = ModuleContext.getEventKindIcon(kind);
+        label.setIcon(icon);
+        labels[looper] = label;
+        steps[looper] = possible;
+      }
+      final IDE ide = mModuleContainer.getIDE();
+      final EventChooserDialog dialog =
+        new EventChooserDialog(ide, labels, steps);
+      dialog.setVisible(true);
+      if (dialog.wasCancelled()) {
+        return;
+      }
+      step = dialog.getSelectedStep();
+      if (step == null) {
+        return;
       }
     }
-    if (mEnabledLastStep.contains(aut))
-      return IconLoader.ICON_TABLE_ENABLED_AUTOMATON;
-    else
-      return IconLoader.ICON_TABLE_NORMAL_AUTOMATON;
+    step(step);
   }
 
   /**
-   * @param time The time (0 = initial, 1 = after the first event etc.) that
-   * the automata need to know if they are controllable or not
-   * @return A set of all automata which are not controllable at a specific time
-   * (IE. They are causing a controllability problem)
+   * Moves the simulation forward one instruction, by firing a step.
+   * @param step The instruction to be followed
    */
-  public Set<AutomatonProxy> isNonControllableAtTime(final int time)
+  public void step(final Step step)
   {
-    if (time < 0 || time > previousStates.size() - 1)
-      return Collections.emptySet();
-    else
+    final SimulatorState newState =
+      SimulatorState.createSuccessorState(mCurrentState, step);
+    removeFutureSteps();
+    addNewSimulatorState(newState);
+    mCurrentTime++;
+    loadSimulatorState();
+    final SimulationChangeEvent simEvent = new SimulationChangeEvent
+      (this, SimulationChangeEvent.STATE_CHANGED);
+    fireSimulationChangeEvent(simEvent);
+  }
+
+  /**
+   * Moves the simulation state back one step, without changing the trace
+   */
+  public void stepBack()
+  {
+    moveSafely(false);
+  }
+  /**
+   * Moves the simulation state forward one step, without changing the trace.
+   * If the trace is a loopTrace, if that trace hasn't been invalidated by the
+   * step() and setState(...) methods, and if the current state is the final state
+   * it will move the simulation state to the beginning of the loop instead.
+   */
+  public void replayStep()
+  {
+    if (mTrace != null)
     {
-      final Set<AutomatonProxy> output = new HashSet<AutomatonProxy>();
-      for (final Pair<EventProxy, AutomatonProxy> blocking: previousStates.get(time).mBlockingEvents)
+      if (mTrace instanceof LoopTraceProxy && !mTraceInvalidated)
       {
-        output.add(blocking.getSecond());
+        if (mCurrentTime == mStateHistory.size() - 1)
+        {
+          mModuleContainer.getIDE().info(": Looping to start of control loop");
+          while (mCurrentTime != ((LoopTraceProxy)mTrace).getLoopIndex() + 1)
+          {
+            stepBack();
+          }
+        }
+        else
+          moveSafely(true);
       }
-      return output;
-    }
-  }
-
-  /**
-   * A check to see if the event is a blocking event (All automaton which are blocked by this event are specifications)
-   * @param event The event to test
-   * @return An empty list if the event is a non-blocking event, all specifications which are blocking it otherwise
-   */
-  public List<AutomatonProxy> getNonControllable(final EventProxy event)
-  {
-    if (mBlockingEvents == null)
-      return Collections.emptyList();
-    final ArrayList<AutomatonProxy> output = new ArrayList<AutomatonProxy>();
-    for (final Pair<EventProxy, AutomatonProxy> blocker : mBlockingEvents)
-    {
-      if (blocker.getFirst() == event)
-        output.add(blocker.getSecond());
-    }
-    return output;
-  }
-
-  public Set<AutomatonProxy> getNonControllable()
-  {
-    if (mBlockingEvents == null)
-      return Collections.emptySet();
-    final HashSet<AutomatonProxy> output = new HashSet<AutomatonProxy>();
-    for (final Pair<EventProxy, AutomatonProxy> blocker : mBlockingEvents)
-    {
-      output.add(blocker.getSecond());
-    }
-    return output;
-  }
-
-  /**
-   * Returns the automaton which are blocked by this event
-   * @param event
-   * @return All automaton which are blocked by this event, or an empty list, if the event is valid.
-   */
-  public List<AutomatonProxy> getInvalid(final EventProxy event)
-  {
-    if (mInvalidEvents.containsKey(event))
-    {
-      return Collections.unmodifiableList(mInvalidEvents.get(event));
+      else
+        moveSafely(true);
     }
     else
-    {
+      moveSafely(true);
+  }
+
+  public void switchToTraceMode(final TraceProxy trace)
+  {
+    final boolean allowLast = !(trace instanceof SafetyTraceProxy);
+    executeTrace(trace, allowLast);
+    final SimulationChangeEvent simEvent = new SimulationChangeEvent
+      (this, SimulationChangeEvent.STATE_CHANGED);
+    fireSimulationChangeEvent(simEvent);
+  }
+
+
+  //#########################################################################
+  //# Accessing the Product DES
+  ProductDESProxy getCompiledDES()
+  {
+    return mCompiledDES;
+  }
+
+  List<AutomatonProxy> getOrderedAutomata()
+  {
+    updateAutomata();
+    return mOrderedAutomata;
+  }
+
+  public AutomatonProxy getAutomatonFromName(final String name)
+  {
+    updateAutomata();
+    return mAutomataMap.get(name);
+  }
+
+  List<EventProxy> getOrderedEvents()
+  {
+    updateEvents();
+    return mOrderedEvents;
+  }
+
+  public List<AutomatonProxy> getAutomataSensitiveToEvent
+    (final EventProxy event)
+  {
+    updateAutomataSensitiveToEvent();
+    final List<AutomatonProxy> list = mAutomataSensitiveToEvent.get(event);
+    if (list == null) {
       return Collections.emptyList();
+    } else {
+      return list;
     }
   }
 
   /**
-   * @param state The state to be drawn
-   * @param automaton The automaton the state belongs to
-   * @param drawAsEditor <STRONG>true</STRONG> if a state inside an automaton with no accepting states should be
-   * drawn with a white inner, <STRONG>false</STRONG> if it should be drawn with a grey (IE. Accepting) inner
+   * @param state
+   *          The state to be drawn
+   * @param automaton
+   *          The automaton the state belongs to
+   * @param drawAsEditor
+   *          <STRONG>true</STRONG> if a state inside an automaton with no
+   *          accepting states should be drawn with a white inner,
+   *          <STRONG>false</STRONG> if it should be drawn with a grey (IE.
+   *          Accepting) inner
    * @return The icon of a state, taking into account propositions
    */
-  public Icon getMarkingIcon(final StateProxy state,
-                             final AutomatonProxy automaton,
-                             final boolean drawAsEditor)
+  Icon getMarkingIcon(final StateProxy state,
+                      final AutomatonProxy automaton,
+                      final boolean drawAsEditor)
   {
     final PropositionIcon.ColorInfo info = getMarkingColorInfo(state, automaton, drawAsEditor);
     return info.getIcon();
   }
 
   /**
-   * @param state The state to be drawn
-   * @param automaton The automaton the state belongs to
-   * @param drawAsEditor <STRONG>true</STRONG> if a state inside an automaton with no accepting states should be
-   * drawn with a white inner, <STRONG>false</STRONG> if it should be drawn with a grey (IE. Accepting) inner
-   * @return The colour of a state, taking into account propositions
+   * @param state
+   *          The state to be drawn
+   * @param automaton
+   *          The automaton the state belongs to
+   * @param drawAsEditor
+   *          <STRONG>true</STRONG> if a state inside an automaton with no
+   *          accepting states should be drawn with a white inner,
+   *          <STRONG>false</STRONG> if it should be drawn with a grey (IE.
+   *          Accepting) inner
+   * @return The colour of a state, taking into account propositions.
    */
-  public PropositionIcon.ColorInfo getMarkingColorInfo
-    (final StateProxy state, final AutomatonProxy automaton, final boolean drawAsEditor)
+  PropositionIcon.ColorInfo getMarkingColorInfo
+    (final StateProxy state, final AutomatonProxy automaton,
+     final boolean drawAsEditor)
   {
     if (!hasPropositions(automaton) && drawAsEditor) {
       return PropositionIcon.getUnmarkedColors();
@@ -397,449 +434,111 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-  public boolean changedLastStep(final AutomatonProxy automaton)
-  {
-    return mEnabledLastStep.contains(automaton);
-  }
-  public boolean changedSecondLastStep(final AutomatonProxy automaton)
-  {
-    if (currentTime < 1)
-      return false;
-    else
-      return previousStates.get(currentTime - 1).mEnabledLastStep.contains(automaton);
-  }
-  public boolean changedNextStep(final AutomatonProxy aut)
-  {
-    if (currentTime == previousStates.size() - 1)
-      return false;
-    else
-      return previousStates.get(currentTime + 1).mEnabledLastStep.contains(aut);
-  }
-
-  public ModuleContainer getContainer()
-  {
-    return mContainer;
-  }
-
-  public List<Step> getEventHistory()
-  {
-    final ArrayList<Step> output = new ArrayList<Step>();
-    for (final SimulatorState state : previousStates)
-    {
-      output.add(state.mCurrentEvent);
-    }
-    return output;
-  }
-
-  public List<Map<AutomatonProxy, StateProxy>> getAutomatonHistory()
-  {
-    final ArrayList<Map<AutomatonProxy, StateProxy>> output = new ArrayList<Map<AutomatonProxy, StateProxy>>();
-    for (final SimulatorState state : previousStates)
-    {
-      output.add(state.mCurrentStates);
-    }
-    return output;
-  }
-
-  public ArrayList<AutomatonProxy> getAutomata()
-  {
-    final ArrayList<AutomatonProxy> output = new ArrayList<AutomatonProxy>();
-    for (final AutomatonProxy automaton : mAllAutomatons.keySet())
-      output.add(automaton);
-    Collections.sort(output);
-    return output;
-  }
-
-  public ArrayList<AutomatonProxy> getAutomatonActivityAtTime(final int time)
-  {
-    return previousStates.get(time).mEnabledLastStep;
-  }
-
-  ProductDESProxy getCompiledDES()
-  {
-    return mCompiledDES;
-  }
-
-  public int getCurrentTime()
-  {
-    return currentTime;
-  }
-
-  public TransitionProxy getPreviousTransition(final AutomatonProxy automaton)
-  {
-    if (currentTime == 0)
-    {
-      return null;
-    }
-    else
-    {
-      if (mCurrentEvent == null)
-        return null;
-      return mCurrentEvent.getTransition(automaton,
-                     previousStates.get(currentTime - 1).mCurrentStates.get(automaton),
-                     mAllAutomatons.get(automaton),
-                     mTransitionsToEvents);
-    }
-  }
-
-  public AutomatonProxy getAutomatonFromName(final String automatonFind)
-  {
-    for (final AutomatonProxy automaton : mAllAutomatons.keySet())
-    {
-      if (automaton.getName().compareTo(automatonFind) == 0)
-        return automaton;
-    }
-    return null;
-  }
-
-  public void setTrace(final TraceProxy trace)
-  {
-    mTrace = trace;
-    invalidated = false;
-  }
-
-  public TraceProxy getTrace()
-  {
-    if (invalidated)
-      return null;
-    else
-      return mTrace;
-  }
-
-  public List<AutomatonProxy> getAutomataSensitiveToEvent
-    (final EventProxy event)
-  {
-    updateAutomataSensitiveToEvent();
-    final List<AutomatonProxy> list = mAutomataSensitiveToEvent.get(event);
-    if (list == null) {
-      return Collections.emptyList();
-    } else {
-      return list;
-    }
-  }
-
-  public List<TransitionProxy> getActiveTransitions(final AutomatonProxy auto)
-  {
-    return mTransitionsToEvents.getTransition(auto, mAllAutomatons.get(auto));
-  }
-
-
-  //###################################################################################
-  // # Control
-  public void setState(final AutomatonProxy automaton, final StateProxy state)
-  {
-    mWarningProperties = new HashMap<Step, AutomatonProxy>();
-    if (!automaton.getStates().contains(state))
-    {
-      throw new IllegalArgumentException("ERROR: " + state.getName() + " does not belong to this automaton");
-    }
-    if (mAllAutomatons.containsKey(automaton))
-      mAllAutomatons.put(automaton, state);
-    else
-      throw new IllegalArgumentException("ERROR: This automaton is not in this program");
-    invalidated = true; // This state changes the simulation so it is different from the trace
-    removeFutureEvents();
-    updateControllability(true);
-    findEventClassification();
-    mCurrentEvent = null; // No event was fired. If mCurrentEvent is null, then either it is a state-change event, or the initial state
-    currentTime++;
-    addNewSimulatorState();
-    final SimulationChangeEvent simEvent = new SimulationChangeEvent
-      (this, SimulationChangeEvent.STATE_CHANGED);
-    fireSimulationChangeEvent(simEvent);
-  }
-
-  /**
-   * Resets the simulation to either it's initial state, or if it has a trace, restores the trace.
-   * Note that this method is used to initialise the simulation as well, so simply setting the current
-   * time to 0 and calling loadSimulatorState() will not work, as it will never be initilized.
-   * @param destroyTrace If this is <STRONG>true</STRONG> then it will ALWAYS return to it's initial state
-   * and it will remove the trace
-   */
-  public void reset(final boolean destroyTrace)
-  {
-    mWarningProperties = new HashMap<Step, AutomatonProxy>();
-    if (mTrace != null && !destroyTrace)
-    {
-      try
-      {
-        run(mTrace, mAllowLastStep);
-      }
-      catch (final NonDeterministicException exception)
-      {
-        // Do nothing
-      }
-    }
-    else
-    {
-      mTrace = null; // If we are to destroy the trace
-      mAllAutomatons = new HashMap<AutomatonProxy, StateProxy>();
-      mEnabledSteps = new ArrayList<Step>();
-      mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
-      if (mCompiledDES != null)
-      {
-        for (final AutomatonProxy automaton : mCompiledDES.getAutomata())
-        {
-          for (final StateProxy state : automaton.getStates())
-          {
-            if (state.isInitial())
-            {
-              mAllAutomatons.put(automaton, state); // Set the state to it's current state
-            }
-          }
-        }
-        findEventClassification();
-      }
-      previousStates = new ArrayList<SimulatorState>();
-      mEnabledLastStep = new ArrayList<AutomatonProxy>();
-      mCurrentEvent = null;
-      mDisabledProperties = new ArrayList<AutomatonProxy>();
-      currentTime = 0;
-      updateControllability(true);
-      addNewSimulatorState();
-      final SimulationChangeEvent simEvent = new SimulationChangeEvent
-        (this, SimulationChangeEvent.STATE_CHANGED);
-      fireSimulationChangeEvent(simEvent);
-    }
-  }
-
-  /**
-   * Resets the simulation, and then loads the trace
-   * @param trace The trace to load
-   * @param allowLastStep <STRONG>true</STRONG> if the last step in the TraceProxy is to be fired, <STRONG>false</STRONG>
-   * if the simulation is to be stopped at the second-to-last step instead.
-   * @throws NonDeterministicException
-   */
-  public void run(final TraceProxy trace, final boolean allowLastStep) throws NonDeterministicException
-  {
-    mTrace = null;
-    mAllowLastStep = false;
-    reset(false);
-    mAllowLastStep = allowLastStep;
-    mTrace = trace;
-    Step locatedStep = null;
-    boolean firstStep = true;
-    final TraceStepProxy lastStep = trace.getTraceSteps().get(trace.getTraceSteps().size() - 1);
-    for (final TraceStepProxy tStep : trace.getTraceSteps()) // Travel through each trace step
-    {
-      locatedStep = null;
-      if (!firstStep && (tStep != lastStep || allowLastStep))
-      {
-        for (final Step step : mEnabledSteps) // Look for all possible Steps in the simulation
-        {
-          final boolean isTheRightStep = compareTraceStep(step, tStep);
-          if (isTheRightStep)
-            locatedStep = step; // We have found the next instruction for the trace
-        }
-        if (locatedStep != null)
-        {
-          step(locatedStep); // So fire it, and continue to the next one.
-        }
-        else
-          throw new IllegalArgumentException("No valid step could be found, trace was: " + trace.getTraceSteps());
-      }
-      else
-        firstStep = false;
-    }
-    invalidated = false;
-    final SimulationChangeEvent simEvent = new SimulationChangeEvent
-      (this, SimulationChangeEvent.STATE_CHANGED);
-    fireSimulationChangeEvent(simEvent);
-  }
-
-  /**
-   * @param step The simulator instruction which is being tested for equality
-   * @param tStep The trace instruction which is being tested for equality
-   * @return <STRONG>true</STRONG> if the Step and the TraceStep represent the same instruction, <STRONG>false</STRONG> otherwise
-   * @throws NonDeterministicException
-   * @throws IllegalArgumentException if the trace step doesn't provide non-deterministic information, while the regular step
-   * contains it (and thus, the simulation is non-deterministic)
-   */
-  private boolean compareTraceStep(final Step step, final TraceStepProxy tStep) throws NonDeterministicException
-  {
-    if (step.getEvent() == tStep.getEvent()) // Check if the event name is right. If not, this is not the correct Step
-    {
-      for (final AutomatonProxy auto : this.mAllAutomatons.keySet())
-      {
-        if (step.getDest().get(auto) != null)
-        {
-          if (tStep.getStateMap().get(auto) == null) // If there is no non-deterministic information, fail always
-            throw new NonDeterministicException("No non-deterministic information available. Trace is:" + mTrace.getTraceSteps());
-          else if (step.getDest().get(auto) != tStep.getStateMap().get(auto)) // If the destinations don't match, then this is the wrong step
-          {
-            return false;
-          }
-        }
-      }
-    }
-    else
-    {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Moves the simulation forward one instruction, by firing a step
-   * @param step The instruction to be followed
-   * @throws NonDeterministicException If the step is deterministic, but non-deterministic information is needed
-   */
-  public void step(final Step step) throws NonDeterministicException
-  {
-    mWarningProperties = new HashMap<Step, AutomatonProxy>();
-    if (step == null)
-    {
-      return;
-    }
-    checkInvalid(step);
-    invalidated = true;
-    removeFutureEvents();
-    mCurrentEvent = step;
-    mEnabledLastStep = new ArrayList<AutomatonProxy>();
-    for (final AutomatonProxy automata : mAllAutomatons.keySet())
-    {
-      if (!mDisabledProperties.contains(automata))
-      {
-        final StateProxy oldLocation = mAllAutomatons.get(automata);
-        if (step.getDest().get(automata) != null)
-        {
-          mAllAutomatons.put(automata, step.getDest().get(automata));
-        }
-        else
-        {
-          moveDeterministicTransition(automata, step, oldLocation);
-        }
-      }
-    }
-    currentTime++;
-    findEventClassification();
-    updateControllability(true);
-    addNewSimulatorState();
-    final SimulationChangeEvent simEvent = new SimulationChangeEvent
-      (this, SimulationChangeEvent.STATE_CHANGED);
-    fireSimulationChangeEvent(simEvent);
-  }
-
-  /**
-   * Finds the appropriate next state for the automaton, and sets it, given that
-   * the step doesn't contain that information inside it The step
-   * <STRONG>can</STRONG> be non-deterministic, but what is required is that the
-   * step cannot contain 'next-state' information about the automaton
-   * @param automata
-   *          The automaton which is finding it's next state
-   * @param step
-   *          The instruction to follow
-   * @param oldLocation
-   *          The old previous current state
-   * @throws NonDeterministicException
-   *           If the automata needs non-deterministic information to fire the
-   *           event. However, this will still be thrown if the step contains
-   *           that information, as it is assumed to NOT possess that
-   *           information.
-   */
-  private void moveDeterministicTransition(final AutomatonProxy automata,
-                                                 final Step step,
-                                                 final StateProxy oldLocation) throws NonDeterministicException
-  {
-    boolean moved = false;
-    for (final TransitionProxy trans : automata.getTransitions())
-    {
-      if (trans.getEvent() == step.getEvent())
-      {
-        if (trans.getSource() == mAllAutomatons.get(automata) && !moved)
-        {
-          mAllAutomatons.put(automata, trans.getTarget());
-          moved = true;
-          mEnabledLastStep.add(automata);
-        }
-        else if (trans.getSource() == oldLocation && moved)
-        {
-          throw new NonDeterministicException("The automaton " + automata.getName() +
-                                              " has two options.");
-        }
-      }
-    }
-    if (!moved && automata.getKind() == ComponentKind.PROPERTY && automata.getEvents().contains(step.getEvent()))
-    {
-      if (SHOW_DISABLED_PROPERTY_ERROR_MESSAGE)
-        mContainer.getIDE().error("Property "
-                                + automata.getName()
-                                + " has been disabled, as the event "
-                                + step.getEvent().getName()
-                                + " could not be fired");
-      mDisabledProperties.add(automata);
-    }
-  }
-
-  /**
-   * Throws Illegal Argument Exceptions if the step is an invalid event, or if it is not inside any valid event
-   * @param step The step to check
-   */
-  private void checkInvalid(final Step step)
-  {
-    if (isInInvalidEvent(step.getEvent()))
-    {
-      String errorMessage = "ERROR: The event " + step.toString() +
-        " cannot be compiled as the following automata are blocking it:";
-      for (final AutomatonProxy automata : mInvalidEvents.get(step.getEvent()))
-        errorMessage += "\r\n" + automata.getName();
-      throw new IllegalArgumentException(errorMessage);
-    }
-    else if (!isInValidEvent(step))
-    {
-      final String errorMessage = "ERROR: The event " + step.toString() +
-        " cannot be completed as it is not inside any automata";
-      throw new IllegalArgumentException(errorMessage);
-    }
-  }
-
-  /**
-   * Moves the simulation state back one step, without changing the trace
-   */
-  public void stepBack()
-  {
-    moveSafely(false);
-  }
-  /**
-   * Moves the simulation state forward one step, without changing the trace.
-   * If the trace is a loopTrace, if that trace hasn't been invalidated by the
-   * step() and setState(...) methods, and if the current state is the final state
-   * it will move the simulation state to the beginning of the loop instead.
-   */
-  public void replayStep()
-  {
-    if (mTrace != null)
-    {
-      if (mTrace instanceof LoopTraceProxy && !invalidated)
-      {
-        if (currentTime == previousStates.size() - 1)
-        {
-          mContainer.getIDE().info(": Looping to start of control loop");
-          while (currentTime != ((LoopTraceProxy)mTrace).getLoopIndex() + 1)
-          {
-            stepBack();
-          }
-        }
-        else
-          moveSafely(true);
-      }
-      else
-        moveSafely(true);
-    }
-    else
-      moveSafely(true);
-  }
-
 
   //#########################################################################
-  //# Class Object
-  public String toString()
+  //# Accessing the State
+  SimulatorState getCurrentState()
   {
-    String output = "";
-    for (final AutomatonProxy auto : mAllAutomatons.keySet()){
-      output += auto.getName() + " -> " + mAllAutomatons.get(auto) + "||";
+    return mCurrentState;
+  }
+
+  SimulatorState getHistoryState(final int time)
+  {
+    return mStateHistory.get(time);
+  }
+
+  /**
+   * Gets the current state of the given automaton in the simulation.
+   */
+  StateProxy getCurrentState(final AutomatonProxy aut)
+  {
+    return mCurrentState.getState(aut);
+  }
+
+  AutomatonStatus getAutomatonStatus(final AutomatonProxy aut)
+  {
+    return mCurrentState.getStatus(aut);
+  }
+
+  /**
+   * This method is used for displaying automata in the AutomatonTable.
+   * Similar, but different code is fired in the EventJTree for it's representation of images
+   * of automata
+   * @param aut The automaton which is to be drawn
+   * @return An image. A tick if that automaton was enabled in the last step
+   * a cross if that automaton is disabled
+   * a yellow flag if that automaton is a property which can be disabled if the correct event is fired
+   * a red flag, if that automaton is causing a controllability problem
+   * no image, if none of the above are true.
+   */
+  ImageIcon getAutomatonActivityIcon(final AutomatonProxy aut)
+  {
+    final AutomatonStatus status = getAutomatonStatus(aut);
+    return status.getIcon();
+  }
+
+
+  public EventStatus getEventStatus(final EventProxy event)
+  {
+    final EventEntry entry = mEventStatusMap.get(event);
+    return entry.getStatus();
+  }
+
+  public EventStatus getEventStatus(final EventProxy event,
+                                    final AutomatonProxy aut)
+  {
+    final EventEntry entry = mEventStatusMap.get(event);
+    return entry.getStatus(aut);
+  }
+
+  public String getEventStatusText(final EventProxy event)
+  {
+    final EventEntry entry = mEventStatusMap.get(event);
+    return entry.getStatusText();
+  }
+
+  /**
+   * @param event The event which is to be drawn
+   * @return An image. A tick if the event can be fired by at least one possible step,
+   * a cross if that event is blocked by some automata,
+   * a yellow flag if firing that event will disable an event, or
+   * a red flag, if that event is causing a controllability problem
+   */
+  ImageIcon getEventActivityIcon(final EventProxy event)
+  {
+    final EventStatus status = getEventStatus(event);
+    return status.getIcon();
+  }
+
+  public List<Step> getEnabledSteps()
+  {
+    updateEventStatus();
+    return mEnabledSteps;
+  }
+
+  TransitionProxy getPreviousTransition(final AutomatonProxy aut)
+  {
+    if (mCurrentTime == 0) {
+      return null;
+    } else {
+      // TODO Add cache
+      final EventProxy event = mCurrentState.getEvent();
+      if (!aut.getEvents().contains(event)) {
+        return null;
+      }
+      final SimulatorState prev = mStateHistory.get(mCurrentTime - 1);
+      final StateProxy source = prev.getState(aut);
+      final StateProxy target = mCurrentState.getState(aut);
+      for (final TransitionProxy trans : aut.getTransitions()) {
+        if (trans.getSource() == source &&
+            trans.getEvent() == event &&
+            trans.getTarget() == target) {
+          return trans;
+        }
+      }
+      throw new IllegalArgumentException
+        ("Previous transition not found for automaton" + aut.getName() + "!");
     }
-    return output;
   }
 
 
@@ -874,21 +573,85 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
+  public void attach(final SimulationObserver observer)
+  {
+    if (!mSimulationObservers.contains(observer)) {
+      mSimulationObservers.add(observer);
+    }
+  }
+
+  public void detach(final SimulationObserver observer)
+  {
+    mSimulationObservers.remove(observer);
+  }
+
 
   //#########################################################################
-  //# Auxiliary Methods
+  //# Updating the DES
+  /**
+   * Stores a new compiled DES. Recomputes all data associated with it
+   * and notifies registered views of the change.
+   */
+  private void setCompiledDES(final ProductDESProxy des)
+  {
+    if (des != mCompiledDES) {
+      mCompiledDES = des;
+      mOrderedEvents = null;
+      mOrderedAutomata = null;
+      mAutomataMap = null;
+      mAutomataSensitiveToEvent = null;
+      resetState(true);
+    }
+  }
+
+  private void updateAutomata()
+  {
+    if (mOrderedAutomata == null) {
+      if (mCompiledDES == null) {
+        mOrderedAutomata = Collections.emptyList();
+      } else {
+        final Collection<AutomatonProxy> automata = mCompiledDES.getAutomata();
+        final int numAutomata = automata.size();
+        mOrderedAutomata = new ArrayList<AutomatonProxy>(numAutomata);
+        mAutomataMap = new HashMap<String,AutomatonProxy>(numAutomata);
+        for (final AutomatonProxy aut : automata) {
+          mOrderedAutomata.add(aut);
+          final String name = aut.getName();
+          mAutomataMap.put(name, aut);
+        }
+        Collections.sort(mOrderedAutomata);
+      }
+    }
+  }
+
+  private void updateEvents()
+  {
+    if (mOrderedEvents == null) {
+      if (mCompiledDES == null) {
+        mOrderedEvents = Collections.emptyList();
+      } else {
+        final Collection<EventProxy> events = mCompiledDES.getEvents();
+        final int numEvents = events.size();
+        mOrderedEvents = new ArrayList<EventProxy>(numEvents);
+        for (final EventProxy event : events) {
+          if (event.getKind() != EventKind.PROPOSITION) {
+            mOrderedEvents.add(event);
+          }
+        }
+        Collections.sort(mOrderedEvents);
+      }
+    }
+  }
+
   private void updateAutomataSensitiveToEvent()
   {
-    if (mAutomataSensitiveToEvent == null) {
-      final int numEvents = mCompiledDES.getEvents().size();
+    if (mAutomataSensitiveToEvent == null && mCompiledDES != null) {
+      updateAutomata();
+      updateEvents();
+      final int numEvents = mOrderedEvents.size();
       mAutomataSensitiveToEvent =
         new HashMap<EventProxy,List<AutomatonProxy>>(numEvents);
-      final Collection<AutomatonProxy> automata = mCompiledDES.getAutomata();
-      final int numAutomata = automata.size();
-      final AutomatonProxy[] array = new AutomatonProxy[numAutomata];
-      automata.toArray(array);
-      Arrays.sort(array);
-      for (final AutomatonProxy aut : array) {
+      for (final AutomatonProxy aut : mOrderedAutomata) {
         for (final EventProxy event : aut.getEvents()) {
           if (event.getKind() != EventKind.PROPOSITION) {
             List<AutomatonProxy> list = mAutomataSensitiveToEvent.get(event);
@@ -903,360 +666,247 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
+
+  //#########################################################################
+  //# Updating the state.
   /**
-   * Finds the new automata and events which are now causing controllability errors.
-   * It also finds properties that could possibly fail next step
+   * Adds a new simulation state to the end of the current history.
+   * Thus, it is only used for step methods.
    */
-  private void updateControllability(final boolean addNewUncontrollable)
+  private void addNewSimulatorState(final SimulatorState state)
   {
-    final ArrayList<Pair<EventProxy, AutomatonProxy>> output = new ArrayList<Pair<EventProxy, AutomatonProxy>>();
-    final ArrayList<AutomatonProxy> uncontrollableAutomatonThisTime = new ArrayList<AutomatonProxy>();
-    for (final EventProxy event : mInvalidEvents.keySet())
-    {
-      if (event.getKind() == EventKind.UNCONTROLLABLE)
-      {
-        boolean blockingPlant = false;
-        Pair<EventProxy, AutomatonProxy> blockingSpec = null;
-        for (final AutomatonProxy automata : mInvalidEvents.get(event))
-        {
-          if (automata.getKind() == ComponentKind.SPEC || automata.getKind() == ComponentKind.SUPERVISOR)
-          {
-            blockingSpec =  new Pair<EventProxy, AutomatonProxy> (event, automata);
-          }
-          else if (automata.getKind() == ComponentKind.PLANT)
-          {
-            blockingPlant = true;
-          }
-        }
-        if (!blockingPlant && blockingSpec != null)
-        {
-          output.add(blockingSpec);
-          uncontrollableAutomatonThisTime.add(blockingSpec.getSecond());
-        }
-      }
-    }
-    if (output.size() == 0)
-      mBlockingEvents = null;
-    else
-      mBlockingEvents = output;
-    for (final AutomatonProxy auto : mAllAutomatons.keySet())
-    {
-      if (auto.getKind() == ComponentKind.PROPERTY && !mDisabledProperties.contains(auto))
-      {
-        for (final Step step : mEnabledSteps)
-        {
-          if (auto.getEvents().contains(step.getEvent()))
-          {
-            boolean found = false;
-            for (final TransitionProxy trans : mTransitionsToEvents.getTransition(auto, mAllAutomatons.get(auto)))
-            {
-              if (trans.getEvent() == step.getEvent())
-                found = true;
-            }
-            if (!found)
-              mWarningProperties.put(step, auto);
-          }
-        }
-      }
-    }
-  }
-
-  private ArrayList<Pair<EventProxy, AutomatonProxy>> testForControlability()
-  {
-    return mBlockingEvents;
-  }
-
-  private boolean isInValidEvent (final Step step)
-  {
-    for (final Step validStep : mEnabledSteps)
-    {
-      if (step == validStep)
-        return true;
-    }
-    return false;
-  }
-
-  private boolean isInInvalidEvent(final EventProxy event)
-  {
-    for (final EventProxy invalidEvent : mInvalidEvents.keySet())
-    {
-      if (invalidEvent == event)
-        return true;
-    }
-    return false;
+    mStateHistory.add(state);
   }
 
   /**
-   * Finds all the possible enabled steps, and all the disabled events
+   * This method takes the current time of the simulation, and changes the
+   * current states of the simulation to match the current time. It is used for
+   * stepping back and forward through the simulation without changing it.
    */
-  private void findEventClassification()
+  private void loadSimulatorState()
   {
-    mEnabledSteps = new ArrayList<Step>();
-    mInvalidEvents = new HashMap<EventProxy, ArrayList<AutomatonProxy>> ();
-    for (final AutomatonProxy aut : mAllAutomatons.keySet())
-    {
-      final ArrayList<TransitionProxy> eventsFirable = new ArrayList<TransitionProxy>();
-      final ArrayList<TransitionProxy> newEventsFirable = new ArrayList<TransitionProxy>();
-      for (final TransitionProxy trans : mTransitionsToEvents.getTransition(aut, mAllAutomatons.get(aut)))
-      {
-        boolean isInEnabled = false;
-        boolean isInInvalid = false;
-        for (final Step step: mEnabledSteps)
-        {
-          if (step.getEvent() == trans.getEvent())
-            isInEnabled = true;
-        }
-        for (final EventProxy invalidEvent : mInvalidEvents.keySet())
-        {
-          if (invalidEvent == trans.getEvent())
-            isInInvalid = true;
-        }
-        if (isInEnabled)
-        {
-          eventsFirable.add(trans);
-        }
-        else if (!isInEnabled && !isInInvalid)
-        {
-          newEventsFirable.add(trans);
-        }
-      }
-      processOldEvents(eventsFirable, aut);
-      processNewEvents(newEventsFirable, aut);
-      if (aut.getKind() != ComponentKind.PROPERTY)
-        removeIgnoredEvents(mTransitionsToEvents.getTransition(aut, mAllAutomatons.get(aut)), aut);
-    }
-    Collections.sort(mEnabledSteps);
-    updateControllability(false);
-    if (mBlockingEvents != null)
-    {
-      final ArrayList<Pair<EventProxy, AutomatonProxy>> invalidEvent = testForControlability();
-      for (final Pair<EventProxy, AutomatonProxy> invalidPair : invalidEvent)
-      {
-        mModuleContainer.getIDE().error(": The event " + invalidPair.getFirst().getName()
-            + " is not controllable, inside the automaton " + invalidPair.getSecond().getName()
-            + ". Current state is: " + mAllAutomatons.get(invalidPair.getSecond()).getName());
-      }
-    }
-    if (mEnabledSteps.size() == 0)
-    {
-      checkForBlockingError();
-    }
+    mCurrentState = mStateHistory.get(mCurrentTime);
+    mEnabledSteps = null;
+    mEventStatusMap = null;
   }
 
   /**
-   * Prints errors if the simulation is blocking. It does not print an error if all the current states are accepting
-   * or if those which are not accepting don't have any accepting states within thier automaton.
+   * Re-evaluates the lists of enabled events ({@link #mEnabledSteps}) and the
+   * event status map ({@link #mEventStatusMap}). This method assumes that the
+   * current state ({@link #mCurrentState}) is correctly set, but it adds
+   * warning and error status to {@link #mCurrentState} if the need is
+   * discovered.
    */
-  private void checkForBlockingError()
+  private void updateEventStatus()
   {
-    for (final AutomatonProxy auto : mAllAutomatons.keySet())
-    {
-      if (mAllAutomatons.get(auto).getPropositions().size() == 0)
-      {
-        for (final StateProxy state : auto.getStates())
-        {
-          if (state.getPropositions().size() != 0)
-          {
-            mModuleContainer.getIDE().error(": The automaton " + auto.getName() + " is blocking");
-          }
-        }
+    if (mEnabledSteps == null) {
+      updateEvents();
+      final int numGlobal = mOrderedEvents.size();
+      final Set<EventProxy> enabled = new THashSet<EventProxy>(numGlobal);
+      mEventStatusMap = new HashMap<EventProxy,EventEntry>(numGlobal);
+      for (final EventProxy event : mOrderedEvents) {
+        final Collection<AutomatonProxy> automata =
+          getAutomataSensitiveToEvent(event);
+        final int numAut = automata.size();
+        final EventEntry entry = new EventEntry(numAut);
+        mEventStatusMap.put(event, entry);
       }
-      else
-      {
-        boolean isAccepting = false;
-        for (final EventProxy prop : mAllAutomatons.get(auto).getPropositions())
-        {
-          if (prop.getName().compareTo(":accepting") == 0)
-            isAccepting = true;
-        }
-        if (!isAccepting)
-        {
-          mModuleContainer.getIDE().error(": The automaton " + auto.getName() + " is blocking");
-        }
-      }
-    }
-  }
-
-  /**
-   * Looks for all events which are sensitive to the automaton, but are not able to be fired in this automaton
-   * It then deletes all enabled events which involve those events, and adds it to the invalid events list
-   * @param automatonsActiveEvents All the automatons possible transitions which it can fire
-   * @param aut The automaton to test
-   */
-  private void removeIgnoredEvents(final List<TransitionProxy> automatonsActiveEvents, final AutomatonProxy aut)
-  {
-    for (final EventProxy event : aut.getEvents())
-    {
-      boolean fired = false;
-      for (final TransitionProxy trans : automatonsActiveEvents)
-      {
-        if (trans.getEvent() == event)
-          fired = true;
-      }
-      if (!fired)
-      {
-        for (final Step toBeRemoved : new ArrayList<Step>(mEnabledSteps))
-        {
-          if (toBeRemoved.getEvent() == event)
-          {
-            mEnabledSteps.remove(toBeRemoved);
-          }
-        }
-        addNewInvalidEvent(event, aut);
-      }
-    }
-  }
-
-  /**
-   * Adds new steps to the list of enabled possible steps
-   * @param newEventsFirable The list of all the transitions in the automaton which the automaton can fire
-   * @param aut The automaton to test
-   */
-  private void processNewEvents(final ArrayList<TransitionProxy> newEventsFirable,
-                                final AutomatonProxy aut)
-  {
-    while (newEventsFirable.size() != 0)
-    {
-      final TransitionProxy firable = newEventsFirable.get(0);
-      final ArrayList<TransitionProxy> targetTrans = new ArrayList<TransitionProxy>();
-      for (final TransitionProxy trans : newEventsFirable)
-      {
-        if (firable.getEvent() == trans.getEvent())
-          targetTrans.add(trans);
-      }
-      if (targetTrans.size() != 1)
-      {
-        for (final TransitionProxy trans : targetTrans)
-        {
-          final HashMap<AutomatonProxy, StateProxy> source = new HashMap<AutomatonProxy, StateProxy>();
-          final HashMap<AutomatonProxy, StateProxy> dest = new HashMap<AutomatonProxy, StateProxy>();
-          source.put(aut, trans.getSource());
-          dest.put(aut, trans.getTarget());
-          mEnabledSteps.add(new Step(trans.getEvent(),source, dest));
-        }
-      }
-      else
-      {
-        mEnabledSteps.add(new Step(firable.getEvent()));
-      }
-      for (final TransitionProxy trans : targetTrans)
-        newEventsFirable.remove(trans);
-    }
-  }
-
-  /**
-   * Modifies existing steps to the list of enabled possible steps. If non-deterministic information is required, it is added here
-   * @param newEventsFirable The list of all the transitions in the automaton which the automaton can fire
-   * @param aut The automaton to test
-   */
-  private void processOldEvents(final ArrayList<TransitionProxy> eventsFirable, final AutomatonProxy aut)
-  {
-    while (eventsFirable.size() != 0)
-    {
-      final TransitionProxy firable = eventsFirable.get(0);
-      final ArrayList<TransitionProxy> targetTrans = new ArrayList<TransitionProxy>();
-      for (final TransitionProxy trans : eventsFirable)
-      {
-        if (firable.getEvent() == trans.getEvent())
-          targetTrans.add(trans);
-      }
-      if (targetTrans.size() != 1)
-      {
-        for (final Step step : new ArrayList<Step>(mEnabledSteps))
-        {
-          if (step.getEvent() == firable.getEvent())
-          {
-            mEnabledSteps.remove(step);
-            for (final TransitionProxy trans : targetTrans)
-            {
-              mEnabledSteps.add(step.addNewTransition(aut, trans));
+      final ComponentKind[] order = new ComponentKind[]
+        {ComponentKind.PLANT, ComponentKind.SPEC, ComponentKind.PROPERTY};
+      for (final ComponentKind kind : order) {
+        for (final AutomatonProxy aut : mOrderedAutomata) {
+          if (aut.getKind() == kind) {
+            final AutomatonStatus status = mCurrentState.getStatus(aut);
+            if (status != AutomatonStatus.DISABLED) {
+              final StateProxy source = mCurrentState.getState(aut);
+              final Collection<EventProxy> local = aut.getEvents();
+              for (final TransitionProxy trans : aut.getTransitions()) {
+                if (trans.getSource() == source) {
+                  final EventProxy event = trans.getEvent();
+                  enabled.add(event);
+                }
+              }
+              for (final EventProxy event : local) {
+                if (event.getKind() != EventKind.PROPOSITION &&
+                    !enabled.contains(event)) {
+                  final EventEntry entry = mEventStatusMap.get(event);
+                  switch (aut.getKind()) {
+                  case PLANT:
+                    entry.setStatus(aut, EventStatus.DISABLED);
+                    break;
+                  case SPEC:
+                    if (event.getKind() == EventKind.CONTROLLABLE ||
+                        entry.getStatus() == EventStatus.DISABLED) {
+                      entry.setStatus(aut, EventStatus.DISABLED);
+                    } else {
+                      entry.setStatus(aut, EventStatus.ERROR);
+                      mCurrentState.addStatus(aut, AutomatonStatus.ERROR);
+                    }
+                    break;
+                  case PROPERTY:
+                    if (entry.getStatus() == EventStatus.DISABLED) {
+                      entry.setStatus(aut, EventStatus.DISABLED);
+                    } else {
+                      entry.setStatus(aut, EventStatus.WARNING);
+                      mCurrentState.addStatus(aut, AutomatonStatus.WARNING);
+                    }
+                    break;
+                  default:
+                    throw new IllegalStateException
+                    ("Unknown component kind " + aut.getKind() + "!");
+                  }
+                }
+              }
+              enabled.clear();
             }
           }
         }
       }
-      for (final TransitionProxy trans : targetTrans)
-        eventsFirable.remove(trans);
-    }
-  }
-
-  /**
-   * Adds a new invalid event to the invalid events list. If it is already on the list, appends the automaton
-   * to the list of automaton blocking that list
-   * @param event The invalid event
-   * @param automaton The new automaton which is blocking that event
-   */
-  private void addNewInvalidEvent(final EventProxy event, final AutomatonProxy automaton)
-  {
-    boolean isInValidEvent = false;
-    for (final Step step : mEnabledSteps)
-    {
-      if (step.getEvent() == event)
-        isInValidEvent = true;
-    }
-    if (isInInvalidEvent(event))
-    {
-      final ArrayList<AutomatonProxy> got = mInvalidEvents.get(event);
-      got.add(automaton);
-      mInvalidEvents.put(event, got);
-    }
-    else if (isInValidEvent)
-    {
-      for (final Step step : mEnabledSteps)
-      {
-        if (step.getEvent() == event)
-          mEnabledSteps.remove(step);
+      final int numAutomata = mOrderedAutomata.size();
+      final Map<AutomatonProxy,StateProxy> source =
+        new HashMap<AutomatonProxy,StateProxy>(numAutomata);
+      final Map<AutomatonProxy,StateProxy> target =
+        new HashMap<AutomatonProxy,StateProxy>(numAutomata);
+      for (final AutomatonProxy aut : mOrderedAutomata) {
+        final StateProxy state = mCurrentState.getState(aut);
+        source.put(aut, state);
+        target.put(aut, state);
       }
-      final ArrayList<AutomatonProxy> failAutomaton = new ArrayList<AutomatonProxy>();
-      failAutomaton.add(automaton);
-      mInvalidEvents.put(event, failAutomaton);
-    }
-    else
-    {
-      final ArrayList<AutomatonProxy> failAutomaton = new ArrayList<AutomatonProxy>();
-      failAutomaton.add(automaton);
-      mInvalidEvents.put(event, failAutomaton);
+      mEnabledSteps = new ArrayList<Step>();
+      for (final EventProxy event : mOrderedEvents) {
+        if (getEventStatus(event) == EventStatus.ENABLED) {
+          final List<AutomatonProxy> automata =
+            getAutomataSensitiveToEvent(event);
+          createSteps(event, source, target, automata, 0);
+        }
+      }
     }
   }
 
-  private boolean hasPropositions(final AutomatonProxy automaton)
+  private void createSteps(final EventProxy event,
+                           final Map<AutomatonProxy,StateProxy> sourceTuple,
+                           final Map<AutomatonProxy,StateProxy> targetTuple,
+                           final List<AutomatonProxy> automata,
+                           final int index)
   {
-    for (final EventProxy event : automaton.getEvents())
-    {
-      if (event.getKind() == EventKind.PROPOSITION)
-        return true;
+    if (index == automata.size()) {
+      final Map<AutomatonProxy,StateProxy> targetCopy =
+        new HashMap<AutomatonProxy,StateProxy>(targetTuple);
+      final Step step = new Step(event, sourceTuple, targetCopy);
+      mEnabledSteps.add(step);
+    } else {
+      final int next = index + 1;
+      final AutomatonProxy aut = automata.get(index);
+      final StateProxy source = sourceTuple.get(aut);
+      for (final TransitionProxy trans : aut.getTransitions()) {
+        if (trans.getSource() == source && trans.getEvent() == event) {
+          final StateProxy target = trans.getTarget();
+          targetTuple.put(aut, target);
+          createSteps(event, sourceTuple, targetTuple, automata, next);
+        }
+      }
     }
-    return false;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  /**
+   * Resets the simulation, and then loads the trace
+   * @param trace The trace to load
+   * @param allowLastStep <STRONG>true</STRONG> if the last step in the TraceProxy is to be fired, <STRONG>false</STRONG>
+   * if the simulation is to be stopped at the second-to-last step instead.
+   */
+  private void executeTrace(final TraceProxy trace,
+                            final boolean allowLastStep)
+  {
+    mTrace = trace;
+    mTraceInvalidated = false;
+    mAllowLastStep = allowLastStep;
+    mStateHistory.clear();
+    mCurrentTime = -1;
+    SimulatorState state = null;
+    final List<TraceStepProxy> list = trace.getTraceSteps();
+    final Iterator<TraceStepProxy> iter = list.iterator();
+    while (iter.hasNext()) {
+      final TraceStepProxy traceStep = iter.next();
+      if (iter.hasNext() || mAllowLastStep) {
+        final EventProxy event = traceStep.getEvent();
+        if (state == null) {
+          state = SimulatorState.createInitialState
+            (mOrderedAutomata, traceStep);
+        } else {
+          state = SimulatorState.createSuccessorState(state, event, traceStep);
+        }
+        mStateHistory.add(state);
+        mCurrentTime++;
+      }
+    }
+    loadSimulatorState();
   }
 
   /**
-   * Stores a new compiled DES. Recomputes all data associated with it
-   * and notifies registered views of the change.
+   * Moves the simulation state forward one step, or backward one step, without
+   * changing the trace.
+   * @param forward
+   *          Moves the simulation forward if <STRONG>true</STRONG>, backwards
+   *          otherwise.
    */
-  private void setCompiledDES(final ProductDESProxy des)
+  private void moveSafely(final boolean forward)
   {
-    if (des != mCompiledDES) {
-      mCompiledDES = des;
-      mAutomataSensitiveToEvent = null;
-      mTransitionsToEvents = new TransitionEventMap(des);
-      reset(true);
+    if (moveTime(forward)) {
+      loadSimulatorState();
+      final SimulationChangeEvent simEvent = new SimulationChangeEvent
+      (this, SimulationChangeEvent.STATE_CHANGED);
+      fireSimulationChangeEvent(simEvent);
     }
   }
 
-  public void attach(final SimulationObserver observer)
+  /**
+   * Increments or decrements the current time counter. If it is the last step
+   * and is moving forward or if it is the first step and it is moving backward,
+   * then it will print an error message instead.
+   */
+  private boolean moveTime(final boolean forward)
   {
-    if (!mSimulationObservers.contains(observer)) {
-      mSimulationObservers.add(observer);
+    if (forward) {
+      if (mCurrentTime == mStateHistory.size() - 1) {
+        final IDE ide = mModuleContainer.getIDE();
+        ide.error("No future events in simulation history!");
+        return false;
+      } else {
+        mCurrentTime++;
+        return true;
+      }
+    } else {
+      if (mCurrentTime == 0) {
+        final IDE ide = mModuleContainer.getIDE();
+        ide.error("No previous event in simulation history!");
+        return false;
+      } else {
+        mCurrentTime--;
+        return true;
+      }
     }
   }
 
-  public void detach(final SimulationObserver observer)
+  /**
+   * Removes all future information from the simulation. This is used if the
+   * simulation is doing something that changes the trace while the current time
+   * is not the last time reached in the simulation. This invalidates all
+   * later states.
+   */
+  private void removeFutureSteps()
   {
-    mSimulationObservers.remove(observer);
+    int index = mStateHistory.size() - 1;
+    while (index > mCurrentTime) {
+      mStateHistory.remove(index--);
+    }
   }
 
   private void fireSimulationChangeEvent(final SimulationChangeEvent event)
   {
-    updateActiveEvents();
+    updateEventStatus();
     final ArrayList<SimulationObserver> temp =
       new ArrayList<SimulationObserver>(mSimulationObservers);
     for (final SimulationObserver observer : temp) {
@@ -1264,88 +914,150 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-  /**
-   * Moves the simulation state forward one step, or backward one step, without changing the trace
-   * @param forward Moves the simulation forward if <STRONG>true</STRONG>, backwards otherwise
-   */
-  private void moveSafely(final boolean forward)
+
+  //#########################################################################
+  //# Auxiliary Static Methods
+  private static boolean hasPropositions(final AutomatonProxy automaton)
   {
-    mWarningProperties = new HashMap<Step, AutomatonProxy>();
-    moveTime(forward);
-    loadSimulatorState();
-    final SimulationChangeEvent simEvent = new SimulationChangeEvent
-      (this, SimulationChangeEvent.STATE_CHANGED);
-    fireSimulationChangeEvent(simEvent);
+    for (final EventProxy event : automaton.getEvents()) {
+      if (event.getKind() == EventKind.PROPOSITION) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  /**
-   * Increments or decrements the current time counter. If it is the last step and is moving forward
-   * or if it is the first step and it is moving backward, then it will print an error message instead.
-   * @param forward
-   */
-  private void moveTime(final boolean forward)
+
+  //#########################################################################
+  //# Inner Class EventEntry
+  private static class EventEntry
   {
-    if (forward)
+    //#########################################################################
+    //# Constructor
+    private EventEntry(final int numAutomata)
     {
-      if (currentTime == previousStates.size() - 1)
-      {
-        mContainer.getIDE().error("No future Events");
-        return;
-      }
-      else
-        currentTime++;
+      mStatus = EventStatus.ENABLED;
+      mAutomataMap = new HashMap<AutomatonProxy,EventStatus>(numAutomata);
     }
-    else
+
+    //#########################################################################
+    //# Simple Access
+    private EventStatus getStatus()
     {
-      if (currentTime == 0)
-      {
-        mContainer.getIDE().error("No previous Event");
-        return;
-      }
-      else
-        currentTime--;
+      return mStatus;
     }
+
+    private EventStatus getStatus(final AutomatonProxy aut)
+    {
+      final EventStatus status = mAutomataMap.get(aut);
+      if (status == null) {
+        return EventStatus.ENABLED;
+      } else {
+        return status;
+      }
+    }
+
+    private String getStatusText()
+    {
+      final StringBuffer buffer;
+      switch (mStatus) {
+      case DISABLED:
+        return "currently disabled";
+      case ENABLED:
+        return "currently enabled";
+      case WARNING:
+        buffer = new StringBuffer("causes violation of property ");
+        break;
+      case ERROR:
+        buffer =
+          new StringBuffer("violates controllability of specification ");
+        break;
+      default:
+        throw new IllegalStateException
+          ("Unknown event status " + mStatus + "!");
+      }
+      boolean first = true;
+      for (final Map.Entry<AutomatonProxy,EventStatus> entry :
+           mAutomataMap.entrySet()) {
+        if (entry.getValue() == mStatus) {
+          if (first) {
+            first = false;
+          } else {
+            buffer.append(", ");
+          }
+          final AutomatonProxy aut = entry.getKey();
+          final String name = aut.getName();
+          buffer.append(name);
+        }
+      }
+      return buffer.toString();
+    }
+
+    private void setStatus(final AutomatonProxy aut, final EventStatus status)
+    {
+      final EventStatus old = mAutomataMap.put(aut, status);
+      assert old == null : "Status override not supported!";
+      if (mStatus == EventStatus.ENABLED || status.compareTo(mStatus) > 0) {
+        mStatus = status;
+      }
+    }
+
+    //#########################################################################
+    //# Data Members
+    private EventStatus mStatus;
+    private final Map<AutomatonProxy,EventStatus> mAutomataMap;
   }
 
-  /**
-   * Removes all future information from the simulation. This is used if the simulation is doing something that changes the trace
-   * while the current time is not the last time reached in the simulation. This invalidates all previous states.
-   */
-  private void removeFutureEvents()
-  {
-    while (previousStates.size() != currentTime + 1)
-    {
-      previousStates.remove(currentTime + 1);
-    }
-  }
+
 
   //#########################################################################
   //# Data Members
-  private final SimpleExpressionCompiler mSimpleExpressionCompiler;
 
-  private TransitionEventMap mTransitionsToEvents;
-  private Map<EventProxy, List<AutomatonProxy>> mAutomataSensitiveToEvent;
-  private Map<AutomatonProxy,StateProxy> mAllAutomatons; // The Map object is the current state of the key
-  private ArrayList<Step> mEnabledSteps;
-  private HashMap<EventProxy, ArrayList<AutomatonProxy>> mInvalidEvents; //The Map object is the list of all the Automatons which are blocking the event
-  private Step mCurrentEvent;
-  private int currentTime; // The index representing the current index for the current version history.
-  private ArrayList<Pair<EventProxy, AutomatonProxy>> mBlockingEvents;
+  // Variables remaining unchanged throughout simulator lifetime:
   private final ModuleContainer mModuleContainer;
-  private ArrayList<AutomatonProxy> mEnabledLastStep;
-  private final ArrayList<SimulationObserver> mSimulationObservers;
+  private final SimpleExpressionCompiler mSimpleExpressionCompiler;
+  private final List<SimulationObserver> mSimulationObservers;
+  private final ToolTipVisitor mToolTipVisitor;
+
+  // Variables recalculated when the product DES is recompiled:
   private ProductDESProxy mCompiledDES;
-  private final ModuleContainer mContainer;
+  private List<EventProxy> mOrderedEvents;
+  private List<AutomatonProxy> mOrderedAutomata;
+  private Map<String,AutomatonProxy> mAutomataMap;
+  private Map<EventProxy, List<AutomatonProxy>> mAutomataSensitiveToEvent;
+
+  // Variables recalculated after each step:
+  /**
+   * History of steps executed so far.
+   */
+  private final List<SimulatorState> mStateHistory;
+  /**
+   *  The current index in the state history.
+   */
+  private int mCurrentTime;
+  /**
+   * The current state of the simulation. This is equal to the history
+   * entry in {@link #mStateHistory} at index {@link #mCurrentTime}.
+   * It contains the previous event and the current state and status
+   * of each automaton.
+   */
+  private SimulatorState mCurrentState;
+  /**
+   * The current status of each event. The map shows for each event
+   * whether it is enabled, disabled, etc. in the current state.
+   * For disabled events, the entry object also shows the automata
+   * that disable it.
+   */
+  private Map<EventProxy,EventEntry> mEventStatusMap;
+  /**
+   * List of currently enabled simulation steps. Each step contains
+   * information about an event and its associated nondeterministic
+   * successor states.
+   */
+  private List<Step> mEnabledSteps;
+
   private TraceProxy mTrace;
   private boolean mAllowLastStep;
-  private boolean invalidated;
-  private HashMap<Step, AutomatonProxy> mWarningProperties;
-  private ArrayList<SimulatorState> previousStates;
-  private ArrayList<AutomatonProxy> mDisabledProperties;
-  private Set<EventProxy> mEnabledEvents;
-  //long time = 0;
+  private boolean mTraceInvalidated;
 
-  // #######################################################################
-  // # Class Constants
-  private static final boolean SHOW_DISABLED_PROPERTY_ERROR_MESSAGE = false;
 }

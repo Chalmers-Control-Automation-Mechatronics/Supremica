@@ -7,9 +7,6 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -21,21 +18,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory;
-import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.simulator.NonDeterministicException;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
-import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
@@ -177,9 +168,10 @@ public abstract class WatersAnalyzeAction
       traceButton.addActionListener(new ActionListener(){
         public void actionPerformed(final ActionEvent e)
         {
+          AnalyzerDialog.this.dispose();
           final TraceProxy counterexample = verifier.getCounterExample();
-          if (verifier instanceof MonolithicSCCControlLoopChecker)
-          {
+          /*
+          if (verifier instanceof MonolithicSCCControlLoopChecker) {
             final Collection<EventProxy> nonLoop = ((MonolithicSCCControlLoopChecker)verifier).getNonLoopEvents();
             String info = "The non loop events are:";
             for (final EventProxy evt : nonLoop)
@@ -188,11 +180,16 @@ public abstract class WatersAnalyzeAction
             }
             getIDE().info(info);
           }
-          ((ModuleContainer)getIDE().getActiveDocumentContainer()).getTabPane().setSelectedIndex(1);
-          try
-          {
-            ((ModuleContainer)getIDE().getActiveDocumentContainer()).getSimulatorPanel().switchToTraceMode(counterexample);
+          */
+          final IDE ide = getIDE();
+          final ModuleContainer container =
+            (ModuleContainer) ide.getActiveDocumentContainer();
+          container.switchToTraceMode(counterexample);
+          final String comment = counterexample.getComment();
+          if (comment != null && comment.length() > 0) {
+            ide.info(comment);
           }
+          /*
           catch (final NonDeterministicException exception)
           {
             final DocumentManager docManager = getIDE().getDocumentContainerManager().getDocumentManager();
@@ -210,10 +207,11 @@ public abstract class WatersAnalyzeAction
             } catch (final IOException exception1) {
               getIDE().error("IO Exception prevented the file from being written: " + exception1);
             }
-            }
-          AnalyzerDialog.this.dispose();
+          }
+          */
         }
 
+        @SuppressWarnings("unused")
         private File getOutputDirectory()
         {
           return getIDE().getActiveDocumentContainer().getFileLocation().getParentFile();

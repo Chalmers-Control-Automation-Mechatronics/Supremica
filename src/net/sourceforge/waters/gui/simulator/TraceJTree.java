@@ -1,5 +1,7 @@
 package net.sourceforge.waters.gui.simulator;
 
+import gnu.trove.TIntHashSet;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -10,8 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -26,30 +27,25 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.IconLoader;
-import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.subject.module.VariableComponentSubject;
-import net.sourceforge.waters.xsd.base.EventKind;
-
+import net.sourceforge.waters.model.des.TraceProxy;
 import org.supremica.gui.ide.ModuleContainer;
 
-public class TraceJTree extends JTree implements InternalFrameObserver, ComponentListener
+public class TraceJTree
+  extends JTree
+  implements InternalFrameObserver, ComponentListener
 {
-  public TraceJTree(final Simulation sim, final AutomatonDesktopPane desktop, final ModuleContainer container)
+  TraceJTree(final Simulation sim, final AutomatonDesktopPane desktop)
   {
-    super();
-    this.setCellRenderer(new TraceTreeCellRenderer());
+    setCellRenderer(new TraceTreeCellRenderer());
     mSim = sim;
     mDesktop = desktop;
     mPane = null;
     desktop.attach(this);
     automatonAreOpen = new ArrayList<String>();
-    mContainer = container;
-    expandedNodes = new ArrayList<Integer>();
+    mExpandedIndexes = new TIntHashSet();
     final TraceMutableTreeNode root = new TraceMutableTreeNode(sim, this);
     this.setModel(new DefaultTreeModel(root, false));
     this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -58,6 +54,7 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
     setAutoscrolls(true);
     setToggleClickCount(0);
     totalEventWidth = 0;
+    final ModuleContainer container = sim.getModuleContainer();
     factory = new TraceTreePopupFactory(container.getIDE().getPopupActionManager(), desktop);
     for (final Integer intVal : eventColumnWidth)
     {
@@ -72,28 +69,9 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
           final MutableTreeNode node = (MutableTreeNode)path.getLastPathComponent();
           if (node == null)
             return; // Nothing is selected
-          if (EventBranchNode.class.isInstance(node))
+          if (node instanceof TraceStepTreeNode)
           {
-            final EventBranchNode eventNode = (EventBranchNode)node;
-            final int targetTime = eventNode.getTime();
-            int currentTime = sim.getCurrentTime();
-            while (currentTime != targetTime)
-            {
-              if (targetTime < currentTime)
-              {
-                sim.stepBack();
-                currentTime--;
-              }
-              else if (targetTime > currentTime)
-              {
-                sim.replayStep();
-                currentTime++;
-              }
-            }
-          }
-          else if (node instanceof TeleportEventTreeNode)
-          {
-            final TeleportEventTreeNode eventNode = (TeleportEventTreeNode)node;
+            final TraceStepTreeNode eventNode = (TraceStepTreeNode)node;
             final int targetTime = eventNode.getTime();
             int currentTime = sim.getCurrentTime();
             while (currentTime != targetTime)
@@ -112,17 +90,8 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
           }
           else if (AutomatonLeafNode.class.isInstance(node))
           {
-            final AutomatonProxy toAdd = ((AutomatonLeafNode)node).getAutomata();
-            mDesktop.addAutomaton(toAdd.getName(), mSim.getContainer(), mSim, 2);
-          }
-          else if (InitialState.class.isInstance(node))
-          {
-            int currentTime = sim.getCurrentTime();
-            while (currentTime != -1)
-            {
-              sim.stepBack();
-              currentTime--;
-            }
+            final AutomatonProxy toAdd = ((AutomatonLeafNode)node).getAutomaton();
+            mDesktop.addAutomaton(toAdd.getName(), mSim.getModuleContainer(), mSim, 2);
           }
         }
       }
@@ -133,21 +102,13 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
         final MutableTreeNode node = (MutableTreeNode)path.getLastPathComponent();
         if (node == null)
           return; // Nothing is selected
-        if (node instanceof EventBranchNode)
+        if (node instanceof TraceStepTreeNode)
         {
-          factory.maybeShowPopup(TraceJTree.this, e, null, ((EventBranchNode)node).getTime());
-        }
-        else if (node instanceof TeleportEventTreeNode)
-        {
-          factory.maybeShowPopup(TraceJTree.this, e, null, ((TeleportEventTreeNode)node).getTime());
-        }
-        else if (node instanceof InitialState)
-        {
-          factory.maybeShowPopup(TraceJTree.this, e, null, -1);
+          factory.maybeShowPopup(TraceJTree.this, e, null, ((TraceStepTreeNode)node).getTime());
         }
         else if (node instanceof AutomatonLeafNode)
         {
-          factory.maybeShowPopup(TraceJTree.this, e, ((AutomatonLeafNode)node).getAutomata());
+          factory.maybeShowPopup(TraceJTree.this, e, ((AutomatonLeafNode)node).getAutomaton());
         }
       }
     });
@@ -156,49 +117,22 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
       public void treeWillCollapse(final TreeExpansionEvent event)
           throws ExpandVetoException
       {
-        if (event.getPath().getLastPathComponent().getClass() == EventBranchNode.class)
+        if (event.getPath().getLastPathComponent() instanceof TraceStepTreeNode)
         {
-          expandedNodes.remove((Integer)(((EventBranchNode)event.getPath().getLastPathComponent()).getTime()));
-        }
-        else if (event.getPath().getLastPathComponent() instanceof TeleportEventTreeNode)
-        {
-          expandedNodes.remove((Integer)(((TeleportEventTreeNode)event.getPath().getLastPathComponent()).getTime()));
-        }
-        else if (InitialState.class.isInstance(event.getPath().getLastPathComponent()))
-        {
-          expandedNodes.remove(Integer.decode("-1"));
+          mExpandedIndexes.remove((Integer)(((TraceStepTreeNode)event.getPath().getLastPathComponent()).getTime()));
         }
       }
 
       public void treeWillExpand(final TreeExpansionEvent event)
           throws ExpandVetoException
       {
-        if (EventBranchNode.class.isInstance(event.getPath().getLastPathComponent()))
-        {
-          final int expansionIndex = ((EventBranchNode)event.getPath().getLastPathComponent()).getTime();
-          for (final Integer index : expandedNodes)
-          {
-            if (index == expansionIndex)
-              return;
+        final Object last = event.getPath().getLastPathComponent();
+        if (last instanceof TraceStepTreeNode) {
+          final TraceStepTreeNode node = (TraceStepTreeNode) last;
+          final Integer time = node.getTime();
+          if (mExpandedIndexes.add(time)) {
+            node.expand(mSim);
           }
-          expandedNodes.add(expansionIndex);
-          ((EventBranchNode)event.getPath().getLastPathComponent()).addAutomata(mSim, mSim.getAutomatonHistory().get(expansionIndex));
-        }
-        else if (event.getPath().getLastPathComponent() instanceof TeleportEventTreeNode)
-        {
-          final int expansionIndex = ((TeleportEventTreeNode)event.getPath().getLastPathComponent()).getTime();
-          for (final Integer index : expandedNodes)
-          {
-            if (index == expansionIndex)
-              return;
-          }
-          expandedNodes.add(expansionIndex);
-          ((TeleportEventTreeNode)event.getPath().getLastPathComponent()).addAutomata(mSim, mSim.getAutomatonHistory().get(expansionIndex));
-        }
-        else if (InitialState.class.isInstance(event.getPath().getLastPathComponent()))
-        {
-          ((InitialState)event.getPath().getLastPathComponent()).expand(mSim);
-          expandedNodes.add(-1);
         }
       }
     });
@@ -214,35 +148,16 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
       {
         final TreePath path = TraceJTree.this.getClosestPathForLocation(e.getX(), e.getY());
         final Object comp = path.getLastPathComponent();
-        if (EventBranchNode.class.isInstance(comp))
-        {
-          String toolTipText = "";
-          final EventProxy event = ((EventBranchNode)comp).getEvent();
-          if (event.getKind() == EventKind.CONTROLLABLE)
-          {
-            toolTipText += "Controllable";
-          }
-          else
-            toolTipText += "Uncontrollable";
-          toolTipText += " Event " + event.getName() + " was fired at time " + (((EventBranchNode)comp).getTime());
-          if (mSim.getTrace() instanceof LoopTraceProxy)
-          {
-            if (((EventBranchNode)comp).getTime() == ((LoopTraceProxy)mSim.getTrace()).getLoopIndex() + 1)
-              toolTipText += ". This event is the start of the loop in the control loop problem";
-          }
-          setToolTipText(toolTipText);
-        }
-        else if (comp instanceof TeleportEventTreeNode)
-        {
-          setToolTipText("Automaton State was manually set");
-        }
-        else if (AutomatonLeafNode.class.isInstance(comp))
-        {
-          setToolTipText(AutomatonPopupFactory.getToolTipName(((AutomatonLeafNode)comp).getAutomata(), mSim, false));
-        }
-        else if (InitialState.class.isInstance(comp))
-        {
-          setToolTipText("The Initial State of the Simulation");
+        if (comp instanceof TraceStepTreeNode) {
+          final TraceStepTreeNode node = (TraceStepTreeNode) comp;
+          final String tooltip = node.getToolTipText(mSim);
+          setToolTipText(tooltip);
+        } else if (comp instanceof AutomatonLeafNode) {
+          final AutomatonLeafNode node = (AutomatonLeafNode) comp;
+          final AutomatonProxy aut = node.getAutomaton();
+          final ToolTipVisitor visitor = mSim.getToolTipVisitor();
+          final String tooltip = visitor.getToolTip(aut, false);
+          setToolTipText(tooltip);
         }
       }
     });
@@ -254,60 +169,32 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
     mPane.addComponentListener(this);
   }
 
-  // ############################################################################
-  // # Simple Access
 
+  //#########################################################################
+  //# Simple Access
   public void forceRecalculation()
   {
     final TraceMutableTreeNode node = new TraceMutableTreeNode(mSim, this);
-    this.setModel(new DefaultTreeModel(node, false));
-    for (int looper = 0; looper < expandedNodes.size(); looper++)
-    {
-      final int expandedIndex = expandedNodes.get(looper);
-      boolean located = false;
-      for (int nodeIndex = 0; nodeIndex < node.getChildCount(); nodeIndex++)
-      {
-        if (EventBranchNode.class.isInstance(node.getChildAt(nodeIndex)))
-        {
-          if (((EventBranchNode)node.getChildAt(nodeIndex)).getTime() == expandedIndex)
-          {
-            ((EventBranchNode)node.getChildAt(nodeIndex)).addAutomata(mSim,
-                mSim.getAutomatonHistory().get(((EventBranchNode)node.getChildAt(nodeIndex)).getTime()));
-            this.expandPath(new TreePath(((EventBranchNode)node.getChildAt(nodeIndex)).getPath()));
-            located = true;
-          }
-        }
-        else if (node.getChildAt(nodeIndex) instanceof TeleportEventTreeNode)
-        {
-          if (expandedIndex == ((TeleportEventTreeNode)node.getChildAt(nodeIndex)).getTime())
-          {
-            ((TeleportEventTreeNode)node.getChildAt(nodeIndex)).addAutomata(mSim,
-                mSim.getAutomatonHistory().get(((TeleportEventTreeNode)node.getChildAt(nodeIndex)).getTime()));
-            this.expandPath(new TreePath(((TeleportEventTreeNode)node.getChildAt(nodeIndex)).getPath()));
-            located = true;
-          }
-        }
-        else if (InitialState.class.isInstance(node.getChildAt(nodeIndex)))
-        {
-          if (expandedIndex == -1)
-          {
-            ((InitialState)node.getChildAt(nodeIndex)).expand(mSim);
-            this.expandPath(new TreePath(((InitialState)node.getChildAt(nodeIndex)).getPath()));
-            located = true;
-          }
-        }
-      }
-      if (!located)
-      {
-        expandedNodes.remove(looper);
-        looper--;
+    setModel(new DefaultTreeModel(node, false));
+    final int childCount = node.getChildCount();
+    final TIntHashSet newExpanded = new TIntHashSet(childCount);
+    for (int nodeIndex = 0; nodeIndex < childCount; nodeIndex++) {
+      final TraceStepTreeNode child =
+        (TraceStepTreeNode) node.getChildAt(nodeIndex);
+      final int time = child.getTime();
+      if (mExpandedIndexes.contains(time)) {
+        child.expand(mSim);
+        final TreePath path = new TreePath(child.getPath());
+        expandPath(path);
+        newExpanded.add(nodeIndex);
       }
     }
+    mExpandedIndexes = newExpanded;
   }
 
-  //##################################################################
-  // # Interface InternalFrameObserver
 
+  //#########################################################################
+  //# Interface InternalFrameObserver
   public void onFrameEvent(final InternalFrameEvent event)
   {
     if (event.isOpeningEvent())
@@ -349,11 +236,11 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
     forceRecalculation();
   }
 
-  // ############################################################################
-  // # Inner Classes
 
+  //#########################################################################
+  //# Inner Classes
   private class TraceTreeCellRenderer
-  implements TreeCellRenderer
+    implements TreeCellRenderer
   {
     //#######################################################################
     //# Constructor
@@ -365,132 +252,94 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
       mEventNameLabel = new JLabel();
       mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
       mEventPanel.add(mEventNameLabel);
-      mAutomataPanel = new JPanel();
-      mAutomataPanel.setLayout(layout);
+      mAutomatonPanel = new JPanel();
+      mAutomatonPanel.setLayout(layout);
       mAutomataNameLabel = new JLabel();
       mAutomataIconLabel = new JLabel();
       mAutomataStatusLabel = new JLabel();
-      mAutomataPanel.add(mAutomataNameLabel);
-      mAutomataPanel.add(mAutomataIconLabel);
-      mAutomataPanel.add(mAutomataStatusLabel);
+      mAutomatonPanel.add(mAutomataNameLabel);
+      mAutomatonPanel.add(mAutomataIconLabel);
+      mAutomatonPanel.add(mAutomataStatusLabel);
     }
 
     //#######################################################################
     //# Interface javax.swing.tree.TreeCellRenderer
     public Component getTreeCellRendererComponent
-    (final JTree tree, final Object value, final boolean sel,
-        final boolean expanded, final boolean leaf,
-        final int row, final boolean hasFocus)
-     {
-       if (EventBranchNode.class.isInstance(value))
-       {
-         if (sel)
-           mEventPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
-         else
-           mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
-         final EventBranchNode eventNode = (EventBranchNode)value;
-         final EventProxy event = eventNode.getEvent();
-         mEventNameLabel.setText(String.valueOf(eventNode.getTime()) + ". " + event.getName());
-         if (mSim.getTrace() instanceof LoopTraceProxy)
-         {
-           if (eventNode.getTime() == ((LoopTraceProxy)mSim.getTrace()).getLoopIndex() + 1)
-             mEventNameLabel.setText(mEventNameLabel.getText() + " <---");
-         }
-         if (event.getKind() == EventKind.CONTROLLABLE)
-           mEventNameLabel.setIcon(IconLoader.ICON_CONTROLLABLE);
-         else
-           mEventNameLabel.setIcon(IconLoader.ICON_UNCONTROLLABLE);
-         if (eventNode.getTime() == TraceJTree.this.mSim.getCurrentTime())
-         {
-           mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.BOLD));
-         }
-         else
-         {
-           mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
-         }
-         return mEventPanel;
-       }
-       else if (AutomatonLeafNode.class.isInstance(value))
-       {
-         if (sel)
-           mAutomataPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
-         else
-           mAutomataPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
-         final AutomatonLeafNode autoNode = (AutomatonLeafNode) value;
-         final AutomatonProxy autoProxy = autoNode.getAutomata();
-         mAutomataNameLabel.setText(autoProxy.getName());
-         if (mContainer.getSourceInfoMap().get(autoProxy).getSourceObject().getClass() == VariableComponentSubject.class)
-           mAutomataNameLabel.setIcon(IconLoader.ICON_VARIABLE);
-         else
-           mAutomataNameLabel.setIcon(ModuleContext.getComponentKindIcon(autoProxy.getKind()));
-         if (autoNode.getBlocking())
-           mAutomataIconLabel.setIcon(IconLoader.ICON_EVENTTREE_BLOCKING_AUTOMATON);
-         else
-           mAutomataIconLabel.setIcon(new ImageIcon());
-         StateProxy currentState;
-         currentState = autoNode.getOverloadedState();
-         mAutomataStatusLabel.setText(currentState.getName());
-         mAutomataStatusLabel.setIcon(mSim.getMarkingIcon(currentState, autoProxy, false));
-         final int width = mPane.getWidth();
-         final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));
-         final int centerWidth = (width * automataColumnWidth[1] - 2 * noduleWidth * automataColumnWidth[1]) / (sum(automataColumnWidth));
-         final int leftWidth = (width * automataColumnWidth[0] - 2 * noduleWidth * automataColumnWidth[0]) / (sum(automataColumnWidth));
-         mAutomataNameLabel.setPreferredSize(new Dimension(leftWidth, rowHeight));
-         mAutomataIconLabel.setPreferredSize(new Dimension(centerWidth, rowHeight));
-         mAutomataStatusLabel.setPreferredSize(new Dimension(rightWidth, rowHeight));
-         if (automatonAreOpen.contains(autoProxy.getName()))
-         {
-           mAutomataNameLabel.setFont(mAutomataNameLabel.getFont().deriveFont(Font.BOLD));
-           mAutomataStatusLabel.setFont(mAutomataStatusLabel.getFont().deriveFont(Font.BOLD));
-         }
-         else
-         {
-           mAutomataNameLabel.setFont(mAutomataNameLabel.getFont().deriveFont(Font.PLAIN));
-           mAutomataStatusLabel.setFont(mAutomataStatusLabel.getFont().deriveFont(Font.PLAIN));
-         }
-         return mAutomataPanel;
-       }
-       else if (InitialState.class.isInstance(value))
-       {
-         if (sel)
-           mEventPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
-         else
-           mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
-         mEventNameLabel.setText("Initial State");
-         if (TraceJTree.this.mSim.getCurrentTime() == 0)
-         {
-           mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.BOLD));
-         }
-         else
-         {
-           mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
-         }
-         mEventNameLabel.setIcon(new ImageIcon());
-         return mEventPanel;
-       }
-       else if (value instanceof TeleportEventTreeNode)
-       {
-         if (sel)
-           mEventPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
-         else
-           mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
-         final TeleportEventTreeNode eventNode = (TeleportEventTreeNode)value;
-         mEventNameLabel.setText("Manual State Set");
-         mEventNameLabel.setIcon(IconLoader.ICON_MANUAL_STATE_SET);
-         if (eventNode.getTime() == TraceJTree.this.mSim.getCurrentTime())
-         {
-           mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.BOLD));
-         }
-         else
-         {
-           mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
-         }
-         return mEventPanel;
-       }
-       else
-       {
-         return new JPanel();
-       }
+      (final JTree tree, final Object value, final boolean sel,
+       final boolean expanded, final boolean leaf,
+       final int row, final boolean hasFocus)
+    {
+      if (value instanceof TraceStepTreeNode) {
+        if (sel)
+          mEventPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
+        else
+          mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
+        final TraceStepTreeNode node = (TraceStepTreeNode) value;
+        final int time = node.getTime();
+        final StringBuffer buffer = new StringBuffer();
+        buffer.append(time);
+        buffer.append(". ");
+        buffer.append(node.getText());
+        final TraceProxy trace = mSim.getTrace();
+        if (trace instanceof LoopTraceProxy) {
+          final LoopTraceProxy loop = (LoopTraceProxy) trace;
+          if (time == loop.getLoopIndex()) {
+            buffer.append(" <---");
+          }
+        }
+        mEventNameLabel.setText(buffer.toString());
+        final Icon icon = node.getIcon();
+        mEventNameLabel.setIcon(icon);
+        if (time == mSim.getCurrentTime()) {
+          mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.BOLD));
+        } else {
+          mEventNameLabel.setFont(mEventNameLabel.getFont().deriveFont(Font.PLAIN));
+        }
+        return mEventPanel;
+      } else if (value instanceof AutomatonLeafNode) {
+        if (sel) {
+          mAutomatonPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
+        } else {
+          mAutomatonPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
+        }
+        final AutomatonLeafNode node = (AutomatonLeafNode) value;
+        final AutomatonProxy aut = node.getAutomaton();
+        mAutomataNameLabel.setText(aut.getName());
+        final Icon autIcon = node.getAutomatonIcon(mSim);
+        mAutomataNameLabel.setIcon(autIcon);
+        final int time = node.getTime();
+        final SimulatorState tuple = mSim.getHistoryState(time);
+        final AutomatonStatus status = tuple.getStatus(aut);
+        if (status.compareTo(AutomatonStatus.WARNING) >= 0) {
+          final Icon statusIcon = status.getIcon();
+          mAutomataIconLabel.setIcon(statusIcon);
+        } else {
+          mAutomataIconLabel.setIcon(null);
+        }
+        final StateProxy state = node.getOverloadedState();
+        mAutomataStatusLabel.setText(state.getName());
+        mAutomataStatusLabel.setIcon(mSim.getMarkingIcon(state, aut, false));
+        final int width = mPane.getWidth();
+        final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));
+        final int centerWidth = (width * automataColumnWidth[1] - 2 * noduleWidth * automataColumnWidth[1]) / (sum(automataColumnWidth));
+        final int leftWidth = (width * automataColumnWidth[0] - 2 * noduleWidth * automataColumnWidth[0]) / (sum(automataColumnWidth));
+        mAutomataNameLabel.setPreferredSize(new Dimension(leftWidth, rowHeight));
+        mAutomataIconLabel.setPreferredSize(new Dimension(centerWidth, rowHeight));
+        mAutomataStatusLabel.setPreferredSize(new Dimension(rightWidth, rowHeight));
+        if (automatonAreOpen.contains(aut.getName()))
+        {
+          mAutomataNameLabel.setFont(mAutomataNameLabel.getFont().deriveFont(Font.BOLD));
+          mAutomataStatusLabel.setFont(mAutomataStatusLabel.getFont().deriveFont(Font.BOLD));
+        }
+        else
+        {
+          mAutomataNameLabel.setFont(mAutomataNameLabel.getFont().deriveFont(Font.PLAIN));
+          mAutomataStatusLabel.setFont(mAutomataStatusLabel.getFont().deriveFont(Font.PLAIN));
+        }
+        return mAutomatonPanel;
+      } else {
+        return new JPanel();
+      }
     }
 
     private int sum (final int[] a)
@@ -501,26 +350,28 @@ public class TraceJTree extends JTree implements InternalFrameObserver, Componen
       return o;
     }
 
-    // ###########################################################################
-    // # Data Members
+    //#######################################################################
+    //# Data Members
     private final JPanel mEventPanel;
     private final JLabel mEventNameLabel;
-    private final JPanel mAutomataPanel;
+    private final JPanel mAutomatonPanel;
     private final JLabel mAutomataNameLabel;
     private final JLabel mAutomataIconLabel;
     private final JLabel mAutomataStatusLabel;
 
-    // ###########################################################################
-    // # Class Constants
+    //#######################################################################
+    //# Class Constants
     private static final long serialVersionUID = 6788022446662090661L;
   }
 
+
+  //#########################################################################
+  //# Data Members
   private final AutomatonDesktopPane mDesktop;
   private final Simulation mSim;
-  private final ModuleContainer mContainer;
   private final ArrayList<String> automatonAreOpen;
   private JScrollPane mPane;
-  private final ArrayList<Integer> expandedNodes;
+  private TIntHashSet mExpandedIndexes;
   private final TraceTreePopupFactory factory;
 
   private static final long serialVersionUID = -4373175227919642063L;

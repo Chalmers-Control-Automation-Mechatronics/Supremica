@@ -33,7 +33,7 @@ public class SimulationJumpToEndAction extends WatersSimulationAction
     final SimulatorPanel panel = getActiveSimulatorPanel();
     if (panel != null) {
       final Simulation sim = getObservedSimulation();
-      while (sim.getCurrentTime() != sim.getEventHistory().size() - 1)
+      while (sim.getCurrentTime() != sim.getHistorySize() - 1)
         sim.replayStep();
     }
   }
@@ -46,7 +46,7 @@ public class SimulationJumpToEndAction extends WatersSimulationAction
     if (sim == null) {
       setEnabled(false);
     } else {
-      setEnabled(sim.getEventHistory().size() != sim.getCurrentTime() + 1);
+      setEnabled(sim.getHistorySize() != sim.getCurrentTime() + 1);
     }
   }
 

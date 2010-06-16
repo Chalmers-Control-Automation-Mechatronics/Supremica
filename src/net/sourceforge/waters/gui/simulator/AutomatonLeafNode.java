@@ -1,63 +1,87 @@
 package net.sourceforge.waters.gui.simulator;
 
+import java.util.Map;
+
+import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import net.sourceforge.waters.gui.IconLoader;
+import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+
+import org.supremica.gui.ide.ModuleContainer;
 
 public class AutomatonLeafNode extends DefaultMutableTreeNode
 {
 
-  public AutomatonLeafNode(final AutomatonProxy automata, final StateProxy overloadedState, final boolean blocking)
+  //#########################################################################
+  //# Constructor
+  public AutomatonLeafNode(final AutomatonProxy aut,
+                           final StateProxy overloadedState,
+                           final int time)
   {
-    super(automata.getName(), false);
-    mAutomata = automata;
+    super(aut.getName(), false);
+    mAutomaton = aut;
     mState = overloadedState;
-    mBlocking = blocking;
+    mTime = time;
   }
 
-  public AutomatonProxy getAutomata()
+
+  //#########################################################################
+  //# Simple Access
+  AutomatonProxy getAutomaton()
   {
-    return mAutomata;
+    return mAutomaton;
   }
-  public StateProxy getOverloadedState()
+
+  StateProxy getOverloadedState()
   {
     return mState;
   }
-  public String getData(final int indents)
+
+  int getTime()
   {
-    String output = getIndents(indents) + this.toString();
-    for (int childLoop = 0; childLoop < this.getChildCount(); childLoop++)
-    {
-      if (this.getChildAt(childLoop).getClass() == EventBranchNode.class)
-      {
-        final EventBranchNode node = (EventBranchNode)this.getChildAt(childLoop);
-        output += "\r\n" + getIndents(indents) + node.getData(indents + 1);
-      }
-      else if (this.getChildAt(childLoop).getClass() == AutomatonLeafNode.class)
-      {
-        final AutomatonLeafNode node = (AutomatonLeafNode)this.getChildAt(childLoop);
-        output += "\r\n" + getIndents(indents) + node.getData(indents + 1);
-      }
+    return mTime;
+  }
+
+  Icon getAutomatonIcon(final Simulation sim)
+  {
+    return getAutomatonIcon(sim, mAutomaton);
+  }
+
+
+  //#########################################################################
+  //# Static Methods
+  static Icon getAutomatonIcon(final Simulation sim, final AutomatonProxy aut)
+  {
+    final ModuleContainer container = sim.getModuleContainer();
+    final Map<Proxy,SourceInfo> infomap = container.getSourceInfoMap();
+    final SourceInfo info = infomap.get(aut);
+    if (info == null) {
+      return null;
+    } else if (info.getSourceObject() instanceof VariableComponentProxy) {
+      return IconLoader.ICON_VARIABLE;
+    } else {
+      final ComponentKind kind = aut.getKind();
+      return ModuleContext.getComponentKindIcon(kind);
     }
-    return output;
-  }
-  private String getIndents(final int indents)
-  {
-    String output = "";
-    for (int looper = 0; looper < indents; looper++)
-      output += "-";
-    return output;
-  }
-  public boolean getBlocking()
-  {
-    return mBlocking;
   }
 
-  private final AutomatonProxy mAutomata;
+
+  //#########################################################################
+  //# Data Members
+  private final AutomatonProxy mAutomaton;
   private final StateProxy mState;
-  private final boolean mBlocking;
+  private final int mTime;
 
+
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = 4785226183311677790L;
 
 }

@@ -11,6 +11,8 @@
 package net.sourceforge.waters.gui.simulator;
 
 
+import gnu.trove.THashSet;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -28,17 +30,13 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JLabel;
-
 import net.sourceforge.waters.gui.BackupGraphPanel;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.GraphPanel;
-import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
@@ -50,6 +48,7 @@ import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent.EmbedderEventType;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
@@ -58,9 +57,9 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -76,8 +75,6 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
-import net.sourceforge.waters.xsd.base.EventKind;
-
 import org.supremica.gui.ide.ModuleContainer;
 
 
@@ -99,6 +96,7 @@ public class AutomatonDisplayPane
     mSim = sim;
     mAutomaton = aut;
     mContainer = container;
+    mToolTipVisitor = new GraphToolTipVisitor();
     mFocusedItem = null;
     mTransform = mInverseTransform = null;
     final ModuleSubject module = container.getModule();
@@ -109,7 +107,7 @@ public class AutomatonDisplayPane
     final BindingContext bindings = sInfo.getBindingContext();
     final ProxyShapeProducer producer =
       new SubjectShapeProducer(graph, module, context, compiler, bindings);
-    factory = new DisplayPanePopupFactory(container.getIDE().getPopupActionManager(),
+    mFactory = new DisplayPanePopupFactory(container.getIDE().getPopupActionManager(),
                                           this,
                                           (AutomatonDesktopPane) parent.getDesktopPane(),
                                           mContainer.getSourceInfoMap());
@@ -160,34 +158,27 @@ public class AutomatonDisplayPane
 
   private void updateEnabledProxy()
   {
-    mEnabledProxy = new HashSet<Proxy>();
-    mNonOptimizedProxy = new HashSet<Proxy>();
+    final Collection<TransitionProxy> transitions = mAutomaton.getTransitions();
+    final int size = 2 * transitions.size();
+    mEnabledProxy = new THashSet<Proxy>(size);
+    mNonOptimizedProxy = new THashSet<Proxy>(size);
     final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-    if (infomap != null) // If the simulation model isn't currently being changed
-    {
-      transitions:
-      for (final TransitionProxy trans : mSim.getActiveTransitions(mAutomaton)) {
-        final EventProxy event = trans.getEvent();
-        if (mSim.getActiveEvents().contains(event))
-        {
-          final Proxy proxy = infomap.get(trans).getGraphSourceObject();
-          mEnabledProxy.add(proxy);
-          final EdgeSubject edge =
-            SubjectTools.getAncestor((Subject) proxy, EdgeSubject.class);
-          mEnabledProxy.add(edge);
-          continue transitions;
-        }
-      }
-      for (final TransitionProxy trans : mAutomaton.getTransitions())
-      {
-        if (infomap.get(trans) != null)
-        {
-          final SourceInfo info = infomap.get(trans);
+    if (infomap != null) {
+      // If the simulation model isn't currently being changed
+      for (final TransitionProxy trans : transitions) {
+        final SourceInfo info = infomap.get(trans);
+        if (info != null) {
           final Proxy source = info.getGraphSourceObject();
           final EdgeSubject edge =
             SubjectTools.getAncestor((Subject) source, EdgeSubject.class);
           mNonOptimizedProxy.add(source);
           mNonOptimizedProxy.add(edge);
+          final EventProxy event = trans.getEvent();
+          final EventStatus status = mSim.getEventStatus(event);
+          if (status.canBeFired()) {
+            mEnabledProxy.add(source);
+            mEnabledProxy.add(edge);
+          }
         }
       }
     }
@@ -356,90 +347,11 @@ public class AutomatonDisplayPane
 
   private void updateToolTip()
   {
-    if (mFocusedItem == null)
-    {
+    if (mFocusedItem == null) {
       setToolTipText(null);
-    }
-    else
-    {
-      final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-      boolean foundState = false;
-      for (final StateProxy possibleState : mAutomaton.getStates())
-      {
-        if (mFocusedItem instanceof GroupNodeProxy)
-          return;
-        if (mFocusedItem == infomap.get(possibleState).getSourceObject())
-        {
-          String toolTipText = "";
-          if (possibleState.isInitial())
-          {
-            toolTipText += "Initial state";
-          }
-          else
-            toolTipText += "State";
-          toolTipText += " " + possibleState.getName();
-          if (mSim.getCurrentStates().get(mAutomaton) == possibleState)
-          {
-            toolTipText += ", current state";
-          }
-          if (possibleState.getPropositions().size() != 0)
-          {
-            toolTipText += ", marked as ";
-            for (final EventProxy proposition : possibleState.getPropositions())
-            {
-              toolTipText += proposition.getName() + ", ";
-            }
-            toolTipText = toolTipText.substring(0, toolTipText.length() - 2);
-          }
-          this.setToolTipText(toolTipText);
-          foundState = true;
-        }
-      }
-      if (mFocusedItem instanceof NodeProxy && !foundState)
-      {
-        setToolTipText("State " + ((NodeProxy)mFocusedItem).getName() + " has been removed due to optimisation");
-      }
-      boolean foundTrans = false;
-      for (final TransitionProxy trans : mAutomaton.getTransitions())
-      {
-        final Proxy source = infomap.get(trans).getGraphSourceObject();
-        if (source == mFocusedItem) {
-          String toolTipText = "";
-          if (trans.getEvent().getKind() == EventKind.CONTROLLABLE)
-            toolTipText += "Controllable event ";
-          else
-            toolTipText += "Uncontrollable event ";
-          toolTipText += trans.getEvent().getName();
-          boolean enabled = false;
-          for (final Step possibleSteps : mSim.getValidTransitions())
-          {
-            if (trans.getEvent() == possibleSteps.getEvent()
-                && (trans.getSource() == possibleSteps.getSource().get(mAutomaton) || possibleSteps.getSource().get(mAutomaton) == null)
-                && (trans.getTarget() == possibleSteps.getDest().get(mAutomaton) || possibleSteps.getDest().get(mAutomaton) == null)
-                && mSim.getCurrentStates().get(mAutomaton) == trans.getSource())
-              enabled = true;
-          }
-          if (enabled)
-            toolTipText += ", currently enabled";
-          else
-            toolTipText += ", currently disabled";
-          Step warning = null;
-          for (final Step step : mSim.getWarningProperties().keySet())
-          {
-            if (step.getEvent() == trans.getEvent())
-              warning = step;
-          }
-          if (warning != null)
-            toolTipText +=
-              ", firing this event will cause the property " +
-              mSim.getWarningProperties().get(warning).getName() +
-              " to be disabled";
-          this.setToolTipText(toolTipText);
-          foundTrans = true;
-        }
-      }
-      if (!foundTrans && mFocusedItem instanceof IdentifierProxy)
-        setToolTipText("Transition " + ((IdentifierProxy)mFocusedItem).toString() + " has been removed due to optimisation");
+    } else {
+      final String tooltip = mToolTipVisitor.getToolTip(mFocusedItem);
+      setToolTipText(tooltip);
     }
   }
 
@@ -456,58 +368,10 @@ public class AutomatonDisplayPane
     return mEnabledProxy.contains(clicked);
   }
 
-  private Step findOptions(final List<Step> possibleEvents)
-  {
-    if (possibleEvents.size() == 0)
-    {
-      mContainer.getIDE().error("There are no possible events to fire");
-      return null;
-    }
-    else if (possibleEvents.size() == 1)
-      return possibleEvents.get(0);
-    else {
-      final JLabel[] possibilities = new JLabel[possibleEvents.size()];
-      final Step[] events = new Step[possibleEvents.size()];
-      for (int looper = 0; looper < possibleEvents.size(); looper++) {
-        final Step event = possibleEvents.get(looper);
-        final JLabel toAdd = new JLabel(event.toString());
-        if (event.getEvent().getKind() == EventKind.CONTROLLABLE)
-          toAdd.setIcon(IconLoader.ICON_CONTROLLABLE);
-        else if (event.getEvent().getKind() == EventKind.UNCONTROLLABLE)
-          toAdd.setIcon(IconLoader.ICON_UNCONTROLLABLE);
-        else
-          toAdd.setIcon(IconLoader.ICON_PROPOSITION);
-        possibilities[looper] = toAdd;
-        events[looper] = event;
-      }
-      final EventChooserDialog dialog =
-          new EventChooserDialog(mContainer.getIDE(), possibilities, events);
-      dialog.setVisible(true);
-      final Step event = dialog.getSelectedStep();
-      if ((event != null && !dialog.wasCancelled())) {
-        for (final Step findEvent : possibleEvents) {
-          if (findEvent == event)
-            return event;
-        }
-      }
-      return null;
-    }
-  }
-
-  private boolean eventCanBeFired(final Simulation sim, final TransitionProxy trans)
-  {
-    for (final Step possibleStep : sim.getValidTransitions())
-    {
-      if (possibleStep.getEvent() == trans.getEvent() && sim.getCurrentStates().get(mAutomaton) == trans.getSource())
-        return true;
-    }
-    return false;
-  }
-
   private ArrayList<Step> getSteps(final TransitionProxy trans)
   {
     final ArrayList<Step> output = new ArrayList<Step>();
-    for (final Step step: mSim.getValidTransitions())
+    for (final Step step: mSim.getEnabledSteps())
     {
       if (step.getEvent() == trans.getEvent()
           && (step.getSource().get(mAutomaton) == null || step.getSource().get(mAutomaton) == trans.getSource())
@@ -519,9 +383,9 @@ public class AutomatonDisplayPane
     return output;
   }
 
-  // #########################################################################
-  // # Event Handling Access methods
 
+  //#########################################################################
+  //# Event Handling Methods
   public boolean canExecute()
   {
     return mFocusedItem != null && isEnabled(mFocusedItem);
@@ -535,8 +399,7 @@ public class AutomatonDisplayPane
       if (proxyToFire instanceof IdentifierProxy) {
         for (final TransitionProxy trans : mAutomaton.getTransitions()) {
           final Proxy source = infomap.get(trans).getGraphSourceObject();
-          if (source == proxyToFire &&
-              eventCanBeFired(mSim, trans)) {
+          if (source == proxyToFire && canBeFired(trans)) {
             possibleSteps.addAll(getSteps(trans));
           }
         }
@@ -546,21 +409,25 @@ public class AutomatonDisplayPane
           final AbstractSubject subject = (AbstractSubject) source;
           final EdgeSubject edge =
             SubjectTools.getAncestor(subject, EdgeSubject.class);
-          if (proxyToFire == edge && eventCanBeFired(mSim, trans)) {
+          if (proxyToFire == edge && canBeFired(trans)) {
             possibleSteps.addAll(getSteps(trans));
           }
         }
       }
-      final Step firedEvent = findOptions(possibleSteps);
-      if (firedEvent != null) {
-        try {
-          mSim.step(firedEvent);
-        } catch (final NonDeterministicException exception) {
-          mContainer.getIDE().error(exception.getMessage()
-              + ". Event will not be fired");
-        }
+      if (!possibleSteps.isEmpty()) {
+        mSim.step(possibleSteps);
       }
     }
+  }
+
+
+  //##########################################################################
+  //# Auxiliary Methods
+  private boolean canBeFired(final TransitionProxy trans)
+  {
+    final EventProxy event = trans.getEvent();
+    final EventStatus status = mSim.getEventStatus(event);
+    return status.canBeFired();
   }
 
 
@@ -589,7 +456,7 @@ public class AutomatonDisplayPane
 
     public void mousePressed(final MouseEvent event)
     {
-      factory.maybeShowPopup(AutomatonDisplayPane.this, event, mFocusedItem);
+      mFactory.maybeShowPopup(AutomatonDisplayPane.this, event, mFocusedItem);
     }
 
     public void mouseReleased(final MouseEvent event)
@@ -678,7 +545,7 @@ public class AutomatonDisplayPane
         return super.getRenderingInformation(proxy);
       } else if (orig instanceof SimpleNodeProxy) {
         final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-        final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
+        final StateProxy currentState = mSim.getCurrentState(mAutomaton);
         if (infomap.get(currentState).getSourceObject() == orig) {
           proxyIsActive = true;
         }
@@ -762,7 +629,7 @@ public class AutomatonDisplayPane
         if (orig instanceof LabelGeometrySubject) {
           final SimpleNodeSubject parent = (SimpleNodeSubject)(((LabelGeometrySubject)orig).getParent());
           final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-          final StateProxy currentState = mSim.getCurrentStates().get(mAutomaton);
+          final StateProxy currentState = mSim.getCurrentState(mAutomaton);
           if (infomap.get(currentState).getSourceObject() == parent)
             proxyIsActive = true;
           boolean found = (proxyIsActive);
@@ -830,15 +697,71 @@ public class AutomatonDisplayPane
     private final Map<SimpleNodeProxy,StateProxy> mStateMap;
 
   }
-  ;
+
+
+  //##########################################################################
+  //# Inner Class GraphToolTipVisitor
+  private class GraphToolTipVisitor extends AbstractModuleProxyVisitor
+  {
+    //#########################################################################
+    //# Invocation
+    private String getToolTip(final Proxy proxy)
+    {
+      try {
+        return (String) proxy.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
+    //#########################################################################
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    public String visitProxy(final Proxy proxy)
+    {
+      return null;
+    }
+
+    //#########################################################################
+    //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
+    public String visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+      for (final TransitionProxy trans : mAutomaton.getTransitions()) {
+        if (ident == infomap.get(trans).getGraphSourceObject()) {
+          final ToolTipVisitor master = mSim.getToolTipVisitor();
+          final EventProxy event = trans.getEvent();
+          return master.visitEventProxy(event);
+        }
+      }
+      final String name = ident.toString();
+      return "Transition " + name + " has been removed due to optimisation";
+    }
+
+    public String visitSimpleNodeProxy(final SimpleNodeProxy node)
+    {
+      final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+      for (final StateProxy state : mAutomaton.getStates()) {
+        if (infomap.get(state).getSourceObject() == node) {
+          final ToolTipVisitor master = mSim.getToolTipVisitor();
+          return master.getToolTip(state, mAutomaton);
+        }
+      }
+      final String name = node.getName();
+      return "State " + name + " has been removed due to optimisation";
+    }
+
+  }
+
 
   //##########################################################################
   //# Data Members
+  private final AutomatonInternalFrame mParent;
   private final Simulation mSim;
   private final AutomatonProxy mAutomaton;
   private final ModuleContainer mContainer;
-  private final AutomatonInternalFrame mParent;
-  private final DisplayPanePopupFactory factory;
+  private final DisplayPanePopupFactory mFactory;
+  private final GraphToolTipVisitor mToolTipVisitor;
+
   private AffineTransform mTransform;
   private AffineTransform mInverseTransform;
   private Proxy mFocusedItem;

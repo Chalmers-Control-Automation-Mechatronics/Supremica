@@ -441,6 +441,20 @@ public class ModuleContext
     }
   }
 
+  public static String getEventKindToolTip(final EventKind kind)
+  {
+    switch (kind) {
+    case CONTROLLABLE:
+      return "Controllable event";
+    case UNCONTROLLABLE:
+      return "Uncontrollable event";
+    case PROPOSITION:
+      return "Proposition";
+    default:
+      throw new IllegalArgumentException("Unknown event kind: " + kind + "!");
+    }
+  }
+
   public static List<Color> getPropositionColours(final SimpleNodeProxy node)
   {
     final List<Color> result = new LinkedList<Color>();
@@ -839,17 +853,7 @@ public class ModuleContext
     public String visitEventDeclProxy(final EventDeclProxy decl)
     {
       final EventKind kind = decl.getKind();
-      switch (kind) {
-      case CONTROLLABLE:
-    return "Controllable event";
-      case UNCONTROLLABLE:
-    return "Uncontrollable event";
-      case PROPOSITION:
-    return "Proposition";
-      default:
-    throw new IllegalArgumentException
-      ("Unknown event kind: " + kind + "!");
-      }
+      return getEventKindToolTip(kind);
     }
 
     public String visitInstanceProxy(final InstanceProxy inst)

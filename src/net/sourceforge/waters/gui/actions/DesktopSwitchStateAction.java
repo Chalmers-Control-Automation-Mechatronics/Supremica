@@ -26,7 +26,7 @@ public class DesktopSwitchStateAction extends WatersAction
     mState = null;
     for (final StateProxy state : mAutomaton.getStates())
     {
-      if (getSimulation().getContainer().getSourceInfoMap().get(state).getSourceObject() == node)
+      if (getSimulation().getModuleContainer().getSourceInfoMap().get(state).getSourceObject() == node)
         mState = state;
     }
     putValue(Action.NAME, "Change to this State");

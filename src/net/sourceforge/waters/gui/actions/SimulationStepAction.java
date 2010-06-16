@@ -14,16 +14,11 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.JLabel;
 import net.sourceforge.waters.gui.IconLoader;
-import net.sourceforge.waters.gui.simulator.EventChooserDialog;
-import net.sourceforge.waters.gui.simulator.NonDeterministicException;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.gui.simulator.Step;
-import net.sourceforge.waters.xsd.base.EventKind;
-
 import org.supremica.gui.ide.IDE;
 
 
@@ -31,6 +26,7 @@ public class SimulationStepAction
   extends WatersSimulationAction
   implements SimulationObserver
 {
+
   //#########################################################################
   //# Constructor
   SimulationStepAction(final IDE ide)
@@ -41,6 +37,7 @@ public class SimulationStepAction
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_STEP);
   }
 
+
   //#########################################################################
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
@@ -48,24 +45,15 @@ public class SimulationStepAction
     final SimulatorPanel panel = getActiveSimulatorPanel();
     if (panel != null) {
       final Simulation sim = getObservedSimulation();
-      final List<Step> possibleEvents = sim.getValidTransitions();
-      if (possibleEvents.size() == 1) {
-        try {
-          sim.step(possibleEvents.get(0));
-        } catch (final NonDeterministicException exception) {
-          // TODO Auto-generated catch block
-          System.err.println(exception.toString());
-        }
+      final List<Step> possibleEvents = sim.getEnabledSteps();
+      if (possibleEvents.isEmpty()) {
+        getIDE().error("No events are enabled.");
       } else {
-        try {
-          sim.step(findOptions(possibleEvents));
-        } catch (final NonDeterministicException exception) {
-          // TODO Auto-generated catch block
-          System.err.println(exception.toString());
-        }
+        sim.step(possibleEvents);
       }
     }
   }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -75,40 +63,13 @@ public class SimulationStepAction
     if (sim == null) {
       setEnabled(false);
     } else {
-      setEnabled(sim.getValidTransitions().size() != 0);
+      setEnabled(sim.getEnabledSteps().size() != 0);
     }
   }
 
-  private Step findOptions(final List<Step> possibleEvents)
-  {
-    final JLabel[] possibilities = new JLabel[possibleEvents.size()];
-    final Step[] events = new Step[possibleEvents.size()];
-    for (int looper = 0; looper < possibleEvents.size(); looper++)
-    {
-      final Step step = possibleEvents.get(looper);
-      final JLabel toAdd = new JLabel(step.toString());
-      if (step.getEvent().getKind() == EventKind.CONTROLLABLE)
-        toAdd.setIcon(IconLoader.ICON_CONTROLLABLE);
-      else if (step.getEvent().getKind() == EventKind.UNCONTROLLABLE)
-        toAdd.setIcon(IconLoader.ICON_UNCONTROLLABLE);
-      else
-        toAdd.setIcon(IconLoader.ICON_PROPOSITION);
-      possibilities[looper] = toAdd;
-      events[looper] = step;
-    }
-    final EventChooserDialog dialog = new EventChooserDialog(this.getIDE().getFrame(), possibilities, events);
-    dialog.setVisible(true);
-    final Step step = dialog.getSelectedStep();
-    if ((step != null && !dialog.wasCancelled())) {
-      for (final Step findEvent : possibleEvents) {
-        if (findEvent == step)
-          return step;
-      }
-    }
-    return null;
-  }
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
+
 }
