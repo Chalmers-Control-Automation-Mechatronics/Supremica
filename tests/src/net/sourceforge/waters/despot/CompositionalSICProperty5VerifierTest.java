@@ -13,7 +13,6 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.gnonblocking.CompositionalGeneralisedConflictChecker;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -43,8 +42,9 @@ public class CompositionalSICProperty5VerifierTest
   protected ModelVerifier createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final ConflictChecker checker =
+    final CompositionalGeneralisedConflictChecker checker =
         new CompositionalGeneralisedConflictChecker(factory);
+    checker.setInternalStepTransitionLimit(100000);
     return new SICProperty5Verifier(checker, factory);
   }
 

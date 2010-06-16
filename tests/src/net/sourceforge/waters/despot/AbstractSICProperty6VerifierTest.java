@@ -57,6 +57,19 @@ public abstract class AbstractSICProperty6VerifierTest extends
                      false);
   }
 
+  public void testSICProperty6Verifier_rhone_subsystem1_ld()
+    throws Exception
+  {
+    runModelVerifier("tests", "hisc", "rhone_subsystem1_ld.wmod", true);
+  }
+
+  public void testSICProperty6Verifier_rhone_subsystem1_ld_failsic5()
+    throws Exception
+  {
+    runModelVerifier("tests", "hisc",
+                     "rhone_subsystem1_ld_failsic5.wmod", true);
+  }
+
   // SimpleManufacturingExample
   public void testSICProperty6Verifier_Manuf_Cells() throws Exception
   {
