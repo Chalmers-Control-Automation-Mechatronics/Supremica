@@ -175,8 +175,19 @@ public abstract class CompositionalConflictCheckerExperiments extends
       ruleList.add(tlrRule);
       ruleList.add(oeRule);
     } else if (mRules == 3) {
-      // TODO: add other orderings to try
-    } else {
+      // observation equivalence first and last
+      ruleList.add(tlrRule);
+      ruleList.add(oeRule);
+      ruleList.add(ramRule);
+      ruleList.add(rdmRule);
+      ruleList.add(rnsRule);
+      ruleList.add(dnasRule);
+      ruleList.add(rttlnsRule);
+      ruleList.add(rttonsRule);
+      ruleList.add(tlrRule);
+      ruleList.add(oeRule);
+    } // TODO: add other orderings to try
+    else {
       System.err
           .println("Error: Rules must be specified by specifying the integer code of the ordered list wanted.");
     }
