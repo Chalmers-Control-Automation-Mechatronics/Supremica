@@ -33,10 +33,10 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.analysis.op.StateEncoding;
+import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
@@ -304,11 +304,11 @@ public class CompositionalGeneralisedConflictChecker extends
         }
       }
     }
-    // final ConflictChecker checker = new NativeConflictChecker(model,
-    // getUsedMarkingProposition(), getFactory());
     final ConflictChecker checker =
-        new MonolithicConflictChecker(model, getUsedMarkingProposition(),
+        new NativeConflictChecker(model, getUsedMarkingProposition(),
             getFactory());
+    // final ConflictChecker checker = new MonolithicConflictChecker(model,
+    // getUsedMarkingProposition(), getFactory());
     checker.setGeneralisedPrecondition(getUsedPreconditionMarkingProposition());
     checker.setNodeLimit(mFinalStepNodeLimit);
     checker.setTransitionLimit(mFinalStepTransitionLimit);
@@ -1047,8 +1047,10 @@ public class CompositionalGeneralisedConflictChecker extends
               && !mUnsuccessfulCandidates.contains(candidate)) {
             final Set<EventProxy> localEvents =
                 identifyLocalEvents(mEventsToAutomata, automata);
-            candidate.setLocalEvents(localEvents);
-            candidates.add(candidate);
+            if (localEvents.size() > 0) {
+              candidate.setLocalEvents(localEvents);
+              candidates.add(candidate);
+            }
           }
         }
       }
