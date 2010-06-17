@@ -420,8 +420,10 @@ public class ObserverProjectionTransitionRelation
     mEvents = Arrays.copyOf(mEvents, newNumEvents);
     mEvents[propID] = prop;
     mEventToInt.put(prop, propID);
-    for (final TIntHashSet set : mMarkingDefinitions) {
-      set.add(propID);
+    if (markStates) {
+      for (final TIntHashSet set : mMarkingDefinitions) {
+        set.add(propID);
+      }
     }
     return propID;
   }
