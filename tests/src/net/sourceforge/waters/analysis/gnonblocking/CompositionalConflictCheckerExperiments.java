@@ -42,6 +42,11 @@ public abstract class CompositionalConflictCheckerExperiments extends
     mSelecting = selectingHeuristic.toLowerCase();
     mRules = rules;
     mRuleCount = 0;
+    if (mRules == 1 || mRules == 2) {
+      mRuleCount = 8;
+    } else if (mRules == 3) {
+      mRuleCount = 10;
+    }
   }
 
   @Override
@@ -91,7 +96,6 @@ public abstract class CompositionalConflictCheckerExperiments extends
         + ",SelecHeuristic," + mSelecting);
 
     mStats = new CompositionalGeneralisedConflictCheckerVerificationResult();
-    mRuleCount = 8;
     mStats.printCSVHorizontalHeadings(mPrintStream, mRuleCount);
   }
 
