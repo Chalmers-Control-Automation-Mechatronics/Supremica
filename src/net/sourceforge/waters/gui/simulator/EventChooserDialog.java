@@ -31,7 +31,7 @@ public class EventChooserDialog extends JDialog
   // #######################################################################
   // # Constructor
 
-  public EventChooserDialog(final JFrame owner, final JLabel[] labels, final Step[] correspondingEvent)
+  public EventChooserDialog(final JFrame owner, final JLabel[] labels, final SimulatorStep[] correspondingEvent)
   {
     super(owner, "Multiple Options available", true);
     cancelled = true;
@@ -137,9 +137,9 @@ public class EventChooserDialog extends JDialog
   // ####################################################################
   // # Simple Access
 
-  public Step getSelectedStep()
+  public SimulatorStep getSelectedStep()
   {
-    return (Step)eventList[mList.getSelectedIndex()];
+    return (SimulatorStep)eventList[mList.getSelectedIndex()];
   }
   public boolean wasCancelled()
   {
@@ -151,7 +151,7 @@ public class EventChooserDialog extends JDialog
 
   private final JList mList;
   private boolean cancelled;
-  private final Step[] eventList;
+  private final SimulatorStep[] eventList;
 
   // ####################################################################
   // # Class Constants

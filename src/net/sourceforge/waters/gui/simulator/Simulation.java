@@ -1,6 +1,14 @@
-package net.sourceforge.waters.gui.simulator;
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Simulator
+//# PACKAGE: net.sourceforge.waters.gui.simulator
+//# CLASS:   Simulation
+//###########################################################################
+//# $Id$
+//###########################################################################
 
-import gnu.trove.THashSet;
+
+package net.sourceforge.waters.gui.simulator;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -9,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -184,8 +193,8 @@ public class Simulation implements ModelObserver, Observer
    */
   public void step(final EventProxy event)
   {
-    final List<Step> steps = new ArrayList<Step>();
-    for (final Step step: getEnabledSteps()) {
+    final List<SimulatorStep> steps = new ArrayList<SimulatorStep>();
+    for (final SimulatorStep step: getEnabledSteps()) {
       if (step.getEvent() == event) {
         steps.add(step);
       }
@@ -220,18 +229,18 @@ public class Simulation implements ModelObserver, Observer
    *                      If the list contains more than one item, a dialog
    *                      is popped up.
    */
-  public void step(final List<Step> possibleSteps)
+  public void step(final List<SimulatorStep> possibleSteps)
   {
     final int size = possibleSteps.size();
     assert size > 0 : "Can't step with empty list of choices!";
-    final Step step;
+    final SimulatorStep step;
     if (size == 1) {
       step = possibleSteps.get(0);
     } else {
       final JLabel[] labels = new JLabel[size];
-      final Step[] steps = new Step[size];
+      final SimulatorStep[] steps = new SimulatorStep[size];
       for (int looper = 0; looper < size; looper++) {
-        final Step possible = possibleSteps.get(looper);
+        final SimulatorStep possible = possibleSteps.get(looper);
         final JLabel label = new JLabel(possible.toString());
         final EventProxy event = possible.getEvent();
         final EventKind kind = event.getKind();
@@ -259,12 +268,11 @@ public class Simulation implements ModelObserver, Observer
    * Moves the simulation forward one instruction, by firing a step.
    * @param step The instruction to be followed
    */
-  public void step(final Step step)
+  public void step(final SimulatorStep step)
   {
-    final SimulatorState newState =
-      SimulatorState.createSuccessorState(mCurrentState, step);
+    final SimulatorState nextState = step.getNextSimulatorState();
     removeFutureSteps();
-    addNewSimulatorState(newState);
+    addNewSimulatorState(nextState);
     mCurrentTime++;
     loadSimulatorState();
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
@@ -510,7 +518,7 @@ public class Simulation implements ModelObserver, Observer
     return status.getIcon();
   }
 
-  public List<Step> getEnabledSteps()
+  public List<SimulatorStep> getEnabledSteps()
   {
     updateEventStatus();
     return mEnabledSteps;
@@ -677,7 +685,8 @@ public class Simulation implements ModelObserver, Observer
     if (mEnabledSteps == null) {
       updateEvents();
       final int numGlobal = mOrderedEvents.size();
-      final Set<EventProxy> enabled = new THashSet<EventProxy>(numGlobal);
+      final Map<EventProxy,List<StateProxy>> enabled =
+        new HashMap<EventProxy,List<StateProxy>>(numGlobal);
       mEventStatusMap = new HashMap<EventProxy,EventEntry>(numGlobal);
       for (final EventProxy event : mOrderedEvents) {
         final Collection<AutomatonProxy> automata =
@@ -698,37 +707,47 @@ public class Simulation implements ModelObserver, Observer
               for (final TransitionProxy trans : aut.getTransitions()) {
                 if (trans.getSource() == source) {
                   final EventProxy event = trans.getEvent();
-                  enabled.add(event);
+                  List<StateProxy> successors = enabled.get(event);
+                  if (successors == null) {
+                    successors = new LinkedList<StateProxy>();
+                    enabled.put(event, successors);
+                  }
+                  final StateProxy target = trans.getTarget();
+                  successors.add(target);
                 }
               }
               for (final EventProxy event : local) {
-                if (event.getKind() != EventKind.PROPOSITION &&
-                    !enabled.contains(event)) {
+                if (event.getKind() != EventKind.PROPOSITION) {
                   final EventEntry entry = mEventStatusMap.get(event);
-                  switch (aut.getKind()) {
-                  case PLANT:
-                    entry.setStatus(aut, EventStatus.DISABLED);
-                    break;
-                  case SPEC:
-                    if (event.getKind() == EventKind.CONTROLLABLE ||
-                        entry.getStatus() == EventStatus.DISABLED) {
+                  final List<StateProxy> successors = enabled.get(event);
+                  if (successors != null) {
+                    entry.setSuccessors(aut, successors);
+                  } else {
+                    switch (aut.getKind()) {
+                    case PLANT:
                       entry.setStatus(aut, EventStatus.DISABLED);
-                    } else {
-                      entry.setStatus(aut, EventStatus.ERROR);
-                      mCurrentState.addStatus(aut, AutomatonStatus.ERROR);
+                      break;
+                    case SPEC:
+                      if (event.getKind() == EventKind.CONTROLLABLE ||
+                          entry.getStatus() == EventStatus.DISABLED) {
+                        entry.setStatus(aut, EventStatus.DISABLED);
+                      } else {
+                        entry.setStatus(aut, EventStatus.ERROR);
+                        mCurrentState.addStatus(aut, AutomatonStatus.ERROR);
+                      }
+                      break;
+                    case PROPERTY:
+                      if (entry.getStatus() == EventStatus.DISABLED) {
+                        entry.setStatus(aut, EventStatus.DISABLED);
+                      } else {
+                        entry.setStatus(aut, EventStatus.WARNING);
+                        mCurrentState.addStatus(aut, AutomatonStatus.WARNING);
+                      }
+                      break;
+                    default:
+                      throw new IllegalStateException
+                        ("Unknown component kind " + aut.getKind() + "!");
                     }
-                    break;
-                  case PROPERTY:
-                    if (entry.getStatus() == EventStatus.DISABLED) {
-                      entry.setStatus(aut, EventStatus.DISABLED);
-                    } else {
-                      entry.setStatus(aut, EventStatus.WARNING);
-                      mCurrentState.addStatus(aut, AutomatonStatus.WARNING);
-                    }
-                    break;
-                  default:
-                    throw new IllegalStateException
-                    ("Unknown component kind " + aut.getKind() + "!");
                   }
                 }
               }
@@ -744,39 +763,53 @@ public class Simulation implements ModelObserver, Observer
         final StateProxy state = mCurrentState.getState(aut);
         source.put(aut, state);
       }
-      mEnabledSteps = new ArrayList<Step>();
+      mEnabledSteps = new ArrayList<SimulatorStep>();
       for (final EventProxy event : mOrderedEvents) {
         if (getEventStatus(event) == EventStatus.ENABLED) {
           final Map<AutomatonProxy,StateProxy> target =
             new HashMap<AutomatonProxy,StateProxy>(source);
           final List<AutomatonProxy> automata =
             getAutomataSensitiveToEvent(event);
-          createSteps(event, source, target, automata, 0);
+          createSteps(event, target, automata, 0, null);
         }
+      }
+      for (final EventEntry entry : mEventStatusMap.values()) {
+        entry.clearSuccessors();
       }
     }
   }
 
   private void createSteps(final EventProxy event,
-                           final Map<AutomatonProxy,StateProxy> sourceTuple,
                            final Map<AutomatonProxy,StateProxy> targetTuple,
                            final List<AutomatonProxy> automata,
-                           final int index)
+                           final int index,
+                           List<AutomatonProxy> nondet)
   {
     if (index == automata.size()) {
       final Map<AutomatonProxy,StateProxy> targetCopy =
         new HashMap<AutomatonProxy,StateProxy>(targetTuple);
-      final Step step = new Step(event, sourceTuple, targetCopy);
+      final SimulatorState nextState =
+        SimulatorState.createSuccessorState(mCurrentState, event, targetCopy);
+      final SimulatorStep step = new SimulatorStep(nextState, nondet);
       mEnabledSteps.add(step);
     } else {
       final int next = index + 1;
       final AutomatonProxy aut = automata.get(index);
-      final StateProxy source = sourceTuple.get(aut);
-      for (final TransitionProxy trans : aut.getTransitions()) {
-        if (trans.getSource() == source && trans.getEvent() == event) {
-          final StateProxy target = trans.getTarget();
+      final EventEntry entry = mEventStatusMap.get(event);
+      final List<StateProxy> successors = entry.getSuccessors(aut);
+      if (successors == null) {
+        targetTuple.remove(aut);
+        createSteps(event, targetTuple, automata, next, nondet);
+      } else {
+        if (successors.size() > 1) {
+          if (nondet == null) {
+            nondet = new LinkedList<AutomatonProxy>();
+          }
+          nondet.add(aut);
+        }
+        for (final StateProxy target : successors) {
           targetTuple.put(aut, target);
-          createSteps(event, sourceTuple, targetTuple, automata, next);
+          createSteps(event, targetTuple, automata, next, nondet);
         }
       }
     }
@@ -912,6 +945,7 @@ public class Simulation implements ModelObserver, Observer
     {
       mStatus = EventStatus.ENABLED;
       mAutomataMap = new HashMap<AutomatonProxy,EventStatus>(numAutomata);
+      mSuccessorMap = new HashMap<AutomatonProxy,List<StateProxy>>(numAutomata);
     }
 
     //#########################################################################
@@ -973,13 +1007,35 @@ public class Simulation implements ModelObserver, Observer
       assert old == null : "Status override not supported!";
       if (mStatus == EventStatus.ENABLED || status.compareTo(mStatus) > 0) {
         mStatus = status;
+        if (!mStatus.canBeFired()) {
+          clearSuccessors();
+        }
       }
+    }
+
+    private List<StateProxy> getSuccessors(final AutomatonProxy aut)
+    {
+      return mSuccessorMap.get(aut);
+    }
+
+    private void setSuccessors(final AutomatonProxy aut,
+                               final List<StateProxy> successors)
+    {
+      if (mStatus.canBeFired()) {
+        mSuccessorMap.put(aut, successors);
+      }
+    }
+
+    private void clearSuccessors()
+    {
+      mSuccessorMap.clear();
     }
 
     //#########################################################################
     //# Data Members
     private EventStatus mStatus;
     private final Map<AutomatonProxy,EventStatus> mAutomataMap;
+    private final Map<AutomatonProxy,List<StateProxy>> mSuccessorMap;
   }
 
 
@@ -1028,7 +1084,7 @@ public class Simulation implements ModelObserver, Observer
    * information about an event and its associated nondeterministic
    * successor states.
    */
-  private List<Step> mEnabledSteps;
+  private List<SimulatorStep> mEnabledSteps;
 
   private TraceProxy mTrace;
   private boolean mAllowLastStep;

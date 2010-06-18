@@ -196,12 +196,13 @@ public class AutomatonDisplayPane
       final RenderingStatus status = getRenderingStatus(mFocusedItem);
       if (status.isEnabled()) {
         final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-        final List<Step> possibleSteps = new ArrayList<Step>();
+        final List<SimulatorStep> possibleSteps =
+          new ArrayList<SimulatorStep>();
         if (proxyToFire instanceof IdentifierProxy) {
           for (final TransitionProxy trans : mAutomaton.getTransitions()) {
             final Proxy source = infomap.get(trans).getGraphSourceObject();
             if (source == proxyToFire && canBeFired(trans)) {
-              possibleSteps.addAll(getSteps(trans));
+              addSteps(trans, possibleSteps);
             }
           }
         } else if (proxyToFire instanceof EdgeProxy) {
@@ -211,7 +212,7 @@ public class AutomatonDisplayPane
             final EdgeSubject edge =
               SubjectTools.getAncestor(subject, EdgeSubject.class);
             if (proxyToFire == edge && canBeFired(trans)) {
-              possibleSteps.addAll(getSteps(trans));
+              addSteps(trans, possibleSteps);
             }
           }
         }
@@ -376,19 +377,19 @@ public class AutomatonDisplayPane
     }
   }
 
-  private List<Step> getSteps(final TransitionProxy trans)
+  private void addSteps(final TransitionProxy trans,
+                        final List<SimulatorStep> output)
   {
-    final List<Step> output = new ArrayList<Step>();
-    for (final Step step: mSim.getEnabledSteps())
-    {
-      if (step.getEvent() == trans.getEvent()
-          && (step.getSource().get(mAutomaton) == null || step.getSource().get(mAutomaton) == trans.getSource())
-          && (step.getDest().get(mAutomaton) == null || step.getDest().get(mAutomaton) == trans.getTarget()))
-      {
-         output.add(step);
+    if (trans.getSource() == mSim.getCurrentState(mAutomaton)) {
+      final EventProxy event = trans.getEvent();
+      final StateProxy target = trans.getTarget();
+      for (final SimulatorStep step: mSim.getEnabledSteps()) {
+        if (step.getEvent() == event &&
+            step.getTargetState(mAutomaton) == target) {
+          output.add(step);
+        }
       }
     }
-    return output;
   }
 
   private boolean canBeFired(final TransitionProxy trans)

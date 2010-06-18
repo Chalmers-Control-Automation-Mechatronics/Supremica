@@ -18,7 +18,7 @@ import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.simulator.Step;
+import net.sourceforge.waters.gui.simulator.SimulatorStep;
 import org.supremica.gui.ide.IDE;
 
 
@@ -45,7 +45,7 @@ public class SimulationStepAction
     final SimulatorPanel panel = getActiveSimulatorPanel();
     if (panel != null) {
       final Simulation sim = getObservedSimulation();
-      final List<Step> possibleEvents = sim.getEnabledSteps();
+      final List<SimulatorStep> possibleEvents = sim.getEnabledSteps();
       if (possibleEvents.isEmpty()) {
         getIDE().error("No events are enabled.");
       } else {

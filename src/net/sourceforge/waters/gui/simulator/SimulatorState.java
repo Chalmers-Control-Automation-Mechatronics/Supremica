@@ -91,15 +91,15 @@ class SimulatorState
     return result;
   }
 
-  static SimulatorState createSuccessorState(final SimulatorState pred,
-                                             final Step step)
+  static SimulatorState createSuccessorState
+    (final SimulatorState pred,
+     final EventProxy event,
+     final Map<AutomatonProxy,StateProxy> nextMap)
 {
   final Map<AutomatonProxy,Entry> predMap = pred.mStateMap;
   final int numAutomata = predMap.size();
-  final EventProxy event = step.getEvent();
   final SimulatorState result = new SimulatorState(event, numAutomata);
-  final Map<AutomatonProxy,StateProxy> stepMap = step.getDest();
-  for (final Map.Entry<AutomatonProxy,StateProxy> entry : stepMap.entrySet()) {
+  for (final Map.Entry<AutomatonProxy,StateProxy> entry : nextMap.entrySet()) {
     final AutomatonProxy aut = entry.getKey();
     final StateProxy source = pred.getState(aut);
     final Collection<EventProxy> local = aut.getEvents();
