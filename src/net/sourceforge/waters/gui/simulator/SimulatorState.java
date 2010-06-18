@@ -130,7 +130,7 @@ class SimulatorState
     for (final AutomatonProxy aut : automata) {
       for (final StateProxy state : aut.getStates()) {
         if (state.isInitial()) {
-          setState(aut, state, AutomatonStatus.OK);
+          setState(aut, state, AutomatonStatus.IGNORED);
           break;
         }
       }

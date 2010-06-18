@@ -33,7 +33,7 @@ enum AutomatonStatus
    * from the previous step, with the current event not contained in
    * the automaton alphabet.
    */
-  IGNORED(IconLoader.ICON_TABLE_NORMAL_AUTOMATON, null),
+  IGNORED(null, null),
   /**
    * Status to indicate that the state of an automaton is unchanged
    * from the previous step, with the current event being an explicit
