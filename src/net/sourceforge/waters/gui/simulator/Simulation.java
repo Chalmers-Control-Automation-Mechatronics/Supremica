@@ -740,16 +740,15 @@ public class Simulation implements ModelObserver, Observer
       final int numAutomata = mOrderedAutomata.size();
       final Map<AutomatonProxy,StateProxy> source =
         new HashMap<AutomatonProxy,StateProxy>(numAutomata);
-      final Map<AutomatonProxy,StateProxy> target =
-        new HashMap<AutomatonProxy,StateProxy>(numAutomata);
       for (final AutomatonProxy aut : mOrderedAutomata) {
         final StateProxy state = mCurrentState.getState(aut);
         source.put(aut, state);
-        target.put(aut, state);
       }
       mEnabledSteps = new ArrayList<Step>();
       for (final EventProxy event : mOrderedEvents) {
         if (getEventStatus(event) == EventStatus.ENABLED) {
+          final Map<AutomatonProxy,StateProxy> target =
+            new HashMap<AutomatonProxy,StateProxy>(source);
           final List<AutomatonProxy> automata =
             getAutomataSensitiveToEvent(event);
           createSteps(event, source, target, automata, 0);

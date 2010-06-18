@@ -376,9 +376,9 @@ public class AutomatonDisplayPane
     }
   }
 
-  private ArrayList<Step> getSteps(final TransitionProxy trans)
+  private List<Step> getSteps(final TransitionProxy trans)
   {
-    final ArrayList<Step> output = new ArrayList<Step>();
+    final List<Step> output = new ArrayList<Step>();
     for (final Step step: mSim.getEnabledSteps())
     {
       if (step.getEvent() == trans.getEvent()

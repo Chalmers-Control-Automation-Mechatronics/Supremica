@@ -158,7 +158,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
    * This method performs some simple checks on the counterexample to make
    * sure that it can be saved. The more advanced semantic checks are
    * performed by {@link #checkCounterExample(ProductDESProxy,TraceProxy)
-   * after the counterexample has been written to a file.
+   * checkCounterExample()} after the counterexample has been written to a file.
    * @param trace The counterexample to be checked.
    * @throws junit.framework.AssertionFailedError to indicate that the
    *   counterexample does not pass the test.
