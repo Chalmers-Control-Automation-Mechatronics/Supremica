@@ -204,7 +204,7 @@ public class Simulation implements ModelObserver, Observer
       final EventKind ekind = event.getKind();
       final ComponentKind akind = disabling.getKind();
       final String msg =
-        ModuleContext.getEventKindToolTip(ekind) + ' ' + event.getName() +
+        ModuleContext.getEventKindToolTip(ekind, true) + ' ' + event.getName() +
         " is disabled by " + ModuleContext.getComponentKindToolTip(akind) +
         ' ' + disabling.getName() + '.';
       final IDE ide = mModuleContainer.getIDE();
@@ -514,31 +514,6 @@ public class Simulation implements ModelObserver, Observer
   {
     updateEventStatus();
     return mEnabledSteps;
-  }
-
-  TransitionProxy getPreviousTransition(final AutomatonProxy aut)
-  {
-    if (mCurrentTime == 0) {
-      return null;
-    } else {
-      // TODO Add cache
-      final EventProxy event = mCurrentState.getEvent();
-      if (!aut.getEvents().contains(event)) {
-        return null;
-      }
-      final SimulatorState prev = mStateHistory.get(mCurrentTime - 1);
-      final StateProxy source = prev.getState(aut);
-      final StateProxy target = mCurrentState.getState(aut);
-      for (final TransitionProxy trans : aut.getTransitions()) {
-        if (trans.getSource() == source &&
-            trans.getEvent() == event &&
-            trans.getTarget() == target) {
-          return trans;
-        }
-      }
-      throw new IllegalArgumentException
-        ("Previous transition not found for automaton" + aut.getName() + "!");
-    }
   }
 
 

@@ -75,7 +75,8 @@ class AutomataTable extends JTable
         final AutomatonProxy aut =
           AutomataTable.this.getModel().getAutomaton(row);
         final ToolTipVisitor visitor = sim.getToolTipVisitor();
-        final String tooltip = visitor.getToolTip(aut, true);
+        final boolean activity = sim.getCurrentTime() > 0;
+        final String tooltip = visitor.getToolTip(aut, activity);
         setToolTipText(tooltip);
       }
     });

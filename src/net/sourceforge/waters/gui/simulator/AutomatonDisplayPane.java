@@ -11,8 +11,6 @@
 package net.sourceforge.waters.gui.simulator;
 
 
-import gnu.trove.THashSet;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -27,16 +25,17 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import net.sourceforge.waters.gui.BackupGraphPanel;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.GraphPanel;
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
@@ -59,11 +58,13 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.Subject;
@@ -75,6 +76,8 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.xsd.base.EventKind;
+
 import org.supremica.gui.ide.ModuleContainer;
 
 
@@ -82,7 +85,7 @@ public class AutomatonDisplayPane
   extends BackupGraphPanel
   implements SimulationObserver
 {
-  //##########################################################################
+  //#########################################################################
   //# Constructors
   public AutomatonDisplayPane(final AutomatonProxy aut,
                               final GraphSubject graph,
@@ -130,11 +133,10 @@ public class AutomatonDisplayPane
     addMouseListener(handler);
     addMouseMotionListener(handler);
     addComponentListener(new ResizeHandler());
-    updateEnabledProxy();
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Simple Access
   public Rectangle2D getMinimumBoundingRectangle()
   {
@@ -147,45 +149,18 @@ public class AutomatonDisplayPane
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Interface net.sourceforge.waters.gui.simulator.SimulatorObserver
   public void simulationChanged(final SimulationChangeEvent event)
   {
-    if (event.getKind() == SimulationChangeEvent.STATE_CHANGED)
-      updateEnabledProxy();
+    if (event.getKind() == SimulationChangeEvent.STATE_CHANGED) {
+      mRenderingStatusMap = null;
+    }
     repaint();
   }
 
-  private void updateEnabledProxy()
-  {
-    final Collection<TransitionProxy> transitions = mAutomaton.getTransitions();
-    final int size = 2 * transitions.size();
-    mEnabledProxy = new THashSet<Proxy>(size);
-    mNonOptimizedProxy = new THashSet<Proxy>(size);
-    final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-    if (infomap != null) {
-      // If the simulation model isn't currently being changed
-      for (final TransitionProxy trans : transitions) {
-        final SourceInfo info = infomap.get(trans);
-        if (info != null) {
-          final Proxy source = info.getGraphSourceObject();
-          final EdgeSubject edge =
-            SubjectTools.getAncestor((Subject) source, EdgeSubject.class);
-          mNonOptimizedProxy.add(source);
-          mNonOptimizedProxy.add(edge);
-          final EventProxy event = trans.getEvent();
-          final EventStatus status = mSim.getEventStatus(event);
-          if (status.canBeFired()) {
-            mEnabledProxy.add(source);
-            mEnabledProxy.add(edge);
-          }
-        }
-      }
-    }
-  }
 
-
-  //##########################################################################
+  //#########################################################################
   //# Interface net.sourceforge.waters.gui.springembedder.EmbedderObserver
   public void embedderChanged(final EmbedderEvent event)
   {
@@ -204,20 +179,51 @@ public class AutomatonDisplayPane
 
 
   //#########################################################################
-  //# Repaint Support
-  public void close()
+  //# Event Handling Methods
+  boolean canExecute()
   {
-    mSim.detach(this);
-    super.close();
+    if (mFocusedItem == null) {
+      return false;
+    } else {
+      final RenderingStatus status = getRenderingStatus(mFocusedItem);
+      return status.isEnabled();
+    }
   }
 
-  protected void graphChanged(final ModelChangeEvent event)
+  void execute(final Proxy proxyToFire)
   {
-    super.graphChanged(event);
-    mTransform = mInverseTransform = null;
+    if (proxyToFire != null) {
+      final RenderingStatus status = getRenderingStatus(mFocusedItem);
+      if (status.isEnabled()) {
+        final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+        final List<Step> possibleSteps = new ArrayList<Step>();
+        if (proxyToFire instanceof IdentifierProxy) {
+          for (final TransitionProxy trans : mAutomaton.getTransitions()) {
+            final Proxy source = infomap.get(trans).getGraphSourceObject();
+            if (source == proxyToFire && canBeFired(trans)) {
+              possibleSteps.addAll(getSteps(trans));
+            }
+          }
+        } else if (proxyToFire instanceof EdgeProxy) {
+          for (final TransitionProxy trans : mAutomaton.getTransitions()) {
+            final Proxy source = infomap.get(trans).getGraphSourceObject();
+            final AbstractSubject subject = (AbstractSubject) source;
+            final EdgeSubject edge =
+              SubjectTools.getAncestor(subject, EdgeSubject.class);
+            if (proxyToFire == edge && canBeFired(trans)) {
+              possibleSteps.addAll(getSteps(trans));
+            }
+          }
+        }
+        if (!possibleSteps.isEmpty()) {
+          mSim.step(possibleSteps);
+        }
+      }
+    }
   }
 
-  //##########################################################################
+
+  //#########################################################################
   //# Repainting
   public void paint(final Graphics g)
   {
@@ -238,7 +244,22 @@ public class AutomatonDisplayPane
   }
 
 
-  //##########################################################################
+  //#########################################################################
+  //# Repaint Support
+  public void close()
+  {
+    mSim.detach(this);
+    super.close();
+  }
+
+  protected void graphChanged(final ModelChangeEvent event)
+  {
+    super.graphChanged(event);
+    mTransform = mInverseTransform = null;
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private AffineTransform createTransform()
   {
@@ -355,19 +376,6 @@ public class AutomatonDisplayPane
     }
   }
 
-  /**
-   * Tests whether the given item represents an enabled transition.
-   * @param  clicked   The item to be examined, which should be of type
-   *                   {@link IdentifierProxy} or {@link EdgeProxy}.
-   * @return <CODE>true</CODE> if the given item represents a transition
-   *         that is enabled in the current simulation state;
-   *         <CODE>false</CODE> otherwise.
-   */
-  private boolean isEnabled(final Proxy clicked)
-  {
-    return mEnabledProxy.contains(clicked);
-  }
-
   private ArrayList<Step> getSteps(final TransitionProxy trans)
   {
     final ArrayList<Step> output = new ArrayList<Step>();
@@ -383,46 +391,6 @@ public class AutomatonDisplayPane
     return output;
   }
 
-
-  //#########################################################################
-  //# Event Handling Methods
-  public boolean canExecute()
-  {
-    return mFocusedItem != null && isEnabled(mFocusedItem);
-  }
-
-  public void execute(final Proxy proxyToFire)
-  {
-    if (proxyToFire != null && isEnabled(proxyToFire)) {
-      final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-      final List<Step> possibleSteps = new ArrayList<Step>();
-      if (proxyToFire instanceof IdentifierProxy) {
-        for (final TransitionProxy trans : mAutomaton.getTransitions()) {
-          final Proxy source = infomap.get(trans).getGraphSourceObject();
-          if (source == proxyToFire && canBeFired(trans)) {
-            possibleSteps.addAll(getSteps(trans));
-          }
-        }
-      } else if (proxyToFire instanceof EdgeProxy) {
-        for (final TransitionProxy trans : mAutomaton.getTransitions()) {
-          final Proxy source = infomap.get(trans).getGraphSourceObject();
-          final AbstractSubject subject = (AbstractSubject) source;
-          final EdgeSubject edge =
-            SubjectTools.getAncestor(subject, EdgeSubject.class);
-          if (proxyToFire == edge && canBeFired(trans)) {
-            possibleSteps.addAll(getSteps(trans));
-          }
-        }
-      }
-      if (!possibleSteps.isEmpty()) {
-        mSim.step(possibleSteps);
-      }
-    }
-  }
-
-
-  //##########################################################################
-  //# Auxiliary Methods
   private boolean canBeFired(final TransitionProxy trans)
   {
     final EventProxy event = trans.getEvent();
@@ -430,13 +398,82 @@ public class AutomatonDisplayPane
     return status.canBeFired();
   }
 
+  private RenderingStatus getRenderingStatus(final Proxy item)
+  {
+    updateRenderingStatus();
+    return mRenderingStatusMap.get(item);
+  }
 
-  //##########################################################################
+  private void updateRenderingStatus()
+  {
+    if (mRenderingStatusMap == null) {
+      final Collection<StateProxy> states = mAutomaton.getStates();
+      final Collection<TransitionProxy> transitions =
+        mAutomaton.getTransitions();
+      final int size = states.size() + 2 * transitions.size();
+      mRenderingStatusMap = new HashMap<Proxy,RenderingStatus>(size);
+      final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+      if (infomap != null) {
+        final StateProxy currentState = mSim.getCurrentState(mAutomaton);
+        for (final StateProxy state : states) {
+          final SourceInfo info = infomap.get(state);
+          if (info != null) {
+            final Proxy source = info.getGraphSourceObject();
+            final boolean active = (state == currentState);
+            final RenderingStatus render =
+              new RenderingStatus(state, active, false);
+            mRenderingStatusMap.put(source, render);
+          }
+        }
+        StateProxy prevState = null;
+        EventProxy prevEvent = mSim.getCurrentState().getEvent();
+        if (prevEvent != null) {
+          final int time = mSim.getCurrentTime();
+          final SimulatorState tuple = mSim.getHistoryState(time - 1);
+          prevState = tuple.getState(mAutomaton);
+        }
+        for (final TransitionProxy trans : transitions) {
+          final SourceInfo info = infomap.get(trans);
+          if (info != null) {
+            Proxy source = info.getGraphSourceObject();
+            final StateProxy from = trans.getSource();
+            final EventProxy event = trans.getEvent();
+            final StateProxy to = trans.getTarget();
+            final EventStatus status = mSim.getEventStatus(event);
+            final boolean enabled =
+              from == currentState && status.canBeFired();
+            final boolean active =
+              from == prevState && event == prevEvent && to == currentState;
+            do {
+              if (!(source instanceof EventListExpressionProxy)) {
+                RenderingStatus render = mRenderingStatusMap.get(source);
+                if (render == null) {
+                  render = new RenderingStatus(trans, active, enabled);
+                  mRenderingStatusMap.put(source, render);
+                } else {
+                  render.addStatus(active, enabled);
+                }
+              }
+              final Subject subject = (Subject) source;
+              source = (Proxy) SubjectTools.getProxyParent(subject);
+            } while (!(source instanceof GraphProxy));
+            if (active) {
+              prevState = null;
+              prevEvent = null;
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class MouseHandler
   private class MouseHandler implements MouseListener, MouseMotionListener
   {
 
-    //########################################################################
+    //#######################################################################
     //# Interface java.awt.event.MouseListener
     public void mouseClicked(final MouseEvent event)
     {
@@ -464,7 +501,7 @@ public class AutomatonDisplayPane
       // Do nothing
     }
 
-    //########################################################################
+    //#######################################################################
     //# Interface java.awt.event.MouseMotionListener
     public void mouseDragged(final MouseEvent event)
     {
@@ -478,12 +515,12 @@ public class AutomatonDisplayPane
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Inner Class ResizeHandler
   private class ResizeHandler extends ComponentAdapter
   {
 
-    //########################################################################
+    //#######################################################################
     //# Inner Class ResizeHandler
     public void componentResized(final ComponentEvent event)
     {
@@ -492,7 +529,7 @@ public class AutomatonDisplayPane
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Inner Class SimulatorRenderingContext
   private class SimulatorRenderingContext extends ModuleRenderingContext
   {
@@ -531,10 +568,6 @@ public class AutomatonDisplayPane
 
     public RenderingInformation getRenderingInformation(final Proxy proxy)
     {
-      boolean proxyIsActive = false;
-      boolean proxyIsEnabled = false;
-      boolean proxyIsSelected = false;
-      boolean proxyIsInvalid = false;
       // The spring embedder modifies a copy of our graph. When it is running,
       // the items being displayed are not in our compiled graph ...
       final Proxy orig = getOriginal(proxy);
@@ -543,167 +576,67 @@ public class AutomatonDisplayPane
         // Identifiers have no original, this may cause failure to
         // highlight them while spring embedding.
         return super.getRenderingInformation(proxy);
-      } else if (orig instanceof SimpleNodeProxy) {
-        final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-        final StateProxy currentState = mSim.getCurrentState(mAutomaton);
-        if (infomap.get(currentState).getSourceObject() == orig) {
-          proxyIsActive = true;
+      } else {
+        final RenderingStatus status;
+        if (orig instanceof LabelGeometrySubject) {
+          final LabelGeometrySubject geo = (LabelGeometrySubject) orig;
+          final Proxy node = (Proxy) geo.getParent();
+          status = getRenderingStatus(node);
+        } else {
+          status = getRenderingStatus(orig);
         }
-        if (mFocusedItem != null)
-        {
+        if (status == null) {
+          final Color foreground = EditorColor.SIMULATION_INVALID;
+          final Color shadow =
+            EditorColor.getShadowColor(orig, GraphPanel.DragOverStatus.NOTDRAG,
+                                       false, false, false);
+          final int prio = getPriority(orig);
+          return new RenderingInformation
+            (false, false, foreground, shadow, prio);
+        } else {
+          final boolean selected;
           if (orig == mFocusedItem) {
-            proxyIsSelected = true;
-          }
-        }
-        boolean found = (proxyIsActive);
-        if (!found)
-        {
-          for (final StateProxy state : mAutomaton.getStates())
-          {
-            if (infomap.get(state).getSourceObject() == orig)
-              found = true;
-          }
-        }
-        if (!found)
-          proxyIsInvalid = true;
-      } else if (orig instanceof IdentifierProxy ||
-                 orig instanceof EdgeProxy) {
-        final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-        final TransitionProxy currentTrans =
-          mSim.getPreviousTransition(mAutomaton);
-        if (currentTrans != null) {
-          final Proxy source = infomap.get(currentTrans).getGraphSourceObject();
-          if (orig instanceof IdentifierProxy) {
-            if (source == orig) {
-              proxyIsActive = true;
-            }
-          } else {
-            final AbstractSubject subject = (AbstractSubject) source;
-            final EdgeSubject edge =
-              SubjectTools.getAncestor(subject, EdgeSubject.class);
-            if (edge == orig) {
-              proxyIsActive = true;
-            }
-          }
-        }
-        if (isEnabled(orig)) {
-          proxyIsEnabled = true;
-        }
-        if (mFocusedItem != null) {
-          if (orig == mFocusedItem) {
-            proxyIsSelected = true;
-          } else if (orig instanceof IdentifierSubject) {
+            selected = true;
+          } else if (orig instanceof IdentifierSubject ||
+                     orig instanceof ForeachEventSubject) {
             final Subject subject = (Subject) orig;
             final EdgeSubject edge =
               SubjectTools.getAncestor(subject, EdgeSubject.class);
-            if (mFocusedItem == edge) {
-              proxyIsSelected = true;
-            }
+            selected = (mFocusedItem == edge);
+          } else if (orig instanceof SimpleNodeSubject) {
+            final SimpleNodeSubject node = (SimpleNodeSubject) orig;
+            selected = (mFocusedItem == node.getLabelGeometry());
+          } else if (orig instanceof LabelGeometrySubject) {
+            final LabelGeometrySubject geo = (LabelGeometrySubject) orig;
+            selected = (mFocusedItem == geo.getParent());
+          } else {
+            selected = false;
           }
-        }
-        boolean found = (proxyIsActive || proxyIsEnabled);
-        if (!found) {
-          found = mNonOptimizedProxy.contains(orig);
-        }
-        if (!found) {
-          proxyIsInvalid = true;
-        }
-      } else if (orig instanceof ForeachEventSubject) {
-        if (orig == mFocusedItem) {
-          proxyIsSelected = true;
-        } else {
-          final Subject subject = (Subject) orig;
-          final EdgeSubject edge =
-            SubjectTools.getAncestor(subject, EdgeSubject.class);
-          if (mFocusedItem == edge) {
-            proxyIsSelected = true;
+          if (selected || status.isActive() || status.isEnabled()) {
+            final Color foreground = status.getForegroundColor();
+            final Color shadow = status.getShadowColor(selected);
+            final int prio = getPriority(orig);
+            return new RenderingInformation
+              (false, true, foreground, shadow, prio);
+          } else {
+            return super.getRenderingInformation(orig);
           }
-        }
-      } else if (orig instanceof LabelGeometryProxy) {
-        if (mFocusedItem instanceof SimpleNodeProxy) {
-          final LabelGeometryProxy label = ((SimpleNodeProxy)mFocusedItem).getLabelGeometry();
-          if (orig == label) {
-            proxyIsSelected = true;
-          }
-        }
-        if (orig instanceof LabelGeometrySubject) {
-          final SimpleNodeSubject parent = (SimpleNodeSubject)(((LabelGeometrySubject)orig).getParent());
-          final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-          final StateProxy currentState = mSim.getCurrentState(mAutomaton);
-          if (infomap.get(currentState).getSourceObject() == parent)
-            proxyIsActive = true;
-          boolean found = (proxyIsActive);
-          if (!found)
-          {
-            for (final StateProxy state : mAutomaton.getStates())
-            {
-              if (infomap.get(state).getSourceObject() == parent)
-                found = true;
-            }
-          }
-          if (!found)
-            proxyIsInvalid = true;
         }
       }
-      return getRawRenderingInformation
-        (orig, proxyIsActive, proxyIsEnabled, proxyIsSelected, proxyIsInvalid);
     }
 
     //#######################################################################
-    //# Auxiliary Methods
-    private RenderingInformation getRawRenderingInformation
-      (final Proxy orig, final boolean proxyIsActive,
-       final boolean proxyIsEnabled, final boolean proxyIsSelected,
-       final boolean proxyIsInvalid)
-    {
-      if (proxyIsInvalid)
-        return new RenderingInformation(false, false, EditorColor.SIMULATION_INVALID,
-                                        EditorColor.getShadowColor(orig, GraphPanel.DragOverStatus.NOTDRAG, false, false, false),
-                                        getPriority(orig));
-      if (proxyIsActive || proxyIsEnabled || proxyIsSelected) {
-        final Color foreground;
-        final Color shadow;
-        if (proxyIsEnabled) {
-          foreground = EditorColor.SIMULATION_ENABLED;
-        } else if (proxyIsActive) {
-          foreground = EditorColor.SIMULATION_ACTIVE;
-        } else {
-          foreground = EditorColor.DEFAULTCOLOR;
-        }
-        if (proxyIsSelected) {
-          if (proxyIsEnabled) {
-            shadow = EditorColor.SIMULATION_FOCUSED_SHADOW;
-          } else {
-            shadow = EditorColor.shadow(EditorColor.SIMULATION_DISABLED_FOCUSED);
-          }
-        } else {
-          if (proxyIsActive) {
-            shadow = EditorColor.shadow(EditorColor.SIMULATION_ACTIVE);
-          } else if (proxyIsEnabled) {
-            shadow = EditorColor.shadow(EditorColor.SIMULATION_ENABLED);
-          } else {
-            shadow = null;
-          }
-        }
-        return new RenderingInformation(false, true, foreground, shadow,
-                                        getPriority(orig));
-      } else {
-        return super.getRenderingInformation(orig);
-      }
-    }
-
-    //########################################################################
     //# Data Members
     private final Map<SimpleNodeProxy,StateProxy> mStateMap;
 
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Inner Class GraphToolTipVisitor
   private class GraphToolTipVisitor extends AbstractModuleProxyVisitor
   {
-    //#########################################################################
+    //#######################################################################
     //# Invocation
     private String getToolTip(final Proxy proxy)
     {
@@ -714,46 +647,192 @@ public class AutomatonDisplayPane
       }
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
     public String visitProxy(final Proxy proxy)
     {
       return null;
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
+    public String visitEdgeProxy(final EdgeProxy edge)
+    {
+      final RenderingStatus status = getRenderingStatus(edge);
+      if (status.getCount() == 1) {
+        return getTransitionToolTip(edge);
+      } else {
+        return null;
+      }
+    }
+
     public String visitIdentifierProxy(final IdentifierProxy ident)
     {
-      final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-      for (final TransitionProxy trans : mAutomaton.getTransitions()) {
-        if (ident == infomap.get(trans).getGraphSourceObject()) {
-          final ToolTipVisitor master = mSim.getToolTipVisitor();
-          final EventProxy event = trans.getEvent();
-          return master.visitEventProxy(event);
-        }
-      }
-      final String name = ident.toString();
-      return "Transition " + name + " has been removed due to optimisation";
+      return getTransitionToolTip(ident);
     }
 
     public String visitSimpleNodeProxy(final SimpleNodeProxy node)
     {
-      final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
-      for (final StateProxy state : mAutomaton.getStates()) {
-        if (infomap.get(state).getSourceObject() == node) {
-          final ToolTipVisitor master = mSim.getToolTipVisitor();
-          return master.getToolTip(state, mAutomaton);
-        }
+      final RenderingStatus status = getRenderingStatus(node);
+      if (status == null) {
+        final String name = node.getName();
+        return "State " + name + " has been removed due to optimisation";
+      } else {
+        final ToolTipVisitor master = mSim.getToolTipVisitor();
+        final StateProxy state = (StateProxy) status.getAutomatonItem();
+        return master.getToolTip(state, mAutomaton);
       }
-      final String name = node.getName();
-      return "State " + name + " has been removed due to optimisation";
+    }
+
+    //#########################################################################
+    //# Inner Class RenderingStatus
+    private String getTransitionToolTip(final Proxy source)
+    {
+      try {
+        final StringWriter writer = new StringWriter();
+        final RenderingStatus status = getRenderingStatus(source);
+        if (status == null) {
+          writer.write("Transition ");
+          ModuleProxyPrinter.printProxy(writer, source);
+          writer.write(" has been removed due to optimisation");
+        } else {
+          if (status.getCount() == 1) {
+            final TransitionProxy trans =
+              (TransitionProxy) status.getAutomatonItem();
+            final EventProxy event = trans.getEvent();
+            final EventKind kind = event.getKind();
+            writer.write(ModuleContext.getEventKindToolTip(kind, false));
+            writer.write(" transition ");
+            writer.write(event.getName());
+          } else {
+            writer.write("Event group ");
+            ModuleProxyPrinter.printProxy(writer, source);
+          }
+          if (status.isActive()) {
+            writer.write(", has just been executed");
+          }
+          if (!status.isEnabled()) {
+            writer.write(", currently disabled");
+          } else if (status.getCount() == 1) {
+            writer.write(", currently enabled");
+          } else {
+            writer.write(", contains enabled events");
+          }
+        }
+        return writer.toString();
+      } catch (final IOException exception) {
+        throw new WatersRuntimeException(exception);
+      }
     }
 
   }
 
 
-  //##########################################################################
+  //#########################################################################
+  //# Inner Class RenderingStatus
+  private static class RenderingStatus
+  {
+    //#######################################################################
+    //# Constructor
+    private RenderingStatus(final Proxy proxy,
+                            final boolean active,
+                            final boolean enabled)
+    {
+      mActive = active;
+      mEnabled = enabled;
+      mCount = 1;
+      mAutomatonItem = proxy;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private boolean isActive()
+    {
+      return mActive;
+    }
+
+    private boolean isEnabled()
+    {
+      return mEnabled;
+    }
+
+    private int getCount()
+    {
+      return mCount;
+    }
+
+    private Proxy getAutomatonItem()
+    {
+      return mAutomatonItem;
+    }
+
+    private void addStatus(final boolean active, final boolean enabled)
+    {
+      mActive |= active;
+      mEnabled |= enabled;
+      mCount++;
+      mAutomatonItem = null;
+    }
+
+    //#######################################################################
+    //# Colour Access
+    private Color getForegroundColor()
+    {
+      if (isEnabled()) {
+        return EditorColor.SIMULATION_ENABLED;
+      } else if (isActive()) {
+        return EditorColor.SIMULATION_ACTIVE;
+      } else {
+        return EditorColor.DEFAULTCOLOR;
+      }
+
+    }
+
+    private Color getShadowColor(final boolean selected)
+    {
+      if (selected) {
+        if (isEnabled()) {
+          return EditorColor.SIMULATION_FOCUSED_SHADOW;
+        } else {
+          return EditorColor.shadow(EditorColor.SIMULATION_DISABLED_FOCUSED);
+        }
+      } else {
+        if (isActive()) {
+          return EditorColor.shadow(EditorColor.SIMULATION_ACTIVE);
+        } else if (isEnabled()) {
+          return EditorColor.shadow(EditorColor.SIMULATION_ENABLED);
+        } else {
+          return null;
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    /**
+     * Whether the state is the current state, or whether a transition has
+     * just fired.
+     */
+    private boolean mActive;
+    /**
+     * Whether a transition is currently enabled.
+     */
+    private boolean mEnabled;
+    /**
+     * The number of automaton transitions compiled from this graph element.
+     * This is used when generating tooltips, to identify a label as an
+     * &quot;event group&quot;.
+     */
+    private int mCount;
+    /**
+     * The unique item in the automaton corresponding to this graph element,
+     * or <CODE>null</CODE> if more than one item has been created from it.
+     */
+    private Proxy mAutomatonItem;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final AutomatonInternalFrame mParent;
   private final Simulation mSim;
@@ -765,10 +844,9 @@ public class AutomatonDisplayPane
   private AffineTransform mTransform;
   private AffineTransform mInverseTransform;
   private Proxy mFocusedItem;
-  private Set<Proxy> mEnabledProxy;
-  private Set<Proxy> mNonOptimizedProxy;
+  private Map<Proxy,RenderingStatus> mRenderingStatusMap;
 
-  //##########################################################################
+  //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
 }

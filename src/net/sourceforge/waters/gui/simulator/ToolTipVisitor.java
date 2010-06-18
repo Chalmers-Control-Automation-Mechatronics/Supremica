@@ -84,7 +84,7 @@ class ToolTipVisitor extends AbstractProductDESProxyVisitor
   {
     final StringBuffer buffer = new StringBuffer();
     final EventKind kind = event.getKind();
-    buffer.append(ModuleContext.getEventKindToolTip(kind));
+    buffer.append(ModuleContext.getEventKindToolTip(kind, true));
     buffer.append(' ');
     buffer.append(event.getName());
     if (mShowActivity) {

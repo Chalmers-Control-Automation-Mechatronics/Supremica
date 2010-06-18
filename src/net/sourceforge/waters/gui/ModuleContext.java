@@ -441,13 +441,14 @@ public class ModuleContext
     }
   }
 
-  public static String getEventKindToolTip(final EventKind kind)
+  public static String getEventKindToolTip(final EventKind kind,
+                                           final boolean event)
   {
     switch (kind) {
     case CONTROLLABLE:
-      return "Controllable event";
+      return event ? "Controllable event" : "Controllable";
     case UNCONTROLLABLE:
-      return "Uncontrollable event";
+      return event ? "Uncontrollable event" : "Uncontrollable";
     case PROPOSITION:
       return "Proposition";
     default:
@@ -853,7 +854,7 @@ public class ModuleContext
     public String visitEventDeclProxy(final EventDeclProxy decl)
     {
       final EventKind kind = decl.getKind();
-      return getEventKindToolTip(kind);
+      return getEventKindToolTip(kind, true);
     }
 
     public String visitInstanceProxy(final InstanceProxy inst)
