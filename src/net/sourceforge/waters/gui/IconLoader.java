@@ -106,6 +106,5 @@ public class IconLoader
   public static final ImageIcon ICON_EVENTTREE_ENABLED_AUTOMATON = getIcon(NAME_TICK);
   public static final ImageIcon ICON_EVENTTREE_CAUSES_WARNING_PROPERTY = getIcon(NAME_YELLOWWARNING);
   public static final Icon ICON_EVENTTREE_BLOCKING_AUTOMATON = getIcon(NAME_WARNING);
-  public static final Icon ICON_MANUAL_STATE_SET = getIcon(NAME_CROSS);
 
 }

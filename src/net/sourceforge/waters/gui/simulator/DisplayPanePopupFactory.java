@@ -1,7 +1,5 @@
 package net.sourceforge.waters.gui.simulator;
 
-import java.util.Map;
-
 import javax.swing.JPopupMenu;
 
 import net.sourceforge.waters.gui.PopupFactory;
@@ -9,13 +7,10 @@ import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.compiler.context.SourceInfo;
-import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
-import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
@@ -28,14 +23,12 @@ class DisplayPanePopupFactory
   //# Constructor
   DisplayPanePopupFactory(final WatersPopupActionManager master,
                           final AutomatonDisplayPane displayPane,
-                          final AutomatonDesktopPane desktopPane,
-                          final Map<Proxy, SourceInfo> infoMap)
+                          final AutomatonDesktopPane desktopPane)
   {
     super(master);
     mVisitor = new DisplayPanePopupVisitor();
     mDisplayPane = displayPane;
     mDesktopPane = desktopPane;
-    mMap = infoMap;
   }
 
 
@@ -95,50 +88,34 @@ class DisplayPanePopupFactory
       return null;
     }
 
-    public Object visitNodeProxy(final NodeProxy node)
-    {
-      if (mDisplayPane != null) {
-        if (node instanceof SimpleNodeProxy)
-        {
-          for (final StateProxy state : mDisplayPane.getAutomaton().getStates())
-          {
-            if (node == mMap.get(state).getSourceObject())
-            {
-
-              final WatersPopupActionManager master = getMaster();
-              final JPopupMenu popup = getPopup();
-              final IDEAction teleport =
-                master.getDesktopSetStateAction(mDisplayPane.getAutomaton(), node);
-              popup.add(teleport);
-              popup.addSeparator();
-              return null;
-            }
-          }
-        }
-      }
-      return null;
-    }
-
-    public Object visitLabelGeometryProxy(final LabelGeometryProxy geo)
-    {
-      return null;
-    }
-
     public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
     {
       visitProxy(ident);
-      if (mDisplayPane != null) {
-        if (mDisplayPane.canExecute()) {
-          final WatersPopupActionManager master = getMaster();
-          final JPopupMenu popup = getPopup();
-          final IDEAction execute =
-            master.getDesktopExecuteAction(mDisplayPane.getAutomaton(), ident);
-          popup.add(execute);
-          popup.addSeparator();
-        }
+      if (mDisplayPane != null && mDisplayPane.canExecute()) {
+        final WatersPopupActionManager master = getMaster();
+        final JPopupMenu popup = getPopup();
+        final IDEAction execute =
+          master.getDesktopExecuteAction(mDisplayPane.getAutomaton(), ident);
+        popup.add(execute);
+        popup.addSeparator();
       }
       return null;
     }
+
+    public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
+    {
+      visitProxy(node);
+      if (mDisplayPane != null && mDisplayPane.canSetState(node)) {
+        final AutomatonProxy aut = mDisplayPane.getAutomaton();
+        final WatersPopupActionManager master = getMaster();
+        final IDEAction teleport = master.getDesktopSetStateAction(aut, node);
+        final JPopupMenu popup = getPopup();
+        popup.add(teleport);
+        popup.addSeparator();
+      }
+      return null;
+    }
+
   }
 
 
@@ -147,5 +124,5 @@ class DisplayPanePopupFactory
   private final ModuleProxyVisitor mVisitor;
   private final AutomatonDisplayPane mDisplayPane;
   private final AutomatonDesktopPane mDesktopPane;
-  private final Map<Proxy,SourceInfo> mMap;
+
 }

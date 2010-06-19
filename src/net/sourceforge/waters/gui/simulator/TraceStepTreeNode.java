@@ -3,7 +3,6 @@ package net.sourceforge.waters.gui.simulator;
 import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -32,45 +31,30 @@ class TraceStepTreeNode extends DefaultMutableTreeNode
 
   static TraceStepTreeNode createInitialStepNode()
   {
-    return new TraceStepTreeNode("Initial state", 0,
-                                 PropositionIcon.getUnmarkedIcon());
+    return new TraceStepTreeNode("Initial state", null, 0);
   }
 
   static TraceStepTreeNode createEventStepNode(final EventProxy event,
                                                final int time)
   {
-    return new TraceStepTreeNode(event, time);
+    return new TraceStepTreeNode(event.getName(), event, time);
   }
 
   static TraceStepTreeNode createTeleportStepNode(final int time)
   {
-    return new TraceStepTreeNode("State set manually", time,
-                                 IconLoader.ICON_MANUAL_STATE_SET);
+    return new TraceStepTreeNode("State set manually", null, time);
   }
 
 
   //#########################################################################
   //# Constructor
   private TraceStepTreeNode(final String description,
-                            final int time,
-                            final Icon icon)
+                            final EventProxy event,
+                            final int time)
   {
     super(description, true);
-    mEvent = null;
-    mTime = time;
-    mIcon = icon;
-    // To ensure that the events list can be expanded. This is removed as soon
-    // as the node is expanded. Still, it appears as a grey box on the tree.
-    add(new DefaultMutableTreeNode("You shouldn't ever see this", false));
-  }
-
-  private TraceStepTreeNode(final EventProxy event, final int time)
-  {
-    super(event.getName(), true);
     mEvent = event;
     mTime = time;
-    final EventKind kind = event.getKind();
-    mIcon = ModuleContext.getEventKindIcon(kind);
     // To ensure that the events list can be expanded. This is removed as soon
     // as the node is expanded. Still, it appears as a grey box on the tree.
     add(new DefaultMutableTreeNode("You shouldn't ever see this", false));
@@ -96,7 +80,12 @@ class TraceStepTreeNode extends DefaultMutableTreeNode
 
   Icon getIcon()
   {
-    return mIcon;
+    if (mEvent != null) {
+      final EventKind kind = mEvent.getKind();
+      return ModuleContext.getEventKindIcon(kind);
+    } else {
+      return PropositionIcon.getUnmarkedIcon();
+    }
   }
 
 
@@ -134,7 +123,6 @@ class TraceStepTreeNode extends DefaultMutableTreeNode
   //# Data Members
   private final EventProxy mEvent;
   private final int mTime;
-  private final Icon mIcon;
 
 
   //#########################################################################

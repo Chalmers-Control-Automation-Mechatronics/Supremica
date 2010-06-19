@@ -140,18 +140,19 @@ public class Simulation implements ModelObserver, Observer
       throw new IllegalArgumentException
         ("Automaton " + aut.getName() +
          " does not contain state " + state.getName() + "!");
-    }
-    final SimulatorState newState = new SimulatorState(null, mCurrentState);
-    newState.setState(aut, state, AutomatonStatus.OK);
-    // This state changes the simulation so it is different from the trace
-    mTraceInvalidated = true;
-    removeFutureSteps();
-    addNewSimulatorState(newState);
-    mCurrentTime++;
-    loadSimulatorState();
-    final SimulationChangeEvent simEvent = new SimulationChangeEvent
+    } else if (getCurrentState(aut) != state) {
+      final SimulatorState newState = new SimulatorState(null, mCurrentState);
+      newState.setState(aut, state, AutomatonStatus.OK);
+      // This state changes the simulation so it is different from the trace
+      mTraceInvalidated = true;
+      removeFutureSteps();
+      addNewSimulatorState(newState);
+      mCurrentTime++;
+      loadSimulatorState();
+      final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
-    fireSimulationChangeEvent(simEvent);
+      fireSimulationChangeEvent(simEvent);
+    }
   }
 
   /**
@@ -763,14 +764,26 @@ public class Simulation implements ModelObserver, Observer
         final StateProxy state = mCurrentState.getState(aut);
         source.put(aut, state);
       }
+      final List<AutomatonProxy> nondet =
+        new ArrayList<AutomatonProxy>(numAutomata);
       mEnabledSteps = new ArrayList<SimulatorStep>();
       for (final EventProxy event : mOrderedEvents) {
         if (getEventStatus(event) == EventStatus.ENABLED) {
-          final Map<AutomatonProxy,StateProxy> target =
-            new HashMap<AutomatonProxy,StateProxy>(source);
           final List<AutomatonProxy> automata =
             getAutomataSensitiveToEvent(event);
-          createSteps(event, target, automata, 0, null);
+          for (final AutomatonProxy aut : automata) {
+            final EventEntry entry = mEventStatusMap.get(event);
+            final List<StateProxy> successors = entry.getSuccessors(aut);
+            if (successors.size() > 1) {
+              nondet.add(aut);
+            }
+          }
+          final List<AutomatonProxy> ndcopy =
+            nondet.isEmpty() ? null : new ArrayList<AutomatonProxy>(nondet);
+          nondet.clear();
+          final Map<AutomatonProxy,StateProxy> target =
+            new HashMap<AutomatonProxy,StateProxy>(source);
+          createSteps(event, target, automata, ndcopy, 0);
         }
       }
       for (final EventEntry entry : mEventStatusMap.values()) {
@@ -782,8 +795,8 @@ public class Simulation implements ModelObserver, Observer
   private void createSteps(final EventProxy event,
                            final Map<AutomatonProxy,StateProxy> targetTuple,
                            final List<AutomatonProxy> automata,
-                           final int index,
-                           List<AutomatonProxy> nondet)
+                           final List<AutomatonProxy> nondet,
+                           final int index)
   {
     if (index == automata.size()) {
       final Map<AutomatonProxy,StateProxy> targetCopy =
@@ -799,17 +812,11 @@ public class Simulation implements ModelObserver, Observer
       final List<StateProxy> successors = entry.getSuccessors(aut);
       if (successors == null) {
         targetTuple.remove(aut);
-        createSteps(event, targetTuple, automata, next, nondet);
+        createSteps(event, targetTuple, automata, nondet, next);
       } else {
-        if (successors.size() > 1) {
-          if (nondet == null) {
-            nondet = new LinkedList<AutomatonProxy>();
-          }
-          nondet.add(aut);
-        }
         for (final StateProxy target : successors) {
           targetTuple.put(aut, target);
-          createSteps(event, targetTuple, automata, next, nondet);
+          createSteps(event, targetTuple, automata, nondet, next);
         }
       }
     }

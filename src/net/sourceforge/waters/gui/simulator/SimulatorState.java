@@ -139,8 +139,13 @@ class SimulatorState
 
   SimulatorState(final EventProxy event, final SimulatorState source)
   {
-    mEvent = event;
-    mStateMap = new HashMap<AutomatonProxy,Entry>(source.mStateMap);
+    this(event, source.size());
+    for (final Map.Entry<AutomatonProxy,Entry> entry :
+         source.mStateMap.entrySet()) {
+      final AutomatonProxy aut = entry.getKey();
+      final StateProxy state = entry.getValue().getState();
+      setState(aut, state, AutomatonStatus.IGNORED);
+    }
   }
 
   SimulatorState(final EventProxy event, final int numAutomata)
@@ -209,6 +214,14 @@ class SimulatorState
     }
     buffer.append("]");
     return buffer.toString();
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  int size()
+  {
+    return mStateMap.size();
   }
 
 
