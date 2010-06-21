@@ -165,13 +165,13 @@ class SimulatorState
   StateProxy getState(final AutomatonProxy aut)
   {
     final Entry entry = mStateMap.get(aut);
-    return entry.getState();
+    return entry == null ? null : entry.getState();
   }
 
   AutomatonStatus getStatus(final AutomatonProxy aut)
   {
     final Entry entry = mStateMap.get(aut);
-    return entry.getStatus();
+    return entry == null ? AutomatonStatus.DISABLED : entry.getStatus();
   }
 
   void setState(final AutomatonProxy aut,

@@ -164,9 +164,14 @@ class AutomataTableModel
           row.add(ModuleContext.getComponentKindIcon(aut.getKind()));
         row.add(aut.getName());
         row.add(getSimulation().getAutomatonActivityIcon(aut));
-        final StateProxy currentState = getSimulation().getCurrentState(aut);
-        row.add(getSimulation().getMarkingIcon(currentState, aut, false));
-        row.add(currentState.getName());
+        final StateProxy state = getSimulation().getCurrentState(aut);
+        if (state != null) {
+          row.add(getSimulation().getMarkingIcon(state, aut, false));
+          row.add(state.getName());
+        } else {
+          row.add(null);
+          row.add("");
+        }
         output.add(row);
       }
       Collections.sort(output, mComparator);
