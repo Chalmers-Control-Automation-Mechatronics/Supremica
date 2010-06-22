@@ -928,7 +928,7 @@ public class CompositionalGeneralisedConflictChecker extends
   private abstract class PreselectingHeuristic
   {
     /**
-     * Pairs the chosen automaton with every other automaton in automata and
+     * Pairs the chosen automaton with every other automaton in 'automata' and
      * creates a candidate for each.
      *
      * @param chosenAut
@@ -954,13 +954,8 @@ public class CompositionalGeneralisedConflictChecker extends
             pair.add(chosenAut);
           }
           final Candidate candidate = new Candidate(pair);
-          if (!mUnsuccessfulCandidates.contains(candidate)) {
-            final Set<EventProxy> localEvents =
-                identifyLocalEvents(mEventsToAutomata, pair);
-            if (localEvents.size() > 0) {
-              candidate.setLocalEvents(localEvents);
-              candidates.add(candidate);
-            }
+          if (validateCandidate(candidate)) {
+            candidates.add(candidate);
           }
         }
       }
@@ -970,26 +965,51 @@ public class CompositionalGeneralisedConflictChecker extends
     /**
      * Checks if a candidate is valid. To satisfy being a valid candidate it
      * must not have been previously tried and marked as unsuccessful, must have
-     * at least one local event, its automata must have at least one shared
+     * at least one local event and its automata must have at least one shared
      * event.
      *
      * @param candidate
      *          The candidate to check.
      * @return True = valid, false = suppress candidate.
      */
-    @SuppressWarnings("unused")
     protected boolean validateCandidate(final Candidate candidate)
     {
-      final boolean valid = false;
       if (!mUnsuccessfulCandidates.contains(candidate)) {
+        final List<AutomatonProxy> candidateAut = candidate.getAutomata();
         final Set<EventProxy> localEvents =
-            identifyLocalEvents(mEventsToAutomata, candidate.getAutomata());
+            identifyLocalEvents(mEventsToAutomata, candidateAut);
         if (localEvents.size() > 0) {
           candidate.setLocalEvents(localEvents);
-          // TODO: check if there are shared events
+          if (checkForSharedEvent(candidate)) {
+            return true;
+          }
         }
       }
-      return valid;
+      return false;
+    }
+
+    /**
+     * Checks if the automata of a candidate share at least one event.
+     *
+     * @param candidate
+     *          Candidate to check.
+     * @return True = at least one shared event, false = no shared event.
+     */
+    protected boolean checkForSharedEvent(final Candidate candidate)
+    {
+      final List<AutomatonProxy> candidateAut = candidate.getAutomata();
+      final AutomatonProxy aut1 = candidateAut.get(0);
+      final AutomatonProxy aut2 = candidateAut.get(1);
+      assert candidateAut.size() == 2;
+      for (final EventProxy event1 : aut1.getEvents()) {
+        for (final EventProxy event2 : aut2.getEvents()) {
+          if (event1 == event2)
+            return true;
+        }
+      }
+      return false;
+      // TODO: or would it be better to search events of mEventsToAutomata and
+      // check if the event is mapped to both automata in candidate...
     }
 
     protected abstract List<Candidate> evaluate(final ProductDESProxy model);
@@ -1065,18 +1085,27 @@ public class CompositionalGeneralisedConflictChecker extends
           // Bring automata into defined ordering.
           Collections.sort(automata);
           final Candidate candidate = new Candidate(automata);
-          if (!candidates.contains(candidate)
-              && !mUnsuccessfulCandidates.contains(candidate)) {
-            final Set<EventProxy> localEvents =
-                identifyLocalEvents(mEventsToAutomata, automata);
-            if (localEvents.size() > 0) {
-              candidate.setLocalEvents(localEvents);
+          if (!candidates.contains(candidate)) {
+            if (validateCandidate(candidate)) {
               candidates.add(candidate);
             }
           }
         }
       }
       return candidates;
+    }
+
+    /**
+     * Returns true without searching for a shared event, since for this
+     * heuristic candidates are automata which share an event.
+     *
+     * @param candidate
+     * @return true, there is definitely a shared event.
+     */
+    @Override
+    protected boolean checkForSharedEvent(final Candidate candidate)
+    {
+      return true;
     }
   }
 
