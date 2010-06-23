@@ -868,9 +868,19 @@ public class CompositionalGeneralisedConflictChecker extends
     return new HeuristicMaxL();
   }
 
+  public HeuristicMaxLOnTransitions createHeuristicMaxLOnTransitions()
+  {
+    return new HeuristicMaxLOnTransitions();
+  }
+
   public HeuristicMaxC createHeuristicMaxC()
   {
     return new HeuristicMaxC();
+  }
+
+  public HeuristicMaxCOnTransitions createHeuristicMaxCOnTransitions()
+  {
+    return new HeuristicMaxCOnTransitions();
   }
 
   public HeuristicMinS createHeuristicMinS()
@@ -893,12 +903,28 @@ public class CompositionalGeneralisedConflictChecker extends
     if (heuristic instanceof HeuristicMaxL) {
       mSelectingHeuristics.add(new HeuristicMaxC());
       mSelectingHeuristics.add(new HeuristicMinS());
+      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
+      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
     } else if (heuristic instanceof HeuristicMaxC) {
       mSelectingHeuristics.add(new HeuristicMaxL());
       mSelectingHeuristics.add(new HeuristicMinS());
+      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
+      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
     } else if (heuristic instanceof HeuristicMinS) {
       mSelectingHeuristics.add(new HeuristicMaxL());
       mSelectingHeuristics.add(new HeuristicMaxC());
+      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
+      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
+    } else if (heuristic instanceof HeuristicMaxLOnTransitions) {
+      mSelectingHeuristics.add(new HeuristicMaxL());
+      mSelectingHeuristics.add(new HeuristicMaxC());
+      mSelectingHeuristics.add(new HeuristicMinS());
+      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
+    } else if (heuristic instanceof HeuristicMaxCOnTransitions) {
+      mSelectingHeuristics.add(new HeuristicMaxL());
+      mSelectingHeuristics.add(new HeuristicMaxC());
+      mSelectingHeuristics.add(new HeuristicMinS());
+      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
     }
     mSelectingHeuristics.add(new HeuristicDefault());
   }
@@ -1194,6 +1220,57 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
+  private abstract class TransitionHeuristic extends SelectingHeuristic
+  {
+    private int mLocalTransitions;
+    private int mTotalTransitions;
+
+    protected int getLocalTransitionCount()
+    {
+      return mLocalTransitions;
+    }
+
+    protected int getTotalTransitionCount()
+    {
+      return mTotalTransitions;
+    }
+
+    protected void countTransitions(final Candidate candidate)
+    {
+      final List<AutomatonProxy> automata = candidate.getAutomata();
+      final Set<EventProxy> localEvents = candidate.getLocalEvents();
+      mLocalTransitions = 0;
+      mTotalTransitions = 0;
+      for (final AutomatonProxy aut : automata) {
+        final Collection<TransitionProxy> transitions = aut.getTransitions();
+        mTotalTransitions = transitions.size();
+        for (final TransitionProxy transition : transitions) {
+          if (localEvents.contains(transition.getEvent())) {
+            mLocalTransitions++;
+          }
+        }
+      }
+    }
+  }
+
+
+  /**
+   * Performs step 2 of the approach to select the automata to compose. The
+   * chosen candidate is the one with the highest proportion of transitions
+   * which are labelled by a local event.
+   */
+  private class HeuristicMaxLOnTransitions extends TransitionHeuristic
+  {
+
+    protected double getHeuristicValue(final Candidate candidate)
+    {
+      countTransitions(candidate);
+      return (double) getLocalTransitionCount()
+          / (double) getTotalTransitionCount();
+    }
+  }
+
+
   /**
    * Performs step 2 of the approach to select the automata to compose. The
    * chosen candidate is the one with the highest proportion of common events.
@@ -1206,6 +1283,23 @@ public class CompositionalGeneralisedConflictChecker extends
       return (double) (candidate.getNumberOfEvents() - candidate
           .getLocalEventCount())
           / (double) candidate.getNumberOfEvents();
+    }
+  }
+
+
+  /**
+   * Performs step 2 of the approach to select the automata to compose. The
+   * chosen candidate is the one with the highest proportion of transitions
+   * which are shared events.
+   */
+  private class HeuristicMaxCOnTransitions extends TransitionHeuristic
+  {
+
+    protected double getHeuristicValue(final Candidate candidate)
+    {
+      countTransitions(candidate);
+      return (double) (getTotalTransitionCount() - getLocalTransitionCount())
+          / (double) getTotalTransitionCount();
     }
   }
 
