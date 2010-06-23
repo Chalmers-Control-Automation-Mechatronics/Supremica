@@ -88,9 +88,15 @@ public abstract class CompositionalConflictCheckerExperiments extends
       mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxC());
     } else if (mSelecting.equals("mins")) {
       mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMinS());
+    } else if (mSelecting.equals("maxlt")) {
+      mVerifier.setSelectingHeuristic(mVerifier
+          .createHeuristicMaxLOnTransitions());
+    } else if (mSelecting.equals("maxlc")) {
+      mVerifier.setSelectingHeuristic(mVerifier
+          .createHeuristicMaxCOnTransitions());
     } else {
       System.err
-          .println("Error: Selecting Heuristic not specified correctly, it must be one of: maxl, maxc, mins");
+          .println("Error: Selecting Heuristic not specified correctly, it must be one of: maxl, maxlt, maxc, maxct, mins");
     }
     mPrintStream.println("PreselHeuristic," + mPreselecting
         + ",SelecHeuristic," + mSelecting);
