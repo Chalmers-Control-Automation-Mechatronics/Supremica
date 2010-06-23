@@ -1152,33 +1152,21 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  private interface SelectingHeuristic
+  private abstract class SelectingHeuristic
   {
-    public List<Candidate> evaluate(final List<Candidate> candidates);
+    protected abstract double getHeuristicValue(Candidate candidate);
 
-  }
-
-
-  /**
-   * Performs step 2 of the approach to select the automata to compose. The
-   * chosen candidate is the one with the highest proportion of local events.
-   */
-  private class HeuristicMaxL implements SelectingHeuristic
-  {
     public List<Candidate> evaluate(final List<Candidate> candidates)
     {
       final Iterator<Candidate> it = candidates.iterator();
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       final Candidate chosenCandidate = it.next();
       chosenCandidates.add(chosenCandidate);
-      double maxLocal =
-          (double) chosenCandidate.getLocalEventCount()
-              / (double) chosenCandidate.getNumberOfEvents();
+      double maxLocal = getHeuristicValue(chosenCandidate);
+
       while (it.hasNext()) {
         final Candidate nextCan = it.next();
-        final double proportion =
-            (double) nextCan.getLocalEventCount()
-                / (double) nextCan.getNumberOfEvents();
+        final double proportion = getHeuristicValue(chosenCandidate);
         if (proportion > maxLocal) {
           chosenCandidates = new ArrayList<Candidate>();
           maxLocal = proportion;
@@ -1194,50 +1182,46 @@ public class CompositionalGeneralisedConflictChecker extends
 
   /**
    * Performs step 2 of the approach to select the automata to compose. The
-   * chosen candidate is the one with the highest proportion of common events.
+   * chosen candidate is the one with the highest proportion of local events.
    */
-  private class HeuristicMaxC implements SelectingHeuristic
+  private class HeuristicMaxL extends SelectingHeuristic
   {
-    public List<Candidate> evaluate(final List<Candidate> candidates)
+    protected double getHeuristicValue(final Candidate candidate)
     {
-      final ListIterator<Candidate> it = candidates.listIterator();
-      List<Candidate> chosenCandidates = new ArrayList<Candidate>();
-      final Candidate chosenCandidate = it.next();
-      chosenCandidates.add(chosenCandidate);
-      double maxCommon =
-          (double) (chosenCandidate.getNumberOfEvents() - chosenCandidate
-              .getLocalEventCount())
-              / (double) chosenCandidate.getNumberOfEvents();
-      while (it.hasNext()) {
-        final Candidate nextCan = it.next();
-        final double proportion =
-            (double) (nextCan.getNumberOfEvents() - nextCan
-                .getLocalEventCount())
-                / (double) nextCan.getNumberOfEvents();
-        if (proportion > maxCommon) {
-          chosenCandidates = new ArrayList<Candidate>();
-          maxCommon = proportion;
-          chosenCandidates.add(nextCan);
-        } else if (proportion == maxCommon) {
-          chosenCandidates.add(nextCan);
-        }
-      }
-      return chosenCandidates;
+      return (double) candidate.getLocalEventCount()
+          / (double) candidate.getNumberOfEvents();
     }
   }
 
 
-  private class HeuristicMinS implements SelectingHeuristic
+  /**
+   * Performs step 2 of the approach to select the automata to compose. The
+   * chosen candidate is the one with the highest proportion of common events.
+   */
+  private class HeuristicMaxC extends SelectingHeuristic
   {
+
+    protected double getHeuristicValue(final Candidate candidate)
+    {
+      return (double) (candidate.getNumberOfEvents() - candidate
+          .getLocalEventCount())
+          / (double) candidate.getNumberOfEvents();
+    }
+  }
+
+
+  private class HeuristicMinS extends SelectingHeuristic
+  {
+    @Override
     public List<Candidate> evaluate(final List<Candidate> candidates)
     {
       Candidate chosenCandidate = candidates.get(0);
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
-      double smallestProduct = calculateProduct(chosenCandidate);
+      double smallestProduct = getHeuristicValue(chosenCandidate);
       chosenCandidates.add(chosenCandidate);
       for (int i = 1; i < candidates.size(); i++) {
         final Candidate candidate = candidates.get(i);
-        final double newproduct = calculateProduct(candidate);
+        final double newproduct = getHeuristicValue(candidate);
         if (smallestProduct > newproduct) {
           chosenCandidates = new ArrayList<Candidate>();
           smallestProduct = newproduct;
@@ -1251,7 +1235,7 @@ public class CompositionalGeneralisedConflictChecker extends
       return chosenCandidates;
     }
 
-    private double calculateProduct(final Candidate candidate)
+    protected double getHeuristicValue(final Candidate candidate)
     {
       double product = 1;
       for (final AutomatonProxy aut : candidate.getAutomata()) {
@@ -1269,8 +1253,9 @@ public class CompositionalGeneralisedConflictChecker extends
    * candidate. The selection is made by comparing the candidates automata names
    * alphabetically.
    */
-  private class HeuristicDefault implements SelectingHeuristic
+  private class HeuristicDefault extends SelectingHeuristic
   {
+    @Override
     public List<Candidate> evaluate(final List<Candidate> candidates)
     {
       ListIterator<Candidate> iter = candidates.listIterator();
@@ -1314,6 +1299,13 @@ public class CompositionalGeneralisedConflictChecker extends
         index++;
       }
       return chosenCandidates;
+    }
+
+    // not used
+    protected double getHeuristicValue(final Candidate candidate)
+    {
+      // TODO Auto-generated method stub
+      return 0;
     }
   }
 
