@@ -21,6 +21,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1013,30 +1014,57 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     protected abstract List<Candidate> evaluate(final ProductDESProxy model);
+
+    protected abstract int getHeuristicProperty(final AutomatonProxy aut);
+
+
+    protected class AutomataComparator implements Comparator<AutomatonProxy>
+    {
+      public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
+      {
+        final int aut1Count = getHeuristicProperty(aut1);
+        final int aut2Count = getHeuristicProperty(aut2);
+        if (aut1Count < aut2Count)
+          return -1;
+        else if (aut1Count > aut2Count)
+          return 1;
+        else
+          return 0;
+      }
+    }
   }
 
 
   private class HeuristicMinT extends PreselectingHeuristic
   {
+    /*
+     * protected List<Candidate> evaluate1(final ProductDESProxy model) { //
+     * Find automata with fewest transitions final Set<AutomatonProxy> automata
+     * = model.getAutomata(); final Iterator<AutomatonProxy> it =
+     * automata.iterator(); AutomatonProxy chosenAut = it.next(); int minTrans =
+     * chosenAut.getTransitions().size(); while (it.hasNext()) { final
+     * AutomatonProxy nextAut = it.next(); final int transCount =
+     * nextAut.getTransitions().size(); if (transCount < minTrans) { minTrans =
+     * transCount; chosenAut = nextAut; } } // pairs chosen automaton with all
+     * others final List<Candidate> candidates = pairAutomata(chosenAut,
+     * automata); return candidates; }
+     */
+
     protected List<Candidate> evaluate(final ProductDESProxy model)
     {
-      // Find automata with fewest transitions
       final Set<AutomatonProxy> automata = model.getAutomata();
-      final Iterator<AutomatonProxy> it = automata.iterator();
-      AutomatonProxy chosenAut = it.next();
-      int minTrans = chosenAut.getTransitions().size();
-      while (it.hasNext()) {
-        final AutomatonProxy nextAut = it.next();
-        final int transCount = nextAut.getTransitions().size();
-        if (transCount < minTrans) {
-          minTrans = transCount;
-          chosenAut = nextAut;
-        }
-      }
+      final AutomatonProxy chosenAut =
+          (AutomatonProxy) Collections.min(automata, new AutomataComparator());
       // pairs chosen automaton with all others
       final List<Candidate> candidates = pairAutomata(chosenAut, automata);
       return candidates;
     }
+
+    protected int getHeuristicProperty(final AutomatonProxy aut)
+    {
+      return aut.getTransitions().size();
+    }
+
   }
 
 
@@ -1048,24 +1076,32 @@ public class CompositionalGeneralisedConflictChecker extends
   private class HeuristicMaxS extends PreselectingHeuristic
   {
 
+    /*
+     * protected List<Candidate> evaluate(final ProductDESProxy model) { // Find
+     * automaton with the most states final Set<AutomatonProxy> automata =
+     * model.getAutomata(); final Iterator<AutomatonProxy> it =
+     * automata.iterator(); AutomatonProxy chosenAut = it.next(); int maxStates
+     * = chosenAut.getStates().size(); while (it.hasNext()) { final
+     * AutomatonProxy nextAut = it.next(); final int statesCount =
+     * nextAut.getStates().size(); if (statesCount > maxStates) { maxStates =
+     * statesCount; chosenAut = nextAut; } } // pairs chosen automaton with all
+     * others final List<Candidate> candidates = pairAutomata(chosenAut,
+     * automata); return candidates; }
+     */
+
     protected List<Candidate> evaluate(final ProductDESProxy model)
     {
-      // Find automaton with the most states
       final Set<AutomatonProxy> automata = model.getAutomata();
-      final Iterator<AutomatonProxy> it = automata.iterator();
-      AutomatonProxy chosenAut = it.next();
-      int maxStates = chosenAut.getStates().size();
-      while (it.hasNext()) {
-        final AutomatonProxy nextAut = it.next();
-        final int statesCount = nextAut.getStates().size();
-        if (statesCount > maxStates) {
-          maxStates = statesCount;
-          chosenAut = nextAut;
-        }
-      }
+      final AutomatonProxy chosenAut =
+          (AutomatonProxy) Collections.max(automata, new AutomataComparator());
       // pairs chosen automaton with all others
       final List<Candidate> candidates = pairAutomata(chosenAut, automata);
       return candidates;
+    }
+
+    protected int getHeuristicProperty(final AutomatonProxy aut)
+    {
+      return aut.getStates().size();
     }
   }
 
@@ -1106,6 +1142,12 @@ public class CompositionalGeneralisedConflictChecker extends
     protected boolean checkForSharedEvent(final Candidate candidate)
     {
       return true;
+    }
+
+    // This is not used
+    protected int getHeuristicProperty(final AutomatonProxy aut)
+    {
+      return 0;
     }
   }
 
@@ -1242,10 +1284,8 @@ public class CompositionalGeneralisedConflictChecker extends
         while (iter.hasNext()) {
           final Candidate nextCandidate = iter.next();
           // currently if two candidates have the same automaton names up
-          // until
-          // a point where one has run out of automata, the candidate with
-          // more
-          // automata is selected
+          // until a point where one has run out of automata, the candidate with
+          // more automata is selected
           // TODO Consider using Candidate.compareTo(). Not exactly the same
           // ordering, though ...
           if (index < nextCandidate.getAutomata().size()) {
