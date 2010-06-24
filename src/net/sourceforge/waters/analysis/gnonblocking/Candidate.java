@@ -82,8 +82,8 @@ public class Candidate implements Comparable<Candidate>
   }
 
   /**
-   * Gets the count of events which the automata in this candidate share with
-   * each other.
+   * Gets the count of events (excluding propositions) which are shared between
+   * all automata of this candidate.
    *
    * @return Count of shared events.
    */
@@ -236,7 +236,7 @@ public class Candidate implements Comparable<Candidate>
 
   /**
    * Initialises mCommonEvents by counting all the events (excluding
-   * propositions) which are shared between the automata of this candidate.
+   * propositions) which are shared between all automata of this candidate.
    */
   private void identifyCommonEvents()
   {
