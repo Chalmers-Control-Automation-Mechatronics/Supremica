@@ -238,24 +238,32 @@ public class CompositionalGeneralisedConflictChecker extends
     final List<Step> modifyingSteps = new ArrayList<Step>();
 
     // performs hiding and abstraction for each automaton individually
-    @SuppressWarnings("unused")
     final KindTranslator translator = getKindTranslator();
     final List<AutomatonProxy> remainingAut =
         new ArrayList<AutomatonProxy>(model.getAutomata().size());
-    final boolean modified = false;
+    boolean modified = false;
     for (final AutomatonProxy aut : model.getAutomata()) {
-      /*
-       * if (translator.getComponentKind(aut) == ComponentKind.PROPERTY) {
-       * modified = true; } else { final List<AutomatonProxy> autAsList =
-       * Collections.singletonList(aut); final Set<EventProxy> localEvents =
-       * identifyLocalEvents(mEventsToAutomata, autAsList); if
-       * (localEvents.size() > 0) { try { final AutomatonProxy abstractedAut =
-       * hideAndAbstract(aut, localEvents); remainingAut.add(abstractedAut);
-       * modified = true; modifyingSteps.addAll(mTemporaryModifyingSteps); }
-       * catch (final OverflowException exception) { remainingAut.add(aut); }
-       * mTemporaryModifyingSteps.clear(); } else { remainingAut.add(aut); } }
-       */
-      remainingAut.add(aut);// TODO:delete and put above back in
+      if (translator.getComponentKind(aut) == ComponentKind.PROPERTY) {
+        modified = true;
+      } else {
+        final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
+        final Set<EventProxy> localEvents =
+            identifyLocalEvents(mEventsToAutomata, autAsList);
+        if (localEvents.size() > 0) {
+          try {
+            final AutomatonProxy abstractedAut =
+                hideAndAbstract(aut, localEvents);
+            remainingAut.add(abstractedAut);
+            modified = true;
+            modifyingSteps.addAll(mTemporaryModifyingSteps);
+          } catch (final OverflowException exception) {
+            remainingAut.add(aut);
+          }
+          mTemporaryModifyingSteps.clear();
+        } else {
+          remainingAut.add(aut);
+        }
+      }
     }
     if (modified) {
       final Candidate candidate = new Candidate(remainingAut, null);
@@ -447,11 +455,11 @@ public class CompositionalGeneralisedConflictChecker extends
     if (mPreselectingHeuristic == null) {
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       setPreselectingHeuristic(defaultHeuristic);
     }
     if (mSelectingHeuristics == null) {
-      final SelectingHeuristic defaultHeuristic = new HeuristicMinS();
+      final SelectingHeuristic defaultHeuristic = new HeuristicMaxC();
       setSelectingHeuristic(defaultHeuristic);
     }
     // reset statistics
@@ -980,7 +988,10 @@ public class CompositionalGeneralisedConflictChecker extends
             pair.add(a);
             pair.add(chosenAut);
           }
-          final Candidate candidate = new Candidate(pair);
+          final Set<EventProxy> localEvents =
+              identifyLocalEvents(mEventsToAutomata, pair);
+          final Candidate candidate = new Candidate(pair, localEvents);
+          candidate.setLocalEvents(localEvents);
           if (validateCandidate(candidate)) {
             candidates.add(candidate);
           }
@@ -999,18 +1010,22 @@ public class CompositionalGeneralisedConflictChecker extends
      *          The candidate to check.
      * @return True = valid, false = suppress candidate.
      */
-    protected boolean validateCandidate(final Candidate candidate)
+    boolean validateCandidate(final Candidate candidate)
     {
       if (!mUnsuccessfulCandidates.contains(candidate)) {
-        final List<AutomatonProxy> candidateAut = candidate.getAutomata();
-        final Set<EventProxy> localEvents =
-            identifyLocalEvents(mEventsToAutomata, candidateAut);
-        if (localEvents.size() > 0) {
-          candidate.setLocalEvents(localEvents);
+        if (checkForLocalEvent(candidate)) {
           if (checkForSharedEvent(candidate)) {
             return true;
           }
         }
+      }
+      return false;
+    }
+
+    boolean checkForLocalEvent(final Candidate candidate)
+    {
+      if (candidate.getLocalEventCount() > 0) {
+        return true;
       }
       return false;
     }
@@ -1029,9 +1044,11 @@ public class CompositionalGeneralisedConflictChecker extends
       final AutomatonProxy aut2 = candidateAut.get(1);
       assert candidateAut.size() == 2;
       for (final EventProxy event1 : aut1.getEvents()) {
-        for (final EventProxy event2 : aut2.getEvents()) {
-          if (event1 == event2)
-            return true;
+        if (event1.getKind() != EventKind.PROPOSITION) {
+          for (final EventProxy event2 : aut2.getEvents()) {
+            if (event1 == event2)
+              return true;
+          }
         }
       }
       return false;
@@ -1091,6 +1108,11 @@ public class CompositionalGeneralisedConflictChecker extends
       return aut.getTransitions().size();
     }
 
+    boolean checkForLocalEvent(final Candidate candidate)
+    {
+      return true;
+    }
+
   }
 
 
@@ -1127,7 +1149,12 @@ public class CompositionalGeneralisedConflictChecker extends
 
     protected int getHeuristicProperty(final AutomatonProxy aut)
     {
-      return aut.getStates().size();
+      return -aut.getStates().size();
+    }
+
+    boolean checkForLocalEvent(final Candidate candidate)
+    {
+      return true;
     }
   }
 
@@ -1146,7 +1173,9 @@ public class CompositionalGeneralisedConflictChecker extends
             && (automata.size() < model.getAutomata().size())) {
           // Bring automata into defined ordering.
           Collections.sort(automata);
-          final Candidate candidate = new Candidate(automata);
+          final Set<EventProxy> localEvents =
+              identifyLocalEvents(mEventsToAutomata, automata);
+          final Candidate candidate = new Candidate(automata, localEvents);
           if (!candidates.contains(candidate)) {
             if (validateCandidate(candidate)) {
               candidates.add(candidate);
@@ -1192,7 +1221,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
       while (it.hasNext()) {
         final Candidate nextCan = it.next();
-        final double proportion = getHeuristicValue(chosenCandidate);
+        final double proportion = getHeuristicValue(nextCan);
         if (proportion > maxLocal) {
           chosenCandidates = new ArrayList<Candidate>();
           maxLocal = proportion;
@@ -1273,16 +1302,17 @@ public class CompositionalGeneralisedConflictChecker extends
 
   /**
    * Performs step 2 of the approach to select the automata to compose. The
-   * chosen candidate is the one with the highest proportion of common events.
+   * chosen candidate is the one with the highest proportion of events which are
+   * shared between that candidates automata.
    */
   private class HeuristicMaxC extends SelectingHeuristic
   {
 
     protected double getHeuristicValue(final Candidate candidate)
     {
-      return (double) (candidate.getNumberOfEvents() - candidate
-          .getLocalEventCount())
-          / (double) candidate.getNumberOfEvents();
+      final int candidatesTotalEvents = candidate.getNumberOfEvents();
+      return (double) (candidatesTotalEvents - candidate.getCommonEventCount())
+          / (double) candidatesTotalEvents;
     }
   }
 
