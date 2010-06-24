@@ -39,17 +39,6 @@ public class Candidate implements Comparable<Candidate>
    *
    * @param autList
    *          List of automata in candidate in defined order.
-   */
-  public Candidate(final List<AutomatonProxy> autList)
-  {
-    this(autList, null);
-  }
-
-  /**
-   * Creates a new candidate.
-   *
-   * @param autList
-   *          List of automata in candidate in defined order.
    * @param localEvents
    *          Identified set of local events of this candidate.
    */
@@ -58,6 +47,7 @@ public class Candidate implements Comparable<Candidate>
   {
     mAutomata = autList;
     mLocalEvents = localEvents;
+    mCommonEvents = -1;
     countEvents();
   }
 
@@ -89,6 +79,20 @@ public class Candidate implements Comparable<Candidate>
   public Set<EventProxy> getLocalEvents()
   {
     return mLocalEvents;
+  }
+
+  /**
+   * Gets the count of events which the automata in this candidate share with
+   * each other.
+   *
+   * @return Count of shared events.
+   */
+  public int getCommonEventCount()
+  {
+    if (mCommonEvents == -1) {
+      identifyCommonEvents();
+    }
+    return mCommonEvents;
   }
 
   /**
@@ -177,7 +181,6 @@ public class Candidate implements Comparable<Candidate>
     return mAutomata.hashCode();
   }
 
-
   // #########################################################################
   // # Model Creation
   /**
@@ -187,8 +190,8 @@ public class Candidate implements Comparable<Candidate>
    * @param factory
    *          The factory to be used to create the proxies.
    */
-  public ProductDESProxy createProductDESProxy
-    (final ProductDESProxyFactory factory)
+  public ProductDESProxy createProductDESProxy(
+                                               final ProductDESProxyFactory factory)
   {
     final String name = toString();
     final Collection<EventProxy> events = getAllEvents();
@@ -196,7 +199,6 @@ public class Candidate implements Comparable<Candidate>
         .createProductDESProxy(name, "Automatically created from candidate.",
                                null, events, mAutomata);
   }
-
 
   // #########################################################################
   // # Auxiliary Methods
@@ -232,13 +234,38 @@ public class Candidate implements Comparable<Candidate>
     mEventCount = events.size();
   }
 
+  /**
+   * Initialises mCommonEvents by counting all the events (excluding
+   * propositions) which are shared between the automata of this candidate.
+   */
+  private void identifyCommonEvents()
+  {
+    mCommonEvents = 0;
+    for (final EventProxy event : getAllEvents()) {
+      if (event.getKind() != EventKind.PROPOSITION) {
+        boolean shared = true;
+        for (final AutomatonProxy aut : getAutomata()) {
+          if (!aut.getEvents().contains(event)) {
+            shared = false;
+            break;
+          }
+        }
+        if (shared) {
+          mCommonEvents++;
+        }
+      }
+    }
+  }
+
   // #########################################################################
   // # Static Methods
   /**
    * Calculates a name that can be given to a synchronous product automaton.
-   * @param  automata List of automata constituting synchronous product.
-   * @return A string consisting of the names of the given automata,
-   *         with appropriate separators between them.
+   *
+   * @param automata
+   *          List of automata constituting synchronous product.
+   * @return A string consisting of the names of the given automata, with
+   *         appropriate separators between them.
    */
   public static String getCompositionName(final List<AutomatonProxy> automata)
   {
@@ -247,10 +274,13 @@ public class Candidate implements Comparable<Candidate>
 
   /**
    * Calculates a name that can be given to a synchronous product automaton.
-   * @param  prefix   A string to be prepended to the result.
-   * @param  automata List of automata constituting synchronous product.
-   * @return A string consisting of the prefix followed by the names of
-   *         the given automata, with appropriate separators between them.
+   *
+   * @param prefix
+   *          A string to be prepended to the result.
+   * @param automata
+   *          List of automata constituting synchronous product.
+   * @return A string consisting of the prefix followed by the names of the
+   *         given automata, with appropriate separators between them.
    */
   public static String getCompositionName(final String prefix,
                                           final List<AutomatonProxy> automata)
@@ -270,11 +300,11 @@ public class Candidate implements Comparable<Candidate>
     return buffer.toString();
   }
 
-
   // #########################################################################
   // # Invocation
   private final List<AutomatonProxy> mAutomata;
   private Set<EventProxy> mLocalEvents;
+  private int mCommonEvents;
   private int mEventCount;
 
 }
