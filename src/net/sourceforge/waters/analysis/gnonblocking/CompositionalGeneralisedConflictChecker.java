@@ -1040,20 +1040,15 @@ public class CompositionalGeneralisedConflictChecker extends
     protected boolean checkForSharedEvent(final Candidate candidate)
     {
       final List<AutomatonProxy> candidateAut = candidate.getAutomata();
-      final AutomatonProxy aut1 = candidateAut.get(0);
-      final AutomatonProxy aut2 = candidateAut.get(1);
-      assert candidateAut.size() == 2;
-      for (final EventProxy event1 : aut1.getEvents()) {
-        if (event1.getKind() != EventKind.PROPOSITION) {
-          for (final EventProxy event2 : aut2.getEvents()) {
-            if (event1 == event2)
-              return true;
+      for (final EventProxy event : mEventsToAutomata.keySet()) {
+        if (event.getKind() != EventKind.PROPOSITION) {
+          final Set<AutomatonProxy> autWithEvent = mEventsToAutomata.get(event);
+          if (autWithEvent.containsAll(candidateAut)) {
+            return true;
           }
         }
       }
       return false;
-      // TODO: or would it be better to search events of mEventsToAutomata and
-      // check if the event is mapped to both automata in candidate...
     }
 
     protected abstract List<Candidate> evaluate(final ProductDESProxy model);
@@ -1367,6 +1362,7 @@ public class CompositionalGeneralisedConflictChecker extends
       }
       final int totalEvents = candidate.getNumberOfEvents();
       final int nonLocalEvents = totalEvents - candidate.getLocalEventCount();
+      // TODO: why do we take events into account here?
       return product * (double) nonLocalEvents / (double) totalEvents;
     }
   }
@@ -1428,7 +1424,6 @@ public class CompositionalGeneralisedConflictChecker extends
     // not used
     protected double getHeuristicValue(final Candidate candidate)
     {
-      // TODO Auto-generated method stub
       return 0;
     }
   }
