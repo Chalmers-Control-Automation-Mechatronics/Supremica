@@ -247,8 +247,7 @@ public class CompositionalGeneralisedConflictChecker extends
         modified = true;
       } else {
         final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
-        final Set<EventProxy> localEvents =
-            identifyLocalEvents(mEventsToAutomata, autAsList);
+        final Set<EventProxy> localEvents = identifyLocalEvents(autAsList);
         if (localEvents.size() > 0) {
           try {
             final AutomatonProxy abstractedAut =
@@ -452,7 +451,7 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     super.setUp();
     mEventsToAutomata = new HashMap<EventProxy,Set<AutomatonProxy>>();
-    if (mPreselectingHeuristic == null) {
+    if (mPreselectingHeuristics == null) {
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
       final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
@@ -709,12 +708,11 @@ public class CompositionalGeneralisedConflictChecker extends
    * automata).
    */
   private Set<EventProxy> identifyLocalEvents(
-                                              final Map<EventProxy,Set<AutomatonProxy>> eventAutomaton,
                                               final List<AutomatonProxy> candidate)
   {
     final Set<EventProxy> localEvents = new HashSet<EventProxy>();
-    for (final EventProxy event : eventAutomaton.keySet()) {
-      final Set<AutomatonProxy> autWithEvent = eventAutomaton.get(event);
+    for (final EventProxy event : mEventsToAutomata.keySet()) {
+      final Set<AutomatonProxy> autWithEvent = mEventsToAutomata.get(event);
       if (candidate.containsAll(autWithEvent)) {
         localEvents.add(event);
       }
@@ -753,7 +751,15 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private List<Candidate> findCandidates(final ProductDESProxy model)
   {
-    return mPreselectingHeuristic.evaluate(model);
+    final ListIterator<PreselectingHeuristic> iter =
+        mPreselectingHeuristics.listIterator();
+    PreselectingHeuristic heuristic = iter.next();
+    List<Candidate> candidates = heuristic.evaluate(model);
+    while (candidates.size() == 0 && iter.hasNext()) {
+      heuristic = iter.next();
+      candidates = heuristic.evaluate(model);
+    }
+    return candidates;
   }
 
   /**
@@ -898,7 +904,20 @@ public class CompositionalGeneralisedConflictChecker extends
 
   public void setPreselectingHeuristic(final PreselectingHeuristic heuristic)
   {
-    mPreselectingHeuristic = heuristic;
+    mPreselectingHeuristics = new ArrayList<PreselectingHeuristic>(4);
+    mPreselectingHeuristics.add(heuristic);
+    if (heuristic instanceof HeuristicMinT) {
+      mPreselectingHeuristics.add(new HeuristicMaxS());
+      mPreselectingHeuristics.add(new HeuristicMustL());
+    } else if (heuristic instanceof HeuristicMaxS) {
+      mPreselectingHeuristics.add(new HeuristicMinT());
+      mPreselectingHeuristics.add(new HeuristicMustL());
+
+    } else if (heuristic instanceof HeuristicMustL) {
+      mPreselectingHeuristics.add(new HeuristicMinT());
+      mPreselectingHeuristics.add(new HeuristicMaxS());
+
+    }
   }
 
   /**
@@ -988,8 +1007,7 @@ public class CompositionalGeneralisedConflictChecker extends
             pair.add(a);
             pair.add(chosenAut);
           }
-          final Set<EventProxy> localEvents =
-              identifyLocalEvents(mEventsToAutomata, pair);
+          final Set<EventProxy> localEvents = identifyLocalEvents(pair);
           final Candidate candidate = new Candidate(pair, localEvents);
           candidate.setLocalEvents(localEvents);
           if (validateCandidate(candidate)) {
@@ -1075,26 +1093,21 @@ public class CompositionalGeneralisedConflictChecker extends
 
   private class HeuristicMinT extends PreselectingHeuristic
   {
-    /*
-     * protected List<Candidate> evaluate1(final ProductDESProxy model) { //
-     * Find automata with fewest transitions final Set<AutomatonProxy> automata
-     * = model.getAutomata(); final Iterator<AutomatonProxy> it =
-     * automata.iterator(); AutomatonProxy chosenAut = it.next(); int minTrans =
-     * chosenAut.getTransitions().size(); while (it.hasNext()) { final
-     * AutomatonProxy nextAut = it.next(); final int transCount =
-     * nextAut.getTransitions().size(); if (transCount < minTrans) { minTrans =
-     * transCount; chosenAut = nextAut; } } // pairs chosen automaton with all
-     * others final List<Candidate> candidates = pairAutomata(chosenAut,
-     * automata); return candidates; }
-     */
 
     protected List<Candidate> evaluate(final ProductDESProxy model)
     {
       final Set<AutomatonProxy> automata = model.getAutomata();
       final AutomatonProxy chosenAut =
           (AutomatonProxy) Collections.min(automata, new AutomataComparator());
-      // pairs chosen automaton with all others
       final List<Candidate> candidates = pairAutomata(chosenAut, automata);
+      /*
+       * if (candidates.size() == 0 && automata.size() > 2) { automata = new
+       * HashSet<AutomatonProxy>(model.getAutomata()); while (candidates.size()
+       * == 0) { automata.remove(chosenAut); if (automata.size() > 0) {
+       * chosenAut = (AutomatonProxy) Collections.min(automata, new
+       * AutomataComparator()); candidates = pairAutomata(chosenAut, automata);
+       * } } }
+       */
       return candidates;
     }
 
@@ -1118,19 +1131,6 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private class HeuristicMaxS extends PreselectingHeuristic
   {
-
-    /*
-     * protected List<Candidate> evaluate(final ProductDESProxy model) { // Find
-     * automaton with the most states final Set<AutomatonProxy> automata =
-     * model.getAutomata(); final Iterator<AutomatonProxy> it =
-     * automata.iterator(); AutomatonProxy chosenAut = it.next(); int maxStates
-     * = chosenAut.getStates().size(); while (it.hasNext()) { final
-     * AutomatonProxy nextAut = it.next(); final int statesCount =
-     * nextAut.getStates().size(); if (statesCount > maxStates) { maxStates =
-     * statesCount; chosenAut = nextAut; } } // pairs chosen automaton with all
-     * others final List<Candidate> candidates = pairAutomata(chosenAut,
-     * automata); return candidates; }
-     */
 
     protected List<Candidate> evaluate(final ProductDESProxy model)
     {
@@ -1168,8 +1168,7 @@ public class CompositionalGeneralisedConflictChecker extends
             && (automata.size() < model.getAutomata().size())) {
           // Bring automata into defined ordering.
           Collections.sort(automata);
-          final Set<EventProxy> localEvents =
-              identifyLocalEvents(mEventsToAutomata, automata);
+          final Set<EventProxy> localEvents = identifyLocalEvents(automata);
           final Candidate candidate = new Candidate(automata, localEvents);
           if (!candidates.contains(candidate)) {
             if (validateCandidate(candidate)) {
@@ -1306,7 +1305,7 @@ public class CompositionalGeneralisedConflictChecker extends
     protected double getHeuristicValue(final Candidate candidate)
     {
       final int candidatesTotalEvents = candidate.getNumberOfEvents();
-      return (double) (candidatesTotalEvents - candidate.getCommonEventCount())
+      return (double) candidate.getCommonEventCount()
           / (double) candidatesTotalEvents;
     }
   }
@@ -1362,14 +1361,13 @@ public class CompositionalGeneralisedConflictChecker extends
       }
       final int totalEvents = candidate.getNumberOfEvents();
       final int nonLocalEvents = totalEvents - candidate.getLocalEventCount();
-      // TODO: why do we take events into account here?
       return product * (double) nonLocalEvents / (double) totalEvents;
     }
   }
 
 
   /**
-   * This heuristic is provided for when the other 3 fail to find one unique
+   * This heuristic is provided for when the others fail to find one unique
    * candidate. The selection is made by comparing the candidates automata names
    * alphabetically.
    */
@@ -2895,7 +2893,7 @@ public class CompositionalGeneralisedConflictChecker extends
   private EventProxy mUsedPreconditionMarking;
 
   // configuration
-  private PreselectingHeuristic mPreselectingHeuristic;
+  private ArrayList<PreselectingHeuristic> mPreselectingHeuristics;
   private List<SelectingHeuristic> mSelectingHeuristics;
   private List<AbstractionRule> mAbstractionRules;
   private int mSyncProductNodeLimit = Integer.MAX_VALUE;
