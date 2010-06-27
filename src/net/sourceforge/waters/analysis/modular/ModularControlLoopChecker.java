@@ -49,7 +49,6 @@ public class ModularControlLoopChecker
     setKindTranslator(translator);
   }
 
-  MonolithicSCCControlLoopChecker subChecker;
 
   public boolean run() throws AnalysisException
   {
@@ -221,10 +220,12 @@ public class ModularControlLoopChecker
       mFauxUncontrollable = new THashSet<EventProxy>();
     }
 
+    @SuppressWarnings("unused")
     public void removeLoopEvents(final EventProxy event)
     {
       mFauxUncontrollable.add(event);
     }
+
     public void removeLoopEvents(final Collection<EventProxy> event)
     {
       mFauxUncontrollable.addAll(event);
@@ -243,18 +244,20 @@ public class ModularControlLoopChecker
         return mBase.getEventKind(event);
     }
 
-    KindTranslator mBase;
-    Set<EventProxy> mFauxUncontrollable;
+    private final KindTranslator mBase;
+    private final Set<EventProxy> mFauxUncontrollable;
   }
 
-  int mTransitionLimit;
-  int mNodeLimit;
-  ProductDESProxy mModel;
-  boolean mAbort;
-  boolean mRun;
-  ProductDESProxyFactory mFactory;
-  ManipulativeTranslator mTranslator;
-  VerificationResult mResult;
-  Set<AutomataGroup> mAutoSets;
-  Set<EventProxy> mLoopEvents;
+  private final ProductDESProxyFactory mFactory;
+  private ProductDESProxy mModel;
+  private int mTransitionLimit;
+  private int mNodeLimit;
+  private boolean mAbort;
+  private boolean mRun;
+  @SuppressWarnings("unused")
+  private MonolithicSCCControlLoopChecker mSubChecker;
+  private ManipulativeTranslator mTranslator;
+  private VerificationResult mResult;
+  private Set<AutomataGroup> mAutoSets;
+  private Set<EventProxy> mLoopEvents;
 }
