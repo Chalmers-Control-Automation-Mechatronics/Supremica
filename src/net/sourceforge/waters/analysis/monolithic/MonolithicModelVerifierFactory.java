@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.modular.ModularControlLoopChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -61,6 +62,12 @@ public class MonolithicModelVerifierFactory
     (final ProductDESProxyFactory factory)
   {
     return new MonolithicSCCControlLoopChecker(factory);
+  }
+
+  public ModularControlLoopChecker createModularControlLoopChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new ModularControlLoopChecker(factory);
   }
 
   public MonolithicLanguageInclusionChecker createLanguageInclusionChecker

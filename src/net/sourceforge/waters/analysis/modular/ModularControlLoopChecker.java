@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
+import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
@@ -20,6 +21,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 public class ModularControlLoopChecker
+  extends AbstractModelVerifier
   implements ControlLoopChecker
 {
 
@@ -44,19 +46,22 @@ public class ModularControlLoopChecker
                                    final KindTranslator translator,
                                    final ProductDESProxyFactory factory)
   {
-    mModel = model;
-    mFactory = factory;
+    super(model, factory, translator);
     setKindTranslator(translator);
+    mAutoSets = new THashSet<AutomataGroup>();
+    createAnalysisResult();
   }
 
 
   public boolean run() throws AnalysisException
   {
-    for (final AutomatonProxy aut: mModel.getAutomata())
+    if (getModel().getAutomata().size() == 0)
+      return setSatisfiedResult();
+    for (final AutomatonProxy aut: getModel().getAutomata())
     {
       mAutoSets.add(new AutomataGroup(aut));
     }
-    final MonolithicSCCControlLoopChecker checker = new MonolithicSCCControlLoopChecker(mModel, mTranslator, mFactory);
+    final MonolithicSCCControlLoopChecker checker = new MonolithicSCCControlLoopChecker(getModel(), mTranslator, getFactory());
     boolean removedLoopEvents = false;
     do
     {
@@ -70,8 +75,7 @@ public class ModularControlLoopChecker
             removedLoopEvents = true;
           if (mLoopEvents.size() == 0)
           {
-            // Set mResult
-            mRun = true;
+            setSatisfiedResult();
             return true;
           }
           mTranslator.removeLoopEvents(nonLoop);
@@ -89,8 +93,11 @@ public class ModularControlLoopChecker
           }
           if (acceptsAll)
           {
-            // Set mResult
-            mRun = true;
+            mLoop = getFactory().createLoopTraceProxy(getModel().getName() + "-loop",
+                                                      getModel(),
+                                                      group.getTrace(),
+                                                      group.getLoopIndex());
+            setFailedResult(mLoop);
             return false;
           }
         }
@@ -121,8 +128,7 @@ public class ModularControlLoopChecker
 
   public LoopTraceProxy getCounterExample()
   {
-    // TODO Auto-generated method stub
-    return null;
+      return mLoop;
   }
 
   public Collection<EventProxy> getNonLoopEvents()
@@ -130,85 +136,15 @@ public class ModularControlLoopChecker
     throw new UnsupportedOperationException("Modular Control Loop Checker does not calculate non-loop events");
   }
 
-  public VerificationResult getAnalysisResult()
-  {
-    return mResult;
-  }
-
   public KindTranslator getKindTranslator()
   {
     return mTranslator;
   }
 
-  public boolean isSatisfied()
-  {
-    if (!mRun)
-      throw new IllegalStateException("Program hasn't run");
-    else
-      return mResult.getCounterExample() == null;
-  }
-
   public void setKindTranslator(final KindTranslator translator)
   {
-    mTranslator = new ManipulativeTranslator(translator);
-  }
-
-  public void clearAnalysisResult()
-  {
-    mResult = new VerificationResult();
-    mRun = false;
-  }
-
-  public ProductDESProxyFactory getFactory()
-  {
-    return mFactory;
-  }
-
-  public ProductDESProxy getModel()
-  {
-    return mModel;
-  }
-
-  public int getNodeLimit()
-  {
-    return mNodeLimit;
-  }
-
-  public int getTransitionLimit()
-  {
-    return mTransitionLimit;
-  }
-
-  public boolean isAborting()
-  {
-    return mAbort;
-  }
-
-  public void requestAbort()
-  {
-    mAbort = true;
-  }
-
-  public void setModel(final ProductDESProxy model)
-  {
-    mModel = model;
-  }
-
-  public void setModel(final AutomatonProxy aut)
-  {
-    final Set<AutomatonProxy> autList = new THashSet<AutomatonProxy>();
-    autList.add(aut);
-    mModel = mFactory.createProductDESProxy(aut.getName(), aut.getEvents(), autList);
-  }
-
-  public void setNodeLimit(final int limit)
-  {
-    mNodeLimit = limit;
-  }
-
-  public void setTransitionLimit(final int limit)
-  {
-    mTransitionLimit = limit;
+    super.setKindTranslator(new ManipulativeTranslator(translator));
+    clearAnalysisResult();
   }
 
   private class ManipulativeTranslator implements KindTranslator
@@ -220,7 +156,6 @@ public class ModularControlLoopChecker
       mFauxUncontrollable = new THashSet<EventProxy>();
     }
 
-    @SuppressWarnings("unused")
     public void removeLoopEvents(final EventProxy event)
     {
       mFauxUncontrollable.add(event);
@@ -248,16 +183,22 @@ public class ModularControlLoopChecker
     private final Set<EventProxy> mFauxUncontrollable;
   }
 
-  private final ProductDESProxyFactory mFactory;
-  private ProductDESProxy mModel;
-  private int mTransitionLimit;
-  private int mNodeLimit;
-  private boolean mAbort;
-  private boolean mRun;
-  @SuppressWarnings("unused")
-  private MonolithicSCCControlLoopChecker mSubChecker;
-  private ManipulativeTranslator mTranslator;
-  private VerificationResult mResult;
-  private Set<AutomataGroup> mAutoSets;
-  private Set<EventProxy> mLoopEvents;
+  //#########################################################################
+  //# Setting the Result
+  @Override
+  protected void addStatistics()
+  {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
+    //final int numstates = mGlobalStateSet.size();
+    //result.setNumberOfAutomata(mNumAutomata);
+    //result.setNumberOfStates(numstates);
+    //result.setPeakNumberOfNodes(numstates);
+    result.setCounterExample(getCounterExample());
+  }
+
+  LoopTraceProxy mLoop;
+  ManipulativeTranslator mTranslator;
+  Set<AutomataGroup> mAutoSets;
+  Set<EventProxy> mLoopEvents;
 }
