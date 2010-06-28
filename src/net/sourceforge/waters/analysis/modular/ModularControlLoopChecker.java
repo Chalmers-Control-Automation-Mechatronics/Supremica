@@ -11,7 +11,6 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
@@ -55,80 +54,83 @@ public class ModularControlLoopChecker
 
   public boolean run() throws AnalysisException
   {
-    if (getModel().getAutomata().size() == 0)
-      return setSatisfiedResult();
-    for (final AutomatonProxy aut: getModel().getAutomata())
-    {
-      mAutoSets.add(new AutomataGroup(aut));
-    }
-    final MonolithicSCCControlLoopChecker checker = new MonolithicSCCControlLoopChecker(getModel(), mTranslator, getFactory());
-    boolean removedLoopEvents = false;
-    do
-    {
+    try {
+      setUp();
+      if (getModel().getAutomata().size() == 0)
+        return setSatisfiedResult();
+      for (final AutomatonProxy aut: getModel().getAutomata())
+      {
+        mAutoSets.add(new AutomataGroup(aut));
+      }
+      final MonolithicSCCControlLoopChecker checker = new MonolithicSCCControlLoopChecker(getModel(), mTranslator, getFactory());
+      boolean removedLoopEvents = false;
       do
       {
-        removedLoopEvents = false;
+        do
+        {
+          removedLoopEvents = false;
+          for (final AutomataGroup group : mAutoSets)
+          {
+            final Collection<EventProxy> nonLoop = group.setControlLoops(checker);
+            if (mLoopEvents.removeAll(nonLoop))
+              removedLoopEvents = true;
+            if (mLoopEvents.size() == 0)
+            {
+              setSatisfiedResult();
+              return true;
+            }
+            mTranslator.removeLoopEvents(nonLoop);
+            boolean acceptsAll = true;
+            for (final AutomataGroup checkLoop : mAutoSets)
+            {
+              if (checkLoop != group)
+              {
+                if (!checkLoop.isControlLoop(group.getTrace(), group.getLoopIndex()));
+                {
+                  acceptsAll = false;
+                  break;
+                }
+              }
+            }
+            if (acceptsAll)
+            {
+              final LoopTraceProxy loop =
+                getFactory().createLoopTraceProxy(getModel().getName() + "-loop",
+                                                  getModel(),
+                                                  group.getTrace(),
+                                                  group.getLoopIndex());
+              setFailedResult(loop);
+              return false;
+            }
+          }
+        }
+        while (removedLoopEvents);
+        outer:
         for (final AutomataGroup group : mAutoSets)
         {
-          final Collection<EventProxy> nonLoop = group.setControlLoops(checker);
-          if (mLoopEvents.removeAll(nonLoop))
-            removedLoopEvents = true;
-          if (mLoopEvents.size() == 0)
-          {
-            setSatisfiedResult();
-            return true;
-          }
-          mTranslator.removeLoopEvents(nonLoop);
-          boolean acceptsAll = true;
           for (final AutomataGroup checkLoop : mAutoSets)
           {
             if (checkLoop != group)
             {
               if (!checkLoop.isControlLoop(group.getTrace(), group.getLoopIndex()));
               {
-                acceptsAll = false;
-                break;
+                mAutoSets.remove(checkLoop);
+                group.merge(checkLoop);
+                break outer;
               }
             }
           }
-          if (acceptsAll)
-          {
-            mLoop = getFactory().createLoopTraceProxy(getModel().getName() + "-loop",
-                                                      getModel(),
-                                                      group.getTrace(),
-                                                      group.getLoopIndex());
-            setFailedResult(mLoop);
-            return false;
-          }
         }
       }
-      while (removedLoopEvents);
-      boolean merged = false;
-      for (final AutomataGroup group : mAutoSets)
-      {
-        for (final AutomataGroup checkLoop : mAutoSets)
-        {
-          if (checkLoop != group)
-          {
-            if (!checkLoop.isControlLoop(group.getTrace(), group.getLoopIndex()));
-            {
-              merged = true;
-              mAutoSets.remove(checkLoop);
-              group.merge(checkLoop);
-              break;
-            }
-          }
-        }
-        if (merged)
-          break;
-      }
+      while (true);
+    } finally {
+      tearDown();
     }
-    while (true);
   }
 
   public LoopTraceProxy getCounterExample()
   {
-      return mLoop;
+      return (LoopTraceProxy) super.getCounterExample();
   }
 
   public Collection<EventProxy> getNonLoopEvents()
@@ -136,11 +138,7 @@ public class ModularControlLoopChecker
     throw new UnsupportedOperationException("Modular Control Loop Checker does not calculate non-loop events");
   }
 
-  public KindTranslator getKindTranslator()
-  {
-    return mTranslator;
-  }
-
+  // TODO Do not change user setting.
   public void setKindTranslator(final KindTranslator translator)
   {
     super.setKindTranslator(new ManipulativeTranslator(translator));
@@ -156,6 +154,7 @@ public class ModularControlLoopChecker
       mFauxUncontrollable = new THashSet<EventProxy>();
     }
 
+    @SuppressWarnings("unused")
     public void removeLoopEvents(final EventProxy event)
     {
       mFauxUncontrollable.add(event);
@@ -183,8 +182,10 @@ public class ModularControlLoopChecker
     private final Set<EventProxy> mFauxUncontrollable;
   }
 
+
   //#########################################################################
   //# Setting the Result
+  /*
   @Override
   protected void addStatistics()
   {
@@ -194,11 +195,14 @@ public class ModularControlLoopChecker
     //result.setNumberOfAutomata(mNumAutomata);
     //result.setNumberOfStates(numstates);
     //result.setPeakNumberOfNodes(numstates);
-    result.setCounterExample(getCounterExample());
   }
+  */
 
-  LoopTraceProxy mLoop;
-  ManipulativeTranslator mTranslator;
-  Set<AutomataGroup> mAutoSets;
-  Set<EventProxy> mLoopEvents;
+
+  //#########################################################################
+  //# Data Members
+  private ManipulativeTranslator mTranslator;
+  private final Set<AutomataGroup> mAutoSets;
+  private Set<EventProxy> mLoopEvents;
+
 }

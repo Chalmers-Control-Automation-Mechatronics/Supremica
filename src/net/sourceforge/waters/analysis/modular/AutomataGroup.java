@@ -32,7 +32,7 @@ public class AutomataGroup
   {
     mAllAutomata = new THashSet<AutomatonProxy>();
     mAllAutomata.add(initial);
-    mSensitiveEvents.addAll(initial.getEvents());
+    mSensitiveEvents = new THashSet<EventProxy>(initial.getEvents());
     mCounterExampleTrace = null;
     mLoopIndex = -1;
   }
