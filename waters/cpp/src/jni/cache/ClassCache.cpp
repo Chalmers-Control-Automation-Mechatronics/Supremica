@@ -48,7 +48,8 @@ hash(const void* key)
 {
   jmethodID mid = mClassGlue->getMethodID(METHOD_Object_hashCode);
   jobject javaobject = (jobject) key;
-  jint result = mEnvironment->CallIntMethod(javaobject, mid);
+  waters::uint32 result =
+    (waters::uint32) mEnvironment->CallIntMethod(javaobject, mid);
   if (jthrowable exception = mEnvironment->ExceptionOccurred()) {
     throw exception;
   }

@@ -97,7 +97,7 @@ public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>
     throws IOException, WatersMarshalException, WatersUnmarshalException
   {
     final String pathname = uri.getPath();
-    final int start1 = pathname.lastIndexOf(File.separatorChar);
+    final int start1 = pathname.lastIndexOf('/');
     final int start2 = start1 < 0 ? 0 : start1 + 1;
     final int stop1 = pathname.lastIndexOf('.');
     final int stop2 = stop1 < 0 ? pathname.length() : stop1;

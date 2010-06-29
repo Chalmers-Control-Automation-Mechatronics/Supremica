@@ -5,6 +5,19 @@
 #
 #############################################################################
 
+
+#############################################################################
+# OS dependent
+
+ifeq "$(OSTYPE)" "linux"
+  MKDIR         = mkdir -p
+  OSPATH        = $(1)
+else
+  MKDIR         = mkdir
+  OSPATH        = $(subst /,\,$(1))
+endif
+
+
 #############################################################################
 # Main Rules
 
@@ -16,19 +29,20 @@ test::			$(TESTAPP)
 
 
 $(LIB):			$(OBJ)
-			@mkdir -p $(LIBDIR)
-			$(CXX) -shared -o $@ $^
+			-$(MKDIR) $(LIBDIR)
+			$(CXX) -shared $(LDFLAGS) -o $@ $^
 
 $(TESTAPP):		$(LIB) $(TESTOBJ)
-			@mkdir -p $(BINDIR)
+			-$(MKDIR) $(BINDIR)
 			$(CXX) -o $@ -L$(LIBDIR) -l$(PROJECT) $(TESTOBJ)
 
 
 #############################################################################
 # General Rules
+export OBJ      = $(CPP:$(SRCDIR)%.cpp=$(OBJDIR)%.o)
 
 $(OBJDIR)/%.o:		$(SRCDIR)/%.cpp
-			@mkdir -p `dirname $@`
+			-$(MKDIR) $(call OSPATH,$(dir $@))
 			$(CXX) -c $(CFLAGS) $(INCDIRS) -o $@ $<
 
 

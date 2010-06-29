@@ -6,6 +6,24 @@
 #############################################################################
 
 #############################################################################
+# OS dependent
+
+ifeq "$(OSTYPE)" "linux"
+  RMDIR         = rm -rf
+  JAVAOS        = linux
+  EXTRA_CFLAGS  = -fPIC
+  LIB_PREFIX    = lib
+  LIB_SUFFIX    = so
+else
+  RMDIR         = rd /s /q
+  JAVAOS        = win32
+  EXTRA_CFLAGS  = -D_JNI_IMPLEMENTATION_
+  EXTRA_LDFLAGS = -Wl,--kill-at
+  LIB_SUFFIX    = dll
+endif
+
+  
+#############################################################################
 # List of sources
 
 export PROJECT  = waters
@@ -32,7 +50,7 @@ export CPP_TEST = $(TESDIR)/HashTest.cpp
 export OBJ      = $(CPP:$(SRCDIR)%.cpp=$(OBJDIR)%.o)
 export TESTOBJ  = $(CPP_TEST:$(SRCDIR)%.cpp=$(OBJDIR)%.o)
 
-export LIB      = $(LIBDIR)/lib$(PROJECT).so
+export LIB      = $(LIBDIR)/$(LIB_PREFIX)$(PROJECT).$(LIB_SUFFIX)
 export TESTAPP  = $(BINDIR)/testapp
 export DEP      = dependencies
 
@@ -43,11 +61,12 @@ export CXX      = g++
 # flags
 
 ifdef JAVA_HOME
-  JNI_INC       = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
+  JNI_INC       = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/$(JAVAOS)"
 endif
 
-export CFLAGS   = -O2 -g -fPIC -DDEBUG -Wall
+export CFLAGS   = -O2 -g -Wall -DDEBUG $(EXTRA_CFLAGS)
 export INCDIRS	= -I$(SRCDIR) $(JNI_INC)
+export LDFLAGS	= $(EXTRA_LDFLAGS)
 
 
 #############################################################################
@@ -60,5 +79,5 @@ test::
 			@$(MAKE) -f Makefile.dep test
 
 clean::
-			rm -rf $(DEP) $(OBJDIR) $(BINDIR) $(LIBDIR)
+			-$(RMDIR) $(DEP) $(OBJDIR) $(BINDIR) $(LIBDIR)
 

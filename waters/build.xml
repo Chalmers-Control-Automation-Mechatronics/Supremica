@@ -108,12 +108,14 @@
     <mkdir dir="${waters.classes}"/>
     <javac srcdir="${src}" destdir="${waters.classes}"
            includes="net/sourceforge/waters/xsd/**/*.java"
-           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
+           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
+    	   includeantruntime="false">
       <classpath refid="jaxb.classpath"/>
     </javac>
     <javac srcdir="${supremica.src}" destdir="${waters.classes}"
            includes="net/sourceforge/waters/model/unchecked/**/*.java"
-           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"/>
+           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
+ 	       includeantruntime="false"/>
   </target>
 
   <target name="jaxb-jar" depends="jaxb-compile"
@@ -133,7 +135,8 @@
   <target name="waters-compile" depends="jaxb-jar">
     <mkdir dir="${waters.classes}"/>
     <javac sourcepath="" srcdir="${supremica.src}" destdir="${waters.classes}" 
-           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
+           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
+     	   includeantruntime="false">
       <classpath refid="waters.compile.classpath"/>
       <compilerarg value="-Xlint:unchecked"/>
       <compilerarg value="-Xlint:deprecation"/>
@@ -209,7 +212,8 @@
   <target name="jniglue-compile">
     <javac srcdir="${src}" destdir="${waters.classes}" 
            includes="net/sourceforge/waters/build/jniglue/*.java"
-           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
+           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
+ 	       includeantruntime="false">
       <classpath refid="waters.compile.classpath"/>
       <compilerarg value="-Xlint:unchecked"/>
     </javac>
@@ -254,7 +258,8 @@
     <javac srcdir="${supremica.testsrc}" destdir="${test.classes}" 
            includes="net/sourceforge/waters/**/*.java"
            excludes="net/sourceforge/waters/gui/**/*.java"
-           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
+           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
+ 	       includeantruntime="false">
       <classpath>
         <path refid="waters.compile.classpath"/>
         <pathelement location="${waters.jar}"/>
