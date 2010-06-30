@@ -1,28 +1,28 @@
 # -*- Makefile -*-
 #############################################################################
 #
-# Makefile for libwaters.so
+# Makefile for libwaters.so / waters.dll
 #
 #############################################################################
 
 #############################################################################
 # OS dependent
 
-ifeq "$(OSTYPE)" "linux"
-  RMDIR         = rm -rf
-  JAVAOS        = linux
-  EXTRA_CFLAGS  = -fPIC
-  LIB_PREFIX    = lib
-  LIB_SUFFIX    = so
+ifeq "$(OSTYPE)" "linux-gnu"
+  export RMDIR         = rm -rf
+  export JAVAOS        = linux
+  export EXTRA_CFLAGS  = -fPIC
+  export LIB_PREFIX    = lib
+  export LIB_SUFFIX    = so
 else
-  RMDIR         = rd /s /q
-  JAVAOS        = win32
-  EXTRA_CFLAGS  = -D_JNI_IMPLEMENTATION_
-  EXTRA_LDFLAGS = -Wl,--kill-at
-  LIB_SUFFIX    = dll
+  export RMDIR         = rd /s /q
+  export JAVAOS        = win32
+  export EXTRA_CFLAGS  = -D_JNI_IMPLEMENTATION_
+  export EXTRA_LDFLAGS = -Wl,--kill-at
+  export LIB_SUFFIX    = dll
 endif
 
-  
+
 #############################################################################
 # List of sources
 

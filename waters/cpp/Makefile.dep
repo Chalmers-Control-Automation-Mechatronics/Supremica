@@ -1,7 +1,7 @@
 # -*- Makefile -*-
 #############################################################################
 #
-# Makefile for libwaters.so
+# Makefile for libwaters.so / waters.dll
 #
 #############################################################################
 
@@ -9,12 +9,12 @@
 #############################################################################
 # OS dependent
 
-ifeq "$(OSTYPE)" "linux"
-  MKDIR         = mkdir -p
-  OSPATH        = $(1)
+ifeq "$(OSTYPE)" "linux-gnu"
+  OSPATH        = $(strip $(1))
+  MKDIR         = mkdir -p $(strip $(1))
 else
-  MKDIR         = mkdir
   OSPATH        = $(subst /,\,$(1))
+  MKDIR         = $(if $(wildcard $(1)),,mkdir $(subst /,\,$(1)))
 endif
 
 
@@ -29,11 +29,11 @@ test::			$(TESTAPP)
 
 
 $(LIB):			$(OBJ)
-			-$(MKDIR) $(LIBDIR)
+			$(call MKDIR,$(LIBDIR))
 			$(CXX) -shared $(LDFLAGS) -o $@ $^
 
 $(TESTAPP):		$(LIB) $(TESTOBJ)
-			-$(MKDIR) $(BINDIR)
+			$(call MKDIR,$(BINDIR))
 			$(CXX) -o $@ -L$(LIBDIR) -l$(PROJECT) $(TESTOBJ)
 
 
@@ -42,7 +42,7 @@ $(TESTAPP):		$(LIB) $(TESTOBJ)
 export OBJ      = $(CPP:$(SRCDIR)%.cpp=$(OBJDIR)%.o)
 
 $(OBJDIR)/%.o:		$(SRCDIR)/%.cpp
-			-$(MKDIR) $(call OSPATH,$(dir $@))
+			@$(call MKDIR,$(dir $@))
 			$(CXX) -c $(CFLAGS) $(INCDIRS) -o $@ $<
 
 

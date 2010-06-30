@@ -247,7 +247,9 @@
   <target name="cpp" depends="javah,jniglue"
           description="Build native library.">
     <exec executable="${native.make}" dir="${cpp}"
-          failonerror="true" failifexecutionfails="false"/>
+          failonerror="true" failifexecutionfails="false">
+      <arg value="OSTYPE=${native.ostype}"/>
+    </exec>
   </target>
 
   <target name="waters" depends="waters-jar,cpp"
@@ -625,6 +627,7 @@
     <delete dir="${jniglue.outdir}"/>
     <exec executable="${native.make}" dir="${cpp}"
           failifexecutionfails="false">
+      <arg value="OSTYPE=${native.ostype}"/>
       <arg value="clean"/>
     </exec>
   </target>
