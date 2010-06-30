@@ -10,10 +10,8 @@
 # OS dependent
 
 ifeq "$(OSTYPE)" "linux-gnu"
-  OSPATH        = $(strip $(1))
   MKDIR         = mkdir -p $(strip $(1))
 else
-  OSPATH        = $(subst /,\,$(1))
   MKDIR         = $(if $(wildcard $(1)),,mkdir $(subst /,\,$(1)))
 endif
 
