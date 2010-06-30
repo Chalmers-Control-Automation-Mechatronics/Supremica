@@ -545,13 +545,14 @@ Class-Path: ${manifest.pathlist}</echo>
         <ant dir="schema/" target="gen_manufacturingtables_vr" inheritAll="false"/>
         <ant dir="schema/" target="gen_manufacturingtables_eop" inheritAll="false"/>
     </target>
-    
+
     <target name="cpp_waters">
         <ant dir="${waters.dir}" target="cpp" inheritAll="false"/>
-        <copy file="${waters.dir}/cpp/lib/libwaters.so" todir="${dist}"
-              failonerror="false"/>
+        <copy todir="${dist}" failonerror="false">
+            <fileset dir="${waters.dir}/cpp/lib" includes="*"/>
+        </copy>
     </target>
-    
+
     <target name="-jar_manufacturingTables_jaxb" depends="compile_manufacturingTables_jaxb">
         <jar jarfile="${lib}/manufacturingTables_jaxb.jar"> 
             <fileset dir="${build}/">
