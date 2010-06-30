@@ -15,7 +15,8 @@ import java.util.Map;
 import java.util.Arrays;
 import gnu.trove.TIntObjectHashMap;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.analysis.MemStateProxy;
+import net.sourceforge.waters.analysis.annotation.MemStateProxy;
+
 import java.util.ArrayList;
 import gnu.trove.TLongArrayList;
 import net.sourceforge.waters.xsd.base.ComponentKind;

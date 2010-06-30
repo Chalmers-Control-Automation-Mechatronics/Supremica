@@ -25,7 +25,7 @@ import gnu.trove.TIntIntProcedure;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectProcedure;
 
-import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
+import net.sourceforge.waters.analysis.annotation.AnnotatedMemStateProxy;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;

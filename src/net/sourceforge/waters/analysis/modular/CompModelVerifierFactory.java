@@ -11,7 +11,7 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.CompNonBlockingChecker;
+import net.sourceforge.waters.analysis.annotation.CompNonBlockingChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

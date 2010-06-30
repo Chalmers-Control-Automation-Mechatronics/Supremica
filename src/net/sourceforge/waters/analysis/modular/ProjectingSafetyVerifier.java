@@ -28,7 +28,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.analysis.TransitionRelation;
+import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.KindTranslator;

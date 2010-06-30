@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.ProjectingNonBlockingChecker;
+import net.sourceforge.waters.analysis.annotation.ProjectingNonBlockingChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;

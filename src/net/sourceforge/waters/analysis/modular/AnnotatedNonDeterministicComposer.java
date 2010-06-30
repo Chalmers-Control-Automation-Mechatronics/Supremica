@@ -21,9 +21,10 @@ import gnu.trove.TIntHashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.THashSet;
-import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
 import java.util.Iterator;
-import net.sourceforge.waters.analysis.AnnotationEvent;
+
+import net.sourceforge.waters.analysis.annotation.AnnotatedMemStateProxy;
+import net.sourceforge.waters.analysis.annotation.AnnotationEvent;
 
 
 public class AnnotatedNonDeterministicComposer

@@ -30,10 +30,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.analysis.CertainDeath;
-import net.sourceforge.waters.analysis.RemoveAllTau;
-import net.sourceforge.waters.analysis.TauLoopRemoval;
-import net.sourceforge.waters.analysis.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
@@ -52,6 +48,10 @@ import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.analysis.annotation.BiSimulatorLanguage;
+import net.sourceforge.waters.analysis.annotation.CertainDeath;
+import net.sourceforge.waters.analysis.annotation.RemoveAllTau;
+import net.sourceforge.waters.analysis.annotation.TauLoopRemoval;
+import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;

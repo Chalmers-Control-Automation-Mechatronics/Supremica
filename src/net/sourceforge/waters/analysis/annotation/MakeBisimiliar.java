@@ -8,7 +8,6 @@ import gnu.trove.TLongHashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.TransitionRelation;
 
 
 public class MakeBisimiliar

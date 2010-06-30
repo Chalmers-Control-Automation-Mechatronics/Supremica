@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.TransitionRelation;
+import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.OverflowException;
 
 
