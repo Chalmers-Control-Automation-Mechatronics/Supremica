@@ -14,12 +14,14 @@ ifeq "$(OSTYPE)" "linux-gnu"
   export LIB_PREFIX    = lib
   export LIB_SUFFIX    = so
   RMDIR	               = rm -rf $(strip $(1))
+  RMFILE	           = rm -f $(strip $(1))
 else
   export JAVAOS        = win32
   export EXTRA_CFLAGS  = -D_JNI_IMPLEMENTATION_
   export EXTRA_LDFLAGS = -Wl,--kill-at
   export LIB_SUFFIX    = dll
-  RMDIR                = $(if $(wildcard $(1)),,rd /s /q $(subst /,\,$(1)))
+  RMDIR                = $(if $(wildcard $(1)),rd /s /q $(subst /,\,$(1)))
+  RMFILE               = $(if $(wildcard $(1)),del $(subst /,\,$(1)))
 endif
 
 
@@ -79,8 +81,8 @@ test::
 			@$(MAKE) -f Makefile.dep test
 
 clean::
-			-$(RMDIR) $(DEP)
-			-$(RMDIR) $(OBJDIR)
-			-$(RMDIR) $(BINDIR)
-			-$(RMDIR) $(LIBDIR)
+			-$(call RMFILE,$(DEP))
+			-$(call RMDIR,$(OBJDIR))
+			-$(call RMDIR,$(BINDIR))
+			-$(call RMDIR,$(LIBDIR))
 
