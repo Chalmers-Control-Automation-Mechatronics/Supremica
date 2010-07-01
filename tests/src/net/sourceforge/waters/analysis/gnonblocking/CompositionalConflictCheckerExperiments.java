@@ -60,7 +60,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
     mVerifier.setInternalStepNodeLimit(internalStateLimit);
     final int internalTransitionLimit = 1000000;
     mVerifier.setInternalStepTransitionLimit(internalTransitionLimit);
-    final int finalStateLimit = 20000000;
+    final int finalStateLimit = 40000000;
     mVerifier.setFinalStepNodeLimit(finalStateLimit);
     final int finalTransitionLimit = 0;
     mVerifier.setFinalStepTransitionLimit(finalTransitionLimit);
