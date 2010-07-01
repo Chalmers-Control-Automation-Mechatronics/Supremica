@@ -233,109 +233,113 @@ public class CompositionalGeneralisedConflictChecker extends
   public boolean run() throws AnalysisException
   {
     setUp();
-    ProductDESProxy model = getModel();
-    mapEventsToAutomata(model);
-    final List<Step> modifyingSteps = new ArrayList<Step>();
+    try {
+      ProductDESProxy model = getModel();
+      mapEventsToAutomata(model);
+      final List<Step> modifyingSteps = new ArrayList<Step>();
 
-    // performs hiding and abstraction for each automaton individually
-    final KindTranslator translator = getKindTranslator();
-    final List<AutomatonProxy> remainingAut =
-        new ArrayList<AutomatonProxy>(model.getAutomata().size());
-    boolean modified = false;
-    for (final AutomatonProxy aut : model.getAutomata()) {
-      if (translator.getComponentKind(aut) == ComponentKind.PROPERTY) {
-        modified = true;
-      } else {
-        final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
-        final Set<EventProxy> localEvents = identifyLocalEvents(autAsList);
-        if (localEvents.size() > 0) {
-          try {
-            final AutomatonProxy abstractedAut =
-                hideAndAbstract(aut, localEvents);
-            remainingAut.add(abstractedAut);
-            modified = true;
-            modifyingSteps.addAll(mTemporaryModifyingSteps);
-          } catch (final OverflowException exception) {
+      // performs hiding and abstraction for each automaton individually
+      final KindTranslator translator = getKindTranslator();
+      final List<AutomatonProxy> remainingAut =
+          new ArrayList<AutomatonProxy>(model.getAutomata().size());
+      boolean modified = false;
+      for (final AutomatonProxy aut : model.getAutomata()) {
+        if (translator.getComponentKind(aut) == ComponentKind.PROPERTY) {
+          modified = true;
+        } else {
+          final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
+          final Set<EventProxy> localEvents = identifyLocalEvents(autAsList);
+          if (localEvents.size() > 0) {
+            try {
+              final AutomatonProxy abstractedAut =
+                  hideAndAbstract(aut, localEvents);
+              remainingAut.add(abstractedAut);
+              modified = true;
+              modifyingSteps.addAll(mTemporaryModifyingSteps);
+            } catch (final OverflowException exception) {
+              remainingAut.add(aut);
+            }
+            mTemporaryModifyingSteps.clear();
+          } else {
             remainingAut.add(aut);
           }
-          mTemporaryModifyingSteps.clear();
-        } else {
-          remainingAut.add(aut);
         }
       }
-    }
-    if (modified) {
-      final Candidate candidate = new Candidate(remainingAut, null);
-      model = candidate.createProductDESProxy(getFactory());
-      mapEventsToAutomata(model);
-    }
+      if (modified) {
+        final Candidate candidate = new Candidate(remainingAut, null);
+        model = candidate.createProductDESProxy(getFactory());
+        mapEventsToAutomata(model);
+      }
 
-    outer: while (remainingAut.size() > 1) {
-      final List<Candidate> candidates = findCandidates(model);
-      Candidate candidate;
-      AutomatonProxy syncProduct = null;
-      while (true) {
-        mTemporaryModifyingSteps = new ArrayList<Step>();
-        candidate = evaluateCandidates(candidates);
-        if (candidate == null) {
-          break outer;
-        }
-        try {
-          syncProduct = composeSynchronousProduct(candidate);
-          final AutomatonProxy abstractedAut =
-              hideAndAbstract(syncProduct, candidate.getLocalEvents());
+      outer: while (remainingAut.size() > 1) {
+        final List<Candidate> candidates = findCandidates(model);
+        Candidate candidate;
+        AutomatonProxy syncProduct = null;
+        while (true) {
+          mTemporaryModifyingSteps = new ArrayList<Step>();
+          candidate = evaluateCandidates(candidates);
+          if (candidate == null) {
+            break outer;
+          }
+          try {
+            syncProduct = composeSynchronousProduct(candidate);
+            final AutomatonProxy abstractedAut =
+                hideAndAbstract(syncProduct, candidate.getLocalEvents());
 
-          // removes the composed automata for this candidate from the set of
-          // remaining automata and adds the newly composed candidate
-          remainingAut.removeAll(candidate.getAutomata());
-          remainingAut.add(abstractedAut);
-          updateEventsToAutomata(abstractedAut, candidate.getAutomata());
+            // removes the composed automata for this candidate from the set of
+            // remaining automata and adds the newly composed candidate
+            remainingAut.removeAll(candidate.getAutomata());
+            remainingAut.add(abstractedAut);
+            updateEventsToAutomata(abstractedAut, candidate.getAutomata());
 
-          // updates the current model to find candidates from
-          final Candidate newModel = new Candidate(remainingAut, null);
-          model = newModel.createProductDESProxy(getFactory());
-          mSuccessfulCompositionCount++;
-          modifyingSteps.addAll(mTemporaryModifyingSteps);
-          break;
-        } catch (final OverflowException e) {
-          mUnsuccessfulCompositionCount++;
-          candidates.remove(candidate);
-          mUnsuccessfulCandidates.add(candidate);
+            // updates the current model to find candidates from
+            final Candidate newModel = new Candidate(remainingAut, null);
+            model = newModel.createProductDESProxy(getFactory());
+            mSuccessfulCompositionCount++;
+            modifyingSteps.addAll(mTemporaryModifyingSteps);
+            break;
+          } catch (final OverflowException e) {
+            mUnsuccessfulCompositionCount++;
+            candidates.remove(candidate);
+            mUnsuccessfulCandidates.add(candidate);
+          }
         }
       }
-    }
-    final ConflictChecker checker =
-        new NativeConflictChecker(model, getUsedMarkingProposition(),
-            getFactory());
-    // final ConflictChecker checker = new MonolithicConflictChecker(model,
-    // getUsedMarkingProposition(), getFactory());
-    checker.setGeneralisedPrecondition(getUsedPreconditionMarkingProposition());
-    checker.setNodeLimit(mFinalStepNodeLimit);
-    checker.setTransitionLimit(mFinalStepTransitionLimit);
-    final boolean result = checker.run();
-    mComposedModelNumberOfStates =
-        checker.getAnalysisResult().getTotalNumberOfStates();
-    mComposedModelNumberOfTransitions =
-        checker.getAnalysisResult().getTotalNumberOfTransitions();
-    if (result) {
-      setSatisfiedResult();
-    } else {
-      final ConflictTraceProxy counterexample = checker.getCounterExample();
-      final int size = modifyingSteps.size();
-      ConflictTraceProxy convertedTrace = counterexample;
-      convertedTrace = saturateTrace(counterexample);
-      TraceChecker.checkCounterExample(convertedTrace, true);
-      final ListIterator<Step> iter = modifyingSteps.listIterator(size);
-      while (iter.hasPrevious()) {
-        final Step step = iter.previous();
-        final ConflictTraceProxy newTrace = step.convertTrace(convertedTrace);
-        TraceChecker.checkCounterExample(newTrace, true);
-        convertedTrace = newTrace;
+      final ConflictChecker checker =
+          new NativeConflictChecker(model, getUsedMarkingProposition(),
+              getFactory());
+      // final ConflictChecker checker = new MonolithicConflictChecker(model,
+      // getUsedMarkingProposition(), getFactory());
+      checker
+          .setGeneralisedPrecondition(getUsedPreconditionMarkingProposition());
+      checker.setNodeLimit(mFinalStepNodeLimit);
+      checker.setTransitionLimit(mFinalStepTransitionLimit);
+      final boolean result = checker.run();
+      mComposedModelNumberOfStates =
+          checker.getAnalysisResult().getTotalNumberOfStates();
+      mComposedModelNumberOfTransitions =
+          checker.getAnalysisResult().getTotalNumberOfTransitions();
+      if (result) {
+        setSatisfiedResult();
+      } else {
+        final ConflictTraceProxy counterexample = checker.getCounterExample();
+        final int size = modifyingSteps.size();
+        ConflictTraceProxy convertedTrace = counterexample;
+        convertedTrace = saturateTrace(counterexample);
+        TraceChecker.checkCounterExample(convertedTrace, true);
+        final ListIterator<Step> iter = modifyingSteps.listIterator(size);
+        while (iter.hasPrevious()) {
+          final Step step = iter.previous();
+          final ConflictTraceProxy newTrace = step.convertTrace(convertedTrace);
+          TraceChecker.checkCounterExample(newTrace, true);
+          convertedTrace = newTrace;
+        }
+        setFailedResult(convertedTrace);
       }
-      setFailedResult(convertedTrace);
+      return result;
+    } finally {
+      tearDown();
     }
-    tearDown();
-    return result;
   }
 
   private AutomatonProxy hideAndAbstract(final AutomatonProxy aut,
@@ -753,12 +757,12 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     final ListIterator<PreselectingHeuristic> iter =
         mPreselectingHeuristics.listIterator();
-    PreselectingHeuristic heuristic = iter.next();
-    List<Candidate> candidates = heuristic.evaluate(model);
-    while (candidates.size() == 0 && iter.hasNext()) {
-      heuristic = iter.next();
-      candidates = heuristic.evaluate(model);
-    }
+    final PreselectingHeuristic heuristic = iter.next();
+    final List<Candidate> candidates = heuristic.evaluate(model);
+    /*
+     * while (candidates.size() == 0 && iter.hasNext()) { heuristic =
+     * iter.next(); candidates = heuristic.evaluate(model); }
+     */
     return candidates;
   }
 
@@ -991,8 +995,9 @@ public class CompositionalGeneralisedConflictChecker extends
      *          The automata to pair chosenAut with.
      * @return The list of candidates creating by pairing chosenAut.
      */
-    protected List<Candidate> pairAutomata(final AutomatonProxy chosenAut,
-                                           final Set<AutomatonProxy> automata)
+    protected List<Candidate> pairAutomata(
+                                           final AutomatonProxy chosenAut,
+                                           final Collection<AutomatonProxy> automata)
     {
       final List<Candidate> candidates =
           new ArrayList<Candidate>(automata.size() - 1);
@@ -1096,18 +1101,24 @@ public class CompositionalGeneralisedConflictChecker extends
 
     protected List<Candidate> evaluate(final ProductDESProxy model)
     {
-      final Set<AutomatonProxy> automata = model.getAutomata();
-      final AutomatonProxy chosenAut =
+      Collection<AutomatonProxy> automata = model.getAutomata();
+      AutomatonProxy chosenAut =
           (AutomatonProxy) Collections.min(automata, new AutomataComparator());
-      final List<Candidate> candidates = pairAutomata(chosenAut, automata);
-      /*
-       * if (candidates.size() == 0 && automata.size() > 2) { automata = new
-       * HashSet<AutomatonProxy>(model.getAutomata()); while (candidates.size()
-       * == 0) { automata.remove(chosenAut); if (automata.size() > 0) {
-       * chosenAut = (AutomatonProxy) Collections.min(automata, new
-       * AutomataComparator()); candidates = pairAutomata(chosenAut, automata);
-       * } } }
-       */
+      List<Candidate> candidates = pairAutomata(chosenAut, automata);
+
+      if (candidates.size() == 0 && automata.size() > 2) {
+        automata = new ArrayList<AutomatonProxy>(model.getAutomata());
+        while (candidates.size() == 0 && automata.size() > 2) {
+          automata.remove(chosenAut);
+          if (automata.size() > 0) {
+            chosenAut =
+                (AutomatonProxy) Collections.min(automata,
+                                                 new AutomataComparator());
+            candidates = pairAutomata(chosenAut, automata);
+          }
+        }
+      }
+
       return candidates;
     }
 
