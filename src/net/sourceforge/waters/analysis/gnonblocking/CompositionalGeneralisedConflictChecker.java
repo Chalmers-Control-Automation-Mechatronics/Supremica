@@ -287,11 +287,16 @@ public class CompositionalGeneralisedConflictChecker extends
                 hideAndAbstract(syncProduct, candidate.getLocalEvents());
 
             // removes the composed automata for this candidate from the set of
-            // remaining automata and adds the newly composed candidate
+            // remaining automata and adds the newly composed candidate if it
+            // was not a trivial automaton
             remainingAut.removeAll(candidate.getAutomata());
-            remainingAut.add(abstractedAut);
-            updateEventsToAutomata(abstractedAut, candidate.getAutomata());
-
+            if (checkTrivial(abstractedAut)) {
+              updateEventsToAutomata(null, candidate.getAutomata());
+              mTrivialAbstractedAutomata.add(abstractedAut);
+            } else {
+              remainingAut.add(abstractedAut);
+              updateEventsToAutomata(abstractedAut, candidate.getAutomata());
+            }
             // updates the current model to find candidates from
             final Candidate newModel = new Candidate(remainingAut, null);
             model = newModel.createProductDESProxy(getFactory());
@@ -342,6 +347,30 @@ public class CompositionalGeneralisedConflictChecker extends
     }
   }
 
+  /**
+   * Checks if an automaton is trivial. Trivial in this case is an automaton
+   * with no transitions and one state which has the generalised precondition
+   * marking and default marking.
+   *
+   * @param abstractedAut
+   * @return
+   */
+  private boolean checkTrivial(final AutomatonProxy abstractedAut)
+  {
+    if (abstractedAut.getStates().size() == 1) {
+      final Iterator<StateProxy> stateIter =
+          abstractedAut.getStates().iterator();
+      final StateProxy singleState = stateIter.next();
+      assert stateIter.hasNext() == false;
+      if (singleState.getPropositions().containsAll(mPropositions)) {
+        if (abstractedAut.getTransitions().size() == 0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   private AutomatonProxy hideAndAbstract(final AutomatonProxy aut,
                                          final Set<EventProxy> localEvents)
       throws AnalysisException
@@ -366,6 +395,11 @@ public class CompositionalGeneralisedConflictChecker extends
   private ConflictTraceProxy saturateTrace(
                                            final ConflictTraceProxy counterexample)
   {
+    Set<AutomatonProxy> traceAutomata = counterexample.getAutomata();
+    if (mTrivialAbstractedAutomata.size() > 0) {
+      traceAutomata = new HashSet<AutomatonProxy>(counterexample.getAutomata());
+      traceAutomata.addAll(mTrivialAbstractedAutomata);
+    }
     final List<TraceStepProxy> traceSteps = counterexample.getTraceSteps();
     final List<TraceStepProxy> convertedSteps = new ArrayList<TraceStepProxy>();
     Map<AutomatonProxy,StateProxy> prevStepMap = null;
@@ -374,7 +408,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final Map<AutomatonProxy,StateProxy> stepMap =
           new HashMap<AutomatonProxy,StateProxy>();
       final EventProxy stepEvent = step.getEvent();
-      for (final AutomatonProxy aut : counterexample.getAutomata()) {
+      for (final AutomatonProxy aut : traceAutomata) {
         StateProxy targetState = step.getStateMap().get(aut);
         if (targetState == null) {
           if (stepEvent != null) {
@@ -397,8 +431,7 @@ public class CompositionalGeneralisedConflictChecker extends
                                               counterexample.getComment(),
                                               counterexample.getLocation(),
                                               counterexample.getProductDES(),
-                                              counterexample.getAutomata(),
-                                              convertedSteps,
+                                              traceAutomata, convertedSteps,
                                               counterexample.getKind());
     return saturatedCounterexample;
   }
@@ -455,10 +488,12 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     super.setUp();
     mEventsToAutomata = new HashMap<EventProxy,Set<AutomatonProxy>>();
+    mUnsuccessfulCandidates = new HashSet<Candidate>();
+    mTrivialAbstractedAutomata = new HashSet<AutomatonProxy>();
     if (mPreselectingHeuristic == null) {
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       setPreselectingHeuristic(defaultHeuristic);
     }
     if (mSelectingHeuristics == null) {
@@ -685,13 +720,15 @@ public class CompositionalGeneralisedConflictChecker extends
                                       final List<AutomatonProxy> autToRemove)
   {
     // adds the new automaton to the events it contains
-    for (final EventProxy event : autToAdd.getEvents()) {
-      if (event.getKind() != EventKind.PROPOSITION) {
-        if (!mEventsToAutomata.containsKey(event)) {
-          final Set<AutomatonProxy> automata = new THashSet<AutomatonProxy>();
-          mEventsToAutomata.put(event, automata);
+    if (autToAdd != null) {
+      for (final EventProxy event : autToAdd.getEvents()) {
+        if (event.getKind() != EventKind.PROPOSITION) {
+          if (!mEventsToAutomata.containsKey(event)) {
+            final Set<AutomatonProxy> automata = new THashSet<AutomatonProxy>();
+            mEventsToAutomata.put(event, automata);
+          }
+          mEventsToAutomata.get(event).add(autToAdd);
         }
-        mEventsToAutomata.get(event).add(autToAdd);
       }
     }
     // removes the automata which have been composed
@@ -2914,8 +2951,8 @@ public class CompositionalGeneralisedConflictChecker extends
   // #########################################################################
   // # Data Members
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata;
-  private final Set<Candidate> mUnsuccessfulCandidates =
-      new HashSet<Candidate>();
+  private Set<Candidate> mUnsuccessfulCandidates;
+  private Set<AutomatonProxy> mTrivialAbstractedAutomata;
   private List<Step> mTemporaryModifyingSteps;
   private Collection<EventProxy> mPropositions;
   private EventProxy mUsedPreconditionMarking;
