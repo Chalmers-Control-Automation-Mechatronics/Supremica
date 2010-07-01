@@ -493,7 +493,7 @@ storeInitialStates(bool initzero, bool donondet)
 {
   uint32* initpacked = mStateSpace->prepare();
   if (initzero) {
-    const int numwords = getAutomatonEncoding().getNumberOfWords();
+    const int numwords = getAutomatonEncoding().getEncodingSize();
     for (int w = 0; w < numwords; w++) {
       initpacked[w] = 0;
     }

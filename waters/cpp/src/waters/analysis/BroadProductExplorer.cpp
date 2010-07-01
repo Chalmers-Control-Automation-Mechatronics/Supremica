@@ -63,7 +63,7 @@ BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mNumEventRecords(0),
     mEventRecords(0),
     mReversedEventRecords(0),
-    mMaxUpdates(0),
+    mMaxNondeterministicUpdates(0),
     mNondeterministicTransitionIterators(0)
 {
 }
@@ -235,7 +235,7 @@ teardown()
 bool BroadProductExplorer::
 expandSafetyState(const uint32* sourcetuple, const uint32* sourcepacked)
 {
-  const int numwords = getAutomatonEncoding().getNumberOfWords();
+  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
   for (int e = 0; e < mNumEventRecords; e++) {
     const BroadEventRecord* event = mEventRecords[e];
     const AutomatonRecord* dis = 0;
@@ -282,7 +282,7 @@ expandNonblockingReachabilityState(uint32 source,
                                    const uint32* sourcetuple,
                                    const uint32* sourcepacked)
 {
-  const int numwords = getAutomatonEncoding().getNumberOfWords();
+  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
   setConflictKind(jni::ConflictKind_DEADLOCK);
   if (getTransitionLimit() > 0) {
 #   define ADD_TRANSITION addCoreachabilityTransition
@@ -330,7 +330,7 @@ void BroadProductExplorer::
 expandNonblockingCoreachabilityState(const uint32* targettuple,
                                      const uint32* targetpacked)
 {
-  const int numwords = getAutomatonEncoding().getNumberOfWords();
+  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
   EXPAND(numwords, TARGET, targettuple, targetpacked);
 }
 
@@ -344,6 +344,7 @@ setupReverseTransitionRelations()
     bool removing =
       getMode() == EXPLORER_MODE_NONBLOCKING && getTransitionLimit() == 0;
     int numreversed = 0;
+    int maxupdates = 0;
     mReversedEventRecords = new BroadEventRecord*[mNumEventRecords];
     for (int e = 0; e < mNumEventRecords; e++) {
       BroadEventRecord* event = mEventRecords[e];
@@ -353,11 +354,21 @@ setupReverseTransitionRelations()
       if (!event->isGloballyDisabled() && !event->isOnlySelfloops()) {
         if (event->reverse()) {
           mReversedEventRecords[numreversed++] = event;
+          const int numupdates = event->getNumberOfNondeterministicUpdates();
+          if (numupdates > maxupdates) {
+            maxupdates = numupdates;
+          }
         }
       }
     }
     qsort(mReversedEventRecords, numreversed, sizeof(BroadEventRecord*),
           BroadEventRecord::compareForBackwardSearch);
+    if (maxupdates > mMaxNondeterministicUpdates) {
+      mMaxNondeterministicUpdates = maxupdates;
+      delete [] mNondeterministicTransitionIterators;
+      mNondeterministicTransitionIterators =
+        new NondeterministicTransitionIterator[mMaxNondeterministicUpdates];
+    }
   }
 }
 
@@ -367,7 +378,7 @@ setupReverseTransitionRelations()
 void BroadProductExplorer::
 expandTraceState(const uint32* targettuple, const uint32* targetpacked)
 {
-  const int numwords = getAutomatonEncoding().getNumberOfWords();
+  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
   const BroadEventRecord* event;
   try {
     int e = -1;
@@ -509,7 +520,7 @@ void BroadProductExplorer::
 setupEventMap(HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
 {
   jni::ClassCache* cache = getCache();
-  const int numwords = getAutomatonEncoding().getNumberOfWords();
+  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
   const jni::SetGlue events = getModel().getEventsGlue(cache);
   const jni::IteratorGlue iter = events.iteratorGlue(cache);
   while (iter.hasNext()) {
@@ -581,7 +592,7 @@ void BroadProductExplorer::
 setupCompactEventList
   (const HashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
 {
-  mMaxUpdates = 0;
+  mMaxNondeterministicUpdates = 0;
   mNumEventRecords = eventmap.size();
   ExplorerMode mode = getMode();
   HashTableIterator hiter1 = eventmap.iterator();
@@ -590,9 +601,9 @@ setupCompactEventList
     if (event->isSkippable(mode)) {
       mNumEventRecords--;
     }
-    const int numupdates = event->getNumberOfUpdates();
-    if (numupdates > mMaxUpdates) {
-      mMaxUpdates = numupdates;
+    const int numupdates = event->getNumberOfNondeterministicUpdates();
+    if (numupdates > mMaxNondeterministicUpdates) {
+      mMaxNondeterministicUpdates = numupdates;
     }
   }
   mEventRecords = new BroadEventRecord*[mNumEventRecords];
@@ -618,8 +629,10 @@ setupCompactEventList
   }
   qsort(mEventRecords, mNumEventRecords, sizeof(BroadEventRecord*),
         BroadEventRecord::compareForForwardSearch);
-  mNondeterministicTransitionIterators =
-    new NondeterministicTransitionIterator[mMaxUpdates];
+  if (mMaxNondeterministicUpdates > 0) {
+    mNondeterministicTransitionIterators =
+      new NondeterministicTransitionIterator[mMaxNondeterministicUpdates];
+  }
 }
 
 

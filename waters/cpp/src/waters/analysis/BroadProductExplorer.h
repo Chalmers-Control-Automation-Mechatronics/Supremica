@@ -96,7 +96,7 @@ private:
   int mNumEventRecords;
   BroadEventRecord** mEventRecords;
   BroadEventRecord** mReversedEventRecords;
-  int mMaxUpdates;
+  int mMaxNondeterministicUpdates;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
   uint32 mTraceLimit;
 };

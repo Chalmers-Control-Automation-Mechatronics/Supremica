@@ -34,7 +34,8 @@ namespace waters {
 
 StateSpace::
 StateSpace(const AutomatonEncoding* encoding, uint32 limit)
-  : mEncodingSize(encoding->getNumberOfWords()),
+  : mEncodingSize(encoding->getEncodingSize()),
+    mNumSignificantWords(encoding->getNumberOfSignificantWords()),
     mNumStates(0),
     mStateLimit(limit),
     mBlocks(INITBLOCKS),
@@ -132,7 +133,7 @@ equals(const void* key1, const void* key2)
   const uint32* tuple1 = get(index1);
   const uint32 index2 = (uint32) key2;
   const uint32* tuple2 = get(index2);
-  for (int i = 0; i < mEncodingSize; i++) {
+  for (int i = 0; i < mNumSignificantWords; i++) {
     if (tuple1[i] != tuple2[i]) {
       return false;
     }
@@ -165,14 +166,14 @@ hash(const void* key)
 {
   const uint32 index = (uint32) key;
   const uint32* tuple = get(index);
-  return hashIntArray(tuple, getEncodingSize(), mMask0);
+  return hashIntArray(tuple, getNumberOfSignificantWords(), mMask0);
 }
 
 bool TaggedStateSpace::
 equals(const void* key1, const void* key2)
   const
 {
-  const int esize = getEncodingSize();
+  const int esize = getNumberOfSignificantWords();
   if (esize > 0) {
     const uint32 index1 = (uint32) key1;
     const uint32* tuple1 = get(index1);

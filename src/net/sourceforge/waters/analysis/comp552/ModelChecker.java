@@ -25,7 +25,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  * form of a sequence of events, explaining why the property that was
  * checked is not satisfied.</P>
  *
- * <P>To use a model checker, the use first creates an instance of a
+ * <P>To use a model checker, the user first creates an instance of a
  * subclass of this class, and sets up the model to be checked as well as
  * any other parameters that may be needed. Then model checking is started
  * using the {@link #run()} method. Afterwards results can be queried using
@@ -68,7 +68,7 @@ public abstract class ModelChecker
    * @param  factory Factory used for trace construction.
    */
   public ModelChecker(final ProductDESProxy model,
-		      final ProductDESProxyFactory factory)
+                      final ProductDESProxyFactory factory)
   {
     mModel = model;
     mFactory = factory;
@@ -135,7 +135,7 @@ public abstract class ModelChecker
    *         property is satisfied and there is no counterexample.
    */
   public abstract TraceProxy getCounterExample();
-  
+
 
   //#########################################################################
   //# Data Members

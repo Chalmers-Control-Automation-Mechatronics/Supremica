@@ -44,6 +44,7 @@ public:
   //##########################################################################
   //# Simple Access
   inline int getEncodingSize() const {return mEncodingSize;}
+  inline int getNumberOfSignificantWords() const {return mNumSignificantWords;}
   inline uint32 size() const {return mNumStates;}
 
   //##########################################################################
@@ -65,6 +66,7 @@ private:
   //##########################################################################
   //# Data Members
   int mEncodingSize;
+  int mNumSignificantWords;
   uint32 mNumStates;
   uint32 mStateLimit;
   ArrayList<uint32*> mBlocks;

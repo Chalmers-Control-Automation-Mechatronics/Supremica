@@ -59,6 +59,8 @@ public:
   inline bool isDeterministic() const
     {return mNumNondeterministicRecords == 0;}
   inline int getNumberOfUpdates() const {return mNumberOfUpdates;}
+  inline int getNumberOfNondeterministicUpdates() const
+    {return mNumNondeterministicRecords;}
   inline TransitionRecord* getTransitionRecord() const
     {return mUsedSearchRecords;}
   inline TransitionUpdateRecord* getTransitionUpdateRecord(int w) const
