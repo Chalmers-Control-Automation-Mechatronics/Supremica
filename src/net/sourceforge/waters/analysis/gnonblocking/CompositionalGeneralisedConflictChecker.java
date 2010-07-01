@@ -455,10 +455,10 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     super.setUp();
     mEventsToAutomata = new HashMap<EventProxy,Set<AutomatonProxy>>();
-    if (mPreselectingHeuristics == null) {
+    if (mPreselectingHeuristic == null) {
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
       setPreselectingHeuristic(defaultHeuristic);
     }
     if (mSelectingHeuristics == null) {
@@ -755,15 +755,7 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private List<Candidate> findCandidates(final ProductDESProxy model)
   {
-    final ListIterator<PreselectingHeuristic> iter =
-        mPreselectingHeuristics.listIterator();
-    final PreselectingHeuristic heuristic = iter.next();
-    final List<Candidate> candidates = heuristic.evaluate(model);
-    /*
-     * while (candidates.size() == 0 && iter.hasNext()) { heuristic =
-     * iter.next(); candidates = heuristic.evaluate(model); }
-     */
-    return candidates;
+    return mPreselectingHeuristic.evaluate(model);
   }
 
   /**
@@ -908,20 +900,7 @@ public class CompositionalGeneralisedConflictChecker extends
 
   public void setPreselectingHeuristic(final PreselectingHeuristic heuristic)
   {
-    mPreselectingHeuristics = new ArrayList<PreselectingHeuristic>(4);
-    mPreselectingHeuristics.add(heuristic);
-    if (heuristic instanceof HeuristicMinT) {
-      mPreselectingHeuristics.add(new HeuristicMaxS());
-      mPreselectingHeuristics.add(new HeuristicMustL());
-    } else if (heuristic instanceof HeuristicMaxS) {
-      mPreselectingHeuristics.add(new HeuristicMinT());
-      mPreselectingHeuristics.add(new HeuristicMustL());
-
-    } else if (heuristic instanceof HeuristicMustL) {
-      mPreselectingHeuristics.add(new HeuristicMinT());
-      mPreselectingHeuristics.add(new HeuristicMaxS());
-
-    }
+    mPreselectingHeuristic = heuristic;
   }
 
   /**
@@ -986,44 +965,6 @@ public class CompositionalGeneralisedConflictChecker extends
   private abstract class PreselectingHeuristic
   {
     /**
-     * Pairs the chosen automaton with every other automaton in 'automata' and
-     * creates a candidate for each.
-     *
-     * @param chosenAut
-     *          The automaton to be paired.
-     * @param automata
-     *          The automata to pair chosenAut with.
-     * @return The list of candidates creating by pairing chosenAut.
-     */
-    protected List<Candidate> pairAutomata(
-                                           final AutomatonProxy chosenAut,
-                                           final Collection<AutomatonProxy> automata)
-    {
-      final List<Candidate> candidates =
-          new ArrayList<Candidate>(automata.size() - 1);
-      for (final AutomatonProxy a : automata) {
-        if (a != chosenAut) {
-          final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
-          // Bring pair into defined ordering.
-          if (chosenAut.compareTo(a) < 0) {
-            pair.add(chosenAut);
-            pair.add(a);
-          } else {
-            pair.add(a);
-            pair.add(chosenAut);
-          }
-          final Set<EventProxy> localEvents = identifyLocalEvents(pair);
-          final Candidate candidate = new Candidate(pair, localEvents);
-          candidate.setLocalEvents(localEvents);
-          if (validateCandidate(candidate)) {
-            candidates.add(candidate);
-          }
-        }
-      }
-      return candidates;
-    }
-
-    /**
      * Checks if a candidate is valid. To satisfy being a valid candidate it
      * must not have been previously tried and marked as unsuccessful, must have
      * at least one local event and its automata must have at least one shared
@@ -1075,35 +1016,30 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     protected abstract List<Candidate> evaluate(final ProductDESProxy model);
-
-    protected abstract int getHeuristicProperty(final AutomatonProxy aut);
-
-
-    protected class AutomataComparator implements Comparator<AutomatonProxy>
-    {
-      public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
-      {
-        final int aut1Count = getHeuristicProperty(aut1);
-        final int aut2Count = getHeuristicProperty(aut2);
-        if (aut1Count < aut2Count)
-          return -1;
-        else if (aut1Count > aut2Count)
-          return 1;
-        else
-          return 0;
-      }
-    }
   }
 
 
-  private class HeuristicMinT extends PreselectingHeuristic
+  /**
+   * This class is to be used by a preselecting heuristic which requires pairing
+   * a chosen automaton with all other to create candidates.
+   *
+   * @author rmf18
+   */
+  private abstract class PreselctingPairingHeuristic extends
+      PreselectingHeuristic
   {
-
+    /**
+     * Finds a list of candidates based on a heuristic which requires pairing If
+     * no candidates is eligible the automaton being paired is removed and
+     * another pairing is attempted.
+     *
+     * @param model
+     * @return
+     */
     protected List<Candidate> evaluate(final ProductDESProxy model)
     {
       Collection<AutomatonProxy> automata = model.getAutomata();
-      AutomatonProxy chosenAut =
-          (AutomatonProxy) Collections.min(automata, new AutomataComparator());
+      AutomatonProxy chosenAut = getHeuristicProperty(automata);
       List<Candidate> candidates = pairAutomata(chosenAut, automata);
 
       if (candidates.size() == 0 && automata.size() > 2) {
@@ -1122,7 +1058,90 @@ public class CompositionalGeneralisedConflictChecker extends
       return candidates;
     }
 
-    protected int getHeuristicProperty(final AutomatonProxy aut)
+    /**
+     * Pairs the chosen automaton with every other automaton in 'automata' and
+     * creates a candidate for each.
+     *
+     * @param chosenAut
+     *          The automaton to be paired.
+     * @param automata
+     *          The automata to pair chosenAut with.
+     * @return The list of candidates creating by pairing chosenAut.
+     */
+    protected List<Candidate> pairAutomata(
+                                           final AutomatonProxy chosenAut,
+                                           final Collection<AutomatonProxy> automata)
+    {
+      final List<Candidate> candidates =
+          new ArrayList<Candidate>(automata.size() - 1);
+      for (final AutomatonProxy a : automata) {
+        if (a != chosenAut) {
+          final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
+          // Bring pair into defined ordering.
+          if (chosenAut.compareTo(a) < 0) {
+            pair.add(chosenAut);
+            pair.add(a);
+          } else {
+            pair.add(a);
+            pair.add(chosenAut);
+          }
+          final Set<EventProxy> localEvents = identifyLocalEvents(pair);
+          final Candidate candidate = new Candidate(pair, localEvents);
+          candidate.setLocalEvents(localEvents);
+          if (validateCandidate(candidate)) {
+            candidates.add(candidate);
+          }
+        }
+      }
+      return candidates;
+    }
+
+
+    /**
+     * Compares two automata based on the type of figure the heuristic specifies
+     * (i.e. number of transitions, or number of states).
+     *
+     * @author rmf18
+     */
+    protected class AutomataComparator implements Comparator<AutomatonProxy>
+    {
+      public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
+      {
+        final int aut1Count = getHeuristicFigure(aut1);
+        final int aut2Count = getHeuristicFigure(aut2);
+        if (aut1Count < aut2Count)
+          return -1;
+        else if (aut1Count > aut2Count)
+          return 1;
+        else
+          return 0;
+      }
+    }
+
+    /**
+     * The type of figure the heuristic uses (i.e. number of transitions, or
+     * number of states).
+     *
+     * @param aut
+     * @return
+     */
+    protected abstract int getHeuristicFigure(final AutomatonProxy aut);
+
+    /**
+     * The min or max of a collection.
+     *
+     * @param automata
+     * @return
+     */
+    protected abstract AutomatonProxy getHeuristicProperty(
+                                                           final Collection<AutomatonProxy> automata);
+
+  }
+
+
+  private class HeuristicMinT extends PreselctingPairingHeuristic
+  {
+    protected int getHeuristicFigure(final AutomatonProxy aut)
     {
       return aut.getTransitions().size();
     }
@@ -1130,6 +1149,13 @@ public class CompositionalGeneralisedConflictChecker extends
     boolean checkForLocalEvent(final Candidate candidate)
     {
       return true;
+    }
+
+    protected AutomatonProxy getHeuristicProperty(
+                                                  final Collection<AutomatonProxy> automata)
+    {
+      return (AutomatonProxy) Collections.min(automata,
+                                              new AutomataComparator());
     }
 
   }
@@ -1140,20 +1166,9 @@ public class CompositionalGeneralisedConflictChecker extends
    * candidate is produced by pairing the automaton with the most states to
    * every other automaton in the model.
    */
-  private class HeuristicMaxS extends PreselectingHeuristic
+  private class HeuristicMaxS extends PreselctingPairingHeuristic
   {
-
-    protected List<Candidate> evaluate(final ProductDESProxy model)
-    {
-      final Set<AutomatonProxy> automata = model.getAutomata();
-      final AutomatonProxy chosenAut =
-          (AutomatonProxy) Collections.max(automata, new AutomataComparator());
-      // pairs chosen automaton with all others
-      final List<Candidate> candidates = pairAutomata(chosenAut, automata);
-      return candidates;
-    }
-
-    protected int getHeuristicProperty(final AutomatonProxy aut)
+    protected int getHeuristicFigure(final AutomatonProxy aut)
     {
       return -aut.getStates().size();
     }
@@ -1161,6 +1176,13 @@ public class CompositionalGeneralisedConflictChecker extends
     boolean checkForLocalEvent(final Candidate candidate)
     {
       return true;
+    }
+
+    protected AutomatonProxy getHeuristicProperty(
+                                                  final Collection<AutomatonProxy> automata)
+    {
+      return (AutomatonProxy) Collections.max(automata,
+                                              new AutomataComparator());
     }
   }
 
@@ -1204,11 +1226,6 @@ public class CompositionalGeneralisedConflictChecker extends
       return true;
     }
 
-    // This is not used
-    protected int getHeuristicProperty(final AutomatonProxy aut)
-    {
-      return 0;
-    }
   }
 
 
@@ -2904,7 +2921,7 @@ public class CompositionalGeneralisedConflictChecker extends
   private EventProxy mUsedPreconditionMarking;
 
   // configuration
-  private ArrayList<PreselectingHeuristic> mPreselectingHeuristics;
+  private PreselectingHeuristic mPreselectingHeuristic;
   private List<SelectingHeuristic> mSelectingHeuristics;
   private List<AbstractionRule> mAbstractionRules;
   private int mSyncProductNodeLimit = Integer.MAX_VALUE;
