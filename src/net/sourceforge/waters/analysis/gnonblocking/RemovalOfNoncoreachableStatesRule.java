@@ -67,7 +67,7 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
   // #######################################################################
   // # Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
-                           final EventProxy tau)
+                                      final EventProxy tau)
   {
     mAutToAbstract = autToAbstract;
     if (!autToAbstract.getEvents().contains(mAlphaMarking)
@@ -137,6 +137,11 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
     return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract,
                                                mTR.getOriginalIntToStateMap(),
                                                mTR.getResultingStateToIntMap());
+  }
+
+  public void cleanup()
+  {
+    mTR = null;
   }
 
   // #######################################################################

@@ -68,7 +68,7 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
   // #######################################################################
   // # Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
-                           final EventProxy tau)
+                                      final EventProxy tau)
   {
     mAutToAbstract = autToAbstract;
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
@@ -141,10 +141,16 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
                                                mTR.getResultingStateToIntMap());
   }
 
+  public void cleanup()
+  {
+    mTR = null;
+  }
+
   // #######################################################################
   // # Data Members
   private EventProxy mAlphaMarking;
   private EventProxy mDefaultMarking;
   private AutomatonProxy mAutToAbstract;
   private ObserverProjectionTransitionRelation mTR;
+
 }

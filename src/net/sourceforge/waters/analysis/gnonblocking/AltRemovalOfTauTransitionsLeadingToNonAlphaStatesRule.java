@@ -45,14 +45,14 @@ class AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
   // #######################################################################
   // # Constructors
   AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule(
-                                                     final ProductDESProxyFactory factory)
+                                                        final ProductDESProxyFactory factory)
   {
     this(factory, null);
   }
 
   AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule(
-                                                     final ProductDESProxyFactory factory,
-                                                     final Collection<EventProxy> propositions)
+                                                        final ProductDESProxyFactory factory,
+                                                        final Collection<EventProxy> propositions)
   {
     super(factory, propositions);
   }
@@ -73,7 +73,7 @@ class AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
   // # Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
-    throws OverflowException
+      throws OverflowException
   {
     if (tau == null) {
       return autToAbstract;
@@ -85,15 +85,14 @@ class AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     }
     final int tauID = eventEnc.getEventCode(tau);
     mInputStateEnc = new StateEncoding(autToAbstract);
-    final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
-      (autToAbstract, eventEnc, mInputStateEnc,
-       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(autToAbstract, eventEnc,
+            mInputStateEnc, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final TransitionIterator iter = rel.createSuccessorsModifyingIterator();
     final int numStates = rel.getNumberOfStates();
     int source = 0;
     boolean modified = false;
-    main:
-    while (source < numStates) {
+    main: while (source < numStates) {
       iter.reset(source, tauID);
       while (iter.advance()) {
         final int target = iter.getCurrentTargetState();
@@ -125,16 +124,20 @@ class AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
     }
   }
 
-  CompositionalGeneralisedConflictChecker.Step createStep
-    (final CompositionalGeneralisedConflictChecker checker,
-     final AutomatonProxy abstractedAut)
+  CompositionalGeneralisedConflictChecker.Step createStep(
+                                                          final CompositionalGeneralisedConflictChecker checker,
+                                                          final AutomatonProxy abstractedAut)
   {
     return checker.createObservationEquivalenceStep(abstractedAut,
-                                                    mAutToAbstract,
-                                                    mTau,
-                                                    mInputStateEnc,
-                                                    null,
+                                                    mAutToAbstract, mTau,
+                                                    mInputStateEnc, null,
                                                     mOutputStateEnc);
+  }
+
+  public void cleanup()
+  {
+    mInputStateEnc = null;
+    mOutputStateEnc = null;
   }
 
   // #######################################################################

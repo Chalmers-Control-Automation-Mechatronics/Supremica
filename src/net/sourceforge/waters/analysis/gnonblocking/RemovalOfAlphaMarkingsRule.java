@@ -56,7 +56,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
   // #######################################################################
   // # Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
-                           final EventProxy tau)
+                                      final EventProxy tau)
   {
     mAutToAbstract = autToAbstract;
     mTR =
@@ -121,6 +121,13 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract,
                                                mOriginalIntToStateMap,
                                                mResultingStateToIntMap);
+  }
+
+  public void cleanup()
+  {
+    mOriginalIntToStateMap = null;
+    mResultingStateToIntMap = null;
+    mTR = null;
   }
 
   // #######################################################################

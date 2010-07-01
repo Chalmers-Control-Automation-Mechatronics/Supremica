@@ -140,6 +140,8 @@ public abstract class AbstractionRule
                                                                    final CompositionalGeneralisedConflictChecker checker,
                                                                    final AutomatonProxy abstractedAut);
 
+  public abstract void cleanup();
+
   // #########################################################################
   // # Logging
   Logger getLogger()

@@ -65,7 +65,7 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
   // #######################################################################
   // # Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
-                           final EventProxy tau)
+                                      final EventProxy tau)
   {
     mAutToAbstract = autToAbstract;
     boolean modified = false;
@@ -128,10 +128,16 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
                                                      mAutToAbstract, mTau, mTR);
   }
 
+  public void cleanup()
+  {
+    mTR = null;
+  }
+
   // #######################################################################
   // # Data Members
   private EventProxy mAlphaMarking;
   private EventProxy mTau;
   private AutomatonProxy mAutToAbstract;
   private ObserverProjectionTransitionRelation mTR;
+
 }

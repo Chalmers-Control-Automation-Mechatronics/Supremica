@@ -46,7 +46,7 @@ class AltRemovalOfNoncoreachableStatesRule extends AbstractionRule
   }
 
   AltRemovalOfNoncoreachableStatesRule(final ProductDESProxyFactory factory,
-                                    final Collection<EventProxy> propositions)
+                                       final Collection<EventProxy> propositions)
   {
     super(factory, propositions);
   }
@@ -76,8 +76,8 @@ class AltRemovalOfNoncoreachableStatesRule extends AbstractionRule
   // #######################################################################
   // # Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
-                           final EventProxy tau)
-    throws OverflowException
+                                      final EventProxy tau)
+      throws OverflowException
   {
     mAutToAbstract = autToAbstract;
     mOriginalIntToStateMap = null;
@@ -86,17 +86,17 @@ class AltRemovalOfNoncoreachableStatesRule extends AbstractionRule
     // Set up transition relation containing all transitions, indexed
     // by predecessor. Only include declared propositions.
     final EventEncoding eventEnc =
-      new EventEncoding(autToAbstract, tau,
-                        getPropositions(), EventEncoding.FILTER_PROPOSITIONS);
+        new EventEncoding(autToAbstract, tau, getPropositions(),
+            EventEncoding.FILTER_PROPOSITIONS);
     final int alphaID = eventEnc.getEventCode(mAlphaMarking);
     final int defaultID = eventEnc.getEventCode(mDefaultMarking);
     if (alphaID < 0 || defaultID < 0) {
       return autToAbstract;
     }
     final StateEncoding stateEnc = new StateEncoding(autToAbstract);
-    final ListBufferTransitionRelation tr = new ListBufferTransitionRelation
-      (autToAbstract, eventEnc, stateEnc,
-       ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final ListBufferTransitionRelation tr =
+        new ListBufferTransitionRelation(autToAbstract, eventEnc, stateEnc,
+            ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     final TransitionIterator iter = tr.createPredecessorsReadOnlyIterator();
 
     // Collects in a bit vector all states which can reach an omega-marked
@@ -106,9 +106,8 @@ class AltRemovalOfNoncoreachableStatesRule extends AbstractionRule
     final BitSet coreachableStates = new BitSet(numStates);
     final TIntStack unvisitedStates = new TIntStack();
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      if ((tr.isMarked(sourceID, defaultID) ||
-           tr.isMarked(sourceID, alphaID)) &&
-          !coreachableStates.get(sourceID)) {
+      if ((tr.isMarked(sourceID, defaultID) || tr.isMarked(sourceID, alphaID))
+          && !coreachableStates.get(sourceID)) {
         if (--nonCoreachableCount == 0) {
           return autToAbstract;
         }
@@ -147,18 +146,24 @@ class AltRemovalOfNoncoreachableStatesRule extends AbstractionRule
     stateEnc.clear();
     final ProductDESProxyFactory factory = getFactory();
     final AutomatonProxy convertedAut =
-      tr.createAutomaton(factory, eventEnc, stateEnc);
+        tr.createAutomaton(factory, eventEnc, stateEnc);
     mResultingStateToIntMap = stateEnc.getStateCodeMap();
     return convertedAut;
   }
 
-  CompositionalGeneralisedConflictChecker.Step createStep
-    (final CompositionalGeneralisedConflictChecker checker,
-     final AutomatonProxy abstractedAut)
+  CompositionalGeneralisedConflictChecker.Step createStep(
+                                                          final CompositionalGeneralisedConflictChecker checker,
+                                                          final AutomatonProxy abstractedAut)
   {
     return checker.createRemovalOfMarkingsStep(abstractedAut, mAutToAbstract,
                                                mOriginalIntToStateMap,
                                                mResultingStateToIntMap);
+  }
+
+  public void cleanup()
+  {
+    mOriginalIntToStateMap = null;
+    mResultingStateToIntMap = null;
   }
 
   // #######################################################################

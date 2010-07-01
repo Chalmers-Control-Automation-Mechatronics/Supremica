@@ -48,7 +48,8 @@ class TauLoopRemovalRule extends AbstractionRule
   // #######################################################################
   // # Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
-                           final EventProxy tau) throws AnalysisException
+                                      final EventProxy tau)
+      throws AnalysisException
   {
     mTau = tau;
     mAutToAbstract = autToAbstract;
@@ -86,6 +87,14 @@ class TauLoopRemovalRule extends AbstractionRule
                                                     mOutputEncoding);
   }
 
+  public void cleanup()
+  {
+    mTr = null;
+    mInputEncoding = null;
+    mPartition = null;
+    mOutputEncoding = null;
+  }
+
   // #######################################################################
   // # Data Members
   private AutomatonProxy mAutToAbstract;
@@ -94,4 +103,5 @@ class TauLoopRemovalRule extends AbstractionRule
   private StateEncoding mInputEncoding;
   private List<int[]> mPartition;
   private StateEncoding mOutputEncoding;
+
 }

@@ -42,15 +42,15 @@ class ObservationEquivalenceRule extends AbstractionRule
   {
     super(factory, propositions);
     mTransitionRemovalMode =
-      ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
+        ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
     mTransitionLimit = Integer.MAX_VALUE;
   }
-
 
   // #######################################################################
   // # Rule Application
   /**
    * Sets the mode which redundant transitions are to be removed.
+   *
    * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
   public void setTransitionRemovalMode(final TransitionRemoval mode)
@@ -60,6 +60,7 @@ class ObservationEquivalenceRule extends AbstractionRule
 
   /**
    * Gets the mode which redundant transitions are to be removed.
+   *
    * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
   public TransitionRemoval getTransitionRemovalMode()
@@ -70,12 +71,14 @@ class ObservationEquivalenceRule extends AbstractionRule
   /**
    * Sets the transition limit. The transition limit specifies the maximum
    * number of transitions (including stored silent transitions of the
-   * transitive closure) that will be constructed by the observation
-   * equivalence algorithm. An attempt to store more transitions leads to an
+   * transitive closure) that will be constructed by the observation equivalence
+   * algorithm. An attempt to store more transitions leads to an
    * {@link net.sourceforge.waters.model.analysis.OverflowException
    * OverflowException}.
-   * @param limit     The new transition limit, or {@link Integer#MAX_VALUE}
-   *                  to allow an unlimited number of transitions.
+   *
+   * @param limit
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow an
+   *          unlimited number of transitions.
    */
   public void setTransitionLimit(final int limit)
   {
@@ -84,6 +87,7 @@ class ObservationEquivalenceRule extends AbstractionRule
 
   /**
    * Gets the transition limit.
+   *
    * @see {@link #setTransitionLimit(int) setTransitionLimit()}
    */
   public int getTransitionLimit()
@@ -91,25 +95,24 @@ class ObservationEquivalenceRule extends AbstractionRule
     return mTransitionLimit;
   }
 
-
   // #######################################################################
   // # Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
-                           final EventProxy tau)
-    throws AnalysisException
+                                      final EventProxy tau)
+      throws AnalysisException
   {
     mTau = tau;
     mAutToAbstract = autToAbstract;
     final EventEncoding eventEnc =
-      new EventEncoding(autToAbstract, tau,
-                        getPropositions(), EventEncoding.FILTER_PROPOSITIONS);
-    //final int codeOfTau = eventEnc.getEventCode(tau);
+        new EventEncoding(autToAbstract, tau, getPropositions(),
+            EventEncoding.FILTER_PROPOSITIONS);
+    // final int codeOfTau = eventEnc.getEventCode(tau);
     mInputEncoding = new StateEncoding(autToAbstract);
-    mTr = new ListBufferTransitionRelation
-      (autToAbstract, eventEnc, mInputEncoding,
-       ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    mTr =
+        new ListBufferTransitionRelation(autToAbstract, eventEnc,
+            mInputEncoding, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier(mTr);
+        new ObservationEquivalenceTRSimplifier(mTr);
     bisimulator.setTransitionRemovalMode(mTransitionRemovalMode);
     bisimulator.setTransitionLimit(mTransitionLimit);
     bisimulator.run();
@@ -126,20 +129,27 @@ class ObservationEquivalenceRule extends AbstractionRule
     }
   }
 
-  CompositionalGeneralisedConflictChecker.Step createStep
-    (final CompositionalGeneralisedConflictChecker checker,
-     final AutomatonProxy abstractedAut)
+  CompositionalGeneralisedConflictChecker.Step createStep(
+                                                          final CompositionalGeneralisedConflictChecker checker,
+                                                          final AutomatonProxy abstractedAut)
   {
-    return checker.createObservationEquivalenceStep
-      (abstractedAut, mAutToAbstract, mTau,
-       mInputEncoding, mPartition, mOutputEncoding);
+    return checker.createObservationEquivalenceStep(abstractedAut,
+                                                    mAutToAbstract, mTau,
+                                                    mInputEncoding, mPartition,
+                                                    mOutputEncoding);
   }
 
+  public void cleanup()
+  {
+    mTr = null;
+    mInputEncoding = null;
+    mPartition = null;
+    mOutputEncoding = null;
+  }
 
   // #######################################################################
   // # Data Members
-  private ObservationEquivalenceTRSimplifier.TransitionRemoval
-    mTransitionRemovalMode;
+  private ObservationEquivalenceTRSimplifier.TransitionRemoval mTransitionRemovalMode;
   private int mTransitionLimit;
 
   private AutomatonProxy mAutToAbstract;

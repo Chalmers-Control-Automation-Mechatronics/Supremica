@@ -599,6 +599,7 @@ public class CompositionalGeneralisedConflictChecker extends
         mTemporaryModifyingSteps.add(step);
       }
       autToAbstract = abstractedAut;
+      rule.cleanup();
     }
     return abstractedAut;
   }
@@ -1276,16 +1277,16 @@ public class CompositionalGeneralisedConflictChecker extends
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       final Candidate chosenCandidate = it.next();
       chosenCandidates.add(chosenCandidate);
-      double maxLocal = getHeuristicValue(chosenCandidate);
+      double maxValue = getHeuristicValue(chosenCandidate);
 
       while (it.hasNext()) {
         final Candidate nextCan = it.next();
         final double proportion = getHeuristicValue(nextCan);
-        if (proportion > maxLocal) {
+        if (proportion > maxValue) {
           chosenCandidates = new ArrayList<Candidate>();
-          maxLocal = proportion;
+          maxValue = proportion;
           chosenCandidates.add(nextCan);
-        } else if (proportion == maxLocal) {
+        } else if (proportion == maxValue) {
           chosenCandidates.add(nextCan);
         }
       }
@@ -1427,6 +1428,7 @@ public class CompositionalGeneralisedConflictChecker extends
       final int totalEvents = candidate.getNumberOfEvents();
       final int nonLocalEvents = totalEvents - candidate.getLocalEventCount();
       return product * (double) nonLocalEvents / (double) totalEvents;
+      // TODO: do we want common events or non local here?
     }
   }
 

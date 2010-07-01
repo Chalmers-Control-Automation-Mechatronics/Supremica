@@ -44,7 +44,7 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
   {
     super(factory, propositions);
     mTransitionRemovalMode =
-      ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
+        ObservationEquivalenceTRSimplifier.TransitionRemoval.NONTAU;
     mTransitionLimit = Integer.MAX_VALUE;
   }
 
@@ -52,6 +52,7 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
   // # Rule Application
   /**
    * Sets the mode which redundant transitions are to be removed.
+   *
    * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
   public void setTransitionRemovalMode(final TransitionRemoval mode)
@@ -61,6 +62,7 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
 
   /**
    * Gets the mode which redundant transitions are to be removed.
+   *
    * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
   public TransitionRemoval getTransitionRemovalMode()
@@ -200,10 +202,17 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
     return initialPartition;
   }
 
+  public void cleanup()
+  {
+    mTr = null;
+    mInputEncoding = null;
+    mPartition = null;
+    mOutputEncoding = null;
+  }
+
   // #######################################################################
   // # Data Members
-  private ObservationEquivalenceTRSimplifier.TransitionRemoval
-    mTransitionRemovalMode;
+  private ObservationEquivalenceTRSimplifier.TransitionRemoval mTransitionRemovalMode;
   private int mTransitionLimit;
 
   private AutomatonProxy mAutToAbstract;
@@ -213,4 +222,5 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
   private StateEncoding mInputEncoding;
   private List<int[]> mPartition;
   private StateEncoding mOutputEncoding;
+
 }

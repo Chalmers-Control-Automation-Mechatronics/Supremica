@@ -69,8 +69,8 @@ class AltRemovalOfAlphaMarkingsRule extends AbstractionRule
   // #######################################################################
   // # Rule Application
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
-                           final EventProxy tau)
-    throws OverflowException
+                                      final EventProxy tau)
+      throws OverflowException
   {
     mAutToAbstract = autToAbstract;
     mOriginalIntToStateMap = null;
@@ -90,16 +90,16 @@ class AltRemovalOfAlphaMarkingsRule extends AbstractionRule
     filter.add(tau);
     filter.add(mAlphaMarking);
     final EventEncoding eventEnc =
-      new EventEncoding(autToAbstract, tau, filter, EventEncoding.FILTER_ALL);
+        new EventEncoding(autToAbstract, tau, filter, EventEncoding.FILTER_ALL);
     final int tauID = EventEncoding.TAU;
     int alphaID = eventEnc.getEventCode(mAlphaMarking);
     if (alphaID < 0) {
       alphaID = eventEnc.addEvent(mAlphaMarking, true);
     }
     final StateEncoding stateEnc = new StateEncoding(autToAbstract);
-    final ListBufferTransitionRelation tr = new ListBufferTransitionRelation
-      (autToAbstract, eventEnc, stateEnc,
-       ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final ListBufferTransitionRelation tr =
+        new ListBufferTransitionRelation(autToAbstract, eventEnc, stateEnc,
+            ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     final TransitionIterator iter = tr.createPredecessorsReadOnlyIterator();
 
     // Visit all alpha-marked states. For each of them, to a depth-first
@@ -135,7 +135,7 @@ class AltRemovalOfAlphaMarkingsRule extends AbstractionRule
     if (modified) {
       mOriginalIntToStateMap = stateEnc.getStatesArray();
       final AutomatonProxy convertedAut =
-        createAutomaton(autToAbstract, tr, eventEnc, stateEnc);
+          createAutomaton(autToAbstract, tr, eventEnc, stateEnc);
       return convertedAut;
     } else {
       return autToAbstract;
@@ -165,7 +165,7 @@ class AltRemovalOfAlphaMarkingsRule extends AbstractionRule
     final Collection<EventProxy> oldEvents = autToAbstract.getEvents();
     final int numEvents = oldEvents.size();
     final Collection<EventProxy> newEvents =
-      new ArrayList<EventProxy>(numEvents + 1);
+        new ArrayList<EventProxy>(numEvents + 1);
     final Collection<EventProxy> props = getPropositions();
     boolean containsAlpha = false;
     for (final EventProxy event : oldEvents) {
@@ -217,10 +217,10 @@ class AltRemovalOfAlphaMarkingsRule extends AbstractionRule
     }
 
     final Collection<TransitionProxy> oldTransitions =
-      autToAbstract.getTransitions();
+        autToAbstract.getTransitions();
     final int numTrans = oldTransitions.size();
     final Collection<TransitionProxy> newTransitions =
-      new ArrayList<TransitionProxy>(numTrans);
+        new ArrayList<TransitionProxy>(numTrans);
     for (final TransitionProxy oldTrans : oldTransitions) {
       final EventProxy event = oldTrans.getEvent();
       final StateProxy oldSource = oldTrans.getSource();
@@ -230,14 +230,19 @@ class AltRemovalOfAlphaMarkingsRule extends AbstractionRule
       final int targetID = stateEnc.getStateCode(oldTarget);
       final StateProxy newTarget = newStates[targetID];
       final TransitionProxy newTrans =
-        factory.createTransitionProxy(newSource, event, newTarget);
+          factory.createTransitionProxy(newSource, event, newTarget);
       newTransitions.add(newTrans);
     }
 
-    return factory.createAutomatonProxy
-      (name, kind, newEvents, Arrays.asList(newStates), newTransitions);
+    return factory.createAutomatonProxy(name, kind, newEvents, Arrays
+        .asList(newStates), newTransitions);
   }
 
+  public void cleanup()
+  {
+    mOriginalIntToStateMap = null;
+    mResultingStateToIntMap = null;
+  }
 
   // #######################################################################
   // # Data Members

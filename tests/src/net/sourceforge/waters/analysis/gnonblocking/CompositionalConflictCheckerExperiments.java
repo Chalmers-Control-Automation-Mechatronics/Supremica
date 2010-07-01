@@ -56,9 +56,9 @@ public abstract class CompositionalConflictCheckerExperiments extends
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mVerifier = new CompositionalGeneralisedConflictChecker(factory);
     mPrintStream = new PrintStream(mOut, true);
-    final int internalStateLimit = 10000;
+    final int internalStateLimit = 5000;
     mVerifier.setInternalStepNodeLimit(internalStateLimit);
-    final int internalTransitionLimit = 1000000;
+    final int internalTransitionLimit = 500000;
     mVerifier.setInternalStepTransitionLimit(internalTransitionLimit);
     final int finalStateLimit = 40000000;
     mVerifier.setFinalStepNodeLimit(finalStateLimit);
