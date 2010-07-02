@@ -142,6 +142,7 @@ class RemovalOfNoncoreachableStatesRule extends AbstractionRule
   public void cleanup()
   {
     mTR = null;
+    mAutToAbstract = null;
   }
 
   // #######################################################################

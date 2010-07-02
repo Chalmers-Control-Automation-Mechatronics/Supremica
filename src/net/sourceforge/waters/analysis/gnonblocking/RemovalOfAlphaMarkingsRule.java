@@ -128,6 +128,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     mOriginalIntToStateMap = null;
     mResultingStateToIntMap = null;
     mTR = null;
+    mAutToAbstract = null;
   }
 
   // #######################################################################

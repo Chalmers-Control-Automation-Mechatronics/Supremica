@@ -58,7 +58,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
     mPrintStream = new PrintStream(mOut, true);
     final int internalStateLimit = 5000;
     mVerifier.setInternalStepNodeLimit(internalStateLimit);
-    final int internalTransitionLimit = 500000;
+    final int internalTransitionLimit = 700000;
     mVerifier.setInternalStepTransitionLimit(internalTransitionLimit);
     final int finalStateLimit = 40000000;
     mVerifier.setFinalStepNodeLimit(finalStateLimit);
@@ -88,6 +88,8 @@ public abstract class CompositionalConflictCheckerExperiments extends
       mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxC());
     } else if (mSelecting.equals("mins")) {
       mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMinS());
+    } else if (mSelecting.equals("minsc")) {
+      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMinSCommon());
     } else if (mSelecting.equals("maxlt")) {
       mVerifier.setSelectingHeuristic(mVerifier
           .createHeuristicMaxLOnTransitions());
@@ -196,7 +198,17 @@ public abstract class CompositionalConflictCheckerExperiments extends
       ruleList.add(rttonsRule);
       ruleList.add(tlrRule);
       ruleList.add(oeRule);
-    } // TODO: add other orderings to try
+    } else if (mRules == 4) {
+      // ordering i came up with while writing report
+      ruleList.add(tlrRule);
+      ruleList.add(oeRule);
+      ruleList.add(ramRule);
+      ruleList.add(rdmRule);
+      ruleList.add(dnasRule);
+      ruleList.add(rttonsRule);
+      ruleList.add(rttlnsRule);
+      ruleList.add(rnsRule);
+    }// TODO: add other orderings to try
     else {
       System.err
           .println("Error: Rules must be specified by specifying the integer code of the ordered list wanted.");

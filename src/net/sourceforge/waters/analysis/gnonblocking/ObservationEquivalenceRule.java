@@ -145,6 +145,7 @@ class ObservationEquivalenceRule extends AbstractionRule
     mInputEncoding = null;
     mPartition = null;
     mOutputEncoding = null;
+    mAutToAbstract = null;
   }
 
   // #######################################################################

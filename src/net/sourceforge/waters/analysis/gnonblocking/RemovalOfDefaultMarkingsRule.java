@@ -144,6 +144,7 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
   public void cleanup()
   {
     mTR = null;
+    mAutToAbstract = null;
   }
 
   // #######################################################################

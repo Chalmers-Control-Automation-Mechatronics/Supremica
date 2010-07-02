@@ -493,7 +493,7 @@ public class CompositionalGeneralisedConflictChecker extends
     if (mPreselectingHeuristic == null) {
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
       setPreselectingHeuristic(defaultHeuristic);
     }
     if (mSelectingHeuristics == null) {
@@ -936,6 +936,11 @@ public class CompositionalGeneralisedConflictChecker extends
     return new HeuristicMinS();
   }
 
+  public HeuristicMinS createHeuristicMinSCommon()
+  {
+    return new HeuristicMinSCommon();
+  }
+
   public void setPreselectingHeuristic(final PreselectingHeuristic heuristic)
   {
     mPreselectingHeuristic = heuristic;
@@ -1271,6 +1276,52 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     protected abstract double getHeuristicValue(Candidate candidate);
 
+    /**
+     * Gets the number of events for this candidate, excluding tau.
+     *
+     * @param candidate
+     * @return
+     */
+    protected int countCandidatesTotalEvents(final Candidate candidate)
+    {
+      int count = 0;
+      for (final EventProxy event : mEventsToAutomata.keySet()) {
+        if (event.getKind() != EventKind.PROPOSITION) {
+          final Set<AutomatonProxy> autWithEvent = mEventsToAutomata.get(event);
+          if (autWithEvent.size() > 1) {
+            final List<AutomatonProxy> candidateAutomata =
+                candidate.getAutomata();
+            for (final AutomatonProxy candidateAut : candidateAutomata) {
+              if (autWithEvent.contains(candidateAut)) {
+                count++;
+                break;
+              }
+            }
+          }
+        }
+      }
+      return count;
+    }
+
+    /**
+     * Gets the number of local events for this candidate, excluding tau.
+     *
+     * @param candidate
+     * @return
+     */
+    protected int countCandidatesLocalEvents(final Candidate candidate)
+    {
+      int count = 0;
+      for (final EventProxy event : candidate.getLocalEvents()) {
+        assert event.getKind() != EventKind.PROPOSITION;
+        final Set<AutomatonProxy> autWithEvent = mEventsToAutomata.get(event);
+        if (autWithEvent.size() > 1) {
+          count++;
+        }
+      }
+      return count;
+    }
+
     public List<Candidate> evaluate(final List<Candidate> candidates)
     {
       final Iterator<Candidate> it = candidates.iterator();
@@ -1299,12 +1350,27 @@ public class CompositionalGeneralisedConflictChecker extends
    * Performs step 2 of the approach to select the automata to compose. The
    * chosen candidate is the one with the highest proportion of local events.
    */
-  private class HeuristicMaxL extends SelectingHeuristic
+  private class HeuristicMaxLt extends SelectingHeuristic
   {
     protected double getHeuristicValue(final Candidate candidate)
     {
       return (double) candidate.getLocalEventCount()
           / (double) candidate.getNumberOfEvents();
+    }
+  }
+
+
+  /**
+   * Performs step 2 of the approach to select the automata to compose. The
+   * chosen candidate is the one with the highest proportion of local events
+   * excluding tau from calculations.
+   */
+  private class HeuristicMaxL extends SelectingHeuristic
+  {
+    protected double getHeuristicValue(final Candidate candidate)
+    {
+      return (double) countCandidatesLocalEvents(candidate)
+          / (double) countCandidatesTotalEvents(candidate);
     }
   }
 
@@ -1419,6 +1485,10 @@ public class CompositionalGeneralisedConflictChecker extends
       return chosenCandidates;
     }
 
+    /**
+     * Predicts number of states for synchronous product with respect to the
+     * number of local events.
+     */
     protected double getHeuristicValue(final Candidate candidate)
     {
       double product = 1;
@@ -1428,7 +1498,25 @@ public class CompositionalGeneralisedConflictChecker extends
       final int totalEvents = candidate.getNumberOfEvents();
       final int nonLocalEvents = totalEvents - candidate.getLocalEventCount();
       return product * (double) nonLocalEvents / (double) totalEvents;
-      // TODO: do we want common events or non local here?
+    }
+  }
+
+
+  private class HeuristicMinSCommon extends HeuristicMinS
+  {
+    /**
+     * Predicts number of states for synchronous product with respect to the
+     * number of events shared within the automata of the candidate.
+     */
+    protected double getHeuristicValue(final Candidate candidate)
+    {
+      double product = 1;
+      for (final AutomatonProxy aut : candidate.getAutomata()) {
+        product *= aut.getStates().size();
+      }
+      final int totalEvents = candidate.getNumberOfEvents();
+      final int commonEvents = candidate.getCommonEventCount();
+      return product * (double) commonEvents / (double) totalEvents;
     }
   }
 

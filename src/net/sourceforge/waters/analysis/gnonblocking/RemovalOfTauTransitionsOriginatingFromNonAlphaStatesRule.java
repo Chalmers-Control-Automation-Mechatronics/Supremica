@@ -163,6 +163,7 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
   public void cleanup()
   {
     mTR = null;
+    mAutToAbstract = null;
   }
 
   // #######################################################################

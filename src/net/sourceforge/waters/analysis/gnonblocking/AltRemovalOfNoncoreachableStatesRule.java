@@ -164,6 +164,7 @@ class AltRemovalOfNoncoreachableStatesRule extends AbstractionRule
   {
     mOriginalIntToStateMap = null;
     mResultingStateToIntMap = null;
+    mAutToAbstract = null;
   }
 
   // #######################################################################

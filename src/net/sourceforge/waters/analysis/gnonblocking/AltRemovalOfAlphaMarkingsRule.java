@@ -240,6 +240,7 @@ class AltRemovalOfAlphaMarkingsRule extends AbstractionRule
 
   public void cleanup()
   {
+    mAutToAbstract = null;
     mOriginalIntToStateMap = null;
     mResultingStateToIntMap = null;
   }

@@ -138,6 +138,7 @@ class AltRemovalOfTauTransitionsLeadingToNonAlphaStatesRule extends
   {
     mInputStateEnc = null;
     mOutputStateEnc = null;
+    mAutToAbstract = null;
   }
 
   // #######################################################################
