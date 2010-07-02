@@ -1304,6 +1304,30 @@ public class CompositionalGeneralisedConflictChecker extends
     }
 
     /**
+     * Counts the number of events which are shared by automata of this
+     * candidate, excluding tau.
+     *
+     * @param candidate
+     * @return
+     */
+    protected int countCandidatesSharedEvents(final Candidate candidate)
+    {
+      int count = 0;
+      final List<AutomatonProxy> candidateAut = candidate.getAutomata();
+      for (final EventProxy event : mEventsToAutomata.keySet()) {
+        if (event.getKind() != EventKind.PROPOSITION) {
+          final Set<AutomatonProxy> autWithEvent = mEventsToAutomata.get(event);
+          if (autWithEvent.size() > 1) {
+            if (autWithEvent.containsAll(candidateAut)) {
+              count++;
+            }
+          }
+        }
+      }
+      return count;
+    }
+
+    /**
      * Gets the number of local events for this candidate, excluding tau.
      *
      * @param candidate
@@ -1431,13 +1455,30 @@ public class CompositionalGeneralisedConflictChecker extends
    * chosen candidate is the one with the highest proportion of events which are
    * shared between that candidates automata.
    */
-  private class HeuristicMaxC extends SelectingHeuristic
+  private class HeuristicMaxCt extends SelectingHeuristic
   {
 
     protected double getHeuristicValue(final Candidate candidate)
     {
       final int candidatesTotalEvents = candidate.getNumberOfEvents();
       return (double) candidate.getCommonEventCount()
+          / (double) candidatesTotalEvents;
+    }
+  }
+
+
+  /**
+   * Performs step 2 of the approach to select the automata to compose. The
+   * chosen candidate is the one with the highest proportion of events which are
+   * shared between that candidates automata excluding tau.
+   */
+  private class HeuristicMaxC extends SelectingHeuristic
+  {
+
+    protected double getHeuristicValue(final Candidate candidate)
+    {
+      final int candidatesTotalEvents = countCandidatesTotalEvents(candidate);
+      return (double) countCandidatesSharedEvents(candidate)
           / (double) candidatesTotalEvents;
     }
   }
