@@ -1374,6 +1374,7 @@ public class CompositionalGeneralisedConflictChecker extends
    * Performs step 2 of the approach to select the automata to compose. The
    * chosen candidate is the one with the highest proportion of local events.
    */
+  @SuppressWarnings("unused")
   private class HeuristicMaxLt extends SelectingHeuristic
   {
     protected double getHeuristicValue(final Candidate candidate)
@@ -1455,6 +1456,7 @@ public class CompositionalGeneralisedConflictChecker extends
    * chosen candidate is the one with the highest proportion of events which are
    * shared between that candidates automata.
    */
+  @SuppressWarnings("unused")
   private class HeuristicMaxCt extends SelectingHeuristic
   {
 
