@@ -30,6 +30,40 @@ class TransitionRecord;
 
 
 //############################################################################
+//# class TarjanStackFrameNondeterministic
+//############################################################################
+
+class TarjanStackFrameNondeterministic
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit TarjanStackFrameNondeterministic(int size);
+  ~TarjanStackFrameNondeterministic();
+
+  //##########################################################################
+  //# Simple Access
+  inline uint32 getFirstStateCode() const {return mFirstStateCode;}
+  inline void setFirstStateCode(uint32 state) {mFirstStateCode = state;}
+
+  //##########################################################################
+  //# Iteration
+  inline void reset() {mTransitionIteratorEnd = 0;}
+  inline bool hasTransitionIterators() const
+    {return mTransitionIteratorEnd != 0;}
+  uint32 setupTransitionIterator(const TransitionRecord* trans, uint32 source);
+  bool advanceTransitionIterators(uint32* bufferpacked);
+
+private:
+  //##########################################################################
+  //# Data Members
+  uint32 mFirstStateCode;
+  NondeterministicTransitionIterator* mTransitionIterators;
+  int mTransitionIteratorEnd;
+};
+
+
+//############################################################################
 //# class TarjanStackFrame
 //############################################################################
 
@@ -47,18 +81,24 @@ public:
   inline uint32 getStateCode() const {return mStateCode;}
   inline uint32 getEventCode() const {return mEventCode;}
   inline bool hasNondeterministicTransitionIterators() const
-    {return mNondeterministicTransitionIteratorEnd != 0;}
+    {return mNondeterministicInfo->hasTransitionIterators();}
+  inline uint32 getFirstNondeterministicSuccessor() const
+    {return mNondeterministicInfo->getFirstStateCode();}
   inline void setRoot(bool root) {mIsRoot = root;}
   inline void setStateCode(uint32 state) {mStateCode = state;}
   inline void setEventCode(uint32 event) {mEventCode = event;}
+  inline void setFirstNondeterministicSuccessor(uint32 state)
+    {mNondeterministicInfo->setFirstStateCode(state);}
 
   //##########################################################################
   //# Advanced Access
   void reset(uint32 state);
   void createNondeterministicTransitionIterators(int max);
-  uint32 setupNondeterministicTransitionIterator(const TransitionRecord* trans,
-						 uint32 source);
-  bool advanceNondeterministicTransitionIterators(uint32* bufferpacked);
+  inline uint32 setupNondeterministicTransitionIterator
+    (const TransitionRecord* trans, uint32 source)
+    {return mNondeterministicInfo->setupTransitionIterator(trans, source);}
+  inline bool advanceNondeterministicTransitionIterators(uint32* bufferpacked)
+    {return mNondeterministicInfo->advanceTransitionIterators(bufferpacked);}
 
 private:
   //##########################################################################
@@ -66,8 +106,7 @@ private:
   bool mIsRoot;
   uint32 mStateCode;
   uint32 mEventCode;
-  NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
-  int mNondeterministicTransitionIteratorEnd;
+  TarjanStackFrameNondeterministic* mNondeterministicInfo;
 };
 
 

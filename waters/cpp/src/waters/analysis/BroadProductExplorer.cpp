@@ -221,7 +221,7 @@ teardown()
     if (getStateSpace().add() == getNumberOfStates()) {                 \
       incNumberOfStates();                                              \
     }                                                                   \
-  } 
+  }
 
 #define ADD_NEW_STATE_ALLOC(source, bufferpacked)                       \
   {                                                                     \
@@ -229,7 +229,7 @@ teardown()
     if (getStateSpace().add() == getNumberOfStates()) {                 \
       bufferpacked = getStateSpace().prepare(incNumberOfStates());      \
     }                                                                   \
-  } 
+  }
 
 
 bool BroadProductExplorer::
@@ -335,6 +335,88 @@ expandNonblockingCoreachabilityState(const uint32* targettuple,
 }
 
 #undef ADD_NEW_STATE
+
+  /*
+void BroadProductExplorer::
+doIterativeTarjan(uint32 start)
+{
+  TarjanControlStack controlStack;
+  TarjanStateStack stateStack;
+  uint32* currenttuple = new uint32[mNumAutomata];
+  storeTarjanIndex(start);
+  controlStack.push(start);
+ outer:
+  while (!controlStack.isEmpty()) {
+    TarjanStackFrame& frame = controlStack.top();
+    uint32 current = frame.getStateCode();
+    uint32 currentindex = getTarjanIndex(current);
+    if (frame.hasNondeterministicIterators()) {
+      // This is not current but the first nondet successor!
+      uint32* succpacked = getStateSpace().prepare(current);
+      while (frame.advanceNondeterministicTransitionIterators(succpacked)) {
+        uint32 succ = getStateSpace().add();
+        if (getTarjanIndex(succ) == 0) { //XXX
+          // we have got an unvisited successor to visit recursively
+          controlStack.push(succ);
+          continue outer;
+        } else if (!inComponent(succ) && getTarjanIndex(succ) < currentindex) {
+          currentindex = getTarjanIndex(succ); // duplicate .oO
+          setTarjanIndex(current, currentindex);
+          frame.setRoot(false);
+        }
+      }
+    }
+    int e = frame.getEventCode();
+    if (e < mNumEventRecords) {
+      uint32* currentpacked = mStateSpace->get(current);
+      getAutomatonEncoding().decode(currentpacked, currenttuple);
+      do {
+        BroadEventRecord* event = mEventRecords[e];
+        const AutomatonRecord* dis = 0;
+        FIND_DISABLING_AUTOMATON(currenttuple, event, dis);
+        if (dis == 0) {
+          uint32* succpacked = getStateSpace().prepare();
+          if (event->isDeterministic()) {
+            for (int w = 0; w < numwords; w++) {
+              TransitionUpdateRecord* update =
+                event->getTransitionUpdateRecord(w);
+              if (update == 0) {
+                succpacked[w] = currentpacked[w];
+              } else {
+                uint32 word = (sourcepacked[w] & update->getKeptMask()) |
+                  update->getCommonTargets();
+                for (TransitionRecord* trans = update->getTransitionRecords();
+                     trans != 0;
+                     trans = trans->getNextInUpdate()) {
+                  const AutomatonRecord* aut = trans->getAutomaton();
+                  const int a = aut->getAutomatonIndex();
+                  const uint32 source = sourcetuple[a];
+                  word |= trans->getDeterministicSuccessorShifted(source);
+                }
+                succpacked[w] = word;
+              }
+            }
+            uint32 succ = getStateSpace().add();
+            if (event->isControllable()) {
+              if (getTarjanIndex(succ) == 0) { //XXX
+                // we have got an unvisited successor to visit recursively
+                controlStack.push(succ);
+                continue outer;
+              } else if (!inComponent(succ) &&
+                         getTarjanIndex(succ) < currentindex) {
+                currentindex = getTarjanIndex(succ); // duplicate .oO
+                setTarjanIndex(current, currentindex);
+                frame.setRoot(false);
+              }
+            }
+          } else { // nondeterministic event
+          }
+        }
+      }
+    }
+  }
+}
+  */
 
 
 void BroadProductExplorer::

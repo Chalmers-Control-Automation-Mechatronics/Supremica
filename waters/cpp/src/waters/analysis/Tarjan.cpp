@@ -18,6 +18,50 @@
 namespace waters {
 
 //############################################################################
+//# class TarjanStackFrameNondeterministic
+//############################################################################
+
+//############################################################################
+//# TarjanStackFrameNondeterministic: Constructors & Destructors
+
+TarjanStackFrameNondeterministic::
+TarjanStackFrameNondeterministic(int size)
+  : mTransitionIterators(new NondeterministicTransitionIterator[size]),
+    mTransitionIteratorEnd(0)
+{
+}
+
+TarjanStackFrameNondeterministic::
+~TarjanStackFrameNondeterministic()
+{
+  delete [] mTransitionIterators;
+}
+  
+
+//############################################################################
+//# TarjanStackFrameNondeterministic: Advanced Access
+
+uint32 TarjanStackFrameNondeterministic::
+setupTransitionIterator(const TransitionRecord* trans, uint32 source)
+{
+  int ndend = mTransitionIteratorEnd++;
+  return mTransitionIterators[ndend].setup(trans, source);
+}
+
+bool TarjanStackFrameNondeterministic::
+advanceTransitionIterators(uint32* bufferpacked)
+{
+  for (int index = 0; index < mTransitionIteratorEnd; index++) {
+    if (!mTransitionIterators[index].advance(bufferpacked)) {
+      return true;
+    }
+  }
+  mTransitionIteratorEnd = 0;
+  return false;
+}
+
+
+//############################################################################
 //# class TarjanStackFrame
 //############################################################################
 
@@ -26,14 +70,14 @@ namespace waters {
 
 TarjanStackFrame::
 TarjanStackFrame()
-  : mNondeterministicTransitionIterators(0)
+  : mNondeterministicInfo(0)
 {
 }
 
 TarjanStackFrame::
 ~TarjanStackFrame()
 {
-  delete [] mNondeterministicTransitionIterators;
+  delete mNondeterministicInfo;
 }
   
 
@@ -46,38 +90,17 @@ reset(uint32 state)
   mIsRoot = true;
   mStateCode = state;
   mEventCode = 0;
-  mNondeterministicTransitionIteratorEnd = 0;
+  if (mNondeterministicInfo != 0) {
+    mNondeterministicInfo->reset();
+  }
 }
 
 void TarjanStackFrame::
 createNondeterministicTransitionIterators(int max)
 {
-  if (mNondeterministicTransitionIterators == 0) {
-    mNondeterministicTransitionIterators =
-      new NondeterministicTransitionIterator[max];
+  if (mNondeterministicInfo == 0) {
+    mNondeterministicInfo = new TarjanStackFrameNondeterministic(max);
   }
-}
-
-uint32 TarjanStackFrame::
-setupNondeterministicTransitionIterator(const TransitionRecord* trans,
-					uint32 source)
-{
-  int ndend = mNondeterministicTransitionIteratorEnd++;
-  return mNondeterministicTransitionIterators[ndend].setup(trans, source);
-}
-
-bool TarjanStackFrame::
-advanceNondeterministicTransitionIterators(uint32* bufferpacked)
-{
-  for (int index = 0;
-       index < mNondeterministicTransitionIteratorEnd;
-       index++) {
-    if (!mNondeterministicTransitionIterators[index].advance(bufferpacked)) {
-      return true;
-    }
-  }
-  mNondeterministicTransitionIteratorEnd = 0;
-  return false;
 }
 
 
