@@ -208,7 +208,8 @@ public abstract class WatersAnalyzeAction
 
     public void succeed()
     {
-      mInformationLabel.setText("Model " + mProductDES.getName() + " " + getSuccessDescription() + ".");
+      mInformationLabel.setText("Model " + mProductDES.getName() + " " +
+                                getSuccessDescription() + ".");
       mExitButton.setText("OK");
       mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
       mExitButton.addActionListener(new ActionListener(){
@@ -283,12 +284,13 @@ public abstract class WatersAnalyzeAction
           return getIDE().getActiveDocumentContainer().getFileLocation().getParentFile();
         }
       });
-      if (mVerifier.getCounterExample().getComment() == null)
-        mInformationLabel.setText("Model " + mProductDES.getName() + " " + getFailureDescription());
-      else if (mVerifier.getCounterExample().getComment().compareTo("") == 0)
-        mInformationLabel.setText("Model " + mProductDES.getName() + " " + getFailureDescription());
-      else
-        mInformationLabel.setText(mVerifier.getCounterExample().getComment());
+      final String comment = mVerifier.getCounterExample().getComment();
+      if (comment == null || comment.length() == 0) {
+        mInformationLabel.setText("Model " + mProductDES.getName() + " " +
+                                  getFailureDescription() + ".");
+      } else {
+        mInformationLabel.setText(comment);
+      }
       mBottomPanel.add(traceButton, BorderLayout.EAST);
       repaint();
     }
