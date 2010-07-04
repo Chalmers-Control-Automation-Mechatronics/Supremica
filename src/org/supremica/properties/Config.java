@@ -57,6 +57,8 @@
  */
 package org.supremica.properties;
 
+import net.sourceforge.waters.model.analysis.ModelVerifierFactoryLoader;
+
 import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.automata.BDD.BDDPartitioningType;
 import org.supremica.automata.algorithms.EquivalenceRelation;
@@ -198,6 +200,14 @@ public final class Config
     public static final ObjectProperty GUI_EDITOR_LAYOUT_MODE  = new ObjectProperty(PropertyType.GUI_EDITOR, "layoutMode", LAYOUT_MODE_LEGALVALUES.Default, "Layout mode", LAYOUT_MODE_LEGALVALUES.values());
 
     // GUI_ANALYZER
+    public static final ObjectProperty GUI_ANALYZER_USED_FACTORY =
+      new ObjectProperty(PropertyType.GUI_ANALYZER, "guiAnalyzerUsedFactory",
+                         ModelVerifierFactoryLoader.Monolithic,
+                         "Model verifier factory used by editor's analysis menu",
+                         ModelVerifierFactoryLoader.values());
+    public static final BooleanProperty GUI_ANALYZER_INCLUDE_HISC =
+      new BooleanProperty(PropertyType.GUI_ANALYZER, "includeHISC", false,
+                          "Include HISC property checks");
     public static final BooleanProperty INCLUDE_BOUNDED_UNCON_TOOLS = new BooleanProperty(PropertyType.GUI_ANALYZER, "includeBoundedUnconTools", false, "Include unbounded controllability tools");
     public static final BooleanProperty GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE = new BooleanProperty(PropertyType.GUI_ANALYZER, "automatonViewerUseControlledSurface", false, "Use new controlled surface panel to display an automaton");
 

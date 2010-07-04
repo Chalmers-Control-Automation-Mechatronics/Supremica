@@ -26,9 +26,8 @@ import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
-import net.sourceforge.waters.gui.actions.AnalyzeModularControlLoopAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSCCControlLoopAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSICPropertyVAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSICProperty5Action;
+import net.sourceforge.waters.gui.actions.AnalyzeSICProperty6Action;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
 import net.sourceforge.waters.gui.actions.IDECopyAction;
@@ -207,6 +206,7 @@ public class IDEMenuBar extends JMenuBar
     Config.INCLUDE_SOCEDITOR.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_ANIMATOR.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener(analyzeListener);
+    Config.GUI_ANALYZER_INCLUDE_HISC.addPropertyChangeListener(analyzeListener);
   }
 
   // #########################################################################
@@ -301,8 +301,9 @@ public class IDEMenuBar extends JMenuBar
       }
 
       // The new analyze menu
-      if (mNewAnalyzeMenu == null && Config.INCLUDE_WATERS_SIMULATOR.isTrue()
-          && (panel instanceof EditorPanel || panel instanceof SimulatorPanel)) {
+      if (mNewAnalyzeMenu == null &&
+          Config.INCLUDE_WATERS_SIMULATOR.isTrue() &&
+          (panel instanceof EditorPanel || panel instanceof SimulatorPanel)) {
         mNewAnalyzeMenu = new JMenu("Analyze");
         mNewAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
         final Action conflict =
@@ -314,19 +315,18 @@ public class IDEMenuBar extends JMenuBar
         final Action controlLoop =
             actions.getAction(AnalyzeControlLoopAction.class);
         mNewAnalyzeMenu.add(controlLoop);
-        final Action sccControlLoop =
-            actions.getAction(AnalyzeSCCControlLoopAction.class);
-        mNewAnalyzeMenu.add(sccControlLoop);
-        final Action modularControlLoop =
-            actions.getAction(AnalyzeModularControlLoopAction.class);
-        mNewAnalyzeMenu.add(modularControlLoop);
         final Action languageInclusion =
             actions.getAction(AnalyzeLanguageInclusionAction.class);
         mNewAnalyzeMenu.add(languageInclusion);
-        mNewAnalyzeMenu.addSeparator();
-        final Action sicpropertyv =
-            actions.getAction(AnalyzeSICPropertyVAction.class);
-        mNewAnalyzeMenu.add(sicpropertyv);
+        if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
+          mNewAnalyzeMenu.addSeparator();
+          final Action sic5 =
+            actions.getAction(AnalyzeSICProperty5Action.class);
+          mNewAnalyzeMenu.add(sic5);
+          final Action sic6 =
+            actions.getAction(AnalyzeSICProperty6Action.class);
+          mNewAnalyzeMenu.add(sic6);
+        }
       }
 
       // Simulate

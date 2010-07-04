@@ -10,10 +10,14 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import java.awt.Component;
+
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.simulator.SimulatorPanel;
+
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.EditorPanel;
 import org.supremica.gui.ide.IDE;
@@ -77,12 +81,15 @@ public abstract class WatersAction
   {
     final IDE ide = getIDE();
     final DocumentContainer container = ide.getActiveDocumentContainer();
-    if (container == null ||
-        !(container.getActivePanel() instanceof EditorPanel) ||
-        !(container instanceof ModuleContainer)) {
+    if (container == null || !(container instanceof ModuleContainer)) {
       return null;
     }
-    return (ModuleContainer) container;
+    final Component panel = container.getActivePanel();
+    if (panel instanceof EditorPanel || panel instanceof SimulatorPanel) {
+      return (ModuleContainer) container;
+    } else {
+      return null;
+    }
   }
 
   /**

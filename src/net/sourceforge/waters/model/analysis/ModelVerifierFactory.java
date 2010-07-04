@@ -24,8 +24,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 public interface ModelVerifierFactory
 {
 
-  // #########################################################################
-  // # Object Construction
+  //#########################################################################
+  //# Object Construction
   /**
    * Creates a conflict checker.
    */
@@ -34,35 +34,24 @@ public interface ModelVerifierFactory
   /**
    * Creates a controllability checker.
    */
-  public ControllabilityChecker createControllabilityChecker(
-                                                             ProductDESProxyFactory factory);
+  public ControllabilityChecker createControllabilityChecker
+    (ProductDESProxyFactory factory);
 
   /**
    * Creates a control-loop checker.
    */
-  public ControlLoopChecker createControlLoopChecker(
-                                                     ProductDESProxyFactory factory);
-
-  /**
-   * Creates a new SCC Control Loop Checker
-   */
-  public ControlLoopChecker createSCCControlLoopChecker(
-                                                        ProductDESProxyFactory factory);
-
-  /**
-   * Creates a new Modular Control Loop Checker
-   */
-  public ControlLoopChecker createModularControlLoopChecker(
-                                                            ProductDESProxyFactory factory);
+  public ControlLoopChecker createControlLoopChecker
+    (ProductDESProxyFactory factory);
 
   /**
    * Creates a language inclusion checker.
    */
-  public LanguageInclusionChecker createLanguageInclusionChecker(
-                                                                 ProductDESProxyFactory factory);
+  public LanguageInclusionChecker createLanguageInclusionChecker
+    (ProductDESProxyFactory factory);
 
-  // #########################################################################
-  // # Command Line Arguments
+
+  //#########################################################################
+  //# Command Line Arguments
   /**
    * Configures the given model verifier according to any command line arguments
    * passed to this factory. This method is called while parsing command line

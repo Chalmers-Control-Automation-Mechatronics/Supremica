@@ -156,14 +156,15 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
 
   public void updateEnabledStatus()
   {
-    final ModuleContainer mContainer = getActiveModuleContainer();
-    if (mContainer == null)
-    {
-      setEnabled(false);
-      return;
+    super.updateEnabledStatus();
+    if (isEnabled()) {
+      final ModuleContainer container = getActiveModuleContainer();
+      final ModuleProxy module = container.getModule();
+      final PropertyFindVisitor visitor = new PropertyFindVisitor();
+      if (!visitor.containsProperty(module)) {
+        setEnabled(false);
+      }
     }
-    final ModuleProxy module = mContainer.getModule();final PropertyFindVisitor visitor = new PropertyFindVisitor();
-    setEnabled(visitor.containsProperty(module));
   }
 
 

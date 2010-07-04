@@ -1,3 +1,13 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: net.sourceforge.waters.gui.actions
+//# CLASS:   WatersAnalyzeAction
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.BorderLayout;
@@ -17,67 +27,131 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.ModelVerifierFactoryLoader;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
+import org.supremica.properties.Config;
+import org.supremica.properties.SupremicaPropertyChangeEvent;
+import org.supremica.properties.SupremicaPropertyChangeListener;
+
 
 public abstract class WatersAnalyzeAction
   extends WatersAction
+  implements SupremicaPropertyChangeListener
 {
-  // #######################################################################
-  // # Constructor
+  //#########################################################################
+  //# Constructor
   protected WatersAnalyzeAction(final IDE ide)
   {
     super(ide);
     ide.attach(this);
-    this.setEnabled(true);
     putValue(Action.NAME, getCheckName() + " check");
-    putValue(Action.SHORT_DESCRIPTION, "Check for " + getCheckName() + " issues");
+    putValue(Action.SHORT_DESCRIPTION,
+             "Check for " + getCheckName() + " issues");
+    Config.GUI_ANALYZER_USED_FACTORY.addPropertyChangeListener(this);
+    updateEnabledStatus();
   }
 
-  // ###################################################################
-  // # Class WatersAction
+
+  //#########################################################################
+  //# Interface java.awt.ActionListener
   public void actionPerformed(final ActionEvent e)
   {
     @SuppressWarnings("unused")
     final AnalyzerDialog dialog = new AnalyzerDialog();
   }
 
-  //########################################################################
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
+  public void update(final EditorChangedEvent event)
+  {
+    updateEnabledStatus();
+  }
+
+
+  //#########################################################################
+  //# Interface org.supremica.properties.SupremicaPropertyChangeListener
+  public void propertyChanged(final SupremicaPropertyChangeEvent event)
+  {
+    updateEnabledStatus();
+  }
+
+
+  //#########################################################################
+  //# Enablement
+  void updateEnabledStatus()
+  {
+    final ModuleContainer container = getActiveModuleContainer();
+    if (container == null) {
+      setEnabled(false);
+      return;
+    }
+    final ModelVerifier verifier = getModelVerifier();
+    setEnabled(verifier != null);
+  }
+
+
+  //#########################################################################
+  //# Factory Access
+  ModelVerifierFactory getModelVerifierFactory()
+    throws ClassNotFoundException
+  {
+    final ModelVerifierFactoryLoader loader =
+      (ModelVerifierFactoryLoader) Config.GUI_ANALYZER_USED_FACTORY.get();
+    return loader.getModelVerifierFactory();
+  }
+
+  ModelVerifier getModelVerifier()
+  {
+    try {
+      final ProductDESProxyFactory desfactory =
+        ProductDESElementFactory.getInstance();
+      final ModelVerifierFactory vfactory = getModelVerifierFactory();
+      return getModelVerifier(vfactory, desfactory);
+    } catch (final ClassNotFoundException exception) {
+      return null;
+    } catch (final UnsupportedOperationException exception) {
+      return null;
+    }
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private void updateProductDES()
   {
-    if (getIDE() != null)
-    {
+    if (getIDE() != null) {
       final DocumentContainer container = getIDE().getActiveDocumentContainer();
       if (container == null || !(container instanceof ModuleContainer)) {
-        des = null;
+        mProductDES = null;
         return;
       }
       final ModuleContainer mContainer = (ModuleContainer)container;
       try {
-        des = mContainer.recompile();
+        mProductDES = mContainer.recompile();
       } catch (final EvalException exception) {
-        des = null;
+        mProductDES = null;
       }
+    } else {
+      mProductDES = null;
     }
-    else
-      des = null;
   }
 
 
-  //########################################################################
+  //#########################################################################
   //# Auxiliary Static Methods
   private static String wrapInHTML(final String raw)
   {
@@ -85,29 +159,21 @@ public abstract class WatersAnalyzeAction
   }
 
 
-  // ##############################################################################
+  //#########################################################################
   // # Abstract Methods
-  protected void updateEnabledStatus()
-  {
-    setEnabled(true);
-  }
-  public void update(final EditorChangedEvent event)
-  {
-    setEnabled(true);
-  }
-
   protected abstract String getCheckName();
   protected abstract String getFailureDescription();
   protected abstract String getSuccessDescription();
-  protected abstract ModelVerifier getModelVerifier(ModelVerifierFactory factory, ProductDESProxyFactory desFactory);
+  protected abstract ModelVerifier getModelVerifier
+    (ModelVerifierFactory factory, ProductDESProxyFactory desFactory);
 
 
   //#########################################################################
   //# Inner Class AnalyzerDialog
   private class AnalyzerDialog extends JDialog
   {
-    // #######################################################################
-    // # Constructor
+    //#######################################################################
+    //# Constructor
     public AnalyzerDialog()
     {
       setSize(DEFAULT_DIALOG_SIZE);
@@ -142,7 +208,7 @@ public abstract class WatersAnalyzeAction
 
     public void succeed()
     {
-      mInformationLabel.setText("Model " + des.getName() + " " + getSuccessDescription() + ".");
+      mInformationLabel.setText("Model " + mProductDES.getName() + " " + getSuccessDescription() + ".");
       mExitButton.setText("OK");
       mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
       mExitButton.addActionListener(new ActionListener(){
@@ -169,7 +235,7 @@ public abstract class WatersAnalyzeAction
         public void actionPerformed(final ActionEvent e)
         {
           AnalyzerDialog.this.dispose();
-          final TraceProxy counterexample = verifier.getCounterExample();
+          final TraceProxy counterexample = mVerifier.getCounterExample();
           /*
           if (verifier instanceof MonolithicSCCControlLoopChecker) {
             final Collection<EventProxy> nonLoop = ((MonolithicSCCControlLoopChecker)verifier).getNonLoopEvents();
@@ -217,12 +283,12 @@ public abstract class WatersAnalyzeAction
           return getIDE().getActiveDocumentContainer().getFileLocation().getParentFile();
         }
       });
-      if (verifier.getCounterExample().getComment() == null)
-        mInformationLabel.setText("Model " + des.getName() + " " + getFailureDescription());
-      else if (verifier.getCounterExample().getComment().compareTo("") == 0)
-        mInformationLabel.setText("Model " + des.getName() + " " + getFailureDescription());
+      if (mVerifier.getCounterExample().getComment() == null)
+        mInformationLabel.setText("Model " + mProductDES.getName() + " " + getFailureDescription());
+      else if (mVerifier.getCounterExample().getComment().compareTo("") == 0)
+        mInformationLabel.setText("Model " + mProductDES.getName() + " " + getFailureDescription());
       else
-        mInformationLabel.setText(verifier.getCounterExample().getComment());
+        mInformationLabel.setText(mVerifier.getCounterExample().getComment());
       mBottomPanel.add(traceButton, BorderLayout.EAST);
       repaint();
     }
@@ -245,80 +311,71 @@ public abstract class WatersAnalyzeAction
     }
 
 
-    //######################################################################
+    //#######################################################################
     //# Inner Class AnalyzerThread
     private class AnalyzerThread extends Thread
     {
-      public AnalyzerThread()
-      {
-        final ProductDESProxyFactory  desfactory =
-          ProductDESElementFactory.getInstance();
-        final ModelVerifierFactory vfactory =
-          MonolithicModelVerifierFactory.getInstance();
-        // TODO Make this configurable.
-        // NativeModelVerifierFactory.getInstance();
-        verifier = getModelVerifier(vfactory, desfactory);
-      }
 
       public void run()
       {
         super.run();
-        verifier.setModel(des);
-        if (des == null)
-        {
-          SwingUtilities.invokeLater(new Runnable() {public void run(){error(new IllegalArgumentException("The model was unable to be compiled"));}});
+        if (mProductDES == null) {
+          final Exception exception = new IllegalArgumentException
+            ("The model was not be compiled successfully.");
+          SwingUtilities.invokeLater
+            (new Runnable() {public void run() {error(exception);}});
           return;
         }
         try {
-          verifier.run();
-        }
-        catch (final AbortException exception)
-        {
+          mVerifier = getModelVerifier();
+          mVerifier.setModel(mProductDES);
+          mVerifier.run();
+        } catch (final AbortException exception) {
           // Do nothing: Aborted
           return;
         } catch (final AnalysisException exception) {
-          SwingUtilities.invokeLater(new Runnable(){public void run(){error(exception);}});
+          SwingUtilities.invokeLater
+            (new Runnable() {public void run() {error(exception);}});
           return;
-        } catch (final OutOfMemoryError error)
-        {
-          SwingUtilities.invokeLater(new Runnable(){public void run(){error(error);}});
+        } catch (final OutOfMemoryError error) {
+          mVerifier = null;
+          System.gc();
+          SwingUtilities.invokeLater
+            (new Runnable() {public void run() {error(error);}});
           return;
         }
-        final boolean result = verifier.isSatisfied();
+        final boolean result = mVerifier.isSatisfied();
         if (result) {
-          SwingUtilities.invokeLater(new Runnable(){public void run(){succeed();}});
+          SwingUtilities.invokeLater
+            (new Runnable() {public void run() {succeed();}});
         } else {
-          SwingUtilities.invokeLater(new Runnable(){public void run(){fail();}});
+          SwingUtilities.invokeLater
+            (new Runnable() {public void run() {fail();}});
         }
       }
 
       public boolean abort()
       {
-        if (verifier != null)
-        {
-          verifier.requestAbort();
+        if (mVerifier != null) {
+          mVerifier.requestAbort();
           return true;
-        }
-        else
-        {
+        } else {
           return false;
         }
       }
     }
 
-    // ######################################################################
-    // # Data Members
+    //######################################################################
+    //# Data Members
     private final AnalyzerThread runner;
-    private ModelVerifier verifier;
+    private ModelVerifier mVerifier;
     private final JPanel mBottomPanel;
     private final JButton mExitButton;
     private JButton traceButton;
     private final WrapperLabel mInformationLabel;
 
-    // #####################################################################
-    // # Class Constants
-    private final Dimension DEFAULT_DIALOG_SIZE = new Dimension(290, 160);
-    private final Point DEFAULT_DIALOG_LOCATION = new Point(250, 150);
+    //######################################################################
+    //# Class Constants
     private static final long serialVersionUID = -2478548485525996982L;
   }
 
@@ -351,11 +408,14 @@ public abstract class WatersAnalyzeAction
 
   //########################################################################
   //# Data Members
-  private ProductDESProxy des;
+  private ProductDESProxy mProductDES;
 
 
   //########################################################################
   //# Class Constants
   private static final long serialVersionUID = -3797986885054648213L;
+
+  private static final Dimension DEFAULT_DIALOG_SIZE = new Dimension(290, 160);
+  private static final Point DEFAULT_DIALOG_LOCATION = new Point(250, 150);
 
 }

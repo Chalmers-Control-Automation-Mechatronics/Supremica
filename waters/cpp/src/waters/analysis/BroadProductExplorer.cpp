@@ -336,45 +336,50 @@ expandNonblockingCoreachabilityState(const uint32* targettuple,
 
 #undef ADD_NEW_STATE
 
-  /*
+
+/*
 void BroadProductExplorer::
 doIterativeTarjan(uint32 start)
 {
   TarjanControlStack controlStack;
   TarjanStateStack stateStack;
   uint32* currenttuple = new uint32[mNumAutomata];
+  uint32 succ = UNDEF_UINT32;
+
+
   storeTarjanIndex(start);
   controlStack.push(start);
- outer:
+
   while (!controlStack.isEmpty()) {
     TarjanStackFrame& frame = controlStack.top();
     uint32 current = frame.getStateCode();
+    uint32* currentpacked = mStateSpace->get(current);
+    getAutomatonEncoding().decode(currentpacked, currenttuple);
     uint32 currentindex = getTarjanIndex(current);
-    if (frame.hasNondeterministicIterators()) {
-      // This is not current but the first nondet successor!
-      uint32* succpacked = getStateSpace().prepare(current);
-      while (frame.advanceNondeterministicTransitionIterators(succpacked)) {
-        uint32 succ = getStateSpace().add();
-        if (getTarjanIndex(succ) == 0) { //XXX
-          // we have got an unvisited successor to visit recursively
-          controlStack.push(succ);
-          continue outer;
-        } else if (!inComponent(succ) && getTarjanIndex(succ) < currentindex) {
-          currentindex = getTarjanIndex(succ); // duplicate .oO
-          setTarjanIndex(current, currentindex);
-          frame.setRoot(false);
+    while (true) {
+      if (frame.hasNondeterministicIterators()) {
+        uint32 first = frame.getFirstNondeterministicSuccessor();
+        uint32* succpacked = getStateSpace().prepare(first);
+        if (frame.advanceNondeterministicTransitionIterators(succpacked)) {
+          succ = getStateSpace().add();
+        } else {
+          continue;
         }
-      }
-    }
-    int e = frame.getEventCode();
-    if (e < mNumEventRecords) {
-      uint32* currentpacked = mStateSpace->get(current);
-      getAutomatonEncoding().decode(currentpacked, currenttuple);
-      do {
-        BroadEventRecord* event = mEventRecords[e];
-        const AutomatonRecord* dis = 0;
-        FIND_DISABLING_AUTOMATON(currenttuple, event, dis);
+      } else {
+        int e = frame.getEventCode();
+        AutomatonRecord* dis = 0;
+        while (e < mNumEventRecords) {
+          BroadEventRecord* event = mEventRecords[e];
+          const AutomatonRecord* dis = 0;
+          FIND_DISABLING_AUTOMATON(currenttuple, event, dis);
+          if (dis != 0) {
+            break;
+          }
+          e++;
+        }
         if (dis == 0) {
+          succ = UNDEF_UINT32;
+        } else {
           uint32* succpacked = getStateSpace().prepare();
           if (event->isDeterministic()) {
             for (int w = 0; w < numwords; w++) {
@@ -396,27 +401,88 @@ doIterativeTarjan(uint32 start)
                 succpacked[w] = word;
               }
             }
-            uint32 succ = getStateSpace().add();
-            if (event->isControllable()) {
-              if (getTarjanIndex(succ) == 0) { //XXX
-                // we have got an unvisited successor to visit recursively
-                controlStack.push(succ);
-                continue outer;
-              } else if (!inComponent(succ) &&
-                         getTarjanIndex(succ) < currentindex) {
-                currentindex = getTarjanIndex(succ); // duplicate .oO
-                setTarjanIndex(current, currentindex);
-                frame.setRoot(false);
-              }
-            }
+            succ = getStateSpace().add();
           } else { // nondeterministic event
+            for (int w = 0; w < numwords; w++) {
+              TransitionUpdateRecord* update =
+                event->getTransitionUpdateRecord(w);
+              if (update == 0) {                                        
+                succpacked[w] = sourcepacked[w];                      
+              } else {                                                  
+                uint32 word = (sourcepacked[w] & update->getKeptMask()) |
+                  update->getCommonTargets(); 
+                for (TransitionRecord* trans = update->getTransitionRecords();
+                     trans != 0;                                        
+                     trans = trans->getNextInUpdate()) {                
+                  const AutomatonRecord* aut = trans->getAutomaton();
+                  const int a = aut->getAutomatonIndex();
+                  const uint32 source = sourcetuple[a];
+                  uint32 succ =
+                    trans->getDeterministicSuccessorShifted(source); 
+                  if (succ == TransitionRecord::MULTIPLE_TRANSITIONS) {
+                    frame.createNondeterministicTransitionIterators
+                      (mMaxNondeterministicUpdates);
+                    succ = frame.setupNondeterministicTransitionIterator
+                      (trans, source);
+                  }                         
+                  word |= succ;             
+                }                           
+                succpacked[w] = word;       
+              }                             
+            }
+            succ = getStateSpace().add();
+            frame.setFirstNondeterministicSuccessor(succ);
           }
+        }
+      }
+      if (succ == UNDEF_UINT32) {
+        // All successors have been processed---
+        // complete the visit() method, then return.
+        if (frame.isRoot()) {
+          setInComponent(current);
+          while (!stateStack.isEmpty()) {
+            uint32 next = stateStack.top();
+            if (currentindex <= getTarjanIndex(next)) {
+              stateStack.pop();
+              setTarjanIndex(next, currentindex);
+              setInComponent(next);
+            } else {
+              break;
+            }
+          }
+        } else {
+          stateStack.push(current);
+        }
+        controlStack.pop();
+        if (!inComponent(current)) {
+          TarjanStackFrame& parentframe = controlStack.top();
+          uint32 parent = parentframe.getStateCode();
+          uint32 parentindex = getTarjanIndex(current);
+          if (currentindex < parentindex) {
+            setTarjanIndex(parent, currentindex);
+            parentframe.setRoot(false);
+          }
+        }
+        break;
+      } else if (getTarjanIndex(succ) == 0) {
+        // We have got an unvisited successor to visit recursively.
+        frame.setEventCode(e);
+        controlStack.push(succ);
+        // TODO-visit uncontrollable successors of succ
+        break;
+      } else if (!inComponent(succ)) {
+        // Skip the recursive call because the successor was visited already.
+        uint32 succindex = getTarjanIndex(succ);
+        if (succindex < currentindex) {
+          currentindex = succindex;
+          setTarjanIndex(current, currentindex);
+          frame.setRoot(false);
         }
       }
     }
   }
 }
-  */
+*/
 
 
 void BroadProductExplorer::

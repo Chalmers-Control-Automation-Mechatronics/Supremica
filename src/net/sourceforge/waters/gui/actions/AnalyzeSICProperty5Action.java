@@ -1,3 +1,13 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: net.sourceforge.waters.gui.actions
+//# CLASS:   AnalyzeSICProperty5Action
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.despot.SICProperty5Verifier;
@@ -9,10 +19,10 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 
-public class AnalyzeSICPropertyVAction extends WatersAnalyzeAction
+public class AnalyzeSICProperty5Action extends WatersAnalyzeAction
 {
 
-  protected AnalyzeSICPropertyVAction(final IDE ide)
+  protected AnalyzeSICProperty5Action(final IDE ide)
   {
     super(ide);
   }
@@ -27,9 +37,9 @@ public class AnalyzeSICPropertyVAction extends WatersAnalyzeAction
     return "does not satisfy SIC Property V";
   }
 
-  protected ModelVerifier getModelVerifier(
-                                           final ModelVerifierFactory factory,
-                                           final ProductDESProxyFactory desFactory)
+  protected ModelVerifier getModelVerifier
+    (final ModelVerifierFactory factory,
+     final ProductDESProxyFactory desFactory)
   {
     final ConflictChecker conflictChecker =
         factory.createConflictChecker(desFactory);
