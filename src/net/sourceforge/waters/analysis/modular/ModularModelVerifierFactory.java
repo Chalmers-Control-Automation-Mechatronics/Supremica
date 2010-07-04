@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
-//# CLASS:   ProjectingModelVerifierFactory
+//# CLASS:   ModularModelVerifierFactory
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -51,6 +51,12 @@ public class ModularModelVerifierFactory
        factory,
        new NativeControllabilityChecker(factory),
        false);
+  }
+
+  public ModularControlLoopChecker createControlLoopChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new ModularControlLoopChecker(factory);
   }
 
   public ObserverProjectionConflictChecker createConflictChecker

@@ -23,8 +23,9 @@ import java.lang.reflect.Method;
 
 public enum ModelVerifierFactoryLoader
 {
-  Monolithic("net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory"),
+  Compositional("net.sourceforge.waters.analysis.gnonblocking.ComposingModelVerifierFactory"),
   Modular("net.sourceforge.waters.analysis.modular.ModularModelVerifierFactory"),
+  Monolithic("net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory"),
   Native("net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory");
 
 
