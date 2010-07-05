@@ -267,7 +267,7 @@ public abstract class AbstractControlLoopCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "tk27.wdes";
-    runModelVerifier(group, dir, name, true); 
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_tp20() throws Exception
@@ -291,6 +291,14 @@ public abstract class AbstractControlLoopCheckerTest
     final String group = "tests";
     final String dir = "hisc";
     final String name = "rhone_subsystem1_patch2.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
+  public void test_Nasty_PartialLoop() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "partial_loop.wmod";
     runModelVerifier(group, dir, name, false);
   }
 
@@ -398,7 +406,7 @@ public abstract class AbstractControlLoopCheckerTest
     final String name = "bfactory.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testBmw_fh() throws Exception
   {
     final String group = "valid";
@@ -422,7 +430,7 @@ public abstract class AbstractControlLoopCheckerTest
     final String name = "debounce.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testFalko() throws Exception
   {
     final String group = "valid";
@@ -430,14 +438,14 @@ public abstract class AbstractControlLoopCheckerTest
     final String name = "falko.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testFtuer() throws Exception
   {
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "ftuer.wdes";
     runModelVerifier(group, dir, name, false);
-  } 
+  }
 
   public void testKoordwsp() throws Exception
   {
@@ -446,7 +454,7 @@ public abstract class AbstractControlLoopCheckerTest
     final String name = "koordwsp.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testSafetydisplay() throws Exception
   {
     final String group = "valid";
@@ -454,7 +462,7 @@ public abstract class AbstractControlLoopCheckerTest
     final String name = "safetydisplay.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testSmallFactory() throws Exception
   {
     final String group = "valid";
@@ -462,7 +470,7 @@ public abstract class AbstractControlLoopCheckerTest
     final String name = "small.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testSmallFactoryUncont() throws Exception
   {
     final String group = "valid";
@@ -470,7 +478,7 @@ public abstract class AbstractControlLoopCheckerTest
     final String name = "small_uncont.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testSmd() throws Exception
   {
     final String group = "valid";
@@ -486,7 +494,7 @@ public abstract class AbstractControlLoopCheckerTest
     final String name = "transferline_templ.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testTline_1() throws Exception
   {
     final String group = "valid";
@@ -565,23 +573,23 @@ public abstract class AbstractControlLoopCheckerTest
     final List<EventProxy> eventlist = counterexample.getEvents();
     final int len = eventlist.size();
     final int loopIndex = counterexample.getLoopIndex();
-    
+
     // General: if counterexample is null
     assertNotNull(counterexample);
-    
+
     // General: if counterexample is empty
     assertTrue("Empty Counterexample!", len > 0);
-    
+
     // 1. All events in the loops are controllable
     for(int i = loopIndex; i < len; i++){
       assertTrue("Event " + eventlist.get(i).getName() +
-                 "in loop is not controllable", 
+                 "in loop is not controllable",
                  eventlist.get(i).getKind() == EventKind.CONTROLLABLE);
     }
-    
+
     // 2. Loop must not be empty
     assertTrue("Loop is empty!", len - loopIndex > 0);
-    
+
     // 3. Check trace is available in each automaton
     // 3.1. Check control loop is actually a loop
     for (final AutomatonProxy aProxy : automata) {
@@ -599,7 +607,7 @@ public abstract class AbstractControlLoopCheckerTest
       }
     }
   }
-  
+
   private boolean checkCounterExample(final AutomatonProxy automaton,
                                       final List<EventProxy> counterexample,
                                       final int loopIndex)
@@ -607,7 +615,7 @@ public abstract class AbstractControlLoopCheckerTest
     final Collection<EventProxy> events = automaton.getEvents();
     final Collection<StateProxy> states = automaton.getStates();
     final Collection<TransitionProxy> transitions = automaton.getTransitions();
-    
+
     // Get initial state to current state
     StateProxy currState = null;
     for(final StateProxy sProxy: states){
