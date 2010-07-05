@@ -76,6 +76,8 @@ public class MonolithicSCCControlLoopChecker
                                       final ProductDESProxyFactory factory)
   {
     super(model, factory, translator);
+    if (translator == null)
+      throw new IllegalArgumentException("Null Translator");
   }
 
 
@@ -158,7 +160,7 @@ public class MonolithicSCCControlLoopChecker
     final HashSet<EventProxy> output = new HashSet<EventProxy>();
     for (final EventProxy event : mEventList)
     {
-      if (event.getKind() == EventKind.CONTROLLABLE)
+      if (getKindTranslator().getEventKind(event) == EventKind.CONTROLLABLE)
       {
         if (!mLoopEvents.contains(event))
           output.add(event);
@@ -194,6 +196,11 @@ public class MonolithicSCCControlLoopChecker
     mAutomataList = new ArrayList<AutomatonProxy>();
     mEventList = new ArrayList<EventProxy>();
     mTransitionList = new ArrayList<ArrayList<TransitionProxy>>();
+
+    // MonolithicSCCControlLoopChecker
+
+    mLoopEvents = new THashSet<EventProxy>();
+    stack = new Stack<EncodedStateTuple>();
 
     // create Automaton list
     for (final AutomatonProxy aProxy : des.getAutomata()) {
@@ -785,7 +792,7 @@ public class MonolithicSCCControlLoopChecker
     final int[] currState = new int[mNumAutomata];
     decode(state.getCodes(), currState);
     for (int i = 0; i < mNumEvent; i++) { // for all events
-      if (mGlobalEventMap[i] == true)
+      if (mGlobalEventMap[i])
       {
         if (eventAvailable(currState, i)) {
           EncodedStateTuple encodedNextTuple =
@@ -927,13 +934,13 @@ public class MonolithicSCCControlLoopChecker
   private int mNextTuple[];
 
   /** a set of all the events which occur in all control loops */
-  private final Set<EventProxy> mLoopEvents = new THashSet<EventProxy>();
+  private Set<EventProxy> mLoopEvents;
 
   /** the number of states which have been visited */
   private int numStates = 0;
 
   /** used for the visit procedure */
-  private final Stack<EncodedStateTuple> stack = new Stack<EncodedStateTuple>();
+  private Stack<EncodedStateTuple> stack;
 
   //#########################################################################
   //# Variables used for encoding/decoding

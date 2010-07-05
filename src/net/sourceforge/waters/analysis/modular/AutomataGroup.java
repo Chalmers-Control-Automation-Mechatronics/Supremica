@@ -69,6 +69,11 @@ public class AutomataGroup
     return mCounterExampleTrace;
   }
 
+  public Collection<EventProxy> getNonLoopEvents()
+  {
+    return mNonLoopEvents;
+  }
+
   public boolean isControlLoop(final List<EventProxy> testTrace, final int loopIndex)
   {
     for (final AutomatonProxy auto : mAllAutomata)
@@ -123,13 +128,16 @@ public class AutomataGroup
   /**
    * Runs the Monolithic SCC Control Loop Checker to determine information on the subset of Automata in this group
    * @param checker The Control Loop Checker to use. It should contain the Kind Translator, and a factory before being called
-   * @return The set of non-loop events. The counter example and the loop index can be recieved by calling getTrace() and getLoopIndex()
    * @throws AnalysisException
    */
-  public Collection<EventProxy> setControlLoops(final MonolithicSCCControlLoopChecker checker) throws AnalysisException
+  public void run(final MonolithicSCCControlLoopChecker checker) throws AnalysisException
   {
-    final ProductDESProxy passer = checker.getFactory().createProductDESProxy("AutomataGroup", mSensitiveEvents, mAllAutomata);
+    final ProductDESProxy old = checker.getModel(); // DEBUG: REMOVE
+    final ProductDESProxy passer;
+    passer = checker.getFactory().createProductDESProxy(getName() , mSensitiveEvents, mAllAutomata);
+    System.out.println(getName() + " has been created");
     checker.setModel(passer);
+    System.out.println(getName() + " is running the SCC Control Loop Checker");
     if (checker.run())
     {
       mCounterExampleTrace = null;
@@ -140,9 +148,33 @@ public class AutomataGroup
       mCounterExampleTrace = checker.getCounterExample().getEvents();
       mLoopIndex = checker.getCounterExample().getLoopIndex();
     }
-    return checker.getNonLoopEvents();
+    System.out.println(getName() + " is finished running the SCC Control Loop Checker");
+    mNonLoopEvents = checker.getNonLoopEvents();
+    System.out.println(getTextNonLoop());
+    checker.setModel(old); // DEBUG: REMOVE
   }
 
+  private String getTextNonLoop()
+  {
+    String output = "";
+    for (final EventProxy event : mNonLoopEvents)
+    {
+      output += event.getName() + " ";
+    }
+    return output;
+  }
+  private String getName()
+  {
+    String output = "";
+    for (final AutomatonProxy auto : mAllAutomata)
+    {
+      output += auto.getName() + "|";
+    }
+    output = output.substring(0, output.length() - 1);
+    return output;
+  }
+
+  Collection<EventProxy> mNonLoopEvents;
   Set<AutomatonProxy> mAllAutomata;
   List<EventProxy> mCounterExampleTrace;
   Set<EventProxy> mSensitiveEvents;
