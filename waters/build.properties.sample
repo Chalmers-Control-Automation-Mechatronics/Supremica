@@ -34,7 +34,7 @@ optimize=off
 # For Linux, a standard installation of GNU C++ and Make should work.
 # Simply uncomment the following two lines.
 #native.make = make
-native.ostype = linux-gnu
+#native.ostype = linux-gnu
 
 # For Windows, you need to install MinGW and SED.
 # First download and install MinGW from http://www.mingw.org/.

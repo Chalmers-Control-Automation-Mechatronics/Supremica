@@ -215,6 +215,7 @@ public class ModularControlLoopChecker
       mFauxUncontrollable = new THashSet<EventProxy>();
     }
 
+    @SuppressWarnings("unused")
     public void removeLoopEvents(final EventProxy event)
     {
       mFauxUncontrollable.add(event);
