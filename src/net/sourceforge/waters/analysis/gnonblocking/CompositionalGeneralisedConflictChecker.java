@@ -916,6 +916,11 @@ public class CompositionalGeneralisedConflictChecker extends
     return new HeuristicMaxL();
   }
 
+  public HeuristicMaxLt createHeuristicMaxLt()
+  {
+    return new HeuristicMaxLt();
+  }
+
   public HeuristicMaxLOnTransitions createHeuristicMaxLOnTransitions()
   {
     return new HeuristicMaxLOnTransitions();
@@ -924,6 +929,11 @@ public class CompositionalGeneralisedConflictChecker extends
   public HeuristicMaxC createHeuristicMaxC()
   {
     return new HeuristicMaxC();
+  }
+
+  public HeuristicMaxCt createHeuristicMaxCt()
+  {
+    return new HeuristicMaxCt();
   }
 
   public HeuristicMaxCOnTransitions createHeuristicMaxCOnTransitions()
@@ -1374,7 +1384,6 @@ public class CompositionalGeneralisedConflictChecker extends
    * Performs step 2 of the approach to select the automata to compose. The
    * chosen candidate is the one with the highest proportion of local events.
    */
-  @SuppressWarnings("unused")
   private class HeuristicMaxLt extends SelectingHeuristic
   {
     protected double getHeuristicValue(final Candidate candidate)
@@ -1456,7 +1465,6 @@ public class CompositionalGeneralisedConflictChecker extends
    * chosen candidate is the one with the highest proportion of events which are
    * shared between that candidates automata.
    */
-  @SuppressWarnings("unused")
   private class HeuristicMaxCt extends SelectingHeuristic
   {
 
