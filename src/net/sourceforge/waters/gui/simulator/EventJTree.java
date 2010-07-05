@@ -361,16 +361,13 @@ public class EventJTree
       return o;
     }
 
-    private EventProxy getParentEvent(final int row)
+    private EventProxy getParentEvent(int row)
     {
-      final TreePath path = getPathForRow(row);
-      if (path == null) {
-        // The row is not visible, so it does not matter
-        // what event is its parent.
-        return null;
-      } else {
-        return (EventProxy) path.getPathComponent(1);
+      if (row >= getRowCount()) {
+        row = getRowCount() - 1;
       }
+      final TreePath path = getPathForRow(row);
+      return (EventProxy) path.getPathComponent(1);
     }
 
     //#######################################################################
