@@ -3899,13 +3899,16 @@ public class GraphEditorPanel
         super.commitEdit();
         // If we get here without exception, the value has been parsed
         // successfully. Let us change the state name.
-        final SimpleNodeSubject newnode = mNode.clone();
         final String newname = getText();
-        newnode.setName(newname);
-        final Command cmd =
-          new EditCommand(mNode, newnode,
-                          GraphEditorPanel.this, "State Renaming");
-        getUndoInterface().executeCommand(cmd);
+        final String oldname = mNode.getName();
+        if (!newname.equals(oldname)) {
+          final SimpleNodeSubject newnode = mNode.clone();
+          newnode.setName(newname);
+          final Command cmd =
+            new EditCommand(mNode, newnode,
+                            GraphEditorPanel.this, "State Renaming");
+          getUndoInterface().executeCommand(cmd);
+        }
       }
     }
 

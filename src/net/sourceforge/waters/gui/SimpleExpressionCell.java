@@ -250,10 +250,10 @@ public class SimpleExpressionCell
         } catch (final ParseException exception) {
           final String msg = exception.getMessage();
           setErrorMessage(msg);
-          final String oldtext = getText();
+          final SimpleExpressionProxy oldvalue =
+            (SimpleExpressionProxy) getValue();
+          final String oldtext = valueToString(oldvalue);
           if (text.equals(oldtext)) {
-            final SimpleExpressionProxy oldvalue =
-              (SimpleExpressionProxy) getValue();
             return oldvalue.clone();
           } else {
             throw exception.getJavaException();
