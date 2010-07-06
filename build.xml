@@ -285,7 +285,8 @@
                  ${supremica_basedir}/external/operationframeworkto61131/**"
                source="1.5"
                fork="true"
-               memoryMaximumSize="192M">
+               includeantruntime="false"
+               memoryMaximumSize="512M">
             <classpath>    
                 <pathelement location="${lib}/${unjared}"/>
             </classpath>
@@ -305,7 +306,8 @@
                excludes="${supremica_basedir}/external/robotCoordination/**"
                source="1.5"
                fork="true"
-               memoryMaximumSize="128M">
+               includeantruntime="false"
+               memoryMaximumSize="256M">
             <classpath>    
                 <pathelement location="${lib}/${unjared}"/>
             </classpath>
@@ -337,6 +339,7 @@
             nowarn="true"
             includes="${supremica_basedir}/manufacturingTables/xsd/**"          
             source="1.5"
+            includeantruntime="false"
         />
     </target>
 
@@ -351,6 +354,7 @@
             nowarn="true"
             includes="${supremica_basedir}/external/genericPLCProgramDescription/xsd/**"                
             source="1.5"
+            includeantruntime="false"
         />
     </target>
 
@@ -372,6 +376,7 @@
             nowarn="true"
             includes="${supremica_basedir}/automata/algorithms/scheduling/**"           
             source="1.5"
+            includeantruntime="false"
         />
     </target>
     
@@ -387,7 +392,8 @@
                includeJavaRuntime="yes"
                deprecation="false"
                verbose="false"
-               source="1.5">
+               source="1.5"
+               includeantruntime="false">
             <classpath> 
                 <pathelement location="${build}"/>
                 <pathelement path="${lib}/${unjared}"/>
@@ -420,10 +426,11 @@
                 <pathelement path="${lib}/${unjared}" />
             </classpath>
                 <javac
-                                debug="on"                          
+                        debug="on"                          
                         source="1.5"
                         debuglevel="lines,source"
-                                />
+                        includeantruntime="false"
+                />
         </groovyc>
     </target>
     
@@ -442,6 +449,7 @@
                 includeJavaRuntime="yes"
                 deprecation="false"
                 verbose="false"
+                includeantruntime="false"
                 excludes="${supremica_basedir}/**,
                         ${jgrafchart_basedir}/external/**,              
                         ${jgrafchart_basedir}/io/**,
@@ -461,7 +469,8 @@
             destdir="${runtimesoftplcbuild}"
             includeJavaRuntime="yes"
             deprecation="false"
-            verbose="false" >
+            verbose="false"
+            includeantruntime="false">
         </javac>
         
     </target>
