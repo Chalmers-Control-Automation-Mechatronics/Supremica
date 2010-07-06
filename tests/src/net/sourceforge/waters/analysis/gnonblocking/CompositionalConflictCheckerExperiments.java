@@ -84,8 +84,12 @@ public abstract class CompositionalConflictCheckerExperiments extends
     // sets correct selecting heuristic
     if (mSelecting.equals("maxl")) {
       mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxL());
+    } else if (mSelecting.equals("maxlt")) {
+      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxLt());
     } else if (mSelecting.equals("maxc")) {
       mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxC());
+    } else if (mSelecting.equals("maxct")) {
+      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxCt());
     } else if (mSelecting.equals("mins")) {
       mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMinS());
     } else if (mSelecting.equals("minsc")) {
@@ -230,14 +234,15 @@ public abstract class CompositionalConflictCheckerExperiments extends
     configureModelVerifier(des);
     try {
       mVerifier.run();
+    } catch (final Exception e) {
+      System.out.print(e.getMessage());
+      mPrintStream.println(name + "," + e.getMessage());
+    } finally {
       mStats =
           (CompositionalGeneralisedConflictCheckerVerificationResult) mVerifier
               .getAnalysisResult();
       mPrintStream.print(name + ",");
       mStats.printCSVHorizontal(mPrintStream);
-    } catch (final Exception e) {
-      System.out.println(e);
-      mPrintStream.println(des.getName() + "," + e);
     }
   }
 

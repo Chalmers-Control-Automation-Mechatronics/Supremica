@@ -190,6 +190,13 @@ public class CompositionalGeneralisedConflictChecker extends
     stats.setComposedModelTransitionCount(mComposedModelNumberOfTransitions);
   }
 
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
+    addStatistics();
+  }
+
   // Ugly override to make this method visible within package.
   @Override
   protected EventProxy getUsedMarkingProposition()
@@ -491,13 +498,13 @@ public class CompositionalGeneralisedConflictChecker extends
     mUnsuccessfulCandidates = new HashSet<Candidate>();
     mTrivialAbstractedAutomata = new HashSet<AutomatonProxy>();
     if (mPreselectingHeuristic == null) {
-      // final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
+      // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
       setPreselectingHeuristic(defaultHeuristic);
     }
     if (mSelectingHeuristics == null) {
-      final SelectingHeuristic defaultHeuristic = new HeuristicMaxC();
+      final SelectingHeuristic defaultHeuristic = new HeuristicMaxL();
       setSelectingHeuristic(defaultHeuristic);
     }
     // reset statistics
