@@ -197,11 +197,6 @@ public class MonolithicSCCControlLoopChecker
     mEventList = new ArrayList<EventProxy>();
     mTransitionList = new ArrayList<ArrayList<TransitionProxy>>();
 
-    // MonolithicSCCControlLoopChecker
-
-    mLoopEvents = new THashSet<EventProxy>();
-    stack = new Stack<EncodedStateTuple>();
-
     // create Automaton list
     for (final AutomatonProxy aProxy : des.getAutomata()) {
       final ComponentKind kind = translator.getComponentKind(aProxy);
@@ -371,6 +366,17 @@ public class MonolithicSCCControlLoopChecker
     // initialise state tuple list
     mGlobalStateSet = new StateHashSet(SIZE_BUFFER);
     mUnvisitedList = new ArrayList<EncodedStateTuple>(SIZE_BUFFER);
+
+    // Resetting everything
+
+    mEncodedCurrTuple = null;
+    mEncodedPreviousStateTuple = null;
+    mEncodedRootStateTuple = null;
+    mLastEvent = -1;
+    mLoopEvents = new THashSet<EventProxy>();
+    stack = new Stack<EncodedStateTuple>();
+    numStates = 0;
+
   }
 
 
@@ -559,7 +565,7 @@ public class MonolithicSCCControlLoopChecker
   return trace;
 }
 
-  private Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> findLoop()
+  private Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> findLoop() throws AbortException
   {
     EncodedStateTuple encodedCurrTuple = new EncodedStateTuple(mNumInts);
     final ArrayList<EncodedStateTuple> layeredList = new ArrayList<EncodedStateTuple>();
@@ -582,7 +588,7 @@ public class MonolithicSCCControlLoopChecker
               EncodedStateTuple encodedNextTuple =
                 new EncodedStateTuple(encode(mNextTuple));
               encodedNextTuple = mGlobalStateSet.get(encodedNextTuple);
-              if (encodedCurrTuple.getRoot() == encodedNextTuple.getRoot()) {
+              if (encodedCurrTuple.getRoot() == encodedNextTuple.getRoot() && j < mNumConEvent) {
                 fakeTraceList.add(mEventList.get(j));
                 mEncodedRootStateTuple = encodedCurrTuple;
                 // now change the root of the loop
@@ -597,7 +603,7 @@ public class MonolithicSCCControlLoopChecker
         if (layeredList.size() != (indexList.get(indexSize-1)+1)) {
           indexList.add(layeredList.size()-1);
         } else {
-          break;
+          throw new AbortException("ERROR: Could not find any new states to explore" + stringDump(layeredList, indexList));
         }
       }
     final Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> output
@@ -680,11 +686,27 @@ public class MonolithicSCCControlLoopChecker
       if (layeredList.size() != (indexList.get(indexSize-1)+1)) {
         indexList.add(layeredList.size()-1);
       } else {
-        break;
+        throw new AbortException("ERROR: Could not find any new states to explore" + stringDump(layeredList, indexList));
       }
     }
     final Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> output
       = new Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>>(layeredList, indexList);
+    return output;
+  }
+
+  private String stringDump(final ArrayList<EncodedStateTuple> layeredList,
+                            final ArrayList<Integer> indexList)
+  {
+    String output = "";
+    for (int layer = 0; layer < indexList.size(); layer++)
+    {
+      for (int i = (layer==0) ? 0 : (indexList.get(layer-1)+1);
+        i <= indexList.get(layer); i++)
+      {
+        output += layeredList.get(i) + " ";
+      }
+      output += "\n";
+    }
     return output;
   }
 
@@ -782,8 +804,8 @@ public class MonolithicSCCControlLoopChecker
   }
 
   /**
-   * Looks for loop events
-   * @param states All states in the strongly connected component
+   * Looks for loop events that connect to that state within its SCC
+   * @param state A state
    * @return All events that connect all the states in the strongly connected component
    */
   private void getLoopEvents(final EncodedStateTuple state)
@@ -791,17 +813,18 @@ public class MonolithicSCCControlLoopChecker
     final HashSet<EventProxy> output = new HashSet<EventProxy>();
     final int[] currState = new int[mNumAutomata];
     decode(state.getCodes(), currState);
-    for (int i = 0; i < mNumEvent; i++) { // for all events
-      if (mGlobalEventMap[i])
-      {
-        if (eventAvailable(currState, i)) {
+    for (int i = 0; i < mNumConEvent; i++) { // for all controllable events
+      if (eventAvailable(currState, i)) {
           EncodedStateTuple encodedNextTuple =
             new EncodedStateTuple(encode(mNextTuple));
           encodedNextTuple = mGlobalStateSet.get(encodedNextTuple);
           if (encodedNextTuple != null) // If false, then this state hasn't been visited yet, it soon will
+          {
             if (encodedNextTuple.getRoot() == state.getRoot())
+            {
               output.add(mEventList.get(i));
-        }
+            }
+          }
       }
     }
     mLoopEvents.addAll(output);

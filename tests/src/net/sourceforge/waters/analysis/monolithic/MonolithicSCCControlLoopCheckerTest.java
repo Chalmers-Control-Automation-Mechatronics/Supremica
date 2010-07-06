@@ -81,6 +81,15 @@ public class MonolithicSCCControlLoopCheckerTest
     checkNonLoopEvents(new String[]{"open_out", "close_out", "stirrer_on", "stirrer_off"});
   }
 
+  public void test_liquidControl() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "liquidControl.wmod";
+    runModelVerifier(group, dir, name, false);
+    checkNonLoopEvents(new String[]{"close_in", "open_in"});
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods

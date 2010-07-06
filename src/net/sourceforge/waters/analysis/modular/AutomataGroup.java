@@ -132,12 +132,9 @@ public class AutomataGroup
    */
   public void run(final MonolithicSCCControlLoopChecker checker) throws AnalysisException
   {
-    final ProductDESProxy old = checker.getModel(); // DEBUG: REMOVE
     final ProductDESProxy passer;
     passer = checker.getFactory().createProductDESProxy(getName() , mSensitiveEvents, mAllAutomata);
-    System.out.println(getName() + " has been created");
     checker.setModel(passer);
-    System.out.println(getName() + " is running the SCC Control Loop Checker");
     if (checker.run())
     {
       mCounterExampleTrace = null;
@@ -148,15 +145,13 @@ public class AutomataGroup
       mCounterExampleTrace = checker.getCounterExample().getEvents();
       mLoopIndex = checker.getCounterExample().getLoopIndex();
     }
-    System.out.println(getName() + " is finished running the SCC Control Loop Checker");
     mNonLoopEvents = checker.getNonLoopEvents();
     System.out.println(getTextNonLoop());
-    checker.setModel(old); // DEBUG: REMOVE
   }
 
   private String getTextNonLoop()
   {
-    String output = "";
+    String output = "Non Loop Events from " + getName() + " are ";
     for (final EventProxy event : mNonLoopEvents)
     {
       output += event.getName() + " ";

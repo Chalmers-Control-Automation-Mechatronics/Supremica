@@ -2,9 +2,10 @@ package net.sourceforge.waters.analysis.modular;
 
 import gnu.trove.THashSet;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
-
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -53,18 +54,17 @@ public class ModularControlLoopChecker
   public boolean run() throws AnalysisException
   {
     boolean output = false;
-    boolean solved = false;
     try {
       setUp();
       if (getModel().getAutomata().size() == 0)
       {
-        solved = true;
-        output = true;
         setSatisfiedResult();
+        return true;
       }
       final MonolithicSCCControlLoopChecker checker = new MonolithicSCCControlLoopChecker(getModel(), mTranslator, getFactory());
       boolean removedLoopEvents = false;
-      while (!solved)
+      solved:
+      while (true)
       {
         do
         {
@@ -83,59 +83,53 @@ public class ModularControlLoopChecker
               System.out.println("Solved: True");
               setSatisfiedResult();
               output = true;
-              solved = true;
+              break solved;
             }
-            if (!solved)
-            {
-              mTranslator.removeLoopEvents(nonLoop);
-              if (group.getTrace() != null)
-              {
-                boolean acceptsAll = true;
-                for (final AutomataGroup checkLoop : mAutoSets)
-                {
-                  if (checkLoop != group)
-                  {
-                    if (!checkLoop.isControlLoop(group.getTrace(), group.getLoopIndex()));
-                    {
-                      acceptsAll = false;
-                      break;
-                    }
-                  }
-                }
-                if (acceptsAll)
-                {
-                  System.out.println("Solved: False");
-                  final LoopTraceProxy loop =
-                    getFactory().createLoopTraceProxy(getModel().getName() + "-loop",
-                                                      getModel(),
-                                                      group.getTrace(),
-                                                      group.getLoopIndex());
-                  setFailedResult(loop);
-                  output = false;
-                  solved = true;
-                }
-              }
-            }
-          }
-        }
-        while (removedLoopEvents);
-        if (!solved)
-        {
-          outer:
-          for (final AutomataGroup group : mAutoSets)
-          {
+            mTranslator.removeLoopEvents(nonLoop);
             if (group.getTrace() != null)
             {
+              boolean acceptsAll = true;
               for (final AutomataGroup checkLoop : mAutoSets)
               {
                 if (checkLoop != group)
                 {
                   if (!checkLoop.isControlLoop(group.getTrace(), group.getLoopIndex()));
                   {
-                    mAutoSets.remove(checkLoop);
-                    group.merge(checkLoop);
-                    break outer;
+                    acceptsAll = false;
+                    break;
                   }
+                }
+              }
+              if (acceptsAll)
+              {
+                System.out.println("Solved: False");
+                final LoopTraceProxy loop =
+                  getFactory().createLoopTraceProxy(getModel().getName() + "-loop",
+                                                    getModel(),
+                                                    group.getTrace(),
+                                                    group.getLoopIndex());
+                setFailedResult(loop);
+                output = false;
+                break solved;
+              }
+            }
+          }
+        }
+        while (removedLoopEvents);
+        outer:
+        for (final AutomataGroup group : mAutoSets)
+        {
+          if (group.getTrace() != null)
+          {
+            for (final AutomataGroup checkLoop : mAutoSets)
+            {
+              if (checkLoop != group)
+              {
+                if (!checkLoop.isControlLoop(group.getTrace(), group.getLoopIndex()));
+                {
+                  mAutoSets.remove(checkLoop);
+                  group.merge(checkLoop);
+                  break outer;
                 }
               }
             }
@@ -156,11 +150,12 @@ public class ModularControlLoopChecker
     {
       output += event.getName() + " ";
     }
+    /*
     output += "\nmTranslator says they aren't ";
     for (final EventProxy event : mTranslator.mFauxUncontrollable)
     {
       output += event.getName() + " ";
-    }
+    }*/
     return output;
   }
 
@@ -184,7 +179,7 @@ public class ModularControlLoopChecker
   public void setUp() throws AnalysisException
   {
     super.setUp();
-    mAutoSets = new THashSet<AutomataGroup>();
+    mAutoSets = new ArrayList<AutomataGroup>();
     mTranslator = new ManipulativeTranslator(getKindTranslator());
     mLoopEvents = new THashSet<EventProxy>();
     for (final EventProxy event : getModel().getEvents())
@@ -215,7 +210,6 @@ public class ModularControlLoopChecker
       mFauxUncontrollable = new THashSet<EventProxy>();
     }
 
-    @SuppressWarnings("unused")
     public void removeLoopEvents(final EventProxy event)
     {
       mFauxUncontrollable.add(event);
@@ -263,7 +257,7 @@ public class ModularControlLoopChecker
   //#########################################################################
   //# Data Members
   private ManipulativeTranslator mTranslator;
-  private Set<AutomataGroup> mAutoSets;
+  private List<AutomataGroup> mAutoSets;
   private Set<EventProxy> mLoopEvents;
 
 }

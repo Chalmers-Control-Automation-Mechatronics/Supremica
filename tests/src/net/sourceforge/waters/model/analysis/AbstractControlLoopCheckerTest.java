@@ -55,6 +55,22 @@ public abstract class AbstractControlLoopCheckerTest
     runModelVerifier(des, true);
   }
 
+  public void test_Uneven_Cancel1()
+    throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "unevenCancel.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
+  public void test_Uneven_Cancel10()
+    throws Exception
+  {
+    for (int looper = 0; looper < 10; looper++)
+      test_Uneven_Cancel1();
+  }
+
   public void testReentrant()
     throws Exception
   {
