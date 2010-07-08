@@ -141,6 +141,12 @@ public class ValidTest extends AbstractWatersTest
     testImport("smd", "smdreset");
   }
 
+  public void testImport_sometimes_blow_up()
+    throws IOException, WatersException
+  {
+    testImport("border_cases", "sometimes_blow_up");
+  }
+
   public void testImport_tline_1()
     throws IOException, WatersException
   {
