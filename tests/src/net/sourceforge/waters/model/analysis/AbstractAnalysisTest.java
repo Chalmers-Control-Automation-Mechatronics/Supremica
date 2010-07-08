@@ -26,6 +26,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
@@ -200,7 +201,7 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
 
   protected void saveAutomaton(final AutomatonProxy aut,
                                final String basename, final String comment)
-    throws WatersMarshalException, IOException
+    throws WatersMarshalException, IOException, ParseException
   {
     assertNotNull(aut);
     final Collection<EventProxy> events = aut.getEvents();
@@ -212,7 +213,7 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
   }
 
   protected void saveDES(final ProductDESProxy des, final String basename)
-    throws WatersMarshalException, IOException
+    throws WatersMarshalException, IOException, ParseException
   {
     assertNotNull(des);
     final String desext = mProductDESMarshaller.getDefaultExtension();

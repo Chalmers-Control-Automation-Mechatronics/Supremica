@@ -37,6 +37,7 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
@@ -330,25 +331,30 @@ public class DocumentContainerManager
       final ModuleSubject module = (ModuleSubject) doc;
       return new ModuleContainer(mIDE, module);
     } else if (doc instanceof Project) {
-      final Project project = (Project) doc;
-      if (SupremicaUnmarshaller.validate(project)) {
-        final ModuleSubject module =
-          (ModuleSubject) mProductDESImporter.importModule(project);
-        return new ModuleContainer(mIDE, module);
-      } else {
-        final String text = getWarningText(doc, WARN_CONVERSION);
-        final int choice =
-          showWarningDialog(text, JOptionPane.YES_NO_CANCEL_OPTION);
-        switch (choice) {
-        case JOptionPane.YES_OPTION:
+      try {
+        final Project project = (Project) doc;
+        if (SupremicaUnmarshaller.validate(project)) {
           final ModuleSubject module =
             (ModuleSubject) mProductDESImporter.importModule(project);
           return new ModuleContainer(mIDE, module);
-        case JOptionPane.NO_OPTION:
-          return new AutomataContainer(mIDE, project);
-        default:
-          return null;
+        } else {
+          final String text = getWarningText(doc, WARN_CONVERSION);
+          final int choice =
+            showWarningDialog(text, JOptionPane.YES_NO_CANCEL_OPTION);
+          switch (choice) {
+          case JOptionPane.YES_OPTION:
+            final ModuleSubject module =
+              (ModuleSubject) mProductDESImporter.importModule(project);
+            return new ModuleContainer(mIDE, module);
+          case JOptionPane.NO_OPTION:
+            return new AutomataContainer(mIDE, project);
+          default:
+            return null;
+          }
         }
+      } catch (final ParseException exception) {
+        showParseError(exception);
+        return null;
       }
     } else {
       throw new ClassCastException("Unknown document type " +
@@ -491,8 +497,12 @@ public class DocumentContainerManager
         final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
         final ProductDESImporter importer = new ProductDESImporter(factory);
         final Project project = (Project) doc;
-        final ModuleProxy module = importer.importModule(project);
-        marshalDocument(file, module, maycancel);
+        try {
+          final ModuleProxy module = importer.importModule(project);
+          marshalDocument(file, module, maycancel);
+        } catch (final ParseException exception) {
+          showParseError(exception);
+        }
       } else {
         throw new ClassCastException("Unknown document container type: " +
                                      container.getClass().getName() + "!");
@@ -604,6 +614,14 @@ public class DocumentContainerManager
       return true;
     }
   }
+
+  private void showParseError(final ParseException exception)
+  {
+    final String msg = "Problem importing module: " + exception.getMessage();
+    JOptionPane.showMessageDialog
+      (mIDE.getFrame(), msg, "Error", JOptionPane.ERROR_MESSAGE);
+  }
+
 
   private int showWarningDialog(final String text, final int optionType)
   {

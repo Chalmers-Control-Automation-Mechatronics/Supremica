@@ -17,6 +17,7 @@ import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -45,8 +46,12 @@ public class ProductDESToModuleUnmarshaller
   public ModuleProxy unmarshal(final URI uri)
     throws WatersUnmarshalException, IOException
   {
-    final ProductDESProxy des = mUnmarshaller.unmarshal(uri);
-    return mImporter.importModule(des);
+    try {
+      final ProductDESProxy des = mUnmarshaller.unmarshal(uri);
+      return mImporter.importModule(des);
+    } catch (final ParseException exception) {
+      throw new WatersUnmarshalException(exception);
+    }
   }
 
   public Class<ModuleProxy> getDocumentClass()
@@ -74,7 +79,7 @@ public class ProductDESToModuleUnmarshaller
     return mImporter.getDocumentManager();
   }
 
-  public void setDocumentManager(DocumentManager manager)
+  public void setDocumentManager(final DocumentManager manager)
   {
     mImporter.setDocumentManager(manager);
   }

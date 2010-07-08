@@ -15,8 +15,6 @@ import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
 import gnu.trove.TObjectIntHashMap;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,8 +30,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import javax.xml.bind.JAXBException;
-
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.analysis.op.StateEncoding;
@@ -47,7 +43,6 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.TraceChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -56,21 +51,11 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
-import net.sourceforge.waters.model.marshaller.ProductDESImporter;
-import net.sourceforge.waters.model.marshaller.WatersMarshalException;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -1747,46 +1732,6 @@ public class CompositionalGeneralisedConflictChecker extends
      */
     abstract ConflictTraceProxy convertTrace(
                                              final ConflictTraceProxy counterexample);
-
-    // #######################################################################
-    // # Debugging
-    void saveAutomata() throws WatersMarshalException, IOException,
-        JAXBException, SAXException
-    {
-      final AutomatonProxy orig = getOriginalAutomaton();
-      final AutomatonProxy result = getResultAutomaton();
-      final List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
-      automata.add(orig);
-      final ComponentKind kind = result.getKind();
-      final Collection<EventProxy> resultEvents = result.getEvents();
-      final Collection<StateProxy> resultStates = result.getStates();
-      final Collection<TransitionProxy> resultTrans = result.getTransitions();
-      final AutomatonProxy altResult =
-          getFactory().createAutomatonProxy("result", kind, resultEvents,
-                                            resultStates, resultTrans);
-      automata.add(altResult);
-      final Collection<EventProxy> events = new THashSet<EventProxy>();
-      events.addAll(orig.getEvents());
-      events.addAll(result.getEvents());
-      final ProductDESProxy des =
-          getFactory().createProductDESProxy("trace_debug", events, automata);
-      final ModuleProxyFactory mfactory = ModuleElementFactory.getInstance();
-      final OperatorTable optable = CompilerOperatorTable.getInstance();
-      final JAXBProductDESMarshaller dmarshaller =
-          new JAXBProductDESMarshaller(getFactory());
-      final JAXBModuleMarshaller mmarshaller =
-          new JAXBModuleMarshaller(mfactory, optable);
-      final DocumentManager manager = new DocumentManager();
-      manager.registerMarshaller(dmarshaller);
-      manager.registerUnmarshaller(dmarshaller);
-      manager.registerMarshaller(mmarshaller);
-      manager.registerUnmarshaller(mmarshaller);
-      final ProductDESImporter importer =
-          new ProductDESImporter(mfactory, manager);
-      final ModuleProxy module = importer.importModule(des);
-      manager.saveAs(des, new File("/home/robi/junk/trace_debug.wdes"));
-      manager.saveAs(module, new File("/home/robi/junk/trace_debug.wmod"));
-    }
 
     // #######################################################################
     // # Data Members

@@ -87,6 +87,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
@@ -262,6 +263,10 @@ public class ProcessCommandLineArguments
                     {
                         System.err.println("Problem unmarshalling: " + ex);
                     }
+                    catch (final ParseException ex)
+                    {
+                        System.err.println("Problem importing to module: " + ex);
+                    }
                     catch (final ClassCastException ex)
                     {
                         System.err.println("Only import of modules is supported: " + ex);
@@ -433,6 +438,10 @@ public class ProcessCommandLineArguments
                     catch (final WatersUnmarshalException ex)
                     {
                         System.err.println("Problem unmarshalling: " + ex);
+                    }
+                    catch (final ParseException ex)
+                    {
+                        System.err.println("Problem importing to module: " + ex);
                     }
                     catch (final GeometryAbsentException ex)
                     {

@@ -325,13 +325,19 @@ public class EventJTree
         mAutomatonNameLabel.setText(aut.getName());
         final Icon autIcon = AutomatonLeafNode.getAutomatonIcon(mSim, aut);
         mAutomatonNameLabel.setIcon(autIcon);
-        final EventProxy event = getParentEvent(row);
-        final EventStatus status = mSim.getEventStatus(event, aut);
-        final Icon statusIcon = status.getIcon();
-        mAutomatonIconLabel.setIcon(statusIcon);
-        final StateProxy currentState = mSim.getCurrentState(aut);
-        mAutomatonStatusLabel.setText(currentState.getName());
-        mAutomatonStatusLabel.setIcon(mSim.getMarkingIcon(currentState, aut, false));
+        if (mSim.getAutomatonStatus(aut) == AutomatonStatus.DISABLED) {
+          mAutomatonIconLabel.setIcon(null);
+          mAutomatonStatusLabel.setText("");
+          mAutomatonStatusLabel.setIcon(null);
+        } else {
+          final EventProxy event = getParentEvent(row);
+          final EventStatus status = mSim.getEventStatus(event, aut);
+          final Icon statusIcon = status.getIcon();
+          mAutomatonIconLabel.setIcon(statusIcon);
+          final StateProxy currentState = mSim.getCurrentState(aut);
+          mAutomatonStatusLabel.setText(currentState.getName());
+          mAutomatonStatusLabel.setIcon(mSim.getMarkingIcon(currentState, aut, false));
+        }
         final int width = mPane.getWidth();
         final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));
         final int centerWidth = (width * automataColumnWidth[1] - 2 * noduleWidth * automataColumnWidth[1]) / (sum(automataColumnWidth));

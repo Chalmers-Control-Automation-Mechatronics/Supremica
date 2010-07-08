@@ -31,7 +31,7 @@ import org.xml.sax.SAXException;
 
 public class HISCUnmarshaller
     implements ProxyUnmarshaller<ModuleProxy>
-{    
+{
     //#########################################################################
     //# Constructor
     public HISCUnmarshaller(final ModuleProxyFactory modfactory)
@@ -47,52 +47,52 @@ public class HISCUnmarshaller
     public ModuleProxy unmarshal(final URI uri)
     throws WatersUnmarshalException, IOException
     {
-        URL url = uri.toURL();
+        final URL url = uri.toURL();
         final ProductDESProxy des;
         try
         {
            des = builder.build(url);
+           return mImporter.importModule(des);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             throw new WatersUnmarshalException(ex);
         }
-        return mImporter.importModule(des);
     }
-    
+
     public Class<ModuleProxy> getDocumentClass()
     {
         return ModuleProxy.class;
     }
-    
+
     public String getDefaultExtension()
     {
         return ".prj";
     }
-    
+
     public Collection<String> getSupportedExtensions()
     {
         return Collections.singletonList(getDefaultExtension());
     }
-    
+
     public Collection<FileFilter> getSupportedFileFilters()
     {
-        FileFilter filter = new StandardExtensionFileFilter(getDefaultExtension(), "HISC Project files [*.prj]");
+        final FileFilter filter = new StandardExtensionFileFilter(getDefaultExtension(), "HISC Project files [*.prj]");
         return Collections.singletonList(filter);
     }
-    
+
     public DocumentManager getDocumentManager()
     {
         return mImporter.getDocumentManager();
     }
-    
-    public void setDocumentManager(DocumentManager manager)
+
+    public void setDocumentManager(final DocumentManager manager)
     {
         mImporter.setDocumentManager(manager);
     }
-        
+
     //#########################################################################
     //# Data Members
     private final ProjectBuildFromHISC builder;
-    private final ProductDESImporter mImporter;    
+    private final ProductDESImporter mImporter;
 }

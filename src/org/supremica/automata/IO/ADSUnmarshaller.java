@@ -48,18 +48,18 @@ public class ADSUnmarshaller
     public ModuleProxy unmarshal(final URI uri)
     throws WatersUnmarshalException, IOException
     {
-        URL url = uri.toURL();
+        final URL url = uri.toURL();
         final ProductDESProxy des;
         try
         {
            des = builder.build(url);
+           return mImporter.importModule(des);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
 			ex.printStackTrace();
             throw new WatersUnmarshalException(ex);
         }
-        return mImporter.importModule(des);
     }
 
     public Class<ModuleProxy> getDocumentClass()
@@ -79,7 +79,7 @@ public class ADSUnmarshaller
 
     public Collection<FileFilter> getSupportedFileFilters()
     {
-        FileFilter filter = new StandardExtensionFileFilter(getDefaultExtension(), "ADS files [*.ads]");
+        final FileFilter filter = new StandardExtensionFileFilter(getDefaultExtension(), "ADS files [*.ads]");
         return Collections.singletonList(filter);
     }
 
@@ -88,7 +88,7 @@ public class ADSUnmarshaller
         return mImporter.getDocumentManager();
     }
 
-    public void setDocumentManager(DocumentManager manager)
+    public void setDocumentManager(final DocumentManager manager)
     {
         mImporter.setDocumentManager(manager);
     }

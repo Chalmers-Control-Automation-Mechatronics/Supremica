@@ -697,7 +697,8 @@ public class Simulation implements ModelObserver, Observer
         mEventStatusMap.put(event, entry);
       }
       final ComponentKind[] order = new ComponentKind[]
-        {ComponentKind.PLANT, ComponentKind.SPEC, ComponentKind.PROPERTY};
+        {ComponentKind.PLANT, ComponentKind.SPEC,
+         ComponentKind.SUPERVISOR, ComponentKind.PROPERTY};
       for (final ComponentKind kind : order) {
         for (final AutomatonProxy aut : mOrderedAutomata) {
           if (aut.getKind() == kind) {
@@ -729,6 +730,7 @@ public class Simulation implements ModelObserver, Observer
                       entry.setStatus(aut, EventStatus.DISABLED);
                       break;
                     case SPEC:
+                    case SUPERVISOR:
                       if (event.getKind() == EventKind.CONTROLLABLE ||
                           entry.getStatus() == EventStatus.DISABLED) {
                         entry.setStatus(aut, EventStatus.DISABLED);

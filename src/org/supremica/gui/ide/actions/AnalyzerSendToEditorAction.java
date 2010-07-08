@@ -23,12 +23,7 @@ import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
-import net.sourceforge.waters.xsd.module.ScopeKind;
-
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.ide.IDE;
@@ -89,23 +84,11 @@ public class AnalyzerSendToEditorAction
 					ide.getActiveDocumentContainer().getEditorPanel().
 						addComponent((AbstractSubject) comp);
 					// Add all (new) events to the module
-					final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
 					boolean problem = false;
 					for (final EventProxy event: aut.getEvents()) {
 						final String name = event.getName();
-						if (name.contains("[")) {
+						if (name.contains(".")) {
 							problem = true;
-						} else if (context.getEventDecl(name) == null) {
-							final SimpleIdentifierSubject nameident =
-								new SimpleIdentifierSubject(name);
-							final EventDeclSubject decl =
-								new EventDeclSubject(nameident,
-													 event.getKind(),
-													 event.isObservable(),
-													 ScopeKind.LOCAL,
-													 null, null,
-													 event.getAttributes());
-							module.getEventDeclListModifiable().add(decl);
 						}
 					}
 					if (problem) {

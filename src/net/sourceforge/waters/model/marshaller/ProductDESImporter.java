@@ -23,14 +23,19 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.ItemNotFoundException;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -68,7 +73,7 @@ public class ProductDESImporter
   //# Constructors
   /**
    * Creates a new product DES importer.
-   * This default constructor yiels a converter that does not provide
+   * This default constructor yields a converter that does not provide
    * location (file name) information in the modules it produces.
    * @param  factory    The factory used to create the module.
    */
@@ -86,7 +91,9 @@ public class ProductDESImporter
   public ProductDESImporter(final ModuleProxyFactory factory,
                             final DocumentManager manager)
   {
+    final OperatorTable optable = CompilerOperatorTable.getInstance();
     mFactory = factory;
+    mExpressionParser = new ExpressionParser(factory, optable);
     mDocumentManager = manager;
   }
 
@@ -127,6 +134,7 @@ public class ProductDESImporter
    *         Compiling it should produce a result equal to <CODE>des</CODE>.
    */
   public ModuleProxy importModule(final ProductDESProxy des)
+    throws ParseException
   {
     final String name = des.getName();
     final String comment = des.getComment();
@@ -158,6 +166,7 @@ public class ProductDESImporter
    * @return A simple component that compiles to the given automaton.
    */
   public SimpleComponentProxy importComponent(final AutomatonProxy aut)
+    throws ParseException
   {
     try {
       mCurrentAutomaton = aut;
@@ -211,10 +220,10 @@ public class ProductDESImporter
         final SimpleNodeProxy target = pair.getTarget();
         final Set<EventProxy> events = transmap.get(pair);
         final int numevents = events.size();
-        final Collection<SimpleIdentifierProxy> labels =
-          new ArrayList<SimpleIdentifierProxy>(numevents);
+        final Collection<IdentifierProxy> labels =
+          new ArrayList<IdentifierProxy>(numevents);
         for (final EventProxy event : events) {
-          final SimpleIdentifierProxy label = importEvent(event);
+          final IdentifierProxy label = importEvent(event);
           labels.add(label);
         }
         final LabelBlockProxy labelblock =
@@ -224,11 +233,11 @@ public class ProductDESImporter
         edges.add(edge);
       }
       final int numblocked = mCurrentBlockedEvents.size();
-      final Collection<SimpleIdentifierProxy> blockedlabels =
-        new ArrayList<SimpleIdentifierProxy>(numblocked);
+      final Collection<IdentifierProxy> blockedlabels =
+        new ArrayList<IdentifierProxy>(numblocked);
       for (final EventProxy event : mCurrentEvents) {
         if (mCurrentBlockedEvents.contains(event)) {
-          final SimpleIdentifierProxy label = importEvent(event);
+          final IdentifierProxy label = importEvent(event);
           blockedlabels.add(label);
         }
       }
@@ -253,8 +262,9 @@ public class ProductDESImporter
   //#########################################################################
   //# Visitor Methods
   private EventDeclProxy importEventDecl(final EventProxy event)
+    throws ParseException
   {
-    final SimpleIdentifierProxy ident = importEvent(event);
+    final IdentifierProxy ident = importEvent(event);
     final EventKind kind = event.getKind();
     final boolean observable = event.isObservable();
     final Map<String,String> attribs = event.getAttributes();
@@ -262,23 +272,24 @@ public class ProductDESImporter
       (ident, kind, observable, ScopeKind.LOCAL, null, null, attribs);
   }
 
-  private SimpleIdentifierProxy importEvent(final EventProxy event)
+  private IdentifierProxy importEvent(final EventProxy event)
+    throws ParseException
   {
     final String name = event.getName();
-    return mFactory.createSimpleIdentifierProxy(name);
+    return mExpressionParser.parseIdentifier(name);
   }
 
   private SimpleNodeProxy importNode(final StateProxy state)
+    throws ParseException
   {
 
     final String name = state.getName();
     final boolean initial = state.isInitial();
     final Collection<EventProxy> props = state.getPropositions();
-    final Collection<SimpleIdentifierProxy> idents =
-      new TreeSet<SimpleIdentifierProxy>();
+    final Collection<IdentifierProxy> idents = new TreeSet<IdentifierProxy>();
     for (final EventProxy prop : props) {
       checkEvent(prop);
-      final SimpleIdentifierProxy ident = importEvent(prop);
+      final IdentifierProxy ident = importEvent(prop);
       idents.add(ident);
     }
     final PlainEventListProxy list =
@@ -454,6 +465,7 @@ public class ProductDESImporter
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
+  private final ExpressionParser mExpressionParser;
   private DocumentManager mDocumentManager;
 
   private AutomatonProxy mCurrentAutomaton;
