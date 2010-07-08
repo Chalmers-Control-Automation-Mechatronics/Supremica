@@ -130,15 +130,17 @@ public class SpringEmbedder
    * @return <CODE>true</CODE> if any is missing geometry.
    *         In this case, a call to {@link #setUpGeometry()} would
    *         change the graph.
-   * @throws GeometryAbsentException if a group node without geometry
-   *         has been found. Group nodes cannot be assigned geometry
-   *         automatically, and therefore the graph cannot be rendered
-   *         when this exception is thrown.
+   * @throws GeometryAbsentException if the graph has more nodes than
+   *         specified by the {@link Config#DOT_MAX_NBR_OF_STATES} setting,
+   *         or if a group node without geometry has been found. Group nodes
+   *         cannot be assigned geometry automatically, and therefore the graph
+   *         cannot be rendered when this exception is thrown.
    *
    */
   public boolean needsGeometry()
     throws GeometryAbsentException
   {
+    checkNumberOfStates();
     if (mBlocked != null) {
       if (mBlocked.getGeometry() == null) {
         mBlocked.setGeometry(new LabelGeometrySubject(new Point(5, 5)));
@@ -152,11 +154,7 @@ public class SpringEmbedder
         }
       } else if (node instanceof GroupNodeSubject) {
         final GroupNodeSubject group = (GroupNodeSubject) node;
-        if (group.getGeometry() == null) {
-          throw new GeometryAbsentException
-            ("There is no geometry information for group node '" +
-             group.getName() + "' in this graph!");
-        }
+        checkGroupNodeGeometry(group);
       } else {
         throw new ClassCastException
           ("Unknown node type: " + node.getClass().getName() + "!");
@@ -174,14 +172,16 @@ public class SpringEmbedder
    * @return <CODE>true</CODE> if any node has been assigned geometry.
    *         In this case, the GUI should invoke the spring embedder
    *         to layout the graph.
-   * @throws GeometryAbsentException if a group node without geometry
-   *         has been found. Group nodes cannot be assigned geometry
-   *         automatically, and therefore the graph cannot be rendered
-   *         when this exception is thrown.
+   * @throws GeometryAbsentException if the graph has more nodes than
+   *         specified by the {@link Config#DOT_MAX_NBR_OF_STATES} setting,
+   *         or if a group node without geometry has been found. Group nodes
+   *         cannot be assigned geometry automatically, and therefore the graph
+   *         cannot be rendered when this exception is thrown.
    */
   public boolean setUpGeometry()
     throws GeometryAbsentException
   {
+    checkNumberOfStates();
     boolean runEmbedder = false;
     for (final NodeSubject node : mNodes) {
       if (node instanceof SimpleNodeSubject) {
@@ -209,11 +209,7 @@ public class SpringEmbedder
         }
       } else if (node instanceof GroupNodeSubject) {
         final GroupNodeSubject group = (GroupNodeSubject) node;
-        if (group.getGeometry() == null) {
-          throw new GeometryAbsentException
-            ("There is no geometry information for group node '" +
-             group.getName() + "' in this graph!");
-        }
+        checkGroupNodeGeometry(group);
       } else {
         throw new ClassCastException
           ("Unknown node type: " + node.getClass().getName() + "!");
@@ -312,6 +308,32 @@ public class SpringEmbedder
   public static int getMaxProgress()
   {
     return NUM_PASSES + 1;
+  }
+
+
+  //##########################################################################
+  //# Failure Detection
+  private void checkNumberOfStates()
+    throws GeometryAbsentException
+  {
+    final int numnodes = mNodes.size();
+    final int maxnodes = Config.DOT_MAX_NBR_OF_STATES.get();
+    if (numnodes > maxnodes) {
+      final String msg = "This graph has " + numnodes + " states.\n" +
+                   "Graphs with more than " + maxnodes +
+                   " states cannot be displayed.";
+      throw new GeometryAbsentException(msg);
+    }
+  }
+
+  private void checkGroupNodeGeometry(final GroupNodeSubject group)
+    throws GeometryAbsentException
+  {
+    if (group.getGeometry() == null) {
+      throw new GeometryAbsentException
+        ("There is no geometry information for group node '" +
+         group.getName() + "' in this graph!");
+    }
   }
 
 
