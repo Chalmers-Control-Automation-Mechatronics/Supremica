@@ -96,6 +96,12 @@ public abstract class AbstractCompilerTest
     compile("tests", "nasty", "array");
   }
 
+  public void testCompile_array2d()
+    throws IOException, WatersException
+  {
+    compile("tests", "nasty", "array2d");
+  }
+
   public void testCompile_buffer_sf1()
     throws IOException, WatersException
   {

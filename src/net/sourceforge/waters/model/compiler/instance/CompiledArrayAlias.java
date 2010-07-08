@@ -161,9 +161,19 @@ class CompiledArrayAlias implements CompiledEvent
   {
     final SimpleExpressionProxy index = iter.next();
     if (iter.hasNext()) {
-      final CompiledArrayAlias alias = new CompiledArrayAlias(this, index);
-      alias.set(iter, value);
-      set(index, alias);
+      final CompiledEvent next = get(index);
+      if (next == null) {
+        final CompiledArrayAlias alias = new CompiledArrayAlias(this, index);
+        alias.set(iter, value);
+        set(index, alias);
+      } else if (next instanceof CompiledArrayAlias) {
+        final CompiledArrayAlias array = (CompiledArrayAlias) next;
+        array.set(iter, value);
+      } else {
+        final ParentInfo info = new IndexedParentInfo(this, index);
+        final String name = info.getName();
+        throw new DuplicateIdentifierException(name);
+      }
     } else {
       set(index, value);
     }
