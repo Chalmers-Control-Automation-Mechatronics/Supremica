@@ -477,7 +477,9 @@ public class IDEMenuBar extends JMenuBar
     if (mToolsMenu != null) {
       add(mToolsMenu);
     }
-    add(mExamplesMenu);
+    if (mExamplesMenu != null) {
+      add(mExamplesMenu);
+    }
     add(mModulesMenu);
     add(mConfigureMenu);
     add(mHelpMenu);
