@@ -343,12 +343,10 @@ public class CompositionalGeneralisedConflictChecker extends
    * Checks if an automaton is trivial. Trivial in this case is an automaton
    * with no transitions and one state which has the generalised precondition
    * marking and default marking.
-   *
-   * @param abstractedAut
-   * @return
    */
   private boolean checkTrivial(final AutomatonProxy abstractedAut)
   {
+    // TODO Should also check the alphabet for the propositions ...
     if (abstractedAut.getStates().size() == 1) {
       final Iterator<StateProxy> stateIter =
           abstractedAut.getStates().iterator();
@@ -473,7 +471,7 @@ public class CompositionalGeneralisedConflictChecker extends
   // #########################################################################
   // # Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   /**
-   * Initialises required variables to default values if the user hasn't
+   * Initialises required variables to default values if the user has not
    * configured them.
    */
   protected void setUp() throws AnalysisException
@@ -1070,36 +1068,31 @@ public class CompositionalGeneralisedConflictChecker extends
    *
    * @author rmf18
    */
-  private abstract class PreselctingPairingHeuristic extends
+  private abstract class PreselectingPairingHeuristic extends
       PreselectingHeuristic
   {
     /**
      * Finds a list of candidates based on a heuristic which requires pairing If
      * no candidates is eligible the automaton being paired is removed and
      * another pairing is attempted.
-     *
-     * @param model
-     * @return
      */
     protected List<Candidate> evaluate(final ProductDESProxy model)
     {
+      // TODO Candidates consisting of all automata should be suppressed
+      // in all cases (not only when the first pairing fails).
       Collection<AutomatonProxy> automata = model.getAutomata();
       AutomatonProxy chosenAut = getHeuristicProperty(automata);
       List<Candidate> candidates = pairAutomata(chosenAut, automata);
-
       if (candidates.size() == 0 && automata.size() > 2) {
         automata = new ArrayList<AutomatonProxy>(model.getAutomata());
         while (candidates.size() == 0 && automata.size() > 2) {
           automata.remove(chosenAut);
           if (automata.size() > 0) {
-            chosenAut =
-                (AutomatonProxy) Collections.min(automata,
-                                                 new AutomataComparator());
+            chosenAut = Collections.min(automata, new AutomataComparator());
             candidates = pairAutomata(chosenAut, automata);
           }
         }
       }
-
       return candidates;
     }
 
@@ -1184,7 +1177,7 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  private class HeuristicMinT extends PreselctingPairingHeuristic
+  private class HeuristicMinT extends PreselectingPairingHeuristic
   {
     protected int getHeuristicFigure(final AutomatonProxy aut)
     {
@@ -1211,7 +1204,7 @@ public class CompositionalGeneralisedConflictChecker extends
    * candidate is produced by pairing the automaton with the most states to
    * every other automaton in the model.
    */
-  private class HeuristicMaxS extends PreselctingPairingHeuristic
+  private class HeuristicMaxS extends PreselectingPairingHeuristic
   {
     protected int getHeuristicFigure(final AutomatonProxy aut)
     {

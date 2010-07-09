@@ -95,7 +95,7 @@ public abstract class AbstractConflictCheckerCounterexampleTest extends
 
   public void testTbedNoderailBlock() throws Exception
   {
-    setConfiguration(10000, 10000, 1000000, 1000000);
+    setConfiguration(10000, 100000, 1000000, 1000000);
     final String group = "tests";
     final String dir = "incremental_suite";
     final String name = "tbed_noderail_block.wmod";

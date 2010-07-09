@@ -25,6 +25,8 @@ import java.util.TreeSet;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -34,6 +36,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
@@ -43,9 +46,11 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -101,9 +106,8 @@ public class ProductDESImporter
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mFactory = factory;
     mExpressionParser = new ExpressionParser(factory, optable);
+    mEnumSymbolCollector = new EnumSymbolCollector();
     mDocumentManager = manager;
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-    mEnumSymbols = new ProxyAccessorHashSet<SimpleIdentifierProxy>(eq);
   }
 
 
@@ -165,26 +169,12 @@ public class ProductDESImporter
         final SimpleComponentProxy comp = importComponent(aut);
         comps.add(comp);
       }
-      final Collection<ConstantAliasProxy> aliases;
-      if (mEnumSymbols.isEmpty()) {
-        aliases = null;
-      } else {
-        final Collection<SimpleIdentifierProxy> values = mEnumSymbols.values();
-        final List<SimpleIdentifierProxy> list =
-          new ArrayList<SimpleIdentifierProxy>(values);
-        Collections.sort(list);
-        final SimpleIdentifierProxy symbols =
-          mFactory.createSimpleIdentifierProxy(":symbols");
-        final EnumSetExpressionProxy expr =
-          mFactory.createEnumSetExpressionProxy(list);
-        final ConstantAliasProxy alias =
-          mFactory.createConstantAliasProxy(symbols, expr);
-        aliases = Collections.singletonList(alias);
-      }
+      final Collection<ConstantAliasProxy> aliases =
+        mEnumSymbolCollector.createAliasList();
       return mFactory.createModuleProxy
         (name, comment, location, aliases, decls, null, comps);
     } finally {
-      mEnumSymbols.clear();
+      mEnumSymbolCollector.clear();
     }
   }
 
@@ -306,15 +296,7 @@ public class ProductDESImporter
   {
     final String name = event.getName();
     final IdentifierProxy ident = mExpressionParser.parseIdentifier(name);
-    if (ident instanceof IndexedIdentifierProxy) {
-      final IndexedIdentifierProxy indexed = (IndexedIdentifierProxy) ident;
-      for (final SimpleExpressionProxy index : indexed.getIndexes()) {
-        if (index instanceof SimpleIdentifierProxy) {
-          final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) index;
-          mEnumSymbols.addProxy(simple);
-        }
-      }
-    }
+    mEnumSymbolCollector.collect(ident);
     return ident;
   }
 
@@ -385,6 +367,98 @@ public class ProductDESImporter
       // Bad name, use null, i.e., no file location ...
       return null;
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class EnumSymbolCollector
+  private class EnumSymbolCollector extends AbstractModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Constructors
+    private EnumSymbolCollector()
+    {
+      mCloner = mFactory.getCloner();
+      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      mEnumSymbols = new ProxyAccessorHashSet<SimpleIdentifierProxy>(eq);
+    }
+
+    //#######################################################################
+    //# Invocation
+    private void collect(final IdentifierProxy ident)
+    {
+      if (!(ident instanceof SimpleIdentifierProxy)) {
+        try {
+          ident.acceptVisitor(this);
+        } catch (final VisitorException exception) {
+          throw new WatersRuntimeException(exception);
+        }
+      }
+    }
+
+    private Collection<ConstantAliasProxy> createAliasList()
+    {
+      if (mEnumSymbols.isEmpty()) {
+        return null;
+      } else {
+        final Collection<SimpleIdentifierProxy> values = mEnumSymbols.values();
+        final List<SimpleIdentifierProxy> list =
+          new ArrayList<SimpleIdentifierProxy>(values);
+        Collections.sort(list);
+        final SimpleIdentifierProxy symbols =
+          mFactory.createSimpleIdentifierProxy(":symbols");
+        final EnumSetExpressionProxy expr =
+          mFactory.createEnumSetExpressionProxy(list);
+        final ConstantAliasProxy alias =
+          mFactory.createConstantAliasProxy(symbols, expr);
+        return Collections.singletonList(alias);
+      }
+    }
+
+    private void clear()
+    {
+      mEnumSymbols.clear();
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitIndexedIdentifierProxy
+      (final IndexedIdentifierProxy ident)
+      throws VisitorException
+    {
+      for (final SimpleExpressionProxy index : ident.getIndexes()) {
+        index.acceptVisitor(this);
+      }
+      return null;
+    }
+
+    public Object visitQualifiedIdentifierProxy
+      (final QualifiedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final IdentifierProxy base = ident.getBaseIdentifier();
+      base.acceptVisitor(this);
+      final IdentifierProxy comp = ident.getComponentIdentifier();
+      return comp.acceptVisitor(this);
+    }
+
+    public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+    {
+      return null;
+    }
+
+    public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
+    {
+      final SimpleIdentifierProxy cloned =
+        (SimpleIdentifierProxy) mCloner.getClone(ident);
+      mEnumSymbols.addProxy(cloned);
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final ModuleProxyCloner mCloner;
+    private final ProxyAccessorSet<SimpleIdentifierProxy> mEnumSymbols;
   }
 
 
@@ -505,7 +579,7 @@ public class ProductDESImporter
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final ExpressionParser mExpressionParser;
-  private final ProxyAccessorSet<SimpleIdentifierProxy> mEnumSymbols;
+  private final EnumSymbolCollector mEnumSymbolCollector;
   private DocumentManager mDocumentManager;
 
   private AutomatonProxy mCurrentAutomaton;
