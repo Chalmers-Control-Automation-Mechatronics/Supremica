@@ -517,7 +517,7 @@ Class-Path: ${manifest.pathlist}</echo>
             <fileset dir="${build}"
                      excludes="net/sourceforge/waters/analysis/comp552/"/>
             <fileset dir="${images}"/>
-            <fileset dir="${examples}"/>
+            <fileset dir="${examples}" includes="includeInJarFile/"/>
             <fileset dir="${animations}"/>              
             <fileset dir="${userinterfaces}"/>  
             <fileset dir="${runtimesoftplcbuild}"/>                     

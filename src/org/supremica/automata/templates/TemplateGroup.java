@@ -49,40 +49,68 @@
  */
 package org.supremica.automata.templates;
 
-import java.util.*;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 
 public class TemplateGroup implements Iterable<TemplateItem>
 {
-    private final List<TemplateItem> items = new LinkedList<TemplateItem>();
-    @SuppressWarnings("unused")
-	private final TemplateTypes type;
-    private final String name;
-    private final String shortDescription;
 
-    public TemplateGroup(final TemplateTypes type)
-    {
-	this.type = type;
-	this.name = type.getName();
-	this.shortDescription = type.getShortDescription();
-    }
+  //#########################################################################
+  //# Constructors
+  public TemplateGroup(final TemplateTypes type)
+  {
+    mName = type.getName();
+    mShortDescription = type.getShortDescription();
+  }
 
-    public String getName()
-    {
-    	return name;
-    }
 
-    public String getShortDescription()
-    {
-    	return shortDescription;
-    }
+  //#########################################################################
+  //# Simple Access
+  public String getName()
+  {
+    return mName;
+  }
 
-    public void addItem(final TemplateItem item)
-    {
-    	items.add(item);
-    }
+  public String getShortDescription()
+  {
+    return mShortDescription;
+  }
 
-    public Iterator<TemplateItem> iterator()
-    {
-	return items.iterator();
+
+  //#########################################################################
+  //# List Access
+  public void addItem(final String name, final String path)
+  {
+    final URL url = getClass().getResource(path);
+    if (url != null) {
+      final TemplateItem item = new TemplateItem(name, path);
+      addItem(item);
     }
+  }
+
+  public void addItem(final TemplateItem item)
+  {
+    mItems.add(item);
+  }
+
+  public boolean isEmpty()
+  {
+    return mItems.isEmpty();
+  }
+
+  public Iterator<TemplateItem> iterator()
+  {
+    return mItems.iterator();
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final List<TemplateItem> mItems = new LinkedList<TemplateItem>();
+  private final String mName;
+  private final String mShortDescription;
+
 }

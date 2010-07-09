@@ -410,22 +410,24 @@ public class IDEMenuBar extends JMenuBar
 
     // Examples
     if (mExamplesMenu == null) {
-      mExamplesMenu = new JMenu("Examples");
-      mExamplesMenu.setMnemonic(KeyEvent.VK_P);
-      mExamplesMenu.add(actions.toolsTestCasesAction.getMenuItem());
       final ExampleTemplates exTempl = ExampleTemplates.getInstance();
-      for (final TemplateGroup currGroup : exTempl) {
-        final JMenu menuFileNewFromTemplateGroup = new JMenu();
-        menuFileNewFromTemplateGroup.setText(currGroup.getName());
-        menuFileNewFromTemplateGroup.setToolTipText(currGroup
-            .getShortDescription());
-        mExamplesMenu.add(menuFileNewFromTemplateGroup);
-        for (final TemplateItem currItem : currGroup) {
-          final JMenuItem menuItem = new JMenuItem();
-          menuItem.setText(currItem.getName());
-          menuItem.setToolTipText(currItem.getShortDescription());
-          menuFileNewFromTemplateGroup.add(menuItem);
-          menuItem.addActionListener(new NewFromTemplateHandler(currItem));
+      if (!exTempl.isEmpty()) {
+        mExamplesMenu = new JMenu("Examples");
+        mExamplesMenu.setMnemonic(KeyEvent.VK_P);
+        mExamplesMenu.add(actions.toolsTestCasesAction.getMenuItem());
+        for (final TemplateGroup currGroup : exTempl) {
+          final JMenu menuFileNewFromTemplateGroup = new JMenu();
+          menuFileNewFromTemplateGroup.setText(currGroup.getName());
+          menuFileNewFromTemplateGroup.setToolTipText(currGroup
+                                                      .getShortDescription());
+          mExamplesMenu.add(menuFileNewFromTemplateGroup);
+          for (final TemplateItem currItem : currGroup) {
+            final JMenuItem menuItem = new JMenuItem();
+            menuItem.setText(currItem.getName());
+            menuItem.setToolTipText(currItem.getShortDescription());
+            menuFileNewFromTemplateGroup.add(menuItem);
+            menuItem.addActionListener(new NewFromTemplateHandler(currItem));
+          }
         }
       }
     }
