@@ -140,7 +140,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 //# ALT-o: Configure menu
 //# ALT-p: Examples menu
 //# ALT-q:
-//# ALT-r:
+//# ALT-r: Verify menu
 //# ALT-s: Simulator menu
 //# ALT-t: Tools menu
 //# ALT-u:
@@ -148,8 +148,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 //# ALT-w:
 //# ALT-x: File/Exit
 //# ALT-y:
-//# ALT-z: Analyze menu (in the Analyse menu) /
-//#        New Analyze menu (in the Editor menu)
+//# ALT-z: Analyze menu
 
 //###########################################################################
 //# CTRL-Hotkeys:
@@ -300,32 +299,32 @@ public class IDEMenuBar extends JMenuBar
         // menu.add(ide.getActions().editorAddBindingAction.getMenuItem());
       }
 
-      // The new analyze menu
-      if (mNewAnalyzeMenu == null &&
+      // Verify
+      if (mVerifyMenu == null &&
           Config.INCLUDE_WATERS_SIMULATOR.isTrue() &&
           (panel instanceof EditorPanel || panel instanceof SimulatorPanel)) {
-        mNewAnalyzeMenu = new JMenu("Analyze");
-        mNewAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
+        mVerifyMenu = new JMenu("Verify");
+        mVerifyMenu.setMnemonic(KeyEvent.VK_R);
         final Action conflict =
             actions.getAction(AnalyzeConflictCheckAction.class);
-        mNewAnalyzeMenu.add(conflict);
+        mVerifyMenu.add(conflict);
         final Action controllability =
             actions.getAction(AnalyzeControllabilityAction.class);
-        mNewAnalyzeMenu.add(controllability);
+        mVerifyMenu.add(controllability);
         final Action controlLoop =
             actions.getAction(AnalyzeControlLoopAction.class);
-        mNewAnalyzeMenu.add(controlLoop);
+        mVerifyMenu.add(controlLoop);
         final Action languageInclusion =
             actions.getAction(AnalyzeLanguageInclusionAction.class);
-        mNewAnalyzeMenu.add(languageInclusion);
+        mVerifyMenu.add(languageInclusion);
         if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
-          mNewAnalyzeMenu.addSeparator();
+          mVerifyMenu.addSeparator();
           final Action sic5 =
             actions.getAction(AnalyzeSICProperty5Action.class);
-          mNewAnalyzeMenu.add(sic5);
+          mVerifyMenu.add(sic5);
           final Action sic6 =
             actions.getAction(AnalyzeSICProperty6Action.class);
-          mNewAnalyzeMenu.add(sic6);
+          mVerifyMenu.add(sic6);
         }
       }
 
@@ -464,12 +463,14 @@ public class IDEMenuBar extends JMenuBar
     if (panel != null) {
       if (panel instanceof EditorPanel) {
         add(mCreateMenu);
-        if (mNewAnalyzeMenu != null)
-          add(mNewAnalyzeMenu);
+        if (mVerifyMenu != null) {
+          add(mVerifyMenu);
+        }
       } else if (panel instanceof SimulatorPanel) {
         add(mSimulateMenu);
-        if (mNewAnalyzeMenu != null)
-          add(mNewAnalyzeMenu);
+        if (mVerifyMenu != null) {
+          add(mVerifyMenu);
+        }
       } else if (panel instanceof AnalyzerPanel) {
         add(mAnalyzeMenu);
       }
@@ -617,7 +618,7 @@ public class IDEMenuBar extends JMenuBar
     // # Interface org.supremica.properties.SupremicaPropertyChangeListener
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
-      mNewAnalyzeMenu = null;
+      mVerifyMenu = null;
       rebuildMenus();
     }
   }
@@ -662,7 +663,7 @@ public class IDEMenuBar extends JMenuBar
   private JMenu mFileMenu = null;
   private JMenu mEditMenu = null;
   private JMenu mCreateMenu = null;
-  private JMenu mNewAnalyzeMenu = null;
+  private JMenu mVerifyMenu = null;
   private JMenu mSimulateMenu = null;
   private JMenu mAnalyzeMenu = null;
   private JMenu mToolsMenu = null;
