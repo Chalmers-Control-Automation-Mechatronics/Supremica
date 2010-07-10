@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="AIP--all" major="0" minor="9" comment="The 'Atelier Inter-établissement de Productique' (AIP) example described in 'Hierarchical Interface-based Supervisory Control' by R.J. Leduc. Here, the redundant 'NewEvents'-models have been removed, otherwise everything is as in the report except for the names of the models which vary slightly. The models can be divided into three disjoint groups--TU4, AS3 and the rest--having no events in common.">
-<Automaton name="h_ASStoreUpState.AS1" type="Plant">
+<Automata name="AIP--all" major="0" minor="9" comment="The 'Atelier Inter-établissement de Productique' (AIP) example described in 'Hierarchical Interface-based Supervisory Control' by R.J. Leduc. Here, the redundant 'NewEvents'-models have been removed, otherwise everything is as in the report except for the names of the models which vary slightly. The models can be divided into three disjoint groups-[TU4],[AS3] and the rest--having no events in common.">
+<Automaton name="h_ASStoreUpState[AS1]" type="Plant">
 	<Events>
-		<Event id="0" label="ASDwn.AS1"/>
-		<Event id="1" label="DoRpr.AS1"/>
-		<Event id="2" label="ProcPallet.AS1"/>
-		<Event id="3" label="QStnUp.AS1"/>
-		<Event id="4" label="RobUp.AS1"/>
-		<Event id="5" label="StnDwn.AS1" controllable="false"/>
-		<Event id="6" label="StnUp.AS1" controllable="false"/>
+		<Event id="0" label="ASDwn[AS1]"/>
+		<Event id="1" label="DoRpr[AS1]"/>
+		<Event id="2" label="ProcPallet[AS1]"/>
+		<Event id="3" label="QStnUp[AS1]"/>
+		<Event id="4" label="RobUp[AS1]"/>
+		<Event id="5" label="StnDwn[AS1]" controllable="false"/>
+		<Event id="6" label="StnUp[AS1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0"/>
@@ -31,15 +31,15 @@
 		<Transition source="3" dest="2" event="6"/>
 	</Transitions>
 </Automaton>
-<Automaton name="h_ASStoreUpState.AS2" type="Plant">
+<Automaton name="h_ASStoreUpState[AS2]" type="Plant">
 	<Events>
-		<Event id="0" label="ASDwn.AS2"/>
-		<Event id="1" label="DoRpr.AS2"/>
-		<Event id="2" label="ProcPallet.AS2"/>
-		<Event id="3" label="QStnUp.AS2"/>
-		<Event id="4" label="RobUp.AS2"/>
-		<Event id="5" label="StnDwn.AS2" controllable="false"/>
-		<Event id="6" label="StnUp.AS2" controllable="false"/>
+		<Event id="0" label="ASDwn[AS2]"/>
+		<Event id="1" label="DoRpr[AS2]"/>
+		<Event id="2" label="ProcPallet[AS2]"/>
+		<Event id="3" label="QStnUp[AS2]"/>
+		<Event id="4" label="RobUp[AS2]"/>
+		<Event id="5" label="StnDwn[AS2]" controllable="false"/>
+		<Event id="6" label="StnUp[AS2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0"/>
@@ -64,8 +64,8 @@
 </Automaton>
 <Automaton name="h_PalletArvGateSenEL3_2" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvGEL_2.AS3" controllable="false"/>
-		<Event id="1" label="ProcPallet.AS3"/>
+		<Event id="0" label="PalletArvGEL_2[AS3]" controllable="false"/>
+		<Event id="1" label="ProcPallet[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -76,14 +76,14 @@
 		<Transition source="1" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="h_QueryPalletAtTU.TU1" type="Plant">
+<Automaton name="h_QueryPalletAtTU[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="IsPalletCL.TU1" controllable="false"/>
-		<Event id="1" label="IsPalletEL.TU1"/>
-		<Event id="2" label="NoPalletCL.TU1" controllable="false"/>
-		<Event id="3" label="NoPalletEL.TU1" controllable="false"/>
-		<Event id="4" label="QPalletAtCL.TU1"/>
-		<Event id="5" label="QPalletAtEL.TU1"/>
+		<Event id="0" label="IsPalletCL[TU1]" controllable="false"/>
+		<Event id="1" label="IsPalletEL[TU1]"/>
+		<Event id="2" label="NoPalletCL[TU1]" controllable="false"/>
+		<Event id="3" label="NoPalletEL[TU1]" controllable="false"/>
+		<Event id="4" label="QPalletAtCL[TU1]"/>
+		<Event id="5" label="QPalletAtEL[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0"/>
@@ -99,14 +99,14 @@
 		<Transition source="2" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="h_QueryPalletAtTU.TU2" type="Plant">
+<Automaton name="h_QueryPalletAtTU[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="IsPalletCL.TU2" controllable="false"/>
-		<Event id="1" label="IsPalletEL.TU2"/>
-		<Event id="2" label="NoPalletCL.TU2" controllable="false"/>
-		<Event id="3" label="NoPalletEL.TU2" controllable="false"/>
-		<Event id="4" label="QPalletAtCL.TU2"/>
-		<Event id="5" label="QPalletAtEL.TU2"/>
+		<Event id="0" label="IsPalletCL[TU2]" controllable="false"/>
+		<Event id="1" label="IsPalletEL[TU2]"/>
+		<Event id="2" label="NoPalletCL[TU2]" controllable="false"/>
+		<Event id="3" label="NoPalletEL[TU2]" controllable="false"/>
+		<Event id="4" label="QPalletAtCL[TU2]"/>
+		<Event id="5" label="QPalletAtEL[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0"/>
@@ -122,14 +122,14 @@
 		<Transition source="2" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="h_QueryPalletAtTU.TU3" type="Plant">
+<Automaton name="h_QueryPalletAtTU[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="IsPalletCL.TU3" controllable="false"/>
-		<Event id="1" label="IsPalletEL.TU3"/>
-		<Event id="2" label="NoPalletCL.TU3" controllable="false"/>
-		<Event id="3" label="NoPalletEL.TU3" controllable="false"/>
-		<Event id="4" label="QPalletAtCL.TU3"/>
-		<Event id="5" label="QPalletAtEL.TU3"/>
+		<Event id="0" label="IsPalletCL[TU3]" controllable="false"/>
+		<Event id="1" label="IsPalletEL[TU3]"/>
+		<Event id="2" label="NoPalletCL[TU3]" controllable="false"/>
+		<Event id="3" label="NoPalletEL[TU3]" controllable="false"/>
+		<Event id="4" label="QPalletAtCL[TU3]"/>
+		<Event id="5" label="QPalletAtEL[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0"/>
@@ -145,14 +145,14 @@
 		<Transition source="2" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="h_QueryPalletAtTU.TU4" type="Plant">
+<Automaton name="h_QueryPalletAtTU[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="IsPalletCL.TU4" controllable="false"/>
-		<Event id="1" label="IsPalletEL.TU4"/>
-		<Event id="2" label="NoPalletCL.TU4" controllable="false"/>
-		<Event id="3" label="NoPalletEL.TU4" controllable="false"/>
-		<Event id="4" label="QPalletAtCL.TU4"/>
-		<Event id="5" label="QPalletAtEL.TU4"/>
+		<Event id="0" label="IsPalletCL[TU4]" controllable="false"/>
+		<Event id="1" label="IsPalletEL[TU4]"/>
+		<Event id="2" label="NoPalletCL[TU4]" controllable="false"/>
+		<Event id="3" label="NoPalletEL[TU4]" controllable="false"/>
+		<Event id="4" label="QPalletAtCL[TU4]"/>
+		<Event id="5" label="QPalletAtEL[TU4]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0"/>
@@ -168,23 +168,23 @@
 		<Transition source="2" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="h_ManageTU1" type="Specification">
+<Automaton name="h_Manag[TU1]" type="Specification">
 	<Events>
-		<Event id="0" label="IsPalletCL.TU1" controllable="false"/>
-		<Event id="1" label="IsPalletEL.TU1"/>
-		<Event id="2" label="LibPallet.TU1"/>
-		<Event id="3" label="NoPalletCL.TU1" controllable="false"/>
-		<Event id="4" label="NoPalletEL.TU1" controllable="false"/>
-		<Event id="5" label="NoTrnsfEL.TU1"/>
-		<Event id="6" label="PalletRlsd.TU1"/>
-		<Event id="7" label="QPalletAtCL.TU1"/>
-		<Event id="8" label="QPalletAtEL.TU1"/>
-		<Event id="10" label="StnDwn.AS1" controllable="false"/>
-		<Event id="11" label="StnUp.AS1" controllable="false"/>
-		<Event id="12" label="TrnsfCplToCL.TU1"/>
-		<Event id="13" label="TrnsfCplToEL.TU1"/>
-		<Event id="14" label="TrnsfELToCL.TU1"/>
-		<Event id="15" label="TrnsfToEL.TU1"/>
+		<Event id="0" label="IsPalletCL[TU1]" controllable="false"/>
+		<Event id="1" label="IsPalletEL[TU1]"/>
+		<Event id="2" label="LibPallet[TU1]"/>
+		<Event id="3" label="NoPalletCL[TU1]" controllable="false"/>
+		<Event id="4" label="NoPalletEL[TU1]" controllable="false"/>
+		<Event id="5" label="NoTrnsfEL[TU1]"/>
+		<Event id="6" label="PalletRlsd[TU1]"/>
+		<Event id="7" label="QPalletAtCL[TU1]"/>
+		<Event id="8" label="QPalletAtEL[TU1]"/>
+		<Event id="10" label="StnDwn[AS1]" controllable="false"/>
+		<Event id="11" label="StnUp[AS1]" controllable="false"/>
+		<Event id="12" label="TrnsfCplToCL[TU1]"/>
+		<Event id="13" label="TrnsfCplToEL[TU1]"/>
+		<Event id="14" label="TrnsfELToCL[TU1]"/>
+		<Event id="15" label="TrnsfToEL[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -224,23 +224,23 @@
 		<Transition source="5" dest="5" event="10"/>
 	</Transitions>
 </Automaton>
-<Automaton name="h_ManageTU2" type="Specification">
+<Automaton name="h_Manag[TU2]" type="Specification">
 	<Events>
-		<Event id="0" label="IsPalletCL.TU2" controllable="false"/>
-		<Event id="1" label="IsPalletEL.TU2"/>
-		<Event id="2" label="LibPallet.TU2"/>
-		<Event id="3" label="NoPalletCL.TU2" controllable="false"/>
-		<Event id="4" label="NoPalletEL.TU2" controllable="false"/>
-		<Event id="5" label="NoTrnsfEL.TU2"/>
-		<Event id="6" label="PalletRlsd.TU2"/>
-		<Event id="7" label="QPalletAtCL.TU2"/>
-		<Event id="8" label="QPalletAtEL.TU2"/>
-		<Event id="10" label="StnDwn.AS2" controllable="false"/>
-		<Event id="11" label="StnUp.AS2" controllable="false"/>
-		<Event id="12" label="TrnsfCplToCL.TU2"/>
-		<Event id="13" label="TrnsfCplToEL.TU2"/>
-		<Event id="14" label="TrnsfELToCL.TU2"/>
-		<Event id="15" label="TrnsfToEL.TU2"/>
+		<Event id="0" label="IsPalletCL[TU2]" controllable="false"/>
+		<Event id="1" label="IsPalletEL[TU2]"/>
+		<Event id="2" label="LibPallet[TU2]"/>
+		<Event id="3" label="NoPalletCL[TU2]" controllable="false"/>
+		<Event id="4" label="NoPalletEL[TU2]" controllable="false"/>
+		<Event id="5" label="NoTrnsfEL[TU2]"/>
+		<Event id="6" label="PalletRlsd[TU2]"/>
+		<Event id="7" label="QPalletAtCL[TU2]"/>
+		<Event id="8" label="QPalletAtEL[TU2]"/>
+		<Event id="10" label="StnDwn[AS2]" controllable="false"/>
+		<Event id="11" label="StnUp[AS2]" controllable="false"/>
+		<Event id="12" label="TrnsfCplToCL[TU2]"/>
+		<Event id="13" label="TrnsfCplToEL[TU2]"/>
+		<Event id="14" label="TrnsfELToCL[TU2]"/>
+		<Event id="15" label="TrnsfToEL[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -280,21 +280,21 @@
 		<Transition source="5" dest="0" event="6"/>
 	</Transitions>
 </Automaton>
-<Automaton name="h_ManageTU3" type="Specification">
+<Automaton name="h_Manag[TU3]" type="Specification">
 	<Events>
 		<Event id="0" label="DetStnsUp"/>
-		<Event id="1" label="IsPalletCL.TU3" controllable="false"/>
-		<Event id="2" label="IsPalletEL.TU3"/>
-		<Event id="3" label="LibPallet.TU3"/>
-		<Event id="4" label="NoPalletCL.TU3" controllable="false"/>
-		<Event id="5" label="NoPalletEL.TU3" controllable="false"/>
-		<Event id="6" label="NoTrnsfEL.TU3"/>
-		<Event id="7" label="PalletRlsd.TU3"/>
-		<Event id="8" label="QPalletAtCL.TU3"/>
-		<Event id="9" label="QPalletAtEL.TU3"/>
-		<Event id="10" label="TrnsfCplToCL.TU3"/>
-		<Event id="11" label="TrnsfCplToEL.TU3"/>
-		<Event id="12" label="TrnsfELToCL.TU3"/>
+		<Event id="1" label="IsPalletCL[TU3]" controllable="false"/>
+		<Event id="2" label="IsPalletEL[TU3]"/>
+		<Event id="3" label="LibPallet[TU3]"/>
+		<Event id="4" label="NoPalletCL[TU3]" controllable="false"/>
+		<Event id="5" label="NoPalletEL[TU3]" controllable="false"/>
+		<Event id="6" label="NoTrnsfEL[TU3]"/>
+		<Event id="7" label="PalletRlsd[TU3]"/>
+		<Event id="8" label="QPalletAtCL[TU3]"/>
+		<Event id="9" label="QPalletAtEL[TU3]"/>
+		<Event id="10" label="TrnsfCplToCL[TU3]"/>
+		<Event id="11" label="TrnsfCplToEL[TU3]"/>
+		<Event id="12" label="TrnsfELToCL[TU3]"/>
 		<Event id="13" label="TrnsfToEL3_1D"/>
 		<Event id="14" label="TrnsfToEL3_2D"/>
 		<Event id="15" label="TrnsfToEL3_BD"/>
@@ -328,21 +328,21 @@
 		<Transition source="5" dest="3" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="h_ManageTU4" type="Specification">
+<Automaton name="h_Manag[TU4]" type="Specification">
 	<Events>
-		<Event id="0" label="IsPalletCL.TU4" controllable="false"/>
-		<Event id="1" label="IsPalletEL.TU4"/>
-		<Event id="2" label="LibPallet.TU4"/>
-		<Event id="3" label="NoPalletCL.TU4" controllable="false"/>
-		<Event id="4" label="NoPalletEL.TU4" controllable="false"/>
-		<Event id="5" label="NoTrnsfEL.TU4"/>
-		<Event id="6" label="PalletRlsd.TU4"/>
-		<Event id="7" label="QPalletAtCL.TU4"/>
-		<Event id="8" label="QPalletAtEL.TU4"/>
-		<Event id="9" label="TrnsfCplToCL.TU4"/>
-		<Event id="10" label="TrnsfCplToEL.TU4"/>
-		<Event id="11" label="TrnsfELToCL.TU4"/>
-		<Event id="12" label="TrnsfToEL.TU4"/>
+		<Event id="0" label="IsPalletCL[TU4]" controllable="false"/>
+		<Event id="1" label="IsPalletEL[TU4]"/>
+		<Event id="2" label="LibPallet[TU4]"/>
+		<Event id="3" label="NoPalletCL[TU4]" controllable="false"/>
+		<Event id="4" label="NoPalletEL[TU4]" controllable="false"/>
+		<Event id="5" label="NoTrnsfEL[TU4]"/>
+		<Event id="6" label="PalletRlsd[TU4]"/>
+		<Event id="7" label="QPalletAtCL[TU4]"/>
+		<Event id="8" label="QPalletAtEL[TU4]"/>
+		<Event id="9" label="TrnsfCplToCL[TU4]"/>
+		<Event id="10" label="TrnsfCplToEL[TU4]"/>
+		<Event id="11" label="TrnsfELToCL[TU4]"/>
+		<Event id="12" label="TrnsfToEL[TU4]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -369,20 +369,20 @@
 </Automaton>
 <Automaton name="h_OFProtEL1" type="Specification">
 	<Events>
-		<Event id="0" label="ASDwn.AS1"/>
-		<Event id="1" label="IsPalletCL.TU1" controllable="false"/>
-		<Event id="2" label="IsPalletEL.TU1"/>
-		<Event id="3" label="LibPallet.TU1"/>
-		<Event id="4" label="NoTrnsfEL.TU1"/>
-		<Event id="5" label="ProcCpl.AS1"/>
-		<Event id="6" label="ProcErr.AS1"/>
-		<Event id="7" label="ProcPallet.AS1"/>
-		<Event id="8" label="StnDwn.AS1" controllable="false"/>
-		<Event id="9" label="StnUp.AS1" controllable="false"/>
-		<Event id="10" label="TrnsfCplToCL.TU1"/>
-		<Event id="11" label="TrnsfCplToEL.TU1"/>
-		<Event id="12" label="TrnsfELToCL.TU1"/>
-		<Event id="13" label="TrnsfToEL.TU1"/>
+		<Event id="0" label="ASDwn[AS1]"/>
+		<Event id="1" label="IsPalletCL[TU1]" controllable="false"/>
+		<Event id="2" label="IsPalletEL[TU1]"/>
+		<Event id="3" label="LibPallet[TU1]"/>
+		<Event id="4" label="NoTrnsfEL[TU1]"/>
+		<Event id="5" label="ProcCpl[AS1]"/>
+		<Event id="6" label="ProcErr[AS1]"/>
+		<Event id="7" label="ProcPallet[AS1]"/>
+		<Event id="8" label="StnDwn[AS1]" controllable="false"/>
+		<Event id="9" label="StnUp[AS1]" controllable="false"/>
+		<Event id="10" label="TrnsfCplToCL[TU1]"/>
+		<Event id="11" label="TrnsfCplToEL[TU1]"/>
+		<Event id="12" label="TrnsfELToCL[TU1]"/>
+		<Event id="13" label="TrnsfToEL[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -422,20 +422,20 @@
 </Automaton>
 <Automaton name="h_OFProtEL2" type="Specification">
 	<Events>
-		<Event id="0" label="ASDwn.AS2"/>
-		<Event id="1" label="IsPalletCL.TU2" controllable="false"/>
-		<Event id="2" label="IsPalletEL.TU2"/>
-		<Event id="3" label="LibPallet.TU2"/>
-		<Event id="4" label="NoTrnsfEL.TU2"/>
-		<Event id="5" label="ProcCpl.AS2"/>
-		<Event id="6" label="ProcErr.AS2"/>
-		<Event id="7" label="ProcPallet.AS2"/>
-		<Event id="8" label="StnDwn.AS2" controllable="false"/>
-		<Event id="9" label="StnUp.AS2" controllable="false"/>
-		<Event id="10" label="TrnsfCplToCL.TU2"/>
-		<Event id="11" label="TrnsfCplToEL.TU2"/>
-		<Event id="12" label="TrnsfELToCL.TU2"/>
-		<Event id="13" label="TrnsfToEL.TU2"/>
+		<Event id="0" label="ASDwn[AS2]"/>
+		<Event id="1" label="IsPalletCL[TU2]" controllable="false"/>
+		<Event id="2" label="IsPalletEL[TU2]"/>
+		<Event id="3" label="LibPallet[TU2]"/>
+		<Event id="4" label="NoTrnsfEL[TU2]"/>
+		<Event id="5" label="ProcCpl[AS2]"/>
+		<Event id="6" label="ProcErr[AS2]"/>
+		<Event id="7" label="ProcPallet[AS2]"/>
+		<Event id="8" label="StnDwn[AS2]" controllable="false"/>
+		<Event id="9" label="StnUp[AS2]" controllable="false"/>
+		<Event id="10" label="TrnsfCplToCL[TU2]"/>
+		<Event id="11" label="TrnsfCplToEL[TU2]"/>
+		<Event id="12" label="TrnsfELToCL[TU2]"/>
+		<Event id="13" label="TrnsfToEL[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -476,13 +476,13 @@
 <Automaton name="h_DetWhichStnUp" type="Specification">
 	<Events>
 		<Event id="0" label="DetStnsUp"/>
-		<Event id="1" label="LibPallet.TU3"/>
-		<Event id="2" label="QStnUp.AS1"/>
-		<Event id="3" label="QStnUp.AS2"/>
-		<Event id="4" label="StnDwn.AS1" controllable="false"/>
-		<Event id="5" label="StnDwn.AS2" controllable="false"/>
-		<Event id="6" label="StnUp.AS1" controllable="false"/>
-		<Event id="7" label="StnUp.AS2" controllable="false"/>
+		<Event id="1" label="LibPallet[TU3]"/>
+		<Event id="2" label="QStnUp[AS1]"/>
+		<Event id="3" label="QStnUp[AS2]"/>
+		<Event id="4" label="StnDwn[AS1]" controllable="false"/>
+		<Event id="5" label="StnDwn[AS2]" controllable="false"/>
+		<Event id="6" label="StnUp[AS1]" controllable="false"/>
+		<Event id="7" label="StnUp[AS2]" controllable="false"/>
 		<Event id="8" label="TrnsfToEL3_1D"/>
 		<Event id="9" label="TrnsfToEL3_2D"/>
 		<Event id="10" label="TrnsfToEL3_BD"/>
@@ -529,18 +529,18 @@
 <Automaton name="h_HndlComEventsAS" type="Specification">
 	<Events>
 		<Event id="0" label="DetStnsUp"/>
-		<Event id="1" label="IsPalletCL.TU1" controllable="false"/>
-		<Event id="2" label="IsPalletCL.TU2" controllable="false"/>
-		<Event id="3" label="NoPalletCL.TU1" controllable="false"/>
-		<Event id="4" label="NoPalletCL.TU2" controllable="false"/>
-		<Event id="5" label="QPalletAtCL.TU1"/>
-		<Event id="6" label="QPalletAtCL.TU2"/>
-		<Event id="7" label="QStnUp.AS1"/>
-		<Event id="8" label="QStnUp.AS2"/>
-		<Event id="9" label="StnDwn.AS1" controllable="false"/>
-		<Event id="10" label="StnDwn.AS2" controllable="false"/>
-		<Event id="11" label="StnUp.AS1" controllable="false"/>
-		<Event id="12" label="StnUp.AS2" controllable="false"/>
+		<Event id="1" label="IsPalletCL[TU1]" controllable="false"/>
+		<Event id="2" label="IsPalletCL[TU2]" controllable="false"/>
+		<Event id="3" label="NoPalletCL[TU1]" controllable="false"/>
+		<Event id="4" label="NoPalletCL[TU2]" controllable="false"/>
+		<Event id="5" label="QPalletAtCL[TU1]"/>
+		<Event id="6" label="QPalletAtCL[TU2]"/>
+		<Event id="7" label="QStnUp[AS1]"/>
+		<Event id="8" label="QStnUp[AS2]"/>
+		<Event id="9" label="StnDwn[AS1]" controllable="false"/>
+		<Event id="10" label="StnDwn[AS2]" controllable="false"/>
+		<Event id="11" label="StnUp[AS1]" controllable="false"/>
+		<Event id="12" label="StnUp[AS2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -572,14 +572,14 @@
 		<Transition source="5" dest="0" event="10"/>
 	</Transitions>
 </Automaton>
-<Automaton name="IntfAssmbStn.AS1" type="Specification">
+<Automaton name="IntfAssmbStn[AS1]" type="Specification">
 	<Events>
-		<Event id="0" label="ASDwn.AS1"/>
-		<Event id="1" label="DoRpr.AS1"/>
-		<Event id="2" label="ProcCpl.AS1"/>
-		<Event id="3" label="ProcErr.AS1"/>
-		<Event id="4" label="ProcPallet.AS1"/>
-		<Event id="5" label="RobUp.AS1"/>
+		<Event id="0" label="ASDwn[AS1]"/>
+		<Event id="1" label="DoRpr[AS1]"/>
+		<Event id="2" label="ProcCpl[AS1]"/>
+		<Event id="3" label="ProcErr[AS1]"/>
+		<Event id="4" label="ProcPallet[AS1]"/>
+		<Event id="5" label="RobUp[AS1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -595,10 +595,10 @@
 		<Transition source="2" dest="0" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapGateEL_2.AS1" type="Plant">
+<Automaton name="l_CapGateEL_2[AS1]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvGEL_2.AS1" controllable="false"/>
-		<Event id="1" label="PalletLvGEL_2.AS1" controllable="false"/>
+		<Event id="0" label="PalletArvGEL_2[AS1]" controllable="false"/>
+		<Event id="1" label="PalletLvGEL_2[AS1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -612,10 +612,10 @@
 		<Transition source="2" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_DepGateNExtrSen.AS1" type="Plant">
+<Automaton name="l_DepGateNExtrSen[AS1]" type="Plant">
 	<Events>
-		<Event id="0" label="PArvAtExtractor.AS1" controllable="false"/>
-		<Event id="1" label="PalletLvGEL_2.AS1" controllable="false"/>
+		<Event id="0" label="PArvAtExtractor[AS1]" controllable="false"/>
+		<Event id="1" label="PalletLvGEL_2[AS1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -629,12 +629,12 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_Extractor.AS1" type="Plant">
+<Automaton name="l_Extractor[AS1]" type="Plant">
 	<Events>
-		<Event id="0" label="ExtrArvConv.AS1" controllable="false"/>
-		<Event id="1" label="ExtrArvPlatf.AS1" controllable="false"/>
-		<Event id="2" label="MvExtrToConv.AS1"/>
-		<Event id="3" label="MvExtrToPlatf.AS1"/>
+		<Event id="0" label="ExtrArvConv[AS1]" controllable="false"/>
+		<Event id="1" label="ExtrArvPlatf[AS1]" controllable="false"/>
+		<Event id="2" label="MvExtrToConv[AS1]"/>
+		<Event id="3" label="MvExtrToPlatf[AS1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -649,10 +649,10 @@
 		<Transition source="3" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletArvGateSenEL_2.AS1" type="Plant">
+<Automaton name="l_PalletArvGateSenEL_2[AS1]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvGEL_2.AS1" controllable="false"/>
-		<Event id="1" label="ProcPallet.AS1"/>
+		<Event id="0" label="PalletArvGEL_2[AS1]" controllable="false"/>
+		<Event id="1" label="ProcPallet[AS1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -663,11 +663,11 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletGateEL_2.AS1" type="Plant">
+<Automaton name="l_PalletGateEL_2[AS1]" type="Plant">
 	<Events>
-		<Event id="0" label="GClosesEL_2.AS1"/>
-		<Event id="1" label="GOpensEL_2.AS1"/>
-		<Event id="2" label="PalletLvGEL_2.AS1" controllable="false"/>
+		<Event id="0" label="GClosesEL_2[AS1]"/>
+		<Event id="1" label="GOpensEL_2[AS1]"/>
+		<Event id="2" label="PalletLvGEL_2[AS1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -680,11 +680,11 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletStopEL_2.AS1" type="Plant">
+<Automaton name="l_PalletStopEL_2[AS1]" type="Plant">
 	<Events>
-		<Event id="0" label="PStopClosesEL_2.AS1"/>
-		<Event id="1" label="PStopOpensEL_2.AS1"/>
-		<Event id="2" label="PalletLvAS.AS1" controllable="false"/>
+		<Event id="0" label="PStopClosesEL_2[AS1]"/>
+		<Event id="1" label="PStopOpensEL_2[AS1]"/>
+		<Event id="2" label="PalletLvAS[AS1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -696,10 +696,10 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PSenAtExtractor.AS1" type="Plant">
+<Automaton name="l_PSenAtExtractor[AS1]" type="Plant">
 	<Events>
-		<Event id="0" label="PArvAtExtractor.AS1" controllable="false"/>
-		<Event id="1" label="PalletLvAS.AS1" controllable="false"/>
+		<Event id="0" label="PArvAtExtractor[AS1]" controllable="false"/>
+		<Event id="1" label="PalletLvAS[AS1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -710,11 +710,11 @@
 		<Transition source="1" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_QueryPalletTyp.AS1" type="Plant">
+<Automaton name="l_QueryPalletTyp[AS1]" type="Plant">
 	<Events>
-		<Event id="0" label="IsType1.AS1" controllable="false"/>
-		<Event id="1" label="IsType2.AS1" controllable="false"/>
-		<Event id="2" label="QType.AS1"/>
+		<Event id="0" label="IsType1[AS1]" controllable="false"/>
+		<Event id="1" label="IsType2[AS1]" controllable="false"/>
+		<Event id="2" label="QType[AS1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -726,14 +726,14 @@
 		<Transition source="1" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_RWDeviceAS1" type="Plant">
+<Automaton name="l_RWDevic[AS1]" type="Plant">
 	<Events>
-		<Event id="0" label="DoneRead.AS1" controllable="false"/>
-		<Event id="1" label="DoneWrite.AS1" controllable="false"/>
-		<Event id="2" label="ReadLabel.AS1"/>
-		<Event id="3" label="WrtCplT1A_1B.AS1"/>
-		<Event id="4" label="WrtErr1A.AS1"/>
-		<Event id="5" label="WrtErr1B.AS1"/>
+		<Event id="0" label="DoneRead[AS1]" controllable="false"/>
+		<Event id="1" label="DoneWrite[AS1]" controllable="false"/>
+		<Event id="2" label="ReadLabel[AS1]"/>
+		<Event id="3" label="WrtCplT1A_1B[AS1]"/>
+		<Event id="4" label="WrtErr1A[AS1]"/>
+		<Event id="5" label="WrtErr1B[AS1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -751,16 +751,16 @@
 </Automaton>
 <Automaton name="l_Robot1" type="Plant">
 	<Events>
-		<Event id="0" label="AError1A.AS1" controllable="false"/>
-		<Event id="1" label="AError1B.AS1" controllable="false"/>
-		<Event id="2" label="RobRprCpl.AS1" controllable="false"/>
-		<Event id="3" label="RtaskCpl1A.AS1" controllable="false"/>
-		<Event id="4" label="RtaskCpl1B.AS1" controllable="false"/>
-		<Event id="5" label="Rtimeout.AS1" controllable="false"/>
-		<Event id="6" label="StrRobRepair.AS1"/>
-		<Event id="7" label="StrRtask1A.AS1"/>
-		<Event id="8" label="StrRtask1B.AS1"/>
-		<Event id="9" label="StrRtimer.AS1"/>
+		<Event id="0" label="AError1A[AS1]" controllable="false"/>
+		<Event id="1" label="AError1B[AS1]" controllable="false"/>
+		<Event id="2" label="RobRprCpl[AS1]" controllable="false"/>
+		<Event id="3" label="RtaskCpl1A[AS1]" controllable="false"/>
+		<Event id="4" label="RtaskCpl1B[AS1]" controllable="false"/>
+		<Event id="5" label="Rtimeout[AS1]" controllable="false"/>
+		<Event id="6" label="StrRobRepair[AS1]"/>
+		<Event id="7" label="StrRtask1A[AS1]"/>
+		<Event id="8" label="StrRtask1B[AS1]"/>
+		<Event id="9" label="StrRtimer[AS1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -784,32 +784,32 @@
 		<Transition source="5" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlPallet.AS1" type="Specification">
+<Automaton name="l_HndlPallet[AS1]" type="Specification">
 	<Events>
-		<Event id="0" label="ASDwn.AS1"/>
-		<Event id="1" label="AssmbErrA.AS1"/>
-		<Event id="2" label="AssmbErrB.AS1"/>
-		<Event id="3" label="DoneRead.AS1" controllable="false"/>
-		<Event id="4" label="DoneWrite.AS1" controllable="false"/>
-		<Event id="5" label="ExtrArvConv.AS1" controllable="false"/>
-		<Event id="6" label="ExtrArvPlatf.AS1" controllable="false"/>
-		<Event id="7" label="IsType1.AS1" controllable="false"/>
-		<Event id="8" label="IsType2.AS1" controllable="false"/>
-		<Event id="9" label="MvExtrToConv.AS1"/>
-		<Event id="10" label="MvExtrToPlatf.AS1"/>
-		<Event id="11" label="PArvAtExtractor.AS1" controllable="false"/>
-		<Event id="12" label="ProcCpl.AS1"/>
-		<Event id="13" label="ProcErr.AS1"/>
-		<Event id="14" label="ProcTyp1.AS1"/>
-		<Event id="15" label="ProcTyp2.AS1"/>
-		<Event id="16" label="QType.AS1"/>
-		<Event id="17" label="RTasksCpl.AS1"/>
-		<Event id="18" label="ReadLabel.AS1"/>
-		<Event id="19" label="RelPallet.AS1"/>
-		<Event id="20" label="RobDwn.AS1"/>
-		<Event id="21" label="WrtCplT1A_1B.AS1"/>
-		<Event id="22" label="WrtErr1A.AS1"/>
-		<Event id="23" label="WrtErr1B.AS1"/>
+		<Event id="0" label="ASDwn[AS1]"/>
+		<Event id="1" label="AssmbErrA[AS1]"/>
+		<Event id="2" label="AssmbErrB[AS1]"/>
+		<Event id="3" label="DoneRead[AS1]" controllable="false"/>
+		<Event id="4" label="DoneWrite[AS1]" controllable="false"/>
+		<Event id="5" label="ExtrArvConv[AS1]" controllable="false"/>
+		<Event id="6" label="ExtrArvPlatf[AS1]" controllable="false"/>
+		<Event id="7" label="IsType1[AS1]" controllable="false"/>
+		<Event id="8" label="IsType2[AS1]" controllable="false"/>
+		<Event id="9" label="MvExtrToConv[AS1]"/>
+		<Event id="10" label="MvExtrToPlatf[AS1]"/>
+		<Event id="11" label="PArvAtExtractor[AS1]" controllable="false"/>
+		<Event id="12" label="ProcCpl[AS1]"/>
+		<Event id="13" label="ProcErr[AS1]"/>
+		<Event id="14" label="ProcTyp1[AS1]"/>
+		<Event id="15" label="ProcTyp2[AS1]"/>
+		<Event id="16" label="QType[AS1]"/>
+		<Event id="17" label="RTasksCpl[AS1]"/>
+		<Event id="18" label="ReadLabel[AS1]"/>
+		<Event id="19" label="RelPallet[AS1]"/>
+		<Event id="20" label="RobDwn[AS1]"/>
+		<Event id="21" label="WrtCplT1A_1B[AS1]"/>
+		<Event id="22" label="WrtErr1A[AS1]"/>
+		<Event id="23" label="WrtErr1B[AS1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -867,15 +867,15 @@
 		<Transition source="16" dest="16" event="9"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlPalletLvAS.AS1" type="Specification">
+<Automaton name="l_HndlPalletLvAS[AS1]" type="Specification">
 	<Events>
-		<Event id="0" label="ASDwn.AS1"/>
-		<Event id="1" label="PStopClosesEL_2.AS1"/>
-		<Event id="2" label="PStopOpensEL_2.AS1"/>
-		<Event id="3" label="PalletLvAS.AS1" controllable="false"/>
-		<Event id="4" label="ProcCpl.AS1"/>
-		<Event id="5" label="ProcErr.AS1"/>
-		<Event id="6" label="RelPallet.AS1"/>
+		<Event id="0" label="ASDwn[AS1]"/>
+		<Event id="1" label="PStopClosesEL_2[AS1]"/>
+		<Event id="2" label="PStopOpensEL_2[AS1]"/>
+		<Event id="3" label="PalletLvAS[AS1]" controllable="false"/>
+		<Event id="4" label="ProcCpl[AS1]"/>
+		<Event id="5" label="ProcErr[AS1]"/>
+		<Event id="6" label="RelPallet[AS1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -893,16 +893,16 @@
 		<Transition source="3" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_OperateGateEL_2.AS1" type="Specification">
+<Automaton name="l_OperateGateEL_2[AS1]" type="Specification">
 	<Events>
-		<Event id="0" label="ASDwn.AS1"/>
-		<Event id="1" label="GClosesEL_2.AS1"/>
-		<Event id="2" label="GOpensEL_2.AS1"/>
-		<Event id="3" label="PalletArvGEL_2.AS1" controllable="false"/>
-		<Event id="4" label="PalletLvGEL_2.AS1" controllable="false"/>
-		<Event id="5" label="ProcCpl.AS1"/>
-		<Event id="6" label="ProcErr.AS1"/>
-		<Event id="7" label="ProcPallet.AS1"/>
+		<Event id="0" label="ASDwn[AS1]"/>
+		<Event id="1" label="GClosesEL_2[AS1]"/>
+		<Event id="2" label="GOpensEL_2[AS1]"/>
+		<Event id="3" label="PalletArvGEL_2[AS1]" controllable="false"/>
+		<Event id="4" label="PalletLvGEL_2[AS1]" controllable="false"/>
+		<Event id="5" label="ProcCpl[AS1]"/>
+		<Event id="6" label="ProcErr[AS1]"/>
+		<Event id="7" label="ProcPallet[AS1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -920,16 +920,16 @@
 		<Transition source="2" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_IntfRobot.AS1" type="Specification">
+<Automaton name="l_IntfRobot[AS1]" type="Specification">
 	<Events>
-		<Event id="0" label="AssmbErrA.AS1"/>
-		<Event id="1" label="AssmbErrB.AS1"/>
-		<Event id="2" label="DoRpr.AS1"/>
-		<Event id="3" label="ProcTyp1.AS1"/>
-		<Event id="4" label="ProcTyp2.AS1"/>
-		<Event id="5" label="RTasksCpl.AS1"/>
-		<Event id="6" label="RobDwn.AS1"/>
-		<Event id="7" label="RobUp.AS1"/>
+		<Event id="0" label="AssmbErrA[AS1]"/>
+		<Event id="1" label="AssmbErrB[AS1]"/>
+		<Event id="2" label="DoRpr[AS1]"/>
+		<Event id="3" label="ProcTyp1[AS1]"/>
+		<Event id="4" label="ProcTyp2[AS1]"/>
+		<Event id="5" label="RTasksCpl[AS1]"/>
+		<Event id="6" label="RobDwn[AS1]"/>
+		<Event id="7" label="RobUp[AS1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -949,24 +949,24 @@
 </Automaton>
 <Automaton name="l_DoRobotTasks1" type="Specification">
 	<Events>
-		<Event id="0" label="AError1A.AS1" controllable="false"/>
-		<Event id="1" label="AError1B.AS1" controllable="false"/>
-		<Event id="2" label="AssmbErrA.AS1"/>
-		<Event id="3" label="AssmbErrB.AS1"/>
-		<Event id="4" label="DoRpr.AS1"/>
-		<Event id="5" label="ProcTyp1.AS1"/>
-		<Event id="6" label="ProcTyp2.AS1"/>
-		<Event id="7" label="RTasksCpl.AS1"/>
-		<Event id="8" label="RobDwn.AS1"/>
-		<Event id="9" label="RobRprCpl.AS1" controllable="false"/>
-		<Event id="10" label="RobUp.AS1"/>
-		<Event id="11" label="RtaskCpl1A.AS1" controllable="false"/>
-		<Event id="12" label="RtaskCpl1B.AS1" controllable="false"/>
-		<Event id="13" label="Rtimeout.AS1" controllable="false"/>
-		<Event id="14" label="StrRobRepair.AS1"/>
-		<Event id="15" label="StrRtask1A.AS1"/>
-		<Event id="16" label="StrRtask1B.AS1"/>
-		<Event id="17" label="StrRtimer.AS1"/>
+		<Event id="0" label="AError1A[AS1]" controllable="false"/>
+		<Event id="1" label="AError1B[AS1]" controllable="false"/>
+		<Event id="2" label="AssmbErrA[AS1]"/>
+		<Event id="3" label="AssmbErrB[AS1]"/>
+		<Event id="4" label="DoRpr[AS1]"/>
+		<Event id="5" label="ProcTyp1[AS1]"/>
+		<Event id="6" label="ProcTyp2[AS1]"/>
+		<Event id="7" label="RTasksCpl[AS1]"/>
+		<Event id="8" label="RobDwn[AS1]"/>
+		<Event id="9" label="RobRprCpl[AS1]" controllable="false"/>
+		<Event id="10" label="RobUp[AS1]"/>
+		<Event id="11" label="RtaskCpl1A[AS1]" controllable="false"/>
+		<Event id="12" label="RtaskCpl1B[AS1]" controllable="false"/>
+		<Event id="13" label="Rtimeout[AS1]" controllable="false"/>
+		<Event id="14" label="StrRobRepair[AS1]"/>
+		<Event id="15" label="StrRtask1A[AS1]"/>
+		<Event id="16" label="StrRtask1B[AS1]"/>
+		<Event id="17" label="StrRtimer[AS1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1033,14 +1033,14 @@
 		<Transition source="19" dest="11" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="IntfAssmbStn.AS2" type="Specification">
+<Automaton name="IntfAssmbStn[AS2]" type="Specification">
 	<Events>
-		<Event id="0" label="ASDwn.AS2"/>
-		<Event id="1" label="DoRpr.AS2"/>
-		<Event id="2" label="ProcCpl.AS2"/>
-		<Event id="3" label="ProcErr.AS2"/>
-		<Event id="4" label="ProcPallet.AS2"/>
-		<Event id="5" label="RobUp.AS2"/>
+		<Event id="0" label="ASDwn[AS2]"/>
+		<Event id="1" label="DoRpr[AS2]"/>
+		<Event id="2" label="ProcCpl[AS2]"/>
+		<Event id="3" label="ProcErr[AS2]"/>
+		<Event id="4" label="ProcPallet[AS2]"/>
+		<Event id="5" label="RobUp[AS2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1056,10 +1056,10 @@
 		<Transition source="2" dest="0" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapGateEL_2.AS2" type="Plant">
+<Automaton name="l_CapGateEL_2[AS2]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvGEL_2.AS2" controllable="false"/>
-		<Event id="1" label="PalletLvGEL_2.AS2" controllable="false"/>
+		<Event id="0" label="PalletArvGEL_2[AS2]" controllable="false"/>
+		<Event id="1" label="PalletLvGEL_2[AS2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1073,10 +1073,10 @@
 		<Transition source="2" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_DepGateNExtrSen.AS2" type="Plant">
+<Automaton name="l_DepGateNExtrSen[AS2]" type="Plant">
 	<Events>
-		<Event id="0" label="PArvAtExtractor.AS2" controllable="false"/>
-		<Event id="1" label="PalletLvGEL_2.AS2" controllable="false"/>
+		<Event id="0" label="PArvAtExtractor[AS2]" controllable="false"/>
+		<Event id="1" label="PalletLvGEL_2[AS2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1090,12 +1090,12 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_Extractor.AS2" type="Plant">
+<Automaton name="l_Extractor[AS2]" type="Plant">
 	<Events>
-		<Event id="0" label="ExtrArvConv.AS2" controllable="false"/>
-		<Event id="1" label="ExtrArvPlatf.AS2" controllable="false"/>
-		<Event id="2" label="MvExtrToConv.AS2"/>
-		<Event id="3" label="MvExtrToPlatf.AS2"/>
+		<Event id="0" label="ExtrArvConv[AS2]" controllable="false"/>
+		<Event id="1" label="ExtrArvPlatf[AS2]" controllable="false"/>
+		<Event id="2" label="MvExtrToConv[AS2]"/>
+		<Event id="3" label="MvExtrToPlatf[AS2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1110,11 +1110,11 @@
 		<Transition source="3" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletGateEL_2.AS2" type="Plant">
+<Automaton name="l_PalletGateEL_2[AS2]" type="Plant">
 	<Events>
-		<Event id="0" label="GClosesEL_2.AS2"/>
-		<Event id="1" label="GOpensEL_2.AS2"/>
-		<Event id="2" label="PalletLvGEL_2.AS2" controllable="false"/>
+		<Event id="0" label="GClosesEL_2[AS2]"/>
+		<Event id="1" label="GOpensEL_2[AS2]"/>
+		<Event id="2" label="PalletLvGEL_2[AS2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1127,10 +1127,10 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletArvGateSenEL_2.AS2" type="Plant">
+<Automaton name="l_PalletArvGateSenEL_2[AS2]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvGEL_2.AS2" controllable="false"/>
-		<Event id="1" label="ProcPallet.AS2"/>
+		<Event id="0" label="PalletArvGEL_2[AS2]" controllable="false"/>
+		<Event id="1" label="ProcPallet[AS2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1141,11 +1141,11 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletStopEL_2.AS2" type="Plant">
+<Automaton name="l_PalletStopEL_2[AS2]" type="Plant">
 	<Events>
-		<Event id="0" label="PStopClosesEL_2.AS2"/>
-		<Event id="1" label="PStopOpensEL_2.AS2"/>
-		<Event id="2" label="PalletLvAS.AS2" controllable="false"/>
+		<Event id="0" label="PStopClosesEL_2[AS2]"/>
+		<Event id="1" label="PStopOpensEL_2[AS2]"/>
+		<Event id="2" label="PalletLvAS[AS2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1157,10 +1157,10 @@
 		<Transition source="1" dest="1" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PSenAtExtractor.AS2" type="Plant">
+<Automaton name="l_PSenAtExtractor[AS2]" type="Plant">
 	<Events>
-		<Event id="0" label="PArvAtExtractor.AS2" controllable="false"/>
-		<Event id="1" label="PalletLvAS.AS2" controllable="false"/>
+		<Event id="0" label="PArvAtExtractor[AS2]" controllable="false"/>
+		<Event id="1" label="PalletLvAS[AS2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1171,11 +1171,11 @@
 		<Transition source="1" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_QueryPalletTyp.AS2" type="Plant">
+<Automaton name="l_QueryPalletTyp[AS2]" type="Plant">
 	<Events>
-		<Event id="0" label="IsType1.AS2" controllable="false"/>
-		<Event id="1" label="IsType2.AS2" controllable="false"/>
-		<Event id="2" label="QType.AS2"/>
+		<Event id="0" label="IsType1[AS2]" controllable="false"/>
+		<Event id="1" label="IsType2[AS2]" controllable="false"/>
+		<Event id="2" label="QType[AS2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1187,14 +1187,14 @@
 		<Transition source="1" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_RWDeviceAS2" type="Plant">
+<Automaton name="l_RWDevic[AS2]" type="Plant">
 	<Events>
-		<Event id="0" label="DoneRead.AS2" controllable="false"/>
-		<Event id="1" label="DoneWrite.AS2" controllable="false"/>
-		<Event id="2" label="ReadLabel.AS2"/>
-		<Event id="3" label="WrtCplT2A_2B.AS2"/>
-		<Event id="4" label="WrtErr2A.AS2"/>
-		<Event id="5" label="WrtErr2B.AS2"/>
+		<Event id="0" label="DoneRead[AS2]" controllable="false"/>
+		<Event id="1" label="DoneWrite[AS2]" controllable="false"/>
+		<Event id="2" label="ReadLabel[AS2]"/>
+		<Event id="3" label="WrtCplT2A_2B[AS2]"/>
+		<Event id="4" label="WrtErr2A[AS2]"/>
+		<Event id="5" label="WrtErr2B[AS2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1212,16 +1212,16 @@
 </Automaton>
 <Automaton name="l_Robot2" type="Plant">
 	<Events>
-		<Event id="0" label="AError2A.AS2" controllable="false"/>
-		<Event id="1" label="AError2B.AS2" controllable="false"/>
-		<Event id="2" label="RobRprCpl.AS2" controllable="false"/>
-		<Event id="3" label="RtaskCpl2A.AS2" controllable="false"/>
-		<Event id="4" label="RtaskCpl2B.AS2" controllable="false"/>
-		<Event id="5" label="Rtimeout.AS2" controllable="false"/>
-		<Event id="6" label="StrRobRepair.AS2"/>
-		<Event id="7" label="StrRtask2A.AS2"/>
-		<Event id="8" label="StrRtask2B.AS2"/>
-		<Event id="9" label="StrRtimer.AS2"/>
+		<Event id="0" label="AError2A[AS2]" controllable="false"/>
+		<Event id="1" label="AError2B[AS2]" controllable="false"/>
+		<Event id="2" label="RobRprCpl[AS2]" controllable="false"/>
+		<Event id="3" label="RtaskCpl2A[AS2]" controllable="false"/>
+		<Event id="4" label="RtaskCpl2B[AS2]" controllable="false"/>
+		<Event id="5" label="Rtimeout[AS2]" controllable="false"/>
+		<Event id="6" label="StrRobRepair[AS2]"/>
+		<Event id="7" label="StrRtask2A[AS2]"/>
+		<Event id="8" label="StrRtask2B[AS2]"/>
+		<Event id="9" label="StrRtimer[AS2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1245,32 +1245,32 @@
 		<Transition source="5" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlPallet.AS2" type="Specification">
+<Automaton name="l_HndlPallet[AS2]" type="Specification">
 	<Events>
-		<Event id="0" label="ASDwn.AS2"/>
-		<Event id="1" label="AssmbErrA.AS2"/>
-		<Event id="2" label="AssmbErrB.AS2"/>
-		<Event id="3" label="DoneRead.AS2" controllable="false"/>
-		<Event id="4" label="DoneWrite.AS2" controllable="false"/>
-		<Event id="5" label="ExtrArvConv.AS2" controllable="false"/>
-		<Event id="6" label="ExtrArvPlatf.AS2" controllable="false"/>
-		<Event id="7" label="IsType1.AS2" controllable="false"/>
-		<Event id="8" label="IsType2.AS2" controllable="false"/>
-		<Event id="9" label="MvExtrToConv.AS2"/>
-		<Event id="10" label="MvExtrToPlatf.AS2"/>
-		<Event id="11" label="PArvAtExtractor.AS2" controllable="false"/>
-		<Event id="12" label="ProcCpl.AS2"/>
-		<Event id="13" label="ProcErr.AS2"/>
-		<Event id="14" label="ProcTyp1.AS2"/>
-		<Event id="15" label="ProcTyp2.AS2"/>
-		<Event id="16" label="QType.AS2"/>
-		<Event id="17" label="RTasksCpl.AS2"/>
-		<Event id="18" label="ReadLabel.AS2"/>
-		<Event id="19" label="RelPallet.AS2"/>
-		<Event id="20" label="RobDwn.AS2"/>
-		<Event id="21" label="WrtCplT2A_2B.AS2"/>
-		<Event id="22" label="WrtErr2A.AS2"/>
-		<Event id="23" label="WrtErr2B.AS2"/>
+		<Event id="0" label="ASDwn[AS2]"/>
+		<Event id="1" label="AssmbErrA[AS2]"/>
+		<Event id="2" label="AssmbErrB[AS2]"/>
+		<Event id="3" label="DoneRead[AS2]" controllable="false"/>
+		<Event id="4" label="DoneWrite[AS2]" controllable="false"/>
+		<Event id="5" label="ExtrArvConv[AS2]" controllable="false"/>
+		<Event id="6" label="ExtrArvPlatf[AS2]" controllable="false"/>
+		<Event id="7" label="IsType1[AS2]" controllable="false"/>
+		<Event id="8" label="IsType2[AS2]" controllable="false"/>
+		<Event id="9" label="MvExtrToConv[AS2]"/>
+		<Event id="10" label="MvExtrToPlatf[AS2]"/>
+		<Event id="11" label="PArvAtExtractor[AS2]" controllable="false"/>
+		<Event id="12" label="ProcCpl[AS2]"/>
+		<Event id="13" label="ProcErr[AS2]"/>
+		<Event id="14" label="ProcTyp1[AS2]"/>
+		<Event id="15" label="ProcTyp2[AS2]"/>
+		<Event id="16" label="QType[AS2]"/>
+		<Event id="17" label="RTasksCpl[AS2]"/>
+		<Event id="18" label="ReadLabel[AS2]"/>
+		<Event id="19" label="RelPallet[AS2]"/>
+		<Event id="20" label="RobDwn[AS2]"/>
+		<Event id="21" label="WrtCplT2A_2B[AS2]"/>
+		<Event id="22" label="WrtErr2A[AS2]"/>
+		<Event id="23" label="WrtErr2B[AS2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1328,15 +1328,15 @@
 		<Transition source="16" dest="16" event="9"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlPalletLvAS.AS2" type="Specification">
+<Automaton name="l_HndlPalletLvAS[AS2]" type="Specification">
 	<Events>
-		<Event id="0" label="ASDwn.AS2"/>
-		<Event id="1" label="PStopClosesEL_2.AS2"/>
-		<Event id="2" label="PStopOpensEL_2.AS2"/>
-		<Event id="3" label="PalletLvAS.AS2" controllable="false"/>
-		<Event id="4" label="ProcCpl.AS2"/>
-		<Event id="5" label="ProcErr.AS2"/>
-		<Event id="6" label="RelPallet.AS2"/>
+		<Event id="0" label="ASDwn[AS2]"/>
+		<Event id="1" label="PStopClosesEL_2[AS2]"/>
+		<Event id="2" label="PStopOpensEL_2[AS2]"/>
+		<Event id="3" label="PalletLvAS[AS2]" controllable="false"/>
+		<Event id="4" label="ProcCpl[AS2]"/>
+		<Event id="5" label="ProcErr[AS2]"/>
+		<Event id="6" label="RelPallet[AS2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1354,16 +1354,16 @@
 		<Transition source="3" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_OperateGateEL_2.AS2" type="Specification">
+<Automaton name="l_OperateGateEL_2[AS2]" type="Specification">
 	<Events>
-		<Event id="0" label="ASDwn.AS2"/>
-		<Event id="1" label="GClosesEL_2.AS2"/>
-		<Event id="2" label="GOpensEL_2.AS2"/>
-		<Event id="3" label="PalletArvGEL_2.AS2" controllable="false"/>
-		<Event id="4" label="PalletLvGEL_2.AS2" controllable="false"/>
-		<Event id="5" label="ProcCpl.AS2"/>
-		<Event id="6" label="ProcErr.AS2"/>
-		<Event id="7" label="ProcPallet.AS2"/>
+		<Event id="0" label="ASDwn[AS2]"/>
+		<Event id="1" label="GClosesEL_2[AS2]"/>
+		<Event id="2" label="GOpensEL_2[AS2]"/>
+		<Event id="3" label="PalletArvGEL_2[AS2]" controllable="false"/>
+		<Event id="4" label="PalletLvGEL_2[AS2]" controllable="false"/>
+		<Event id="5" label="ProcCpl[AS2]"/>
+		<Event id="6" label="ProcErr[AS2]"/>
+		<Event id="7" label="ProcPallet[AS2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1381,16 +1381,16 @@
 		<Transition source="2" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_IntfRobot.AS2" type="Specification">
+<Automaton name="l_IntfRobot[AS2]" type="Specification">
 	<Events>
-		<Event id="0" label="AssmbErrA.AS2"/>
-		<Event id="1" label="AssmbErrB.AS2"/>
-		<Event id="2" label="DoRpr.AS2"/>
-		<Event id="3" label="ProcTyp1.AS2"/>
-		<Event id="4" label="ProcTyp2.AS2"/>
-		<Event id="5" label="RTasksCpl.AS2"/>
-		<Event id="6" label="RobDwn.AS2"/>
-		<Event id="7" label="RobUp.AS2"/>
+		<Event id="0" label="AssmbErrA[AS2]"/>
+		<Event id="1" label="AssmbErrB[AS2]"/>
+		<Event id="2" label="DoRpr[AS2]"/>
+		<Event id="3" label="ProcTyp1[AS2]"/>
+		<Event id="4" label="ProcTyp2[AS2]"/>
+		<Event id="5" label="RTasksCpl[AS2]"/>
+		<Event id="6" label="RobDwn[AS2]"/>
+		<Event id="7" label="RobUp[AS2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1410,24 +1410,24 @@
 </Automaton>
 <Automaton name="l_DoRobotTasks2" type="Specification">
 	<Events>
-		<Event id="0" label="AError2A.AS2" controllable="false"/>
-		<Event id="1" label="AError2B.AS2" controllable="false"/>
-		<Event id="2" label="AssmbErrA.AS2"/>
-		<Event id="3" label="AssmbErrB.AS2"/>
-		<Event id="4" label="DoRpr.AS2"/>
-		<Event id="5" label="ProcTyp1.AS2"/>
-		<Event id="6" label="ProcTyp2.AS2"/>
-		<Event id="7" label="RTasksCpl.AS2"/>
-		<Event id="8" label="RobDwn.AS2"/>
-		<Event id="9" label="RobRprCpl.AS2" controllable="false"/>
-		<Event id="10" label="RobUp.AS2"/>
-		<Event id="11" label="RtaskCpl2A.AS2" controllable="false"/>
-		<Event id="12" label="RtaskCpl2B.AS2" controllable="false"/>
-		<Event id="13" label="Rtimeout.AS2" controllable="false"/>
-		<Event id="14" label="StrRobRepair.AS2"/>
-		<Event id="15" label="StrRtask2A.AS2"/>
-		<Event id="16" label="StrRtask2B.AS2"/>
-		<Event id="17" label="StrRtimer.AS2"/>
+		<Event id="0" label="AError2A[AS2]" controllable="false"/>
+		<Event id="1" label="AError2B[AS2]" controllable="false"/>
+		<Event id="2" label="AssmbErrA[AS2]"/>
+		<Event id="3" label="AssmbErrB[AS2]"/>
+		<Event id="4" label="DoRpr[AS2]"/>
+		<Event id="5" label="ProcTyp1[AS2]"/>
+		<Event id="6" label="ProcTyp2[AS2]"/>
+		<Event id="7" label="RTasksCpl[AS2]"/>
+		<Event id="8" label="RobDwn[AS2]"/>
+		<Event id="9" label="RobRprCpl[AS2]" controllable="false"/>
+		<Event id="10" label="RobUp[AS2]"/>
+		<Event id="11" label="RtaskCpl2A[AS2]" controllable="false"/>
+		<Event id="12" label="RtaskCpl2B[AS2]" controllable="false"/>
+		<Event id="13" label="Rtimeout[AS2]" controllable="false"/>
+		<Event id="14" label="StrRobRepair[AS2]"/>
+		<Event id="15" label="StrRtask2A[AS2]"/>
+		<Event id="16" label="StrRtask2B[AS2]"/>
+		<Event id="17" label="StrRtimer[AS2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1494,12 +1494,12 @@
 		<Transition source="19" dest="15" event="11"/>
 	</Transitions>
 </Automaton>
-<Automaton name="IntfAssmbStn.AS3" type="Specification">
+<Automaton name="IntfAssmbStn[AS3]" type="Specification">
 	<Events>
-		<Event id="0" label="PalletRepd.AS3"/>
-		<Event id="1" label="ProcCpl.AS3"/>
-		<Event id="2" label="ProcErr.AS3"/>
-		<Event id="3" label="ProcPallet.AS3"/>
+		<Event id="0" label="PalletRepd[AS3]"/>
+		<Event id="1" label="ProcCpl[AS3]"/>
+		<Event id="2" label="ProcErr[AS3]"/>
+		<Event id="3" label="ProcPallet[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1512,10 +1512,10 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapGateEL_2_AS3" type="Plant">
+<Automaton name="l_CapGateEL_2[AS3]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletLvGEL_2.AS3" controllable="false"/>
-		<Event id="1" label="ProcPallet.AS3"/>
+		<Event id="0" label="PalletLvGEL_2[AS3]" controllable="false"/>
+		<Event id="1" label="ProcPallet[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1529,10 +1529,10 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_DepGateNExtrSen.AS3" type="Plant">
+<Automaton name="l_DepGateNExtrSen[AS3]" type="Plant">
 	<Events>
-		<Event id="0" label="PArvAtExtractor.AS3" controllable="false"/>
-		<Event id="1" label="PalletLvGEL_2.AS3" controllable="false"/>
+		<Event id="0" label="PArvAtExtractor[AS3]" controllable="false"/>
+		<Event id="1" label="PalletLvGEL_2[AS3]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1546,12 +1546,12 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_Extractor.AS3" type="Plant">
+<Automaton name="l_Extractor[AS3]" type="Plant">
 	<Events>
-		<Event id="0" label="ExtrArvConv.AS3" controllable="false"/>
-		<Event id="1" label="ExtrArvPlatf.AS3" controllable="false"/>
-		<Event id="2" label="MvExtrToConv.AS3"/>
-		<Event id="3" label="MvExtrToPlatf.AS3"/>
+		<Event id="0" label="ExtrArvConv[AS3]" controllable="false"/>
+		<Event id="1" label="ExtrArvPlatf[AS3]" controllable="false"/>
+		<Event id="2" label="MvExtrToConv[AS3]"/>
+		<Event id="3" label="MvExtrToPlatf[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1566,11 +1566,11 @@
 		<Transition source="3" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletGateEL_2.AS3" type="Plant">
+<Automaton name="l_PalletGateEL_2[AS3]" type="Plant">
 	<Events>
-		<Event id="0" label="GClosesEL_2.AS3"/>
-		<Event id="1" label="GOpensEL_2.AS3"/>
-		<Event id="2" label="PalletLvGEL_2.AS3" controllable="false"/>
+		<Event id="0" label="GClosesEL_2[AS3]"/>
+		<Event id="1" label="GOpensEL_2[AS3]"/>
+		<Event id="2" label="PalletLvGEL_2[AS3]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1583,11 +1583,11 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletStopEL_2.AS3" type="Plant">
+<Automaton name="l_PalletStopEL_2[AS3]" type="Plant">
 	<Events>
-		<Event id="0" label="PStopClosesEL_2.AS3"/>
-		<Event id="1" label="PStopOpensEL_2.AS3"/>
-		<Event id="2" label="PalletLvAS.AS3" controllable="false"/>
+		<Event id="0" label="PStopClosesEL_2[AS3]"/>
+		<Event id="1" label="PStopOpensEL_2[AS3]"/>
+		<Event id="2" label="PalletLvAS[AS3]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1599,10 +1599,10 @@
 		<Transition source="1" dest="1" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PSenAtExtractor.AS3" type="Plant">
+<Automaton name="l_PSenAtExtractor[AS3]" type="Plant">
 	<Events>
-		<Event id="0" label="PArvAtExtractor.AS3" controllable="false"/>
-		<Event id="1" label="PalletLvAS.AS3" controllable="false"/>
+		<Event id="0" label="PArvAtExtractor[AS3]" controllable="false"/>
+		<Event id="1" label="PalletLvAS[AS3]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1613,19 +1613,19 @@
 		<Transition source="1" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_RWDeviceAS3" type="Plant">
+<Automaton name="l_RWDevic[AS3]" type="Plant">
 	<Events>
-		<Event id="0" label="DoneRead.AS3" controllable="false"/>
-		<Event id="1" label="DoneReset.AS3" controllable="false"/>
-		<Event id="2" label="DoneWrite.AS3" controllable="false"/>
-		<Event id="3" label="ReadLabel.AS3"/>
-		<Event id="4" label="ResetAssmbInfo.AS3"/>
-		<Event id="5" label="WrtCplT1A_1B.AS3"/>
-		<Event id="6" label="WrtCplT2A_2B.AS3"/>
-		<Event id="7" label="WrtErr1A.AS3"/>
-		<Event id="8" label="WrtErr1B.AS3"/>
-		<Event id="9" label="WrtErr2A.AS3"/>
-		<Event id="10" label="WrtErr2B.AS3"/>
+		<Event id="0" label="DoneRead[AS3]" controllable="false"/>
+		<Event id="1" label="DoneReset[AS3]" controllable="false"/>
+		<Event id="2" label="DoneWrite[AS3]" controllable="false"/>
+		<Event id="3" label="ReadLabel[AS3]"/>
+		<Event id="4" label="ResetAssmbInfo[AS3]"/>
+		<Event id="5" label="WrtCplT1A_1B[AS3]"/>
+		<Event id="6" label="WrtCplT2A_2B[AS3]"/>
+		<Event id="7" label="WrtErr1A[AS3]"/>
+		<Event id="8" label="WrtErr1B[AS3]"/>
+		<Event id="9" label="WrtErr2A[AS3]"/>
+		<Event id="10" label="WrtErr2B[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1647,13 +1647,13 @@
 		<Transition source="3" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletMaint.AS3" type="Plant">
+<Automaton name="l_PalletMaint[AS3]" type="Plant">
 	<Events>
-		<Event id="0" label="MaintCpl.AS3" controllable="false"/>
-		<Event id="1" label="SigMaintT1A.AS3"/>
-		<Event id="2" label="SigMaintT1B.AS3"/>
-		<Event id="3" label="SigMaintT2A.AS3"/>
-		<Event id="4" label="SigMaintT2B.AS3"/>
+		<Event id="0" label="MaintCpl[AS3]" controllable="false"/>
+		<Event id="1" label="SigMaintT1A[AS3]"/>
+		<Event id="2" label="SigMaintT1B[AS3]"/>
+		<Event id="3" label="SigMaintT2A[AS3]"/>
+		<Event id="4" label="SigMaintT2B[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1667,15 +1667,15 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_QueryTypNCpl.AS3" type="Plant">
+<Automaton name="l_QueryTypNCpl[AS3]" type="Plant">
 	<Events>
-		<Event id="0" label="IsCpl.AS3" controllable="false"/>
-		<Event id="1" label="IsType1.AS3" controllable="false"/>
-		<Event id="2" label="IsType2.AS3" controllable="false"/>
-		<Event id="3" label="NotCpl.AS3" controllable="false"/>
-		<Event id="4" label="QCplT1A_1B.AS3"/>
-		<Event id="5" label="QCplT2A_2B.AS3"/>
-		<Event id="6" label="QType.AS3"/>
+		<Event id="0" label="IsCpl[AS3]" controllable="false"/>
+		<Event id="1" label="IsType1[AS3]" controllable="false"/>
+		<Event id="2" label="IsType2[AS3]" controllable="false"/>
+		<Event id="3" label="NotCpl[AS3]" controllable="false"/>
+		<Event id="4" label="QCplT1A_1B[AS3]"/>
+		<Event id="5" label="QCplT2A_2B[AS3]"/>
+		<Event id="6" label="QType[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1692,17 +1692,17 @@
 		<Transition source="2" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_ChkErr.AS3" type="Plant">
+<Automaton name="l_ChkErr[AS3]" type="Plant">
 	<Events>
-		<Event id="0" label="IsErr1A.AS3" controllable="false"/>
-		<Event id="1" label="IsErr1B.AS3" controllable="false"/>
-		<Event id="2" label="IsErr2A.AS3" controllable="false"/>
-		<Event id="3" label="IsErr2B.AS3" controllable="false"/>
-		<Event id="4" label="NoErr.AS3" controllable="false"/>
-		<Event id="5" label="QErr1A.AS3"/>
-		<Event id="6" label="QErr1B.AS3"/>
-		<Event id="7" label="QErr2A.AS3"/>
-		<Event id="8" label="QErr2B.AS3"/>
+		<Event id="0" label="IsErr1A[AS3]" controllable="false"/>
+		<Event id="1" label="IsErr1B[AS3]" controllable="false"/>
+		<Event id="2" label="IsErr2A[AS3]" controllable="false"/>
+		<Event id="3" label="IsErr2B[AS3]" controllable="false"/>
+		<Event id="4" label="NoErr[AS3]" controllable="false"/>
+		<Event id="5" label="QErr1A[AS3]"/>
+		<Event id="6" label="QErr1B[AS3]"/>
+		<Event id="7" label="QErr2A[AS3]"/>
+		<Event id="8" label="QErr2B[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1728,18 +1728,18 @@
 </Automaton>
 <Automaton name="l_Robot3" type="Plant">
 	<Events>
-		<Event id="0" label="AssmbErr1A.AS3" controllable="false"/>
-		<Event id="1" label="AssmbErr1B.AS3" controllable="false"/>
-		<Event id="2" label="AssmbErr2A.AS3" controllable="false"/>
-		<Event id="3" label="AssmbErr2B.AS3" controllable="false"/>
-		<Event id="4" label="RtaskCpl1A.AS3" controllable="false"/>
-		<Event id="5" label="RtaskCpl1B.AS3" controllable="false"/>
-		<Event id="6" label="RtaskCpl2A.AS3" controllable="false"/>
-		<Event id="7" label="RtaskCpl2B.AS3" controllable="false"/>
-		<Event id="8" label="StrRtask1A.AS3"/>
-		<Event id="9" label="StrRtask1B.AS3"/>
-		<Event id="10" label="StrRtask2A.AS3"/>
-		<Event id="11" label="StrRtask2B.AS3"/>
+		<Event id="0" label="AssmbErr1A[AS3]" controllable="false"/>
+		<Event id="1" label="AssmbErr1B[AS3]" controllable="false"/>
+		<Event id="2" label="AssmbErr2A[AS3]" controllable="false"/>
+		<Event id="3" label="AssmbErr2B[AS3]" controllable="false"/>
+		<Event id="4" label="RtaskCpl1A[AS3]" controllable="false"/>
+		<Event id="5" label="RtaskCpl1B[AS3]" controllable="false"/>
+		<Event id="6" label="RtaskCpl2A[AS3]" controllable="false"/>
+		<Event id="7" label="RtaskCpl2B[AS3]" controllable="false"/>
+		<Event id="8" label="StrRtask1A[AS3]"/>
+		<Event id="9" label="StrRtask1B[AS3]"/>
+		<Event id="10" label="StrRtask2A[AS3]"/>
+		<Event id="11" label="StrRtask2B[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1763,38 +1763,38 @@
 		<Transition source="4" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlPalletAS3" type="Specification">
+<Automaton name="l_HndlPalle[AS3]" type="Specification">
 	<Events>
-		<Event id="0" label="AssmbErr1A.AS3" controllable="false"/>
-		<Event id="1" label="AssmbErr1B.AS3" controllable="false"/>
-		<Event id="2" label="AssmbErr2A.AS3" controllable="false"/>
-		<Event id="3" label="AssmbErr2B.AS3" controllable="false"/>
-		<Event id="4" label="CplT1A_1B.AS3"/>
-		<Event id="5" label="CplT2A_2B.AS3"/>
-		<Event id="6" label="DetNProcPallet.AS3"/>
-		<Event id="7" label="DoRepPallet.AS3"/>
-		<Event id="8" label="DoneRead.AS3" controllable="false"/>
-		<Event id="9" label="DoneReset.AS3" controllable="false"/>
-		<Event id="10" label="DoneWrite.AS3" controllable="false"/>
-		<Event id="11" label="ExtrArvConv.AS3" controllable="false"/>
-		<Event id="12" label="ExtrArvPlatf.AS3" controllable="false"/>
-		<Event id="13" label="MvExtrToConv.AS3"/>
-		<Event id="14" label="MvExtrToPlatf.AS3"/>
-		<Event id="15" label="PArvAtExtractor.AS3" controllable="false"/>
-		<Event id="16" label="PalletRepaired.AS3"/>
-		<Event id="17" label="PalletRepd.AS3"/>
-		<Event id="18" label="ProcCpl.AS3"/>
-		<Event id="19" label="ProcErr.AS3"/>
-		<Event id="20" label="ReadLabel.AS3"/>
-		<Event id="21" label="RelPallet.AS3"/>
-		<Event id="22" label="RepNotNeeded.AS3"/>
-		<Event id="23" label="ResetAssmbInfo.AS3"/>
-		<Event id="24" label="WrtCplT1A_1B.AS3"/>
-		<Event id="25" label="WrtCplT2A_2B.AS3"/>
-		<Event id="26" label="WrtErr1A.AS3"/>
-		<Event id="27" label="WrtErr1B.AS3"/>
-		<Event id="28" label="WrtErr2A.AS3"/>
-		<Event id="29" label="WrtErr2B.AS3"/>
+		<Event id="0" label="AssmbErr1A[AS3]" controllable="false"/>
+		<Event id="1" label="AssmbErr1B[AS3]" controllable="false"/>
+		<Event id="2" label="AssmbErr2A[AS3]" controllable="false"/>
+		<Event id="3" label="AssmbErr2B[AS3]" controllable="false"/>
+		<Event id="4" label="CplT1A_1B[AS3]"/>
+		<Event id="5" label="CplT2A_2B[AS3]"/>
+		<Event id="6" label="DetNProcPallet[AS3]"/>
+		<Event id="7" label="DoRepPallet[AS3]"/>
+		<Event id="8" label="DoneRead[AS3]" controllable="false"/>
+		<Event id="9" label="DoneReset[AS3]" controllable="false"/>
+		<Event id="10" label="DoneWrite[AS3]" controllable="false"/>
+		<Event id="11" label="ExtrArvConv[AS3]" controllable="false"/>
+		<Event id="12" label="ExtrArvPlatf[AS3]" controllable="false"/>
+		<Event id="13" label="MvExtrToConv[AS3]"/>
+		<Event id="14" label="MvExtrToPlatf[AS3]"/>
+		<Event id="15" label="PArvAtExtractor[AS3]" controllable="false"/>
+		<Event id="16" label="PalletRepaired[AS3]"/>
+		<Event id="17" label="PalletRepd[AS3]"/>
+		<Event id="18" label="ProcCpl[AS3]"/>
+		<Event id="19" label="ProcErr[AS3]"/>
+		<Event id="20" label="ReadLabel[AS3]"/>
+		<Event id="21" label="RelPallet[AS3]"/>
+		<Event id="22" label="RepNotNeeded[AS3]"/>
+		<Event id="23" label="ResetAssmbInfo[AS3]"/>
+		<Event id="24" label="WrtCplT1A_1B[AS3]"/>
+		<Event id="25" label="WrtCplT2A_2B[AS3]"/>
+		<Event id="26" label="WrtErr1A[AS3]"/>
+		<Event id="27" label="WrtErr1B[AS3]"/>
+		<Event id="28" label="WrtErr2A[AS3]"/>
+		<Event id="29" label="WrtErr2B[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1869,15 +1869,15 @@
 		<Transition source="20" dest="20" event="13"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlPalletLvAS3" type="Specification">
+<Automaton name="l_HndlPalletL[AS3]" type="Specification">
 	<Events>
-		<Event id="0" label="PStopClosesEL_2.AS3"/>
-		<Event id="1" label="PStopOpensEL_2.AS3"/>
-		<Event id="2" label="PalletLvAS.AS3" controllable="false"/>
-		<Event id="3" label="PalletRepd.AS3"/>
-		<Event id="4" label="ProcCpl.AS3"/>
-		<Event id="5" label="ProcErr.AS3"/>
-		<Event id="6" label="RelPallet.AS3"/>
+		<Event id="0" label="PStopClosesEL_2[AS3]"/>
+		<Event id="1" label="PStopOpensEL_2[AS3]"/>
+		<Event id="2" label="PalletLvAS[AS3]" controllable="false"/>
+		<Event id="3" label="PalletRepd[AS3]"/>
+		<Event id="4" label="ProcCpl[AS3]"/>
+		<Event id="5" label="ProcErr[AS3]"/>
+		<Event id="6" label="RelPallet[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1897,13 +1897,13 @@
 </Automaton>
 <Automaton name="l_OperateGateEL3_2" type="Specification">
 	<Events>
-		<Event id="0" label="GClosesEL_2.AS3"/>
-		<Event id="1" label="GOpensEL_2.AS3"/>
-		<Event id="2" label="PalletLvGEL_2.AS3" controllable="false"/>
-		<Event id="3" label="PalletRepd.AS3"/>
-		<Event id="4" label="ProcCpl.AS3"/>
-		<Event id="5" label="ProcErr.AS3"/>
-		<Event id="6" label="ProcPallet.AS3"/>
+		<Event id="0" label="GClosesEL_2[AS3]"/>
+		<Event id="1" label="GOpensEL_2[AS3]"/>
+		<Event id="2" label="PalletLvGEL_2[AS3]" controllable="false"/>
+		<Event id="3" label="PalletRepd[AS3]"/>
+		<Event id="4" label="ProcCpl[AS3]"/>
+		<Event id="5" label="ProcErr[AS3]"/>
+		<Event id="6" label="ProcPallet[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1920,11 +1920,11 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_IntfRepairPallet.AS3" type="Specification">
+<Automaton name="l_IntfRepairPallet[AS3]" type="Specification">
 	<Events>
-		<Event id="0" label="DoRepPallet.AS3"/>
-		<Event id="1" label="PalletRepaired.AS3"/>
-		<Event id="2" label="RepNotNeeded.AS3"/>
+		<Event id="0" label="DoRepPallet[AS3]"/>
+		<Event id="1" label="PalletRepaired[AS3]"/>
+		<Event id="2" label="RepNotNeeded[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1936,15 +1936,15 @@
 		<Transition source="1" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_IntfDetOpNProc.AS3" type="Specification">
+<Automaton name="l_IntfDetOpNProc[AS3]" type="Specification">
 	<Events>
-		<Event id="0" label="AssmbErr1A.AS3" controllable="false"/>
-		<Event id="1" label="AssmbErr1B.AS3" controllable="false"/>
-		<Event id="2" label="AssmbErr2A.AS3" controllable="false"/>
-		<Event id="3" label="AssmbErr2B.AS3" controllable="false"/>
-		<Event id="4" label="CplT1A_1B.AS3"/>
-		<Event id="5" label="CplT2A_2B.AS3"/>
-		<Event id="6" label="DetNProcPallet.AS3"/>
+		<Event id="0" label="AssmbErr1A[AS3]" controllable="false"/>
+		<Event id="1" label="AssmbErr1B[AS3]" controllable="false"/>
+		<Event id="2" label="AssmbErr2A[AS3]" controllable="false"/>
+		<Event id="3" label="AssmbErr2B[AS3]" controllable="false"/>
+		<Event id="4" label="CplT1A_1B[AS3]"/>
+		<Event id="5" label="CplT2A_2B[AS3]"/>
+		<Event id="6" label="DetNProcPallet[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -1960,22 +1960,22 @@
 		<Transition source="1" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_DoMaintenance.AS3" type="Specification">
+<Automaton name="l_DoMaintenance[AS3]" type="Specification">
 	<Events>
-		<Event id="0" label="DoRepPallet.AS3"/>
-		<Event id="1" label="IsErr1A.AS3" controllable="false"/>
-		<Event id="2" label="IsErr1B.AS3" controllable="false"/>
-		<Event id="3" label="IsErr2A.AS3" controllable="false"/>
-		<Event id="4" label="IsErr2B.AS3" controllable="false"/>
-		<Event id="5" label="MaintCpl.AS3" controllable="false"/>
-		<Event id="6" label="NoError.AS3"/>
-		<Event id="7" label="PalletRepaired.AS3"/>
-		<Event id="8" label="QError.AS3"/>
-		<Event id="9" label="RepNotNeeded.AS3"/>
-		<Event id="10" label="SigMaintT1A.AS3"/>
-		<Event id="11" label="SigMaintT1B.AS3"/>
-		<Event id="12" label="SigMaintT2A.AS3"/>
-		<Event id="13" label="SigMaintT2B.AS3"/>
+		<Event id="0" label="DoRepPallet[AS3]"/>
+		<Event id="1" label="IsErr1A[AS3]" controllable="false"/>
+		<Event id="2" label="IsErr1B[AS3]" controllable="false"/>
+		<Event id="3" label="IsErr2A[AS3]" controllable="false"/>
+		<Event id="4" label="IsErr2B[AS3]" controllable="false"/>
+		<Event id="5" label="MaintCpl[AS3]" controllable="false"/>
+		<Event id="6" label="NoError[AS3]"/>
+		<Event id="7" label="PalletRepaired[AS3]"/>
+		<Event id="8" label="QError[AS3]"/>
+		<Event id="9" label="RepNotNeeded[AS3]"/>
+		<Event id="10" label="SigMaintT1A[AS3]"/>
+		<Event id="11" label="SigMaintT1B[AS3]"/>
+		<Event id="12" label="SigMaintT2A[AS3]"/>
+		<Event id="13" label="SigMaintT2B[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2007,27 +2007,27 @@
 		<Transition source="7" dest="7" event="13"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_DetNProc.AS3" type="Specification">
+<Automaton name="l_DetNProc[AS3]" type="Specification">
 	<Events>
-		<Event id="0" label="AssmbErr1A.AS3" controllable="false"/>
-		<Event id="1" label="AssmbErr1B.AS3" controllable="false"/>
-		<Event id="2" label="AssmbErr2A.AS3" controllable="false"/>
-		<Event id="3" label="AssmbErr2B.AS3" controllable="false"/>
-		<Event id="4" label="CplT1A_1B.AS3"/>
-		<Event id="5" label="CplT2A_2B.AS3"/>
-		<Event id="6" label="DetNProcPallet.AS3"/>
-		<Event id="7" label="IsCpl.AS3" controllable="false"/>
-		<Event id="8" label="IsType1.AS3" controllable="false"/>
-		<Event id="9" label="IsType2.AS3" controllable="false"/>
-		<Event id="10" label="NotCpl.AS3" controllable="false"/>
-		<Event id="11" label="ProcTyp1AsR1.AS3"/>
-		<Event id="12" label="ProcTyp1AsR2.AS3"/>
-		<Event id="13" label="ProcTyp2AsR1.AS3"/>
-		<Event id="14" label="ProcTyp2AsR2.AS3"/>
-		<Event id="15" label="QCplT1A_1B.AS3"/>
-		<Event id="16" label="QCplT2A_2B.AS3"/>
-		<Event id="17" label="QType.AS3"/>
-		<Event id="18" label="RTasksCpl.AS3"/>
+		<Event id="0" label="AssmbErr1A[AS3]" controllable="false"/>
+		<Event id="1" label="AssmbErr1B[AS3]" controllable="false"/>
+		<Event id="2" label="AssmbErr2A[AS3]" controllable="false"/>
+		<Event id="3" label="AssmbErr2B[AS3]" controllable="false"/>
+		<Event id="4" label="CplT1A_1B[AS3]"/>
+		<Event id="5" label="CplT2A_2B[AS3]"/>
+		<Event id="6" label="DetNProcPallet[AS3]"/>
+		<Event id="7" label="IsCpl[AS3]" controllable="false"/>
+		<Event id="8" label="IsType1[AS3]" controllable="false"/>
+		<Event id="9" label="IsType2[AS3]" controllable="false"/>
+		<Event id="10" label="NotCpl[AS3]" controllable="false"/>
+		<Event id="11" label="ProcTyp1AsR1[AS3]"/>
+		<Event id="12" label="ProcTyp1AsR2[AS3]"/>
+		<Event id="13" label="ProcTyp2AsR1[AS3]"/>
+		<Event id="14" label="ProcTyp2AsR2[AS3]"/>
+		<Event id="15" label="QCplT1A_1B[AS3]"/>
+		<Event id="16" label="QCplT2A_2B[AS3]"/>
+		<Event id="17" label="QType[AS3]"/>
+		<Event id="18" label="RTasksCpl[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2072,14 +2072,14 @@
 		<Transition source="9" dest="8" event="18"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_IntfQueryErrors.AS3" type="Specification">
+<Automaton name="l_IntfQueryErrors[AS3]" type="Specification">
 	<Events>
-		<Event id="0" label="IsErr1A.AS3" controllable="false"/>
-		<Event id="1" label="IsErr1B.AS3" controllable="false"/>
-		<Event id="2" label="IsErr2A.AS3" controllable="false"/>
-		<Event id="3" label="IsErr2B.AS3" controllable="false"/>
-		<Event id="4" label="NoError.AS3"/>
-		<Event id="5" label="QError.AS3"/>
+		<Event id="0" label="IsErr1A[AS3]" controllable="false"/>
+		<Event id="1" label="IsErr1B[AS3]" controllable="false"/>
+		<Event id="2" label="IsErr2A[AS3]" controllable="false"/>
+		<Event id="3" label="IsErr2B[AS3]" controllable="false"/>
+		<Event id="4" label="NoError[AS3]"/>
+		<Event id="5" label="QError[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2094,17 +2094,17 @@
 		<Transition source="1" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_Intf-DetOpNProc-Robot.AS3" type="Specification">
+<Automaton name="l_Intf-DetOpNProc-Robot[AS3]" type="Specification">
 	<Events>
-		<Event id="0" label="AssmbErr1A.AS3" controllable="false"/>
-		<Event id="1" label="AssmbErr1B.AS3" controllable="false"/>
-		<Event id="2" label="AssmbErr2A.AS3" controllable="false"/>
-		<Event id="3" label="AssmbErr2B.AS3" controllable="false"/>
-		<Event id="4" label="ProcTyp1AsR1.AS3"/>
-		<Event id="5" label="ProcTyp1AsR2.AS3"/>
-		<Event id="6" label="ProcTyp2AsR1.AS3"/>
-		<Event id="7" label="ProcTyp2AsR2.AS3"/>
-		<Event id="8" label="RTasksCpl.AS3"/>
+		<Event id="0" label="AssmbErr1A[AS3]" controllable="false"/>
+		<Event id="1" label="AssmbErr1B[AS3]" controllable="false"/>
+		<Event id="2" label="AssmbErr2A[AS3]" controllable="false"/>
+		<Event id="3" label="AssmbErr2B[AS3]" controllable="false"/>
+		<Event id="4" label="ProcTyp1AsR1[AS3]"/>
+		<Event id="5" label="ProcTyp1AsR2[AS3]"/>
+		<Event id="6" label="ProcTyp2AsR1[AS3]"/>
+		<Event id="7" label="ProcTyp2AsR2[AS3]"/>
+		<Event id="8" label="RTasksCpl[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2124,19 +2124,19 @@
 		<Transition source="2" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_DoChkErr.AS3" type="Specification">
+<Automaton name="l_DoChkErr[AS3]" type="Specification">
 	<Events>
-		<Event id="0" label="IsErr1A.AS3" controllable="false"/>
-		<Event id="1" label="IsErr1B.AS3" controllable="false"/>
-		<Event id="2" label="IsErr2A.AS3" controllable="false"/>
-		<Event id="3" label="IsErr2B.AS3" controllable="false"/>
-		<Event id="4" label="NoErr.AS3" controllable="false"/>
-		<Event id="5" label="NoError.AS3"/>
-		<Event id="6" label="QErr1A.AS3"/>
-		<Event id="7" label="QErr1B.AS3"/>
-		<Event id="8" label="QErr2A.AS3"/>
-		<Event id="9" label="QErr2B.AS3"/>
-		<Event id="10" label="QError.AS3"/>
+		<Event id="0" label="IsErr1A[AS3]" controllable="false"/>
+		<Event id="1" label="IsErr1B[AS3]" controllable="false"/>
+		<Event id="2" label="IsErr2A[AS3]" controllable="false"/>
+		<Event id="3" label="IsErr2B[AS3]" controllable="false"/>
+		<Event id="4" label="NoErr[AS3]" controllable="false"/>
+		<Event id="5" label="NoError[AS3]"/>
+		<Event id="6" label="QErr1A[AS3]"/>
+		<Event id="7" label="QErr1B[AS3]"/>
+		<Event id="8" label="QErr2A[AS3]"/>
+		<Event id="9" label="QErr2B[AS3]"/>
+		<Event id="10" label="QError[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2165,23 +2165,23 @@
 </Automaton>
 <Automaton name="l_DoRobotTasks3" type="Specification">
 	<Events>
-		<Event id="0" label="AssmbErr1A.AS3" controllable="false"/>
-		<Event id="1" label="AssmbErr1B.AS3" controllable="false"/>
-		<Event id="2" label="AssmbErr2A.AS3" controllable="false"/>
-		<Event id="3" label="AssmbErr2B.AS3" controllable="false"/>
-		<Event id="4" label="ProcTyp1AsR1.AS3"/>
-		<Event id="5" label="ProcTyp1AsR2.AS3"/>
-		<Event id="6" label="ProcTyp2AsR1.AS3"/>
-		<Event id="7" label="ProcTyp2AsR2.AS3"/>
-		<Event id="8" label="RTasksCpl.AS3"/>
-		<Event id="9" label="RtaskCpl1A.AS3" controllable="false"/>
-		<Event id="10" label="RtaskCpl1B.AS3" controllable="false"/>
-		<Event id="11" label="RtaskCpl2A.AS3" controllable="false"/>
-		<Event id="12" label="RtaskCpl2B.AS3" controllable="false"/>
-		<Event id="13" label="StrRtask1A.AS3"/>
-		<Event id="14" label="StrRtask1B.AS3"/>
-		<Event id="15" label="StrRtask2A.AS3"/>
-		<Event id="16" label="StrRtask2B.AS3"/>
+		<Event id="0" label="AssmbErr1A[AS3]" controllable="false"/>
+		<Event id="1" label="AssmbErr1B[AS3]" controllable="false"/>
+		<Event id="2" label="AssmbErr2A[AS3]" controllable="false"/>
+		<Event id="3" label="AssmbErr2B[AS3]" controllable="false"/>
+		<Event id="4" label="ProcTyp1AsR1[AS3]"/>
+		<Event id="5" label="ProcTyp1AsR2[AS3]"/>
+		<Event id="6" label="ProcTyp2AsR1[AS3]"/>
+		<Event id="7" label="ProcTyp2AsR2[AS3]"/>
+		<Event id="8" label="RTasksCpl[AS3]"/>
+		<Event id="9" label="RtaskCpl1A[AS3]" controllable="false"/>
+		<Event id="10" label="RtaskCpl1B[AS3]" controllable="false"/>
+		<Event id="11" label="RtaskCpl2A[AS3]" controllable="false"/>
+		<Event id="12" label="RtaskCpl2B[AS3]" controllable="false"/>
+		<Event id="13" label="StrRtask1A[AS3]"/>
+		<Event id="14" label="StrRtask1B[AS3]"/>
+		<Event id="15" label="StrRtask2A[AS3]"/>
+		<Event id="16" label="StrRtask2B[AS3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2229,15 +2229,15 @@
 		<Transition source="10" dest="6" event="11"/>
 	</Transitions>
 </Automaton>
-<Automaton name="IntfTU.TU1" type="Specification">
+<Automaton name="IntfTU[TU1]" type="Specification">
 	<Events>
-		<Event id="0" label="LibPallet.TU1"/>
-		<Event id="1" label="NoTrnsfEL.TU1"/>
-		<Event id="2" label="PalletRlsd.TU1"/>
-		<Event id="3" label="TrnsfCplToCL.TU1"/>
-		<Event id="4" label="TrnsfCplToEL.TU1"/>
-		<Event id="5" label="TrnsfELToCL.TU1"/>
-		<Event id="6" label="TrnsfToEL.TU1"/>
+		<Event id="0" label="LibPallet[TU1]"/>
+		<Event id="1" label="NoTrnsfEL[TU1]"/>
+		<Event id="2" label="PalletRlsd[TU1]"/>
+		<Event id="3" label="TrnsfCplToCL[TU1]"/>
+		<Event id="4" label="TrnsfCplToEL[TU1]"/>
+		<Event id="5" label="TrnsfELToCL[TU1]"/>
+		<Event id="6" label="TrnsfToEL[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2255,12 +2255,12 @@
 		<Transition source="3" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapGateCL.TU1" type="Plant">
+<Automaton name="l_CapGateCL[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="LibPallet.TU1"/>
-		<Event id="1" label="NoTrnsfEL.TU1"/>
-		<Event id="2" label="PalletLvGCL.TU1" controllable="false"/>
-		<Event id="3" label="TrnsfToEL.TU1"/>
+		<Event id="0" label="LibPallet[TU1]"/>
+		<Event id="1" label="NoTrnsfEL[TU1]"/>
+		<Event id="2" label="PalletLvGCL[TU1]" controllable="false"/>
+		<Event id="3" label="TrnsfToEL[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2278,10 +2278,10 @@
 		<Transition source="2" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapGateEL_1.TU1" type="Plant">
+<Automaton name="l_CapGateEL_1[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletLvGEL_1.TU1" controllable="false"/>
-		<Event id="1" label="TrnsfELToCL.TU1"/>
+		<Event id="0" label="PalletLvGEL_1[TU1]" controllable="false"/>
+		<Event id="1" label="TrnsfELToCL[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2295,12 +2295,12 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapTUDrwToExit.TU1" type="Plant">
+<Automaton name="l_CapTUDrwToExit[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvDrwCL.TU1" controllable="false"/>
-		<Event id="1" label="PalletArvDrwEL.TU1" controllable="false"/>
-		<Event id="2" label="PalletLvTUAtCL.TU1" controllable="false"/>
-		<Event id="3" label="PalletLvTUAtEL_1.TU1" controllable="false"/>
+		<Event id="0" label="PalletArvDrwCL[TU1]" controllable="false"/>
+		<Event id="1" label="PalletArvDrwEL[TU1]" controllable="false"/>
+		<Event id="2" label="PalletLvTUAtCL[TU1]" controllable="false"/>
+		<Event id="3" label="PalletLvTUAtEL_1[TU1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2318,10 +2318,10 @@
 		<Transition source="2" dest="1" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapTUDrwToGateCL.TU1" type="Plant">
+<Automaton name="l_CapTUDrwToGateCL[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvDrwCL.TU1" controllable="false"/>
-		<Event id="1" label="PalletLvGCL.TU1" controllable="false"/>
+		<Event id="0" label="PalletArvDrwCL[TU1]" controllable="false"/>
+		<Event id="1" label="PalletLvGCL[TU1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2335,10 +2335,10 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapTUDrwToGateEL_1.TU1" type="Plant">
+<Automaton name="l_CapTUDrwToGateEL_1[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvDrwEL.TU1" controllable="false"/>
-		<Event id="1" label="PalletLvGEL_1.TU1" controllable="false"/>
+		<Event id="0" label="PalletArvDrwEL[TU1]" controllable="false"/>
+		<Event id="1" label="PalletLvGEL_1[TU1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2352,11 +2352,11 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletGateCL.TU1" type="Plant">
+<Automaton name="l_PalletGateCL[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="GClosesCL.TU1"/>
-		<Event id="1" label="GOpensCL.TU1"/>
-		<Event id="2" label="PalletLvGCL.TU1" controllable="false"/>
+		<Event id="0" label="GClosesCL[TU1]"/>
+		<Event id="1" label="GOpensCL[TU1]"/>
+		<Event id="2" label="PalletLvGCL[TU1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2369,11 +2369,11 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletGateEL_1.TU1" type="Plant">
+<Automaton name="l_PalletGateEL_1[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="GClosesEL_1.TU1"/>
-		<Event id="1" label="GOpensEL_1.TU1"/>
-		<Event id="2" label="PalletLvGEL_1.TU1" controllable="false"/>
+		<Event id="0" label="GClosesEL_1[TU1]"/>
+		<Event id="1" label="GOpensEL_1[TU1]"/>
+		<Event id="2" label="PalletLvGEL_1[TU1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2386,11 +2386,11 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletStopCL.TU1" type="Plant">
+<Automaton name="l_PalletStopCL[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="PStopClosesCL.TU1"/>
-		<Event id="1" label="PStopOpensCL.TU1"/>
-		<Event id="2" label="PalletLvTUAtCL.TU1" controllable="false"/>
+		<Event id="0" label="PStopClosesCL[TU1]"/>
+		<Event id="1" label="PStopOpensCL[TU1]"/>
+		<Event id="2" label="PalletLvTUAtCL[TU1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2402,11 +2402,11 @@
 		<Transition source="1" dest="1" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletStopEL_1.TU1" type="Plant">
+<Automaton name="l_PalletStopEL_1[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="PStopClosesEL_1.TU1"/>
-		<Event id="1" label="PStopOpensEL_1.TU1"/>
-		<Event id="2" label="PalletLvTUAtEL_1.TU1" controllable="false"/>
+		<Event id="0" label="PStopClosesEL_1[TU1]"/>
+		<Event id="1" label="PStopOpensEL_1[TU1]"/>
+		<Event id="2" label="PalletLvTUAtEL_1[TU1]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2418,13 +2418,13 @@
 		<Transition source="1" dest="1" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_QueryDrwLoc.TU1" type="Plant">
+<Automaton name="l_QueryDrwLoc[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU1" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU1" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU1" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU1" controllable="false"/>
-		<Event id="4" label="QDrwLoc.TU1"/>
+		<Event id="0" label="DrwArvCL[TU1]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU1]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU1]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU1]" controllable="false"/>
+		<Event id="4" label="QDrwLoc[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2443,10 +2443,10 @@
 		<Transition source="3" dest="2" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_RWDevice.TU1" type="Plant">
+<Automaton name="l_RWDevice[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="DoneRead.TU1" controllable="false"/>
-		<Event id="1" label="ReadLabel.TU1"/>
+		<Event id="0" label="DoneRead[TU1]" controllable="false"/>
+		<Event id="1" label="ReadLabel[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2457,12 +2457,12 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_TUDrawer.TU1" type="Plant">
+<Automaton name="l_TUDrawer[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU1" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU1" controllable="false"/>
-		<Event id="2" label="MvDrwToCL.TU1"/>
-		<Event id="3" label="MvDrwToEL.TU1"/>
+		<Event id="0" label="DrwArvCL[TU1]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU1]" controllable="false"/>
+		<Event id="2" label="MvDrwToCL[TU1]"/>
+		<Event id="3" label="MvDrwToEL[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2477,17 +2477,17 @@
 		<Transition source="3" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_ChkErr.TU1" type="Plant">
+<Automaton name="l_ChkErr[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="IsErr1A.TU1" controllable="false"/>
-		<Event id="1" label="IsErr1B.TU1" controllable="false"/>
-		<Event id="2" label="IsErr2A.TU1" controllable="false"/>
-		<Event id="3" label="IsErr2B.TU1" controllable="false"/>
-		<Event id="4" label="NoErr.TU1" controllable="false"/>
-		<Event id="5" label="QErr1A.TU1"/>
-		<Event id="6" label="QErr1B.TU1"/>
-		<Event id="7" label="QErr2A.TU1"/>
-		<Event id="8" label="QErr2B.TU1"/>
+		<Event id="0" label="IsErr1A[TU1]" controllable="false"/>
+		<Event id="1" label="IsErr1B[TU1]" controllable="false"/>
+		<Event id="2" label="IsErr2A[TU1]" controllable="false"/>
+		<Event id="3" label="IsErr2B[TU1]" controllable="false"/>
+		<Event id="4" label="NoErr[TU1]" controllable="false"/>
+		<Event id="5" label="QErr1A[TU1]"/>
+		<Event id="6" label="QErr1B[TU1]"/>
+		<Event id="7" label="QErr2A[TU1]"/>
+		<Event id="8" label="QErr2B[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2511,15 +2511,15 @@
 		<Transition source="4" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_QueryTypNCpl.TU1" type="Plant">
+<Automaton name="l_QueryTypNCpl[TU1]" type="Plant">
 	<Events>
-		<Event id="0" label="IsCpl.TU1" controllable="false"/>
-		<Event id="1" label="IsType1.TU1" controllable="false"/>
-		<Event id="2" label="IsType2.TU1" controllable="false"/>
-		<Event id="3" label="NotCpl.TU1" controllable="false"/>
-		<Event id="4" label="QCplT1A_1B.TU1"/>
-		<Event id="5" label="QCplT2A_2B.TU1"/>
-		<Event id="6" label="QType.TU1"/>
+		<Event id="0" label="IsCpl[TU1]" controllable="false"/>
+		<Event id="1" label="IsType1[TU1]" controllable="false"/>
+		<Event id="2" label="IsType2[TU1]" controllable="false"/>
+		<Event id="3" label="NotCpl[TU1]" controllable="false"/>
+		<Event id="4" label="QCplT1A_1B[TU1]"/>
+		<Event id="5" label="QCplT2A_2B[TU1]"/>
+		<Event id="6" label="QType[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2536,36 +2536,36 @@
 		<Transition source="2" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlComEvents.TU1" type="Specification">
+<Automaton name="l_HndlComEvents[TU1]" type="Specification">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU1" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU1" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU1" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU1" controllable="false"/>
-		<Event id="4" label="GClosesCL.TU1"/>
-		<Event id="5" label="GClosesEL_1.TU1"/>
-		<Event id="6" label="GOpensCL.TU1"/>
-		<Event id="7" label="GOpensEL_1.TU1"/>
-		<Event id="8" label="LibPallet.TU1"/>
-		<Event id="9" label="MvDrwToCL.TU1"/>
-		<Event id="10" label="MvDrwToEL.TU1"/>
-		<Event id="11" label="NoTrnsfEL.TU1"/>
-		<Event id="12" label="PStopClosesCL.TU1"/>
-		<Event id="13" label="PStopClosesEL_1.TU1"/>
-		<Event id="14" label="PStopOpensCL.TU1"/>
-		<Event id="15" label="PStopOpensEL_1.TU1"/>
-		<Event id="16" label="PalletArvDrwCL.TU1" controllable="false"/>
-		<Event id="17" label="PalletArvDrwEL.TU1" controllable="false"/>
-		<Event id="18" label="PalletLvGCL.TU1" controllable="false"/>
-		<Event id="19" label="PalletLvGEL_1.TU1" controllable="false"/>
-		<Event id="20" label="PalletLvTUAtCL.TU1" controllable="false"/>
-		<Event id="21" label="PalletLvTUAtEL_1.TU1" controllable="false"/>
-		<Event id="22" label="PalletRlsd.TU1"/>
-		<Event id="23" label="QDrwLoc.TU1"/>
-		<Event id="24" label="TrnsfCplToCL.TU1"/>
-		<Event id="25" label="TrnsfCplToEL.TU1"/>
-		<Event id="26" label="TrnsfELToCL.TU1"/>
-		<Event id="27" label="TrnsfToEL.TU1"/>
+		<Event id="0" label="DrwArvCL[TU1]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU1]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU1]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU1]" controllable="false"/>
+		<Event id="4" label="GClosesCL[TU1]"/>
+		<Event id="5" label="GClosesEL_1[TU1]"/>
+		<Event id="6" label="GOpensCL[TU1]"/>
+		<Event id="7" label="GOpensEL_1[TU1]"/>
+		<Event id="8" label="LibPallet[TU1]"/>
+		<Event id="9" label="MvDrwToCL[TU1]"/>
+		<Event id="10" label="MvDrwToEL[TU1]"/>
+		<Event id="11" label="NoTrnsfEL[TU1]"/>
+		<Event id="12" label="PStopClosesCL[TU1]"/>
+		<Event id="13" label="PStopClosesEL_1[TU1]"/>
+		<Event id="14" label="PStopOpensCL[TU1]"/>
+		<Event id="15" label="PStopOpensEL_1[TU1]"/>
+		<Event id="16" label="PalletArvDrwCL[TU1]" controllable="false"/>
+		<Event id="17" label="PalletArvDrwEL[TU1]" controllable="false"/>
+		<Event id="18" label="PalletLvGCL[TU1]" controllable="false"/>
+		<Event id="19" label="PalletLvGEL_1[TU1]" controllable="false"/>
+		<Event id="20" label="PalletLvTUAtCL[TU1]" controllable="false"/>
+		<Event id="21" label="PalletLvTUAtEL_1[TU1]" controllable="false"/>
+		<Event id="22" label="PalletRlsd[TU1]"/>
+		<Event id="23" label="QDrwLoc[TU1]"/>
+		<Event id="24" label="TrnsfCplToCL[TU1]"/>
+		<Event id="25" label="TrnsfCplToEL[TU1]"/>
+		<Event id="26" label="TrnsfELToCL[TU1]"/>
+		<Event id="27" label="TrnsfToEL[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2602,31 +2602,31 @@
 		<Transition source="1" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlLibPallet.TU1" type="Specification">
+<Automaton name="l_HndlLibPallet[TU1]" type="Specification">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU1" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU1" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU1" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU1" controllable="false"/>
-		<Event id="4" label="GClosesCL.TU1"/>
-		<Event id="5" label="GClosesEL_1.TU1"/>
-		<Event id="6" label="GOpensCL.TU1"/>
-		<Event id="7" label="GOpensEL_1.TU1"/>
-		<Event id="8" label="LibPallet.TU1"/>
-		<Event id="9" label="MvDrwToCL.TU1"/>
-		<Event id="10" label="MvDrwToEL.TU1"/>
-		<Event id="11" label="PStopClosesCL.TU1"/>
-		<Event id="12" label="PStopClosesEL_1.TU1"/>
-		<Event id="13" label="PStopOpensCL.TU1"/>
-		<Event id="14" label="PStopOpensEL_1.TU1"/>
-		<Event id="15" label="PalletArvDrwCL.TU1" controllable="false"/>
-		<Event id="16" label="PalletArvDrwEL.TU1" controllable="false"/>
-		<Event id="17" label="PalletLvGCL.TU1" controllable="false"/>
-		<Event id="18" label="PalletLvGEL_1.TU1" controllable="false"/>
-		<Event id="19" label="PalletLvTUAtCL.TU1" controllable="false"/>
-		<Event id="20" label="PalletLvTUAtEL_1.TU1" controllable="false"/>
-		<Event id="21" label="PalletRlsd.TU1"/>
-		<Event id="22" label="QDrwLoc.TU1"/>
+		<Event id="0" label="DrwArvCL[TU1]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU1]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU1]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU1]" controllable="false"/>
+		<Event id="4" label="GClosesCL[TU1]"/>
+		<Event id="5" label="GClosesEL_1[TU1]"/>
+		<Event id="6" label="GOpensCL[TU1]"/>
+		<Event id="7" label="GOpensEL_1[TU1]"/>
+		<Event id="8" label="LibPallet[TU1]"/>
+		<Event id="9" label="MvDrwToCL[TU1]"/>
+		<Event id="10" label="MvDrwToEL[TU1]"/>
+		<Event id="11" label="PStopClosesCL[TU1]"/>
+		<Event id="12" label="PStopClosesEL_1[TU1]"/>
+		<Event id="13" label="PStopOpensCL[TU1]"/>
+		<Event id="14" label="PStopOpensEL_1[TU1]"/>
+		<Event id="15" label="PalletArvDrwCL[TU1]" controllable="false"/>
+		<Event id="16" label="PalletArvDrwEL[TU1]" controllable="false"/>
+		<Event id="17" label="PalletLvGCL[TU1]" controllable="false"/>
+		<Event id="18" label="PalletLvGEL_1[TU1]" controllable="false"/>
+		<Event id="19" label="PalletLvTUAtCL[TU1]" controllable="false"/>
+		<Event id="20" label="PalletLvTUAtEL_1[TU1]" controllable="false"/>
+		<Event id="21" label="PalletRlsd[TU1]"/>
+		<Event id="22" label="QDrwLoc[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2673,31 +2673,31 @@
 		<Transition source="7" dest="0" event="21"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlTrnsfELToCL.TU1" type="Specification">
+<Automaton name="l_HndlTrnsfELToCL[TU1]" type="Specification">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU1" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU1" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU1" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU1" controllable="false"/>
-		<Event id="4" label="GClosesCL.TU1"/>
-		<Event id="5" label="GClosesEL_1.TU1"/>
-		<Event id="6" label="GOpensCL.TU1"/>
-		<Event id="7" label="GOpensEL_1.TU1"/>
-		<Event id="8" label="MvDrwToCL.TU1"/>
-		<Event id="9" label="MvDrwToEL.TU1"/>
-		<Event id="10" label="PStopClosesCL.TU1"/>
-		<Event id="11" label="PStopClosesEL_1.TU1"/>
-		<Event id="12" label="PStopOpensCL.TU1"/>
-		<Event id="13" label="PStopOpensEL_1.TU1"/>
-		<Event id="14" label="PalletArvDrwCL.TU1" controllable="false"/>
-		<Event id="15" label="PalletArvDrwEL.TU1" controllable="false"/>
-		<Event id="16" label="PalletLvGCL.TU1" controllable="false"/>
-		<Event id="17" label="PalletLvGEL_1.TU1" controllable="false"/>
-		<Event id="18" label="PalletLvTUAtCL.TU1" controllable="false"/>
-		<Event id="19" label="PalletLvTUAtEL_1.TU1" controllable="false"/>
-		<Event id="20" label="QDrwLoc.TU1"/>
-		<Event id="21" label="TrnsfCplToCL.TU1"/>
-		<Event id="22" label="TrnsfELToCL.TU1"/>
+		<Event id="0" label="DrwArvCL[TU1]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU1]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU1]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU1]" controllable="false"/>
+		<Event id="4" label="GClosesCL[TU1]"/>
+		<Event id="5" label="GClosesEL_1[TU1]"/>
+		<Event id="6" label="GOpensCL[TU1]"/>
+		<Event id="7" label="GOpensEL_1[TU1]"/>
+		<Event id="8" label="MvDrwToCL[TU1]"/>
+		<Event id="9" label="MvDrwToEL[TU1]"/>
+		<Event id="10" label="PStopClosesCL[TU1]"/>
+		<Event id="11" label="PStopClosesEL_1[TU1]"/>
+		<Event id="12" label="PStopOpensCL[TU1]"/>
+		<Event id="13" label="PStopOpensEL_1[TU1]"/>
+		<Event id="14" label="PalletArvDrwCL[TU1]" controllable="false"/>
+		<Event id="15" label="PalletArvDrwEL[TU1]" controllable="false"/>
+		<Event id="16" label="PalletLvGCL[TU1]" controllable="false"/>
+		<Event id="17" label="PalletLvGEL_1[TU1]" controllable="false"/>
+		<Event id="18" label="PalletLvTUAtCL[TU1]" controllable="false"/>
+		<Event id="19" label="PalletLvTUAtEL_1[TU1]" controllable="false"/>
+		<Event id="20" label="QDrwLoc[TU1]"/>
+		<Event id="21" label="TrnsfCplToCL[TU1]"/>
+		<Event id="22" label="TrnsfELToCL[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2754,43 +2754,43 @@
 		<Transition source="10" dest="0" event="21"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlTrnsfToEL.TU1" type="Specification">
+<Automaton name="l_HndlTrnsfToEL[TU1]" type="Specification">
 	<Events>
-		<Event id="0" label="DoneRead.TU1" controllable="false"/>
-		<Event id="1" label="DrwArvCL.TU1" controllable="false"/>
-		<Event id="2" label="DrwArvEL.TU1" controllable="false"/>
-		<Event id="3" label="DrwAtCL.TU1" controllable="false"/>
-		<Event id="4" label="DrwAtEL.TU1" controllable="false"/>
-		<Event id="5" label="GClosesCL.TU1"/>
-		<Event id="6" label="GClosesEL_1.TU1"/>
-		<Event id="7" label="GOpensCL.TU1"/>
-		<Event id="8" label="GOpensEL_1.TU1"/>
-		<Event id="9" label="IsErr1A.TU1" controllable="false"/>
-		<Event id="10" label="IsErr1B.TU1" controllable="false"/>
-		<Event id="11" label="IsErr2A.TU1" controllable="false"/>
-		<Event id="12" label="IsErr2B.TU1" controllable="false"/>
-		<Event id="13" label="MvDrwToCL.TU1"/>
-		<Event id="14" label="MvDrwToEL.TU1"/>
-		<Event id="15" label="NoError.TU1"/>
-		<Event id="16" label="NoTrnsfEL.TU1"/>
-		<Event id="17" label="NotOpNeeded.TU1"/>
-		<Event id="18" label="OpNeeded.TU1"/>
-		<Event id="19" label="PStopClosesCL.TU1"/>
-		<Event id="20" label="PStopClosesEL_1.TU1"/>
-		<Event id="21" label="PStopOpensCL.TU1"/>
-		<Event id="22" label="PStopOpensEL_1.TU1"/>
-		<Event id="23" label="PalletArvDrwCL.TU1" controllable="false"/>
-		<Event id="24" label="PalletArvDrwEL.TU1" controllable="false"/>
-		<Event id="25" label="PalletLvGCL.TU1" controllable="false"/>
-		<Event id="26" label="PalletLvGEL_1.TU1" controllable="false"/>
-		<Event id="27" label="PalletLvTUAtCL.TU1" controllable="false"/>
-		<Event id="28" label="PalletLvTUAtEL_1.TU1" controllable="false"/>
-		<Event id="29" label="QDrwLoc.TU1"/>
-		<Event id="30" label="QError.TU1"/>
-		<Event id="31" label="QOpNeeded.TU1"/>
-		<Event id="32" label="ReadLabel.TU1"/>
-		<Event id="33" label="TrnsfCplToEL.TU1"/>
-		<Event id="34" label="TrnsfToEL.TU1"/>
+		<Event id="0" label="DoneRead[TU1]" controllable="false"/>
+		<Event id="1" label="DrwArvCL[TU1]" controllable="false"/>
+		<Event id="2" label="DrwArvEL[TU1]" controllable="false"/>
+		<Event id="3" label="DrwAtCL[TU1]" controllable="false"/>
+		<Event id="4" label="DrwAtEL[TU1]" controllable="false"/>
+		<Event id="5" label="GClosesCL[TU1]"/>
+		<Event id="6" label="GClosesEL_1[TU1]"/>
+		<Event id="7" label="GOpensCL[TU1]"/>
+		<Event id="8" label="GOpensEL_1[TU1]"/>
+		<Event id="9" label="IsErr1A[TU1]" controllable="false"/>
+		<Event id="10" label="IsErr1B[TU1]" controllable="false"/>
+		<Event id="11" label="IsErr2A[TU1]" controllable="false"/>
+		<Event id="12" label="IsErr2B[TU1]" controllable="false"/>
+		<Event id="13" label="MvDrwToCL[TU1]"/>
+		<Event id="14" label="MvDrwToEL[TU1]"/>
+		<Event id="15" label="NoError[TU1]"/>
+		<Event id="16" label="NoTrnsfEL[TU1]"/>
+		<Event id="17" label="NotOpNeeded[TU1]"/>
+		<Event id="18" label="OpNeeded[TU1]"/>
+		<Event id="19" label="PStopClosesCL[TU1]"/>
+		<Event id="20" label="PStopClosesEL_1[TU1]"/>
+		<Event id="21" label="PStopOpensCL[TU1]"/>
+		<Event id="22" label="PStopOpensEL_1[TU1]"/>
+		<Event id="23" label="PalletArvDrwCL[TU1]" controllable="false"/>
+		<Event id="24" label="PalletArvDrwEL[TU1]" controllable="false"/>
+		<Event id="25" label="PalletLvGCL[TU1]" controllable="false"/>
+		<Event id="26" label="PalletLvGEL_1[TU1]" controllable="false"/>
+		<Event id="27" label="PalletLvTUAtCL[TU1]" controllable="false"/>
+		<Event id="28" label="PalletLvTUAtEL_1[TU1]" controllable="false"/>
+		<Event id="29" label="QDrwLoc[TU1]"/>
+		<Event id="30" label="QError[TU1]"/>
+		<Event id="31" label="QOpNeeded[TU1]"/>
+		<Event id="32" label="ReadLabel[TU1]"/>
+		<Event id="33" label="TrnsfCplToEL[TU1]"/>
+		<Event id="34" label="TrnsfToEL[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2863,14 +2863,14 @@
 		<Transition source="14" dest="0" event="33"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_IntfQueryErrors.TU1" type="Specification">
+<Automaton name="l_IntfQueryErrors[TU1]" type="Specification">
 	<Events>
-		<Event id="0" label="IsErr1A.TU1" controllable="false"/>
-		<Event id="1" label="IsErr1B.TU1" controllable="false"/>
-		<Event id="2" label="IsErr2A.TU1" controllable="false"/>
-		<Event id="3" label="IsErr2B.TU1" controllable="false"/>
-		<Event id="4" label="NoError.TU1"/>
-		<Event id="5" label="QError.TU1"/>
+		<Event id="0" label="IsErr1A[TU1]" controllable="false"/>
+		<Event id="1" label="IsErr1B[TU1]" controllable="false"/>
+		<Event id="2" label="IsErr2A[TU1]" controllable="false"/>
+		<Event id="3" label="IsErr2B[TU1]" controllable="false"/>
+		<Event id="4" label="NoError[TU1]"/>
+		<Event id="5" label="QError[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2885,11 +2885,11 @@
 		<Transition source="1" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_IntfCheckOpNeeded.TU1" type="Specification">
+<Automaton name="l_IntfCheckOpNeeded[TU1]" type="Specification">
 	<Events>
-		<Event id="0" label="NotOpNeeded.TU1"/>
-		<Event id="1" label="OpNeeded.TU1"/>
-		<Event id="2" label="QOpNeeded.TU1"/>
+		<Event id="0" label="NotOpNeeded[TU1]"/>
+		<Event id="1" label="OpNeeded[TU1]"/>
+		<Event id="2" label="QOpNeeded[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2901,19 +2901,19 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_DoChkErr.TU1" type="Specification">
+<Automaton name="l_DoChkErr[TU1]" type="Specification">
 	<Events>
-		<Event id="0" label="IsErr1A.TU1" controllable="false"/>
-		<Event id="1" label="IsErr1B.TU1" controllable="false"/>
-		<Event id="2" label="IsErr2A.TU1" controllable="false"/>
-		<Event id="3" label="IsErr2B.TU1" controllable="false"/>
-		<Event id="4" label="NoErr.TU1" controllable="false"/>
-		<Event id="5" label="NoError.TU1"/>
-		<Event id="6" label="QErr1A.TU1"/>
-		<Event id="7" label="QErr1B.TU1"/>
-		<Event id="8" label="QErr2A.TU1"/>
-		<Event id="9" label="QErr2B.TU1"/>
-		<Event id="10" label="QError.TU1"/>
+		<Event id="0" label="IsErr1A[TU1]" controllable="false"/>
+		<Event id="1" label="IsErr1B[TU1]" controllable="false"/>
+		<Event id="2" label="IsErr2A[TU1]" controllable="false"/>
+		<Event id="3" label="IsErr2B[TU1]" controllable="false"/>
+		<Event id="4" label="NoErr[TU1]" controllable="false"/>
+		<Event id="5" label="NoError[TU1]"/>
+		<Event id="6" label="QErr1A[TU1]"/>
+		<Event id="7" label="QErr1B[TU1]"/>
+		<Event id="8" label="QErr2A[TU1]"/>
+		<Event id="9" label="QErr2B[TU1]"/>
+		<Event id="10" label="QError[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2940,18 +2940,18 @@
 		<Transition source="5" dest="0" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_DetIfOpNeeded.TU1" type="Specification">
+<Automaton name="l_DetIfOpNeeded[TU1]" type="Specification">
 	<Events>
-		<Event id="0" label="IsCpl.TU1" controllable="false"/>
-		<Event id="1" label="IsType1.TU1" controllable="false"/>
-		<Event id="2" label="IsType2.TU1" controllable="false"/>
-		<Event id="3" label="NotCpl.TU1" controllable="false"/>
-		<Event id="4" label="NotOpNeeded.TU1"/>
-		<Event id="5" label="OpNeeded.TU1"/>
-		<Event id="6" label="QCplT1A_1B.TU1"/>
-		<Event id="7" label="QCplT2A_2B.TU1"/>
-		<Event id="8" label="QOpNeeded.TU1"/>
-		<Event id="9" label="QType.TU1"/>
+		<Event id="0" label="IsCpl[TU1]" controllable="false"/>
+		<Event id="1" label="IsType1[TU1]" controllable="false"/>
+		<Event id="2" label="IsType2[TU1]" controllable="false"/>
+		<Event id="3" label="NotCpl[TU1]" controllable="false"/>
+		<Event id="4" label="NotOpNeeded[TU1]"/>
+		<Event id="5" label="OpNeeded[TU1]"/>
+		<Event id="6" label="QCplT1A_1B[TU1]"/>
+		<Event id="7" label="QCplT2A_2B[TU1]"/>
+		<Event id="8" label="QOpNeeded[TU1]"/>
+		<Event id="9" label="QType[TU1]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -2976,15 +2976,15 @@
 		<Transition source="5" dest="0" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="IntfTU.TU2" type="Specification">
+<Automaton name="IntfTU[TU2]" type="Specification">
 	<Events>
-		<Event id="0" label="LibPallet.TU2"/>
-		<Event id="1" label="NoTrnsfEL.TU2"/>
-		<Event id="2" label="PalletRlsd.TU2"/>
-		<Event id="3" label="TrnsfCplToCL.TU2"/>
-		<Event id="4" label="TrnsfCplToEL.TU2"/>
-		<Event id="5" label="TrnsfELToCL.TU2"/>
-		<Event id="6" label="TrnsfToEL.TU2"/>
+		<Event id="0" label="LibPallet[TU2]"/>
+		<Event id="1" label="NoTrnsfEL[TU2]"/>
+		<Event id="2" label="PalletRlsd[TU2]"/>
+		<Event id="3" label="TrnsfCplToCL[TU2]"/>
+		<Event id="4" label="TrnsfCplToEL[TU2]"/>
+		<Event id="5" label="TrnsfELToCL[TU2]"/>
+		<Event id="6" label="TrnsfToEL[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3002,12 +3002,12 @@
 		<Transition source="3" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapGateCL.TU2" type="Plant">
+<Automaton name="l_CapGateCL[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="LibPallet.TU2"/>
-		<Event id="1" label="NoTrnsfEL.TU2"/>
-		<Event id="2" label="PalletLvGCL.TU2" controllable="false"/>
-		<Event id="3" label="TrnsfToEL.TU2"/>
+		<Event id="0" label="LibPallet[TU2]"/>
+		<Event id="1" label="NoTrnsfEL[TU2]"/>
+		<Event id="2" label="PalletLvGCL[TU2]" controllable="false"/>
+		<Event id="3" label="TrnsfToEL[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3025,10 +3025,10 @@
 		<Transition source="2" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapGateEL_1.TU2" type="Plant">
+<Automaton name="l_CapGateEL_1[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletLvGEL_1.TU2" controllable="false"/>
-		<Event id="1" label="TrnsfELToCL.TU2"/>
+		<Event id="0" label="PalletLvGEL_1[TU2]" controllable="false"/>
+		<Event id="1" label="TrnsfELToCL[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3042,12 +3042,12 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapTUDrwToExit.TU2" type="Plant">
+<Automaton name="l_CapTUDrwToExit[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvDrwCL.TU2" controllable="false"/>
-		<Event id="1" label="PalletArvDrwEL.TU2" controllable="false"/>
-		<Event id="2" label="PalletLvTUAtCL.TU2" controllable="false"/>
-		<Event id="3" label="PalletLvTUAtEL_1.TU2" controllable="false"/>
+		<Event id="0" label="PalletArvDrwCL[TU2]" controllable="false"/>
+		<Event id="1" label="PalletArvDrwEL[TU2]" controllable="false"/>
+		<Event id="2" label="PalletLvTUAtCL[TU2]" controllable="false"/>
+		<Event id="3" label="PalletLvTUAtEL_1[TU2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3065,10 +3065,10 @@
 		<Transition source="2" dest="1" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapTUDrwToGateCL.TU2" type="Plant">
+<Automaton name="l_CapTUDrwToGateCL[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvDrwCL.TU2" controllable="false"/>
-		<Event id="1" label="PalletLvGCL.TU2" controllable="false"/>
+		<Event id="0" label="PalletArvDrwCL[TU2]" controllable="false"/>
+		<Event id="1" label="PalletLvGCL[TU2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3082,10 +3082,10 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapTUDrwToGateEL_1.TU2" type="Plant">
+<Automaton name="l_CapTUDrwToGateEL_1[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvDrwEL.TU2" controllable="false"/>
-		<Event id="1" label="PalletLvGEL_1.TU2" controllable="false"/>
+		<Event id="0" label="PalletArvDrwEL[TU2]" controllable="false"/>
+		<Event id="1" label="PalletLvGEL_1[TU2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3099,11 +3099,11 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletGateCL.TU2" type="Plant">
+<Automaton name="l_PalletGateCL[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="GClosesCL.TU2"/>
-		<Event id="1" label="GOpensCL.TU2"/>
-		<Event id="2" label="PalletLvGCL.TU2" controllable="false"/>
+		<Event id="0" label="GClosesCL[TU2]"/>
+		<Event id="1" label="GOpensCL[TU2]"/>
+		<Event id="2" label="PalletLvGCL[TU2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3116,11 +3116,11 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletGateEL_1.TU2" type="Plant">
+<Automaton name="l_PalletGateEL_1[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="GClosesEL_1.TU2"/>
-		<Event id="1" label="GOpensEL_1.TU2"/>
-		<Event id="2" label="PalletLvGEL_1.TU2" controllable="false"/>
+		<Event id="0" label="GClosesEL_1[TU2]"/>
+		<Event id="1" label="GOpensEL_1[TU2]"/>
+		<Event id="2" label="PalletLvGEL_1[TU2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3133,11 +3133,11 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletStopCL.TU2" type="Plant">
+<Automaton name="l_PalletStopCL[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="PStopClosesCL.TU2"/>
-		<Event id="1" label="PStopOpensCL.TU2"/>
-		<Event id="2" label="PalletLvTUAtCL.TU2" controllable="false"/>
+		<Event id="0" label="PStopClosesCL[TU2]"/>
+		<Event id="1" label="PStopOpensCL[TU2]"/>
+		<Event id="2" label="PalletLvTUAtCL[TU2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3149,11 +3149,11 @@
 		<Transition source="1" dest="1" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletStopEL_1.TU2" type="Plant">
+<Automaton name="l_PalletStopEL_1[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="PStopClosesEL_1.TU2"/>
-		<Event id="1" label="PStopOpensEL_1.TU2"/>
-		<Event id="2" label="PalletLvTUAtEL_1.TU2" controllable="false"/>
+		<Event id="0" label="PStopClosesEL_1[TU2]"/>
+		<Event id="1" label="PStopOpensEL_1[TU2]"/>
+		<Event id="2" label="PalletLvTUAtEL_1[TU2]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3165,13 +3165,13 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_QueryDrwLoc.TU2" type="Plant">
+<Automaton name="l_QueryDrwLoc[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU2" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU2" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU2" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU2" controllable="false"/>
-		<Event id="4" label="QDrwLoc.TU2"/>
+		<Event id="0" label="DrwArvCL[TU2]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU2]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU2]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU2]" controllable="false"/>
+		<Event id="4" label="QDrwLoc[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3190,10 +3190,10 @@
 		<Transition source="3" dest="2" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_RWDevice.TU2" type="Plant">
+<Automaton name="l_RWDevice[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="DoneRead.TU2" controllable="false"/>
-		<Event id="1" label="ReadLabel.TU2"/>
+		<Event id="0" label="DoneRead[TU2]" controllable="false"/>
+		<Event id="1" label="ReadLabel[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3204,12 +3204,12 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_TUDrawer.TU2" type="Plant">
+<Automaton name="l_TUDrawer[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU2" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU2" controllable="false"/>
-		<Event id="2" label="MvDrwToCL.TU2"/>
-		<Event id="3" label="MvDrwToEL.TU2"/>
+		<Event id="0" label="DrwArvCL[TU2]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU2]" controllable="false"/>
+		<Event id="2" label="MvDrwToCL[TU2]"/>
+		<Event id="3" label="MvDrwToEL[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3224,17 +3224,17 @@
 		<Transition source="3" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_ChkErr.TU2" type="Plant">
+<Automaton name="l_ChkErr[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="IsErr1A.TU2" controllable="false"/>
-		<Event id="1" label="IsErr1B.TU2" controllable="false"/>
-		<Event id="2" label="IsErr2A.TU2" controllable="false"/>
-		<Event id="3" label="IsErr2B.TU2" controllable="false"/>
-		<Event id="4" label="NoErr.TU2" controllable="false"/>
-		<Event id="5" label="QErr1A.TU2"/>
-		<Event id="6" label="QErr1B.TU2"/>
-		<Event id="7" label="QErr2A.TU2"/>
-		<Event id="8" label="QErr2B.TU2"/>
+		<Event id="0" label="IsErr1A[TU2]" controllable="false"/>
+		<Event id="1" label="IsErr1B[TU2]" controllable="false"/>
+		<Event id="2" label="IsErr2A[TU2]" controllable="false"/>
+		<Event id="3" label="IsErr2B[TU2]" controllable="false"/>
+		<Event id="4" label="NoErr[TU2]" controllable="false"/>
+		<Event id="5" label="QErr1A[TU2]"/>
+		<Event id="6" label="QErr1B[TU2]"/>
+		<Event id="7" label="QErr2A[TU2]"/>
+		<Event id="8" label="QErr2B[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3258,15 +3258,15 @@
 		<Transition source="4" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_QueryTypNCpl.TU2" type="Plant">
+<Automaton name="l_QueryTypNCpl[TU2]" type="Plant">
 	<Events>
-		<Event id="0" label="IsCpl.TU2" controllable="false"/>
-		<Event id="1" label="IsType1.TU2" controllable="false"/>
-		<Event id="2" label="IsType2.TU2" controllable="false"/>
-		<Event id="3" label="NotCpl.TU2" controllable="false"/>
-		<Event id="4" label="QCplT1A_1B.TU2"/>
-		<Event id="5" label="QCplT2A_2B.TU2"/>
-		<Event id="6" label="QType.TU2"/>
+		<Event id="0" label="IsCpl[TU2]" controllable="false"/>
+		<Event id="1" label="IsType1[TU2]" controllable="false"/>
+		<Event id="2" label="IsType2[TU2]" controllable="false"/>
+		<Event id="3" label="NotCpl[TU2]" controllable="false"/>
+		<Event id="4" label="QCplT1A_1B[TU2]"/>
+		<Event id="5" label="QCplT2A_2B[TU2]"/>
+		<Event id="6" label="QType[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3283,36 +3283,36 @@
 		<Transition source="2" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlComEvents.TU2" type="Specification">
+<Automaton name="l_HndlComEvents[TU2]" type="Specification">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU2" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU2" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU2" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU2" controllable="false"/>
-		<Event id="4" label="GClosesCL.TU2"/>
-		<Event id="5" label="GClosesEL_1.TU2"/>
-		<Event id="6" label="GOpensCL.TU2"/>
-		<Event id="7" label="GOpensEL_1.TU2"/>
-		<Event id="8" label="LibPallet.TU2"/>
-		<Event id="9" label="MvDrwToCL.TU2"/>
-		<Event id="10" label="MvDrwToEL.TU2"/>
-		<Event id="11" label="NoTrnsfEL.TU2"/>
-		<Event id="12" label="PStopClosesCL.TU2"/>
-		<Event id="13" label="PStopClosesEL_1.TU2"/>
-		<Event id="14" label="PStopOpensCL.TU2"/>
-		<Event id="15" label="PStopOpensEL_1.TU2"/>
-		<Event id="16" label="PalletArvDrwCL.TU2" controllable="false"/>
-		<Event id="17" label="PalletArvDrwEL.TU2" controllable="false"/>
-		<Event id="18" label="PalletLvGCL.TU2" controllable="false"/>
-		<Event id="19" label="PalletLvGEL_1.TU2" controllable="false"/>
-		<Event id="20" label="PalletLvTUAtCL.TU2" controllable="false"/>
-		<Event id="21" label="PalletLvTUAtEL_1.TU2" controllable="false"/>
-		<Event id="22" label="PalletRlsd.TU2"/>
-		<Event id="23" label="QDrwLoc.TU2"/>
-		<Event id="24" label="TrnsfCplToCL.TU2"/>
-		<Event id="25" label="TrnsfCplToEL.TU2"/>
-		<Event id="26" label="TrnsfELToCL.TU2"/>
-		<Event id="27" label="TrnsfToEL.TU2"/>
+		<Event id="0" label="DrwArvCL[TU2]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU2]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU2]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU2]" controllable="false"/>
+		<Event id="4" label="GClosesCL[TU2]"/>
+		<Event id="5" label="GClosesEL_1[TU2]"/>
+		<Event id="6" label="GOpensCL[TU2]"/>
+		<Event id="7" label="GOpensEL_1[TU2]"/>
+		<Event id="8" label="LibPallet[TU2]"/>
+		<Event id="9" label="MvDrwToCL[TU2]"/>
+		<Event id="10" label="MvDrwToEL[TU2]"/>
+		<Event id="11" label="NoTrnsfEL[TU2]"/>
+		<Event id="12" label="PStopClosesCL[TU2]"/>
+		<Event id="13" label="PStopClosesEL_1[TU2]"/>
+		<Event id="14" label="PStopOpensCL[TU2]"/>
+		<Event id="15" label="PStopOpensEL_1[TU2]"/>
+		<Event id="16" label="PalletArvDrwCL[TU2]" controllable="false"/>
+		<Event id="17" label="PalletArvDrwEL[TU2]" controllable="false"/>
+		<Event id="18" label="PalletLvGCL[TU2]" controllable="false"/>
+		<Event id="19" label="PalletLvGEL_1[TU2]" controllable="false"/>
+		<Event id="20" label="PalletLvTUAtCL[TU2]" controllable="false"/>
+		<Event id="21" label="PalletLvTUAtEL_1[TU2]" controllable="false"/>
+		<Event id="22" label="PalletRlsd[TU2]"/>
+		<Event id="23" label="QDrwLoc[TU2]"/>
+		<Event id="24" label="TrnsfCplToCL[TU2]"/>
+		<Event id="25" label="TrnsfCplToEL[TU2]"/>
+		<Event id="26" label="TrnsfELToCL[TU2]"/>
+		<Event id="27" label="TrnsfToEL[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3349,31 +3349,31 @@
 		<Transition source="1" dest="0" event="22"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlLibPallet.TU2" type="Specification">
+<Automaton name="l_HndlLibPallet[TU2]" type="Specification">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU2" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU2" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU2" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU2" controllable="false"/>
-		<Event id="4" label="GClosesCL.TU2"/>
-		<Event id="5" label="GClosesEL_1.TU2"/>
-		<Event id="6" label="GOpensCL.TU2"/>
-		<Event id="7" label="GOpensEL_1.TU2"/>
-		<Event id="8" label="LibPallet.TU2"/>
-		<Event id="9" label="MvDrwToCL.TU2"/>
-		<Event id="10" label="MvDrwToEL.TU2"/>
-		<Event id="11" label="PStopClosesCL.TU2"/>
-		<Event id="12" label="PStopClosesEL_1.TU2"/>
-		<Event id="13" label="PStopOpensCL.TU2"/>
-		<Event id="14" label="PStopOpensEL_1.TU2"/>
-		<Event id="15" label="PalletArvDrwCL.TU2" controllable="false"/>
-		<Event id="16" label="PalletArvDrwEL.TU2" controllable="false"/>
-		<Event id="17" label="PalletLvGCL.TU2" controllable="false"/>
-		<Event id="18" label="PalletLvGEL_1.TU2" controllable="false"/>
-		<Event id="19" label="PalletLvTUAtCL.TU2" controllable="false"/>
-		<Event id="20" label="PalletLvTUAtEL_1.TU2" controllable="false"/>
-		<Event id="21" label="PalletRlsd.TU2"/>
-		<Event id="22" label="QDrwLoc.TU2"/>
+		<Event id="0" label="DrwArvCL[TU2]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU2]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU2]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU2]" controllable="false"/>
+		<Event id="4" label="GClosesCL[TU2]"/>
+		<Event id="5" label="GClosesEL_1[TU2]"/>
+		<Event id="6" label="GOpensCL[TU2]"/>
+		<Event id="7" label="GOpensEL_1[TU2]"/>
+		<Event id="8" label="LibPallet[TU2]"/>
+		<Event id="9" label="MvDrwToCL[TU2]"/>
+		<Event id="10" label="MvDrwToEL[TU2]"/>
+		<Event id="11" label="PStopClosesCL[TU2]"/>
+		<Event id="12" label="PStopClosesEL_1[TU2]"/>
+		<Event id="13" label="PStopOpensCL[TU2]"/>
+		<Event id="14" label="PStopOpensEL_1[TU2]"/>
+		<Event id="15" label="PalletArvDrwCL[TU2]" controllable="false"/>
+		<Event id="16" label="PalletArvDrwEL[TU2]" controllable="false"/>
+		<Event id="17" label="PalletLvGCL[TU2]" controllable="false"/>
+		<Event id="18" label="PalletLvGEL_1[TU2]" controllable="false"/>
+		<Event id="19" label="PalletLvTUAtCL[TU2]" controllable="false"/>
+		<Event id="20" label="PalletLvTUAtEL_1[TU2]" controllable="false"/>
+		<Event id="21" label="PalletRlsd[TU2]"/>
+		<Event id="22" label="QDrwLoc[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3420,31 +3420,31 @@
 		<Transition source="7" dest="0" event="21"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlTrnsfELToCL.TU2" type="Specification">
+<Automaton name="l_HndlTrnsfELToCL[TU2]" type="Specification">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU2" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU2" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU2" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU2" controllable="false"/>
-		<Event id="4" label="GClosesCL.TU2"/>
-		<Event id="5" label="GClosesEL_1.TU2"/>
-		<Event id="6" label="GOpensCL.TU2"/>
-		<Event id="7" label="GOpensEL_1.TU2"/>
-		<Event id="8" label="MvDrwToCL.TU2"/>
-		<Event id="9" label="MvDrwToEL.TU2"/>
-		<Event id="10" label="PStopClosesCL.TU2"/>
-		<Event id="11" label="PStopClosesEL_1.TU2"/>
-		<Event id="12" label="PStopOpensCL.TU2"/>
-		<Event id="13" label="PStopOpensEL_1.TU2"/>
-		<Event id="14" label="PalletArvDrwCL.TU2" controllable="false"/>
-		<Event id="15" label="PalletArvDrwEL.TU2" controllable="false"/>
-		<Event id="16" label="PalletLvGCL.TU2" controllable="false"/>
-		<Event id="17" label="PalletLvGEL_1.TU2" controllable="false"/>
-		<Event id="18" label="PalletLvTUAtCL.TU2" controllable="false"/>
-		<Event id="19" label="PalletLvTUAtEL_1.TU2" controllable="false"/>
-		<Event id="20" label="QDrwLoc.TU2"/>
-		<Event id="21" label="TrnsfCplToCL.TU2"/>
-		<Event id="22" label="TrnsfELToCL.TU2"/>
+		<Event id="0" label="DrwArvCL[TU2]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU2]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU2]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU2]" controllable="false"/>
+		<Event id="4" label="GClosesCL[TU2]"/>
+		<Event id="5" label="GClosesEL_1[TU2]"/>
+		<Event id="6" label="GOpensCL[TU2]"/>
+		<Event id="7" label="GOpensEL_1[TU2]"/>
+		<Event id="8" label="MvDrwToCL[TU2]"/>
+		<Event id="9" label="MvDrwToEL[TU2]"/>
+		<Event id="10" label="PStopClosesCL[TU2]"/>
+		<Event id="11" label="PStopClosesEL_1[TU2]"/>
+		<Event id="12" label="PStopOpensCL[TU2]"/>
+		<Event id="13" label="PStopOpensEL_1[TU2]"/>
+		<Event id="14" label="PalletArvDrwCL[TU2]" controllable="false"/>
+		<Event id="15" label="PalletArvDrwEL[TU2]" controllable="false"/>
+		<Event id="16" label="PalletLvGCL[TU2]" controllable="false"/>
+		<Event id="17" label="PalletLvGEL_1[TU2]" controllable="false"/>
+		<Event id="18" label="PalletLvTUAtCL[TU2]" controllable="false"/>
+		<Event id="19" label="PalletLvTUAtEL_1[TU2]" controllable="false"/>
+		<Event id="20" label="QDrwLoc[TU2]"/>
+		<Event id="21" label="TrnsfCplToCL[TU2]"/>
+		<Event id="22" label="TrnsfELToCL[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3501,43 +3501,43 @@
 		<Transition source="10" dest="0" event="21"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlTrnsfToEL.TU2" type="Specification">
+<Automaton name="l_HndlTrnsfToEL[TU2]" type="Specification">
 	<Events>
-		<Event id="0" label="DoneRead.TU2" controllable="false"/>
-		<Event id="1" label="DrwArvCL.TU2" controllable="false"/>
-		<Event id="2" label="DrwArvEL.TU2" controllable="false"/>
-		<Event id="3" label="DrwAtCL.TU2" controllable="false"/>
-		<Event id="4" label="DrwAtEL.TU2" controllable="false"/>
-		<Event id="5" label="GClosesCL.TU2"/>
-		<Event id="6" label="GClosesEL_1.TU2"/>
-		<Event id="7" label="GOpensCL.TU2"/>
-		<Event id="8" label="GOpensEL_1.TU2"/>
-		<Event id="9" label="IsErr1A.TU2" controllable="false"/>
-		<Event id="10" label="IsErr1B.TU2" controllable="false"/>
-		<Event id="11" label="IsErr2A.TU2" controllable="false"/>
-		<Event id="12" label="IsErr2B.TU2" controllable="false"/>
-		<Event id="13" label="MvDrwToCL.TU2"/>
-		<Event id="14" label="MvDrwToEL.TU2"/>
-		<Event id="15" label="NoError.TU2"/>
-		<Event id="16" label="NoTrnsfEL.TU2"/>
-		<Event id="17" label="NotOpNeeded.TU2"/>
-		<Event id="18" label="OpNeeded.TU2"/>
-		<Event id="19" label="PStopClosesCL.TU2"/>
-		<Event id="20" label="PStopClosesEL_1.TU2"/>
-		<Event id="21" label="PStopOpensCL.TU2"/>
-		<Event id="22" label="PStopOpensEL_1.TU2"/>
-		<Event id="23" label="PalletArvDrwCL.TU2" controllable="false"/>
-		<Event id="24" label="PalletArvDrwEL.TU2" controllable="false"/>
-		<Event id="25" label="PalletLvGCL.TU2" controllable="false"/>
-		<Event id="26" label="PalletLvGEL_1.TU2" controllable="false"/>
-		<Event id="27" label="PalletLvTUAtCL.TU2" controllable="false"/>
-		<Event id="28" label="PalletLvTUAtEL_1.TU2" controllable="false"/>
-		<Event id="29" label="QDrwLoc.TU2"/>
-		<Event id="30" label="QError.TU2"/>
-		<Event id="31" label="QOpNeeded.TU2"/>
-		<Event id="32" label="ReadLabel.TU2"/>
-		<Event id="33" label="TrnsfCplToEL.TU2"/>
-		<Event id="34" label="TrnsfToEL.TU2"/>
+		<Event id="0" label="DoneRead[TU2]" controllable="false"/>
+		<Event id="1" label="DrwArvCL[TU2]" controllable="false"/>
+		<Event id="2" label="DrwArvEL[TU2]" controllable="false"/>
+		<Event id="3" label="DrwAtCL[TU2]" controllable="false"/>
+		<Event id="4" label="DrwAtEL[TU2]" controllable="false"/>
+		<Event id="5" label="GClosesCL[TU2]"/>
+		<Event id="6" label="GClosesEL_1[TU2]"/>
+		<Event id="7" label="GOpensCL[TU2]"/>
+		<Event id="8" label="GOpensEL_1[TU2]"/>
+		<Event id="9" label="IsErr1A[TU2]" controllable="false"/>
+		<Event id="10" label="IsErr1B[TU2]" controllable="false"/>
+		<Event id="11" label="IsErr2A[TU2]" controllable="false"/>
+		<Event id="12" label="IsErr2B[TU2]" controllable="false"/>
+		<Event id="13" label="MvDrwToCL[TU2]"/>
+		<Event id="14" label="MvDrwToEL[TU2]"/>
+		<Event id="15" label="NoError[TU2]"/>
+		<Event id="16" label="NoTrnsfEL[TU2]"/>
+		<Event id="17" label="NotOpNeeded[TU2]"/>
+		<Event id="18" label="OpNeeded[TU2]"/>
+		<Event id="19" label="PStopClosesCL[TU2]"/>
+		<Event id="20" label="PStopClosesEL_1[TU2]"/>
+		<Event id="21" label="PStopOpensCL[TU2]"/>
+		<Event id="22" label="PStopOpensEL_1[TU2]"/>
+		<Event id="23" label="PalletArvDrwCL[TU2]" controllable="false"/>
+		<Event id="24" label="PalletArvDrwEL[TU2]" controllable="false"/>
+		<Event id="25" label="PalletLvGCL[TU2]" controllable="false"/>
+		<Event id="26" label="PalletLvGEL_1[TU2]" controllable="false"/>
+		<Event id="27" label="PalletLvTUAtCL[TU2]" controllable="false"/>
+		<Event id="28" label="PalletLvTUAtEL_1[TU2]" controllable="false"/>
+		<Event id="29" label="QDrwLoc[TU2]"/>
+		<Event id="30" label="QError[TU2]"/>
+		<Event id="31" label="QOpNeeded[TU2]"/>
+		<Event id="32" label="ReadLabel[TU2]"/>
+		<Event id="33" label="TrnsfCplToEL[TU2]"/>
+		<Event id="34" label="TrnsfToEL[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3610,14 +3610,14 @@
 		<Transition source="14" dest="0" event="33"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_IntfQueryErrors.TU2" type="Specification">
+<Automaton name="l_IntfQueryErrors[TU2]" type="Specification">
 	<Events>
-		<Event id="0" label="IsErr1A.TU2" controllable="false"/>
-		<Event id="1" label="IsErr1B.TU2" controllable="false"/>
-		<Event id="2" label="IsErr2A.TU2" controllable="false"/>
-		<Event id="3" label="IsErr2B.TU2" controllable="false"/>
-		<Event id="4" label="NoError.TU2"/>
-		<Event id="5" label="QError.TU2"/>
+		<Event id="0" label="IsErr1A[TU2]" controllable="false"/>
+		<Event id="1" label="IsErr1B[TU2]" controllable="false"/>
+		<Event id="2" label="IsErr2A[TU2]" controllable="false"/>
+		<Event id="3" label="IsErr2B[TU2]" controllable="false"/>
+		<Event id="4" label="NoError[TU2]"/>
+		<Event id="5" label="QError[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3632,11 +3632,11 @@
 		<Transition source="1" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_IntfCheckOpNeeded.TU2" type="Specification">
+<Automaton name="l_IntfCheckOpNeeded[TU2]" type="Specification">
 	<Events>
-		<Event id="0" label="NotOpNeeded.TU2"/>
-		<Event id="1" label="OpNeeded.TU2"/>
-		<Event id="2" label="QOpNeeded.TU2"/>
+		<Event id="0" label="NotOpNeeded[TU2]"/>
+		<Event id="1" label="OpNeeded[TU2]"/>
+		<Event id="2" label="QOpNeeded[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3648,19 +3648,19 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_DoChkErr.TU2" type="Specification">
+<Automaton name="l_DoChkErr[TU2]" type="Specification">
 	<Events>
-		<Event id="0" label="IsErr1A.TU2" controllable="false"/>
-		<Event id="1" label="IsErr1B.TU2" controllable="false"/>
-		<Event id="2" label="IsErr2A.TU2" controllable="false"/>
-		<Event id="3" label="IsErr2B.TU2" controllable="false"/>
-		<Event id="4" label="NoErr.TU2" controllable="false"/>
-		<Event id="5" label="NoError.TU2"/>
-		<Event id="6" label="QErr1A.TU2"/>
-		<Event id="7" label="QErr1B.TU2"/>
-		<Event id="8" label="QErr2A.TU2"/>
-		<Event id="9" label="QErr2B.TU2"/>
-		<Event id="10" label="QError.TU2"/>
+		<Event id="0" label="IsErr1A[TU2]" controllable="false"/>
+		<Event id="1" label="IsErr1B[TU2]" controllable="false"/>
+		<Event id="2" label="IsErr2A[TU2]" controllable="false"/>
+		<Event id="3" label="IsErr2B[TU2]" controllable="false"/>
+		<Event id="4" label="NoErr[TU2]" controllable="false"/>
+		<Event id="5" label="NoError[TU2]"/>
+		<Event id="6" label="QErr1A[TU2]"/>
+		<Event id="7" label="QErr1B[TU2]"/>
+		<Event id="8" label="QErr2A[TU2]"/>
+		<Event id="9" label="QErr2B[TU2]"/>
+		<Event id="10" label="QError[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3687,18 +3687,18 @@
 		<Transition source="5" dest="0" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_DetIfOpNeeded.TU2" type="Specification">
+<Automaton name="l_DetIfOpNeeded[TU2]" type="Specification">
 	<Events>
-		<Event id="0" label="IsCpl.TU2" controllable="false"/>
-		<Event id="1" label="IsType1.TU2" controllable="false"/>
-		<Event id="2" label="IsType2.TU2" controllable="false"/>
-		<Event id="3" label="NotCpl.TU2" controllable="false"/>
-		<Event id="4" label="NotOpNeeded.TU2"/>
-		<Event id="5" label="OpNeeded.TU2"/>
-		<Event id="6" label="QCplT1A_1B.TU2"/>
-		<Event id="7" label="QCplT2A_2B.TU2"/>
-		<Event id="8" label="QOpNeeded.TU2"/>
-		<Event id="9" label="QType.TU2"/>
+		<Event id="0" label="IsCpl[TU2]" controllable="false"/>
+		<Event id="1" label="IsType1[TU2]" controllable="false"/>
+		<Event id="2" label="IsType2[TU2]" controllable="false"/>
+		<Event id="3" label="NotCpl[TU2]" controllable="false"/>
+		<Event id="4" label="NotOpNeeded[TU2]"/>
+		<Event id="5" label="OpNeeded[TU2]"/>
+		<Event id="6" label="QCplT1A_1B[TU2]"/>
+		<Event id="7" label="QCplT2A_2B[TU2]"/>
+		<Event id="8" label="QOpNeeded[TU2]"/>
+		<Event id="9" label="QType[TU2]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3723,14 +3723,14 @@
 		<Transition source="5" dest="0" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="IntfTU.TU3" type="Specification">
+<Automaton name="IntfTU[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="LibPallet.TU3"/>
-		<Event id="1" label="NoTrnsfEL.TU3"/>
-		<Event id="2" label="PalletRlsd.TU3"/>
-		<Event id="3" label="TrnsfCplToCL.TU3"/>
-		<Event id="4" label="TrnsfCplToEL.TU3"/>
-		<Event id="5" label="TrnsfELToCL.TU3"/>
+		<Event id="0" label="LibPallet[TU3]"/>
+		<Event id="1" label="NoTrnsfEL[TU3]"/>
+		<Event id="2" label="PalletRlsd[TU3]"/>
+		<Event id="3" label="TrnsfCplToCL[TU3]"/>
+		<Event id="4" label="TrnsfCplToEL[TU3]"/>
+		<Event id="5" label="TrnsfELToCL[TU3]"/>
 		<Event id="6" label="TrnsfToEL3_1D"/>
 		<Event id="7" label="TrnsfToEL3_2D"/>
 		<Event id="8" label="TrnsfToEL3_BD"/>
@@ -3755,11 +3755,11 @@
 		<Transition source="3" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapGateCL.TU3" type="Plant">
+<Automaton name="l_CapGateCL[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="LibPallet.TU3"/>
-		<Event id="1" label="NoTrnsfEL.TU3"/>
-		<Event id="2" label="PalletLvGCL.TU3" controllable="false"/>
+		<Event id="0" label="LibPallet[TU3]"/>
+		<Event id="1" label="NoTrnsfEL[TU3]"/>
+		<Event id="2" label="PalletLvGCL[TU3]" controllable="false"/>
 		<Event id="3" label="TrnsfToEL3_1D"/>
 		<Event id="4" label="TrnsfToEL3_2D"/>
 		<Event id="5" label="TrnsfToEL3_BD"/>
@@ -3787,10 +3787,10 @@
 		<Transition source="2" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapGateEL_1.TU3" type="Plant">
+<Automaton name="l_CapGateEL_1[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletLvGEL_1.TU3" controllable="false"/>
-		<Event id="1" label="TrnsfELToCL.TU3"/>
+		<Event id="0" label="PalletLvGEL_1[TU3]" controllable="false"/>
+		<Event id="1" label="TrnsfELToCL[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3804,12 +3804,12 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapTUDrwToExit.TU3" type="Plant">
+<Automaton name="l_CapTUDrwToExit[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvDrwCL.TU3" controllable="false"/>
-		<Event id="1" label="PalletArvDrwEL.TU3" controllable="false"/>
-		<Event id="2" label="PalletLvTUAtCL.TU3" controllable="false"/>
-		<Event id="3" label="PalletLvTUAtEL_1.TU3" controllable="false"/>
+		<Event id="0" label="PalletArvDrwCL[TU3]" controllable="false"/>
+		<Event id="1" label="PalletArvDrwEL[TU3]" controllable="false"/>
+		<Event id="2" label="PalletLvTUAtCL[TU3]" controllable="false"/>
+		<Event id="3" label="PalletLvTUAtEL_1[TU3]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3827,10 +3827,10 @@
 		<Transition source="2" dest="1" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapTUDrwToGateCL.TU3" type="Plant">
+<Automaton name="l_CapTUDrwToGateCL[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvDrwCL.TU3" controllable="false"/>
-		<Event id="1" label="PalletLvGCL.TU3" controllable="false"/>
+		<Event id="0" label="PalletArvDrwCL[TU3]" controllable="false"/>
+		<Event id="1" label="PalletLvGCL[TU3]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3844,10 +3844,10 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapTUDrwToGateEL_1.TU3" type="Plant">
+<Automaton name="l_CapTUDrwToGateEL_1[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvDrwEL.TU3" controllable="false"/>
-		<Event id="1" label="PalletLvGEL_1.TU3" controllable="false"/>
+		<Event id="0" label="PalletArvDrwEL[TU3]" controllable="false"/>
+		<Event id="1" label="PalletLvGEL_1[TU3]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3861,11 +3861,11 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletGateCL.TU3" type="Plant">
+<Automaton name="l_PalletGateCL[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="GClosesCL.TU3"/>
-		<Event id="1" label="GOpensCL.TU3"/>
-		<Event id="2" label="PalletLvGCL.TU3" controllable="false"/>
+		<Event id="0" label="GClosesCL[TU3]"/>
+		<Event id="1" label="GOpensCL[TU3]"/>
+		<Event id="2" label="PalletLvGCL[TU3]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3878,11 +3878,11 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletGateEL_1.TU3" type="Plant">
+<Automaton name="l_PalletGateEL_1[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="GClosesEL_1.TU3"/>
-		<Event id="1" label="GOpensEL_1.TU3"/>
-		<Event id="2" label="PalletLvGEL_1.TU3" controllable="false"/>
+		<Event id="0" label="GClosesEL_1[TU3]"/>
+		<Event id="1" label="GOpensEL_1[TU3]"/>
+		<Event id="2" label="PalletLvGEL_1[TU3]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3895,11 +3895,11 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletStopCL.TU3" type="Plant">
+<Automaton name="l_PalletStopCL[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="PStopClosesCL.TU3"/>
-		<Event id="1" label="PStopOpensCL.TU3"/>
-		<Event id="2" label="PalletLvTUAtCL.TU3" controllable="false"/>
+		<Event id="0" label="PStopClosesCL[TU3]"/>
+		<Event id="1" label="PStopOpensCL[TU3]"/>
+		<Event id="2" label="PalletLvTUAtCL[TU3]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3911,11 +3911,11 @@
 		<Transition source="1" dest="1" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletStopEL_1.TU3" type="Plant">
+<Automaton name="l_PalletStopEL_1[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="PStopClosesEL_1.TU3"/>
-		<Event id="1" label="PStopOpensEL_1.TU3"/>
-		<Event id="2" label="PalletLvTUAtEL_1.TU3" controllable="false"/>
+		<Event id="0" label="PStopClosesEL_1[TU3]"/>
+		<Event id="1" label="PStopOpensEL_1[TU3]"/>
+		<Event id="2" label="PalletLvTUAtEL_1[TU3]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3927,13 +3927,13 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_QueryDrwLoc.TU3" type="Plant">
+<Automaton name="l_QueryDrwLoc[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU3" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU3" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU3" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU3" controllable="false"/>
-		<Event id="4" label="QDrwLoc.TU3"/>
+		<Event id="0" label="DrwArvCL[TU3]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU3]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU3]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU3]" controllable="false"/>
+		<Event id="4" label="QDrwLoc[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3952,10 +3952,10 @@
 		<Transition source="3" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_RWDevice.TU3" type="Plant">
+<Automaton name="l_RWDevice[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="DoneRead.TU3" controllable="false"/>
-		<Event id="1" label="ReadLabel.TU3"/>
+		<Event id="0" label="DoneRead[TU3]" controllable="false"/>
+		<Event id="1" label="ReadLabel[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3966,12 +3966,12 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_TUDrawer.TU3" type="Plant">
+<Automaton name="l_TUDrawer[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU3" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU3" controllable="false"/>
-		<Event id="2" label="MvDrwToCL.TU3"/>
-		<Event id="3" label="MvDrwToEL.TU3"/>
+		<Event id="0" label="DrwArvCL[TU3]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU3]" controllable="false"/>
+		<Event id="2" label="MvDrwToCL[TU3]"/>
+		<Event id="3" label="MvDrwToEL[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -3986,17 +3986,17 @@
 		<Transition source="3" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_ChkErr.TU3" type="Plant">
+<Automaton name="l_ChkErr[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="IsErr1A.TU3" controllable="false"/>
-		<Event id="1" label="IsErr1B.TU3" controllable="false"/>
-		<Event id="2" label="IsErr2A.TU3" controllable="false"/>
-		<Event id="3" label="IsErr2B.TU3" controllable="false"/>
-		<Event id="4" label="NoErr.TU3" controllable="false"/>
-		<Event id="5" label="QErr1A.TU3"/>
-		<Event id="6" label="QErr1B.TU3"/>
-		<Event id="7" label="QErr2A.TU3"/>
-		<Event id="8" label="QErr2B.TU3"/>
+		<Event id="0" label="IsErr1A[TU3]" controllable="false"/>
+		<Event id="1" label="IsErr1B[TU3]" controllable="false"/>
+		<Event id="2" label="IsErr2A[TU3]" controllable="false"/>
+		<Event id="3" label="IsErr2B[TU3]" controllable="false"/>
+		<Event id="4" label="NoErr[TU3]" controllable="false"/>
+		<Event id="5" label="QErr1A[TU3]"/>
+		<Event id="6" label="QErr1B[TU3]"/>
+		<Event id="7" label="QErr2A[TU3]"/>
+		<Event id="8" label="QErr2B[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4020,15 +4020,15 @@
 		<Transition source="4" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_QueryTypNCpl.TU3" type="Plant">
+<Automaton name="l_QueryTypNCpl[TU3]" type="Plant">
 	<Events>
-		<Event id="0" label="IsCpl.TU3" controllable="false"/>
-		<Event id="1" label="IsType1.TU3" controllable="false"/>
-		<Event id="2" label="IsType2.TU3" controllable="false"/>
-		<Event id="3" label="NotCpl.TU3" controllable="false"/>
-		<Event id="4" label="QCplT1A_1B.TU3"/>
-		<Event id="5" label="QCplT2A_2B.TU3"/>
-		<Event id="6" label="QType.TU3"/>
+		<Event id="0" label="IsCpl[TU3]" controllable="false"/>
+		<Event id="1" label="IsType1[TU3]" controllable="false"/>
+		<Event id="2" label="IsType2[TU3]" controllable="false"/>
+		<Event id="3" label="NotCpl[TU3]" controllable="false"/>
+		<Event id="4" label="QCplT1A_1B[TU3]"/>
+		<Event id="5" label="QCplT2A_2B[TU3]"/>
+		<Event id="6" label="QType[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4045,35 +4045,35 @@
 		<Transition source="2" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlComEvents.TU3" type="Specification">
+<Automaton name="l_HndlComEvents[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU3" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU3" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU3" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU3" controllable="false"/>
-		<Event id="4" label="GClosesCL.TU3"/>
-		<Event id="5" label="GClosesEL_1.TU3"/>
-		<Event id="6" label="GOpensCL.TU3"/>
-		<Event id="7" label="GOpensEL_1.TU3"/>
-		<Event id="8" label="LibPallet.TU3"/>
-		<Event id="9" label="MvDrwToCL.TU3"/>
-		<Event id="10" label="MvDrwToEL.TU3"/>
-		<Event id="11" label="NoTrnsfEL.TU3"/>
-		<Event id="12" label="PStopClosesCL.TU3"/>
-		<Event id="13" label="PStopClosesEL_1.TU3"/>
-		<Event id="14" label="PStopOpensCL.TU3"/>
-		<Event id="15" label="PStopOpensEL_1.TU3"/>
-		<Event id="16" label="PalletArvDrwCL.TU3" controllable="false"/>
-		<Event id="17" label="PalletArvDrwEL.TU3" controllable="false"/>
-		<Event id="18" label="PalletLvGCL.TU3" controllable="false"/>
-		<Event id="19" label="PalletLvGEL_1.TU3" controllable="false"/>
-		<Event id="20" label="PalletLvTUAtCL.TU3" controllable="false"/>
-		<Event id="21" label="PalletLvTUAtEL_1.TU3" controllable="false"/>
-		<Event id="22" label="PalletRlsd.TU3"/>
-		<Event id="23" label="QDrwLoc.TU3"/>
-		<Event id="24" label="TrnsfCplToCL.TU3"/>
-		<Event id="25" label="TrnsfCplToEL.TU3"/>
-		<Event id="26" label="TrnsfELToCL.TU3"/>
+		<Event id="0" label="DrwArvCL[TU3]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU3]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU3]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU3]" controllable="false"/>
+		<Event id="4" label="GClosesCL[TU3]"/>
+		<Event id="5" label="GClosesEL_1[TU3]"/>
+		<Event id="6" label="GOpensCL[TU3]"/>
+		<Event id="7" label="GOpensEL_1[TU3]"/>
+		<Event id="8" label="LibPallet[TU3]"/>
+		<Event id="9" label="MvDrwToCL[TU3]"/>
+		<Event id="10" label="MvDrwToEL[TU3]"/>
+		<Event id="11" label="NoTrnsfEL[TU3]"/>
+		<Event id="12" label="PStopClosesCL[TU3]"/>
+		<Event id="13" label="PStopClosesEL_1[TU3]"/>
+		<Event id="14" label="PStopOpensCL[TU3]"/>
+		<Event id="15" label="PStopOpensEL_1[TU3]"/>
+		<Event id="16" label="PalletArvDrwCL[TU3]" controllable="false"/>
+		<Event id="17" label="PalletArvDrwEL[TU3]" controllable="false"/>
+		<Event id="18" label="PalletLvGCL[TU3]" controllable="false"/>
+		<Event id="19" label="PalletLvGEL_1[TU3]" controllable="false"/>
+		<Event id="20" label="PalletLvTUAtCL[TU3]" controllable="false"/>
+		<Event id="21" label="PalletLvTUAtEL_1[TU3]" controllable="false"/>
+		<Event id="22" label="PalletRlsd[TU3]"/>
+		<Event id="23" label="QDrwLoc[TU3]"/>
+		<Event id="24" label="TrnsfCplToCL[TU3]"/>
+		<Event id="25" label="TrnsfCplToEL[TU3]"/>
+		<Event id="26" label="TrnsfELToCL[TU3]"/>
 		<Event id="27" label="TrnsfToEL3_1D"/>
 		<Event id="28" label="TrnsfToEL3_2D"/>
 		<Event id="29" label="TrnsfToEL3_BD"/>
@@ -4117,31 +4117,31 @@
 		<Transition source="1" dest="0" event="22"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlLibPallet.TU3" type="Specification">
+<Automaton name="l_HndlLibPallet[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU3" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU3" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU3" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU3" controllable="false"/>
-		<Event id="4" label="GClosesCL.TU3"/>
-		<Event id="5" label="GClosesEL_1.TU3"/>
-		<Event id="6" label="GOpensCL.TU3"/>
-		<Event id="7" label="GOpensEL_1.TU3"/>
-		<Event id="8" label="LibPallet.TU3"/>
-		<Event id="9" label="MvDrwToCL.TU3"/>
-		<Event id="10" label="MvDrwToEL.TU3"/>
-		<Event id="11" label="PStopClosesCL.TU3"/>
-		<Event id="12" label="PStopClosesEL_1.TU3"/>
-		<Event id="13" label="PStopOpensCL.TU3"/>
-		<Event id="14" label="PStopOpensEL_1.TU3"/>
-		<Event id="15" label="PalletArvDrwCL.TU3" controllable="false"/>
-		<Event id="16" label="PalletArvDrwEL.TU3" controllable="false"/>
-		<Event id="17" label="PalletLvGCL.TU3" controllable="false"/>
-		<Event id="18" label="PalletLvGEL_1.TU3" controllable="false"/>
-		<Event id="19" label="PalletLvTUAtCL.TU3" controllable="false"/>
-		<Event id="20" label="PalletLvTUAtEL_1.TU3" controllable="false"/>
-		<Event id="21" label="PalletRlsd.TU3"/>
-		<Event id="22" label="QDrwLoc.TU3"/>
+		<Event id="0" label="DrwArvCL[TU3]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU3]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU3]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU3]" controllable="false"/>
+		<Event id="4" label="GClosesCL[TU3]"/>
+		<Event id="5" label="GClosesEL_1[TU3]"/>
+		<Event id="6" label="GOpensCL[TU3]"/>
+		<Event id="7" label="GOpensEL_1[TU3]"/>
+		<Event id="8" label="LibPallet[TU3]"/>
+		<Event id="9" label="MvDrwToCL[TU3]"/>
+		<Event id="10" label="MvDrwToEL[TU3]"/>
+		<Event id="11" label="PStopClosesCL[TU3]"/>
+		<Event id="12" label="PStopClosesEL_1[TU3]"/>
+		<Event id="13" label="PStopOpensCL[TU3]"/>
+		<Event id="14" label="PStopOpensEL_1[TU3]"/>
+		<Event id="15" label="PalletArvDrwCL[TU3]" controllable="false"/>
+		<Event id="16" label="PalletArvDrwEL[TU3]" controllable="false"/>
+		<Event id="17" label="PalletLvGCL[TU3]" controllable="false"/>
+		<Event id="18" label="PalletLvGEL_1[TU3]" controllable="false"/>
+		<Event id="19" label="PalletLvTUAtCL[TU3]" controllable="false"/>
+		<Event id="20" label="PalletLvTUAtEL_1[TU3]" controllable="false"/>
+		<Event id="21" label="PalletRlsd[TU3]"/>
+		<Event id="22" label="QDrwLoc[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4188,16 +4188,16 @@
 		<Transition source="7" dest="0" event="21"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlSelCheck.TU3" type="Specification">
+<Automaton name="l_HndlSelCheck[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="IsErr1A.TU3" controllable="false"/>
-		<Event id="1" label="IsErr1B.TU3" controllable="false"/>
-		<Event id="2" label="IsErr2A.TU3" controllable="false"/>
-		<Event id="3" label="IsErr2B.TU3" controllable="false"/>
-		<Event id="4" label="QDwnOpNeeded_1D.TU3"/>
-		<Event id="5" label="QDwnOpNeeded_2D.TU3"/>
-		<Event id="6" label="QDwnOpNeeded_BD.TU3"/>
-		<Event id="7" label="SkipDwnOpChk.TU3"/>
+		<Event id="0" label="IsErr1A[TU3]" controllable="false"/>
+		<Event id="1" label="IsErr1B[TU3]" controllable="false"/>
+		<Event id="2" label="IsErr2A[TU3]" controllable="false"/>
+		<Event id="3" label="IsErr2B[TU3]" controllable="false"/>
+		<Event id="4" label="QDwnOpNeeded_1D[TU3]"/>
+		<Event id="5" label="QDwnOpNeeded_2D[TU3]"/>
+		<Event id="6" label="QDwnOpNeeded_BD[TU3]"/>
+		<Event id="7" label="SkipDwnOpChk[TU3]"/>
 		<Event id="8" label="TrnsfToEL3_1D"/>
 		<Event id="9" label="TrnsfToEL3_2D"/>
 		<Event id="10" label="TrnsfToEL3_BD"/>
@@ -4237,31 +4237,31 @@
 		<Transition source="4" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlTrnsfELToCL.TU3" type="Specification">
+<Automaton name="l_HndlTrnsfELToCL[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU3" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU3" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU3" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU3" controllable="false"/>
-		<Event id="4" label="GClosesCL.TU3"/>
-		<Event id="5" label="GClosesEL_1.TU3"/>
-		<Event id="6" label="GOpensCL.TU3"/>
-		<Event id="7" label="GOpensEL_1.TU3"/>
-		<Event id="8" label="MvDrwToCL.TU3"/>
-		<Event id="9" label="MvDrwToEL.TU3"/>
-		<Event id="10" label="PStopClosesCL.TU3"/>
-		<Event id="11" label="PStopClosesEL_1.TU3"/>
-		<Event id="12" label="PStopOpensCL.TU3"/>
-		<Event id="13" label="PStopOpensEL_1.TU3"/>
-		<Event id="14" label="PalletArvDrwCL.TU3" controllable="false"/>
-		<Event id="15" label="PalletArvDrwEL.TU3" controllable="false"/>
-		<Event id="16" label="PalletLvGCL.TU3" controllable="false"/>
-		<Event id="17" label="PalletLvGEL_1.TU3" controllable="false"/>
-		<Event id="18" label="PalletLvTUAtCL.TU3" controllable="false"/>
-		<Event id="19" label="PalletLvTUAtEL_1.TU3" controllable="false"/>
-		<Event id="20" label="QDrwLoc.TU3"/>
-		<Event id="21" label="TrnsfCplToCL.TU3"/>
-		<Event id="22" label="TrnsfELToCL.TU3"/>
+		<Event id="0" label="DrwArvCL[TU3]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU3]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU3]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU3]" controllable="false"/>
+		<Event id="4" label="GClosesCL[TU3]"/>
+		<Event id="5" label="GClosesEL_1[TU3]"/>
+		<Event id="6" label="GOpensCL[TU3]"/>
+		<Event id="7" label="GOpensEL_1[TU3]"/>
+		<Event id="8" label="MvDrwToCL[TU3]"/>
+		<Event id="9" label="MvDrwToEL[TU3]"/>
+		<Event id="10" label="PStopClosesCL[TU3]"/>
+		<Event id="11" label="PStopClosesEL_1[TU3]"/>
+		<Event id="12" label="PStopOpensCL[TU3]"/>
+		<Event id="13" label="PStopOpensEL_1[TU3]"/>
+		<Event id="14" label="PalletArvDrwCL[TU3]" controllable="false"/>
+		<Event id="15" label="PalletArvDrwEL[TU3]" controllable="false"/>
+		<Event id="16" label="PalletLvGCL[TU3]" controllable="false"/>
+		<Event id="17" label="PalletLvGEL_1[TU3]" controllable="false"/>
+		<Event id="18" label="PalletLvTUAtCL[TU3]" controllable="false"/>
+		<Event id="19" label="PalletLvTUAtEL_1[TU3]" controllable="false"/>
+		<Event id="20" label="QDrwLoc[TU3]"/>
+		<Event id="21" label="TrnsfCplToCL[TU3]"/>
+		<Event id="22" label="TrnsfELToCL[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4318,45 +4318,45 @@
 		<Transition source="10" dest="0" event="21"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlTrnsfToEL.TU3" type="Specification">
+<Automaton name="l_HndlTrnsfToEL[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="DoneRead.TU3" controllable="false"/>
-		<Event id="1" label="DrwArvCL.TU3" controllable="false"/>
-		<Event id="2" label="DrwArvEL.TU3" controllable="false"/>
-		<Event id="3" label="DrwAtCL.TU3" controllable="false"/>
-		<Event id="4" label="DrwAtEL.TU3" controllable="false"/>
-		<Event id="5" label="DwnOpNeeded.TU3"/>
-		<Event id="6" label="GClosesCL.TU3"/>
-		<Event id="7" label="GClosesEL_1.TU3"/>
-		<Event id="8" label="GOpensCL.TU3"/>
-		<Event id="9" label="GOpensEL_1.TU3"/>
-		<Event id="10" label="IsErr1A.TU3" controllable="false"/>
-		<Event id="11" label="IsErr1B.TU3" controllable="false"/>
-		<Event id="12" label="IsErr2A.TU3" controllable="false"/>
-		<Event id="13" label="IsErr2B.TU3" controllable="false"/>
-		<Event id="14" label="MvDrwToCL.TU3"/>
-		<Event id="15" label="MvDrwToEL.TU3"/>
-		<Event id="16" label="NoError.TU3"/>
-		<Event id="17" label="NoTrnsfEL.TU3"/>
-		<Event id="18" label="NotDwnOpNeeded.TU3"/>
-		<Event id="19" label="PStopClosesCL.TU3"/>
-		<Event id="20" label="PStopClosesEL_1.TU3"/>
-		<Event id="21" label="PStopOpensCL.TU3"/>
-		<Event id="22" label="PStopOpensEL_1.TU3"/>
-		<Event id="23" label="PalletArvDrwCL.TU3" controllable="false"/>
-		<Event id="24" label="PalletArvDrwEL.TU3" controllable="false"/>
-		<Event id="25" label="PalletLvGCL.TU3" controllable="false"/>
-		<Event id="26" label="PalletLvGEL_1.TU3" controllable="false"/>
-		<Event id="27" label="PalletLvTUAtCL.TU3" controllable="false"/>
-		<Event id="28" label="PalletLvTUAtEL_1.TU3" controllable="false"/>
-		<Event id="29" label="QDrwLoc.TU3"/>
-		<Event id="30" label="QDwnOpNeeded_1D.TU3"/>
-		<Event id="31" label="QDwnOpNeeded_2D.TU3"/>
-		<Event id="32" label="QDwnOpNeeded_BD.TU3"/>
-		<Event id="33" label="QError.TU3"/>
-		<Event id="34" label="ReadLabel.TU3"/>
-		<Event id="35" label="SkipDwnOpChk.TU3"/>
-		<Event id="36" label="TrnsfCplToEL.TU3"/>
+		<Event id="0" label="DoneRead[TU3]" controllable="false"/>
+		<Event id="1" label="DrwArvCL[TU3]" controllable="false"/>
+		<Event id="2" label="DrwArvEL[TU3]" controllable="false"/>
+		<Event id="3" label="DrwAtCL[TU3]" controllable="false"/>
+		<Event id="4" label="DrwAtEL[TU3]" controllable="false"/>
+		<Event id="5" label="DwnOpNeeded[TU3]"/>
+		<Event id="6" label="GClosesCL[TU3]"/>
+		<Event id="7" label="GClosesEL_1[TU3]"/>
+		<Event id="8" label="GOpensCL[TU3]"/>
+		<Event id="9" label="GOpensEL_1[TU3]"/>
+		<Event id="10" label="IsErr1A[TU3]" controllable="false"/>
+		<Event id="11" label="IsErr1B[TU3]" controllable="false"/>
+		<Event id="12" label="IsErr2A[TU3]" controllable="false"/>
+		<Event id="13" label="IsErr2B[TU3]" controllable="false"/>
+		<Event id="14" label="MvDrwToCL[TU3]"/>
+		<Event id="15" label="MvDrwToEL[TU3]"/>
+		<Event id="16" label="NoError[TU3]"/>
+		<Event id="17" label="NoTrnsfEL[TU3]"/>
+		<Event id="18" label="NotDwnOpNeeded[TU3]"/>
+		<Event id="19" label="PStopClosesCL[TU3]"/>
+		<Event id="20" label="PStopClosesEL_1[TU3]"/>
+		<Event id="21" label="PStopOpensCL[TU3]"/>
+		<Event id="22" label="PStopOpensEL_1[TU3]"/>
+		<Event id="23" label="PalletArvDrwCL[TU3]" controllable="false"/>
+		<Event id="24" label="PalletArvDrwEL[TU3]" controllable="false"/>
+		<Event id="25" label="PalletLvGCL[TU3]" controllable="false"/>
+		<Event id="26" label="PalletLvGEL_1[TU3]" controllable="false"/>
+		<Event id="27" label="PalletLvTUAtCL[TU3]" controllable="false"/>
+		<Event id="28" label="PalletLvTUAtEL_1[TU3]" controllable="false"/>
+		<Event id="29" label="QDrwLoc[TU3]"/>
+		<Event id="30" label="QDwnOpNeeded_1D[TU3]"/>
+		<Event id="31" label="QDwnOpNeeded_2D[TU3]"/>
+		<Event id="32" label="QDwnOpNeeded_BD[TU3]"/>
+		<Event id="33" label="QError[TU3]"/>
+		<Event id="34" label="ReadLabel[TU3]"/>
+		<Event id="35" label="SkipDwnOpChk[TU3]"/>
+		<Event id="36" label="TrnsfCplToEL[TU3]"/>
 		<Event id="37" label="TrnsfToEL3_1D"/>
 		<Event id="38" label="TrnsfToEL3_2D"/>
 		<Event id="39" label="TrnsfToEL3_BD"/>
@@ -4439,14 +4439,14 @@
 		<Transition source="14" dest="0" event="36"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_IntfQueryErrors.TU3" type="Specification">
+<Automaton name="l_IntfQueryErrors[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="IsErr1A.TU3" controllable="false"/>
-		<Event id="1" label="IsErr1B.TU3" controllable="false"/>
-		<Event id="2" label="IsErr2A.TU3" controllable="false"/>
-		<Event id="3" label="IsErr2B.TU3" controllable="false"/>
-		<Event id="4" label="NoError.TU3"/>
-		<Event id="5" label="QError.TU3"/>
+		<Event id="0" label="IsErr1A[TU3]" controllable="false"/>
+		<Event id="1" label="IsErr1B[TU3]" controllable="false"/>
+		<Event id="2" label="IsErr2A[TU3]" controllable="false"/>
+		<Event id="3" label="IsErr2B[TU3]" controllable="false"/>
+		<Event id="4" label="NoError[TU3]"/>
+		<Event id="5" label="QError[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4461,13 +4461,13 @@
 		<Transition source="1" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_IntfCheckDwnOpNeeded.TU3" type="Specification">
+<Automaton name="l_IntfCheckDwnOpNeeded[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="DwnOpNeeded.TU3"/>
-		<Event id="1" label="NotDwnOpNeeded.TU3"/>
-		<Event id="2" label="QDwnOpNeeded_1D.TU3"/>
-		<Event id="3" label="QDwnOpNeeded_2D.TU3"/>
-		<Event id="4" label="QDwnOpNeeded_BD.TU3"/>
+		<Event id="0" label="DwnOpNeeded[TU3]"/>
+		<Event id="1" label="NotDwnOpNeeded[TU3]"/>
+		<Event id="2" label="QDwnOpNeeded_1D[TU3]"/>
+		<Event id="3" label="QDwnOpNeeded_2D[TU3]"/>
+		<Event id="4" label="QDwnOpNeeded_BD[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4481,19 +4481,19 @@
 		<Transition source="1" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_DoChkErr.TU3" type="Specification">
+<Automaton name="l_DoChkErr[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="IsErr1A.TU3" controllable="false"/>
-		<Event id="1" label="IsErr1B.TU3" controllable="false"/>
-		<Event id="2" label="IsErr2A.TU3" controllable="false"/>
-		<Event id="3" label="IsErr2B.TU3" controllable="false"/>
-		<Event id="4" label="NoErr.TU3" controllable="false"/>
-		<Event id="5" label="NoError.TU3"/>
-		<Event id="6" label="QErr1A.TU3"/>
-		<Event id="7" label="QErr1B.TU3"/>
-		<Event id="8" label="QErr2A.TU3"/>
-		<Event id="9" label="QErr2B.TU3"/>
-		<Event id="10" label="QError.TU3"/>
+		<Event id="0" label="IsErr1A[TU3]" controllable="false"/>
+		<Event id="1" label="IsErr1B[TU3]" controllable="false"/>
+		<Event id="2" label="IsErr2A[TU3]" controllable="false"/>
+		<Event id="3" label="IsErr2B[TU3]" controllable="false"/>
+		<Event id="4" label="NoErr[TU3]" controllable="false"/>
+		<Event id="5" label="NoError[TU3]"/>
+		<Event id="6" label="QErr1A[TU3]"/>
+		<Event id="7" label="QErr1B[TU3]"/>
+		<Event id="8" label="QErr2A[TU3]"/>
+		<Event id="9" label="QErr2B[TU3]"/>
+		<Event id="10" label="QError[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4520,18 +4520,18 @@
 		<Transition source="5" dest="0" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlBothStnDwn.TU3" type="Specification">
+<Automaton name="l_HndlBothStnDwn[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="DwnOpNeeded.TU3"/>
-		<Event id="1" label="IsCpl.TU3" controllable="false"/>
-		<Event id="2" label="IsType1.TU3" controllable="false"/>
-		<Event id="3" label="IsType2.TU3" controllable="false"/>
-		<Event id="4" label="NotCpl.TU3" controllable="false"/>
-		<Event id="5" label="NotDwnOpNeeded.TU3"/>
-		<Event id="6" label="QCplT1A_1B.TU3"/>
-		<Event id="7" label="QCplT2A_2B.TU3"/>
-		<Event id="8" label="QDwnOpNeeded_BD.TU3"/>
-		<Event id="9" label="QType.TU3"/>
+		<Event id="0" label="DwnOpNeeded[TU3]"/>
+		<Event id="1" label="IsCpl[TU3]" controllable="false"/>
+		<Event id="2" label="IsType1[TU3]" controllable="false"/>
+		<Event id="3" label="IsType2[TU3]" controllable="false"/>
+		<Event id="4" label="NotCpl[TU3]" controllable="false"/>
+		<Event id="5" label="NotDwnOpNeeded[TU3]"/>
+		<Event id="6" label="QCplT1A_1B[TU3]"/>
+		<Event id="7" label="QCplT2A_2B[TU3]"/>
+		<Event id="8" label="QDwnOpNeeded_BD[TU3]"/>
+		<Event id="9" label="QType[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4561,20 +4561,20 @@
 		<Transition source="4" dest="0" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlComEvents_ChkDwn.TU3" type="Specification">
+<Automaton name="l_HndlComEvents_ChkDwn[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="DwnOpNeeded.TU3"/>
-		<Event id="1" label="IsCpl.TU3" controllable="false"/>
-		<Event id="2" label="IsType1.TU3" controllable="false"/>
-		<Event id="3" label="IsType2.TU3" controllable="false"/>
-		<Event id="4" label="NotCpl.TU3" controllable="false"/>
-		<Event id="5" label="NotDwnOpNeeded.TU3"/>
-		<Event id="6" label="QCplT1A_1B.TU3"/>
-		<Event id="7" label="QCplT2A_2B.TU3"/>
-		<Event id="8" label="QDwnOpNeeded_1D.TU3"/>
-		<Event id="9" label="QDwnOpNeeded_2D.TU3"/>
-		<Event id="10" label="QDwnOpNeeded_BD.TU3"/>
-		<Event id="11" label="QType.TU3"/>
+		<Event id="0" label="DwnOpNeeded[TU3]"/>
+		<Event id="1" label="IsCpl[TU3]" controllable="false"/>
+		<Event id="2" label="IsType1[TU3]" controllable="false"/>
+		<Event id="3" label="IsType2[TU3]" controllable="false"/>
+		<Event id="4" label="NotCpl[TU3]" controllable="false"/>
+		<Event id="5" label="NotDwnOpNeeded[TU3]"/>
+		<Event id="6" label="QCplT1A_1B[TU3]"/>
+		<Event id="7" label="QCplT2A_2B[TU3]"/>
+		<Event id="8" label="QDwnOpNeeded_1D[TU3]"/>
+		<Event id="9" label="QDwnOpNeeded_2D[TU3]"/>
+		<Event id="10" label="QDwnOpNeeded_BD[TU3]"/>
+		<Event id="11" label="QType[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4595,18 +4595,18 @@
 		<Transition source="1" dest="0" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlStn1Dwn.TU3" type="Specification">
+<Automaton name="l_HndlStn1Dwn[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="DwnOpNeeded.TU3"/>
-		<Event id="1" label="IsCpl.TU3" controllable="false"/>
-		<Event id="2" label="IsType1.TU3" controllable="false"/>
-		<Event id="3" label="IsType2.TU3" controllable="false"/>
-		<Event id="4" label="NotCpl.TU3" controllable="false"/>
-		<Event id="5" label="NotDwnOpNeeded.TU3"/>
-		<Event id="6" label="QCplT1A_1B.TU3"/>
-		<Event id="7" label="QCplT2A_2B.TU3"/>
-		<Event id="8" label="QDwnOpNeeded_1D.TU3"/>
-		<Event id="9" label="QType.TU3"/>
+		<Event id="0" label="DwnOpNeeded[TU3]"/>
+		<Event id="1" label="IsCpl[TU3]" controllable="false"/>
+		<Event id="2" label="IsType1[TU3]" controllable="false"/>
+		<Event id="3" label="IsType2[TU3]" controllable="false"/>
+		<Event id="4" label="NotCpl[TU3]" controllable="false"/>
+		<Event id="5" label="NotDwnOpNeeded[TU3]"/>
+		<Event id="6" label="QCplT1A_1B[TU3]"/>
+		<Event id="7" label="QCplT2A_2B[TU3]"/>
+		<Event id="8" label="QDwnOpNeeded_1D[TU3]"/>
+		<Event id="9" label="QType[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4640,18 +4640,18 @@
 		<Transition source="5" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlStn2Dwn.TU3" type="Specification">
+<Automaton name="l_HndlStn2Dwn[TU3]" type="Specification">
 	<Events>
-		<Event id="0" label="DwnOpNeeded.TU3"/>
-		<Event id="1" label="IsCpl.TU3" controllable="false"/>
-		<Event id="2" label="IsType1.TU3" controllable="false"/>
-		<Event id="3" label="IsType2.TU3" controllable="false"/>
-		<Event id="4" label="NotCpl.TU3" controllable="false"/>
-		<Event id="5" label="NotDwnOpNeeded.TU3"/>
-		<Event id="6" label="QCplT1A_1B.TU3"/>
-		<Event id="7" label="QCplT2A_2B.TU3"/>
-		<Event id="8" label="QDwnOpNeeded_2D.TU3"/>
-		<Event id="9" label="QType.TU3"/>
+		<Event id="0" label="DwnOpNeeded[TU3]"/>
+		<Event id="1" label="IsCpl[TU3]" controllable="false"/>
+		<Event id="2" label="IsType1[TU3]" controllable="false"/>
+		<Event id="3" label="IsType2[TU3]" controllable="false"/>
+		<Event id="4" label="NotCpl[TU3]" controllable="false"/>
+		<Event id="5" label="NotDwnOpNeeded[TU3]"/>
+		<Event id="6" label="QCplT1A_1B[TU3]"/>
+		<Event id="7" label="QCplT2A_2B[TU3]"/>
+		<Event id="8" label="QDwnOpNeeded_2D[TU3]"/>
+		<Event id="9" label="QType[TU3]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4685,15 +4685,15 @@
 		<Transition source="5" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="IntfTU.TU4" type="Specification">
+<Automaton name="IntfTU[TU4]" type="Specification">
 	<Events>
-		<Event id="0" label="LibPallet.TU4"/>
-		<Event id="1" label="NoTrnsfEL.TU4"/>
-		<Event id="2" label="PalletRlsd.TU4"/>
-		<Event id="3" label="TrnsfCplToCL.TU4"/>
-		<Event id="4" label="TrnsfCplToEL.TU4"/>
-		<Event id="5" label="TrnsfELToCL.TU4"/>
-		<Event id="6" label="TrnsfToEL.TU4"/>
+		<Event id="0" label="LibPallet[TU4]"/>
+		<Event id="1" label="NoTrnsfEL[TU4]"/>
+		<Event id="2" label="PalletRlsd[TU4]"/>
+		<Event id="3" label="TrnsfCplToCL[TU4]"/>
+		<Event id="4" label="TrnsfCplToEL[TU4]"/>
+		<Event id="5" label="TrnsfELToCL[TU4]"/>
+		<Event id="6" label="TrnsfToEL[TU4]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4711,12 +4711,12 @@
 		<Transition source="3" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapGateCL.TU4" type="Plant">
+<Automaton name="l_CapGateCL[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="LibPallet.TU4"/>
-		<Event id="1" label="NoTrnsfEL.TU4"/>
-		<Event id="2" label="PalletLvGCL.TU4" controllable="false"/>
-		<Event id="3" label="TrnsfToEL.TU4"/>
+		<Event id="0" label="LibPallet[TU4]"/>
+		<Event id="1" label="NoTrnsfEL[TU4]"/>
+		<Event id="2" label="PalletLvGCL[TU4]" controllable="false"/>
+		<Event id="3" label="TrnsfToEL[TU4]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4734,10 +4734,10 @@
 		<Transition source="2" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapGateEL_1.TU4" type="Plant">
+<Automaton name="l_CapGateEL_1[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletLvGEL_1.TU4" controllable="false"/>
-		<Event id="1" label="TrnsfELToCL.TU4"/>
+		<Event id="0" label="PalletLvGEL_1[TU4]" controllable="false"/>
+		<Event id="1" label="TrnsfELToCL[TU4]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4751,12 +4751,12 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapTUDrwToExit.TU4" type="Plant">
+<Automaton name="l_CapTUDrwToExit[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvDrwCL.TU4" controllable="false"/>
-		<Event id="1" label="PalletArvDrwEL.TU4" controllable="false"/>
-		<Event id="2" label="PalletLvTUAtCL.TU4" controllable="false"/>
-		<Event id="3" label="PalletLvTUAtEL_1.TU4" controllable="false"/>
+		<Event id="0" label="PalletArvDrwCL[TU4]" controllable="false"/>
+		<Event id="1" label="PalletArvDrwEL[TU4]" controllable="false"/>
+		<Event id="2" label="PalletLvTUAtCL[TU4]" controllable="false"/>
+		<Event id="3" label="PalletLvTUAtEL_1[TU4]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4774,10 +4774,10 @@
 		<Transition source="2" dest="1" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapTUDrwToGateCL.TU4" type="Plant">
+<Automaton name="l_CapTUDrwToGateCL[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvDrwCL.TU4" controllable="false"/>
-		<Event id="1" label="PalletLvGCL.TU4" controllable="false"/>
+		<Event id="0" label="PalletArvDrwCL[TU4]" controllable="false"/>
+		<Event id="1" label="PalletLvGCL[TU4]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4791,10 +4791,10 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_CapTUDrwToGateEL_1.TU4" type="Plant">
+<Automaton name="l_CapTUDrwToGateEL_1[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="PalletArvDrwEL.TU4" controllable="false"/>
-		<Event id="1" label="PalletLvGEL_1.TU4" controllable="false"/>
+		<Event id="0" label="PalletArvDrwEL[TU4]" controllable="false"/>
+		<Event id="1" label="PalletLvGEL_1[TU4]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4808,11 +4808,11 @@
 		<Transition source="2" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletGateCL.TU4" type="Plant">
+<Automaton name="l_PalletGateCL[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="GClosesCL.TU4"/>
-		<Event id="1" label="GOpensCL.TU4"/>
-		<Event id="2" label="PalletLvGCL.TU4" controllable="false"/>
+		<Event id="0" label="GClosesCL[TU4]"/>
+		<Event id="1" label="GOpensCL[TU4]"/>
+		<Event id="2" label="PalletLvGCL[TU4]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4825,11 +4825,11 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletGateEL_1.TU4" type="Plant">
+<Automaton name="l_PalletGateEL_1[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="GClosesEL_1.TU4"/>
-		<Event id="1" label="GOpensEL_1.TU4"/>
-		<Event id="2" label="PalletLvGEL_1.TU4" controllable="false"/>
+		<Event id="0" label="GClosesEL_1[TU4]"/>
+		<Event id="1" label="GOpensEL_1[TU4]"/>
+		<Event id="2" label="PalletLvGEL_1[TU4]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4842,11 +4842,11 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletStopCL.TU4" type="Plant">
+<Automaton name="l_PalletStopCL[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="PStopClosesCL.TU4"/>
-		<Event id="1" label="PStopOpensCL.TU4"/>
-		<Event id="2" label="PalletLvTUAtCL.TU4" controllable="false"/>
+		<Event id="0" label="PStopClosesCL[TU4]"/>
+		<Event id="1" label="PStopOpensCL[TU4]"/>
+		<Event id="2" label="PalletLvTUAtCL[TU4]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4858,11 +4858,11 @@
 		<Transition source="1" dest="1" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_PalletStopEL_1.TU4" type="Plant">
+<Automaton name="l_PalletStopEL_1[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="PStopClosesEL_1.TU4"/>
-		<Event id="1" label="PStopOpensEL_1.TU4"/>
-		<Event id="2" label="PalletLvTUAtEL_1.TU4" controllable="false"/>
+		<Event id="0" label="PStopClosesEL_1[TU4]"/>
+		<Event id="1" label="PStopOpensEL_1[TU4]"/>
+		<Event id="2" label="PalletLvTUAtEL_1[TU4]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4874,15 +4874,15 @@
 		<Transition source="1" dest="1" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_QCorrectType.TU4" type="Plant">
+<Automaton name="l_QCorrectType[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="CorrType.TU4" controllable="false"/>
-		<Event id="1" label="IsCpl.TU4" controllable="false"/>
-		<Event id="2" label="IsType1.TU4" controllable="false"/>
-		<Event id="3" label="IsType2.TU4" controllable="false"/>
-		<Event id="4" label="NotCpl.TU4" controllable="false"/>
-		<Event id="5" label="QCorrType.TU4"/>
-		<Event id="6" label="WrongType.TU4" controllable="false"/>
+		<Event id="0" label="CorrType[TU4]" controllable="false"/>
+		<Event id="1" label="IsCpl[TU4]" controllable="false"/>
+		<Event id="2" label="IsType1[TU4]" controllable="false"/>
+		<Event id="3" label="IsType2[TU4]" controllable="false"/>
+		<Event id="4" label="NotCpl[TU4]" controllable="false"/>
+		<Event id="5" label="QCorrType[TU4]"/>
+		<Event id="6" label="WrongType[TU4]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4919,12 +4919,12 @@
 		<Transition source="11" dest="3" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_QTasksCpl.TU4" type="Plant">
+<Automaton name="l_QTasksCpl[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="IsCpl.TU4" controllable="false"/>
-		<Event id="1" label="NotCpl.TU4" controllable="false"/>
-		<Event id="2" label="QCpTl2A_2B.TU4"/>
-		<Event id="3" label="QCplT1A_1B.TU4"/>
+		<Event id="0" label="IsCpl[TU4]" controllable="false"/>
+		<Event id="1" label="NotCpl[TU4]" controllable="false"/>
+		<Event id="2" label="QCpTl2A_2B[TU4]"/>
+		<Event id="3" label="QCplT1A_1B[TU4]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4937,13 +4937,13 @@
 		<Transition source="1" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_QueryDrwLoc.TU4" type="Plant">
+<Automaton name="l_QueryDrwLoc[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU4" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU4" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU4" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU4" controllable="false"/>
-		<Event id="4" label="QDrwLoc.TU4"/>
+		<Event id="0" label="DrwArvCL[TU4]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU4]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU4]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU4]" controllable="false"/>
+		<Event id="4" label="QDrwLoc[TU4]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4962,10 +4962,10 @@
 		<Transition source="3" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_RWDevice.TU4" type="Plant">
+<Automaton name="l_RWDevice[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="DoneRead.TU4" controllable="false"/>
-		<Event id="1" label="ReadLabel.TU4"/>
+		<Event id="0" label="DoneRead[TU4]" controllable="false"/>
+		<Event id="1" label="ReadLabel[TU4]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4976,12 +4976,12 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_TUDrawer.TU4" type="Plant">
+<Automaton name="l_TUDrawer[TU4]" type="Plant">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU4" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU4" controllable="false"/>
-		<Event id="2" label="MvDrwToCL.TU4"/>
-		<Event id="3" label="MvDrwToEL.TU4"/>
+		<Event id="0" label="DrwArvCL[TU4]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU4]" controllable="false"/>
+		<Event id="2" label="MvDrwToCL[TU4]"/>
+		<Event id="3" label="MvDrwToEL[TU4]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -4996,36 +4996,36 @@
 		<Transition source="3" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlComEvents.TU4" type="Specification">
+<Automaton name="l_HndlComEvents[TU4]" type="Specification">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU4" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU4" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU4" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU4" controllable="false"/>
-		<Event id="4" label="GClosesCL.TU4"/>
-		<Event id="5" label="GClosesEL_1.TU4"/>
-		<Event id="6" label="GOpensCL.TU4"/>
-		<Event id="7" label="GOpensEL_1.TU4"/>
-		<Event id="8" label="LibPallet.TU4"/>
-		<Event id="9" label="MvDrwToCL.TU4"/>
-		<Event id="10" label="MvDrwToEL.TU4"/>
-		<Event id="11" label="NoTrnsfEL.TU4"/>
-		<Event id="12" label="PStopClosesCL.TU4"/>
-		<Event id="13" label="PStopClosesEL_1.TU4"/>
-		<Event id="14" label="PStopOpensCL.TU4"/>
-		<Event id="15" label="PStopOpensEL_1.TU4"/>
-		<Event id="16" label="PalletArvDrwCL.TU4" controllable="false"/>
-		<Event id="17" label="PalletArvDrwEL.TU4" controllable="false"/>
-		<Event id="18" label="PalletLvGCL.TU4" controllable="false"/>
-		<Event id="19" label="PalletLvGEL_1.TU4" controllable="false"/>
-		<Event id="20" label="PalletLvTUAtCL.TU4" controllable="false"/>
-		<Event id="21" label="PalletLvTUAtEL_1.TU4" controllable="false"/>
-		<Event id="22" label="PalletRlsd.TU4"/>
-		<Event id="23" label="QDrwLoc.TU4"/>
-		<Event id="24" label="TrnsfCplToCL.TU4"/>
-		<Event id="25" label="TrnsfCplToEL.TU4"/>
-		<Event id="26" label="TrnsfELToCL.TU4"/>
-		<Event id="27" label="TrnsfToEL.TU4"/>
+		<Event id="0" label="DrwArvCL[TU4]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU4]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU4]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU4]" controllable="false"/>
+		<Event id="4" label="GClosesCL[TU4]"/>
+		<Event id="5" label="GClosesEL_1[TU4]"/>
+		<Event id="6" label="GOpensCL[TU4]"/>
+		<Event id="7" label="GOpensEL_1[TU4]"/>
+		<Event id="8" label="LibPallet[TU4]"/>
+		<Event id="9" label="MvDrwToCL[TU4]"/>
+		<Event id="10" label="MvDrwToEL[TU4]"/>
+		<Event id="11" label="NoTrnsfEL[TU4]"/>
+		<Event id="12" label="PStopClosesCL[TU4]"/>
+		<Event id="13" label="PStopClosesEL_1[TU4]"/>
+		<Event id="14" label="PStopOpensCL[TU4]"/>
+		<Event id="15" label="PStopOpensEL_1[TU4]"/>
+		<Event id="16" label="PalletArvDrwCL[TU4]" controllable="false"/>
+		<Event id="17" label="PalletArvDrwEL[TU4]" controllable="false"/>
+		<Event id="18" label="PalletLvGCL[TU4]" controllable="false"/>
+		<Event id="19" label="PalletLvGEL_1[TU4]" controllable="false"/>
+		<Event id="20" label="PalletLvTUAtCL[TU4]" controllable="false"/>
+		<Event id="21" label="PalletLvTUAtEL_1[TU4]" controllable="false"/>
+		<Event id="22" label="PalletRlsd[TU4]"/>
+		<Event id="23" label="QDrwLoc[TU4]"/>
+		<Event id="24" label="TrnsfCplToCL[TU4]"/>
+		<Event id="25" label="TrnsfCplToEL[TU4]"/>
+		<Event id="26" label="TrnsfELToCL[TU4]"/>
+		<Event id="27" label="TrnsfToEL[TU4]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -5062,31 +5062,31 @@
 		<Transition source="1" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlLibPallet.TU4" type="Specification">
+<Automaton name="l_HndlLibPallet[TU4]" type="Specification">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU4" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU4" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU4" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU4" controllable="false"/>
-		<Event id="4" label="GClosesCL.TU4"/>
-		<Event id="5" label="GClosesEL_1.TU4"/>
-		<Event id="6" label="GOpensCL.TU4"/>
-		<Event id="7" label="GOpensEL_1.TU4"/>
-		<Event id="8" label="LibPallet.TU4"/>
-		<Event id="9" label="MvDrwToCL.TU4"/>
-		<Event id="10" label="MvDrwToEL.TU4"/>
-		<Event id="11" label="PStopClosesCL.TU4"/>
-		<Event id="12" label="PStopClosesEL_1.TU4"/>
-		<Event id="13" label="PStopOpensCL.TU4"/>
-		<Event id="14" label="PStopOpensEL_1.TU4"/>
-		<Event id="15" label="PalletArvDrwCL.TU4" controllable="false"/>
-		<Event id="16" label="PalletArvDrwEL.TU4" controllable="false"/>
-		<Event id="17" label="PalletLvGCL.TU4" controllable="false"/>
-		<Event id="18" label="PalletLvGEL_1.TU4" controllable="false"/>
-		<Event id="19" label="PalletLvTUAtCL.TU4" controllable="false"/>
-		<Event id="20" label="PalletLvTUAtEL_1.TU4" controllable="false"/>
-		<Event id="21" label="PalletRlsd.TU4"/>
-		<Event id="22" label="QDrwLoc.TU4"/>
+		<Event id="0" label="DrwArvCL[TU4]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU4]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU4]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU4]" controllable="false"/>
+		<Event id="4" label="GClosesCL[TU4]"/>
+		<Event id="5" label="GClosesEL_1[TU4]"/>
+		<Event id="6" label="GOpensCL[TU4]"/>
+		<Event id="7" label="GOpensEL_1[TU4]"/>
+		<Event id="8" label="LibPallet[TU4]"/>
+		<Event id="9" label="MvDrwToCL[TU4]"/>
+		<Event id="10" label="MvDrwToEL[TU4]"/>
+		<Event id="11" label="PStopClosesCL[TU4]"/>
+		<Event id="12" label="PStopClosesEL_1[TU4]"/>
+		<Event id="13" label="PStopOpensCL[TU4]"/>
+		<Event id="14" label="PStopOpensEL_1[TU4]"/>
+		<Event id="15" label="PalletArvDrwCL[TU4]" controllable="false"/>
+		<Event id="16" label="PalletArvDrwEL[TU4]" controllable="false"/>
+		<Event id="17" label="PalletLvGCL[TU4]" controllable="false"/>
+		<Event id="18" label="PalletLvGEL_1[TU4]" controllable="false"/>
+		<Event id="19" label="PalletLvTUAtCL[TU4]" controllable="false"/>
+		<Event id="20" label="PalletLvTUAtEL_1[TU4]" controllable="false"/>
+		<Event id="21" label="PalletRlsd[TU4]"/>
+		<Event id="22" label="QDrwLoc[TU4]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -5133,31 +5133,31 @@
 		<Transition source="7" dest="0" event="21"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlTrnsfELToCL.TU4" type="Specification">
+<Automaton name="l_HndlTrnsfELToCL[TU4]" type="Specification">
 	<Events>
-		<Event id="0" label="DrwArvCL.TU4" controllable="false"/>
-		<Event id="1" label="DrwArvEL.TU4" controllable="false"/>
-		<Event id="2" label="DrwAtCL.TU4" controllable="false"/>
-		<Event id="3" label="DrwAtEL.TU4" controllable="false"/>
-		<Event id="4" label="GClosesCL.TU4"/>
-		<Event id="5" label="GClosesEL_1.TU4"/>
-		<Event id="6" label="GOpensCL.TU4"/>
-		<Event id="7" label="GOpensEL_1.TU4"/>
-		<Event id="8" label="MvDrwToCL.TU4"/>
-		<Event id="9" label="MvDrwToEL.TU4"/>
-		<Event id="10" label="PStopClosesCL.TU4"/>
-		<Event id="11" label="PStopClosesEL_1.TU4"/>
-		<Event id="12" label="PStopOpensCL.TU4"/>
-		<Event id="13" label="PStopOpensEL_1.TU4"/>
-		<Event id="14" label="PalletArvDrwCL.TU4" controllable="false"/>
-		<Event id="15" label="PalletArvDrwEL.TU4" controllable="false"/>
-		<Event id="16" label="PalletLvGCL.TU4" controllable="false"/>
-		<Event id="17" label="PalletLvGEL_1.TU4" controllable="false"/>
-		<Event id="18" label="PalletLvTUAtCL.TU4" controllable="false"/>
-		<Event id="19" label="PalletLvTUAtEL_1.TU4" controllable="false"/>
-		<Event id="20" label="QDrwLoc.TU4"/>
-		<Event id="21" label="TrnsfCplToCL.TU4"/>
-		<Event id="22" label="TrnsfELToCL.TU4"/>
+		<Event id="0" label="DrwArvCL[TU4]" controllable="false"/>
+		<Event id="1" label="DrwArvEL[TU4]" controllable="false"/>
+		<Event id="2" label="DrwAtCL[TU4]" controllable="false"/>
+		<Event id="3" label="DrwAtEL[TU4]" controllable="false"/>
+		<Event id="4" label="GClosesCL[TU4]"/>
+		<Event id="5" label="GClosesEL_1[TU4]"/>
+		<Event id="6" label="GOpensCL[TU4]"/>
+		<Event id="7" label="GOpensEL_1[TU4]"/>
+		<Event id="8" label="MvDrwToCL[TU4]"/>
+		<Event id="9" label="MvDrwToEL[TU4]"/>
+		<Event id="10" label="PStopClosesCL[TU4]"/>
+		<Event id="11" label="PStopClosesEL_1[TU4]"/>
+		<Event id="12" label="PStopOpensCL[TU4]"/>
+		<Event id="13" label="PStopOpensEL_1[TU4]"/>
+		<Event id="14" label="PalletArvDrwCL[TU4]" controllable="false"/>
+		<Event id="15" label="PalletArvDrwEL[TU4]" controllable="false"/>
+		<Event id="16" label="PalletLvGCL[TU4]" controllable="false"/>
+		<Event id="17" label="PalletLvGEL_1[TU4]" controllable="false"/>
+		<Event id="18" label="PalletLvTUAtCL[TU4]" controllable="false"/>
+		<Event id="19" label="PalletLvTUAtEL_1[TU4]" controllable="false"/>
+		<Event id="20" label="QDrwLoc[TU4]"/>
+		<Event id="21" label="TrnsfCplToCL[TU4]"/>
+		<Event id="22" label="TrnsfELToCL[TU4]"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
@@ -5214,41 +5214,41 @@
 		<Transition source="10" dest="0" event="21"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_HndlTrnsfToEL.TU4" type="Specification">
+<Automaton name="l_HndlTrnsfToEL[TU4]" type="Specification">
 	<Events>
-		<Event id="0" label="CorrType.TU4" controllable="false"/>
-		<Event id="1" label="DoneRead.TU4" controllable="false"/>
-		<Event id="2" label="DrwArvCL.TU4" controllable="false"/>
-		<Event id="3" label="DrwArvEL.TU4" controllable="false"/>
-		<Event id="4" label="DrwAtCL.TU4" controllable="false"/>
-		<Event id="5" label="DrwAtEL.TU4" controllable="false"/>
-		<Event id="6" label="GClosesCL.TU4"/>
-		<Event id="7" label="GClosesEL_1.TU4"/>
-		<Event id="8" label="GOpensCL.TU4"/>
-		<Event id="9" label="GOpensEL_1.TU4"/>
-		<Event id="10" label="IsCpl.TU4" controllable="false"/>
-		<Event id="11" label="MvDrwToCL.TU4"/>
-		<Event id="12" label="MvDrwToEL.TU4"/>
-		<Event id="13" label="NoTrnsfEL.TU4"/>
-		<Event id="14" label="NotCpl.TU4" controllable="false"/>
-		<Event id="15" label="PStopClosesCL.TU4"/>
-		<Event id="16" label="PStopClosesEL_1.TU4"/>
-		<Event id="17" label="PStopOpensCL.TU4"/>
-		<Event id="18" label="PStopOpensEL_1.TU4"/>
-		<Event id="19" label="PalletArvDrwCL.TU4" controllable="false"/>
-		<Event id="20" label="PalletArvDrwEL.TU4" controllable="false"/>
-		<Event id="21" label="PalletLvGCL.TU4" controllable="false"/>
-		<Event id="22" label="PalletLvGEL_1.TU4" controllable="false"/>
-		<Event id="23" label="PalletLvTUAtCL.TU4" controllable="false"/>
-		<Event id="24" label="PalletLvTUAtEL_1.TU4" controllable="false"/>
-		<Event id="25" label="QCorrType.TU4"/>
-		<Event id="26" label="QCpTl2A_2B.TU4"/>
-		<Event id="27" label="QCplT1A_1B.TU4"/>
-		<Event id="28" label="QDrwLoc.TU4"/>
-		<Event id="29" label="ReadLabel.TU4"/>
-		<Event id="30" label="TrnsfCplToEL.TU4"/>
-		<Event id="31" label="TrnsfToEL.TU4"/>
-		<Event id="32" label="WrongType.TU4" controllable="false"/>
+		<Event id="0" label="CorrType[TU4]" controllable="false"/>
+		<Event id="1" label="DoneRead[TU4]" controllable="false"/>
+		<Event id="2" label="DrwArvCL[TU4]" controllable="false"/>
+		<Event id="3" label="DrwArvEL[TU4]" controllable="false"/>
+		<Event id="4" label="DrwAtCL[TU4]" controllable="false"/>
+		<Event id="5" label="DrwAtEL[TU4]" controllable="false"/>
+		<Event id="6" label="GClosesCL[TU4]"/>
+		<Event id="7" label="GClosesEL_1[TU4]"/>
+		<Event id="8" label="GOpensCL[TU4]"/>
+		<Event id="9" label="GOpensEL_1[TU4]"/>
+		<Event id="10" label="IsCpl[TU4]" controllable="false"/>
+		<Event id="11" label="MvDrwToCL[TU4]"/>
+		<Event id="12" label="MvDrwToEL[TU4]"/>
+		<Event id="13" label="NoTrnsfEL[TU4]"/>
+		<Event id="14" label="NotCpl[TU4]" controllable="false"/>
+		<Event id="15" label="PStopClosesCL[TU4]"/>
+		<Event id="16" label="PStopClosesEL_1[TU4]"/>
+		<Event id="17" label="PStopOpensCL[TU4]"/>
+		<Event id="18" label="PStopOpensEL_1[TU4]"/>
+		<Event id="19" label="PalletArvDrwCL[TU4]" controllable="false"/>
+		<Event id="20" label="PalletArvDrwEL[TU4]" controllable="false"/>
+		<Event id="21" label="PalletLvGCL[TU4]" controllable="false"/>
+		<Event id="22" label="PalletLvGEL_1[TU4]" controllable="false"/>
+		<Event id="23" label="PalletLvTUAtCL[TU4]" controllable="false"/>
+		<Event id="24" label="PalletLvTUAtEL_1[TU4]" controllable="false"/>
+		<Event id="25" label="QCorrType[TU4]"/>
+		<Event id="26" label="QCpTl2A_2B[TU4]"/>
+		<Event id="27" label="QCplT1A_1B[TU4]"/>
+		<Event id="28" label="QDrwLoc[TU4]"/>
+		<Event id="29" label="ReadLabel[TU4]"/>
+		<Event id="30" label="TrnsfCplToEL[TU4]"/>
+		<Event id="31" label="TrnsfToEL[TU4]"/>
+		<Event id="32" label="WrongType[TU4]" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>

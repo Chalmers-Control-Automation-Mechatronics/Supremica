@@ -211,7 +211,9 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     final String prefix = basePrefix + "/OtherExamples/centralLock/";
     // THREE DOORS
     //thisGroup.addItem("Central Locking - 3 Doors", prefix + "verriegel3.xml");
-    thisGroup.addItem("Central Locking - 3 Doors", basePrefix + "/ModuleExamples/central_locking/verriegel3.wmod");
+    thisGroup.addItem("Central Locking - 3 Doors",
+                      basePrefix +
+                      "/ModuleExamples/central_locking/verriegel3.wmod");
     //thisGroup.addItem("Central Locking - 3 Doors - Uncontrollable", prefix + "verriegel3_uncontrollable.xml");
     thisGroup.addItem("Central Locking - 3 Doors - Language Inclusion", prefix + "verriegel3_language_inclusion.xml");
     thisGroup.addItem("Central Locking - 3 Doors - Language Exclusion", prefix + "verriegel3_language_exclusion.xml");
@@ -219,16 +221,18 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     //thisGroup.addItem("Central Locking - 3 Doors - Synchronized Plants Uncontrollable", prefix + "verriegel3_joint_uncontrollable.xml");
     // FOUR DOORS
     //thisGroup.addItem("Central Lock - 4 Doors", prefix + "verriegel4.xml");
-    thisGroup.addItem("Central Lock - 4 Doors", basePrefix + "/ModuleExamples/central_locking/verriegel4.wmod");
-    thisGroup.addItem("Central Lock - 4 Doors - Language Inclusion", prefix + "verriegel4_language_inclusion.xml");
-    thisGroup.addItem("Central Lock - 4 Doors - Language Exclusion", prefix + "verriegel4_language_exclusion.xml");
+    thisGroup.addItem("Central Lock - 4 Doors",
+                      basePrefix +
+                      "/ModuleExamples/central_locking/verriegel4.wmod");
+    //thisGroup.addItem("Central Lock - 4 Doors - Language Inclusion", prefix + "verriegel4_language_inclusion.xml");
+    //thisGroup.addItem("Central Lock - 4 Doors - Language Exclusion", prefix + "verriegel4_language_exclusion.xml");
     // Subsystems
     thisGroup.addItem("Central Locking - ftuer",
                       basePrefix +
-    "/ModuleExamples/central_locking/ftuer.wmod");
+                      "/ModuleExamples/central_locking/ftuer.wmod");
     thisGroup.addItem("Central Locking - koordwsp",
                       basePrefix +
-    "/ModuleExamples/central_locking/koordwsp.wmod");
+                      "/ModuleExamples/central_locking/koordwsp.wmod");
     addGroup(thisGroup);
   }
 

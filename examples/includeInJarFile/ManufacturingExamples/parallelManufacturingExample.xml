@@ -18,7 +18,7 @@
 		<Transition source="A2" dest="A0" event="allow_exit"/>
 	</Transitions>
 </Automaton>
-<Automaton name="HighLevel-Source" type="Plant">
+<Automaton name="HighLevel_Source" type="Plant">
 	<Events>
 		<Event id="new_part" controllable="true"/>
 	</Events>
@@ -29,7 +29,7 @@
 		<Transition source="A0" dest="A0" event="new_part"/>
 	</Transitions>
 </Automaton>
-<Automaton name="HighLevel-Sink" type="Plant">
+<Automaton name="HighLevel_Sink" type="Plant">
 	<Events>
 		<Event id="allow_exit" controllable="true"/>
 	</Events>
@@ -40,7 +40,7 @@
 		<Transition source="A0" dest="A0" event="allow_exit"/>
 	</Transitions>
 </Automaton>
-<Automaton name="HighLevel-TestUnit" type="Plant">
+<Automaton name="HighLevel_TestUnit" type="Plant">
 	<Events>
 		<Event id="part_f_obuff" controllable="true"/>
 		<Event id="part_fails" controllable="false"/>
@@ -64,13 +64,13 @@
 </Automaton>
 
 <!-- SUPERVISORS FOR THE HIGH LEVEL -->
-<Automaton name="HighLevel-InputBuffer" type="Supervisor">
+<Automaton name="HighLevel_InputBuffer" type="Supervisor">
 	<Events>
 		<Event id="ret_inbuff" controllable="true"/>
 		<Event id="new_part" controllable="true"/>
-		<Event id="part_ent-1" controllable="true"/>
-		<Event id="part_ent-2" controllable="true"/>
-		<Event id="part_ent-3" controllable="true"/>
+		<Event id="part_ent_1" controllable="true"/>
+		<Event id="part_ent_2" controllable="true"/>
+		<Event id="part_ent_3" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -82,34 +82,34 @@
 	<Transitions>
 		<Transition source="A0" dest="A1" event="ret_inbuff"/>
 		<Transition source="A0" dest="A1" event="new_part"/>
-		<Transition source="A1" dest="A0" event="part_ent-1"/>
-		<Transition source="A1" dest="A0" event="part_ent-2"/>
-		<Transition source="A1" dest="A0" event="part_ent-3"/>
+		<Transition source="A1" dest="A0" event="part_ent_1"/>
+		<Transition source="A1" dest="A0" event="part_ent_2"/>
+		<Transition source="A1" dest="A0" event="part_ent_3"/>
 		<Transition source="A1" dest="A2" event="ret_inbuff"/>
 		<Transition source="A1" dest="A2" event="new_part"/>
-		<Transition source="A2" dest="A1" event="part_ent-1"/>
-		<Transition source="A2" dest="A1" event="part_ent-2"/>
-		<Transition source="A2" dest="A1" event="part_ent-3"/>
+		<Transition source="A2" dest="A1" event="part_ent_1"/>
+		<Transition source="A2" dest="A1" event="part_ent_2"/>
+		<Transition source="A2" dest="A1" event="part_ent_3"/>
 		<Transition source="A2" dest="A3" event="ret_inbuff"/>
 		<Transition source="A2" dest="A3" event="new_part"/>
-		<Transition source="A3" dest="A2" event="part_ent-1"/>
-		<Transition source="A3" dest="A2" event="part_ent-2"/>
-		<Transition source="A3" dest="A2" event="part_ent-3"/>
+		<Transition source="A3" dest="A2" event="part_ent_1"/>
+		<Transition source="A3" dest="A2" event="part_ent_2"/>
+		<Transition source="A3" dest="A2" event="part_ent_3"/>
 		<Transition source="A3" dest="A4" event="ret_inbuff"/>
 		<Transition source="A3" dest="A4" event="new_part"/>
-		<Transition source="A4" dest="A3" event="part_ent-1"/>
-		<Transition source="A4" dest="A3" event="part_ent-2"/>
-		<Transition source="A4" dest="A3" event="part_ent-3"/>
+		<Transition source="A4" dest="A3" event="part_ent_1"/>
+		<Transition source="A4" dest="A3" event="part_ent_2"/>
+		<Transition source="A4" dest="A3" event="part_ent_3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="HighLevel-OutputBuffer" type="Supervisor">
+<Automaton name="HighLevel_OutputBuffer" type="Supervisor">
 	<Events>
-		<Event id="part_ent-1" controllable="true"/>
-		<Event id="part_ent-2" controllable="true"/>
-		<Event id="part_ent-3" controllable="true"/>
-		<Event id="fin_exit-1" controllable="false"/>
-		<Event id="fin_exit-2" controllable="false"/>
-		<Event id="fin_exit-3" controllable="false"/>
+		<Event id="part_ent_1" controllable="true"/>
+		<Event id="part_ent_2" controllable="true"/>
+		<Event id="part_ent_3" controllable="true"/>
+		<Event id="fin_exit_1" controllable="false"/>
+		<Event id="fin_exit_2" controllable="false"/>
+		<Event id="fin_exit_3" controllable="false"/>
 		<Event id="part_f_obuff" controllable="true"/>
 	</Events>
 	<States>
@@ -120,31 +120,31 @@
 		<State id="A4"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A0" event="part_ent-1"/>
-		<Transition source="A0" dest="A0" event="part_ent-2"/>
-		<Transition source="A0" dest="A0" event="part_ent-3"/>
-		<Transition source="A0" dest="A1" event="fin_exit-1"/>
-		<Transition source="A0" dest="A1" event="fin_exit-2"/>
-		<Transition source="A0" dest="A1" event="fin_exit-3"/>
+		<Transition source="A0" dest="A0" event="part_ent_1"/>
+		<Transition source="A0" dest="A0" event="part_ent_2"/>
+		<Transition source="A0" dest="A0" event="part_ent_3"/>
+		<Transition source="A0" dest="A1" event="fin_exit_1"/>
+		<Transition source="A0" dest="A1" event="fin_exit_2"/>
+		<Transition source="A0" dest="A1" event="fin_exit_3"/>
 		<Transition source="A1" dest="A0" event="part_f_obuff"/>
-		<Transition source="A1" dest="A1" event="part_ent-1"/>
-		<Transition source="A1" dest="A1" event="part_ent-2"/>
-		<Transition source="A1" dest="A1" event="part_ent-3"/>
-		<Transition source="A1" dest="A2" event="fin_exit-1"/>
-		<Transition source="A1" dest="A2" event="fin_exit-2"/>
-		<Transition source="A1" dest="A2" event="fin_exit-3"/>
+		<Transition source="A1" dest="A1" event="part_ent_1"/>
+		<Transition source="A1" dest="A1" event="part_ent_2"/>
+		<Transition source="A1" dest="A1" event="part_ent_3"/>
+		<Transition source="A1" dest="A2" event="fin_exit_1"/>
+		<Transition source="A1" dest="A2" event="fin_exit_2"/>
+		<Transition source="A1" dest="A2" event="fin_exit_3"/>
 		<Transition source="A2" dest="A1" event="part_f_obuff"/>
-		<Transition source="A2" dest="A3" event="fin_exit-1"/>
-		<Transition source="A2" dest="A3" event="fin_exit-2"/>
-		<Transition source="A2" dest="A3" event="fin_exit-3"/>
+		<Transition source="A2" dest="A3" event="fin_exit_1"/>
+		<Transition source="A2" dest="A3" event="fin_exit_2"/>
+		<Transition source="A2" dest="A3" event="fin_exit_3"/>
 		<Transition source="A3" dest="A2" event="part_f_obuff"/>
-		<Transition source="A3" dest="A4" event="fin_exit-1"/>
-		<Transition source="A3" dest="A4" event="fin_exit-2"/>
-		<Transition source="A3" dest="A4" event="fin_exit-3"/>
+		<Transition source="A3" dest="A4" event="fin_exit_1"/>
+		<Transition source="A3" dest="A4" event="fin_exit_2"/>
+		<Transition source="A3" dest="A4" event="fin_exit_3"/>
 		<Transition source="A4" dest="A3" event="part_f_obuff"/>
 	</Transitions>
 </Automaton>
-<Automaton name="HighLevel-PackageBuffer" type="Supervisor">
+<Automaton name="HighLevel_PackageBuffer" type="Supervisor">
 	<Events>
 		<Event id="deposit_part" controllable="true"/>
 		<Event id="take_item" controllable="true"/>
@@ -169,7 +169,7 @@
 </Automaton>
 
 <!-- EXTRA SUPERVISOR TO ENSURE NON-BLOCKING (see Section 9.3 in Leducs PhD thesis) -->
-<Automaton name="HighLevel-MaterialFeedbackSupervisor" type="Supervisor">
+<Automaton name="HighLevel_MaterialFeedbackSupervisor" type="Supervisor">
 	<Events>
 		<Event id="new_part" controllable="true"/>
 		<Event id="part_passes" controllable="true"/>
@@ -200,36 +200,36 @@
 </Automaton>
 
 <!-- INTERFACE BETWEEN THE HIGH LEVEL AND LOW LEVEL 1 -->
-<Automaton name="Interface HighLevel/LowLevel1" type="Interface">
+<Automaton name="Interface_HighLevel_LowLevel1" type="Interface">
 	<Events>
-		<Event id="part_ent-1" controllable="true"/>
-		<Event id="fin_exit-1" controllable="false"/>
+		<Event id="part_ent_1" controllable="true"/>
+		<Event id="fin_exit_1" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
 		<State id="A1"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="part_ent-1"/>
-		<Transition source="A1" dest="A0" event="fin_exit-1"/>
+		<Transition source="A0" dest="A1" event="part_ent_1"/>
+		<Transition source="A1" dest="A0" event="fin_exit_1"/>
 	</Transitions>
 </Automaton>
 
 <!-- PLANTS FOR LOW LEVEL 1 -->
-<Automaton name="LowLevel1-PathFlowModel" type="Plant">
+<Automaton name="LowLevel1_PathFlowModel" type="Plant">
 	<Events>
-		<Event id="part_ent-1" controllable="true"/>
-		<Event id="part_arr1-1" controllable="false"/>
-		<Event id="part_lv1-1" controllable="true"/>
-		<Event id="part_lvExit-1" controllable="true"/>
-		<Event id="part_arr2-1" controllable="false"/>
-		<Event id="recog_A-1" controllable="false"/>
-		<Event id="recog_B-1" controllable="false"/>
-		<Event id="part_lv2-1" controllable="true"/>
-		<Event id="part_arr3-1" controllable="false"/>
-		<Event id="part_lv3-1" controllable="true"/>
-		<Event id="str_exit-1" controllable="true"/>
-		<Event id="fin_exit-1" controllable="false"/>
+		<Event id="part_ent_1" controllable="true"/>
+		<Event id="part_arr1_1" controllable="false"/>
+		<Event id="part_lv1_1" controllable="true"/>
+		<Event id="part_lvExit_1" controllable="true"/>
+		<Event id="part_arr2_1" controllable="false"/>
+		<Event id="recog_A_1" controllable="false"/>
+		<Event id="recog_B_1" controllable="false"/>
+		<Event id="part_lv2_1" controllable="true"/>
+		<Event id="part_arr3_1" controllable="false"/>
+		<Event id="part_lv3_1" controllable="true"/>
+		<Event id="str_exit_1" controllable="true"/>
+		<Event id="fin_exit_1" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -244,28 +244,28 @@
 		<State id="A9"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="part_ent-1"/>
-		<Transition source="A1" dest="A2" event="part_arr1-1"/>
-		<Transition source="A2" dest="A3" event="part_lv1-1"/>
-		<Transition source="A3" dest="A4" event="part_lvExit-1"/>
-		<Transition source="A4" dest="A5" event="part_arr2-1"/>
-		<Transition source="A5" dest="A6" event="recog_A-1"/>
-		<Transition source="A5" dest="A6" event="recog_B-1"/>
-		<Transition source="A6" dest="A7" event="part_lv2-1"/>
-		<Transition source="A7" dest="A8" event="part_arr3-1"/>
-		<Transition source="A8" dest="A1" event="part_lv3-1"/>
-		<Transition source="A3" dest="A9" event="str_exit-1"/>
-		<Transition source="A9" dest="A0" event="fin_exit-1"/>
+		<Transition source="A0" dest="A1" event="part_ent_1"/>
+		<Transition source="A1" dest="A2" event="part_arr1_1"/>
+		<Transition source="A2" dest="A3" event="part_lv1_1"/>
+		<Transition source="A3" dest="A4" event="part_lvExit_1"/>
+		<Transition source="A4" dest="A5" event="part_arr2_1"/>
+		<Transition source="A5" dest="A6" event="recog_A_1"/>
+		<Transition source="A5" dest="A6" event="recog_B_1"/>
+		<Transition source="A6" dest="A7" event="part_lv2_1"/>
+		<Transition source="A7" dest="A8" event="part_arr3_1"/>
+		<Transition source="A8" dest="A1" event="part_lv3_1"/>
+		<Transition source="A3" dest="A9" event="str_exit_1"/>
+		<Transition source="A9" dest="A0" event="fin_exit_1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel1-AttachPart" type="Plant">
+<Automaton name="LowLevel1_AttachPart" type="Plant">
 	<Events>
-		<Event id="take_pt-1" controllable="true"/>
-		<Event id="str_ptA-1" controllable="true"/>
-		<Event id="str_ptB-1" controllable="true"/>
-		<Event id="cmpl_A-1" controllable="false"/>
-		<Event id="cmpl_B-1" controllable="false"/>
-		<Event id="ret_pt-1" controllable="false"/>
+		<Event id="take_pt_1" controllable="true"/>
+		<Event id="str_ptA_1" controllable="true"/>
+		<Event id="str_ptB_1" controllable="true"/>
+		<Event id="cmpl_A_1" controllable="false"/>
+		<Event id="cmpl_B_1" controllable="false"/>
+		<Event id="ret_pt_1" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -275,21 +275,21 @@
 		<State id="A4"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="take_pt-1"/>
-		<Transition source="A1" dest="A2" event="str_ptA-1"/>
-		<Transition source="A1" dest="A3" event="str_ptB-1"/>
-		<Transition source="A2" dest="A4" event="cmpl_A-1"/>
-		<Transition source="A3" dest="A4" event="cmpl_B-1"/>
-		<Transition source="A4" dest="A0" event="ret_pt-1"/>
+		<Transition source="A0" dest="A1" event="take_pt_1"/>
+		<Transition source="A1" dest="A2" event="str_ptA_1"/>
+		<Transition source="A1" dest="A3" event="str_ptB_1"/>
+		<Transition source="A2" dest="A4" event="cmpl_A_1"/>
+		<Transition source="A3" dest="A4" event="cmpl_B_1"/>
+		<Transition source="A4" dest="A0" event="ret_pt_1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel1-PolishPart" type="Plant">
+<Automaton name="LowLevel1_PolishPart" type="Plant">
 	<Events>
-		<Event id="start_pol-1" controllable="true"/>
-		<Event id="dip_acid-1" controllable="true"/>
-		<Event id="polish-1" controllable="true"/>
-		<Event id="str_rlse-1" controllable="true"/>
-		<Event id="compl_pol-1" controllable="false"/>
+		<Event id="start_pol_1" controllable="true"/>
+		<Event id="dip_acid_1" controllable="true"/>
+		<Event id="polish_1" controllable="true"/>
+		<Event id="str_rlse_1" controllable="true"/>
+		<Event id="compl_pol_1" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -297,18 +297,18 @@
 		<State id="A2"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="start_pol-1"/>
-		<Transition source="A1" dest="A1" event="dip_acid-1"/>
-		<Transition source="A1" dest="A1" event="polish-1"/>
-		<Transition source="A1" dest="A2" event="str_rlse-1"/>
-		<Transition source="A2" dest="A0" event="compl_pol-1"/>
+		<Transition source="A0" dest="A1" event="start_pol_1"/>
+		<Transition source="A1" dest="A1" event="dip_acid_1"/>
+		<Transition source="A1" dest="A1" event="polish_1"/>
+		<Transition source="A1" dest="A2" event="str_rlse_1"/>
+		<Transition source="A2" dest="A0" event="compl_pol_1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel1-AttachCase" type="Plant">
+<Automaton name="LowLevel1_AttachCase" type="Plant">
 	<Events>
-		<Event id="start_case-1" controllable="true"/>
-		<Event id="attch_case-1" controllable="false"/>
-		<Event id="compl_case-1" controllable="false"/>
+		<Event id="start_case_1" controllable="true"/>
+		<Event id="attch_case_1" controllable="false"/>
+		<Event id="compl_case_1" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -316,40 +316,40 @@
 		<State id="A2"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="start_case-1"/>
-		<Transition source="A1" dest="A2" event="attch_case-1"/>
-		<Transition source="A2" dest="A0" event="compl_case-1"/>
+		<Transition source="A0" dest="A1" event="start_case_1"/>
+		<Transition source="A1" dest="A2" event="attch_case_1"/>
+		<Transition source="A2" dest="A0" event="compl_case_1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel1-DefineNewEvents" type="Plant">
+<Automaton name="LowLevel1_DefineNewEvents" type="Plant">
 	<Events>
-		<Event id="attch_ptA-1" controllable="true"/>
-		<Event id="attch_ptB-1" controllable="true"/>
-		<Event id="finA_attch-1" controllable="true"/>
-		<Event id="finB_attch-1" controllable="true"/>
+		<Event id="attch_ptA_1" controllable="true"/>
+		<Event id="attch_ptB_1" controllable="true"/>
+		<Event id="finA_attch_1" controllable="true"/>
+		<Event id="finB_attch_1" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A0" event="attch_ptA-1"/>
-		<Transition source="A0" dest="A0" event="attch_ptB-1"/>
-		<Transition source="A0" dest="A0" event="finA_attch-1"/>
-		<Transition source="A0" dest="A0" event="finB_attch-1"/>
+		<Transition source="A0" dest="A0" event="attch_ptA_1"/>
+		<Transition source="A0" dest="A0" event="attch_ptB_1"/>
+		<Transition source="A0" dest="A0" event="finA_attch_1"/>
+		<Transition source="A0" dest="A0" event="finB_attch_1"/>
 	</Transitions>
 </Automaton>
 
 <!-- SUPERVISORS FOR LOW LEVEL 1 -->
-<Automaton name="LowLevel1-InternalInterface" type="Supervisor">
+<Automaton name="LowLevel1_InternalInterface" type="Supervisor">
 	<Events>
-		<Event id="start_pol-1" controllable="true"/>
-		<Event id="compl_pol-1" controllable="false"/>
-		<Event id="attch_ptA-1" controllable="true"/>
-		<Event id="finA_attch-1" controllable="true"/>
-		<Event id="attch_ptB-1" controllable="true"/>
-		<Event id="finB_attch-1" controllable="true"/>
-		<Event id="start_case-1" controllable="true"/>
-		<Event id="compl_case-1" controllable="false"/>
+		<Event id="start_pol_1" controllable="true"/>
+		<Event id="compl_pol_1" controllable="false"/>
+		<Event id="attch_ptA_1" controllable="true"/>
+		<Event id="finA_attch_1" controllable="true"/>
+		<Event id="attch_ptB_1" controllable="true"/>
+		<Event id="finB_attch_1" controllable="true"/>
+		<Event id="start_case_1" controllable="true"/>
+		<Event id="compl_case_1" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -359,39 +359,39 @@
 		<State id="A4"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="start_pol-1"/>
-		<Transition source="A1" dest="A0" event="compl_pol-1"/>
-		<Transition source="A0" dest="A2" event="attch_ptA-1"/>
-		<Transition source="A2" dest="A0" event="finA_attch-1"/>
-		<Transition source="A0" dest="A3" event="attch_ptB-1"/>
-		<Transition source="A3" dest="A0" event="finB_attch-1"/>
-		<Transition source="A0" dest="A4" event="start_case-1"/>
-		<Transition source="A4" dest="A0" event="compl_case-1"/>
+		<Transition source="A0" dest="A1" event="start_pol_1"/>
+		<Transition source="A1" dest="A0" event="compl_pol_1"/>
+		<Transition source="A0" dest="A2" event="attch_ptA_1"/>
+		<Transition source="A2" dest="A0" event="finA_attch_1"/>
+		<Transition source="A0" dest="A3" event="attch_ptB_1"/>
+		<Transition source="A3" dest="A0" event="finB_attch_1"/>
+		<Transition source="A0" dest="A4" event="start_case_1"/>
+		<Transition source="A4" dest="A0" event="compl_case_1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel1-SequenceTasks" type="Supervisor">
+<Automaton name="LowLevel1_SequenceTasks" type="Supervisor">
 	<Events>
-		<Event id="fin_exit-1" controllable="false"/>
-		<Event id="part_ent-1" controllable="true"/>
-		<Event id="part_arr1-1" controllable="false"/>
-		<Event id="start_pol-1" controllable="true"/>
-		<Event id="compl_pol-1" controllable="false"/>
-		<Event id="part_lv1-1" controllable="true"/>
+		<Event id="fin_exit_1" controllable="false"/>
+		<Event id="part_ent_1" controllable="true"/>
+		<Event id="part_arr1_1" controllable="false"/>
+		<Event id="start_pol_1" controllable="true"/>
+		<Event id="compl_pol_1" controllable="false"/>
+		<Event id="part_lv1_1" controllable="true"/>
         <!-- Leduc is confusing here, it's probably controllable, though -->
-		<Event id="part_lvExit-1" controllable="true"/>
-		<Event id="part_arr2-1" controllable="false"/>
-		<Event id="recog_A-1" controllable="false"/>
-		<Event id="recog_B-1" controllable="false"/>
-		<Event id="attch_ptA-1" controllable="true"/>
-		<Event id="attch_ptB-1" controllable="true"/>
-		<Event id="finA_attch-1" controllable="true"/>
-		<Event id="finB_attch-1" controllable="true"/>
-		<Event id="part_lv2-1" controllable="true"/>
-		<Event id="part_arr3-1" controllable="false"/>
-		<Event id="start_case-1" controllable="true"/>
-		<Event id="compl_case-1" controllable="false"/>
-		<Event id="part_lv3-1" controllable="true"/>
-		<Event id="str_exit-1" controllable="true"/>
+		<Event id="part_lvExit_1" controllable="true"/>
+		<Event id="part_arr2_1" controllable="false"/>
+		<Event id="recog_A_1" controllable="false"/>
+		<Event id="recog_B_1" controllable="false"/>
+		<Event id="attch_ptA_1" controllable="true"/>
+		<Event id="attch_ptB_1" controllable="true"/>
+		<Event id="finA_attch_1" controllable="true"/>
+		<Event id="finB_attch_1" controllable="true"/>
+		<Event id="part_lv2_1" controllable="true"/>
+		<Event id="part_arr3_1" controllable="false"/>
+		<Event id="start_case_1" controllable="true"/>
+		<Event id="compl_case_1" controllable="false"/>
+		<Event id="part_lv3_1" controllable="true"/>
+		<Event id="str_exit_1" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -413,36 +413,36 @@
 		<State id="A16"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A0" event="fin_exit-1"/>
-		<Transition source="A0" dest="A1" event="part_ent-1"/>
-		<Transition source="A1" dest="A2" event="part_arr1-1"/>
-		<Transition source="A2" dest="A3" event="start_pol-1"/>
-		<Transition source="A3" dest="A4" event="compl_pol-1"/>
-		<Transition source="A4" dest="A5" event="part_lv1-1"/>
-		<Transition source="A5" dest="A5" event="part_lvExit-1"/>
-		<Transition source="A5" dest="A5" event="part_arr2-1"/>
-		<Transition source="A5" dest="A6" event="recog_A-1"/>
-		<Transition source="A5" dest="A8" event="recog_B-1"/>
-		<Transition source="A6" dest="A7" event="attch_ptA-1"/>
-		<Transition source="A8" dest="A9" event="attch_ptB-1"/>
-		<Transition source="A7" dest="A10" event="finA_attch-1"/>
-		<Transition source="A9" dest="A10" event="finB_attch-1"/>
-		<Transition source="A10" dest="A11" event="part_lv2-1"/>
-		<Transition source="A11" dest="A12" event="part_arr3-1"/>
-		<Transition source="A12" dest="A13" event="start_case-1"/>
-		<Transition source="A13" dest="A14" event="compl_case-1"/>
-		<Transition source="A14" dest="A15" event="part_lv3-1"/>
-		<Transition source="A15" dest="A16" event="part_arr1-1"/>
-		<Transition source="A16" dest="A16" event="part_lv1-1"/>
-		<Transition source="A16" dest="A0" event="str_exit-1"/>
+		<Transition source="A0" dest="A0" event="fin_exit_1"/>
+		<Transition source="A0" dest="A1" event="part_ent_1"/>
+		<Transition source="A1" dest="A2" event="part_arr1_1"/>
+		<Transition source="A2" dest="A3" event="start_pol_1"/>
+		<Transition source="A3" dest="A4" event="compl_pol_1"/>
+		<Transition source="A4" dest="A5" event="part_lv1_1"/>
+		<Transition source="A5" dest="A5" event="part_lvExit_1"/>
+		<Transition source="A5" dest="A5" event="part_arr2_1"/>
+		<Transition source="A5" dest="A6" event="recog_A_1"/>
+		<Transition source="A5" dest="A8" event="recog_B_1"/>
+		<Transition source="A6" dest="A7" event="attch_ptA_1"/>
+		<Transition source="A8" dest="A9" event="attch_ptB_1"/>
+		<Transition source="A7" dest="A10" event="finA_attch_1"/>
+		<Transition source="A9" dest="A10" event="finB_attch_1"/>
+		<Transition source="A10" dest="A11" event="part_lv2_1"/>
+		<Transition source="A11" dest="A12" event="part_arr3_1"/>
+		<Transition source="A12" dest="A13" event="start_case_1"/>
+		<Transition source="A13" dest="A14" event="compl_case_1"/>
+		<Transition source="A14" dest="A15" event="part_lv3_1"/>
+		<Transition source="A15" dest="A16" event="part_arr1_1"/>
+		<Transition source="A16" dest="A16" event="part_lv1_1"/>
+		<Transition source="A16" dest="A0" event="str_exit_1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel1-PolishingSequence" type="Supervisor">
+<Automaton name="LowLevel1_PolishingSequence" type="Supervisor">
 	<Events>
-		<Event id="start_pol-1" controllable="true"/>
-		<Event id="dip_acid-1" controllable="true"/>
-		<Event id="polish-1" controllable="true"/>
-		<Event id="str_rlse-1" controllable="true"/>
+		<Event id="start_pol_1" controllable="true"/>
+		<Event id="dip_acid_1" controllable="true"/>
+		<Event id="polish_1" controllable="true"/>
+		<Event id="str_rlse_1" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -453,26 +453,26 @@
 		<State id="A5"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="start_pol-1"/>
-		<Transition source="A1" dest="A2" event="dip_acid-1"/>
-		<Transition source="A2" dest="A3" event="polish-1"/>
-		<Transition source="A3" dest="A4" event="dip_acid-1"/>
-		<Transition source="A4" dest="A5" event="polish-1"/>
-		<Transition source="A5" dest="A0" event="str_rlse-1"/>
+		<Transition source="A0" dest="A1" event="start_pol_1"/>
+		<Transition source="A1" dest="A2" event="dip_acid_1"/>
+		<Transition source="A2" dest="A3" event="polish_1"/>
+		<Transition source="A3" dest="A4" event="dip_acid_1"/>
+		<Transition source="A4" dest="A5" event="polish_1"/>
+		<Transition source="A5" dest="A0" event="str_rlse_1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel1-AffixPart" type="Supervisor">
+<Automaton name="LowLevel1_AffixPart" type="Supervisor">
 	<Events>
-		<Event id="attch_ptA-1" controllable="true"/>
-		<Event id="attch_ptB-1" controllable="true"/>
-		<Event id="take_pt-1" controllable="true"/>
-		<Event id="str_ptA-1" controllable="true"/>
-		<Event id="str_ptB-1" controllable="true"/>
-		<Event id="cmpl_A-1" controllable="false"/>
-		<Event id="cmpl_B-1" controllable="false"/>
-		<Event id="ret_pt-1" controllable="false"/>
-		<Event id="finA_attch-1" controllable="true"/>
-		<Event id="finB_attch-1" controllable="true"/>
+		<Event id="attch_ptA_1" controllable="true"/>
+		<Event id="attch_ptB_1" controllable="true"/>
+		<Event id="take_pt_1" controllable="true"/>
+		<Event id="str_ptA_1" controllable="true"/>
+		<Event id="str_ptB_1" controllable="true"/>
+		<Event id="cmpl_A_1" controllable="false"/>
+		<Event id="cmpl_B_1" controllable="false"/>
+		<Event id="ret_pt_1" controllable="false"/>
+		<Event id="finA_attch_1" controllable="true"/>
+		<Event id="finB_attch_1" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -488,52 +488,52 @@
 		<State id="A10"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="attch_ptA-1"/>
-		<Transition source="A1" dest="A2" event="take_pt-1"/>
-		<Transition source="A2" dest="A3" event="str_ptA-1"/>
-		<Transition source="A3" dest="A4" event="cmpl_A-1"/>
-		<Transition source="A4" dest="A5" event="ret_pt-1"/>
-		<Transition source="A5" dest="A0" event="finA_attch-1"/>
-		<Transition source="A0" dest="A6" event="attch_ptB-1"/>
-		<Transition source="A6" dest="A7" event="take_pt-1"/>
-		<Transition source="A7" dest="A8" event="str_ptB-1"/>
-		<Transition source="A8" dest="A9" event="cmpl_B-1"/>
-		<Transition source="A9" dest="A10" event="ret_pt-1"/>
-		<Transition source="A10" dest="A0" event="finB_attch-1"/>
+		<Transition source="A0" dest="A1" event="attch_ptA_1"/>
+		<Transition source="A1" dest="A2" event="take_pt_1"/>
+		<Transition source="A2" dest="A3" event="str_ptA_1"/>
+		<Transition source="A3" dest="A4" event="cmpl_A_1"/>
+		<Transition source="A4" dest="A5" event="ret_pt_1"/>
+		<Transition source="A5" dest="A0" event="finA_attch_1"/>
+		<Transition source="A0" dest="A6" event="attch_ptB_1"/>
+		<Transition source="A6" dest="A7" event="take_pt_1"/>
+		<Transition source="A7" dest="A8" event="str_ptB_1"/>
+		<Transition source="A8" dest="A9" event="cmpl_B_1"/>
+		<Transition source="A9" dest="A10" event="ret_pt_1"/>
+		<Transition source="A10" dest="A0" event="finB_attch_1"/>
 	</Transitions>
 </Automaton>
 
 <!-- INTERFACE BETWEEN THE HIGH LEVEL AND LOW LEVEL 2 -->
-<Automaton name="Interface HighLevel/LowLevel2" type="Interface">
+<Automaton name="Interface_HighLevel_LowLevel2" type="Interface">
 	<Events>
-		<Event id="part_ent-2" controllable="true"/>
-		<Event id="fin_exit-2" controllable="false"/>
+		<Event id="part_ent_2" controllable="true"/>
+		<Event id="fin_exit_2" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
 		<State id="A1"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="part_ent-2"/>
-		<Transition source="A1" dest="A0" event="fin_exit-2"/>
+		<Transition source="A0" dest="A1" event="part_ent_2"/>
+		<Transition source="A1" dest="A0" event="fin_exit_2"/>
 	</Transitions>
 </Automaton>
 
 <!-- PLANTS FOR LOW LEVEL 2 -->
 <Automaton name="LowLevel2-PathFlowModel" type="Plant">
 	<Events>
-		<Event id="part_ent-2" controllable="true"/>
-		<Event id="part_arr1-2" controllable="false"/>
-		<Event id="part_lv1-2" controllable="true"/>
-		<Event id="part_lvExit-2" controllable="true"/>
-		<Event id="part_arr2-2" controllable="false"/>
-		<Event id="recog_A-2" controllable="false"/>
-		<Event id="recog_B-2" controllable="false"/>
-		<Event id="part_lv2-2" controllable="true"/>
-		<Event id="part_arr3-2" controllable="false"/>
-		<Event id="part_lv3-2" controllable="true"/>
-		<Event id="str_exit-2" controllable="true"/>
-		<Event id="fin_exit-2" controllable="false"/>
+		<Event id="part_ent_2" controllable="true"/>
+		<Event id="part_arr1_2" controllable="false"/>
+		<Event id="part_lv1_2" controllable="true"/>
+		<Event id="part_lvExit_2" controllable="true"/>
+		<Event id="part_arr2_2" controllable="false"/>
+		<Event id="recog_A_2" controllable="false"/>
+		<Event id="recog_B_2" controllable="false"/>
+		<Event id="part_lv2_2" controllable="true"/>
+		<Event id="part_arr3_2" controllable="false"/>
+		<Event id="part_lv3_2" controllable="true"/>
+		<Event id="str_exit_2" controllable="true"/>
+		<Event id="fin_exit_2" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -548,28 +548,28 @@
 		<State id="A9"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="part_ent-2"/>
-		<Transition source="A1" dest="A2" event="part_arr1-2"/>
-		<Transition source="A2" dest="A3" event="part_lv1-2"/>
-		<Transition source="A3" dest="A4" event="part_lvExit-2"/>
-		<Transition source="A4" dest="A5" event="part_arr2-2"/>
-		<Transition source="A5" dest="A6" event="recog_A-2"/>
-		<Transition source="A5" dest="A6" event="recog_B-2"/>
-		<Transition source="A6" dest="A7" event="part_lv2-2"/>
-		<Transition source="A7" dest="A8" event="part_arr3-2"/>
-		<Transition source="A8" dest="A1" event="part_lv3-2"/>
-		<Transition source="A3" dest="A9" event="str_exit-2"/>
-		<Transition source="A9" dest="A0" event="fin_exit-2"/>
+		<Transition source="A0" dest="A1" event="part_ent_2"/>
+		<Transition source="A1" dest="A2" event="part_arr1_2"/>
+		<Transition source="A2" dest="A3" event="part_lv1_2"/>
+		<Transition source="A3" dest="A4" event="part_lvExit_2"/>
+		<Transition source="A4" dest="A5" event="part_arr2_2"/>
+		<Transition source="A5" dest="A6" event="recog_A_2"/>
+		<Transition source="A5" dest="A6" event="recog_B_2"/>
+		<Transition source="A6" dest="A7" event="part_lv2_2"/>
+		<Transition source="A7" dest="A8" event="part_arr3_2"/>
+		<Transition source="A8" dest="A1" event="part_lv3_2"/>
+		<Transition source="A3" dest="A9" event="str_exit_2"/>
+		<Transition source="A9" dest="A0" event="fin_exit_2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel2-AttachPart" type="Plant">
+<Automaton name="LowLevel2_AttachPart" type="Plant">
 	<Events>
-		<Event id="take_pt-2" controllable="true"/>
-		<Event id="str_ptA-2" controllable="true"/>
-		<Event id="str_ptB-2" controllable="true"/>
-		<Event id="cmpl_A-2" controllable="false"/>
-		<Event id="cmpl_B-2" controllable="false"/>
-		<Event id="ret_pt-2" controllable="false"/>
+		<Event id="take_pt_2" controllable="true"/>
+		<Event id="str_ptA_2" controllable="true"/>
+		<Event id="str_ptB_2" controllable="true"/>
+		<Event id="cmpl_A_2" controllable="false"/>
+		<Event id="cmpl_B_2" controllable="false"/>
+		<Event id="ret_pt_2" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -579,21 +579,21 @@
 		<State id="A4"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="take_pt-2"/>
-		<Transition source="A1" dest="A2" event="str_ptA-2"/>
-		<Transition source="A1" dest="A3" event="str_ptB-2"/>
-		<Transition source="A2" dest="A4" event="cmpl_A-2"/>
-		<Transition source="A3" dest="A4" event="cmpl_B-2"/>
-		<Transition source="A4" dest="A0" event="ret_pt-2"/>
+		<Transition source="A0" dest="A1" event="take_pt_2"/>
+		<Transition source="A1" dest="A2" event="str_ptA_2"/>
+		<Transition source="A1" dest="A3" event="str_ptB_2"/>
+		<Transition source="A2" dest="A4" event="cmpl_A_2"/>
+		<Transition source="A3" dest="A4" event="cmpl_B_2"/>
+		<Transition source="A4" dest="A0" event="ret_pt_2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel2-PolishPart" type="Plant">
+<Automaton name="LowLevel2_PolishPart" type="Plant">
 	<Events>
-		<Event id="start_pol-2" controllable="true"/>
-		<Event id="dip_acid-2" controllable="true"/>
-		<Event id="polish-2" controllable="true"/>
-		<Event id="str_rlse-2" controllable="true"/>
-		<Event id="compl_pol-2" controllable="false"/>
+		<Event id="start_pol_2" controllable="true"/>
+		<Event id="dip_acid_2" controllable="true"/>
+		<Event id="polish_2" controllable="true"/>
+		<Event id="str_rlse_2" controllable="true"/>
+		<Event id="compl_pol_2" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -601,18 +601,18 @@
 		<State id="A2"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="start_pol-2"/>
-		<Transition source="A1" dest="A1" event="dip_acid-2"/>
-		<Transition source="A1" dest="A1" event="polish-2"/>
-		<Transition source="A1" dest="A2" event="str_rlse-2"/>
-		<Transition source="A2" dest="A0" event="compl_pol-2"/>
+		<Transition source="A0" dest="A1" event="start_pol_2"/>
+		<Transition source="A1" dest="A1" event="dip_acid_2"/>
+		<Transition source="A1" dest="A1" event="polish_2"/>
+		<Transition source="A1" dest="A2" event="str_rlse_2"/>
+		<Transition source="A2" dest="A0" event="compl_pol_2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel2-AttachCase" type="Plant">
+<Automaton name="LowLevel2_AttachCase" type="Plant">
 	<Events>
-		<Event id="start_case-2" controllable="true"/>
-		<Event id="attch_case-2" controllable="false"/>
-		<Event id="compl_case-2" controllable="false"/>
+		<Event id="start_case_2" controllable="true"/>
+		<Event id="attch_case_2" controllable="false"/>
+		<Event id="compl_case_2" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -620,40 +620,40 @@
 		<State id="A2"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="start_case-2"/>
-		<Transition source="A1" dest="A2" event="attch_case-2"/>
-		<Transition source="A2" dest="A0" event="compl_case-2"/>
+		<Transition source="A0" dest="A1" event="start_case_2"/>
+		<Transition source="A1" dest="A2" event="attch_case_2"/>
+		<Transition source="A2" dest="A0" event="compl_case_2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel2-DefineNewEvents" type="Plant">
+<Automaton name="LowLevel2_DefineNewEvents" type="Plant">
 	<Events>
-		<Event id="attch_ptA-2" controllable="true"/>
-		<Event id="attch_ptB-2" controllable="true"/>
-		<Event id="finA_attch-2" controllable="true"/>
-		<Event id="finB_attch-2" controllable="true"/>
+		<Event id="attch_ptA_2" controllable="true"/>
+		<Event id="attch_ptB_2" controllable="true"/>
+		<Event id="finA_attch_2" controllable="true"/>
+		<Event id="finB_attch_2" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A0" event="attch_ptA-2"/>
-		<Transition source="A0" dest="A0" event="attch_ptB-2"/>
-		<Transition source="A0" dest="A0" event="finA_attch-2"/>
-		<Transition source="A0" dest="A0" event="finB_attch-2"/>
+		<Transition source="A0" dest="A0" event="attch_ptA_2"/>
+		<Transition source="A0" dest="A0" event="attch_ptB_2"/>
+		<Transition source="A0" dest="A0" event="finA_attch_2"/>
+		<Transition source="A0" dest="A0" event="finB_attch_2"/>
 	</Transitions>
 </Automaton>
 
 <!-- SUPERVISORS FOR LOW LEVEL 2 -->
-<Automaton name="LowLevel2-InternalInterface" type="Supervisor">
+<Automaton name="LowLevel2_InternalInterface" type="Supervisor">
 	<Events>
-		<Event id="start_pol-2" controllable="true"/>
-		<Event id="compl_pol-2" controllable="false"/>
-		<Event id="attch_ptA-2" controllable="true"/>
-		<Event id="finA_attch-2" controllable="true"/>
-		<Event id="attch_ptB-2" controllable="true"/>
-		<Event id="finB_attch-2" controllable="true"/>
-		<Event id="start_case-2" controllable="true"/>
-		<Event id="compl_case-2" controllable="false"/>
+		<Event id="start_pol_2" controllable="true"/>
+		<Event id="compl_pol_2" controllable="false"/>
+		<Event id="attch_ptA_2" controllable="true"/>
+		<Event id="finA_attch_2" controllable="true"/>
+		<Event id="attch_ptB_2" controllable="true"/>
+		<Event id="finB_attch_2" controllable="true"/>
+		<Event id="start_case_2" controllable="true"/>
+		<Event id="compl_case_2" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -663,39 +663,39 @@
 		<State id="A4"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="start_pol-2"/>
-		<Transition source="A1" dest="A0" event="compl_pol-2"/>
-		<Transition source="A0" dest="A2" event="attch_ptA-2"/>
-		<Transition source="A2" dest="A0" event="finA_attch-2"/>
-		<Transition source="A0" dest="A3" event="attch_ptB-2"/>
-		<Transition source="A3" dest="A0" event="finB_attch-2"/>
-		<Transition source="A0" dest="A4" event="start_case-2"/>
-		<Transition source="A4" dest="A0" event="compl_case-2"/>
+		<Transition source="A0" dest="A1" event="start_pol_2"/>
+		<Transition source="A1" dest="A0" event="compl_pol_2"/>
+		<Transition source="A0" dest="A2" event="attch_ptA_2"/>
+		<Transition source="A2" dest="A0" event="finA_attch_2"/>
+		<Transition source="A0" dest="A3" event="attch_ptB_2"/>
+		<Transition source="A3" dest="A0" event="finB_attch_2"/>
+		<Transition source="A0" dest="A4" event="start_case_2"/>
+		<Transition source="A4" dest="A0" event="compl_case_2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel2-SequenceTasks" type="Supervisor">
+<Automaton name="LowLevel2_SequenceTasks" type="Supervisor">
 	<Events>
-		<Event id="fin_exit-2" controllable="false"/>
-		<Event id="part_ent-2" controllable="true"/>
-		<Event id="part_arr1-2" controllable="false"/>
-		<Event id="start_pol-2" controllable="true"/>
-		<Event id="compl_pol-2" controllable="false"/>
-		<Event id="part_lv1-2" controllable="true"/>
+		<Event id="fin_exit_2" controllable="false"/>
+		<Event id="part_ent_2" controllable="true"/>
+		<Event id="part_arr1_2" controllable="false"/>
+		<Event id="start_pol_2" controllable="true"/>
+		<Event id="compl_pol_2" controllable="false"/>
+		<Event id="part_lv1_2" controllable="true"/>
         <!-- Leduc is confusing here, it's probably controllable, though -->
-		<Event id="part_lvExit-2" controllable="true"/>
-		<Event id="part_arr2-2" controllable="false"/>
-		<Event id="recog_A-2" controllable="false"/>
-		<Event id="recog_B-2" controllable="false"/>
-		<Event id="attch_ptA-2" controllable="true"/>
-		<Event id="attch_ptB-2" controllable="true"/>
-		<Event id="finA_attch-2" controllable="true"/>
-		<Event id="finB_attch-2" controllable="true"/>
-		<Event id="part_lv2-2" controllable="true"/>
-		<Event id="part_arr3-2" controllable="false"/>
-		<Event id="start_case-2" controllable="true"/>
-		<Event id="compl_case-2" controllable="false"/>
-		<Event id="part_lv3-2" controllable="true"/>
-		<Event id="str_exit-2" controllable="true"/>
+		<Event id="part_lvExit_2" controllable="true"/>
+		<Event id="part_arr2_2" controllable="false"/>
+		<Event id="recog_A_2" controllable="false"/>
+		<Event id="recog_B_2" controllable="false"/>
+		<Event id="attch_ptA_2" controllable="true"/>
+		<Event id="attch_ptB_2" controllable="true"/>
+		<Event id="finA_attch_2" controllable="true"/>
+		<Event id="finB_attch_2" controllable="true"/>
+		<Event id="part_lv2_2" controllable="true"/>
+		<Event id="part_arr3_2" controllable="false"/>
+		<Event id="start_case_2" controllable="true"/>
+		<Event id="compl_case_2" controllable="false"/>
+		<Event id="part_lv3_2" controllable="true"/>
+		<Event id="str_exit_2" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -717,36 +717,36 @@
 		<State id="A16"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A0" event="fin_exit-2"/>
-		<Transition source="A0" dest="A1" event="part_ent-2"/>
-		<Transition source="A1" dest="A2" event="part_arr1-2"/>
-		<Transition source="A2" dest="A3" event="start_pol-2"/>
-		<Transition source="A3" dest="A4" event="compl_pol-2"/>
-		<Transition source="A4" dest="A5" event="part_lv1-2"/>
-		<Transition source="A5" dest="A5" event="part_lvExit-2"/>
-		<Transition source="A5" dest="A5" event="part_arr2-2"/>
-		<Transition source="A5" dest="A6" event="recog_A-2"/>
-		<Transition source="A5" dest="A8" event="recog_B-2"/>
-		<Transition source="A6" dest="A7" event="attch_ptA-2"/>
-		<Transition source="A8" dest="A9" event="attch_ptB-2"/>
-		<Transition source="A7" dest="A10" event="finA_attch-2"/>
-		<Transition source="A9" dest="A10" event="finB_attch-2"/>
-		<Transition source="A10" dest="A11" event="part_lv2-2"/>
-		<Transition source="A11" dest="A12" event="part_arr3-2"/>
-		<Transition source="A12" dest="A13" event="start_case-2"/>
-		<Transition source="A13" dest="A14" event="compl_case-2"/>
-		<Transition source="A14" dest="A15" event="part_lv3-2"/>
-		<Transition source="A15" dest="A16" event="part_arr1-2"/>
-		<Transition source="A16" dest="A16" event="part_lv1-2"/>
-		<Transition source="A16" dest="A0" event="str_exit-2"/>
+		<Transition source="A0" dest="A0" event="fin_exit_2"/>
+		<Transition source="A0" dest="A1" event="part_ent_2"/>
+		<Transition source="A1" dest="A2" event="part_arr1_2"/>
+		<Transition source="A2" dest="A3" event="start_pol_2"/>
+		<Transition source="A3" dest="A4" event="compl_pol_2"/>
+		<Transition source="A4" dest="A5" event="part_lv1_2"/>
+		<Transition source="A5" dest="A5" event="part_lvExit_2"/>
+		<Transition source="A5" dest="A5" event="part_arr2_2"/>
+		<Transition source="A5" dest="A6" event="recog_A_2"/>
+		<Transition source="A5" dest="A8" event="recog_B_2"/>
+		<Transition source="A6" dest="A7" event="attch_ptA_2"/>
+		<Transition source="A8" dest="A9" event="attch_ptB_2"/>
+		<Transition source="A7" dest="A10" event="finA_attch_2"/>
+		<Transition source="A9" dest="A10" event="finB_attch_2"/>
+		<Transition source="A10" dest="A11" event="part_lv2_2"/>
+		<Transition source="A11" dest="A12" event="part_arr3_2"/>
+		<Transition source="A12" dest="A13" event="start_case_2"/>
+		<Transition source="A13" dest="A14" event="compl_case_2"/>
+		<Transition source="A14" dest="A15" event="part_lv3_2"/>
+		<Transition source="A15" dest="A16" event="part_arr1_2"/>
+		<Transition source="A16" dest="A16" event="part_lv1_2"/>
+		<Transition source="A16" dest="A0" event="str_exit_2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel2-PolishingSequence" type="Supervisor">
+<Automaton name="LowLevel2_PolishingSequence" type="Supervisor">
 	<Events>
-		<Event id="start_pol-2" controllable="true"/>
-		<Event id="dip_acid-2" controllable="true"/>
-		<Event id="polish-2" controllable="true"/>
-		<Event id="str_rlse-2" controllable="true"/>
+		<Event id="start_pol_2" controllable="true"/>
+		<Event id="dip_acid_2" controllable="true"/>
+		<Event id="polish_2" controllable="true"/>
+		<Event id="str_rlse_2" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -757,26 +757,26 @@
 		<State id="A5"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="start_pol-2"/>
-		<Transition source="A1" dest="A2" event="dip_acid-2"/>
-		<Transition source="A2" dest="A3" event="polish-2"/>
-		<Transition source="A3" dest="A4" event="dip_acid-2"/>
-		<Transition source="A4" dest="A5" event="polish-2"/>
-		<Transition source="A5" dest="A0" event="str_rlse-2"/>
+		<Transition source="A0" dest="A1" event="start_pol_2"/>
+		<Transition source="A1" dest="A2" event="dip_acid_2"/>
+		<Transition source="A2" dest="A3" event="polish_2"/>
+		<Transition source="A3" dest="A4" event="dip_acid_2"/>
+		<Transition source="A4" dest="A5" event="polish_2"/>
+		<Transition source="A5" dest="A0" event="str_rlse_2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel2-AffixPart" type="Supervisor">
+<Automaton name="LowLevel2_AffixPart" type="Supervisor">
 	<Events>
-		<Event id="attch_ptA-2" controllable="true"/>
-		<Event id="attch_ptB-2" controllable="true"/>
-		<Event id="take_pt-2" controllable="true"/>
-		<Event id="str_ptA-2" controllable="true"/>
-		<Event id="str_ptB-2" controllable="true"/>
-		<Event id="cmpl_A-2" controllable="false"/>
-		<Event id="cmpl_B-2" controllable="false"/>
-		<Event id="ret_pt-2" controllable="false"/>
-		<Event id="finA_attch-2" controllable="true"/>
-		<Event id="finB_attch-2" controllable="true"/>
+		<Event id="attch_ptA_2" controllable="true"/>
+		<Event id="attch_ptB_2" controllable="true"/>
+		<Event id="take_pt_2" controllable="true"/>
+		<Event id="str_ptA_2" controllable="true"/>
+		<Event id="str_ptB_2" controllable="true"/>
+		<Event id="cmpl_A_2" controllable="false"/>
+		<Event id="cmpl_B_2" controllable="false"/>
+		<Event id="ret_pt_2" controllable="false"/>
+		<Event id="finA_attch_2" controllable="true"/>
+		<Event id="finB_attch_2" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -792,52 +792,52 @@
 		<State id="A10"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="attch_ptA-2"/>
-		<Transition source="A1" dest="A2" event="take_pt-2"/>
-		<Transition source="A2" dest="A3" event="str_ptA-2"/>
-		<Transition source="A3" dest="A4" event="cmpl_A-2"/>
-		<Transition source="A4" dest="A5" event="ret_pt-2"/>
-		<Transition source="A5" dest="A0" event="finA_attch-2"/>
-		<Transition source="A0" dest="A6" event="attch_ptB-2"/>
-		<Transition source="A6" dest="A7" event="take_pt-2"/>
-		<Transition source="A7" dest="A8" event="str_ptB-2"/>
-		<Transition source="A8" dest="A9" event="cmpl_B-2"/>
-		<Transition source="A9" dest="A10" event="ret_pt-2"/>
-		<Transition source="A10" dest="A0" event="finB_attch-2"/>
+		<Transition source="A0" dest="A1" event="attch_ptA_2"/>
+		<Transition source="A1" dest="A2" event="take_pt_2"/>
+		<Transition source="A2" dest="A3" event="str_ptA_2"/>
+		<Transition source="A3" dest="A4" event="cmpl_A_2"/>
+		<Transition source="A4" dest="A5" event="ret_pt_2"/>
+		<Transition source="A5" dest="A0" event="finA_attch_2"/>
+		<Transition source="A0" dest="A6" event="attch_ptB_2"/>
+		<Transition source="A6" dest="A7" event="take_pt_2"/>
+		<Transition source="A7" dest="A8" event="str_ptB_2"/>
+		<Transition source="A8" dest="A9" event="cmpl_B_2"/>
+		<Transition source="A9" dest="A10" event="ret_pt_2"/>
+		<Transition source="A10" dest="A0" event="finB_attch_2"/>
 	</Transitions>
 </Automaton>
 
 <!-- INTERFACE BETWEEN THE HIGH LEVEL AND LOW LEVEL 3 -->
-<Automaton name="Interface HighLevel/LowLevel3" type="Interface">
+<Automaton name="Interface_HighLevel_LowLevel3" type="Interface">
 	<Events>
-		<Event id="part_ent-3" controllable="true"/>
-		<Event id="fin_exit-3" controllable="false"/>
+		<Event id="part_ent_3" controllable="true"/>
+		<Event id="fin_exit_3" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
 		<State id="A1"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="part_ent-3"/>
-		<Transition source="A1" dest="A0" event="fin_exit-3"/>
+		<Transition source="A0" dest="A1" event="part_ent_3"/>
+		<Transition source="A1" dest="A0" event="fin_exit_3"/>
 	</Transitions>
 </Automaton>
 
 <!-- PLANTS FOR LOW LEVEL 3 -->
-<Automaton name="LowLevel3-PathFlowModel" type="Plant">
+<Automaton name="LowLevel3_PathFlowModel" type="Plant">
 	<Events>
-		<Event id="part_ent-3" controllable="true"/>
-		<Event id="part_arr1-3" controllable="false"/>
-		<Event id="part_lv1-3" controllable="true"/>
-		<Event id="part_lvExit-3" controllable="true"/>
-		<Event id="part_arr2-3" controllable="false"/>
-		<Event id="recog_A-3" controllable="false"/>
-		<Event id="recog_B-3" controllable="false"/>
-		<Event id="part_lv2-3" controllable="true"/>
-		<Event id="part_arr3-3" controllable="false"/>
-		<Event id="part_lv3-3" controllable="true"/>
-		<Event id="str_exit-3" controllable="true"/>
-		<Event id="fin_exit-3" controllable="false"/>
+		<Event id="part_ent_3" controllable="true"/>
+		<Event id="part_arr1_3" controllable="false"/>
+		<Event id="part_lv1_3" controllable="true"/>
+		<Event id="part_lvExit_3" controllable="true"/>
+		<Event id="part_arr2_3" controllable="false"/>
+		<Event id="recog_A_3" controllable="false"/>
+		<Event id="recog_B_3" controllable="false"/>
+		<Event id="part_lv2_3" controllable="true"/>
+		<Event id="part_arr3_3" controllable="false"/>
+		<Event id="part_lv3_3" controllable="true"/>
+		<Event id="str_exit_3" controllable="true"/>
+		<Event id="fin_exit_3" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -852,28 +852,28 @@
 		<State id="A9"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="part_ent-3"/>
-		<Transition source="A1" dest="A2" event="part_arr1-3"/>
-		<Transition source="A2" dest="A3" event="part_lv1-3"/>
-		<Transition source="A3" dest="A4" event="part_lvExit-3"/>
-		<Transition source="A4" dest="A5" event="part_arr2-3"/>
-		<Transition source="A5" dest="A6" event="recog_A-3"/>
-		<Transition source="A5" dest="A6" event="recog_B-3"/>
-		<Transition source="A6" dest="A7" event="part_lv2-3"/>
-		<Transition source="A7" dest="A8" event="part_arr3-3"/>
-		<Transition source="A8" dest="A1" event="part_lv3-3"/>
-		<Transition source="A3" dest="A9" event="str_exit-3"/>
-		<Transition source="A9" dest="A0" event="fin_exit-3"/>
+		<Transition source="A0" dest="A1" event="part_ent_3"/>
+		<Transition source="A1" dest="A2" event="part_arr1_3"/>
+		<Transition source="A2" dest="A3" event="part_lv1_3"/>
+		<Transition source="A3" dest="A4" event="part_lvExit_3"/>
+		<Transition source="A4" dest="A5" event="part_arr2_3"/>
+		<Transition source="A5" dest="A6" event="recog_A_3"/>
+		<Transition source="A5" dest="A6" event="recog_B_3"/>
+		<Transition source="A6" dest="A7" event="part_lv2_3"/>
+		<Transition source="A7" dest="A8" event="part_arr3_3"/>
+		<Transition source="A8" dest="A1" event="part_lv3_3"/>
+		<Transition source="A3" dest="A9" event="str_exit_3"/>
+		<Transition source="A9" dest="A0" event="fin_exit_3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel3-AttachPart" type="Plant">
+<Automaton name="LowLevel3_AttachPart" type="Plant">
 	<Events>
-		<Event id="take_pt-3" controllable="true"/>
-		<Event id="str_ptA-3" controllable="true"/>
-		<Event id="str_ptB-3" controllable="true"/>
-		<Event id="cmpl_A-3" controllable="false"/>
-		<Event id="cmpl_B-3" controllable="false"/>
-		<Event id="ret_pt-3" controllable="false"/>
+		<Event id="take_pt_3" controllable="true"/>
+		<Event id="str_ptA_3" controllable="true"/>
+		<Event id="str_ptB_3" controllable="true"/>
+		<Event id="cmpl_A_3" controllable="false"/>
+		<Event id="cmpl_B_3" controllable="false"/>
+		<Event id="ret_pt_3" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -883,21 +883,21 @@
 		<State id="A4"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="take_pt-3"/>
-		<Transition source="A1" dest="A2" event="str_ptA-3"/>
-		<Transition source="A1" dest="A3" event="str_ptB-3"/>
-		<Transition source="A2" dest="A4" event="cmpl_A-3"/>
-		<Transition source="A3" dest="A4" event="cmpl_B-3"/>
-		<Transition source="A4" dest="A0" event="ret_pt-3"/>
+		<Transition source="A0" dest="A1" event="take_pt_3"/>
+		<Transition source="A1" dest="A2" event="str_ptA_3"/>
+		<Transition source="A1" dest="A3" event="str_ptB_3"/>
+		<Transition source="A2" dest="A4" event="cmpl_A_3"/>
+		<Transition source="A3" dest="A4" event="cmpl_B_3"/>
+		<Transition source="A4" dest="A0" event="ret_pt_3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel3-PolishPart" type="Plant">
+<Automaton name="LowLevel3_PolishPart" type="Plant">
 	<Events>
-		<Event id="start_pol-3" controllable="true"/>
-		<Event id="dip_acid-3" controllable="true"/>
-		<Event id="polish-3" controllable="true"/>
-		<Event id="str_rlse-3" controllable="true"/>
-		<Event id="compl_pol-3" controllable="false"/>
+		<Event id="start_pol_3" controllable="true"/>
+		<Event id="dip_acid_3" controllable="true"/>
+		<Event id="polish_3" controllable="true"/>
+		<Event id="str_rlse_3" controllable="true"/>
+		<Event id="compl_pol_3" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -905,18 +905,18 @@
 		<State id="A2"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="start_pol-3"/>
-		<Transition source="A1" dest="A1" event="dip_acid-3"/>
-		<Transition source="A1" dest="A1" event="polish-3"/>
-		<Transition source="A1" dest="A2" event="str_rlse-3"/>
-		<Transition source="A2" dest="A0" event="compl_pol-3"/>
+		<Transition source="A0" dest="A1" event="start_pol_3"/>
+		<Transition source="A1" dest="A1" event="dip_acid_3"/>
+		<Transition source="A1" dest="A1" event="polish_3"/>
+		<Transition source="A1" dest="A2" event="str_rlse_3"/>
+		<Transition source="A2" dest="A0" event="compl_pol_3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel3-AttachCase" type="Plant">
+<Automaton name="LowLevel3_AttachCase" type="Plant">
 	<Events>
-		<Event id="start_case-3" controllable="true"/>
-		<Event id="attch_case-3" controllable="false"/>
-		<Event id="compl_case-3" controllable="false"/>
+		<Event id="start_case_3" controllable="true"/>
+		<Event id="attch_case_3" controllable="false"/>
+		<Event id="compl_case_3" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -924,40 +924,40 @@
 		<State id="A2"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="start_case-3"/>
-		<Transition source="A1" dest="A2" event="attch_case-3"/>
-		<Transition source="A2" dest="A0" event="compl_case-3"/>
+		<Transition source="A0" dest="A1" event="start_case_3"/>
+		<Transition source="A1" dest="A2" event="attch_case_3"/>
+		<Transition source="A2" dest="A0" event="compl_case_3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel3-DefineNewEvents" type="Plant">
+<Automaton name="LowLevel3_DefineNewEvents" type="Plant">
 	<Events>
-		<Event id="attch_ptA-3" controllable="true"/>
-		<Event id="attch_ptB-3" controllable="true"/>
-		<Event id="finA_attch-3" controllable="true"/>
-		<Event id="finB_attch-3" controllable="true"/>
+		<Event id="attch_ptA_3" controllable="true"/>
+		<Event id="attch_ptB_3" controllable="true"/>
+		<Event id="finA_attch_3" controllable="true"/>
+		<Event id="finB_attch_3" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A0" event="attch_ptA-3"/>
-		<Transition source="A0" dest="A0" event="attch_ptB-3"/>
-		<Transition source="A0" dest="A0" event="finA_attch-3"/>
-		<Transition source="A0" dest="A0" event="finB_attch-3"/>
+		<Transition source="A0" dest="A0" event="attch_ptA_3"/>
+		<Transition source="A0" dest="A0" event="attch_ptB_3"/>
+		<Transition source="A0" dest="A0" event="finA_attch_3"/>
+		<Transition source="A0" dest="A0" event="finB_attch_3"/>
 	</Transitions>
 </Automaton>
 
 <!-- SUPERVISORS FOR LOW LEVEL 3 -->
-<Automaton name="LowLevel3-InternalInterface" type="Supervisor">
+<Automaton name="LowLevel3_InternalInterface" type="Supervisor">
 	<Events>
-		<Event id="start_pol-3" controllable="true"/>
-		<Event id="compl_pol-3" controllable="false"/>
-		<Event id="attch_ptA-3" controllable="true"/>
-		<Event id="finA_attch-3" controllable="true"/>
-		<Event id="attch_ptB-3" controllable="true"/>
-		<Event id="finB_attch-3" controllable="true"/>
-		<Event id="start_case-3" controllable="true"/>
-		<Event id="compl_case-3" controllable="false"/>
+		<Event id="start_pol_3" controllable="true"/>
+		<Event id="compl_pol_3" controllable="false"/>
+		<Event id="attch_ptA_3" controllable="true"/>
+		<Event id="finA_attch_3" controllable="true"/>
+		<Event id="attch_ptB_3" controllable="true"/>
+		<Event id="finB_attch_3" controllable="true"/>
+		<Event id="start_case_3" controllable="true"/>
+		<Event id="compl_case_3" controllable="false"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -967,39 +967,39 @@
 		<State id="A4"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="start_pol-3"/>
-		<Transition source="A1" dest="A0" event="compl_pol-3"/>
-		<Transition source="A0" dest="A2" event="attch_ptA-3"/>
-		<Transition source="A2" dest="A0" event="finA_attch-3"/>
-		<Transition source="A0" dest="A3" event="attch_ptB-3"/>
-		<Transition source="A3" dest="A0" event="finB_attch-3"/>
-		<Transition source="A0" dest="A4" event="start_case-3"/>
-		<Transition source="A4" dest="A0" event="compl_case-3"/>
+		<Transition source="A0" dest="A1" event="start_pol_3"/>
+		<Transition source="A1" dest="A0" event="compl_pol_3"/>
+		<Transition source="A0" dest="A2" event="attch_ptA_3"/>
+		<Transition source="A2" dest="A0" event="finA_attch_3"/>
+		<Transition source="A0" dest="A3" event="attch_ptB_3"/>
+		<Transition source="A3" dest="A0" event="finB_attch_3"/>
+		<Transition source="A0" dest="A4" event="start_case_3"/>
+		<Transition source="A4" dest="A0" event="compl_case_3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel3-SequenceTasks" type="Supervisor">
+<Automaton name="LowLevel3_SequenceTasks" type="Supervisor">
 	<Events>
-		<Event id="fin_exit-3" controllable="false"/>
-		<Event id="part_ent-3" controllable="true"/>
-		<Event id="part_arr1-3" controllable="false"/>
-		<Event id="start_pol-3" controllable="true"/>
-		<Event id="compl_pol-3" controllable="false"/>
-		<Event id="part_lv1-3" controllable="true"/>
+		<Event id="fin_exit_3" controllable="false"/>
+		<Event id="part_ent_3" controllable="true"/>
+		<Event id="part_arr1_3" controllable="false"/>
+		<Event id="start_pol_3" controllable="true"/>
+		<Event id="compl_pol_3" controllable="false"/>
+		<Event id="part_lv1_3" controllable="true"/>
         <!-- Leduc is confusing here, it's probably controllable, though -->
-		<Event id="part_lvExit-3" controllable="true"/>
-		<Event id="part_arr2-3" controllable="false"/>
-		<Event id="recog_A-3" controllable="false"/>
-		<Event id="recog_B-3" controllable="false"/>
-		<Event id="attch_ptA-3" controllable="true"/>
-		<Event id="attch_ptB-3" controllable="true"/>
-		<Event id="finA_attch-3" controllable="true"/>
-		<Event id="finB_attch-3" controllable="true"/>
-		<Event id="part_lv2-3" controllable="true"/>
-		<Event id="part_arr3-3" controllable="false"/>
-		<Event id="start_case-3" controllable="true"/>
-		<Event id="compl_case-3" controllable="false"/>
-		<Event id="part_lv3-3" controllable="true"/>
-		<Event id="str_exit-3" controllable="true"/>
+		<Event id="part_lvExit_3" controllable="true"/>
+		<Event id="part_arr2_3" controllable="false"/>
+		<Event id="recog_A_3" controllable="false"/>
+		<Event id="recog_B_3" controllable="false"/>
+		<Event id="attch_ptA_3" controllable="true"/>
+		<Event id="attch_ptB_3" controllable="true"/>
+		<Event id="finA_attch_3" controllable="true"/>
+		<Event id="finB_attch_3" controllable="true"/>
+		<Event id="part_lv2_3" controllable="true"/>
+		<Event id="part_arr3_3" controllable="false"/>
+		<Event id="start_case_3" controllable="true"/>
+		<Event id="compl_case_3" controllable="false"/>
+		<Event id="part_lv3_3" controllable="true"/>
+		<Event id="str_exit_3" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -1021,36 +1021,36 @@
 		<State id="A16"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A0" event="fin_exit-3"/>
-		<Transition source="A0" dest="A1" event="part_ent-3"/>
-		<Transition source="A1" dest="A2" event="part_arr1-3"/>
-		<Transition source="A2" dest="A3" event="start_pol-3"/>
-		<Transition source="A3" dest="A4" event="compl_pol-3"/>
-		<Transition source="A4" dest="A5" event="part_lv1-3"/>
-		<Transition source="A5" dest="A5" event="part_lvExit-3"/>
-		<Transition source="A5" dest="A5" event="part_arr2-3"/>
-		<Transition source="A5" dest="A6" event="recog_A-3"/>
-		<Transition source="A5" dest="A8" event="recog_B-3"/>
-		<Transition source="A6" dest="A7" event="attch_ptA-3"/>
-		<Transition source="A8" dest="A9" event="attch_ptB-3"/>
-		<Transition source="A7" dest="A10" event="finA_attch-3"/>
-		<Transition source="A9" dest="A10" event="finB_attch-3"/>
-		<Transition source="A10" dest="A11" event="part_lv2-3"/>
-		<Transition source="A11" dest="A12" event="part_arr3-3"/>
-		<Transition source="A12" dest="A13" event="start_case-3"/>
-		<Transition source="A13" dest="A14" event="compl_case-3"/>
-		<Transition source="A14" dest="A15" event="part_lv3-3"/>
-		<Transition source="A15" dest="A16" event="part_arr1-3"/>
-		<Transition source="A16" dest="A16" event="part_lv1-3"/>
-		<Transition source="A16" dest="A0" event="str_exit-3"/>
+		<Transition source="A0" dest="A0" event="fin_exit_3"/>
+		<Transition source="A0" dest="A1" event="part_ent_3"/>
+		<Transition source="A1" dest="A2" event="part_arr1_3"/>
+		<Transition source="A2" dest="A3" event="start_pol_3"/>
+		<Transition source="A3" dest="A4" event="compl_pol_3"/>
+		<Transition source="A4" dest="A5" event="part_lv1_3"/>
+		<Transition source="A5" dest="A5" event="part_lvExit_3"/>
+		<Transition source="A5" dest="A5" event="part_arr2_3"/>
+		<Transition source="A5" dest="A6" event="recog_A_3"/>
+		<Transition source="A5" dest="A8" event="recog_B_3"/>
+		<Transition source="A6" dest="A7" event="attch_ptA_3"/>
+		<Transition source="A8" dest="A9" event="attch_ptB_3"/>
+		<Transition source="A7" dest="A10" event="finA_attch_3"/>
+		<Transition source="A9" dest="A10" event="finB_attch_3"/>
+		<Transition source="A10" dest="A11" event="part_lv2_3"/>
+		<Transition source="A11" dest="A12" event="part_arr3_3"/>
+		<Transition source="A12" dest="A13" event="start_case_3"/>
+		<Transition source="A13" dest="A14" event="compl_case_3"/>
+		<Transition source="A14" dest="A15" event="part_lv3_3"/>
+		<Transition source="A15" dest="A16" event="part_arr1_3"/>
+		<Transition source="A16" dest="A16" event="part_lv1_3"/>
+		<Transition source="A16" dest="A0" event="str_exit_3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel3-PolishingSequence" type="Supervisor">
+<Automaton name="LowLevel3_PolishingSequence" type="Supervisor">
 	<Events>
-		<Event id="start_pol-3" controllable="true"/>
-		<Event id="dip_acid-3" controllable="true"/>
-		<Event id="polish-3" controllable="true"/>
-		<Event id="str_rlse-3" controllable="true"/>
+		<Event id="start_pol_3" controllable="true"/>
+		<Event id="dip_acid_3" controllable="true"/>
+		<Event id="polish_3" controllable="true"/>
+		<Event id="str_rlse_3" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -1061,26 +1061,26 @@
 		<State id="A5"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="start_pol-3"/>
-		<Transition source="A1" dest="A2" event="dip_acid-3"/>
-		<Transition source="A2" dest="A3" event="polish-3"/>
-		<Transition source="A3" dest="A4" event="dip_acid-3"/>
-		<Transition source="A4" dest="A5" event="polish-3"/>
-		<Transition source="A5" dest="A0" event="str_rlse-3"/>
+		<Transition source="A0" dest="A1" event="start_pol_3"/>
+		<Transition source="A1" dest="A2" event="dip_acid_3"/>
+		<Transition source="A2" dest="A3" event="polish_3"/>
+		<Transition source="A3" dest="A4" event="dip_acid_3"/>
+		<Transition source="A4" dest="A5" event="polish_3"/>
+		<Transition source="A5" dest="A0" event="str_rlse_3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel3-AffixPart" type="Supervisor">
+<Automaton name="LowLevel3_AffixPart" type="Supervisor">
 	<Events>
-		<Event id="attch_ptA-3" controllable="true"/>
-		<Event id="attch_ptB-3" controllable="true"/>
-		<Event id="take_pt-3" controllable="true"/>
-		<Event id="str_ptA-3" controllable="true"/>
-		<Event id="str_ptB-3" controllable="true"/>
-		<Event id="cmpl_A-3" controllable="false"/>
-		<Event id="cmpl_B-3" controllable="false"/>
-		<Event id="ret_pt-3" controllable="false"/>
-		<Event id="finA_attch-3" controllable="true"/>
-		<Event id="finB_attch-3" controllable="true"/>
+		<Event id="attch_ptA_3" controllable="true"/>
+		<Event id="attch_ptB_3" controllable="true"/>
+		<Event id="take_pt_3" controllable="true"/>
+		<Event id="str_ptA_3" controllable="true"/>
+		<Event id="str_ptB_3" controllable="true"/>
+		<Event id="cmpl_A_3" controllable="false"/>
+		<Event id="cmpl_B_3" controllable="false"/>
+		<Event id="ret_pt_3" controllable="false"/>
+		<Event id="finA_attch_3" controllable="true"/>
+		<Event id="finB_attch_3" controllable="true"/>
 	</Events>
 	<States>
 		<State id="A0" initial="true" accepting="true"/>
@@ -1096,18 +1096,18 @@
 		<State id="A10"/>
 	</States>
 	<Transitions>
-		<Transition source="A0" dest="A1" event="attch_ptA-3"/>
-		<Transition source="A1" dest="A2" event="take_pt-3"/>
-		<Transition source="A2" dest="A3" event="str_ptA-3"/>
-		<Transition source="A3" dest="A4" event="cmpl_A-3"/>
-		<Transition source="A4" dest="A5" event="ret_pt-3"/>
-		<Transition source="A5" dest="A0" event="finA_attch-3"/>
-		<Transition source="A0" dest="A6" event="attch_ptB-3"/>
-		<Transition source="A6" dest="A7" event="take_pt-3"/>
-		<Transition source="A7" dest="A8" event="str_ptB-3"/>
-		<Transition source="A8" dest="A9" event="cmpl_B-3"/>
-		<Transition source="A9" dest="A10" event="ret_pt-3"/>
-		<Transition source="A10" dest="A0" event="finB_attch-3"/>
+		<Transition source="A0" dest="A1" event="attch_ptA_3"/>
+		<Transition source="A1" dest="A2" event="take_pt_3"/>
+		<Transition source="A2" dest="A3" event="str_ptA_3"/>
+		<Transition source="A3" dest="A4" event="cmpl_A_3"/>
+		<Transition source="A4" dest="A5" event="ret_pt_3"/>
+		<Transition source="A5" dest="A0" event="finA_attch_3"/>
+		<Transition source="A0" dest="A6" event="attch_ptB_3"/>
+		<Transition source="A6" dest="A7" event="take_pt_3"/>
+		<Transition source="A7" dest="A8" event="str_ptB_3"/>
+		<Transition source="A8" dest="A9" event="cmpl_B_3"/>
+		<Transition source="A9" dest="A10" event="ret_pt_3"/>
+		<Transition source="A10" dest="A0" event="finB_attch_3"/>
 	</Transitions>
 </Automaton>
 </Automata>
