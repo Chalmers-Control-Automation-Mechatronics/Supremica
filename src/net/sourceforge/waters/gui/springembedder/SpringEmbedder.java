@@ -319,10 +319,7 @@ public class SpringEmbedder
     final int numnodes = mNodes.size();
     final int maxnodes = Config.DOT_MAX_NBR_OF_STATES.get();
     if (numnodes > maxnodes) {
-      final String msg = "This graph has " + numnodes + " states.\n" +
-                   "Graphs with more than " + maxnodes +
-                   " states cannot be displayed.";
-      throw new GeometryAbsentException(msg);
+      throw new GeometryAbsentException(numnodes);
     }
   }
 
@@ -330,9 +327,7 @@ public class SpringEmbedder
     throws GeometryAbsentException
   {
     if (group.getGeometry() == null) {
-      throw new GeometryAbsentException
-        ("There is no geometry information for group node '" +
-         group.getName() + "' in this graph!");
+      throw new GeometryAbsentException(group);
     }
   }
 

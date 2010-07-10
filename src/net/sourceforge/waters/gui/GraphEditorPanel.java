@@ -3817,10 +3817,6 @@ public class GraphEditorPanel
                                final SimpleIdentifierSubject ident)
     {
       super(ident, new StateNameInputParser(ident));
-      final StateNameInputParser parser =
-        (StateNameInputParser) getFormattedInputParser();
-      parser.setCell(this);
-
       mNode = node;
       final LabelGeometrySubject geo = node.getLabelGeometry();
       final Point2D pgeo = node.getPointGeometry().getPoint();

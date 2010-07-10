@@ -13,8 +13,6 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.Action;
-import javax.swing.JOptionPane;
-
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
@@ -63,8 +61,9 @@ public class ShowGraphAction
     try {
       root.showEditor(comp);
     } catch (final GeometryAbsentException exception) {
-      JOptionPane.showMessageDialog
-        (root.getRootWindow(), exception.getMessage());
+      final IDE ide = getIDE();
+      final String msg = exception.getMessage(comp);
+      ide.error(msg);
     }
   }
 

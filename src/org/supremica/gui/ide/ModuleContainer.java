@@ -273,29 +273,25 @@ public class ModuleContainer
   }
 
   public ComponentEditorPanel showEditor(final SimpleComponentSubject comp)
+    throws GeometryAbsentException
   {
     final ComponentEditorPanel panel = createComponentEditorPanel(comp);
-    if (panel != null) {
-      mTabPanel.setSelectedComponent(mEditorPanel);
-      mEditorPanel.setRightComponent(panel);
-    }
+    mTabPanel.setSelectedComponent(mEditorPanel);
+    mEditorPanel.setRightComponent(panel);
     return panel;
   }
 
   ComponentEditorPanel createComponentEditorPanel
     (final SimpleComponentSubject comp)
+    throws GeometryAbsentException
   {
     ComponentEditorPanel panel = getComponentEditorPanel(comp);
     if (panel == null) {
       final EditorPanel editorPanel = getEditorPanel();
       final JComponent right = editorPanel.getRightComponent();
       final Dimension oldsize = right.getSize();
-      try {
-        panel = new ComponentEditorPanel(this, comp, oldsize);
-        mComponentToPanelMap.put(comp, panel);
-      } catch (final GeometryAbsentException exception) {
-        JOptionPane.showMessageDialog(getIDE(), exception.getMessage());
-      }
+      panel = new ComponentEditorPanel(this, comp, oldsize);
+      mComponentToPanelMap.put(comp, panel);
     }
     return panel;
   }

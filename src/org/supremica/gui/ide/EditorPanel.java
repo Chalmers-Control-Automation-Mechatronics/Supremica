@@ -34,6 +34,7 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SubPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Subject;
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -144,11 +145,12 @@ public class EditorPanel
     }
 
     public EditorWindowInterface showEditor(final SimpleComponentSubject comp)
+    throws GeometryAbsentException
     {
-        final ComponentEditorPanel panel =
-            mModuleContainer.createComponentEditorPanel(comp);
-        setRightComponent(panel);
-        return panel;
+      final ComponentEditorPanel panel =
+        mModuleContainer.createComponentEditorPanel(comp);
+      setRightComponent(panel);
+      return panel;
     }
 
     public EditorWindowInterface getEditorWindowInterface

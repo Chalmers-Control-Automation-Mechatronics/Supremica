@@ -3,6 +3,7 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -33,7 +34,12 @@ public class DesktopEditAction extends WatersDesktopAction
       final Proxy source = info.getSourceObject();
       if (source instanceof SimpleComponentSubject) {
         final SimpleComponentSubject comp = (SimpleComponentSubject) source;
-        modContainer.showEditor(comp);
+        try {
+          modContainer.showEditor(comp);
+        } catch (final GeometryAbsentException exception) {
+          final String msg = exception.getMessage(comp);
+          ide.error(msg);
+        }
       }
     } else {
       ide.error("Source Information is null!");

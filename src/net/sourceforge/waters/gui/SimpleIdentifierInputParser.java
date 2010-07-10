@@ -10,7 +10,6 @@
 
 package net.sourceforge.waters.gui;
 
-import javax.swing.JFormattedTextField;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
@@ -52,11 +51,6 @@ class SimpleIdentifierInputParser
     return mOldName;
   }
 
-  void setCell(final JFormattedTextField cell)
-  {
-    mCell = cell;
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.FormattedInputParser
@@ -86,7 +80,7 @@ class SimpleIdentifierInputParser
                            final AttributeSet attribs)
     throws BadLocationException
   {
-    final String filtered = filter(text, offset);
+    final String filtered = filter(text);
     if (filtered != null) {
       super.insertString(bypass, offset, filtered, attribs);
     }
@@ -99,32 +93,16 @@ class SimpleIdentifierInputParser
                       final AttributeSet attribs)
     throws BadLocationException
   {
-    final String filtered = filter(text, offset);
+    final String filtered = filter(text);
     if (filtered != null) {
       super.replace(bypass, offset, length, filtered, attribs);
-    }
-  }
-
-  public void remove(final DocumentFilter.FilterBypass bypass,
-                     final int offset,
-                     final int length)
-    throws BadLocationException
-  {
-    final String text = mCell.getText();
-    boolean ok = true;
-    if (offset == 0 && length < text.length()) {
-      final char ch = text.charAt(length);
-      ok = mExpressionParser.isIdentifierStart(ch);
-    }
-    if (ok) {
-      super.remove(bypass, offset, length);
     }
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private String filter(final String text, int offset)
+  private String filter(final String text)
   {
     if (text == null) {
       return null;
@@ -133,11 +111,8 @@ class SimpleIdentifierInputParser
       final StringBuffer buffer = new StringBuffer(len);
       for (int i = 0; i < len; i++) {
         final char ch = text.charAt(i);
-        if (offset == 0 ?
-            mExpressionParser.isIdentifierStart(ch) :
-            mExpressionParser.isIdentifierCharacter(ch)) {
+        if (mExpressionParser.isIdentifierCharacter(ch)) {
           buffer.append(ch);
-          offset++;
         }
       }
       if (buffer.length() == 0) {
@@ -155,6 +130,4 @@ class SimpleIdentifierInputParser
   private final SimpleIdentifierProxy mOldIdentifier;
   private final ExpressionParser mExpressionParser;
 
-  private JFormattedTextField mCell;
-  
 }

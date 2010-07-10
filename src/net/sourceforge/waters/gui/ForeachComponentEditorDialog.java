@@ -107,7 +107,6 @@ public class ForeachComponentEditorDialog
     mVariableInput = new SimpleExpressionCell(ident, nameparser);
     mVariableInput.addActionListener(commithandler);
     mVariableInput.setToolTipText("Enter the name of the index variable");
-    nameparser.setCell(mVariableInput);
     mRangeLabel = new JLabel("Range:");
     final SimpleExpressionProxy oldrange =
       mForeach == null ? null : template.getRange();

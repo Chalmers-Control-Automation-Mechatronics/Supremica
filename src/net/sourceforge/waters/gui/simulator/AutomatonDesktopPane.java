@@ -86,7 +86,7 @@ public class AutomatonDesktopPane
   //# Simple Access
   public boolean automatonIsOpen(final AutomatonProxy automaton)
   {
-    return openAutomaton.containsKey(automaton.getName());
+    return mOpenAutomata.containsKey(automaton.getName());
   }
 
   public void addAutomaton(final String aut,
@@ -94,7 +94,7 @@ public class AutomatonDesktopPane
   {
     if (aut == null)
       return;
-    if (!openAutomaton.containsKey(aut)) {
+    if (!mOpenAutomata.containsKey(aut)) {
       if (clicks == 2) {
         final Map<Proxy,SourceInfo> infomap = container.getSourceInfoMap();
         final AutomatonProxy realAuto = sim.getAutomatonFromName(aut);
@@ -108,17 +108,17 @@ public class AutomatonDesktopPane
             final AutomatonInternalFrame newFrame = new AutomatonInternalFrame
               (realAuto, graph, this, container, sim);
             final ArrayList<Rectangle> otherScreens = new ArrayList<Rectangle>();
-            for (final AutomatonInternalFrame automaton : openAutomaton.values())
+            for (final AutomatonInternalFrame automaton : mOpenAutomata.values())
               otherScreens.add(automaton.getBounds());
             newFrame.setLocation(findLocation(otherScreens, newFrame.getSize()));
             add(newFrame);
             newFrame.moveToFront();
-            openAutomaton.put(aut, newFrame);
+            mOpenAutomata.put(aut, newFrame);
             fireFrameOpenedEvent(aut, newFrame);
             newFrame.setVisible(true);
           } catch (final GeometryAbsentException exception) {
             final IDE ide = container.getIDE();
-            final String msg = exception.getMessage();
+            final String msg = exception.getMessage(comp);
             ide.error(msg);
           }
         }
@@ -130,30 +130,29 @@ public class AutomatonDesktopPane
 
   public void removeAutomaton(final String aut)
   {
-    fireFrameClosedEvent(aut, openAutomaton.get(aut));
-    openAutomaton.remove(aut);
+    fireFrameClosedEvent(aut, mOpenAutomata.get(aut));
+    mOpenAutomata.remove(aut);
   }
 
-  public void onReOpen(final ModuleContainer container, final Simulation sim)
+  public void onReOpen()
   {
-    if (hasBeenEdited)
-    {
+    if (mHasBeenEdited) {
       for (final String name : order) {
-        addAutomaton(name, container, sim, 2);
-        if (openAutomaton.get(name) != null)
-        {
-          openAutomaton.get(name).setPreferredSize(new Dimension((int)oldOpen.get(name).getWidth(), (int)oldOpen.get(name).getHeight()));
-          openAutomaton.get(name).setLocation((int)oldOpen.get(name).getX(), (int)oldOpen.get(name).getY());
+        addAutomaton(name, mContainer, mSim, 2);
+        final AutomatonInternalFrame frame = mOpenAutomata.get(name);
+        if (frame != null) {
+          frame.setPreferredSize(new Dimension((int)oldOpen.get(name).getWidth(), (int)oldOpen.get(name).getHeight()));
+          frame.setLocation((int)oldOpen.get(name).getX(), (int)oldOpen.get(name).getY());
         }
       }
     }
-    hasBeenEdited = false;
+    mHasBeenEdited = false;
   }
 
   private void selectAutomaton(final int clicks, final String aut)
   {
     try {
-      final AutomatonInternalFrame frame = openAutomaton.get(aut);
+      final AutomatonInternalFrame frame = mOpenAutomata.get(aut);
       switch (clicks) {
       case 1:
         frame.setSelected(true);
@@ -232,22 +231,22 @@ public class AutomatonDesktopPane
 
   public void closeAutomaton(final String aut)
   {
-    openAutomaton.get(aut).dispose();
+    mOpenAutomata.get(aut).dispose();
   }
 
   public void closeAllAutomaton()
   {
-    final Set<String> copySet = copySet(openAutomaton.keySet());
+    final Set<String> copySet = copySet(mOpenAutomata.keySet());
     for (final String string : copySet)
-      openAutomaton.get(string).dispose();
+      mOpenAutomata.get(string).dispose();
   }
 
   public void closeOtherAutomaton(final String aut)
   {
-    final Set<String> copySet = copySet(openAutomaton.keySet());
+    final Set<String> copySet = copySet(mOpenAutomata.keySet());
     for (final String string : copySet)
       if (string.compareTo(aut) != 0)
-        openAutomaton.get(string).dispose();
+        mOpenAutomata.get(string).dispose();
   }
 
   public void openOtherAutomaton(final String name)
@@ -269,7 +268,7 @@ public class AutomatonDesktopPane
   public void cascade()
   {
     final ArrayList<Rectangle> previousLocations = new ArrayList<Rectangle>();
-    for (final AutomatonInternalFrame frame : openAutomaton.values())
+    for (final AutomatonInternalFrame frame : mOpenAutomata.values())
     {
       final Point newPoint = findLocation(previousLocations, frame.getSize());
       final Rectangle newRect = new Rectangle(newPoint.x, newPoint.y, (int)frame.getSize().getWidth(), (int)frame.getSize().getHeight());
@@ -281,15 +280,15 @@ public class AutomatonDesktopPane
 
   public void execute (final String aut, final Proxy proxyToFire)
   {
-    if (openAutomaton.get(aut) != null)
+    if (mOpenAutomata.get(aut) != null)
     {
-      openAutomaton.get(aut).execute(proxyToFire);
+      mOpenAutomata.get(aut).execute(proxyToFire);
     }
   }
 
   public void resizeAutomaton(final String name)
   {
-    final AutomatonInternalFrame thisAutomaton = openAutomaton.get(name);
+    final AutomatonInternalFrame thisAutomaton = mOpenAutomata.get(name);
     if (thisAutomaton != null && canResize(name))
     {
       thisAutomaton.resize();
@@ -300,7 +299,7 @@ public class AutomatonDesktopPane
   {
     if (canResizeOther(name))
     {
-      for (final AutomatonInternalFrame frame : openAutomaton.values())
+      for (final AutomatonInternalFrame frame : mOpenAutomata.values())
       {
         if (frame.getTitle() != name && canResize(frame.getTitle()))
         {
@@ -314,7 +313,7 @@ public class AutomatonDesktopPane
   {
     if (canResizeAll())
     {
-      for (final AutomatonInternalFrame frame : openAutomaton.values())
+      for (final AutomatonInternalFrame frame : mOpenAutomata.values())
       {
         if (canResize(frame.getTitle()))
         {
@@ -326,7 +325,7 @@ public class AutomatonDesktopPane
 
   public boolean canResize(final String name)
   {
-    final AutomatonInternalFrame thisAutomaton = openAutomaton.get(name);
+    final AutomatonInternalFrame thisAutomaton = mOpenAutomata.get(name);
     if (thisAutomaton != null)
       return thisAutomaton.canResize();
     else
@@ -335,7 +334,7 @@ public class AutomatonDesktopPane
 
   public boolean canResizeAll()
   {
-    for (final AutomatonInternalFrame frame : openAutomaton.values())
+    for (final AutomatonInternalFrame frame : mOpenAutomata.values())
     {
       if (canResize(frame.getTitle()))
       {
@@ -347,7 +346,7 @@ public class AutomatonDesktopPane
 
   public boolean canResizeOther(final String name)
   {
-    for (final AutomatonInternalFrame frame : openAutomaton.values())
+    for (final AutomatonInternalFrame frame : mOpenAutomata.values())
     {
       if (frame.getTitle() != name && canResize(frame.getTitle()))
       {
@@ -359,11 +358,11 @@ public class AutomatonDesktopPane
 
   public boolean canOpenOther(final String name)
   {
-    if (openAutomaton.size() > 1)
+    if (mOpenAutomata.size() > 1)
       return true;
-    else if (openAutomaton.size() == 0)
+    else if (mOpenAutomata.size() == 0)
       return false;
-    else if (openAutomaton.containsKey(name))
+    else if (mOpenAutomata.containsKey(name))
       return false;
     else
       return true;
@@ -408,16 +407,16 @@ public class AutomatonDesktopPane
   {
     if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED)
     {
-      if (!hasBeenEdited)
+      if (!mHasBeenEdited)
       {
-        hasBeenEdited = true;
+        mHasBeenEdited = true;
         oldOpen.clear();
         order.clear();
-        if (openAutomaton.keySet().size() == 0)
+        if (mOpenAutomata.keySet().size() == 0)
           return;
         final List<Map.Entry<String,AutomatonInternalFrame>> entries =
           new ArrayList<Map.Entry<String,AutomatonInternalFrame>>
-            (openAutomaton.entrySet());
+            (mOpenAutomata.entrySet());
         while (entries.size() != 0)
         {
           int highestZValue = Integer.MIN_VALUE;
@@ -445,17 +444,19 @@ public class AutomatonDesktopPane
 
   //#########################################################################
   //# Interface ModelObserver
-
   public void update(final EditorChangedEvent event)
   {
-    if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH)
-      onReOpen(mContainer, mSim);
+    if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH &&
+        mContainer.getActivePanel() instanceof SimulatorPanel &&
+        mSim.getCompiledDES() != null) {
+      onReOpen();
+    }
   }
+
 
   //#########################################################################
   //# Data Members
-
-  private final HashMap<String,AutomatonInternalFrame> openAutomaton =
+  private final HashMap<String,AutomatonInternalFrame> mOpenAutomata =
     new HashMap<String,AutomatonInternalFrame>();
   private final HashMap<String, Rectangle> oldOpen =
     new HashMap<String, Rectangle>();
@@ -464,11 +465,12 @@ public class AutomatonDesktopPane
   private final ModuleContainer mContainer;
   private final Set<InternalFrameObserver> observers;
   private final DesktopPanePopupFactory factory;
-  private boolean hasBeenEdited;
+  private boolean mHasBeenEdited;
+
 
   //#########################################################################
   //# Class Constants
-
   private static final double SCREENS_TOO_CLOSE = 3;
   private static final long serialVersionUID = -5528014241244952875L;
+
 }

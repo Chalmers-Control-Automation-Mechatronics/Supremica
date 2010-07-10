@@ -1059,7 +1059,7 @@ public class EventDeclEditorDialog
                              final AttributeSet attribs)
       throws BadLocationException
     {
-      final String filtered = filter(text, offset);
+      final String filtered = filter(text);
       if (filtered != null) {
         super.insertString(bypass, offset, filtered, attribs);
       }
@@ -1072,35 +1072,16 @@ public class EventDeclEditorDialog
                         final AttributeSet attribs)
       throws BadLocationException
     {
-      final String filtered = filter(text, offset);
+      final String filtered = filter(text);
       if (filtered != null) {
         super.replace(bypass, offset, length, filtered, attribs);
-      }
-    }
-
-    public void remove(final DocumentFilter.FilterBypass bypass,
-                       final int offset,
-                       final int length)
-      throws BadLocationException
-    {
-      boolean ok = true;
-      if (offset == 0) {
-        final String text = mNameInput.getText();
-        if (length < text.length()) {
-          final ExpressionParser parser = getExpressionParser();
-          final char ch = text.charAt(length);
-          ok = parser.isIdentifierStart(ch);
-        }
-      }
-      if (ok) {
-        super.remove(bypass, offset, length);
       }
     }
 
 
     //#######################################################################
     //# Auxiliary Methods
-    private String filter(final String text, int offset)
+    private String filter(final String text)
     {
       if (text == null) {
         return null;
@@ -1110,11 +1091,8 @@ public class EventDeclEditorDialog
         final StringBuffer buffer = new StringBuffer(len);
         for (int i = 0; i < len; i++) {
           final char ch = text.charAt(i);
-          if (offset == 0 ?
-              parser.isIdentifierStart(ch) :
-              parser.isIdentifierCharacter(ch)) {
+          if (parser.isIdentifierCharacter(ch)) {
             buffer.append(ch);
-            offset++;
           }
         }
         if (buffer.length() == 0) {
