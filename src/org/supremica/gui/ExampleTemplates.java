@@ -208,24 +208,17 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
   private void initializeCentralLockExamples()
   {
     final TemplateGroup thisGroup = CentralLockExamples;
-    final String prefix = basePrefix + "/OtherExamples/centralLock/";
     // THREE DOORS
-    //thisGroup.addItem("Central Locking - 3 Doors", prefix + "verriegel3.xml");
     thisGroup.addItem("Central Locking - 3 Doors",
                       basePrefix +
                       "/ModuleExamples/central_locking/verriegel3.wmod");
     //thisGroup.addItem("Central Locking - 3 Doors - Uncontrollable", prefix + "verriegel3_uncontrollable.xml");
-    thisGroup.addItem("Central Locking - 3 Doors - Language Inclusion", prefix + "verriegel3_language_inclusion.xml");
-    thisGroup.addItem("Central Locking - 3 Doors - Language Exclusion", prefix + "verriegel3_language_exclusion.xml");
     //thisGroup.addItem("Central Locking - 3 Doors - Synchronized Plants", prefix + "verriegel3_joint.xml");
     //thisGroup.addItem("Central Locking - 3 Doors - Synchronized Plants Uncontrollable", prefix + "verriegel3_joint_uncontrollable.xml");
     // FOUR DOORS
-    //thisGroup.addItem("Central Lock - 4 Doors", prefix + "verriegel4.xml");
-    thisGroup.addItem("Central Lock - 4 Doors",
+    thisGroup.addItem("Central Locking - 4 Doors",
                       basePrefix +
                       "/ModuleExamples/central_locking/verriegel4.wmod");
-    //thisGroup.addItem("Central Lock - 4 Doors - Language Inclusion", prefix + "verriegel4_language_inclusion.xml");
-    //thisGroup.addItem("Central Lock - 4 Doors - Language Exclusion", prefix + "verriegel4_language_exclusion.xml");
     // Subsystems
     thisGroup.addItem("Central Locking - ftuer",
                       basePrefix +
