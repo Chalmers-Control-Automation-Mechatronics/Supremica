@@ -709,6 +709,9 @@ public class AutomatonDisplayPane
             final EventProxy event = trans.getEvent();
             final EventKind kind = event.getKind();
             writer.write(ModuleContext.getEventKindToolTip(kind, false));
+            if (!event.isObservable()) {
+              writer.write(" unobservable");
+            }
             writer.write(" transition ");
             writer.write(event.getName());
           } else {

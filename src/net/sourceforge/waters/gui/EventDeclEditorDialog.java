@@ -198,10 +198,12 @@ public class EventDeclEditorDialog
       mKindLabel = new JLabel("Kind:");
       mKindGroup = new ButtonGroup();
       mControllableButton =
-        new IconRadioButton("Controllable", IconLoader.ICON_CONTROLLABLE,
+        new IconRadioButton("Controllable",
+                            IconLoader.ICON_CONTROLLABLE_OBSERVABLE,
                             mKindGroup);
       mUncontrollableButton =
-        new IconRadioButton("Uncontrollable", IconLoader.ICON_UNCONTROLLABLE,
+        new IconRadioButton("Uncontrollable",
+                            IconLoader.ICON_UNCONTROLLABLE_OBSERVABLE,
                             mKindGroup);
       mPropositionButton =
         new IconRadioButton("Proposition", PropositionIcon.getDefaultMarkedIcon(),

@@ -410,6 +410,8 @@ public class DocumentContainerManager
     if (returnVal == JFileChooser.APPROVE_OPTION) {
       final FileFilter filter = chooser.getFileFilter();
       final File file = chooser.getSelectedFile();
+      final DocumentContainer container = getActiveContainer();
+      container.adjustDocumentName(file);
       saveDocument(filter, file, maycancel);
     } else {
       mWasCancelled = true;

@@ -409,13 +409,22 @@ public class ModuleContext
         ("Unknown component kind: " + kind + "!");
     }
   }
-  public static Icon getEventKindIcon(final EventKind event)
+  public static Icon getEventKindIcon(final EventKind event,
+                                      final boolean observable)
   {
     switch (event){
     case CONTROLLABLE:
-      return IconLoader.ICON_CONTROLLABLE;
+      if (observable) {
+        return IconLoader.ICON_CONTROLLABLE_OBSERVABLE;
+      } else {
+        return IconLoader.ICON_CONTROLLABLE_UNOBSERVABLE;
+      }
     case UNCONTROLLABLE:
-      return IconLoader.ICON_UNCONTROLLABLE;
+      if (observable) {
+        return IconLoader.ICON_UNCONTROLLABLE_OBSERVABLE;
+      } else {
+        return IconLoader.ICON_UNCONTROLLABLE_UNOBSERVABLE;
+      }
     case PROPOSITION:
       return IconLoader.ICON_PROPOSITION;
     default:
@@ -774,23 +783,23 @@ public class ModuleContext
       final EventKind kind = decl.getKind();
       switch (kind) {
       case CONTROLLABLE:
-	return IconLoader.ICON_CONTROLLABLE;
       case UNCONTROLLABLE:
-	return IconLoader.ICON_UNCONTROLLABLE;
+        final boolean observable = decl.isObservable();
+        return getEventKindIcon(kind, observable);
       case PROPOSITION:
-	final String name = decl.getName();
+        final String name = decl.getName();
         final ColorGeometryProxy geo = decl.getColorGeometry();
         if (geo != null && !geo.getColorSet().isEmpty()) {
           final Color color = geo.getColorSet().iterator().next();
           return PropositionIcon.getIcon(color);
         } else if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-	  return IconLoader.ICON_FORBIDDEN;
-	} else {
+          return IconLoader.ICON_FORBIDDEN;
+        } else {
           return PropositionIcon.getDefaultMarkedIcon();
-	}
+        }
       default:
-	throw new IllegalArgumentException
-	  ("Unknown event kind: " + kind + "!");
+        throw new IllegalArgumentException
+          ("Unknown event kind: " + kind + "!");
       }
     }
 

@@ -245,7 +245,8 @@ public class Simulation implements ModelObserver, Observer
         final JLabel label = new JLabel(possible.toString());
         final EventProxy event = possible.getEvent();
         final EventKind kind = event.getKind();
-        final Icon icon = ModuleContext.getEventKindIcon(kind);
+        final boolean observable = event.isObservable();
+        final Icon icon = ModuleContext.getEventKindIcon(kind, observable);
         label.setIcon(icon);
         labels[looper] = label;
         steps[looper] = possible;

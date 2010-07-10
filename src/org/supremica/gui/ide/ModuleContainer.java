@@ -58,8 +58,6 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -114,9 +112,7 @@ public class ModuleContainer
     mTabPanel.addChangeListener(this);
     mEditorPanel.showComment();
 
-    final ListSubject<AbstractSubject> comps =
-      module.getComponentListModifiable();
-    comps.addModelObserver(this);
+    module.addModelObserver(this);
 
     mTabPanel.addMouseListener(new java.awt.event.MouseAdapter()
     {
@@ -213,7 +209,13 @@ public class ModuleContainer
   public void modelChanged(final ModelChangeEvent event)
   {
     final int kind = event.getKind();
-    if (kind == ModelChangeEvent.ITEM_REMOVED) {
+    switch (kind) {
+    case ModelChangeEvent.NAME_CHANGED:
+      if (event.getSource() == getModule()) {
+        setDocumentNameHasChanged(true);
+      }
+      break;
+    case ModelChangeEvent.ITEM_REMOVED:
       final Object value = event.getValue();
       if (value instanceof SimpleComponentSubject) {
         final ComponentEditorPanel panel =
@@ -224,6 +226,9 @@ public class ModuleContainer
           // deletions can be undone!
         }
       }
+      break;
+    default:
+      break;
     }
     if (kind != ModelChangeEvent.GEOMETRY_CHANGED) {
       mCompiledDES = null;

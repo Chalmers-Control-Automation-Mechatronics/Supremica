@@ -23,7 +23,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.IconLoader;
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Pair;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -300,11 +300,11 @@ public class EventJTree
            mEventPanel.setBackground(EditorColor.BACKGROUND_FOCUSSED);
          else
            mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
-        final EventProxy event = (EventProxy)value;
-        if (event.getKind() == EventKind.CONTROLLABLE)
-          mEventNameLabel.setIcon(IconLoader.ICON_CONTROLLABLE);
-        else
-          mEventNameLabel.setIcon(IconLoader.ICON_UNCONTROLLABLE);
+        final EventProxy event = (EventProxy) value;
+        final EventKind kind = event.getKind();
+        final boolean observable = event.isObservable();
+        final Icon icon = ModuleContext.getEventKindIcon(kind, observable);
+        mEventNameLabel.setIcon(icon);
         mEventNameLabel.setText(event.getName());
         final Icon eventActivityIcon = mSim.getEventActivityIcon(event);
         mEventStatusLabel.setIcon(eventActivityIcon);

@@ -32,7 +32,10 @@ public class IconLoader
   //#########################################################################
   //# Class Constants
   private static final String NAME_AUTOMATON = "waters/automaton16";
-  private static final String NAME_CONTROLLABLE = "waters/controllable";
+  private static final String NAME_CONTROLLABLE_OBSERVABLE =
+    "waters/controllable";
+  private static final String NAME_CONTROLLABLE_UNOBSERVABLE =
+    "waters/controllable_unobs";
   private static final String NAME_EVENT = "waters/event";
   private static final String NAME_FORBIDDEN = "ForbiddenState16";
   private static final String NAME_INSTANCE = "waters/instance";
@@ -50,7 +53,10 @@ public class IconLoader
     "waters/simulator_to_start";
   private static final String NAME_SPEC = "waters/spec";
   private static final String NAME_SUPERVISOR = "waters/supervisor";
-  private static final String NAME_UNCONTROLLABLE = "waters/uncontrollable";
+  private static final String NAME_UNCONTROLLABLE_OBSERVABLE =
+    "waters/uncontrollable";
+  private static final String NAME_UNCONTROLLABLE_UNOBSERVABLE =
+    "waters/uncontrollable_unobs";
   private static final String NAME_VARIABLE = "waters/variable";
   private static final String NAME_CROSS = "waters/cross16";
   private static final String NAME_TICK = "waters/tick16";
@@ -62,8 +68,10 @@ public class IconLoader
   //# Class Constants
   public static final ImageIcon ICON_AUTOMATON = getIcon(NAME_AUTOMATON);
   public static final ImageIcon ICON_BINDING = null;
-  public static final ImageIcon ICON_CONTROLLABLE =
-    getIcon(NAME_CONTROLLABLE);
+  public static final ImageIcon ICON_CONTROLLABLE_OBSERVABLE =
+    getIcon(NAME_CONTROLLABLE_OBSERVABLE);
+  public static final ImageIcon ICON_CONTROLLABLE_UNOBSERVABLE =
+    getIcon(NAME_CONTROLLABLE_UNOBSERVABLE);
   public static final ImageIcon ICON_EVENT = getIcon(NAME_EVENT);
   public static final ImageIcon ICON_FORBIDDEN = getIcon(NAME_FORBIDDEN);
   public static final ImageIcon ICON_FOREACH = null;
@@ -86,8 +94,10 @@ public class IconLoader
     getIcon(NAME_SIMULATOR_TO_START);
   public static final ImageIcon ICON_SPEC = getIcon(NAME_SPEC);
   public static final ImageIcon ICON_SUPERVISOR = getIcon(NAME_SUPERVISOR);
-  public static final ImageIcon ICON_UNCONTROLLABLE =
-    getIcon(NAME_UNCONTROLLABLE);
+  public static final ImageIcon ICON_UNCONTROLLABLE_OBSERVABLE =
+    getIcon(NAME_UNCONTROLLABLE_OBSERVABLE);
+  public static final ImageIcon ICON_UNCONTROLLABLE_UNOBSERVABLE =
+    getIcon(NAME_UNCONTROLLABLE_UNOBSERVABLE);
   public static final ImageIcon ICON_VARIABLE = getIcon(NAME_VARIABLE);
   /*public static final ImageIcon ICON_CROSS = getIcon(NAME_CROSS);
   public static final ImageIcon ICON_TICK = getIcon(NAME_TICK);

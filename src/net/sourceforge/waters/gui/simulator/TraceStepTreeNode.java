@@ -82,7 +82,8 @@ class TraceStepTreeNode extends DefaultMutableTreeNode
   {
     if (mEvent != null) {
       final EventKind kind = mEvent.getKind();
-      return ModuleContext.getEventKindIcon(kind);
+      final boolean observable = mEvent.isObservable();
+      return ModuleContext.getEventKindIcon(kind, observable);
     } else {
       return PropositionIcon.getUnmarkedIcon();
     }

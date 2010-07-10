@@ -63,9 +63,6 @@ public class PlainTextPrinter
       (final EventDeclProxy proxy)
     throws VisitorException
   {
-    if (!proxy.isObservable()) {
-      print("unobservable ");
-    }
     print(proxy.getName());
     final List<SimpleExpressionProxy> ranges = proxy.getRanges();
     for (final SimpleExpressionProxy expr : ranges) {
