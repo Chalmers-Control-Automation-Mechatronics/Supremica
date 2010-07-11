@@ -1080,17 +1080,20 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       // TODO Candidates consisting of all automata should be suppressed
       // in all cases (not only when the first pairing fails).
+      // TODO: unsure if I understood correctly what the problem is - candidates
+      // for pairing heuristics can only ever have two automata...so I think I
+      // only ever need to check that there will be more than 2 automata AFTER
+      // the failing aut is removed?
       Collection<AutomatonProxy> automata = model.getAutomata();
       AutomatonProxy chosenAut = getHeuristicProperty(automata);
       List<Candidate> candidates = pairAutomata(chosenAut, automata);
-      if (candidates.size() == 0 && automata.size() > 2) {
+      final int minCandidateSize = 4;
+      if (candidates.size() == 0 && automata.size() >= minCandidateSize) {
         automata = new ArrayList<AutomatonProxy>(model.getAutomata());
-        while (candidates.size() == 0 && automata.size() > 2) {
+        while (candidates.size() == 0 && automata.size() >= minCandidateSize) {
           automata.remove(chosenAut);
-          if (automata.size() > 0) {
-            chosenAut = Collections.min(automata, new AutomataComparator());
-            candidates = pairAutomata(chosenAut, automata);
-          }
+          chosenAut = Collections.min(automata, new AutomataComparator());
+          candidates = pairAutomata(chosenAut, automata);
         }
       }
       return candidates;
