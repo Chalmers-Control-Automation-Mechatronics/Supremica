@@ -484,8 +484,10 @@ public class AutomatonDisplayPane
     //# Interface java.awt.event.MouseListener
     public void mouseClicked(final MouseEvent event)
     {
-      if (event.getClickCount() == 2)
+      if (event.getButton() == MouseEvent.BUTTON1 &&
+          event.getClickCount() == 2) {
         execute(mFocusedItem);
+      }
     }
 
     public void mouseEntered(final MouseEvent event)
