@@ -223,7 +223,8 @@ public class WatersPopupActionManager
 
   public IDEAction getDesktopCloseAllAction()
   {
-    return new DesktopCloseAllAction(mIDE);
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(SimulationCloseAllAction.class);
   }
 
   public IDEAction getDesktopCloseOtherAction(final AutomatonProxy automaton)
@@ -231,19 +232,16 @@ public class WatersPopupActionManager
     return new DesktopCloseOtherAction(mIDE, automaton);
   }
 
-  public IDEAction getDesktopOpenOtherAction(final AutomatonProxy automaton)
-  {
-    return new DesktopOpenOtherAction(mIDE, automaton);
-  }
-
   public IDEAction getDesktopShowAllAction()
   {
-    return new DesktopShowAllAction(mIDE);
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(SimulationShowAllAction.class);
   }
 
   public IDEAction getDesktopCascadeAction()
   {
-    return new DesktopCascadeAction(mIDE);
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(SimulationCascadeAction.class);
   }
 
   public IDEAction getResizeAllAction()

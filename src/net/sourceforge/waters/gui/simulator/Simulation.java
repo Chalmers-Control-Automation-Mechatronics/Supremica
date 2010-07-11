@@ -336,7 +336,7 @@ public class Simulation implements ModelObserver, Observer
     return mCompiledDES;
   }
 
-  List<AutomatonProxy> getOrderedAutomata()
+  public List<AutomatonProxy> getOrderedAutomata()
   {
     updateAutomata();
     return mOrderedAutomata;

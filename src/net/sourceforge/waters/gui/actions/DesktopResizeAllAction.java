@@ -22,7 +22,7 @@ public class DesktopResizeAllAction extends WatersDesktopAction
 
   public void actionPerformed(final ActionEvent e)
   {
-    getDesktop().resizeAllAutomaton();
+    getDesktop().resizeAllAutomata();
   }
 
   private static final long serialVersionUID = -1644229513613033199L;

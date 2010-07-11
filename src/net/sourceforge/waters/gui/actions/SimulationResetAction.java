@@ -27,31 +27,31 @@ public class SimulationResetAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    final SimulatorPanel panel = getActiveSimulatorPanel();
+    final SimulatorPanel panel = getObservedSimulatorPanel();
     if (panel != null) {
-      final Simulation sim = getObservedSimulation();
+      final Simulation sim = panel.getSimulation();
       sim.resetState(false);
     }
   }
 
   //#########################################################################
   //# Auxiliary Methods
+  @Override
   void updateEnabledStatus()
   {
-    final Simulation sim = getObservedSimulation();
-    if (sim == null) {
+    final SimulatorPanel panel = getObservedSimulatorPanel();
+    if (panel == null) {
       setEnabled(false);
       putValue(Action.NAME, "Reset");
       putValue(Action.SHORT_DESCRIPTION, "Reset the Simulation");
     } else {
+      final Simulation sim = panel.getSimulation();
       setEnabled(sim.getHistorySize() != 0);
-      if (sim.getTrace() != null)
-      {
+      if (sim.getTrace() != null) {
         putValue(Action.NAME, "Restore Trace");
-        putValue(Action.SHORT_DESCRIPTION, "Restore the Trace to it's original state");
-      }
-      else
-      {
+        putValue(Action.SHORT_DESCRIPTION,
+                 "Restore the Trace to its original state");
+      } else {
         putValue(Action.NAME, "Reset");
         putValue(Action.SHORT_DESCRIPTION, "Reset the Simulation");
       }

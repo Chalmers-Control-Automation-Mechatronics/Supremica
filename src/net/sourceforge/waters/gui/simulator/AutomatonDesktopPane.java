@@ -9,6 +9,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +46,7 @@ public class AutomatonDesktopPane
   {
     mSim = sim;
     mContainer = container;
-    observers = new HashSet<InternalFrameObserver>();
+    mObservers = new HashSet<InternalFrameObserver>();
     mPopupFactory =
       new DesktopPanePopupFactory(container.getIDE().getPopupActionManager());
     order = new ArrayList<String>();
@@ -127,10 +128,10 @@ public class AutomatonDesktopPane
     }
   }
 
-  public void removeAutomaton(final String aut)
+  public void removeAutomaton(final String name)
   {
-    fireFrameClosedEvent(aut, mOpenAutomata.get(aut));
-    mOpenAutomata.remove(aut);
+    final AutomatonInternalFrame frame = mOpenAutomata.remove(name);
+    fireFrameClosedEvent(name, frame);
   }
 
   public void onReOpen()
@@ -166,16 +167,6 @@ public class AutomatonDesktopPane
     } catch (final PropertyVetoException exception) {
       // Can't select frame---too bad ...
     }
-  }
-
-  private Set<String> copySet(final Set<String> toCopy)
-  {
-    final Set<String> output = new HashSet<String>();
-    for (final String copy : toCopy)
-    {
-      output.add(copy);
-    }
-    return output;
   }
 
   private Point findLocation(final ArrayList<Rectangle> bannedLocations, final Dimension newSize)
@@ -227,40 +218,41 @@ public class AutomatonDesktopPane
 
   //#########################################################################
   //# Event Access Methods
-
-  public void closeAutomaton(final String aut)
+  public int getNumberOfOpenAutomata()
   {
-    mOpenAutomata.get(aut).dispose();
+    return mOpenAutomata.size();
   }
 
-  public void closeAllAutomaton()
+  public void closeAutomaton(final String name)
   {
-    final Set<String> copySet = copySet(mOpenAutomata.keySet());
-    for (final String string : copySet)
-      mOpenAutomata.get(string).dispose();
+    mOpenAutomata.get(name).dispose();
   }
 
-  public void closeOtherAutomaton(final String aut)
+  public void closeAllAutomata()
   {
-    final Set<String> copySet = copySet(mOpenAutomata.keySet());
-    for (final String string : copySet)
-      if (string.compareTo(aut) != 0)
-        mOpenAutomata.get(string).dispose();
+    final Collection<AutomatonInternalFrame> victims =
+      new ArrayList<AutomatonInternalFrame>(mOpenAutomata.values());
+    for (final AutomatonInternalFrame frame : victims) {
+      frame.dispose();
+    }
   }
 
-  public void openOtherAutomaton(final String name)
+  public void closeOtherAutomata(final String name)
   {
-    final List<AutomatonProxy> otherAutomata = mSim.getOrderedAutomata();
-    for (final AutomatonProxy auto : otherAutomata)
-      if (name.compareTo(auto.getName()) != 0)
-        addAutomaton(auto.getName(), mContainer, mSim, 2);
+    final Collection<AutomatonInternalFrame> victims =
+      new ArrayList<AutomatonInternalFrame>(mOpenAutomata.values());
+    for (final AutomatonInternalFrame frame : victims) {
+      final String fname = frame.getTitle();
+      if (!name.equals(fname)) {
+        frame.dispose();
+      }
+    }
   }
 
   public void showAllAutomata()
   {
-    for (final AutomatonProxy automata : mSim.getOrderedAutomata())
-    {
-      addAutomaton(automata.getName(), mContainer, mSim, 2);
+    for (final AutomatonProxy aut : mSim.getOrderedAutomata()) {
+      addAutomaton(aut.getName(), mContainer, mSim, 2);
     }
   }
 
@@ -277,7 +269,7 @@ public class AutomatonDesktopPane
     }
   }
 
-  public void execute (final String aut, final Proxy proxyToFire)
+  public void execute(final String aut, final Proxy proxyToFire)
   {
     if (mOpenAutomata.get(aut) != null)
     {
@@ -308,7 +300,7 @@ public class AutomatonDesktopPane
     }
   }
 
-  public void resizeAllAutomaton()
+  public void resizeAllAutomata()
   {
     if (canResizeAll())
     {
@@ -367,36 +359,40 @@ public class AutomatonDesktopPane
       return true;
   }
 
+
   //#########################################################################
   //# Dealing with attached InternalFrameObservers
-
-  public void attach (final InternalFrameObserver observer)
+  public void attach(final InternalFrameObserver observer)
   {
-    observers.add(observer);
+    mObservers.add(observer);
   }
 
-  public void detach (final InternalFrameObserver observer)
+  public void detach(final InternalFrameObserver observer)
   {
-    observers.remove(observer);
+    mObservers.remove(observer);
   }
 
-  private void fireFrameOpenedEvent(final String mAutomaton, final AutomatonInternalFrame opening)
+  private void fireFrameOpenedEvent(final String mAutomaton,
+                                    final AutomatonInternalFrame opening)
   {
     final Set<InternalFrameObserver> temp =
-      new HashSet<InternalFrameObserver>(observers);
-    for (final InternalFrameObserver observer : temp)
-    {
-      observer.onFrameEvent(new InternalFrameEvent(mAutomaton, opening, true));
+      new HashSet<InternalFrameObserver>(mObservers);
+    final InternalFrameEvent event =
+      new InternalFrameEvent(mAutomaton, opening, true);
+    for (final InternalFrameObserver observer : temp) {
+      observer.onFrameEvent(event);
     }
   }
 
-  private void fireFrameClosedEvent(final String mAutomaton, final AutomatonInternalFrame closing)
+  private void fireFrameClosedEvent(final String mAutomaton,
+                                    final AutomatonInternalFrame closing)
   {
     final Set<InternalFrameObserver> temp =
-      new HashSet<InternalFrameObserver>(observers);
-    for (final InternalFrameObserver observer : temp)
-    {
-      observer.onFrameEvent(new InternalFrameEvent(mAutomaton, closing, false));
+      new HashSet<InternalFrameObserver>(mObservers);
+    final InternalFrameEvent event =
+      new InternalFrameEvent(mAutomaton, closing, false);
+    for (final InternalFrameObserver observer : temp) {
+      observer.onFrameEvent(event);
     }
   }
 
@@ -462,7 +458,7 @@ public class AutomatonDesktopPane
   private final ArrayList<String> order;
   private final Simulation mSim;
   private final ModuleContainer mContainer;
-  private final Set<InternalFrameObserver> observers;
+  private final Set<InternalFrameObserver> mObservers;
   private final DesktopPanePopupFactory mPopupFactory;
   private boolean mHasBeenEdited;
 

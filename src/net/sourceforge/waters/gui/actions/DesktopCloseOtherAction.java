@@ -22,7 +22,7 @@ public class DesktopCloseOtherAction extends WatersDesktopAction
 
   public void actionPerformed(final ActionEvent e)
   {
-    getDesktop().closeOtherAutomaton(mAutomaton.getName());
+    getDesktop().closeOtherAutomata(mAutomaton.getName());
   }
 
   private final AutomatonProxy mAutomaton;

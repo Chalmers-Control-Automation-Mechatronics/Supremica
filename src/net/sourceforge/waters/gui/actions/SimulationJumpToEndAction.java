@@ -30,9 +30,9 @@ public class SimulationJumpToEndAction extends WatersSimulationAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    final SimulatorPanel panel = getActiveSimulatorPanel();
+    final SimulatorPanel panel = getObservedSimulatorPanel();
     if (panel != null) {
-      final Simulation sim = getObservedSimulation();
+      final Simulation sim = panel.getSimulation();
       while (sim.getCurrentTime() != sim.getHistorySize() - 1)
         sim.replayStep();
     }
@@ -40,12 +40,14 @@ public class SimulationJumpToEndAction extends WatersSimulationAction
 
   //#########################################################################
   //# Auxiliary Methods
+  @Override
   void updateEnabledStatus()
   {
-    final Simulation sim = getObservedSimulation();
-    if (sim == null) {
+    final SimulatorPanel panel = getObservedSimulatorPanel();
+    if (panel == null) {
       setEnabled(false);
     } else {
+      final Simulation sim = panel.getSimulation();
       setEnabled(sim.getHistorySize() != sim.getCurrentTime() + 1);
     }
   }

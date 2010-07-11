@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters/Supremica IDE
 //# PACKAGE: net.sourceforge.waters.gui.actions
-//# CLASS:   GraphLayoutAction
+//# CLASS:   WatersSimulationAction
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -27,6 +27,7 @@ public abstract class WatersSimulationAction
   extends WatersAction
   implements SimulationObserver
 {
+
   //#########################################################################
   //# Constructor
   WatersSimulationAction(final IDE ide)
@@ -34,6 +35,7 @@ public abstract class WatersSimulationAction
     super(ide);
     updateEnabledStatus();
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
@@ -47,8 +49,7 @@ public abstract class WatersSimulationAction
         setEnabled(false);
         observeSimulation(null);
       } else {
-        final Simulation sim = panel.getSimulation();
-        observeSimulation(sim);
+        observeSimulation(panel);
         updateEnabledStatus();
       }
       break;
@@ -57,12 +58,14 @@ public abstract class WatersSimulationAction
     }
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.simulation.SimulationObserver
   public void simulationChanged(final SimulationChangeEvent event)
   {
     updateEnabledStatus();
   }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -82,35 +85,39 @@ public abstract class WatersSimulationAction
     }
   }
 
-  Simulation getObservedSimulation()
+  SimulatorPanel getObservedSimulatorPanel()
   {
-    return mObservedSimulation;
+    return mObservedSimulatorPanel;
   }
 
-  void observeSimulation(final Simulation sim)
+  void observeSimulation(final SimulatorPanel panel)
   {
-    if (sim != mObservedSimulation) {
-      if (mObservedSimulation != null) {
-        mObservedSimulation.detach(this);
+    if (panel != mObservedSimulatorPanel) {
+      if (mObservedSimulatorPanel != null) {
+        final Simulation sim = mObservedSimulatorPanel.getSimulation();
+        sim.detach(this);
       }
-      mObservedSimulation = sim;
-      if (mObservedSimulation != null) {
-        mObservedSimulation.attach(this);
+      mObservedSimulatorPanel = panel;
+      if (mObservedSimulatorPanel != null) {
+        final Simulation sim = panel.getSimulation();
+        sim.attach(this);
       }
     }
   }
 
-  // ########################################################################
-  // # Abstract Methods
 
+  //#########################################################################
+  //# Abstract Methods
   abstract void updateEnabledStatus();
 
 
   //#########################################################################
   //# Data Members
-  private Simulation mObservedSimulation;
+  private SimulatorPanel mObservedSimulatorPanel;
+
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
+
 }

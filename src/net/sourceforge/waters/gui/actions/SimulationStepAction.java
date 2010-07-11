@@ -42,9 +42,9 @@ public class SimulationStepAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    final SimulatorPanel panel = getActiveSimulatorPanel();
+    final SimulatorPanel panel = getObservedSimulatorPanel();
     if (panel != null) {
-      final Simulation sim = getObservedSimulation();
+      final Simulation sim = panel.getSimulation();
       final List<SimulatorStep> possibleEvents = sim.getEnabledSteps();
       if (possibleEvents.isEmpty()) {
         getIDE().error("No events are enabled.");
@@ -57,12 +57,14 @@ public class SimulationStepAction
 
   //#########################################################################
   //# Auxiliary Methods
+  @Override
   void updateEnabledStatus()
   {
-    final Simulation sim = getObservedSimulation();
-    if (sim == null) {
+    final SimulatorPanel panel = getObservedSimulatorPanel();
+    if (panel == null) {
       setEnabled(false);
     } else {
+      final Simulation sim = panel.getSimulation();
       setEnabled(sim.getEnabledSteps().size() != 0);
     }
   }

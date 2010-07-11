@@ -11,6 +11,8 @@ import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
+
 import org.supremica.gui.ide.IDE;
 
 public class SimulationReplayStepAction
@@ -35,9 +37,9 @@ public class SimulationReplayStepAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    final SimulatorPanel panel = getActiveSimulatorPanel();
+    final SimulatorPanel panel = getObservedSimulatorPanel();
     if (panel != null) {
-      final Simulation sim = getObservedSimulation();
+      final Simulation sim = panel.getSimulation();
       sim.replayStep();
     }
   }
@@ -45,17 +47,21 @@ public class SimulationReplayStepAction
 
   //#########################################################################
   //# Auxiliary Methods
+  @Override
   void updateEnabledStatus()
   {
-    final Simulation sim = getObservedSimulation();
-    if (sim == null) {
+    final SimulatorPanel panel = getObservedSimulatorPanel();
+    if (panel == null) {
       setEnabled(false);
-    } else if (sim.getTrace() != null) {
-      setEnabled(sim.getHistorySize() != sim.getCurrentTime() + 1 ||
-                 sim.getTrace() instanceof LoopTraceProxy);
-    } else {
-      setEnabled(sim.getHistorySize() != sim.getCurrentTime() + 1);
+      return;
     }
+    final Simulation sim = panel.getSimulation();
+    if (sim.getCurrentTime() < sim.getHistorySize() - 1) {
+      setEnabled(true);
+      return;
+    }
+    final TraceProxy trace = sim.getTrace();
+    setEnabled(trace != null && trace instanceof LoopTraceProxy);
   }
 
 

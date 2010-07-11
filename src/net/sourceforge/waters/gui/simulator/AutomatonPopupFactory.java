@@ -43,8 +43,6 @@ public class AutomatonPopupFactory
         final IDEAction closeOther = master.getDesktopCloseOtherAction(aut);
         popup.add(closeOther);
       }
-      final IDEAction openOther = master.getDesktopOpenOtherAction(aut);
-      popup.add(openOther);
       final IDEAction edit = master.getDesktopEditAction(aut);
       popup.add(edit);
       if (desktopPane.canResize(aut.getName()))

@@ -44,9 +44,12 @@ import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.ShowGraphAction;
 import net.sourceforge.waters.gui.actions.ShowModuleCommentAction;
 import net.sourceforge.waters.gui.actions.SimulationBackToStartAction;
+import net.sourceforge.waters.gui.actions.SimulationCascadeAction;
+import net.sourceforge.waters.gui.actions.SimulationCloseAllAction;
 import net.sourceforge.waters.gui.actions.SimulationJumpToEndAction;
 import net.sourceforge.waters.gui.actions.SimulationReplayStepAction;
 import net.sourceforge.waters.gui.actions.SimulationResetAction;
+import net.sourceforge.waters.gui.actions.SimulationShowAllAction;
 import net.sourceforge.waters.gui.actions.SimulationStepAction;
 import net.sourceforge.waters.gui.actions.SimulationStepBackAction;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
@@ -348,6 +351,16 @@ public class IDEMenuBar extends JMenuBar
         final Action endTrace =
           actions.getAction(SimulationJumpToEndAction.class);
         mSimulateMenu.add(endTrace);
+        mSimulateMenu.addSeparator();
+        final Action showAll =
+          actions.getAction(SimulationShowAllAction.class);
+        mSimulateMenu.add(showAll);
+        final Action closeAll =
+          actions.getAction(SimulationCloseAllAction.class);
+        mSimulateMenu.add(closeAll);
+        final Action cascade =
+          actions.getAction(SimulationCascadeAction.class);
+        mSimulateMenu.add(cascade);
       }
 
       // Analyze
