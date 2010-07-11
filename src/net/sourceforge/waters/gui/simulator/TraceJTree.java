@@ -1,3 +1,13 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Simulator
+//# PACKAGE: net.sourceforge.waters.gui.simulator
+//# CLASS:   TraceJTree
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.gui.simulator;
 
 import gnu.trove.TIntHashSet;
@@ -31,7 +41,9 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
+
 import org.supremica.gui.ide.ModuleContainer;
+
 
 public class TraceJTree
   extends JTree
@@ -55,7 +67,7 @@ public class TraceJTree
     setToggleClickCount(0);
     totalEventWidth = 0;
     final ModuleContainer container = sim.getModuleContainer();
-    factory = new TraceTreePopupFactory(container.getIDE().getPopupActionManager(), desktop);
+    mPopupFactory = new TraceTreePopupFactory(container.getIDE().getPopupActionManager(), desktop);
     for (final Integer intVal : eventColumnWidth)
     {
       totalEventWidth += intVal;
@@ -96,20 +108,14 @@ public class TraceJTree
         }
       }
 
-      public void mousePressed(final MouseEvent e)
+      public void mousePressed(final MouseEvent event)
       {
-        final TreePath path = TraceJTree.this.getClosestPathForLocation((int)e.getPoint().getX(), (int)e.getPoint().getY());
-        final MutableTreeNode node = (MutableTreeNode)path.getLastPathComponent();
-        if (node == null)
-          return; // Nothing is selected
-        if (node instanceof TraceStepTreeNode)
-        {
-          factory.maybeShowPopup(TraceJTree.this, e, null, ((TraceStepTreeNode)node).getTime());
-        }
-        else if (node instanceof AutomatonLeafNode)
-        {
-          factory.maybeShowPopup(TraceJTree.this, e, ((AutomatonLeafNode)node).getAutomaton());
-        }
+        maybeShowPopup(event);
+      }
+
+      public void mouseReleased(final MouseEvent event)
+      {
+        maybeShowPopup(event);
       }
     });
     this.addTreeWillExpandListener(new TreeWillExpandListener(){
@@ -163,7 +169,7 @@ public class TraceJTree
     });
   }
 
-  public void addScrollPane(final JScrollPane scroll)
+  void addScrollPane(final JScrollPane scroll)
   {
     mPane = scroll;
     mPane.addComponentListener(this);
@@ -234,6 +240,24 @@ public class TraceJTree
   public void componentShown(final ComponentEvent e)
   {
     forceRecalculation();
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void maybeShowPopup(final MouseEvent event)
+  {
+    final TreePath path = getClosestPathForLocation(event.getX(), event.getY());
+    final MutableTreeNode node = (MutableTreeNode)path.getLastPathComponent();
+    if (node == null) {
+      return; // Nothing is selected
+    } else if (node instanceof TraceStepTreeNode) {
+      final TraceStepTreeNode step = (TraceStepTreeNode) node;
+      mPopupFactory.maybeShowPopup(this, event, null, step.getTime());
+    } else if (node instanceof AutomatonLeafNode) {
+      final AutomatonLeafNode leaf = (AutomatonLeafNode) node;
+      mPopupFactory.maybeShowPopup(this, event, leaf.getAutomaton());
+    }
   }
 
 
@@ -372,7 +396,7 @@ public class TraceJTree
   private final ArrayList<String> automatonAreOpen;
   private JScrollPane mPane;
   private TIntHashSet mExpandedIndexes;
-  private final TraceTreePopupFactory factory;
+  private final TraceTreePopupFactory mPopupFactory;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};

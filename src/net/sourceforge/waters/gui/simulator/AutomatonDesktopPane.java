@@ -46,13 +46,13 @@ public class AutomatonDesktopPane
     mSim = sim;
     mContainer = container;
     observers = new HashSet<InternalFrameObserver>();
-    factory = new DesktopPanePopupFactory(container.getIDE().getPopupActionManager());
+    mPopupFactory =
+      new DesktopPanePopupFactory(container.getIDE().getPopupActionManager());
     order = new ArrayList<String>();
     setBackground(EditorColor.BACKGROUNDCOLOR);
     container.attach(this);
     container.getModule().addModelObserver(this);
-    this.addMouseListener(new MouseListener(){
-
+    addMouseListener(new MouseListener(){
       public void mouseClicked(final MouseEvent e)
       {
         // Do nothing
@@ -68,16 +68,15 @@ public class AutomatonDesktopPane
         // Do nothing
       }
 
-      public void mousePressed(final MouseEvent e)
+      public void mousePressed(final MouseEvent event)
       {
-        factory.maybeShowPopup(AutomatonDesktopPane.this, e, null);
+        mPopupFactory.maybeShowPopup(AutomatonDesktopPane.this, event, null);
       }
 
-      public void mouseReleased(final MouseEvent e)
+      public void mouseReleased(final MouseEvent event)
       {
-        // Do nothing
+        mPopupFactory.maybeShowPopup(AutomatonDesktopPane.this, event, null);
       }
-
     });
   }
 
@@ -464,7 +463,7 @@ public class AutomatonDesktopPane
   private final Simulation mSim;
   private final ModuleContainer mContainer;
   private final Set<InternalFrameObserver> observers;
-  private final DesktopPanePopupFactory factory;
+  private final DesktopPanePopupFactory mPopupFactory;
   private boolean mHasBeenEdited;
 
 

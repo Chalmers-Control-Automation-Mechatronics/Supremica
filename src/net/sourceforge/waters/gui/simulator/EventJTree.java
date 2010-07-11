@@ -59,7 +59,7 @@ public class EventJTree
     setAutoscrolls(true);
     setToggleClickCount(0);
     final ModuleContainer container = sim.getModuleContainer();
-    factory = new EventTreePopupFactory(container.getIDE().getPopupActionManager(), mDesktop);
+    mPopupFactory = new EventTreePopupFactory(container.getIDE().getPopupActionManager(), mDesktop);
     addMouseListener(new MouseListener() {
       public void mouseClicked(final MouseEvent e)
       {
@@ -78,11 +78,12 @@ public class EventJTree
         }
       }
 
-      public void mousePressed(final MouseEvent e)
+      public void mousePressed(final MouseEvent event)
       {
-        if (EventJTree.this.getPathForLocation(e.getX(), e.getY()) != null)
-        {
-          factory.maybeShowPopup(EventJTree.this, e, (Proxy)EventJTree.this.getPathForLocation(e.getX(), e.getY()).getLastPathComponent());
+        final TreePath path = getPathForLocation(event.getX(), event.getY());
+        if (path != null) {
+          final Proxy proxy = (Proxy) path.getLastPathComponent();
+          mPopupFactory.maybeShowPopup(EventJTree.this, event, proxy);
         }
       }
 
@@ -96,9 +97,13 @@ public class EventJTree
         // Do nothing
       }
 
-      public void mouseReleased(final MouseEvent e)
+      public void mouseReleased(final MouseEvent event)
       {
-        // Do nothing
+        final TreePath path = getPathForLocation(event.getX(), event.getY());
+        if (path != null) {
+          final Proxy proxy = (Proxy) path.getLastPathComponent();
+          mPopupFactory.maybeShowPopup(EventJTree.this, event, proxy);
+        }
       }
     });
     this.addMouseMotionListener(new MouseMotionListener(){
@@ -400,7 +405,7 @@ public class EventJTree
   private final ArrayList<Pair<Boolean, Integer>> mSortingMethods;
   private final ArrayList<String> expandedNodes;
   private JScrollPane mPane;
-  private final EventTreePopupFactory factory;
+  private final EventTreePopupFactory mPopupFactory;
 
 
   //#########################################################################

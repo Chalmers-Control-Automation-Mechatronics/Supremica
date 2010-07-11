@@ -62,7 +62,7 @@ class AutomataTable extends JTable
     listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     getTableHeader().addMouseListener(new TableHeaderMouseListener());
     setShowGrid(!DISABLE_AUTOMATON_GRIDLINES);
-    factory = new AutomatonTablePopupFactory(sim.getModuleContainer().getIDE().getPopupActionManager(), mDesktop);
+    mPopupFactory = new AutomatonTablePopupFactory(sim.getModuleContainer().getIDE().getPopupActionManager(), mDesktop);
     this.addMouseMotionListener(new MouseMotionListener(){
       public void mouseDragged(final MouseEvent e)
       {
@@ -154,11 +154,9 @@ class AutomataTable extends JTable
     public void mouseClicked(final MouseEvent event)
     {
       if (event.getButton() == MouseEvent.BUTTON1) {
-        final int row = rowAtPoint(event.getPoint());
-        if (row >= 0) {
-          final AutomataTableModel model = getModel();
-          final AutomatonProxy toAdd = model.getAutomaton(row);
-          mDesktop.addAutomaton(toAdd.getName(), mSimulation.getModuleContainer(),
+        final AutomatonProxy aut = getAutomaton(event);
+        if (aut != null) {
+          mDesktop.addAutomaton(aut.getName(), mSimulation.getModuleContainer(),
                                 mSimulation, event.getClickCount());
         }
       }
@@ -166,16 +164,32 @@ class AutomataTable extends JTable
 
     public void mousePressed(final MouseEvent event)
     {
-      AutomatonProxy triggerAuto = null;
+      final AutomatonProxy aut = getAutomaton(event);
+      if (aut != null) {
+        mPopupFactory.maybeShowPopup(AutomataTable.this, event, aut);
+      }
+    }
+
+    public void mouseReleased(final MouseEvent event)
+    {
+      final AutomatonProxy aut = getAutomaton(event);
+      if (aut != null) {
+        mPopupFactory.maybeShowPopup(AutomataTable.this, event, aut);
+      }
+    }
+
+    //#########################################################################
+    //# Auxiliary Methods
+    private AutomatonProxy getAutomaton(final MouseEvent event)
+    {
       final int row = rowAtPoint(event.getPoint());
       if (row >= 0) {
         final AutomataTableModel model = getModel();
-        triggerAuto = model.getAutomaton(row);
+        return model.getAutomaton(row);
+      } else {
+        return null;
       }
-      if (triggerAuto != null)
-        factory.maybeShowPopup(AutomataTable.this, event, triggerAuto);
     }
-
   }
 
 
@@ -203,7 +217,7 @@ class AutomataTable extends JTable
   //# Data Members
   private final Simulation mSimulation;
   private final AutomatonDesktopPane mDesktop;
-  private final AutomatonTablePopupFactory factory;
+  private final AutomatonTablePopupFactory mPopupFactory;
 
 
   //#########################################################################
