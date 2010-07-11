@@ -1187,11 +1187,6 @@ public class CompositionalGeneralisedConflictChecker extends
       return aut.getTransitions().size();
     }
 
-    boolean checkForLocalEvent(final Candidate candidate)
-    {
-      return true;
-    }
-
     protected AutomatonProxy getHeuristicProperty(
                                                   final Collection<AutomatonProxy> automata)
     {
@@ -1212,11 +1207,6 @@ public class CompositionalGeneralisedConflictChecker extends
     protected int getHeuristicFigure(final AutomatonProxy aut)
     {
       return -aut.getStates().size();
-    }
-
-    boolean checkForLocalEvent(final Candidate candidate)
-    {
-      return true;
     }
 
     protected AutomatonProxy getHeuristicProperty(
@@ -1391,8 +1381,9 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     protected double getHeuristicValue(final Candidate candidate)
     {
-      return (double) countCandidatesLocalEvents(candidate)
-          / (double) countCandidatesTotalEvents(candidate);
+      final double localEvents = countCandidatesLocalEvents(candidate);
+      final double totalEvents = countCandidatesTotalEvents(candidate);
+      return localEvents / totalEvents;
     }
   }
 
