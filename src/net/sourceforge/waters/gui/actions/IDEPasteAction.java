@@ -137,7 +137,7 @@ public class IDEPasteAction
     final boolean enabled;
     if (watersOwner != null) {
       enabled = watersOwner.canPaste(transferable);
-    } else if (swingOwner != null) {
+    } else if (swingOwner != null && swingOwner.isEditable()) {
       enabled = transferable.isDataFlavorSupported(DataFlavor.stringFlavor);
     } else {
       enabled = false;
@@ -150,7 +150,7 @@ public class IDEPasteAction
   //# Data Members
   private final Action mDefaultAction;
 
-  
+
   //#######################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
