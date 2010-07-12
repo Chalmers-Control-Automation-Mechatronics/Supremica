@@ -1253,6 +1253,18 @@ public class CompositionalGeneralisedConflictChecker extends
       return true;
     }
 
+    /**
+     * Returns true without searching for a local event.
+     *
+     * @param candidate
+     * @return true, there is definitely a local event.
+     */
+    @Override
+    protected boolean checkForLocalEvent(final Candidate candidate)
+    {
+      return true;
+    }
+
   }
 
 
