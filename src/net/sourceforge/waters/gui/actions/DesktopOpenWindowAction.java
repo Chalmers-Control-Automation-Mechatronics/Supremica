@@ -15,7 +15,12 @@ public class DesktopOpenWindowAction extends WatersDesktopAction
   {
     super(ide);
     mAutomaton = autoToOpen;
-    putValue(Action.NAME, "Open Automaton");
+    final String name = mAutomaton.getName();
+    if (name.length() <= 32) {
+      putValue(Action.NAME, "Open Automaton " + name);
+    } else {
+      putValue(Action.NAME, "Open Automaton");
+    }
     putValue(Action.SHORT_DESCRIPTION, "Open this Automaton window");
     setEnabled(true);
   }

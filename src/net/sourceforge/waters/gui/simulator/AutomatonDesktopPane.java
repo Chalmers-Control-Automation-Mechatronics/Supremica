@@ -47,8 +47,7 @@ public class AutomatonDesktopPane
     mSim = sim;
     mContainer = container;
     mObservers = new HashSet<InternalFrameObserver>();
-    mPopupFactory =
-      new DesktopPanePopupFactory(container.getIDE().getPopupActionManager());
+    mPopupFactory = new SimulatorPopupFactory(sim);
     order = new ArrayList<String>();
     setBackground(EditorColor.BACKGROUNDCOLOR);
     container.attach(this);
@@ -459,7 +458,7 @@ public class AutomatonDesktopPane
   private final Simulation mSim;
   private final ModuleContainer mContainer;
   private final Set<InternalFrameObserver> mObservers;
-  private final DesktopPanePopupFactory mPopupFactory;
+  private final SimulatorPopupFactory mPopupFactory;
   private boolean mHasBeenEdited;
 
 

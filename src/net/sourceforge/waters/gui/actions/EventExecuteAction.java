@@ -16,8 +16,13 @@ class EventExecuteAction extends WatersAction
   {
     super(ide);
     mEvent = event;
-    putValue(Action.NAME, "Execute Event");
-    putValue(Action.SHORT_DESCRIPTION, "Execute event " + event.getName());
+    final String name = event.getName();
+    if (name.length() <= 32) {
+      putValue(Action.NAME, "Execute Event " + event.getName());
+    } else {
+      putValue(Action.NAME, "Execute Event");
+    }
+    putValue(Action.SHORT_DESCRIPTION, "Execute this event");
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_STEP);
     updateEnabledStatus();
   }

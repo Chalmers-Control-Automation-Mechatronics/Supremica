@@ -14,7 +14,12 @@ public class DesktopCloseWindowAction extends WatersDesktopAction
   {
     super(ide);
     mAutomaton = autoToClose;
-    putValue(Action.NAME, "Close Automaton");
+    final String name = mAutomaton.getName();
+    if (name.length() <= 32) {
+      putValue(Action.NAME, "Close Automaton " + name);
+    } else {
+      putValue(Action.NAME, "Close Automaton");
+    }
     putValue(Action.SHORT_DESCRIPTION, "Close this Automaton window");
     setEnabled(true);
   }

@@ -58,8 +58,7 @@ public class EventJTree
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
-    final ModuleContainer container = sim.getModuleContainer();
-    mPopupFactory = new EventTreePopupFactory(container.getIDE().getPopupActionManager(), mDesktop);
+    mPopupFactory = new SimulatorPopupFactory(sim);
     addMouseListener(new MouseListener() {
       public void mouseClicked(final MouseEvent e)
       {
@@ -73,6 +72,7 @@ public class EventJTree
             mSim.step(event);
           } else if (node instanceof AutomatonProxy) {
             final AutomatonProxy aut = (AutomatonProxy) node;
+            final ModuleContainer container = mSim.getModuleContainer();
             mDesktop.addAutomaton(aut.getName(), container, mSim, 2);
           }
         }
@@ -405,7 +405,7 @@ public class EventJTree
   private final ArrayList<Pair<Boolean, Integer>> mSortingMethods;
   private final ArrayList<String> expandedNodes;
   private JScrollPane mPane;
-  private final EventTreePopupFactory mPopupFactory;
+  private final SimulatorPopupFactory mPopupFactory;
 
 
   //#########################################################################

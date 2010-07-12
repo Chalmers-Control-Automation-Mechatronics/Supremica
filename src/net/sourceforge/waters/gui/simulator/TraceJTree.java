@@ -42,8 +42,6 @@ import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
-import org.supremica.gui.ide.ModuleContainer;
-
 
 public class TraceJTree
   extends JTree
@@ -66,8 +64,7 @@ public class TraceJTree
     setAutoscrolls(true);
     setToggleClickCount(0);
     totalEventWidth = 0;
-    final ModuleContainer container = sim.getModuleContainer();
-    mPopupFactory = new TraceTreePopupFactory(container.getIDE().getPopupActionManager(), desktop);
+    mPopupFactory = new SimulatorPopupFactory(sim);
     for (final Integer intVal : eventColumnWidth)
     {
       totalEventWidth += intVal;
@@ -396,7 +393,7 @@ public class TraceJTree
   private final ArrayList<String> automatonAreOpen;
   private JScrollPane mPane;
   private TIntHashSet mExpandedIndexes;
-  private final TraceTreePopupFactory mPopupFactory;
+  private final SimulatorPopupFactory mPopupFactory;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};

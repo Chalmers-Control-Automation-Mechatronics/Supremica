@@ -211,7 +211,11 @@ public class ModularControlLoopChecker
     // Please can the person who is adding a suppressWarnings("unused") please stop doing so. This is
     // a public method, and thus the suppressWarnings method just creates a warning itself, and that
     // warning says that the suppressWarnings statement is not needed. Thanks, ach17
-    public void removeLoopEvents(final EventProxy event)
+    // Then declare the method private. A private class does not need public
+    // methods (unless they are in an interface). Or delete the method---
+    // after all, it is not used. Robi
+    @SuppressWarnings("unused")
+    private void removeLoopEvents(final EventProxy event)
     {
       mFauxUncontrollable.add(event);
     }

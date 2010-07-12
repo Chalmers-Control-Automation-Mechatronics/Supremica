@@ -110,10 +110,7 @@ public class AutomatonDisplayPane
     final BindingContext bindings = sInfo.getBindingContext();
     final ProxyShapeProducer producer =
       new SubjectShapeProducer(graph, module, context, compiler, bindings);
-    mPopupFactory =
-      new DisplayPanePopupFactory(container.getIDE().getPopupActionManager(),
-                                  this,
-                                  (AutomatonDesktopPane) parent.getDesktopPane());
+    mPopupFactory = new DisplayPanePopupFactory(sim, this);
     setShapeProducer(producer);
     final int width;
     final int height;
@@ -186,7 +183,7 @@ public class AutomatonDisplayPane
       return false;
     } else {
       final RenderingStatus status = getRenderingStatus(mFocusedItem);
-      return status.isEnabled();
+      return status != null && status.isEnabled();
     }
   }
 
@@ -194,7 +191,7 @@ public class AutomatonDisplayPane
   {
     if (proxyToFire != null) {
       final RenderingStatus status = getRenderingStatus(mFocusedItem);
-      if (status.isEnabled()) {
+      if (status != null && status.isEnabled()) {
         final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
         final List<SimulatorStep> possibleSteps =
           new ArrayList<SimulatorStep>();
@@ -670,7 +667,7 @@ public class AutomatonDisplayPane
     public String visitEdgeProxy(final EdgeProxy edge)
     {
       final RenderingStatus status = getRenderingStatus(edge);
-      if (status.getCount() == 1) {
+      if (status != null && status.getCount() == 1) {
         return getTransitionToolTip(edge);
       } else {
         return null;

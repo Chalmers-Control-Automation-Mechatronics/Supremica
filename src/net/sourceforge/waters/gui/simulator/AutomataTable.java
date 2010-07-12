@@ -62,7 +62,7 @@ class AutomataTable extends JTable
     listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     getTableHeader().addMouseListener(new TableHeaderMouseListener());
     setShowGrid(!DISABLE_AUTOMATON_GRIDLINES);
-    mPopupFactory = new AutomatonTablePopupFactory(sim.getModuleContainer().getIDE().getPopupActionManager(), mDesktop);
+    mPopupFactory = new SimulatorPopupFactory(sim);
     this.addMouseMotionListener(new MouseMotionListener(){
       public void mouseDragged(final MouseEvent e)
       {
@@ -217,7 +217,7 @@ class AutomataTable extends JTable
   //# Data Members
   private final Simulation mSimulation;
   private final AutomatonDesktopPane mDesktop;
-  private final AutomatonTablePopupFactory mPopupFactory;
+  private final SimulatorPopupFactory mPopupFactory;
 
 
   //#########################################################################

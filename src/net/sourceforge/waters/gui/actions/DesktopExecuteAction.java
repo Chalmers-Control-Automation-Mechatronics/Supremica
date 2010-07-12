@@ -4,20 +4,36 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 
 import org.supremica.gui.ide.IDE;
 
 public class DesktopExecuteAction extends WatersDesktopAction
 {
-  protected DesktopExecuteAction(final IDE ide, final AutomatonProxy autoToClose, final Proxy proxyToFire)
+  protected DesktopExecuteAction(final IDE ide,
+                                 final AutomatonProxy aut,
+                                 final Proxy proxyToFire)
   {
     super(ide);
-    mAutomaton = autoToClose;
+    mAutomaton = aut;
     mProxyToFire = proxyToFire;
-    putValue(Action.NAME, "Execute Transition");
+    String name = null;
+    if (proxyToFire instanceof IdentifierProxy) {
+      name = proxyToFire.toString();
+      if (name.length() > 32) {
+        name = null;
+      }
+    }
+    if (name != null) {
+      putValue(Action.NAME, "Execute Transition " + name);
+    } else {
+      putValue(Action.NAME, "Execute Transition");
+    }
     putValue(Action.SHORT_DESCRIPTION, "Execute this transition");
+    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_STEP);
     setEnabled(true);
   }
 

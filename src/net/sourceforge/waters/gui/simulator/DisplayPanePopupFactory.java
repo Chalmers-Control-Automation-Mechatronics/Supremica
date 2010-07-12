@@ -2,65 +2,67 @@ package net.sourceforge.waters.gui.simulator;
 
 import javax.swing.JPopupMenu;
 
-import net.sourceforge.waters.gui.PopupFactory;
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.ModuleProxyVisitor;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 
 class DisplayPanePopupFactory
-  extends PopupFactory
+  extends SimulatorPopupFactory
 {
 
   //#########################################################################
   //# Constructor
-  DisplayPanePopupFactory(final WatersPopupActionManager master,
-                          final AutomatonDisplayPane displayPane,
-                          final AutomatonDesktopPane desktopPane)
+  DisplayPanePopupFactory(final Simulation sim,
+                          final AutomatonDisplayPane displayPane)
   {
-    super(master);
-    mVisitor = new DisplayPanePopupVisitor();
+    super(sim);
     mDisplayPane = displayPane;
-    mDesktopPane = desktopPane;
+    mVisitor = new PopupVisitor();
   }
 
 
   //#########################################################################
   //# Menu Items
+  @Override
   protected void addDefaultMenuItems()
   {
-    // Do nothing
+    final AutomatonProxy aut = mDisplayPane.getAutomaton();
+    super.addItemSpecificMenuItems(aut);
   }
 
+  @Override
   protected void addItemSpecificMenuItems(final Proxy proxy)
   {
-    try {
-      proxy.acceptVisitor(mVisitor);
-    } catch (final VisitorException exception) {
-      throw exception.getRuntimeException();
-    }
-  }
-
-  protected void addCommonMenuItems()
-  {
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
-    AutomatonPopupFactory.setPopup(popup, master, mDesktopPane, mDisplayPane.getAutomaton());
+    mVisitor.addMenuItems(proxy);
+    final AutomatonProxy aut = mDisplayPane.getAutomaton();
+    super.addItemSpecificMenuItems(aut);
   }
 
 
   //#########################################################################
   //# Inner Class DisplayPanePopupVisitor
-  private class DisplayPanePopupVisitor
+  private class PopupVisitor
     extends AbstractModuleProxyVisitor
   {
+
+    //#######################################################################
+    //# Invocation
+    private void addMenuItems(final Proxy proxy)
+    {
+      try {
+        proxy.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
@@ -72,23 +74,23 @@ class DisplayPanePopupFactory
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
     {
       visitProxy(edge);
-      if (mDisplayPane != null) {
-        if (mDisplayPane.canExecute()) {
-          final WatersPopupActionManager master = getMaster();
-          final JPopupMenu popup = getPopup();
-          final IDEAction execute =
-            master.getDesktopExecuteAction(mDisplayPane.getAutomaton(), edge);
-          popup.add(execute);
-          popup.addSeparator();
-        }
+      if (mDisplayPane != null && mDisplayPane.canExecute()) {
+        final WatersPopupActionManager master = getMaster();
+        final JPopupMenu popup = getPopup();
+        final IDEAction execute =
+          master.getDesktopExecuteAction(mDisplayPane.getAutomaton(), edge);
+        popup.add(execute);
+        popup.addSeparator();
       }
       return null;
     }
 
-    public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
+    @Override
+    public Object visitIdentifierProxy(final IdentifierProxy ident)
     {
       visitProxy(ident);
       if (mDisplayPane != null && mDisplayPane.canExecute()) {
@@ -102,6 +104,7 @@ class DisplayPanePopupFactory
       return null;
     }
 
+    @Override
     public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
     {
       visitProxy(node);
@@ -121,8 +124,7 @@ class DisplayPanePopupFactory
 
   //#######################################################################
   //# Data Members
-  private final ModuleProxyVisitor mVisitor;
+  private final PopupVisitor mVisitor;
   private final AutomatonDisplayPane mDisplayPane;
-  private final AutomatonDesktopPane mDesktopPane;
 
 }
