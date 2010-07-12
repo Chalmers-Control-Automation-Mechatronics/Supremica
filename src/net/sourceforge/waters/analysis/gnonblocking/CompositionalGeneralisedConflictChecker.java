@@ -1020,10 +1020,14 @@ public class CompositionalGeneralisedConflictChecker extends
     boolean validateCandidate(final Candidate candidate)
     {
       if (!mUnsuccessfulCandidates.contains(candidate)) {
-        if (checkForLocalEvent(candidate)) {
-          if (checkForSharedEvent(candidate)) {
-            return true;
-          }
+        // if (checkForLocalEvent(candidate)) {
+        // TODO:checkForLocalEvent() has to be disabled for pairing heuristics,
+        // because there may be cases where there are no two automata containing
+        // a local event. Sometimes every event is in at least three automata.
+        // In that case, we have to pair automata without local events
+        if (checkForSharedEvent(candidate)) {
+          return true;
+          // }
         }
       }
       return false;
@@ -1474,9 +1478,10 @@ public class CompositionalGeneralisedConflictChecker extends
 
     protected double getHeuristicValue(final Candidate candidate)
     {
-      final int candidatesTotalEvents = countCandidatesTotalEvents(candidate);
-      return (double) countCandidatesSharedEvents(candidate)
-          / (double) candidatesTotalEvents;
+      final double candidatesTotalEvents =
+          countCandidatesTotalEvents(candidate);
+      final double sharedEvents = countCandidatesSharedEvents(candidate);
+      return sharedEvents / candidatesTotalEvents;
     }
   }
 
