@@ -1078,12 +1078,6 @@ public class CompositionalGeneralisedConflictChecker extends
      */
     protected List<Candidate> evaluate(final ProductDESProxy model)
     {
-      // TODO Candidates consisting of all automata should be suppressed
-      // in all cases (not only when the first pairing fails).
-      // TODO: unsure if I understood correctly what the problem is - candidates
-      // for pairing heuristics can only ever have two automata...so I think I
-      // only ever need to check that there will be more than 2 automata AFTER
-      // the failing aut is removed?
       Collection<AutomatonProxy> automata = model.getAutomata();
       AutomatonProxy chosenAut = getHeuristicProperty(automata);
       List<Candidate> candidates = pairAutomata(chosenAut, automata);
@@ -1115,22 +1109,24 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       final List<Candidate> candidates =
           new ArrayList<Candidate>(automata.size() - 1);
-      for (final AutomatonProxy a : automata) {
-        if (a != chosenAut) {
-          final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
-          // Bring pair into defined ordering.
-          if (chosenAut.compareTo(a) < 0) {
-            pair.add(chosenAut);
-            pair.add(a);
-          } else {
-            pair.add(a);
-            pair.add(chosenAut);
-          }
-          final Set<EventProxy> localEvents = identifyLocalEvents(pair);
-          final Candidate candidate = new Candidate(pair, localEvents);
-          candidate.setLocalEvents(localEvents);
-          if (validateCandidate(candidate)) {
-            candidates.add(candidate);
+      if (automata.size() > 2) {
+        for (final AutomatonProxy a : automata) {
+          if (a != chosenAut) {
+            final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
+            // Bring pair into defined ordering.
+            if (chosenAut.compareTo(a) < 0) {
+              pair.add(chosenAut);
+              pair.add(a);
+            } else {
+              pair.add(a);
+              pair.add(chosenAut);
+            }
+            final Set<EventProxy> localEvents = identifyLocalEvents(pair);
+            final Candidate candidate = new Candidate(pair, localEvents);
+            candidate.setLocalEvents(localEvents);
+            if (validateCandidate(candidate)) {
+              candidates.add(candidate);
+            }
           }
         }
       }
