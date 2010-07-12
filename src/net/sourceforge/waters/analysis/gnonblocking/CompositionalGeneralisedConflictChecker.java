@@ -1081,7 +1081,7 @@ public class CompositionalGeneralisedConflictChecker extends
       Collection<AutomatonProxy> automata = model.getAutomata();
       AutomatonProxy chosenAut = getHeuristicProperty(automata);
       List<Candidate> candidates = pairAutomata(chosenAut, automata);
-      final int minCandidateSize = 4;
+      final int minCandidateSize = 3;
       if (candidates.size() == 0 && automata.size() >= minCandidateSize) {
         automata = new ArrayList<AutomatonProxy>(model.getAutomata());
         while (candidates.size() == 0 && automata.size() >= minCandidateSize) {
