@@ -68,7 +68,10 @@ public abstract class AbstractControlLoopCheckerTest
     throws Exception
   {
     for (int looper = 0; looper < 10; looper++)
+    {
+      System.out.println("Run " + looper);
       test_Uneven_Cancel1();
+    }
   }
 
   public void testReentrant()

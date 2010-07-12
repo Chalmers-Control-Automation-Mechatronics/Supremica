@@ -8,6 +8,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -146,9 +147,12 @@ public class AutomataGroup
       mLoopIndex = checker.getCounterExample().getLoopIndex();
     }
     mNonLoopEvents = checker.getNonLoopEvents();
-    System.out.println(getTextNonLoop());
+    mStats = checker.getAnalysisResult();
+    //System.out.println(getStatisticsText());
+    //System.out.println(getTextNonLoop());
   }
 
+  @SuppressWarnings("unused")
   private String getTextNonLoop()
   {
     String output = "Non Loop Events from " + getName() + " are ";
@@ -168,10 +172,19 @@ public class AutomataGroup
     output = output.substring(0, output.length() - 1);
     return output;
   }
+  public VerificationResult getStatistics()
+  {
+    return mStats;
+  }
+  public String getStatisticsText()
+  {
+    return "Stats: Automata:" + mStats.getTotalNumberOfAutomata() + ". States: " + mStats.getTotalNumberOfStates() + ". Transitions: " + mStats.getTotalNumberOfTransitions() + ". Runtime: " + mStats.getRunTime();
+  }
 
   Collection<EventProxy> mNonLoopEvents;
   Set<AutomatonProxy> mAllAutomata;
   List<EventProxy> mCounterExampleTrace;
   Set<EventProxy> mSensitiveEvents;
+  VerificationResult mStats;
   int mLoopIndex;
 }

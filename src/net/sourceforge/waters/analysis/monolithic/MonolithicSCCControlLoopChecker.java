@@ -376,7 +376,6 @@ public class MonolithicSCCControlLoopChecker
     mLoopEvents = new THashSet<EventProxy>();
     stack = new Stack<EncodedStateTuple>();
     numStates = 0;
-
   }
 
 
@@ -435,7 +434,7 @@ public class MonolithicSCCControlLoopChecker
       if (stackSize != 0)
       {
         getLoopEvents(encodedCurrTuple);
-        while (stack.size() >= firstStackSize)
+        while (stack.size() > firstStackSize)
         {
           final EncodedStateTuple popped = stack.pop();
           popped.setInComponent(true);
@@ -825,6 +824,8 @@ public class MonolithicSCCControlLoopChecker
               output.add(mEventList.get(i));
             }
           }
+          else
+            throw new UnsupportedOperationException("The state hasn't been visited yet");
       }
     }
     mLoopEvents.addAll(output);

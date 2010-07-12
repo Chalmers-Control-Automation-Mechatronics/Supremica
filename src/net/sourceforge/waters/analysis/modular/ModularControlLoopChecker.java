@@ -12,6 +12,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
@@ -77,10 +78,8 @@ public class ModularControlLoopChecker
             {
               removedLoopEvents = true;
             }
-            System.out.println("DEBUG: Loop events are " + printLoopEvents());
             if (mLoopEvents.size() == 0)
             {
-              System.out.println("Solved: True");
               setSatisfiedResult();
               output = true;
               break solved;
@@ -102,7 +101,6 @@ public class ModularControlLoopChecker
               }
               if (acceptsAll)
               {
-                System.out.println("Solved: False");
                 final LoopTraceProxy loop =
                   getFactory().createLoopTraceProxy(getModel().getName() + "-loop",
                                                     getModel(),
@@ -136,13 +134,13 @@ public class ModularControlLoopChecker
           }
         }
       }
-      System.out.println("DEBUG: Processing complete");
     } finally {
       tearDown();
     }
     return output;
   }
 
+  @SuppressWarnings("unused")
   private String printLoopEvents()
   {
     String output = "\nmLoopEvents says they are ";
@@ -210,7 +208,9 @@ public class ModularControlLoopChecker
       mFauxUncontrollable = new THashSet<EventProxy>();
     }
 
-    @SuppressWarnings("unused")
+    // Please can the person who is adding a suppressWarnings("unused") please stop doing so. This is
+    // a public method, and thus the suppressWarnings method just creates a warning itself, and that
+    // warning says that the suppressWarnings statement is not needed. Thanks, ach17
     public void removeLoopEvents(final EventProxy event)
     {
       mFauxUncontrollable.add(event);
@@ -241,18 +241,34 @@ public class ModularControlLoopChecker
 
   //#########################################################################
   //# Setting the Result
-  /*
   @Override
   protected void addStatistics()
   {
     super.addStatistics();
     final VerificationResult result = getAnalysisResult();
+    double maxStates = -1;
+    double maxTransitions = -1;
+    int maxAutomata = -1;
+    for (final AutomataGroup group : mAutoSets)
+    {
+      if (group.getStatistics() != null)
+      {
+        if (group.getStatistics().getTotalNumberOfAutomata() > maxAutomata)
+          maxAutomata = group.getStatistics().getTotalNumberOfAutomata();
+        if (group.getStatistics().getTotalNumberOfStates() > maxStates)
+          maxStates = group.getStatistics().getTotalNumberOfStates();
+        if (group.getStatistics().getTotalNumberOfTransitions() > maxTransitions)
+          maxTransitions = group.getStatistics().getTotalNumberOfTransitions();
+      }
+    }
+    result.setPeakNumberOfNodes(maxAutomata);
+    result.setPeakNumberOfStates(maxStates);
+    result.setPeakNumberOfTransitions(maxTransitions);
     //final int numstates = mGlobalStateSet.size();
     //result.setNumberOfAutomata(mNumAutomata);
     //result.setNumberOfStates(numstates);
     //result.setPeakNumberOfNodes(numstates);
   }
-  */
 
 
   //#########################################################################
