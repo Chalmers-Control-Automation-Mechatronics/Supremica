@@ -70,37 +70,23 @@ public class TraceJTree
       totalEventWidth += intVal;
     }
     this.addMouseListener(new MouseAdapter(){
-      public void mouseClicked(final MouseEvent e)
+      public void mouseClicked(final MouseEvent event)
       {
-        if (e.getClickCount() == 2)
-        {
-          final TreePath path = TraceJTree.this.getClosestPathForLocation((int)e.getPoint().getX(), (int)e.getPoint().getY());
-          final MutableTreeNode node = (MutableTreeNode)path.getLastPathComponent();
-          if (node == null)
+        if (event.getButton() == MouseEvent.BUTTON1 &&
+            event.getClickCount() == 2) {
+          final TreePath path =
+            getClosestPathForLocation(event.getX(), event.getY());
+          final Object node = path.getLastPathComponent();
+          if (node == null) {
             return; // Nothing is selected
-          if (node instanceof TraceStepTreeNode)
-          {
-            final TraceStepTreeNode eventNode = (TraceStepTreeNode)node;
+          } else if (node instanceof TraceStepTreeNode) {
+            final TraceStepTreeNode eventNode = (TraceStepTreeNode) node;
             final int targetTime = eventNode.getTime();
-            int currentTime = sim.getCurrentTime();
-            while (currentTime != targetTime)
-            {
-              if (targetTime < currentTime)
-              {
-                sim.stepBack();
-                currentTime--;
-              }
-              else if (targetTime > currentTime)
-              {
-                sim.replayStep();
-                currentTime++;
-              }
-            }
-          }
-          else if (AutomatonLeafNode.class.isInstance(node))
-          {
+            mSim.setState(targetTime);
+          } else if (node instanceof AutomatonLeafNode) {
             final AutomatonProxy toAdd = ((AutomatonLeafNode)node).getAutomaton();
-            mDesktop.addAutomaton(toAdd.getName(), mSim.getModuleContainer(), mSim, 2);
+            mDesktop.addAutomaton(toAdd.getName(), mSim.getModuleContainer(),
+                                  mSim, 2);
           }
         }
       }
