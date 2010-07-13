@@ -903,6 +903,11 @@ public class CompositionalGeneralisedConflictChecker extends
     return new HeuristicMustL();
   }
 
+  public HeuristicMinA createHeuristicMinA()
+  {
+    return new HeuristicMinA();
+  }
+
   public HeuristicMaxL createHeuristicMaxL()
   {
     return new HeuristicMaxL();
@@ -1399,6 +1404,25 @@ public class CompositionalGeneralisedConflictChecker extends
       }
       return false;
     }
+  }
+
+
+  /**
+   * Performs step 2 of the approach to select the automata to compose. The
+   * chosen candidate is the one with the lowest proportion of alpha-marked
+   * states.
+   *
+   * @author rmf18
+   */
+  private class HeuristicMinA extends MinSelectingHeuristic
+  {
+
+    protected double getHeuristicValue(final Candidate candidate)
+    {
+      // TODO
+      return 0;
+    }
+
   }
 
 
