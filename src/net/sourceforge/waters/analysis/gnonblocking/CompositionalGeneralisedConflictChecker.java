@@ -346,15 +346,17 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private boolean checkTrivial(final AutomatonProxy abstractedAut)
   {
-    // TODO Should also check the alphabet for the propositions ...
-    if (abstractedAut.getStates().size() == 1) {
-      final Iterator<StateProxy> stateIter =
-          abstractedAut.getStates().iterator();
-      final StateProxy singleState = stateIter.next();
-      assert stateIter.hasNext() == false;
-      if (singleState.getPropositions().containsAll(mPropositions)) {
-        if (abstractedAut.getTransitions().size() == 0) {
-          return true;
+    // checks alphabet for propositions
+    if (abstractedAut.getEvents().containsAll(mPropositions)) {
+      if (abstractedAut.getStates().size() == 1) {
+        final Iterator<StateProxy> stateIter =
+            abstractedAut.getStates().iterator();
+        final StateProxy singleState = stateIter.next();
+        assert stateIter.hasNext() == false;
+        if (singleState.getPropositions().containsAll(mPropositions)) {
+          if (abstractedAut.getTransitions().size() == 0) {
+            return true;
+          }
         }
       }
     }
@@ -379,8 +381,8 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
   /**
-   * Fills in the target states in the state maps for each step of the trace
-   * for all automata.
+   * Fills in the target states in the state maps for each step of the trace for
+   * all automata.
    */
   private ConflictTraceProxy saturateTrace(
                                            final ConflictTraceProxy counterexample)
