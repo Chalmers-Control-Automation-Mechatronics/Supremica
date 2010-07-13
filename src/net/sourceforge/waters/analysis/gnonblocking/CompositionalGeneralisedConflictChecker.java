@@ -1279,6 +1279,8 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     protected abstract double getHeuristicValue(Candidate candidate);
 
+    protected abstract boolean getMaxOrMin(double currentMaxMin, double newValue);
+
     /**
      * Gets the number of events for this candidate, excluding tau.
      *
@@ -1355,20 +1357,47 @@ public class CompositionalGeneralisedConflictChecker extends
       List<Candidate> chosenCandidates = new ArrayList<Candidate>();
       final Candidate chosenCandidate = it.next();
       chosenCandidates.add(chosenCandidate);
-      double maxValue = getHeuristicValue(chosenCandidate);
+      double value = getHeuristicValue(chosenCandidate);
 
       while (it.hasNext()) {
         final Candidate nextCan = it.next();
-        final double proportion = getHeuristicValue(nextCan);
-        if (proportion > maxValue) {
+        final double newProportion = getHeuristicValue(nextCan);
+        if (getMaxOrMin(value, newProportion)) {
           chosenCandidates = new ArrayList<Candidate>();
-          maxValue = proportion;
+          value = newProportion;
           chosenCandidates.add(nextCan);
-        } else if (proportion == maxValue) {
+        } else if (newProportion == value) {
           chosenCandidates.add(nextCan);
         }
       }
       return chosenCandidates;
+
+    }
+  }
+
+
+  private abstract class MinSelectingHeuristic extends SelectingHeuristic
+  {
+    protected boolean getMaxOrMin(final double currentMaxMin,
+                                  final double newValue)
+    {
+      if (currentMaxMin > newValue) {
+        return true;
+      }
+      return false;
+    }
+  }
+
+
+  private abstract class MaxSelectingHeuristic extends SelectingHeuristic
+  {
+    protected boolean getMaxOrMin(final double currentMaxMin,
+                                  final double newValue)
+    {
+      if (currentMaxMin < newValue) {
+        return true;
+      }
+      return false;
     }
   }
 
@@ -1377,7 +1406,7 @@ public class CompositionalGeneralisedConflictChecker extends
    * Performs step 2 of the approach to select the automata to compose. The
    * chosen candidate is the one with the highest proportion of local events.
    */
-  private class HeuristicMaxLt extends SelectingHeuristic
+  private class HeuristicMaxLt extends MaxSelectingHeuristic
   {
     protected double getHeuristicValue(final Candidate candidate)
     {
@@ -1392,7 +1421,7 @@ public class CompositionalGeneralisedConflictChecker extends
    * chosen candidate is the one with the highest proportion of local events
    * excluding tau from calculations.
    */
-  private class HeuristicMaxL extends SelectingHeuristic
+  private class HeuristicMaxL extends MaxSelectingHeuristic
   {
     protected double getHeuristicValue(final Candidate candidate)
     {
@@ -1403,7 +1432,7 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  private abstract class TransitionHeuristic extends SelectingHeuristic
+  private abstract class TransitionHeuristic extends MaxSelectingHeuristic
   {
     private int mLocalTransitions;
     private int mTotalTransitions;
@@ -1459,7 +1488,7 @@ public class CompositionalGeneralisedConflictChecker extends
    * chosen candidate is the one with the highest proportion of events which are
    * shared between that candidates automata.
    */
-  private class HeuristicMaxCt extends SelectingHeuristic
+  private class HeuristicMaxCt extends MaxSelectingHeuristic
   {
 
     protected double getHeuristicValue(final Candidate candidate)
@@ -1476,7 +1505,7 @@ public class CompositionalGeneralisedConflictChecker extends
    * chosen candidate is the one with the highest proportion of events which are
    * shared between that candidates automata excluding tau.
    */
-  private class HeuristicMaxC extends SelectingHeuristic
+  private class HeuristicMaxC extends MaxSelectingHeuristic
   {
 
     protected double getHeuristicValue(final Candidate candidate)
@@ -1506,31 +1535,8 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
 
-  private class HeuristicMinS extends SelectingHeuristic
+  private class HeuristicMinS extends MinSelectingHeuristic
   {
-    @Override
-    public List<Candidate> evaluate(final List<Candidate> candidates)
-    {
-      Candidate chosenCandidate = candidates.get(0);
-      List<Candidate> chosenCandidates = new ArrayList<Candidate>();
-      double smallestProduct = getHeuristicValue(chosenCandidate);
-      chosenCandidates.add(chosenCandidate);
-      for (int i = 1; i < candidates.size(); i++) {
-        final Candidate candidate = candidates.get(i);
-        final double newproduct = getHeuristicValue(candidate);
-        if (smallestProduct > newproduct) {
-          chosenCandidates = new ArrayList<Candidate>();
-          smallestProduct = newproduct;
-          chosenCandidate = candidate;
-          chosenCandidates.add(chosenCandidate);
-        } else if (smallestProduct == newproduct) {
-          chosenCandidate = candidate;
-          chosenCandidates.add(chosenCandidate);
-        }
-      }
-      return chosenCandidates;
-    }
-
     /**
      * Predicts number of states for synchronous product with respect to the
      * number of local events.
@@ -1624,6 +1630,13 @@ public class CompositionalGeneralisedConflictChecker extends
     protected double getHeuristicValue(final Candidate candidate)
     {
       return 0;
+    }
+
+    // not used
+    protected boolean getMaxOrMin(final double currentMaxMin,
+                                  final double newValue)
+    {
+      return false;
     }
   }
 
