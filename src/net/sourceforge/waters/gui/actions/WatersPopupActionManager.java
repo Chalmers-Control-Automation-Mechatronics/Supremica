@@ -244,11 +244,6 @@ public class WatersPopupActionManager
     return master.getAction(SimulationCascadeAction.class);
   }
 
-  public IDEAction getResizeAllAction()
-  {
-    return new DesktopResizeAllAction(mIDE);
-  }
-
   public IDEAction getResizeAction(final AutomatonProxy automaton)
   {
     return new DesktopOriginalSizeAction(mIDE, automaton);

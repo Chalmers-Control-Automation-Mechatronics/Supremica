@@ -379,8 +379,8 @@ public class CompositionalGeneralisedConflictChecker extends
   }
 
   /**
-   * Fills in the target states in the stateMaps for each step of the trace for
-   * all automaton.
+   * Fills in the target states in the state maps for each step of the trace
+   * for all automata.
    */
   private ConflictTraceProxy saturateTrace(
                                            final ConflictTraceProxy counterexample)
@@ -1033,6 +1033,7 @@ public class CompositionalGeneralisedConflictChecker extends
       return false;
     }
 
+    @SuppressWarnings("unused")
     boolean checkForLocalEvent(final Candidate candidate)
     {
       if (candidate.getLocalEventCount() > 0) {

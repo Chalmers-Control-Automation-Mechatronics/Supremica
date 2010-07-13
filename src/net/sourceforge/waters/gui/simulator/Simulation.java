@@ -134,6 +134,17 @@ public class Simulation implements ModelObserver, Observer
 
   //###################################################################################
   //# Control
+  public void setState(final int time)
+  {
+    if (mCurrentTime != time) {
+      mCurrentTime = time;
+      loadSimulatorState();
+      final SimulationChangeEvent simEvent =
+        new SimulationChangeEvent(this, SimulationChangeEvent.STATE_CHANGED);
+      fireSimulationChangeEvent(simEvent);
+    }
+  }
+
   public void setState(final AutomatonProxy aut, final StateProxy state)
   {
     if (!aut.getStates().contains(state)) {
@@ -150,7 +161,7 @@ public class Simulation implements ModelObserver, Observer
       mCurrentTime++;
       loadSimulatorState();
       final SimulationChangeEvent simEvent = new SimulationChangeEvent
-      (this, SimulationChangeEvent.STATE_CHANGED);
+        (this, SimulationChangeEvent.STATE_CHANGED);
       fireSimulationChangeEvent(simEvent);
     }
   }
@@ -195,7 +206,7 @@ public class Simulation implements ModelObserver, Observer
   public void step(final EventProxy event)
   {
     final List<SimulatorStep> steps = new ArrayList<SimulatorStep>();
-    for (final SimulatorStep step: getEnabledSteps()) {
+    for (final SimulatorStep step : getEnabledSteps()) {
       if (step.getEvent() == event) {
         steps.add(step);
       }

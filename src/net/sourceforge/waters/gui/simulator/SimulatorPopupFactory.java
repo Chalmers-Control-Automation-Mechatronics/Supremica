@@ -37,6 +37,7 @@ class SimulatorPopupFactory extends PopupFactory
     super(sim.getModuleContainer().getIDE().getPopupActionManager());
     mSimulation = sim;
     mPopupVisitor = new PopupVisitor();
+    mTime = -1;
   }
 
 
@@ -47,9 +48,12 @@ class SimulatorPopupFactory extends PopupFactory
                       final Proxy proxy,
                       final int time)
   {
-    mTime = time;
-    maybeShowPopup(invoker, event, proxy);
-    mTime = -1;
+    try {
+      mTime = time;
+      maybeShowPopup(invoker, event, proxy);
+    } finally {
+      mTime = -1;
+    }
   }
 
 
