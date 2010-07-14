@@ -213,6 +213,13 @@ public class ModuleContainer
     case ModelChangeEvent.NAME_CHANGED:
       if (event.getSource() == getModule()) {
         setDocumentNameHasChanged(true);
+      } else {
+        mCompiledDES = null;
+      }
+      break;
+    case ModelChangeEvent.STATE_CHANGED:
+      if (event.getSource() != getModule()) {
+        mCompiledDES = null;
       }
       break;
     case ModelChangeEvent.ITEM_REMOVED:
@@ -226,12 +233,13 @@ public class ModuleContainer
           // deletions can be undone!
         }
       }
+      mCompiledDES = null;
+      break;
+    case ModelChangeEvent.GEOMETRY_CHANGED:
       break;
     default:
-      break;
-    }
-    if (kind != ModelChangeEvent.GEOMETRY_CHANGED) {
       mCompiledDES = null;
+      break;
     }
   }
 

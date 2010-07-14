@@ -46,6 +46,7 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -546,8 +547,19 @@ public class Simulation implements ModelObserver, Observer
   // tab is activated.
   public void modelChanged(final ModelChangeEvent event)
   {
-    if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED) {
-      setCompiledDES(null);
+    final int kind = event.getKind();
+    switch (kind) {
+    case ModelChangeEvent.NAME_CHANGED:
+    case ModelChangeEvent.STATE_CHANGED:
+      if (!(event.getSource() instanceof ModuleProxy)) {
+        setCompiledDES(null);
+      }
+      break;
+    case ModelChangeEvent.GEOMETRY_CHANGED:
+      break;
+    default:
+      setCompiledDES(null);;
+      break;
     }
   }
 

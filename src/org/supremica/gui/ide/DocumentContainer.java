@@ -129,9 +129,8 @@ public abstract class DocumentContainer
         final DocumentSubject subject = (DocumentSubject) mDocument;
         subject.setName(tail);
       }
-    } else {
-      mDocumentNameHasChanged = false;
     }
+    mDocumentNameHasChanged = false;
   }
 
 
