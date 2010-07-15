@@ -609,6 +609,9 @@ public class Simulation implements ModelObserver, Observer
       mAutomataMap = null;
       mAutomataSensitiveToEvent = null;
       resetState(true);
+      final SimulationChangeEvent simEvent = new SimulationChangeEvent
+        (this, SimulationChangeEvent.MODEL_CHANGED);
+      fireSimulationChangeEvent(simEvent);
     }
   }
 

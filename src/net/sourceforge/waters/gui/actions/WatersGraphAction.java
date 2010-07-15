@@ -10,11 +10,15 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import java.awt.Component;
+
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.GraphEventPanel;
-import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+
+import org.supremica.gui.ide.ComponentEditorPanel;
+import org.supremica.gui.ide.EditorPanel;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -55,7 +59,7 @@ public abstract class WatersGraphAction
     case CONTAINER_SWITCH:
     case MAINPANEL_SWITCH:
     case SUBPANEL_SWITCH:
-      final EditorWindowInterface gui = getActiveEditorWindowInterface();
+      final EditorWindowInterface gui = getActiveComponentEditorPanel();
       final boolean enabled = gui != null;
       setEnabled(enabled);
       break;
@@ -73,14 +77,18 @@ public abstract class WatersGraphAction
    *          panel, or <CODE>null</CODE> if no graph editor panel is\
    *          currently active.
    */
-  EditorWindowInterface getActiveEditorWindowInterface()
+  ComponentEditorPanel getActiveComponentEditorPanel()
   {
     final ModuleContainer container = getActiveModuleContainer();
     if (container == null) {
       return null;
+    }
+    final Component panel = container.getActivePanel();
+    if (panel instanceof EditorPanel) {
+      final EditorPanel epanel = (EditorPanel) panel;
+      return epanel.getActiveEditorWindowInterface();
     } else {
-      final ModuleWindowInterface iface = container.getEditorPanel();
-      return iface.getActiveEditorWindowInterface();
+      return null;
     }
   }
 
@@ -91,7 +99,7 @@ public abstract class WatersGraphAction
    */
   GraphEditorPanel getActiveGraphEditorPanel()
   {
-    final EditorWindowInterface gui = getActiveEditorWindowInterface();
+    final ComponentEditorPanel gui = getActiveComponentEditorPanel();
     return gui == null ? null : gui.getGraphEditorPanel();
   }
 
@@ -102,7 +110,7 @@ public abstract class WatersGraphAction
    */
   GraphEventPanel getActiveGraphEventPanel()
   {
-    final EditorWindowInterface gui = getActiveEditorWindowInterface();
+    final EditorWindowInterface gui = getActiveComponentEditorPanel();
     return gui == null ? null : gui.getEventPanel();
   }
 

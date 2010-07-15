@@ -25,8 +25,6 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.subject.base.ModelChangeEvent;
-import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
@@ -36,7 +34,7 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public class AutomatonDesktopPane
   extends JDesktopPane
-  implements ModelObserver, Observer
+  implements SimulationObserver, Observer
 {
 
   //#########################################################################
@@ -51,7 +49,7 @@ public class AutomatonDesktopPane
     order = new ArrayList<String>();
     setBackground(EditorColor.BACKGROUNDCOLOR);
     container.attach(this);
-    container.getModule().addModelObserver(this);
+    sim.attach(this);
     addMouseListener(new MouseListener(){
       public void mouseClicked(final MouseEvent e)
       {
@@ -397,22 +395,21 @@ public class AutomatonDesktopPane
 
   //#########################################################################
   //# Interface SimulationObserver
-  public void modelChanged(final ModelChangeEvent event)
+  public void simulationChanged(final SimulationChangeEvent event)
   {
-    if (event.getKind() != ModelChangeEvent.GEOMETRY_CHANGED)
-    {
-      if (!mHasBeenEdited)
-      {
+    if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED) {
+      if (!mHasBeenEdited) {
         mHasBeenEdited = true;
         oldOpen.clear();
         order.clear();
-        if (mOpenAutomata.keySet().size() == 0)
+        if (mOpenAutomata.isEmpty()) {
           return;
+        }
+        // TODO This is done better by sorting the frames by z-order.
         final List<Map.Entry<String,AutomatonInternalFrame>> entries =
           new ArrayList<Map.Entry<String,AutomatonInternalFrame>>
             (mOpenAutomata.entrySet());
-        while (entries.size() != 0)
-        {
+        while (entries.size() != 0) {
           int highestZValue = Integer.MIN_VALUE;
           Map.Entry<String,AutomatonInternalFrame> lowestFrame = null;
           for (final Map.Entry<String,AutomatonInternalFrame> entry :

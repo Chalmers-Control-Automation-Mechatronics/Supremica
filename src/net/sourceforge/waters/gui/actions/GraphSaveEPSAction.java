@@ -10,23 +10,24 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
+
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.gui.GraphEditorPanel;
-import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
+import org.supremica.gui.ide.ComponentEditorPanel;
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
 
@@ -59,8 +60,8 @@ public class GraphSaveEPSAction
       final IDE ide = getIDE();
       final ModuleProxy module = surface.getModule();
       // The name of the graph ...
-      final EditorWindowInterface iface = getActiveEditorWindowInterface();
-      final String name = iface.getComponent().getName();
+      final ComponentEditorPanel panel = getActiveComponentEditorPanel();
+      final String name = panel.getComponent().getName();
       final JFileChooser chooser = getFileChooser(module, name);
       if (chooser.showSaveDialog(ide) != JFileChooser.APPROVE_OPTION) {
         return;
@@ -86,7 +87,7 @@ public class GraphSaveEPSAction
       }
     }
   }
-   
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -97,7 +98,7 @@ public class GraphSaveEPSAction
       mFileChooser = new JFileChooser();
       mFileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
       mFileChooser.setMultiSelectionEnabled(false);
-      final FileFilter filter = 
+      final FileFilter filter =
         new StandardExtensionFileFilter(EPS,
                                         "Encapsulated Postscript (*.eps)");
       mFileChooser.addChoosableFileFilter(filter);

@@ -15,8 +15,11 @@ import java.awt.event.KeyEvent;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
-import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+
+import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.ModuleContainer;
 
 
 /**
@@ -37,10 +40,11 @@ public class ShowModuleCommentAction
     super(ide);
     putValue(Action.NAME, "Show Module Comments");
     putValue(Action.SHORT_DESCRIPTION,
-	     "Edit the name and description of the current module");
+             "Edit the name and description of the current module");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_M);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_M, ActionEvent.CTRL_MASK));
+    updateEnabledStatus();
   }
 
 
@@ -48,8 +52,32 @@ public class ShowModuleCommentAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    final ModuleWindowInterface root = getActiveModuleWindowInterface();
-    root.showComment();
+    final IDE ide = getIDE();
+    final DocumentContainer container = ide.getActiveDocumentContainer();
+    if (container instanceof ModuleContainer) {
+      final ModuleContainer mcontainer = (ModuleContainer) container;
+      mcontainer.showComment();
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
+  public void update(final EditorChangedEvent event)
+  {
+    if (event.getKind() == EditorChangedEvent.Kind.CONTAINER_SWITCH) {
+      updateEnabledStatus();
+    }
+  }
+
+
+  //#########################################################################
+  //# Enablement
+  void updateEnabledStatus()
+  {
+    final IDE ide = getIDE();
+    final DocumentContainer container = ide.getActiveDocumentContainer();
+    setEnabled(container instanceof ModuleContainer);
   }
 
 

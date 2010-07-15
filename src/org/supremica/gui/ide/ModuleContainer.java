@@ -285,6 +285,12 @@ public class ModuleContainer
     return mPrinter;
   }
 
+  public void showComment()
+  {
+    mTabPanel.setSelectedComponent(mEditorPanel);
+    mEditorPanel.showComment();
+  }
+
   public ComponentEditorPanel showEditor(final SimpleComponentSubject comp)
     throws GeometryAbsentException
   {

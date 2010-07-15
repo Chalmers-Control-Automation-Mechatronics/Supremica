@@ -101,13 +101,15 @@ public abstract class WatersAction
   {
     final IDE ide = getIDE();
     final DocumentContainer container = ide.getActiveDocumentContainer();
-    if (container == null ||
-        !(container.getActivePanel() instanceof EditorPanel) ||
-        !(container instanceof ModuleContainer)) {
+    if (container == null || !(container instanceof ModuleContainer)) {
       return null;
     }
-    final ModuleContainer mcontainer = (ModuleContainer) container;
-    return mcontainer.getEditorPanel();
+    final Component panel = container.getActivePanel();
+    if (panel instanceof EditorPanel) {
+      return (ModuleWindowInterface) panel;
+    } else {
+      return null;
+    }
   }
 
   /**
