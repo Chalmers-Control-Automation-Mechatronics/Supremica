@@ -180,6 +180,9 @@ public class MonolithicSCCControlLoopChecker
     result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(numstates);
     result.setPeakNumberOfNodes(numstates);
+    result.setNumberOfTransitions(mNumTrans);
+    //TOD Remove this line
+    //System.out.println("DEBUG: Transitions : " + mNumTrans);
   }
 
 
@@ -376,6 +379,7 @@ public class MonolithicSCCControlLoopChecker
     mLoopEvents = new THashSet<EventProxy>();
     stack = new Stack<EncodedStateTuple>();
     numStates = 0;
+    mNumTrans = 0;
   }
 
 
@@ -401,6 +405,7 @@ public class MonolithicSCCControlLoopChecker
     for (int i = 0; i < mNumEvent; i++) { // for all events
       if (mGlobalEventMap[i]) { // CONTROLLABLE
         if (eventAvailable(currTuple, i)) {
+          mNumTrans++;
           EncodedStateTuple encodedNextTuple =
             new EncodedStateTuple(encode(mNextTuple));
           if (addState(encodedNextTuple)) {
@@ -421,6 +426,7 @@ public class MonolithicSCCControlLoopChecker
         }
       }  else { // UNCONTROLLABLE
         if (eventAvailable(currTuple, i)) {
+          mNumTrans++;
           final EncodedStateTuple encodedNextTuple =
             new EncodedStateTuple(encode(mNextTuple));
           addState(encodedNextTuple);
@@ -899,6 +905,7 @@ public class MonolithicSCCControlLoopChecker
   }
 
 
+
   //#########################################################################
   //# Data Members
   /** a sentinel that states if the model is control loop free. */
@@ -918,6 +925,9 @@ public class MonolithicSCCControlLoopChecker
 
   /** number of controllable events in the model */
   private int mNumConEvent;
+
+  /** number of transitions in the model */
+  private double mNumTrans;
 
   /** a list of transitions in the model */
   private ArrayList<ArrayList<TransitionProxy>> mTransitionList;
