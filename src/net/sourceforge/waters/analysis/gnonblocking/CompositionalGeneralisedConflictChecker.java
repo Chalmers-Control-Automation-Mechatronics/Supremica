@@ -175,13 +175,6 @@ public class CompositionalGeneralisedConflictChecker extends
     stats.setComposedModelTransitionCount(mComposedModelNumberOfTransitions);
   }
 
-  @Override
-  protected void tearDown()
-  {
-    super.tearDown();
-    addStatistics();
-  }
-
   // Ugly override to make this method visible within package.
   @Override
   protected EventProxy getUsedMarkingProposition()

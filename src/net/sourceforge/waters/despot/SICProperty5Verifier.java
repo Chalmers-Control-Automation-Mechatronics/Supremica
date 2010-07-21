@@ -81,9 +81,13 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
       for (final EventProxy answer : answers) {
         convertedModel = builder.createSIC5Model(answer);
         checker.setModel(convertedModel);
-        checker.run();
-        final VerificationResult result = checker.getAnalysisResult();
-        recordStatistics(result);
+        final VerificationResult result;
+        try {
+          checker.run();
+        } finally {
+          result = checker.getAnalysisResult();
+          recordStatistics(result);
+        }
         if (!result.isSatisfied()) {
           final ConflictTraceProxy counterexample =
               checker.getCounterExample();
@@ -95,8 +99,8 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
       }
       return setSatisfiedResult();
     } finally {
-      mConflictCheckerStats = null;
       tearDown();
+      mConflictCheckerStats = null;
     }
   }
 

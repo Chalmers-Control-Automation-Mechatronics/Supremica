@@ -79,7 +79,6 @@ public class SICProperty6Verifier extends AbstractSICConflictChecker
       checker.setGeneralisedPrecondition(preMark);
       checker.run();
       final VerificationResult result = checker.getAnalysisResult();
-      setAnalysisResult(result);
       if (result.isSatisfied()) {
         return true;
       } else {
@@ -90,6 +89,20 @@ public class SICProperty6Verifier extends AbstractSICConflictChecker
       }
     } finally {
       tearDown();
+    }
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
+  @Override
+  protected void addStatistics()
+  {
+    super.addStatistics();
+    final ConflictChecker checker = getConflictChecker();
+    final VerificationResult result = checker.getAnalysisResult();
+    if (result != null) {
+      setAnalysisResult(result);
     }
   }
 

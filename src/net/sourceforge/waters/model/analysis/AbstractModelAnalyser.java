@@ -147,6 +147,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   protected void tearDown()
   {
     mIsAborting = false;
+    addStatistics();
     final long current = System.currentTimeMillis();
     mAnalysisResult.setRuntime(current - mStartTime);
   }
