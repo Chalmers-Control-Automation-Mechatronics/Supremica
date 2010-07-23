@@ -219,9 +219,9 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
 
     } finally {
       // So the garbage collector can clean up ...
+      tearDown();
       mEventMap = null;
       mSyncProduct = null;
-      tearDown();
     }
   }
 
@@ -290,12 +290,15 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
   {
     super.addStatistics();
     final VerificationResult result = getAnalysisResult();
-    final int numaut = mSyncProduct.getNumberOfAutomata();
-    final int numstates = mSyncProduct.getNumberOfStates();
-    result.setNumberOfAutomata(numaut);
-    result.setNumberOfStates(numstates);
-    result.setPeakNumberOfNodes(numstates);
+    if (mSyncProduct != null) {
+      final int numaut = mSyncProduct.getNumberOfAutomata();
+      final int numstates = mSyncProduct.getNumberOfStates();
+      result.setNumberOfAutomata(numaut);
+      result.setNumberOfStates(numstates);
+      result.setPeakNumberOfNodes(numstates);
+    }
   }
+
 
   // #########################################################################
   // # Auxiliary Methods

@@ -148,8 +148,6 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   {
     mIsAborting = false;
     addStatistics();
-    final long current = System.currentTimeMillis();
-    mAnalysisResult.setRuntime(current - mStartTime);
   }
 
   /**
@@ -244,6 +242,8 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
    */
   protected void addStatistics()
   {
+    final long current = System.currentTimeMillis();
+    mAnalysisResult.setRuntime(current - mStartTime);
   }
 
 

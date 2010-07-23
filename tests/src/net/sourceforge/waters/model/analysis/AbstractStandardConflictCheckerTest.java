@@ -74,9 +74,9 @@ public abstract class AbstractStandardConflictCheckerTest
     }
   }
 
+
   //#########################################################################
   //# Test Cases --- nondeterministic
-
   public void testNondeterministicCombiniations() throws Exception
   {
     final String group = "tests/nondeterministic";
@@ -129,6 +129,13 @@ public abstract class AbstractStandardConflictCheckerTest
     final String group = "handwritten";
     final String name = "DosingTankWithJellyEFA1.wmod";
     runModelVerifier(group, name, false);
+  }
+
+  public void testElevatorSafety() throws Exception
+  {
+    final String group = "handwritten";
+    final String name = "elevator_safety.wmod";
+    runModelVerifier(group, name, true);
   }
 
   public void testSmallFactory2() throws Exception

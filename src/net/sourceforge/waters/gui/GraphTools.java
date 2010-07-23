@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.gui.renderer.LabelProxyShape;
@@ -247,13 +248,9 @@ public class GraphTools {
   //# Updating the Group Node Hierarchy
   public static boolean updateGroupNodeHierarchy(final GraphSubject graph)
   {
-    // TODO
-    // Suppress change notifications if there is no change.
     final List<GroupNodeSubject> groups = new ArrayList<GroupNodeSubject>();
     for (final NodeSubject n : graph.getNodesModifiable()) {
       if (n instanceof GroupNodeSubject) {
-        // event ...
-        //((GroupNodeSubject) n).getImmediateChildNodesModifiable().clear();
         groups.add((GroupNodeSubject) n);
       }
     }
@@ -268,7 +265,8 @@ public class GraphTools {
       }
     });
     // Go through all the nodes ...
-    final HashMap<GroupNodeSubject, ArrayList<NodeSubject>> newContainers = new HashMap<GroupNodeSubject, ArrayList<NodeSubject>>();
+    final Map<GroupNodeSubject,List<NodeSubject>> newContainers =
+      new HashMap<GroupNodeSubject,List<NodeSubject>>();
     for (final NodeSubject n : graph.getNodesModifiable()) {
       final Rectangle2D r1;
       if (n instanceof GroupNodeSubject) {
@@ -277,9 +275,11 @@ public class GraphTools {
         final Point2D p = ((SimpleNodeSubject) n).getPointGeometry().getPoint();
         r1 = new Rectangle((int) p.getX(), (int) p.getY(), 1, 1);
       }
-      final Collection<GroupNodeSubject> parents = new ArrayList<GroupNodeSubject>();
+      final Collection<GroupNodeSubject> parents =
+        new ArrayList<GroupNodeSubject>();
       mainloop:
       for (final GroupNodeSubject group : groups) {
+        newContainers.put(group, new ArrayList<NodeSubject>());
         if (n != group) {
           if (group.getGeometry().getRectangle().contains(r1)) {
             for (final GroupNodeSubject parent : parents) {
@@ -288,12 +288,7 @@ public class GraphTools {
                 continue mainloop;
               }
             }
-            if (!newContainers.containsKey(group))
-            {
-              newContainers.put(group, new ArrayList<NodeSubject>());
-            }
             newContainers.get(group).add(n);
-            //group.getImmediateChildNodesModifiable().add(n); // event
             parents.add(group);
           }
         }
@@ -305,20 +300,21 @@ public class GraphTools {
       final ArrayList<NodeProxy> nodesToAdd = new ArrayList<NodeProxy>();
       for (final NodeProxy node : group.getImmediateChildNodes())
       {
-        if (!newContainers.get(group).contains(node))
-        {
+        if (!newContainers.get(group).contains(node)) {
           nodesToRemove.add(node);
         }
       }
-      for (final NodeProxy node : newContainers.get(group))
-      {
-        if (!group.getImmediateChildNodes().contains(node))
+      for (final NodeProxy node : newContainers.get(group)) {
+        if (!group.getImmediateChildNodes().contains(node)) {
           nodesToAdd.add(node);
+        }
       }
-      for (final NodeProxy node : nodesToRemove)
+      for (final NodeProxy node : nodesToRemove) {
         group.getImmediateChildNodesModifiable().remove(node);
-      for (final NodeProxy node : nodesToAdd)
+      }
+      for (final NodeProxy node : nodesToAdd) {
         group.getImmediateChildNodesModifiable().add((NodeSubject)node);
+      }
     }
     return !groups.isEmpty();
   }
