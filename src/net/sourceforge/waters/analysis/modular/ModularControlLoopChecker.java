@@ -12,7 +12,6 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
@@ -337,13 +336,21 @@ public class ModularControlLoopChecker
 
   //#########################################################################
   //# Setting the Result
+  public LoopResult getAnalysisResult()
+  {
+    return (LoopResult) super.getAnalysisResult();
+  }
+
   @Override
   protected void addStatistics()
   {
     super.addStatistics();
-    final VerificationResult result = getAnalysisResult();
+    final LoopResult result = getAnalysisResult();
     double maxStates = -1;
+    double totalStates = 0;
     double maxTransitions = -1;
+    double totalTransitions = 0;
+    int totalComps = 0;
     int maxAutomata = -1;
     for (final AutomataGroup group : mAutoSets)
     {
@@ -355,15 +362,18 @@ public class ModularControlLoopChecker
           maxStates = group.getStatistics().getTotalNumberOfStates();
         if (group.getStatistics().getTotalNumberOfTransitions() > maxTransitions)
           maxTransitions = group.getStatistics().getTotalNumberOfTransitions();
+        totalStates += group.getStatistics().getTotalNumberOfStates();
+        totalTransitions += group.getStatistics().getTotalNumberOfTransitions();
+        totalComps += group.getStatistics().getTotalNumberOfAutomata() - 1;
       }
     }
-    result.setPeakNumberOfNodes(maxAutomata);
+    result.setPeakNumberOfAutomata(maxAutomata);
     result.setPeakNumberOfStates(maxStates);
     result.setPeakNumberOfTransitions(maxTransitions);
-    //final int numstates = mGlobalStateSet.size();
-    //result.setNumberOfAutomata(mNumAutomata);
-    //result.setNumberOfStates(numstates);
-    //result.setPeakNumberOfNodes(numstates);
+    result.setTotalNumberOfAutomata(totalComps + mAutoSets.size());
+    result.setTotalNumberOfStates(totalStates);
+    result.setTotalNumberOfTransitions(totalTransitions);
+    result.setNumberOfCompositions(totalComps);
   }
 
 
@@ -380,6 +390,6 @@ public class ModularControlLoopChecker
    * 0 = Merge First Two values
    * 1 = Merge Two Smallest Groups
    */
-  private static final int MERGE_VERSION = 1;
+  private static final int MERGE_VERSION = 0;
 
 }
