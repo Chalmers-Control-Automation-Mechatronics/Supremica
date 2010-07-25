@@ -331,11 +331,14 @@ public class ProjectingSafetyVerifier
   private Object[] convertSpec(final AutomatonProxy a, final int num,
                                final Map<EventProxy, EventProxy> forbtouncont)
   {
+    final ProductDESProxyFactory factory = getFactory();
     final Map<EventProxy, EventProxy> uncont = new HashMap<EventProxy, EventProxy>();
     for (final EventProxy e : a.getEvents()) {
       if (getKindTranslator().getEventKind(e) == EventKind.UNCONTROLLABLE) {
-        uncont.put(e, getFactory().createEventProxy(e.getName() + ":" + num,
-                                                    EventKind.UNCONTROLLABLE));
+        final String name = e.getName();
+        final EventProxy event =
+          factory.createEventProxy(name + ":" + num, EventKind.UNCONTROLLABLE);
+        uncont.put(e, event);
         forbtouncont.put(uncont.get(e), e);
       }
     }
@@ -432,7 +435,7 @@ public class ProjectingSafetyVerifier
           }
         }
       }
-      final Set<Tuple> possible = new TreeSet<Tuple>();
+      final Set<Candidate> possible = new TreeSet<Candidate>();
       boolean stop = true;
       for (final SortedSet<AutomatonProxy> s : numoccuring.keySet()) {
         if (s.size() > 4 && s.size() != automata.size()) {
@@ -449,15 +452,15 @@ public class ProjectingSafetyVerifier
         final double tot = total.size();
         final double uncom = tot - common.size();
         size *= uncom;
-        possible.add(new Tuple(s, size));
+        possible.add(new Candidate(s, size));
       }
       int overflows = 0;
       ProjectionList minlist = null;
       minSize = Integer.MAX_VALUE / 4;
-      for (final Tuple tup : possible) {
+      for (final Candidate candidate : possible) {
         try {
           final ProjectionList t =
-            new ProjectionList(p, automata, tup.mSet, forbiddenEvents);
+            new ProjectionList(p, automata, candidate.mSet, forbiddenEvents);
           if (minSize >= t.getNew().getStates().size()) {
             minlist = t;
             minSize = t.getNew().getStates().size();
@@ -838,19 +841,19 @@ public class ProjectingSafetyVerifier
     }
   }
 
-  private static class Tuple
-    implements Comparable<Tuple>
+  private static class Candidate
+    implements Comparable<Candidate>
   {
     public final Set<AutomatonProxy> mSet;
     public final double mSize;
 
-    public Tuple(final Set<AutomatonProxy> set, final double size)
+    public Candidate(final Set<AutomatonProxy> set, final double size)
     {
       mSet = set;
       mSize = size;
     }
 
-    public int compareTo(final Tuple t)
+    public int compareTo(final Candidate t)
     {
       if (mSize < t.mSize) {
         return -1;
