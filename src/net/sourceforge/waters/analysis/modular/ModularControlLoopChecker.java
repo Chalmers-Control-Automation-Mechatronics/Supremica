@@ -53,7 +53,6 @@ public class ModularControlLoopChecker
 
   public boolean run() throws AnalysisException
   {
-    boolean output = false;
     try {
       setUp();
       if (getModel().getAutomata().size() == 0)
@@ -63,7 +62,6 @@ public class ModularControlLoopChecker
       }
       final MonolithicSCCControlLoopChecker checker = new MonolithicSCCControlLoopChecker(getModel(), mTranslator, getFactory());
       boolean removedLoopEvents = false;
-      solved:
       while (true)
       {
         do
@@ -76,20 +74,20 @@ public class ModularControlLoopChecker
             if (mLoopEvents.removeAll(nonLoop))
             {
               removedLoopEvents = true;
+              for (final AutomataGroup invalidate : mAutoSets)
+                invalidate.isChanged(nonLoop);
             }
             if (mLoopEvents.size() == 0)
             {
               setSatisfiedResult();
-              output = true;
-              break solved;
+              return true;
             }
             mTranslator.removeLoopEvents(nonLoop);
             final LoopTraceProxy loop = testOne(group);
             if (loop != null)
             {
               setFailedResult(loop);
-              output = false;
-              break solved;
+              return false;
             }
           }
         }
@@ -98,25 +96,48 @@ public class ModularControlLoopChecker
         if (loop != null)
         {
           setFailedResult(loop);
-          output = false;
-          break solved;
+          return false;
         }
-        switch (MERGE_VERSION)
+        boolean failed = true;
+        AutomataGroup primary = null;
+        int bestScore = Integer.MIN_VALUE;
+        for (final AutomataGroup group : mAutoSets)
         {
-        case 0:
-          mergeFirstTwo();
-          break;
-        case 1:
-          mergeTwoSmallest();
-          break;
-        default:
-          throw new UnsupportedOperationException("ERROR: Merge version is not supported");
+          if (group.getScore() > bestScore)
+          {
+            bestScore = group.getScore();
+            primary = group;
+          }
         }
+        bestScore = Integer.MIN_VALUE;
+        AutomataGroup bestGroup = null;
+        if (primary.getTrace() != null) {
+          for (final AutomataGroup checkLoop : mAutoSets) {
+            if (checkLoop != primary) {
+              final int score = checkLoop.isControlLoop(primary, mTranslator);
+              if (score > bestScore)
+              {
+                bestGroup = checkLoop;
+                bestScore = score;
+              }
+            }
+          }
+          if (bestGroup != null)
+          {
+            System.out.println("DEBUG: Merged with score " + bestGroup.isControlLoop(primary, mTranslator));
+            mAutoSets.remove(bestGroup);
+            primary.merge(bestGroup);
+            failed = false;
+           }
+        }
+        else
+          throw new IllegalArgumentException("Primary has no trace. This shouldn't happen, as the implementation demands that such a group has a score of Integer.MIN_VALUE");
+        if (failed)
+          throw new AnalysisException("ERROR: Two automata could not be selected for merging. Scoring system may not work. Num Events: " + mLoopEvents.size());
       }
     } finally {
       tearDown();
     }
-    return output;
   }
 
   private LoopTraceProxy testAll()
@@ -140,7 +161,7 @@ public class ModularControlLoopChecker
       {
         if (checkLoop != group)
         {
-          if (!checkLoop.isControlLoop(group.getTrace(), group.getLoopIndex()))
+          if (checkLoop.isControlLoop(group, mTranslator) != Integer.MIN_VALUE)
           {
             acceptsAll = false;
             break;
@@ -153,82 +174,6 @@ public class ModularControlLoopChecker
       }
     }
     return null;
-  }
-
-  private void mergeFirstTwo()
-  {
-    for (final AutomataGroup group : mAutoSets) {
-      if (group.getTrace() != null) {
-        for (final AutomataGroup checkLoop : mAutoSets) {
-          if (checkLoop != group) {
-            if (!checkLoop.isControlLoop(group.getTrace(), group.getLoopIndex()))
-            {
-              mAutoSets.remove(checkLoop);
-              group.merge(checkLoop);
-              return;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  private void mergeTwoSmallest()
-  {
-    System.out.println("DEBUG: Merging");
-    AutomataGroup smallest = null;
-    int smallestIndex = -1;
-    double size = Double.MAX_VALUE;
-    for (int looper = 0; looper < mAutoSets.size(); looper++)
-    {
-      if (mAutoSets.get(looper).getTrace() != null)
-      {
-        if (mAutoSets.get(looper).getStatistics().getTotalNumberOfStates() < size)
-        {
-          size = mAutoSets.get(looper).getStatistics().getTotalNumberOfStates();
-          smallest = mAutoSets.get(looper);
-          smallestIndex = looper;
-        }
-      }
-    }
-    for (int looper = 0; looper < mAutoSets.size(); looper++)
-    {
-      if (mAutoSets.get(looper).getTrace() != null)
-      {
-        if (looper != smallestIndex)
-        {
-          if (!mAutoSets.get(looper).isControlLoop(
-              smallest.getTrace(), smallest.getLoopIndex())
-              && !smallest.isControlLoop(
-              mAutoSets.get(looper).getTrace(), mAutoSets.get(looper).getLoopIndex()))
-          {
-            smallest.merge(mAutoSets.get(looper));
-            mAutoSets.remove(mAutoSets.get(looper));
-            return;
-          }
-        }
-      }
-    }
-    // If it gets this far, then the very strict check for Counter examples has failed: Use a less strict version
-    for (int looper = 0; looper < mAutoSets.size(); looper++)
-    {
-      if (looper != smallestIndex)
-      {
-        if (!mAutoSets.get(looper).isControlLoop(
-                                                 smallest.getTrace(), smallest.getLoopIndex()))
-        {
-          smallest.merge(mAutoSets.get(looper));
-          mAutoSets.remove(mAutoSets.get(looper));
-          return;
-        }
-      }
-    }
-    // If it gets THIS far, then something has gone wrong. Run testAll() to ensure a counter example hasn't gone missing
-    final LoopTraceProxy confusion = testOne(mAutoSets.get(smallestIndex));
-    if (confusion != null)
-      throw new IllegalArgumentException("ERROR: testAll was not called in time");
-    else
-      throw new IllegalArgumentException("ERROR: testAll did not successfully detect forced control loop for group " + smallestIndex);
   }
 
   @SuppressWarnings("unused")
@@ -299,12 +244,6 @@ public class ModularControlLoopChecker
       mFauxUncontrollable = new THashSet<EventProxy>();
     }
 
-    // Please can the person who is adding a suppressWarnings("unused") please stop doing so. This is
-    // a public method, and thus the suppressWarnings method just creates a warning itself, and that
-    // warning says that the suppressWarnings statement is not needed. Thanks, ach17
-    // Then declare the method private. A private class does not need public
-    // methods (unless they are in an interface). Or delete the method---
-    // after all, it is not used. Robi
     @SuppressWarnings("unused")
     private void removeLoopEvents(final EventProxy event)
     {
@@ -336,16 +275,12 @@ public class ModularControlLoopChecker
 
   //#########################################################################
   //# Setting the Result
-  public LoopResult getAnalysisResult()
-  {
-    return (LoopResult) super.getAnalysisResult();
-  }
 
   @Override
   protected void addStatistics()
   {
     super.addStatistics();
-    final LoopResult result = getAnalysisResult();
+    final LoopResult result = new LoopResult(getAnalysisResult());
     double maxStates = -1;
     double totalStates = 0;
     double maxTransitions = -1;
@@ -374,6 +309,7 @@ public class ModularControlLoopChecker
     result.setTotalNumberOfStates(totalStates);
     result.setTotalNumberOfTransitions(totalTransitions);
     result.setNumberOfCompositions(totalComps);
+    this.setAnalysisResult(result);
   }
 
 
@@ -382,14 +318,4 @@ public class ModularControlLoopChecker
   private ManipulativeTranslator mTranslator;
   private List<AutomataGroup> mAutoSets;
   private Set<EventProxy> mLoopEvents;
-
-  //#########################################################################
-  //# Constant Values
-
-  /**
-   * 0 = Merge First Two values
-   * 1 = Merge Two Smallest Groups
-   */
-  private static final int MERGE_VERSION = 0;
-
 }

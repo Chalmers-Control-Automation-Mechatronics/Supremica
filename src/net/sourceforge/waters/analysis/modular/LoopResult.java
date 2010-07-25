@@ -14,6 +14,21 @@ public class LoopResult extends VerificationResult
     mNumberOfCompositions = -1;
   }
 
+  public LoopResult(final VerificationResult old)
+  {
+    super();
+    this.setCounterExample(old.getCounterExample());
+    this.setException(old.getException());
+    this.setTotalNumberOfAutomata(old.getTotalNumberOfAutomata());
+    this.setTotalNumberOfStates(old.getTotalNumberOfStates());
+    this.setTotalNumberOfTransitions(old.getTotalNumberOfTransitions());
+    this.setPeakNumberOfStates(old.getPeakNumberOfStates());
+    this.setPeakNumberOfTransitions(old.getPeakNumberOfTransitions());
+    this.setPeakNumberOfNodes(old.getPeakNumberOfNodes());
+    mPeakNumberOfAutomata = -1;
+    mNumberOfCompositions = -1;
+  }
+
   /**
    * Gets the maximum number of automata which are composed by the analysis.
    * The peak number of automata should identify the largest number of
@@ -40,7 +55,7 @@ public class LoopResult extends VerificationResult
 
   public int getNumberOfCompositions()
   {
-    return mPeakNumberOfAutomata;
+    return mNumberOfCompositions;
   }
 
   /**
@@ -77,7 +92,7 @@ public class LoopResult extends VerificationResult
    */
   public void setNumberOfCompositions(final int numcomp)
   {
-    mPeakNumberOfAutomata = numcomp;
+    mNumberOfCompositions = numcomp;
   }
 
   public void print(final PrintStream stream)

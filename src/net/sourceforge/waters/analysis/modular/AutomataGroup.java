@@ -2,12 +2,14 @@ package net.sourceforge.waters.analysis.modular;
 
 import gnu.trove.THashSet;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -15,6 +17,7 @@ import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 public class AutomataGroup
 {
@@ -42,6 +45,7 @@ public class AutomataGroup
     mAllAutomata.addAll(newGroup.mAllAutomata);
     mSensitiveEvents.addAll(newGroup.mSensitiveEvents);
     mLoopTraceProxy = null;
+    mValidRun = false;
   }
 
   public void addAutomata(final AutomatonProxy auto)
@@ -49,11 +53,13 @@ public class AutomataGroup
     mAllAutomata.add(auto);
     mSensitiveEvents.addAll(auto.getEvents());
     mLoopTraceProxy = null;
+    mValidRun = false;
   }
 
   public void setCounterExample(final LoopTraceProxy lProxy)
   {
     mLoopTraceProxy = lProxy;
+    mValidRun = false;
   }
 
   public int getLoopIndex()
@@ -82,17 +88,157 @@ public class AutomataGroup
     return mNonLoopEvents;
   }
 
-  public boolean isControlLoop(final List<EventProxy> testTrace, final int loopIndex)
+  public Collection<EventProxy> getEvents()
   {
+    final ArrayList<EventProxy> output = new ArrayList<EventProxy>();
     for (final AutomatonProxy auto : mAllAutomata)
-    {
-      if (!isControlLoop(auto, testTrace, loopIndex))
-        return false;
-    }
-    return true;
+      output.addAll(auto.getEvents());
+    return output;
   }
 
-  private boolean isControlLoop(final AutomatonProxy auto, final List<EventProxy> testTrace, final int loopIndex)
+  /**
+   * Returns the score to be the primary automata group to be merged, depending on the merging method
+   * Note that a group with no counter-example automatically gets a score of Integer.MIN_VALUE, regardless of the
+   * merging method.
+   * @return The score of this group. The highest score is the primary merging candidate
+   */
+  public int getScore()
+  {
+    if (getLoopTraceProxy() == null)
+      return Integer.MIN_VALUE;
+    switch (MERGE_VERSION)
+    {
+    case 0:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+      return 1;
+    case 1:
+      return 0 - mAllAutomata.size();
+    case 6:
+    case 7:
+    case 8:
+      return 0 - getEvents().size();
+    case 9:
+      return (int)(0 - mStats.getTotalNumberOfStates()); // Note: This heuristic will fail for automata with over 2^31 states
+    }
+    throw new UnsupportedOperationException("Merging method not supported");
+  }
+
+  /**
+   * Returns a score (Highest being the best, Lowest being the worst) determining how well the group is a candidate for merging
+   * It returns Integer.MIN_VALUE if the control loop is accepting
+   * @param otherGroup The primary merging candidate
+   * @param trans The translator used in the SCC running phase
+   * @return A score determining the candicy of how well it will merge with the other automata, highest being the best, and
+   * Integer.MIN_VALUE meaning it accepts the control loop
+   */
+  public int isControlLoop(final AutomataGroup otherGroup, final KindTranslator trans)
+  {
+    final List<EventProxy> testTrace = otherGroup.getTrace();
+    final int loopIndex = otherGroup.getLoopIndex();
+    int constantOutput = Integer.MIN_VALUE;
+    int output = Integer.MIN_VALUE;
+    switch (MERGE_VERSION)
+    {
+    case 0:
+      constantOutput = 1;
+      break;
+    case 1:
+      constantOutput = 0 - mAllAutomata.size(); // The less automata, the better
+      break;
+    case 2:
+      output = Integer.MAX_VALUE;
+      break;
+    case 3:
+      output = Integer.MIN_VALUE;
+      break;
+    case 4:
+      constantOutput = 0;
+      final Collection<EventProxy> thisEvents = getEvents();
+      for (final EventProxy otherEvent : otherGroup.getEvents())
+      {
+        if (thisEvents.contains(otherEvent))
+          constantOutput++;
+      }
+      break;
+    case 5:
+      constantOutput = 0;
+      final Collection<EventProxy> thisUncontEvents = getEvents();
+      for (final EventProxy otherEvent : otherGroup.getEvents())
+      {
+        if (thisUncontEvents.contains(otherEvent) && trans.getEventKind(otherEvent) == EventKind.UNCONTROLLABLE)
+          constantOutput++;
+      }
+      break;
+    case 6:
+      constantOutput = 0 - getEvents().size();
+      break;
+    case 7:
+      int shared = 0;
+      final Collection<EventProxy> otherDifferentEvents = otherGroup.getEvents();
+      for (final EventProxy thisDifferentEvent : getEvents())
+      {
+        if (otherDifferentEvents.contains(thisDifferentEvent))
+          shared++;
+      }
+      constantOutput = shared - getEvents().size();
+      break;
+    case 8:
+      int relativeShared = 0;
+      final Collection<EventProxy> otherRelativeEvents = otherGroup.getEvents();
+      for (final EventProxy thisDifferentEvent : getEvents())
+      {
+        if (otherRelativeEvents.contains(thisDifferentEvent))
+          relativeShared++;
+      }
+      constantOutput = relativeShared / getEvents().size();
+      break;
+    case 9:
+      if (mStats == null) // In this case, we are testing if it is a control loop or not, so we don't need to know the number of states
+        constantOutput = 1;
+      else
+        constantOutput = (int)(0 - mStats.getTotalNumberOfStates());
+    }
+    for (final AutomatonProxy auto : mAllAutomata)
+    {
+      final int thisAutoScore = isControlLoop(auto, testTrace, loopIndex);
+      if (thisAutoScore != Integer.MIN_VALUE)
+      {
+        if (constantOutput != Integer.MIN_VALUE)
+        {
+          return constantOutput;
+        }
+        else
+        {
+          if (MERGE_VERSION == 2)
+          {
+            if (thisAutoScore < output)
+              output = thisAutoScore;
+          }
+          else if (MERGE_VERSION == 3)
+          {
+            if (thisAutoScore > output)
+              output = thisAutoScore;
+          }
+        }
+      }
+    }
+    if (MERGE_VERSION == 2 && output == Integer.MAX_VALUE)
+      output = Integer.MIN_VALUE; // In this case, all automata accept the counter-example, so say so
+    return output;
+  }
+
+  /**
+   * Returns the number of events the control loop accepted. If the entire counter example was accepted, it returns Integer.MIN_VALUE
+   * @param auto The Automaton in this group which is being checked for the candicy for merging
+   * @param testTrace The trace from the other automata group which is being merged
+   * @param loopIndex The index in the trace where the loop starts
+   * @return A score determining the candicy of how well it will merge with the other automata, highest being the best, and
+   * Integer.MIN_VALUE meaning it accepts the control loop
+   */
+  private int isControlLoop(final AutomatonProxy auto, final List<EventProxy> testTrace, final int loopIndex)
   {
       final Collection<EventProxy> events = auto.getEvents();
       final Collection<StateProxy> states = auto.getStates();
@@ -107,7 +253,7 @@ public class AutomataGroup
       }
 
       if(currState == null){
-        return false;
+        throw new IllegalArgumentException("ERROR: No initial state!");
       }
 
       int index = 0;
@@ -126,11 +272,14 @@ public class AutomataGroup
             }
           }
           if (!found) {
-            return false;
+            return index;
           }
         }
       }
-      return (loopStart == currState);
+      if (loopStart == currState)
+        return Integer.MIN_VALUE;
+      else
+        return index;
   }
 
   /**
@@ -140,6 +289,8 @@ public class AutomataGroup
    */
   public void run(final MonolithicSCCControlLoopChecker checker) throws AnalysisException
   {
+    if (mValidRun)
+      return;
     final ProductDESProxy passer;
     passer = checker.getFactory().createProductDESProxy(getName() , mSensitiveEvents, mAllAutomata);
     checker.setModel(passer);
@@ -155,6 +306,33 @@ public class AutomataGroup
     mStats = checker.getAnalysisResult();
     //System.out.println(getStatisticsText());
     //System.out.println(getTextNonLoop());
+    mValidRun = true;
+  }
+
+  /**
+   * Invalidates the run if an automata within this group is sensitive to one of these events
+   * Pass an empty array, or null to return if the run is valid or not
+   * @param changedEvents The list of events which have recently become faux-uncontrollable
+   * @return TRUE if the run has been invalidated, FALSE otherwise
+   */
+  public boolean isChanged(final Collection<EventProxy> changedEvents)
+  {
+    if (changedEvents == null)
+      return mValidRun;
+    if (!mValidRun)
+      return false;
+    for (final AutomatonProxy auto : mAllAutomata)
+    {
+      for (final EventProxy event : changedEvents)
+      {
+        if (auto.getEvents().contains(event))
+        {
+          mValidRun = false;
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   @SuppressWarnings("unused")
@@ -191,4 +369,22 @@ public class AutomataGroup
   LoopTraceProxy mLoopTraceProxy;
   Set<EventProxy> mSensitiveEvents;
   VerificationResult mStats;
+  boolean mValidRun;
+
+  //#########################################################################
+  //# Constant Values
+
+  /**
+   * 0 = One
+   * 1 = MinAutomata
+   * 2 = EarlyNotAccept
+   * 3 = LateNotAccept
+   * 4 = MaxCommonEvents
+   * 5 = MaxCommonUncontr
+   * 6 = MinEvents
+   * 7 = MinNewEvents
+   * 8 = RelMaxCommonEvents
+   * 9 = MinStates
+   */
+  private static final int MERGE_VERSION = 1;
 }
