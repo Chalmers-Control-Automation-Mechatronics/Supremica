@@ -210,6 +210,19 @@ public class ModularControlLoopChecker
     clearAnalysisResult();
   }
 
+  public void setMergeVersion(final AutomataGroup.MergeVersion m)
+  {
+    AutomataGroup.setMergeVersion(m);
+  }
+  public void setSelectVersion(final AutomataGroup.SelectVersion s)
+  {
+    AutomataGroup.setSelectVersion(s);
+  }
+  public void setControlLoopDetection(final MonolithicSCCControlLoopChecker.CLDetector c)
+  {
+    MonolithicSCCControlLoopChecker.setLoopDetector(c);
+  }
+
   public void setUp() throws AnalysisException
   {
     super.setUp();

@@ -21,7 +21,6 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 public class AutomataGroup
 {
-
   public AutomataGroup(final Set<AutomatonProxy> initial)
   {
     mAllAutomata = initial;
@@ -60,6 +59,15 @@ public class AutomataGroup
   {
     mLoopTraceProxy = lProxy;
     mValidRun = false;
+  }
+
+  public static void setMergeVersion(final MergeVersion newVersion)
+  {
+    MERGE_VERSION = newVersion;
+  }
+  public static void setSelectVersion(final SelectVersion selectVersion)
+  {
+    SELECT_VERSION = selectVersion;
   }
 
   public int getLoopIndex()
@@ -106,22 +114,10 @@ public class AutomataGroup
   {
     if (getLoopTraceProxy() == null)
       return Integer.MIN_VALUE;
-    switch (MERGE_VERSION)
+    switch (SELECT_VERSION)
     {
-    case 0:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
+    case Naive:
       return 1;
-    case 1:
-      return 0 - mAllAutomata.size();
-    case 6:
-    case 7:
-    case 8:
-      return 0 - getEvents().size();
-    case 9:
-      return (int)(0 - mStats.getTotalNumberOfStates()); // Note: This heuristic will fail for automata with over 2^31 states
     }
     throw new UnsupportedOperationException("Merging method not supported");
   }
@@ -142,19 +138,19 @@ public class AutomataGroup
     int output = Integer.MIN_VALUE;
     switch (MERGE_VERSION)
     {
-    case 0:
+    case One:
       constantOutput = 1;
       break;
-    case 1:
+    case MinAutomata:
       constantOutput = 0 - mAllAutomata.size(); // The less automata, the better
       break;
-    case 2:
+    case EarlyNotAccept:
       output = Integer.MAX_VALUE;
       break;
-    case 3:
+    case LateNotAccept:
       output = Integer.MIN_VALUE;
       break;
-    case 4:
+    case MaxCommonEvents:
       constantOutput = 0;
       final Collection<EventProxy> thisEvents = getEvents();
       for (final EventProxy otherEvent : otherGroup.getEvents())
@@ -163,7 +159,7 @@ public class AutomataGroup
           constantOutput++;
       }
       break;
-    case 5:
+    case MaxCommonUncontr:
       constantOutput = 0;
       final Collection<EventProxy> thisUncontEvents = getEvents();
       for (final EventProxy otherEvent : otherGroup.getEvents())
@@ -172,10 +168,10 @@ public class AutomataGroup
           constantOutput++;
       }
       break;
-    case 6:
+    case MinEvents:
       constantOutput = 0 - getEvents().size();
       break;
-    case 7:
+    case MinNewEvents:
       int shared = 0;
       final Collection<EventProxy> otherDifferentEvents = otherGroup.getEvents();
       for (final EventProxy thisDifferentEvent : getEvents())
@@ -185,7 +181,7 @@ public class AutomataGroup
       }
       constantOutput = shared - getEvents().size();
       break;
-    case 8:
+    case RelMaxCommonEvents:
       int relativeShared = 0;
       final Collection<EventProxy> otherRelativeEvents = otherGroup.getEvents();
       for (final EventProxy thisDifferentEvent : getEvents())
@@ -195,7 +191,7 @@ public class AutomataGroup
       }
       constantOutput = relativeShared / getEvents().size();
       break;
-    case 9:
+    case MinStates:
       if (mStats == null) // In this case, we are testing if it is a control loop or not, so we don't need to know the number of states
         constantOutput = 1;
       else
@@ -212,12 +208,12 @@ public class AutomataGroup
         }
         else
         {
-          if (MERGE_VERSION == 2)
+          if (MERGE_VERSION == MergeVersion.EarlyNotAccept)
           {
             if (thisAutoScore < output)
               output = thisAutoScore;
           }
-          else if (MERGE_VERSION == 3)
+          else if (MERGE_VERSION == MergeVersion.LateNotAccept)
           {
             if (thisAutoScore > output)
               output = thisAutoScore;
@@ -225,7 +221,7 @@ public class AutomataGroup
         }
       }
     }
-    if (MERGE_VERSION == 2 && output == Integer.MAX_VALUE)
+    if (MERGE_VERSION == MergeVersion.EarlyNotAccept && output == Integer.MAX_VALUE)
       output = Integer.MIN_VALUE; // In this case, all automata accept the counter-example, so say so
     return output;
   }
@@ -386,5 +382,26 @@ public class AutomataGroup
    * 8 = RelMaxCommonEvents
    * 9 = MinStates
    */
-  private static final int MERGE_VERSION = 1;
+  private static MergeVersion MERGE_VERSION = MergeVersion.EarlyNotAccept;
+
+  private static SelectVersion SELECT_VERSION = SelectVersion.Naive;
+
+  //##################################################################
+  //# Enumerations
+
+  public enum MergeVersion {
+    One,
+    MinAutomata,
+    EarlyNotAccept,
+    LateNotAccept,
+    MaxCommonEvents,
+    MaxCommonUncontr,
+    MinEvents,
+    MinNewEvents,
+    RelMaxCommonEvents,
+    MinStates
+    }
+  public enum SelectVersion {
+    Naive
+  }
 }

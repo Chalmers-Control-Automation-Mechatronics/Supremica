@@ -136,6 +136,11 @@ public class MonolithicSCCControlLoopChecker
     clearAnalysisResult();
   }
 
+  public static void setLoopDetector(final CLDetector newDetector)
+  {
+    DETECTOR_VERSION = newDetector;
+  }
+
   /**
    * Gets a counterexample if the model was found to be not control-loop free.
    * representing a control-loop error trace. A control-loop error
@@ -904,8 +909,6 @@ public class MonolithicSCCControlLoopChecker
     }
   }
 
-
-
   //#########################################################################
   //# Data Members
   /** a sentinel that states if the model is control loop free. */
@@ -976,6 +979,10 @@ public class MonolithicSCCControlLoopChecker
   /** used for the visit procedure */
   private Stack<EncodedStateTuple> stack;
 
+  /** used to determine which control loop is returned */
+  @SuppressWarnings("unused")
+  private static CLDetector DETECTOR_VERSION;
+
   //#########################################################################
   //# Variables used for encoding/decoding
   /** a list contains number of bits needed for each automaton */
@@ -989,6 +996,14 @@ public class MonolithicSCCControlLoopChecker
 
   /** an index of first automaton in each integer buffer */
   private int mIndexAutomata[];
+
+  //#########################################################################
+  //# Enumerations
+
+  public enum CLDetector
+  {
+    ShortestLoop
+  }
 
 
   //#########################################################################

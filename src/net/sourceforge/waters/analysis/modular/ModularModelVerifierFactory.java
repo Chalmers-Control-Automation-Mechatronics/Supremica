@@ -11,9 +11,12 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.analysis.op.ObserverProjectionConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
+import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -38,6 +41,9 @@ public class ModularModelVerifierFactory
     super(arglist);
     addArgument(ModularHeuristicFactory.getMethodArgument());
     addArgument(ModularHeuristicFactory.getPreferenceArgument());
+    addArgument(new MergeVersion());
+    addArgument(new SelectVersion());
+    addArgument(new DetectorVersion());
   }
 
 
@@ -91,6 +97,98 @@ public class ModularModelVerifierFactory
     return new ModularModelVerifierFactory(cmdline);
   }
 
+  //#########################################################################
+  //# Inner Class MergeVersion
+
+  private static class MergeVersion
+  extends CommandLineArgumentEnum<AutomataGroup.MergeVersion>
+  {
+
+    //#######################################################################
+    //# Constructors
+    private MergeVersion()
+    {
+      super("-merge", "Method used to select the secondary automaton for merging",
+            AutomataGroup.MergeVersion.class);
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final AutomataGroup.MergeVersion method = getValue();
+      if (verifier instanceof ModularControlLoopChecker) {
+        final ModularControlLoopChecker checker =
+          (ModularControlLoopChecker) verifier;
+        checker.setMergeVersion(method);
+      } else {
+        fail(getName() + " option only supported for modular control loop checker!");
+      }
+    }
+  }
+
+  //#########################################################################
+  //# Inner Class SelectVersion
+
+  private static class SelectVersion
+  extends CommandLineArgumentEnum<AutomataGroup.SelectVersion>
+  {
+
+    //#######################################################################
+    //# Constructors
+    private SelectVersion()
+    {
+      super("-select", "Method used to select the primary automaton for merging",
+            AutomataGroup.SelectVersion.class);
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final AutomataGroup.SelectVersion method = getValue();
+      if (verifier instanceof ModularControlLoopChecker) {
+        final ModularControlLoopChecker checker =
+          (ModularControlLoopChecker) verifier;
+        checker.setSelectVersion(method);
+      } else {
+        fail(getName() + " option only supported for modular control loop checker!");
+      }
+    }
+  }
+
+  //#########################################################################
+  //# Inner Class DetectorVersion
+
+  private static class DetectorVersion
+  extends CommandLineArgumentEnum<MonolithicSCCControlLoopChecker.CLDetector>
+  {
+
+    //#######################################################################
+    //# Constructors
+    private DetectorVersion()
+    {
+      super("-detect", "Method used to select the control loop of a synchronous product",
+            MonolithicSCCControlLoopChecker.CLDetector.class);
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    protected void configure(final ModelVerifier verifier)
+    {
+      final MonolithicSCCControlLoopChecker.CLDetector method = getValue();
+      if (verifier instanceof ModularControlLoopChecker) {
+        final ModularControlLoopChecker checker =
+          (ModularControlLoopChecker) verifier;
+        checker.setControlLoopDetection(method);
+      } else {
+        fail(getName() + " option only supported for modular control loop checker!");
+      }
+    }
+  }
 
   //#########################################################################
   //# Class Variables
