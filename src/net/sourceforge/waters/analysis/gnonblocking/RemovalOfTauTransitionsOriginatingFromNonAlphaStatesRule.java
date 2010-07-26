@@ -14,9 +14,6 @@ import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Queue;
-
 import net.sourceforge.waters.analysis.op.ObserverProjectionTransitionRelation;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -92,53 +89,50 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
 
     final int numStates = mTR.getNumberOfStates();
 
-    final Queue<Integer> visitStates = new LinkedList<Integer>();
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if (!mTR.isMarked(sourceID, alphaID)
           && !mTR.isMarked(sourceID, defaultID)) {
-        visitStates.offer(sourceID);
-      }
-    }
-    while (visitStates.size() > 0) {
-      final int sourceID = visitStates.remove();
-      final TIntHashSet[] allSuccessors = mTR.getAllSuccessors(sourceID);
-      TIntHashSet tauSuccessors = null;
-      boolean nonTauSuccessors = false;
-      if (allSuccessors != null) {
-        for (int eventID = 0; eventID < allSuccessors.length; eventID++) {
-          if (eventID != tauID) {
-            final TIntHashSet succ = allSuccessors[eventID];
-            if (succ != null) {
-              nonTauSuccessors = true;
-              break;
-            }
-          } else {
-            tauSuccessors = allSuccessors[eventID];
-          }
-        }
-        if (!nonTauSuccessors && tauSuccessors != null) {
-          final TIntArrayList transToRemove =
-              new TIntArrayList(tauSuccessors.size());
-          final TIntIterator iter = tauSuccessors.iterator();
-          while (iter.hasNext()) {
-            final int targetID = iter.next();
-            if (targetID != sourceID) {
-              transToRemove.add(targetID);
+
+        final TIntHashSet[] allSuccessors = mTR.getAllSuccessors(sourceID);
+        TIntHashSet tauSuccessors = null;
+        boolean nonTauSuccessors = false;
+        if (allSuccessors != null) {
+          for (int eventID = 0; eventID < allSuccessors.length; eventID++) {
+            if (eventID != tauID) {
+              final TIntHashSet succ = allSuccessors[eventID];
+              if (succ != null) {
+                nonTauSuccessors = true;
+                break;
+              }
+            } else {
+              tauSuccessors = allSuccessors[eventID];
             }
           }
-          if (transToRemove.isEmpty()) {
-            mTR.removeTransition(sourceID, tauID, sourceID);
-          } else {
-            for (int i = 0; i < transToRemove.size(); i++) {
-              final int targetID = transToRemove.get(i);
-              mTR.addAllPredeccessors(sourceID, targetID);
-              mTR.removeTransition(sourceID, tauID, targetID);
-              modified = true;
+          if (!nonTauSuccessors && tauSuccessors != null) {
+            final TIntArrayList transToRemove =
+                new TIntArrayList(tauSuccessors.size());
+            final TIntIterator iter = tauSuccessors.iterator();
+            while (iter.hasNext()) {
+              final int targetID = iter.next();
+              if (targetID != sourceID) {
+                transToRemove.add(targetID);
+              }
             }
-            mTR.removeAllIncoming(sourceID);
-            if (mTR.isInitial(sourceID)) {
-              mTR.makeInitialState(sourceID, false);
+            if (transToRemove.isEmpty()) {
+              mTR.removeTransition(sourceID, tauID, sourceID);
+            } else {
+              for (int i = 0; i < transToRemove.size(); i++) {
+                final int targetID = transToRemove.get(i);
+                mTR.addAllPredeccessors(sourceID, targetID);
+                mTR.removeTransition(sourceID, tauID, targetID);
+                modified = true;
+              }
+              mTR.removeAllIncoming(sourceID);
+              if (mTR.isInitial(sourceID)) {
+                mTR.makeInitialState(sourceID, false);
+              }
             }
+
           }
         }
       }
