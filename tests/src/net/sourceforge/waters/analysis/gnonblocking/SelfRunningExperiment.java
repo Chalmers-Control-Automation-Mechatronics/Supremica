@@ -9,7 +9,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 public class SelfRunningExperiment
 {
 
-  public SelfRunningExperiment(final String property, String filename,
+  public SelfRunningExperiment(final String property, final String filename,
                                final int rules) throws Exception
   {
     final String outputprop = System.getProperty("waters.test.outputdir");
@@ -19,11 +19,13 @@ public class SelfRunningExperiment
           getPreselectingHeuristic(preselecting);
       for (int selecting = 0; selecting < 6; selecting++) {
         final String selectingHeuristic = getSelectingHeuristic(selecting);
-        filename += " " + preselecting + " " + selecting + ".csv";
+        final String entirefilename =
+            filename + " " + preselecting + " " + selecting + ".csv";
         if (property.equals("standardnonblocking")) {
           final CompositionalStandardConflictCheckerExperiments experiment =
               new CompositionalStandardConflictCheckerExperiments(outputprop
-                  + filename, preselectingHeuristic, selectingHeuristic, rules);
+                  + entirefilename, preselectingHeuristic, selectingHeuristic,
+                  rules);
           experiment.setUp();
           experiment.runAllTests();
           experiment.tearDown();
