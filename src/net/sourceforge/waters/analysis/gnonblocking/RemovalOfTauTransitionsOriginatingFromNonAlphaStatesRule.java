@@ -127,12 +127,12 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
                 mTR.removeTransition(sourceID, tauID, targetID);
                 modified = true;
               }
-              mTR.removeAllIncoming(sourceID);
-              if (mTR.isInitial(sourceID)) {
-                mTR.makeInitialState(sourceID, false);
-              }
-            }
 
+            }
+            mTR.removeAllIncoming(sourceID);
+            if (mTR.isInitial(sourceID)) {
+              mTR.makeInitialState(sourceID, false);
+            }
           }
         }
       }

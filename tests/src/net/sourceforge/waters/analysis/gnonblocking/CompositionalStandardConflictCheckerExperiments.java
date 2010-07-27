@@ -49,7 +49,7 @@ public class CompositionalStandardConflictCheckerExperiments extends
     }
   }
 
-  private void runAllTests() throws Exception
+  protected void runAllTests() throws Exception
   {
     verifyBig_BMW();
     verify_ftechnik();

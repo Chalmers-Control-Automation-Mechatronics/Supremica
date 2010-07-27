@@ -49,7 +49,7 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     }
   }
 
-  private void runAllTests() throws Exception
+  void runAllTests() throws Exception
   {
     verify_aip3_syn_as1();
     verify_aip3_syn_as2();
@@ -59,8 +59,6 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     verify_aip3_syn_tu2();
     verify_aip3_syn_tu3();
     verify_aip3_syn_tu4();
-    // TODO: look at tests in LargeCompositionalSICPropertyVVerifierTest to see
-    // if maip etc can pass and be added here...
   }
 
   // #######################################################################

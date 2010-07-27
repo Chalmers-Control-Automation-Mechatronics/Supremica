@@ -58,7 +58,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
     mPrintStream = new PrintStream(mOut, true);
     final int internalStateLimit = 5000;
     mVerifier.setInternalStepNodeLimit(internalStateLimit);
-    final int internalTransitionLimit = 700000;
+    final int internalTransitionLimit = 1000000;
     mVerifier.setInternalStepTransitionLimit(internalTransitionLimit);
     final int finalStateLimit = 40000000;
     mVerifier.setFinalStepNodeLimit(finalStateLimit);
@@ -69,6 +69,18 @@ public abstract class CompositionalConflictCheckerExperiments extends
         + ",FinalStateLimit," + finalStateLimit + ",FinalTransitionLimit,"
         + finalTransitionLimit);
 
+    setPreselectingHeuristic();
+    setSelectingHeuristic();
+
+    mPrintStream.println("PreselHeuristic," + mPreselecting
+        + ",SelecHeuristic," + mSelecting);
+
+    mStats = new CompositionalGeneralisedConflictCheckerVerificationResult();
+    mStats.printCSVHorizontalHeadings(mPrintStream, mRuleCount);
+  }
+
+  protected void setPreselectingHeuristic()
+  {
     // sets correct preselecting heuristic
     if (mPreselecting.equals("mint")) {
       mVerifier.setPreselectingHeuristic(mVerifier.createHeuristicMinT());
@@ -80,7 +92,10 @@ public abstract class CompositionalConflictCheckerExperiments extends
       System.err
           .println("Error: Preselecting Heuristic not specified correctly, it must be one of: mint, maxs, mustl");
     }
+  }
 
+  protected void setSelectingHeuristic()
+  {
     // sets correct selecting heuristic
     if (mSelecting.equals("maxl")) {
       mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxL());
@@ -104,11 +119,6 @@ public abstract class CompositionalConflictCheckerExperiments extends
       System.err
           .println("Error: Selecting Heuristic not specified correctly, it must be one of: maxl, maxlt, maxc, maxct, mins");
     }
-    mPrintStream.println("PreselHeuristic," + mPreselecting
-        + ",SelecHeuristic," + mSelecting);
-
-    mStats = new CompositionalGeneralisedConflictCheckerVerificationResult();
-    mStats.printCSVHorizontalHeadings(mPrintStream, mRuleCount);
   }
 
   @Override
@@ -249,7 +259,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
   // #######################################################################
   // # Data Members
   CompositionalGeneralisedConflictCheckerVerificationResult mStats;
-  private CompositionalGeneralisedConflictChecker mVerifier;
+  protected CompositionalGeneralisedConflictChecker mVerifier;
   final FileOutputStream mOut;
   PrintStream mPrintStream;
   final String mPreselecting;
