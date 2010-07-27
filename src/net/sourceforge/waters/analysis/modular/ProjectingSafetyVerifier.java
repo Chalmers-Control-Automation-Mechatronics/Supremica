@@ -553,7 +553,7 @@ public class ProjectingSafetyVerifier
       mOriginalAlphabet = events;
       mHidden = new HashSet<EventProxy>(events);
       for (final AutomatonProxy a : mAutomata) {
-        if (a != mSpec) {
+        if (a != null) {
           mHidden.removeAll(a.getEvents());
         }
       }
@@ -870,7 +870,6 @@ public class ProjectingSafetyVerifier
   //# Data Members
   private int minSize = 1000;
   private final SafetyVerifier mChecker;
-  private final AutomatonProxy mSpec = null;
   private int mStates;
   private int mMaxProjStates;
   private final Map<AutomataHidden, AutomatonProxy> mMinAutMap =

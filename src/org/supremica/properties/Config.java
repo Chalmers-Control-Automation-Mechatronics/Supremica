@@ -203,7 +203,7 @@ public final class Config
     public static final ObjectProperty GUI_ANALYZER_USED_FACTORY =
       new ObjectProperty(PropertyType.GUI_ANALYZER, "guiAnalyzerUsedFactory",
                          ModelVerifierFactoryLoader.Monolithic,
-                         "Model verifier factory used by editor's analysis menu",
+                         "Model verifier factory used by Editor's Verify menu",
                          ModelVerifierFactoryLoader.values());
     public static final BooleanProperty GUI_ANALYZER_INCLUDE_HISC =
       new BooleanProperty(PropertyType.GUI_ANALYZER, "includeHISC", false,

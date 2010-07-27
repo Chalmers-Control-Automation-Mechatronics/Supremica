@@ -35,6 +35,7 @@ public class CompositionalStandardSelfRunningConflictCheckerExperiments extends
 
       final String filename = args[0];
       final String property = "standardnonblocking";
+      @SuppressWarnings("unused")
       final SelfRunningExperiment experiments =
           new SelfRunningExperiment(property, filename, rules);
     } else {

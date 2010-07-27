@@ -35,6 +35,7 @@ public class CompositionaGeneralisedSelfRunningConflictCheckerExperiments
 
       final String filename = args[0];
       final String property = "generalisednonblocking";
+      @SuppressWarnings("unused")
       final SelfRunningExperiment experiments =
           new SelfRunningExperiment(property, filename, rules);
     } else {
