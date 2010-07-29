@@ -284,6 +284,8 @@ public class AbstractionRuleStatistics
     stream.print("RunTime,");
     stream.print("Reduction,");
     stream.print("Prob Reduction,");
+    stream.print("State Red %,");
+    stream.print("Trans Red %,");
     stream.print("Tot In States,");
     stream.print("Tot In Trans,");
     stream.print("Tot Out States,");
@@ -302,8 +304,15 @@ public class AbstractionRuleStatistics
     stream.print(mAppliedCount + ",");
     stream.print(mRunTime + ",");
     stream.print(mReductionCount + ",");
-    final double probability =
-        (double) mReductionCount / (double) mAppliedCount;
+    double probability = (double) mReductionCount / (double) mAppliedCount;
+    stream.print(probability + ",");
+    probability =
+        (double) (getTotalInputStates() - getTotalOutputStates())
+            / (double) getTotalInputStates();
+    stream.print(probability + ",");
+    probability =
+        (double) (getTotalInputTransitions() - getTotalOutputTransitions())
+            / (double) getTotalInputTransitions();
     stream.print(probability + ",");
     stream.print(getTotalInputStates() + ",");
     stream.print(getTotalInputTransitions() + ",");

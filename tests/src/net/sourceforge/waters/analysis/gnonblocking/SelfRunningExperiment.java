@@ -65,11 +65,11 @@ public class SelfRunningExperiment
   private static String getPreselectingHeuristic(final int preselecting)
   {
     if (preselecting == 0) {
-      return "mint";
+      return "mustl";
     } else if (preselecting == 1) {
       return "maxs";
     } else if (preselecting == 2) {
-      return "mustl";
+      return "mint";
     }
     return "";
   }

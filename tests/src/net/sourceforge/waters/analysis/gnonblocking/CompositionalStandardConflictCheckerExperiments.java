@@ -53,11 +53,11 @@ public class CompositionalStandardConflictCheckerExperiments extends
   {
     verifyBig_BMW();
     verify_ftechnik();
-    verify_verriegel4();
+     verify_verriegel4();
     verify_verriegel4b();
     verify_rhone_alps();
     verify_tbed_ctct();
-    verify_fzelle();
+   verify_fzelle();
     verify_tbed_uncont();
     verify_tbed_noderail();
     verify_tbed_noderail_block();
