@@ -46,6 +46,8 @@ public abstract class CompositionalConflictCheckerExperiments extends
       mRuleCount = 8;
     } else if (mRules == 3) {
       mRuleCount = 10;
+    } else if (mRules == 5) {
+      mRuleCount = 7;
     }
   }
 
@@ -222,8 +224,17 @@ public abstract class CompositionalConflictCheckerExperiments extends
       ruleList.add(rttonsRule);
       ruleList.add(rttlnsRule);
       ruleList.add(rnsRule);
-    }// TODO: add other orderings to try
-    else {
+    } else if (mRules == 5) {
+      // dont apply removal of tau leading to, since it increases number of
+      // transitions
+      ruleList.add(tlrRule);
+      ruleList.add(oeRule);
+      ruleList.add(ramRule);
+      ruleList.add(rdmRule);
+      ruleList.add(rnsRule);
+      ruleList.add(dnasRule);
+      ruleList.add(rttonsRule);
+    } else {
       System.err
           .println("Error: Rules must be specified by specifying the integer code of the ordered list wanted.");
     }
