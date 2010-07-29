@@ -302,7 +302,8 @@ public class AbstractionRuleStatistics
   {
     stream.print(ProxyTools.getShortClassName(mRuleClass) + ",");
     stream.print(mAppliedCount + ",");
-    stream.print(mRunTime + ",");
+    final float seconds = 0.001f * mRunTime;
+    stream.print(seconds + ",");
     stream.print(mReductionCount + ",");
     double probability = (double) mReductionCount / (double) mAppliedCount;
     stream.print(probability + ",");
