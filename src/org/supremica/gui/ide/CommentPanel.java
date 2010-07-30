@@ -16,7 +16,9 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
@@ -68,7 +70,10 @@ class CommentPanel extends JPanel
     commentPane.setBorder(commentBorder);
     commentPane.setBackground(EditorColor.BACKGROUNDCOLOR);
     commentPane.setFont(new Font(null, Font.PLAIN, 12));
-    add(BorderLayout.CENTER, commentPane);
+    final JScrollPane scroll = new JScrollPane(commentPane);
+    scroll.setHorizontalScrollBarPolicy
+      (ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    add(BorderLayout.CENTER, scroll);
     mCommentHandler = new CommentPaneHandler(commentPane);
     mCommentHandler.loadPane();
     commentPane.addFocusListener(mCommentHandler);
