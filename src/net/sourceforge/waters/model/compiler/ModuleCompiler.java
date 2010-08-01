@@ -33,7 +33,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 public class ModuleCompiler
 {
- 
+
   //##########################################################################
   //# Constructors
   public ModuleCompiler(final DocumentManager manager,
@@ -43,6 +43,14 @@ public class ModuleCompiler
     mDocumentManager = manager;
     mFactory = factory;
     mInputModule = module;
+  }
+
+
+  //##########################################################################
+  //# Simple Access
+  public ModuleProxy getInputModule()
+  {
+    return mInputModule;
   }
 
 
