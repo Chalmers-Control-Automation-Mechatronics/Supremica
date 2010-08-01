@@ -38,7 +38,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * <P>This tester receives two {@link AutomatonProxy} objects as input
  * and checks whether they have bisimilar transition structures.
  * State names do not have to be the same, only transition
- * structures, initial state status, and marking must match. It is
+ * structures, initial state status, and markings must match. It is
  * configurable whether events are matched by object identity or by
  * name.</P>
  *
@@ -209,6 +209,7 @@ public class IsomorphismChecker
       break;
     case PROPOSITION:
       props.add(event);
+      break;
     default:
       throw new IllegalArgumentException
         ("Unknown event kind " + event.getKind() + "!");
