@@ -249,9 +249,13 @@ public class GraphTools {
   public static boolean updateGroupNodeHierarchy(final GraphSubject graph)
   {
     final List<GroupNodeSubject> groups = new ArrayList<GroupNodeSubject>();
+    final Map<GroupNodeSubject,List<NodeSubject>> newContainers =
+      new HashMap<GroupNodeSubject,List<NodeSubject>>();
     for (final NodeSubject n : graph.getNodesModifiable()) {
       if (n instanceof GroupNodeSubject) {
-        groups.add((GroupNodeSubject) n);
+        final GroupNodeSubject group = (GroupNodeSubject) n;
+        groups.add(group);
+        newContainers.put(group, new ArrayList<NodeSubject>());
       }
     }
     // Sort all the node groups from smallest to largest ...
@@ -265,8 +269,6 @@ public class GraphTools {
       }
     });
     // Go through all the nodes ...
-    final Map<GroupNodeSubject,List<NodeSubject>> newContainers =
-      new HashMap<GroupNodeSubject,List<NodeSubject>>();
     for (final NodeSubject n : graph.getNodesModifiable()) {
       final Rectangle2D r1;
       if (n instanceof GroupNodeSubject) {
@@ -279,7 +281,6 @@ public class GraphTools {
         new ArrayList<GroupNodeSubject>();
       mainloop:
       for (final GroupNodeSubject group : groups) {
-        newContainers.put(group, new ArrayList<NodeSubject>());
         if (n != group) {
           if (group.getGeometry().getRectangle().contains(r1)) {
             for (final GroupNodeSubject parent : parents) {
@@ -294,8 +295,7 @@ public class GraphTools {
         }
       }
     }
-    for (final GroupNodeSubject group : groups)
-    {
+    for (final GroupNodeSubject group : groups) {
       final ArrayList<NodeProxy> nodesToRemove = new ArrayList<NodeProxy>();
       final ArrayList<NodeProxy> nodesToAdd = new ArrayList<NodeProxy>();
       for (final NodeProxy node : group.getImmediateChildNodes())

@@ -43,6 +43,7 @@ import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.CommandLineTool;
+import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -65,6 +66,7 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -75,6 +77,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.xml.sax.SAXException;
+
 
 /**
  * @author Robi Malik
@@ -593,6 +596,40 @@ public class ModelAssess
     }
   }
 
+
+  //#########################################################################
+  //# Error Reporting
+  private void showException(final Throwable exception)
+  {
+    final String ename = ProxyTools.getShortClassName(exception);
+    mOutput.println("{\\bf\\itshape " + ename + " caught!}");
+    final String msg = exception.getMessage();
+    if (msg != null && msg.length() > 0) {
+      mOutput.println("\\\\");
+      mOutput.println(msg);
+    }
+    mOutput.println();
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Static Methods
+  private static EventProxy getSecondaryMarking(final ProductDESProxy des)
+  {
+    EventProxy result = null;
+    for (final EventProxy event : des.getEvents()) {
+      if (event.getKind() == EventKind.PROPOSITION &&
+          !event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+        if (result == null) {
+          result = event;
+        } else {
+          return null;
+        }
+      }
+    }
+    return result;
+  }
+
   private static String getComponentKindNamePlural(final ComponentKind kind)
   {
     switch (kind) {
@@ -608,22 +645,6 @@ public class ModelAssess
       throw new IllegalArgumentException
         ("Unknown component kind " + kind + "!");
     }
-
-  }
-
-
-  //#########################################################################
-  //# Error Reporting
-  private void showException(final Throwable exception)
-  {
-    final String ename = ProxyTools.getShortClassName(exception);
-    mOutput.println("{\\bf\\itshape " + ename + " caught!}");
-    final String msg = exception.getMessage();
-    if (msg != null && msg.length() > 0) {
-      mOutput.println("\\\\");
-      mOutput.println(msg);
-    }
-    mOutput.println();
   }
 
 
@@ -1145,6 +1166,13 @@ public class ModelAssess
     }
 
     //#########################################################################
+    //# Simple Access
+    ModelVerifier getModelVerifier()
+    {
+      return mVerifier;
+    }
+
+    //#########################################################################
     //# Overrides for AbstractTest
     boolean check(final ProductDESProxy des)
       throws AnalysisException
@@ -1244,6 +1272,11 @@ public class ModelAssess
         final Solution sol = getSolution();
         final ProductDESProxy propdes =
           sol.createInclusionModel(des, mPropertyName, ComponentKind.PLANT);
+        final EventProxy marking = getSecondaryMarking(propdes);
+        if (marking != null) {
+          final ConflictChecker checker = (ConflictChecker) getModelVerifier();
+          checker.setMarkingProposition(marking);
+        }
         return super.check(propdes);
       }
     }
