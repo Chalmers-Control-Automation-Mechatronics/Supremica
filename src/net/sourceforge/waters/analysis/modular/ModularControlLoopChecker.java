@@ -53,6 +53,12 @@ public class ModularControlLoopChecker
 
   public boolean run() throws AnalysisException
   {
+    if (mTimeOut > 0)
+    {
+      mTimeOutThread = new TimeOut();
+      final Thread second = new Thread(new TimeOut());
+      second.start();
+    }
     try {
       setUp();
       if (getModel().getAutomata().size() == 0)
@@ -69,6 +75,7 @@ public class ModularControlLoopChecker
           removedLoopEvents = false;
           for (final AutomataGroup group : mAutoSets)
           {
+            checkAbort();
             group.run(checker);
             final Collection<EventProxy> nonLoop = group.getNonLoopEvents();
             if (mLoopEvents.removeAll(nonLoop))
@@ -124,7 +131,8 @@ public class ModularControlLoopChecker
           }
           if (bestGroup != null)
           {
-            System.out.println("DEBUG: Merged with score " + bestGroup.isControlLoop(primary, mTranslator));
+            checkAbort();
+            //System.out.println("DEBUG: Merged with score " + bestGroup.isControlLoop(primary, mTranslator));
             mAutoSets.remove(bestGroup);
             primary.merge(bestGroup);
             failed = false;
@@ -222,6 +230,10 @@ public class ModularControlLoopChecker
   {
     MonolithicSCCControlLoopChecker.setLoopDetector(c);
   }
+  public void setTimeOut(final long time)
+  {
+    mTimeOut = time;
+  }
 
   public void setUp() throws AnalysisException
   {
@@ -246,6 +258,7 @@ public class ModularControlLoopChecker
     mLoopEvents = null;
     mTranslator = null;
     mAutoSets = null;
+    mTimeOutThread.abort();
   }
 
   private class ManipulativeTranslator implements KindTranslator
@@ -285,6 +298,30 @@ public class ModularControlLoopChecker
     private final Set<EventProxy> mFauxUncontrollable;
   }
 
+  //#########################################################################
+  //# Timeout Inner Class
+
+  private class TimeOut implements Runnable
+  {
+    public void run()
+    {
+      boolean interrupted = false;
+      try {
+        Thread.sleep(mTimeOut);
+      } catch (final InterruptedException exception) {
+        interrupted = true;
+      }
+      if (!interrupted)
+        ModularControlLoopChecker.this.requestAbort();
+    }
+
+    public void abort()
+    {
+      interrupted = true;
+    }
+
+    boolean interrupted;
+  }
 
   //#########################################################################
   //# Setting the Result
@@ -331,4 +368,6 @@ public class ModularControlLoopChecker
   private ManipulativeTranslator mTranslator;
   private List<AutomataGroup> mAutoSets;
   private Set<EventProxy> mLoopEvents;
+  private TimeOut mTimeOutThread;
+  private long mTimeOut = 0;
 }

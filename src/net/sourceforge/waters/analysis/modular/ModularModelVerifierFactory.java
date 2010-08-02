@@ -16,6 +16,7 @@ import net.sourceforge.waters.analysis.op.ObserverProjectionConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -122,6 +123,31 @@ public class ModularModelVerifierFactory
         final ModularControlLoopChecker checker =
           (ModularControlLoopChecker) verifier;
         checker.setMergeVersion(method);
+      } else {
+        fail(getName() + " option only supported for modular control loop checker!");
+      }
+    }
+  }
+
+  //#########################################################################
+  //# Inner Class TimeOut
+
+  private static class TimeOut
+  extends CommandLineArgumentInteger
+  {
+
+    private TimeOut()
+    {
+      super("-timeOut", "Number of ms before the program is aborted. This is only useful for wcheck");
+    }
+
+    protected void configure(final ModelVerifier verifier)
+    {
+      final int time = getValue();
+      if (verifier instanceof ModularControlLoopChecker) {
+        final ModularControlLoopChecker checker =
+          (ModularControlLoopChecker) verifier;
+        checker.setTimeOut((long)time);
       } else {
         fail(getName() + " option only supported for modular control loop checker!");
       }
