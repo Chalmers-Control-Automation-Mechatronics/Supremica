@@ -298,9 +298,9 @@ public class ModularControlLoopChecker
     private final Set<EventProxy> mFauxUncontrollable;
   }
 
+
   //#########################################################################
   //# Timeout Inner Class
-
   private class TimeOut implements Runnable
   {
     public void run()
@@ -320,12 +320,13 @@ public class ModularControlLoopChecker
       interrupted = true;
     }
 
-    boolean interrupted;
+    @SuppressWarnings("unused")
+    private boolean interrupted;
   }
+
 
   //#########################################################################
   //# Setting the Result
-
   @Override
   protected void addStatistics()
   {

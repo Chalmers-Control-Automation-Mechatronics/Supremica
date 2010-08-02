@@ -544,9 +544,12 @@ public class ModelAssess
       case '$':
       case '&':
       case '%':
-      case '_':
         mOutput.print('\\');
         mOutput.print(ch);
+        blank = space = false;
+        break;
+      case '_':
+        mOutput.print("\\uscore{}");
         blank = space = false;
         break;
       case '^':

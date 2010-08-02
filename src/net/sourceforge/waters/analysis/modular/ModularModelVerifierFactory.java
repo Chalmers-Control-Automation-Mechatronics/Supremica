@@ -131,9 +131,9 @@ public class ModularModelVerifierFactory
 
   //#########################################################################
   //# Inner Class TimeOut
-
+  @SuppressWarnings("unused")
   private static class TimeOut
-  extends CommandLineArgumentInteger
+    extends CommandLineArgumentInteger
   {
 
     private TimeOut()
@@ -153,6 +153,7 @@ public class ModularModelVerifierFactory
       }
     }
   }
+
 
   //#########################################################################
   //# Inner Class SelectVersion
