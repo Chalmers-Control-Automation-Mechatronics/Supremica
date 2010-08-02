@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.comp552;
+package net.sourceforge.waters.gui.comp552;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -1207,6 +1207,7 @@ public class ModelAssess
               mOutput.print("$\\langle$expecting ");
               printLaTeXString(rest, false);
               mOutput.print("$\\rangle$");
+              break;
             } else {
               printLaTeXName(event);
             }
