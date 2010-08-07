@@ -84,28 +84,22 @@ public class ModularControlLoopChecker
               for (final AutomataGroup invalidate : mAutoSets)
                 invalidate.isChanged(nonLoop);
             }
-            if (mLoopEvents.size() == 0)
-            {
+            if (mLoopEvents.size() == 0) {
               setSatisfiedResult();
-              mIsSatisfied = true;
               return true;
             }
             mTranslator.removeLoopEvents(nonLoop);
             final LoopTraceProxy loop = testOne(group);
-            if (loop != null)
-            {
+            if (loop != null) {
               setFailedResult(loop);
-              mIsSatisfied = false;
               return false;
             }
           }
         }
         while (removedLoopEvents);
         final LoopTraceProxy loop = testAll();
-        if (loop != null)
-        {
+        if (loop != null) {
           setFailedResult(loop);
-          mIsSatisfied = false;
           return false;
         }
         boolean failed = true;
@@ -333,20 +327,24 @@ public class ModularControlLoopChecker
   //#########################################################################
   //# Setting the Result
   @Override
+  protected LoopResult createAnalysisResult()
+  {
+    return new LoopResult();
+  }
+
+  @Override
   protected void addStatistics()
   {
     super.addStatistics();
-    final LoopResult result = new LoopResult(getAnalysisResult());
+    final LoopResult result = (LoopResult) getAnalysisResult();
     double maxStates = -1;
     double totalStates = 0;
     double maxTransitions = -1;
     double totalTransitions = 0;
     int totalComps = 0;
     int maxAutomata = -1;
-    for (final AutomataGroup group : mAutoSets)
-    {
-      if (group.getStatistics() != null)
-      {
+    for (final AutomataGroup group : mAutoSets) {
+      if (group.getStatistics() != null) {
         if (group.getStatistics().getTotalNumberOfAutomata() > maxAutomata)
           maxAutomata = group.getStatistics().getTotalNumberOfAutomata();
         if (group.getStatistics().getTotalNumberOfStates() > maxStates)
@@ -365,8 +363,6 @@ public class ModularControlLoopChecker
     result.setTotalNumberOfStates(totalStates);
     result.setTotalNumberOfTransitions(totalTransitions);
     result.setNumberOfCompositions(totalComps);
-    result.setSatisfied(mIsSatisfied);
-    this.setAnalysisResult(result);
   }
 
 
@@ -377,6 +373,5 @@ public class ModularControlLoopChecker
   private Set<EventProxy> mLoopEvents;
   private TimeOut mTimeOutThread;
   private long mTimeOut = 0;
-  private boolean mIsSatisfied;
   private final int mNodesRemaining = 3000000;
 }

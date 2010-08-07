@@ -1,30 +1,15 @@
 package net.sourceforge.waters.analysis.modular;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.analysis.VerificationResult;
 
 public class LoopResult extends VerificationResult
 {
 
-  public LoopResult()
+  LoopResult()
   {
     super();
-    mPeakNumberOfAutomata = -1;
-    mNumberOfCompositions = -1;
-  }
-
-  public LoopResult(final VerificationResult old)
-  {
-    super();
-    this.setCounterExample(old.getCounterExample());
-    this.setException(old.getException());
-    this.setTotalNumberOfAutomata(old.getTotalNumberOfAutomata());
-    this.setTotalNumberOfStates(old.getTotalNumberOfStates());
-    this.setTotalNumberOfTransitions(old.getTotalNumberOfTransitions());
-    this.setPeakNumberOfStates(old.getPeakNumberOfStates());
-    this.setPeakNumberOfTransitions(old.getPeakNumberOfTransitions());
-    this.setPeakNumberOfNodes(old.getPeakNumberOfNodes());
     mPeakNumberOfAutomata = -1;
     mNumberOfCompositions = -1;
   }
@@ -95,32 +80,36 @@ public class LoopResult extends VerificationResult
     mNumberOfCompositions = numcomp;
   }
 
-  public void print(final PrintStream stream)
+  @Override
+  public void print(final PrintWriter writer)
   {
-    super.print(stream);
+    super.print(writer);
     if (mPeakNumberOfAutomata >= 0) {
-      stream.println("Peak number of automata: " + mPeakNumberOfAutomata);
+      writer.println("Peak number of automata: " + mPeakNumberOfAutomata);
     }
     if (mNumberOfCompositions >= 0) {
-      stream.println("Number of Compositions: " + mNumberOfCompositions);
+      writer.println("Number of Compositions: " + mNumberOfCompositions);
     }
   }
 
-  public void printCSVHorizontal(final PrintStream stream)
+  @Override
+  public void printCSVHorizontal(final PrintWriter writer)
   {
-    super.printCSVHorizontal(stream);
-    stream.print(mPeakNumberOfAutomata + ",");
-    stream.print(mNumberOfCompositions + ",");
+    super.printCSVHorizontal(writer);
+    writer.print("," + mPeakNumberOfAutomata);
+    writer.print("," + mNumberOfCompositions);
   }
 
-  public void printCSVHorizontalHeadings(final PrintStream stream)
+  @Override
+  public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
-    super.printCSVHorizontalHeadings(stream);
-    stream.print("Peak aut,");
-    stream.print("Compositions,");
+    super.printCSVHorizontalHeadings(writer);
+    writer.print(",Peak aut");
+    writer.print(",Compositions");
   }
 
-  public int mPeakNumberOfAutomata;
-  public int mNumberOfCompositions;
+
+  private int mPeakNumberOfAutomata;
+  private int mNumberOfCompositions;
 
 }

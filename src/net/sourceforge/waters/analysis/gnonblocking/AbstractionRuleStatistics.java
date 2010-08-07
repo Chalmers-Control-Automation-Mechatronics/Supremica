@@ -1,6 +1,6 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Formatter;
 
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -245,86 +245,85 @@ public class AbstractionRuleStatistics
 
   // #########################################################################
   // # Printing
-  public void print(final PrintStream stream)
+  public void print(final PrintWriter writer)
   {
     @SuppressWarnings("unused")
-    final Formatter formatter = new Formatter(stream);
-    stream.println("Name of rule: " + ProxyTools.getShortClassName(mRuleClass));
-    stream.println("Total number of times applied: " + mAppliedCount);
+    final Formatter formatter = new Formatter(writer);
+    writer.println("Name of rule: " + ProxyTools.getShortClassName(mRuleClass));
+    writer.println("Total number of times applied: " + mAppliedCount);
 
-    stream.println("Total run time: " + mRunTime);
-    stream.println("Total number of times a reduction occurred: "
+    writer.println("Total run time: " + mRunTime);
+    writer.println("Total number of times a reduction occurred: "
         + mReductionCount);
     final double probability =
         (double) mReductionCount / (double) mAppliedCount;
-    stream.println("Probability of a reduction occurring: " + probability);
-    stream.println("Total number of input states: " + getTotalInputStates());
-    stream.println("Total number of input transitions: "
+    writer.println("Probability of a reduction occurring: " + probability);
+    writer.println("Total number of input states: " + getTotalInputStates());
+    writer.println("Total number of input transitions: "
         + getTotalInputTransitions());
-    stream.println("Total number of output states: " + getTotalOutputStates());
-    stream.println("Total number of output transitions: "
+    writer.println("Total number of output states: " + getTotalOutputStates());
+    writer.println("Total number of output transitions: "
         + getTotalOutputTransitions());
-    stream.println("Sum of input states with a reduction: " + mInputStates);
-    stream.println("Sum of input transitions with a reduction: "
+    writer.println("Sum of input states with a reduction: " + mInputStates);
+    writer.println("Sum of input transitions with a reduction: "
         + mInputTransitions);
-    stream.println("Sum of output states with a reduction: " + mOutputStates);
-    stream.println("Sum of output transitions with a reduction: "
+    writer.println("Sum of output states with a reduction: " + mOutputStates);
+    writer.println("Sum of output transitions with a reduction: "
         + mOutputTransitions);
-    stream
+    writer
         .println("Sum of input states with no reduction: " + mUnchangedStates);
-    stream.println("Sum of input transitions with no reduction: "
+    writer.println("Sum of input transitions with no reduction: "
         + mUnchangedTransitions);
 
   }
 
-  public void printCSVHorizontalHeadings(final PrintStream stream)
+  public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
-    stream.print("Rule Name,");
-    stream.print("Applied,");
-    stream.print("RunTime,");
-    stream.print("Reduction,");
-    stream.print("Prob Reduction,");
-    stream.print("State Red %,");
-    stream.print("Trans Red %,");
-    stream.print("Tot In States,");
-    stream.print("Tot In Trans,");
-    stream.print("Tot Out States,");
-    stream.print("Tot Out Trans,");
-    stream.print("Sum In S Reduction,");
-    stream.print("Sum In T Reduction,");
-    stream.print("Sum Out S Reduction,");
-    stream.print("Sum Out T Reduction,");
-    stream.print("Sum S NoRed,");
-    stream.print("Sum T NoRed,");
+    writer.print(",Rule Name");
+    writer.print(",Applied");
+    writer.print(",RunTime");
+    writer.print(",Reduction");
+    writer.print(",Prob Reduction");
+    writer.print(",State Red %");
+    writer.print(",Trans Red %");
+    writer.print(",Tot In States");
+    writer.print(",Tot In Trans");
+    writer.print(",Tot Out States");
+    writer.print(",Tot Out Trans");
+    writer.print(",Sum In S Reduction");
+    writer.print(",Sum In T Reduction");
+    writer.print(",Sum Out S Reduction");
+    writer.print(",Sum Out T Reduction");
+    writer.print(",Sum S NoRed");
+    writer.print(",Sum T NoRed");
   }
 
-  public void printCSVHorizontal(final PrintStream stream)
+  public void printCSVHorizontal(final PrintWriter writer)
   {
-    stream.print(ProxyTools.getShortClassName(mRuleClass) + ",");
-    stream.print(mAppliedCount + ",");
-    final float seconds = 0.001f * mRunTime;
-    stream.print(seconds + ",");
-    stream.print(mReductionCount + ",");
+    writer.print("," + ProxyTools.getShortClassName(mRuleClass));
+    writer.print("," + mAppliedCount);
+    writer.print("," + mRunTime);
+    writer.print("," + mReductionCount );
     double probability = (double) mReductionCount / (double) mAppliedCount;
-    stream.print(probability + ",");
+    writer.print("," + probability);
     probability =
         (double) (getTotalInputStates() - getTotalOutputStates())
             / (double) getTotalInputStates();
-    stream.print(probability + ",");
+    writer.print("," + probability);
     probability =
         (double) (getTotalInputTransitions() - getTotalOutputTransitions())
             / (double) getTotalInputTransitions();
-    stream.print(probability + ",");
-    stream.print(getTotalInputStates() + ",");
-    stream.print(getTotalInputTransitions() + ",");
-    stream.print(getTotalOutputStates() + ",");
-    stream.print(getTotalOutputTransitions() + ",");
-    stream.print(mInputStates + ",");
-    stream.print(mInputTransitions + ",");
-    stream.print(mOutputStates + ",");
-    stream.print(mOutputTransitions + ",");
-    stream.print(mUnchangedStates + ",");
-    stream.print(mUnchangedTransitions + ",");
+    writer.print("," + probability);
+    writer.print("," + getTotalInputStates());
+    writer.print("," + getTotalInputTransitions());
+    writer.print("," + getTotalOutputStates());
+    writer.print("," + getTotalOutputTransitions());
+    writer.print("," + mInputStates);
+    writer.print("," + mInputTransitions);
+    writer.print("," + mOutputStates);
+    writer.print("," + mOutputTransitions);
+    writer.print("," + mUnchangedStates);
+    writer.print("," + mUnchangedTransitions);
   }
 
   // #########################################################################

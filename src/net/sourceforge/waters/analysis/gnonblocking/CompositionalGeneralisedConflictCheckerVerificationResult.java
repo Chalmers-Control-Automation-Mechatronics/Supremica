@@ -1,6 +1,7 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -136,77 +137,81 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult extends
     mUnsuccessfulCompositionCount = count;
   }
 
-  // #########################################################################
-  // # Printing
+  //#########################################################################
+  //# Printing
   @Override
-  public void print(final PrintStream stream)
+  public void print(final PrintWriter writer)
   {
-    super.print(stream);
-
-    stream.println("Number of times a model is successfully composed: "
+    super.print(writer);
+    writer.println("Number of times a model is successfully composed: "
         + mSuccessfulCompositionCount);
-    stream.println("Number of times a model is unsuccessfully composed: "
+    writer.println("Number of times a model is unsuccessfully composed: "
         + mUnsuccessfulCompositionCount);
-
     final double probability =
         (double) mUnsuccessfulCompositionCount
             / (double) getTotalCompositionCount();
-
-    stream.println("Probability of a candidate selection being unsuccessful: "
+    writer.println("Probability of a candidate selection being unsuccessful: "
         + probability);
-
-    stream.println("Number of states in final composed model: "
+    writer.println("Number of states in final composed model: "
         + mComposedModelNumberOfStates);
-    stream.println("Number of transitions in final composed model: "
+    writer.println("Number of transitions in final composed model: "
         + mComposedModelNumberOfTransitions);
-
-    stream
+    writer
         .println("-----------------------Rule Results ----------------------");
     for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
-      ruleStats.print(stream);
-      stream.println();
+      ruleStats.print(writer);
+      writer.println();
     }
 
   }
 
-  public void printCSVHorizontalHeadings(final PrintStream stream,
-                                         final int numRules)
+  @Override
+  public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
-    stream.print("Model name,");
-    super.printCSVHorizontalHeadings(stream);
-    stream.print("Succ composed,");
-    stream.print("Unsucc composed,");
-    stream.print("Prob candidate unsucc,");
-    stream.print("States final,");
-    stream.print("Tansitions final,");
+    printCSVHorizontalHeadings(writer, mAbstractionRuleStats.size());
+  }
+
+  void printCSVHorizontalHeadings(final PrintStream stream, final int numRules)
+  {
+    final PrintWriter writer = new PrintWriter(stream);
+    printCSVHorizontalHeadings(writer, numRules);
+  }
+
+  void printCSVHorizontalHeadings(final PrintWriter writer, final int numRules)
+  {
+    super.printCSVHorizontalHeadings(writer);
+    writer.print(",Succ composed");
+    writer.print(",Unsucc composed");
+    writer.print(",Prob candidate unsucc");
+    writer.print(",States final");
+    writer.print(",Tansitions final");
     final AbstractionRuleStatistics ruleStats =
         new AbstractionRuleStatistics(null);
     for (int i = 0; i < numRules; i++) {
-      ruleStats.printCSVHorizontalHeadings(stream);
+      ruleStats.printCSVHorizontalHeadings(writer);
     }
-    stream.println();
   }
 
-  public void printCSVHorizontal(final PrintStream stream)
+  @Override
+  public void printCSVHorizontal(final PrintWriter writer)
   {
-    super.printCSVHorizontal(stream);
-    stream.print(mSuccessfulCompositionCount + ",");
-    stream.print(mUnsuccessfulCompositionCount + ",");
-
+    super.printCSVHorizontal(writer);
+    writer.print("," + mSuccessfulCompositionCount);
+    writer.print("," + mUnsuccessfulCompositionCount);
     final double probability =
         (double) mUnsuccessfulCompositionCount
             / (double) getTotalCompositionCount();
-    stream.print(probability + ",");
-    stream.print(mComposedModelNumberOfStates + ",");
-    stream.print(mComposedModelNumberOfTransitions + ",");
+    writer.print("," + probability);
+    writer.print("," + mComposedModelNumberOfStates);
+    writer.print("," + mComposedModelNumberOfTransitions);
     for (final AbstractionRuleStatistics ruleStats : mAbstractionRuleStats) {
-      ruleStats.printCSVHorizontal(stream);
+      ruleStats.printCSVHorizontal(writer);
     }
-    stream.println();
   }
 
-  // #########################################################################
-  // # Data Members
+
+  //#########################################################################
+  //# Data Members
   private List<AbstractionRuleStatistics> mAbstractionRuleStats;
   private int mSuccessfulCompositionCount;
   private int mUnsuccessfulCompositionCount;

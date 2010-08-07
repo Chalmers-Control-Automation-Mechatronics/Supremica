@@ -3,7 +3,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +37,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
       throws FileNotFoundException
   {
     mOut = new FileOutputStream(statsFilename);
-    mPrintStream = null;
+    mPrintWriter = null;
     mPreselecting = preselectingHeuristic.toLowerCase();
     mSelecting = selectingHeuristic.toLowerCase();
     mRules = rules;
@@ -57,7 +57,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mVerifier = new CompositionalGeneralisedConflictChecker(factory);
-    mPrintStream = new PrintStream(mOut, true);
+    mPrintWriter = new PrintWriter(mOut, true);
     final int internalStateLimit = 5000;
     mVerifier.setInternalStepNodeLimit(internalStateLimit);
     final int internalTransitionLimit = 1000000;
@@ -66,7 +66,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
     mVerifier.setFinalStepNodeLimit(finalStateLimit);
     final int finalTransitionLimit = 0;
     mVerifier.setFinalStepTransitionLimit(finalTransitionLimit);
-    mPrintStream.println("InternalStateLimit," + internalStateLimit
+    mPrintWriter.println("InternalStateLimit," + internalStateLimit
         + ",InternalTransitionLimit," + internalTransitionLimit
         + ",FinalStateLimit," + finalStateLimit + ",FinalTransitionLimit,"
         + finalTransitionLimit);
@@ -74,11 +74,12 @@ public abstract class CompositionalConflictCheckerExperiments extends
     setPreselectingHeuristic();
     setSelectingHeuristic();
 
-    mPrintStream.println("PreselHeuristic," + mPreselecting
+    mPrintWriter.println("PreselHeuristic," + mPreselecting
         + ",SelecHeuristic," + mSelecting);
 
     mStats = new CompositionalGeneralisedConflictCheckerVerificationResult();
-    mStats.printCSVHorizontalHeadings(mPrintStream, mRuleCount);
+    mPrintWriter.print("Model,");
+    mStats.printCSVHorizontalHeadings(mPrintWriter, mRuleCount);
   }
 
   protected void setPreselectingHeuristic()
@@ -127,7 +128,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
   protected void tearDown() throws Exception
   {
     mVerifier = null;
-    mPrintStream.close();
+    mPrintWriter.close();
     mOut.close();
     System.out.println("All experiments complete");
     super.tearDown();
@@ -244,7 +245,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
   protected void runModel(final String group, final String subdir,
                           final String name) throws Exception
   {
-    System.out.println("Running " + name + "....");
+    System.out.println("Running " + name + " ...");
     final String inputprop = System.getProperty("waters.test.inputdir");
     final File inputRoot = new File(inputprop);
     final File rootdir = new File(inputRoot, "waters");
@@ -257,13 +258,15 @@ public abstract class CompositionalConflictCheckerExperiments extends
       mVerifier.run();
     } catch (final Exception e) {
       System.out.print(e.getMessage());
-      mPrintStream.println(name + "," + e.getMessage());
+      mPrintWriter.println(name + "," + e.getMessage());
     } finally {
       mStats =
           (CompositionalGeneralisedConflictCheckerVerificationResult) mVerifier
               .getAnalysisResult();
-      mPrintStream.print(name + ",");
-      mStats.printCSVHorizontal(mPrintStream);
+      mPrintWriter.print(name);
+      mPrintWriter.print(',');
+      mStats.printCSVHorizontal(mPrintWriter);
+      mPrintWriter.println();
     }
   }
 
@@ -272,7 +275,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
   CompositionalGeneralisedConflictCheckerVerificationResult mStats;
   protected CompositionalGeneralisedConflictChecker mVerifier;
   final FileOutputStream mOut;
-  PrintStream mPrintStream;
+  PrintWriter mPrintWriter;
   final String mPreselecting;
   final String mSelecting;
   final int mRules;

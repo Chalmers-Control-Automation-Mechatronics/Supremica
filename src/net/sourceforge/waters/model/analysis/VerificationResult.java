@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Formatter;
 
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -219,14 +219,16 @@ public class VerificationResult extends AnalysisResult
     mPeakNumberOfNodes = numnodes;
   }
 
-  // #########################################################################
-  // # Printing
-  public void print(final PrintStream stream)
+
+  //#########################################################################
+  //# Printing
+  @Override
+  public void print(final PrintWriter writer)
   {
-    super.print(stream);
-    final Formatter formatter = new Formatter(stream);
+    super.print(writer);
+    final Formatter formatter = new Formatter(writer);
     if (mTotalNumberOfAutomata >= 0) {
-      stream.println("Total number of automata: " + mTotalNumberOfAutomata);
+      writer.println("Total number of automata: " + mTotalNumberOfAutomata);
     }
     if (mTotalNumberOfStates >= 0) {
       formatter.format("Total number of states: %.0f\n", mTotalNumberOfStates);
@@ -243,34 +245,56 @@ public class VerificationResult extends AnalysisResult
                        mPeakNumberOfTransitions);
     }
     if (mPeakNumberOfNodes >= 0) {
-      stream.println("Peak number of nodes: " + mPeakNumberOfNodes);
+      writer.println("Peak number of nodes: " + mPeakNumberOfNodes);
     }
   }
 
-  public void printCSVHorizontal(final PrintStream stream)
+  @Override
+  public void printCSVHorizontal(final PrintWriter writer)
   {
-    super.printCSVHorizontal(stream);
-    stream.print(mTotalNumberOfAutomata + ",");
-    stream.print(mTotalNumberOfStates + ",");
-    stream.print(mTotalNumberOfTransitions + ",");
-    stream.print(mPeakNumberOfStates + ",");
-    stream.print(mPeakNumberOfTransitions + ",");
-    stream.print(mPeakNumberOfNodes + ",");
+    super.printCSVHorizontal(writer);
+    final Formatter formatter = new Formatter(writer);
+    writer.print(',');
+    if (mTotalNumberOfAutomata >= 0) {
+      writer.print(mTotalNumberOfAutomata);
+    }
+    writer.print(',');
+    if (mTotalNumberOfStates >= 0) {
+      formatter.format("%.0f", mTotalNumberOfStates);
+    }
+    writer.print(',');
+    if (mTotalNumberOfTransitions >= 0) {
+      formatter.format("%.0f", mTotalNumberOfTransitions);
+    }
+    writer.print(',');
+    if (mPeakNumberOfStates >= 0) {
+      formatter.format("%.0f", mPeakNumberOfStates);
+    }
+    writer.print(',');
+    if (mPeakNumberOfTransitions >= 0) {
+      formatter.format("%.0f", mPeakNumberOfTransitions);
+    }
+    writer.print(',');
+    if (mPeakNumberOfNodes >= 0) {
+      writer.print(mPeakNumberOfNodes);
+    }
   }
 
-  public void printCSVHorizontalHeadings(final PrintStream stream)
+  @Override
+  public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
-    super.printCSVHorizontalHeadings(stream);
-    stream.print("Tot aut,");
-    stream.print("Tot states,");
-    stream.print("Tot trans,");
-    stream.print("Peak states,");
-    stream.print("Peak trans,");
-    stream.print("Peak nodes,");
+    super.printCSVHorizontalHeadings(writer);
+    writer.print(",Tot aut");
+    writer.print(",Tot states");
+    writer.print(",Tot trans");
+    writer.print(",Peak states");
+    writer.print(",Peak trans");
+    writer.print(",Peak nodes");
   }
 
-  // #########################################################################
-  // # Data Members
+
+  //#########################################################################
+  //# Data Members
   private TraceProxy mCounterExample;
   private int mTotalNumberOfAutomata;
   private double mTotalNumberOfStates;

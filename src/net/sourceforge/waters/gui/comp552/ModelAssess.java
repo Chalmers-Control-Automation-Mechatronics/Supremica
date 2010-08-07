@@ -18,7 +18,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,7 +41,6 @@ import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.CommandLineTool;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
@@ -76,6 +74,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.supremica.log.LoggerFactory;
 import org.xml.sax.SAXException;
 
 
@@ -98,16 +97,8 @@ public class ModelAssess
     final String outputdir = args[3];
 
     try {
-      final ClassLoader loader = CommandLineTool.class.getClassLoader();
-      try {
-        final Class<?> lclazz = loader.loadClass(LOGGERFACTORY);
-        final Method method0 = lclazz.getMethod("getInstance");
-        final Object loggerfactory = method0.invoke(null);
-        final Method method = lclazz.getMethod("logToNull");
-        method.invoke(loggerfactory);
-      } catch (final ClassNotFoundException exception) {
-        // No loggers---no trouble ...
-      }
+      final LoggerFactory loggerfactory = LoggerFactory.getInstance();
+      loggerfactory.logToNull();
       final ModelAssess assess =
         new ModelAssess(config, classlist, inputdir, outputdir);
       assess.run();
@@ -1210,7 +1201,6 @@ public class ModelAssess
               mOutput.print("$\\langle$expecting ");
               printLaTeXString(rest, false);
               mOutput.print("$\\rangle$");
-              break;
             } else {
               printLaTeXName(event);
             }
@@ -1439,11 +1429,5 @@ public class ModelAssess
   private PrintStream mOutput;
   private boolean mSkip;
   private int mAutomatonIndex;
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final String LOGGERFACTORY =
-    "org.supremica.log.LoggerFactory";
 
 }

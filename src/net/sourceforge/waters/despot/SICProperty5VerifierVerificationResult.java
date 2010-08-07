@@ -1,6 +1,6 @@
 package net.sourceforge.waters.despot;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,9 +39,8 @@ public class SICProperty5VerifierVerificationResult extends VerificationResult
     return mConflictCheckerStats;
   }
 
-  // #########################################################################
-  // # Providing Statistics
-
+  //#########################################################################
+  //# Providing Statistics
   /**
    * Sets all the conflict checker results for this SIC property V verification
    * (one result for each answer event).
@@ -52,14 +51,35 @@ public class SICProperty5VerifierVerificationResult extends VerificationResult
     mConflictCheckerStats = results;
   }
 
-  // #########################################################################
-  // # Printing
+
+  //#########################################################################
+  //# Printing
   @Override
-  public void print(final PrintStream stream)
+  public void print(final PrintWriter writer)
   {
-    super.print(stream);
+    super.print(writer);
     for (final VerificationResult result : mConflictCheckerStats) {
-      result.print(stream);
+      result.print(writer);
+    }
+  }
+
+  @Override
+  public void printCSVHorizontal(final PrintWriter writer)
+  {
+    super.printCSVHorizontal(writer);
+    for (final VerificationResult result : mConflictCheckerStats) {
+      writer.print(',');
+      result.printCSVHorizontal(writer);
+    }
+  }
+
+  @Override
+  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  {
+    super.printCSVHorizontalHeadings(writer);
+    for (final VerificationResult result : mConflictCheckerStats) {
+      writer.print(',');
+      result.printCSVHorizontalHeadings(writer);
     }
   }
 

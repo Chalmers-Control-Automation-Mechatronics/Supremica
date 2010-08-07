@@ -12,7 +12,7 @@ package net.sourceforge.waters.model.analysis;
 
 /**
  * An exception indicating that an analysis algorithm has been aborted
- * because the set state limit has been exceeded.
+ * because a set limit has been exceeded.
  *
  * @author Robi Malik
  */
@@ -22,7 +22,7 @@ public class OverflowException extends AnalysisException {
   //#########################################################################
   //# Constructors
   /**
-   * Constructs a new overflow exception with a default message.
+   * Constructs a new state limit overflow exception with a default message.
    */
   public OverflowException()
   {
@@ -30,7 +30,7 @@ public class OverflowException extends AnalysisException {
   }
 
   /**
-   * Constructs an overflow exception with a message indicating the
+   * Constructs a state limit overflow exception with a message indicating the
    * number of states reached.
    */
   public OverflowException(final int limit)
@@ -49,7 +49,7 @@ public class OverflowException extends AnalysisException {
 
   /**
    * Constructs an overflow exception with a message indicating the
-   * number of states or transitions reached.
+   * type of limit and the number of states or transitions reached.
    */
   public OverflowException(final Kind kind, final int limit)
   {

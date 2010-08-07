@@ -11,7 +11,10 @@ package net.sourceforge.waters.model.analysis;
 
 import java.lang.reflect.Method;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Formatter;
@@ -71,6 +74,12 @@ public class CommandLineTool
    */
   public static void main(final String[] args)
   {
+    boolean verbose = true;
+    boolean stats = false;
+    boolean optimise = true;
+    boolean noargs = false;
+    PrintWriter csv = null;
+
     try {
       if (args.length < 2) {
         System.err.println
@@ -89,10 +98,6 @@ public class CommandLineTool
       List<ParameterBindingProxy> bindings = null;
       ModelVerifier wrapper = null;
 
-      boolean verbose = true;
-      boolean stats = false;
-      boolean optimise = true;
-      boolean noargs = false;
       final String factoryname = args[0];
       final List<String> arglist = new LinkedList<String>();
       for (int i = 1; i < args.length; i++) {
@@ -109,6 +114,10 @@ public class CommandLineTool
           stats = true;
         } else if (arg.equals("-noopt")) {
           optimise = false;
+        } else if (arg.equals("-csv") && i + 1 < args.length) {
+          final String csvname = args[++i];
+          final OutputStream csvstream = new FileOutputStream(csvname);
+          csv = new PrintWriter(csvstream);
         } else if (arg.startsWith("-D")) {
           final int eqpos = arg.indexOf('=', 2);
           if (eqpos > 2) {
@@ -193,6 +202,7 @@ public class CommandLineTool
       final List<String> filenames = factory.configure(checker);
 
       final Formatter formatter = new Formatter(System.out);
+      boolean first = true;
       for (final String name : filenames) {
         final File filename = new File(name);
         final DocumentProxy doc = docManager.load(filename);
@@ -254,9 +264,9 @@ public class CommandLineTool
           final float difftime = 0.001f * (stop - start);
           formatter.format("OVERFLOW (%.3f s)\n", difftime);
         }
-        if (stats) {
-          final VerificationResult result = wrapper.getAnalysisResult();
-          if (result != null) {
+        final VerificationResult result = wrapper.getAnalysisResult();
+        if (result != null) {
+          if (stats) {
             System.out.println(SEPARATOR);
             System.out.println("Statistics:");
             System.out.println("Automata in model: " +
@@ -266,10 +276,21 @@ public class CommandLineTool
             result.print(System.out);
             additions = true;
           }
+          if (csv != null) {
+            if (first) {
+              csv.print("Model,");
+              result.printCSVHorizontalHeadings(csv);
+              csv.println();
+            }
+            csv.print(des.getName() + ',');
+            result.printCSVHorizontal(csv);
+            csv.println();
+          }
         }
         if (additions) {
           System.out.println(SEPARATOR);
         }
+        first = false;
       }
 
     } catch (final Throwable exception) {
@@ -277,6 +298,10 @@ public class CommandLineTool
       System.err.println(ProxyTools.getShortClassName(exception) +
                          " caught in main()!");
       exception.printStackTrace(System.err);
+    } finally {
+      if (csv != null) {
+        csv.close();
+      }
     }
   }
 
