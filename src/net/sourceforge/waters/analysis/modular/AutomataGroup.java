@@ -281,15 +281,23 @@ public class AutomataGroup
   /**
    * Runs the Monolithic SCC Control Loop Checker to determine information on the subset of Automata in this group
    * @param checker The Control Loop Checker to use. It should contain the Kind Translator, and a factory before being called
+   * @param nodesRemaining
    * @throws AnalysisException
+   * @returns The number of space left in the model checker
    */
-  public void run(final MonolithicSCCControlLoopChecker checker) throws AnalysisException
+  public void run(final MonolithicSCCControlLoopChecker checker, final int nodesRemaining) throws AnalysisException
   {
     if (mValidRun)
       return;
+    int spaceLeft;
+    if (checker.getAnalysisResult() != null)
+      spaceLeft = (int) (nodesRemaining + checker.getAnalysisResult().getTotalNumberOfStates());
+    else
+      spaceLeft = nodesRemaining;
     final ProductDESProxy passer;
     passer = checker.getFactory().createProductDESProxy(getName() , mSensitiveEvents, mAllAutomata);
     checker.setModel(passer);
+    checker.setNodeLimit(spaceLeft);
     if (checker.run())
     {
       mLoopTraceProxy = null;
@@ -298,6 +306,7 @@ public class AutomataGroup
     {
       mLoopTraceProxy = checker.getCounterExample();
     }
+    spaceLeft = (int) (spaceLeft - checker.getAnalysisResult().getTotalNumberOfStates());
     mNonLoopEvents = checker.getNonLoopEvents();
     mStats = checker.getAnalysisResult();
     //System.out.println(getStatisticsText());

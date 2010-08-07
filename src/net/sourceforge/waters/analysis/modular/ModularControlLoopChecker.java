@@ -76,7 +76,7 @@ public class ModularControlLoopChecker
           for (final AutomataGroup group : mAutoSets)
           {
             checkAbort();
-            group.run(checker);
+            group.run(checker, mNodesRemaining);
             final Collection<EventProxy> nonLoop = group.getNonLoopEvents();
             if (mLoopEvents.removeAll(nonLoop))
             {
@@ -87,6 +87,7 @@ public class ModularControlLoopChecker
             if (mLoopEvents.size() == 0)
             {
               setSatisfiedResult();
+              mIsSatisfied = true;
               return true;
             }
             mTranslator.removeLoopEvents(nonLoop);
@@ -94,6 +95,7 @@ public class ModularControlLoopChecker
             if (loop != null)
             {
               setFailedResult(loop);
+              mIsSatisfied = false;
               return false;
             }
           }
@@ -103,6 +105,7 @@ public class ModularControlLoopChecker
         if (loop != null)
         {
           setFailedResult(loop);
+          mIsSatisfied = false;
           return false;
         }
         boolean failed = true;
@@ -132,7 +135,7 @@ public class ModularControlLoopChecker
           if (bestGroup != null)
           {
             checkAbort();
-            //System.out.println("DEBUG: Merged with score " + bestGroup.isControlLoop(primary, mTranslator));
+            //System.out.println("DEBUG: Merged with score " + bestGroup.isControlLoop(primary, mTranslator) + " at time " + System.currentTimeMillis());
             mAutoSets.remove(bestGroup);
             primary.merge(bestGroup);
             failed = false;
@@ -143,7 +146,8 @@ public class ModularControlLoopChecker
         if (failed)
           throw new AnalysisException("ERROR: Two automata could not be selected for merging. Scoring system may not work. Num Events: " + mLoopEvents.size());
       }
-    } finally {
+    }
+    finally {
       tearDown();
     }
   }
@@ -258,7 +262,8 @@ public class ModularControlLoopChecker
     mLoopEvents = null;
     mTranslator = null;
     mAutoSets = null;
-    mTimeOutThread.abort();
+    if (mTimeOutThread != null)
+      mTimeOutThread.abort();
   }
 
   private class ManipulativeTranslator implements KindTranslator
@@ -360,6 +365,7 @@ public class ModularControlLoopChecker
     result.setTotalNumberOfStates(totalStates);
     result.setTotalNumberOfTransitions(totalTransitions);
     result.setNumberOfCompositions(totalComps);
+    result.setSatisfied(mIsSatisfied);
     this.setAnalysisResult(result);
   }
 
@@ -371,4 +377,6 @@ public class ModularControlLoopChecker
   private Set<EventProxy> mLoopEvents;
   private TimeOut mTimeOutThread;
   private long mTimeOut = 0;
+  private boolean mIsSatisfied;
+  private final int mNodesRemaining = 3000000;
 }

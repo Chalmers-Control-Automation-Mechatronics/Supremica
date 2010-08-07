@@ -122,7 +122,19 @@ public class MonolithicSCCControlLoopChecker
         final LoopTraceProxy counterexample = computeCounterExample();
         return setFailedResult(counterexample);
       }
-    } finally {
+    }
+    catch (final OutOfMemoryError e)
+    {
+      mTransitionList = null;
+      mMap = null;
+      mUnvisitedList = null;
+      stack = null;
+      mLoopEvents = null;
+      System.gc();
+      System.out.println("DEBUG: Out of Memory Error solved");
+      throw new AnalysisException();
+    }
+    finally {
       tearDown();
     }
   }
