@@ -114,24 +114,23 @@ class RemovalOfTauTransitionsOriginatingFromNonAlphaStatesRule extends
             final TIntIterator iter = tauSuccessors.iterator();
             while (iter.hasNext()) {
               final int targetID = iter.next();
-              if (targetID != sourceID) {
-                transToRemove.add(targetID);
-              }
+              transToRemove.add(targetID);
             }
-            if (transToRemove.isEmpty()) {
-              mTR.removeTransition(sourceID, tauID, sourceID);
-            } else {
-              for (int i = 0; i < transToRemove.size(); i++) {
-                final int targetID = transToRemove.get(i);
+            boolean unlink = false;
+            for (int i = 0; i < transToRemove.size(); i++) {
+              final int targetID = transToRemove.get(i);
+              if (sourceID != targetID) {
                 mTR.addAllPredeccessors(sourceID, targetID);
-                mTR.removeTransition(sourceID, tauID, targetID);
-                modified = true;
+                unlink = true;
               }
-
+              mTR.removeTransition(sourceID, tauID, targetID);
+              modified = true;
             }
-            mTR.removeAllIncoming(sourceID);
-            if (mTR.isInitial(sourceID)) {
-              mTR.makeInitialState(sourceID, false);
+            if (unlink) {
+              mTR.removeAllIncoming(sourceID);
+              if (mTR.isInitial(sourceID)) {
+                mTR.makeInitialState(sourceID, false);
+              }
             }
           }
         }
