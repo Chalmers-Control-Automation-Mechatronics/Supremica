@@ -405,7 +405,8 @@ public class Composing {
 	  final Projection2 proj = new Projection2(newP, mFactory, can.getLocalEvents(), eForbidden);
 	  proj.setNodeLimit(nodelimit);
 	  long timeTemp = System.currentTimeMillis();
-	  AutomatonProxy newAutomaton = proj.project();
+	  proj.run();
+	  AutomatonProxy newAutomaton = proj.getComputedAutomaton();
 	  projectionTime += System.currentTimeMillis()-timeTemp;
 	  //System.out.println("One Projection Time: "+projectionTime);
 	  //System.out.println("Real State Size: "+newAutomaton.getStates().size());

@@ -575,7 +575,8 @@ public class ProjectingSafetyVerifier
           new Projection2(comp, getFactory(), mHidden, localforbiddenEvents);
         try {
           proj.setNodeLimit(mMaxProjStates);
-          minAutomaton = proj.project();
+          proj.run();
+          minAutomaton = proj.getComputedAutomaton();
           if (mOriginalAlphabet.containsAll(forbiddenEvents)) {
             final TransitionRelation tr = new TransitionRelation(minAutomaton, null);
             int states = tr.getAutomaton(getFactory()).getStates().size();

@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -38,52 +39,20 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import gnu.trove.THashSet;
 
 
-public class Projection2
+public class Projection2 extends AbstractAutomatonBuilder
 {
-  public static AutomatonProxy removeNonLocal(final AutomatonProxy aut, final ProductDESProxyFactory factory)
-  {
-    final Map<EventProxy, Set<StateProxy>> loopedstates = new HashMap<EventProxy, Set<StateProxy>>();
-    for (final EventProxy e : aut.getEvents()) {
-      loopedstates.put(e, new THashSet<StateProxy>());
-    }
-    for (final TransitionProxy t : aut.getTransitions()) {
-      if (!t.getSource().equals(t.getTarget())) {
-        loopedstates.remove(t.getEvent());
-      }
-      if (loopedstates.containsKey(t.getEvent())) {
-        loopedstates.get(t.getEvent()).add(t.getSource());
-      }
-    }
-    final Set<EventProxy> temp = new THashSet<EventProxy>(aut.getEvents());
-    for (final EventProxy e : loopedstates.keySet()) {
-      if (loopedstates.get(e).size() == aut.getStates().size()) {
-        temp.remove(e);
-      }
-    }
-    if (temp.size() == aut.getEvents().size()) {
-      return aut;
-    }
-    System.out.println("non local: " + (aut.getEvents().size() - temp.size()));
-    final List<TransitionProxy> trans = new ArrayList<TransitionProxy>();
-    for (final TransitionProxy tran : aut.getTransitions()){
-      if (temp.contains(tran.getEvent())) {trans.add(tran);}
-    }
-    final AutomatonProxy result = factory.createAutomatonProxy(aut.getName(), aut.getKind(),
-                                                               temp, aut.getStates(),
-                                                               trans);
-    return result;
-  }
 
-  public Projection2(final ProductDESProxy model, final ProductDESProxyFactory factory,
-                     final Set<EventProxy> hide, final Set<EventProxy> forbidden)
+  public Projection2(final ProductDESProxy model,
+                     final ProductDESProxyFactory factory,
+                     final Set<EventProxy> hide,
+                     final Set<EventProxy> forbidden)
   {
-    mModel = model;
-    mFactory = factory;
+    super(model, factory);
     mHide = hide;
     mForbidden = new HashSet<EventProxy>(forbidden);
-    mForbidden.retainAll(mModel.getEvents());
+    mForbidden.retainAll(model.getEvents());
     mNodeLimit = 1000;
-    mDisabled = new HashSet<EventProxy>(mModel.getEvents());
+    mDisabled = new HashSet<EventProxy>(model.getEvents());
     mDisabled.remove(mHide);
     numStates = 1;
   }
@@ -93,155 +62,162 @@ public class Projection2
     mNodeLimit = stateLimit;
   }
 
-  public AutomatonProxy project()
+  public boolean run()
     throws AnalysisException
   {
-    states = new IntMap(mNodeLimit);
-    trans = new ArrayList<TransitionProxy>();
-    events = mModel.getEvents().toArray(new EventProxy[mModel.getEvents().size()]);
-    mPossible = new boolean[events.length];
-    final int numAutomata = mModel.getAutomata().size();
-    AutomatonProxy[] aut = mModel.getAutomata().toArray(new AutomatonProxy[numAutomata]);
-    eventAutomaton = new int[events.length][numAutomata];
-    int l = 0;
-    // transitions indexed first by automaton then by event then by source state
-    mTransitions = new int[numAutomata][events.length][];
-    // go through and put all the events to be hidden to the front
-    Map<EventProxy, Integer> eventToIndex = new HashMap<EventProxy, Integer>(events.length);
-    for (int i = 0; i < events.length; i++) {
-      if (mHide.contains(events[i])) {
-        final EventProxy temp = events[i];
-        events[i] = events[l];
-        events[l] = temp;
-        l++;
-      }
-    }
-    assert(l == mHide.size());
-    //put all the forbidden events directly after the Hidden ones
-    for (int i = l; i < events.length; i++) {
-      if (mForbidden.contains(events[i])) {
-        final EventProxy temp = events[i];
-        events[i] = events[l];
-        events[l] = temp;
-        l++;
-      }
-    }
-    for (int i = 0; i < events.length; i++) {
-      eventToIndex.put(events[i], i);
-    }
-    assert(l == mHide.size() + mForbidden.size());
-    // this has to be done after events gets it's final ordering to avoid
-    // subtle bugs
-    for (int i = 0; i < events.length; i++) {
-      for (int j = 0; j < aut.length; j++) {
-        if (aut[j].getEvents().contains(events[i])) {
-          final int[] states1 = new int[aut[j].getStates().size()];
-          Arrays.fill(states1, -1);
-          mTransitions[j][i] = states1;
-        } else {
-          mTransitions[j][i] = null;
+    try {
+      setUp();
+      final ProductDESProxy model = getModel();
+      states = new IntMap(mNodeLimit);
+      trans = new ArrayList<TransitionProxy>();
+      events = model.getEvents().toArray(new EventProxy[model.getEvents().size()]);
+      mPossible = new boolean[events.length];
+      final int numAutomata = model.getAutomata().size();
+      AutomatonProxy[] aut = model.getAutomata().toArray(new AutomatonProxy[numAutomata]);
+      eventAutomaton = new int[events.length][numAutomata];
+      int l = 0;
+      // transitions indexed first by automaton then by event then by source state
+      mTransitions = new int[numAutomata][events.length][];
+      // go through and put all the events to be hidden to the front
+      Map<EventProxy, Integer> eventToIndex = new HashMap<EventProxy, Integer>(events.length);
+      for (int i = 0; i < events.length; i++) {
+        if (mHide.contains(events[i])) {
+          final EventProxy temp = events[i];
+          events[i] = events[l];
+          events[l] = temp;
+          l++;
         }
       }
-    }
-    int[] currentState = new int[numAutomata];
-    for (int i = 0; i < aut.length; i++) {
-      final Map<StateProxy, Integer> stateMap = new HashMap<StateProxy, Integer>(aut[i].getStates().size());
-      l = 0;
-      for (final StateProxy s : aut[i].getStates()) {
-        if (s.isInitial()) {
-          currentState[i] = l;
+      assert(l == mHide.size());
+      //put all the forbidden events directly after the Hidden ones
+      for (int i = l; i < events.length; i++) {
+        if (mForbidden.contains(events[i])) {
+          final EventProxy temp = events[i];
+          events[i] = events[l];
+          events[l] = temp;
+          l++;
         }
-        stateMap.put(s, l);
-        l++;
       }
-      assert(l == aut[i].getStates().size());
-      for (final TransitionProxy t : aut[i].getTransitions()) {
-        mTransitions[i][eventToIndex.get(t.getEvent())]
-                   [stateMap.get(t.getSource())] = stateMap.get(t.getTarget());
+      for (int i = 0; i < events.length; i++) {
+        eventToIndex.put(events[i], i);
       }
-    }
-    for (int i = 0; i < events.length; i++) {
-      final IntDouble[] list = new IntDouble[numAutomata];
-      for (int j = 0; j < aut.length; j++) {
-        list[j] = new IntDouble(j, 0);
-        if (mTransitions[j][i] != null) {
-          for (int k = 0; k < mTransitions[j][i].length; k++) {
-            if (mTransitions[j][i][k] != -1) {
-              list[j].mDouble++;
-            }
+      assert(l == mHide.size() + mForbidden.size());
+      // this has to be done after events gets it's final ordering to avoid
+      // subtle bugs
+      for (int i = 0; i < events.length; i++) {
+        for (int j = 0; j < aut.length; j++) {
+          if (aut[j].getEvents().contains(events[i])) {
+            final int[] states1 = new int[aut[j].getStates().size()];
+            Arrays.fill(states1, -1);
+            mTransitions[j][i] = states1;
+          } else {
+            mTransitions[j][i] = null;
           }
-          list[j].mDouble /= (double)mTransitions[j][i].length;
-        } else {
-          list[j].mDouble = Double.POSITIVE_INFINITY;
         }
       }
-      Arrays.sort(list);
-      for (int j = 0; j < eventAutomaton[i].length; j++) {
-        eventAutomaton[i][j] = list[j].mInt;
+      int[] currentState = new int[numAutomata];
+      for (int i = 0; i < aut.length; i++) {
+        final Map<StateProxy, Integer> stateMap = new HashMap<StateProxy, Integer>(aut[i].getStates().size());
+        l = 0;
+        for (final StateProxy s : aut[i].getStates()) {
+          if (s.isInitial()) {
+            currentState[i] = l;
+          }
+          stateMap.put(s, l);
+          l++;
+        }
+        assert(l == aut[i].getStates().size());
+        for (final TransitionProxy t : aut[i].getTransitions()) {
+          mTransitions[i][eventToIndex.get(t.getEvent())]
+                          [stateMap.get(t.getSource())] = stateMap.get(t.getTarget());
+        }
       }
-    }
-    // don't need these anymore
-    aut = null;
-    eventToIndex = null;
+      for (int i = 0; i < events.length; i++) {
+        final IntDouble[] list = new IntDouble[numAutomata];
+        for (int j = 0; j < aut.length; j++) {
+          list[j] = new IntDouble(j, 0);
+          if (mTransitions[j][i] != null) {
+            for (int k = 0; k < mTransitions[j][i].length; k++) {
+              if (mTransitions[j][i][k] != -1) {
+                list[j].mDouble++;
+              }
+            }
+            list[j].mDouble /= (double)mTransitions[j][i].length;
+          } else {
+            list[j].mDouble = Double.POSITIVE_INFINITY;
+          }
+        }
+        Arrays.sort(list);
+        for (int j = 0; j < eventAutomaton[i].length; j++) {
+          eventAutomaton[i][j] = list[j].mInt;
+        }
+      }
+      // don't need these anymore
+      aut = null;
+      eventToIndex = null;
 
-    // Time to start building the automaton
-    numStates = 1;
-    currentState = encode(currentState);
-    states.put(currentState, 0);
-    unvisited = new ArrayBag(100);
-    unvisited.offer(currentState);
-    while (!unvisited.isEmpty()) {
-      currentState = unvisited.take();
-      if (!explore(currentState, true)) {
-        explore(currentState, false);
+      // Time to start building the automaton
+      numStates = 1;
+      currentState = encode(currentState);
+      states.put(currentState, 0);
+      unvisited = new ArrayBag(100);
+      unvisited.offer(currentState);
+      while (!unvisited.isEmpty()) {
+        currentState = unvisited.take();
+        if (!explore(currentState, true)) {
+          explore(currentState, false);
+        }
       }
-    }
-    states.values().size();
-    states = null;
-    currentState = new int[] {0};
-    mTransitions = new int[1][events.length][numStates];
-    for (int i = 0; i < mTransitions[0].length; i++) {
-      for (int j = 0; j < mTransitions[0][i].length; j++) {
-        mTransitions[0][i][j] = -1;
+      states.values().size();
+      states = null;
+      currentState = new int[] {0};
+      mTransitions = new int[1][events.length][numStates];
+      for (int i = 0; i < mTransitions[0].length; i++) {
+        for (int j = 0; j < mTransitions[0][i].length; j++) {
+          mTransitions[0][i][j] = -1;
+        }
       }
-    }
-    for (final int[] tran : newtrans) {
-      mTransitions[0][tran[1]][tran[0]] = tran[2];
-    }
-    numStates = 1;
-    currentState = actualState(currentState);
-    newStates = new StateMap(mNodeLimit);
-    newStates.put(currentState, new MemStateProxy(0));
-    unvisited.offer(currentState);
-    while (!unvisited.isEmpty()) {
-      currentState = unvisited.take();
-      if (!explore2(currentState, true)) {
-        explore2(currentState, false);
+      for (final int[] tran : newtrans) {
+        mTransitions[0][tran[1]][tran[0]] = tran[2];
       }
-    }
-    final Collection<EventProxy> ev = new ArrayList<EventProxy>(mModel.getEvents());
-    ev.removeAll(mHide);
+      numStates = 1;
+      currentState = actualState(currentState);
+      newStates = new StateMap(mNodeLimit);
+      newStates.put(currentState, new MemStateProxy(0));
+      unvisited.offer(currentState);
+      while (!unvisited.isEmpty()) {
+        currentState = unvisited.take();
+        if (!explore2(currentState, true)) {
+          explore2(currentState, false);
+        }
+      }
+      final Collection<EventProxy> ev = new ArrayList<EventProxy>(model.getEvents());
+      ev.removeAll(mHide);
 
-    final StringBuffer name = new StringBuffer();
-    name.append("proj:");
-    final ArrayList<String> names = new ArrayList<String>(mModel.getAutomata().size());
-    for (final AutomatonProxy a : mModel.getAutomata()) {
-      names.add(a.getName());
+      final StringBuffer name = new StringBuffer();
+      name.append("proj:");
+      final ArrayList<String> names = new ArrayList<String>(model.getAutomata().size());
+      for (final AutomatonProxy a : model.getAutomata()) {
+        names.add(a.getName());
+      }
+      Collections.sort(names);
+      final int namesize = names.size();
+      for (int i=0;i<namesize;i++) {
+        name.append(names.get(i));
+        if (i<namesize-1) name.append(",");
+      }
+      final ProductDESProxyFactory factory = getFactory();
+      AutomatonProxy result =
+        factory.createAutomatonProxy(name.toString(), ComponentKind.PLANT,
+                                     ev, newStates.values(), trans);
+      newStates = null;
+      trans = null;
+      final Minimizer min = new Minimizer(result, factory);
+      result = min.run();
+      return setAutomatonResult(result);
+    } finally {
+      tearDown();
     }
-    Collections.sort(names);
-    final int namesize = names.size();
-    for (int i=0;i<namesize;i++) {
-      name.append(names.get(i));
-      if (i<namesize-1) name.append(",");
-    }
-    AutomatonProxy result =
-      mFactory.createAutomatonProxy(name.toString(), ComponentKind.PLANT,
-                                    ev, newStates.values(), trans);
-    newStates = null;
-    trans = null;
-    final Minimizer min = new Minimizer(result, mFactory);
-    result = min.run();
-    return result;
   }
 
   public Set<EventProxy> BlockedEvents()
@@ -323,6 +299,7 @@ public class Projection2
     }
     boolean result = false;
     //System.out.println("state:" + Arrays.toString(state));
+    final ProductDESProxyFactory factory = getFactory();
     final StateProxy source = newStates.get(state);
     for (int i = min; i < max; i++) {
       final List<Integer> successor = new ArrayList<Integer>(state.length);
@@ -353,7 +330,7 @@ public class Projection2
         }
         unvisited.offer(succ);
       }
-      trans.add(mFactory.createTransitionProxy(source, events[i], target));
+      trans.add(factory.createTransitionProxy(source, events[i], target));
     }
     return result;
   }
@@ -733,8 +710,6 @@ public class Projection2
 
   private boolean[] mPossible;
   private int mNodeLimit;
-  private final ProductDESProxy mModel;
-  private final ProductDESProxyFactory mFactory;
   private final Set<EventProxy> mHide;
   private final Set<EventProxy> mForbidden;
   private final Set<EventProxy> mDisabled;
