@@ -82,6 +82,7 @@ public class ObserverProjectionTransitionRelation
     mName = aut.getName();
     mKind = aut.getKind();
     mNumProperEvents = 0;
+    mPropositions = allProps;
     int numPropositions = 0;
     Collection<EventProxy> events = aut.getEvents();
     if (extraEvents != null) {
@@ -428,6 +429,22 @@ public class ObserverProjectionTransitionRelation
     return propID;
   }
 
+  /**
+   * Removes the given proposition from the event alphabet of this transition
+   * relation and removes the marking from all states.
+   *
+   * @param prop
+   *          The event to be removed.
+   */
+  public void removeProposition(final int propID)
+  {
+    mEvents[propID] = null;
+    // mEventToInt.put(prop, propID);
+    for (final TIntHashSet set : mMarkingDefinitions) {
+      set.remove(propID);
+    }
+  }
+
   // #########################################################################
   // # Transitions Access
   public int getNumberOfTransitions()
@@ -725,13 +742,12 @@ public class ObserverProjectionTransitionRelation
   }
 
   /**
-   * Attempts to simplify the automaton by removing all tau selfloops.
-   * If this results in the tau being disabled in, the tau event is
-   * marked as unused. Tau events are recognised by their standard
-   * code {@link EventEncoding#TAU}.
-   * @return <CODE>true</CODE> if all transitions with the tau event
-   *         were selfloops and have been removed, <CODE>false</CODE>
-   *         otherwise.
+   * Attempts to simplify the automaton by removing all tau selfloops. If this
+   * results in the tau being disabled in, the tau event is marked as unused.
+   * Tau events are recognised by their standard code {@link EventEncoding#TAU}.
+   *
+   * @return <CODE>true</CODE> if all transitions with the tau event were
+   *         selfloops and have been removed, <CODE>false</CODE> otherwise.
    */
   public boolean removeTauSelfLoops(final int tau)
   {
@@ -754,7 +770,6 @@ public class ObserverProjectionTransitionRelation
       return false;
     }
   }
-
 
   public boolean removeAllSelfLoops(final int e)
   {
@@ -856,6 +871,27 @@ public class ObserverProjectionTransitionRelation
       if (isPureSelfloopEvent(e)) {
         removeEvent(e);
       }
+    }
+  }
+
+  /**
+   * Checks for each proposition whether it appears on all reachable states, and
+   * if so, removes the proposition by un-marking all states and removing the
+   * proposition from the event alphabet.
+   */
+  public void removeRedundantPropositions()
+  {
+    boolean allMarked;
+    propLoop: for (final EventProxy proposition : mPropositions) {
+      final int propID = mEventToInt.get(proposition);
+      allMarked = true;
+      for (int state = 0; state < mOriginalStates.length; state++) {
+        allMarked &= isMarked(state, propID);
+        if (!allMarked) {
+          continue propLoop;
+        }
+      }
+      removeProposition(propID);
     }
   }
 
@@ -1024,7 +1060,6 @@ public class ObserverProjectionTransitionRelation
     return intset;
   }
 
-
   // #########################################################################
   // # Data Members
   private final String mName;
@@ -1036,6 +1071,7 @@ public class ObserverProjectionTransitionRelation
   private final Map<StateProxy,Integer> mOriginalStatesMap;
   private final boolean[] mIsInitial;
   private final int[] mStateMarkings;
+  private final Collection<EventProxy> mPropositions;
   private final List<TIntHashSet> mMarkingDefinitions;
   private final TObjectIntHashMap<TIntHashSet> mMarkingMap;
   private final TIntHashSet[] mActiveEvents;

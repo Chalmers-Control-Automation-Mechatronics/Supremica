@@ -476,7 +476,7 @@ public class CompositionalGeneralisedConflictChecker extends
     mUnsuccessfulCandidates = new HashSet<Candidate>();
     mTrivialAbstractedAutomata = new HashSet<AutomatonProxy>();
     if (mPreselectingHeuristic == null) {
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMinTa();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
       setPreselectingHeuristic(defaultHeuristic);
@@ -886,6 +886,11 @@ public class CompositionalGeneralisedConflictChecker extends
     return new HeuristicMinT();
   }
 
+  public HeuristicMinTa createHeuristicMinTa()
+  {
+    return new HeuristicMinTa();
+  }
+
   public HeuristicMaxS createHeuristicMaxS()
   {
     return new HeuristicMaxS();
@@ -1195,6 +1200,32 @@ public class CompositionalGeneralisedConflictChecker extends
                                               new AutomataComparator());
     }
 
+  }
+
+
+  private class HeuristicMinTa extends HeuristicMinT
+  {
+    @Override
+    protected AutomatonProxy getHeuristicProperty(
+                                                  final Collection<AutomatonProxy> automata)
+    {
+      final Collection<AutomatonProxy> autWithAlpha =
+          new ArrayList<AutomatonProxy>();
+      final EventProxy alpha = getUsedPreconditionMarkingProposition();
+      for (final AutomatonProxy aut : automata) {
+        if (aut.getEvents().contains(alpha)) {
+          autWithAlpha.add(aut);
+        }
+      }
+      if (autWithAlpha.size() == 0) {
+        return super.getHeuristicProperty(automata);
+      } /*
+         * else if (autWithAlpha.size() == 1) { return
+         * autWithAlpha.iterator().next(); }
+         */
+      return (AutomatonProxy) Collections.min(autWithAlpha,
+                                              new AutomataComparator());
+    }
   }
 
 
