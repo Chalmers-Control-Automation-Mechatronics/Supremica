@@ -401,10 +401,16 @@ public abstract class TransitionListBuffer
    * earlier in the resultant list.
    * @param  source   From-state containing transitions to be copied.
    * @param  dest     From-state to receive transitions.
+   * @param  reverse  Another transition list buffer containing the reverse
+   *                  of this buffer's transitions. If non-<CODE>null</CODE>
+   *                  any transitions added during this operation will also
+   *                  be added to the reverse buffer, in reversed form.
    * @return <CODE>true</CODE> if at least one transition was copied;
    *         <CODE>false</CODE> otherwise.
    */
-  public boolean copyTransitions(final int source, final int dest)
+  public boolean copyTransitions(final int source,
+                                 final int dest,
+                                 final TransitionListBuffer reverse)
   {
     if (source == dest) {
       return false;
@@ -441,6 +447,9 @@ public abstract class TransitionListBuffer
           if (existing.add(state1)) {
             list2 = prepend(list2, data1);
             added = true;
+            if (reverse != null) {
+              reverse.addTransition(state1, event, dest);
+            }
           }
           list1 = block1[offset1 + OFFSET_NEXT];
           if (list1 == NULL) {
