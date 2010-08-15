@@ -356,6 +356,34 @@ public class CompositionalGeneralisedConflictChecker extends
     return false;
   }
 
+  /**
+   * Creates a hash set of events which are "non-alpha" events. An event e is
+   * non-alpha if there is one automaton such that every transition with event e
+   * has neither the source nor the target marked alpha.
+   */
+  @SuppressWarnings("unused")
+  private void findNonAlphaEvents(final List<AutomatonProxy> automata)
+  {
+    mNonAlphaEvents = new HashSet<EventProxy>();
+    eventLoop: for (final EventProxy event : mEventsToAutomata.keySet()) {
+      for (final AutomatonProxy aut : automata) {
+        for (final TransitionProxy transition : aut.getTransitions()) {
+          if (transition.getEvent() == event) {
+            final StateProxy source = transition.getSource();
+            final StateProxy target = transition.getTarget();
+            if (!source.getPropositions()
+                .contains(getUsedPreconditionMarkingProposition())
+                && !target.getPropositions()
+                    .contains(getUsedPreconditionMarkingProposition())) {
+              continue eventLoop;
+            }
+          }
+        }
+      }
+      mNonAlphaEvents.add(event);
+    }
+  }
+
   private AutomatonProxy hideAndAbstract(final AutomatonProxy aut,
                                          final Set<EventProxy> localEvents)
       throws AnalysisException
@@ -473,6 +501,7 @@ public class CompositionalGeneralisedConflictChecker extends
   {
     super.setUp();
     mEventsToAutomata = new HashMap<EventProxy,Set<AutomatonProxy>>();
+    mNonAlphaEvents = new HashSet<EventProxy>();
     mUnsuccessfulCandidates = new HashSet<Candidate>();
     mTrivialAbstractedAutomata = new HashSet<AutomatonProxy>();
     if (mPreselectingHeuristic == null) {
@@ -3108,6 +3137,7 @@ public class CompositionalGeneralisedConflictChecker extends
   // #########################################################################
   // # Data Members
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata;
+  private Set<EventProxy> mNonAlphaEvents;
   private Set<Candidate> mUnsuccessfulCandidates;
   private Set<AutomatonProxy> mTrivialAbstractedAutomata;
   private List<Step> mTemporaryModifyingSteps;
