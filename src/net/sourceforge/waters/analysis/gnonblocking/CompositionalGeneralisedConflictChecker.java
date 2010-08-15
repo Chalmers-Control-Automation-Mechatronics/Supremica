@@ -930,14 +930,14 @@ public class CompositionalGeneralisedConflictChecker extends
     return new HeuristicMustL();
   }
 
-  public HeuristicMinA createHeuristicMinA()
-  {
-    return new HeuristicMinA();
-  }
-
   public HeuristicMaxL createHeuristicMaxL()
   {
     return new HeuristicMaxL();
+  }
+
+  public HeuristicMaxLa createHeuristicMaxLa()
+  {
+    return new HeuristicMaxLa();
   }
 
   public HeuristicMaxLt createHeuristicMaxLt()
@@ -1462,25 +1462,6 @@ public class CompositionalGeneralisedConflictChecker extends
 
   /**
    * Performs step 2 of the approach to select the automata to compose. The
-   * chosen candidate is the one with the lowest proportion of alpha-marked
-   * states.
-   *
-   * @author rmf18
-   */
-  private class HeuristicMinA extends MinSelectingHeuristic
-  {
-
-    protected double getHeuristicValue(final Candidate candidate)
-    {
-      // TODO
-      return 0;
-    }
-
-  }
-
-
-  /**
-   * Performs step 2 of the approach to select the automata to compose. The
    * chosen candidate is the one with the highest proportion of local events.
    */
   private class HeuristicMaxLt extends MaxSelectingHeuristic
@@ -1505,6 +1486,41 @@ public class CompositionalGeneralisedConflictChecker extends
       final double localEvents = countCandidatesLocalEvents(candidate);
       final double totalEvents = countCandidatesTotalEvents(candidate);
       return localEvents / totalEvents;
+    }
+  }
+
+
+  /**
+   * Performs step 2 of the approach to select the automata to compose. The
+   * chosen candidate is the one with the highest proportion of events that are
+   * guaranteed to be non-alpha.
+   */
+  private class HeuristicMaxLa extends MaxSelectingHeuristic
+  {
+    protected double getHeuristicValue(final Candidate candidate)
+    {
+      // TODO: do we want maxLa calculated as a proportion like I have already
+      // done? or just by the maximum count of local non-alpha events??
+      double nonAlphaEvents = 0;
+      for (final EventProxy event : candidate.getLocalEvents()) {
+        if (mNonAlphaEvents.contains(event)) {
+          nonAlphaEvents++;
+        }
+      }
+      final double totalEvents = countCandidatesTotalEvents(candidate);
+      return nonAlphaEvents / totalEvents;
+    }
+
+    @Override
+    public List<Candidate> evaluate(final List<Candidate> candidates)
+    {
+      List<Candidate> chosenCandidates = super.evaluate(candidates);
+      if (chosenCandidates.size() > 1) {
+        final HeuristicMaxL maxL = createHeuristicMaxL();
+        chosenCandidates = maxL.evaluate(chosenCandidates);
+      }
+      return chosenCandidates;
+
     }
   }
 
