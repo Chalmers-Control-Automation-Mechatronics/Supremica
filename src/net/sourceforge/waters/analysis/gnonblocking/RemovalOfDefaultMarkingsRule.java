@@ -125,6 +125,7 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
       }
     }
     if (modified) {
+      mTR.removeRedundantPropositions();
       final AutomatonProxy convertedAut = mTR.createAutomaton(getFactory());
       return convertedAut;
     } else {
