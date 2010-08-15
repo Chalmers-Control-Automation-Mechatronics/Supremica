@@ -84,6 +84,7 @@ public class ProjectingSafetyVerifier
     setHeuristicPreference
       (ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
     mChecker = checker;
+    mProjector = new Projection2(factory);
     mStates = 0;
     mMaxProjStates = projsize;
   }
@@ -571,12 +572,13 @@ public class ProjectingSafetyVerifier
       } else {
         final ProductDESProxy comp =
           getFactory().createProductDESProxy("comp", events, compAutomata);
-        final Projection2 proj =
-          new Projection2(comp, getFactory(), mHidden, localforbiddenEvents);
         try {
-          proj.setNodeLimit(mMaxProjStates);
-          proj.run();
-          minAutomaton = proj.getComputedAutomaton();
+          mProjector.setModel(comp);
+          mProjector.setHidden(mHidden);
+          mProjector.setForbidden(localforbiddenEvents);
+          mProjector.setNodeLimit(mMaxProjStates);
+          mProjector.run();
+          minAutomaton = mProjector.getComputedAutomaton();
           if (mOriginalAlphabet.containsAll(forbiddenEvents)) {
             final TransitionRelation tr = new TransitionRelation(minAutomaton, null);
             int states = tr.getAutomaton(getFactory()).getStates().size();
@@ -871,6 +873,7 @@ public class ProjectingSafetyVerifier
   //# Data Members
   private int minSize = 1000;
   private final SafetyVerifier mChecker;
+  private final SafetyProjectionBuilder mProjector;
   private int mStates;
   private int mMaxProjStates;
   private final Map<AutomataHidden, AutomatonProxy> mMinAutMap =

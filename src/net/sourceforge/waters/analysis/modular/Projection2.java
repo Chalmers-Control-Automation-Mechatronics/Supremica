@@ -36,11 +36,19 @@ import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import gnu.trove.THashSet;
 
 
-public class Projection2 extends AbstractAutomatonBuilder
+public class Projection2
+  extends AbstractAutomatonBuilder
+  implements SafetyProjectionBuilder
 {
+
+  //#########################################################################
+  //# Constructor
+  public Projection2(final ProductDESProxyFactory factory)
+  {
+    super(factory);
+  }
 
   public Projection2(final ProductDESProxy model,
                      final ProductDESProxyFactory factory,
@@ -50,25 +58,43 @@ public class Projection2 extends AbstractAutomatonBuilder
     super(model, factory);
     mHide = hide;
     mForbidden = new HashSet<EventProxy>(forbidden);
-    mForbidden.retainAll(model.getEvents());
-    mNodeLimit = 1000;
-    mDisabled = new HashSet<EventProxy>(model.getEvents());
-    mDisabled.remove(mHide);
-    numStates = 1;
   }
 
-  public void setNodeLimit(final int stateLimit)
+
+  //#########################################################################
+  //# Configuration
+  public Set<EventProxy> getHidden()
   {
-    mNodeLimit = stateLimit;
+    return mHide;
   }
 
+  public void setHidden(final Set<EventProxy> hidden)
+  {
+    mHide = hidden;
+  }
+
+  public Set<EventProxy> getForbidden()
+  {
+    return mForbidden;
+  }
+
+  public void setForbidden(final Set<EventProxy> forbidden)
+  {
+    mForbidden = forbidden;
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  @Override
   public boolean run()
     throws AnalysisException
   {
     try {
       setUp();
       final ProductDESProxy model = getModel();
-      states = new IntMap(mNodeLimit);
+      final int limit = getNodeLimit();
+      states = new IntMap(limit);
       trans = new ArrayList<TransitionProxy>();
       events = model.getEvents().toArray(new EventProxy[model.getEvents().size()]);
       mPossible = new boolean[events.length];
@@ -157,7 +183,7 @@ public class Projection2 extends AbstractAutomatonBuilder
       eventToIndex = null;
 
       // Time to start building the automaton
-      numStates = 1;
+      mNumberOfStates = 1;
       currentState = encode(currentState);
       states.put(currentState, 0);
       unvisited = new ArrayBag(100);
@@ -171,7 +197,7 @@ public class Projection2 extends AbstractAutomatonBuilder
       states.values().size();
       states = null;
       currentState = new int[] {0};
-      mTransitions = new int[1][events.length][numStates];
+      mTransitions = new int[1][events.length][mNumberOfStates];
       for (int i = 0; i < mTransitions[0].length; i++) {
         for (int j = 0; j < mTransitions[0][i].length; j++) {
           mTransitions[0][i][j] = -1;
@@ -180,9 +206,9 @@ public class Projection2 extends AbstractAutomatonBuilder
       for (final int[] tran : newtrans) {
         mTransitions[0][tran[1]][tran[0]] = tran[2];
       }
-      numStates = 1;
+      mNumberOfStates = 1;
       currentState = actualState(currentState);
-      newStates = new StateMap(mNodeLimit);
+      newStates = new StateMap(limit);
       newStates.put(currentState, new MemStateProxy(0));
       unvisited.offer(currentState);
       while (!unvisited.isEmpty()) {
@@ -220,16 +246,49 @@ public class Projection2 extends AbstractAutomatonBuilder
     }
   }
 
-  public Set<EventProxy> BlockedEvents()
+
+  //#########################################################################
+  //# Auxiliary Methods
+  @Override
+  protected void setUp()
+    throws AnalysisException
   {
-    final Set<EventProxy> blocked = new THashSet<EventProxy>();
-    for (int e = 0; e < events.length; e++) {
-      if (!mPossible[e]) {blocked.add(events[e]);}
+    super.setUp();
+    final ProductDESProxy model = getModel();
+    final Collection<EventProxy> events = model.getEvents();
+    if (mHide == null) {
+      mHide = Collections.emptySet();
     }
-    return blocked;
+    if (mForbidden == null) {
+      mForbidden = Collections.emptySet();
+    } else {
+      mForbidden.retainAll(events);
+    }
+    mDisabled = new HashSet<EventProxy>(events);
+    mDisabled.removeAll(mHide);
+    mNumberOfStates = 1;
+    newtrans = new ArrayList<int[]>();
   }
 
-  public boolean explore(int[] state, final boolean forbidden)
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
+    mDisabled = null;
+    states = null;
+    trans = null;
+    events = null;
+    mTransitions = null;
+    newtrans = null;
+    newStates = null;
+    unvisited = null;
+    eventAutomaton = null;
+  }
+
+
+  //#########################################################################
+  //# Algorithm
+  private boolean explore(int[] state, final boolean forbidden)
     throws OverflowException
   {
     boolean result = false;
@@ -272,11 +331,12 @@ public class Projection2 extends AbstractAutomatonBuilder
       mDisabled.remove(events[i]);
       Integer target = states.get(suc);
       if (target == null) {
-        target = numStates;
+        target = mNumberOfStates;
         states.put(suc, target);
-        numStates++;
-        if (numStates > mNodeLimit) {
-          throw new OverflowException(mNodeLimit);
+        mNumberOfStates++;
+        final int limit = getNodeLimit();
+        if (mNumberOfStates > limit) {
+          throw new OverflowException(limit);
         }
         unvisited.offer(suc);
       }
@@ -286,7 +346,7 @@ public class Projection2 extends AbstractAutomatonBuilder
     return result;
   }
 
-  public boolean explore2(final int[] state, final boolean forbidden)
+  private boolean explore2(final int[] state, final boolean forbidden)
     throws OverflowException
   {
     int min, max;
@@ -322,11 +382,12 @@ public class Projection2 extends AbstractAutomatonBuilder
       succ = actualState(succ);
       StateProxy target = newStates.get(succ);
       if (target == null) {
-        target = new MemStateProxy(numStates);
+        target = new MemStateProxy(mNumberOfStates);
         newStates.put(succ, target);
-        numStates++;
-        if (numStates > mNodeLimit) {
-          throw new OverflowException(mNodeLimit);
+        mNumberOfStates++;
+        final int limit = getNodeLimit();
+        if (mNumberOfStates > limit) {
+          throw new OverflowException(limit);
         }
         unvisited.offer(succ);
       }
@@ -335,7 +396,7 @@ public class Projection2 extends AbstractAutomatonBuilder
     return result;
   }
 
-  public int[] actualState(final int[] state)
+  private int[] actualState(final int[] state)
   {
     final int numHidden = mHide.size();
     final SortedSet<Integer> setofstates = new TreeSet<Integer>();
@@ -368,6 +429,9 @@ public class Projection2 extends AbstractAutomatonBuilder
     return result;
   }
 
+
+  //#########################################################################
+  //# Inner Class MemStateProxy
   private static class MemStateProxy
     implements StateProxy
   {
@@ -709,17 +773,16 @@ public class Projection2 extends AbstractAutomatonBuilder
   }
 
   private boolean[] mPossible;
-  private int mNodeLimit;
-  private final Set<EventProxy> mHide;
-  private final Set<EventProxy> mForbidden;
-  private final Set<EventProxy> mDisabled;
+  private Set<EventProxy> mHide;
+  private Set<EventProxy> mForbidden;
+  private Set<EventProxy> mDisabled;
   private Map<int[], Integer> states;
   private Collection<TransitionProxy> trans;
   private EventProxy[] events;
   private int[][][] mTransitions;
-  private final List<int[]> newtrans = new ArrayList<int[]>();
+  private List<int[]> newtrans = new ArrayList<int[]>();
   private Map<int[], StateProxy> newStates;
-  private int numStates;
+  private int mNumberOfStates;
   private Bag unvisited;
   private int[][] eventAutomaton;
 }
