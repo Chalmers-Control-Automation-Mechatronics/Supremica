@@ -144,6 +144,7 @@ class DeterminisationOfNonAlphaStatesRule extends AbstractionRule
       mPartition = bisimulator.getResultPartition();
       mTr.removeTauSelfLoops();
       mTr.removeProperSelfLoopEvents();
+      mTr.removeRedundantPropositions();
       final ProductDESProxyFactory factory = getFactory();
       mOutputEncoding = new StateEncoding();
       mTr.reverse();

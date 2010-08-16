@@ -121,6 +121,7 @@ class ObservationEquivalenceRule extends AbstractionRule
       mPartition = bisimulator.getResultPartition();
       mTr.removeTauSelfLoops();
       mTr.removeProperSelfLoopEvents();
+      mTr.removeRedundantPropositions();
       final ProductDESProxyFactory factory = getFactory();
       mOutputEncoding = new StateEncoding();
       return mTr.createAutomaton(factory, eventEnc, mOutputEncoding);

@@ -886,9 +886,11 @@ public class ObserverProjectionTransitionRelation
       final int propID = mEventToInt.get(proposition);
       allMarked = true;
       for (int state = 0; state < mOriginalStates.length; state++) {
-        allMarked &= isMarked(state, propID);
-        if (!allMarked) {
-          continue propLoop;
+        if (hasPredecessors(state)) {
+          allMarked &= isMarked(state, propID);
+          if (!allMarked) {
+            continue propLoop;
+          }
         }
       }
       removeProposition(propID);

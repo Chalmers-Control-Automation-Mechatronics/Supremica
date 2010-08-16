@@ -360,11 +360,16 @@ public class CompositionalGeneralisedConflictChecker extends
    * Creates a hash set of events which are "non-alpha" events. An event e is
    * non-alpha if there is one automaton such that every transition with event e
    * has neither the source nor the target marked alpha.
+   * TODO On second thoughts, it may be just as reasonable to consider
+   * non-alpha events within candidates instead of globally. That is, and
+   * event e is non-alpha in candidate C if C contains an automaton with
+   * above property. Let us implement first whatever is easier.
    */
   @SuppressWarnings("unused")
   private void findNonAlphaEvents(final List<AutomatonProxy> automata)
   {
-    mNonAlphaEvents = new HashSet<EventProxy>();
+    mNonAlphaEvents = new THashSet<EventProxy>();
+    // TODO Hmmm ... not quite correct ...
     eventLoop: for (final EventProxy event : mEventsToAutomata.keySet()) {
       for (final AutomatonProxy aut : automata) {
         for (final TransitionProxy transition : aut.getTransitions()) {
@@ -376,11 +381,49 @@ public class CompositionalGeneralisedConflictChecker extends
                 && !target.getPropositions()
                     .contains(getUsedPreconditionMarkingProposition())) {
               continue eventLoop;
+              // Discards events from being non-alpha as soon as one
+              // transition is non-alpha. But this should help to make them
+              // non-alpha ???
             }
           }
         }
       }
       mNonAlphaEvents.add(event);
+    }
+    // TODO How about using the following instead?
+    final EventProxy alpha = getUsedPreconditionMarkingProposition();
+    // Hash set to collect events found to be non-alpha in an automaton.
+    final Set<EventProxy> localNonAlphaEvents = new THashSet<EventProxy>();
+    autLoop:
+    for (final AutomatonProxy aut : automata) {
+      // Check that alphabet first ...
+      if (aut.getEvents().contains(alpha)) {
+        // First assume all events in this automaton are non-alpha ...
+        for (final EventProxy event : aut.getEvents()) {
+          if (event.getKind() != EventKind.PROPOSITION) {
+            localNonAlphaEvents.add(event);
+          }
+        }
+        // Events on transitions with alpha source or target are not non-alpha
+        // in this automaton ...
+        for (final TransitionProxy transition : aut.getTransitions()) {
+          final StateProxy source = transition.getSource();
+          final StateProxy target = transition.getTarget();
+          if (source.getPropositions().contains(alpha) ||
+              target.getPropositions().contains(alpha)) {
+            final EventProxy event = transition.getEvent();
+            localNonAlphaEvents.remove(event);
+            if (localNonAlphaEvents.isEmpty()) {
+              continue autLoop;
+            }
+          }
+        }
+        // Any remaining events are globally non-alpha, because we have found
+        // an automaton where all transitions have neither source nor target
+        // marked alpha.
+        mNonAlphaEvents.addAll(localNonAlphaEvents);
+        localNonAlphaEvents.clear();
+      }
     }
   }
 
@@ -505,7 +548,7 @@ public class CompositionalGeneralisedConflictChecker extends
     mUnsuccessfulCandidates = new HashSet<Candidate>();
     mTrivialAbstractedAutomata = new HashSet<AutomatonProxy>();
     if (mPreselectingHeuristic == null) {
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMinTa();
+      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
       setPreselectingHeuristic(defaultHeuristic);
@@ -1501,6 +1544,8 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       // TODO: do we want maxLa calculated as a proportion like I have already
       // done? or just by the maximum count of local non-alpha events??
+      // I was thinking of the number of non-alpha events --- but no idea
+      // what might work best ~~~Robi
       double nonAlphaEvents = 0;
       for (final EventProxy event : candidate.getLocalEvents()) {
         if (mNonAlphaEvents.contains(event)) {
