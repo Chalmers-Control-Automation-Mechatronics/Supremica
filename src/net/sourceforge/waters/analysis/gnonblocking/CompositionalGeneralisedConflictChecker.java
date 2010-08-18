@@ -339,21 +339,21 @@ public class CompositionalGeneralisedConflictChecker extends
    */
   private boolean checkTrivial(final AutomatonProxy abstractedAut)
   {
+    final Collection<StateProxy> states = abstractedAut.getStates();
+    if (states.size() != 1 || !abstractedAut.getTransitions().isEmpty()) {
+      return false;
+    }
+    final Collection<EventProxy> alphabet = abstractedAut.getEvents();
+    final Iterator<StateProxy> stateIter = states.iterator();
+    final StateProxy singleState = stateIter.next();
+    final Collection<EventProxy> stateProps = singleState.getPropositions();
     // checks alphabet for propositions
-    if (abstractedAut.getEvents().containsAll(mPropositions)) {
-      if (abstractedAut.getStates().size() == 1) {
-        final Iterator<StateProxy> stateIter =
-            abstractedAut.getStates().iterator();
-        final StateProxy singleState = stateIter.next();
-        assert stateIter.hasNext() == false;
-        if (singleState.getPropositions().containsAll(mPropositions)) {
-          if (abstractedAut.getTransitions().size() == 0) {
-            return true;
-          }
-        }
+    for (final EventProxy prop : mPropositions) {
+      if (alphabet.contains(prop) && !stateProps.contains(prop)) {
+        return false;
       }
     }
-    return false;
+    return true;
   }
 
   /**
@@ -361,7 +361,7 @@ public class CompositionalGeneralisedConflictChecker extends
    * non-alpha if there is one automaton such that every transition with event e
    * has neither the source nor the target marked alpha.
    * TODO On second thoughts, it may be just as reasonable to consider
-   * non-alpha events within candidates instead of globally. That is, and
+   * non-alpha events within candidates instead of globally. That is, an
    * event e is non-alpha in candidate C if C contains an automaton with
    * above property. Let us implement first whatever is easier.
    */
@@ -549,6 +549,7 @@ public class CompositionalGeneralisedConflictChecker extends
     mTrivialAbstractedAutomata = new HashSet<AutomatonProxy>();
     if (mPreselectingHeuristic == null) {
       final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
+      // final PreselectingHeuristic defaultHeuristic = new HeuristicMinTa();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
       // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
       setPreselectingHeuristic(defaultHeuristic);
@@ -1098,13 +1099,12 @@ public class CompositionalGeneralisedConflictChecker extends
     {
       if (!mUnsuccessfulCandidates.contains(candidate)) {
         // if (checkForLocalEvent(candidate)) {
-        // TODO:checkForLocalEvent() has to be disabled for pairing heuristics,
+        // checkForLocalEvent() has to be disabled for pairing heuristics,
         // because there may be cases where there are no two automata containing
         // a local event. Sometimes every event is in at least three automata.
-        // In that case, we have to pair automata without local events
+        // In that case, we have to pair automata without local events.
         if (checkForSharedEvent(candidate)) {
           return true;
-          // }
         }
       }
       return false;
@@ -1240,17 +1240,11 @@ public class CompositionalGeneralisedConflictChecker extends
     /**
      * The type of figure the heuristic uses (i.e. number of transitions, or
      * number of states).
-     *
-     * @param aut
-     * @return
      */
     protected abstract int getHeuristicFigure(final AutomatonProxy aut);
 
     /**
      * The min or max of a collection.
-     *
-     * @param automata
-     * @return
      */
     protected abstract AutomatonProxy getHeuristicProperty(
                                                            final Collection<AutomatonProxy> automata);
@@ -1268,8 +1262,7 @@ public class CompositionalGeneralisedConflictChecker extends
     protected AutomatonProxy getHeuristicProperty(
                                                   final Collection<AutomatonProxy> automata)
     {
-      return (AutomatonProxy) Collections.min(automata,
-                                              new AutomataComparator());
+      return Collections.min(automata, new AutomataComparator());
     }
 
   }
@@ -1291,12 +1284,8 @@ public class CompositionalGeneralisedConflictChecker extends
       }
       if (autWithAlpha.size() == 0) {
         return super.getHeuristicProperty(automata);
-      } /*
-         * else if (autWithAlpha.size() == 1) { return
-         * autWithAlpha.iterator().next(); }
-         */
-      return (AutomatonProxy) Collections.min(autWithAlpha,
-                                              new AutomataComparator());
+      }
+      return Collections.min(autWithAlpha, new AutomataComparator());
     }
   }
 
@@ -1316,8 +1305,7 @@ public class CompositionalGeneralisedConflictChecker extends
     protected AutomatonProxy getHeuristicProperty(
                                                   final Collection<AutomatonProxy> automata)
     {
-      return (AutomatonProxy) Collections.max(automata,
-                                              new AutomataComparator());
+      return Collections.max(automata, new AutomataComparator());
     }
   }
 
@@ -1351,8 +1339,6 @@ public class CompositionalGeneralisedConflictChecker extends
     /**
      * Returns true without searching for a shared event, since for this
      * heuristic candidates are automata which share an event.
-     *
-     * @param candidate
      * @return true, there is definitely a shared event.
      */
     @Override
@@ -1384,9 +1370,6 @@ public class CompositionalGeneralisedConflictChecker extends
 
     /**
      * Gets the number of events for this candidate, excluding tau.
-     *
-     * @param candidate
-     * @return
      */
     protected int countCandidatesTotalEvents(final Candidate candidate)
     {

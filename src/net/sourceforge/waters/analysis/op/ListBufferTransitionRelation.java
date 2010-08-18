@@ -164,6 +164,54 @@ public class ListBufferTransitionRelation
   }
 
 
+  /**
+   * Creates an empty transition relation. This method creates a transition
+   * relation with the given number of states and event encoding, but without
+   * any transitions. Initial states have to be set using
+   * {@link #setInitial(int,boolean)}, and transitions have to be added using
+   * {@link #addTransition(int,int,int)}.
+   * @param  name      A name for the new transition relation.
+   * @param  kind      A component kind for the new transition relation.
+   * @param  eventEnc  Event encoding to define the assignment of integer
+   *                   codes to events in the transition buffers.
+   * @param  numStates The number of states to be encoded.
+   * @param  config    Configuration flags defining which transition buffers
+   *                   are to be created. Should be one of
+   *                   {@link #CONFIG_SUCCESSORS},
+   *                   {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   * @throws OverflowException if the given number of states and events
+   *         is too large to be encoded in the bit sizes used by the
+   *         list buffer implementations.
+   */
+  public ListBufferTransitionRelation
+    (final String name,
+     final ComponentKind kind,
+     final EventEncoding eventEnc,
+     final int numStates,
+     final int config)
+    throws OverflowException
+  {
+    checkConfig(config);
+    mName = name;
+    mKind = kind;
+    final int numProps = eventEnc.getNumberOfPropositions();
+    mStateBuffer = new IntStateBuffer(numStates, numProps);
+    final int numEvents = eventEnc.getNumberOfProperEvents();
+    if ((config & CONFIG_SUCCESSORS) != 0) {
+      mSuccessorBuffer =
+        new OutgoingTransitionListBuffer(numEvents, numStates, 0);
+    }
+    if ((config & CONFIG_PREDECESSORS) != 0) {
+      mPredecessorBuffer =
+        new IncomingTransitionListBuffer(numEvents, numStates, 0);
+    }
+    mUsedEvents = new BitSet(numEvents);
+    final int tau = EventEncoding.TAU;
+    final int first = eventEnc.getProperEvent(tau) == null ? tau + 1 : tau;
+    mUsedEvents.set(first, numEvents, true);
+  }
+
+
   //#########################################################################
   //# Overrides for java.lang.object
   public String toString()
