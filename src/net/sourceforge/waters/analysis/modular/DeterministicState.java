@@ -12,6 +12,8 @@ package net.sourceforge.waters.analysis.modular;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -22,78 +24,79 @@ import net.sourceforge.waters.model.des.StateProxy;
 
 public class DeterministicState
 {
-  public DeterministicState(final int size)
+  public DeterministicState(final Set<Integer> states)
   {
-    mSetStates = new int[size];
-    mName = -1;
+    mSetStates = new int[states.size()];
+    int i = 0;
+    for (final int state : states) {
+      mSetStates[i++] = state;
+    }
+    Arrays.sort(mSetStates);
     mProxy = null;
   }
 
-  public boolean insert(final int pos, final int state){
-    if(Arrays.binarySearch(mSetStates, state) >= 0){
-      mSetStates[pos] = state;
-      return true;
-    }
-    return false;
+  @Override
+  public int hashCode(){
+    return Arrays.hashCode(mSetStates);
   }
 
-  public void clear()
-  {
-    mSetStates = new int[0];
-  }
-
-  public int compare(final DeterministicState d)
-  {
-    if(d.size() != this.size()){
-      return 1;
+  @Override
+  public boolean equals(final Object o){
+    if(o != null && o.getClass() == getClass()){
+      final DeterministicState detState = (DeterministicState) o;
+      return Arrays.equals(mSetStates, detState.mSetStates);
     } else {
-      for(int i=0; i <d.mSetStates.length; i++){
-        if(!(this.mSetStates[i] == d.mSetStates[i])){
-          return 1;
-        }
-      }
+      return false;
     }
-    return 0;
   }
 
   public int size(){
     return mSetStates.length;
   }
 
-  public DeterministicState copy(){
-    final DeterministicState temp = new DeterministicState(mSetStates.length);
-    temp.mName = this.mName;
-    temp.mSetStates = this.mSetStates.clone();
-
-    return temp;
-  }
-
   public int getState(final int state){
     return mSetStates[state];
   }
 
-  public void sortStates(){
-    Arrays.sort(mSetStates);
+  public int[] getSetState(){
+    return mSetStates;
   }
-
 
   public StateProxy getProxy(){
     return mProxy;
   }
-
   public void setProxy(final int name){
     mProxy = new MemStateProxy(name);
   }
 
+  public static DeterministicState merge(final DeterministicState d, final DeterministicState s){
+    final HashSet<Integer> set = new HashSet<Integer>();
+    for(final int i : d.mSetStates){
+      set.add(i);
+    }
+    for(final int i : s.mSetStates){
+      set.add(i);
+    }
+    return new DeterministicState(set);
+  }
+
+  public int getName()
+  {
+    return mName;
+  }
+
+  public void setName(final int name){
+    mName = name;
+  }
 
   private static class MemStateProxy
   implements StateProxy
   {
-  private final int mName;
+  private final int mProxyName;
 
   public MemStateProxy(final int name)
   {
-    mName = name;
+    mProxyName = name;
   }
 
   public Collection<EventProxy> getPropositions()
@@ -103,17 +106,17 @@ public class DeterministicState
 
   public boolean isInitial()
   {
-    return mName == 0;
+    return mProxyName == 0;
   }
 
   public MemStateProxy clone()
   {
-    return new MemStateProxy(mName);
+    return new MemStateProxy(mProxyName);
   }
 
   public String getName()
   {
-    return Integer.toString(mName);
+    return Integer.toString(mProxyName);
   }
 
   @SuppressWarnings("unused")
@@ -129,7 +132,7 @@ public class DeterministicState
   {
     if (o instanceof MemStateProxy) {
       final MemStateProxy s = (MemStateProxy) o;
-      return s.mName == mName;
+      return s.mProxyName == mProxyName;
     } else {
       return false;
     }
@@ -137,7 +140,7 @@ public class DeterministicState
 
   public int refHashCode()
   {
-    return mName;
+    return mProxyName;
   }
 
   public Object acceptVisitor(final ProxyVisitor visitor)
@@ -160,8 +163,8 @@ public class DeterministicState
   }
 
 
-  private int[] mSetStates;
-  private int mName;
+  private final int[] mSetStates;
   private StateProxy mProxy;
+  private int mName;
 
 }

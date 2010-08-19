@@ -11,6 +11,9 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import net.sourceforge.waters.model.des.StateProxy;
 
 public class CollectionDeterministic
@@ -18,70 +21,54 @@ public class CollectionDeterministic
 
 public CollectionDeterministic(final int initialSize)
 {
-  mDetStates = new ArrayList<DeterministicState>(initialSize);
+  mDetStates = new HashMap<DeterministicState, DeterministicState>(initialSize);
 }
 
-public void insert(final int index, final DeterministicState d){
-  if(!mDetStates.contains(d)){
-    mDetStates.add(index, d);
+public boolean insert(final DeterministicState d, final int name){
+  if(!mDetStates.containsKey(d))
+  {
+    d.setProxy(name);
+    mDetStates.put(d, d);
+    return true;
   }
+  return false;
 }
 
 public void remove(final DeterministicState d){
   mDetStates.remove(d);
 }
 
-public int member(final DeterministicState d){
- return mDetStates.indexOf(d);
-}
-
-public DeterministicState getState(final DeterministicState d){
-  DeterministicState result = null;
-  for(final DeterministicState state : mDetStates){
-    if(state.compare(d) == 0){
-      result = state;
-    }
-  }
-  return result;
-}
-
-public int getStateName(final StateProxy s){
-  int result = -1;
-  for(final DeterministicState state : mDetStates){
-    if(state.getProxy() == s){
-      return result = mDetStates.indexOf(state);
-    }
-  }
-  return result;
+public boolean member(final DeterministicState d){
+ return mDetStates.containsKey(d);
 }
 
 public int getName(final DeterministicState d){
-  return mDetStates.indexOf(d);
+  return mDetStates.get(d).getName();
+}
+
+public DeterministicState getState (final int name){
+  return mDetStates.get(name);
 }
 
 public Collection<StateProxy> getAllStateProxy(){
   final ArrayList<StateProxy> result = new ArrayList<StateProxy>();
-  for(final DeterministicState state : mDetStates){
+  for(final DeterministicState state : mDetStates.values()){
     result.add(state.getProxy());
   }
   return result;
 }
 
+public StateProxy getStateProxy(final DeterministicState d){
+  if(mDetStates.containsKey(d)){
+    return mDetStates.get(d).getProxy();
+  }
+  return null;
 
-public void setStateProxy(final DeterministicState d){
-  d.setProxy(getName(d));
-}
-
-public DeterministicState takeState(){
-  final DeterministicState result = mDetStates.get(mDetStates.size()-1);
-  remove(result);
-
-  return result;
 }
 
 public int getSize(){
   return mDetStates.size();
 }
 
-  private final ArrayList<DeterministicState> mDetStates;
+  private final Map<DeterministicState, DeterministicState> mDetStates;
 }
