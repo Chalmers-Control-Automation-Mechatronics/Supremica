@@ -74,18 +74,14 @@ implements SafetyProjectionBuilder
     mForbidden = forbidden;
   }
 
-  public void setNodeLimit(final int stateLimit)
-  {
-    mNodeLimit = stateLimit;
-  }
-
   public boolean run()
     throws AnalysisException
   {
     try {
       setUp();
+      final int limit = getNodeLimit();
       final ProductDESProxy model = getModel();
-      states = new HashMap<StateCouple, StateCouple>(mNodeLimit);
+      states = new HashMap<StateCouple, StateCouple>(limit);
       trans = new ArrayList<TransitionProxy>();
       events = model.getEvents().toArray(new EventProxy[model.getEvents().size()]);
       mPossible = new boolean[events.length];
@@ -205,11 +201,11 @@ implements SafetyProjectionBuilder
       createState.add(0);
       DeterministicState detState = new DeterministicState(createState);
       detState = closure(detState);
-      newStates = new CollectionDeterministic(mNodeLimit);
+      newStates = new CollectionDeterministic(limit);
       newStates.insert(detState, 0);
       mDeterministicQueue.offer(detState);
       while (!mDeterministicQueue.isEmpty()) {
-        mDeterministicQueue.remove();
+        detState = mDeterministicQueue.remove();
         if (!exploreSubsetConstruction(detState, true)) {
           exploreSubsetConstruction(detState, false);
         }
@@ -233,6 +229,9 @@ implements SafetyProjectionBuilder
       AutomatonProxy result =
         factory.createAutomatonProxy(name.toString(), ComponentKind.PLANT,
                                      ev, newStates.getAllStateProxy(), trans);
+      System.out.print("printing resulting Name: " + result.getName());
+      System.out.println(" |number of states: " + result.getStates().size());
+      mTransitions = null;
       newStates = null;
       trans = null;
       final Minimizer min = new Minimizer(result, factory);
@@ -278,6 +277,13 @@ implements SafetyProjectionBuilder
     mCoupleQueue = null;
     mDeterministicQueue = null;
     eventAutomaton = null;
+  }
+
+  @Override
+  protected void addStatistics(){
+    super.addStatistics();
+    // AnalysisResult result = getAnalysisResult();
+
   }
 
   public boolean exploreSyncProduct(final StateCouple state, final boolean forbidden)
@@ -332,8 +338,9 @@ implements SafetyProjectionBuilder
         successor.setName(target);
         states.put(successor, successor);
         mNumberOfStates++;
-        if (mNumberOfStates > mNodeLimit) {
-          throw new OverflowException(mNodeLimit);
+        final int limit = getNodeLimit();
+        if (mNumberOfStates > limit) {
+          throw new OverflowException(limit);
         }
         mCoupleQueue.offer(successor);
       }
@@ -448,6 +455,7 @@ implements SafetyProjectionBuilder
         temp = memo_singleState_closure(d.getState(i));
         result = DeterministicState.merge(result, temp);
       }
+      mDetRecord.put(d, result);
     }
     return result;
   }
@@ -545,7 +553,6 @@ implements SafetyProjectionBuilder
   }
 
   private boolean[] mPossible;
-  private int mNodeLimit;
   private Set<EventProxy> mHide;
   private Set<EventProxy> mForbidden;
   private Set<EventProxy> mDisabled;

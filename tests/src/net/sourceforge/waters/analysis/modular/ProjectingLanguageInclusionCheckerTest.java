@@ -46,8 +46,9 @@ public class ProjectingLanguageInclusionCheckerTest
   {
     final SafetyVerifier subchecker =
       new NativeLanguageInclusionChecker(factory);
+    final SafetyProjectionBuilder projector = new Projection2(factory);
     final ProjectingLanguageInclusionChecker checker =
-      new ProjectingLanguageInclusionChecker(factory, subchecker);
+      new ProjectingLanguageInclusionChecker(factory, subchecker, projector);
     checker.setMaxProjStates(2000);
     return checker;
   }

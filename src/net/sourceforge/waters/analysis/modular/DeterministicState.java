@@ -71,6 +71,12 @@ public class DeterministicState
   }
 
   public static DeterministicState merge(final DeterministicState d, final DeterministicState s){
+    if(d == null){
+      return s;
+    }
+    if(s == null){
+      return d;
+    }
     final HashSet<Integer> set = new HashSet<Integer>();
     for(final int i : d.mSetStates){
       set.add(i);

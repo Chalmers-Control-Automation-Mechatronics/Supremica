@@ -46,8 +46,9 @@ public class ProjectingControllabilityCheckerTest
   {
     final ControllabilityChecker subchecker =
       new NativeControllabilityChecker(factory);
+    final SafetyProjectionBuilder projector = new Projection2(factory);
     final ProjectingControllabilityChecker checker =
-      new ProjectingControllabilityChecker(factory, subchecker);
+      new ProjectingControllabilityChecker(factory, subchecker, projector);
     //checker.setMaxProjStates(2000);
     return checker;
   }

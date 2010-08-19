@@ -194,7 +194,6 @@ public class Projection2
           explore(currentState, false);
         }
       }
-      states.values().size();
       states = null;
       currentState = new int[] {0};
       mTransitions = new int[1][events.length][mNumberOfStates];

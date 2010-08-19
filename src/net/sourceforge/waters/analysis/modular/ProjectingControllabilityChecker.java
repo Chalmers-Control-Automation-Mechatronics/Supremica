@@ -28,33 +28,37 @@ public class ProjectingControllabilityChecker
   //#########################################################################
   //# Constructors
   public ProjectingControllabilityChecker(final ProductDESProxyFactory factory,
-                                          final SafetyVerifier checker)
+                                          final SafetyVerifier checker,
+                                          final SafetyProjectionBuilder projector)
   {
-    this(null, factory, checker);
+    this(null, factory, checker, projector);
   }
 
   public ProjectingControllabilityChecker(final ProductDESProxy model,
                                           final ProductDESProxyFactory factory,
-                                          final SafetyVerifier checker)
+                                          final SafetyVerifier checker,
+                                          final SafetyProjectionBuilder projector)
   {
     super(model, ControllabilityKindTranslator.getInstance(),
-          factory, checker);
+          factory, checker, projector);
   }
 
   public ProjectingControllabilityChecker(final ProductDESProxyFactory factory,
                                           final SafetyVerifier checker,
+                                          final SafetyProjectionBuilder projector,
                                           final int projsize)
   {
-    this(null, factory, checker, projsize);
+    this(null, factory, checker, projector, projsize);
   }
 
   public ProjectingControllabilityChecker(final ProductDESProxy model,
                                           final ProductDESProxyFactory factory,
                                           final SafetyVerifier checker,
+                                          final SafetyProjectionBuilder projector,
                                           final int projsize)
   {
     super(model, ControllabilityKindTranslator.getInstance(),
-          factory, checker, projsize);
+          factory, checker, projector, projsize);
   }
 
 }

@@ -68,15 +68,17 @@ public class ProjectingSafetyVerifier
   public ProjectingSafetyVerifier(final ProductDESProxy model,
                                   final KindTranslator translator,
                                   final ProductDESProxyFactory factory,
-                                  final SafetyVerifier checker)
+                                  final SafetyVerifier checker,
+                                  final SafetyProjectionBuilder projector)
   {
-    this(model, translator, factory, checker, 16000);
+    this(model, translator, factory, checker, projector, 16000);
   }
 
   public ProjectingSafetyVerifier(final ProductDESProxy model,
                                   final KindTranslator translator,
                                   final ProductDESProxyFactory factory,
                                   final SafetyVerifier checker,
+                                  final SafetyProjectionBuilder projector,
                                   final int projsize)
   {
     super(model, translator, factory);
@@ -84,7 +86,7 @@ public class ProjectingSafetyVerifier
     setHeuristicPreference
       (ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
     mChecker = checker;
-    mProjector = new Projection2(factory);
+    mProjector = projector;
     mStates = 0;
     mMaxProjStates = projsize;
   }

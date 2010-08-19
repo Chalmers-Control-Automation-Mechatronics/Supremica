@@ -74,8 +74,9 @@ public class ProjectingModelVerifierFactory
   public ProjectingControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
   {
+    final SafetyProjectionBuilder projector = new Projection2(factory);
     return new ProjectingControllabilityChecker
-      (factory, new NativeControllabilityChecker(factory));
+      (factory, new NativeControllabilityChecker(factory), projector);
   }
 
   public ObserverProjectionConflictChecker createConflictChecker
