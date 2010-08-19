@@ -447,6 +447,7 @@ implements SafetyProjectionBuilder
   }
 
   //per non-det state use this method
+  @SuppressWarnings("unused")
   private DeterministicState silent_closure(final DeterministicState d){
     DeterministicState result = mDetRecord.get(d);
     if(result == null){
@@ -471,6 +472,7 @@ implements SafetyProjectionBuilder
   }
 
   //per-subset method
+  @SuppressWarnings("unused")
   private DeterministicState memo_DetStates_closure (final DeterministicState d){
     if(mDetRecord.containsKey(d)){
      return mDetRecord.get(d);
