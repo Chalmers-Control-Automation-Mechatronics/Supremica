@@ -33,6 +33,7 @@ public class DeterministicState
     }
     Arrays.sort(mSetStates);
     mProxy = null;
+    mName = -1;
   }
 
   @Override

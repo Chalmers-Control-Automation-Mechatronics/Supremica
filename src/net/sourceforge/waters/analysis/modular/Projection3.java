@@ -34,8 +34,15 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
-public class Projection3 extends AbstractAutomatonBuilder
+public class Projection3
+extends AbstractAutomatonBuilder
+implements SafetyProjectionBuilder
 {
+
+  public Projection3(final ProductDESProxyFactory factory)
+  {
+    super(factory);
+  }
 
   public Projection3(final ProductDESProxy model,
                      final ProductDESProxyFactory factory,
@@ -45,11 +52,26 @@ public class Projection3 extends AbstractAutomatonBuilder
     super(model, factory);
     mHide = hide;
     mForbidden = new HashSet<EventProxy>(forbidden);
-    mForbidden.retainAll(model.getEvents());
-    mNodeLimit = 1000;
-    mDisabled = new HashSet<EventProxy>(model.getEvents());
-    mDisabled.remove(mHide);
-    mNumberOfStates = 1;
+  }
+
+  public Set<EventProxy> getHidden()
+  {
+    return mHide;
+  }
+
+  public void setHidden(final Set<EventProxy> hidden)
+  {
+    mHide = hidden;
+  }
+
+  public Set<EventProxy> getForbidden()
+  {
+    return mForbidden;
+  }
+
+  public void setForbidden(final Set<EventProxy> forbidden)
+  {
+    mForbidden = forbidden;
   }
 
   public void setNodeLimit(final int stateLimit)
@@ -178,6 +200,7 @@ public class Projection3 extends AbstractAutomatonBuilder
       mNumberOfStates = 1;
       currentState = null;
       setStates = null;
+      mDeterministicQueue = new ArrayDeque<DeterministicState>(100);
       final Set<Integer> createState = new HashSet<Integer>();
       createState.add(0);
       DeterministicState detState = new DeterministicState(createState);
@@ -298,7 +321,12 @@ public class Projection3 extends AbstractAutomatonBuilder
       result = true;
       final StateCouple successor = new StateCouple(suc);
       mDisabled.remove(events[i]);
-      Integer target = states.get(successor).getName();
+      Integer target;
+      if(states.containsKey(successor)){
+         target = states.get(successor).getName();
+      } else {
+        target = -1;
+      }
       if (target == -1) {
         target = mNumberOfStates;
         successor.setName(target);
