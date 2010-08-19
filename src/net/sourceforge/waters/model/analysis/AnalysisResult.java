@@ -138,6 +138,7 @@ public class AnalysisResult
   {
     final PrintWriter writer = new PrintWriter(stream);
     print(writer);
+    writer.flush();
   }
 
   public void print(final PrintWriter writer)
