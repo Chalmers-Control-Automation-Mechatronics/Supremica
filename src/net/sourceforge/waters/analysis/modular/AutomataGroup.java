@@ -45,6 +45,7 @@ public class AutomataGroup
     mSensitiveEvents.addAll(newGroup.mSensitiveEvents);
     mLoopTraceProxy = null;
     mValidRun = false;
+    mValidStats = false;
   }
 
   public void addAutomata(final AutomatonProxy auto)
@@ -53,12 +54,14 @@ public class AutomataGroup
     mSensitiveEvents.addAll(auto.getEvents());
     mLoopTraceProxy = null;
     mValidRun = false;
+    mValidStats = false;
   }
 
   public void setCounterExample(final LoopTraceProxy lProxy)
   {
     mLoopTraceProxy = lProxy;
     mValidRun = false;
+    mValidStats = false;
   }
 
   public static void setMergeVersion(final MergeVersion newVersion)
@@ -312,6 +315,18 @@ public class AutomataGroup
     //System.out.println(getStatisticsText());
     //System.out.println(getTextNonLoop());
     mValidRun = true;
+    mValidStats = false;
+  }
+  /**
+   * Checks to see if the stats have changed. Regardless, it then invalidates the stats
+   * Calling rerun();rerun(); is guaranteed to return FALSE on the second call.
+   * @return TRUE if the stats have changed (and thus they should be updated). FALSE otherwise
+   */
+  public boolean rerun()
+  {
+    final boolean output = !mValidStats;
+    mValidStats = true;
+    return output;
   }
 
   /**
@@ -374,7 +389,12 @@ public class AutomataGroup
   LoopTraceProxy mLoopTraceProxy;
   Set<EventProxy> mSensitiveEvents;
   VerificationResult mStats;
+  /** This is used to ensure that the MonolithicSCCControl Loop Checker is not run a second time, when no data has changed
+   * It is TRUE when nothing has changed, and FALSE otherwise */
   boolean mValidRun;
+  /** This is used to ensure that the statistics are not updated a second time, when no data has changed
+   * It is TRUE when nothing has changed, and FALSE otherwise*/
+  boolean mValidStats;
 
   //#########################################################################
   //# Constant Values

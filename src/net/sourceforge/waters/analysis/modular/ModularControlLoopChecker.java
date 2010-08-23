@@ -53,12 +53,6 @@ public class ModularControlLoopChecker
 
   public boolean run() throws AnalysisException
   {
-    if (mTimeOut > 0)
-    {
-      mTimeOutThread = new TimeOut();
-      final Thread second = new Thread(new TimeOut());
-      second.start();
-    }
     try {
       setUp();
       if (getModel().getAutomata().size() == 0)
@@ -77,6 +71,7 @@ public class ModularControlLoopChecker
           {
             checkAbort();
             group.run(checker, mNodesRemaining);
+            updateResult(group);
             final Collection<EventProxy> nonLoop = group.getNonLoopEvents();
             if (mLoopEvents.removeAll(nonLoop))
             {
@@ -133,6 +128,8 @@ public class ModularControlLoopChecker
             mAutoSets.remove(bestGroup);
             primary.merge(bestGroup);
             failed = false;
+            mTotalCompositions++;
+            updateResult(primary);
            }
         }
         else
@@ -143,6 +140,21 @@ public class ModularControlLoopChecker
     }
     finally {
       tearDown();
+    }
+  }
+
+  private void updateResult(final AutomataGroup newGroup)
+  {
+    if (newGroup.rerun())
+    {
+      if (mPeakAutomata < newGroup.getStatistics().getTotalNumberOfAutomata() || mPeakAutomata == -1)
+        mPeakAutomata = newGroup.getStatistics().getTotalNumberOfAutomata();
+      if (mPeakStates < newGroup.getStatistics().getTotalNumberOfStates() || mPeakStates == -1)
+        mPeakStates = newGroup.getStatistics().getTotalNumberOfStates();
+      if (mPeakTransitions < newGroup.getStatistics().getTotalNumberOfTransitions() || mPeakTransitions == -1)
+        mPeakTransitions = newGroup.getStatistics().getTotalNumberOfTransitions();
+      mTotalStates += newGroup.getStatistics().getTotalNumberOfStates();
+      mTotalTransitions += newGroup.getStatistics().getTotalNumberOfTransitions();
     }
   }
 
@@ -228,10 +240,6 @@ public class ModularControlLoopChecker
   {
     MonolithicSCCControlLoopChecker.setLoopDetector(c);
   }
-  public void setTimeOut(final long time)
-  {
-    mTimeOut = time;
-  }
 
   public void setUp() throws AnalysisException
   {
@@ -248,6 +256,13 @@ public class ModularControlLoopChecker
     {
       mAutoSets.add(new AutomataGroup(aut));
     }
+    mPeakAutomata = 0;
+    mPeakStates = 0;
+    mPeakTransitions = 0;
+    mTotalAutomata = getModel().getAutomata().size();
+    mTotalStates = 0;
+    mTotalTransitions = 0;
+    mTotalCompositions = 0;
   }
 
   public void tearDown()
@@ -256,8 +271,13 @@ public class ModularControlLoopChecker
     mLoopEvents = null;
     mTranslator = null;
     mAutoSets = null;
-    if (mTimeOutThread != null)
-      mTimeOutThread.abort();
+    mPeakAutomata = -1;
+    mPeakStates = -1;
+    mPeakTransitions = -1;
+    mTotalAutomata = -1;
+    mTotalStates = -1;
+    mTotalTransitions = -1;
+    mTotalCompositions = -1;
   }
 
   private class ManipulativeTranslator implements KindTranslator
@@ -297,33 +317,6 @@ public class ModularControlLoopChecker
     private final Set<EventProxy> mFauxUncontrollable;
   }
 
-
-  //#########################################################################
-  //# Timeout Inner Class
-  private class TimeOut implements Runnable
-  {
-    public void run()
-    {
-      boolean interrupted = false;
-      try {
-        Thread.sleep(mTimeOut);
-      } catch (final InterruptedException exception) {
-        interrupted = true;
-      }
-      if (!interrupted)
-        ModularControlLoopChecker.this.requestAbort();
-    }
-
-    public void abort()
-    {
-      interrupted = true;
-    }
-
-    @SuppressWarnings("unused")
-    private boolean interrupted;
-  }
-
-
   //#########################################################################
   //# Setting the Result
   @Override
@@ -337,41 +330,30 @@ public class ModularControlLoopChecker
   {
     super.addStatistics();
     final LoopResult result = (LoopResult) getAnalysisResult();
-    double maxStates = -1;
-    double totalStates = 0;
-    double maxTransitions = -1;
-    double totalTransitions = 0;
-    int totalComps = 0;
-    int maxAutomata = -1;
-    for (final AutomataGroup group : mAutoSets) {
-      if (group.getStatistics() != null) {
-        if (group.getStatistics().getTotalNumberOfAutomata() > maxAutomata)
-          maxAutomata = group.getStatistics().getTotalNumberOfAutomata();
-        if (group.getStatistics().getTotalNumberOfStates() > maxStates)
-          maxStates = group.getStatistics().getTotalNumberOfStates();
-        if (group.getStatistics().getTotalNumberOfTransitions() > maxTransitions)
-          maxTransitions = group.getStatistics().getTotalNumberOfTransitions();
-        totalStates += group.getStatistics().getTotalNumberOfStates();
-        totalTransitions += group.getStatistics().getTotalNumberOfTransitions();
-        totalComps += group.getStatistics().getTotalNumberOfAutomata() - 1;
-      }
-    }
-    result.setPeakNumberOfAutomata(maxAutomata);
-    result.setPeakNumberOfStates(maxStates);
-    result.setPeakNumberOfTransitions(maxTransitions);
-    result.setTotalNumberOfAutomata(totalComps + mAutoSets.size());
-    result.setTotalNumberOfStates(totalStates);
-    result.setTotalNumberOfTransitions(totalTransitions);
-    result.setNumberOfCompositions(totalComps);
+    result.setPeakNumberOfAutomata(mPeakAutomata);
+    result.setPeakNumberOfStates(mPeakStates);
+    result.setPeakNumberOfTransitions(mPeakTransitions);
+    result.setTotalNumberOfAutomata(mTotalAutomata);
+    result.setTotalNumberOfStates(mTotalStates);
+    result.setTotalNumberOfTransitions(mTotalTransitions);
+    result.setNumberOfCompositions(mTotalCompositions);
+    setAnalysisResult(result);
   }
 
+  //#########################################################################
+  //# Output Data
+  private int mPeakAutomata;
+  private double mPeakStates;
+  private double mPeakTransitions;
+  private int mTotalAutomata;
+  private double mTotalStates;
+  private double mTotalTransitions;
+  private int mTotalCompositions;
 
   //#########################################################################
   //# Data Members
   private ManipulativeTranslator mTranslator;
   private List<AutomataGroup> mAutoSets;
   private Set<EventProxy> mLoopEvents;
-  private TimeOut mTimeOutThread;
-  private long mTimeOut = 0;
   private final int mNodesRemaining = 3000000;
 }
