@@ -28,6 +28,8 @@ import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
 import org.supremica.properties.Config;
+import org.supremica.properties.SupremicaPropertyChangeEvent;
+import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 /**
@@ -40,7 +42,7 @@ import org.supremica.properties.Config;
 
 public class GraphPanel
   extends JComponent
-  implements Printable
+  implements SupremicaPropertyChangeListener, Printable
 {
 
   //##########################################################################
@@ -82,6 +84,30 @@ public class GraphPanel
   public List<MiscShape> getDrawnObjects()
   {
     return Collections.emptyList();
+  }
+
+
+  //#########################################################################
+  //# Repaint Support
+  public void registerSupremicaPropertyChangeListeners()
+  {
+    Config.GUI_EDITOR_NODE_RADIUS.addPropertyChangeListener(this);
+    Config.GUI_EDITOR_EDGEARROW_AT_END.addPropertyChangeListener(this);
+  }
+
+  public void unregisterSupremicaPropertyChangeListeners()
+  {
+    Config.GUI_EDITOR_NODE_RADIUS.removePropertyChangeListener(this);
+    Config.GUI_EDITOR_EDGEARROW_AT_END.removePropertyChangeListener(this);
+  }
+
+
+  //#########################################################################
+  //# Interface org.supremica.properties.SupremicaPropertyChangeListener
+  public void propertyChanged(final SupremicaPropertyChangeEvent event)
+  {
+    getShapeProducer().clear();
+    repaint();
   }
 
 
@@ -140,9 +166,6 @@ public class GraphPanel
     paintComponent(g, false);
   }
 
-  /**
-   * Paints the surface on {@code g}.
-   */
   private void paintComponent(final Graphics g, final boolean printing)
   {
     // Only paint the grid if we're not printing!

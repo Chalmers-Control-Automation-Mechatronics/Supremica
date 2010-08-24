@@ -141,8 +141,6 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeEvent;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 /**
@@ -156,8 +154,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 
 public class GraphEditorPanel
   extends BackupGraphPanel
-  implements SelectionOwner, Observer, FocusListener, DragGestureListener,
-             SupremicaPropertyChangeListener
+  implements SelectionOwner, Observer, FocusListener, DragGestureListener
 {
   //#########################################################################
   //# Constructors
@@ -188,6 +185,7 @@ public class GraphEditorPanel
     mSizeMayHaveChanged = true;
     mIsPermanentFocusOwner = false;
     registerGraphObserver();
+    registerSupremicaPropertyChangeListeners();
     addFocusListener(this);
     module.getEventDeclListModifiable().addModelObserver
       (mEventDeclListModelObserver);
@@ -246,6 +244,21 @@ public class GraphEditorPanel
       point = mCurrentPoint;
     }
     return findGrid(point);
+  }
+
+
+  //#########################################################################
+  //# Repaint Support
+  public void registerSupremicaPropertyChangeListeners()
+  {
+    super.registerSupremicaPropertyChangeListeners();
+    Config.GUI_EDITOR_GRID_SIZE.addPropertyChangeListener(this);
+  }
+
+  public void unregisterSupremicaPropertyChangeListeners()
+  {
+    super.registerSupremicaPropertyChangeListeners();
+    Config.GUI_EDITOR_GRID_SIZE.removePropertyChangeListener(this);
   }
 
 
@@ -893,15 +906,6 @@ public class GraphEditorPanel
         throw new IllegalArgumentException(exception);
       }
     }
-  }
-
-
-  //#########################################################################
-  //# Interface org.supremica.properties.SupremicaPropertyChangeListener
-  public void propertyChanged(final SupremicaPropertyChangeEvent event)
-  {
-    getShapeProducer().clear();
-    repaint();
   }
 
 

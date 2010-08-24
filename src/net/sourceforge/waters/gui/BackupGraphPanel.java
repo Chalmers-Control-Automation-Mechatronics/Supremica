@@ -132,6 +132,7 @@ public class BackupGraphPanel
     producer.close();
     final GraphSubject graph = getGraph();
     graph.removeModelObserver(mGraphModelObserver);
+    unregisterSupremicaPropertyChangeListeners();
   }
 
   protected void graphChanged(final ModelChangeEvent event)

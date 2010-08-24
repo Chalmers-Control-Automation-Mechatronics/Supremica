@@ -130,6 +130,7 @@ public class AutomatonDisplayPane
     addMouseListener(handler);
     addMouseMotionListener(handler);
     addComponentListener(new ResizeHandler());
+    registerSupremicaPropertyChangeListeners();
   }
 
 
