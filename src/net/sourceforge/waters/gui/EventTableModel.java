@@ -503,24 +503,9 @@ public class EventTableModel
           }
         }
         break;
-      case ModelChangeEvent.STATE_CHANGED:
-        row0 = row1 = -1;
-        for (int row = 0; row < rowcount; row++) {
-          if (guessEventDecl(row) == decl) {
-            if (row0 < 0) {
-              row0 = row;
-            }
-            row1 = row;
-          } else if (row0 >= 0) {
-            fireTableRowsUpdated(row0, row1);
-            row0 = -1;
-          }
-        }
-        if (row0 >= 0) {
-          fireTableRowsUpdated(row0, row1);
-        }
-        break;
       default:
+        // NAME_CHANGED
+        // STATE_CHANGED - may really be name change by change of identifier
         fireTableDataChanged();
         break;
       }
