@@ -265,79 +265,193 @@ public class OPSearchAutomatonSimplifier
     final int numStates = mOriginalStates.length;
     mVerifierStatePairs = new TLongArrayList(numStates);
     mVerifierStateMap = new TLongIntHashMap(numStates);
+    mVerifierPredecessors = new TIntArrayList(numStates);
+    mPredecessorsOfDead = mListBuffer.createList();
+    for (int s = 0; s < numStates; s++) {
+      expandVerifierPairSingleton(s);
+    }
+    final int pindex = 0;
+    while (pindex < mVerifierStatePairs.size()) {
+      final long pair = mVerifierStatePairs.get(pindex);
+      final int pcode = pindex + mOriginalStates.length;
+      expandVerifierPairEncoded(pcode, pair);
+    }
+  }
 
-    for (final StronglyConnectedComponent comp1 : mComponents) {
-      if (comp1.isEnabledEvent(mUnobservableTau)) {
-        final int code1 = comp1.getCode();
-        for (final int state1 : comp1.getStates()) {
-          final int successors = mUnobservableTauSuccessors[state1];
-          if (successors != IntListBuffer.NULL) {
-            mReadOnlyIterator.reset(successors);
-            while (mReadOnlyIterator.advance()) {
-              final int state2 = mReadOnlyIterator.getCurrentData();
-              final StronglyConnectedComponent comp2 = mComponents.get(state2);
-              final int code2 = comp2 == null ? state2 : comp2.getCode();
-              exploreVerifierPair(code1, code2);
+  private void expandVerifierPairSingleton(final int code)
+  {
+    final StronglyConnectedComponent comp = mComponentOfState[code];
+    if (comp == null) {
+      expandVerifierPairTagged(code, code, code);
+    } else {
+      final int root = comp.getRootIndex();
+      expandVerifierPairTagged(root, root, root);
+    }
+  }
+
+  private void expandVerifierPairEncoded(final int pcode, final long pair)
+  {
+    final int code1 = (int) (pair & 0xffffffff);
+    final int code2 = (int) (pair >> 32);
+    expandVerifierPairTagged(pcode, code1, code2);
+  }
+
+  private void expandVerifierPairTagged(final int pcode,
+                                        final int code1,
+                                        final int code2)
+  {
+    final StronglyConnectedComponent comp1 = mComponents.get(code1);
+    final int tausucc1 = mUnobservableTauSuccessors[code1];
+    final boolean entau1 = comp1 == null ?
+                           tausucc1 != IntListBuffer.NULL :
+                           comp1.isEnabledEvent(mUnobservableTau);
+    final StronglyConnectedComponent comp2 = mComponents.get(code2);
+    final int tausucc2 = mUnobservableTauSuccessors[code2];
+    final boolean entau2 = comp2 == null ?
+                           tausucc2 != IntListBuffer.NULL :
+                           comp2.isEnabledEvent(mUnobservableTau);
+    // Proper event transitions ...
+    for (int e = 0; e < mUnobservableTau; e++) {
+      int esucc1 = 0, esucc2 = 0;
+      final boolean en1, en2;
+      if (comp1 == null) {
+        esucc1 = mObservableSucessor[e][code1];
+        en1 = esucc1 != NO_TRANSITION;
+      } else {
+        en1 = comp1.isEnabledEvent(e);
+      }
+      if (comp2 == null) {
+        esucc2 = mObservableSucessor[e][code1];
+        en2 = esucc2 != NO_TRANSITION;
+      } else {
+        en2 = comp2.isEnabledEvent(e);
+      }
+      if (en1 && en2) {
+        if (comp1 == null) {
+          if (comp2 == null) {
+            enqueueSuccessor(pcode, esucc1, esucc2);
+          } else {
+            enqueueSuccessors(pcode, e, esucc1, comp2);
+          }
+        } else {
+          if (comp2 == null) {
+            enqueueSuccessors(pcode, e, esucc2, comp1);
+          } else if (comp1 == comp2) {
+            enqueueSuccessors(pcode, e, comp1);
+          } else {
+            for (final int member1 : comp1.getStates()) {
+              final int succ1 = mObservableSucessor[e][member1];
+              if (succ1 != NO_TRANSITION) {
+                enqueueSuccessors(pcode, e, succ1, comp2);
+              }
             }
+          }
+        }
+      } else if (en1 && !entau2 || en2 && !entau1) {
+        mListBuffer.prepend(mPredecessorsOfDead, pcode);
+      }
+    }
+    // Silent event transitions ...
+    if (entau1) {
+      enqueueTauSuccessors(pcode, comp1, code1, code2);
+    }
+    if (entau2 && code1 != code2) {
+      enqueueTauSuccessors(pcode, comp2, code2, code1);
+    }
+  }
+
+  private void enqueueSuccessors(final int pcode,
+                                 final int e,
+                                 final StronglyConnectedComponent comp)
+  {
+    final int[] states = comp.getStates();
+    final int numStates = states.length;
+    for (int i = 0; i < numStates; i++) {
+      final int source1 = states[i];
+      final int succ1 = mObservableSucessor[e][source1];
+      if (succ1 != NO_TRANSITION) {
+        for (int j = i + 1; i < numStates; j++) {
+          final int source2 = states[j];
+          final int succ2 = mObservableSucessor[e][source2];
+          if (succ2 != NO_TRANSITION) {
+            enqueueSuccessor(pcode, succ1, succ2);
           }
         }
       }
     }
   }
 
-  private void exploreVerifierPair(final int code1, final int code2)
+  private void enqueueSuccessors(final int pcode,
+                                 final int e,
+                                 final int esucc1,
+                                 final StronglyConnectedComponent comp2)
   {
-    if (code1 < code2) {
-      exploreVerifierPairRaw(code1, code2);
-    } else if (code1 > code2) {
-      exploreVerifierPairRaw(code2, code1);
-    }
-  }
-
-  private void exploreVerifierPairRaw(final int code1, final int code2)
-  {
-    final long pair = code1 | (code2 << 32);
-    int pcode = mVerifierStateMap.get(pair);
-    if (pcode > 0) {
-      pcode = mVerifierStateMap.size() + mOriginalStates.length;
-      mVerifierStatePairs.add(pair);
-      mVerifierStateMap.put(pair, pcode);
-      expandVerifierPairRaw(pcode, code1, code2);
-    }
-  }
-
-  private void expandVerifierPairRaw(final int pcode,
-                                     final int code1, final int code2)
-  {
-    for (int e = 0; e < mUnobservableTau; e++) {
-      final boolean en1 = isEnabledObservableEvent(code1, e);
-      final boolean en2 = isEnabledObservableEvent(code1, e);
-      if (en1 && en2) {
-
-      } else if (en1 && !isEnabledUnobservableTau(code2) ||
-                 en2 && !isEnabledUnobservableTau(code1)) {
-
+    for (final int member2 : comp2.getStates()) {
+      final int succ2 = mObservableSucessor[e][member2];
+      if (succ2 != NO_TRANSITION) {
+        enqueueSuccessor(pcode, esucc1, succ2);
       }
     }
   }
 
-  private boolean isEnabledObservableEvent(final int s, final int e)
+  private void enqueueTauSuccessors(final int pcode,
+                                    final StronglyConnectedComponent comp1,
+                                    final int code1,
+                                    final int code2)
   {
-    final StronglyConnectedComponent comp = mComponents.get(s);
-    if (comp == null) {
-      return mObservableSucessor[e][s] != NO_TRANSITION;
+    if (comp1 == null) {
+      enqueueTauSuccessors(pcode, code1, code2);
     } else {
-      return comp.isEnabledEvent(e);
+      for (final int state : comp1.getStates()) {
+        enqueueTauSuccessors(pcode, state, code2);
+      }
     }
   }
 
-  private boolean isEnabledUnobservableTau(final int s)
+  private void enqueueTauSuccessors(final int pcode,
+                                    final int code1,
+                                    final int code2)
   {
-    final StronglyConnectedComponent comp = mComponents.get(s);
-    if (comp == null) {
-      return mUnobservableTauSuccessors[s] != IntListBuffer.NULL;
-    } else {
-      return comp.isEnabledEvent(mUnobservableTau);
+    final int list1 = mUnobservableTauSuccessors[code1];
+    mReadOnlyIterator.reset(list1);
+    while (mReadOnlyIterator.advance()) {
+      final int succ1 = mReadOnlyIterator.getCurrentData();
+      enqueueSuccessor(pcode, succ1, code2);
+    }
+  }
+
+  private void enqueueSuccessor(final int from, final int to1, final int to2)
+  {
+    if (to1 != to2) {
+      final StronglyConnectedComponent comp1 = mComponents.get(to1);
+      final int root1 = comp1 == null ? to1 : comp1.getRootIndex();
+      final StronglyConnectedComponent comp2 = mComponents.get(to2);
+      final int root2 = comp2 == null ? to2 : comp2.getRootIndex();
+      if (root1 != root2) {
+        final long pair;
+        if (root1 < root2) {
+          pair = root1 | ((long) root2 << 32);
+        } else {
+          pair = root2 | ((long) root1 << 32);
+        }
+        final int lookup = mVerifierStateMap.get(pair);
+        final int pindex;
+        if (lookup > 0) {
+          pindex = lookup - mOriginalStates.length;
+        } else {
+          pindex = mVerifierStateMap.size();
+          final int pcode = pindex + mOriginalStates.length;
+          mVerifierStatePairs.add(pair);
+          mVerifierStateMap.put(pair, pcode);
+          mVerifierPredecessors.add(IntListBuffer.NULL);
+        }
+        int list = mVerifierPredecessors.get(pindex);
+        if (list == IntListBuffer.NULL) {
+          list = mListBuffer.createList();
+          mVerifierPredecessors.set(pindex, list);
+        }
+        mListBuffer.prependUnique(list, from);
+      }
     }
   }
 
@@ -398,8 +512,11 @@ public class OPSearchAutomatonSimplifier
         } while (pop != state);
         if (mTempComponent.size() > 1) {
           final int[] array = mTempComponent.toNativeArray();
+          final int end = array.length - 1;
+          array[end] = array[0];
+          array[0] = state;
           final StronglyConnectedComponent comp =
-            new StronglyConnectedComponent(state, array);
+            new StronglyConnectedComponent(array);
           mComponents.add(comp);
           for (final int elem : array) {
             mComponentOfState[elem] = comp;
@@ -428,18 +545,17 @@ public class OPSearchAutomatonSimplifier
 
     //#######################################################################
     //# Constructor
-    private StronglyConnectedComponent(final int code, final int[] states)
+    private StronglyConnectedComponent(final int[] states)
     {
-      mCode = code;
       mStates = states;
       mEnabledEvents = new BitSet(mObservableTau);
     }
 
     //#######################################################################
     //# Simple Access
-    private int getCode()
+    private int getRootIndex()
     {
-      return mCode;
+      return mStates[0];
     }
 
     private int[] getStates()
@@ -462,7 +578,7 @@ public class OPSearchAutomatonSimplifier
         for (final int state : mStates) {
           if (successors[state] != NO_TRANSITION) {
             mEnabledEvents.set(e);
-            break events;
+            continue events;
           }
         }
       }
@@ -484,7 +600,6 @@ public class OPSearchAutomatonSimplifier
 
     //#######################################################################
     //# Data Members
-    private final int mCode;
     private final int[] mStates;
     private final BitSet mEnabledEvents;
 
@@ -510,6 +625,8 @@ public class OPSearchAutomatonSimplifier
 
   private TLongArrayList mVerifierStatePairs;
   private TLongIntHashMap mVerifierStateMap;
+  private TIntArrayList mVerifierPredecessors;
+  private int mPredecessorsOfDead;
 
 
   //#########################################################################
