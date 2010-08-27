@@ -273,7 +273,7 @@ public class IntListBuffer
     public void reset(final int list)
     {
       if (list != NULL) {
-        mCurrent = getNext(list);
+        mCurrent = list;
       } else {
         throw new IllegalArgumentException("List head cannot be NULL!");
       }

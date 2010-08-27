@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
@@ -75,6 +76,65 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
 
   //#########################################################################
   //# Compiling
+  protected ProductDESProxy getCompiledDES(final String group,
+                                           final String name)
+    throws Exception
+  {
+    return getCompiledDES(group, name, (List<ParameterBindingProxy>) null);
+  }
+
+  protected ProductDESProxy getCompiledDES
+    (final String group,
+     final String name,
+     final List<ParameterBindingProxy> bindings)
+    throws Exception
+  {
+    final File rootdir = getWatersInputRoot();
+    final File groupdir = new File(rootdir, group);
+    return getCompiledDES(groupdir, name, bindings);
+  }
+
+  protected ProductDESProxy getCompiledDES(final String group,
+                                           final String subdir,
+                                           final String name)
+    throws Exception
+  {
+    return getCompiledDES(group, subdir, name, null);
+  }
+
+  protected ProductDESProxy getCompiledDES
+    (final String group,
+     final String subdir,
+     final String name,
+     final List<ParameterBindingProxy> bindings)
+    throws Exception
+  {
+    final File rootdir = getWatersInputRoot();
+    final File groupdir = new File(rootdir, group);
+    return getCompiledDES(groupdir, subdir, name, bindings);
+  }
+
+  protected ProductDESProxy getCompiledDES
+    (final File groupdir,
+     final String subdir,
+     final String name,
+     final List<ParameterBindingProxy> bindings)
+    throws Exception
+  {
+    final File dir = new File(groupdir, subdir);
+    return getCompiledDES(dir, name, bindings);
+  }
+
+  protected ProductDESProxy getCompiledDES
+    (final File dir,
+     final String name,
+     final List<ParameterBindingProxy> bindings)
+    throws Exception
+  {
+    final File filename = new File(dir, name);
+    return getCompiledDES(filename, bindings);
+  }
+
   protected ProductDESProxy getCompiledDES(final File filename)
     throws Exception
   {
@@ -158,6 +218,17 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
       }
     }
     return null;
+  }
+
+  protected List<EventProxy> getUnobservableEvents(final ProductDESProxy des)
+  {
+    final List<EventProxy> result = new LinkedList<EventProxy>();
+    for (final EventProxy event : des.getEvents()) {
+      if (!event.isObservable()) {
+        result.add(event);
+      }
+    }
+    return result;
   }
 
   protected AutomatonProxy findAutomaton(final ProductDESProxy des,

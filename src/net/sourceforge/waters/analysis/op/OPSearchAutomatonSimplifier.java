@@ -115,7 +115,7 @@ public class OPSearchAutomatonSimplifier
     try {
       setUp();
       // TODO Auto-generated method stub
-      return false;
+      return mListBuffer.isEmpty(mPredecessorsOfDead);
     } finally {
       tearDown();
     }
@@ -139,6 +139,18 @@ public class OPSearchAutomatonSimplifier
   protected void tearDown()
   {
     super.tearDown();
+    mListBuffer = null;
+    mReadOnlyIterator = null;
+    mEvents = null;
+    mOriginalStates = null;
+    mObservableSucessor = null;
+    mUnobservableTauSuccessors = null;
+    mObservableTauSuccessors = null;
+    mComponents = null;
+    mComponentOfState = null;
+    mVerifierStatePairs = null;
+    mVerifierStateMap = null;
+    mVerifierPredecessors = null;
   }
 
 
@@ -191,8 +203,8 @@ public class OPSearchAutomatonSimplifier
       stateMap.put(state, code);
     }
 
-    mObservableSucessor = new int[numEvents][numStates];
-    for (next = 0; next < numEvents; next++) {
+    mObservableSucessor = new int[numStates][numEvents];
+    for (next = 0; next < numStates; next++) {
       Arrays.fill(mObservableSucessor[next], NO_TRANSITION);
     }
     mUnobservableTauSuccessors = new int[numStates];
@@ -270,8 +282,7 @@ public class OPSearchAutomatonSimplifier
     for (int s = 0; s < numStates; s++) {
       expandVerifierPairSingleton(s);
     }
-    final int pindex = 0;
-    while (pindex < mVerifierStatePairs.size()) {
+    for (int pindex = 0; pindex < mVerifierStatePairs.size(); pindex++) {
       final long pair = mVerifierStatePairs.get(pindex);
       final int pcode = pindex + mOriginalStates.length;
       expandVerifierPairEncoded(pcode, pair);
@@ -300,12 +311,12 @@ public class OPSearchAutomatonSimplifier
                                         final int code1,
                                         final int code2)
   {
-    final StronglyConnectedComponent comp1 = mComponents.get(code1);
+    final StronglyConnectedComponent comp1 = mComponentOfState[code1];
     final int tausucc1 = mUnobservableTauSuccessors[code1];
     final boolean entau1 = comp1 == null ?
                            tausucc1 != IntListBuffer.NULL :
                            comp1.isEnabledEvent(mUnobservableTau);
-    final StronglyConnectedComponent comp2 = mComponents.get(code2);
+    final StronglyConnectedComponent comp2 = mComponentOfState[code2];
     final int tausucc2 = mUnobservableTauSuccessors[code2];
     final boolean entau2 = comp2 == null ?
                            tausucc2 != IntListBuffer.NULL :
@@ -315,13 +326,13 @@ public class OPSearchAutomatonSimplifier
       int esucc1 = 0, esucc2 = 0;
       final boolean en1, en2;
       if (comp1 == null) {
-        esucc1 = mObservableSucessor[e][code1];
+        esucc1 = mObservableSucessor[code1][e];
         en1 = esucc1 != NO_TRANSITION;
       } else {
         en1 = comp1.isEnabledEvent(e);
       }
       if (comp2 == null) {
-        esucc2 = mObservableSucessor[e][code1];
+        esucc2 = mObservableSucessor[code2][e];
         en2 = esucc2 != NO_TRANSITION;
       } else {
         en2 = comp2.isEnabledEvent(e);
@@ -368,11 +379,11 @@ public class OPSearchAutomatonSimplifier
     final int numStates = states.length;
     for (int i = 0; i < numStates; i++) {
       final int source1 = states[i];
-      final int succ1 = mObservableSucessor[e][source1];
+      final int succ1 = mObservableSucessor[source1][e];
       if (succ1 != NO_TRANSITION) {
-        for (int j = i + 1; i < numStates; j++) {
+        for (int j = i + 1; j < numStates; j++) {
           final int source2 = states[j];
-          final int succ2 = mObservableSucessor[e][source2];
+          final int succ2 = mObservableSucessor[source2][e];
           if (succ2 != NO_TRANSITION) {
             enqueueSuccessor(pcode, succ1, succ2);
           }
@@ -387,7 +398,7 @@ public class OPSearchAutomatonSimplifier
                                  final StronglyConnectedComponent comp2)
   {
     for (final int member2 : comp2.getStates()) {
-      final int succ2 = mObservableSucessor[e][member2];
+      final int succ2 = mObservableSucessor[member2][e];
       if (succ2 != NO_TRANSITION) {
         enqueueSuccessor(pcode, esucc1, succ2);
       }
@@ -423,9 +434,9 @@ public class OPSearchAutomatonSimplifier
   private void enqueueSuccessor(final int from, final int to1, final int to2)
   {
     if (to1 != to2) {
-      final StronglyConnectedComponent comp1 = mComponents.get(to1);
+      final StronglyConnectedComponent comp1 = mComponentOfState[to1];
       final int root1 = comp1 == null ? to1 : comp1.getRootIndex();
-      final StronglyConnectedComponent comp2 = mComponents.get(to2);
+      final StronglyConnectedComponent comp2 = mComponentOfState[to2];
       final int root2 = comp2 == null ? to2 : comp2.getRootIndex();
       if (root1 != root2) {
         final long pair;
@@ -574,9 +585,8 @@ public class OPSearchAutomatonSimplifier
     {
       events:
       for (int e = 0; e < mUnobservableTau; e++) {
-        final int[] successors = mObservableSucessor[e];
         for (final int state : mStates) {
-          if (successors[state] != NO_TRANSITION) {
+          if (mObservableSucessor[state][e] != NO_TRANSITION) {
             mEnabledEvents.set(e);
             continue events;
           }

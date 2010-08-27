@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.analysis.op;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -591,18 +590,6 @@ public class ListBufferTransitionRelationTest extends
   {
     final ProductDESProxy des = getCompiledDES(group, subdir, desname);
     return findAutomaton(des, autname);
-  }
-
-  private ProductDESProxy getCompiledDES(final String group,
-                                         final String subdir,
-                                         final String name)
-    throws Exception
-  {
-    final File root = getWatersInputRoot();
-    final File dirname1 = new File(root, group);
-    final File dirname2 = new File(dirname1, subdir);
-    final File filename = new File(dirname2, name);
-    return getCompiledDES(filename, null);
   }
 
 }
