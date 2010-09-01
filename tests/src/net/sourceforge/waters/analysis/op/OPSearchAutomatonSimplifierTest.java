@@ -47,8 +47,9 @@ public class OPSearchAutomatonSimplifierTest
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mSimplifier = new OPSearchAutomatonSimplifier(factory);
+    mSimplifier.setOutputName("result");
     mIntegrityChecker = ProductDESIntegrityChecker.getInstance();
-    mIsomorphismChecker = new IsomorphismChecker(factory, false);
+    mIsomorphismChecker = new IsomorphismChecker(factory, true);
   }
 
   protected void tearDown() throws Exception
@@ -102,12 +103,14 @@ public class OPSearchAutomatonSimplifierTest
     mSimplifier.setHiddenEvents(hidden);
     final boolean result = mSimplifier.run();
     assertEquals("Unexpected result from OP-Verifier!", expect, result);
-    //checkResult(des, before, result);
-    getLogger().info("Done " + des.getName());
+    if (result) {
+      final AutomatonProxy aut = mSimplifier.getComputedAutomaton();
+      checkResult(des, before, aut);
+      getLogger().info("Done " + des.getName());
+    }
 
   }
 
-  @SuppressWarnings("unused")
   private void checkResult(final ProductDESProxy des,
                            final AutomatonProxy before,
                            final AutomatonProxy result)

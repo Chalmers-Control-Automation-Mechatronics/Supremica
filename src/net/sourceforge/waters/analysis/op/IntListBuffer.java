@@ -51,6 +51,70 @@ public class IntListBuffer
   //#########################################################################
   //# Access Methods
   /**
+   * Adds the given data to the end of the specified list.
+   * @param  list   The unique list number that identifies the list to be modified
+   *                in this buffer.
+   * @param  data   The integer data to be stored as the new last element of
+   *                the list.
+   */
+  public void append(final int list, final int data)
+  {
+    final int pair = allocatePair();
+    setDataAndNext(pair, data, NULL);
+    final int tail = getData(list);
+    if (tail == NULL) {
+      setDataAndNext(list, pair, pair);
+    } else {
+      setNext(tail, pair);
+      setData(list, pair);
+    }
+  }
+
+  public boolean contains(final int list, final int data)
+  {
+    int next = getNext(list);
+    while (next != NULL) {
+      final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
+      final int offset = next & BLOCK_MASK;
+      if (block[offset + OFFSET_DATA] == data) {
+        return true;
+      }
+      next = block[offset + OFFSET_NEXT];
+    }
+    return false;
+  }
+
+  /**
+   * Creates a new list from the data of two given lists.
+   * This method merges the two lists destructively, and there is no
+   * guarantee that either input list continues to exists after the call.
+   * @param  list1   The unique list number that identifies the
+   *                 first list to be catenated.
+   * @param  list2   The unique list number that identifies the
+   *                 second list to be catenated.
+   * @return list    A unique list number that identifying a new list
+   *                 containing the elements of list1 followed by list2.
+   */
+  public int catenateDestructively(final int list1, final int list2)
+  {
+    final int tail1 = getData(list1);
+    if (tail1 == NULL) {
+      recyclePair(list1);
+      return list2;
+    }
+    final int head2 = getNext(list2);
+    if (head2 == NULL) {
+      recyclePair(list2);
+      return list1;
+    }
+    setNext(tail1, head2);
+    final int tail2 = getData(list2);
+    setData(list1, tail2);
+    recyclePair(list2);
+    return list1;
+  }
+
+  /**
    * Creates a new empty list of integers.
    * @return The unique list number that identifies the new list in this
    *         buffer.
@@ -58,49 +122,16 @@ public class IntListBuffer
   public int createList()
   {
     final int list = allocatePair();
-    setNext(list, NULL);
+    setDataAndNext(list, NULL, NULL);
     return list;
   }
 
-  /**
-   * Adds the given data to the front of the specified list.
-   * @param  list   The unique list number that identifies the list to be modified
-   *                in this buffer.
-   * @param  data   The integer data to be stored as the new first element of
-   *                the list.
-   */
-  public void prepend(final int list, final int data)
-  {
-    final int tail = getNext(list);
-    final int pair = allocatePair();
-    setDataAndNext(pair, data, tail);
-    setNext(list, pair);
-  }
-
-  /**
-   * Adds the given data to the front of the specified list, but only if the
-   * current first list element is different from the new data.
-   * @param  list   The unique list number that identifies the list to be modified
-   *                in this buffer.
-   * @param  data   The integer data to be stored as the new first element of
-   *                the list.
-   */
-  public void prependUnique(final int list, final int data)
-  {
-    final int tail = getNext(list);
-    if (getData(tail) != data) {
-      final int pair = allocatePair();
-      setDataAndNext(pair, data, tail);
-      setNext(list, pair);
-    }
-  }
-
-  public Iterator createReadOnlyIterator()
+  public ReadOnlyIterator createReadOnlyIterator()
   {
     return new ReadOnlyIterator();
   }
 
-  public Iterator createReadOnlyIterator(final int list)
+  public ReadOnlyIterator createReadOnlyIterator(final int list)
   {
     return new ReadOnlyIterator(list);
   }
@@ -115,10 +146,36 @@ public class IntListBuffer
     return new ModifyingIterator(list);
   }
 
+  public void dispose(final int list)
+  {
+    if (list != NULL) {
+      final int tail = getNext(list);
+      final int last = tail == NULL ? list : tail;
+      setNext(last, mRecycleStart);
+      mRecycleStart = list;
+    }
+  }
 
   public boolean isEmpty(final int list)
   {
     return getNext(list) == NULL;
+  }
+
+  /**
+   * Gets the first data element from the given list.
+   * @param   The list number identifying the list to be examined
+   *          in this buffer.
+   * @throws  IllegalArgumentException to indicate that the list
+   *                 is {@link #NULL} or empty.
+   */
+  public int getFirst(final int list)
+  {
+    final int head = getNext(list);
+    if (head == NULL) {
+      throw new IllegalArgumentException
+        ("Attempting to get element from NULL or empty list!");
+    }
+    return getData(head);
   }
 
   /**
@@ -137,18 +194,37 @@ public class IntListBuffer
     return count;
   }
 
-  public boolean contains(final int list, final int data)
+  /**
+   * Adds the given data to the front of the specified list.
+   * @param  list   The unique list number that identifies the list to be modified
+   *                in this buffer.
+   * @param  data   The integer data to be stored as the new first element of
+   *                the list.
+   */
+  public void prepend(final int list, final int data)
   {
-    int next = getNext(list);
-    while (next != NULL) {
-      final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
-      final int offset = next & BLOCK_MASK;
-      if (block[offset + OFFSET_DATA] == data) {
-        return true;
-      }
-      next = block[offset + OFFSET_NEXT];
+    final int tail = getNext(list);
+    final int pair = allocatePair();
+    setDataAndNext(pair, data, tail);
+    setHead(list, pair);
+  }
+
+  /**
+   * Adds the given data to the front of the specified list, but only if the
+   * current first list element is different from the new data.
+   * @param  list   The unique list number that identifies the list to be modified
+   *                in this buffer.
+   * @param  data   The integer data to be stored as the new first element of
+   *                the list.
+   */
+  public void prependUnique(final int list, final int data)
+  {
+    final int tail = getNext(list);
+    if (tail != NULL || getData(tail) != data) {
+      final int pair = allocatePair();
+      setDataAndNext(pair, data, tail);
+      setHead(list, pair);
     }
-    return false;
   }
 
   public boolean remove(final int list, final int data)
@@ -161,7 +237,14 @@ public class IntListBuffer
         final int offset = current & BLOCK_MASK;
         final int next = block[offset + OFFSET_NEXT];
         if (block[offset + OFFSET_NEXT] == data) {
-          setNext(prev, next);
+          if (next != NULL) {
+            setNext(prev, next);
+          } else if (prev == list) {
+            setDataAndNext(list, NULL, NULL);
+          } else {
+            setNext(prev, next);
+            setData(list, prev);
+          }
           block[offset + OFFSET_NEXT] = mRecycleStart;
           mRecycleStart = current;
           return true;
@@ -171,20 +254,6 @@ public class IntListBuffer
       }
     }
     return false;
-  }
-
-  public void dispose(final int list)
-  {
-    if (list != NULL) {
-      int current = list;
-      int next = getNext(current);
-      while (next != NULL) {
-        current = next;
-        next = getNext(current);
-      }
-      setNext(current, mRecycleStart);
-      mRecycleStart = list;
-    }
   }
 
 
@@ -214,6 +283,17 @@ public class IntListBuffer
     block[(list & BLOCK_MASK) + OFFSET_NEXT] = next;
   }
 
+  private void setHead(final int list, final int head)
+  {
+    final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
+    final int offset = list & BLOCK_MASK;
+    if (block[offset + OFFSET_NEXT] == NULL) {
+      block[offset + OFFSET_NEXT] = block[offset + OFFSET_DATA] = head;
+    } else {
+      block[offset + OFFSET_NEXT] = head;
+    }
+  }
+
   private void setDataAndNext(final int list, final int data, final int next)
   {
     final int[] block = mBlocks.get(list >> BLOCK_SHIFT);
@@ -239,6 +319,12 @@ public class IntListBuffer
     }
   }
 
+  public void recyclePair(final int list)
+  {
+    setNext(list, mRecycleStart);
+    mRecycleStart = list;
+  }
+
 
   //#########################################################################
   //# Inner Interface Iterator
@@ -254,7 +340,7 @@ public class IntListBuffer
 
   //#########################################################################
   //# Inner Class ReadOnlyIterator
-  private class ReadOnlyIterator implements Iterator
+  public class ReadOnlyIterator implements Iterator
   {
     //#########################################################################
     //# Constructor
@@ -312,6 +398,13 @@ public class IntListBuffer
     }
 
     //#########################################################################
+    //# Specific Access
+    public void reset(final ReadOnlyIterator iter)
+    {
+      mCurrent = iter.mCurrent;
+    }
+
+    //#########################################################################
     //# Data Members
     private int mCurrent;
 
@@ -326,7 +419,7 @@ public class IntListBuffer
     //# Constructor
     private ModifyingIterator()
     {
-      mPrevious = mCurrent = NULL;
+      mHead = mPrevious = mCurrent = NULL;
     }
 
     private ModifyingIterator(final int list)
@@ -340,7 +433,7 @@ public class IntListBuffer
     {
       if (list != NULL) {
         mPrevious = NULL;
-        mCurrent = list;
+        mHead = mCurrent = list;
       } else {
         throw new IllegalArgumentException("List head cannot be NULL!");
       }
@@ -379,7 +472,14 @@ public class IntListBuffer
         final int[] block = mBlocks.get(mCurrent >> BLOCK_SHIFT);
         final int offset = mCurrent & BLOCK_MASK;
         final int next = block[offset + OFFSET_NEXT];
-        setNext(mPrevious, next);
+        if (next != NULL) {
+          setNext(mPrevious, next);
+        } else if (mPrevious == mHead) {
+          setDataAndNext(mHead, NULL, NULL);
+        } else {
+          setNext(mPrevious, next);
+          setData(mHead, mPrevious);
+        }
         block[offset + OFFSET_NEXT] = mRecycleStart;
         mRecycleStart = mCurrent;
         mCurrent = mPrevious;
@@ -392,6 +492,7 @@ public class IntListBuffer
 
     //#########################################################################
     //# Data Members
+    private int mHead;
     private int mPrevious;
     private int mCurrent;
 

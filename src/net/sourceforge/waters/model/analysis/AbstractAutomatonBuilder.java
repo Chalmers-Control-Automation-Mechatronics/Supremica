@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.analysis;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
@@ -51,6 +52,26 @@ public abstract class AbstractAutomatonBuilder
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.AutomatonBuilder
+  public void setOutputName(final String name)
+  {
+    mOuptutName = name;
+  }
+
+  public String getOutputName()
+  {
+    return mOuptutName;
+  }
+
+  public void setOutputKind(final ComponentKind kind)
+  {
+    mOutputKind = kind;
+  }
+
+  public ComponentKind getOutputKind()
+  {
+    return mOutputKind;
+  }
+
   public AutomatonProxy getComputedAutomaton()
   {
     final AutomatonResult result = getAnalysisResult();
@@ -93,4 +114,11 @@ public abstract class AbstractAutomatonBuilder
     return result.isSatisfied();
   }
 
+
+  //#########################################################################
+  //# Data Members
+  private String mOuptutName;
+  private ComponentKind mOutputKind;
+
 }
+

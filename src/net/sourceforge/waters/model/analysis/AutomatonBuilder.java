@@ -10,6 +10,7 @@
 package net.sourceforge.waters.model.analysis;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
@@ -31,6 +32,37 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 
 public interface AutomatonBuilder extends ModelAnalyser
 {
+
+  //#########################################################################
+  //# Configuration
+  /**
+   * Sets the name to be given to the output automaton.
+   * @param  name   Name for output automaton, or <CODE>null</CODE> to
+   *                indicate that the name of the input automaton is to
+   *                be used.
+   */
+  public void setOutputName(String name);
+
+  /**
+   * Gets the configured name of the output automaton.
+   * @see {@link #setOutputName(String) setOutputName()}
+   */
+  public String getOutputName();
+
+  /**
+   * Gets the component kind to be given to the output automaton.
+   * @param  name   Kind of output automaton, or <CODE>null</CODE> to
+   *                indicate that the kind of the input automaton is to
+   *                be used.
+   */
+  public void setOutputKind(ComponentKind kind);
+
+  /**
+   * Gets the configured component kind of the output automaton.
+   * @see {@link #setOutputKind(ComponentKind) setOutputKind()}
+   */
+  public ComponentKind getOutputKind();
+
 
   //#########################################################################
   //# More Specific Access to the Results
