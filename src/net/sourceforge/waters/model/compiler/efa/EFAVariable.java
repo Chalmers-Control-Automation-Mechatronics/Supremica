@@ -60,6 +60,14 @@ class EFAVariable implements Comparable<EFAVariable> {
 
 
   //#########################################################################
+  //# Overrides for java.lang.Object
+  public String toString()
+  {
+    return mVariableName.toString();
+  }
+
+
+  //#########################################################################
   //# Interface java.lang.Comparable
   public int compareTo(final EFAVariable var)
   {
@@ -109,7 +117,7 @@ class EFAVariable implements Comparable<EFAVariable> {
       mEventList.add(event);
     }
   }
-    
+
 
   //#########################################################################
   //# Data Members

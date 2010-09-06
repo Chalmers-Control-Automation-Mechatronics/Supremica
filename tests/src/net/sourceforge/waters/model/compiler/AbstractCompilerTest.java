@@ -243,6 +243,12 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "BallLift");
   }
 
+  public void testCompile_batch_tank_vout()
+    throws IOException, WatersException
+  {
+    compile("tests", "nasty", "batch_tank_vout");
+  }
+
   public void testCompile_ControllableTestModelEFA()
     throws IOException, WatersException
   {
@@ -387,6 +393,13 @@ public abstract class AbstractCompilerTest
   {
     compileError("handwritten", "edge0", null,
                  EmptyLabelBlockException.class, "q0");
+  }
+
+  public void testCompile_error_batch_tank_out()
+    throws IOException, WatersException
+  {
+    compileError("tests", "nasty", "batch_tank_out", null,
+                 DuplicateIdentifierException.class, "'out'");
   }
 
   public void testCompile_error_ims()

@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="batch_tank_vout" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
+<EventDecl Kind="CONTROLLABLE" Name="close_in"/>
+<EventDecl Kind="CONTROLLABLE" Name="close_out"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="jelly"/>
+<EventDecl Kind="CONTROLLABLE" Name="open_in"/>
+<EventDecl Kind="CONTROLLABLE" Name="open_out"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="s1_off"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="s1_on"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="s2_off"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="s2_on"/>
+<EventDecl Kind="CONTROLLABLE" Name="stirrer_off"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="sensors">
+<Graph>
+<NodeList>
+<SimpleNode Name="FULL">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="48" X="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="-7" X="-39"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="PARTIAL">
+<PointGeometry>
+<Point Y="112" X="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="-7" X="-59"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="EMPTY">
+<PointGeometry>
+<Point Y="176" X="96"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="1" X="-30"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="4" X="-46"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="FULL" Source="FULL">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="47" X="136"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="PARTIAL" Source="FULL">
+<LabelBlock>
+<SimpleIdentifier Name="s2_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-16" X="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="79" X="111"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="level"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-3" X="4"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="PARTIAL" Source="EMPTY">
+<LabelBlock>
+<SimpleIdentifier Name="s1_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="-46"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="176" X="96"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="145" X="82"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="level"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="3" X="-47"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="FULL" Source="PARTIAL">
+<LabelBlock>
+<SimpleIdentifier Name="s2_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="-45"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="78" X="81"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="level"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-1" X="-44"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="EMPTY" Source="PARTIAL">
+<LabelBlock>
+<SimpleIdentifier Name="s1_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="147" X="109"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="176" X="96"/>
+</EndPointGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="level"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="0" X="5"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="PARTIAL" Source="PARTIAL">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="113" X="137"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="valve_out">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="CLOSED">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="80" X="80"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="0" X="-21"/>
+</InitialArrowGeometry>
+<LabelGeometry>
+<Point Y="9" X="-42"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="OPEN">
+<PointGeometry>
+<Point Y="80" X="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="CLOSED" Source="CLOSED">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-23" X="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="48" X="80"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="OPEN" Source="CLOSED">
+<LabelBlock>
+<SimpleIdentifier Name="open_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-33" X="-30"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="65" X="121"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="vout"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="-19"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="CLOSED" Source="OPEN">
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="1" X="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="95" X="120"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="vout"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="15" X="-13"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="OPEN" Source="OPEN">
+<LabelBlock>
+<SimpleIdentifier Name="s1_off"/>
+<SimpleIdentifier Name="s2_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-36" X="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="48" X="161"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="valve_mutex">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="idle">
+<PointGeometry>
+<Point Y="112" X="208"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-20" X="0"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="11" X="-13"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="out">
+<PointGeometry>
+<Point Y="112" X="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-29"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="in">
+<PointGeometry>
+<Point Y="112" X="288"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="7"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="in" Source="idle">
+<LabelBlock>
+<SimpleIdentifier Name="open_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-21" X="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="97" X="249"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="idle" Source="in">
+<LabelBlock>
+<SimpleIdentifier Name="close_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="3" X="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="127" X="246"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="out" Source="idle">
+<LabelBlock>
+<SimpleIdentifier Name="open_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-23" X="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="97" X="169"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="idle" Source="out">
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="3" X="-34"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="127" X="169"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="dont_stir">
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="96" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S0" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_off"/>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="98" X="156"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="|" Text="level &lt; 2 | vout == 1">
+<BinaryExpression Operator="&lt;">
+<SimpleIdentifier Name="level"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="vout"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point Y="27" X="3"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<VariableComponent Name="level">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="level"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<VariableComponent Name="vout">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="vout"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+</ComponentList>
+</Module>

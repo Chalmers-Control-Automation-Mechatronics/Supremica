@@ -30,7 +30,7 @@ public interface ProxyAccessorMap<P extends Proxy,V>
   //# Access as Proxy Set
   public boolean containsProxyKey(P proxy);
 
-  public <PP extends P> ProxyAccessor<PP> createAccessor(PP proxy);
+  public <PP extends P> ProxyAccessor<P> createAccessor(PP proxy);
 
   public V getByProxy(P proxy);
 

@@ -412,21 +412,30 @@ public class EFACompiler
       (final SimpleComponentProxy comp)
       throws VisitorException
     {
-      final GraphProxy graph = comp.getGraph();
-      final List<SimpleIdentifierProxy> list = visitGraphProxy(graph);
-      final CompiledRange range = new CompiledEnumRange(list);
-      mRootContext.createVariables(comp, range, mFactory, mOperatorTable);
-      return range;
+      try {
+        final GraphProxy graph = comp.getGraph();
+        final List<SimpleIdentifierProxy> list = visitGraphProxy(graph);
+        final CompiledRange range = new CompiledEnumRange(list);
+        mRootContext.createVariables(comp, range, mFactory, mOperatorTable);
+        return range;
+      } catch (final DuplicateIdentifierException exception) {
+        throw wrap(exception);
+      }
     }
 
     public IdentifierProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
+      throws VisitorException
     {
-      final String name = node.getName();
-      final SimpleIdentifierProxy ident =
-        mFactory.createSimpleIdentifierProxy(name);
-      mRootContext.addBinding(ident, ident);
-      mCurrentRange.add(ident);
-      return ident;
+      try {
+        final String name = node.getName();
+        final SimpleIdentifierProxy ident =
+          mFactory.createSimpleIdentifierProxy(name);
+        mRootContext.insertEnumAtom(ident);
+        mCurrentRange.add(ident);
+        return ident;
+      } catch (final DuplicateIdentifierException exception) {
+        throw wrap(exception);
+      }
     }
 
     public CompiledRange visitVariableComponentProxy

@@ -383,9 +383,13 @@ public class SimpleExpressionCompiler
         final SimpleExpressionProxy found = getBoundExpression(item);
         if (found == null) {
           if (mContext != null) {
-            final ModuleBindingContext modulecontext =
-              mContext.getModuleBindingContext();
-            modulecontext.addBinding(item, item);
+            try {
+              final ModuleBindingContext modulecontext =
+                mContext.getModuleBindingContext();
+              modulecontext.insertEnumAtom(item);
+            } catch (final DuplicateIdentifierException exception) {
+              throw wrap(exception);
+            }
           }
         } else if (mEquality.equals(found, item)) {
           // nothing ...

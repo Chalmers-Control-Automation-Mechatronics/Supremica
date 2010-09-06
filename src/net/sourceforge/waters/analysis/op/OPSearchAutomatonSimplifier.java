@@ -16,6 +16,7 @@ import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntStack;
 import gnu.trove.TLongArrayList;
 import gnu.trove.TLongIntHashMap;
+import gnu.trove.TLongLongHashMap;
 import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayList;
@@ -167,9 +168,12 @@ public class OPSearchAutomatonSimplifier
     mVerifierStatePairs = null;
     mVerifierStateMap = null;
     mVerifierPredecessors = null;
-    mBFSList1 = null;
-    mBFSList2 = null;
-    mBFSVisited = null;
+    mBFSIntList1 = null;
+    mBFSIntList2 = null;
+    mBFSIntVisited = null;
+    mBFSLongList1 = null;
+    mBFSLongList2 = null;
+    mBFSLongVisited = null;
   }
 
 
@@ -477,12 +481,7 @@ public class OPSearchAutomatonSimplifier
       final StronglyConnectedComponent comp2 = mComponentOfState[to2];
       final int root2 = comp2 == null ? to2 : comp2.getRootIndex();
       if (root1 != root2) {
-        final long pair;
-        if (root1 < root2) {
-          pair = root1 | ((long) root2 << 32);
-        } else {
-          pair = root2 | ((long) root1 << 32);
-        }
+        final long pair = getPair(root1, root2);
         final int lookup = mVerifierStateMap.get(pair);
         final int pindex;
         if (lookup > 0) {
@@ -510,13 +509,15 @@ public class OPSearchAutomatonSimplifier
   @SuppressWarnings("unused")
   private void findOPSearchTransition()
   {
-    if (mBFSList1 == null) {
-      mBFSList1 = new TIntArrayList();
-      mBFSList2 = new TIntArrayList();
-      mBFSVisited = new TIntHashSet();
+    if (mBFSIntList1 == null) {
+      mBFSIntList1 = new TIntArrayList();
+      mBFSIntList2 = new TIntArrayList();
+      mBFSIntVisited = new TIntHashSet();
+      mBFSLongList1 = new TLongArrayList();
+      mBFSLongVisited = new TLongLongHashMap();
     }
-    TIntArrayList current = mBFSList1;
-    TIntArrayList next = mBFSList2;
+    TIntArrayList current = mBFSIntList1;
+    TIntArrayList next = mBFSIntList2;
     boolean found = false;
     int state = 0;
     long pair = 0;
@@ -531,7 +532,7 @@ public class OPSearchAutomatonSimplifier
         if ((pair & 0xffffffff) == (pair >> 32)) {
           found = true;
           break;
-        } else if (mBFSVisited.add(pred)) {
+        } else if (mBFSIntVisited.add(pred)) {
           next.add(pred);
         }
       }
@@ -551,7 +552,7 @@ public class OPSearchAutomatonSimplifier
           pair = mVerifierStatePairs.get(pred);
           if ((pair & 0xffffffff) == (pair >> 32)) {
             break outer;
-          } else if (mBFSVisited.add(pred)) {
+          } else if (mBFSIntVisited.add(pred)) {
             next.add(pred);
           }
         }
@@ -560,10 +561,130 @@ public class OPSearchAutomatonSimplifier
     }
     current.clear();
     next.clear();
-    mBFSVisited.clear();
+    mBFSIntVisited.clear();
     // found: pred/pair -> state
-    // final int start = (int) (pair & 0xffffffff);
-    // pair = mVerifierStatePairs.get(state);
+
+    // pair is start/start; state is end1/end2
+    // We must search the strongly connected component of start
+    // to find a link to strongly connected components end1/end2.
+    // The search only uses states in start/start or end1/end2.
+    // The first step of the shortest path found gets selected.
+    int start = (int) (pair & 0xffffffff);
+    final int startroot = getRootIndex(start);
+    final long targetpair = mVerifierStatePairs.get(state);
+    final StronglyConnectedComponent comp = mComponentOfState[start];
+    long foundtrans = 0;
+    if (comp == null) {
+      foundtrans = searchTauSuccessors(startroot, start, start,
+                                       targetpair, mBFSLongList1);
+    } else {
+      comp.iterate();
+      while (mReadOnlyIterator.advance() && foundtrans == 0) {
+        start = mReadOnlyIterator.getCurrentData();
+        foundtrans = searchTauSuccessors(startroot, start, start,
+                                         targetpair, mBFSLongList1);
+      }
+    }
+    if (foundtrans == 0) {
+      if (mBFSLongList2 == null) {
+        mBFSLongList2 = new TLongArrayList();
+      }
+      TLongArrayList currentpairs = mBFSLongList1;
+      TLongArrayList nextpairs = mBFSLongList2;
+      trans:
+      while (true) {
+        final int len = currentpairs.size();
+        for (int i = 0; i < len; i++) {
+          pair = currentpairs.get(i);
+          final int state1 = (int) (pair & 0xffffffff);
+          final int state2 = (int) (pair >> 32);
+          foundtrans = searchTauSuccessors(startroot, state1, state2,
+                                           targetpair, nextpairs);
+          if (foundtrans != 0) {
+            break trans;
+          }
+          foundtrans = searchTauSuccessors(startroot, state2, state1,
+                                           targetpair, nextpairs);
+          if (foundtrans != 0) {
+            break trans;
+          }
+          foundtrans = searchProperSuccessors(startroot, state1, state2,
+                                              targetpair, nextpairs);
+          if (foundtrans != 0) {
+            break trans;
+          }
+        }
+        final TLongArrayList tmp = nextpairs;
+        nextpairs = currentpairs;
+        currentpairs = tmp;
+      }
+      mBFSLongList1.clear();
+      mBFSLongList2.clear();
+      mBFSLongVisited.clear();
+    }
+  }
+
+  private long searchTauSuccessors(final int startroot,
+                                  final int current1,
+                                  final int current2,
+                                  final long targetpair,
+                                  final TLongArrayList queue)
+  {
+    final long predpair = getPair(current1, current2);
+    long predinfo = mBFSLongVisited.get(predpair);
+    final int list = mUnobservableTauSuccessors[current1];
+    final int root2 = getRootIndex(current2);
+    mAltReadOnlyIterator.reset(list);
+    while (mAltReadOnlyIterator.advance()) {
+      final int succ = mAltReadOnlyIterator.getCurrentData();
+      if (succ != current2) {
+        final int succroot = getRootIndex(succ);
+        if (succroot == startroot) {
+          final long succpair = getPair(succ, current2);
+          if (!mBFSLongVisited.containsKey(succpair)) {
+            if (predinfo == 0) {
+              predinfo = ((long) current1) | (((long) succ) << 32);
+            }
+            mBFSLongVisited.put(succpair, predinfo);
+            queue.add(succpair);
+          }
+        } else if (getPair(succroot, root2) == targetpair) {
+          if (predinfo == 0) {
+            predinfo = ((long) current1) | (((long) succ) << 32);
+          }
+          return predinfo;
+        }
+      }
+    }
+    return 0;
+  }
+
+  private long searchProperSuccessors(final int startroot,
+                                      final int current1,
+                                      final int current2,
+                                      final long targetpair,
+                                      final TLongArrayList queue)
+  {
+    final long predpair = getPair(current1, current2);
+    final long predinfo = mBFSLongVisited.get(predpair);
+    for (int e = 0; e < mUnobservableTau; e++) {
+      final int succ1 = mObservableSucessor[current1][e];
+      final int succ2 = mObservableSucessor[current2][e];
+      if (succ1 != NO_TRANSITION && succ2 != NO_TRANSITION && succ1 != succ2) {
+        final int root1 = getRootIndex(succ1);
+        final int root2 = getRootIndex(succ1);
+        if (root1 == startroot && root2 == startroot) {
+          final long succpair = getPair(succ1, succ2);
+          if (!mBFSLongVisited.containsKey(succpair)) {
+            mBFSLongVisited.put(succpair, predinfo);
+            queue.add(succpair);
+          }
+        } else if (getPair(root1, root2) == targetpair) {
+          return predinfo;
+        }
+      }
+    }
+    return 0;
   }
 
 
@@ -801,6 +922,15 @@ public class OPSearchAutomatonSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
+  private long getPair(final int root1, final int root2)
+  {
+    if (root1 < root2) {
+      return root1 | ((long) root2 << 32);
+    } else {
+      return root2 | ((long) root1 << 32);
+    }
+  }
+
   private int getRootIndex(final int state)
   {
     final StronglyConnectedComponent comp = mComponentOfState[state];
@@ -1020,9 +1150,12 @@ public class OPSearchAutomatonSimplifier
   private TLongIntHashMap mVerifierStateMap;
   private TIntArrayList mVerifierPredecessors;
   private int mPredecessorsOfDead;
-  private TIntArrayList mBFSList1;
-  private TIntArrayList mBFSList2;
-  private TIntHashSet mBFSVisited;
+  private TIntArrayList mBFSIntList1;
+  private TIntArrayList mBFSIntList2;
+  private TIntHashSet mBFSIntVisited;
+  private TLongArrayList mBFSLongList1;
+  private TLongArrayList mBFSLongList2;
+  private TLongLongHashMap mBFSLongVisited;
 
 
   //#########################################################################

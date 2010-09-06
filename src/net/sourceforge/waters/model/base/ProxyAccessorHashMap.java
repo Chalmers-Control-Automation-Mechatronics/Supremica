@@ -92,9 +92,9 @@ public class ProxyAccessorHashMap<P extends Proxy,V>
     return true;
   }
 
-  public <PP extends P> ProxyAccessor<PP> createAccessor(final PP proxy)
+  public <PP extends P> ProxyAccessor<P> createAccessor(final PP proxy)
   {
-    return new Accessor<PP>(proxy);
+    return new Accessor<P>(proxy);
   }
 
   public V getByProxy(final P proxy)

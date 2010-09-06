@@ -121,14 +121,6 @@ public class ModuleBindingContext implements BindingContext
 
   //#########################################################################
   //# Compilation
-  public void addBinding(final SimpleExpressionProxy ident,
-                         final SimpleExpressionProxy value)
-  {
-    final ProxyAccessor<SimpleExpressionProxy> key =
-      mMap.createAccessor(ident);
-    mMap.put(key, value);
-  }
-
   public void insertBinding(final SimpleExpressionProxy ident,
                             final SimpleExpressionProxy value)
     throws DuplicateIdentifierException
@@ -140,6 +132,23 @@ public class ModuleBindingContext implements BindingContext
       throw new DuplicateIdentifierException(name);
     } else {
       mMap.put(key, value);
+    }
+  }
+
+  public void insertEnumAtom(final SimpleIdentifierProxy ident)
+    throws DuplicateIdentifierException
+  {
+    final ProxyAccessor<SimpleExpressionProxy> key = mMap.createAccessor(ident);
+    final SimpleExpressionProxy expr = mMap.get(key);
+    if (expr == null) {
+      mMap.put(key, ident);
+    } else {
+      final ModuleEqualityVisitor eq =
+        ModuleEqualityVisitor.getInstance(false);
+      if (!eq.equals(ident, expr)) {
+        final String name = ident.toString();
+        throw new DuplicateIdentifierException(name);
+      }
     }
   }
 

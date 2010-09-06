@@ -2,13 +2,13 @@
 <ProductDES Name="ControllableTestModelEFA"
   xmlns:ns2="http://waters.sourceforge.net/xsd/base"
   xmlns="http://waters.sourceforge.net/xsd/des">
-<ns2:Comment>Strange EFA model. The guard (x &lt;= 3) in S1 is always true due to the range of variable x.</ns2:Comment>
+<ns2:Comment>Strange EFA model. The guard (x &lt;= 3) in Spec1 is always true due to the range of variable x.</ns2:Comment>
 <EventList>
 <Event Kind="CONTROLLABLE" Name="a"/>
 <Event Kind="UNCONTROLLABLE" Name="u"/>
 </EventList>
 <AutomataList>
-<Automaton Kind="PLANT" Name="P1">
+<Automaton Kind="PLANT" Name="Plant1">
 <EventRefList>
 <EventRef Name="u"/>
 </EventRefList>
@@ -21,7 +21,7 @@
 <Transition Source="S1" Target="S0" Event="u"/>
 </TransitionList>
 </Automaton>
-<Automaton Kind="SPEC" Name="S1">
+<Automaton Kind="SPEC" Name="Spec1">
 <EventRefList>
 <EventRef Name="a"/>
 <EventRef Name="u"/>

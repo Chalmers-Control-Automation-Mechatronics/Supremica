@@ -122,9 +122,9 @@ public class ProxyAccessorHashSet<P extends Proxy>
     return true;
   }
 
-  public <PP extends P> ProxyAccessor<PP> createAccessor(final PP proxy)
+  public <PP extends P> ProxyAccessor<P> createAccessor(final PP proxy)
   {
-    return new Accessor<PP>(proxy);
+    return new Accessor<P>(proxy);
   }
 
   public boolean equalsByAccessorEquality(final ProxyAccessorSet<P> partner)

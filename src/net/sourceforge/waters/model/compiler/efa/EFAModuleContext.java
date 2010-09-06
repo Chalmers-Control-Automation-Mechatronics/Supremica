@@ -18,15 +18,18 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.
   UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 
 /**
@@ -107,15 +110,49 @@ class EFAModuleContext
                        final CompiledRange range,
                        final ModuleProxyFactory factory,
                        final CompilerOperatorTable optable)
+    throws DuplicateIdentifierException
   {
-    final EFAVariable curvar =
+    final IdentifierProxy ident = comp.getIdentifier();
+    if (getBoundExpression(ident) != null) {
+      throw new DuplicateIdentifierException(ident);
+    }
+    final EFAVariable var =
       new EFAVariable(false, comp, range, factory, optable);
-    final SimpleExpressionProxy curvarname = curvar.getVariableName();
-    mMap.putByProxy(curvarname, curvar);
+    final ProxyAccessor<SimpleExpressionProxy> key =
+      mMap.createAccessor(ident);
+    if (mMap.containsKey(key)) {
+      throw new DuplicateIdentifierException(ident);
+    }
+    mMap.put(key, var);
     final EFAVariable nextvar =
       new EFAVariable(true, comp, range, factory, optable);
-    final SimpleExpressionProxy nextvarname = nextvar.getVariableName();
-    mMap.putByProxy(nextvarname, nextvar);
+    final SimpleExpressionProxy nextident = nextvar.getVariableName();
+    mMap.putByProxy(nextident, nextvar);
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.compiler.context.ModuleBindingContext
+  public void insertBinding(final SimpleExpressionProxy ident,
+                            final SimpleExpressionProxy value)
+    throws DuplicateIdentifierException
+  {
+    if (mMap.containsProxyKey(ident)) {
+      throw new DuplicateIdentifierException(ident);
+    } else {
+      super.insertBinding(ident, value);
+    }
+  }
+
+  public void insertEnumAtom(final SimpleIdentifierProxy ident)
+    throws DuplicateIdentifierException
+  {
+    if (mMap.containsProxyKey(ident)) {
+      throw new DuplicateIdentifierException(ident);
+    } else {
+      super.insertEnumAtom(ident);
+    }
   }
 
 

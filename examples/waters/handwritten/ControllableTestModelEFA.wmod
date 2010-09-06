@@ -1,244 +1,244 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="ControllableTestModelEFA" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Strange EFA model. The guard (x &lt;= 3) in S1 is always true due to the range of variable x.</ns2:Comment>
-    <EventDeclList>
-        <EventDecl Kind="UNCONTROLLABLE" Name="u"/>
-        <EventDecl Kind="CONTROLLABLE" Name="a"/>
-    </EventDeclList>
-    <ComponentList>
-        <VariableComponent Deterministic="false" Name="x">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="3"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="x"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableInitial>
-        </VariableComponent>
-        <SimpleComponent Kind="PLANT" Name="P1">
-            <Graph Deterministic="false">
-                <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
-                        <PointGeometry>
-                            <Point Y="96" X="160"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S1">
-                        <PointGeometry>
-                            <Point Y="96" X="304"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Target="S1" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="u"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-8"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="76" X="232"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-25" X="0"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="S0" Source="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="u"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-7"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="113" X="233"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="23" X="0"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="P2">
-            <Graph Deterministic="false">
-                <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
-                        <PointGeometry>
-                            <Point Y="64" X="80"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="-16"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Target="S0" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="a"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-26" X="3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="64" X="134"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="&lt;">
-                                    <SimpleIdentifier Name="x"/>
-                                    <IntConstant Value="3"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <Actions>
-                                <BinaryExpression Operator="+=">
-                                    <SimpleIdentifier Name="x"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-12" X="3"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="S1">
-            <Graph Deterministic="false">
-                <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
-                        <PointGeometry>
-                            <Point Y="80" X="96"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="2" X="-24"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S1">
-                        <PointGeometry>
-                            <Point Y="80" X="224"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="3" X="7"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S2">
-                        <PointGeometry>
-                            <Point Y="192" X="224"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="2" X="7"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S3">
-                        <PointGeometry>
-                            <Point Y="192" X="96"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="1" X="-23"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Target="S1" Source="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="u"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-11"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="64" X="159"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-26" X="0"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="S0" Source="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="u"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="4" X="-13"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="95" X="158"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="&lt;=">
-                                    <SimpleIdentifier Name="x"/>
-                                    <IntConstant Value="3"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="18" X="-13"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Target="S2" Source="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="a"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="4"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="136" X="224"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="S3" Source="S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="u"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-11"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="192" X="160"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Target="S0" Source="S3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="u"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="3"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point Y="136" X="96"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-    </ComponentList>
+<ns2:Comment>Strange EFA model. The guard (x &lt;= 3) in Spec1 is always true due to the range of variable x.</ns2:Comment>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="u"/>
+<EventDecl Kind="CONTROLLABLE" Name="a"/>
+</EventDeclList>
+<ComponentList>
+<VariableComponent Deterministic="false" Name="x">
+<VariableRange>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="3"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="x"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+</VariableComponent>
+<SimpleComponent Kind="PLANT" Name="Plant1">
+<Graph Deterministic="false">
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="96" X="160"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="96" X="304"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="76" X="232"/>
+</SplineGeometry>
+<GuardActionBlock>
+<LabelGeometry Anchor="NW">
+<Point Y="-25" X="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="S0" Source="S1">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="113" X="233"/>
+</SplineGeometry>
+<GuardActionBlock>
+<LabelGeometry Anchor="NW">
+<Point Y="23" X="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT" Name="Plant2">
+<Graph Deterministic="false">
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="64" X="80"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="8" X="-16"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S0" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-26" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="64" X="134"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&lt;">
+<SimpleIdentifier Name="x"/>
+<IntConstant Value="3"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="x"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="3"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC" Name="Spec1">
+<Graph Deterministic="false">
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="80" X="96"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="-24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="80" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="3" X="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point Y="192" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S3">
+<PointGeometry>
+<Point Y="192" X="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="1" X="-23"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="64" X="159"/>
+</SplineGeometry>
+<GuardActionBlock>
+<LabelGeometry Anchor="NW">
+<Point Y="-26" X="0"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="S0" Source="S1">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point Y="4" X="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="95" X="158"/>
+</SplineGeometry>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&lt;=">
+<SimpleIdentifier Name="x"/>
+<IntConstant Value="3"/>
+</BinaryExpression>
+</Guards>
+<LabelGeometry Anchor="NW">
+<Point Y="18" X="-13"/>
+</LabelGeometry>
+</GuardActionBlock>
+</Edge>
+<Edge Target="S2" Source="S1">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="136" X="224"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S3" Source="S2">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="192" X="160"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S0" Source="S3">
+<LabelBlock>
+<SimpleIdentifier Name="u"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="136" X="96"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
 </Module>

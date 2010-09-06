@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="batch_tank_vout" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+<ns2:EventList>
+<ns2:Event Kind="PROPOSITION" Name=":accepting"/>
+<ns2:Event Kind="CONTROLLABLE" Name="close_in"/>
+<ns2:Event Kind="CONTROLLABLE" Name="close_out"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="jelly"/>
+<ns2:Event Kind="CONTROLLABLE" Name="open_in"/>
+<ns2:Event Kind="CONTROLLABLE" Name="open_out"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="s1_off"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="s1_on"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="s2_off"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="s2_on"/>
+<ns2:Event Kind="CONTROLLABLE" Name="stirrer_off.{level&lt;=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="stirrer_off.{vout}"/>
+</ns2:EventList>
+<ns2:AutomataList>
+<ns2:Automaton Kind="PLANT" Name="sensors">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="jelly"/>
+<ns2:EventRef Name="s2_off"/>
+<ns2:EventRef Name="s2_on"/>
+<ns2:EventRef Name="s1_off"/>
+<ns2:EventRef Name="s1_on"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Name="FULL">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="PARTIAL"/>
+<ns2:State Initial="true" Name="EMPTY"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="PARTIAL" Source="EMPTY" Event="s1_on"/>
+<ns2:Transition Target="FULL" Source="FULL" Event="jelly"/>
+<ns2:Transition Target="PARTIAL" Source="FULL" Event="s2_off"/>
+<ns2:Transition Target="PARTIAL" Source="PARTIAL" Event="jelly"/>
+<ns2:Transition Target="EMPTY" Source="PARTIAL" Event="s1_off"/>
+<ns2:Transition Target="FULL" Source="PARTIAL" Event="s2_on"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="valve_out">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="jelly"/>
+<ns2:EventRef Name="open_out"/>
+<ns2:EventRef Name="close_out"/>
+<ns2:EventRef Name="s1_off"/>
+<ns2:EventRef Name="s2_off"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="CLOSED">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="OPEN"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="CLOSED" Source="CLOSED" Event="jelly"/>
+<ns2:Transition Target="OPEN" Source="CLOSED" Event="open_out"/>
+<ns2:Transition Target="CLOSED" Source="OPEN" Event="close_out"/>
+<ns2:Transition Target="OPEN" Source="OPEN" Event="s1_off"/>
+<ns2:Transition Target="OPEN" Source="OPEN" Event="s2_off"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="SPEC" Name="valve_mutex">
+<ns2:EventRefList>
+<ns2:EventRef Name="open_in"/>
+<ns2:EventRef Name="open_out"/>
+<ns2:EventRef Name="close_out"/>
+<ns2:EventRef Name="close_in"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="idle"/>
+<ns2:State Name="out"/>
+<ns2:State Name="in"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="in" Source="idle" Event="open_in"/>
+<ns2:Transition Target="out" Source="idle" Event="open_out"/>
+<ns2:Transition Target="idle" Source="in" Event="close_in"/>
+<ns2:Transition Target="idle" Source="out" Event="close_out"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="SPEC" Name="dont_stir">
+<ns2:EventRefList>
+<ns2:EventRef Name="stirrer_off.{level&lt;=1}"/>
+<ns2:EventRef Name="stirrer_off.{vout}"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="S0" Source="S0" Event="stirrer_off.{level&lt;=1}"/>
+<ns2:Transition Target="S0" Source="S0" Event="stirrer_off.{vout}"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="level">
+<ns2:EventRefList>
+<ns2:EventRef Name="stirrer_off.{level&lt;=1}"/>
+<ns2:EventRef Name="s1_off"/>
+<ns2:EventRef Name="s1_on"/>
+<ns2:EventRef Name="s2_off"/>
+<ns2:EventRef Name="s2_on"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="0"/>
+<ns2:State Name="1"/>
+<ns2:State Name="2"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="0" Source="0" Event="s1_off"/>
+<ns2:Transition Target="1" Source="0" Event="s1_on"/>
+<ns2:Transition Target="1" Source="0" Event="s2_off"/>
+<ns2:Transition Target="2" Source="0" Event="s2_on"/>
+<ns2:Transition Target="0" Source="0" Event="stirrer_off.{level&lt;=1}"/>
+<ns2:Transition Target="0" Source="1" Event="s1_off"/>
+<ns2:Transition Target="1" Source="1" Event="s1_on"/>
+<ns2:Transition Target="1" Source="1" Event="s2_off"/>
+<ns2:Transition Target="2" Source="1" Event="s2_on"/>
+<ns2:Transition Target="1" Source="1" Event="stirrer_off.{level&lt;=1}"/>
+<ns2:Transition Target="0" Source="2" Event="s1_off"/>
+<ns2:Transition Target="1" Source="2" Event="s1_on"/>
+<ns2:Transition Target="1" Source="2" Event="s2_off"/>
+<ns2:Transition Target="2" Source="2" Event="s2_on"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="vout">
+<ns2:EventRefList>
+<ns2:EventRef Name="close_out"/>
+<ns2:EventRef Name="open_out"/>
+<ns2:EventRef Name="stirrer_off.{vout}"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="0"/>
+<ns2:State Name="1"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="0" Source="0" Event="close_out"/>
+<ns2:Transition Target="1" Source="0" Event="open_out"/>
+<ns2:Transition Target="0" Source="1" Event="close_out"/>
+<ns2:Transition Target="1" Source="1" Event="open_out"/>
+<ns2:Transition Target="1" Source="1" Event="stirrer_off.{vout}"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+</ns2:AutomataList>
+</ns2:ProductDES>

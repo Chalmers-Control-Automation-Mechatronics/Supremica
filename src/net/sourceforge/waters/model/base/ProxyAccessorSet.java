@@ -38,7 +38,7 @@ public interface ProxyAccessorSet<P extends Proxy>
 
   public boolean containsAll(Collection<? extends P> collection);
 
-  public <PP extends P> ProxyAccessor<PP> createAccessor(PP proxy);
+  public <PP extends P> ProxyAccessor<P> createAccessor(PP proxy);
 
   public boolean equalsByAccessorEquality(ProxyAccessorSet<P> partner);
 

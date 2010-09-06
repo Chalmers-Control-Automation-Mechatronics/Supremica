@@ -329,18 +329,31 @@ public class ConstraintPropagatorTest extends TestCase
   }
 
   public void testPropagate_balllift_3()
-    throws EvalException, ParseException
-  {
-    addBooleanVariable("qOut");
-    addBooleanVariable("qOut'");
-    addBooleanVariable("qUp");
-    addBooleanVariable("qUp'");
-    addBooleanVariable("c_iBallDn");
-    final String[] constraints = {"!c_iBallDn",
-                                  "qUp' == ((qUp|c_iBallDn) & qOut')"};
-    final String[] expected = {"!c_iBallDn", "qUp' == (qUp & qOut')"};
-    testPropagate(constraints, expected);
-  }
+  throws EvalException, ParseException
+{
+  addBooleanVariable("qOut");
+  addBooleanVariable("qOut'");
+  addBooleanVariable("qUp");
+  addBooleanVariable("qUp'");
+  addBooleanVariable("c_iBallDn");
+  final String[] constraints = {"!c_iBallDn",
+                                "qUp' == ((qUp|c_iBallDn) & qOut')"};
+  final String[] expected = {"!c_iBallDn", "qUp' == (qUp & qOut')"};
+  testPropagate(constraints, expected);
+}
+
+  public void testPropagate_outprime()
+  throws EvalException, ParseException
+{
+  final CompiledIntRange range = createIntRange(0, 2);
+  addVariable("level", range);
+  addVariable("level'", range);
+  addBooleanVariable("out");
+  addBooleanVariable("out'");
+  final String[] constraints = {"out'==1"};
+  final String[] expected = {"out'"};
+  testPropagate(constraints, expected);
+}
 
   public void testPropagate_balllift_4()
     throws EvalException, ParseException

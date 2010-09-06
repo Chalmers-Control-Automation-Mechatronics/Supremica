@@ -50,6 +50,14 @@ class EFAEventDecl {
 
 
   //#########################################################################
+  //# Overrides for java.lang.Object
+  public String toString()
+  {
+    return mEventDecl.getName();
+  }
+
+
+  //#########################################################################
   //# Simple Access
   EventDeclProxy getEventDecl()
   {

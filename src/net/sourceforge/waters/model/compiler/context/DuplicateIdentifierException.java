@@ -10,7 +10,7 @@ package net.sourceforge.waters.model.compiler.context;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 public class DuplicateIdentifierException extends EvalException {
@@ -28,7 +28,7 @@ public class DuplicateIdentifierException extends EvalException {
    * Constructs a new exception indicating that the given identifier is already
    * defined.
    */
-  public DuplicateIdentifierException(final IdentifierProxy ident)
+  public DuplicateIdentifierException(final SimpleExpressionProxy ident)
   {
     this(ident, "Name");
   }
@@ -47,7 +47,7 @@ public class DuplicateIdentifierException extends EvalException {
    * defined, with the specified originating expression.
    */
   public DuplicateIdentifierException(final String name,
-				      final Proxy location)
+                                      final Proxy location)
   {
     this(name, "Name", location);
   }
@@ -56,8 +56,8 @@ public class DuplicateIdentifierException extends EvalException {
    * Constructs a new exception indicating that the given identifier is already
    * defined.
    */
-  public DuplicateIdentifierException(final IdentifierProxy ident,
-				      final String typename)
+  public DuplicateIdentifierException(final SimpleExpressionProxy ident,
+                                      final String typename)
   {
     this(ident.toString(), typename, ident);
   }
@@ -67,7 +67,7 @@ public class DuplicateIdentifierException extends EvalException {
    * defined.
    */
   public DuplicateIdentifierException(final String name,
-				      final String typename)
+                                      final String typename)
   {
     this(name, typename, null);
   }
@@ -77,13 +77,13 @@ public class DuplicateIdentifierException extends EvalException {
    * defined, with the specified originating expression.
    */
   public DuplicateIdentifierException(final String name,
-				      final String typename,
-				      final Proxy location)
+                                      final String typename,
+                                      final Proxy location)
   {
     super(typename + " '" + name + "' is already in use!", location);
   }
 
-  
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
