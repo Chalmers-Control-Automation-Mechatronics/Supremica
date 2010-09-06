@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,12 +80,16 @@ implements SafetyProjectionBuilder
     throws AnalysisException
   {
     try {
+      setOutputStream(true);
       setUp();
       final int limit = getNodeLimit();
       final ProductDESProxy model = getModel();
       states = new HashMap<StateCouple, StateCouple>(limit);
       trans = new ArrayList<TransitionProxy>();
       events = model.getEvents().toArray(new EventProxy[model.getEvents().size()]);
+      if(mPrintData){
+        addOutputData(1, events.length +"");
+      }
       mPossible = new boolean[events.length];
       final int numAutomata = model.getAutomata().size();
       AutomatonProxy[] aut = model.getAutomata().toArray(new AutomatonProxy[numAutomata]);
@@ -100,6 +106,9 @@ implements SafetyProjectionBuilder
           events[l] = temp;
           l++;
         }
+      }
+      if(mPrintData){
+        addOutputData(2,mHide.size() + "");
       }
       assert(l == mHide.size());
       //put all the forbidden events directly after the Hidden ones
@@ -129,7 +138,9 @@ implements SafetyProjectionBuilder
         }
       }
       int[] setStates = new int[numAutomata];
+      int stateCounter = 0;
       for (int i = 0; i < aut.length; i++) {
+        stateCounter += aut[i].getStates().size();
         final Map<StateProxy, Integer> stateMap = new HashMap<StateProxy, Integer>(aut[i].getStates().size());
         l = 0;
         for (final StateProxy s : aut[i].getStates()) {
@@ -144,6 +155,9 @@ implements SafetyProjectionBuilder
           mTransitions[i][eventToIndex.get(t.getEvent())]
                           [stateMap.get(t.getSource())] = stateMap.get(t.getTarget());
         }
+      }
+      if(mPrintData){
+        addOutputData(0, stateCounter+"");
       }
       for (int i = 0; i < events.length; i++) {
         final IntDouble[] list = new IntDouble[numAutomata];
@@ -169,6 +183,10 @@ implements SafetyProjectionBuilder
       aut = null;
       eventToIndex = null;
 
+      long timer = 0;
+      if(mPrintData){
+        timer = System.currentTimeMillis();
+      }
       // Time to start building the automaton
       mNumberOfStates = 1;
       StateCouple currentState = new StateCouple(setStates);
@@ -182,6 +200,11 @@ implements SafetyProjectionBuilder
           exploreSyncProduct(currentState, false);
         }
       }
+      if(mPrintData){
+        //calculate and add to the output the time it took for synchronous product
+        addOutputData(4,(System.currentTimeMillis() - timer) + "");
+        addOutputData(5, states.size()+"");
+      }
       states = null;
       currentState = null;
       mTransitions = new int[1][events.length][mNumberOfStates];
@@ -190,8 +213,17 @@ implements SafetyProjectionBuilder
           mTransitions[0][i][j] = -1;
         }
       }
+      int silentTransitionCounter = 0;
       for (final int[] tran : newtrans) {
+        //calculate the number of silent transitions in the sync product
+        if(tran[1] > mHide.size()){
+          silentTransitionCounter++;
+        }
         mTransitions[0][tran[1]][tran[0]] = tran[2];
+      }
+      if(mPrintData){
+        addOutputData(3, silentTransitionCounter +"");
+        timer = System.currentTimeMillis();
       }
       mNumberOfStates = 1;
       currentState = null;
@@ -200,7 +232,12 @@ implements SafetyProjectionBuilder
       final Set<Integer> createState = new HashSet<Integer>();
       createState.add(0);
       DeterministicState detState = new DeterministicState(createState);
-      detState = closure(detState);
+      switch(mAlgorithm){
+        //case GRAPH: graph not implemented yet
+        case STATE: detState = Memo_TotalState_Closure(detState); break;
+        case SUBSET: detState = Memo_Subset_Closure(detState); break;
+        default: detState = Memo_Subset_Closure(detState);
+      }
       newStates = new CollectionDeterministic(limit);
       newStates.insert(detState, 0);
       mDeterministicQueue.offer(detState);
@@ -209,6 +246,11 @@ implements SafetyProjectionBuilder
         if (!exploreSubsetConstruction(detState, true)) {
           exploreSubsetConstruction(detState, false);
         }
+      }
+      if(mPrintData){
+        //calculate and add to the output the time it took for deterministic automata
+        addOutputData(6,(System.currentTimeMillis() - timer) + "");
+        addOutputData(7, newStates.getSize()+"");
       }
       final Collection<EventProxy> ev = new ArrayList<EventProxy>(model.getEvents());
       ev.removeAll(mHide);
@@ -229,8 +271,6 @@ implements SafetyProjectionBuilder
       AutomatonProxy result =
         factory.createAutomatonProxy(name.toString(), ComponentKind.PLANT,
                                      ev, newStates.getAllStateProxy(), trans);
-      System.out.print("printing resulting Name: " + result.getName());
-      System.out.println(" |number of states: " + result.getStates().size());
       mTransitions = null;
       newStates = null;
       trans = null;
@@ -239,6 +279,8 @@ implements SafetyProjectionBuilder
       return setAutomatonResult(result);
     } finally {
       tearDown();
+      if(mPrintData)
+        printOutput();
     }
   }
 
@@ -247,6 +289,8 @@ implements SafetyProjectionBuilder
     throws AnalysisException
   {
     super.setUp();
+    setMethod(Method.STATE);
+    mStartTime = System.currentTimeMillis();
     final ProductDESProxy model = getModel();
     final Collection<EventProxy> events = model.getEvents();
     if (mHide == null) {
@@ -261,6 +305,8 @@ implements SafetyProjectionBuilder
     mDisabled.removeAll(mHide);
     mNumberOfStates = 1;
     newtrans = new ArrayList<int[]>();
+    mDetRecord = new HashMap<DeterministicState, DeterministicState>();
+    mNonDetRecord = new HashMap<Integer, DeterministicState>();
   }
 
   @Override
@@ -277,13 +323,12 @@ implements SafetyProjectionBuilder
     mCoupleQueue = null;
     mDeterministicQueue = null;
     eventAutomaton = null;
+    addOutputData(8, (System.currentTimeMillis() - mStartTime) + "");
   }
 
   @Override
   protected void addStatistics(){
     super.addStatistics();
-    // AnalysisResult result = getAnalysisResult();
-
   }
 
   public boolean exploreSyncProduct(final StateCouple state, final boolean forbidden)
@@ -379,7 +424,12 @@ implements SafetyProjectionBuilder
       }
       result = true;
       DeterministicState succ = new DeterministicState(successor);
-      succ = closure(succ);
+      switch(mAlgorithm){
+      //case GRAPH: graph not implemented yet
+      case STATE: succ = Memo_TotalState_Closure(succ); break;
+      case SUBSET: succ = Memo_Subset_Closure(succ); break;
+      default: succ = Memo_Subset_Closure(succ);
+    }
       StateProxy target = newStates.getStateProxy(succ);
       if (target == null) {
         newStates.insert(succ, mNumberOfStates);
@@ -396,7 +446,7 @@ implements SafetyProjectionBuilder
     return result;
   }
 
-  public DeterministicState closure(final DeterministicState state)
+  public DeterministicState Subset_Closure(final DeterministicState state)
   {
     final int numHidden = mHide.size();
     final Set<Integer> setofstates = new TreeSet<Integer>();
@@ -423,37 +473,44 @@ implements SafetyProjectionBuilder
     return result;
   }
 
-  public DeterministicState state_closure(final int state)
+  public DeterministicState State_Closure(final int state)
   {
     final int numHidden = mHide.size();
     final Set<Integer> setofstates = new TreeSet<Integer>();
     final IntBag nextstate = new IntBag(100);
+    //for each state in det state ( given det state with 1 element)
     nextstate.offer(state);
     // find out what states can be reached from state with hidden events
+    //while ther is an unmarked state
     while (!nextstate.isEmpty()) {
+      //take the next state
       final int s = nextstate.take();
+      //for each event to be hidden
       for (int i = 0; i < numHidden; i++) {
+        //get the target state for the hidden events from source state
         final int newstate = mTransitions[0][i][s];
+        //if target state is = -1, then source state cannot get to target directly using hidden event
         if (newstate == -1) {
           continue;
         }
+        //if the set of states does not have target state, add it and then add it to the unmarked states
         if (setofstates.add(newstate)) {
           nextstate.offer(newstate);
         }
       }
     }
+    //create the new determinstic state and return it
     final DeterministicState result = new DeterministicState(setofstates);
     return result;
   }
 
   //per non-det state use this method
-  @SuppressWarnings("unused")
-  private DeterministicState silent_closure(final DeterministicState d){
+  private DeterministicState Memo_TotalState_Closure(final DeterministicState d){
     DeterministicState result = mDetRecord.get(d);
     if(result == null){
       DeterministicState temp;
       for(int i = 0; i < d.size(); i++){
-        temp = memo_singleState_closure(d.getState(i));
+        temp = Memo_SingleState_Closure(d.getState(i));
         result = DeterministicState.merge(result, temp);
       }
       mDetRecord.put(d, result);
@@ -461,23 +518,23 @@ implements SafetyProjectionBuilder
     return result;
   }
 
-  private DeterministicState memo_singleState_closure (final int s){
+  private DeterministicState Memo_SingleState_Closure (final int s){
+    //if we have already seen this state before, then return the results we already found
     if(mNonDetRecord.containsKey(s)){
      return mNonDetRecord.get(s);
     } else {
-      final DeterministicState result = state_closure(s);
+      //else find the resulting set of states, and reference it with key origonal state (s)
+      final DeterministicState result = State_Closure(s);
       mNonDetRecord.put(s, result);
       return result;
     }
   }
 
-  //per-subset method
-  @SuppressWarnings("unused")
-  private DeterministicState memo_DetStates_closure (final DeterministicState d){
+  private DeterministicState Memo_Subset_Closure (final DeterministicState d){
     if(mDetRecord.containsKey(d)){
      return mDetRecord.get(d);
     } else {
-      final DeterministicState result = closure(d);
+      final DeterministicState result = Subset_Closure(d);
       mDetRecord.put(d,result);
       return result;
     }
@@ -554,7 +611,81 @@ implements SafetyProjectionBuilder
     }
   }
 
+  public void setOutputStream(final boolean set){
+    mPrintData = set;
+    if(mPrintData){
+      mFileName = "Projection3Results.csv";
+      mRowResults = new String[]{"Number Initial States","Number Events","Number Hidden Events","Number Synchrounous Product Silent Transitions",
+                   "Synchronous Product Time","Number Synchronous Product States","Determinstic State Time",
+                   "Number Deterministic States","OverAll Time"};
+      final File mFile = new File(mFileName);
+      if(!mFile.exists()){
+        try
+        {
+          final FileWriter writer = new FileWriter(mFile, true);
+          for(final String result : mRowResults)
+          {
+            writer.append(result);
+            writer.append(',');
+          }
+          writer.append('\n');
+          writer.flush();
+        }
+        catch(final Exception e)
+        {
+          e.printStackTrace();
+        }
+      }
+    }
+
+  }
+
+  private void addOutputData(final int index, final String data){
+    mRowResults[index] = data;
+  }
+
+  private void printOutput(){
+    //append to string builder end of line character
+    //get whole row of results
+    try
+    {
+      final File mFile = new File(mFileName);
+      final FileWriter writer = new FileWriter(mFile, true);
+      for(final String result : mRowResults)
+      {
+        writer.append(result);
+        writer.append(',');
+      }
+      writer.append('\n');
+      writer.flush();
+        writer.close();
+    }
+    catch(final Exception e)
+    {
+      e.printStackTrace();
+    }
+
+  }
+
+  public enum Method {
+    //method will determine which algorithm will be used.
+    //graph not implemented yet.
+    //GRAPH,
+    STATE,
+    SUBSET
+    };
+
+    public void setMethod(final Method method){
+      mAlgorithm = method;
+    }
+
+
+  private String[] mRowResults;
+  private long mStartTime;
+  private String mFileName;
+  private boolean mPrintData;
   private boolean[] mPossible;
+  private Method mAlgorithm;
   private Set<EventProxy> mHide;
   private Set<EventProxy> mForbidden;
   private Set<EventProxy> mDisabled;
