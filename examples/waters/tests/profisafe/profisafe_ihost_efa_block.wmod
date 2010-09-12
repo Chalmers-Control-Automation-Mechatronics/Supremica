@@ -1767,9 +1767,9 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="DELAY"/>
-                        <NodeRef Name="HOST"/>
                         <NodeRef Name="OFF"/>
+                        <NodeRef Name="HOST"/>
+                        <NodeRef Name="DELAY"/>
                         <BoxGeometry>
                             <Box Y="32" X="48" Width="288" Height="224"/>
                         </BoxGeometry>
@@ -2125,7 +2125,7 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                     </IndexedIdentifier>
                     <Graph>
                         <NodeList>
-                            <SimpleNode Initial="true" Name="preset">
+                            <SimpleNode Initial="true" Name="pre">
                                 <PointGeometry>
                                     <Point Y="144" X="144"/>
                                 </PointGeometry>
@@ -2133,12 +2133,12 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                                     <Point Y="-5" X="-5"/>
                                 </InitialArrowGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="7" X="-45"/>
+                                    <Point Y="4" X="-27"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="preset" Source="preset">
+                            <Edge Target="pre" Source="pre">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="preset_fs_master_bit2_CRCNO">
                                         <SimpleIdentifier Name="value"/>
@@ -2171,7 +2171,7 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                     </IndexedIdentifier>
                     <Graph>
                         <NodeList>
-                            <SimpleNode Initial="true" Name="preset">
+                            <SimpleNode Initial="true" Name="pre">
                                 <PointGeometry>
                                     <Point Y="144" X="144"/>
                                 </PointGeometry>
@@ -2179,12 +2179,12 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                                     <Point Y="-5" X="-5"/>
                                 </InitialArrowGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="7" X="-45"/>
+                                    <Point Y="4" X="-29"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="preset" Source="preset">
+                            <Edge Target="pre" Source="pre">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="preset_fs_master_bit3_TO">
                                         <SimpleIdentifier Name="value"/>
@@ -2217,7 +2217,7 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                     </IndexedIdentifier>
                     <Graph>
                         <NodeList>
-                            <SimpleNode Initial="true" Name="preset">
+                            <SimpleNode Initial="true" Name="pre">
                                 <PointGeometry>
                                     <Point Y="144" X="144"/>
                                 </PointGeometry>
@@ -2225,12 +2225,12 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                                     <Point Y="-5" X="-5"/>
                                 </InitialArrowGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="7" X="-45"/>
+                                    <Point Y="4" X="-26"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="preset" Source="preset">
+                            <Edge Target="pre" Source="pre">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="preset_fs_slave_bit2_CRCNO">
                                         <SimpleIdentifier Name="value"/>
@@ -2263,7 +2263,7 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                     </IndexedIdentifier>
                     <Graph>
                         <NodeList>
-                            <SimpleNode Initial="true" Name="preset">
+                            <SimpleNode Initial="true" Name="pre">
                                 <PointGeometry>
                                     <Point Y="144" X="144"/>
                                 </PointGeometry>
@@ -2271,12 +2271,12 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                                     <Point Y="-5" X="-5"/>
                                 </InitialArrowGeometry>
                                 <LabelGeometry Anchor="NW">
-                                    <Point Y="7" X="-45"/>
+                                    <Point Y="3" X="-26"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="preset" Source="preset">
+                            <Edge Target="pre" Source="pre">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="preset_fs_slave_bit3_TO">
                                         <SimpleIdentifier Name="value"/>
@@ -3204,9 +3204,9 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="init0nok"/>
                         <NodeRef Name="init0ok"/>
                         <NodeRef Name="init_nok"/>
+                        <NodeRef Name="init0nok"/>
                         <NodeRef Name="init_ok"/>
                         <BoxGeometry>
                             <Box Y="160" X="112" Width="416" Height="80"/>
@@ -3219,8 +3219,8 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G2">
-                        <NodeRef Name="pre0nok"/>
                         <NodeRef Name="pre0ok"/>
+                        <NodeRef Name="pre0nok"/>
                         <NodeRef Name="pre_nok"/>
                         <NodeRef Name="pre_ok"/>
                         <BoxGeometry>
@@ -4086,8 +4086,8 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G1">
-                        <NodeRef Name="fv_fault"/>
                         <NodeRef Name="fv_ok"/>
+                        <NodeRef Name="fv_fault"/>
                         <BoxGeometry>
                             <Box Y="528" X="128" Width="288" Height="80"/>
                         </BoxGeometry>
@@ -4118,15 +4118,15 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G6">
-                        <NodeRef Name="pre_0"/>
                         <NodeRef Name="pre_other"/>
+                        <NodeRef Name="pre_0"/>
                         <BoxGeometry>
                             <Box Y="32" X="128" Width="288" Height="80"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G7">
-                        <NodeRef Name="init_0"/>
                         <NodeRef Name="init_other"/>
+                        <NodeRef Name="init_0"/>
                         <BoxGeometry>
                             <Box Y="160" X="128" Width="288" Height="80"/>
                         </BoxGeometry>
@@ -4947,8 +4947,8 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                                 </BoxGeometry>
                             </GroupNode>
                             <GroupNode Name="G1">
-                                <NodeRef Name="fv_fault"/>
                                 <NodeRef Name="fv_ok"/>
+                                <NodeRef Name="fv_fault"/>
                                 <BoxGeometry>
                                     <Box Y="416" X="128" Width="288" Height="96"/>
                                 </BoxGeometry>
@@ -4979,16 +4979,16 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                                 </BoxGeometry>
                             </GroupNode>
                             <GroupNode Name="G6">
-                                <NodeRef Name="pre_0"/>
                                 <NodeRef Name="pre_other"/>
+                                <NodeRef Name="pre_0"/>
                                 <BoxGeometry>
                                     <Box Y="32" X="128" Width="288" Height="80"/>
                                 </BoxGeometry>
                             </GroupNode>
                             <GroupNode Name="G7">
-                                <NodeRef Name="init_0"/>
                                 <NodeRef Name="init_fault"/>
                                 <NodeRef Name="init_other"/>
+                                <NodeRef Name="init_0"/>
                                 <BoxGeometry>
                                     <Box Y="160" X="128" Width="400" Height="80"/>
                                 </BoxGeometry>
