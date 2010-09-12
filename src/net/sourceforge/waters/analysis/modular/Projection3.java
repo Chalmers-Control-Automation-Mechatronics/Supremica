@@ -79,8 +79,8 @@ implements SafetyProjectionBuilder
   public boolean run()
     throws AnalysisException
   {
+    long timer = 0;
     try {
-      setOutputStream(true);
       setUp();
       final int limit = getNodeLimit();
       final ProductDESProxy model = getModel();
@@ -183,7 +183,6 @@ implements SafetyProjectionBuilder
       aut = null;
       eventToIndex = null;
 
-      long timer = 0;
       if(mPrintData){
         timer = System.currentTimeMillis();
       }
@@ -194,36 +193,44 @@ implements SafetyProjectionBuilder
       states.put(currentState, currentState);
       mCoupleQueue = new ArrayDeque<StateCouple>(100);
       mCoupleQueue.offer(currentState);
-      while (!mCoupleQueue.isEmpty()) {
-        currentState = mCoupleQueue.remove();
-        if (!exploreSyncProduct(currentState, true)) {
-          exploreSyncProduct(currentState, false);
-        }
-      }
-      if(mPrintData){
-        //calculate and add to the output the time it took for synchronous product
-        addOutputData(4,(System.currentTimeMillis() - timer) + "");
-        addOutputData(5, states.size()+"");
-      }
-      states = null;
-      currentState = null;
-      mTransitions = new int[1][events.length][mNumberOfStates];
-      for (int i = 0; i < mTransitions[0].length; i++) {
-        for (int j = 0; j < mTransitions[0][i].length; j++) {
-          mTransitions[0][i][j] = -1;
-        }
-      }
       int silentTransitionCounter = 0;
-      for (final int[] tran : newtrans) {
-        //calculate the number of silent transitions in the sync product
-        if(tran[1] > mHide.size()){
-          silentTransitionCounter++;
+      int size = 0;
+        try{
+          while (!mCoupleQueue.isEmpty()) {
+            currentState = mCoupleQueue.remove();
+            if (!exploreSyncProduct(currentState, true)) {
+              exploreSyncProduct(currentState, false);
+            }
+          }
+          size = states.size();
+          timer = System.currentTimeMillis() - timer;
+          states = null;
+          currentState = null;
+          mTransitions = new int[1][events.length][mNumberOfStates];
+          for (int i = 0; i < mTransitions[0].length; i++) {
+            for (int j = 0; j < mTransitions[0][i].length; j++) {
+              mTransitions[0][i][j] = -1;
+            }
+          }
+          for (final int[] tran : newtrans) {
+            //calculate the number of silent transitions in the sync product
+            if(tran[1] < mHide.size()){
+              silentTransitionCounter++;
+            }
+            mTransitions[0][tran[1]][tran[0]] = tran[2];
+          }
+      } finally{
+        if(mPrintData){
+          //calculate and add to the output the time it took for synchronous product
+          if(size == 0){
+            size = states.size();
+            timer = System.currentTimeMillis() - timer;
+          }
+          addOutputData(4, timer + "");
+          addOutputData(5, size + "");
+          addOutputData(3, silentTransitionCounter + "");
+          timer = System.currentTimeMillis();
         }
-        mTransitions[0][tran[1]][tran[0]] = tran[2];
-      }
-      if(mPrintData){
-        addOutputData(3, silentTransitionCounter +"");
-        timer = System.currentTimeMillis();
       }
       mNumberOfStates = 1;
       currentState = null;
@@ -236,21 +243,24 @@ implements SafetyProjectionBuilder
         //case GRAPH: graph not implemented yet
         case STATE: detState = Memo_TotalState_Closure(detState); break;
         case SUBSET: detState = Memo_Subset_Closure(detState); break;
-        default: detState = Memo_Subset_Closure(detState);
+        default: throw new IllegalStateException("Unknown algorithm " + mAlgorithm);
       }
       newStates = new CollectionDeterministic(limit);
       newStates.insert(detState, 0);
       mDeterministicQueue.offer(detState);
-      while (!mDeterministicQueue.isEmpty()) {
-        detState = mDeterministicQueue.remove();
-        if (!exploreSubsetConstruction(detState, true)) {
-          exploreSubsetConstruction(detState, false);
+      try{
+        while (!mDeterministicQueue.isEmpty()) {
+          detState = mDeterministicQueue.remove();
+          if (!exploreSubsetConstruction(detState, true)) {
+            exploreSubsetConstruction(detState, false);
+          }
         }
-      }
-      if(mPrintData){
-        //calculate and add to the output the time it took for deterministic automata
-        addOutputData(6,(System.currentTimeMillis() - timer) + "");
-        addOutputData(7, newStates.getSize()+"");
+      } finally {
+        if(mPrintData){
+          //calculate and add to the output the time it took for deterministic automata
+          addOutputData(6,(System.currentTimeMillis() - timer) + "");
+          addOutputData(7, newStates.getSize()+"");
+        }
       }
       final Collection<EventProxy> ev = new ArrayList<EventProxy>(model.getEvents());
       ev.removeAll(mHide);
@@ -289,7 +299,7 @@ implements SafetyProjectionBuilder
     throws AnalysisException
   {
     super.setUp();
-    setMethod(Method.STATE);
+    setMethod(Method.SUBSET);
     mStartTime = System.currentTimeMillis();
     final ProductDESProxy model = getModel();
     final Collection<EventProxy> events = model.getEvents();
@@ -329,6 +339,7 @@ implements SafetyProjectionBuilder
   @Override
   protected void addStatistics(){
     super.addStatistics();
+
   }
 
   public boolean exploreSyncProduct(final StateCouple state, final boolean forbidden)
@@ -428,7 +439,7 @@ implements SafetyProjectionBuilder
       //case GRAPH: graph not implemented yet
       case STATE: succ = Memo_TotalState_Closure(succ); break;
       case SUBSET: succ = Memo_Subset_Closure(succ); break;
-      default: succ = Memo_Subset_Closure(succ);
+      default: throw new IllegalStateException("Unknown algorithm " + mAlgorithm);
     }
       StateProxy target = newStates.getStateProxy(succ);
       if (target == null) {
@@ -479,6 +490,7 @@ implements SafetyProjectionBuilder
     final Set<Integer> setofstates = new TreeSet<Integer>();
     final IntBag nextstate = new IntBag(100);
     //for each state in det state ( given det state with 1 element)
+    setofstates.add(state);
     nextstate.offer(state);
     // find out what states can be reached from state with hidden events
     //while ther is an unmarked state
@@ -509,8 +521,9 @@ implements SafetyProjectionBuilder
     DeterministicState result = mDetRecord.get(d);
     if(result == null){
       DeterministicState temp;
-      for(int i = 0; i < d.size(); i++){
-        temp = Memo_SingleState_Closure(d.getState(i));
+      //for each not deterministic state in the det state set
+      for(final int i : d.getSetState()){
+        temp = Memo_SingleState_Closure(i);
         result = DeterministicState.merge(result, temp);
       }
       mDetRecord.put(d, result);
@@ -614,7 +627,7 @@ implements SafetyProjectionBuilder
   public void setOutputStream(final boolean set){
     mPrintData = set;
     if(mPrintData){
-      mFileName = "Projection3Results.csv";
+      mFileName = "Projection3"+mAlgorithm.toString()+"Results.csv";
       mRowResults = new String[]{"Number Initial States","Number Events","Number Hidden Events","Number Synchrounous Product Silent Transitions",
                    "Synchronous Product Time","Number Synchronous Product States","Determinstic State Time",
                    "Number Deterministic States","OverAll Time"};
@@ -637,7 +650,6 @@ implements SafetyProjectionBuilder
         }
       }
     }
-
   }
 
   private void addOutputData(final int index, final String data){
@@ -664,7 +676,6 @@ implements SafetyProjectionBuilder
     {
       e.printStackTrace();
     }
-
   }
 
   public enum Method {
