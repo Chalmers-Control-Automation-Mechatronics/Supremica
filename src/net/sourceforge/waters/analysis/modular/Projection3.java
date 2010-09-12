@@ -299,7 +299,6 @@ implements SafetyProjectionBuilder
     throws AnalysisException
   {
     super.setUp();
-    setMethod(Method.SUBSET);
     mStartTime = System.currentTimeMillis();
     final ProductDESProxy model = getModel();
     final Collection<EventProxy> events = model.getEvents();
@@ -627,7 +626,7 @@ implements SafetyProjectionBuilder
   public void setOutputStream(final boolean set){
     mPrintData = set;
     if(mPrintData){
-      mFileName = "Projection3"+mAlgorithm.toString()+"Results.csv";
+      mFileName = "Projection3"+mAlgorithm+"Results.csv";
       mRowResults = new String[]{"Number Initial States","Number Events","Number Hidden Events","Number Synchrounous Product Silent Transitions",
                    "Synchronous Product Time","Number Synchronous Product States","Determinstic State Time",
                    "Number Deterministic States","OverAll Time"};

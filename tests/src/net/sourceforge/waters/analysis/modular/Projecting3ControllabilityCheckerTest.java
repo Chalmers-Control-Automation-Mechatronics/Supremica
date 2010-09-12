@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.modular;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.modular.Projection3.Method;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
@@ -47,6 +48,7 @@ public class Projecting3ControllabilityCheckerTest
     final ControllabilityChecker subchecker =
       new NativeControllabilityChecker(factory);
     final Projection3 projector = new Projection3(factory);
+    projector.setMethod(Method.SUBSET);
     projector.setOutputStream(true);
     final ProjectingControllabilityChecker checker =
       new ProjectingControllabilityChecker(factory, subchecker, projector);
