@@ -1,16 +1,17 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters/Supremica IDE
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   EPSGraphPrinter
 //###########################################################################
-//# $Id: EPSGraphPrinter
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -23,9 +24,9 @@ import java.io.OutputStream;
 import net.sourceforge.waters.model.module.GraphProxy;
 
 import org.apache.xmlgraphics.java2d.GraphicContext;
+import org.apache.xmlgraphics.java2d.TextHandler;
 import org.apache.xmlgraphics.java2d.ps.AbstractPSDocumentGraphics2D;
 import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
-import org.apache.xmlgraphics.java2d.ps.TextHandler;
 import org.apache.xmlgraphics.ps.PSGenerator;
 
 
@@ -81,6 +82,7 @@ public class EPSGraphPrinter extends Renderer
       final int width = (int) Math.ceil(bounds.getWidth());
       final int height = (int) Math.ceil(bounds.getHeight());
       mGraphics.setupDocument(stream, width, height);
+      mGraphics.preparePainting();
       renderGraph(mGraph, null, mProxyShapeProducer, mGraphics);
       mGraphics.finish();
     } finally {
@@ -99,7 +101,8 @@ public class EPSGraphPrinter extends Renderer
   {
   }
 
-  public void drawString(final String text, final float x, final float y)
+  public void drawString(final Graphics2D graphics, final String text,
+                         final float x, final float y)
     throws IOException
   {
     final PSGenerator gen = mGraphics.getPSGenerator();
@@ -121,6 +124,13 @@ public class EPSGraphPrinter extends Renderer
     // Hm ... gen replaces special characters with ??? ...
     gen.writeln("(" + text + ") t");
     gen.writeln("grestore");
+  }
+
+  @Deprecated
+  public void drawString(final String text, final float x, final float y)
+    throws IOException
+  {
+    drawString(mGraphics, text, x, y);
   }
 
 

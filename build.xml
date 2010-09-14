@@ -181,7 +181,7 @@
         <!-- unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/-->
         <!-- unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/-->
         <!-- Tools for Adobe PostScript. -->
-        <unjar src="${lib}/xmlgraphics-commons-1.2.jar"
+        <unjar src="${lib}/xmlgraphics-commons-1.4.jar"
                dest="${lib}/${unjared}"/>
 
         <unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>

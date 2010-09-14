@@ -39,7 +39,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * An implementation of the OP-search algorithm by Patricia Pena et.al.
+ * An implementation of the OP-search algorithm by Patr&iacute;cia Pena et.al.
  *
  * @author Robi Malik
  */
@@ -163,7 +163,7 @@ public class OPSearchAutomatonSimplifier
     mObservableSucessor = null;
     mUnobservableTauSuccessors = null;
     mObservableTauSuccessors = null;
-    mComponents = null;
+    mTarjan = null;
     mComponentOfState = null;
     mVerifierStatePairs = null;
     mVerifierStateMap = null;
@@ -299,13 +299,9 @@ public class OPSearchAutomatonSimplifier
   private void setUpStronglyConnectedComponents()
   {
     final int numStates = mOriginalStates.length;
-    mComponents = new ArrayList<StronglyConnectedComponent>();
+    mTarjan = new Tarjan(numStates);
     mComponentOfState = new StronglyConnectedComponent[numStates];
-    final Tarjan tarjan = new Tarjan();
-    tarjan.findStronglyConnectedComponents();
-    for (final StronglyConnectedComponent comp : mComponents) {
-      comp.setUpEventStatus();
-    }
+    mTarjan.findStronglyConnectedComponents();
   }
 
   private void setUpVerifier()
@@ -507,7 +503,27 @@ public class OPSearchAutomatonSimplifier
   //#########################################################################
   //# OP-Search Algorithm
   @SuppressWarnings("unused")
-  private void findOPSearchTransition()
+  private void doOPSearchStep()
+  {
+    final long trans = findOPSearchTransition();
+    final int source = (int) (trans & 0xffffffff);
+    final int target = (int) (trans >> 32);
+    final int unobsList = mUnobservableTauSuccessors[source];
+    mListBuffer.remove(unobsList, target);
+    final int obsList = mObservableTauSuccessors[source];
+    mListBuffer.prependUnique(obsList, target);
+    final StronglyConnectedComponent comp = mComponentOfState[source];
+    if (comp == mComponentOfState[target]) {
+      mTarjan.split(comp);
+    }
+    // rebuild verifier ...
+  }
+
+
+  /**
+   * @return Found transition encoded as <CODE>source | (target << 32)</CODE>.
+   */
+  private long findOPSearchTransition()
   {
     if (mBFSIntList1 == null) {
       mBFSIntList1 = new TIntArrayList();
@@ -537,32 +553,34 @@ public class OPSearchAutomatonSimplifier
         }
       }
     }
-    outer:
-    while (!found) {
-      final TIntArrayList tmp = next;
-      next = current;
-      current = tmp;
-      final int len = current.size();
-      for (int i = 0; i < len; i++) {
-        state = current.get(i);
-        final int list = mVerifierPredecessors.get(state);
-        mReadOnlyIterator.reset(list);
-        while (mReadOnlyIterator.advance()) {
-          final int pred = mReadOnlyIterator.getCurrentData();
-          pair = mVerifierStatePairs.get(pred);
-          if ((pair & 0xffffffff) == (pair >> 32)) {
-            break outer;
-          } else if (mBFSIntVisited.add(pred)) {
-            next.add(pred);
+    if (!found) {
+      outer:
+      while (true) {
+        final TIntArrayList tmp = next;
+        next = current;
+        current = tmp;
+        final int len = current.size();
+        for (int i = 0; i < len; i++) {
+          state = current.get(i);
+          final int list = mVerifierPredecessors.get(state);
+          mReadOnlyIterator.reset(list);
+          while (mReadOnlyIterator.advance()) {
+            final int pred = mReadOnlyIterator.getCurrentData();
+            pair = mVerifierStatePairs.get(pred);
+            if ((pair & 0xffffffff) == (pair >> 32)) {
+              break outer;
+            } else if (mBFSIntVisited.add(pred)) {
+              next.add(pred);
+            }
           }
         }
+        current.clear();
       }
-      current.clear();
     }
     current.clear();
     next.clear();
     mBFSIntVisited.clear();
-    // found: pred/pair -> state
+    // found: pair -> state
 
     // pair is start/start; state is end1/end2
     // We must search the strongly connected component of start
@@ -571,8 +589,8 @@ public class OPSearchAutomatonSimplifier
     // The first step of the shortest path found gets selected.
     int start = (int) (pair & 0xffffffff);
     final int startroot = getRootIndex(start);
-    final long targetpair = mVerifierStatePairs.get(state);
     final StronglyConnectedComponent comp = mComponentOfState[start];
+    final long targetpair = mVerifierStatePairs.get(state);
     long foundtrans = 0;
     if (comp == null) {
       foundtrans = searchTauSuccessors(startroot, start, start,
@@ -591,7 +609,7 @@ public class OPSearchAutomatonSimplifier
       }
       TLongArrayList currentpairs = mBFSLongList1;
       TLongArrayList nextpairs = mBFSLongList2;
-      trans:
+      outer:
       while (true) {
         final int len = currentpairs.size();
         for (int i = 0; i < len; i++) {
@@ -601,34 +619,39 @@ public class OPSearchAutomatonSimplifier
           foundtrans = searchTauSuccessors(startroot, state1, state2,
                                            targetpair, nextpairs);
           if (foundtrans != 0) {
-            break trans;
+            break outer;
           }
           foundtrans = searchTauSuccessors(startroot, state2, state1,
                                            targetpair, nextpairs);
           if (foundtrans != 0) {
-            break trans;
+            break outer;
           }
           foundtrans = searchProperSuccessors(startroot, state1, state2,
                                               targetpair, nextpairs);
           if (foundtrans != 0) {
-            break trans;
+            break outer;
           }
         }
         final TLongArrayList tmp = nextpairs;
         nextpairs = currentpairs;
         currentpairs = tmp;
       }
-      mBFSLongList1.clear();
       mBFSLongList2.clear();
-      mBFSLongVisited.clear();
     }
+    mBFSLongList1.clear();
+    mBFSLongVisited.clear();
+    return foundtrans;
   }
 
+  /**
+   * @return Found transition encoded as <CODE>source | (target << 32)</CODE>,
+   *         or <CODE>0</CODE>.
+   */
   private long searchTauSuccessors(final int startroot,
-                                  final int current1,
-                                  final int current2,
-                                  final long targetpair,
-                                  final TLongArrayList queue)
+                                   final int current1,
+                                   final int current2,
+                                   final long targetpair,
+                                   final TLongArrayList queue)
   {
     final long predpair = getPair(current1, current2);
     long predinfo = mBFSLongVisited.get(predpair);
@@ -948,24 +971,58 @@ public class OPSearchAutomatonSimplifier
   {
 
     //#########################################################################
-    //# Invocation
-    private void findStronglyConnectedComponents()
+    //# Constructor
+    private Tarjan(final int numStates)
     {
-      final int numStates = mOriginalStates.length;
       mTarjan = new int[numStates];
       mLowLink = new int[numStates];
       mStack = new TIntStack();
       mOnStack = new boolean[numStates];
+      mComponents = new ArrayList<StronglyConnectedComponent>();
+    }
+
+    //#########################################################################
+    //# Invocation
+    private void findStronglyConnectedComponents()
+    {
+      final int numStates = mTarjan.length;
       mCallIndex = 1;
       for (int state = 0; state < numStates; state++) {
         if (mTarjan[state] == 0) {
           tarjan(state);
         }
       }
+      setUpEventStatus();
+    }
+
+    private void split(final StronglyConnectedComponent comp)
+    {
+      comp.iterate();
+      while (mReadOnlyIterator.advance()) {
+        final int state = mReadOnlyIterator.getCurrentData();
+        mTarjan[state] = mLowLink[state] = 0;
+      }
+      mCallIndex = 1;
+      comp.iterate();
+      while (mReadOnlyIterator.advance()) {
+        final int state = mReadOnlyIterator.getCurrentData();
+        if (mTarjan[state] == 0) {
+          tarjan(state);
+        }
+      }
+      setUpEventStatus();
+    }
+
+    private void setUpEventStatus()
+    {
+      for (final StronglyConnectedComponent comp : mComponents) {
+        comp.setUpEventStatus();
+      }
+      mComponents.clear();
     }
 
     //#########################################################################
-    //# Inner Class Tarjan
+    //# Algorithm
     private void tarjan(final int state)
     {
       mTarjan[state] = mLowLink[state] = mCallIndex++;
@@ -1014,12 +1071,13 @@ public class OPSearchAutomatonSimplifier
 
     //#######################################################################
     //# Data Members
-    private int[] mTarjan;
-    private int[] mLowLink;
-    private TIntStack mStack;
-    private boolean[] mOnStack;
-    private int mCallIndex;
+    private final int[] mTarjan;
+    private final int[] mLowLink;
+    private final TIntStack mStack;
+    private final boolean[] mOnStack;
+    private final Collection<StronglyConnectedComponent> mComponents;
 
+    private int mCallIndex;
   }
 
 
@@ -1143,7 +1201,7 @@ public class OPSearchAutomatonSimplifier
   private int[][] mObservableSucessor;
   private int[] mUnobservableTauSuccessors;
   private int[] mObservableTauSuccessors;
-  private List<StronglyConnectedComponent> mComponents;
+  private Tarjan mTarjan;
   private StronglyConnectedComponent[] mComponentOfState;
 
   private TLongArrayList mVerifierStatePairs;
