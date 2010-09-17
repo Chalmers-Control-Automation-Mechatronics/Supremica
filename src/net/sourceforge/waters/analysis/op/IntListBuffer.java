@@ -51,6 +51,27 @@ public class IntListBuffer
   //#########################################################################
   //# Access Methods
   /**
+   * Adds the given data to the end of the specified list if it is not already
+   * contained. This method does a full list search to check for containment
+   * and therefore is of linear complexity.
+   * @param  list   The unique list number that identifies the list to be
+   *                modified in this buffer.
+   * @param  data   The integer data to be stored as the new last element of
+   *                the list.
+   * @return <CODE>true</CODE> if the data was not contained in the list and
+   *         added, <CODE>false</CODE> otherwise.
+   */
+  public boolean add(final int list, final int data)
+  {
+    if (contains(list, data)) {
+      return false;
+    } else {
+      append(list, data);
+      return true;
+    }
+  }
+
+  /**
    * Adds the given data to the end of the specified list.
    * @param  list   The unique list number that identifies the list to be modified
    *                in this buffer.
@@ -68,20 +89,6 @@ public class IntListBuffer
       setNext(tail, pair);
       setData(list, pair);
     }
-  }
-
-  public boolean contains(final int list, final int data)
-  {
-    int next = getNext(list);
-    while (next != NULL) {
-      final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
-      final int offset = next & BLOCK_MASK;
-      if (block[offset + OFFSET_DATA] == data) {
-        return true;
-      }
-      next = block[offset + OFFSET_NEXT];
-    }
-    return false;
   }
 
   /**
@@ -112,6 +119,29 @@ public class IntListBuffer
     setData(list1, tail2);
     recyclePair(list2);
     return list1;
+  }
+
+  /**
+   * Tests whether the given list contains the given data element
+   * This method does a full list search and is of linear complexity.
+   * @param  list   The unique list number that identifies the list to be
+   *                examined in this buffer.
+   * @param  data   The integer data to be searched for in the list.
+   * @return <CODE>true</CODE> if the data is contained in the list,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean contains(final int list, final int data)
+  {
+    int next = getNext(list);
+    while (next != NULL) {
+      final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
+      final int offset = next & BLOCK_MASK;
+      if (block[offset + OFFSET_DATA] == data) {
+        return true;
+      }
+      next = block[offset + OFFSET_NEXT];
+    }
+    return false;
   }
 
   /**

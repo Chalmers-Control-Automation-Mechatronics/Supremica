@@ -118,11 +118,15 @@ public class OPSearchAutomatonSimplifier
   {
     try {
       setUp();
-      // TODO Auto-generated method stub
+      // TODO Replace with proper OP-search:
+      // while (!mListBuffer.isEmpty(mPredecessorsOfDead)) {
+      //   doOPSearchStep();
+      // }
       final boolean op = mListBuffer.isEmpty(mPredecessorsOfDead);
       if (!op) {
         return false;
       }
+      // end replace
       if (hasSilentTransitions()) {
         final AutomatonProxy aut = createOutputAutomaton();
         return setAutomatonResult(aut);
@@ -174,6 +178,7 @@ public class OPSearchAutomatonSimplifier
     mBFSLongList1 = null;
     mBFSLongList2 = null;
     mBFSLongVisited = null;
+    mContainmentTestSet = null;
   }
 
 
@@ -311,6 +316,27 @@ public class OPSearchAutomatonSimplifier
     mVerifierStateMap = new TLongIntHashMap(numStates);
     mVerifierPredecessors = new TIntArrayList(numStates);
     mPredecessorsOfDead = mListBuffer.createList();
+    mContainmentTestSet = new BitSet(numStates);
+    buildVerifier();
+  }
+
+  private void rebuildVerifier()
+  {
+    mVerifierStatePairs.clear();
+    mVerifierStateMap.clear();
+    for (int i = 0; i < mVerifierPredecessors.size(); i++) {
+      final int list = mVerifierPredecessors.get(i);
+      mListBuffer.dispose(list);
+    }
+    mVerifierPredecessors.clear();
+    mListBuffer.dispose(mPredecessorsOfDead);
+    mPredecessorsOfDead = mListBuffer.createList();
+    buildVerifier();
+  }
+
+  private void buildVerifier()
+  {
+    final int numStates = mOriginalStates.length;
     for (int s = 0; s < numStates; s++) {
       expandVerifierPairSingleton(s);
     }
@@ -324,11 +350,8 @@ public class OPSearchAutomatonSimplifier
   private void expandVerifierPairSingleton(final int code)
   {
     final StronglyConnectedComponent comp = mComponentOfState[code];
-    if (comp == null) {
+    if (comp == null || comp.getRootIndex() == code) {
       expandVerifierPairTagged(code, code, code);
-    } else {
-      final int root = comp.getRootIndex();
-      expandVerifierPairTagged(root, root, root);
     }
   }
 
@@ -353,6 +376,7 @@ public class OPSearchAutomatonSimplifier
     final boolean entau2 = comp2 == null ?
                            tausucc2 != IntListBuffer.NULL :
                            comp2.isEnabledEvent(mUnobservableTau);
+    // TODO Observable tau transitions ...
     // Proper event transitions ...
     for (int e = 0; e < mUnobservableTau; e++) {
       int esucc1 = 0, esucc2 = 0;
@@ -394,6 +418,7 @@ public class OPSearchAutomatonSimplifier
         }
       } else if (en1 && !entau2 || en2 && !entau1) {
         mListBuffer.prepend(mPredecessorsOfDead, pcode);
+        return;
       }
     }
     // Silent event transitions ...
@@ -472,30 +497,60 @@ public class OPSearchAutomatonSimplifier
   private void enqueueSuccessor(final int from, final int to1, final int to2)
   {
     if (to1 != to2) {
-      final StronglyConnectedComponent comp1 = mComponentOfState[to1];
-      final int root1 = comp1 == null ? to1 : comp1.getRootIndex();
-      final StronglyConnectedComponent comp2 = mComponentOfState[to2];
-      final int root2 = comp2 == null ? to2 : comp2.getRootIndex();
+      final int root1 = getRootIndex(to1);
+      final int root2 = getRootIndex(to2);
       if (root1 != root2) {
         final long pair = getPair(root1, root2);
         final int lookup = mVerifierStateMap.get(pair);
-        final int pindex;
+        final int list;
         if (lookup > 0) {
-          pindex = lookup - mOriginalStates.length;
+          final int pindex = lookup - mOriginalStates.length;
+          list = mVerifierPredecessors.get(pindex);
         } else {
-          pindex = mVerifierStateMap.size();
+          final int pindex = mVerifierStateMap.size();
           final int pcode = pindex + mOriginalStates.length;
           mVerifierStatePairs.add(pair);
           mVerifierStateMap.put(pair, pcode);
-          mVerifierPredecessors.add(IntListBuffer.NULL);
-        }
-        int list = mVerifierPredecessors.get(pindex);
-        if (list == IntListBuffer.NULL) {
           list = mListBuffer.createList();
-          mVerifierPredecessors.set(pindex, list);
+          mVerifierPredecessors.add(list);
         }
         mListBuffer.prependUnique(list, from);
       }
+    }
+  }
+
+  /**
+   * Tests whether all strongly connected components of observable tau
+   * successors of the strongly connected component of state inner are also
+   * strongly connected components of observable tau successors of the strongly
+   * connected component of state outer.
+   */
+  @SuppressWarnings("unused")
+  private boolean containsObservableTauSuccessors(final int inner,
+                                                  final int outer)
+  {
+    final StronglyConnectedComponent ocomp = mComponentOfState[outer];
+    if (ocomp == null) {
+      collectContainmentTestSet(outer);
+    } else if (ocomp.isEnabledEvent(mObservableTau)) {
+      ocomp.iterate();
+      while (mReadOnlyIterator.advance()) {
+        final int state = mReadOnlyIterator.getCurrentData();
+        collectContainmentTestSet(state);
+      }
+    }
+    mContainmentTestSet.clear();
+    return true;
+  }
+
+  private void collectContainmentTestSet(final int state)
+  {
+    final int list = mObservableTauSuccessors[state];
+    mAltReadOnlyIterator.reset(list);
+    while (mAltReadOnlyIterator.advance()) {
+      final int succ = mAltReadOnlyIterator.getCurrentData();
+      final int root = getRootIndex(succ);
+      mContainmentTestSet.set(root);
     }
   }
 
@@ -511,12 +566,14 @@ public class OPSearchAutomatonSimplifier
     final int unobsList = mUnobservableTauSuccessors[source];
     mListBuffer.remove(unobsList, target);
     final int obsList = mObservableTauSuccessors[source];
-    mListBuffer.prependUnique(obsList, target);
+    mListBuffer.add(obsList, target);
     final StronglyConnectedComponent comp = mComponentOfState[source];
     if (comp == mComponentOfState[target]) {
       mTarjan.split(comp);
+    } else if (comp != null) {
+      comp.updateEventStatus();
     }
-    // rebuild verifier ...
+    rebuildVerifier();
   }
 
 
@@ -882,7 +939,7 @@ public class OPSearchAutomatonSimplifier
         final StronglyConnectedComponent comp =
           new StronglyConnectedComponent(list);
         mComponentOfState[state1] = mComponentOfState[state2] = comp;
-        comp.setUpEventStatus();
+        comp.initialiseEventStatus();
       } else {
         comp2.merge(state1);
       }
@@ -1016,7 +1073,7 @@ public class OPSearchAutomatonSimplifier
     private void setUpEventStatus()
     {
       for (final StronglyConnectedComponent comp : mComponents) {
-        comp.setUpEventStatus();
+        comp.initialiseEventStatus();
       }
       mComponents.clear();
     }
@@ -1113,31 +1170,47 @@ public class OPSearchAutomatonSimplifier
 
     //#######################################################################
     //# Flag Setup
-    private void setUpEventStatus()
+    private void initialiseEventStatus()
     {
-      events:
+      setUpProperEventStatus();
+      setUpTauEventStatus(mUnobservableTau, mUnobservableTauSuccessors);
+      setUpTauEventStatus(mObservableTau, mObservableTauSuccessors);
+    }
+
+    private void updateEventStatus()
+    {
+      mEnabledEvents.clear(mUnobservableTau);
+      setUpTauEventStatus(mUnobservableTau, mUnobservableTauSuccessors);
+      mEnabledEvents.set(mObservableTau);
+    }
+
+    private void setUpProperEventStatus()
+    {
       for (int e = 0; e < mUnobservableTau; e++) {
         iterate();
         while (mReadOnlyIterator.advance()) {
           final int state = mReadOnlyIterator.getCurrentData();
           if (mObservableSucessor[state][e] != NO_TRANSITION) {
             mEnabledEvents.set(e);
-            continue events;
+            break;
           }
         }
       }
+    }
+
+    private void setUpTauEventStatus(final int taucode, final int[] successors)
+    {
       iterate();
-      tau:
       while (mReadOnlyIterator.advance()) {
         final int state = mReadOnlyIterator.getCurrentData();
-        final int list = mUnobservableTauSuccessors[state];
+        final int list = successors[state];
         if (list != IntListBuffer.NULL) {
           mAltReadOnlyIterator.reset(list);
           while (mAltReadOnlyIterator.advance()) {
             final int succ = mAltReadOnlyIterator.getCurrentData();
             if (mComponentOfState[succ] != this) {
-              mEnabledEvents.set(mUnobservableTau);
-              break tau;
+              mEnabledEvents.set(taucode);
+              return;
             }
           }
         }
@@ -1214,6 +1287,7 @@ public class OPSearchAutomatonSimplifier
   private TLongArrayList mBFSLongList1;
   private TLongArrayList mBFSLongList2;
   private TLongLongHashMap mBFSLongVisited;
+  private BitSet mContainmentTestSet;
 
 
   //#########################################################################

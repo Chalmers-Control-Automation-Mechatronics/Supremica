@@ -92,15 +92,7 @@ public class EPSGraphPrinter extends Renderer
 
 
   //#########################################################################
-  //# Interface org.apache.xmlgraphics.java2d.ps.Texthandler
-  public void writeSetup()
-  {
-  }
-
-  public void writePageSetup()
-  {
-  }
-
+  //# Interface org.apache.xmlgraphics.java2d.TextHandler
   public void drawString(final Graphics2D graphics, final String text,
                          final float x, final float y)
     throws IOException
