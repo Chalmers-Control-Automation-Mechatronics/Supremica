@@ -33,7 +33,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 /**
  * <P>A debugging tool to check whether two nondeterministic automata
- * are isomorphic or observation equivalent.</P>
+ * are isomorphic, bisimilar, or observation equivalent.</P>
  *
  * <P>This tester receives two {@link AutomatonProxy} objects as input
  * and checks whether they have bisimilar transition structures.
@@ -46,8 +46,8 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * {@link ListBufferTransitionRelation} and then uses a
  * {@link ObservationEquivalenceTRSimplifier} to find the coarsest bisimulation
  * relation. Afterwards it tests whether the two automata have matching
- * initial states, and whether all equivalence classes have equal numbers
- * of states for both input automata.</P>
+ * initial states, and for isomorphism is also tests whether all equivalence
+ * classes have equal numbers of states for both input automata.</P>
  *
  * @author Robi Malik
  */
@@ -57,6 +57,13 @@ public class IsomorphismChecker
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a new isomorphism checker.
+   * @param  factory     Factory used for automaton creation during the check.
+   * @param  matchNames  <CODE>true</CODE> if events are to be matched by name,
+   *                     <CODE>false</CODE> if events are to be matched by
+   *                     object identity.
+   */
   public IsomorphismChecker(final ProductDESProxyFactory factory,
                             final boolean matchNames)
   {
@@ -67,11 +74,22 @@ public class IsomorphismChecker
 
   //#########################################################################
   //# Configuration
+  /**
+   * Gets the <I>matching names</I> setting of this isomorphism checker.
+   * @return <CODE>true</CODE> if events are matched by name,
+   *         <CODE>false</CODE> if events are matched by object identity.
+   */
   public boolean isMatchingNames()
   {
     return mMatchingNames;
   }
 
+  /**
+   * Sets the <I>matching names</I> setting of this isomorphism checker.
+   * @param  matchNames  <CODE>true</CODE> if events are to be matched by name,
+   *                     <CODE>false</CODE> if events are to be matched by
+   *                     object identity.
+   */
   public void setMatchingNames(final boolean matchNames)
   {
     mMatchingNames = matchNames;
@@ -82,6 +100,8 @@ public class IsomorphismChecker
   //# Invocation
   /**
    * Checks whether the two given automata are isomorphic.
+   * @param  aut1   The first automaton to be compared.
+   * @param  aut2   The second automaton to be compared.
    * @throws AnalysisException if the input automata are not isomorphic.
    */
   public void checkIsomorphism(final AutomatonProxy aut1,
@@ -104,12 +124,45 @@ public class IsomorphismChecker
           ("Bisimulator did not identify any states!");
       }
       final List<int[]> partition = bisimulator.getResultPartition();
+      checkIsomorphismPartition(partition, rel, stateEnc);
+    }
+  }
+
+  /**
+   * Checks whether the two given automata are bisimilar.
+   * @param  aut1   The first automaton to be compared.
+   * @param  aut2   The second automaton to be compared.
+   * @throws AnalysisException if the input automata are not isomorphic.
+   */
+  public void checkBisimulation(final AutomatonProxy aut1,
+                                final AutomatonProxy aut2)
+    throws AnalysisException
+  {
+    if (aut1.getStates().size() != 0 || aut2.getStates().size() != 0) {
+      setupEventMap(aut1, aut2);
+      final AutomatonProxy aut = createTestAutomaton(aut1, aut2, false);
+      final EventEncoding eventEnc = new EventEncoding(aut);
+      final StateEncoding stateEnc = new StateEncoding(aut);
+      final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
+        (aut, eventEnc, stateEnc,
+         ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+      final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier(rel);
+      final boolean result = bisimulator.run();
+      if (!result) {
+        throw new IsomorphismException
+          ("Bisimulator did not identify any states!");
+      }
+      final List<int[]> partition = bisimulator.getResultPartition();
       checkBisimulationPartition(partition, rel, stateEnc);
     }
   }
 
   /**
    * Checks whether the two given automata are observation equivalent.
+   * @param  aut1   The first automaton to be compared.
+   * @param  aut2   The second automaton to be compared.
+   * @param  tau    Silent event used for observation equivalence.
    * @throws AnalysisException if the input automata are not isomorphic.
    */
   public void checkObservationEquivalence(final AutomatonProxy aut1,
@@ -133,7 +186,7 @@ public class IsomorphismChecker
           ("Bisimulator did not identify any states!");
       }
       final List<int[]> partition = bisimulator.getResultPartition();
-      checkObservationEquivalencePartition(partition, rel, stateEnc);
+      checkBisimulationPartition(partition, rel, stateEnc);
     }
   }
 
@@ -300,11 +353,13 @@ public class IsomorphismChecker
       (name, ComponentKind.PLANT, events, states, transitions);
   }
 
-  private void checkBisimulationPartition(final List<int[]> partition,
+  private void checkIsomorphismPartition(final List<int[]> partition,
                                           final ListBufferTransitionRelation rel,
                                           final StateEncoding enc)
     throws IsomorphismException
   {
+    // TODO Not a proper isomorphism check. Must also match outgoing
+    // transitions for each state.
     final int[] count = new int[2];
     final int[] initCount = new int[2];
     for (final int[] clazz : partition) {
@@ -321,7 +376,7 @@ public class IsomorphismChecker
       }
       if (count[0] != count[1]) {
         throw new IsomorphismException
-          ("Automata contain non-bisimilar states!");
+          ("Automata contain non-isomorphic states!");
       } else if (initCount[0] != initCount[1]) {
         throw new IsomorphismException
           ("Initial states do not match!");
@@ -329,7 +384,7 @@ public class IsomorphismChecker
     }
   }
 
-  private void checkObservationEquivalencePartition
+  private void checkBisimulationPartition
     (final List<int[]> partition,
      final ListBufferTransitionRelation rel,
      final StateEncoding enc)
@@ -351,7 +406,7 @@ public class IsomorphismChecker
       }
       if (count[0] != count[1]) {
         throw new IsomorphismException
-          ("Automata contain non-observation equivalent states!");
+          ("Automata contain non-bisimilar states!");
       } else if (initCount[0] != initCount[1]) {
         throw new IsomorphismException
           ("Initial states do not match!");
