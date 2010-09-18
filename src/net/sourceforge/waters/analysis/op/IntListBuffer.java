@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.op;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -250,7 +251,7 @@ public class IntListBuffer
   public void prependUnique(final int list, final int data)
   {
     final int tail = getNext(list);
-    if (tail != NULL || getData(tail) != data) {
+    if (tail == NULL || getData(tail) != data) {
       final int pair = allocatePair();
       setDataAndNext(pair, data, tail);
       setHead(list, pair);
@@ -266,7 +267,7 @@ public class IntListBuffer
         final int[] block = mBlocks.get(current >> BLOCK_SHIFT);
         final int offset = current & BLOCK_MASK;
         final int next = block[offset + OFFSET_NEXT];
-        if (block[offset + OFFSET_NEXT] == data) {
+        if (block[offset + OFFSET_DATA] == data) {
           if (next != NULL) {
             setNext(prev, next);
           } else if (prev == list) {
@@ -284,6 +285,30 @@ public class IntListBuffer
       }
     }
     return false;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  public void dumpList(final PrintWriter writer, final int list)
+  {
+    if (list == NULL) {
+      writer.print("NULL");
+    } else {
+      writer.print('[');
+      int next = getNext(list);
+      while (next != NULL) {
+        final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
+        final int offset = next & BLOCK_MASK;
+        final int data = block[offset + OFFSET_DATA];
+        writer.print(data);
+        next = block[offset + OFFSET_NEXT];
+        if (next != NULL) {
+          writer.print(',');
+        }
+      }
+      writer.print(']');
+    }
   }
 
 
@@ -339,7 +364,7 @@ public class IntListBuffer
       mRecycleStart = getNext(mRecycleStart);
       return result;
     } else {
-      if ((mNextFreeIndex & BLOCK_MASK) >= BLOCK_SIZE) {
+      if ((mNextFreeIndex & BLOCK_MASK) == 0) {
         final int[] block = new int[BLOCK_SIZE];
         mBlocks.add(block);
       }

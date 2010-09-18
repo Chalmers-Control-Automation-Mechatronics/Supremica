@@ -17,7 +17,6 @@ import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -48,14 +47,12 @@ public class OPSearchAutomatonSimplifierTest
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mSimplifier = new OPSearchAutomatonSimplifier(factory);
     mSimplifier.setOutputName("result");
-    mIntegrityChecker = ProductDESIntegrityChecker.getInstance();
     mIsomorphismChecker = new IsomorphismChecker(factory, true);
   }
 
   protected void tearDown() throws Exception
   {
     mSimplifier = null;
-    mIntegrityChecker = null;
     mIsomorphismChecker = null;
     mBindings = null;
     super.tearDown();
@@ -96,43 +93,29 @@ public class OPSearchAutomatonSimplifierTest
     throws Exception
   {
     final ProductDESProxy des = getCompiledDES("tests", "abstraction", name);
-    getLogger().info("Checking " + des.getName() + " ...");
+    final String desname = des.getName();
+    getLogger().info("Checking " + desname + " ...");
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     final List<EventProxy> hidden = getUnobservableEvents(des);
     mSimplifier.setModel(before);
     mSimplifier.setHiddenEvents(hidden);
     final boolean result = mSimplifier.run();
-    assertEquals("Unexpected result from OP-Verifier!", expect, result);
-    if (result) {
-      final AutomatonProxy aut = mSimplifier.getComputedAutomaton();
-      checkResult(des, before, aut);
-      getLogger().info("Done " + des.getName());
-    }
-
-  }
-
-  private void checkResult(final ProductDESProxy des,
-                           final AutomatonProxy before,
-                           final AutomatonProxy result)
-      throws Exception
-  {
-    final String name = des.getName();
-    final String basename = appendSuffixes(name, mBindings);
+    final AutomatonProxy aut = mSimplifier.getComputedAutomaton();
+    final String basename = appendSuffixes(desname, mBindings);
     final String comment =
-        "Test output from " + ProxyTools.getShortClassName(mSimplifier)
-            + '.';
-    saveAutomaton(result, basename, comment);
-    mIntegrityChecker.check(result, des);
-    final AutomatonProxy expected = getAutomaton(des, AFTER);
-    if (expected == null) {
+      "Test output from " + ProxyTools.getShortClassName(mSimplifier) + '.';
+    saveAutomaton(aut, basename, comment);
+    assertTrue("Unexpected result (false) from OP-Verifier!", result);
+    final AutomatonProxy after = getAutomaton(des, AFTER);
+    if (after == null) {
       assertSame("Test expects no change, " +
                  "but the object returned is not the same as the input!",
-                 before, result);
+                 before, aut);
     } else {
-      mIsomorphismChecker.checkIsomorphism(result, expected);
+      mIsomorphismChecker.checkIsomorphism(aut, after);
     }
+    getLogger().info("Done " + desname);
   }
-
 
 
   //#########################################################################
@@ -147,7 +130,6 @@ public class OPSearchAutomatonSimplifierTest
   //#########################################################################
   //# Data Members
   private OPSearchAutomatonSimplifier mSimplifier;
-  private ProductDESIntegrityChecker mIntegrityChecker;
   private IsomorphismChecker mIsomorphismChecker;
   private List<ParameterBindingProxy> mBindings;
 
