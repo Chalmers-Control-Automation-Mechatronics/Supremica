@@ -111,6 +111,11 @@ public class OPSearchAutomatonSimplifierTest
     runOPVerifier("op_8.wmod", true);
   }
 
+  public void testOP9() throws Exception
+  {
+    runOPVerifier("op_9.wmod", true);
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods

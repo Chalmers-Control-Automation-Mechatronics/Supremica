@@ -124,7 +124,7 @@ public class OPSearchAutomatonSimplifier
       while (!mListBuffer.isEmpty(mPredecessorsOfDead)) {
         doOPSearchStep();
       }
-      if (hasSilentTransitions()) {
+      if (needsMerge()) {
         final AutomatonProxy aut = createOutputAutomaton();
         return setAutomatonResult(aut);
       } else {
@@ -834,15 +834,19 @@ public class OPSearchAutomatonSimplifier
 
   //#########################################################################
   //# Output Automaton Construction
-  private boolean hasSilentTransitions()
+  private boolean needsMerge()
   {
-    final int numStates = mOriginalStates.length;
-    for (int s = 0; s < numStates; s++) {
-      if (mUnobservableTauSuccessors[s] != IntListBuffer.NULL) {
-        return true;
+    if (mVerifierStatePairs.isEmpty()) {
+      final int numStates = mOriginalStates.length;
+      for (int s = 0; s < numStates; s++) {
+        if (mComponentOfState[s] != null) {
+          return true;
+        }
       }
+      return false;
+    } else {
+      return true;
     }
-    return false;
   }
 
   private AutomatonProxy createOutputAutomaton()
@@ -858,21 +862,15 @@ public class OPSearchAutomatonSimplifier
 
     // 1. Merge states
     // All strongly tau-connected components are treated as a single state.
-    // Furthermore, any two components linked by a tau-transitions are merged.
-    // The observer property ensures that the result is still observation
-    // equivalent to the original automaton.
-    final IntListBuffer.ReadOnlyIterator iter =
-      mListBuffer.createReadOnlyIterator();
-    final int numStates = mOriginalStates.length;
-    for (int src = 0; src < numStates; src++) {
-      final int list = mUnobservableTauSuccessors[src];
-      if (list != IntListBuffer.NULL) {
-        iter.reset(list);
-        while (iter.advance()) {
-          final int tausucc = iter.getCurrentData();
-          mergeComponents(src, tausucc);
-        }
-      }
+    // Furthermore, any two components that contains states reached by strings
+    // with equal projection are merged. The observer property ensures that the
+    // result is still observation equivalent to the original automaton.
+    final int numPairs = mVerifierStatePairs.size();
+    for (int i = 0; i < numPairs; i++) {
+      final long pair = mVerifierStatePairs.get(i);
+      final int state1 = (int) (pair & 0xffffffff);
+      final int state2 = (int) (pair >> 32);
+      mergeComponents(state1, state2);
     }
 
     // 2. Create States
@@ -882,6 +880,7 @@ public class OPSearchAutomatonSimplifier
         allProps.add(event);
       }
     }
+    final int numStates = mOriginalStates.length;
     final Collection<StateProxy> states = new ArrayList<StateProxy>(numStates);
     final TIntObjectHashMap<MemStateProxy> stateMap =
       new TIntObjectHashMap<MemStateProxy>(numStates);
@@ -975,7 +974,7 @@ public class OPSearchAutomatonSimplifier
       }
     }
 
-    // 3. Create Output Automaton
+    // 4. Create Output Automaton
     final int numOutputEvents = mEvents.length + observableTauEvents.size();
     final List<EventProxy> events = new ArrayList<EventProxy>(numOutputEvents);
     for (final EventProxy event : mEvents) {
