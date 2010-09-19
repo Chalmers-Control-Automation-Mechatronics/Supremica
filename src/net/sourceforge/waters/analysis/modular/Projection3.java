@@ -284,8 +284,15 @@ implements SafetyProjectionBuilder
       mTransitions = null;
       newStates = null;
       trans = null;
+      if(mPrintData){
+        timer = System.currentTimeMillis();
+      }
       final Minimizer min = new Minimizer(result, factory);
       result = min.run();
+      if(mPrintData){
+        addOutputData(8, (System.currentTimeMillis() - timer)+"");
+        addOutputData(9, result.getStates().size()+"");
+      }
       return setAutomatonResult(result);
     } finally {
       tearDown();
@@ -332,7 +339,9 @@ implements SafetyProjectionBuilder
     mCoupleQueue = null;
     mDeterministicQueue = null;
     eventAutomaton = null;
-    addOutputData(8, (System.currentTimeMillis() - mStartTime) + "");
+    if(mPrintData){
+      addOutputData(10, (System.currentTimeMillis() - mStartTime) + "");
+    }
   }
 
   @Override
@@ -627,9 +636,9 @@ implements SafetyProjectionBuilder
     mPrintData = set;
     if(mPrintData){
       mFileName = "Projection3"+mAlgorithm+"Results.csv";
-      mRowResults = new String[]{"Number Initial States","Number Events","Number Hidden Events","Number Synchrounous Product Silent Transitions",
-                   "Synchronous Product Time","Number Synchronous Product States","Determinstic State Time",
-                   "Number Deterministic States","OverAll Time"};
+      mRowResults = new String[]{"#States","#Events","#Hidden","#Sync.Trans",
+                   "Sync.Time","Syne.States","Det.Time",
+                   "Det.States","Min.Time","Min.States","Overall"};
       final File mFile = new File(mFileName);
       if(!mFile.exists()){
         try
@@ -642,6 +651,9 @@ implements SafetyProjectionBuilder
           }
           writer.append('\n');
           writer.flush();
+          mRowResults = new String[]{"#States","#Events","#Hidden","#Sync.Trans",
+                                     "Sync.Time","Syne.States","Det.Time",
+                                     "Det.States","Min.Time","Min.States","Overall"};
         }
         catch(final Exception e)
         {
@@ -669,7 +681,10 @@ implements SafetyProjectionBuilder
       }
       writer.append('\n');
       writer.flush();
-        writer.close();
+      writer.close();
+      mRowResults = new String[]{"#States","#Events","#Hidden","#Sync.Trans",
+                                 "Sync.Time","Syne.States","Det.Time",
+                                 "Det.States","Min.Time","Min.States","Overall"};
     }
     catch(final Exception e)
     {

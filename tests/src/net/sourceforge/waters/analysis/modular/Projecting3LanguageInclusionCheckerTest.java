@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.modular;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.modular.Projection3.Method;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.
        AbstractLanguageInclusionCheckerTest;
@@ -46,10 +47,12 @@ public class Projecting3LanguageInclusionCheckerTest
   {
     final SafetyVerifier subchecker =
       new NativeLanguageInclusionChecker(factory);
-    final SafetyProjectionBuilder projector = new Projection3(factory);
+    final Projection3 projector = new Projection3(factory);
+    projector.setMethod(Method.STATE);
+    projector.setOutputStream(true);
     final ProjectingLanguageInclusionChecker checker =
       new ProjectingLanguageInclusionChecker(factory, subchecker, projector);
-    checker.setMaxProjStates(2000);
+    //checker.setMaxProjStates(2000);
     return checker;
   }
 

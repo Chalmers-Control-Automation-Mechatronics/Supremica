@@ -48,7 +48,7 @@ public class Projecting3ControllabilityCheckerTest
     final ControllabilityChecker subchecker =
       new NativeControllabilityChecker(factory);
     final Projection3 projector = new Projection3(factory);
-    projector.setMethod(Method.SUBSET);
+    projector.setMethod(Method.STATE);
     projector.setOutputStream(true);
     final ProjectingControllabilityChecker checker =
       new ProjectingControllabilityChecker(factory, subchecker, projector);
