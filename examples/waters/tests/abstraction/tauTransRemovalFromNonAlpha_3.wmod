@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tauTransRemovalFromNonAlpha_3" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A simple test for the tauTransRemovalFromNonAlphaStates rule. This tests thata transition is not removed if there are transitions other than tau going out of the state which culd have been removed otherwise.</ns2:Comment>
+    <ns2:Comment>A simple test for the tauTransRemovalFromNonAlphaStates rule. This tests thata transition is not removed if there are transitions other than tau going out of the state which could have been removed otherwise.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":alpha">
             <ColorGeometry>

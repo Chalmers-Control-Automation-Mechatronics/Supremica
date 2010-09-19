@@ -81,9 +81,34 @@ public class OPSearchAutomatonSimplifierTest
     runOPVerifier("op_3.wmod", false);
   }
 
+  public void testOP3a() throws Exception
+  {
+    runOPVerifier("tauTransRemovalFromNonAlpha_3.wmod", true);
+  }
+
   public void testOP4() throws Exception
   {
     runOPVerifier("op_4.wmod", true);
+  }
+
+  public void testOP5() throws Exception
+  {
+    runOPVerifier("op_5.wmod", true);
+  }
+
+  public void testOP6() throws Exception
+  {
+    runOPVerifier("op_6.wmod", true);
+  }
+
+  public void testOP7() throws Exception
+  {
+    runOPVerifier("op_7.wmod", true);
+  }
+
+  public void testOP8() throws Exception
+  {
+    runOPVerifier("op_8.wmod", true);
   }
 
 

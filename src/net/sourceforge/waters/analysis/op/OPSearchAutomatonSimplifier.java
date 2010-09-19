@@ -617,6 +617,10 @@ public class OPSearchAutomatonSimplifier
     final int target = (int) (trans >> 32);
     final int unobsList = mUnobservableTauSuccessors[source];
     mListBuffer.remove(unobsList, target);
+    if (mListBuffer.isEmpty(unobsList)) {
+      mListBuffer.dispose(unobsList);
+      mUnobservableTauSuccessors[source] = IntListBuffer.NULL;
+    }
     int obsList = mObservableTauSuccessors[source];
     if (obsList == IntListBuffer.NULL) {
       mObservableTauSuccessors[source] = obsList = mListBuffer.createList();
@@ -857,13 +861,15 @@ public class OPSearchAutomatonSimplifier
     // Furthermore, any two components linked by a tau-transitions are merged.
     // The observer property ensures that the result is still observation
     // equivalent to the original automaton.
+    final IntListBuffer.ReadOnlyIterator iter =
+      mListBuffer.createReadOnlyIterator();
     final int numStates = mOriginalStates.length;
     for (int src = 0; src < numStates; src++) {
       final int list = mUnobservableTauSuccessors[src];
       if (list != IntListBuffer.NULL) {
-        mReadOnlyIterator.reset(list);
-        while (mReadOnlyIterator.advance()) {
-          final int tausucc = mReadOnlyIterator.getCurrentData();
+        iter.reset(list);
+        while (iter.advance()) {
+          final int tausucc = iter.getCurrentData();
           mergeComponents(src, tausucc);
         }
       }

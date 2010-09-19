@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tauTransRemovalFromNonAlpha_9" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A test to check the tauTransRemovalFromNonAlphaStates rule correctly handles all states being implicitly marked alpha.</ns2:Comment>
+    <ns2:Comment>A test to check the tauTransRemovalFromNonAlphaStates rule correctly handles all states being implicitly marked omega.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":alpha">
             <ColorGeometry>
