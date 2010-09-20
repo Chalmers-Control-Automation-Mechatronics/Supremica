@@ -97,7 +97,8 @@ public class OverflowException extends AnalysisException {
   public static enum Kind
   {
     STATE,
-    TRANSITION;
+    TRANSITION,
+    NODE;
 
     //#########################################################################
     //# Display
