@@ -74,7 +74,7 @@ import org.supremica.gui.ide.actions.SaveAsAction;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
-
+import  net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
 
 /**
  * <P>
@@ -209,6 +209,7 @@ public class IDEMenuBar extends JMenuBar
     Config.INCLUDE_ANIMATOR.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener(analyzeListener);
     Config.GUI_ANALYZER_INCLUDE_HISC.addPropertyChangeListener(analyzeListener);
+    Config.GUI_ANALYZER_INCLUDE_SD.addPropertyChangeListener(analyzeListener);
   }
 
   // #########################################################################
@@ -329,6 +330,12 @@ public class IDEMenuBar extends JMenuBar
             actions.getAction(AnalyzeSICProperty6Action.class);
           mVerifyMenu.add(sic6);
         }
+	    if (Config.GUI_ANALYZER_INCLUDE_SD.isTrue()) {
+           mVerifyMenu.addSeparator();
+           final Action plantComplete = 
+           actions.getAction(AnalyzeSDPlantCompletenessAction.class);
+            mVerifyMenu.add(plantComplete);
+		}
       }
 
       // Simulate

@@ -208,6 +208,11 @@ public final class Config
     public static final BooleanProperty GUI_ANALYZER_INCLUDE_HISC =
       new BooleanProperty(PropertyType.GUI_ANALYZER, "includeHISC", false,
                           "Include HISC property checks");
+
+   public static final BooleanProperty GUI_ANALYZER_INCLUDE_SD =
+      new BooleanProperty(PropertyType.GUI_ANALYZER, "includeSD", false, "Include SD property checks");
+
+
     public static final BooleanProperty INCLUDE_BOUNDED_UNCON_TOOLS = new BooleanProperty(PropertyType.GUI_ANALYZER, "includeBoundedUnconTools", false, "Include unbounded controllability tools");
     public static final BooleanProperty GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE = new BooleanProperty(PropertyType.GUI_ANALYZER, "automatonViewerUseControlledSurface", false, "Use new controlled surface panel to display an automaton");
 

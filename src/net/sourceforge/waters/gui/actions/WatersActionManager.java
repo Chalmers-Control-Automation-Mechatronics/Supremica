@@ -39,6 +39,7 @@ public abstract class WatersActionManager implements Observer
     addAction(new AnalyzeLanguageInclusionAction(ide));
     addAction(new AnalyzeSICProperty5Action(ide));
     addAction(new AnalyzeSICProperty6Action(ide));
+    addAction(new AnalyzeSDPlantCompletenessAction(ide));
     addAction(new EditEventLabelAction(ide));
     addAction(new GraphLayoutAction(ide));
     addAction(new GraphSaveEPSAction(ide));
