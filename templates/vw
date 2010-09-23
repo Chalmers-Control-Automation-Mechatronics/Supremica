@@ -6,4 +6,4 @@ DIR=`dirname $THIS`
 export LD_LIBRARY_PATH=$DIR
 
 java -cp "$DIR/Supremica.jar" -enableassertions \
-    net.sourceforge.waters.valid.ValidToWaters "$@"
+    net.sourceforge.waters.external.valid.ValidToWaters "$@"

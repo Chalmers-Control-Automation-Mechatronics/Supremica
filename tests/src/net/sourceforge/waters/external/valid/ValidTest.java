@@ -7,11 +7,12 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.valid;
+package net.sourceforge.waters.external.valid;
 
 import java.io.File;
 import java.io.IOException;
 
+import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;

@@ -2,24 +2,24 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.despot
-//# CLASS:   NativeSICProperty6VerifierTest
+//# CLASS:   CompositionalSICProperty5VerifierTest
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.despot;
+package net.sourceforge.waters.analysis.hisc;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.analysis.gnonblocking.CompositionalGeneralisedConflictChecker;
+import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NativeSICProperty6VerifierTest extends
-    AbstractSICProperty6VerifierTest
+public class CompositionalSICProperty5VerifierTest
+  extends AbstractSICProperty5VerifierTest
 {
 
   //#########################################################################
@@ -27,7 +27,7 @@ public class NativeSICProperty6VerifierTest extends
   public static Test suite()
   {
     final TestSuite suite =
-      new TestSuite(NativeSICProperty6VerifierTest.class);
+      new TestSuite(CompositionalSICProperty5VerifierTest.class);
     return suite;
   }
 
@@ -43,8 +43,10 @@ public class NativeSICProperty6VerifierTest extends
   protected ModelVerifier createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final ConflictChecker checker = new NativeConflictChecker(factory);
-    return new SICProperty6Verifier(checker, factory);
+    final CompositionalGeneralisedConflictChecker checker =
+        new CompositionalGeneralisedConflictChecker(factory);
+    checker.setInternalStepTransitionLimit(100000);
+    return new SICProperty5Verifier(checker, factory);
   }
 
 }

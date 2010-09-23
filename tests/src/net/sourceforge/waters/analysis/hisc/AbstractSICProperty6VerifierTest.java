@@ -7,12 +7,14 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.despot;
+package net.sourceforge.waters.analysis.hisc;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.hisc.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.SICPropertyBuilder;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.des.AutomatonProxy;

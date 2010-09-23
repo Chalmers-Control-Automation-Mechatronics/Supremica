@@ -8,7 +8,7 @@
 //###########################################################################
 
 
-package net.sourceforge.waters.despot;
+package net.sourceforge.waters.analysis.hisc;
 
 import java.util.ArrayList;
 import java.util.Collection;

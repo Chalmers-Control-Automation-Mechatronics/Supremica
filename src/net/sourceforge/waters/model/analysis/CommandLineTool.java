@@ -22,9 +22,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.despot.AbstractSICConflictChecker;
-import net.sourceforge.waters.despot.SICProperty5Verifier;
-import net.sourceforge.waters.despot.SICProperty6Verifier;
+import net.sourceforge.waters.analysis.hisc.AbstractSICConflictChecker;
+import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
+import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
+import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -41,7 +42,6 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.valid.ValidUnmarshaller;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 

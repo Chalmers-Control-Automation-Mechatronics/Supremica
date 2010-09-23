@@ -503,7 +503,7 @@ Class-Path: ${manifest.pathlist}</echo>
     
     <target name="copy_watersxmlfiles_into_build">
         <copy file="${waters.xsl}/vw.xsl"
-              todir="${build}/net/sourceforge/waters/valid"/>
+              todir="${build}/net/sourceforge/waters/external/valid"/>
         <copy todir="${build}/net/sourceforge/waters/model/marshaller">
             <fileset dir="${waters.xsd}" includes="*.xsd"/>
         </copy>

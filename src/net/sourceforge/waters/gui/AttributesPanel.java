@@ -54,7 +54,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
-import net.sourceforge.waters.despot.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.HISCAttributes;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.Proxy;

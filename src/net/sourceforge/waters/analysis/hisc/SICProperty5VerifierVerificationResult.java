@@ -1,4 +1,4 @@
-package net.sourceforge.waters.despot;
+package net.sourceforge.waters.analysis.hisc;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;

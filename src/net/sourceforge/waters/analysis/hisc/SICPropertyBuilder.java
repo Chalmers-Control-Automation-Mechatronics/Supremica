@@ -8,7 +8,7 @@
 //###########################################################################
 
 
-package net.sourceforge.waters.despot;
+package net.sourceforge.waters.analysis.hisc;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +29,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
-import net.sourceforge.waters.despot.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.HISCAttributes;
 
 
 /**

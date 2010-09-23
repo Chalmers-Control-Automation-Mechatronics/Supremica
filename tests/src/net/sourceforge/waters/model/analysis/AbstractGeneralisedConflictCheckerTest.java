@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.despot.HISCAttributes;
-import net.sourceforge.waters.despot.SICPropertyBuilder;
+import net.sourceforge.waters.analysis.hisc.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.SICPropertyBuilder;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;

@@ -28,7 +28,8 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.despot.DESpotImporter;
+import net.sourceforge.waters.external.despot.DESpotImporter;
+import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.gui.observer.ContainerSwitchEvent;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -56,7 +57,6 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.samples.maze.MazeCompiler;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.valid.ValidUnmarshaller;
 
 import org.supremica.automata.Project;
 import org.supremica.automata.IO.ADSUnmarshaller;

@@ -149,7 +149,7 @@
 
   <target name="waters-jar" depends="waters-compile">
     <copy file="${xsl}/vw.xsl"
-          todir="${waters.classes}/net/sourceforge/waters/valid"/>
+          todir="${waters.classes}/net/sourceforge/waters/external/valid"/>
     <copy todir="${waters.classes}/net/sourceforge/waters/model/marshaller">
       <fileset dir="${xsd}" includes="*.xsd"/>
     </copy>
@@ -173,7 +173,7 @@
 
   <target name="jar552" depends="waters-compile">
     <copy file="${xsl}/vw.xsl"
-          todir="${waters.classes}/net/sourceforge/waters/valid"/>
+          todir="${waters.classes}/net/sourceforge/waters/external/valid"/>
     <copy todir="${waters.classes}/net/sourceforge/waters/model/marshaller">
       <fileset dir="${xsd}" includes="*.xsd"/>
     </copy>
@@ -589,7 +589,7 @@
         <exclude name="net/sourceforge/waters/model/analysis/**"/>
         <exclude name="net/sourceforge/waters/model/compiler/old/OldModuleCompiler.java"/>
         <include name="net/sourceforge/waters/plain/**"/>
-        <include name="net/sourceforge/waters/valid/**"/>
+        <include name="net/sourceforge/waters/external/valid/**"/>
       </fileset>
     </copy>
     <javadoc destdir="${javadoc552}" windowtitle="Waters API">

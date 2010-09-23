@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.despot;
+package net.sourceforge.waters.external.despot;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,6 +19,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sourceforge.waters.external.despot.DESpotImporter;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;

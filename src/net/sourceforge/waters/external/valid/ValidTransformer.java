@@ -7,7 +7,7 @@
 //###########################################################################
 
 
-package net.sourceforge.waters.valid;
+package net.sourceforge.waters.external.valid;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,8 +42,8 @@ class ValidTransformer
 
     // Create an XSL transformer
     final ClassLoader loader = currentThread().getContextClassLoader();
-    final InputStream stream =
-      loader.getResourceAsStream("net/sourceforge/waters/valid/vw.xsl");
+    final InputStream stream = loader.getResourceAsStream
+      ("net/sourceforge/waters/external/valid/vw.xsl");
     final Source xslsource = new StreamSource(stream);
     final TransformerFactory factory = TransformerFactory.newInstance();
     factory.setURIResolver(this);

@@ -1,4 +1,4 @@
-package net.sourceforge.waters.despot;
+package net.sourceforge.waters.external.despot;
 
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -22,6 +22,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sourceforge.waters.analysis.hisc.HISCAttributes;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;

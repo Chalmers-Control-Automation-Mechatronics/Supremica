@@ -2,24 +2,25 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.despot
-//# CLASS:   CompositionalSICProperty6VerifierTest
+//# CLASS:   NativeSICProperty6VerifierTest
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.despot;
+package net.sourceforge.waters.analysis.hisc;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.gnonblocking.CompositionalGeneralisedConflictChecker;
+import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
+import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class CompositionalSICProperty6VerifierTest
-  extends AbstractSICProperty6VerifierTest
+public class NativeSICProperty6VerifierTest extends
+    AbstractSICProperty6VerifierTest
 {
 
   //#########################################################################
@@ -27,7 +28,7 @@ public class CompositionalSICProperty6VerifierTest
   public static Test suite()
   {
     final TestSuite suite =
-      new TestSuite(CompositionalSICProperty6VerifierTest.class);
+      new TestSuite(NativeSICProperty6VerifierTest.class);
     return suite;
   }
 
@@ -43,8 +44,7 @@ public class CompositionalSICProperty6VerifierTest
   protected ModelVerifier createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final ConflictChecker checker =
-        new CompositionalGeneralisedConflictChecker(factory);
+    final ConflictChecker checker = new NativeConflictChecker(factory);
     return new SICProperty6Verifier(checker, factory);
   }
 

@@ -8,7 +8,7 @@
 //###########################################################################
 
 
-package net.sourceforge.waters.valid;
+package net.sourceforge.waters.external.valid;
 
 import java.io.BufferedReader;
 import java.io.IOException;

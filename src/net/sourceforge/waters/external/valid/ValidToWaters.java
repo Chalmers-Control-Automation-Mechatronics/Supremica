@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.valid;
+package net.sourceforge.waters.external.valid;
 
 
 import java.io.File;

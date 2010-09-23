@@ -2,16 +2,17 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.despot
-//# CLASS:   MonolithicSICProperty5VerifierTest
+//# CLASS:   MonolithicSICProperty6VerifierTest
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.despot;
+package net.sourceforge.waters.analysis.hisc;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
@@ -19,8 +20,8 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class MonolithicSICProperty5VerifierTest extends
-    AbstractSICProperty5VerifierTest
+public class MonolithicSICProperty6VerifierTest extends
+    AbstractSICProperty6VerifierTest
 {
 
   //#########################################################################
@@ -28,7 +29,7 @@ public class MonolithicSICProperty5VerifierTest extends
   public static Test suite()
   {
     final TestSuite suite =
-      new TestSuite(MonolithicSICProperty5VerifierTest.class);
+      new TestSuite(MonolithicSICProperty6VerifierTest.class);
     return suite;
   }
 
@@ -45,27 +46,27 @@ public class MonolithicSICProperty5VerifierTest extends
                                               final ProductDESProxyFactory factory)
   {
     final ConflictChecker checker = new MonolithicConflictChecker(factory);
-    return new SICProperty5Verifier(checker, factory);
+    return new SICProperty6Verifier(checker, factory);
   }
 
 
   //#########################################################################
   //# Test Cases
-  public void testSICProperty5Verifier_rhone_subsystem1_ld()
+  public void testSICProperty6Verifier_rhone_subsystem1_ld()
     throws Exception
   {
     try {
-      super.testSICProperty5Verifier_rhone_subsystem1_ld();
+      super.testSICProperty6Verifier_rhone_subsystem1_ld();
     } catch (final OverflowException exception) {
       // MonolithicConflictChecker fails because of state encoding size :-(
     }
   }
 
-  public void testSICProperty5Verifier_rhone_subsystem1_ld_failsic5()
+  public void testSICProperty6Verifier_rhone_subsystem1_ld_failsic5()
     throws Exception
   {
     try {
-      super.testSICProperty5Verifier_rhone_subsystem1_ld_failsic5();
+      super.testSICProperty6Verifier_rhone_subsystem1_ld_failsic5();
     } catch (final OverflowException exception) {
       // MonolithicConflictChecker fails because of state encoding size :-(
     }

@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.despot.SICProperty5Verifier;
+import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;

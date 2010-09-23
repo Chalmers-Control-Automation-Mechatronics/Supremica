@@ -7,13 +7,14 @@
 //# $Id: DESpotImporterTest.java 5044 2009-12-30 20:14:13Z robi $
 //###########################################################################
 
-package net.sourceforge.waters.despot;
+package net.sourceforge.waters.analysis.hisc;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 
+import net.sourceforge.waters.analysis.hisc.SICPropertyBuilder;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;

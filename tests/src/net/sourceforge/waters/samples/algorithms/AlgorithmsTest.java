@@ -33,8 +33,8 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.valid.ValidUnmarshaller;
 
+import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 
 import org.xml.sax.SAXException;

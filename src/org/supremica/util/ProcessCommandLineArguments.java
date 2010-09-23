@@ -70,6 +70,7 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.xml.bind.JAXBException;
 
+import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
@@ -102,7 +103,6 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.valid.ValidUnmarshaller;
 
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
