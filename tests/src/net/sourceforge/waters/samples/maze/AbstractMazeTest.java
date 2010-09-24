@@ -39,8 +39,6 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
 
-import org.xml.sax.SAXException;
-
 
 public abstract class AbstractMazeTest extends AbstractWatersTest
 {
@@ -486,9 +484,11 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
+  @Override
   protected void setUp()
-    throws JAXBException, SAXException
+    throws Exception
   {
+    super.setUp();
     mInputDirectory = new File(getWatersInputRoot(), "maze");
     mOutputDirectory = getOutputDirectory();
     final ModuleProxyFactory moduleFactory =
@@ -509,7 +509,9 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     ensureDirectoryExists(mOutputDirectory);
   }
 
+  @Override
   protected void tearDown()
+    throws Exception
   {
     mInputDirectory = null;
     mOutputDirectory = null;
@@ -518,6 +520,7 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     mProductDESMarshaller = null;
     mMazeCompiler = null;
     mDocumentManager = null;
+    super.tearDown();
   }
 
 
