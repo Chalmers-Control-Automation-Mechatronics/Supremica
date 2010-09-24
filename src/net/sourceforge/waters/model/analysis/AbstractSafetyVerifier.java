@@ -1,18 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.cpp.analysis
-//# CLASS:   NativeSafetyVerifier
+//# PACKAGE: net.sourceforge.waters.model.analysis
+//# CLASS:   AbstractConflictChecker
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.cpp.analysis;
+package net.sourceforge.waters.model.analysis;
 
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -22,27 +18,45 @@ import net.sourceforge.waters.model.des.StateProxy;
 
 
 /**
+ * An abstract base class that can be used for all safety verifier
+ * implementations. In addition to the model and factory members inherited
+ * from {@link AbstractModelVerifier}, this class provides some support for
+ * counterexample generation.
+ *
  * @author Robi Malik
  */
 
-public class NativeSafetyVerifier
-  extends NativeModelVerifier
+public abstract class AbstractSafetyVerifier
+  extends AbstractModelVerifier
   implements SafetyVerifier
 {
 
   //#########################################################################
   //# Constructors
-  public NativeSafetyVerifier(final KindTranslator translator,
-                              final SafetyDiagnostics diag,
-                              final ProductDESProxyFactory factory)
+  /**
+   * Creates a new safety verifier.
+   * @param  translator  The kind translator is used to remap component and
+   *                     event kinds.
+   * @param  factory     The factory used for trace construction.
+   */
+  public AbstractSafetyVerifier(final KindTranslator translator,
+                                final SafetyDiagnostics diag,
+                                final ProductDESProxyFactory factory)
   {
     this(null, translator, diag, factory);
   }
 
-  public NativeSafetyVerifier(final ProductDESProxy model,
-                              final KindTranslator translator,
-                              final SafetyDiagnostics diag,
-                              final ProductDESProxyFactory factory)
+  /**
+   * Creates a new safety verifier to check a particular model.
+   * @param  model       The model to be checked by this verifier.
+   * @param  translator  The kind translator is used to remap component and
+   *                     event kinds.
+   * @param  factory     The factory used for trace construction.
+   */
+  public AbstractSafetyVerifier(final ProductDESProxy model,
+                                final KindTranslator translator,
+                                final SafetyDiagnostics diag,
+                                final ProductDESProxyFactory factory)
   {
     super(model, factory, translator);
     mDiagnostics = diag;
@@ -56,6 +70,7 @@ public class NativeSafetyVerifier
     return mDiagnostics;
   }
 
+  @Override
   public SafetyTraceProxy getCounterExample()
   {
     return (SafetyTraceProxy) super.getCounterExample();
@@ -63,17 +78,11 @@ public class NativeSafetyVerifier
 
 
   //#########################################################################
-  //# Native Methods
-  native VerificationResult runNativeAlgorithm();
-
-
-  //#########################################################################
   //# Auxiliary Methods
   /**
    * Gets a name that can be used for a counterexample for the current model.
    */
-  @Override
-  public String getTraceName()
+  protected String getTraceName()
   {
     final ProductDESProxy des = getModel();
     if (mDiagnostics == null) {
@@ -98,9 +107,9 @@ public class NativeSafetyVerifier
    * @return An English string that describes why the safety property is
    *         violated, which can be used as a trace comment.
    */
-  public String getTraceComment(final EventProxy event,
-                                final AutomatonProxy aut,
-                                final StateProxy state)
+  protected String getTraceComment(final EventProxy event,
+                                   final AutomatonProxy aut,
+                                   final StateProxy state)
   {
     if (mDiagnostics == null) {
       return null;

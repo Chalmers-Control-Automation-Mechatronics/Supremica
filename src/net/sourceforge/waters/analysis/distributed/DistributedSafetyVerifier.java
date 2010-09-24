@@ -14,9 +14,10 @@ import java.util.UUID;
 import net.sourceforge.waters.analysis.distributed.application.JobResult;
 import net.sourceforge.waters.analysis.distributed.application.Server;
 import net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerificationJob;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.SerializableKindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -32,21 +33,23 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
  * @author Sam Douglas
  */
 public class DistributedSafetyVerifier
-  extends AbstractModelVerifier
+  extends AbstractSafetyVerifier
   implements SafetyVerifier
 {
   public DistributedSafetyVerifier(final KindTranslator translator,
+                                   final SafetyDiagnostics diag,
                                    final ProductDESProxyFactory factory)
   {
-    this(null, translator, factory);
+    this(null, translator, diag, factory);
   }
 
 
   public DistributedSafetyVerifier(final ProductDESProxy model,
                                    final KindTranslator translator,
+                                   final SafetyDiagnostics diag,
                                    final ProductDESProxyFactory factory)
   {
-    super(model, factory, translator);
+    super(model, translator, diag, factory);
   }
 
   public boolean run() throws AnalysisException

@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -41,7 +42,9 @@ public class ProjectingLanguageInclusionChecker
      final SafetyVerifier checker,
      final SafetyProjectionBuilder projector)
   {
-    super(model, LanguageInclusionKindTranslator.getInstance(),
+    super(model,
+          LanguageInclusionKindTranslator.getInstance(),
+          LanguageInclusionDiagnostics.getInstance(),
           factory, checker, projector);
   }
 
@@ -61,7 +64,9 @@ public class ProjectingLanguageInclusionChecker
      final SafetyProjectionBuilder projector,
      final int projsize)
   {
-    super(model, LanguageInclusionKindTranslator.getInstance(),
+    super(model,
+          LanguageInclusionKindTranslator.getInstance(),
+          LanguageInclusionDiagnostics.getInstance(),
           factory, checker, projector, projsize);
   }
 

@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.ControllabilityDiagnostics;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -39,7 +40,9 @@ public class ProjectingControllabilityChecker
                                           final SafetyVerifier checker,
                                           final SafetyProjectionBuilder projector)
   {
-    super(model, ControllabilityKindTranslator.getInstance(),
+    super(model,
+          ControllabilityKindTranslator.getInstance(),
+          ControllabilityDiagnostics.getInstance(),
           factory, checker, projector);
   }
 
@@ -57,7 +60,9 @@ public class ProjectingControllabilityChecker
                                           final SafetyProjectionBuilder projector,
                                           final int projsize)
   {
-    super(model, ControllabilityKindTranslator.getInstance(),
+    super(model,
+          ControllabilityKindTranslator.getInstance(),
+          ControllabilityDiagnostics.getInstance(),
           factory, checker, projector, projsize);
   }
 

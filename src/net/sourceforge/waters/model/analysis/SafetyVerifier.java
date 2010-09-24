@@ -26,6 +26,18 @@ public interface SafetyVerifier extends ModelVerifier
 {
 
   //#########################################################################
+  //# Diagnostics
+  /**
+   * Gets the diagnostics generator for the property being checked.
+   * This is used to generate standardised comments for safety
+   * counterexamples for all verifiers implementing a particular type of
+   * check, e.g. controllability.
+   * @see SafetyDiagnostics
+   */
+  public SafetyDiagnostics getDiagnostics();
+
+
+  //#########################################################################
   //# More Specific Access to the Results
   public SafetyTraceProxy getCounterExample();
 

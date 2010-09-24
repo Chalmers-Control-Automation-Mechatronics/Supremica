@@ -17,8 +17,10 @@ import java.util.List;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -46,7 +48,10 @@ public class ComposingLanguageInclusionChecker
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory)
   {
-    super(model, LanguageInclusionKindTranslator.getInstance(), factory);
+    super(model,
+          LanguageInclusionKindTranslator.getInstance(),
+          LanguageInclusionDiagnostics.getInstance(),
+          factory);
   }
 
 
@@ -63,8 +68,9 @@ public class ComposingLanguageInclusionChecker
     final ProductDESProxyFactory factory = getFactory();
     final ConvertModelLang converter =
       new ConvertModelLang(model, translator1, factory);
+    final SafetyDiagnostics diag = getDiagnostics();
     final ComposingSafetyVerifier verifier =
-      new ComposingSafetyVerifier(translator0, factory);
+      new ComposingSafetyVerifier(translator0, diag, factory);
     verifier.setNodeLimit(getNodeLimit());
     verifier.setProjectionNodeLimit(getProjectionNodeLimit());
     verifier.setHeuristic(getHeuristic());

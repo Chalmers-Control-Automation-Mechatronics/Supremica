@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.bdd;
 
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -36,7 +37,10 @@ public class BDDLanguageInclusionChecker
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory)
   {
-    super(model, LanguageInclusionKindTranslator.getInstance(), factory);
+    super(model,
+          LanguageInclusionKindTranslator.getInstance(),
+          LanguageInclusionDiagnostics.getInstance(),
+          factory);
   }
 
 }

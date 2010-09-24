@@ -27,6 +27,7 @@ import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -59,9 +60,10 @@ public class BDDSafetyVerifier
    * @param  factory     The factory used for trace construction.
    */
   public BDDSafetyVerifier(final KindTranslator translator,
+                           final SafetyDiagnostics diag,
                            final ProductDESProxyFactory factory)
   {
-    this(null, translator, factory);
+    this(null, translator, diag, factory);
   }
 
   /**
@@ -72,10 +74,11 @@ public class BDDSafetyVerifier
    * @param  bddpackage  The name of the BDD packe to be used.
    */
   public BDDSafetyVerifier(final KindTranslator translator,
+                           final SafetyDiagnostics diag,
                            final ProductDESProxyFactory desfactory,
                            final String bddpackage)
   {
-    this(null, translator, desfactory, bddpackage);
+    this(null, translator, diag, desfactory, bddpackage);
   }
 
   /**
@@ -87,9 +90,10 @@ public class BDDSafetyVerifier
    */
   public BDDSafetyVerifier(final ProductDESProxy model,
                            final KindTranslator translator,
+                           final SafetyDiagnostics diag,
                            final ProductDESProxyFactory factory)
   {
-    this(model, translator, factory, BDD_PACKAGE);
+    this(model, translator, diag, factory, BDD_PACKAGE);
   }
 
   /**
@@ -102,10 +106,12 @@ public class BDDSafetyVerifier
    */
   public BDDSafetyVerifier(final ProductDESProxy model,
                            final KindTranslator translator,
+                           final SafetyDiagnostics diag,
                            final ProductDESProxyFactory desfactory,
                            final String bddpackage)
   {
     super(model, desfactory, translator);
+    mDiagnostics = diag;
     mBDDPackage = bddpackage;
     mIsReorderingEnabled =
       bddpackage.equals("buddy") || bddpackage.equals("cudd");
@@ -147,13 +153,23 @@ public class BDDSafetyVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
+  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
+  @Override
   public void setKindTranslator(final KindTranslator translator)
   {
     super.setKindTranslator(translator);
     clearAnalysisResult();
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
+  public SafetyDiagnostics getDiagnostics()
+  {
+    return mDiagnostics;
+  }
+
+  @Override
   public SafetyTraceProxy getCounterExample()
   {
     return (SafetyTraceProxy) super.getCounterExample();
@@ -489,6 +505,7 @@ public class BDDSafetyVerifier
 
   //#########################################################################
   //# Data Members
+  private final SafetyDiagnostics mDiagnostics;
   private String mBDDPackage;
   private final boolean mIsReorderingEnabled;
 

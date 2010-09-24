@@ -22,9 +22,10 @@ import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.bdd.BDDSafetyVerifier;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -48,23 +49,25 @@ import org.supremica.log.LoggerFactory;
 
 
 public class ComposingSafetyVerifier
-  extends AbstractModelVerifier
+  extends AbstractSafetyVerifier
   implements SafetyVerifier {
 
   //#########################################################################
   //# Constructors
   public ComposingSafetyVerifier(final KindTranslator translator,
+                                 final SafetyDiagnostics diag,
                                  final ProductDESProxyFactory factory)
   {
-    this(null, translator, factory);
+    this(null, translator, diag, factory);
   }
 
   public ComposingSafetyVerifier(final ProductDESProxy model,
                                  final KindTranslator translator,
+                                 final SafetyDiagnostics diag,
                                  final ProductDESProxyFactory factory)
   {
     // TODO KindTranslator is not used?
-    super(model, factory, translator);
+    super(model, translator, diag, factory);
     setNodeLimit(10000000);
     setProjectionNodeLimit(3000);
   }
@@ -72,10 +75,6 @@ public class ComposingSafetyVerifier
 
   //#########################################################################
   //# Simple Access
-  public SafetyTraceProxy getCounterExample() {
-    return (SafetyTraceProxy)super.getCounterExample();
-  }
-
   public int getProjectionNodeLimit()
   {
     if (getNodeLimit() < mProjectionNodeLimit) {
@@ -154,12 +153,12 @@ public class ComposingSafetyVerifier
       }
     }*/
 
+    final ProductDESProxyFactory factory = getFactory();
+    final KindTranslator translator = getConvertedKindTranslator();
+    final SafetyDiagnostics diag = getDiagnostics();
     final SafetyVerifier checker =
-      //new ModularLanguageInclusionChecker(des,getFactory(),
-          //new ModularControllabilityChecker(des,getFactory(),new NativeControllabilityChecker(getFactory()),false));
-      //new ModularControllabilityChecker(des,getFactory(),new NativeControllabilityChecker(getFactory()),false);
-      //new NativeSafetyVerifier(des, getConvertedKindTranslator(),getFactory());
-      new BDDSafetyVerifier(des, getConvertedKindTranslator(), getFactory());
+      //new NativeSafetyVerifier(des, translator, diag, factory);
+      new BDDSafetyVerifier(des, translator, diag, factory);
     checker.setNodeLimit(getNodeLimit());
     final boolean result = checker.run();
     //mStates = (int)checker.getAnalysisResult().getTotalNumberOfStates();

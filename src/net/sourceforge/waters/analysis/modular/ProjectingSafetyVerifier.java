@@ -30,6 +30,7 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -67,21 +68,23 @@ public class ProjectingSafetyVerifier
   //# Constructors
   public ProjectingSafetyVerifier(final ProductDESProxy model,
                                   final KindTranslator translator,
+                                  final SafetyDiagnostics diag,
                                   final ProductDESProxyFactory factory,
                                   final SafetyVerifier checker,
                                   final SafetyProjectionBuilder projector)
   {
-    this(model, translator, factory, checker, projector, 16000);
+    this(model, translator, diag, factory, checker, projector, 16000);
   }
 
   public ProjectingSafetyVerifier(final ProductDESProxy model,
                                   final KindTranslator translator,
+                                  final SafetyDiagnostics diag,
                                   final ProductDESProxyFactory factory,
                                   final SafetyVerifier checker,
                                   final SafetyProjectionBuilder projector,
                                   final int projsize)
   {
-    super(model, translator, factory);
+    super(model, translator, diag, factory);
     setHeuristicMethod(ModularHeuristicFactory.Method.MaxCommonEvents);
     setHeuristicPreference
       (ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);

@@ -9,12 +9,12 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 
 /**
@@ -28,7 +28,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
  */
 
 abstract class AbstractModularSafetyVerifier
-  extends AbstractModelVerifier
+  extends AbstractSafetyVerifier
   implements SafetyVerifier
 {
 
@@ -37,14 +37,15 @@ abstract class AbstractModularSafetyVerifier
   public AbstractModularSafetyVerifier(final ProductDESProxy model,
                                        final ProductDESProxyFactory factory)
   {
-    this(model, null, factory);
+    this(model, null, null, factory);
   }
 
   public AbstractModularSafetyVerifier(final ProductDESProxy model,
                                        final KindTranslator translator,
+                                       final SafetyDiagnostics diag,
                                        final ProductDESProxyFactory factory)
   {
-    super(model, factory, translator);
+    super(model, translator, diag, factory);
     mHeuristicMethod = ModularHeuristicFactory.Method.RelMaxCommonEvents;
     mHeuristicPreference = ModularHeuristicFactory.Preference.NOPREF;
   }
@@ -78,11 +79,6 @@ abstract class AbstractModularSafetyVerifier
     final ModularHeuristicFactory factory =
       ModularHeuristicFactory.getInstance();
     return factory.getHeuristic(mHeuristicMethod, mHeuristicPreference);
-  }
-
-  public SafetyTraceProxy getCounterExample()
-  {
-    return (SafetyTraceProxy) super.getCounterExample();
   }
 
 

@@ -1,6 +1,7 @@
 package net.sourceforge.waters.analysis.distributed;
 
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.ControllabilityDiagnostics;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -20,8 +21,11 @@ public class DistributedControllabilityChecker
   }
 
   public DistributedControllabilityChecker(final ProductDESProxy model,
-					   final ProductDESProxyFactory factory)
+                                           final ProductDESProxyFactory factory)
   {
-    super(model, ControllabilityKindTranslator.getInstance(), factory);
+    super(model,
+          ControllabilityKindTranslator.getInstance(),
+          ControllabilityDiagnostics.getInstance(),
+          factory);
   }
 }

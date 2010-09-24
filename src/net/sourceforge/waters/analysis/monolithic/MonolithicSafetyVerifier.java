@@ -20,10 +20,11 @@ import java.util.Set;
 import java.util.Arrays;
 
 import net.sourceforge.waters.model.analysis.AbortException;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -47,7 +48,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 public class MonolithicSafetyVerifier
-  extends AbstractModelVerifier
+  extends AbstractSafetyVerifier
   implements SafetyVerifier
 {
 
@@ -60,9 +61,10 @@ public class MonolithicSafetyVerifier
    * @param  factory     The factory used for trace construction.
    */
   public MonolithicSafetyVerifier(final KindTranslator translator,
+                                  final SafetyDiagnostics diag,
                                   final ProductDESProxyFactory factory)
   {
-    this(null, translator, factory);
+    this(null, translator, diag, factory);
   }
 
   /**
@@ -74,9 +76,10 @@ public class MonolithicSafetyVerifier
    */
   public MonolithicSafetyVerifier(final ProductDESProxy model,
                                   final KindTranslator translator,
+                                  final SafetyDiagnostics diag,
                                   final ProductDESProxyFactory factory)
   {
-    super(model, factory, translator);
+    super(model, translator, diag, factory);
   }
 
 
@@ -232,16 +235,11 @@ public class MonolithicSafetyVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
+  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
   public void setKindTranslator(final KindTranslator translator)
   {
     super.setKindTranslator(translator);
     clearAnalysisResult();
-  }
-
-  public SafetyTraceProxy getCounterExample()
-  {
-    return (SafetyTraceProxy) super.getCounterExample();
   }
 
 
@@ -462,8 +460,6 @@ public class MonolithicSafetyVerifier
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
-    final String desname = des.getName();
-    final String tracename = desname + "-uncontrollable";
     final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
 
     boolean enabled;
@@ -474,9 +470,6 @@ public class MonolithicSafetyVerifier
     final EventProxy event0 = mEventCodingList.get(mErrorEvent);
     final AutomatonProxy aut = mAutomata[mErrorAutomaton];
     final List<StateProxy> codes0 = new ArrayList<StateProxy>(aut.getStates());
-    final int code0 = mSystemState[mErrorAutomaton];
-    final StateProxy state0 = codes0.get(code0);
-    final String comment = createTraceComment(des, event0, aut, state0);
 
     final TraceStepProxy step0 = factory.createTraceStepProxy(event0);
     steps.add(0, step0);
@@ -545,20 +538,13 @@ public class MonolithicSafetyVerifier
     }
     final TraceStepProxy init = factory.createTraceStepProxy(null);
     steps.add(0, init);
+    final String tracename = getTraceName();
+    final int code0 = mSystemState[mErrorAutomaton];
+    final StateProxy state0 = codes0.get(code0);
+    final String comment = getTraceComment(event0, aut, state0);
     final SafetyTraceProxy trace = factory.createSafetyTraceProxy
       (tracename, comment, null, des, null, steps);
     return trace;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  String createTraceComment(final ProductDESProxy des,
-                            final EventProxy event,
-                            final AutomatonProxy aut,
-                            final StateProxy state)
-  {
-    return null;
   }
 
 

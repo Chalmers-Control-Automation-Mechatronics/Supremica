@@ -14,9 +14,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.ControllabilityDiagnostics;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -24,13 +25,12 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class OneUncontrollableChecker
-  extends AbstractModelVerifier
+  extends AbstractSafetyVerifier
   implements ControllabilityChecker
 {
 
@@ -40,18 +40,13 @@ public class OneUncontrollableChecker
                                   final ProductDESProxyFactory factory,
                                   final ControllabilityChecker checker)
   {
-    super(model, factory, ControllabilityKindTranslator.getInstance());
+    super(model,
+          ControllabilityKindTranslator.getInstance(),
+          ControllabilityDiagnostics.getInstance(),
+          factory);
     mChecker = checker;
     mStates = 0;
     setNodeLimit(5000000);
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
-  public SafetyTraceProxy getCounterExample()
-  {
-    return (SafetyTraceProxy)super.getCounterExample();
   }
 
 
