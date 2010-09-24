@@ -52,7 +52,7 @@ public class Projecting3LanguageInclusionCheckerTest
     projector.setOutputStream(true);
     final ProjectingLanguageInclusionChecker checker =
       new ProjectingLanguageInclusionChecker(factory, subchecker, projector);
-    //checker.setMaxProjStates(2000);
+    checker.setMaxProjStates(2000);
     return checker;
   }
 

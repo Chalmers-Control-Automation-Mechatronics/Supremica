@@ -131,6 +131,11 @@ public class OPSearchAutomatonSimplifierTest
     runOPVerifier("op_12.wmod", true);
   }
 
+  public void testOP13() throws Exception
+  {
+    runOPVerifier("op_13.wmod", true);
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
