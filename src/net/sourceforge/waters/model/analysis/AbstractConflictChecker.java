@@ -211,6 +211,14 @@ public abstract class AbstractConflictChecker
   protected String getTraceName()
   {
     final ProductDESProxy model = getModel();
+    return getTraceName(model);
+  }
+
+  /**
+   * Gets a name that can be used for a counterexample for the given model.
+   */
+  public static String getTraceName(final ProductDESProxy model)
+  {
     final String modelname = model.getName();
     return modelname + "-conflicting";
   }
