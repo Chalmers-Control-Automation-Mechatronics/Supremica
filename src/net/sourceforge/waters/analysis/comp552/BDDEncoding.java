@@ -49,15 +49,15 @@ import net.sourceforge.waters.xsd.base.EventKind;
  *
  * <P>This class mainly serves as a demonstration to show how to encode
  * automata using BDDs. It is kept simple and leaves a lot of room for
- * performance improvement. Things that can be improved include but are:</P>
- * <UL>
+ * performance improvement. Things that can be improved include are:</P>
+ * <OL>
  * <LI>Find a better variable ordering.</LI>
  * <LI>It is better to avoid computing monolithic transition relation as
  *     returned by {@link BDDEncoding#getTransitionRelationBDD()}, and use
  *     partitioned transition relations instead.</LI>
  * <LI>Disjunctive partitioning is better than conjunctive partitioning.</LI>
  * <LI>etc.</LI>
- * </UL>
+ * </OL>
  *
  * @author Robi Malik
  */
@@ -68,7 +68,9 @@ public class BDDEncoding
   //#########################################################################
   //# Constructor
   /**
-   * Creates a new BDD encoding.
+   * Creates a new BDD encoding. The constructor assigns codes to all events
+   * and automata states and allocates the necessary BDD variables in the
+   * given BDD factory.
    * @param  bddFactory   The BDD factory used to construct BDDs.
    * @param  model        The model for which BDDs are to be constructed.
    */
@@ -587,7 +589,8 @@ public class BDDEncoding
   /**
    * The number of bits used to encode the events. Since events appear
    * first in the variable ordering, this number also is the index of the
-   * first automaton variable.
+   * first automaton variable. Events are encoded using the variable indexes
+   * 0..mNumEventBits-1.
    */
   private final int mNumEventBits;
   /**
