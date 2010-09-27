@@ -26,6 +26,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
@@ -96,11 +97,13 @@ public class BDDEncoding
     mAutomata = new ArrayList<AutomatonEncoding>(numAutomata);
     int varIndex = mNumEventBits;
     for (final AutomatonProxy aut : automata) {
-      final AutomatonEncoding enc = new AutomatonEncoding(aut, varIndex);
-      mAutomata.add(enc);
-      final int numBits = enc.getNumberOfBits();
-      mNumAutomataBits += numBits;
-      varIndex += 2 * numBits;
+      if (aut.getKind() != ComponentKind.PROPERTY) {
+        final AutomatonEncoding enc = new AutomatonEncoding(aut, varIndex);
+        mAutomata.add(enc);
+        final int numBits = enc.getNumberOfBits();
+        mNumAutomataBits += numBits;
+        varIndex += 2 * numBits;
+      }
     }
     // Allocate BDD variables ...
     if (mBDDFactory.varNum() < varIndex) {

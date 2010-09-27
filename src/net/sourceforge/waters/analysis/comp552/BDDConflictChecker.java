@@ -114,8 +114,8 @@ public class BDDConflictChecker extends ModelChecker
       // should inform the factory that it can now be reclaimed.
       x0.free();
       x1.free();
-      and01.free();
       // It causes an exception if we use x0 or x1 again from now on.
+      and01.free();
 
       // Since such operations are used very often, there is a shorter
       // alternative. The andWith() (and similar methods) automatically
@@ -126,6 +126,7 @@ public class BDDConflictChecker extends ModelChecker
       // Now variable x2 contains the conjunction x2 && x3.
       // The old value of x2 and x3 have been freed and must not be accessed
       // again.
+      x2.free();
 
       // This all was no good at all as far as nonblocking of the input model
       // is concerned. Let us try something more serious ...
