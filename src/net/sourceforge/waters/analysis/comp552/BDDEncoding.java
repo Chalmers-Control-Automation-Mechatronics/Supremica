@@ -78,7 +78,7 @@ public class BDDEncoding
   public BDDEncoding(final BDDFactory bddFactory, final ProductDESProxy model)
   {
     mBDDFactory = bddFactory;
-
+    // Encode events ...
     final Collection<EventProxy> events = model.getEvents();
     int numEvents = events.size();
     mEventMap = new HashMap<EventProxy,Integer>(numEvents);
@@ -90,7 +90,7 @@ public class BDDEncoding
     }
     numEvents = index;
     mNumEventBits = AutomatonTools.log2(numEvents);
-
+    // Encode automata ...
     final Collection<AutomatonProxy> automata = model.getAutomata();
     final int numAutomata = automata.size();
     mAutomata = new ArrayList<AutomatonEncoding>(numAutomata);
@@ -102,7 +102,10 @@ public class BDDEncoding
       mNumAutomataBits += numBits;
       varIndex += 2 * numBits;
     }
-    mBDDFactory.setVarNum(varIndex);
+    // Allocate BDD variables ...
+    if (mBDDFactory.varNum() < varIndex) {
+      mBDDFactory.setVarNum(varIndex);
+    }
   }
 
 
