@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis
+//# PROJECT: COMP452/552-10B Assignment 3
+//# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   ModelChecker
 //###########################################################################
 //# $Id$
@@ -28,19 +28,19 @@ import net.sourceforge.waters.model.des.TraceProxy;
  * <P>To use a model checker, the user first creates an instance of a
  * subclass of this class, and sets up the model to be checked as well as
  * any other parameters that may be needed. Then model checking is started
- * using the {@link #run()} method. Afterwards results can be queried using
- * the {@link #getResult()} and {@link #getCounterExample()} methods. This
- * all can be done with the following code.</P>
+ * using the {@link #run()} method. Then, if the property was found not to be
+ * satisfied a counterexample can be retrieved using the {@link
+ * #getCounterExample()} method. This all can be done with the following
+ * code.</P>
  *
  * <P>
  * <CODE>{@link ProductDESProxyFactory} factory =
  *   {@link net.sourceforge.waters.plain.des.ProductDESElementFactory}.{@link
  *   net.sourceforge.waters.plain.des.ProductDESElementFactory#getInstance()
  *   getInstance}();</CODE><BR>
- * <CODE>ModelChecker checker = new ConflictChecker(des, factory);
+ * <CODE>ModelChecker checker = new {@link BDDConflictChecker}(des, factory);
  * //</CODE> <I>e.g.</I><BR>
- * <CODE>checker.{@link #run()};</CODE><BR>
- * <CODE>boolean result = checker.{@link #getResult()};</CODE><BR>
+ * <CODE>boolean result = checker.{@link #run()};</CODE><BR>
  * <CODE>if (result) {</CODE><BR>
  * <CODE>&nbsp;&nbsp;//</CODE> <I>property satisfied ...</I><BR>
  * <CODE>} else {</CODE><BR>
@@ -51,8 +51,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  *
  * <P>This class is to be subclassed to implement model checking
  * algorithms for various properties. Each subclass must implement
- * at least the methods {@link #run()}, {@link #getResult()},
- * and {@link #getCounterExample()}.</P>
+ * at least the methods {@link #run()} and {@link #getCounterExample()}.</P>
  *
  * @author Robi Malik
  */
@@ -81,13 +80,10 @@ public abstract class ModelChecker
    * Runs this model checker.
    * This method starts the model checking process on the model given
    * as parameter to the constructor of this object. On termination,
-   * the result of checking the property is known and can be queried
-   * using the {@link #getResult()} and {@link #getCounterExample()}
-   * methods.
+   * if the result is false, a counterexample can be queried
+   * using {@link #getCounterExample()} method.
    * @return <CODE>true</CODE> or <CODE>false</CODE> to indicate
    *         whether the property checked is satisfied or not.
-   *         The same value can be queried using the {@link #getResult()}
-   *         method.
    */
   public abstract boolean run();
 
@@ -113,16 +109,6 @@ public abstract class ModelChecker
   {
     return mFactory;
   }
-
-  /**
-   * Gets the result of model checking.
-   * @return <CODE>true</CODE> if the property checked is satisfied,
-   *         <CODE>false</CODE> otherwise.
-   * @throws IllegalStateException if this method is called before
-   *         model checking has completed, i.e., before {@link #run()}
-   *         has been called.
-   */
-  public abstract boolean getResult();
 
   /**
    * Gets a counterexample if model checking has found that the

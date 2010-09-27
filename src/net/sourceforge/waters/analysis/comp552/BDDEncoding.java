@@ -18,6 +18,7 @@ import java.util.Map;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
+import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
@@ -149,8 +150,8 @@ public class BDDEncoding
   }
 
   /**
-   * Computes a BDD representing the transition relation of this encoding's
-   * model.
+   * Computes a BDD representing the monolithic transition relation of this
+   * encoding's model.
    * @return A BDD over the current and next state variables of all automata
    *         in the model, which is true precisely when there is a transition
    *         between the current and next state in the synchronous composition
@@ -158,6 +159,7 @@ public class BDDEncoding
    */
   public BDD getTransitionRelationBDD()
   {
+    // First compose the transition relations of all automata, bottom-up ...
     final BDD trans = mBDDFactory.one();
     final int end = mAutomata.size();
     final ListIterator<AutomatonEncoding> iter = mAutomata.listIterator(end);
@@ -166,6 +168,9 @@ public class BDDEncoding
       final BDD autTrans = enc.getTransitionRelationBDD();
       trans.andWith(autTrans);
     }
+    // The resultant BDD includes the event variables and all state and next
+    // state variables. Most model checking algorithms only use the transition
+    // information, so we quantify out the event variables.
     final BDDVarSet eventVars = getEventVarSet();
     final BDD result = trans.exist(eventVars);
     trans.free();
@@ -194,8 +199,10 @@ public class BDDEncoding
    */
   public BDDVarSet getCurrentStateVarSet()
   {
+    // Most BDD packages represent variable sets as BDDs,
+    // so we also build them bottom-up.
     final int firstIndex = mNumEventBits;
-    final int lastIndex = firstIndex + 2 * (mNumAutomataBits = 1);
+    final int lastIndex = firstIndex + 2 * (mNumAutomataBits - 1);
     final BDDVarSet varset = mBDDFactory.emptySet();
     for (int varIndex = lastIndex; varIndex >= firstIndex; varIndex -= 2) {
       varset.unionWith(varIndex);
@@ -213,7 +220,7 @@ public class BDDEncoding
   public BDDVarSet getNextStateVarSet()
   {
     final int firstIndex = mNumEventBits + 1;
-    final int lastIndex = firstIndex + 2 * (mNumAutomataBits = 1);
+    final int lastIndex = firstIndex + 2 * (mNumAutomataBits - 1);
     final BDDVarSet varset = mBDDFactory.emptySet();
     for (int varIndex = lastIndex; varIndex >= firstIndex; varIndex -= 2) {
       varset.unionWith(varIndex);
@@ -236,6 +243,44 @@ public class BDDEncoding
     return varset;
   }
 
+  /**
+   * Computes a pairing that maps all current state variables of this
+   * encoding to their corresponding next state variables.
+   * BDD pairings can be used with the {@link BDD#replace(BDDPairing) replace()}
+   * or {@link BDD#replaceWith(BDDPairing) replaceWith()} methods to
+   * substitute variables in a BDD.
+   */
+  public BDDPairing getCurrentStateToNextStatePairing()
+  {
+    final int firstIndex = mNumEventBits;
+    final int lastIndex = firstIndex + 2 * (mNumAutomataBits - 1);
+    final BDDPairing pairing = mBDDFactory.makePair();
+    for (int varIndex = lastIndex; varIndex >= firstIndex; varIndex -= 2) {
+      final int nextVarIndex = varIndex + 1;
+      pairing.set(varIndex, nextVarIndex);
+    }
+    return pairing;
+  }
+
+  /**
+   * Computes a pairing that maps all next state variables of this
+   * encoding to their corresponding current state variables.
+   * BDD pairings can be used with the {@link BDD#replace(BDDPairing) replace()}
+   * or {@link BDD#replaceWith(BDDPairing) replaceWith()} methods to
+   * substitute variables in a BDD.
+   */
+  public BDDPairing getNextStateToCurrentStatePairing()
+  {
+    final int firstIndex = mNumEventBits;
+    final int lastIndex = firstIndex + 2 * (mNumAutomataBits - 1);
+    final BDDPairing pairing = mBDDFactory.makePair();
+    for (int varIndex = lastIndex; varIndex >= firstIndex; varIndex -= 2) {
+      final int nextVarIndex = varIndex + 1;
+      pairing.set(nextVarIndex, varIndex);
+    }
+    return pairing;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -245,7 +290,7 @@ public class BDDEncoding
    * @param  firstVarIndex The index of the first variable to be used for
    *                       encoding.
    * @param  numBits       The number of bits used to encode the given number.
-   * @param  interleave    The distance between to consecutive bits used to
+   * @param  interleave    The distance between two consecutive bits used to
    *                       encode the given number.
    * @return A BDD over the variables firstVarIndex, firstVarIndex+interleave,
    *         ..., firstVarIndex+(numBits-1)*interleave which is true precisely
@@ -278,7 +323,7 @@ public class BDDEncoding
    * @param  firstVarIndex The index of the first variable to be used for
    *                       encoding.
    * @param  numBits       The number of bits used to encode the given number.
-   * @param  interleave    The distance between to consecutive bits used to
+   * @param  interleave    The distance between two consecutive bits used to
    *                       encode the given number.
    * @param  bdd           A BDD to which the encoding is added.
    * @return A BDD representing the conjunction of the given BDD and the

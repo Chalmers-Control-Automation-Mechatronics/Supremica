@@ -1,7 +1,7 @@
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis
-//# CLASS:   ConflictChecker
+//# PROJECT: COMP452/552-10B Assignment 3
+//# PACKAGE: net.sourceforge.waters.analysis.comp552
+//# CLASS:   BDDConflictChecker
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,12 +12,12 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDFactory;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
@@ -34,7 +34,7 @@ import net.sourceforge.waters.xsd.des.ConflictKind;
  * @author Robi Malik
  */
 
-public class ConflictChecker extends ModelChecker
+public class BDDConflictChecker extends ModelChecker
 {
 
   //#########################################################################
@@ -45,8 +45,8 @@ public class ConflictChecker extends ModelChecker
    * @param  model      The model to be checked by this conflict checker.
    * @param  desFactory Factory used for trace construction.
    */
-  public ConflictChecker(final ProductDESProxy model,
-                         final ProductDESProxyFactory desFactory)
+  public BDDConflictChecker(final ProductDESProxy model,
+                            final ProductDESProxyFactory desFactory)
   {
     this(model, getDefaultMarkingProposition(model), desFactory);
   }
@@ -64,9 +64,9 @@ public class ConflictChecker extends ModelChecker
    *                    same object).
    * @param  desFactory Factory used for trace construction.
    */
-  public ConflictChecker(final ProductDESProxy model,
-                         final EventProxy marking,
-                         final ProductDESProxyFactory desFactory)
+  public BDDConflictChecker(final ProductDESProxy model,
+                            final EventProxy marking,
+                            final ProductDESProxyFactory desFactory)
   {
     super(model, desFactory);
     mMarking = marking;
@@ -88,42 +88,76 @@ public class ConflictChecker extends ModelChecker
    */
   public boolean run()
   {
-    // The following code determines and prints the number of marked
-    // states in the model (before synchronous composition).
-    // This is not very helpful for a conflict check, but it demonstrates
-    // the use of the interfaces.
+    // Let us try to open a BDD factory. The "java" BDD factory is much
+    // easier to debug than the faster "buddy" factory, but let us try
+    // "buddy" first to see whether the native library can be loaded.
+    // Another fast alternative is "cudd".
+    final BDDFactory bddFactory = BDDFactory.init("buddy", 10000, 5000);
 
-    int count = 0;
+    try {
 
-    // First get the model
-    final ProductDESProxy model = getModel();
+      // The following code demonstrates how to create some BDDs.
+      // It has nothing to do with conflict checking.
 
-    // For each automaton ...
-    for (final AutomatonProxy aut : model.getAutomata()) {
-      // Is the marking proposition in the alphabet?
-      final Collection<EventProxy> events = aut.getEvents();
-      if (events.contains(mMarking)) {
-        // Yes, this automaton has explicit markings.
-        // For each state ...
-        for (final StateProxy state : aut.getStates()) {
-          // Does the list of propositions contain the marking proposition?
-          final Collection<EventProxy> props = state.getPropositions();
-          if (props.contains(mMarking)) {
-            // Yes --- this is a marked state.
-            count++;
-          }
-        }
-      } else {
-        // Marking proposition not in alphabet: all states marked implicitly.
-        count += aut.getStates().size();
-      }
+      // Allocate five Boolean variables ...
+      bddFactory.setVarNum(5);
+
+      // Get the first and second variable ...
+      final BDD x0 = bddFactory.ithVar(0);
+      final BDD x1 = bddFactory.ithVar(1);
+
+      // Calculate their logical AND ...
+      final BDD and01 = x0.and(x1);
+
+      // The BDD factory has its own memory management and garbage
+      // collection. If we do not want to use a BDD any longer, we
+      // should inform the factory that it can now be reclaimed.
+      x0.free();
+      x1.free();
+      and01.free();
+      // It causes an exception if we use x0 or x1 again from now on.
+
+      // Since such operations are used very often, there is a shorter
+      // alternative. The andWith() (and similar methods) automatically
+      // consume the two input BDDs.
+      final BDD x2 = bddFactory.ithVar(2);
+      final BDD x3 = bddFactory.ithVar(3);
+      x2.andWith(x3);
+      // Now variable x2 contains the conjunction x2 && x3.
+      // The old value of x2 and x3 have been freed and must not be accessed
+      // again.
+
+      // This all was no good at all as far as nonblocking of the input model
+      // is concerned. Let us try something more serious ...
+
+      // First get the model.
+      final ProductDESProxy model = getModel();
+      // Create an encoding for the events and automata.
+      final BDDEncoding enc = new BDDEncoding(bddFactory, model);
+      // Get the initial states BDD ...
+      final BDD init = enc.getInitialStateBDD();
+      // ... and the marked states BDD.
+      final EventProxy marking = getConfiguredMarkingProposition();
+      final BDD marked = enc.getMarkedStateBDD(marking);
+      // What states are initial and not marked?
+      final BDD notMarked = marked.not();
+      marked.free();
+      final BDD initNotMarked = init.andWith(notMarked);
+      // Use this BDD for something (well, sort of) ...
+      initNotMarked.free();
+
+      // Still no real progress towards conflict checking.
+      // Let us just leave ...
+      return true;
+
+    } finally {
+
+      // Before we leave, we _must_ close the BDD factory, otherwise
+      // it cannot be used a second time. This is done in a finally
+      // block, to make sure it happens even in case of errors.
+      bddFactory.done();
+
     }
-    // Print the number of marked states that we have counted.
-    System.out.print(count + " ");
-
-    // This all was no good as far as conflict checking was concerned.
-    // Let us just leave.
-    return true;
   }
 
 
@@ -172,6 +206,22 @@ public class ConflictChecker extends ModelChecker
 
   //#########################################################################
   //# Auxiliary Methods
+  /**
+   * Gets the marking proposition configured for the current conflict check.
+   * This method checks if a marking proposition has been set by the user,
+   * and if so, returns it. Otherwise the model's default marking proposition
+   * is found and returned.
+   */
+  private EventProxy getConfiguredMarkingProposition()
+  {
+    if (mMarking == null) {
+      final ProductDESProxy model = getModel();
+      return getDefaultMarkingProposition(model);
+    } else {
+      return mMarking;
+    }
+  }
+
   /**
    * Searches the given model for a proposition event with the default
    * marking name and returns this event.
