@@ -340,7 +340,7 @@ public class BDDEncoding
   {
     // Construct BDD bottom-up, starting with the highest variable index
     // and the least significant bit of the encoding ...
-    int varIndex = firstVarIndex + numBits;
+    int varIndex = firstVarIndex + numBits * interleave;
     int mask = 1;
     while (varIndex > firstVarIndex) {
       varIndex -= interleave;
